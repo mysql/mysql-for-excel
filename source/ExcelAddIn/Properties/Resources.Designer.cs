@@ -585,5 +585,14 @@ namespace MySQL.ExcelAddIn.Properties {
                 return ResourceManager.GetString("UnableToLoadDatabases", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to retrieve data from &apos;{0}&apos;..
+        /// </summary>
+        internal static string UnableToRetrieveData {
+            get {
+                return ResourceManager.GetString("UnableToRetrieveData", resourceCulture);
+            }
+        }
     }
 }

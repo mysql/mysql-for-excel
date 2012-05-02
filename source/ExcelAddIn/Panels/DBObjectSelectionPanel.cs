@@ -7,24 +7,22 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using MySQL.Utility;
+using MySQL.ExcelAddIn.Properties;
 
 namespace MySQL.ExcelAddIn
 {
   public partial class DBObjectSelectionPanel : UserControl
   {
     private MySqlWorkbenchConnection connection;
-    private string schema;
 
-    private DBObject selectedDBObject;
-    public MySQLSchemaInfo SchemaInfo { set; private get; }
+    //private DBObject selectedDBObject;
+    //public MySQLSchemaInfo SchemaInfo { set; private get; }
     
     public bool ExportDataActionEnabled
     {
       set { exportToNewTable.Enabled = value; }
       get { return exportToNewTable.Enabled; }
     }
-    //public delegate bool DBObjectSelectionPanelLeavingHandler(object sender, DBObjectSelectionPanelLeavingArgs args);
-    //public event DBObjectSelectionPanelLeavingHandler DBObjectSelectionPanelLeaving;
 
     public DBObjectSelectionPanel()
     {
@@ -32,10 +30,9 @@ namespace MySQL.ExcelAddIn
       Utilities.SetDoubleBuffered(lisDBObjects);
     }
 
-    public void SetConnectionAndSchema(MySqlWorkbenchConnection connection, string schema)
+    public void SetConnection(MySqlWorkbenchConnection connection)
     {
       this.connection = connection;
-      this.schema = schema;
       lblConnectionName.Text = connection.Name;
       lblUserIP.Text = String.Format("User: {0}, IP: {1}", connection.UserName, connection.Host);
       PopulateList();
@@ -52,7 +49,7 @@ namespace MySQL.ExcelAddIn
     private void LoadTables()
     {
       int counter = 0;
-      DataTable tables = Utilities.GetSchemaCollection(connection, "Tables", null, schema);
+      DataTable tables = Utilities.GetSchemaCollection(connection, "Tables", null, connection.Schema);
 
       foreach (DataRow tableRow in tables.Rows)
       {
@@ -61,6 +58,7 @@ namespace MySQL.ExcelAddIn
         ListViewItem lvi = new ListViewItem(tileItems, 0, lisDBObjects.Groups["grpTables"]);
         lvi.Name = tableName;
         lvi.Font = new Font("Arial", 8, FontStyle.Regular);
+        lvi.Tag = new DBObject(tableName, DBObjectType.Table);
         lisDBObjects.Items.Add(lvi);
         counter++;
       }
@@ -70,7 +68,7 @@ namespace MySQL.ExcelAddIn
     private void LoadViews()
     {
       int counter = 0;
-      DataTable views = Utilities.GetSchemaCollection(connection, "Views", null, schema);
+      DataTable views = Utilities.GetSchemaCollection(connection, "Views", null, connection.Schema);
       if (views == null) return;
       foreach (DataRow viewRow in views.Rows)
       {
@@ -79,6 +77,7 @@ namespace MySQL.ExcelAddIn
         ListViewItem lvi = new ListViewItem(tileItems, 1, lisDBObjects.Groups["grpViews"]);
         lvi.Name = viewName;
         lvi.Font = new Font("Arial", 8, FontStyle.Regular);
+        lvi.Tag = new DBObject(viewName, DBObjectType.View);
         lisDBObjects.Items.Add(lvi);
         counter++;
       }
@@ -88,7 +87,7 @@ namespace MySQL.ExcelAddIn
     private void LoadRoutines()
     {
       int counter = 0;
-      DataTable procs = Utilities.GetSchemaCollection(connection, "Procedures", null, schema);
+      DataTable procs = Utilities.GetSchemaCollection(connection, "Procedures", null, connection.Schema);
       if (procs == null) return;
 
       foreach (DataRow routineRow in procs.Rows)
@@ -100,35 +99,10 @@ namespace MySQL.ExcelAddIn
         ListViewItem lvi = new ListViewItem(tileItems, 1, lisDBObjects.Groups["grpRoutines"]);
         lvi.Name = routineName;
         lvi.Font = new Font("Arial", 8, FontStyle.Regular);
+        lvi.Tag = new DBObject(routineName, DBObjectType.Routine);
         lisDBObjects.Items.Add(lvi);
       }
       lisDBObjects.Groups["grpRoutines"].Header = String.Format("Routines ({0})", counter);
-    }
-
-    private bool importDataToExcel()
-    {
-      //bool success = false;
-
-      //if (selectedDBObject != null)
-      //{
-      //  switch (selectedDBObject.Type)
-      //  {
-      //    case DBObjectType.Table:
-      //      MessageBox.Show("Importing Data From Table...");
-      //      DataTable data = SchemaInfo.GetTableData(selectedDBObject.Name, null, String.Empty);
-      //      success = OnDBObjectSelectionPanelLeaving(new DBObjectSelectionPanelLeavingArgs(DBObjectSelectionPanelLeavingAction.Import, data));
-      //      break;
-      //    case DBObjectType.View:
-      //      MessageBox.Show("Importing Data From View...");
-      //      break;
-      //    case DBObjectType.Routine:
-      //      MessageBox.Show("Importing Data From Routine...");
-      //      break;
-      //  }
-      //}
-
-      //return success;
-      return true;
     }
 
     private bool exportDataToTable(string appendToTableName)
@@ -145,59 +119,31 @@ namespace MySQL.ExcelAddIn
       return true;
     }
 
-    //protected virtual bool OnDBObjectSelectionPanelLeaving(DBObjectSelectionPanelLeavingArgs args)
-    //{
-    //  bool success = false;
-    //  if (DBObjectSelectionPanelLeaving != null)
-    //    success = DBObjectSelectionPanelLeaving(this, args);
-    //  lisDBObjects.SelectedItems.Clear();
-    //  return success;
-    //}
-
     private void lisDBObjects_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
     {
       if (lisDBObjects.SelectedItems.Count > 0 && !e.Item.Equals(lisDBObjects.SelectedItems[0]))
         return;
-
-      if (e.IsSelected)
-      {
-        selectedDBObject = new DBObject();
-        selectedDBObject.Name = e.Item.Name;
-        switch (e.Item.Group.Name)
-        {
-          case "grpTables":
-            selectedDBObject.Type = DBObjectType.Table;
-            break;
-          case "grpViews":
-            selectedDBObject.Type = DBObjectType.View;
-            break;
-          case "grpRoutines":
-            selectedDBObject.Type = DBObjectType.Routine;
-            break;
-        }
-      }
-      else
-        selectedDBObject = null;
+      DBObject o = e.Item.Tag as DBObject;
 
       importData.Enabled = e.IsSelected;
       editData.Enabled = e.IsSelected;
-      appendData.Enabled = e.IsSelected && (selectedDBObject.Type == DBObjectType.Table);
+      appendData.Enabled = e.IsSelected && o.Type == DBObjectType.Table; 
     }
-
-    //private void DBObjectSelectionPanel_VisibleChanged(object sender, EventArgs e)
-    //{
-    //  //if (this.Visible)
-    //  //{
-    //  //  resetDBObjectSelectionPanel();
-    //  //  infImportData.PictureEnabled = false;
-    //  //  infEditData.PictureEnabled = false;
-    //  //  infAppendData.PictureEnabled = false;
-    //  //}
-    //}
 
     private void importData_Click(object sender, EventArgs e)
     {
-      importDataToExcel();
+      if (lisDBObjects.SelectedItems.Count != 1) return;
+
+      DBObject dbo = lisDBObjects.SelectedItems[0].Tag as DBObject;
+      DataTable dt = Utilities.GetDataFromDbObject(connection, dbo);
+      if (dt == null)
+      {
+        string msg = String.Format(Resources.UnableToRetrieveData, dbo.Name);
+        MessageBox.Show(msg, Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        return;
+      }
+
+      (Parent as TaskPaneControl).ImportDataToExcel(dt);
     }
 
     private void editData_Click(object sender, EventArgs e)
@@ -225,85 +171,12 @@ namespace MySQL.ExcelAddIn
     private void btnBack_Click(object sender, EventArgs e)
     {
       (Parent as TaskPaneControl).CloseSchema();
-//      OnDBObjectSelectionPanelLeaving(new DBObjectSelectionPanelLeavingArgs(DBObjectSelectionPanelLeavingAction.Back));
     }
 
     private void btnClose_Click(object sender, EventArgs e)
     {
       (Parent as TaskPaneControl).CloseConnection();
-//      OnDBObjectSelectionPanelLeaving(new DBObjectSelectionPanelLeavingArgs(DBObjectSelectionPanelLeavingAction.Close));
     }
-
-    private void dbObjectsContextMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-    {
-      if (selectedDBObject == null)
-        return;
-      switch(e.ClickedItem.Name)
-      {
-        case "importDataToolStripMenuItem":
-          importDataToExcel();
-          break;
-        case "editDataToolStripMenuItem":
-          break;
-        case "appendDataToolStripMenuItem":
-          exportDataToTable(e.ClickedItem.Name);
-          break;
-      }
-    }
-
-    private void dbObjectsContextMenu_Opening(object sender, CancelEventArgs e)
-    {
-      if (selectedDBObject == null)
-      {
-        e.Cancel = true;
-        return;
-      }
-      dbObjectsContextMenu.Items["appendDataToolStripMenuItem"].Visible = selectedDBObject.Type == DBObjectType.Table;
-    }
-
   }
-
-  //public enum DBObjectSelectionPanelLeavingAction { Back, Close, Import, Edit, Append, Export };
-
-  //public class DBObjectSelectionPanelLeavingArgs : EventArgs
-  //{
-  //  private DBObjectSelectionPanelLeavingAction selectedAction;
-  //  private DataTable dataForExcel;
-  //  private string appendToTable;
-
-  //  public DBObjectSelectionPanelLeavingAction SelectedAction
-  //  {
-  //    get { return selectedAction; }
-  //  }
-  //  public DataTable DataForExcel
-  //  {
-  //    get { return dataForExcel; }
-  //  }
-  //  public string AppendToTable
-  //  {
-  //    get { return appendToTable; }
-  //  }
-
-  //  public DBObjectSelectionPanelLeavingArgs(DBObjectSelectionPanelLeavingAction selAction, DataTable data)
-  //  {
-  //    selectedAction = selAction;
-  //    dataForExcel = data;
-  //    appendToTable = String.Empty;
-  //  }
-
-  //  public DBObjectSelectionPanelLeavingArgs(DBObjectSelectionPanelLeavingAction selAction, string appendToTableName)
-  //  {
-  //    selectedAction = selAction;
-  //    dataForExcel = null;
-  //    appendToTable = appendToTableName;
-  //  }
-
-  //  public DBObjectSelectionPanelLeavingArgs(DBObjectSelectionPanelLeavingAction selAction)
-  //  {
-  //    selectedAction = selAction;
-  //    dataForExcel = null;
-  //    appendToTable = String.Empty;
-  //  }
-  //}
 
 }

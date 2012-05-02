@@ -139,8 +139,8 @@
             this.appendDataToolStripMenuItem});
       this.dbObjectsContextMenu.Name = "dbObjectsContextMenu";
       this.dbObjectsContextMenu.Size = new System.Drawing.Size(219, 70);
-      this.dbObjectsContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.dbObjectsContextMenu_Opening);
-      this.dbObjectsContextMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.dbObjectsContextMenu_ItemClicked);
+      //this.dbObjectsContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.dbObjectsContextMenu_Opening);
+      //this.dbObjectsContextMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.dbObjectsContextMenu_ItemClicked);
       // 
       // importDataToolStripMenuItem
       // 
@@ -243,6 +243,7 @@
       this.appendData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.appendData.Description = "Add data to an existing MySQL Table";
       this.appendData.DescriptionFont = new System.Drawing.Font("Arial", 8.25F);
+      this.appendData.Enabled = false;
       this.appendData.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.appendData.HotTracking = true;
       this.appendData.Image = global::MySQL.ExcelAddIn.Properties.Resources.export_excel_existing_table_32x32;
@@ -260,6 +261,7 @@
       this.editData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.editData.Description = "Open a new sheet to edit object\'s data";
       this.editData.DescriptionFont = new System.Drawing.Font("Arial", 8.25F);
+      this.editData.Enabled = false;
       this.editData.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.editData.HotTracking = true;
       this.editData.Image = global::MySQL.ExcelAddIn.Properties.Resources.edit_data_32x32;
@@ -277,6 +279,7 @@
       this.importData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.importData.Description = "Add object\'s data at a given range of cells";
       this.importData.DescriptionFont = new System.Drawing.Font("Arial", 8.25F);
+      this.importData.Enabled = false;
       this.importData.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.importData.HotTracking = true;
       this.importData.Image = global::MySQL.ExcelAddIn.Properties.Resources.import_data_32x32;

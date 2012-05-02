@@ -129,8 +129,6 @@
             this.selectDatabaseSchemaToolStripMenuItem});
       this.schemasContextMenu.Name = "schemasContextMenu";
       this.schemasContextMenu.Size = new System.Drawing.Size(202, 26);
-      this.schemasContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.schemasContextMenu_Opening);
-      this.schemasContextMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.schemasContextMenu_ItemClicked);
       // 
       // selectDatabaseSchemaToolStripMenuItem
       // 

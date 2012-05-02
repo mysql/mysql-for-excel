@@ -58,17 +58,6 @@ namespace MySQL.ExcelAddIn
       btnNext_Click(this, EventArgs.Empty);
     }
 
-    private void schemasContextMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-    {
-      btnNext_Click(this, EventArgs.Empty);
-    }
-
-    private void schemasContextMenu_Opening(object sender, CancelEventArgs e)
-    {
-      if (lisDatabases.SelectedItems.Count == 0)
-        e.Cancel = true;
-    }
-
     private void LoadSchemas()
     {
       DataTable databases = Utilities.GetSchemaCollection(connection, "Databases", null);

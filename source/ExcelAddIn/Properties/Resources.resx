@@ -334,4 +334,7 @@
   <data name="UnableToLoadDatabases" xml:space="preserve">
     <value>Unable to load databases for the given connection.</value>
   </data>
+  <data name="UnableToRetrieveData" xml:space="preserve">
+    <value>Unable to retrieve data from '{0}'.</value>
+  </data>
 </root>

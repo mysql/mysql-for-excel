@@ -20,6 +20,7 @@ namespace MySQL.ExcelAddIn
       cs.Server = connection.Host;
       cs.UserID = connection.UserName;
       cs.Password = connection.Password;
+      cs.Database = connection.Schema;
       //TODO:  use additional necessary options
       return cs.ConnectionString;
     }
@@ -41,6 +42,18 @@ namespace MySQL.ExcelAddIn
         System.Diagnostics.Debug.WriteLine(ex.Message);
         return null;
       }
+    }
+
+    public static DataTable GetDataFromDbObject(MySqlWorkbenchConnection connection, DBObject dbo)
+    {
+      string sql = String.Format("SELECT * FROM `{0}`", dbo.Name);
+
+      if (dbo.Type == DBObjectType.Routine)
+        sql = String.Format("CALL `{0}`", dbo.Name);
+
+      DataSet ds = MySqlHelper.ExecuteDataset(GetConnectionString(connection), sql);
+      if (ds.Tables.Count == 0) return null;
+      return ds.Tables[0];
     }
 
     public static void SetDoubleBuffered(System.Windows.Forms.Control c)

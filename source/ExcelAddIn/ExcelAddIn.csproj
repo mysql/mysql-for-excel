@@ -177,6 +177,10 @@
     <Reference Include="MySql.Data">
       <HintPath>libraries\MySql.Data.dll</HintPath>
     </Reference>
+    <Reference Include="MySQL.Utility, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>libraries\MySQL.Utility.dll</HintPath>
+    </Reference>
     <Reference Include="Office, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
@@ -530,12 +534,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\new_connection_48x48.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\MySQL.Utility\MySQL.Utility.csproj">
-      <Project>{B8A3BD3B-3CBD-48D5-84F5-076365655E0B}</Project>
-      <Name>MySQL.Utility</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\ExcelAddinFilter.png" />

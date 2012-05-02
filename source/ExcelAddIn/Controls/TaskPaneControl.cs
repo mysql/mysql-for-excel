@@ -63,7 +63,8 @@ namespace MySQL.ExcelAddIn
 
     public void OpenSchema(string schema)
     {
-      dbObjectSelectionPanel1.SetConnectionAndSchema(connection, schema);
+      connection.Schema = schema;
+      dbObjectSelectionPanel1.SetConnection(connection);
       dbObjectSelectionPanel1.BringToFront();
     }
 
@@ -102,9 +103,8 @@ namespace MySQL.ExcelAddIn
     //  return success;
     //}
 
-    private bool importDataToExcel(DataTable dt)
+    public void ImportDataToExcel(DataTable dt)
     {
-      bool success = false;
       if (dt != null && dt.Rows.Count > 0)
       {
         int rowsCount = dt.Rows.Count;
@@ -123,8 +123,9 @@ namespace MySQL.ExcelAddIn
         }
         fillingRange.set_Value(Type.Missing, fillingArray);
       }
-      return success;
     }
+
+
 
     private bool appendDataToTable()
     {
@@ -139,7 +140,7 @@ namespace MySQL.ExcelAddIn
 
     public void CloseAddIn()
     {
-//      Globals.ThisAddIn.TaskPane.Visible = false;
+      //      Globals.ThisAddIn.TaskPane.Visible = false;
       welcomePanel1.Visible = true;
       schemaSelectionPanel1.Visible = false;
       dbObjectSelectionPanel1.Visible = false;
