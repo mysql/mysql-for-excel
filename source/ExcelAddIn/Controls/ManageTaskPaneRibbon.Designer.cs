@@ -43,21 +43,21 @@
       // tab1
       // 
       this.tab1.ControlId.ControlIdType = Microsoft.Office.Tools.Ribbon.RibbonControlIdType.Office;
+      this.tab1.ControlId.OfficeId = "TabData";
       this.tab1.Groups.Add(this.grpMySQLExcelAddIn);
-      this.tab1.Label = "TabAddIns";
+      this.tab1.Label = "TabData";
       this.tab1.Name = "tab1";
       // 
       // grpMySQLExcelAddIn
       // 
       this.grpMySQLExcelAddIn.Items.Add(this.togShowTaskPane);
-      this.grpMySQLExcelAddIn.Label = "MySQL Excel Add-In";
       this.grpMySQLExcelAddIn.Name = "grpMySQLExcelAddIn";
       // 
       // togShowTaskPane
       // 
       this.togShowTaskPane.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
       this.togShowTaskPane.Image = global::MySQL.ExcelAddIn.Properties.Resources.MainLogo;
-      this.togShowTaskPane.Label = "Show Task Pane";
+      this.togShowTaskPane.Label = "MySQL For Excel";
       this.togShowTaskPane.Name = "togShowTaskPane";
       this.togShowTaskPane.ShowImage = true;
       this.togShowTaskPane.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.togShowTaskPane_Click);

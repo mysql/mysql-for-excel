@@ -47,14 +47,14 @@
       this.smallImages = new System.Windows.Forms.ImageList(this.components);
       this.btnClose = new System.Windows.Forms.Button();
       this.btnBack = new System.Windows.Forms.Button();
-      this.infSelectDBObject = new MySQL.ExcelAddIn.Controls.InfolLabel();
-      this.infExportDataNewTable = new MySQL.ExcelAddIn.Controls.InfolLabel();
       this.shapeContainer1 = new Microsoft.VisualBasic.PowerPacks.ShapeContainer();
       this.linSeparator = new Microsoft.VisualBasic.PowerPacks.LineShape();
       this.btnHelp = new System.Windows.Forms.Button();
-      this.infImportData = new MySQL.ExcelAddIn.Controls.InfolLabel();
-      this.infEditData = new MySQL.ExcelAddIn.Controls.InfolLabel();
-      this.infAppendData = new MySQL.ExcelAddIn.Controls.InfolLabel();
+      this.appendData = new MySQL.ExcelAddIn.Controls.HotLabel();
+      this.editData = new MySQL.ExcelAddIn.Controls.HotLabel();
+      this.importData = new MySQL.ExcelAddIn.Controls.HotLabel();
+      this.hotLabel2 = new MySQL.ExcelAddIn.Controls.HotLabel();
+      this.exportToNewTable = new MySQL.ExcelAddIn.Controls.HotLabel();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
       this.dbObjectsContextMenu.SuspendLayout();
       this.SuspendLayout();
@@ -63,7 +63,7 @@
       // 
       this.lblConnectionName.AutoSize = true;
       this.lblConnectionName.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblConnectionName.Location = new System.Drawing.Point(84, 27);
+      this.lblConnectionName.Location = new System.Drawing.Point(98, 31);
       this.lblConnectionName.Name = "lblConnectionName";
       this.lblConnectionName.Size = new System.Drawing.Size(121, 16);
       this.lblConnectionName.TabIndex = 1;
@@ -73,7 +73,7 @@
       // 
       this.lblUserIP.AutoSize = true;
       this.lblUserIP.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblUserIP.Location = new System.Drawing.Point(84, 53);
+      this.lblUserIP.Location = new System.Drawing.Point(100, 51);
       this.lblUserIP.Name = "lblUserIP";
       this.lblUserIP.Size = new System.Drawing.Size(91, 15);
       this.lblUserIP.TabIndex = 2;
@@ -82,15 +82,18 @@
       // picAddInLogo
       // 
       this.picAddInLogo.Image = global::MySQL.ExcelAddIn.Properties.Resources.MainLogo;
-      this.picAddInLogo.Location = new System.Drawing.Point(14, 12);
+      this.picAddInLogo.Location = new System.Drawing.Point(16, 14);
       this.picAddInLogo.Name = "picAddInLogo";
-      this.picAddInLogo.Size = new System.Drawing.Size(64, 64);
+      this.picAddInLogo.Size = new System.Drawing.Size(75, 74);
       this.picAddInLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
       this.picAddInLogo.TabIndex = 13;
       this.picAddInLogo.TabStop = false;
       // 
       // lisDBObjects
       // 
+      this.lisDBObjects.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.lisDBObjects.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colDBObjectName,
             this.colDBObjectInfo});
@@ -109,10 +112,10 @@
             listViewGroup3});
       this.lisDBObjects.HideSelection = false;
       this.lisDBObjects.LargeImageList = this.largeImages;
-      this.lisDBObjects.Location = new System.Drawing.Point(14, 185);
+      this.lisDBObjects.Location = new System.Drawing.Point(16, 214);
       this.lisDBObjects.MultiSelect = false;
       this.lisDBObjects.Name = "lisDBObjects";
-      this.lisDBObjects.Size = new System.Drawing.Size(256, 300);
+      this.lisDBObjects.Size = new System.Drawing.Size(298, 262);
       this.lisDBObjects.SmallImageList = this.smallImages;
       this.lisDBObjects.Sorting = System.Windows.Forms.SortOrder.Ascending;
       this.lisDBObjects.TabIndex = 5;
@@ -180,10 +183,11 @@
       // 
       // btnClose
       // 
+      this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnClose.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnClose.Location = new System.Drawing.Point(195, 624);
+      this.btnClose.Location = new System.Drawing.Point(229, 651);
       this.btnClose.Name = "btnClose";
-      this.btnClose.Size = new System.Drawing.Size(75, 23);
+      this.btnClose.Size = new System.Drawing.Size(87, 27);
       this.btnClose.TabIndex = 11;
       this.btnClose.Text = "Close";
       this.btnClose.UseVisualStyleBackColor = true;
@@ -191,43 +195,15 @@
       // 
       // btnBack
       // 
+      this.btnBack.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnBack.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnBack.Location = new System.Drawing.Point(114, 624);
+      this.btnBack.Location = new System.Drawing.Point(136, 651);
       this.btnBack.Name = "btnBack";
-      this.btnBack.Size = new System.Drawing.Size(75, 23);
+      this.btnBack.Size = new System.Drawing.Size(87, 27);
       this.btnBack.TabIndex = 10;
       this.btnBack.Text = "< Back";
       this.btnBack.UseVisualStyleBackColor = true;
       this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
-      // 
-      // infSelectDBObject
-      // 
-      this.infSelectDBObject.Image = global::MySQL.ExcelAddIn.Properties.Resources.db_Objects_32x32;
-      this.infSelectDBObject.ImageSize = MySQL.ExcelAddIn.Controls.InfolLabel.PictureSize.W32H32;
-      this.infSelectDBObject.InfoText1 = "Then click on an action item below";
-      this.infSelectDBObject.InfoText2 = "";
-      this.infSelectDBObject.Location = new System.Drawing.Point(14, 141);
-      this.infSelectDBObject.MainText = "Select a Database Object";
-      this.infSelectDBObject.Name = "infSelectDBObject";
-      this.infSelectDBObject.PictureAsButton = true;
-      this.infSelectDBObject.PictureEnabled = true;
-      this.infSelectDBObject.Size = new System.Drawing.Size(256, 38);
-      this.infSelectDBObject.TabIndex = 4;
-      // 
-      // infExportDataNewTable
-      // 
-      this.infExportDataNewTable.Image = global::MySQL.ExcelAddIn.Properties.Resources.export_excel_new_table_32x32;
-      this.infExportDataNewTable.ImageSize = MySQL.ExcelAddIn.Controls.InfolLabel.PictureSize.W32H32;
-      this.infExportDataNewTable.InfoText1 = "Create a new table and fill it with data";
-      this.infExportDataNewTable.InfoText2 = "";
-      this.infExportDataNewTable.Location = new System.Drawing.Point(14, 82);
-      this.infExportDataNewTable.MainText = "Export Excel Data to New Table";
-      this.infExportDataNewTable.Name = "infExportDataNewTable";
-      this.infExportDataNewTable.PictureAsButton = true;
-      this.infExportDataNewTable.PictureEnabled = true;
-      this.infExportDataNewTable.Size = new System.Drawing.Size(256, 38);
-      this.infExportDataNewTable.TabIndex = 3;
-      this.infExportDataNewTable.PictureClick += new System.EventHandler(this.infExportDataNewTable_PictureClick);
       // 
       // shapeContainer1
       // 
@@ -236,7 +212,7 @@
       this.shapeContainer1.Name = "shapeContainer1";
       this.shapeContainer1.Shapes.AddRange(new Microsoft.VisualBasic.PowerPacks.Shape[] {
             this.linSeparator});
-      this.shapeContainer1.Size = new System.Drawing.Size(287, 650);
+      this.shapeContainer1.Size = new System.Drawing.Size(335, 697);
       this.shapeContainer1.TabIndex = 0;
       this.shapeContainer1.TabStop = false;
       // 
@@ -245,77 +221,115 @@
       this.linSeparator.BorderColor = System.Drawing.SystemColors.ControlDark;
       this.linSeparator.BorderWidth = 2;
       this.linSeparator.Name = "linSeparator";
-      this.linSeparator.X1 = 15;
-      this.linSeparator.X2 = 270;
-      this.linSeparator.Y1 = 131;
-      this.linSeparator.Y2 = 131;
+      this.linSeparator.X1 = 16;
+      this.linSeparator.X2 = 271;
+      this.linSeparator.Y1 = 150;
+      this.linSeparator.Y2 = 150;
       // 
       // btnHelp
       // 
+      this.btnHelp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.btnHelp.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnHelp.Location = new System.Drawing.Point(14, 624);
+      this.btnHelp.Location = new System.Drawing.Point(17, 651);
       this.btnHelp.Name = "btnHelp";
-      this.btnHelp.Size = new System.Drawing.Size(75, 23);
+      this.btnHelp.Size = new System.Drawing.Size(87, 27);
       this.btnHelp.TabIndex = 9;
       this.btnHelp.Text = "Help";
       this.btnHelp.UseVisualStyleBackColor = true;
       this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
       // 
-      // infImportData
+      // appendData
       // 
-      this.infImportData.Image = global::MySQL.ExcelAddIn.Properties.Resources.import_data_32x32;
-      this.infImportData.ImageSize = MySQL.ExcelAddIn.Controls.InfolLabel.PictureSize.W32H32;
-      this.infImportData.InfoText1 = "Add object\'s data at a given range of cells";
-      this.infImportData.InfoText2 = "";
-      this.infImportData.Location = new System.Drawing.Point(14, 491);
-      this.infImportData.MainText = "Import MySQL Data";
-      this.infImportData.Name = "infImportData";
-      this.infImportData.PictureAsButton = true;
-      this.infImportData.PictureEnabled = true;
-      this.infImportData.Size = new System.Drawing.Size(256, 38);
-      this.infImportData.TabIndex = 6;
-      this.infImportData.PictureClick += new System.EventHandler(this.infImportData_PictureClick);
+      this.appendData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.appendData.Description = "Add data to an existing MySQL Table";
+      this.appendData.DescriptionFont = new System.Drawing.Font("Arial", 8.25F);
+      this.appendData.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.appendData.HotTracking = true;
+      this.appendData.Image = global::MySQL.ExcelAddIn.Properties.Resources.export_excel_existing_table_32x32;
+      this.appendData.ImageSize = new System.Drawing.Size(32, 32);
+      this.appendData.Location = new System.Drawing.Point(17, 587);
+      this.appendData.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.appendData.Name = "appendData";
+      this.appendData.Size = new System.Drawing.Size(258, 44);
+      this.appendData.TabIndex = 18;
+      this.appendData.Title = "Append Excel Data to Table";
+      this.appendData.Click += new System.EventHandler(this.appendData_Click);
       // 
-      // infEditData
+      // editData
       // 
-      this.infEditData.Image = global::MySQL.ExcelAddIn.Properties.Resources.edit_data_32x32;
-      this.infEditData.ImageSize = MySQL.ExcelAddIn.Controls.InfolLabel.PictureSize.W32H32;
-      this.infEditData.InfoText1 = "Open a new sheet to edit object\'s data";
-      this.infEditData.InfoText2 = "";
-      this.infEditData.Location = new System.Drawing.Point(14, 535);
-      this.infEditData.MainText = "Edit MySQL Data";
-      this.infEditData.Name = "infEditData";
-      this.infEditData.PictureAsButton = true;
-      this.infEditData.PictureEnabled = true;
-      this.infEditData.Size = new System.Drawing.Size(256, 38);
-      this.infEditData.TabIndex = 7;
-      this.infEditData.PictureClick += new System.EventHandler(this.infEditData_PictureClick);
+      this.editData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.editData.Description = "Open a new sheet to edit object\'s data";
+      this.editData.DescriptionFont = new System.Drawing.Font("Arial", 8.25F);
+      this.editData.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.editData.HotTracking = true;
+      this.editData.Image = global::MySQL.ExcelAddIn.Properties.Resources.edit_data_32x32;
+      this.editData.ImageSize = new System.Drawing.Size(32, 32);
+      this.editData.Location = new System.Drawing.Point(17, 535);
+      this.editData.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.editData.Name = "editData";
+      this.editData.Size = new System.Drawing.Size(258, 44);
+      this.editData.TabIndex = 17;
+      this.editData.Title = "Edit MySQL Data";
+      this.editData.Click += new System.EventHandler(this.editData_Click);
       // 
-      // infAppendData
+      // importData
       // 
-      this.infAppendData.Image = global::MySQL.ExcelAddIn.Properties.Resources.export_excel_existing_table_32x32;
-      this.infAppendData.ImageSize = MySQL.ExcelAddIn.Controls.InfolLabel.PictureSize.W32H32;
-      this.infAppendData.InfoText1 = "Add data to an existing MySQL Table";
-      this.infAppendData.InfoText2 = "";
-      this.infAppendData.Location = new System.Drawing.Point(15, 579);
-      this.infAppendData.MainText = "Append Excel Data to Table";
-      this.infAppendData.Name = "infAppendData";
-      this.infAppendData.PictureAsButton = true;
-      this.infAppendData.PictureEnabled = true;
-      this.infAppendData.Size = new System.Drawing.Size(256, 38);
-      this.infAppendData.TabIndex = 8;
-      this.infAppendData.PictureClick += new System.EventHandler(this.infAppendData_PictureClick);
+      this.importData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.importData.Description = "Add object\'s data at a given range of cells";
+      this.importData.DescriptionFont = new System.Drawing.Font("Arial", 8.25F);
+      this.importData.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.importData.HotTracking = true;
+      this.importData.Image = global::MySQL.ExcelAddIn.Properties.Resources.import_data_32x32;
+      this.importData.ImageSize = new System.Drawing.Size(32, 32);
+      this.importData.Location = new System.Drawing.Point(17, 483);
+      this.importData.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.importData.Name = "importData";
+      this.importData.Size = new System.Drawing.Size(258, 44);
+      this.importData.TabIndex = 16;
+      this.importData.Title = "Import MySQL Data";
+      this.importData.Click += new System.EventHandler(this.importData_Click);
+      // 
+      // hotLabel2
+      // 
+      this.hotLabel2.Description = "Then click on an action item below";
+      this.hotLabel2.DescriptionFont = new System.Drawing.Font("Arial", 8.25F);
+      this.hotLabel2.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.hotLabel2.HotTracking = false;
+      this.hotLabel2.Image = global::MySQL.ExcelAddIn.Properties.Resources.db_Objects_32x32;
+      this.hotLabel2.ImageSize = new System.Drawing.Size(32, 32);
+      this.hotLabel2.Location = new System.Drawing.Point(16, 163);
+      this.hotLabel2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.hotLabel2.Name = "hotLabel2";
+      this.hotLabel2.Size = new System.Drawing.Size(258, 44);
+      this.hotLabel2.TabIndex = 15;
+      this.hotLabel2.Title = "Select a Database Object";
+      // 
+      // exportToNewTable
+      // 
+      this.exportToNewTable.Description = "Create a new table and fill it with data";
+      this.exportToNewTable.DescriptionFont = new System.Drawing.Font("Arial", 8.25F);
+      this.exportToNewTable.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.exportToNewTable.HotTracking = true;
+      this.exportToNewTable.Image = global::MySQL.ExcelAddIn.Properties.Resources.export_excel_new_table_32x32;
+      this.exportToNewTable.ImageSize = new System.Drawing.Size(32, 32);
+      this.exportToNewTable.Location = new System.Drawing.Point(17, 98);
+      this.exportToNewTable.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.exportToNewTable.Name = "exportToNewTable";
+      this.exportToNewTable.Size = new System.Drawing.Size(258, 44);
+      this.exportToNewTable.TabIndex = 14;
+      this.exportToNewTable.Title = "Export Excel Data to New Table";
+      this.exportToNewTable.Click += new System.EventHandler(this.exportToNewTable_Click);
       // 
       // DBObjectSelectionPanel
       // 
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.Controls.Add(this.infAppendData);
-      this.Controls.Add(this.infEditData);
-      this.Controls.Add(this.infImportData);
+      this.Controls.Add(this.appendData);
+      this.Controls.Add(this.editData);
+      this.Controls.Add(this.importData);
+      this.Controls.Add(this.hotLabel2);
+      this.Controls.Add(this.exportToNewTable);
       this.Controls.Add(this.btnHelp);
-      this.Controls.Add(this.infExportDataNewTable);
-      this.Controls.Add(this.infSelectDBObject);
       this.Controls.Add(this.btnClose);
       this.Controls.Add(this.btnBack);
       this.Controls.Add(this.lisDBObjects);
@@ -323,9 +337,9 @@
       this.Controls.Add(this.lblUserIP);
       this.Controls.Add(this.picAddInLogo);
       this.Controls.Add(this.shapeContainer1);
+      this.Font = new System.Drawing.Font("Arial", 9F);
       this.Name = "DBObjectSelectionPanel";
-      this.Size = new System.Drawing.Size(287, 650);
-      this.VisibleChanged += new System.EventHandler(this.DBObjectSelectionPanel_VisibleChanged);
+      this.Size = new System.Drawing.Size(335, 697);
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
       this.dbObjectsContextMenu.ResumeLayout(false);
       this.ResumeLayout(false);
@@ -345,17 +359,17 @@
     private System.Windows.Forms.ImageList largeImages;
     private System.Windows.Forms.ColumnHeader colDBObjectName;
     private System.Windows.Forms.ColumnHeader colDBObjectInfo;
-    private Controls.InfolLabel infSelectDBObject;
-    private Controls.InfolLabel infExportDataNewTable;
     private Microsoft.VisualBasic.PowerPacks.ShapeContainer shapeContainer1;
     private Microsoft.VisualBasic.PowerPacks.LineShape linSeparator;
     public System.Windows.Forms.Button btnHelp;
-    private Controls.InfolLabel infImportData;
-    private Controls.InfolLabel infEditData;
-    private Controls.InfolLabel infAppendData;
     private System.Windows.Forms.ContextMenuStrip dbObjectsContextMenu;
     private System.Windows.Forms.ToolStripMenuItem importDataToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem editDataToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem appendDataToolStripMenuItem;
+    private Controls.HotLabel exportToNewTable;
+    private Controls.HotLabel hotLabel2;
+    private Controls.HotLabel importData;
+    private Controls.HotLabel editData;
+    private Controls.HotLabel appendData;
   }
 }

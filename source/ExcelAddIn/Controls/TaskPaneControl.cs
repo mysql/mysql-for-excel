@@ -8,14 +8,15 @@ using System.Text;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using Excel = Microsoft.Office.Interop.Excel;
+using MySQL.Utility;
 
 namespace MySQL.ExcelAddIn
 {
   public partial class TaskPaneControl : UserControl
   {
-    private PasswordForm pwdForm;
     private Excel.Application excelApplication;
-    private MySQLSchemaInfo schemaInfo;
+    private MySqlWorkbenchConnection connection;
+    //private MySQLSchemaInfo schemaInfo;
 
     public Excel.Worksheet ActiveWorksheet
     {
@@ -27,18 +28,6 @@ namespace MySQL.ExcelAddIn
       excelApplication = app;
       excelApplication.SheetSelectionChange += new Excel.AppEvents_SheetSelectionChangeEventHandler(excelApplication_SheetSelectionChange);
       InitializeComponent();
-      schemaInfo = new MySQLSchemaInfo();
-
-      schemaSelectionPanel1.SchemaInfo = schemaInfo;
-      dbObjectSelectionPanel1.SchemaInfo = schemaInfo;
-
-      welcomePanel1.Visible = true;
-      schemaSelectionPanel1.Visible = false;
-      dbObjectSelectionPanel1.Visible = false;
-
-      welcomePanel1.WelcomePanelLeaving += welcomePanel1_WelcomePanelLeaving;
-      schemaSelectionPanel1.SchemaSelectionPanelLeaving += schemaSelectionPanel1_SchemaSelectionPanelLeaving;
-      dbObjectSelectionPanel1.DBObjectSelectionPanelLeaving += dbObjectSelectionPanel1_DBObjectSelectionPanelLeaving;
     }
 
     void excelApplication_SheetSelectionChange(object Sh, Excel.Range Target)
@@ -50,78 +39,68 @@ namespace MySQL.ExcelAddIn
       dbObjectSelectionPanel1.ExportDataActionEnabled = !emptyRange;
     }
 
-    void welcomePanel1_WelcomePanelLeaving(object sender, WelcomePanelLeavingArgs args)
+    public void OpenConnection(MySqlWorkbenchConnection connection)
     {
-      if (args.SelectedConnectionData == null)
-        return;
-
-      if (args.SelectedConnectionData.Password == null)
+      this.connection = connection;
+      if (connection.Password == null)
       {
-        if (pwdForm == null)
-          pwdForm = new PasswordForm();
-        pwdForm.HostIdentifier = args.SelectedConnectionData.HostIdentifier;
-        pwdForm.UserName = args.SelectedConnectionData.UserName;
-        pwdForm.PasswordText = String.Empty;
-        DialogResult dr = pwdForm.ShowDialog();
-        if (dr == DialogResult.Cancel)
-          return;
-        args.SelectedConnectionData.Password = pwdForm.PasswordText;
+        PasswordForm dlg = new PasswordForm();
+        dlg.HostIdentifier = connection.HostIdentifier;
+        dlg.UserName = connection.UserName;
+        dlg.PasswordText = String.Empty;
+        if (dlg.ShowDialog() == DialogResult.Cancel) return;
+        connection.Password = dlg.PasswordText;
       }
-      schemaInfo.ConnectionData = args.SelectedConnectionData;
-
-      welcomePanel1.Visible = false;
-      schemaSelectionPanel1.Visible = true;
-      dbObjectSelectionPanel1.Visible = false;
+      schemaSelectionPanel1.SetConnection(connection);
+      schemaSelectionPanel1.BringToFront();
     }
 
-    void schemaSelectionPanel1_SchemaSelectionPanelLeaving(object sender, SchemaSelectionPanelLeavingArgs args)
+    public void CloseConnection()
     {
-      switch(args.SelectedAction)
-      {
-        case SchemaSelectionPanelLeavingAction.Back:
-          schemaInfo.ConnectionData = null;
-          welcomePanel1.Visible = true;
-          schemaSelectionPanel1.Visible = false;
-          dbObjectSelectionPanel1.Visible = false;
-          break;
-        case SchemaSelectionPanelLeavingAction.Next:
-          schemaInfo.CurrentSchema = args.SelectedSchemaName;
-          welcomePanel1.Visible = false;
-          schemaSelectionPanel1.Visible = false;
-          dbObjectSelectionPanel1.Visible = true;
-          break;
-      }
+      welcomePanel1.BringToFront();
+      connection = null;
     }
 
-    bool dbObjectSelectionPanel1_DBObjectSelectionPanelLeaving(object sender, DBObjectSelectionPanelLeavingArgs args)
+    public void OpenSchema(string schema)
     {
-      bool success = false;
-
-      switch (args.SelectedAction)
-      {
-        case DBObjectSelectionPanelLeavingAction.Back:
-          schemaInfo.CurrentSchema = String.Empty;
-          welcomePanel1.Visible = false;
-          schemaSelectionPanel1.Visible = true;
-          dbObjectSelectionPanel1.Visible = false;
-          success = true;
-          break;
-        case DBObjectSelectionPanelLeavingAction.Close:
-          CloseAddIn();
-          success = true;
-          break;
-        case DBObjectSelectionPanelLeavingAction.Import:
-          success = importDataToExcel(args.DataForExcel);
-          break;
-        case DBObjectSelectionPanelLeavingAction.Edit:
-          break;
-        case DBObjectSelectionPanelLeavingAction.Append:
-          success = appendDataToTable();
-          break;
-      }
-
-      return success;
+      dbObjectSelectionPanel1.SetConnectionAndSchema(connection, schema);
+      dbObjectSelectionPanel1.BringToFront();
     }
+
+    public void CloseSchema()
+    {
+      schemaSelectionPanel1.BringToFront();
+    }
+
+    //bool dbObjectSelectionPanel1_DBObjectSelectionPanelLeaving(object sender, DBObjectSelectionPanelLeavingArgs args)
+    //{
+    //  bool success = false;
+
+    //  switch (args.SelectedAction)
+    //  {
+    //    case DBObjectSelectionPanelLeavingAction.Back:
+    //      schemaInfo.CurrentSchema = String.Empty;
+    //      welcomePanel1.Visible = false;
+    //      schemaSelectionPanel1.Visible = true;
+    //      dbObjectSelectionPanel1.Visible = false;
+    //      success = true;
+    //      break;
+    //    case DBObjectSelectionPanelLeavingAction.Close:
+    //      CloseAddIn();
+    //      success = true;
+    //      break;
+    //    case DBObjectSelectionPanelLeavingAction.Import:
+    //      success = importDataToExcel(args.DataForExcel);
+    //      break;
+    //    case DBObjectSelectionPanelLeavingAction.Edit:
+    //      break;
+    //    case DBObjectSelectionPanelLeavingAction.Append:
+    //      success = appendDataToTable();
+    //      break;
+    //  }
+
+    //  return success;
+    //}
 
     private bool importDataToExcel(DataTable dt)
     {
@@ -160,12 +139,12 @@ namespace MySQL.ExcelAddIn
 
     public void CloseAddIn()
     {
-      Globals.ThisAddIn.TaskPane.Visible = false;
+//      Globals.ThisAddIn.TaskPane.Visible = false;
       welcomePanel1.Visible = true;
       schemaSelectionPanel1.Visible = false;
       dbObjectSelectionPanel1.Visible = false;
 
-      schemaInfo.Clear();
+      //schemaInfo.Clear();
     }
   }
 

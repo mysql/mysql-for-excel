@@ -6,17 +6,49 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using System.Data;
+using MySql.Data.MySqlClient;
+using MySQL.Utility;
+using System.Reflection;
 
 namespace MySQL.ExcelAddIn
 {
   public static class Utilities
   {
+    public static string GetConnectionString(MySqlWorkbenchConnection connection)
+    {
+      MySqlConnectionStringBuilder cs = new MySqlConnectionStringBuilder();
+      cs.Server = connection.Host;
+      cs.UserID = connection.UserName;
+      cs.Password = connection.Password;
+      //TODO:  use additional necessary options
+      return cs.ConnectionString;
+    }
+
+    public static DataTable GetSchemaCollection(MySqlWorkbenchConnection connection, string collection, params string[] restrictions)
+    {
+      string connectionString = GetConnectionString(connection);
+      try
+      {
+        using (MySqlConnection c = new MySqlConnection(connectionString))
+        {
+          c.Open();
+          DataTable dt = c.GetSchema(collection, restrictions);
+          return dt;
+        }
+      }
+      catch (Exception ex)
+      {
+        System.Diagnostics.Debug.WriteLine(ex.Message);
+        return null;
+      }
+    }
+
     public static void SetDoubleBuffered(System.Windows.Forms.Control c)
     {
-      if (System.Windows.Forms.SystemInformation.TerminalServerSession)
+      if (SystemInformation.TerminalServerSession)
         return;
 
-      System.Reflection.PropertyInfo aProp =
+      PropertyInfo aProp =
             typeof(System.Windows.Forms.Control).GetProperty(
                   "DoubleBuffered",
                   System.Reflection.BindingFlags.NonPublic |
