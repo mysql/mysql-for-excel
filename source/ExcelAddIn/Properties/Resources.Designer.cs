@@ -82,6 +82,15 @@ namespace MySQL.ExcelAddIn.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Column mapping for all columns in Excel selection is incomplete. Do you want to proceed with the current mapped data only?.
+        /// </summary>
+        internal static string columnMappingIncomplete {
+            get {
+                return ResourceManager.GetString("columnMappingIncomplete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MySQL Connection is closed, must be opened first to perform action.
         /// </summary>
         internal static string connectionClosedError {

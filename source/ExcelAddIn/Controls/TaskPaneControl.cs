@@ -35,7 +35,9 @@ namespace MySQL.ExcelAddIn
       if (!this.Visible)
         return;
 
-      bool emptyRange = Target.SpecialCells(Excel.XlCellType.xlCellTypeBlanks).Count == Target.Count;
+      int selectedCellsCount = Target.Count;
+      int blankCellsInRangeCount = Target.SpecialCells(Excel.XlCellType.xlCellTypeBlanks).Count;
+      bool emptyRange = selectedCellsCount == blankCellsInRangeCount;
       dbObjectSelectionPanel1.ExportDataActionEnabled = !emptyRange;
     }
 
@@ -125,17 +127,10 @@ namespace MySQL.ExcelAddIn
       }
     }
 
-
-
-    private bool appendDataToTable()
+    public void AppendDataToTable(string toTableName)
     {
-      bool success = false;
-      if (excelApplication.Selection is Excel.Range)
-      {
-        Excel.Range selectedRange = excelApplication.Selection as Excel.Range;
-
-      }
-      return success;
+      ExportDataToTableForm exportDataForm = new ExportDataToTableForm(connection, connection.Schema, toTableName, excelApplication.Selection as Excel.Range);
+      DialogResult dr = exportDataForm.ShowDialog();
     }
 
     public void CloseAddIn()
@@ -144,8 +139,6 @@ namespace MySQL.ExcelAddIn
       welcomePanel1.Visible = true;
       schemaSelectionPanel1.Visible = false;
       dbObjectSelectionPanel1.Visible = false;
-
-      //schemaInfo.Clear();
     }
   }
 

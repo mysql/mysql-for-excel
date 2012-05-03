@@ -237,12 +237,6 @@
     <Compile Include="Controls\MyTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Controls\PasswordForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Controls\PasswordForm.Designer.cs">
-      <DependentUpon>PasswordForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controls\SearchEdit.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -273,6 +267,10 @@
     <Compile Include="Forms\NewSchemaDialog.Designer.cs">
       <DependentUpon>NewSchemaDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\PasswordForm.cs" />
+    <Compile Include="Forms\PasswordForm.Designer.cs">
+      <DependentUpon>PasswordForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Panels\DBObjectSelectionPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -300,9 +298,6 @@
     <EmbeddedResource Include="Controls\ManageTaskPaneRibbon.resx">
       <DependentUpon>ManageTaskPaneRibbon.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\PasswordForm.resx">
-      <DependentUpon>PasswordForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Controls\SearchEdit.resx">
       <DependentUpon>SearchEdit.cs</DependentUpon>
     </EmbeddedResource>
@@ -317,6 +312,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\NewSchemaDialog.resx">
       <DependentUpon>NewSchemaDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PasswordForm.resx">
+      <DependentUpon>PasswordForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Panels\DBObjectSelectionPanel.resx">
       <DependentUpon>DBObjectSelectionPanel.cs</DependentUpon>

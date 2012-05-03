@@ -116,6 +116,7 @@ namespace MySQL.ExcelAddIn
       //  args = new DBObjectSelectionPanelLeavingArgs(DBObjectSelectionPanelLeavingAction.Export, String.Empty);
       //success = OnDBObjectSelectionPanelLeaving(args);
       //return success;
+      (Parent as TaskPaneControl).AppendDataToTable(appendToTableName);
       return true;
     }
 

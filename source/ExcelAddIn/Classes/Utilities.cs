@@ -25,23 +25,32 @@ namespace MySQL.ExcelAddIn
       return cs.ConnectionString;
     }
 
-    public static DataTable GetSchemaCollection(MySqlWorkbenchConnection connection, string collection, params string[] restrictions)
+    public static DataTable GetSchemaCollection(MySqlWorkbenchConnection wbConnection, string collection, params string[] restrictions)
     {
-      string connectionString = GetConnectionString(connection);
+      string connectionString = GetConnectionString(wbConnection);
+      DataTable dt = null;
+
       try
       {
-        using (MySqlConnection c = new MySqlConnection(connectionString))
+        using (MySqlConnection conn = new MySqlConnection(connectionString))
         {
-          c.Open();
-          DataTable dt = c.GetSchema(collection, restrictions);
-          return dt;
+          conn.Open();
+
+          if (collection.ToUpperInvariant().Equals("ENGINES"))
+          {
+            MySqlDataAdapter mysqlAdapter = new MySqlDataAdapter("SELECT * FROM information_schema.engines ORDER BY engine", conn);
+            mysqlAdapter.Fill(dt);
+          }
+          else
+            dt = conn.GetSchema(collection, restrictions);
         }
       }
       catch (Exception ex)
       {
         System.Diagnostics.Debug.WriteLine(ex.Message);
-        return null;
       }
+
+      return dt;
     }
 
     public static DataTable GetDataFromDbObject(MySqlWorkbenchConnection connection, DBObject dbo)
@@ -103,6 +112,11 @@ namespace MySQL.ExcelAddIn
       //dispose the Graphics object
       g.Dispose();
       return newBitmap;
+    }
+
+    public static DialogResult ShowWarningBox(string warningMessage)
+    {
+      return MessageBox.Show(warningMessage, "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
     }
 
     public static void ShowErrorBox(string errorMessage)

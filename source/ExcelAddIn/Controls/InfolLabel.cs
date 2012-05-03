@@ -17,6 +17,7 @@ namespace MySQL.ExcelAddIn.Controls
     private bool pictureAsButton = false;
     private Image colorImage;
     private Image disabledImage;
+    private bool eventsEnabled = false;
     
     public enum PictureSize { W32H32, W48H48 };
     public string MainText
@@ -59,24 +60,7 @@ namespace MySQL.ExcelAddIn.Controls
       set
       {
         pictureAsButton = value;
-        if (pictureAsButton)
-        {
-          picImage.Click += picImage_Click;
-          //picImage.MouseHover += picImage_MouseHover;
-          picImage.MouseEnter += picImage_MouseEnter;
-          picImage.MouseLeave += picImage_MouseLeave;
-          picImage.MouseDown += picImage_MouseDown;
-          picImage.MouseUp += picImage_MouseUp;
-        }
-        else
-        {
-          picImage.Click -= picImage_Click;
-          //picImage.MouseHover -= picImage_MouseHover;
-          picImage.MouseEnter -= picImage_MouseEnter;
-          picImage.MouseLeave -= picImage_MouseLeave;
-          picImage.MouseDown -= picImage_MouseDown;
-          picImage.MouseUp -= picImage_MouseUp;
-        }
+        setInternalEvents(pictureAsButton);
       }
     }
 
@@ -86,7 +70,8 @@ namespace MySQL.ExcelAddIn.Controls
       set 
       { 
         picImage.Enabled = value;
-        PictureAsButton = value;
+        if (pictureAsButton)
+          setInternalEvents(value);
         picImage.Image = (value ? colorImage : disabledImage);
       }
     }
@@ -98,6 +83,30 @@ namespace MySQL.ExcelAddIn.Controls
     public InfolLabel()
     {      
       InitializeComponent();
+    }
+
+    private void setInternalEvents(bool enabled)
+    {
+      if (enabled && !eventsEnabled)
+      {
+        picImage.Click += picImage_Click;
+        //picImage.MouseHover += picImage_MouseHover;
+        picImage.MouseEnter += picImage_MouseEnter;
+        picImage.MouseLeave += picImage_MouseLeave;
+        picImage.MouseDown += picImage_MouseDown;
+        picImage.MouseUp += picImage_MouseUp;
+        eventsEnabled = true;
+      }
+      if (!enabled && eventsEnabled)
+      {
+        picImage.Click -= picImage_Click;
+        //picImage.MouseHover -= picImage_MouseHover;
+        picImage.MouseEnter -= picImage_MouseEnter;
+        picImage.MouseLeave -= picImage_MouseLeave;
+        picImage.MouseDown -= picImage_MouseDown;
+        picImage.MouseUp -= picImage_MouseUp;
+        eventsEnabled = false;
+      }
     }
 
     private int widestLabelWidth()

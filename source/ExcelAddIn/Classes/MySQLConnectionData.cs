@@ -30,7 +30,6 @@ namespace MySQL.ExcelAddIn
   {
     private Guid id;
     private string stringId;
-    private string connectionString = String.Empty;
 
     public string Name { get; set; }
     public Guid Id { get { return id; } }
@@ -50,16 +49,12 @@ namespace MySQL.ExcelAddIn
     {
       get
       {
-        if (connectionString == String.Empty)
-        {
-          MySqlConnectionStringBuilder sb = new MySqlConnectionStringBuilder();
-          sb.Server = HostName;
-          sb.Port = Convert.ToUInt32(Port);
-          sb.UserID = UserName;
-          sb.Password = Password;
-          connectionString = sb.ConnectionString;
-        }
-        return connectionString;
+        MySqlConnectionStringBuilder sb = new MySqlConnectionStringBuilder();
+        sb.Server = HostName;
+        sb.Port = Convert.ToUInt32(Port);
+        sb.UserID = UserName;
+        sb.Password = Password;
+        return sb.ConnectionString;
       }
     }
 
