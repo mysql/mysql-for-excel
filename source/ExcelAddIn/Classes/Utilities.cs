@@ -55,14 +55,65 @@ namespace MySQL.ExcelAddIn
 
     public static DataTable GetDataFromDbObject(MySqlWorkbenchConnection connection, DBObject dbo)
     {
-      string sql = String.Format("SELECT * FROM `{0}`", dbo.Name);
-
+      string sql;
       if (dbo.Type == DBObjectType.Routine)
         sql = String.Format("CALL `{0}`", dbo.Name);
+      else
+        sql = String.Format("SELECT * FROM `{0}`", dbo.Name);
 
       DataSet ds = MySqlHelper.ExecuteDataset(GetConnectionString(connection), sql);
       if (ds.Tables.Count == 0) return null;
       return ds.Tables[0];
+    }
+
+    public static DataTable GetDataFromTableOrView(MySqlWorkbenchConnection connection, DBObject dbo, List<string> columnsList, int firstRowIdx, int rowCount)
+    {
+      DataTable retTable = null;
+      
+      if (dbo.Type != DBObjectType.Routine)
+      {
+        StringBuilder queryString = new StringBuilder("SELECT ");
+        if (columnsList == null || columnsList.Count == 0)
+          queryString.Append("*");
+        else
+        {
+          foreach (string columnName in columnsList)
+          {
+            queryString.AppendFormat("{0},", columnName);
+          }
+          queryString.Remove(queryString.Length - 1, 1);
+        }
+        queryString.AppendFormat(" FROM `{0}`", dbo.Name);
+        if (firstRowIdx > 0)
+        {
+          string strCount = (rowCount >= 0 ? rowCount.ToString() : "18446744073709551615");
+          queryString.AppendFormat(" LIMIT {0},{1}", firstRowIdx, strCount);
+        }
+        else if (rowCount >= 0)
+          queryString.AppendFormat(" LIMIT {0}", rowCount);
+        DataSet ds = MySqlHelper.ExecuteDataset(GetConnectionString(connection), queryString.ToString());
+        retTable = (ds.Tables.Count > 0 ? ds.Tables[0] : null);
+      }
+
+      return retTable;
+    }
+
+    public static DataTable GetDataFromTableOrView(MySqlWorkbenchConnection connection, DBObject dbo, List<string> columnsList)
+    {
+      return GetDataFromTableOrView(connection, dbo, columnsList, -1, -1);
+    }
+
+    public static DataSet GetDataSetFromRoutine(MySqlWorkbenchConnection connection, DBObject dbo)
+    {
+      DataSet retDS = null;
+      
+      if (dbo.Type == DBObjectType.Routine)
+      {
+        string sql = String.Format("CALL `{0}`", dbo.Name);
+        retDS = MySqlHelper.ExecuteDataset(GetConnectionString(connection), sql);
+      }
+
+      return retDS;
     }
 
     public static void SetDoubleBuffered(System.Windows.Forms.Control c)

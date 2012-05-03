@@ -255,6 +255,12 @@
     <Compile Include="Forms\ExportDataToTableForm.Designer.cs">
       <DependentUpon>ExportDataToTableForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\ImportForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ImportForm.Designer.cs">
+      <DependentUpon>ImportForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\NewConnectionDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -308,6 +314,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ExportDataToTableForm.resx">
       <DependentUpon>ExportDataToTableForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ImportForm.resx">
+      <DependentUpon>ImportForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\NewConnectionDialog.resx">
       <DependentUpon>NewConnectionDialog.cs</DependentUpon>

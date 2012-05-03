@@ -105,18 +105,29 @@ namespace MySQL.ExcelAddIn
     //  return success;
     //}
 
-    public void ImportDataToExcel(DataTable dt)
+    public void ImportDataToExcel(DataTable dt, List<string> headersList)
     {
       if (dt != null && dt.Rows.Count > 0)
       {
         int rowsCount = dt.Rows.Count;
         int colsCount = dt.Columns.Count;
+        bool containsHeaders = headersList != null && headersList.Count > 0;
+        int startingRow = (containsHeaders ? 1 : 0);
+
         Excel.Worksheet currentSheet = excelApplication.ActiveSheet as Excel.Worksheet;
         Excel.Range currentCell = excelApplication.ActiveCell;
         Excel.Range fillingRange = currentCell.get_Resize(rowsCount, colsCount);
-        string[,] fillingArray = new string[rowsCount, colsCount];
+        string[,] fillingArray = new string[rowsCount + startingRow, colsCount];
 
-        for (int currRow = 0; currRow < rowsCount; currRow++)
+        if (containsHeaders)
+        {
+          for (int currCol = 0; currCol < colsCount; currCol++)
+          {
+            fillingArray[0, currCol] = headersList[currCol];
+          }
+        }
+
+        for (int currRow = startingRow; currRow < rowsCount; currRow++)
         {
           for (int currCol = 0; currCol < colsCount; currCol++)
           {

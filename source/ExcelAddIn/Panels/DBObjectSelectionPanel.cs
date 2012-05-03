@@ -123,16 +123,23 @@ namespace MySQL.ExcelAddIn
 
     private void importData_Click(object sender, EventArgs e)
     {
+      if (objectList.SelectedNode == null)
+        return;
+
       DBObject dbo = objectList.SelectedNode.Tag as DBObject;
-      DataTable dt = Utilities.GetDataFromDbObject(connection, dbo);
-      if (dt == null)
+      //DataTable dt = Utilities.GetDataFromDbObject(connection, dbo);
+      ImportForm importForm = new ImportForm(connection, dbo);
+      DialogResult dr = importForm.ShowDialog();
+      if (dr == DialogResult.Cancel)
+        return;
+      if (importForm.ImportDataTable == null)
       {
         string msg = String.Format(Resources.UnableToRetrieveData, dbo.Name);
         MessageBox.Show(msg, Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
         return;
       }
 
-      (Parent as TaskPaneControl).ImportDataToExcel(dt);
+      (Parent as TaskPaneControl).ImportDataToExcel(importForm.ImportDataTable, importForm.HeadersList);
     }
 
     private void editData_Click(object sender, EventArgs e)
