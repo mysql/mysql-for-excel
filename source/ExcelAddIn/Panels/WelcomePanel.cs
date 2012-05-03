@@ -25,21 +25,25 @@ namespace MySQL.ExcelAddIn
 
     private void LoadConnections()
     {
-      connectionList.Clear();
+      foreach (TreeNode node in connectionList.Nodes)
+        node.Nodes.Clear();
       foreach (MySqlWorkbenchConnection conn in MySqlWorkbench.Connections)
-      {
         AddConnectionToList(conn);
-      }
     }
 
     private void AddConnectionToList(MySqlWorkbenchConnection conn)
     {
-      string[] items = new string[2];
-      items[0] = conn.Name;
-      items[1] = String.Format("User: {0}, IP: {1}", conn.UserName, conn.Host);
-      ListViewItem lvi = new ListViewItem(items, 0, connectionList.Groups["grpLocalConnection"]);
-      lvi.Tag = conn;
-      connectionList.Items.Add(lvi);
+      //string[] items = new string[2];
+      //items[0] = conn.Name;
+      //items[1] = String.Format("User: {0}, IP: {1}", conn.UserName, conn.Host);
+      //ListViewItem lvi = new ListViewItem(items, 0, connectionList.Groups["grpLocalConnection"]);
+      //lvi.Tag = conn;
+      //connectionList.Items.Add(lvi);
+
+      string s = String.Format("{0}|{1}", conn.Name, String.Format("User: {0}, IP: {1}", conn.UserName, conn.Host)); ;
+      TreeNode node = connectionList.Nodes[0].Nodes.Add(s);
+      node.ImageIndex = 0;
+      node.Tag = conn;
     }
 
     private void newConnectionLabel_Click(object sender, EventArgs e)
@@ -61,9 +65,10 @@ namespace MySQL.ExcelAddIn
       MySqlWorkbench.LaunchConfigure(null);
     }
 
-    private void connectionList_ItemActivate(object sender, EventArgs e)
+    private void connectionList_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
     {
-      MySqlWorkbenchConnection c = connectionList.SelectedItems[0].Tag as MySqlWorkbenchConnection;
+      if (e.Node == null || e.Node.Level == 0) return;
+      MySqlWorkbenchConnection c = connectionList.SelectedNode.Tag as MySqlWorkbenchConnection;
       (Parent as TaskPaneControl).OpenConnection(c);
     }
   }

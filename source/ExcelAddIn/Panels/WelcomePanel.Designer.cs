@@ -30,8 +30,8 @@
     {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WelcomePanel));
-      System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("Local Connections", System.Windows.Forms.HorizontalAlignment.Left);
-      System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Remote Connections", System.Windows.Forms.HorizontalAlignment.Left);
+      System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Local Connections");
+      System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Remote Connections");
       this.lblExcelAddIn = new System.Windows.Forms.Label();
       this.lblWelcome = new System.Windows.Forms.Label();
       this.picAddInLogo = new System.Windows.Forms.PictureBox();
@@ -42,12 +42,10 @@
       this.lblInstructions = new System.Windows.Forms.Label();
       this.lblCopyright = new System.Windows.Forms.Label();
       this.lblAllRights = new System.Windows.Forms.Label();
+      this.connectionList = new TreeViewTest.MyTreeView();
+      this.hotLabel1 = new MySQL.ExcelAddIn.Controls.HotLabel();
       this.manageConnectionsLabel = new MySQL.ExcelAddIn.Controls.HotLabel();
       this.newConnectionLabel = new MySQL.ExcelAddIn.Controls.HotLabel();
-      this.hotLabel1 = new MySQL.ExcelAddIn.Controls.HotLabel();
-      this.connectionList = new System.Windows.Forms.ListView();
-      this.colSchemaName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-      this.colSchemaInfo = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
       this.connectionsContextMenu.SuspendLayout();
       this.SuspendLayout();
@@ -146,6 +144,52 @@
       this.lblAllRights.Text = "All rights reserved.";
       this.lblAllRights.TextAlign = System.Drawing.ContentAlignment.TopCenter;
       // 
+      // connectionList
+      // 
+      this.connectionList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.connectionList.CollapsedIcon = global::MySQL.ExcelAddIn.Properties.Resources.ArrowRight;
+      this.connectionList.DescriptionColor = System.Drawing.Color.Silver;
+      this.connectionList.DescriptionFont = new System.Drawing.Font("Arial Narrow", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.connectionList.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawAll;
+      this.connectionList.ExpandedIcon = global::MySQL.ExcelAddIn.Properties.Resources.ArrowDown;
+      this.connectionList.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.connectionList.Indent = 18;
+      this.connectionList.ItemHeight = 20;
+      this.connectionList.Location = new System.Drawing.Point(14, 203);
+      this.connectionList.Name = "connectionList";
+      this.connectionList.NodeImages = this.largeImages;
+      treeNode1.BackColor = System.Drawing.SystemColors.ControlDark;
+      treeNode1.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode1.Name = "LocalConnectionsNode";
+      treeNode1.Text = "Local Connections";
+      treeNode2.BackColor = System.Drawing.SystemColors.ControlDark;
+      treeNode2.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode2.Name = "Node0";
+      treeNode2.Text = "Remote Connections";
+      this.connectionList.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
+            treeNode1,
+            treeNode2});
+      this.connectionList.Size = new System.Drawing.Size(265, 264);
+      this.connectionList.TabIndex = 22;
+      this.connectionList.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.connectionList_NodeMouseDoubleClick);
+      // 
+      // hotLabel1
+      // 
+      this.hotLabel1.Description = "Double-Click a Connection to Start";
+      this.hotLabel1.DescriptionFont = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.hotLabel1.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.hotLabel1.HotTracking = false;
+      this.hotLabel1.Image = global::MySQL.ExcelAddIn.Properties.Resources.lightning_32x32;
+      this.hotLabel1.ImageSize = new System.Drawing.Size(28, 28);
+      this.hotLabel1.Location = new System.Drawing.Point(14, 152);
+      this.hotLabel1.Margin = new System.Windows.Forms.Padding(4);
+      this.hotLabel1.Name = "hotLabel1";
+      this.hotLabel1.Size = new System.Drawing.Size(256, 44);
+      this.hotLabel1.TabIndex = 20;
+      this.hotLabel1.Title = "Open a MySQL Connection";
+      // 
       // manageConnectionsLabel
       // 
       this.manageConnectionsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
@@ -181,60 +225,6 @@
       this.newConnectionLabel.TabIndex = 15;
       this.newConnectionLabel.Title = "New Connection";
       this.newConnectionLabel.Click += new System.EventHandler(this.newConnectionLabel_Click);
-      // 
-      // hotLabel1
-      // 
-      this.hotLabel1.Description = "Double-Click a Connection to Start";
-      this.hotLabel1.DescriptionFont = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.hotLabel1.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.hotLabel1.HotTracking = false;
-      this.hotLabel1.Image = global::MySQL.ExcelAddIn.Properties.Resources.lightning_32x32;
-      this.hotLabel1.ImageSize = new System.Drawing.Size(28, 28);
-      this.hotLabel1.Location = new System.Drawing.Point(14, 152);
-      this.hotLabel1.Margin = new System.Windows.Forms.Padding(4);
-      this.hotLabel1.Name = "hotLabel1";
-      this.hotLabel1.Size = new System.Drawing.Size(256, 44);
-      this.hotLabel1.TabIndex = 20;
-      this.hotLabel1.Title = "Open a MySQL Connection";
-      // 
-      // connectionList
-      // 
-      this.connectionList.Activation = System.Windows.Forms.ItemActivation.TwoClick;
-      this.connectionList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.connectionList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.colSchemaName,
-            this.colSchemaInfo});
-      this.connectionList.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.connectionList.FullRowSelect = true;
-      listViewGroup1.Header = "Local Connections";
-      listViewGroup1.Name = "grpLocalConnections";
-      listViewGroup2.Header = "Remote Connections";
-      listViewGroup2.Name = "grpRemoteConnections";
-      this.connectionList.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1,
-            listViewGroup2});
-      this.connectionList.HideSelection = false;
-      this.connectionList.LargeImageList = this.largeImages;
-      this.connectionList.Location = new System.Drawing.Point(14, 203);
-      this.connectionList.MultiSelect = false;
-      this.connectionList.Name = "connectionList";
-      this.connectionList.Size = new System.Drawing.Size(265, 264);
-      this.connectionList.SmallImageList = this.smallImages;
-      this.connectionList.Sorting = System.Windows.Forms.SortOrder.Ascending;
-      this.connectionList.TabIndex = 21;
-      this.connectionList.UseCompatibleStateImageBehavior = false;
-      this.connectionList.View = System.Windows.Forms.View.Tile;
-      this.connectionList.ItemActivate += new System.EventHandler(this.connectionList_ItemActivate);
-      // 
-      // colSchemaName
-      // 
-      this.colSchemaName.Text = "Schema Name";
-      // 
-      // colSchemaInfo
-      // 
-      this.colSchemaInfo.Text = "Info";
       // 
       // WelcomePanel
       // 
@@ -273,8 +263,6 @@
     private Controls.HotLabel newConnectionLabel;
     private Controls.HotLabel manageConnectionsLabel;
     private Controls.HotLabel hotLabel1;
-    private System.Windows.Forms.ListView connectionList;
-    private System.Windows.Forms.ColumnHeader colSchemaName;
-    private System.Windows.Forms.ColumnHeader colSchemaInfo;
+    private TreeViewTest.MyTreeView connectionList;
   }
 }

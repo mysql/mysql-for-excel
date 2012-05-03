@@ -234,6 +234,9 @@
     <Compile Include="Controls\ManageTaskPaneRibbon.Designer.cs">
       <DependentUpon>ManageTaskPaneRibbon.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\MyTreeView.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\PasswordForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -537,6 +540,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\ExcelAddinFilter.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ArrowDown.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ArrowRight.png" />
   </ItemGroup>
   <!-- Include the build rules for a C# project. -->
   <PropertyGroup>

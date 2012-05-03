@@ -67,6 +67,20 @@ namespace MySQL.ExcelAddIn.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap ArrowDown {
+            get {
+                object obj = ResourceManager.GetObject("ArrowDown", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap ArrowRight {
+            get {
+                object obj = ResourceManager.GetObject("ArrowRight", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to MySQL Connection is closed, must be opened first to perform action.
         /// </summary>
