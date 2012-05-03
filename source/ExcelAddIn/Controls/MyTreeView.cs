@@ -149,21 +149,11 @@ namespace TreeViewTest
         e.Graphics.DrawString(parts[1], DescriptionFont, brush, pt.X, pt.Y);
     }
 
-    protected override void OnVisibleChanged(EventArgs e)
+    public TreeNode AddNode(TreeNode parent, string text)
     {
-      if (!heightsSet)
-      {
-        foreach (TreeNode node in Nodes)
-        {
-          SetNodeHeight(node, 1);
-          foreach (TreeNode child in node.Nodes)
-          {
-            SetNodeHeight(child, 2);
-          }
-        }
-        heightsSet = true;
-      }
-      base.OnVisibleChanged(e);
+      TreeNode node = parent.Nodes.Add(text);
+      SetNodeHeight(node, parent != null ? 2 : 1);
+      return node;
     }
 
     private void SetNodeHeight(TreeNode node, int integral)

@@ -19,7 +19,6 @@ namespace MySQL.ExcelAddIn
       InitializeComponent();
       DoubleBuffered = true;
       manageConnectionsLabel.Enabled = MySqlWorkbench.IsInstalled;
-      Utilities.SetDoubleBuffered(connectionList);
       LoadConnections();
     }
 
@@ -33,15 +32,8 @@ namespace MySQL.ExcelAddIn
 
     private void AddConnectionToList(MySqlWorkbenchConnection conn)
     {
-      //string[] items = new string[2];
-      //items[0] = conn.Name;
-      //items[1] = String.Format("User: {0}, IP: {1}", conn.UserName, conn.Host);
-      //ListViewItem lvi = new ListViewItem(items, 0, connectionList.Groups["grpLocalConnection"]);
-      //lvi.Tag = conn;
-      //connectionList.Items.Add(lvi);
-
       string s = String.Format("{0}|{1}", conn.Name, String.Format("User: {0}, IP: {1}", conn.UserName, conn.Host)); ;
-      TreeNode node = connectionList.Nodes[0].Nodes.Add(s);
+      TreeNode node = connectionList.AddNode(connectionList.Nodes[0], s);
       node.ImageIndex = 0;
       node.Tag = conn;
     }

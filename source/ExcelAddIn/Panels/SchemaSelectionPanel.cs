@@ -19,7 +19,6 @@ namespace MySQL.ExcelAddIn
     public SchemaSelectionPanel()
     {
       InitializeComponent();
-      Utilities.SetDoubleBuffered(lisDatabases);
     }
 
     public void SetConnection(MySqlWorkbenchConnection connection)
@@ -30,11 +29,9 @@ namespace MySQL.ExcelAddIn
       LoadSchemas();
     }
 
-    private void lisDatabases_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+    private void databaseList_AfterSelect(object sender, TreeViewEventArgs e)
     {
-      if (lisDatabases.SelectedItems.Count > 0 && !e.Item.Equals(lisDatabases.SelectedItems[0]))
-        return;
-      btnNext.Enabled = e.IsSelected;
+      btnNext.Enabled = e.Node != null && e.Node.Level > 0;
     }
 
     private void btnHelp_Click(object sender, EventArgs e)
@@ -49,48 +46,38 @@ namespace MySQL.ExcelAddIn
 
     private void btnNext_Click(object sender, EventArgs e)
     {
-      string databaseName = lisDatabases.SelectedItems[0].Text;
+      string databaseName = databaseList.SelectedNode.Tag as string;
       (Parent as TaskPaneControl).OpenSchema(databaseName);
     }
 
-    private void lisDatabases_ItemActivate(object sender, EventArgs e)
+    private void databaseList_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
     {
       btnNext_Click(this, EventArgs.Empty);
     }
 
     private void LoadSchemas()
     {
+      foreach (TreeNode node in databaseList.Nodes)
+        node.Nodes.Clear();
       DataTable databases = Utilities.GetSchemaCollection(connection, "Databases", null);
       if (databases == null)
       {
         MessageBox.Show(Resources.UnableToLoadDatabases);
         return;
       }
-      int systemCounter = 0;
-      int usersCounter = 0;
-      ListViewGroup lvg;
+
       foreach (DataRow row in databases.Rows)
       {
         string schemaName = row["DATABASE_NAME"].ToString();
         string lcSchemaName = schemaName.ToLowerInvariant();
-        if (lcSchemaName == "mysql" || lcSchemaName == "information_schema")
-        {
-          lvg = lisDatabases.Groups["grpSystemSchemas"];
-          systemCounter++;
-        }
-        else
-        {
-          lvg = lisDatabases.Groups["grpUserSchemas"];
-          usersCounter++;
-        }
-        string[] tileItems = new string[] { schemaName, String.Format("CharSet: {0}", row["DEFAULT_CHARACTER_SET_NAME"].ToString()) };
-        ListViewItem lvi = new ListViewItem(tileItems, 0, lvg);
-        lvi.Name = schemaName;
-        lvi.Font = new Font("Arial", 8, FontStyle.Regular);
-        lisDatabases.Items.Add(lvi);
+        int index = (lcSchemaName == "mysql" || lcSchemaName == "information_schema") ? 1 : 0;
+
+        string text = String.Format("{0}|{1}", schemaName,
+          String.Format("CharSet: {0}", row["DEFAULT_CHARACTER_SET_NAME"].ToString()));
+        TreeNode node = databaseList.AddNode(databaseList.Nodes[index], text);
+        node.Tag = schemaName;
+        node.ImageIndex = 0;
       }
-      lisDatabases.Groups["grpUserSchemas"].Header = String.Format("Schemas ({0})", usersCounter);
-      lisDatabases.Groups["grpSystemSchemas"].Header = String.Format("System Schemas ({0})", systemCounter);
     }
 
     private void createNewSchema_Click(object sender, EventArgs e)
@@ -112,5 +99,6 @@ namespace MySQL.ExcelAddIn
       }
       LoadSchemas();
     }
+
   }
 }

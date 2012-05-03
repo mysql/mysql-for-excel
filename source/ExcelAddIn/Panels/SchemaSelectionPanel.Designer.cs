@@ -29,15 +29,12 @@
     private void InitializeComponent()
     {
       this.components = new System.ComponentModel.Container();
-      System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("Schemas", System.Windows.Forms.HorizontalAlignment.Left);
-      System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("System Schemas", System.Windows.Forms.HorizontalAlignment.Left);
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SchemaSelectionPanel));
+      System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Schemas");
+      System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("System Schemas");
       this.lblConnectionName = new System.Windows.Forms.Label();
       this.lblUserIP = new System.Windows.Forms.Label();
       this.picAddInLogo = new System.Windows.Forms.PictureBox();
-      this.lisDatabases = new System.Windows.Forms.ListView();
-      this.colSchemaName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-      this.colSchemaInfo = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.schemasContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.selectDatabaseSchemaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.largeImages = new System.Windows.Forms.ImageList(this.components);
@@ -46,6 +43,7 @@
       this.btnNext = new System.Windows.Forms.Button();
       this.lblInstructions = new System.Windows.Forms.Label();
       this.btnHelp = new System.Windows.Forms.Button();
+      this.databaseList = new TreeViewTest.MyTreeView();
       this.searchEdit1 = new MySQL.ExcelAddIn.Controls.SearchEdit();
       this.createNewSchema = new MySQL.ExcelAddIn.Controls.HotLabel();
       this.hotLabel1 = new MySQL.ExcelAddIn.Controls.HotLabel();
@@ -82,46 +80,6 @@
       this.picAddInLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
       this.picAddInLogo.TabIndex = 13;
       this.picAddInLogo.TabStop = false;
-      // 
-      // lisDatabases
-      // 
-      this.lisDatabases.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.lisDatabases.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.colSchemaName,
-            this.colSchemaInfo});
-      this.lisDatabases.ContextMenuStrip = this.schemasContextMenu;
-      this.lisDatabases.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lisDatabases.FullRowSelect = true;
-      listViewGroup1.Header = "Schemas";
-      listViewGroup1.Name = "grpUserSchemas";
-      listViewGroup2.Header = "System Schemas";
-      listViewGroup2.Name = "grpSystemSchemas";
-      this.lisDatabases.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1,
-            listViewGroup2});
-      this.lisDatabases.HideSelection = false;
-      this.lisDatabases.LargeImageList = this.largeImages;
-      this.lisDatabases.Location = new System.Drawing.Point(14, 254);
-      this.lisDatabases.MultiSelect = false;
-      this.lisDatabases.Name = "lisDatabases";
-      this.lisDatabases.Size = new System.Drawing.Size(265, 338);
-      this.lisDatabases.SmallImageList = this.smallImages;
-      this.lisDatabases.Sorting = System.Windows.Forms.SortOrder.Ascending;
-      this.lisDatabases.TabIndex = 4;
-      this.lisDatabases.UseCompatibleStateImageBehavior = false;
-      this.lisDatabases.View = System.Windows.Forms.View.Tile;
-      this.lisDatabases.ItemActivate += new System.EventHandler(this.lisDatabases_ItemActivate);
-      this.lisDatabases.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.lisDatabases_ItemSelectionChanged);
-      // 
-      // colSchemaName
-      // 
-      this.colSchemaName.Text = "Schema Name";
-      // 
-      // colSchemaInfo
-      // 
-      this.colSchemaInfo.Text = "Info";
       // 
       // schemasContextMenu
       // 
@@ -198,6 +156,38 @@
       this.btnHelp.UseVisualStyleBackColor = true;
       this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
       // 
+      // databaseList
+      // 
+      this.databaseList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.databaseList.CollapsedIcon = global::MySQL.ExcelAddIn.Properties.Resources.ArrowRight;
+      this.databaseList.DescriptionColor = System.Drawing.Color.Silver;
+      this.databaseList.DescriptionFont = new System.Drawing.Font("Arial Narrow", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.databaseList.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawAll;
+      this.databaseList.ExpandedIcon = global::MySQL.ExcelAddIn.Properties.Resources.ArrowDown;
+      this.databaseList.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.databaseList.Indent = 18;
+      this.databaseList.ItemHeight = 20;
+      this.databaseList.Location = new System.Drawing.Point(14, 254);
+      this.databaseList.Name = "databaseList";
+      this.databaseList.NodeImages = this.largeImages;
+      treeNode1.BackColor = System.Drawing.SystemColors.ControlDark;
+      treeNode1.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode1.Name = "Node0";
+      treeNode1.Text = "Schemas";
+      treeNode2.BackColor = System.Drawing.SystemColors.ControlDark;
+      treeNode2.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode2.Name = "Node1";
+      treeNode2.Text = "System Schemas";
+      this.databaseList.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
+            treeNode1,
+            treeNode2});
+      this.databaseList.Size = new System.Drawing.Size(265, 338);
+      this.databaseList.TabIndex = 23;
+      this.databaseList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.databaseList_AfterSelect);
+      this.databaseList.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.databaseList_NodeMouseDoubleClick);
+      // 
       // searchEdit1
       // 
       this.searchEdit1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -245,6 +235,7 @@
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+      this.Controls.Add(this.databaseList);
       this.Controls.Add(this.searchEdit1);
       this.Controls.Add(this.createNewSchema);
       this.Controls.Add(this.hotLabel1);
@@ -252,7 +243,6 @@
       this.Controls.Add(this.lblInstructions);
       this.Controls.Add(this.btnNext);
       this.Controls.Add(this.btnBack);
-      this.Controls.Add(this.lisDatabases);
       this.Controls.Add(this.lblConnectionName);
       this.Controls.Add(this.lblUserIP);
       this.Controls.Add(this.picAddInLogo);
@@ -271,7 +261,6 @@
     private System.Windows.Forms.Label lblConnectionName;
     private System.Windows.Forms.Label lblUserIP;
     private System.Windows.Forms.PictureBox picAddInLogo;
-    private System.Windows.Forms.ListView lisDatabases;
     public System.Windows.Forms.Button btnBack;
     public System.Windows.Forms.Button btnNext;
     private System.Windows.Forms.ImageList smallImages;
@@ -280,10 +269,9 @@
     public System.Windows.Forms.Button btnHelp;
     private System.Windows.Forms.ContextMenuStrip schemasContextMenu;
     private System.Windows.Forms.ToolStripMenuItem selectDatabaseSchemaToolStripMenuItem;
-    private System.Windows.Forms.ColumnHeader colSchemaName;
-    private System.Windows.Forms.ColumnHeader colSchemaInfo;
     private Controls.HotLabel hotLabel1;
     private Controls.HotLabel createNewSchema;
     private Controls.SearchEdit searchEdit1;
+    private TreeViewTest.MyTreeView databaseList;
   }
 }

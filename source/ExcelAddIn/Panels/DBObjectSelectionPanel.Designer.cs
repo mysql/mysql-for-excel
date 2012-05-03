@@ -29,16 +29,13 @@
     private void InitializeComponent()
     {
       this.components = new System.ComponentModel.Container();
-      System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("Tables", System.Windows.Forms.HorizontalAlignment.Left);
-      System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Views", System.Windows.Forms.HorizontalAlignment.Left);
-      System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Routines", System.Windows.Forms.HorizontalAlignment.Left);
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DBObjectSelectionPanel));
+      System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Tables");
+      System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Views");
+      System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Routines");
       this.lblConnectionName = new System.Windows.Forms.Label();
       this.lblUserIP = new System.Windows.Forms.Label();
       this.picAddInLogo = new System.Windows.Forms.PictureBox();
-      this.lisDBObjects = new System.Windows.Forms.ListView();
-      this.colDBObjectName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-      this.colDBObjectInfo = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.dbObjectsContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.importDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.editDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,6 +47,7 @@
       this.shapeContainer1 = new Microsoft.VisualBasic.PowerPacks.ShapeContainer();
       this.linSeparator = new Microsoft.VisualBasic.PowerPacks.LineShape();
       this.btnHelp = new System.Windows.Forms.Button();
+      this.objectList = new TreeViewTest.MyTreeView();
       this.appendData = new MySQL.ExcelAddIn.Controls.HotLabel();
       this.editData = new MySQL.ExcelAddIn.Controls.HotLabel();
       this.importData = new MySQL.ExcelAddIn.Controls.HotLabel();
@@ -89,48 +87,6 @@
       this.picAddInLogo.TabIndex = 13;
       this.picAddInLogo.TabStop = false;
       // 
-      // lisDBObjects
-      // 
-      this.lisDBObjects.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.lisDBObjects.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.colDBObjectName,
-            this.colDBObjectInfo});
-      this.lisDBObjects.ContextMenuStrip = this.dbObjectsContextMenu;
-      this.lisDBObjects.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lisDBObjects.FullRowSelect = true;
-      listViewGroup1.Header = "Tables";
-      listViewGroup1.Name = "grpTables";
-      listViewGroup2.Header = "Views";
-      listViewGroup2.Name = "grpViews";
-      listViewGroup3.Header = "Routines";
-      listViewGroup3.Name = "grpRoutines";
-      this.lisDBObjects.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1,
-            listViewGroup2,
-            listViewGroup3});
-      this.lisDBObjects.HideSelection = false;
-      this.lisDBObjects.LargeImageList = this.largeImages;
-      this.lisDBObjects.Location = new System.Drawing.Point(16, 214);
-      this.lisDBObjects.MultiSelect = false;
-      this.lisDBObjects.Name = "lisDBObjects";
-      this.lisDBObjects.Size = new System.Drawing.Size(298, 262);
-      this.lisDBObjects.SmallImageList = this.smallImages;
-      this.lisDBObjects.Sorting = System.Windows.Forms.SortOrder.Ascending;
-      this.lisDBObjects.TabIndex = 5;
-      this.lisDBObjects.UseCompatibleStateImageBehavior = false;
-      this.lisDBObjects.View = System.Windows.Forms.View.Tile;
-      this.lisDBObjects.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.lisDBObjects_ItemSelectionChanged);
-      // 
-      // colDBObjectName
-      // 
-      this.colDBObjectName.Text = "Name";
-      // 
-      // colDBObjectInfo
-      // 
-      this.colDBObjectInfo.Text = "Info";
-      // 
       // dbObjectsContextMenu
       // 
       this.dbObjectsContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -139,8 +95,6 @@
             this.appendDataToolStripMenuItem});
       this.dbObjectsContextMenu.Name = "dbObjectsContextMenu";
       this.dbObjectsContextMenu.Size = new System.Drawing.Size(219, 70);
-      //this.dbObjectsContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.dbObjectsContextMenu_Opening);
-      //this.dbObjectsContextMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.dbObjectsContextMenu_ItemClicked);
       // 
       // importDataToolStripMenuItem
       // 
@@ -185,7 +139,7 @@
       // 
       this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnClose.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnClose.Location = new System.Drawing.Point(229, 651);
+      this.btnClose.Location = new System.Drawing.Point(207, 651);
       this.btnClose.Name = "btnClose";
       this.btnClose.Size = new System.Drawing.Size(87, 27);
       this.btnClose.TabIndex = 11;
@@ -197,7 +151,7 @@
       // 
       this.btnBack.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnBack.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnBack.Location = new System.Drawing.Point(136, 651);
+      this.btnBack.Location = new System.Drawing.Point(114, 651);
       this.btnBack.Name = "btnBack";
       this.btnBack.Size = new System.Drawing.Size(87, 27);
       this.btnBack.TabIndex = 10;
@@ -212,7 +166,7 @@
       this.shapeContainer1.Name = "shapeContainer1";
       this.shapeContainer1.Shapes.AddRange(new Microsoft.VisualBasic.PowerPacks.Shape[] {
             this.linSeparator});
-      this.shapeContainer1.Size = new System.Drawing.Size(335, 697);
+      this.shapeContainer1.Size = new System.Drawing.Size(313, 697);
       this.shapeContainer1.TabIndex = 0;
       this.shapeContainer1.TabStop = false;
       // 
@@ -237,6 +191,42 @@
       this.btnHelp.Text = "Help";
       this.btnHelp.UseVisualStyleBackColor = true;
       this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
+      // 
+      // objectList
+      // 
+      this.objectList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.objectList.CollapsedIcon = global::MySQL.ExcelAddIn.Properties.Resources.ArrowRight;
+      this.objectList.DescriptionColor = System.Drawing.Color.Silver;
+      this.objectList.DescriptionFont = new System.Drawing.Font("Arial Narrow", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.objectList.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawAll;
+      this.objectList.ExpandedIcon = global::MySQL.ExcelAddIn.Properties.Resources.ArrowDown;
+      this.objectList.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.objectList.Indent = 18;
+      this.objectList.ItemHeight = 20;
+      this.objectList.Location = new System.Drawing.Point(17, 214);
+      this.objectList.Name = "objectList";
+      this.objectList.NodeImages = this.largeImages;
+      treeNode1.BackColor = System.Drawing.SystemColors.ControlDark;
+      treeNode1.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode1.Name = "Node0";
+      treeNode1.Text = "Tables";
+      treeNode2.BackColor = System.Drawing.SystemColors.ControlDark;
+      treeNode2.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode2.Name = "Node1";
+      treeNode2.Text = "Views";
+      treeNode3.BackColor = System.Drawing.SystemColors.ControlDark;
+      treeNode3.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode3.Name = "Node0";
+      treeNode3.Text = "Routines";
+      this.objectList.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
+            treeNode1,
+            treeNode2,
+            treeNode3});
+      this.objectList.Size = new System.Drawing.Size(277, 262);
+      this.objectList.TabIndex = 24;
+      this.objectList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.objectList_AfterSelect);
       // 
       // appendData
       // 
@@ -327,6 +317,7 @@
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+      this.Controls.Add(this.objectList);
       this.Controls.Add(this.appendData);
       this.Controls.Add(this.editData);
       this.Controls.Add(this.importData);
@@ -335,14 +326,13 @@
       this.Controls.Add(this.btnHelp);
       this.Controls.Add(this.btnClose);
       this.Controls.Add(this.btnBack);
-      this.Controls.Add(this.lisDBObjects);
       this.Controls.Add(this.lblConnectionName);
       this.Controls.Add(this.lblUserIP);
       this.Controls.Add(this.picAddInLogo);
       this.Controls.Add(this.shapeContainer1);
       this.Font = new System.Drawing.Font("Arial", 9F);
       this.Name = "DBObjectSelectionPanel";
-      this.Size = new System.Drawing.Size(335, 697);
+      this.Size = new System.Drawing.Size(313, 697);
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
       this.dbObjectsContextMenu.ResumeLayout(false);
       this.ResumeLayout(false);
@@ -355,13 +345,10 @@
     private System.Windows.Forms.Label lblConnectionName;
     private System.Windows.Forms.Label lblUserIP;
     private System.Windows.Forms.PictureBox picAddInLogo;
-    private System.Windows.Forms.ListView lisDBObjects;
     public System.Windows.Forms.Button btnClose;
     public System.Windows.Forms.Button btnBack;
     private System.Windows.Forms.ImageList smallImages;
     private System.Windows.Forms.ImageList largeImages;
-    private System.Windows.Forms.ColumnHeader colDBObjectName;
-    private System.Windows.Forms.ColumnHeader colDBObjectInfo;
     private Microsoft.VisualBasic.PowerPacks.ShapeContainer shapeContainer1;
     private Microsoft.VisualBasic.PowerPacks.LineShape linSeparator;
     public System.Windows.Forms.Button btnHelp;
@@ -374,5 +361,6 @@
     private Controls.HotLabel importData;
     private Controls.HotLabel editData;
     private Controls.HotLabel appendData;
+    private TreeViewTest.MyTreeView objectList;
   }
 }

@@ -15,19 +15,15 @@ namespace MySQL.ExcelAddIn
   {
     private MySqlWorkbenchConnection connection;
 
-    //private DBObject selectedDBObject;
-    //public MySQLSchemaInfo SchemaInfo { set; private get; }
-    
+    public DBObjectSelectionPanel()
+    {
+      InitializeComponent();
+    }
+
     public bool ExportDataActionEnabled
     {
       set { exportToNewTable.Enabled = value; }
       get { return exportToNewTable.Enabled; }
-    }
-
-    public DBObjectSelectionPanel()
-    {
-      InitializeComponent();
-      Utilities.SetDoubleBuffered(lisDBObjects);
     }
 
     public void SetConnection(MySqlWorkbenchConnection connection)
@@ -40,7 +36,9 @@ namespace MySQL.ExcelAddIn
 
     private void PopulateList()
     {
-      lisDBObjects.Items.Clear();
+      foreach (TreeNode node in objectList.Nodes)
+        node.Nodes.Clear();
+
       LoadTables();
       LoadViews();
       LoadRoutines();
@@ -48,61 +46,53 @@ namespace MySQL.ExcelAddIn
 
     private void LoadTables()
     {
-      int counter = 0;
       DataTable tables = Utilities.GetSchemaCollection(connection, "Tables", null, connection.Schema);
 
+      TreeNode parent = objectList.Nodes[0];
       foreach (DataRow tableRow in tables.Rows)
       {
         string tableName = tableRow["TABLE_NAME"].ToString();
-        string[] tileItems = new string[] { tableName, String.Format("Engine: {0}", tableRow["ENGINE"].ToString()) };
-        ListViewItem lvi = new ListViewItem(tileItems, 0, lisDBObjects.Groups["grpTables"]);
-        lvi.Name = tableName;
-        lvi.Font = new Font("Arial", 8, FontStyle.Regular);
-        lvi.Tag = new DBObject(tableName, DBObjectType.Table);
-        lisDBObjects.Items.Add(lvi);
-        counter++;
+        string text = String.Format("{0}|{1}", tableName, String.Format("Engine: {0}", tableRow["ENGINE"].ToString()));
+
+        TreeNode node = objectList.AddNode(parent, text);
+        node.Tag = new DBObject(tableName, DBObjectType.Table);
+        node.ImageIndex = 0;
       }
-      lisDBObjects.Groups["grpTables"].Header = String.Format("Tables ({0})", counter);
     }
 
     private void LoadViews()
     {
-      int counter = 0;
       DataTable views = Utilities.GetSchemaCollection(connection, "Views", null, connection.Schema);
       if (views == null) return;
+
+      TreeNode parent = objectList.Nodes[1];
       foreach (DataRow viewRow in views.Rows)
       {
         string viewName = viewRow["TABLE_NAME"].ToString();
-        string[] tileItems = new string[] { viewName, String.Format("Updatable: {0}", viewRow["IS_UPDATABLE"].ToString()) };
-        ListViewItem lvi = new ListViewItem(tileItems, 1, lisDBObjects.Groups["grpViews"]);
-        lvi.Name = viewName;
-        lvi.Font = new Font("Arial", 8, FontStyle.Regular);
-        lvi.Tag = new DBObject(viewName, DBObjectType.View);
-        lisDBObjects.Items.Add(lvi);
-        counter++;
+        string text = String.Format("{0}|{1}", viewName, String.Format("Updatable: {0}", viewRow["IS_UPDATABLE"].ToString()));
+
+        TreeNode node = objectList.AddNode(parent, text);
+        node.Tag = new DBObject(viewName, DBObjectType.View);
+        node.ImageIndex = 1;
       }
-      lisDBObjects.Groups["grpViews"].Header = String.Format("Views ({0})", counter);
     }
 
     private void LoadRoutines()
     {
-      int counter = 0;
       DataTable procs = Utilities.GetSchemaCollection(connection, "Procedures", null, connection.Schema);
       if (procs == null) return;
 
+      TreeNode parent = objectList.Nodes[2];
       foreach (DataRow routineRow in procs.Rows)
       {
-        string routineName = routineRow["ROUTINE_NAME"].ToString();
+        string procName = routineRow["ROUTINE_NAME"].ToString();
         string type = routineRow["ROUTINE_TYPE"].ToString();
-        if (type != "PROCEDURE") continue;
-        string[] tileItems = new string[] { routineName, String.Format("Type: {0}", type) };
-        ListViewItem lvi = new ListViewItem(tileItems, 1, lisDBObjects.Groups["grpRoutines"]);
-        lvi.Name = routineName;
-        lvi.Font = new Font("Arial", 8, FontStyle.Regular);
-        lvi.Tag = new DBObject(routineName, DBObjectType.Routine);
-        lisDBObjects.Items.Add(lvi);
+        string text = String.Format("{0}|{1}", procName, String.Format("Type: {0}", type));
+
+        TreeNode node = objectList.AddNode(parent, text);
+        node.Tag = new DBObject(procName, DBObjectType.Routine);
+        node.ImageIndex = 2;
       }
-      lisDBObjects.Groups["grpRoutines"].Header = String.Format("Routines ({0})", counter);
     }
 
     private bool exportDataToTable(string appendToTableName)
@@ -120,22 +110,20 @@ namespace MySQL.ExcelAddIn
       return true;
     }
 
-    private void lisDBObjects_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+    private void objectList_AfterSelect(object sender, TreeViewEventArgs e)
     {
-      if (lisDBObjects.SelectedItems.Count > 0 && !e.Item.Equals(lisDBObjects.SelectedItems[0]))
-        return;
-      DBObject o = e.Item.Tag as DBObject;
+      DBObject o = null;
+      if (e.Node != null && e.Node.Level > 0)
+        o = e.Node.Tag as DBObject;
 
-      importData.Enabled = e.IsSelected;
-      editData.Enabled = e.IsSelected;
-      appendData.Enabled = e.IsSelected && o.Type == DBObjectType.Table; 
+      importData.Enabled = o != null;
+      editData.Enabled = o != null;
+      appendData.Enabled = o != null && o.Type == DBObjectType.Table;
     }
 
     private void importData_Click(object sender, EventArgs e)
     {
-      if (lisDBObjects.SelectedItems.Count != 1) return;
-
-      DBObject dbo = lisDBObjects.SelectedItems[0].Tag as DBObject;
+      DBObject dbo = objectList.SelectedNode.Tag as DBObject;
       DataTable dt = Utilities.GetDataFromDbObject(connection, dbo);
       if (dt == null)
       {
@@ -160,8 +148,7 @@ namespace MySQL.ExcelAddIn
 
     private void exportToNewTable_Click(object sender, EventArgs e)
     {
-      if (lisDBObjects.SelectedItems.Count > 0)
-        exportDataToTable(lisDBObjects.SelectedItems[0].Name);
+      exportDataToTable(objectList.SelectedNode.Name);
     }
 
     private void btnHelp_Click(object sender, EventArgs e)
@@ -178,6 +165,7 @@ namespace MySQL.ExcelAddIn
     {
       (Parent as TaskPaneControl).CloseConnection();
     }
+
   }
 
 }
