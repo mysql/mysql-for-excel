@@ -73,11 +73,10 @@
       // 
       // picAddInLogo
       // 
-      this.picAddInLogo.Image = global::MySQL.ExcelAddIn.Properties.Resources.MainLogo;
+      this.picAddInLogo.Image = global::MySQL.ExcelAddIn.Properties.Resources.MySQLExcelAddInLogo_64x64;
       this.picAddInLogo.Location = new System.Drawing.Point(14, 13);
       this.picAddInLogo.Name = "picAddInLogo";
-      this.picAddInLogo.Size = new System.Drawing.Size(64, 69);
-      this.picAddInLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+      this.picAddInLogo.Size = new System.Drawing.Size(64, 64);
       this.picAddInLogo.TabIndex = 13;
       this.picAddInLogo.TabStop = false;
       // 

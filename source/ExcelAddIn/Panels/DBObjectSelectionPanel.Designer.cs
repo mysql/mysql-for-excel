@@ -61,7 +61,7 @@
       // 
       this.lblConnectionName.AutoSize = true;
       this.lblConnectionName.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblConnectionName.Location = new System.Drawing.Point(98, 31);
+      this.lblConnectionName.Location = new System.Drawing.Point(84, 29);
       this.lblConnectionName.Name = "lblConnectionName";
       this.lblConnectionName.Size = new System.Drawing.Size(121, 16);
       this.lblConnectionName.TabIndex = 1;
@@ -71,7 +71,7 @@
       // 
       this.lblUserIP.AutoSize = true;
       this.lblUserIP.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblUserIP.Location = new System.Drawing.Point(100, 51);
+      this.lblUserIP.Location = new System.Drawing.Point(84, 50);
       this.lblUserIP.Name = "lblUserIP";
       this.lblUserIP.Size = new System.Drawing.Size(91, 15);
       this.lblUserIP.TabIndex = 2;
@@ -79,11 +79,10 @@
       // 
       // picAddInLogo
       // 
-      this.picAddInLogo.Image = global::MySQL.ExcelAddIn.Properties.Resources.MainLogo;
-      this.picAddInLogo.Location = new System.Drawing.Point(16, 14);
+      this.picAddInLogo.Image = global::MySQL.ExcelAddIn.Properties.Resources.MySQLExcelAddInLogo_64x64;
+      this.picAddInLogo.Location = new System.Drawing.Point(14, 13);
       this.picAddInLogo.Name = "picAddInLogo";
-      this.picAddInLogo.Size = new System.Drawing.Size(75, 74);
-      this.picAddInLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+      this.picAddInLogo.Size = new System.Drawing.Size(64, 64);
       this.picAddInLogo.TabIndex = 13;
       this.picAddInLogo.TabStop = false;
       // 
@@ -139,9 +138,9 @@
       // 
       this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnClose.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnClose.Location = new System.Drawing.Point(207, 651);
+      this.btnClose.Location = new System.Drawing.Point(219, 651);
       this.btnClose.Name = "btnClose";
-      this.btnClose.Size = new System.Drawing.Size(87, 27);
+      this.btnClose.Size = new System.Drawing.Size(75, 25);
       this.btnClose.TabIndex = 11;
       this.btnClose.Text = "Close";
       this.btnClose.UseVisualStyleBackColor = true;
@@ -151,9 +150,9 @@
       // 
       this.btnBack.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnBack.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnBack.Location = new System.Drawing.Point(114, 651);
+      this.btnBack.Location = new System.Drawing.Point(138, 651);
       this.btnBack.Name = "btnBack";
-      this.btnBack.Size = new System.Drawing.Size(87, 27);
+      this.btnBack.Size = new System.Drawing.Size(75, 25);
       this.btnBack.TabIndex = 10;
       this.btnBack.Text = "< Back";
       this.btnBack.UseVisualStyleBackColor = true;
@@ -176,7 +175,7 @@
       this.linSeparator.BorderWidth = 2;
       this.linSeparator.Name = "linSeparator";
       this.linSeparator.X1 = 16;
-      this.linSeparator.X2 = 271;
+      this.linSeparator.X2 = 291;
       this.linSeparator.Y1 = 150;
       this.linSeparator.Y2 = 150;
       // 
@@ -186,7 +185,7 @@
       this.btnHelp.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.btnHelp.Location = new System.Drawing.Point(17, 651);
       this.btnHelp.Name = "btnHelp";
-      this.btnHelp.Size = new System.Drawing.Size(87, 27);
+      this.btnHelp.Size = new System.Drawing.Size(75, 25);
       this.btnHelp.TabIndex = 9;
       this.btnHelp.Text = "Help";
       this.btnHelp.UseVisualStyleBackColor = true;
@@ -224,7 +223,7 @@
             treeNode1,
             treeNode2,
             treeNode3});
-      this.objectList.Size = new System.Drawing.Size(277, 262);
+      this.objectList.Size = new System.Drawing.Size(277, 264);
       this.objectList.TabIndex = 24;
       this.objectList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.objectList_AfterSelect);
       // 

@@ -30,8 +30,8 @@
     {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WelcomePanel));
-      System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Local Connections");
-      System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Remote Connections");
+      System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Local Connections");
+      System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Remote Connections");
       this.lblExcelAddIn = new System.Windows.Forms.Label();
       this.lblWelcome = new System.Windows.Forms.Label();
       this.picAddInLogo = new System.Windows.Forms.PictureBox();
@@ -72,11 +72,10 @@
       // 
       // picAddInLogo
       // 
-      this.picAddInLogo.Image = global::MySQL.ExcelAddIn.Properties.Resources.MainLogo;
+      this.picAddInLogo.Image = global::MySQL.ExcelAddIn.Properties.Resources.MySQLExcelAddInLogo_64x64;
       this.picAddInLogo.Location = new System.Drawing.Point(14, 12);
       this.picAddInLogo.Name = "picAddInLogo";
       this.picAddInLogo.Size = new System.Drawing.Size(64, 64);
-      this.picAddInLogo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
       this.picAddInLogo.TabIndex = 13;
       this.picAddInLogo.TabStop = false;
       // 
@@ -160,17 +159,17 @@
       this.connectionList.Location = new System.Drawing.Point(14, 203);
       this.connectionList.Name = "connectionList";
       this.connectionList.NodeImages = this.largeImages;
-      treeNode1.BackColor = System.Drawing.SystemColors.ControlDark;
-      treeNode1.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode1.Name = "LocalConnectionsNode";
-      treeNode1.Text = "Local Connections";
-      treeNode2.BackColor = System.Drawing.SystemColors.ControlDark;
-      treeNode2.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode2.Name = "Node0";
-      treeNode2.Text = "Remote Connections";
+      treeNode3.BackColor = System.Drawing.SystemColors.ControlDark;
+      treeNode3.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode3.Name = "LocalConnectionsNode";
+      treeNode3.Text = "Local Connections";
+      treeNode4.BackColor = System.Drawing.SystemColors.ControlDark;
+      treeNode4.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode4.Name = "Node0";
+      treeNode4.Text = "Remote Connections";
       this.connectionList.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1,
-            treeNode2});
+            treeNode3,
+            treeNode4});
       this.connectionList.Size = new System.Drawing.Size(265, 264);
       this.connectionList.TabIndex = 22;
       this.connectionList.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.connectionList_NodeMouseDoubleClick);
@@ -231,8 +230,8 @@
       this.Controls.Add(this.connectionList);
       this.Controls.Add(this.hotLabel1);
       this.Controls.Add(this.manageConnectionsLabel);
-      this.Controls.Add(this.newConnectionLabel);
       this.Controls.Add(this.lblInstructions);
+      this.Controls.Add(this.newConnectionLabel);
       this.Controls.Add(this.lblCopyright);
       this.Controls.Add(this.lblExcelAddIn);
       this.Controls.Add(this.lblWelcome);
