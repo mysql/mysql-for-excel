@@ -79,7 +79,7 @@ namespace MySQL.ExcelAddIn
         {
           foreach (string columnName in columnsList)
           {
-            queryString.AppendFormat("{0},", columnName);
+            queryString.AppendFormat("`{0}`,", columnName);
           }
           queryString.Remove(queryString.Length - 1, 1);
         }

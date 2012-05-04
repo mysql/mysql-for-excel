@@ -1,6 +1,6 @@
 ﻿namespace MySQL.ExcelAddIn
 {
-  partial class ImportForm
+  partial class ImportRoutineDialog
   {
     /// <summary>
     /// Required designer variable.
@@ -28,9 +28,8 @@
     /// </summary>
     private void InitializeComponent()
     {
-      this.grpPreview = new System.Windows.Forms.GroupBox();
-      this.grdPreview = new System.Windows.Forms.DataGridView();
-      this.lblFrom = new System.Windows.Forms.Label();
+      this.btnCancel = new System.Windows.Forms.Button();
+      this.btnImport = new System.Windows.Forms.Button();
       this.grpOptions = new System.Windows.Forms.GroupBox();
       this.chkLimitRows = new System.Windows.Forms.CheckBox();
       this.chkIncludeHeaders = new System.Windows.Forms.CheckBox();
@@ -38,51 +37,38 @@
       this.lblToRow = new System.Windows.Forms.Label();
       this.numFromRow = new System.Windows.Forms.NumericUpDown();
       this.lblFromRow = new System.Windows.Forms.Label();
-      this.btnImport = new System.Windows.Forms.Button();
-      this.btnCancel = new System.Windows.Forms.Button();
-      this.grpPreview.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.grdPreview)).BeginInit();
+      this.lblFrom = new System.Windows.Forms.Label();
+      this.grpPreview = new System.Windows.Forms.GroupBox();
+      this.grdPreview = new System.Windows.Forms.DataGridView();
+      this.parametersGrid = new System.Windows.Forms.PropertyGrid();
+      this.grpParameters = new System.Windows.Forms.GroupBox();
       this.grpOptions.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.numRowsCount)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.numFromRow)).BeginInit();
+      this.grpPreview.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.grdPreview)).BeginInit();
+      this.grpParameters.SuspendLayout();
       this.SuspendLayout();
       // 
-      // grpPreview
+      // btnCancel
       // 
-      this.grpPreview.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.grpPreview.Controls.Add(this.grdPreview);
-      this.grpPreview.Location = new System.Drawing.Point(12, 25);
-      this.grpPreview.Name = "grpPreview";
-      this.grpPreview.Size = new System.Drawing.Size(704, 214);
-      this.grpPreview.TabIndex = 0;
-      this.grpPreview.TabStop = false;
-      this.grpPreview.Text = "Data Preview";
+      this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.btnCancel.Location = new System.Drawing.Point(641, 392);
+      this.btnCancel.Name = "btnCancel";
+      this.btnCancel.Size = new System.Drawing.Size(75, 23);
+      this.btnCancel.TabIndex = 9;
+      this.btnCancel.Text = "Cancel";
+      this.btnCancel.UseVisualStyleBackColor = true;
       // 
-      // grdPreview
+      // btnImport
       // 
-      this.grdPreview.AllowUserToAddRows = false;
-      this.grdPreview.AllowUserToDeleteRows = false;
-      this.grdPreview.AllowUserToResizeColumns = false;
-      this.grdPreview.AllowUserToResizeRows = false;
-      this.grdPreview.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-      this.grdPreview.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-      this.grdPreview.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.grdPreview.Location = new System.Drawing.Point(3, 16);
-      this.grdPreview.Name = "grdPreview";
-      this.grdPreview.ReadOnly = true;
-      this.grdPreview.RowHeadersVisible = false;
-      this.grdPreview.Size = new System.Drawing.Size(698, 195);
-      this.grdPreview.TabIndex = 0;
-      // 
-      // lblFrom
-      // 
-      this.lblFrom.AutoSize = true;
-      this.lblFrom.Location = new System.Drawing.Point(12, 9);
-      this.lblFrom.Name = "lblFrom";
-      this.lblFrom.Size = new System.Drawing.Size(78, 13);
-      this.lblFrom.TabIndex = 1;
-      this.lblFrom.Text = "From Table: ??";
+      this.btnImport.DialogResult = System.Windows.Forms.DialogResult.OK;
+      this.btnImport.Location = new System.Drawing.Point(560, 392);
+      this.btnImport.Name = "btnImport";
+      this.btnImport.Size = new System.Drawing.Size(75, 23);
+      this.btnImport.TabIndex = 8;
+      this.btnImport.Text = "Import";
+      this.btnImport.UseVisualStyleBackColor = true;
       // 
       // grpOptions
       // 
@@ -92,10 +78,10 @@
       this.grpOptions.Controls.Add(this.lblToRow);
       this.grpOptions.Controls.Add(this.numFromRow);
       this.grpOptions.Controls.Add(this.lblFromRow);
-      this.grpOptions.Location = new System.Drawing.Point(12, 245);
+      this.grpOptions.Location = new System.Drawing.Point(212, 245);
       this.grpOptions.Name = "grpOptions";
-      this.grpOptions.Size = new System.Drawing.Size(704, 70);
-      this.grpOptions.TabIndex = 2;
+      this.grpOptions.Size = new System.Drawing.Size(567, 70);
+      this.grpOptions.TabIndex = 7;
       this.grpOptions.TabStop = false;
       this.grpOptions.Text = "Options";
       // 
@@ -108,7 +94,6 @@
       this.chkLimitRows.TabIndex = 5;
       this.chkLimitRows.Text = "Limit Rows";
       this.chkLimitRows.UseVisualStyleBackColor = true;
-      this.chkLimitRows.CheckedChanged += new System.EventHandler(this.chkLimitRows_CheckedChanged);
       // 
       // chkIncludeHeaders
       // 
@@ -167,50 +152,84 @@
       this.lblFromRow.TabIndex = 0;
       this.lblFromRow.Text = "From Row:";
       // 
-      // btnImport
+      // lblFrom
       // 
-      this.btnImport.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.btnImport.Location = new System.Drawing.Point(560, 321);
-      this.btnImport.Name = "btnImport";
-      this.btnImport.Size = new System.Drawing.Size(75, 23);
-      this.btnImport.TabIndex = 3;
-      this.btnImport.Text = "Import";
-      this.btnImport.UseVisualStyleBackColor = true;
-      this.btnImport.Click += new System.EventHandler(this.btnImport_Click);
+      this.lblFrom.AutoSize = true;
+      this.lblFrom.Location = new System.Drawing.Point(12, 9);
+      this.lblFrom.Name = "lblFrom";
+      this.lblFrom.Size = new System.Drawing.Size(88, 13);
+      this.lblFrom.TabIndex = 6;
+      this.lblFrom.Text = "From Routine: ??";
       // 
-      // btnCancel
+      // grpPreview
       // 
-      this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnCancel.Location = new System.Drawing.Point(641, 321);
-      this.btnCancel.Name = "btnCancel";
-      this.btnCancel.Size = new System.Drawing.Size(75, 23);
-      this.btnCancel.TabIndex = 4;
-      this.btnCancel.Text = "Cancel";
-      this.btnCancel.UseVisualStyleBackColor = true;
+      this.grpPreview.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.grpPreview.Controls.Add(this.grdPreview);
+      this.grpPreview.Location = new System.Drawing.Point(212, 25);
+      this.grpPreview.Name = "grpPreview";
+      this.grpPreview.Size = new System.Drawing.Size(570, 214);
+      this.grpPreview.TabIndex = 5;
+      this.grpPreview.TabStop = false;
+      this.grpPreview.Text = "Data Preview";
       // 
-      // ImportForm
+      // grdPreview
       // 
-      this.AcceptButton = this.btnImport;
+      this.grdPreview.AllowUserToAddRows = false;
+      this.grdPreview.AllowUserToDeleteRows = false;
+      this.grdPreview.AllowUserToResizeColumns = false;
+      this.grdPreview.AllowUserToResizeRows = false;
+      this.grdPreview.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+      this.grdPreview.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+      this.grdPreview.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.grdPreview.Location = new System.Drawing.Point(3, 16);
+      this.grdPreview.Name = "grdPreview";
+      this.grdPreview.ReadOnly = true;
+      this.grdPreview.RowHeadersVisible = false;
+      this.grdPreview.Size = new System.Drawing.Size(564, 195);
+      this.grdPreview.TabIndex = 0;
+      // 
+      // parametersGrid
+      // 
+      this.parametersGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.parametersGrid.Location = new System.Drawing.Point(3, 16);
+      this.parametersGrid.Name = "parametersGrid";
+      this.parametersGrid.Size = new System.Drawing.Size(188, 271);
+      this.parametersGrid.TabIndex = 10;
+      // 
+      // grpParameters
+      // 
+      this.grpParameters.Controls.Add(this.parametersGrid);
+      this.grpParameters.Location = new System.Drawing.Point(12, 25);
+      this.grpParameters.Name = "grpParameters";
+      this.grpParameters.Size = new System.Drawing.Size(194, 290);
+      this.grpParameters.TabIndex = 11;
+      this.grpParameters.TabStop = false;
+      this.grpParameters.Text = "Parameters";
+      // 
+      // ImportRoutineDialog
+      // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.CancelButton = this.btnCancel;
-      this.ClientSize = new System.Drawing.Size(728, 355);
+      this.ClientSize = new System.Drawing.Size(794, 421);
       this.ControlBox = false;
+      this.Controls.Add(this.grpParameters);
       this.Controls.Add(this.btnCancel);
       this.Controls.Add(this.btnImport);
       this.Controls.Add(this.grpOptions);
       this.Controls.Add(this.lblFrom);
       this.Controls.Add(this.grpPreview);
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-      this.Name = "ImportForm";
+      this.Name = "ImportRoutineDialog";
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
       this.Text = "Import Data";
-      this.grpPreview.ResumeLayout(false);
-      ((System.ComponentModel.ISupportInitialize)(this.grdPreview)).EndInit();
       this.grpOptions.ResumeLayout(false);
       this.grpOptions.PerformLayout();
       ((System.ComponentModel.ISupportInitialize)(this.numRowsCount)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.numFromRow)).EndInit();
+      this.grpPreview.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.grdPreview)).EndInit();
+      this.grpParameters.ResumeLayout(false);
       this.ResumeLayout(false);
       this.PerformLayout();
 
@@ -218,17 +237,19 @@
 
     #endregion
 
-    private System.Windows.Forms.GroupBox grpPreview;
-    private System.Windows.Forms.Label lblFrom;
-    private System.Windows.Forms.DataGridView grdPreview;
+    private System.Windows.Forms.Button btnCancel;
+    private System.Windows.Forms.Button btnImport;
     private System.Windows.Forms.GroupBox grpOptions;
+    private System.Windows.Forms.CheckBox chkLimitRows;
+    private System.Windows.Forms.CheckBox chkIncludeHeaders;
+    private System.Windows.Forms.NumericUpDown numRowsCount;
     private System.Windows.Forms.Label lblToRow;
     private System.Windows.Forms.NumericUpDown numFromRow;
     private System.Windows.Forms.Label lblFromRow;
-    private System.Windows.Forms.CheckBox chkIncludeHeaders;
-    private System.Windows.Forms.NumericUpDown numRowsCount;
-    private System.Windows.Forms.Button btnImport;
-    private System.Windows.Forms.Button btnCancel;
-    private System.Windows.Forms.CheckBox chkLimitRows;
+    private System.Windows.Forms.Label lblFrom;
+    private System.Windows.Forms.GroupBox grpPreview;
+    private System.Windows.Forms.DataGridView grdPreview;
+    private System.Windows.Forms.PropertyGrid parametersGrid;
+    private System.Windows.Forms.GroupBox grpParameters;
   }
 }

@@ -12,7 +12,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ExcelAddIn
 {
-  public partial class ExportDataToTableForm : Form
+  public partial class ExportDataToTableDialog : Form
   {
     //private MySQLSchemaInfo localSchemaInfo;
     private MySqlWorkbenchConnection wbConnection;
@@ -37,7 +37,7 @@ namespace MySQL.ExcelAddIn
       get { return (columnSchemaInfo != null && formattedExcelData != null ? columnSchemaInfo.Select("MappedColIdx > -1").Length == 0 : true); }
     }
 
-    public ExportDataToTableForm(MySqlWorkbenchConnection wbConnection, string toSchemaName, string toTableName, Excel.Range exportDataRange)
+    public ExportDataToTableDialog(MySqlWorkbenchConnection wbConnection, string toSchemaName, string toTableName, Excel.Range exportDataRange)
     {
       //localSchemaInfo = schemaInfo;
       this.wbConnection = wbConnection;

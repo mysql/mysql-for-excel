@@ -1,6 +1,6 @@
 ﻿namespace MySQL.ExcelAddIn
 {
-  partial class PasswordForm
+  partial class PasswordDialog
   {
     /// <summary>
     /// Required designer variable.
@@ -139,7 +139,7 @@
       this.btnOK.Text = "OK";
       this.btnOK.UseVisualStyleBackColor = true;
       // 
-      // PasswordForm
+      // PasswordDialog
       // 
       this.AcceptButton = this.btnOK;
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);

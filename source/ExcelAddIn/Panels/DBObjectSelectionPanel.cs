@@ -128,7 +128,7 @@ namespace MySQL.ExcelAddIn
 
       DBObject dbo = objectList.SelectedNode.Tag as DBObject;
       //DataTable dt = Utilities.GetDataFromDbObject(connection, dbo);
-      ImportForm importForm = new ImportForm(connection, dbo);
+      ImportTableViewDialog importForm = new ImportTableViewDialog(connection, dbo);
       DialogResult dr = importForm.ShowDialog();
       if (dr == DialogResult.Cancel)
         return;

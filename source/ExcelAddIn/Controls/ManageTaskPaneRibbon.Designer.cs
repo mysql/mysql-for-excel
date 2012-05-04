@@ -51,13 +51,14 @@
       // grpMySQLExcelAddIn
       // 
       this.grpMySQLExcelAddIn.Items.Add(this.togShowTaskPane);
+      this.grpMySQLExcelAddIn.Label = "MySQL";
       this.grpMySQLExcelAddIn.Name = "grpMySQLExcelAddIn";
       // 
       // togShowTaskPane
       // 
       this.togShowTaskPane.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
       this.togShowTaskPane.Image = global::MySQL.ExcelAddIn.Properties.Resources.MainLogo;
-      this.togShowTaskPane.Label = "MySQL For Excel";
+      this.togShowTaskPane.Label = "MySQL for Excel";
       this.togShowTaskPane.Name = "togShowTaskPane";
       this.togShowTaskPane.ShowImage = true;
       this.togShowTaskPane.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.togShowTaskPane_Click);

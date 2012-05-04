@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace MySQL.ExcelAddIn
 {
-  public partial class PasswordForm : Form
+  public partial class PasswordDialog : Form
   {
     public string PasswordText
     {
@@ -27,7 +27,7 @@ namespace MySQL.ExcelAddIn
       set { lblUserValue.Text = value; }
     }
 
-    public PasswordForm()
+    public PasswordDialog()
     {
       InitializeComponent();
     }

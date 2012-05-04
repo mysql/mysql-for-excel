@@ -10,7 +10,7 @@ using MySQL.Utility;
 
 namespace MySQL.ExcelAddIn
 {
-  public partial class ImportForm : Form
+  public partial class ImportTableViewDialog : Form
   {
     private MySqlWorkbenchConnection wbConnection;
     private DBObject importDBObject;
@@ -18,7 +18,7 @@ namespace MySQL.ExcelAddIn
     public DataTable ImportDataTable = null;
     public List<string> HeadersList { get; private set; }
 
-    public ImportForm(MySqlWorkbenchConnection wbConnection, DBObject importDBObject)
+    public ImportTableViewDialog(MySqlWorkbenchConnection wbConnection, DBObject importDBObject)
     {
       this.wbConnection = wbConnection;
       this.importDBObject = importDBObject;
@@ -34,7 +34,7 @@ namespace MySQL.ExcelAddIn
 
     private void fillPreviewGrid()
     {
-      previewDataTable = Utilities.GetDataFromTableOrView(wbConnection, importDBObject, null, 0, 8);
+      previewDataTable = Utilities.GetDataFromTableOrView(wbConnection, importDBObject, null, 0, 10);
       grdPreview.DataSource = previewDataTable;
       foreach (DataGridViewColumn gridCol in grdPreview.Columns)
       {

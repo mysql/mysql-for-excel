@@ -122,7 +122,9 @@ namespace TreeViewTest
 
       if (NodeImages != null)
       {
-        Image i = NodeImages.Images[e.Node.ImageIndex];
+        Image i = null;
+        if (NodeImages.Images.Count > 0 && e.Node.ImageIndex >= 0 && e.Node.ImageIndex < NodeImages.Images.Count)
+          i = NodeImages.Images[e.Node.ImageIndex];
         if (i != null)
         {
           pt.X += 5;

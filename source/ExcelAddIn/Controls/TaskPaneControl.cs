@@ -46,7 +46,7 @@ namespace MySQL.ExcelAddIn
       this.connection = connection;
       if (connection.Password == null)
       {
-        PasswordForm dlg = new PasswordForm();
+        PasswordDialog dlg = new PasswordDialog();
         dlg.HostIdentifier = connection.HostIdentifier;
         dlg.UserName = connection.UserName;
         dlg.PasswordText = String.Empty;
@@ -140,7 +140,7 @@ namespace MySQL.ExcelAddIn
 
     public void AppendDataToTable(string toTableName)
     {
-      ExportDataToTableForm exportDataForm = new ExportDataToTableForm(connection, connection.Schema, toTableName, excelApplication.Selection as Excel.Range);
+      ExportDataToTableDialog exportDataForm = new ExportDataToTableDialog(connection, connection.Schema, toTableName, excelApplication.Selection as Excel.Range);
       DialogResult dr = exportDataForm.ShowDialog();
     }
 
