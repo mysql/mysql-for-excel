@@ -90,7 +90,7 @@ namespace MySQL.ExcelAddIn
         string text = String.Format("{0}|{1}", procName, String.Format("Type: {0}", type));
 
         TreeNode node = objectList.AddNode(parent, text);
-        node.Tag = new DBObject(procName, DBObjectType.Routine);
+        node.Tag = new DBObject(procName, DBObjectType.Routine, (type == "PROCEDURE" ? RoutineType.Procedure : RoutineType.Function));
         node.ImageIndex = 2;
       }
     }
@@ -127,19 +127,46 @@ namespace MySQL.ExcelAddIn
         return;
 
       DBObject dbo = objectList.SelectedNode.Tag as DBObject;
-      //DataTable dt = Utilities.GetDataFromDbObject(connection, dbo);
-      ImportTableViewDialog importForm = new ImportTableViewDialog(connection, dbo);
-      DialogResult dr = importForm.ShowDialog();
+      switch (dbo.Type)
+      {
+        case DBObjectType.Table:
+        case DBObjectType.View:
+          importTableOrView(dbo);
+          break;
+        case DBObjectType.Routine:
+          importRoutine(dbo);
+          break;
+      }
+    }
+
+    private void importTableOrView(DBObject dbo)
+    {
+      ImportTableViewDialog importDialog = new ImportTableViewDialog(connection, dbo);
+      DialogResult dr = importDialog.ShowDialog();
       if (dr == DialogResult.Cancel)
         return;
-      if (importForm.ImportDataTable == null)
+      if (importDialog.ImportDataTable == null)
       {
         string msg = String.Format(Resources.UnableToRetrieveData, dbo.Name);
         MessageBox.Show(msg, Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
         return;
       }
+      (Parent as TaskPaneControl).ImportDataToExcel(importDialog.ImportDataTable, importDialog.ImportHeaders);
+    }
 
-      (Parent as TaskPaneControl).ImportDataToExcel(importForm.ImportDataTable, importForm.HeadersList);
+    private void importRoutine(DBObject dbo)
+    {
+      ImportRoutineDialog importDialog = new ImportRoutineDialog(connection, dbo);
+      DialogResult dr = importDialog.ShowDialog();
+      if (dr == DialogResult.Cancel)
+        return;
+      if (importDialog.ImportDataSet == null)
+      {
+        string msg = String.Format(Resources.UnableToRetrieveData, dbo.Name);
+        MessageBox.Show(msg, Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        return;
+      }
+      (Parent as TaskPaneControl).ImportDataToExcel(importDialog.ImportDataSet, importDialog.ImportHeaders, importDialog.ImportType);
     }
 
     private void editData_Click(object sender, EventArgs e)

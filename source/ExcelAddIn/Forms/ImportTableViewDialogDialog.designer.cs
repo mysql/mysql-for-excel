@@ -32,6 +32,7 @@
       this.grdPreview = new System.Windows.Forms.DataGridView();
       this.lblFrom = new System.Windows.Forms.Label();
       this.grpOptions = new System.Windows.Forms.GroupBox();
+      this.btnSelect = new System.Windows.Forms.Button();
       this.chkLimitRows = new System.Windows.Forms.CheckBox();
       this.chkIncludeHeaders = new System.Windows.Forms.CheckBox();
       this.numRowsCount = new System.Windows.Forms.NumericUpDown();
@@ -40,6 +41,7 @@
       this.lblFromRow = new System.Windows.Forms.Label();
       this.btnImport = new System.Windows.Forms.Button();
       this.btnCancel = new System.Windows.Forms.Button();
+      this.lblRowsCount = new System.Windows.Forms.Label();
       this.grpPreview.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.grdPreview)).BeginInit();
       this.grpOptions.SuspendLayout();
@@ -55,7 +57,7 @@
       this.grpPreview.Location = new System.Drawing.Point(12, 25);
       this.grpPreview.Name = "grpPreview";
       this.grpPreview.Size = new System.Drawing.Size(704, 214);
-      this.grpPreview.TabIndex = 0;
+      this.grpPreview.TabIndex = 1;
       this.grpPreview.TabStop = false;
       this.grpPreview.Text = "Data Preview";
       // 
@@ -74,6 +76,7 @@
       this.grdPreview.RowHeadersVisible = false;
       this.grdPreview.Size = new System.Drawing.Size(698, 195);
       this.grdPreview.TabIndex = 0;
+      this.grdPreview.SelectionChanged += new System.EventHandler(this.grdPreview_SelectionChanged);
       // 
       // lblFrom
       // 
@@ -81,11 +84,12 @@
       this.lblFrom.Location = new System.Drawing.Point(12, 9);
       this.lblFrom.Name = "lblFrom";
       this.lblFrom.Size = new System.Drawing.Size(78, 13);
-      this.lblFrom.TabIndex = 1;
+      this.lblFrom.TabIndex = 0;
       this.lblFrom.Text = "From Table: ??";
       // 
       // grpOptions
       // 
+      this.grpOptions.Controls.Add(this.btnSelect);
       this.grpOptions.Controls.Add(this.chkLimitRows);
       this.grpOptions.Controls.Add(this.chkIncludeHeaders);
       this.grpOptions.Controls.Add(this.numRowsCount);
@@ -99,13 +103,23 @@
       this.grpOptions.TabStop = false;
       this.grpOptions.Text = "Options";
       // 
+      // btnSelect
+      // 
+      this.btnSelect.Location = new System.Drawing.Point(548, 15);
+      this.btnSelect.Name = "btnSelect";
+      this.btnSelect.Size = new System.Drawing.Size(150, 23);
+      this.btnSelect.TabIndex = 1;
+      this.btnSelect.Text = "Select All";
+      this.btnSelect.UseVisualStyleBackColor = true;
+      this.btnSelect.Click += new System.EventHandler(this.btnSelect_Click);
+      // 
       // chkLimitRows
       // 
       this.chkLimitRows.AutoSize = true;
       this.chkLimitRows.Location = new System.Drawing.Point(6, 42);
       this.chkLimitRows.Name = "chkLimitRows";
       this.chkLimitRows.Size = new System.Drawing.Size(77, 17);
-      this.chkLimitRows.TabIndex = 5;
+      this.chkLimitRows.TabIndex = 2;
       this.chkLimitRows.Text = "Limit Rows";
       this.chkLimitRows.UseVisualStyleBackColor = true;
       this.chkLimitRows.CheckedChanged += new System.EventHandler(this.chkLimitRows_CheckedChanged);
@@ -116,13 +130,13 @@
       this.chkIncludeHeaders.Location = new System.Drawing.Point(6, 19);
       this.chkIncludeHeaders.Name = "chkIncludeHeaders";
       this.chkIncludeHeaders.Size = new System.Drawing.Size(192, 17);
-      this.chkIncludeHeaders.TabIndex = 4;
+      this.chkIncludeHeaders.TabIndex = 0;
       this.chkIncludeHeaders.Text = "Include Column Names as Headers";
       this.chkIncludeHeaders.UseVisualStyleBackColor = true;
       // 
       // numRowsCount
       // 
-      this.numRowsCount.Location = new System.Drawing.Point(460, 41);
+      this.numRowsCount.Location = new System.Drawing.Point(450, 41);
       this.numRowsCount.Minimum = new decimal(new int[] {
             1,
             0,
@@ -130,20 +144,20 @@
             -2147483648});
       this.numRowsCount.Name = "numRowsCount";
       this.numRowsCount.Size = new System.Drawing.Size(63, 20);
-      this.numRowsCount.TabIndex = 3;
+      this.numRowsCount.TabIndex = 6;
       // 
       // lblToRow
       // 
       this.lblToRow.AutoSize = true;
-      this.lblToRow.Location = new System.Drawing.Point(318, 43);
+      this.lblToRow.Location = new System.Drawing.Point(308, 43);
       this.lblToRow.Name = "lblToRow";
       this.lblToRow.Size = new System.Drawing.Size(136, 13);
-      this.lblToRow.TabIndex = 2;
+      this.lblToRow.TabIndex = 5;
       this.lblToRow.Text = "Number of Rows to Return:";
       // 
       // numFromRow
       // 
-      this.numFromRow.Location = new System.Drawing.Point(217, 41);
+      this.numFromRow.Location = new System.Drawing.Point(207, 41);
       this.numFromRow.Minimum = new decimal(new int[] {
             1,
             0,
@@ -151,7 +165,7 @@
             0});
       this.numFromRow.Name = "numFromRow";
       this.numFromRow.Size = new System.Drawing.Size(63, 20);
-      this.numFromRow.TabIndex = 1;
+      this.numFromRow.TabIndex = 4;
       this.numFromRow.Value = new decimal(new int[] {
             1,
             0,
@@ -161,10 +175,10 @@
       // lblFromRow
       // 
       this.lblFromRow.AutoSize = true;
-      this.lblFromRow.Location = new System.Drawing.Point(153, 43);
+      this.lblFromRow.Location = new System.Drawing.Point(143, 43);
       this.lblFromRow.Name = "lblFromRow";
       this.lblFromRow.Size = new System.Drawing.Size(58, 13);
-      this.lblFromRow.TabIndex = 0;
+      this.lblFromRow.TabIndex = 3;
       this.lblFromRow.Text = "From Row:";
       // 
       // btnImport
@@ -188,6 +202,16 @@
       this.btnCancel.Text = "Cancel";
       this.btnCancel.UseVisualStyleBackColor = true;
       // 
+      // lblRowsCount
+      // 
+      this.lblRowsCount.AutoSize = true;
+      this.lblRowsCount.Location = new System.Drawing.Point(583, 9);
+      this.lblRowsCount.Name = "lblRowsCount";
+      this.lblRowsCount.Size = new System.Drawing.Size(110, 13);
+      this.lblRowsCount.TabIndex = 5;
+      this.lblRowsCount.Text = "Total Rows Count: ??";
+      this.lblRowsCount.TextAlign = System.Drawing.ContentAlignment.TopRight;
+      // 
       // ImportTableViewDialog
       // 
       this.AcceptButton = this.btnImport;
@@ -196,6 +220,7 @@
       this.CancelButton = this.btnCancel;
       this.ClientSize = new System.Drawing.Size(728, 355);
       this.ControlBox = false;
+      this.Controls.Add(this.lblRowsCount);
       this.Controls.Add(this.btnCancel);
       this.Controls.Add(this.btnImport);
       this.Controls.Add(this.grpOptions);
@@ -230,5 +255,7 @@
     private System.Windows.Forms.Button btnImport;
     private System.Windows.Forms.Button btnCancel;
     private System.Windows.Forms.CheckBox chkLimitRows;
+    private System.Windows.Forms.Button btnSelect;
+    private System.Windows.Forms.Label lblRowsCount;
   }
 }

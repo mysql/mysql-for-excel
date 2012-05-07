@@ -66,6 +66,17 @@ namespace MySQL.ExcelAddIn
       return ds.Tables[0];
     }
 
+    public static long GetRowsCountFromTableOrView(MySqlWorkbenchConnection connection, DBObject dbo)
+    {
+      if (dbo.Type == DBObjectType.Routine)
+        return 0;
+
+      string sql = String.Format("SELECT COUNT(*) FROM `{0}`", dbo.Name);
+      object objCount = MySqlHelper.ExecuteScalar(GetConnectionString(connection), sql);
+      long retCount = (objCount != null ? (long)objCount : 0);
+      return retCount;
+    }
+
     public static DataTable GetDataFromTableOrView(MySqlWorkbenchConnection connection, DBObject dbo, List<string> columnsList, int firstRowIdx, int rowCount)
     {
       DataTable retTable = null;
@@ -103,17 +114,55 @@ namespace MySQL.ExcelAddIn
       return GetDataFromTableOrView(connection, dbo, columnsList, -1, -1);
     }
 
-    public static DataSet GetDataSetFromRoutine(MySqlWorkbenchConnection connection, DBObject dbo)
+    public static DataSet GetDataSetFromRoutine(MySqlWorkbenchConnection connection, DBObject dbo, params MySqlParameter[] parameters)
     {
       DataSet retDS = null;
       
       if (dbo.Type == DBObjectType.Routine)
       {
-        string sql = String.Format("CALL `{0}`", dbo.Name);
-        retDS = MySqlHelper.ExecuteDataset(GetConnectionString(connection), sql);
+        string sql = String.Format("`{0}`", dbo.Name);
+        retDS = ExecuteDatasetSP(GetConnectionString(connection), sql, parameters);
       }
 
       return retDS;
+    }
+
+    public static DataSet ExecuteDatasetSP(MySqlConnection connection, string commandText, params MySqlParameter[] commandParameters)
+    {
+      //create a command and prepare it for execution
+      MySqlCommand cmd = new MySqlCommand();
+      cmd.Connection = connection;
+      cmd.CommandText = commandText;
+      cmd.CommandType = CommandType.StoredProcedure;
+
+      if (commandParameters != null)
+        foreach (MySqlParameter p in commandParameters)
+          cmd.Parameters.Add(p);
+
+      //create the DataAdapter & DataSet
+      MySqlDataAdapter da = new MySqlDataAdapter(cmd);
+      DataSet ds = new DataSet();
+
+      //fill the DataSet using default values for DataTable names, etc.
+      da.Fill(ds);
+
+      // detach the MySqlParameters from the command object, so they can be used again.			
+      cmd.Parameters.Clear();
+
+      //return the dataset
+      return ds;
+    }
+
+    public static DataSet ExecuteDatasetSP(string connectionString, string commandText, params MySqlParameter[] commandParameters)
+    {
+      //create & open a SqlConnection, and dispose of it after we are done.
+      using (MySqlConnection cn = new MySqlConnection(connectionString))
+      {
+        cn.Open();
+
+        //call the overload that takes a connection in place of the connection string
+        return ExecuteDatasetSP(cn, commandText, commandParameters);
+      }
     }
 
     public static void SetDoubleBuffered(System.Windows.Forms.Control c)

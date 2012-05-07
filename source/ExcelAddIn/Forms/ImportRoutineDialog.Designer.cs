@@ -31,20 +31,17 @@
       this.btnCancel = new System.Windows.Forms.Button();
       this.btnImport = new System.Windows.Forms.Button();
       this.grpOptions = new System.Windows.Forms.GroupBox();
-      this.chkLimitRows = new System.Windows.Forms.CheckBox();
+      this.cmbMultipleResultSets = new System.Windows.Forms.ComboBox();
+      this.lblMultipleResultSets = new System.Windows.Forms.Label();
       this.chkIncludeHeaders = new System.Windows.Forms.CheckBox();
-      this.numRowsCount = new System.Windows.Forms.NumericUpDown();
-      this.lblToRow = new System.Windows.Forms.Label();
-      this.numFromRow = new System.Windows.Forms.NumericUpDown();
-      this.lblFromRow = new System.Windows.Forms.Label();
       this.lblFrom = new System.Windows.Forms.Label();
       this.grpPreview = new System.Windows.Forms.GroupBox();
+      this.lisResultSets = new System.Windows.Forms.ListBox();
       this.grdPreview = new System.Windows.Forms.DataGridView();
       this.parametersGrid = new System.Windows.Forms.PropertyGrid();
       this.grpParameters = new System.Windows.Forms.GroupBox();
+      this.btnCall = new System.Windows.Forms.Button();
       this.grpOptions.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.numRowsCount)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.numFromRow)).BeginInit();
       this.grpPreview.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.grdPreview)).BeginInit();
       this.grpParameters.SuspendLayout();
@@ -53,7 +50,7 @@
       // btnCancel
       // 
       this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnCancel.Location = new System.Drawing.Point(641, 392);
+      this.btnCancel.Location = new System.Drawing.Point(707, 321);
       this.btnCancel.Name = "btnCancel";
       this.btnCancel.Size = new System.Drawing.Size(75, 23);
       this.btnCancel.TabIndex = 9;
@@ -63,7 +60,7 @@
       // btnImport
       // 
       this.btnImport.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.btnImport.Location = new System.Drawing.Point(560, 392);
+      this.btnImport.Location = new System.Drawing.Point(626, 321);
       this.btnImport.Name = "btnImport";
       this.btnImport.Size = new System.Drawing.Size(75, 23);
       this.btnImport.TabIndex = 8;
@@ -72,28 +69,33 @@
       // 
       // grpOptions
       // 
-      this.grpOptions.Controls.Add(this.chkLimitRows);
+      this.grpOptions.Controls.Add(this.cmbMultipleResultSets);
+      this.grpOptions.Controls.Add(this.lblMultipleResultSets);
       this.grpOptions.Controls.Add(this.chkIncludeHeaders);
-      this.grpOptions.Controls.Add(this.numRowsCount);
-      this.grpOptions.Controls.Add(this.lblToRow);
-      this.grpOptions.Controls.Add(this.numFromRow);
-      this.grpOptions.Controls.Add(this.lblFromRow);
-      this.grpOptions.Location = new System.Drawing.Point(212, 245);
+      this.grpOptions.Location = new System.Drawing.Point(215, 270);
       this.grpOptions.Name = "grpOptions";
-      this.grpOptions.Size = new System.Drawing.Size(567, 70);
+      this.grpOptions.Size = new System.Drawing.Size(567, 45);
       this.grpOptions.TabIndex = 7;
       this.grpOptions.TabStop = false;
       this.grpOptions.Text = "Options";
       // 
-      // chkLimitRows
+      // cmbMultipleResultSets
       // 
-      this.chkLimitRows.AutoSize = true;
-      this.chkLimitRows.Location = new System.Drawing.Point(6, 42);
-      this.chkLimitRows.Name = "chkLimitRows";
-      this.chkLimitRows.Size = new System.Drawing.Size(77, 17);
-      this.chkLimitRows.TabIndex = 5;
-      this.chkLimitRows.Text = "Limit Rows";
-      this.chkLimitRows.UseVisualStyleBackColor = true;
+      this.cmbMultipleResultSets.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.cmbMultipleResultSets.FormattingEnabled = true;
+      this.cmbMultipleResultSets.Location = new System.Drawing.Point(385, 17);
+      this.cmbMultipleResultSets.Name = "cmbMultipleResultSets";
+      this.cmbMultipleResultSets.Size = new System.Drawing.Size(176, 21);
+      this.cmbMultipleResultSets.TabIndex = 6;
+      // 
+      // lblMultipleResultSets
+      // 
+      this.lblMultipleResultSets.AutoSize = true;
+      this.lblMultipleResultSets.Location = new System.Drawing.Point(233, 20);
+      this.lblMultipleResultSets.Name = "lblMultipleResultSets";
+      this.lblMultipleResultSets.Size = new System.Drawing.Size(146, 13);
+      this.lblMultipleResultSets.TabIndex = 5;
+      this.lblMultipleResultSets.Text = "Return Multiple ResultSets in:";
       // 
       // chkIncludeHeaders
       // 
@@ -104,53 +106,6 @@
       this.chkIncludeHeaders.TabIndex = 4;
       this.chkIncludeHeaders.Text = "Include Column Names as Headers";
       this.chkIncludeHeaders.UseVisualStyleBackColor = true;
-      // 
-      // numRowsCount
-      // 
-      this.numRowsCount.Location = new System.Drawing.Point(460, 41);
-      this.numRowsCount.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            -2147483648});
-      this.numRowsCount.Name = "numRowsCount";
-      this.numRowsCount.Size = new System.Drawing.Size(63, 20);
-      this.numRowsCount.TabIndex = 3;
-      // 
-      // lblToRow
-      // 
-      this.lblToRow.AutoSize = true;
-      this.lblToRow.Location = new System.Drawing.Point(318, 43);
-      this.lblToRow.Name = "lblToRow";
-      this.lblToRow.Size = new System.Drawing.Size(136, 13);
-      this.lblToRow.TabIndex = 2;
-      this.lblToRow.Text = "Number of Rows to Return:";
-      // 
-      // numFromRow
-      // 
-      this.numFromRow.Location = new System.Drawing.Point(217, 41);
-      this.numFromRow.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-      this.numFromRow.Name = "numFromRow";
-      this.numFromRow.Size = new System.Drawing.Size(63, 20);
-      this.numFromRow.TabIndex = 1;
-      this.numFromRow.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-      // 
-      // lblFromRow
-      // 
-      this.lblFromRow.AutoSize = true;
-      this.lblFromRow.Location = new System.Drawing.Point(153, 43);
-      this.lblFromRow.Name = "lblFromRow";
-      this.lblFromRow.Size = new System.Drawing.Size(58, 13);
-      this.lblFromRow.TabIndex = 0;
-      this.lblFromRow.Text = "From Row:";
       // 
       // lblFrom
       // 
@@ -165,13 +120,23 @@
       // 
       this.grpPreview.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+      this.grpPreview.Controls.Add(this.lisResultSets);
       this.grpPreview.Controls.Add(this.grdPreview);
       this.grpPreview.Location = new System.Drawing.Point(212, 25);
       this.grpPreview.Name = "grpPreview";
-      this.grpPreview.Size = new System.Drawing.Size(570, 214);
+      this.grpPreview.Size = new System.Drawing.Size(570, 239);
       this.grpPreview.TabIndex = 5;
       this.grpPreview.TabStop = false;
       this.grpPreview.Text = "Data Preview";
+      // 
+      // lisResultSets
+      // 
+      this.lisResultSets.FormattingEnabled = true;
+      this.lisResultSets.Location = new System.Drawing.Point(6, 16);
+      this.lisResultSets.Name = "lisResultSets";
+      this.lisResultSets.Size = new System.Drawing.Size(80, 212);
+      this.lisResultSets.TabIndex = 1;
+      this.lisResultSets.SelectedIndexChanged += new System.EventHandler(this.lisResultSets_SelectedIndexChanged);
       // 
       // grdPreview
       // 
@@ -179,26 +144,30 @@
       this.grdPreview.AllowUserToDeleteRows = false;
       this.grdPreview.AllowUserToResizeColumns = false;
       this.grdPreview.AllowUserToResizeRows = false;
+      this.grdPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.grdPreview.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
       this.grdPreview.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-      this.grdPreview.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.grdPreview.Location = new System.Drawing.Point(3, 16);
+      this.grdPreview.Location = new System.Drawing.Point(92, 16);
       this.grdPreview.Name = "grdPreview";
       this.grdPreview.ReadOnly = true;
       this.grdPreview.RowHeadersVisible = false;
-      this.grdPreview.Size = new System.Drawing.Size(564, 195);
+      this.grdPreview.Size = new System.Drawing.Size(475, 212);
       this.grdPreview.TabIndex = 0;
       // 
       // parametersGrid
       // 
-      this.parametersGrid.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.parametersGrid.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.parametersGrid.Location = new System.Drawing.Point(3, 16);
       this.parametersGrid.Name = "parametersGrid";
-      this.parametersGrid.Size = new System.Drawing.Size(188, 271);
+      this.parametersGrid.PropertySort = System.Windows.Forms.PropertySort.NoSort;
+      this.parametersGrid.Size = new System.Drawing.Size(188, 239);
       this.parametersGrid.TabIndex = 10;
+      this.parametersGrid.ToolbarVisible = false;
       // 
       // grpParameters
       // 
+      this.grpParameters.Controls.Add(this.btnCall);
       this.grpParameters.Controls.Add(this.parametersGrid);
       this.grpParameters.Location = new System.Drawing.Point(12, 25);
       this.grpParameters.Name = "grpParameters";
@@ -207,11 +176,21 @@
       this.grpParameters.TabStop = false;
       this.grpParameters.Text = "Parameters";
       // 
+      // btnCall
+      // 
+      this.btnCall.Location = new System.Drawing.Point(113, 261);
+      this.btnCall.Name = "btnCall";
+      this.btnCall.Size = new System.Drawing.Size(75, 23);
+      this.btnCall.TabIndex = 1;
+      this.btnCall.Text = "Call";
+      this.btnCall.UseVisualStyleBackColor = true;
+      this.btnCall.Click += new System.EventHandler(this.btnCall_Click);
+      // 
       // ImportRoutineDialog
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(794, 421);
+      this.ClientSize = new System.Drawing.Size(794, 356);
       this.ControlBox = false;
       this.Controls.Add(this.grpParameters);
       this.Controls.Add(this.btnCancel);
@@ -225,8 +204,6 @@
       this.Text = "Import Data";
       this.grpOptions.ResumeLayout(false);
       this.grpOptions.PerformLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.numRowsCount)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.numFromRow)).EndInit();
       this.grpPreview.ResumeLayout(false);
       ((System.ComponentModel.ISupportInitialize)(this.grdPreview)).EndInit();
       this.grpParameters.ResumeLayout(false);
@@ -240,16 +217,15 @@
     private System.Windows.Forms.Button btnCancel;
     private System.Windows.Forms.Button btnImport;
     private System.Windows.Forms.GroupBox grpOptions;
-    private System.Windows.Forms.CheckBox chkLimitRows;
     private System.Windows.Forms.CheckBox chkIncludeHeaders;
-    private System.Windows.Forms.NumericUpDown numRowsCount;
-    private System.Windows.Forms.Label lblToRow;
-    private System.Windows.Forms.NumericUpDown numFromRow;
-    private System.Windows.Forms.Label lblFromRow;
     private System.Windows.Forms.Label lblFrom;
     private System.Windows.Forms.GroupBox grpPreview;
     private System.Windows.Forms.DataGridView grdPreview;
     private System.Windows.Forms.PropertyGrid parametersGrid;
     private System.Windows.Forms.GroupBox grpParameters;
+    private System.Windows.Forms.Button btnCall;
+    private System.Windows.Forms.ListBox lisResultSets;
+    private System.Windows.Forms.ComboBox cmbMultipleResultSets;
+    private System.Windows.Forms.Label lblMultipleResultSets;
   }
 }

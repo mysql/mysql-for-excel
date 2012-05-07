@@ -15,14 +15,14 @@ namespace MySQL.ExcelAddIn
     private MySqlWorkbenchConnection wbConnection;
     private DBObject importDBObject;
     private DataTable previewDataTable = null;
+    private bool allColumnsSelected { get { return (grdPreview.SelectedColumns.Count == grdPreview.Columns.Count); } }
     public DataTable ImportDataTable = null;
-    public List<string> HeadersList { get; private set; }
+    public bool ImportHeaders { get { return chkIncludeHeaders.Checked; } }
 
     public ImportTableViewDialog(MySqlWorkbenchConnection wbConnection, DBObject importDBObject)
     {
       this.wbConnection = wbConnection;
       this.importDBObject = importDBObject;
-      HeadersList = null;
 
       InitializeComponent();
 
@@ -35,6 +35,8 @@ namespace MySQL.ExcelAddIn
     private void fillPreviewGrid()
     {
       previewDataTable = Utilities.GetDataFromTableOrView(wbConnection, importDBObject, null, 0, 10);
+      long totalRowsCount = Utilities.GetRowsCountFromTableOrView(wbConnection, importDBObject);
+      lblRowsCount.Text = String.Format("Total Rows Count: {0}", totalRowsCount);
       grdPreview.DataSource = previewDataTable;
       foreach (DataGridViewColumn gridCol in grdPreview.Columns)
       {
@@ -60,8 +62,6 @@ namespace MySQL.ExcelAddIn
       {
         importColumns.Add(selCol.HeaderText);
       }
-      if (chkIncludeHeaders.Checked)
-        HeadersList = new List<string>(importColumns);
       if (chkLimitRows.Checked)
         ImportDataTable = Utilities.GetDataFromTableOrView(wbConnection, importDBObject, importColumns, Convert.ToInt32(numFromRow.Value) - 1, Convert.ToInt32(numRowsCount.Value));
       else
@@ -71,6 +71,19 @@ namespace MySQL.ExcelAddIn
     private void chkLimitRows_CheckedChanged(object sender, EventArgs e)
     {
       numRowsCount.Enabled = numFromRow.Enabled = chkLimitRows.Checked;
+    }
+
+    private void btnSelect_Click(object sender, EventArgs e)
+    {
+      if (allColumnsSelected)
+        grdPreview.ClearSelection();
+      else
+        grdPreview.SelectAll();
+    }
+
+    private void grdPreview_SelectionChanged(object sender, EventArgs e)
+    {
+      btnSelect.Text = (allColumnsSelected ? "Select None" : "Select All");
     }
   }
 }

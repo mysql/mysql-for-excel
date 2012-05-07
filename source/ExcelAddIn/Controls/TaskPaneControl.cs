@@ -75,66 +75,73 @@ namespace MySQL.ExcelAddIn
       schemaSelectionPanel1.BringToFront();
     }
 
-    //bool dbObjectSelectionPanel1_DBObjectSelectionPanelLeaving(object sender, DBObjectSelectionPanelLeavingArgs args)
-    //{
-    //  bool success = false;
-
-    //  switch (args.SelectedAction)
-    //  {
-    //    case DBObjectSelectionPanelLeavingAction.Back:
-    //      schemaInfo.CurrentSchema = String.Empty;
-    //      welcomePanel1.Visible = false;
-    //      schemaSelectionPanel1.Visible = true;
-    //      dbObjectSelectionPanel1.Visible = false;
-    //      success = true;
-    //      break;
-    //    case DBObjectSelectionPanelLeavingAction.Close:
-    //      CloseAddIn();
-    //      success = true;
-    //      break;
-    //    case DBObjectSelectionPanelLeavingAction.Import:
-    //      success = importDataToExcel(args.DataForExcel);
-    //      break;
-    //    case DBObjectSelectionPanelLeavingAction.Edit:
-    //      break;
-    //    case DBObjectSelectionPanelLeavingAction.Append:
-    //      success = appendDataToTable();
-    //      break;
-    //  }
-
-    //  return success;
-    //}
-
-    public void ImportDataToExcel(DataTable dt, List<string> headersList)
+    private Excel.Range importDataTableToExelAtGivenCell(DataTable dt, bool importColumnNames, Excel.Range atCell)
     {
+      Excel.Range endCell = null;
+
       if (dt != null && dt.Rows.Count > 0)
       {
         int rowsCount = dt.Rows.Count;
         int colsCount = dt.Columns.Count;
-        bool containsHeaders = headersList != null && headersList.Count > 0;
-        int startingRow = (containsHeaders ? 1 : 0);
+        int startingRow = (importColumnNames ? 1 : 0);
 
         Excel.Worksheet currentSheet = excelApplication.ActiveSheet as Excel.Worksheet;
         Excel.Range currentCell = excelApplication.ActiveCell;
-        Excel.Range fillingRange = currentCell.get_Resize(rowsCount, colsCount);
+        Excel.Range fillingRange = currentCell.get_Resize(rowsCount + startingRow, colsCount);
         string[,] fillingArray = new string[rowsCount + startingRow, colsCount];
 
-        if (containsHeaders)
+        if (importColumnNames)
         {
           for (int currCol = 0; currCol < colsCount; currCol++)
           {
-            fillingArray[0, currCol] = headersList[currCol];
+            fillingArray[0, currCol] = dt.Columns[currCol].ColumnName;
           }
         }
 
-        for (int currRow = startingRow; currRow < rowsCount; currRow++)
+        int fillingRowIdx = startingRow;
+        for (int currRow = 0; currRow < rowsCount; currRow++)
         {
           for (int currCol = 0; currCol < colsCount; currCol++)
           {
-            fillingArray[currRow, currCol] = dt.Rows[currRow][currCol].ToString();
+            fillingArray[fillingRowIdx, currCol] = dt.Rows[currRow][currCol].ToString();
           }
+          fillingRowIdx++;
         }
         fillingRange.set_Value(Type.Missing, fillingArray);
+        endCell = fillingRange.Cells[fillingRange.Rows.Count, fillingRange.Columns.Count] as Excel.Range;
+      }
+
+      return endCell;
+    }
+
+    public void ImportDataToExcel(DataTable dt, bool importColumnNames)
+    {
+      importDataTableToExelAtGivenCell(dt, importColumnNames, excelApplication.ActiveCell);
+    }
+
+    public void ImportDataToExcel(DataSet ds, bool importColumnNames, ImportMultipleType importType)
+    {
+      Excel.Range atCell = excelApplication.ActiveCell;
+      Excel.Range endCell = null;
+
+      foreach (DataTable dt in ds.Tables)
+      {
+        endCell = importDataTableToExelAtGivenCell(dt, importColumnNames, atCell);
+        switch (importType)
+        {
+          case ImportMultipleType.SingleWorkSheetHorizontally:
+            endCell = endCell.get_Offset(0, 2);
+            break;
+          case ImportMultipleType.SingleWorkSheetVertically:
+            endCell = endCell.get_Offset(2, 0);
+            break;
+          case ImportMultipleType.MultipleWorkSheets:
+            Excel.Worksheet wSheet = excelApplication.Sheets.Add(Type.Missing, excelApplication.ActiveSheet, Type.Missing, Type.Missing);
+            wSheet.Activate();
+            endCell = wSheet.get_Range("A1", Type.Missing);
+            endCell.Select();
+            break;
+        }
       }
     }
 
