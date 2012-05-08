@@ -249,6 +249,12 @@
     <Compile Include="Controls\TaskPaneControl.Designer.cs">
       <DependentUpon>TaskPaneControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\ExportDataToTableDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ExportDataToTableDialog.Designer.cs">
+      <DependentUpon>ExportDataToTableDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\ImportRoutineDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -317,6 +323,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\TaskPaneControl.resx">
       <DependentUpon>TaskPaneControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ExportDataToTableDialog.resx">
+      <DependentUpon>ExportDataToTableDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportRoutineDialog.resx">
       <DependentUpon>ImportRoutineDialog.cs</DependentUpon>
