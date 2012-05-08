@@ -28,6 +28,9 @@
     /// </summary>
     private void InitializeComponent()
     {
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
       this.btnCancel = new System.Windows.Forms.Button();
       this.btnImport = new System.Windows.Forms.Button();
       this.grpOptions = new System.Windows.Forms.GroupBox();
@@ -53,7 +56,7 @@
       this.btnCancel.Location = new System.Drawing.Point(707, 321);
       this.btnCancel.Name = "btnCancel";
       this.btnCancel.Size = new System.Drawing.Size(75, 23);
-      this.btnCancel.TabIndex = 9;
+      this.btnCancel.TabIndex = 5;
       this.btnCancel.Text = "Cancel";
       this.btnCancel.UseVisualStyleBackColor = true;
       // 
@@ -63,7 +66,7 @@
       this.btnImport.Location = new System.Drawing.Point(626, 321);
       this.btnImport.Name = "btnImport";
       this.btnImport.Size = new System.Drawing.Size(75, 23);
-      this.btnImport.TabIndex = 8;
+      this.btnImport.TabIndex = 4;
       this.btnImport.Text = "Import";
       this.btnImport.UseVisualStyleBackColor = true;
       // 
@@ -75,7 +78,7 @@
       this.grpOptions.Location = new System.Drawing.Point(215, 270);
       this.grpOptions.Name = "grpOptions";
       this.grpOptions.Size = new System.Drawing.Size(567, 45);
-      this.grpOptions.TabIndex = 7;
+      this.grpOptions.TabIndex = 3;
       this.grpOptions.TabStop = false;
       this.grpOptions.Text = "Options";
       // 
@@ -86,7 +89,7 @@
       this.cmbMultipleResultSets.Location = new System.Drawing.Point(385, 17);
       this.cmbMultipleResultSets.Name = "cmbMultipleResultSets";
       this.cmbMultipleResultSets.Size = new System.Drawing.Size(176, 21);
-      this.cmbMultipleResultSets.TabIndex = 6;
+      this.cmbMultipleResultSets.TabIndex = 2;
       // 
       // lblMultipleResultSets
       // 
@@ -94,7 +97,7 @@
       this.lblMultipleResultSets.Location = new System.Drawing.Point(233, 20);
       this.lblMultipleResultSets.Name = "lblMultipleResultSets";
       this.lblMultipleResultSets.Size = new System.Drawing.Size(146, 13);
-      this.lblMultipleResultSets.TabIndex = 5;
+      this.lblMultipleResultSets.TabIndex = 1;
       this.lblMultipleResultSets.Text = "Return Multiple ResultSets in:";
       // 
       // chkIncludeHeaders
@@ -103,7 +106,7 @@
       this.chkIncludeHeaders.Location = new System.Drawing.Point(6, 19);
       this.chkIncludeHeaders.Name = "chkIncludeHeaders";
       this.chkIncludeHeaders.Size = new System.Drawing.Size(192, 17);
-      this.chkIncludeHeaders.TabIndex = 4;
+      this.chkIncludeHeaders.TabIndex = 0;
       this.chkIncludeHeaders.Text = "Include Column Names as Headers";
       this.chkIncludeHeaders.UseVisualStyleBackColor = true;
       // 
@@ -113,7 +116,7 @@
       this.lblFrom.Location = new System.Drawing.Point(12, 9);
       this.lblFrom.Name = "lblFrom";
       this.lblFrom.Size = new System.Drawing.Size(88, 13);
-      this.lblFrom.TabIndex = 6;
+      this.lblFrom.TabIndex = 0;
       this.lblFrom.Text = "From Routine: ??";
       // 
       // grpPreview
@@ -125,7 +128,7 @@
       this.grpPreview.Location = new System.Drawing.Point(212, 25);
       this.grpPreview.Name = "grpPreview";
       this.grpPreview.Size = new System.Drawing.Size(570, 239);
-      this.grpPreview.TabIndex = 5;
+      this.grpPreview.TabIndex = 2;
       this.grpPreview.TabStop = false;
       this.grpPreview.Text = "Data Preview";
       // 
@@ -134,8 +137,8 @@
       this.lisResultSets.FormattingEnabled = true;
       this.lisResultSets.Location = new System.Drawing.Point(6, 16);
       this.lisResultSets.Name = "lisResultSets";
-      this.lisResultSets.Size = new System.Drawing.Size(80, 212);
-      this.lisResultSets.TabIndex = 1;
+      this.lisResultSets.Size = new System.Drawing.Size(120, 212);
+      this.lisResultSets.TabIndex = 0;
       this.lisResultSets.SelectedIndexChanged += new System.EventHandler(this.lisResultSets_SelectedIndexChanged);
       // 
       // grdPreview
@@ -146,13 +149,37 @@
       this.grdPreview.AllowUserToResizeRows = false;
       this.grdPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.grdPreview.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+      dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.grdPreview.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
       this.grdPreview.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-      this.grdPreview.Location = new System.Drawing.Point(92, 16);
+      dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.Window;
+      dataGridViewCellStyle8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.grdPreview.DefaultCellStyle = dataGridViewCellStyle8;
+      this.grdPreview.Location = new System.Drawing.Point(132, 16);
       this.grdPreview.Name = "grdPreview";
       this.grdPreview.ReadOnly = true;
+      dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle9.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.grdPreview.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
       this.grdPreview.RowHeadersVisible = false;
-      this.grdPreview.Size = new System.Drawing.Size(475, 212);
-      this.grdPreview.TabIndex = 0;
+      this.grdPreview.Size = new System.Drawing.Size(435, 212);
+      this.grdPreview.TabIndex = 1;
       // 
       // parametersGrid
       // 
@@ -162,7 +189,7 @@
       this.parametersGrid.Name = "parametersGrid";
       this.parametersGrid.PropertySort = System.Windows.Forms.PropertySort.NoSort;
       this.parametersGrid.Size = new System.Drawing.Size(188, 239);
-      this.parametersGrid.TabIndex = 10;
+      this.parametersGrid.TabIndex = 0;
       this.parametersGrid.ToolbarVisible = false;
       // 
       // grpParameters
@@ -172,7 +199,7 @@
       this.grpParameters.Location = new System.Drawing.Point(12, 25);
       this.grpParameters.Name = "grpParameters";
       this.grpParameters.Size = new System.Drawing.Size(194, 290);
-      this.grpParameters.TabIndex = 11;
+      this.grpParameters.TabIndex = 1;
       this.grpParameters.TabStop = false;
       this.grpParameters.Text = "Parameters";
       // 

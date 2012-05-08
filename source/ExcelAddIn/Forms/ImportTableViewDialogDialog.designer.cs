@@ -28,6 +28,9 @@
     /// </summary>
     private void InitializeComponent()
     {
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
       this.grpPreview = new System.Windows.Forms.GroupBox();
       this.grdPreview = new System.Windows.Forms.DataGridView();
       this.lblFrom = new System.Windows.Forms.Label();
@@ -68,14 +71,40 @@
       this.grdPreview.AllowUserToResizeColumns = false;
       this.grdPreview.AllowUserToResizeRows = false;
       this.grdPreview.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
+      dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.grdPreview.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
       this.grdPreview.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+      dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.ScrollBar;
+      dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Window;
+      dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.grdPreview.DefaultCellStyle = dataGridViewCellStyle2;
       this.grdPreview.Dock = System.Windows.Forms.DockStyle.Fill;
       this.grdPreview.Location = new System.Drawing.Point(3, 16);
       this.grdPreview.Name = "grdPreview";
       this.grdPreview.ReadOnly = true;
+      dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.grdPreview.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
       this.grdPreview.RowHeadersVisible = false;
       this.grdPreview.Size = new System.Drawing.Size(698, 195);
       this.grdPreview.TabIndex = 0;
+      this.grdPreview.ColumnStateChanged += new System.Windows.Forms.DataGridViewColumnStateChangedEventHandler(this.grdPreview_ColumnStateChanged);
+      this.grdPreview.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.grdPreview_DataBindingComplete);
       this.grdPreview.SelectionChanged += new System.EventHandler(this.grdPreview_SelectionChanged);
       // 
       // lblFrom
@@ -136,6 +165,7 @@
       // 
       // numRowsCount
       // 
+      this.numRowsCount.Enabled = false;
       this.numRowsCount.Location = new System.Drawing.Point(450, 41);
       this.numRowsCount.Minimum = new decimal(new int[] {
             1,
@@ -157,6 +187,7 @@
       // 
       // numFromRow
       // 
+      this.numFromRow.Enabled = false;
       this.numFromRow.Location = new System.Drawing.Point(207, 41);
       this.numFromRow.Minimum = new decimal(new int[] {
             1,

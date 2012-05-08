@@ -26,6 +26,7 @@ namespace MySQL.ExcelAddIn
 
       InitializeComponent();
 
+      chkIncludeHeaders.Checked = true;
       chkLimitRows.Checked = false;
       lblFrom.Text = String.Format("From {0}: {1}", importDBObject.Type.ToString(), importDBObject.Name);
 
@@ -41,6 +42,7 @@ namespace MySQL.ExcelAddIn
       foreach (DataGridViewColumn gridCol in grdPreview.Columns)
       {
         gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
+        //gridCol.HeaderCell.Tag = true;
       }
       grdPreview.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
     }
@@ -49,9 +51,10 @@ namespace MySQL.ExcelAddIn
     {
       List<string> importColumns = new List<string>();
       List<DataGridViewColumn> selectedColumns = new List<DataGridViewColumn>();
-      foreach (DataGridViewColumn selCol in grdPreview.SelectedColumns)
+      foreach (DataGridViewColumn selCol in grdPreview.Columns)
       {
-        selectedColumns.Add(selCol);
+        if ((bool)selCol.HeaderCell.Tag)
+          selectedColumns.Add(selCol);
       }
       if (selectedColumns.Count > 1)
         selectedColumns.Sort(delegate(DataGridViewColumn c1, DataGridViewColumn c2)
@@ -84,6 +87,22 @@ namespace MySQL.ExcelAddIn
     private void grdPreview_SelectionChanged(object sender, EventArgs e)
     {
       btnSelect.Text = (allColumnsSelected ? "Select None" : "Select All");
+      //if (grdPreview.CurrentCell != null)
+      //{
+      //  DataGridViewColumn dgvc = grdPreview.CurrentCell.OwningColumn;
+      //  dgvc.Selected = (bool)dgvc.HeaderCell.Tag;
+      //}
+    }
+
+    private void grdPreview_ColumnStateChanged(object sender, DataGridViewColumnStateChangedEventArgs e)
+    {
+      //if (e.StateChanged == DataGridViewElementStates.Selected)
+      //  e.Column.HeaderCell.Tag = !(bool)grdPreview.CurrentCell.OwningColumn.HeaderCell.Tag;
+    }
+
+    private void grdPreview_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+    {
+      grdPreview.SelectAll();
     }
   }
 }

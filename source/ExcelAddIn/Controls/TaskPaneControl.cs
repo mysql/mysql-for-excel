@@ -86,8 +86,7 @@ namespace MySQL.ExcelAddIn
         int startingRow = (importColumnNames ? 1 : 0);
 
         Excel.Worksheet currentSheet = excelApplication.ActiveSheet as Excel.Worksheet;
-        Excel.Range currentCell = excelApplication.ActiveCell;
-        Excel.Range fillingRange = currentCell.get_Resize(rowsCount + startingRow, colsCount);
+        Excel.Range fillingRange = atCell.get_Resize(rowsCount + startingRow, colsCount);
         string[,] fillingArray = new string[rowsCount + startingRow, colsCount];
 
         if (importColumnNames)
@@ -124,30 +123,33 @@ namespace MySQL.ExcelAddIn
       Excel.Range atCell = excelApplication.ActiveCell;
       Excel.Range endCell = null;
 
+      int tableIdx = 0;
       foreach (DataTable dt in ds.Tables)
       {
         endCell = importDataTableToExelAtGivenCell(dt, importColumnNames, atCell);
-        switch (importType)
-        {
-          case ImportMultipleType.SingleWorkSheetHorizontally:
-            endCell = endCell.get_Offset(0, 2);
-            break;
-          case ImportMultipleType.SingleWorkSheetVertically:
-            endCell = endCell.get_Offset(2, 0);
-            break;
-          case ImportMultipleType.MultipleWorkSheets:
-            Excel.Worksheet wSheet = excelApplication.Sheets.Add(Type.Missing, excelApplication.ActiveSheet, Type.Missing, Type.Missing);
-            wSheet.Activate();
-            endCell = wSheet.get_Range("A1", Type.Missing);
-            endCell.Select();
-            break;
-        }
+        tableIdx++;
+        if (tableIdx < ds.Tables.Count)
+          switch (importType)
+          {
+            case ImportMultipleType.SingleWorkSheetHorizontally:
+              atCell = endCell.get_Offset(atCell.Row - endCell.Row, 2);
+              break;
+            case ImportMultipleType.SingleWorkSheetVertically:
+              atCell = endCell.get_Offset(2, atCell.Column - endCell.Column);
+              break;
+            case ImportMultipleType.MultipleWorkSheets:
+              Excel.Worksheet wSheet = excelApplication.Sheets.Add(Type.Missing, excelApplication.ActiveSheet, Type.Missing, Type.Missing);
+              wSheet.Activate();
+              atCell = wSheet.get_Range("A1", Type.Missing);
+              atCell.Select();
+              break;
+          }
       }
     }
 
     public void AppendDataToTable(string toTableName)
     {
-      ExportDataToTableDialog exportDataForm = new ExportDataToTableDialog(connection, connection.Schema, toTableName, excelApplication.Selection as Excel.Range);
+      OldExportDataToTableDialog exportDataForm = new OldExportDataToTableDialog(connection, connection.Schema, toTableName, excelApplication.Selection as Excel.Range);
       DialogResult dr = exportDataForm.ShowDialog();
     }
 

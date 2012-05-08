@@ -583,7 +583,7 @@ namespace MySQL.ExcelAddIn
 
     public string GetColumnDefinition(DataRow dr)
     {
-      string dataType = dr["Type"].ToString();
+      string dataType = dr["Type"].ToString().ToLowerInvariant();
       StringBuilder colDefinition =  new StringBuilder(dataType);
       bool isBit = dataType == "bit";
       bool isDecimal = dataType == "real" || dataType == "double" || dataType == "float" || dataType == "decimal" || dataType == "numeric";
@@ -605,9 +605,9 @@ namespace MySQL.ExcelAddIn
       if (isBit || isNum || isChar || isBinary)
       {
         if (valLength > 0)
-          colDefinition.AppendFormat(" ({0}", valLength);
+          colDefinition.AppendFormat("({0}", valLength);
         if (valDecimals > 0)
-          colDefinition.AppendFormat(", {0}", valDecimals);
+          colDefinition.AppendFormat(",{0}", valDecimals);
         if (valLength > 0)
           colDefinition.Append(")");
       }

@@ -97,15 +97,6 @@ namespace MySQL.ExcelAddIn
 
     private bool exportDataToTable(string appendToTableName)
     {
-      //bool success = false;
-      //DBObjectSelectionPanelLeavingArgs args;
-
-      //if (appendToTableName != null && appendToTableName != String.Empty)
-      //  args = new DBObjectSelectionPanelLeavingArgs(DBObjectSelectionPanelLeavingAction.Append, appendToTableName);
-      //else
-      //  args = new DBObjectSelectionPanelLeavingArgs(DBObjectSelectionPanelLeavingAction.Export, String.Empty);
-      //success = OnDBObjectSelectionPanelLeaving(args);
-      //return success;
       (Parent as TaskPaneControl).AppendDataToTable(appendToTableName);
       return true;
     }
@@ -176,13 +167,16 @@ namespace MySQL.ExcelAddIn
 
     private void appendData_Click(object sender, EventArgs e)
     {
-      MessageBox.Show("Appending Data...");
+      if ((objectList.SelectedNode.Tag as DBObject).Type == DBObjectType.Table)
+        exportDataToTable(objectList.SelectedNode.Name);
     }
 
 
     private void exportToNewTable_Click(object sender, EventArgs e)
     {
-      exportDataToTable(objectList.SelectedNode.Name);
+      bool success = exportDataToTable(String.Empty);
+      if (success)
+        LoadTables();
     }
 
     private void btnHelp_Click(object sender, EventArgs e)

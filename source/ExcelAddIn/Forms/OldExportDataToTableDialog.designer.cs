@@ -1,6 +1,6 @@
 ﻿namespace MySQL.ExcelAddIn
 {
-  partial class ExportDataToTableDialog
+  partial class OldExportDataToTableDialog
   {
     /// <summary>
     /// Required designer variable.
@@ -562,7 +562,7 @@
       this.btnCancel.Text = "Cancel";
       this.btnCancel.UseVisualStyleBackColor = true;
       // 
-      // ExportDataToTableDialog
+      // OldExportDataToTableDialog
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;

@@ -12,7 +12,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ExcelAddIn
 {
-  public partial class ExportDataToTableDialog : Form
+  public partial class OldExportDataToTableDialog : Form
   {
     //private MySQLSchemaInfo localSchemaInfo;
     private MySqlWorkbenchConnection wbConnection;
@@ -37,7 +37,7 @@ namespace MySQL.ExcelAddIn
       get { return (columnSchemaInfo != null && formattedExcelData != null ? columnSchemaInfo.Select("MappedColIdx > -1").Length == 0 : true); }
     }
 
-    public ExportDataToTableDialog(MySqlWorkbenchConnection wbConnection, string toSchemaName, string toTableName, Excel.Range exportDataRange)
+    public OldExportDataToTableDialog(MySqlWorkbenchConnection wbConnection, string toSchemaName, string toTableName, Excel.Range exportDataRange)
     {
       //localSchemaInfo = schemaInfo;
       this.wbConnection = wbConnection;
@@ -58,7 +58,7 @@ namespace MySQL.ExcelAddIn
       {
         DataTable databases = Utilities.GetSchemaCollection(wbConnection, "Databases", null);
         cmbExistingSchema.DataSource = databases;
-        cmbExistingSchema.DisplayMember = cmbExistingSchema.ValueMember = "SCHEMA_NAME";
+        cmbExistingSchema.DisplayMember = cmbExistingSchema.ValueMember = "database_name";
         cmbExistingSchema.Text = selectedSchema;
       }
 
@@ -280,7 +280,7 @@ namespace MySQL.ExcelAddIn
 
     private void cmbColumnType_SelectedIndexChanged(object sender, EventArgs e)
     {
-      string colType = cmbColumnType.Text;
+      string colType = cmbColumnType.Text.ToLowerInvariant();
       bool isDecimal = colType == "real" || colType == "double" || colType == "float" || colType == "decimal" || colType == "numeric";
       bool isNum = isDecimal || colType.Contains("int");
       numColumnTypeLength.Enabled = isNum || colType == "bit" || colType.Contains("char") || colType.Contains("binary");
@@ -477,7 +477,7 @@ namespace MySQL.ExcelAddIn
       foreach (DataRow dr in resultSet)
       {
         mappedColumnIndexes.Add(Convert.ToInt32(dr["MappedColIdx"]));
-        mappedColumnTypes.Add(dr["Type"].ToString());
+        mappedColumnTypes.Add(dr["Type"].ToString().ToLowerInvariant());
         queryString.AppendFormat("{0},", dr["Name"].ToString());
       }
       if (resultSet.Length > 0)

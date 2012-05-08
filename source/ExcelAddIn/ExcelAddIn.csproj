@@ -249,12 +249,6 @@
     <Compile Include="Controls\TaskPaneControl.Designer.cs">
       <DependentUpon>TaskPaneControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\ExportDataToTableDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\ExportDataToTableDialog.designer.cs">
-      <DependentUpon>ExportDataToTableDialog.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\ImportRoutineDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -278,6 +272,12 @@
     </Compile>
     <Compile Include="Forms\NewSchemaDialog.Designer.cs">
       <DependentUpon>NewSchemaDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\OldExportDataToTableDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\OldExportDataToTableDialog.designer.cs">
+      <DependentUpon>OldExportDataToTableDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\PasswordDialog.cs">
       <SubType>Form</SubType>
@@ -318,9 +318,6 @@
     <EmbeddedResource Include="Controls\TaskPaneControl.resx">
       <DependentUpon>TaskPaneControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ExportDataToTableDialog.resx">
-      <DependentUpon>ExportDataToTableDialog.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportRoutineDialog.resx">
       <DependentUpon>ImportRoutineDialog.cs</DependentUpon>
     </EmbeddedResource>
@@ -332,6 +329,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\NewSchemaDialog.resx">
       <DependentUpon>NewSchemaDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\OldExportDataToTableDialog.resx">
+      <DependentUpon>OldExportDataToTableDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PasswordDialog.resx">
       <DependentUpon>PasswordDialog.cs</DependentUpon>

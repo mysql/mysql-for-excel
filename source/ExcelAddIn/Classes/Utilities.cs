@@ -39,6 +39,7 @@ namespace MySQL.ExcelAddIn
           if (collection.ToUpperInvariant().Equals("ENGINES"))
           {
             MySqlDataAdapter mysqlAdapter = new MySqlDataAdapter("SELECT * FROM information_schema.engines ORDER BY engine", conn);
+            dt = new DataTable();
             mysqlAdapter.Fill(dt);
           }
           else

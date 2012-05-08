@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using MySQL.Utility;
 using System.Collections;
 using MySql.Data.MySqlClient;
+using System.Reflection;
 
 namespace MySQL.ExcelAddIn
 {
@@ -100,20 +101,25 @@ namespace MySQL.ExcelAddIn
         bool paramUnsigned = dr["DTD_IDENTIFIER"].ToString().Contains("unsigned");
         //string paramDirectionStr = (dr["PARAMETER_MODE"] != null && dr["PARAMETER_MODE"] != DBNull.Value ? dr["PARAMETER_MODE"].ToString().ToLowerInvariant() : "return");
         string paramDirectionStr = (paramName != "RETURN_VALUE" ? dr["PARAMETER_MODE"].ToString().ToLowerInvariant() : "return");
+        bool paramIsReadOnly = false;
 
         switch (paramDirectionStr)
         {
           case "in":
             paramDirection = ParameterDirection.Input;
+            paramIsReadOnly = false;
             break;
           case "out":
             paramDirection = ParameterDirection.Output;
+            paramIsReadOnly = true;
             break;
           case "inout":
             paramDirection = ParameterDirection.InputOutput;
+            paramIsReadOnly = false;
             break;
           case "return":
             paramDirection = ParameterDirection.ReturnValue;
+            paramIsReadOnly = true;
             break;
         }
 
@@ -187,31 +193,53 @@ namespace MySQL.ExcelAddIn
             objValue = null;
             break;
         }
-        parameter = new CustomProperty(paramName, objValue, paramDirection == ParameterDirection.Output, true);
+        parameter = new CustomProperty(paramName, objValue, paramIsReadOnly, true);
+        parameter.Description = String.Format("Direction: {0}, Data Type: {1}", paramDirection.ToString(), dataType);
         mysqlParameters[paramIdx] = new MySqlParameter(paramName, dbType, paramSize, paramDirection, false, paramPrecision, paramScale, null, DataRowVersion.Current, objValue);
         routineParamsProperties.Add(parameter);
         paramIdx++;
       }
+      FieldInfo fi = parametersGrid.GetType().GetField("gridView", BindingFlags.NonPublic | BindingFlags.Instance);
+      object gridViewRef = fi.GetValue(parametersGrid);
+      Type gridViewType = gridViewRef.GetType();
+      MethodInfo mi = gridViewType.GetMethod("MoveSplitterTo", BindingFlags.NonPublic | BindingFlags.Instance);
+      int gridColWidth = (int)Math.Truncate(parametersGrid.Width * 0.4);
+      mi.Invoke(gridViewRef, new object[] {gridColWidth});
       parametersGrid.Refresh();
     }
 
     private void btnCall_Click(object sender, EventArgs e)
     {
+      // Prepare parameters and execute routine and create OutAndReturnValues table
+      DataTable outParamsTable = new DataTable("OutAndReturnValues");
       for (int paramIdx = 0; paramIdx < routineParamsProperties.Count; paramIdx++)
       {
         mysqlParameters[paramIdx].Value = routineParamsProperties[paramIdx].Value;
+        if (mysqlParameters[paramIdx].Direction == ParameterDirection.Output || mysqlParameters[paramIdx].Direction == ParameterDirection.ReturnValue)
+          outParamsTable.Columns.Add(routineParamsProperties[paramIdx].Name, routineParamsProperties[paramIdx].Value.GetType());
       }
       ImportDataSet = Utilities.GetDataSetFromRoutine(wbConnection, importDBObject, mysqlParameters);
+
+      // Refresh output/return parameter values in PropertyGrid and add them to OutAndReturnValues table
+      DataRow valuesRow = outParamsTable.NewRow();
       for (int paramIdx = 0; paramIdx < routineParamsProperties.Count; paramIdx++)
       {
-        if (mysqlParameters[paramIdx].Direction == ParameterDirection.Output)
+        if (mysqlParameters[paramIdx].Direction == ParameterDirection.Output || mysqlParameters[paramIdx].Direction == ParameterDirection.ReturnValue)
+        {
           routineParamsProperties[paramIdx].Value = mysqlParameters[paramIdx].Value;
+          valuesRow[mysqlParameters[paramIdx].ParameterName] = mysqlParameters[paramIdx].Value;
+        }
       }
+      outParamsTable.Rows.Add(valuesRow);
+      ImportDataSet.Tables.Add(outParamsTable);
       parametersGrid.Refresh();
+
+      // Refresh list of ResultSets
       lisResultSets.Items.Clear();
-      for (int dtIdx = 1; dtIdx <= ImportDataSet.Tables.Count; dtIdx++)
+      for (int dtIdx = 0; dtIdx < ImportDataSet.Tables.Count; dtIdx++)
       {
-        lisResultSets.Items.Add(String.Format("ResultSet {0}", dtIdx));
+        //lisResultSets.Items.Add(String.Format("ResultSet {0}", dtIdx));
+        lisResultSets.Items.Add(ImportDataSet.Tables[dtIdx].TableName);
       }
       if (lisResultSets.Items.Count > 0)
         lisResultSets.SelectedIndex = 0;
@@ -221,6 +249,7 @@ namespace MySQL.ExcelAddIn
     {
       if (lisResultSets.Items.Count > 0)
       {
+        grdPreview.SelectionMode = DataGridViewSelectionMode.CellSelect;
         grdPreview.DataSource = ImportDataSet;
         grdPreview.DataMember = ImportDataSet.Tables[lisResultSets.SelectedIndex].TableName;
         foreach (DataGridViewColumn gridCol in grdPreview.Columns)
@@ -243,6 +272,7 @@ namespace MySQL.ExcelAddIn
     public bool ReadOnly { get; private set; }
     public bool Visible { get; private set; }
     public object Value { get; set; }
+    public string Description { get; set; }
 
     public CustomProperty(string sName, object value, bool bReadOnly, bool bVisible )
     {
@@ -280,7 +310,7 @@ namespace MySQL.ExcelAddIn
 
     public override string Description
     {
-      get { return m_Property.Name; }
+      get { return m_Property.Description; }
     }
     
     public override string Category
