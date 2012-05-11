@@ -29,6 +29,7 @@ namespace MySQL.ExcelAddIn
     {
       string connectionString = GetConnectionString(wbConnection);
       DataTable dt = null;
+      MySqlDataAdapter mysqlAdapter = null;
 
       try
       {
@@ -36,14 +37,32 @@ namespace MySQL.ExcelAddIn
         {
           conn.Open();
 
-          if (collection.ToUpperInvariant().Equals("ENGINES"))
+          switch (collection.ToUpperInvariant())
           {
-            MySqlDataAdapter mysqlAdapter = new MySqlDataAdapter("SELECT * FROM information_schema.engines ORDER BY engine", conn);
-            dt = new DataTable();
-            mysqlAdapter.Fill(dt);
+            case "ENGINES":
+              mysqlAdapter = new MySqlDataAdapter("SELECT * FROM information_schema.engines ORDER BY engine", conn);
+              dt = new DataTable();
+              mysqlAdapter.Fill(dt);
+              break;
+            case "COLLATIONS":
+              string queryString;
+              if (!String.IsNullOrEmpty(restrictions[0]))
+                queryString = String.Format("SHOW COLLATION WHERE charset = '{0}'", restrictions[0]);
+              else
+                queryString = "SHOW COLLATION";
+              mysqlAdapter = new MySqlDataAdapter(queryString, conn);
+              dt = new DataTable();
+              mysqlAdapter.Fill(dt);
+              break;
+            case "CHARSETS":
+              mysqlAdapter = new MySqlDataAdapter("SHOW CHARSET", conn);
+              dt = new DataTable();
+              mysqlAdapter.Fill(dt);
+              break;
+            default:
+              dt = conn.GetSchema(collection, restrictions);
+              break;
           }
-          else
-            dt = conn.GetSchema(collection, restrictions);
         }
       }
       catch (Exception ex)
@@ -164,6 +183,114 @@ namespace MySQL.ExcelAddIn
         //call the overload that takes a connection in place of the connection string
         return ExecuteDatasetSP(cn, commandText, commandParameters);
       }
+    }
+
+    public static List<string> GetDataTypes()
+    {
+      List<string> retList = new List<string>();
+      retList.AddRange(new string[] {
+            "bit",
+            "tinyint",
+            "boolean",
+            "smallint",
+            "mediumint",
+            "int",
+            "serial",
+            "float",
+            "double",
+            "decimal",
+            "date",
+            "datetime",
+            "timestamp",
+            "time",
+            "year",
+            "char",
+            "varchar",
+            "binary",
+            "varbinary",
+            "tinyblob",
+            "tinytext",
+            "blob",
+            "text",
+            "mediumblob",
+            "mediumtext",
+            "longblob",
+            "longtext",
+            "enum(x,y,z)",
+            "set(x,y,z)"});
+      return retList;
+    }
+
+    public static string GetMySQLDataType(object packedValue)
+    {
+      string retType = String.Empty;
+      if (packedValue == null)
+        return retType;
+
+      Type objUnpackedType = packedValue.GetType();
+      string strType = objUnpackedType.FullName;
+      int strLength = packedValue.ToString().Length;
+      strLength = strLength + (10 - strLength % 10);
+      bool unsigned = strType.Contains(".U");
+
+      switch (strType)
+      {
+        case "System.String":
+          if (strLength > 65535)
+            retType = "text";
+          else
+            retType = "varchar";
+          break;
+        case "System.Byte":
+          retType = "tinyint";
+          break;
+        case "System.UInt16":
+        case "System.Int16":
+          retType = String.Format("smallint{0}", (unsigned ? " unsigned" : String.Empty));
+          break;
+        case "System.UInt32":
+        case "System.Int32":
+          retType = String.Format("int{0}", (unsigned ? " unsigned" : String.Empty));
+          break;
+        case "System.UInt64":
+        case "System.Int64":
+          retType = String.Format("bigint{0}", (unsigned ? " unsigned" : String.Empty));
+          break;
+        case "System.Decimal":
+          retType = "decimal";
+          break;
+        case "System.Single":
+          retType = "float";
+          break;
+        case "System.Double":
+          retType = "double";
+          break;
+        case "System.Boolean":
+          retType = "bit";
+          break;
+        case "System.DateTime":
+          retType = "datetime";
+          break;
+        case "System.TimeSpan":
+          retType = "time";
+          break;
+        case "System.Guid":
+          retType = "binary(16)";
+          break;
+      }
+
+      return retType;
+    }
+
+    public static bool TableExistsInSchema(MySqlWorkbenchConnection connection, string schemaName, string tableName)
+    {
+      if (String.IsNullOrEmpty(schemaName) || String.IsNullOrEmpty(tableName))
+        return false;
+
+      string sql = String.Format("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{0}' and table_name = '{1}'", schemaName, tableName);
+      object objCount = MySqlHelper.ExecuteScalar(GetConnectionString(connection), sql);
+      long retCount = (objCount != null ? (long)objCount : 0);
+      return (retCount > 0);
     }
 
     public static void SetDoubleBuffered(System.Windows.Forms.Control c)

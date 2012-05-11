@@ -16,7 +16,6 @@ namespace MySQL.ExcelAddIn
   {
     private Excel.Application excelApplication;
     private MySqlWorkbenchConnection connection;
-    //private MySQLSchemaInfo schemaInfo;
 
     public Excel.Worksheet ActiveWorksheet
     {
@@ -147,10 +146,20 @@ namespace MySQL.ExcelAddIn
       }
     }
 
-    public void AppendDataToTable(string toTableName)
+    public bool AppendDataToTable(string toTableName)
     {
-      OldExportDataToTableDialog exportDataForm = new OldExportDataToTableDialog(connection, connection.Schema, toTableName, excelApplication.Selection as Excel.Range);
-      DialogResult dr = exportDataForm.ShowDialog();
+      DialogResult dr = DialogResult.Cancel;
+      if (toTableName.Length > 0)
+      {
+        OldExportDataToTableDialog oldExportDataForm = new OldExportDataToTableDialog(connection, connection.Schema, toTableName, excelApplication.Selection as Excel.Range);
+        dr = oldExportDataForm.ShowDialog();
+      }
+      else
+      {
+        ExportDataToTableDialog exportDataForm = new ExportDataToTableDialog(connection, excelApplication.Selection as Excel.Range);
+        dr = exportDataForm.ShowDialog();
+      }
+      return dr == DialogResult.OK;
     }
 
     public void CloseAddIn()

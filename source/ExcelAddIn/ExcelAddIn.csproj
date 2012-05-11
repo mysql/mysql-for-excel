@@ -217,10 +217,12 @@
     can be found.
   -->
   <ItemGroup>
+    <Compile Include="Classes\MySQLColumn.cs" />
     <Compile Include="Classes\MySQLConnectionData.cs" />
     <Compile Include="Classes\MySQLSchemaInfo.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Classes\MySQLTable.cs" />
     <Compile Include="Classes\Utilities.cs" />
     <Compile Include="Controls\HotLabel.cs">
       <SubType>UserControl</SubType>
@@ -365,6 +367,8 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="ExcelAddIn_TemporaryKey.pfx" />
+    <None Include="Properties\DataSources\MySQLColumn.datasource" />
+    <None Include="Properties\DataSources\MySQLTable.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -573,6 +577,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\ArrowRight.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\db.Column.16x16.png" />
   </ItemGroup>
   <!-- Include the build rules for a C# project. -->
   <PropertyGroup>

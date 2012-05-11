@@ -95,12 +95,6 @@ namespace MySQL.ExcelAddIn
       }
     }
 
-    private bool exportDataToTable(string appendToTableName)
-    {
-      (Parent as TaskPaneControl).AppendDataToTable(appendToTableName);
-      return true;
-    }
-
     private void objectList_AfterSelect(object sender, TreeViewEventArgs e)
     {
       DBObject o = null;
@@ -160,6 +154,11 @@ namespace MySQL.ExcelAddIn
       (Parent as TaskPaneControl).ImportDataToExcel(importDialog.ImportDataSet, importDialog.ImportHeaders, importDialog.ImportType);
     }
 
+    private bool exportDataToTable(string appendToTableName)
+    {
+      return (Parent as TaskPaneControl).AppendDataToTable(appendToTableName);
+    }
+
     private void editData_Click(object sender, EventArgs e)
     {
       MessageBox.Show("Editing Data...");
@@ -167,8 +166,11 @@ namespace MySQL.ExcelAddIn
 
     private void appendData_Click(object sender, EventArgs e)
     {
-      if ((objectList.SelectedNode.Tag as DBObject).Type == DBObjectType.Table)
-        exportDataToTable(objectList.SelectedNode.Name);
+      if (objectList.SelectedNode == null)
+        return;
+      DBObject selDBObject = (objectList.SelectedNode.Tag as DBObject);
+      if (selDBObject.Type == DBObjectType.Table)
+        exportDataToTable(selDBObject.Name);
     }
 
 
@@ -176,7 +178,10 @@ namespace MySQL.ExcelAddIn
     {
       bool success = exportDataToTable(String.Empty);
       if (success)
+      {
+        objectList.Nodes[0].Nodes.Clear();
         LoadTables();
+      }
     }
 
     private void btnHelp_Click(object sender, EventArgs e)
