@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?define ProductName="MySQL For Excel 1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <Product Name="$(var.ProductName)" Id ="17E3FD69-D9E7-45E3-8C57-67BB34F0CCF6" Manufacturer="Oracle" Language="1033" Version="1.0" 
+           UpgradeCode="30162E4E-2EED-48D1-BBC0-8D4A517DB004">
+		<Package Id="*" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" InstallPrivileges="elevated"/>
+
+    <Property Id="ARPURLINFOABOUT" Value="http://www.mysql.com" />
+    <Property Id="ARPURLUPDATEINFO" Value="http://dev.mysql.com"/>    
+
+    <Media Id="1" Cabinet="MySQLForExcel.cab" EmbedCab="yes"  CompressionLevel="high"/>
+
+    <Condition Message="You must have Administrative rights on this machine to install [ProductName].">
+      <![CDATA[ Privileged  ]]>
+    </Condition>
+
+    <!-- First make sure that .NET is installed -->
+    <PropertyRef Id="NETFRAMEWORK40CLIENT"/>
+    <PropertyRef Id="NETFRAMEWORK40FULL"/>
+    <Condition Message="This application requires .NET Framework 4.0. Please install the .NET Framework then run this installer again.  For more information, please see http://go.microsoft.com/fwlink/?LinkId=181012">
+      <![CDATA[Installed OR NETFRAMEWORK40FULL OR NETFRAMEWORK40CLIENT]]>
+    </Condition>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      
+      <Directory Id="ProgramFilesFolder" Name='PFiles'>
+        <Directory Id='CompanyDir' Name='MySQL'>
+          <Directory Id="INSTALLDIR" Name="$(var.ProductName)">
+            <Component Id='MainItems' Guid='2395C79F-4F2E-415F-9667-76CBE129D4CE'>
+              <File Id="Manifest" Name="MySQL.ExcelAddIn.dll.manifest" Source="..\Source\bin\release\MySQL.ExcelAddIn.dll.manifest" />
+              <File Id="MySql.Utility" Name="MySQL.Utility.dll" Source="..\Source\bin\release\mysql.utility.dll" />
+              <File Id="MySql.Data" Name="MySql.Data.dll" Source="..\Source\bin\release\mysql.data.dll" />
+              <File Id="v40Utilities" Name="Microsoft.Office.Tools.Common.v4.0.Utilities.dll" Source="..\Source\bin\release\Microsoft.Office.Tools.Common.v4.0.Utilities.dll" />
+              <File Id="VSTOFile" Name="MySQL.ExcelAddIn.vsto" Source="..\Source\bin\release\MySQL.ExcelAddIn.vsto" />
+              <File Id="AddIn" Name="MySQL.ExcelAddIn.dll" KeyPath="yes" Source="..\Source\bin\release\MySQL.ExcelAddIn.dll" />
+
+              <!--<File Id="_3259BD5CB475A992801BA08E894505C9" Name="Microsoft.VisualBasic.PowerPacks.Vs.dll" Source="SourceDir\File\_3259BD5CB475A992801BA08E894505C9" />
+              <File Id="_F7FD2352BC6C3C2046F6B91527C61742" Name="Microsoft.VisualStudio.Tools.Applications.Runtime.dll" Assembly=".net" AssemblyManifest="_F7FD2352BC6C3C2046F6B91527C61742" AssemblyApplication="_F7FD2352BC6C3C2046F6B91527C61742" DiskId="1" Source="SourceDir\File\_F7FD2352BC6C3C2046F6B91527C61742" />-->
+              <RemoveFolder Id="INSTALLDIR" On="uninstall" />              
+            </Component>            
+          </Directory>
+        </Directory>
+      </Directory>
+
+      <Directory Id="ProgramMenuFolder" Name="PMFolder">
+        <Directory Id='PMCompanyDir' Name='MySQL'>
+          <Directory Id="ShortCutDir" Name="$(var.ProductName)"/>
+        </Directory>
+      </Directory>
+
+      <!--<Directory Id="DesktopFolder"  Name="Desktop">
+        <Component Id="DesktopShortcut" Guid="1e9fb57a-62e3-45cf-a896-686e33407608">
+          <RegistryKey Root="HKCU" Key="MySQL AB\MySQLTrayApp" Action="createAndRemoveOnUninstall">
+            <RegistryValue Name="MySQLTrayAppShortCut" Value="1" Type="integer" KeyPath="yes"/>
+          </RegistryKey>
+          <Shortcut Id="DesktopShortcut" Directory="DesktopFolder" Name="MySQL Tray Application" ShortName="MySQLTAP" Icon="Icon.exe" Target="[INSTALLDIR]MySQL.TrayApp.exe" Show="normal" WorkingDirectory="INSTALLDIR">
+            <Icon Id="Icon.exe" SourceFile="..\Source\bin\Release\MySQL.TrayApp.exe" />
+          </Shortcut>
+        </Component>
+      </Directory>-->
+    
+    </Directory>
+
+    <!--<DirectoryRef Id="ShortCutDir">
+      <Component Id="ProgramMenuShortcutsComponent" Guid="1e9fb57a-62e3-45cf-a896-686e33407610">
+        <CreateFolder Directory="PMCompanyDir" />
+        <CreateFolder Directory="ShortCutDir" />
+        <RemoveFolder Id="RemovePMCompanyDir" Directory="PMCompanyDir" On="uninstall" />        
+        <RemoveFolder Id="RemoveShortCutDir"  Directory="ShortCutDir" On="uninstall"/>
+        <Shortcut Id="ApplicationStartMenuShortcut" Name="$(var.ProductName)"   Description="MySQL Tray Application"  Target="[INSTALLDIR]MySQL.TrayApp.exe"  WorkingDirectory="INSTALLDIR"/>       
+        <RegistryValue Root="HKCU" Key="Software\MySQL AB\[ProductName]" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+        <RegistryValue Root="HKCU" Key="Software\MySQL AB\[ProductName]" Name="location" Type="string" Value="[INSTALLDIR]"/>
+      </Component>
+    </DirectoryRef>-->
+
+    <Feature Id="DefaultFeature" ConfigurableDirectory="TARGETDIR" Level="1">
+      <ComponentRef Id="MainItems" />
+    </Feature>
+
+
+    <!--<Feature Id="Complete" Level="1">		
+			<ComponentRef Id="MainExecutable" />
+      --><!--<ComponentRef Id="DesktopShortcut" />--><!--
+      <ComponentRef Id="ProgramMenuShortcutsComponent"/>
+    </Feature>-->
+
+  
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+    <UIRef Id="WixUI_Minimal" />
+    <WixVariable Id="WixUIBannerBmp" Value="Bitmaps/BannrBmp.bmp"/>
+    <WixVariable Id="WixUIDialogBmp" Value="Bitmaps/DlgBmp.bmp"/>
+    <!--<Icon Id="TraApp.ico" SourceFile="app_default.ico" />-->
+
+  </Product>
+</Wix>
