@@ -17,16 +17,16 @@ namespace MySQL.ExcelAddIn
     private Excel.Application excelApplication;
     private MySqlWorkbenchConnection connection;
 
-    public Excel.Worksheet ActiveWorksheet
-    {
-      get { return ((Excel.Worksheet)excelApplication.ActiveSheet); }
-    }
-
     public TaskPaneControl(Excel.Application app)
     {
       excelApplication = app;
       excelApplication.SheetSelectionChange += new Excel.AppEvents_SheetSelectionChangeEventHandler(excelApplication_SheetSelectionChange);
       InitializeComponent();
+    }
+
+    public Excel.Worksheet ActiveWorksheet
+    {
+      get { return ((Excel.Worksheet)excelApplication.ActiveSheet); }
     }
 
     void excelApplication_SheetSelectionChange(object Sh, Excel.Range Target)
