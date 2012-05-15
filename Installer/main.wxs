@@ -21,6 +21,13 @@
       <![CDATA[ Privileged  ]]>
     </Condition>
 
+    <Property Id="VSTOINSTALLED">
+      <RegistrySearch Id="RegVSTOSearch" Root="HKLM" Key="Software\Microsoft\VSTO Runtime Setup\v4" Name="Install" Type="raw"/>
+    </Property>
+    <Condition Message="The Microsoft Visual Studio Tools for Office Runtime must be installed prior to running this installation.">
+      <![CDATA[Installed OR VSTOINSTALLED]]>
+    </Condition>
+
     <!-- First make sure that .NET is installed -->
     <PropertyRef Id="NETFRAMEWORK40CLIENT"/>
     <PropertyRef Id="NETFRAMEWORK40FULL"/>
