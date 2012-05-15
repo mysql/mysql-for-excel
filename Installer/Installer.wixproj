@@ -24,6 +24,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="main.wxs" />
+    <Compile Include="ui.wxs" />
   </ItemGroup>
   <ItemGroup>
     <WixExtension Include="WixNetFxExtension">

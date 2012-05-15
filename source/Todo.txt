@@ -1,6 +1,5 @@
 ﻿installer
 =====================
-1. remove license page
-2. make sure all non-VSTO items are installed
-3. check for existance of VSTO runtime as launch condition
-4. make appropriate registry settings to regiter addin
+- make sure all non-VSTO items are installed
+- check for existance of VSTO runtime as launch condition
+- make appropriate registry settings to regiter addin

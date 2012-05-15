@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?define ProductName="MySQL For Excel 1.0"?>
+<?define Version="1.0"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
   <Product Name="$(var.ProductName)" Id ="17E3FD69-D9E7-45E3-8C57-67BB34F0CCF6" Manufacturer="Oracle" Language="1033" Version="1.0" 
            UpgradeCode="30162E4E-2EED-48D1-BBC0-8D4A517DB004">
 		<Package Id="*" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" InstallPrivileges="elevated"/>
 
+    <Upgrade Id="3106FB9F-1793-4A0D-BEBB-742952D69CDB">
+      <UpgradeVersion OnlyDetect="yes" Minimum="$(var.Version)" Property="NEWERVERSIONDETECTED" IncludeMinimum="no" />
+      <UpgradeVersion OnlyDetect="no" Maximum="$(var.Version)" Property="OLDERVERSIONBEINGUPGRADED" IncludeMaximum="yes" />
+    </Upgrade>    
+    
     <Property Id="ARPURLINFOABOUT" Value="http://www.mysql.com" />
     <Property Id="ARPURLUPDATEINFO" Value="http://dev.mysql.com"/>    
 
@@ -23,7 +29,6 @@
     </Condition>
 
     <Directory Id="TARGETDIR" Name="SourceDir">
-      
       <Directory Id="ProgramFilesFolder" Name='PFiles'>
         <Directory Id='CompanyDir' Name='MySQL'>
           <Directory Id="INSTALLDIR" Name="$(var.ProductName)">
@@ -37,17 +42,18 @@
 
               <!--<File Id="_3259BD5CB475A992801BA08E894505C9" Name="Microsoft.VisualBasic.PowerPacks.Vs.dll" Source="SourceDir\File\_3259BD5CB475A992801BA08E894505C9" />
               <File Id="_F7FD2352BC6C3C2046F6B91527C61742" Name="Microsoft.VisualStudio.Tools.Applications.Runtime.dll" Assembly=".net" AssemblyManifest="_F7FD2352BC6C3C2046F6B91527C61742" AssemblyApplication="_F7FD2352BC6C3C2046F6B91527C61742" DiskId="1" Source="SourceDir\File\_F7FD2352BC6C3C2046F6B91527C61742" />-->
-              <RemoveFolder Id="INSTALLDIR" On="uninstall" />              
-            </Component>            
+              <RemoveFolder Id="INSTALLDIR" On="uninstall" />
+            </Component>
           </Directory>
         </Directory>
       </Directory>
+    </Directory>
 
-      <Directory Id="ProgramMenuFolder" Name="PMFolder">
+      <!--<Directory Id="ProgramMenuFolder" Name="PMFolder">
         <Directory Id='PMCompanyDir' Name='MySQL'>
           <Directory Id="ShortCutDir" Name="$(var.ProductName)"/>
         </Directory>
-      </Directory>
+      </Directory>-->
 
       <!--<Directory Id="DesktopFolder"  Name="Desktop">
         <Component Id="DesktopShortcut" Guid="1e9fb57a-62e3-45cf-a896-686e33407608">
@@ -60,8 +66,7 @@
         </Component>
       </Directory>-->
     
-    </Directory>
-
+    
     <!--<DirectoryRef Id="ShortCutDir">
       <Component Id="ProgramMenuShortcutsComponent" Guid="1e9fb57a-62e3-45cf-a896-686e33407610">
         <CreateFolder Directory="PMCompanyDir" />
@@ -74,7 +79,7 @@
       </Component>
     </DirectoryRef>-->
 
-    <Feature Id="DefaultFeature" ConfigurableDirectory="TARGETDIR" Level="1">
+    <Feature Id="DefaultFeature" ConfigurableDirectory="INSTALLDIR" Level="1" >
       <ComponentRef Id="MainItems" />
     </Feature>
 
@@ -85,10 +90,13 @@
       <ComponentRef Id="ProgramMenuShortcutsComponent"/>
     </Feature>-->
 
-  
+    <InstallExecuteSequence>
+      <RemoveExistingProducts After="InstallInitialize" />
+    </InstallExecuteSequence>
 
-    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
-    <UIRef Id="WixUI_Minimal" />
+
+      <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+    <UIRef Id="WixUI_MySQL" />
     <WixVariable Id="WixUIBannerBmp" Value="Bitmaps/BannrBmp.bmp"/>
     <WixVariable Id="WixUIDialogBmp" Value="Bitmaps/DlgBmp.bmp"/>
     <!--<Icon Id="TraApp.ico" SourceFile="app_default.ico" />-->

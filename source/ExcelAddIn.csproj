@@ -581,6 +581,9 @@
   <ItemGroup>
     <None Include="Resources\db.Column.16x16.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Todo.txt" />
+  </ItemGroup>
   <!-- Include the build rules for a C# project. -->
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
