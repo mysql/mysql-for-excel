@@ -21,9 +21,13 @@ namespace MySQL.ExcelAddIn
       if (row != null)
         ParseColumnInfo(row);
       AllowNull = true;
+      MappedDataColName = null;
     }
 
     #region Properties
+
+    [Browsable(false)]
+    public string MappedDataColName;
 
     [Browsable(false)]
     public MySQLTable OwningTable;

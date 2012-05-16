@@ -217,11 +217,9 @@
     can be found.
   -->
   <ItemGroup>
+    <Compile Include="Classes\ExportDataHelper.cs" />
     <Compile Include="Classes\MySQLColumn.cs" />
     <Compile Include="Classes\MySQLConnectionData.cs" />
-    <Compile Include="Classes\MySQLSchemaInfo.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Classes\MySQLTable.cs" />
     <Compile Include="Classes\Utilities.cs" />
     <Compile Include="Controls\HotLabel.cs">
@@ -235,6 +233,12 @@
     </Compile>
     <Compile Include="Controls\ManageTaskPaneRibbon.Designer.cs">
       <DependentUpon>ManageTaskPaneRibbon.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\MultiHeaderDataGridView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\MultiHeaderDataGridView.Designer.cs">
+      <DependentUpon>MultiHeaderDataGridView.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\MyTreeView.cs">
       <SubType>Component</SubType>
@@ -250,6 +254,12 @@
     </Compile>
     <Compile Include="Controls\TaskPaneControl.Designer.cs">
       <DependentUpon>TaskPaneControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\AppendDataToTableDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AppendDataToTableDialog.Designer.cs">
+      <DependentUpon>AppendDataToTableDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\ExportDataToTableDialog.cs">
       <SubType>Form</SubType>
@@ -280,12 +290,6 @@
     </Compile>
     <Compile Include="Forms\NewSchemaDialog.Designer.cs">
       <DependentUpon>NewSchemaDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\OldExportDataToTableDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\OldExportDataToTableDialog.designer.cs">
-      <DependentUpon>OldExportDataToTableDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\PasswordDialog.cs">
       <SubType>Form</SubType>
@@ -320,11 +324,17 @@
     <EmbeddedResource Include="Controls\ManageTaskPaneRibbon.resx">
       <DependentUpon>ManageTaskPaneRibbon.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\MultiHeaderDataGridView.resx">
+      <DependentUpon>MultiHeaderDataGridView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\SearchEdit.resx">
       <DependentUpon>SearchEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\TaskPaneControl.resx">
       <DependentUpon>TaskPaneControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AppendDataToTableDialog.resx">
+      <DependentUpon>AppendDataToTableDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ExportDataToTableDialog.resx">
       <DependentUpon>ExportDataToTableDialog.cs</DependentUpon>
@@ -340,9 +350,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\NewSchemaDialog.resx">
       <DependentUpon>NewSchemaDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\OldExportDataToTableDialog.resx">
-      <DependentUpon>OldExportDataToTableDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PasswordDialog.resx">
       <DependentUpon>PasswordDialog.cs</DependentUpon>
@@ -580,6 +587,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\db.Column.16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\chain_link.24x24.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Todo.txt" />

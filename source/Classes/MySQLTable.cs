@@ -19,6 +19,8 @@ namespace MySQL.ExcelAddIn
 
       if (tableRow != null)
         parseTableData(tableRow);
+      else
+        _isNew = true;
       if (columnsTable != null)
         parseColumns(columnsTable);
     }

@@ -378,7 +378,7 @@ namespace MySQL.ExcelAddIn
     {
       if (!allColumnsMapped)
       {
-        DialogResult dr = Utilities.ShowWarningBox(Properties.Resources.columnMappingIncomplete);
+        DialogResult dr = Utilities.ShowWarningBox(Properties.Resources.ColumnMappingIncomplete);
         if (dr == DialogResult.No)
           return;
       }

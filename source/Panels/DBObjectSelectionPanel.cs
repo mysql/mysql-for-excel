@@ -154,9 +154,9 @@ namespace MySQL.ExcelAddIn
       (Parent as TaskPaneControl).ImportDataToExcel(importDialog.ImportDataSet, importDialog.ImportHeaders, importDialog.ImportType);
     }
 
-    private bool exportDataToTable(string appendToTableName)
+    private bool exportDataToTable(DBObject appendToTable)
     {
-      return (Parent as TaskPaneControl).AppendDataToTable(appendToTableName);
+      return (Parent as TaskPaneControl).AppendDataToTable(appendToTable);
     }
 
     private void editData_Click(object sender, EventArgs e)
@@ -170,13 +170,13 @@ namespace MySQL.ExcelAddIn
         return;
       DBObject selDBObject = (objectList.SelectedNode.Tag as DBObject);
       if (selDBObject.Type == DBObjectType.Table)
-        exportDataToTable(selDBObject.Name);
+        exportDataToTable(selDBObject);
     }
 
 
     private void exportToNewTable_Click(object sender, EventArgs e)
     {
-      bool success = exportDataToTable(String.Empty);
+      bool success = exportDataToTable(null);
       if (success)
       {
         objectList.Nodes[0].Nodes.Clear();

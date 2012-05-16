@@ -121,13 +121,13 @@
   <data name="action_eer_rev_eng_db" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\action_eer_rev_eng_db.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="connectionClosedError" xml:space="preserve">
+  <data name="ConnectionClosedError" xml:space="preserve">
     <value>MySQL Connection is closed, must be opened first to perform action</value>
   </data>
-  <data name="connectionsFileNotFound" xml:space="preserve">
+  <data name="ConnectionsFileNotFound" xml:space="preserve">
     <value>Workbench connections.xml file not found</value>
   </data>
-  <data name="connectionStringNotSet" xml:space="preserve">
+  <data name="ConnectionStringNotSet" xml:space="preserve">
     <value>Can't open MySQL connection since connection string has not been set</value>
   </data>
   <data name="CurrentChangesLostConfirmation" xml:space="preserve">
@@ -310,16 +310,16 @@
   <data name="new_connection_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\new_connection_48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="selectedDBObjectNotTable" xml:space="preserve">
+  <data name="SelectedDBObjectNotTable" xml:space="preserve">
     <value>Selected DB Object used for this action must be of Type =Table.</value>
   </data>
-  <data name="selectedDBObjectNull" xml:space="preserve">
+  <data name="SelectedDBObjectNull" xml:space="preserve">
     <value>Empty or null DB Object used for this action.  A valid DB Object must be used.</value>
   </data>
-  <data name="selectedDBSchemaNull" xml:space="preserve">
+  <data name="SelectedDBSchemaNull" xml:space="preserve">
     <value>Empty or null DB Schema used for this action.  A valid Schema must be used.</value>
   </data>
-  <data name="selectedTableNull" xml:space="preserve">
+  <data name="SelectedTableNull" xml:space="preserve">
     <value>Empty or null Table used for this action.  A valid Table must be used.</value>
   </data>
   <data name="Error" xml:space="preserve">
@@ -346,10 +346,25 @@
   <data name="db_Column_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\db.Column.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="columnMappingIncomplete" xml:space="preserve">
+  <data name="ColumnMappingIncomplete" xml:space="preserve">
     <value>Column mapping for all columns in Excel selection is incomplete. Do you want to proceed with the current mapped data only?</value>
   </data>
   <data name="RemoveColumnConfirmation" xml:space="preserve">
     <value>Are you sure you want to remove the selected column?</value>
+  </data>
+  <data name="chain_link_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\chain_link.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ColumnMappedOverwrite" xml:space="preserve">
+    <value>This column has already been mapped, do you want to overwrite existing mapping?</value>
+  </data>
+  <data name="ColumnMappedRemove" xml:space="preserve">
+    <value>This column has already been mapped, do you want to remove it and its mapping?</value>
+  </data>
+  <data name="TableNotNewInCreate" xml:space="preserve">
+    <value>Table must be new in order to create it in MySQL DB.</value>
+  </data>
+  <data name="ColumnsMappedOverwrite" xml:space="preserve">
+    <value>Some columns have already been mapped, do you want to overwrite existing mappings?</value>
   </data>
 </root>

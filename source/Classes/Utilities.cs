@@ -9,6 +9,7 @@ using System.Data;
 using MySql.Data.MySqlClient;
 using MySQL.Utility;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace MySQL.ExcelAddIn
 {
@@ -46,7 +47,7 @@ namespace MySQL.ExcelAddIn
               break;
             case "COLLATIONS":
               string queryString;
-              if (!String.IsNullOrEmpty(restrictions[0]))
+              if (restrictions != null && restrictions.Length > 0 && !String.IsNullOrEmpty(restrictions[0]))
                 queryString = String.Format("SHOW COLLATION WHERE charset = '{0}'", restrictions[0]);
               else
                 queryString = "SHOW COLLATION";
@@ -159,28 +160,28 @@ namespace MySQL.ExcelAddIn
         foreach (MySqlParameter p in commandParameters)
           cmd.Parameters.Add(p);
 
-      //create the DataAdapter & DataSet
+      // Create the DataAdapter & DataSet
       MySqlDataAdapter da = new MySqlDataAdapter(cmd);
       DataSet ds = new DataSet();
 
-      //fill the DataSet using default values for DataTable names, etc.
+      // Fill the DataSet using default values for DataTable names, etc.
       da.Fill(ds);
 
-      // detach the MySqlParameters from the command object, so they can be used again.			
+      // Detach the MySqlParameters from the command object, so they can be used again.			
       cmd.Parameters.Clear();
 
-      //return the dataset
+      // Return the dataset
       return ds;
     }
 
     public static DataSet ExecuteDatasetSP(string connectionString, string commandText, params MySqlParameter[] commandParameters)
     {
-      //create & open a SqlConnection, and dispose of it after we are done.
+      // Create & open a SqlConnection, and dispose of it after we are done.
       using (MySqlConnection cn = new MySqlConnection(connectionString))
       {
         cn.Open();
 
-        //call the overload that takes a connection in place of the connection string
+        // Call the overload that takes a connection in place of the connection string
         return ExecuteDatasetSP(cn, commandText, commandParameters);
       }
     }
@@ -309,13 +310,13 @@ namespace MySQL.ExcelAddIn
 
     public static Bitmap MakeGrayscale(Bitmap original)
     {
-      //create a blank bitmap the same size as original
+      // Create a blank bitmap the same size as original
       Bitmap newBitmap = new Bitmap(original.Width, original.Height);
 
-      //get a graphics object from the new image
+      // Get a graphics object from the new image
       Graphics g = Graphics.FromImage(newBitmap);
 
-      //create the grayscale ColorMatrix
+      // Create the grayscale ColorMatrix
       ColorMatrix colorMatrix = new ColorMatrix(
          new float[][] 
       {
@@ -326,20 +327,36 @@ namespace MySQL.ExcelAddIn
          new float[] {0, 0, 0, 0, 1}
       });
 
-      //create some image attributes
+      // Create some image attributes
       ImageAttributes attributes = new ImageAttributes();
 
-      //set the color matrix attribute
+      // Set the color matrix attribute
       attributes.SetColorMatrix(colorMatrix);
 
-      //draw the original image on the new image
-      //using the grayscale color matrix
+      // Draw the original image on the new image using the grayscale color matrix
       g.DrawImage(original, new Rectangle(0, 0, original.Width, original.Height),
          0, 0, original.Width, original.Height, GraphicsUnit.Pixel, attributes);
 
-      //dispose the Graphics object
+      // Dispose the Graphics object
       g.Dispose();
       return newBitmap;
+    }
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr CreateIconIndirect(ref IconInfo icon);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool GetIconInfo(IntPtr hIcon, ref IconInfo pIconInfo);
+
+    public static Cursor CreateCursor(Bitmap bmp, int xHotSpot, int yHotSpot)
+    {
+      IconInfo tmp = new IconInfo();
+      GetIconInfo(bmp.GetHicon(), ref tmp);
+      tmp.xHotspot = xHotSpot;
+      tmp.yHotspot = yHotSpot;
+      tmp.fIcon = false;
+      return new Cursor(CreateIconIndirect(ref tmp));
     }
 
     public static DialogResult ShowWarningBox(string warningMessage)
@@ -386,5 +403,14 @@ namespace MySQL.ExcelAddIn
 
       return retList;
     }
+  }
+
+  public struct IconInfo
+  {
+    public bool fIcon;
+    public int xHotspot;
+    public int yHotspot;
+    public IntPtr hbmMask;
+    public IntPtr hbmColor;
   }
 }

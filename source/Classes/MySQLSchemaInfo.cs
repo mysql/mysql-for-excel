@@ -93,7 +93,7 @@ namespace MySQL.ExcelAddIn
 
       if (connData.ConnectionString == String.Empty)
       {
-        Utilities.ShowErrorBox(Properties.Resources.connectionStringNotSet);
+        Utilities.ShowErrorBox(Properties.Resources.ConnectionStringNotSet);
         return success;
       }
       
@@ -163,7 +163,7 @@ namespace MySQL.ExcelAddIn
       {
         if (mysqlConnection.State == ConnectionState.Closed)
         {
-          Utilities.ShowErrorBox(Properties.Resources.connectionClosedError);
+          Utilities.ShowErrorBox(Properties.Resources.ConnectionClosedError);
           return;
         }
         
@@ -189,7 +189,7 @@ namespace MySQL.ExcelAddIn
         return;
       if (mysqlConnection.State == ConnectionState.Closed)
       {
-        Utilities.ShowErrorBox(Properties.Resources.connectionClosedError);
+        Utilities.ShowErrorBox(Properties.Resources.ConnectionClosedError);
         return;
       }
 
@@ -223,7 +223,7 @@ namespace MySQL.ExcelAddIn
         return;
       if (mysqlConnection.State == ConnectionState.Closed)
       {
-        Utilities.ShowErrorBox(Properties.Resources.connectionClosedError);
+        Utilities.ShowErrorBox(Properties.Resources.ConnectionClosedError);
         return;
       }
 
@@ -321,17 +321,17 @@ namespace MySQL.ExcelAddIn
 
       if (mysqlConnection.State == ConnectionState.Closed)
       {
-        Utilities.ShowErrorBox(Properties.Resources.connectionClosedError);
+        Utilities.ShowErrorBox(Properties.Resources.ConnectionClosedError);
         return retTable;
       }
       if (String.IsNullOrEmpty(currentSchema))
       {
-        Utilities.ShowErrorBox(Properties.Resources.selectedDBSchemaNull);
+        Utilities.ShowErrorBox(Properties.Resources.SelectedDBSchemaNull);
         return retTable;
       }
       if (string.IsNullOrEmpty(tableName))
       {
-        Utilities.ShowErrorBox(Properties.Resources.selectedTableNull);
+        Utilities.ShowErrorBox(Properties.Resources.SelectedTableNull);
         return retTable;
       }
 
@@ -377,17 +377,17 @@ namespace MySQL.ExcelAddIn
 
       if (mysqlConnection.State == ConnectionState.Closed)
       {
-        Utilities.ShowErrorBox(Properties.Resources.connectionClosedError);
+        Utilities.ShowErrorBox(Properties.Resources.ConnectionClosedError);
         return success;
       }
       if (String.IsNullOrEmpty(currentSchema))
       {
-        Utilities.ShowErrorBox(Properties.Resources.selectedDBSchemaNull);
+        Utilities.ShowErrorBox(Properties.Resources.SelectedDBSchemaNull);
         return success;
       }
       if (string.IsNullOrEmpty(newTableName))
       {
-        Utilities.ShowErrorBox(Properties.Resources.selectedTableNull);
+        Utilities.ShowErrorBox(Properties.Resources.SelectedTableNull);
         return success;
       }
 
@@ -430,17 +430,17 @@ namespace MySQL.ExcelAddIn
 
       if (mysqlConnection.State == ConnectionState.Closed)
       {
-        Utilities.ShowErrorBox(Properties.Resources.connectionClosedError);
+        Utilities.ShowErrorBox(Properties.Resources.ConnectionClosedError);
         return success;
       }
       if (String.IsNullOrEmpty(currentSchema))
       {
-        Utilities.ShowErrorBox(Properties.Resources.selectedDBSchemaNull);
+        Utilities.ShowErrorBox(Properties.Resources.SelectedDBSchemaNull);
         return success;
       }
       if (string.IsNullOrEmpty(toTableName))
       {
-        Utilities.ShowErrorBox(Properties.Resources.selectedTableNull);
+        Utilities.ShowErrorBox(Properties.Resources.SelectedTableNull);
         return success;
       }
 

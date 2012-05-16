@@ -17,13 +17,14 @@ namespace MySQL.ExcelAddIn
   public partial class ExportDataToTableDialog : Form
   {
     private MySqlWorkbenchConnection wbConnection;
-    private DataTable formattedExcelData;
-    private DataTable unformattedExcelData;
-    private MySQLTable exportTable;
-    ToolStripButton columnPropsButton;
-    ToolStripButton tablePropsButton;
-    List<ColumnGuessData> headerRowColumnsGuessData;
-    List<ColumnGuessData> dataRowsColumnsGuessData;
+    private ToolStripButton columnPropsButton;
+    private ToolStripButton tablePropsButton;
+    private ExportDataHelper exportDataHelper;
+    private MySQLTable exportTable { get { return exportDataHelper.ExportTable; } }
+    private List<ColumnGuessData> headerRowColumnsGuessData { get { return exportDataHelper.HeaderRowColumnsGuessData; } }
+    private List<ColumnGuessData> dataRowsColumnsGuessData { get { return exportDataHelper.DataRowsColumnsGuessData; } }
+    private DataTable formattedExcelData { get { return exportDataHelper.FormattedExcelData; } }
+    private DataTable unformattedExcelData { get { return exportDataHelper.UnformattedExcelData; } }
 
     public ExportDataToTableDialog(MySqlWorkbenchConnection wbConnection, Excel.Range exportDataRange)
     {
@@ -31,9 +32,8 @@ namespace MySQL.ExcelAddIn
 
       InitializeComponent();
 
+      exportDataHelper = new ExportDataHelper(wbConnection, exportDataRange, null);
       addPropertyButtonsToToolbar();
-      createMySQLTable();
-      fillDataTablesFromRange(exportDataRange);
       initializeGridCombos();
 
       Text = String.Format("Export Data to Table (Range: {0})", exportDataRange.Address);
@@ -61,25 +61,6 @@ namespace MySQL.ExcelAddIn
       DataGridViewComboBoxColumn collationCombo = grdColumnProperties.Columns["collationDataGridViewComboBoxColumn"] as DataGridViewComboBoxColumn;
       collationCombo.DataSource = Utilities.GetSchemaCollection(wbConnection, "Collations", charset);
       collationCombo.DataPropertyName = "Collation";
-    }
-
-    private void createMySQLTable()
-    {
-      exportTable = new MySQLTable(wbConnection, null, null);
-      exportTable.Engine = "InnoDB";
-
-      int tableCount = 1;
-      string tableName = String.Empty ;
-      bool tableExists = true;
-      while (tableExists)
-      {
-        tableName = String.Format("Table{0}", tableCount++);
-        tableExists = Utilities.TableExistsInSchema(wbConnection, wbConnection.Schema, tableName);
-      }
-
-      exportTable.Name = tableName;
-      exportTable.CharacterSet = "latin1";
-      exportTable.Collation = "latin1_swedish_ci";
     }
 
     private void addPropertyButtonsToToolbar()
@@ -130,116 +111,6 @@ namespace MySQL.ExcelAddIn
       columnPropertiesGrid.SelectedObject = exportTable;
     }
 
-    private void fillDataTablesFromRange(Excel.Range selectedRange)
-    {
-      formattedExcelData = new DataTable();
-      unformattedExcelData = new DataTable();
-
-      object[,] formattedArrayFromRange = selectedRange.Value as object[,];
-      object[,] unformattedArrayFromRange = selectedRange.Value2 as object[,];
-      object valueFromArray = null;
-      DataRow formattedRow;
-      DataRow unformattedRow;
-      MySQLColumn newColumn;
-
-      int rowsCount = formattedArrayFromRange.GetUpperBound(0);
-      int colsCount = formattedArrayFromRange.GetUpperBound(1);
-
-      for (int colPos = 1; colPos <= colsCount; colPos++)
-      {
-        newColumn = new MySQLColumn(null, exportTable);
-        exportTable.Columns.Add(newColumn);
-        formattedExcelData.Columns.Add();
-        unformattedExcelData.Columns.Add();
-      }
-
-      for (int rowPos = 1; rowPos <= rowsCount; rowPos++)
-      {
-        bool wholeRowNull = true;
-        formattedRow = formattedExcelData.NewRow();
-        unformattedRow = unformattedExcelData.NewRow();
-
-        for (int colPos = 1; colPos <= colsCount; colPos++)
-        {
-          valueFromArray = formattedArrayFromRange[rowPos, colPos];
-          wholeRowNull = wholeRowNull && valueFromArray == null;
-          formattedRow[colPos - 1] = (valueFromArray != null ? valueFromArray.ToString() : String.Empty);
-          valueFromArray = unformattedArrayFromRange[rowPos, colPos];
-          unformattedRow[colPos - 1] = (valueFromArray != null ? valueFromArray.ToString() : String.Empty);
-        }
-
-        if (!wholeRowNull)
-        {
-          formattedExcelData.Rows.Add(formattedRow);
-          unformattedExcelData.Rows.Add(unformattedRow);
-        }
-      }
-
-      guessDataTypesFromData(formattedArrayFromRange);
-    }
-
-    private void guessDataTypesFromData(object[,] formattedArrayFromRange)
-    {
-      int rowsCount = formattedArrayFromRange.GetUpperBound(0);
-      int colsCount = formattedArrayFromRange.GetUpperBound(1);
-      headerRowColumnsGuessData = new List<ColumnGuessData>(colsCount);
-      dataRowsColumnsGuessData = new List<ColumnGuessData>(colsCount);
-
-      object valueFromArray = null;
-      string strValue = String.Empty;
-      string proposedType = String.Empty;
-      string previousType = String.Empty;
-      string headerType = String.Empty;
-      bool typesConsistent = true;
-      int maxStrValue = 0;
-      string nameFromHeader;
-      string nameGeneric;
-      CultureInfo cultureForDates = new CultureInfo("en-US");
-      string dateFormat = "yyyy-MM-dd HH:mm:ss";
-
-      for (int colPos = 1; colPos <= colsCount; colPos++)
-      {
-        headerRowColumnsGuessData.Add(new ColumnGuessData());
-        dataRowsColumnsGuessData.Add(new ColumnGuessData());
-
-        for (int rowPos = 1; rowPos <= rowsCount; rowPos++)
-        {
-          valueFromArray = formattedArrayFromRange[rowPos, colPos];
-          if (valueFromArray == null)
-            continue;
-          strValue = valueFromArray.ToString();
-          proposedType = Utilities.GetMySQLDataType(valueFromArray);
-          if (proposedType == "datetime" && valueFromArray is DateTime)
-          {
-            DateTime dtValue = (DateTime)valueFromArray;
-            formattedExcelData.Rows[rowPos - 1][colPos - 1] = dtValue.ToString(dateFormat);
-          }
-          maxStrValue = Math.Max(strValue.Length, maxStrValue);
-          if (rowPos == 1)
-            headerType = proposedType;
-          else
-          {
-            typesConsistent = typesConsistent && (rowPos >  2 ? previousType == proposedType : true);
-            previousType = proposedType;
-          }
-        }
-
-        nameFromHeader = (formattedArrayFromRange[1, colPos] != null ? formattedArrayFromRange[1, colPos].ToString().Replace(" ", "_").Replace("(", String.Empty).Replace(")", String.Empty) : String.Empty);
-        nameGeneric = String.Format("Column{0}", colPos);
-        if (nameFromHeader.Length == 0)
-          nameFromHeader = nameGeneric;
-        int charLen = (maxStrValue + (10 - maxStrValue % 10));
-        headerType = (headerType.Length == 0 ? previousType : (headerType == "varchar" ? (charLen > 65535 ? "text" : "varchar") : headerType));
-        previousType = (previousType.Length == 0 ? "varchar" : (previousType == "varchar" ? (charLen > 65535 ? "text" : "varchar") : previousType));
-        headerRowColumnsGuessData[colPos - 1].ColumnName = nameFromHeader;
-        headerRowColumnsGuessData[colPos - 1].MySQLType = headerType;
-        headerRowColumnsGuessData[colPos - 1].StrLen = charLen;
-        dataRowsColumnsGuessData[colPos - 1].ColumnName = nameGeneric;
-        dataRowsColumnsGuessData[colPos - 1].MySQLType = previousType;
-        dataRowsColumnsGuessData[colPos - 1].StrLen = charLen;
-      }
-    }
-
     private void refreshColumnsNameAndType()
     {
       ColumnGuessData headerColData;
@@ -265,98 +136,6 @@ namespace MySQL.ExcelAddIn
       columnBindingSource.ResetBindings(false);
     }
 
-    private void refreshPreviewGridWithHeaderSelection()
-    {
-
-    }
-
-    private bool createTable()
-    {
-      bool success = false;
-      string connectionString = Utilities.GetConnectionString(wbConnection);
-      string queryString = exportTable.GetSQL();
-
-      try
-      {
-        using (MySqlConnection conn = new MySqlConnection(connectionString))
-        {
-          conn.Open();
-
-          MySqlCommand cmd = new MySqlCommand(queryString, conn);
-          cmd.ExecuteNonQuery();
-          success = true;
-        }
-      }
-      catch (Exception ex)
-      {
-        System.Diagnostics.Debug.WriteLine(ex.Message);
-      }
-
-      return success;
-    }
-
-    private bool insertData()
-    {
-      bool success = false;
-
-      string connectionString = Utilities.GetConnectionString(wbConnection);
-      StringBuilder queryString = new StringBuilder();
-      int rowIdx = 0;
-      int exportColsCount = exportTable.Columns.Count;
-      List<bool> columnsRequireQuotes = new List<bool>();
-      bool firstRowHeader = chkFirstRowHeaders.Checked;
-      DataTable insertingData = (chkUseFormatted.Checked ? formattedExcelData : unformattedExcelData);
-
-      queryString.AppendFormat("USE {0}; INSERT INTO", wbConnection.Schema);
-      queryString.AppendFormat(" {0} (", exportTable.Name);
-
-      foreach (MySQLColumn column in exportTable.Columns)
-      {
-        queryString.AppendFormat("{0},", column.ColumnName);
-        columnsRequireQuotes.Add(column.IsCharOrText || column.IsDate);
-      }
-      if (exportColsCount > 0)
-        queryString.Remove(queryString.Length - 1, 1);
-      queryString.Append(") VALUES ");
-
-      foreach (DataRow dr in insertingData.Rows)
-      {
-        if (firstRowHeader && rowIdx++ == 0)
-          continue;
-        queryString.Append("(");
-        for (int colIdx = 0; colIdx < exportTable.Columns.Count; colIdx++)
-        {
-          queryString.AppendFormat("{0}{1}{0},",
-                                   (columnsRequireQuotes[colIdx] ? "'" : String.Empty),
-                                   dr[colIdx].ToString());
-        }
-        if (exportColsCount > 0)
-          queryString.Remove(queryString.Length - 1, 1);
-        queryString.Append("),");
-      }
-      if (insertingData.Rows.Count > 0)
-        queryString.Remove(queryString.Length - 1, 1);
-      queryString.Append(";");
-
-      try
-      {
-        using (MySqlConnection conn = new MySqlConnection(connectionString))
-        {
-          conn.Open();
-
-          MySqlCommand cmd = new MySqlCommand(queryString.ToString(), conn);
-          cmd.ExecuteNonQuery();
-          success = true;
-        }
-      }
-      catch (Exception ex)
-      {
-        System.Diagnostics.Debug.WriteLine(ex.Message);
-      }
-
-      return success;
-    }
-
     private void chkFirstRowHeaders_CheckedChanged(object sender, EventArgs e)
     {
       if (exportTable == null || exportTable.Columns.Count == 0)
@@ -370,6 +149,8 @@ namespace MySQL.ExcelAddIn
       }
       grdPreviewData.CurrentCell = null;
       grdPreviewData.Rows[0].Visible = !chkFirstRowHeaders.Checked;
+      if (chkFirstRowHeaders.Checked && grdPreviewData.Rows.Count < 2)
+        return;
       grdPreviewData.FirstDisplayedScrollingRowIndex = (chkFirstRowHeaders.Checked ? 1 : 0);
     }
 
@@ -401,8 +182,8 @@ namespace MySQL.ExcelAddIn
 
     private void btnExport_Click(object sender, EventArgs e)
     {
-      bool success = createTable();
-      success = success && insertData();
+      bool success = exportDataHelper.CreateTableInDB();
+      success = success && exportDataHelper.InsertData(chkFirstRowHeaders.Checked, chkUseFormatted.Checked);
       if (success)
       {
         DialogResult = DialogResult.OK;
@@ -425,7 +206,6 @@ namespace MySQL.ExcelAddIn
         headerRowColumnsGuessData.RemoveAt(removeColdIndex);
         dataRowsColumnsGuessData.RemoveAt(removeColdIndex);
         grdPreviewData.Refresh();
-        //grdPreviewData.Columns.Remove(grdPreviewData.SelectedColumns[0]);
         grdPreviewData.ClearSelection();
       }
     }
@@ -438,6 +218,7 @@ namespace MySQL.ExcelAddIn
         gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
       }
       grdPreviewData.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
+      chkFirstRowHeaders_CheckedChanged(chkFirstRowHeaders, EventArgs.Empty);
     }
 
     private void grdColumnProperties_CurrentCellDirtyStateChanged(object sender, EventArgs e)

@@ -146,18 +146,20 @@ namespace MySQL.ExcelAddIn
       }
     }
 
-    public bool AppendDataToTable(string toTableName)
+    public bool AppendDataToTable(DBObject toTableObject)
     {
       DialogResult dr = DialogResult.Cancel;
-      if (toTableName.Length > 0)
+      Excel.Range exportRange = excelApplication.Selection as Excel.Range;
+
+      if (toTableObject != null)
       {
-        OldExportDataToTableDialog oldExportDataForm = new OldExportDataToTableDialog(connection, connection.Schema, toTableName, excelApplication.Selection as Excel.Range);
-        dr = oldExportDataForm.ShowDialog();
+        AppendDataToTableDialog appendDataDialog = new AppendDataToTableDialog(connection, exportRange, toTableObject);
+        dr = appendDataDialog.ShowDialog();
       }
       else
       {
-        ExportDataToTableDialog exportDataForm = new ExportDataToTableDialog(connection, excelApplication.Selection as Excel.Range);
-        dr = exportDataForm.ShowDialog();
+        ExportDataToTableDialog exportDataDialog = new ExportDataToTableDialog(connection, exportRange);
+        dr = exportDataDialog.ShowDialog();
       }
       return dr == DialogResult.OK;
     }
