@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace MySQL.ExcelAddIn
+namespace MySQL.ForExcel
 {
   public partial class MultiHeaderDataGridView : UserControl
   {

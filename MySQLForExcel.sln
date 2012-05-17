@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelAddIn", "source\ExcelAddIn.csproj", "{F39FEA53-4835-4762-B7F1-A0B32F618078}"
-EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Installer", "Installer\Installer.wixproj", "{EC7DAD39-2206-484C-9966-AB256269A6D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySQL.ForExcel", "source\MySQL.ForExcel.csproj", "{F39FEA53-4835-4762-B7F1-A0B32F618078}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,16 +15,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Release|x86.ActiveCfg = Release|Any CPU
 		{EC7DAD39-2206-484C-9966-AB256269A6D4}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{EC7DAD39-2206-484C-9966-AB256269A6D4}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{EC7DAD39-2206-484C-9966-AB256269A6D4}.Debug|Mixed Platforms.Build.0 = Debug|x86
@@ -35,6 +25,16 @@ Global
 		{EC7DAD39-2206-484C-9966-AB256269A6D4}.Release|Mixed Platforms.Build.0 = Release|x86
 		{EC7DAD39-2206-484C-9966-AB256269A6D4}.Release|x86.ActiveCfg = Release|x86
 		{EC7DAD39-2206-484C-9966-AB256269A6D4}.Release|x86.Build.0 = Release|x86
+		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

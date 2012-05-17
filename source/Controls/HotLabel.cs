@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace MySQL.ExcelAddIn.Controls
+namespace MySQL.ForExcel.Controls
 {
   public partial class HotLabel : UserControl
   {

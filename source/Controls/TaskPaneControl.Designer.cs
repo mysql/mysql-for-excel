@@ -1,4 +1,4 @@
-﻿namespace MySQL.ExcelAddIn
+﻿namespace MySQL.ForExcel
 {
   partial class TaskPaneControl
   {
@@ -28,9 +28,9 @@
     /// </summary>
     private void InitializeComponent()
     {
-      this.welcomePanel1 = new MySQL.ExcelAddIn.WelcomePanel();
-      this.dbObjectSelectionPanel1 = new MySQL.ExcelAddIn.DBObjectSelectionPanel();
-      this.schemaSelectionPanel1 = new MySQL.ExcelAddIn.SchemaSelectionPanel();
+      this.welcomePanel1 = new MySQL.ForExcel.WelcomePanel();
+      this.dbObjectSelectionPanel1 = new MySQL.ForExcel.DBObjectSelectionPanel();
+      this.schemaSelectionPanel1 = new MySQL.ForExcel.SchemaSelectionPanel();
       this.SuspendLayout();
       // 
       // welcomePanel1

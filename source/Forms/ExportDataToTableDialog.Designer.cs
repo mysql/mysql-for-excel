@@ -1,4 +1,4 @@
-﻿namespace MySQL.ExcelAddIn
+﻿namespace MySQL.ForExcel
 {
   partial class ExportDataToTableDialog
   {
@@ -354,7 +354,7 @@
       // 
       // columnBindingSource
       // 
-      this.columnBindingSource.DataSource = typeof(MySQL.ExcelAddIn.MySQLColumn);
+      this.columnBindingSource.DataSource = typeof(MySQL.ForExcel.MySQLColumn);
       this.columnBindingSource.CurrentChanged += new System.EventHandler(this.columnBindingSource_CurrentChanged);
       // 
       // btnExport
@@ -380,7 +380,7 @@
       // 
       // mySQLTableBindingSource
       // 
-      this.mySQLTableBindingSource.DataSource = typeof(MySQL.ExcelAddIn.MySQLTable);
+      this.mySQLTableBindingSource.DataSource = typeof(MySQL.ForExcel.MySQLTable);
       // 
       // ExportDataToTableDialog
       // 

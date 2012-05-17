@@ -1,4 +1,4 @@
-﻿namespace MySQL.ExcelAddIn
+﻿namespace MySQL.ForExcel
 {
   partial class DBObjectSelectionPanel
   {
@@ -48,11 +48,11 @@
       this.linSeparator = new Microsoft.VisualBasic.PowerPacks.LineShape();
       this.btnHelp = new System.Windows.Forms.Button();
       this.objectList = new TreeViewTest.MyTreeView();
-      this.appendData = new MySQL.ExcelAddIn.Controls.HotLabel();
-      this.editData = new MySQL.ExcelAddIn.Controls.HotLabel();
-      this.importData = new MySQL.ExcelAddIn.Controls.HotLabel();
-      this.hotLabel2 = new MySQL.ExcelAddIn.Controls.HotLabel();
-      this.exportToNewTable = new MySQL.ExcelAddIn.Controls.HotLabel();
+      this.appendData = new MySQL.ForExcel.Controls.HotLabel();
+      this.editData = new MySQL.ForExcel.Controls.HotLabel();
+      this.importData = new MySQL.ForExcel.Controls.HotLabel();
+      this.hotLabel2 = new MySQL.ForExcel.Controls.HotLabel();
+      this.exportToNewTable = new MySQL.ForExcel.Controls.HotLabel();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
       this.dbObjectsContextMenu.SuspendLayout();
       this.SuspendLayout();
@@ -79,7 +79,7 @@
       // 
       // picAddInLogo
       // 
-      this.picAddInLogo.Image = global::MySQL.ExcelAddIn.Properties.Resources.MySQLExcelAddInLogo_64x64;
+      this.picAddInLogo.Image = global::MySQL.ForExcel.Properties.Resources.MySQLExcelAddInLogo_64x64;
       this.picAddInLogo.Location = new System.Drawing.Point(14, 13);
       this.picAddInLogo.Name = "picAddInLogo";
       this.picAddInLogo.Size = new System.Drawing.Size(64, 64);
@@ -97,14 +97,14 @@
       // 
       // importDataToolStripMenuItem
       // 
-      this.importDataToolStripMenuItem.Image = global::MySQL.ExcelAddIn.Properties.Resources.import_data_16x16;
+      this.importDataToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.import_data_16x16;
       this.importDataToolStripMenuItem.Name = "importDataToolStripMenuItem";
       this.importDataToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
       this.importDataToolStripMenuItem.Text = "Import MySQL Data";
       // 
       // editDataToolStripMenuItem
       // 
-      this.editDataToolStripMenuItem.Image = global::MySQL.ExcelAddIn.Properties.Resources.edit_data_16x16;
+      this.editDataToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.edit_data_16x16;
       this.editDataToolStripMenuItem.Name = "editDataToolStripMenuItem";
       this.editDataToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
       this.editDataToolStripMenuItem.Text = "Edit MySQL Data";
@@ -112,7 +112,7 @@
       // 
       // appendDataToolStripMenuItem
       // 
-      this.appendDataToolStripMenuItem.Image = global::MySQL.ExcelAddIn.Properties.Resources.export_excel_existing_table_16x16;
+      this.appendDataToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.export_excel_existing_table_16x16;
       this.appendDataToolStripMenuItem.Name = "appendDataToolStripMenuItem";
       this.appendDataToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
       this.appendDataToolStripMenuItem.Text = "Append Excel Data to Table";
@@ -196,11 +196,11 @@
       this.objectList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.objectList.CollapsedIcon = global::MySQL.ExcelAddIn.Properties.Resources.ArrowRight;
+      this.objectList.CollapsedIcon = global::MySQL.ForExcel.Properties.Resources.ArrowRight;
       this.objectList.DescriptionColor = System.Drawing.Color.Silver;
       this.objectList.DescriptionFont = new System.Drawing.Font("Arial Narrow", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.objectList.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawAll;
-      this.objectList.ExpandedIcon = global::MySQL.ExcelAddIn.Properties.Resources.ArrowDown;
+      this.objectList.ExpandedIcon = global::MySQL.ForExcel.Properties.Resources.ArrowDown;
       this.objectList.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.objectList.Indent = 18;
       this.objectList.ItemHeight = 20;
@@ -235,7 +235,7 @@
       this.appendData.Enabled = false;
       this.appendData.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.appendData.HotTracking = true;
-      this.appendData.Image = global::MySQL.ExcelAddIn.Properties.Resources.export_excel_existing_table_32x32;
+      this.appendData.Image = global::MySQL.ForExcel.Properties.Resources.export_excel_existing_table_32x32;
       this.appendData.ImageSize = new System.Drawing.Size(32, 32);
       this.appendData.Location = new System.Drawing.Point(17, 587);
       this.appendData.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -253,7 +253,7 @@
       this.editData.Enabled = false;
       this.editData.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.editData.HotTracking = true;
-      this.editData.Image = global::MySQL.ExcelAddIn.Properties.Resources.edit_data_32x32;
+      this.editData.Image = global::MySQL.ForExcel.Properties.Resources.edit_data_32x32;
       this.editData.ImageSize = new System.Drawing.Size(32, 32);
       this.editData.Location = new System.Drawing.Point(17, 535);
       this.editData.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -271,7 +271,7 @@
       this.importData.Enabled = false;
       this.importData.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.importData.HotTracking = true;
-      this.importData.Image = global::MySQL.ExcelAddIn.Properties.Resources.import_data_32x32;
+      this.importData.Image = global::MySQL.ForExcel.Properties.Resources.import_data_32x32;
       this.importData.ImageSize = new System.Drawing.Size(32, 32);
       this.importData.Location = new System.Drawing.Point(17, 483);
       this.importData.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -287,7 +287,7 @@
       this.hotLabel2.DescriptionFont = new System.Drawing.Font("Arial", 8.25F);
       this.hotLabel2.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.hotLabel2.HotTracking = false;
-      this.hotLabel2.Image = global::MySQL.ExcelAddIn.Properties.Resources.db_Objects_32x32;
+      this.hotLabel2.Image = global::MySQL.ForExcel.Properties.Resources.db_Objects_32x32;
       this.hotLabel2.ImageSize = new System.Drawing.Size(32, 32);
       this.hotLabel2.Location = new System.Drawing.Point(16, 163);
       this.hotLabel2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -302,7 +302,7 @@
       this.exportToNewTable.DescriptionFont = new System.Drawing.Font("Arial", 8.25F);
       this.exportToNewTable.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.exportToNewTable.HotTracking = true;
-      this.exportToNewTable.Image = global::MySQL.ExcelAddIn.Properties.Resources.export_excel_new_table_32x32;
+      this.exportToNewTable.Image = global::MySQL.ForExcel.Properties.Resources.export_excel_new_table_32x32;
       this.exportToNewTable.ImageSize = new System.Drawing.Size(32, 32);
       this.exportToNewTable.Location = new System.Drawing.Point(17, 98);
       this.exportToNewTable.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);

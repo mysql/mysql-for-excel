@@ -1,6 +1,6 @@
-﻿namespace MySQL.ExcelAddIn
+﻿namespace MySQL.ForExcel
 {
-  partial class ImportTableViewDialog
+  partial class EditTableDialog
   {
     /// <summary>
     /// Required designer variable.

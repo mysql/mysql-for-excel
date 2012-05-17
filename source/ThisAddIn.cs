@@ -7,7 +7,7 @@ using Office = Microsoft.Office.Core;
 using Microsoft.Office.Tools.Excel;
 using System.Windows.Forms;
 
-namespace MySQL.ExcelAddIn
+namespace MySQL.ForExcel
 {
   public partial class ThisAddIn
   {

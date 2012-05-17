@@ -1,4 +1,4 @@
-﻿namespace MySQL.ExcelAddIn
+﻿namespace MySQL.ForExcel
 {
   partial class SchemaSelectionPanel
   {
@@ -44,9 +44,9 @@
       this.lblInstructions = new System.Windows.Forms.Label();
       this.btnHelp = new System.Windows.Forms.Button();
       this.databaseList = new TreeViewTest.MyTreeView();
-      this.searchEdit1 = new MySQL.ExcelAddIn.Controls.SearchEdit();
-      this.createNewSchema = new MySQL.ExcelAddIn.Controls.HotLabel();
-      this.hotLabel1 = new MySQL.ExcelAddIn.Controls.HotLabel();
+      this.searchEdit1 = new MySQL.ForExcel.Controls.SearchEdit();
+      this.createNewSchema = new MySQL.ForExcel.Controls.HotLabel();
+      this.hotLabel1 = new MySQL.ForExcel.Controls.HotLabel();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
       this.schemasContextMenu.SuspendLayout();
       this.SuspendLayout();
@@ -73,7 +73,7 @@
       // 
       // picAddInLogo
       // 
-      this.picAddInLogo.Image = global::MySQL.ExcelAddIn.Properties.Resources.MySQLExcelAddInLogo_64x64;
+      this.picAddInLogo.Image = global::MySQL.ForExcel.Properties.Resources.MySQLExcelAddInLogo_64x64;
       this.picAddInLogo.Location = new System.Drawing.Point(14, 13);
       this.picAddInLogo.Name = "picAddInLogo";
       this.picAddInLogo.Size = new System.Drawing.Size(64, 64);
@@ -89,7 +89,7 @@
       // 
       // selectDatabaseSchemaToolStripMenuItem
       // 
-      this.selectDatabaseSchemaToolStripMenuItem.Image = global::MySQL.ExcelAddIn.Properties.Resources.db_Schema_16x16;
+      this.selectDatabaseSchemaToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.db_Schema_16x16;
       this.selectDatabaseSchemaToolStripMenuItem.Name = "selectDatabaseSchemaToolStripMenuItem";
       this.selectDatabaseSchemaToolStripMenuItem.Size = new System.Drawing.Size(201, 22);
       this.selectDatabaseSchemaToolStripMenuItem.Text = "Select Database Schema";
@@ -160,11 +160,11 @@
       this.databaseList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.databaseList.CollapsedIcon = global::MySQL.ExcelAddIn.Properties.Resources.ArrowRight;
+      this.databaseList.CollapsedIcon = global::MySQL.ForExcel.Properties.Resources.ArrowRight;
       this.databaseList.DescriptionColor = System.Drawing.Color.Silver;
       this.databaseList.DescriptionFont = new System.Drawing.Font("Arial Narrow", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.databaseList.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawAll;
-      this.databaseList.ExpandedIcon = global::MySQL.ExcelAddIn.Properties.Resources.ArrowDown;
+      this.databaseList.ExpandedIcon = global::MySQL.ForExcel.Properties.Resources.ArrowDown;
       this.databaseList.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.databaseList.Indent = 18;
       this.databaseList.ItemHeight = 20;
@@ -205,7 +205,7 @@
       this.createNewSchema.DescriptionFont = new System.Drawing.Font("Arial", 8.25F);
       this.createNewSchema.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.createNewSchema.HotTracking = true;
-      this.createNewSchema.Image = global::MySQL.ExcelAddIn.Properties.Resources.db_Schema_add_32x32;
+      this.createNewSchema.Image = global::MySQL.ForExcel.Properties.Resources.db_Schema_add_32x32;
       this.createNewSchema.ImageSize = new System.Drawing.Size(32, 32);
       this.createNewSchema.Location = new System.Drawing.Point(14, 599);
       this.createNewSchema.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -221,7 +221,7 @@
       this.hotLabel1.DescriptionFont = new System.Drawing.Font("Arial", 8.25F);
       this.hotLabel1.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.hotLabel1.HotTracking = false;
-      this.hotLabel1.Image = global::MySQL.ExcelAddIn.Properties.Resources.db_Schema_many_32x32;
+      this.hotLabel1.Image = global::MySQL.ForExcel.Properties.Resources.db_Schema_many_32x32;
       this.hotLabel1.ImageSize = new System.Drawing.Size(32, 32);
       this.hotLabel1.Location = new System.Drawing.Point(14, 182);
       this.hotLabel1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);

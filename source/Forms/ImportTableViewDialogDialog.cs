@@ -8,9 +8,9 @@ using System.Text;
 using System.Windows.Forms;
 using MySQL.Utility;
 
-namespace MySQL.ExcelAddIn
+namespace MySQL.ForExcel
 {
-  public partial class ImportTableViewDialog : Form
+  public partial class EditTableDialog : Form
   {
     private MySqlWorkbenchConnection wbConnection;
     private DBObject importDBObject;
@@ -19,7 +19,7 @@ namespace MySQL.ExcelAddIn
     public DataTable ImportDataTable = null;
     public bool ImportHeaders { get { return chkIncludeHeaders.Checked; } }
 
-    public ImportTableViewDialog(MySqlWorkbenchConnection wbConnection, DBObject importDBObject)
+    public EditTableDialog(MySqlWorkbenchConnection wbConnection, DBObject importDBObject)
     {
       this.wbConnection = wbConnection;
       this.importDBObject = importDBObject;

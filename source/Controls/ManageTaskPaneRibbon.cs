@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.Office.Tools.Ribbon;
 using System.Windows.Forms;
 
-namespace MySQL.ExcelAddIn
+namespace MySQL.ForExcel
 {
   public partial class ManageTaskPaneRibbon
   {

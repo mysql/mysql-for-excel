@@ -1,4 +1,4 @@
-﻿namespace MySQL.ExcelAddIn
+﻿namespace MySQL.ForExcel
 {
   partial class NewConnectionDialog
   {

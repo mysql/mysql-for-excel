@@ -8,9 +8,9 @@ using System.Text;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using MySQL.Utility;
-using MySQL.ExcelAddIn.Properties;
+using MySQL.ForExcel.Properties;
 
-namespace MySQL.ExcelAddIn
+namespace MySQL.ForExcel
 {
   public partial class SchemaSelectionPanel : UserControl
   {

@@ -10,7 +10,7 @@ using System.IO;
 using System.Windows.Forms;
 using MySQL.Utility;
 
-namespace MySQL.ExcelAddIn
+namespace MySQL.ForExcel
 {
   public partial class WelcomePanel : UserControl
   {

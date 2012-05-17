@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Data;
 using MySQL.Utility;
 
-namespace MySQL.ExcelAddIn
+namespace MySQL.ForExcel
 {
   public class MySQLColumn
   {

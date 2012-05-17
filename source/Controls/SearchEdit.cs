@@ -6,9 +6,9 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using MySQL.ExcelAddIn.Properties;
+using MySQL.ForExcel.Properties;
 
-namespace MySQL.ExcelAddIn.Controls
+namespace MySQL.ForExcel.Controls
 {
   public partial class SearchEdit : UserControl
   {

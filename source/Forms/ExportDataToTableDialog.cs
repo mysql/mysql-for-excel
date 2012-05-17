@@ -12,7 +12,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 using System.Reflection;
 using System.Globalization;
 
-namespace MySQL.ExcelAddIn
+namespace MySQL.ForExcel
 {
   public partial class ExportDataToTableDialog : Form
   {

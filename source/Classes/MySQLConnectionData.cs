@@ -6,7 +6,7 @@ using System.Data;
 using MySql.Data.MySqlClient;
 using System.Windows.Forms;
 
-namespace MySQL.ExcelAddIn
+namespace MySQL.ForExcel
 {
   public enum DBObjectType { Table, View, Routine };
   public enum RoutineType { None, Procedure, Function };

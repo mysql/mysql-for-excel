@@ -1,4 +1,4 @@
-﻿namespace MySQL.ExcelAddIn.Controls
+﻿namespace MySQL.ForExcel.Controls
 {
   partial class SearchEdit
   {

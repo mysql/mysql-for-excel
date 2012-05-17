@@ -10,7 +10,7 @@ using MySql.Data.MySqlClient;
 using Excel = Microsoft.Office.Interop.Excel;
 using MySQL.Utility;
 
-namespace MySQL.ExcelAddIn
+namespace MySQL.ForExcel
 {
   public partial class TaskPaneControl : UserControl
   {

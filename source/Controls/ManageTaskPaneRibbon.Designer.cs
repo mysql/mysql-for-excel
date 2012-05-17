@@ -1,4 +1,4 @@
-﻿namespace MySQL.ExcelAddIn
+﻿namespace MySQL.ForExcel
 {
   partial class ManageTaskPaneRibbon : Microsoft.Office.Tools.Ribbon.RibbonBase
   {
@@ -57,7 +57,7 @@
       // togShowTaskPane
       // 
       this.togShowTaskPane.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-      this.togShowTaskPane.Image = global::MySQL.ExcelAddIn.Properties.Resources.MainLogo;
+      this.togShowTaskPane.Image = global::MySQL.ForExcel.Properties.Resources.MainLogo;
       this.togShowTaskPane.Label = "MySQL for Excel";
       this.togShowTaskPane.Name = "togShowTaskPane";
       this.togShowTaskPane.ShowImage = true;

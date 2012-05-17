@@ -25,8 +25,8 @@
     <ProjectGuid>{F39FEA53-4835-4762-B7F1-A0B32F618078}</ProjectGuid>
     <OutputType>Library</OutputType>
     <NoStandardLibraries>false</NoStandardLibraries>
-    <RootNamespace>MySQL.ExcelAddIn</RootNamespace>
-    <AssemblyName>MySQL.ExcelAddIn</AssemblyName>
+    <RootNamespace>MySQL.ForExcel</RootNamespace>
+    <AssemblyName>MySQL.ForExcel</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <DefineConstants>VSTO40</DefineConstants>
@@ -46,10 +46,10 @@
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>7</UpdateInterval>
     <UpdateIntervalUnits>days</UpdateIntervalUnits>
-    <ProductName>MySQL.ExcelAddIn</ProductName>
+    <ProductName>MySQL.ForExcel</ProductName>
     <PublisherName />
     <SupportUrl />
-    <FriendlyName>MySQL.ExcelAddIn</FriendlyName>
+    <FriendlyName>MySQL.ForExcel</FriendlyName>
     <OfficeApplicationDescription />
     <LoadBehavior>3</LoadBehavior>
   </PropertyGroup>
@@ -373,7 +373,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="ExcelAddIn_TemporaryKey.pfx" />
+    <None Include="MySQL.ForExcel_TemporaryKey.pfx" />
     <None Include="Properties\DataSources\MySQLColumn.datasource" />
     <None Include="Properties\DataSources\MySQLTable.datasource" />
     <None Include="Properties\Settings.settings">
@@ -608,7 +608,7 @@
     <VisualStudio>
       <FlavorProperties GUID="{BAA0C2D2-18E2-41B9-852F-F413020CAA33}">
         <ProjectProperties HostName="Excel" HostPackage="{20A848B8-E01F-4801-962E-25DB0FF57389}" OfficeVersion="14.0" VstxVersion="4.0" ApplicationType="Excel" Language="cs" TemplatesPath="VSTOTemplates" DebugInfoExeName="#Software\Microsoft\Office\14.0\Excel\InstallRoot\Path#excel.exe" AddItemTemplatesGuid="{147FB6A7-F239-4523-AE65-B6A4E49B361F}" />
-        <Host Name="Excel" GeneratedCodeNamespace="MySQL.ExcelAddIn" IconIndex="0">
+        <Host Name="Excel" GeneratedCodeNamespace="MySQL.ForExcel" IconIndex="0">
           <HostItem Name="ThisAddIn" Code="ThisAddIn.cs" CanonicalName="AddIn" CanActivate="false" IconIndex="1" Blueprint="ThisAddIn.Designer.xml" GeneratedCode="ThisAddIn.Designer.cs" />
         </Host>
       </FlavorProperties>

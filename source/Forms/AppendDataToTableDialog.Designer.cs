@@ -1,4 +1,4 @@
-﻿namespace MySQL.ExcelAddIn
+﻿namespace MySQL.ForExcel
 {
   partial class AppendDataToTableDialog
   {
@@ -45,7 +45,7 @@
       this.btnAppend = new System.Windows.Forms.Button();
       this.lblInstructions = new System.Windows.Forms.Label();
       this.btnAutoMap = new System.Windows.Forms.Button();
-      this.grdToTable = new MySQL.ExcelAddIn.MultiHeaderDataGridView();
+      this.grdToTable = new MySQL.ForExcel.MultiHeaderDataGridView();
       this.grpExcelDataPreview.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).BeginInit();
       this.grpToTablePreview.SuspendLayout();

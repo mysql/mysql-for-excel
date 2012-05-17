@@ -8,7 +8,7 @@ using System.Globalization;
 using MySQL.Utility;
 using MySql.Data.MySqlClient;
 
-namespace MySQL.ExcelAddIn
+namespace MySQL.ForExcel
 {
   class ExportDataHelper
   {

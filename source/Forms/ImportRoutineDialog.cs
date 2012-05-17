@@ -11,7 +11,7 @@ using System.Collections;
 using MySql.Data.MySqlClient;
 using System.Reflection;
 
-namespace MySQL.ExcelAddIn
+namespace MySQL.ForExcel
 {
   public partial class ImportRoutineDialog : Form
   {

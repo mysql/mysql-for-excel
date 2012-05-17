@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using MySQL.Utility;
-using MySQL.ExcelAddIn.Properties;
+using MySQL.ForExcel.Properties;
 
-namespace MySQL.ExcelAddIn
+namespace MySQL.ForExcel
 {
   public partial class DBObjectSelectionPanel : UserControl
   {
@@ -126,7 +126,7 @@ namespace MySQL.ExcelAddIn
 
     private void importTableOrView(DBObject dbo)
     {
-      ImportTableViewDialog importDialog = new ImportTableViewDialog(connection, dbo);
+      EditTableDialog importDialog = new EditTableDialog(connection, dbo);
       DialogResult dr = importDialog.ShowDialog();
       if (dr == DialogResult.Cancel)
         return;

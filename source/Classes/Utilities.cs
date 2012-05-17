@@ -11,7 +11,7 @@ using MySQL.Utility;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace MySQL.ExcelAddIn
+namespace MySQL.ForExcel
 {
   public static class Utilities
   {
