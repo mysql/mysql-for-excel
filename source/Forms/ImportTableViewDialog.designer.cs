@@ -1,6 +1,6 @@
 ﻿namespace MySQL.ForExcel
 {
-  partial class EditTableDialog
+  partial class ImportTableViewDialog
   {
     /// <summary>
     /// Required designer variable.

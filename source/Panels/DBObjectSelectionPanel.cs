@@ -126,7 +126,7 @@ namespace MySQL.ForExcel
 
     private void importTableOrView(DBObject dbo)
     {
-      EditTableDialog importDialog = new EditTableDialog(connection, dbo);
+      ImportTableViewDialog importDialog = new ImportTableViewDialog(connection, dbo);
       DialogResult dr = importDialog.ShowDialog();
       if (dr == DialogResult.Cancel)
         return;

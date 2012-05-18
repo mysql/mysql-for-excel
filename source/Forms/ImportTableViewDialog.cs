@@ -10,7 +10,7 @@ using MySQL.Utility;
 
 namespace MySQL.ForExcel
 {
-  public partial class EditTableDialog : Form
+  public partial class ImportTableViewDialog : Form
   {
     private MySqlWorkbenchConnection wbConnection;
     private DBObject importDBObject;
@@ -19,7 +19,7 @@ namespace MySQL.ForExcel
     public DataTable ImportDataTable = null;
     public bool ImportHeaders { get { return chkIncludeHeaders.Checked; } }
 
-    public EditTableDialog(MySqlWorkbenchConnection wbConnection, DBObject importDBObject)
+    public ImportTableViewDialog(MySqlWorkbenchConnection wbConnection, DBObject importDBObject)
     {
       this.wbConnection = wbConnection;
       this.importDBObject = importDBObject;

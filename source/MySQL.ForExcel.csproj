@@ -269,11 +269,11 @@
     <Compile Include="Forms\ImportRoutineDialog.Designer.cs">
       <DependentUpon>ImportRoutineDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\ImportTableViewDialogDialog.cs">
+    <Compile Include="Forms\ImportTableViewDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\ImportTableViewDialogDialog.designer.cs">
-      <DependentUpon>ImportTableViewDialogDialog.cs</DependentUpon>
+    <Compile Include="Forms\ImportTableViewDialog.designer.cs">
+      <DependentUpon>ImportTableViewDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\NewConnectionDialog.cs">
       <SubType>Form</SubType>
@@ -338,8 +338,8 @@
     <EmbeddedResource Include="Forms\ImportRoutineDialog.resx">
       <DependentUpon>ImportRoutineDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ImportTableViewDialogDialog.resx">
-      <DependentUpon>ImportTableViewDialogDialog.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\ImportTableViewDialog.resx">
+      <DependentUpon>ImportTableViewDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\NewConnectionDialog.resx">
       <DependentUpon>NewConnectionDialog.cs</DependentUpon>

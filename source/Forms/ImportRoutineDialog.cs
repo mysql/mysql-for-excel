@@ -19,7 +19,6 @@ namespace MySQL.ForExcel
     private DBObject importDBObject;
     private PropertiesCollection routineParamsProperties;
     private MySqlParameter[] mysqlParameters;
-    private DataTable previewDataTable = null;
     public DataSet ImportDataSet = null;
     public bool ImportHeaders { get { return chkIncludeHeaders.Checked; } }
     public ImportMultipleType ImportType 
