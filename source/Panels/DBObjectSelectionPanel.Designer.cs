@@ -44,8 +44,6 @@
       this.smallImages = new System.Windows.Forms.ImageList(this.components);
       this.btnClose = new System.Windows.Forms.Button();
       this.btnBack = new System.Windows.Forms.Button();
-      this.shapeContainer1 = new Microsoft.VisualBasic.PowerPacks.ShapeContainer();
-      this.linSeparator = new Microsoft.VisualBasic.PowerPacks.LineShape();
       this.btnHelp = new System.Windows.Forms.Button();
       this.objectList = new TreeViewTest.MyTreeView();
       this.appendData = new MySQL.ForExcel.Controls.HotLabel();
@@ -53,6 +51,7 @@
       this.importData = new MySQL.ForExcel.Controls.HotLabel();
       this.hotLabel2 = new MySQL.ForExcel.Controls.HotLabel();
       this.exportToNewTable = new MySQL.ForExcel.Controls.HotLabel();
+      this.label1 = new System.Windows.Forms.Label();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
       this.dbObjectsContextMenu.SuspendLayout();
       this.SuspendLayout();
@@ -138,7 +137,7 @@
       // 
       this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnClose.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnClose.Location = new System.Drawing.Point(219, 651);
+      this.btnClose.Location = new System.Drawing.Point(242, 651);
       this.btnClose.Name = "btnClose";
       this.btnClose.Size = new System.Drawing.Size(75, 25);
       this.btnClose.TabIndex = 11;
@@ -150,34 +149,13 @@
       // 
       this.btnBack.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnBack.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnBack.Location = new System.Drawing.Point(138, 651);
+      this.btnBack.Location = new System.Drawing.Point(161, 651);
       this.btnBack.Name = "btnBack";
       this.btnBack.Size = new System.Drawing.Size(75, 25);
       this.btnBack.TabIndex = 10;
       this.btnBack.Text = "< Back";
       this.btnBack.UseVisualStyleBackColor = true;
       this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
-      // 
-      // shapeContainer1
-      // 
-      this.shapeContainer1.Location = new System.Drawing.Point(0, 0);
-      this.shapeContainer1.Margin = new System.Windows.Forms.Padding(0);
-      this.shapeContainer1.Name = "shapeContainer1";
-      this.shapeContainer1.Shapes.AddRange(new Microsoft.VisualBasic.PowerPacks.Shape[] {
-            this.linSeparator});
-      this.shapeContainer1.Size = new System.Drawing.Size(313, 697);
-      this.shapeContainer1.TabIndex = 0;
-      this.shapeContainer1.TabStop = false;
-      // 
-      // linSeparator
-      // 
-      this.linSeparator.BorderColor = System.Drawing.SystemColors.ControlDark;
-      this.linSeparator.BorderWidth = 2;
-      this.linSeparator.Name = "linSeparator";
-      this.linSeparator.X1 = 16;
-      this.linSeparator.X2 = 291;
-      this.linSeparator.Y1 = 150;
-      this.linSeparator.Y2 = 150;
       // 
       // btnHelp
       // 
@@ -223,7 +201,7 @@
             treeNode1,
             treeNode2,
             treeNode3});
-      this.objectList.Size = new System.Drawing.Size(277, 264);
+      this.objectList.Size = new System.Drawing.Size(300, 264);
       this.objectList.TabIndex = 24;
       this.objectList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.objectList_AfterSelect);
       // 
@@ -312,10 +290,21 @@
       this.exportToNewTable.Title = "Export Excel Data to New Table";
       this.exportToNewTable.Click += new System.EventHandler(this.exportToNewTable_Click);
       // 
+      // label1
+      // 
+      this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.label1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+      this.label1.Location = new System.Drawing.Point(16, 152);
+      this.label1.Name = "label1";
+      this.label1.Size = new System.Drawing.Size(300, 2);
+      this.label1.TabIndex = 25;
+      // 
       // DBObjectSelectionPanel
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+      this.Controls.Add(this.label1);
       this.Controls.Add(this.objectList);
       this.Controls.Add(this.appendData);
       this.Controls.Add(this.editData);
@@ -328,10 +317,10 @@
       this.Controls.Add(this.lblConnectionName);
       this.Controls.Add(this.lblUserIP);
       this.Controls.Add(this.picAddInLogo);
-      this.Controls.Add(this.shapeContainer1);
       this.Font = new System.Drawing.Font("Arial", 9F);
       this.Name = "DBObjectSelectionPanel";
-      this.Size = new System.Drawing.Size(313, 697);
+      this.Size = new System.Drawing.Size(336, 697);
+      this.Paint += new System.Windows.Forms.PaintEventHandler(this.DBObjectSelectionPanel_Paint);
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
       this.dbObjectsContextMenu.ResumeLayout(false);
       this.ResumeLayout(false);
@@ -348,8 +337,6 @@
     public System.Windows.Forms.Button btnBack;
     private System.Windows.Forms.ImageList smallImages;
     private System.Windows.Forms.ImageList largeImages;
-    private Microsoft.VisualBasic.PowerPacks.ShapeContainer shapeContainer1;
-    private Microsoft.VisualBasic.PowerPacks.LineShape linSeparator;
     public System.Windows.Forms.Button btnHelp;
     private System.Windows.Forms.ContextMenuStrip dbObjectsContextMenu;
     private System.Windows.Forms.ToolStripMenuItem importDataToolStripMenuItem;
@@ -361,5 +348,6 @@
     private Controls.HotLabel editData;
     private Controls.HotLabel appendData;
     private TreeViewTest.MyTreeView objectList;
+    private System.Windows.Forms.Label label1;
   }
 }

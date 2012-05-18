@@ -1,5 +1,4 @@
 ﻿installer
 =====================
 - make sure all non-VSTO items are installed
-- check for existance of VSTO runtime as launch condition
 - make appropriate registry settings to regiter addin

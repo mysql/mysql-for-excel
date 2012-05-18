@@ -199,6 +199,11 @@ namespace MySQL.ForExcel
       (Parent as TaskPaneControl).CloseConnection();
     }
 
+    private void DBObjectSelectionPanel_Paint(object sender, PaintEventArgs e)
+    {
+
+    }
+
   }
 
 }
