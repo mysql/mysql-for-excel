@@ -31,13 +31,29 @@ namespace MySQL.ForExcel
 
     void excelApplication_SheetSelectionChange(object Sh, Excel.Range Target)
     {
-      if (!this.Visible)
-        return;
+      if (!this.Visible)  return;
 
       int selectedCellsCount = Target.Count;
-      int blankCellsInRangeCount = Target.SpecialCells(Excel.XlCellType.xlCellTypeBlanks).Count;
-      bool emptyRange = selectedCellsCount == blankCellsInRangeCount;
-      dbObjectSelectionPanel1.ExportDataActionEnabled = !emptyRange;
+
+      bool hasData = false;
+
+      if (Target.Count == 1)
+        hasData = Target.Value2 != null;
+      else if (Target.Count > 1)
+      {
+        object[,] values = Target.Value2;
+
+        if (values != null)
+        {
+          foreach (object o in values)
+          {
+            if (o == null) continue;
+            hasData = true;
+            break;
+          }
+        }
+      }
+      dbObjectSelectionPanel1.ExportDataActionEnabled = hasData;
     }
 
     public void OpenConnection(MySqlWorkbenchConnection connection)

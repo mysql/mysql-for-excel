@@ -302,6 +302,7 @@
       // 
       this.exportToNewTable.Description = "Create a new table and fill it with data";
       this.exportToNewTable.DescriptionFont = new System.Drawing.Font("Arial", 8.25F);
+      this.exportToNewTable.Enabled = false;
       this.exportToNewTable.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.exportToNewTable.HotTracking = true;
       this.exportToNewTable.Image = global::MySQL.ForExcel.Properties.Resources.export_excel_new_table_32x32;
