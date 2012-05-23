@@ -45,13 +45,14 @@
       this.btnClose = new System.Windows.Forms.Button();
       this.btnBack = new System.Windows.Forms.Button();
       this.btnHelp = new System.Windows.Forms.Button();
+      this.label1 = new System.Windows.Forms.Label();
+      this.objectFilter = new MySQL.ForExcel.Controls.SearchEdit();
       this.objectList = new TreeViewTest.MyTreeView();
       this.appendData = new MySQL.ForExcel.Controls.HotLabel();
       this.editData = new MySQL.ForExcel.Controls.HotLabel();
       this.importData = new MySQL.ForExcel.Controls.HotLabel();
       this.hotLabel2 = new MySQL.ForExcel.Controls.HotLabel();
       this.exportToNewTable = new MySQL.ForExcel.Controls.HotLabel();
-      this.label1 = new System.Windows.Forms.Label();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
       this.dbObjectsContextMenu.SuspendLayout();
       this.SuspendLayout();
@@ -169,6 +170,29 @@
       this.btnHelp.UseVisualStyleBackColor = true;
       this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
       // 
+      // label1
+      // 
+      this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.label1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+      this.label1.Location = new System.Drawing.Point(16, 152);
+      this.label1.Name = "label1";
+      this.label1.Size = new System.Drawing.Size(300, 2);
+      this.label1.TabIndex = 25;
+      // 
+      // objectFilter
+      // 
+      this.objectFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.objectFilter.BackColor = System.Drawing.SystemColors.Window;
+      this.objectFilter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+      this.objectFilter.Location = new System.Drawing.Point(17, 214);
+      this.objectFilter.Name = "objectFilter";
+      this.objectFilter.NoTextLabel = "Filter Schema Objects";
+      this.objectFilter.Size = new System.Drawing.Size(300, 26);
+      this.objectFilter.TabIndex = 26;
+      this.objectFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.objectFilter_KeyDown);
+      // 
       // objectList
       // 
       this.objectList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -182,7 +206,7 @@
       this.objectList.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.objectList.Indent = 18;
       this.objectList.ItemHeight = 20;
-      this.objectList.Location = new System.Drawing.Point(17, 214);
+      this.objectList.Location = new System.Drawing.Point(17, 246);
       this.objectList.Name = "objectList";
       this.objectList.NodeImages = this.largeImages;
       treeNode1.BackColor = System.Drawing.SystemColors.ControlDark;
@@ -201,7 +225,7 @@
             treeNode1,
             treeNode2,
             treeNode3});
-      this.objectList.Size = new System.Drawing.Size(300, 264);
+      this.objectList.Size = new System.Drawing.Size(300, 232);
       this.objectList.TabIndex = 24;
       this.objectList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.objectList_AfterSelect);
       // 
@@ -290,20 +314,11 @@
       this.exportToNewTable.Title = "Export Excel Data to New Table";
       this.exportToNewTable.Click += new System.EventHandler(this.exportToNewTable_Click);
       // 
-      // label1
-      // 
-      this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.label1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-      this.label1.Location = new System.Drawing.Point(16, 152);
-      this.label1.Name = "label1";
-      this.label1.Size = new System.Drawing.Size(300, 2);
-      this.label1.TabIndex = 25;
-      // 
       // DBObjectSelectionPanel
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+      this.Controls.Add(this.objectFilter);
       this.Controls.Add(this.label1);
       this.Controls.Add(this.objectList);
       this.Controls.Add(this.appendData);
@@ -320,7 +335,6 @@
       this.Font = new System.Drawing.Font("Arial", 9F);
       this.Name = "DBObjectSelectionPanel";
       this.Size = new System.Drawing.Size(336, 697);
-      this.Paint += new System.Windows.Forms.PaintEventHandler(this.DBObjectSelectionPanel_Paint);
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
       this.dbObjectsContextMenu.ResumeLayout(false);
       this.ResumeLayout(false);
@@ -349,5 +363,6 @@
     private Controls.HotLabel appendData;
     private TreeViewTest.MyTreeView objectList;
     private System.Windows.Forms.Label label1;
+    private Controls.SearchEdit objectFilter;
   }
 }

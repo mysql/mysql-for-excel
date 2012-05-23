@@ -15,6 +15,7 @@ namespace MySQL.ForExcel
   public partial class SchemaSelectionPanel : UserControl
   {
     private MySqlWorkbenchConnection connection;
+    private string filter;
 
     public SchemaSelectionPanel()
     {
@@ -52,7 +53,8 @@ namespace MySQL.ForExcel
 
     private void databaseList_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
     {
-      btnNext_Click(this, EventArgs.Empty);
+      if (e.Node.Level > 0)
+        btnNext_Click(this, EventArgs.Empty);
     }
 
     private void LoadSchemas()
@@ -69,6 +71,10 @@ namespace MySQL.ForExcel
       foreach (DataRow row in databases.Rows)
       {
         string schemaName = row["DATABASE_NAME"].ToString();
+
+        // if the user has specified a filter then check it
+        if (!String.IsNullOrEmpty(filter) && String.Compare(filter, schemaName, true) != 0) continue;
+
         string lcSchemaName = schemaName.ToLowerInvariant();
         int index = (lcSchemaName == "mysql" || lcSchemaName == "information_schema") ? 1 : 0;
 
@@ -98,6 +104,15 @@ namespace MySQL.ForExcel
         return;
       }
       LoadSchemas();
+    }
+
+    private void schemaFilter_KeyDown(object sender, KeyEventArgs e)
+    {
+      if (e.KeyCode == Keys.Enter)
+      {
+        filter = schemaFilter.Text.Trim();
+        LoadSchemas();
+      }
     }
 
   }

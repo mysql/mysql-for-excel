@@ -44,7 +44,7 @@
       this.lblInstructions = new System.Windows.Forms.Label();
       this.btnHelp = new System.Windows.Forms.Button();
       this.databaseList = new TreeViewTest.MyTreeView();
-      this.searchEdit1 = new MySQL.ForExcel.Controls.SearchEdit();
+      this.schemaFilter = new MySQL.ForExcel.Controls.SearchEdit();
       this.createNewSchema = new MySQL.ForExcel.Controls.HotLabel();
       this.hotLabel1 = new MySQL.ForExcel.Controls.HotLabel();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
@@ -187,16 +187,18 @@
       this.databaseList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.databaseList_AfterSelect);
       this.databaseList.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.databaseList_NodeMouseDoubleClick);
       // 
-      // searchEdit1
+      // schemaFilter
       // 
-      this.searchEdit1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+      this.schemaFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.searchEdit1.BackColor = System.Drawing.SystemColors.Window;
-      this.searchEdit1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-      this.searchEdit1.Location = new System.Drawing.Point(14, 225);
-      this.searchEdit1.Name = "searchEdit1";
-      this.searchEdit1.Size = new System.Drawing.Size(265, 23);
-      this.searchEdit1.TabIndex = 16;
+      this.schemaFilter.BackColor = System.Drawing.SystemColors.Window;
+      this.schemaFilter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+      this.schemaFilter.Location = new System.Drawing.Point(14, 225);
+      this.schemaFilter.Name = "schemaFilter";
+      this.schemaFilter.NoTextLabel = "Filter Schemas";
+      this.schemaFilter.Size = new System.Drawing.Size(265, 23);
+      this.schemaFilter.TabIndex = 16;
+      this.schemaFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.schemaFilter_KeyDown);
       // 
       // createNewSchema
       // 
@@ -235,7 +237,7 @@
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.Controls.Add(this.databaseList);
-      this.Controls.Add(this.searchEdit1);
+      this.Controls.Add(this.schemaFilter);
       this.Controls.Add(this.createNewSchema);
       this.Controls.Add(this.hotLabel1);
       this.Controls.Add(this.btnHelp);
@@ -270,7 +272,7 @@
     private System.Windows.Forms.ToolStripMenuItem selectDatabaseSchemaToolStripMenuItem;
     private Controls.HotLabel hotLabel1;
     private Controls.HotLabel createNewSchema;
-    private Controls.SearchEdit searchEdit1;
+    private Controls.SearchEdit schemaFilter;
     private TreeViewTest.MyTreeView databaseList;
   }
 }

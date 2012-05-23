@@ -41,6 +41,7 @@
       this.innerText.Size = new System.Drawing.Size(311, 14);
       this.innerText.TabIndex = 1;
       this.innerText.Enter += new System.EventHandler(this.innerText_Enter);
+      this.innerText.KeyDown += new System.Windows.Forms.KeyEventHandler(this.innerText_KeyDown);
       this.innerText.Leave += new System.EventHandler(this.innerText_Leave);
       // 
       // SearchEdit

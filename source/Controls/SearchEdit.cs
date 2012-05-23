@@ -20,8 +20,17 @@ namespace MySQL.ForExcel.Controls
       InitializeComponent();
       DoubleBuffered = true;
       width = Resources.ExcelAddinFilter.Width;
+      innerText.Text = NoTextLabel;
       innerText_Leave(null, EventArgs.Empty);
     }
+
+    public string Text
+    {
+      get { return innerText.Text.Trim(); }
+      set { innerText.Text = value; }
+    }
+
+    public string NoTextLabel { get; set; }
 
     protected override void OnPaint(PaintEventArgs e)
     {
@@ -35,7 +44,7 @@ namespace MySQL.ForExcel.Controls
     {
       if (innerText.Text.Trim().Length == 0)
       {
-        innerText.Text = "Filter Schema Objects";
+        innerText.Text = NoTextLabel; 
         innerText.ForeColor = Color.Silver;
         isEmpty = true;
       }
@@ -55,5 +64,11 @@ namespace MySQL.ForExcel.Controls
     {
       innerText.SetBounds(width*3/2 , (Height - innerText.Height)/2, Size.Width - width, innerText.Height);
     }
+
+    private void innerText_KeyDown(object sender, KeyEventArgs e)
+    {
+      OnKeyDown(e);
+    }
+
   }
 }

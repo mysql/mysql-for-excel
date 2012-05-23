@@ -14,6 +14,7 @@ namespace MySQL.ForExcel
   public partial class DBObjectSelectionPanel : UserControl
   {
     private MySqlWorkbenchConnection connection;
+    private string filter;
 
     public DBObjectSelectionPanel()
     {
@@ -52,6 +53,10 @@ namespace MySQL.ForExcel
       foreach (DataRow tableRow in tables.Rows)
       {
         string tableName = tableRow["TABLE_NAME"].ToString();
+
+        // check our filter
+        if (!String.IsNullOrEmpty(filter) && String.Compare(filter, tableName, true) != 0) continue;
+
         string text = String.Format("{0}|{1}", tableName, String.Format("Engine: {0}", tableRow["ENGINE"].ToString()));
 
         TreeNode node = objectList.AddNode(parent, text);
@@ -69,6 +74,10 @@ namespace MySQL.ForExcel
       foreach (DataRow viewRow in views.Rows)
       {
         string viewName = viewRow["TABLE_NAME"].ToString();
+
+        // check our filter
+        if (!String.IsNullOrEmpty(filter) && String.Compare(filter, viewName, true) != 0) continue;
+
         string text = String.Format("{0}|{1}", viewName, String.Format("Updatable: {0}", viewRow["IS_UPDATABLE"].ToString()));
 
         TreeNode node = objectList.AddNode(parent, text);
@@ -86,6 +95,10 @@ namespace MySQL.ForExcel
       foreach (DataRow routineRow in procs.Rows)
       {
         string procName = routineRow["ROUTINE_NAME"].ToString();
+
+        // check our filter
+        if (!String.IsNullOrEmpty(filter) && String.Compare(filter, procName, true) != 0) continue;
+
         string type = routineRow["ROUTINE_TYPE"].ToString();
         string text = String.Format("{0}|{1}", procName, String.Format("Type: {0}", type));
 
@@ -199,9 +212,13 @@ namespace MySQL.ForExcel
       (Parent as TaskPaneControl).CloseConnection();
     }
 
-    private void DBObjectSelectionPanel_Paint(object sender, PaintEventArgs e)
+    private void objectFilter_KeyDown(object sender, KeyEventArgs e)
     {
-
+      if (e.KeyCode == Keys.Enter)
+      {
+        filter = objectFilter.Text.Trim();
+        PopulateList();
+      }
     }
 
   }
