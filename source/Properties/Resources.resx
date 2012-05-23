@@ -118,253 +118,256 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="action_eer_rev_eng_db" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\action_eer_rev_eng_db.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ConnectionClosedError" xml:space="preserve">
-    <value>MySQL Connection is closed, must be opened first to perform action</value>
-  </data>
-  <data name="ConnectionsFileNotFound" xml:space="preserve">
-    <value>Workbench connections.xml file not found</value>
-  </data>
-  <data name="ConnectionStringNotSet" xml:space="preserve">
-    <value>Can't open MySQL connection since connection string has not been set</value>
-  </data>
-  <data name="CurrentChangesLostConfirmation" xml:space="preserve">
-    <value>Current changes will be lost, do you want to continue?</value>
-  </data>
-  <data name="db_mgmt_Connection_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.mgmt.Connection.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_mgmt_Connection_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.mgmt.Connection.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_mgmt_Connection_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.mgmt.Connection.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_mgmt_Connection_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.mgmt.Connection.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_mgmt_Connection_manage_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.mgmt.Connection.manage.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_mgmt_Connection_manage_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.mgmt.Connection.manage.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_mgmt_Connection_manage_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.mgmt.Connection.manage.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="db_Objects_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\db.Objects.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Objects_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Objects.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="db_Routine_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\db.Routine.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="db_Routine_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Routine.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Routine_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Routine.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Routine_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Routine.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Schema_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Schema.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Schema_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Schema.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Schema_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Schema.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Schema_add_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Schema.add.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Schema_add_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Schema.add.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Schema_many_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Schema.many.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Schema_many_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Schema.many.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Table_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Table.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Table_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Table.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Table_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Table.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Table_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Table.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_View_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.View.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_View_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.View.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_View_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.View.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_View_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.View.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="edit_data_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\edit_data.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="edit_data_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\edit_data.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="MySQLExcelAddInLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLExcelAddInLogo.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="edit_data_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\edit_data.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="edit_data_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\edit_data.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ColumnsMappedOverwrite" xml:space="preserve">
+    <value>Some columns have already been mapped, do you want to overwrite existing mappings?</value>
   </data>
-  <data name="excel_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\excel-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="db_mgmt_Connection_manage_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.mgmt.Connection.manage.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="export_excel_existing_table" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\export_excel_existing_table.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="export_excel_existing_table_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\export_excel_existing_table.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="export_excel_existing_table_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\export_excel_existing_table.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="export_excel_existing_table_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\export_excel_existing_table.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="export_excel_new_table" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\export_excel_new_table.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="db_Table_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Table.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="export_excel_new_table_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\export_excel_new_table.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="export_excel_new_table_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\export_excel_new_table.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="export_excel_new_table_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\export_excel_new_table.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="import_data_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\import_data.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="import_data_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\import_data.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="import_data_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\import_data.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="lightning_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\lightning_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="lightning_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\lightning_24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="lightning_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\lightning_32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="lightning_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\lightning_48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="lightning_86x86" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\lightning_86x86.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MainLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLExcelAddInLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLExcelAddInLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLExcelAddInLogo.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="action_eer_rev_eng_db" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\action_eer_rev_eng_db.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="MySQLExcelAddInLogo_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySQLExcelAddInLogo.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="MySQLExcelAddInLogo_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLExcelAddInLogo.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLExcelAddInLogo_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLExcelAddInLogo.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLExcelAddInLogo_64x64" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLExcelAddInLogo.64x64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="new_connection_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\new_connection_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="new_connection_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\new_connection_24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="new_connection_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\new_connection_32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="MainLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLExcelAddInLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="new_connection_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\new_connection_48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="SelectedDBObjectNotTable" xml:space="preserve">
-    <value>Selected DB Object used for this action must be of Type =Table.</value>
+  <data name="export_excel_new_table" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\export_excel_new_table.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="SelectedDBObjectNull" xml:space="preserve">
-    <value>Empty or null DB Object used for this action.  A valid DB Object must be used.</value>
-  </data>
-  <data name="SelectedDBSchemaNull" xml:space="preserve">
-    <value>Empty or null DB Schema used for this action.  A valid Schema must be used.</value>
-  </data>
-  <data name="SelectedTableNull" xml:space="preserve">
-    <value>Empty or null Table used for this action.  A valid Table must be used.</value>
-  </data>
-  <data name="Error" xml:space="preserve">
-    <value>Error</value>
-  </data>
-  <data name="ErrorCreatingNewSchema" xml:space="preserve">
-    <value>An error occurred creating a new schema: {0}</value>
-  </data>
-  <data name="ExcelAddinFilter" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ExcelAddinFilter.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="UnableToLoadDatabases" xml:space="preserve">
-    <value>Unable to load databases for the given connection.</value>
+  <data name="db_View_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.View.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="UnableToRetrieveData" xml:space="preserve">
     <value>Unable to retrieve data from '{0}'.</value>
   </data>
-  <data name="ArrowDown" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ArrowDown.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="db_Schema_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Schema.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="db_Table_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Table.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="db_mgmt_Connection_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.mgmt.Connection.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="new_connection_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\new_connection_32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="db_mgmt_Connection_manage_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.mgmt.Connection.manage.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ConnectionsFileNotFound" xml:space="preserve">
+    <value>Workbench connections.xml file not found</value>
+  </data>
+  <data name="db_mgmt_Connection_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.mgmt.Connection.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ArrowRight" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ArrowRight.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="db_Column_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Column.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ColumnMappingIncomplete" xml:space="preserve">
-    <value>Column mapping for all columns in Excel selection is incomplete. Do you want to proceed with the current mapped data only?</value>
-  </data>
-  <data name="RemoveColumnConfirmation" xml:space="preserve">
-    <value>Are you sure you want to remove the selected column?</value>
-  </data>
-  <data name="chain_link_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\chain_link.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="ColumnMappedOverwrite" xml:space="preserve">
-    <value>This column has already been mapped, do you want to overwrite existing mapping?</value>
-  </data>
-  <data name="ColumnMappedRemove" xml:space="preserve">
-    <value>This column has already been mapped, do you want to remove it and its mapping?</value>
+  <data name="db_mgmt_Connection_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.mgmt.Connection.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="TableNotNewInCreate" xml:space="preserve">
     <value>Table must be new in order to create it in MySQL DB.</value>
   </data>
-  <data name="ColumnsMappedOverwrite" xml:space="preserve">
-    <value>Some columns have already been mapped, do you want to overwrite existing mappings?</value>
+  <data name="ColumnMappingIncomplete" xml:space="preserve">
+    <value>Column mapping for all columns in Excel selection is incomplete. Do you want to proceed with the current mapped data only?</value>
+  </data>
+  <data name="SelectedDBSchemaNull" xml:space="preserve">
+    <value>Empty or null DB Schema used for this action.  A valid Schema must be used.</value>
+  </data>
+  <data name="ConnectionStringNotSet" xml:space="preserve">
+    <value>Can't open MySQL connection since connection string has not been set</value>
+  </data>
+  <data name="db_Schema_add_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Schema.add.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="export_excel_new_table_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\export_excel_new_table.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lightning_86x86" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\lightning_86x86.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="db_Table_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Table.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="export_excel_existing_table_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\export_excel_existing_table.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="db_mgmt_Connection_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.mgmt.Connection.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lightning_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\lightning_24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="db_Schema_add_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Schema.add.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lightning_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\lightning_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ConnectionClosedError" xml:space="preserve">
+    <value>MySQL Connection is closed, must be opened first to perform action</value>
+  </data>
+  <data name="excel_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\excel-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SelectedDBObjectNull" xml:space="preserve">
+    <value>Empty or null DB Object used for this action.  A valid DB Object must be used.</value>
+  </data>
+  <data name="db_Routine_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Routine.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="db_Schema_many_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Schema.many.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lightning_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\lightning_32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="edit_data_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\edit_data.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="new_connection_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\new_connection_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLExcelAddInLogo_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLExcelAddInLogo.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SelectedDBObjectNotTable" xml:space="preserve">
+    <value>Selected DB Object used for this action must be of Type =Table.</value>
+  </data>
+  <data name="export_excel_existing_table_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\export_excel_existing_table.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UnableToLoadDatabases" xml:space="preserve">
+    <value>Unable to load databases for the given connection.</value>
+  </data>
+  <data name="db_View_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.View.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="lightning_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\lightning_48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="db_Schema_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Schema.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="edit_data_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\edit_data.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SelectedTableNull" xml:space="preserve">
+    <value>Empty or null Table used for this action.  A valid Table must be used.</value>
+  </data>
+  <data name="export_excel_existing_table" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\export_excel_existing_table.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="edit_data_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\edit_data.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="db_Objects_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Objects.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="db_Schema_many_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Schema.many.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ColumnMappedRemove" xml:space="preserve">
+    <value>This column has already been mapped, do you want to remove it and its mapping?</value>
+  </data>
+  <data name="db_mgmt_Connection_manage_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.mgmt.Connection.manage.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="import_data_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\import_data.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="export_excel_existing_table_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\export_excel_existing_table.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="new_connection_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\new_connection_24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="db_Column_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Column.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="export_excel_new_table_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\export_excel_new_table.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="chain_link_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\chain_link.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="RemoveColumnConfirmation" xml:space="preserve">
+    <value>Are you sure you want to remove the selected column?</value>
+  </data>
+  <data name="ErrorCreatingNewSchema" xml:space="preserve">
+    <value>An error occurred creating a new schema: {0}</value>
+  </data>
+  <data name="db_Table_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Table.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="import_data_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\import_data.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="db_Routine_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Routine.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="db_View_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.View.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="db_Routine_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Routine.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ColumnMappedOverwrite" xml:space="preserve">
+    <value>This column has already been mapped, do you want to overwrite existing mapping?</value>
+  </data>
+  <data name="ArrowDown" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ArrowDown.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="db_Schema_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Schema.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ExcelAddinFilter" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ExcelAddinFilter.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="db_View_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.View.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="import_data_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\import_data.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLExcelAddInLogo_64x64" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLExcelAddInLogo.64x64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CurrentChangesLostConfirmation" xml:space="preserve">
+    <value>Current changes will be lost, do you want to continue?</value>
+  </data>
+  <data name="MySQLExcelAddInLogo_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLExcelAddInLogo.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="mysql-for-excel-header" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\mysql-for-excel-header.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

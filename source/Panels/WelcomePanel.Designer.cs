@@ -30,10 +30,8 @@
     {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WelcomePanel));
-      System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Local Connections");
-      System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Remote Connections");
-      this.lblExcelAddIn = new System.Windows.Forms.Label();
-      this.lblWelcome = new System.Windows.Forms.Label();
+      System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Local Connections");
+      System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Remote Connections");
       this.picAddInLogo = new System.Windows.Forms.PictureBox();
       this.connectionsContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.openConnectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,32 +48,12 @@
       this.connectionsContextMenu.SuspendLayout();
       this.SuspendLayout();
       // 
-      // lblExcelAddIn
-      // 
-      this.lblExcelAddIn.AutoSize = true;
-      this.lblExcelAddIn.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblExcelAddIn.Location = new System.Drawing.Point(98, 51);
-      this.lblExcelAddIn.Name = "lblExcelAddIn";
-      this.lblExcelAddIn.Size = new System.Drawing.Size(135, 19);
-      this.lblExcelAddIn.TabIndex = 1;
-      this.lblExcelAddIn.Text = "MySQL for Excel";
-      // 
-      // lblWelcome
-      // 
-      this.lblWelcome.AutoSize = true;
-      this.lblWelcome.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblWelcome.Location = new System.Drawing.Point(84, 32);
-      this.lblWelcome.Name = "lblWelcome";
-      this.lblWelcome.Size = new System.Drawing.Size(84, 16);
-      this.lblWelcome.TabIndex = 0;
-      this.lblWelcome.Text = "Welcome to";
-      // 
       // picAddInLogo
       // 
-      this.picAddInLogo.Image = global::MySQL.ForExcel.Properties.Resources.MySQLExcelAddInLogo_64x64;
+      this.picAddInLogo.Image = global::MySQL.ForExcel.Properties.Resources.mysql_for_excel_header;
       this.picAddInLogo.Location = new System.Drawing.Point(14, 12);
       this.picAddInLogo.Name = "picAddInLogo";
-      this.picAddInLogo.Size = new System.Drawing.Size(64, 64);
+      this.picAddInLogo.Size = new System.Drawing.Size(235, 68);
       this.picAddInLogo.TabIndex = 13;
       this.picAddInLogo.TabStop = false;
       // 
@@ -159,17 +137,17 @@
       this.connectionList.Location = new System.Drawing.Point(14, 203);
       this.connectionList.Name = "connectionList";
       this.connectionList.NodeImages = this.largeImages;
-      treeNode3.BackColor = System.Drawing.SystemColors.ControlDark;
-      treeNode3.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode3.Name = "LocalConnectionsNode";
-      treeNode3.Text = "Local Connections";
-      treeNode4.BackColor = System.Drawing.SystemColors.ControlDark;
-      treeNode4.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode4.Name = "Node0";
-      treeNode4.Text = "Remote Connections";
+      treeNode1.BackColor = System.Drawing.SystemColors.ControlDark;
+      treeNode1.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode1.Name = "LocalConnectionsNode";
+      treeNode1.Text = "Local Connections";
+      treeNode2.BackColor = System.Drawing.SystemColors.ControlDark;
+      treeNode2.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode2.Name = "Node0";
+      treeNode2.Text = "Remote Connections";
       this.connectionList.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode3,
-            treeNode4});
+            treeNode1,
+            treeNode2});
       this.connectionList.Size = new System.Drawing.Size(265, 264);
       this.connectionList.TabIndex = 22;
       this.connectionList.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.connectionList_NodeMouseDoubleClick);
@@ -233,8 +211,6 @@
       this.Controls.Add(this.lblInstructions);
       this.Controls.Add(this.newConnectionLabel);
       this.Controls.Add(this.lblCopyright);
-      this.Controls.Add(this.lblExcelAddIn);
-      this.Controls.Add(this.lblWelcome);
       this.Controls.Add(this.picAddInLogo);
       this.Controls.Add(this.lblAllRights);
       this.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -243,14 +219,11 @@
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
       this.connectionsContextMenu.ResumeLayout(false);
       this.ResumeLayout(false);
-      this.PerformLayout();
 
     }
 
     #endregion
 
-    private System.Windows.Forms.Label lblExcelAddIn;
-    private System.Windows.Forms.Label lblWelcome;
     private System.Windows.Forms.PictureBox picAddInLogo;
     private System.Windows.Forms.ImageList smallImages;
     private System.Windows.Forms.ImageList largeImages;
