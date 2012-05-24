@@ -74,8 +74,8 @@ namespace MySQL.ForExcel
 
     public void CloseConnection()
     {
-      welcomePanel1.BringToFront();
       connection = null;
+      welcomePanel1.BringToFront();
     }
 
     public void OpenSchema(string schema)
@@ -182,10 +182,8 @@ namespace MySQL.ForExcel
 
     public void CloseAddIn()
     {
-      //      Globals.ThisAddIn.TaskPane.Visible = false;
-      welcomePanel1.Visible = true;
-      schemaSelectionPanel1.Visible = false;
-      dbObjectSelectionPanel1.Visible = false;
+      CloseConnection();
+      Globals.ThisAddIn.TaskPane.Visible = false;
     }
   }
 

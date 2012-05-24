@@ -47,19 +47,6 @@
       this.grdColumnProperties = new System.Windows.Forms.DataGridView();
       this.columnNameDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
       this.dataTypeDataGridViewComboBoxColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
-      this.charMaxLengthDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-      this.precisionDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-      this.scaleDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-      this.allowNullDataGridViewCheckBoxColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-      this.isUnsignedDataGridViewCheckBoxColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-      this.isZerofillDataGridViewCheckBoxColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-      this.autoIncrementDataGridViewCheckBoxColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-      this.defaultValueDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-      this.primaryKeyDataGridViewCheckBoxColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-      this.uniqueKeyDataGridViewCheckBoxColumn = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-      this.characterSetDataGridViewComboBoxColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
-      this.collationDataGridViewComboBoxColumn = new System.Windows.Forms.DataGridViewComboBoxColumn();
-      this.commentDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
       this.columnBindingSource = new System.Windows.Forms.BindingSource(this.components);
       this.btnExport = new System.Windows.Forms.Button();
       this.btnCancel = new System.Windows.Forms.Button();
@@ -88,7 +75,7 @@
       // chkUseFormatted
       // 
       this.chkUseFormatted.AutoSize = true;
-      this.chkUseFormatted.Location = new System.Drawing.Point(186, 19);
+      this.chkUseFormatted.Location = new System.Drawing.Point(220, 19);
       this.chkUseFormatted.Name = "chkUseFormatted";
       this.chkUseFormatted.Size = new System.Drawing.Size(130, 17);
       this.chkUseFormatted.TabIndex = 1;
@@ -111,9 +98,9 @@
       this.chkFirstRowHeaders.AutoSize = true;
       this.chkFirstRowHeaders.Location = new System.Drawing.Point(6, 19);
       this.chkFirstRowHeaders.Name = "chkFirstRowHeaders";
-      this.chkFirstRowHeaders.Size = new System.Drawing.Size(157, 17);
+      this.chkFirstRowHeaders.Size = new System.Drawing.Size(188, 17);
       this.chkFirstRowHeaders.TabIndex = 0;
-      this.chkFirstRowHeaders.Text = "First Row Contains Headers";
+      this.chkFirstRowHeaders.Text = "First Row Contains Column Names";
       this.chkFirstRowHeaders.UseVisualStyleBackColor = true;
       this.chkFirstRowHeaders.CheckedChanged += new System.EventHandler(this.chkFirstRowHeaders_CheckedChanged);
       // 
@@ -167,17 +154,16 @@
       this.groupBox1.Controls.Add(this.grdColumnProperties);
       this.groupBox1.Location = new System.Drawing.Point(12, 218);
       this.groupBox1.Name = "groupBox1";
-      this.groupBox1.Size = new System.Drawing.Size(770, 199);
+      this.groupBox1.Size = new System.Drawing.Size(770, 321);
       this.groupBox1.TabIndex = 1;
       this.groupBox1.TabStop = false;
       this.groupBox1.Text = "New Table";
       // 
       // columnPropertiesGrid
       // 
-      this.columnPropertiesGrid.HelpVisible = false;
       this.columnPropertiesGrid.Location = new System.Drawing.Point(395, 24);
       this.columnPropertiesGrid.Name = "columnPropertiesGrid";
-      this.columnPropertiesGrid.Size = new System.Drawing.Size(369, 169);
+      this.columnPropertiesGrid.Size = new System.Drawing.Size(369, 280);
       this.columnPropertiesGrid.TabIndex = 3;
       // 
       // txtTableName
@@ -203,6 +189,7 @@
       this.grdColumnProperties.AllowUserToResizeColumns = false;
       this.grdColumnProperties.AllowUserToResizeRows = false;
       this.grdColumnProperties.AutoGenerateColumns = false;
+      this.grdColumnProperties.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
       dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
       dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
       dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -214,20 +201,7 @@
       this.grdColumnProperties.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
       this.grdColumnProperties.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.columnNameDataGridViewTextBoxColumn,
-            this.dataTypeDataGridViewComboBoxColumn,
-            this.charMaxLengthDataGridViewTextBoxColumn,
-            this.precisionDataGridViewTextBoxColumn,
-            this.scaleDataGridViewTextBoxColumn,
-            this.allowNullDataGridViewCheckBoxColumn,
-            this.isUnsignedDataGridViewCheckBoxColumn,
-            this.isZerofillDataGridViewCheckBoxColumn,
-            this.autoIncrementDataGridViewCheckBoxColumn,
-            this.defaultValueDataGridViewTextBoxColumn,
-            this.primaryKeyDataGridViewCheckBoxColumn,
-            this.uniqueKeyDataGridViewCheckBoxColumn,
-            this.characterSetDataGridViewComboBoxColumn,
-            this.collationDataGridViewComboBoxColumn,
-            this.commentDataGridViewTextBoxColumn});
+            this.dataTypeDataGridViewComboBoxColumn});
       this.grdColumnProperties.DataSource = this.columnBindingSource;
       dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
@@ -248,7 +222,7 @@
       dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
       dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
       this.grdColumnProperties.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
-      this.grdColumnProperties.Size = new System.Drawing.Size(380, 143);
+      this.grdColumnProperties.Size = new System.Drawing.Size(380, 254);
       this.grdColumnProperties.TabIndex = 2;
       this.grdColumnProperties.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.grdColumnProperties_CellValueChanged);
       this.grdColumnProperties.CurrentCellDirtyStateChanged += new System.EventHandler(this.grdColumnProperties_CurrentCellDirtyStateChanged);
@@ -268,90 +242,6 @@
       this.dataTypeDataGridViewComboBoxColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
       this.dataTypeDataGridViewComboBoxColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
       // 
-      // charMaxLengthDataGridViewTextBoxColumn
-      // 
-      this.charMaxLengthDataGridViewTextBoxColumn.DataPropertyName = "CharMaxLength";
-      this.charMaxLengthDataGridViewTextBoxColumn.HeaderText = "Character Length";
-      this.charMaxLengthDataGridViewTextBoxColumn.Name = "charMaxLengthDataGridViewTextBoxColumn";
-      // 
-      // precisionDataGridViewTextBoxColumn
-      // 
-      this.precisionDataGridViewTextBoxColumn.DataPropertyName = "Precision";
-      this.precisionDataGridViewTextBoxColumn.HeaderText = "Precision";
-      this.precisionDataGridViewTextBoxColumn.Name = "precisionDataGridViewTextBoxColumn";
-      // 
-      // scaleDataGridViewTextBoxColumn
-      // 
-      this.scaleDataGridViewTextBoxColumn.DataPropertyName = "Scale";
-      this.scaleDataGridViewTextBoxColumn.HeaderText = "Scale";
-      this.scaleDataGridViewTextBoxColumn.Name = "scaleDataGridViewTextBoxColumn";
-      // 
-      // allowNullDataGridViewCheckBoxColumn
-      // 
-      this.allowNullDataGridViewCheckBoxColumn.DataPropertyName = "AllowNull";
-      this.allowNullDataGridViewCheckBoxColumn.HeaderText = "Allow Nulls";
-      this.allowNullDataGridViewCheckBoxColumn.Name = "allowNullDataGridViewCheckBoxColumn";
-      // 
-      // isUnsignedDataGridViewCheckBoxColumn
-      // 
-      this.isUnsignedDataGridViewCheckBoxColumn.DataPropertyName = "IsUnsigned";
-      this.isUnsignedDataGridViewCheckBoxColumn.HeaderText = "Is Unsigned";
-      this.isUnsignedDataGridViewCheckBoxColumn.Name = "isUnsignedDataGridViewCheckBoxColumn";
-      // 
-      // isZerofillDataGridViewCheckBoxColumn
-      // 
-      this.isZerofillDataGridViewCheckBoxColumn.DataPropertyName = "IsZerofill";
-      this.isZerofillDataGridViewCheckBoxColumn.HeaderText = "Is Zerofill";
-      this.isZerofillDataGridViewCheckBoxColumn.Name = "isZerofillDataGridViewCheckBoxColumn";
-      // 
-      // autoIncrementDataGridViewCheckBoxColumn
-      // 
-      this.autoIncrementDataGridViewCheckBoxColumn.DataPropertyName = "AutoIncrement";
-      this.autoIncrementDataGridViewCheckBoxColumn.HeaderText = "Autoincrement";
-      this.autoIncrementDataGridViewCheckBoxColumn.Name = "autoIncrementDataGridViewCheckBoxColumn";
-      // 
-      // defaultValueDataGridViewTextBoxColumn
-      // 
-      this.defaultValueDataGridViewTextBoxColumn.DataPropertyName = "DefaultValue";
-      this.defaultValueDataGridViewTextBoxColumn.HeaderText = "Default Value";
-      this.defaultValueDataGridViewTextBoxColumn.Name = "defaultValueDataGridViewTextBoxColumn";
-      // 
-      // primaryKeyDataGridViewCheckBoxColumn
-      // 
-      this.primaryKeyDataGridViewCheckBoxColumn.DataPropertyName = "PrimaryKey";
-      this.primaryKeyDataGridViewCheckBoxColumn.HeaderText = "Primary Key";
-      this.primaryKeyDataGridViewCheckBoxColumn.Name = "primaryKeyDataGridViewCheckBoxColumn";
-      // 
-      // uniqueKeyDataGridViewCheckBoxColumn
-      // 
-      this.uniqueKeyDataGridViewCheckBoxColumn.DataPropertyName = "UniqueKey";
-      this.uniqueKeyDataGridViewCheckBoxColumn.HeaderText = "Unique Key";
-      this.uniqueKeyDataGridViewCheckBoxColumn.Name = "uniqueKeyDataGridViewCheckBoxColumn";
-      // 
-      // characterSetDataGridViewComboBoxColumn
-      // 
-      this.characterSetDataGridViewComboBoxColumn.DataPropertyName = "CharacterSet";
-      this.characterSetDataGridViewComboBoxColumn.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
-      this.characterSetDataGridViewComboBoxColumn.HeaderText = "Character Set";
-      this.characterSetDataGridViewComboBoxColumn.Name = "characterSetDataGridViewComboBoxColumn";
-      this.characterSetDataGridViewComboBoxColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-      this.characterSetDataGridViewComboBoxColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-      // 
-      // collationDataGridViewComboBoxColumn
-      // 
-      this.collationDataGridViewComboBoxColumn.DataPropertyName = "Collation";
-      this.collationDataGridViewComboBoxColumn.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
-      this.collationDataGridViewComboBoxColumn.HeaderText = "Collation";
-      this.collationDataGridViewComboBoxColumn.Name = "collationDataGridViewComboBoxColumn";
-      this.collationDataGridViewComboBoxColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-      this.collationDataGridViewComboBoxColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-      // 
-      // commentDataGridViewTextBoxColumn
-      // 
-      this.commentDataGridViewTextBoxColumn.DataPropertyName = "Comment";
-      this.commentDataGridViewTextBoxColumn.HeaderText = "Comment";
-      this.commentDataGridViewTextBoxColumn.Name = "commentDataGridViewTextBoxColumn";
-      // 
       // columnBindingSource
       // 
       this.columnBindingSource.DataSource = typeof(MySQL.ForExcel.MySQLColumn);
@@ -360,7 +250,7 @@
       // btnExport
       // 
       this.btnExport.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.btnExport.Location = new System.Drawing.Point(626, 423);
+      this.btnExport.Location = new System.Drawing.Point(626, 545);
       this.btnExport.Name = "btnExport";
       this.btnExport.Size = new System.Drawing.Size(75, 23);
       this.btnExport.TabIndex = 2;
@@ -371,7 +261,7 @@
       // btnCancel
       // 
       this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnCancel.Location = new System.Drawing.Point(707, 423);
+      this.btnCancel.Location = new System.Drawing.Point(707, 545);
       this.btnCancel.Name = "btnCancel";
       this.btnCancel.Size = new System.Drawing.Size(75, 23);
       this.btnCancel.TabIndex = 3;
@@ -387,7 +277,7 @@
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.btnCancel;
-      this.ClientSize = new System.Drawing.Size(794, 457);
+      this.ClientSize = new System.Drawing.Size(794, 582);
       this.ControlBox = false;
       this.Controls.Add(this.btnCancel);
       this.Controls.Add(this.btnExport);
@@ -427,18 +317,5 @@
     private System.Windows.Forms.CheckBox chkUseFormatted;
     private System.Windows.Forms.DataGridViewTextBoxColumn columnNameDataGridViewTextBoxColumn;
     private System.Windows.Forms.DataGridViewComboBoxColumn dataTypeDataGridViewComboBoxColumn;
-    private System.Windows.Forms.DataGridViewTextBoxColumn charMaxLengthDataGridViewTextBoxColumn;
-    private System.Windows.Forms.DataGridViewTextBoxColumn precisionDataGridViewTextBoxColumn;
-    private System.Windows.Forms.DataGridViewTextBoxColumn scaleDataGridViewTextBoxColumn;
-    private System.Windows.Forms.DataGridViewCheckBoxColumn allowNullDataGridViewCheckBoxColumn;
-    private System.Windows.Forms.DataGridViewCheckBoxColumn isUnsignedDataGridViewCheckBoxColumn;
-    private System.Windows.Forms.DataGridViewCheckBoxColumn isZerofillDataGridViewCheckBoxColumn;
-    private System.Windows.Forms.DataGridViewCheckBoxColumn autoIncrementDataGridViewCheckBoxColumn;
-    private System.Windows.Forms.DataGridViewTextBoxColumn defaultValueDataGridViewTextBoxColumn;
-    private System.Windows.Forms.DataGridViewCheckBoxColumn primaryKeyDataGridViewCheckBoxColumn;
-    private System.Windows.Forms.DataGridViewCheckBoxColumn uniqueKeyDataGridViewCheckBoxColumn;
-    private System.Windows.Forms.DataGridViewComboBoxColumn characterSetDataGridViewComboBoxColumn;
-    private System.Windows.Forms.DataGridViewComboBoxColumn collationDataGridViewComboBoxColumn;
-    private System.Windows.Forms.DataGridViewTextBoxColumn commentDataGridViewTextBoxColumn;
   }
 }

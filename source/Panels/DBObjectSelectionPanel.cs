@@ -33,6 +33,7 @@ namespace MySQL.ForExcel
       lblConnectionName.Text = connection.Name;
       lblUserIP.Text = String.Format("User: {0}, IP: {1}", connection.UserName, connection.Host);
       PopulateList();
+      objectList_AfterSelect(null, null);
     }
 
     private void PopulateList()
@@ -111,7 +112,7 @@ namespace MySQL.ForExcel
     private void objectList_AfterSelect(object sender, TreeViewEventArgs e)
     {
       DBObject o = null;
-      if (e.Node != null && e.Node.Level > 0)
+      if (e != null && e.Node != null && e.Node.Level > 0)
         o = e.Node.Tag as DBObject;
 
       importData.Enabled = o != null;

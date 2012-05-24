@@ -61,7 +61,7 @@
       // 
       this.lblConnectionName.AutoSize = true;
       this.lblConnectionName.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblConnectionName.Location = new System.Drawing.Point(84, 29);
+      this.lblConnectionName.Location = new System.Drawing.Point(84, 17);
       this.lblConnectionName.Name = "lblConnectionName";
       this.lblConnectionName.Size = new System.Drawing.Size(121, 16);
       this.lblConnectionName.TabIndex = 1;
@@ -71,7 +71,7 @@
       // 
       this.lblUserIP.AutoSize = true;
       this.lblUserIP.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblUserIP.Location = new System.Drawing.Point(84, 50);
+      this.lblUserIP.Location = new System.Drawing.Point(84, 38);
       this.lblUserIP.Name = "lblUserIP";
       this.lblUserIP.Size = new System.Drawing.Size(91, 15);
       this.lblUserIP.TabIndex = 2;
@@ -79,7 +79,7 @@
       // 
       // picAddInLogo
       // 
-      this.picAddInLogo.Image = global::MySQL.ForExcel.Properties.Resources.MySQLExcelAddInLogo_64x64;
+      this.picAddInLogo.Image = global::MySQL.ForExcel.Properties.Resources.mysql_header_img;
       this.picAddInLogo.Location = new System.Drawing.Point(14, 13);
       this.picAddInLogo.Name = "picAddInLogo";
       this.picAddInLogo.Size = new System.Drawing.Size(64, 64);
@@ -168,6 +168,7 @@
       this.btnHelp.TabIndex = 9;
       this.btnHelp.Text = "Help";
       this.btnHelp.UseVisualStyleBackColor = true;
+      this.btnHelp.Visible = false;
       this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
       // 
       // label1
@@ -175,7 +176,7 @@
       this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.label1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-      this.label1.Location = new System.Drawing.Point(16, 152);
+      this.label1.Location = new System.Drawing.Point(16, 133);
       this.label1.Name = "label1";
       this.label1.Size = new System.Drawing.Size(300, 2);
       this.label1.TabIndex = 25;
@@ -186,7 +187,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
       this.objectFilter.BackColor = System.Drawing.SystemColors.Window;
       this.objectFilter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-      this.objectFilter.Location = new System.Drawing.Point(17, 214);
+      this.objectFilter.Location = new System.Drawing.Point(17, 191);
       this.objectFilter.Name = "objectFilter";
       this.objectFilter.NoTextLabel = "Filter Schema Objects";
       this.objectFilter.Size = new System.Drawing.Size(300, 26);
@@ -206,7 +207,7 @@
       this.objectList.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.objectList.Indent = 18;
       this.objectList.ItemHeight = 20;
-      this.objectList.Location = new System.Drawing.Point(17, 246);
+      this.objectList.Location = new System.Drawing.Point(17, 223);
       this.objectList.Name = "objectList";
       this.objectList.NodeImages = this.largeImages;
       treeNode1.BackColor = System.Drawing.SystemColors.ControlDark;
@@ -225,7 +226,7 @@
             treeNode1,
             treeNode2,
             treeNode3});
-      this.objectList.Size = new System.Drawing.Size(300, 232);
+      this.objectList.Size = new System.Drawing.Size(300, 255);
       this.objectList.TabIndex = 24;
       this.objectList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.objectList_AfterSelect);
       // 
@@ -291,7 +292,7 @@
       this.hotLabel2.HotTracking = false;
       this.hotLabel2.Image = global::MySQL.ForExcel.Properties.Resources.db_Objects_32x32;
       this.hotLabel2.ImageSize = new System.Drawing.Size(32, 32);
-      this.hotLabel2.Location = new System.Drawing.Point(16, 163);
+      this.hotLabel2.Location = new System.Drawing.Point(16, 142);
       this.hotLabel2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.hotLabel2.Name = "hotLabel2";
       this.hotLabel2.Size = new System.Drawing.Size(258, 44);
@@ -307,7 +308,7 @@
       this.exportToNewTable.HotTracking = true;
       this.exportToNewTable.Image = global::MySQL.ForExcel.Properties.Resources.export_excel_new_table_32x32;
       this.exportToNewTable.ImageSize = new System.Drawing.Size(32, 32);
-      this.exportToNewTable.Location = new System.Drawing.Point(17, 98);
+      this.exportToNewTable.Location = new System.Drawing.Point(17, 84);
       this.exportToNewTable.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.exportToNewTable.Name = "exportToNewTable";
       this.exportToNewTable.Size = new System.Drawing.Size(258, 44);

@@ -51,7 +51,7 @@
       // picAddInLogo
       // 
       this.picAddInLogo.Image = global::MySQL.ForExcel.Properties.Resources.mysql_for_excel_header;
-      this.picAddInLogo.Location = new System.Drawing.Point(14, 12);
+      this.picAddInLogo.Location = new System.Drawing.Point(14, 13);
       this.picAddInLogo.Name = "picAddInLogo";
       this.picAddInLogo.Size = new System.Drawing.Size(235, 68);
       this.picAddInLogo.TabIndex = 13;

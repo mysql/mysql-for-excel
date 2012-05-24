@@ -535,9 +535,9 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap MainLogo {
+        internal static System.Drawing.Bitmap mysql_for_excel {
             get {
-                object obj = ResourceManager.GetObject("MainLogo", resourceCulture);
+                object obj = ResourceManager.GetObject("mysql-for-excel", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -549,37 +549,9 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        internal static System.Drawing.Icon MySQLExcelAddInLogo {
+        internal static System.Drawing.Bitmap mysql_header_img {
             get {
-                object obj = ResourceManager.GetObject("MySQLExcelAddInLogo", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap MySQLExcelAddInLogo_16x16 {
-            get {
-                object obj = ResourceManager.GetObject("MySQLExcelAddInLogo_16x16", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap MySQLExcelAddInLogo_32x32 {
-            get {
-                object obj = ResourceManager.GetObject("MySQLExcelAddInLogo_32x32", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap MySQLExcelAddInLogo_48x48 {
-            get {
-                object obj = ResourceManager.GetObject("MySQLExcelAddInLogo_48x48", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap MySQLExcelAddInLogo_64x64 {
-            get {
-                object obj = ResourceManager.GetObject("MySQLExcelAddInLogo_64x64", resourceCulture);
+                object obj = ResourceManager.GetObject("mysql-header-img", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

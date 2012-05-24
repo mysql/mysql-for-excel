@@ -57,7 +57,7 @@
       // togShowTaskPane
       // 
       this.togShowTaskPane.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-      this.togShowTaskPane.Image = global::MySQL.ForExcel.Properties.Resources.MainLogo;
+      this.togShowTaskPane.Image = global::MySQL.ForExcel.Properties.Resources.mysql_for_excel;
       this.togShowTaskPane.Label = "MySQL for Excel";
       this.togShowTaskPane.Name = "togShowTaskPane";
       this.togShowTaskPane.ShowImage = true;

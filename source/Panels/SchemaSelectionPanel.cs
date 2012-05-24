@@ -28,11 +28,12 @@ namespace MySQL.ForExcel
       lblConnectionName.Text = connection.Name;
       lblUserIP.Text = String.Format("User: {0}, IP: {1}", connection.UserName, connection.Host);
       LoadSchemas();
+      databaseList_AfterSelect(null, null);
     }
 
     private void databaseList_AfterSelect(object sender, TreeViewEventArgs e)
     {
-      btnNext.Enabled = e.Node != null && e.Node.Level > 0;
+      btnNext.Enabled = e != null && e.Node != null && e.Node.Level > 0;
     }
 
     private void btnHelp_Click(object sender, EventArgs e)

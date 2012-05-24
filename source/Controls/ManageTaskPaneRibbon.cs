@@ -19,7 +19,11 @@ namespace MySQL.ForExcel
       bool enableAddIn = ((RibbonToggleButton)sender).Checked;
       Globals.ThisAddIn.TaskPane.Visible = enableAddIn;
       if (!enableAddIn)
-        (Globals.ThisAddIn.TaskPane as TaskPaneControl).CloseAddIn();
+      {
+        TaskPaneControl tpc = Globals.ThisAddIn.TaskPane as TaskPaneControl;
+        if (tpc != null)
+          tpc.CloseAddIn();
+      }
     }
 
   }

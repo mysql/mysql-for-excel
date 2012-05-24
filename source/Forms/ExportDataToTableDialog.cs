@@ -48,19 +48,19 @@ namespace MySQL.ForExcel
     {
       DataGridViewComboBoxColumn dataTypeCombo = grdColumnProperties.Columns["dataTypeDataGridViewComboBoxColumn"] as DataGridViewComboBoxColumn;
       dataTypeCombo.DataSource = Utilities.GetDataTypes();
-      DataGridViewComboBoxColumn charSetCombo = grdColumnProperties.Columns["characterSetDataGridViewComboBoxColumn"] as DataGridViewComboBoxColumn;
-      charSetCombo.DataSource = Utilities.GetSchemaCollection(wbConnection, "Charsets");
-      charSetCombo.DisplayMember = "Charset";
-      DataGridViewComboBoxColumn collationCombo = grdColumnProperties.Columns["collationDataGridViewComboBoxColumn"] as DataGridViewComboBoxColumn;
-      collationCombo.DataSource = Utilities.GetSchemaCollection(wbConnection, "Collations");
-      collationCombo.DisplayMember = "Collation";
+      //DataGridViewComboBoxColumn charSetCombo = grdColumnProperties.Columns["characterSetDataGridViewComboBoxColumn"] as DataGridViewComboBoxColumn;
+      //charSetCombo.DataSource = Utilities.GetSchemaCollection(wbConnection, "Charsets");
+      //charSetCombo.DisplayMember = "Charset";
+      //DataGridViewComboBoxColumn collationCombo = grdColumnProperties.Columns["collationDataGridViewComboBoxColumn"] as DataGridViewComboBoxColumn;
+      //collationCombo.DataSource = Utilities.GetSchemaCollection(wbConnection, "Collations");
+      //collationCombo.DisplayMember = "Collation";
     }
 
     private void resetCollationGridCombo(string charset)
     {
-      DataGridViewComboBoxColumn collationCombo = grdColumnProperties.Columns["collationDataGridViewComboBoxColumn"] as DataGridViewComboBoxColumn;
-      collationCombo.DataSource = Utilities.GetSchemaCollection(wbConnection, "Collations", charset);
-      collationCombo.DataPropertyName = "Collation";
+      //DataGridViewComboBoxColumn collationCombo = grdColumnProperties.Columns["collationDataGridViewComboBoxColumn"] as DataGridViewComboBoxColumn;
+      //collationCombo.DataSource = Utilities.GetSchemaCollection(wbConnection, "Collations", charset);
+      //collationCombo.DataPropertyName = "Collation";
     }
 
     private void addPropertyButtonsToToolbar()

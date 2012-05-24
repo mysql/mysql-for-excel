@@ -121,14 +121,17 @@
   <data name="db_Objects_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\db.Objects.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="mysql-for-excel-header" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\mysql-for-excel-header.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="db_Routine_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\db.Routine.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="MySQLExcelAddInLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLExcelAddInLogo.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="SelectedDBSchemaNull" xml:space="preserve">
+    <value>Empty or null DB Schema used for this action.  A valid Schema must be used.</value>
   </data>
-  <data name="edit_data_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\edit_data.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="db_Schema_add_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Schema.add.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ColumnsMappedOverwrite" xml:space="preserve">
     <value>Some columns have already been mapped, do you want to overwrite existing mappings?</value>
@@ -144,12 +147,6 @@
   </data>
   <data name="action_eer_rev_eng_db" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\action_eer_rev_eng_db.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLExcelAddInLogo_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLExcelAddInLogo.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MainLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLExcelAddInLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="new_connection_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\new_connection_48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -196,14 +193,11 @@
   <data name="ColumnMappingIncomplete" xml:space="preserve">
     <value>Column mapping for all columns in Excel selection is incomplete. Do you want to proceed with the current mapped data only?</value>
   </data>
-  <data name="SelectedDBSchemaNull" xml:space="preserve">
-    <value>Empty or null DB Schema used for this action.  A valid Schema must be used.</value>
-  </data>
   <data name="ConnectionStringNotSet" xml:space="preserve">
     <value>Can't open MySQL connection since connection string has not been set</value>
   </data>
-  <data name="db_Schema_add_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Schema.add.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="edit_data_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\edit_data.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="export_excel_new_table_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\export_excel_new_table.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -238,6 +232,9 @@
   <data name="SelectedDBObjectNull" xml:space="preserve">
     <value>Empty or null DB Object used for this action.  A valid DB Object must be used.</value>
   </data>
+  <data name="ExcelAddinFilter" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\ExcelAddinFilter.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="db_Routine_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\db.Routine.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -252,9 +249,6 @@
   </data>
   <data name="new_connection_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\new_connection_16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLExcelAddInLogo_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLExcelAddInLogo.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="SelectedDBObjectNotTable" xml:space="preserve">
     <value>Selected DB Object used for this action must be of Type =Table.</value>
@@ -282,9 +276,6 @@
   </data>
   <data name="export_excel_existing_table" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\export_excel_existing_table.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="edit_data_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\edit_data.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="db_Objects_48x48" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\db.Objects.48x48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -316,6 +307,9 @@
   <data name="chain_link_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\chain_link.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="mysql-for-excel" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\mysql-for-excel.ico;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="RemoveColumnConfirmation" xml:space="preserve">
     <value>Are you sure you want to remove the selected column?</value>
   </data>
@@ -346,8 +340,8 @@
   <data name="db_Schema_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\db.Schema.24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ExcelAddinFilter" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\ExcelAddinFilter.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="edit_data_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\edit_data.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Error" xml:space="preserve">
     <value>Error</value>
@@ -358,16 +352,10 @@
   <data name="import_data_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\import_data.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="MySQLExcelAddInLogo_64x64" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLExcelAddInLogo.64x64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="CurrentChangesLostConfirmation" xml:space="preserve">
     <value>Current changes will be lost, do you want to continue?</value>
   </data>
-  <data name="MySQLExcelAddInLogo_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLExcelAddInLogo.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="mysql-for-excel-header" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\mysql-for-excel-header.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="mysql-header-img" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\mysql-header-img.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

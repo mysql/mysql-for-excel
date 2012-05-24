@@ -53,7 +53,7 @@ namespace MySQL.ForExcel
       List<DataGridViewColumn> selectedColumns = new List<DataGridViewColumn>();
       foreach (DataGridViewColumn selCol in grdPreview.Columns)
       {
-        if ((bool)selCol.HeaderCell.Tag)
+        //if ((bool)selCol.HeaderCell.Tag)
           selectedColumns.Add(selCol);
       }
       if (selectedColumns.Count > 1)

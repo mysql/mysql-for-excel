@@ -43,88 +43,84 @@
       // 
       // pictureBox1
       // 
-      this.pictureBox1.Image = global::MySQL.ForExcel.Properties.Resources.MainLogo;
-      this.pictureBox1.Location = new System.Drawing.Point(12, 12);
+      this.pictureBox1.Image = global::MySQL.ForExcel.Properties.Resources.mysql_header_img;
+      this.pictureBox1.Location = new System.Drawing.Point(14, 15);
+      this.pictureBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.pictureBox1.Name = "pictureBox1";
-      this.pictureBox1.Size = new System.Drawing.Size(128, 128);
+      this.pictureBox1.Size = new System.Drawing.Size(79, 116);
       this.pictureBox1.TabIndex = 0;
       this.pictureBox1.TabStop = false;
       // 
       // lblEnterPassword
       // 
       this.lblEnterPassword.AutoSize = true;
-      this.lblEnterPassword.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblEnterPassword.Location = new System.Drawing.Point(146, 12);
+      this.lblEnterPassword.Location = new System.Drawing.Point(99, 15);
       this.lblEnterPassword.Name = "lblEnterPassword";
-      this.lblEnterPassword.Size = new System.Drawing.Size(360, 19);
+      this.lblEnterPassword.Size = new System.Drawing.Size(273, 16);
       this.lblEnterPassword.TabIndex = 0;
       this.lblEnterPassword.Text = "Please enter the password for the connection:";
       // 
       // lblConnection
       // 
       this.lblConnection.AutoSize = true;
-      this.lblConnection.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblConnection.Location = new System.Drawing.Point(147, 41);
+      this.lblConnection.Location = new System.Drawing.Point(126, 40);
       this.lblConnection.Name = "lblConnection";
-      this.lblConnection.Size = new System.Drawing.Size(73, 14);
+      this.lblConnection.Size = new System.Drawing.Size(77, 16);
       this.lblConnection.TabIndex = 1;
       this.lblConnection.Text = "Connection:";
       // 
       // lblUser
       // 
       this.lblUser.AutoSize = true;
-      this.lblUser.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblUser.Location = new System.Drawing.Point(184, 65);
+      this.lblUser.Location = new System.Drawing.Point(164, 67);
       this.lblUser.Name = "lblUser";
-      this.lblUser.Size = new System.Drawing.Size(36, 14);
+      this.lblUser.Size = new System.Drawing.Size(39, 16);
       this.lblUser.TabIndex = 3;
       this.lblUser.Text = "User:";
       // 
       // lblPassword
       // 
       this.lblPassword.AutoSize = true;
-      this.lblPassword.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblPassword.Location = new System.Drawing.Point(155, 92);
+      this.lblPassword.Location = new System.Drawing.Point(134, 92);
       this.lblPassword.Name = "lblPassword";
-      this.lblPassword.Size = new System.Drawing.Size(66, 14);
+      this.lblPassword.Size = new System.Drawing.Size(69, 16);
       this.lblPassword.TabIndex = 5;
       this.lblPassword.Text = "Password:";
       // 
       // txtPassword
       // 
-      this.txtPassword.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.txtPassword.Location = new System.Drawing.Point(226, 89);
+      this.txtPassword.Location = new System.Drawing.Point(212, 92);
+      this.txtPassword.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.txtPassword.Name = "txtPassword";
-      this.txtPassword.Size = new System.Drawing.Size(271, 20);
+      this.txtPassword.Size = new System.Drawing.Size(315, 22);
       this.txtPassword.TabIndex = 6;
       this.txtPassword.UseSystemPasswordChar = true;
       // 
       // lblConnectionValue
       // 
       this.lblConnectionValue.AutoSize = true;
-      this.lblConnectionValue.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblConnectionValue.Location = new System.Drawing.Point(226, 41);
+      this.lblConnectionValue.Location = new System.Drawing.Point(209, 40);
       this.lblConnectionValue.Name = "lblConnectionValue";
-      this.lblConnectionValue.Size = new System.Drawing.Size(19, 14);
+      this.lblConnectionValue.Size = new System.Drawing.Size(22, 16);
       this.lblConnectionValue.TabIndex = 2;
       this.lblConnectionValue.Text = "??";
       // 
       // lblUserValue
       // 
       this.lblUserValue.AutoSize = true;
-      this.lblUserValue.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblUserValue.Location = new System.Drawing.Point(226, 66);
+      this.lblUserValue.Location = new System.Drawing.Point(209, 67);
       this.lblUserValue.Name = "lblUserValue";
-      this.lblUserValue.Size = new System.Drawing.Size(19, 14);
+      this.lblUserValue.Size = new System.Drawing.Size(22, 16);
       this.lblUserValue.TabIndex = 4;
       this.lblUserValue.Text = "??";
       // 
       // btnCancel
       // 
       this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnCancel.Location = new System.Drawing.Point(422, 119);
+      this.btnCancel.Location = new System.Drawing.Point(440, 132);
+      this.btnCancel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.btnCancel.Name = "btnCancel";
-      this.btnCancel.Size = new System.Drawing.Size(75, 23);
+      this.btnCancel.Size = new System.Drawing.Size(87, 28);
       this.btnCancel.TabIndex = 8;
       this.btnCancel.Text = "Cancel";
       this.btnCancel.UseVisualStyleBackColor = true;
@@ -132,9 +128,10 @@
       // btnOK
       // 
       this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.btnOK.Location = new System.Drawing.Point(341, 119);
+      this.btnOK.Location = new System.Drawing.Point(346, 132);
+      this.btnOK.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.btnOK.Name = "btnOK";
-      this.btnOK.Size = new System.Drawing.Size(75, 23);
+      this.btnOK.Size = new System.Drawing.Size(87, 28);
       this.btnOK.TabIndex = 7;
       this.btnOK.Text = "OK";
       this.btnOK.UseVisualStyleBackColor = true;
@@ -142,10 +139,10 @@
       // PasswordDialog
       // 
       this.AcceptButton = this.btnOK;
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.btnCancel;
-      this.ClientSize = new System.Drawing.Size(509, 151);
+      this.ClientSize = new System.Drawing.Size(547, 181);
       this.ControlBox = false;
       this.Controls.Add(this.btnOK);
       this.Controls.Add(this.btnCancel);
@@ -157,7 +154,10 @@
       this.Controls.Add(this.lblConnection);
       this.Controls.Add(this.lblEnterPassword);
       this.Controls.Add(this.pictureBox1);
-      this.Name = "PasswordForm";
+      this.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+      this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.Name = "PasswordDialog";
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
       this.Text = "Connection Password";
       ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();

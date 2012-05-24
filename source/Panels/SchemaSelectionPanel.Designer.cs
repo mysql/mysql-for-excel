@@ -55,7 +55,7 @@
       // 
       this.lblConnectionName.AutoSize = true;
       this.lblConnectionName.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblConnectionName.Location = new System.Drawing.Point(84, 29);
+      this.lblConnectionName.Location = new System.Drawing.Point(84, 17);
       this.lblConnectionName.Name = "lblConnectionName";
       this.lblConnectionName.Size = new System.Drawing.Size(121, 16);
       this.lblConnectionName.TabIndex = 0;
@@ -65,7 +65,7 @@
       // 
       this.lblUserIP.AutoSize = true;
       this.lblUserIP.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblUserIP.Location = new System.Drawing.Point(84, 50);
+      this.lblUserIP.Location = new System.Drawing.Point(84, 38);
       this.lblUserIP.Name = "lblUserIP";
       this.lblUserIP.Size = new System.Drawing.Size(91, 15);
       this.lblUserIP.TabIndex = 1;
@@ -73,7 +73,7 @@
       // 
       // picAddInLogo
       // 
-      this.picAddInLogo.Image = global::MySQL.ForExcel.Properties.Resources.MySQLExcelAddInLogo_64x64;
+      this.picAddInLogo.Image = global::MySQL.ForExcel.Properties.Resources.mysql_header_img;
       this.picAddInLogo.Location = new System.Drawing.Point(14, 13);
       this.picAddInLogo.Name = "picAddInLogo";
       this.picAddInLogo.Size = new System.Drawing.Size(64, 64);
@@ -135,9 +135,9 @@
       // 
       this.lblInstructions.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblInstructions.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-      this.lblInstructions.Location = new System.Drawing.Point(11, 89);
+      this.lblInstructions.Location = new System.Drawing.Point(11, 80);
       this.lblInstructions.Name = "lblInstructions";
-      this.lblInstructions.Size = new System.Drawing.Size(259, 89);
+      this.lblInstructions.Size = new System.Drawing.Size(259, 98);
       this.lblInstructions.TabIndex = 2;
       this.lblInstructions.Text = "Please select the MySQL schema you want to work with. Each schema can hold a coll" +
     "ection of tables that store data, views that hold selected data and routines tha" +
@@ -153,6 +153,7 @@
       this.btnHelp.TabIndex = 6;
       this.btnHelp.Text = "Help";
       this.btnHelp.UseVisualStyleBackColor = true;
+      this.btnHelp.Visible = false;
       this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
       // 
       // databaseList

@@ -38,37 +38,38 @@
       // 
       // pictureBox1
       // 
-      this.pictureBox1.Image = global::MySQL.ForExcel.Properties.Resources.MainLogo;
-      this.pictureBox1.Location = new System.Drawing.Point(12, 12);
+      this.pictureBox1.Image = global::MySQL.ForExcel.Properties.Resources.mysql_header_img;
+      this.pictureBox1.Location = new System.Drawing.Point(14, 15);
+      this.pictureBox1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.pictureBox1.Name = "pictureBox1";
-      this.pictureBox1.Size = new System.Drawing.Size(128, 128);
+      this.pictureBox1.Size = new System.Drawing.Size(71, 105);
       this.pictureBox1.TabIndex = 0;
       this.pictureBox1.TabStop = false;
       // 
       // lblEnterPassword
       // 
       this.lblEnterPassword.AutoSize = true;
-      this.lblEnterPassword.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblEnterPassword.Location = new System.Drawing.Point(146, 21);
+      this.lblEnterPassword.Location = new System.Drawing.Point(92, 15);
       this.lblEnterPassword.Name = "lblEnterPassword";
-      this.lblEnterPassword.Size = new System.Drawing.Size(163, 19);
+      this.lblEnterPassword.Size = new System.Drawing.Size(127, 16);
       this.lblEnterPassword.TabIndex = 0;
       this.lblEnterPassword.Text = "New Schema Name:";
       // 
       // schemaName
       // 
-      this.schemaName.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.schemaName.Location = new System.Drawing.Point(150, 47);
+      this.schemaName.Location = new System.Drawing.Point(96, 35);
+      this.schemaName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.schemaName.Name = "schemaName";
-      this.schemaName.Size = new System.Drawing.Size(347, 20);
+      this.schemaName.Size = new System.Drawing.Size(404, 22);
       this.schemaName.TabIndex = 6;
       // 
       // btnCancel
       // 
       this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnCancel.Location = new System.Drawing.Point(422, 116);
+      this.btnCancel.Location = new System.Drawing.Point(413, 92);
+      this.btnCancel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.btnCancel.Name = "btnCancel";
-      this.btnCancel.Size = new System.Drawing.Size(75, 23);
+      this.btnCancel.Size = new System.Drawing.Size(87, 28);
       this.btnCancel.TabIndex = 8;
       this.btnCancel.Text = "Cancel";
       this.btnCancel.UseVisualStyleBackColor = true;
@@ -76,9 +77,10 @@
       // btnOK
       // 
       this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.btnOK.Location = new System.Drawing.Point(341, 116);
+      this.btnOK.Location = new System.Drawing.Point(318, 92);
+      this.btnOK.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.btnOK.Name = "btnOK";
-      this.btnOK.Size = new System.Drawing.Size(75, 23);
+      this.btnOK.Size = new System.Drawing.Size(87, 28);
       this.btnOK.TabIndex = 7;
       this.btnOK.Text = "OK";
       this.btnOK.UseVisualStyleBackColor = true;
@@ -87,16 +89,19 @@
       // NewSchemaDialog
       // 
       this.AcceptButton = this.btnOK;
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 16F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.btnCancel;
-      this.ClientSize = new System.Drawing.Size(509, 151);
+      this.ClientSize = new System.Drawing.Size(521, 136);
       this.ControlBox = false;
       this.Controls.Add(this.btnOK);
       this.Controls.Add(this.btnCancel);
       this.Controls.Add(this.schemaName);
       this.Controls.Add(this.lblEnterPassword);
       this.Controls.Add(this.pictureBox1);
+      this.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+      this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.Name = "NewSchemaDialog";
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
       this.Text = "Create New Schema";
