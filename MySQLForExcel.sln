@@ -5,8 +5,6 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Installer", "Installer\Inst
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySQL.ForExcel", "source\MySQL.ForExcel.csproj", "{F39FEA53-4835-4762-B7F1-A0B32F618078}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySQL.Utility", "..\..\..\MySQL.Utility\MySQL.Utility.csproj", "{B8A3BD3B-3CBD-48D5-84F5-076365655E0B}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,16 +34,6 @@ Global
 		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{F39FEA53-4835-4762-B7F1-A0B32F618078}.Release|x86.ActiveCfg = Release|Any CPU
-		{B8A3BD3B-3CBD-48D5-84F5-076365655E0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B8A3BD3B-3CBD-48D5-84F5-076365655E0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B8A3BD3B-3CBD-48D5-84F5-076365655E0B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{B8A3BD3B-3CBD-48D5-84F5-076365655E0B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{B8A3BD3B-3CBD-48D5-84F5-076365655E0B}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{B8A3BD3B-3CBD-48D5-84F5-076365655E0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B8A3BD3B-3CBD-48D5-84F5-076365655E0B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B8A3BD3B-3CBD-48D5-84F5-076365655E0B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{B8A3BD3B-3CBD-48D5-84F5-076365655E0B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{B8A3BD3B-3CBD-48D5-84F5-076365655E0B}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -130,7 +130,7 @@ namespace MySQL.ForExcel
         else
         {
           exportTable.Columns[colIdx].ColumnName = otherColData.ColumnName;
-          exportTable.Columns[colIdx].AssignDataType((headerColData.MySQLType == otherColData.MySQLType ? otherColData.MySQLType : "varchar"), otherColData.StrLen);
+          exportTable.Columns[colIdx].AssignDataType((headerColData.MySQLType == otherColData.MySQLType ? otherColData.MySQLType : "varchar"), otherColData.StrLen);        
         }
       }
       columnBindingSource.ResetBindings(false);
@@ -156,12 +156,17 @@ namespace MySQL.ForExcel
 
     private void grdPreviewData_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
     {
-      grdPreviewData.ClearSelection();
+      //grdPreviewData.ClearSelection();
     }
 
     private void columnBindingSource_CurrentChanged(object sender, EventArgs e)
     {
-      columnPropertiesGrid.SelectedObject = columnBindingSource.Current as MySQLColumn;
+      if (columnBindingSource.Current != null)
+      {
+        columnPropertiesGrid.SelectedObject = columnBindingSource.Current as MySQLColumn;
+        columnPropsButton_Click(columnPropsButton, EventArgs.Empty);
+        grdPreviewData.Columns[columnBindingSource.Position].Selected = true;
+      }
     }
 
     private void grdPreviewData_SelectionChanged(object sender, EventArgs e)
@@ -170,8 +175,6 @@ namespace MySQL.ForExcel
       {
         btnRemove.Enabled = true;
         columnBindingSource.Position = grdPreviewData.SelectedColumns[0].DisplayIndex;
-        if (!(columnPropertiesGrid.SelectedObject is MySQLColumn))
-          columnPropsButton_Click(columnPropsButton, EventArgs.Empty);
       }
       else
       {
@@ -236,6 +239,11 @@ namespace MySQL.ForExcel
         grdColumnProperties[e.ColumnIndex + 1, e.RowIndex].Value = String.Empty;
         resetCollationGridCombo(grdColumnProperties.CurrentCell.Value.ToString());
       }
+    }
+
+    private void txtTableName_Enter(object sender, EventArgs e)
+    {
+      tablePropsButton_Click(tablePropsButton, EventArgs.Empty);
     }
   }
 

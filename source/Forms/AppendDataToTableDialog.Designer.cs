@@ -32,23 +32,29 @@
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
       this.grpExcelDataPreview = new System.Windows.Forms.GroupBox();
-      this.lblMappedColumns = new System.Windows.Forms.Label();
+      this.btnAutoMap = new System.Windows.Forms.Button();
       this.chkUseFormatted = new System.Windows.Forms.CheckBox();
       this.btnRemove = new System.Windows.Forms.Button();
       this.chkFirstRowHeaders = new System.Windows.Forms.CheckBox();
       this.grdPreviewData = new System.Windows.Forms.DataGridView();
+      this.lblMappedColumns = new System.Windows.Forms.Label();
       this.grpToTablePreview = new System.Windows.Forms.GroupBox();
       this.lblToTable = new System.Windows.Forms.Label();
       this.btnUnmap = new System.Windows.Forms.Button();
       this.lblRowsCount = new System.Windows.Forms.Label();
+      this.grdToTable = new MySQL.ForExcel.MultiHeaderDataGridView();
       this.btnCancel = new System.Windows.Forms.Button();
       this.btnAppend = new System.Windows.Forms.Button();
       this.lblInstructions = new System.Windows.Forms.Label();
-      this.btnAutoMap = new System.Windows.Forms.Button();
-      this.grdToTable = new MySQL.ForExcel.MultiHeaderDataGridView();
+      this.lblColorMapUnmapped = new System.Windows.Forms.Label();
+      this.picColorMapUnmapped = new System.Windows.Forms.PictureBox();
+      this.picColorMapMapped = new System.Windows.Forms.PictureBox();
+      this.lblColorMapMapped = new System.Windows.Forms.Label();
       this.grpExcelDataPreview.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).BeginInit();
       this.grpToTablePreview.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.picColorMapUnmapped)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.picColorMapMapped)).BeginInit();
       this.SuspendLayout();
       // 
       // grpExcelDataPreview
@@ -65,14 +71,15 @@
       this.grpExcelDataPreview.TabStop = false;
       this.grpExcelDataPreview.Text = "Excel Data Preview";
       // 
-      // lblMappedColumns
+      // btnAutoMap
       // 
-      this.lblMappedColumns.AutoSize = true;
-      this.lblMappedColumns.Location = new System.Drawing.Point(515, 24);
-      this.lblMappedColumns.Name = "lblMappedColumns";
-      this.lblMappedColumns.Size = new System.Drawing.Size(101, 13);
-      this.lblMappedColumns.TabIndex = 2;
-      this.lblMappedColumns.Text = "Mapped Columns: 0";
+      this.btnAutoMap.Location = new System.Drawing.Point(518, 15);
+      this.btnAutoMap.Name = "btnAutoMap";
+      this.btnAutoMap.Size = new System.Drawing.Size(120, 23);
+      this.btnAutoMap.TabIndex = 2;
+      this.btnAutoMap.Text = "Auto-Map All";
+      this.btnAutoMap.UseVisualStyleBackColor = true;
+      this.btnAutoMap.Click += new System.EventHandler(this.btnAutoMap_Click);
       // 
       // chkUseFormatted
       // 
@@ -153,6 +160,15 @@
       this.grdPreviewData.MouseMove += new System.Windows.Forms.MouseEventHandler(this.grdPreviewData_MouseMove);
       this.grdPreviewData.MouseUp += new System.Windows.Forms.MouseEventHandler(this.grdPreviewData_MouseUp);
       // 
+      // lblMappedColumns
+      // 
+      this.lblMappedColumns.AutoSize = true;
+      this.lblMappedColumns.Location = new System.Drawing.Point(515, 24);
+      this.lblMappedColumns.Name = "lblMappedColumns";
+      this.lblMappedColumns.Size = new System.Drawing.Size(101, 13);
+      this.lblMappedColumns.TabIndex = 2;
+      this.lblMappedColumns.Text = "Mapped Columns: 0";
+      // 
       // grpToTablePreview
       // 
       this.grpToTablePreview.Controls.Add(this.lblMappedColumns);
@@ -196,6 +212,28 @@
       this.lblRowsCount.Text = "Total Rows Count: ??";
       this.lblRowsCount.TextAlign = System.Drawing.ContentAlignment.TopRight;
       // 
+      // grdToTable
+      // 
+      this.grdToTable.AllowUserToAddRows = false;
+      this.grdToTable.AllowUserToDeleteRows = false;
+      this.grdToTable.AllowUserToResizeColumns = false;
+      this.grdToTable.AllowUserToResizeRows = false;
+      this.grdToTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+      this.grdToTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+      this.grdToTable.DataSource = null;
+      this.grdToTable.GridAllowsDrop = true;
+      this.grdToTable.Location = new System.Drawing.Point(9, 48);
+      this.grdToTable.MultiSelect = false;
+      this.grdToTable.Name = "grdToTable";
+      this.grdToTable.ReadOnly = true;
+      this.grdToTable.RowHeadersVisible = false;
+      this.grdToTable.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.RowHeaderSelect;
+      this.grdToTable.Size = new System.Drawing.Size(755, 150);
+      this.grdToTable.TabIndex = 4;
+      this.grdToTable.SelectionChanged += new System.EventHandler(this.grdToTable_SelectionChanged);
+      this.grdToTable.GridDragOver += new System.Windows.Forms.DragEventHandler(this.grdToTable_GridDragOver);
+      this.grdToTable.GridDragDrop += new System.Windows.Forms.DragEventHandler(this.grdToTable_GridDragDrop);
+      // 
       // btnCancel
       // 
       this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
@@ -227,37 +265,41 @@
       this.lblInstructions.Text = "Drag columns from the Excel Data Preview grid to the Table Data Preview grid to m" +
     "ap columns for appending data.";
       // 
-      // btnAutoMap
+      // lblColorMapUnmapped
       // 
-      this.btnAutoMap.Location = new System.Drawing.Point(518, 15);
-      this.btnAutoMap.Name = "btnAutoMap";
-      this.btnAutoMap.Size = new System.Drawing.Size(120, 23);
-      this.btnAutoMap.TabIndex = 2;
-      this.btnAutoMap.Text = "Auto-Map All";
-      this.btnAutoMap.UseVisualStyleBackColor = true;
-      this.btnAutoMap.Click += new System.EventHandler(this.btnAutoMap_Click);
+      this.lblColorMapUnmapped.AutoSize = true;
+      this.lblColorMapUnmapped.Location = new System.Drawing.Point(47, 458);
+      this.lblColorMapUnmapped.Name = "lblColorMapUnmapped";
+      this.lblColorMapUnmapped.Size = new System.Drawing.Size(97, 13);
+      this.lblColorMapUnmapped.TabIndex = 5;
+      this.lblColorMapUnmapped.Text = "Unmapped Column";
       // 
-      // grdToTable
+      // picColorMapUnmapped
       // 
-      this.grdToTable.AllowUserToAddRows = false;
-      this.grdToTable.AllowUserToDeleteRows = false;
-      this.grdToTable.AllowUserToResizeColumns = false;
-      this.grdToTable.AllowUserToResizeRows = false;
-      this.grdToTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-      this.grdToTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
-      this.grdToTable.DataSource = null;
-      this.grdToTable.GridAllowsDrop = true;
-      this.grdToTable.Location = new System.Drawing.Point(9, 48);
-      this.grdToTable.MultiSelect = false;
-      this.grdToTable.Name = "grdToTable";
-      this.grdToTable.ReadOnly = true;
-      this.grdToTable.RowHeadersVisible = false;
-      this.grdToTable.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.RowHeaderSelect;
-      this.grdToTable.Size = new System.Drawing.Size(755, 150);
-      this.grdToTable.TabIndex = 4;
-      this.grdToTable.SelectionChanged += new System.EventHandler(this.grdToTable_SelectionChanged);
-      this.grdToTable.GridDragOver += new System.Windows.Forms.DragEventHandler(this.grdToTable_GridDragOver);
-      this.grdToTable.GridDragDrop += new System.Windows.Forms.DragEventHandler(this.grdToTable_GridDragDrop);
+      this.picColorMapUnmapped.BackColor = System.Drawing.Color.OrangeRed;
+      this.picColorMapUnmapped.Location = new System.Drawing.Point(18, 453);
+      this.picColorMapUnmapped.Name = "picColorMapUnmapped";
+      this.picColorMapUnmapped.Size = new System.Drawing.Size(23, 23);
+      this.picColorMapUnmapped.TabIndex = 6;
+      this.picColorMapUnmapped.TabStop = false;
+      // 
+      // picColorMapMapped
+      // 
+      this.picColorMapMapped.BackColor = System.Drawing.Color.LightGreen;
+      this.picColorMapMapped.Location = new System.Drawing.Point(166, 453);
+      this.picColorMapMapped.Name = "picColorMapMapped";
+      this.picColorMapMapped.Size = new System.Drawing.Size(23, 23);
+      this.picColorMapMapped.TabIndex = 8;
+      this.picColorMapMapped.TabStop = false;
+      // 
+      // lblColorMapMapped
+      // 
+      this.lblColorMapMapped.AutoSize = true;
+      this.lblColorMapMapped.Location = new System.Drawing.Point(195, 458);
+      this.lblColorMapMapped.Name = "lblColorMapMapped";
+      this.lblColorMapMapped.Size = new System.Drawing.Size(84, 13);
+      this.lblColorMapMapped.TabIndex = 7;
+      this.lblColorMapMapped.Text = "Mapped Column";
       // 
       // AppendDataToTableDialog
       // 
@@ -266,6 +308,10 @@
       this.CancelButton = this.btnCancel;
       this.ClientSize = new System.Drawing.Size(794, 488);
       this.ControlBox = false;
+      this.Controls.Add(this.picColorMapMapped);
+      this.Controls.Add(this.lblColorMapMapped);
+      this.Controls.Add(this.picColorMapUnmapped);
+      this.Controls.Add(this.lblColorMapUnmapped);
       this.Controls.Add(this.lblInstructions);
       this.Controls.Add(this.btnCancel);
       this.Controls.Add(this.btnAppend);
@@ -280,6 +326,8 @@
       ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).EndInit();
       this.grpToTablePreview.ResumeLayout(false);
       this.grpToTablePreview.PerformLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.picColorMapUnmapped)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.picColorMapMapped)).EndInit();
       this.ResumeLayout(false);
       this.PerformLayout();
 
@@ -302,5 +350,9 @@
     private System.Windows.Forms.Button btnUnmap;
     private System.Windows.Forms.Label lblInstructions;
     private System.Windows.Forms.Button btnAutoMap;
+    private System.Windows.Forms.Label lblColorMapUnmapped;
+    private System.Windows.Forms.PictureBox picColorMapUnmapped;
+    private System.Windows.Forms.PictureBox picColorMapMapped;
+    private System.Windows.Forms.Label lblColorMapMapped;
   }
 }

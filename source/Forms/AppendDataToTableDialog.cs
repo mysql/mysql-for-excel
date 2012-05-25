@@ -68,7 +68,7 @@ namespace MySQL.ForExcel
       {
         if (!newMappings && colIdx >= maxMappingCols)
           break;
-        string colHeadText = (mapped ? grdPreviewData.Columns[colIdx].HeaderText : "Unmapped");
+        string colHeadText = (mapped ? grdPreviewData.Columns[colIdx].HeaderText : String.Empty);
         string mappedColName = (mapped ? grdPreviewData.Columns[colIdx].HeaderText : null);
         Color backColor = (mapped ? Color.LightGreen : Color.OrangeRed);
         if (newMappings)
@@ -98,7 +98,7 @@ namespace MySQL.ForExcel
       bool nullMappedColName = String.IsNullOrEmpty(mappedColName);
 
       MultiHeaderColumn multiHeaderCol = grdToTable.MultiHeaderColumnList[columnIndex];
-      multiHeaderCol.HeaderText = (nullMappedColName ? "Unmapped" : mappedColName);
+      multiHeaderCol.HeaderText = (nullMappedColName ? String.Empty : mappedColName);
       multiHeaderCol.BackgroundColor = (nullMappedColName ? Color.OrangeRed : Color.LightGreen);
       exportTable.Columns[columnIndex].MappedDataColName = mappedColName;
 
@@ -290,7 +290,8 @@ namespace MySQL.ForExcel
         {
           if (!String.IsNullOrEmpty(exportTable.Columns[grdToTableColumnIndexToDrop].MappedDataColName))
           {
-            DialogResult dr = Utilities.ShowWarningBox(Properties.Resources.ColumnMappedOverwrite);
+            bool isIdenticalMapping = exportTable.Columns[grdToTableColumnIndexToDrop].MappedDataColName == draggedColumnName;
+            DialogResult dr = (isIdenticalMapping ? DialogResult.No : Utilities.ShowWarningBox(Properties.Resources.ColumnMappedOverwrite));
             if (dr == DialogResult.Yes)
               setToTableColumnMapping(grdToTableColumnIndexToDrop, null);
             else

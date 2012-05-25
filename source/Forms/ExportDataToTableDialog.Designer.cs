@@ -172,6 +172,7 @@
       this.txtTableName.Name = "txtTableName";
       this.txtTableName.Size = new System.Drawing.Size(309, 20);
       this.txtTableName.TabIndex = 1;
+      this.txtTableName.Enter += new System.EventHandler(this.txtTableName_Enter);
       // 
       // lblTableName
       // 

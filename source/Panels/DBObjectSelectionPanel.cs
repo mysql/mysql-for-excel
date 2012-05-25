@@ -210,7 +210,7 @@ namespace MySQL.ForExcel
 
     private void btnClose_Click(object sender, EventArgs e)
     {
-      (Parent as TaskPaneControl).CloseConnection();
+      (Parent as TaskPaneControl).CloseAddIn();
     }
 
     private void objectFilter_KeyDown(object sender, KeyEventArgs e)

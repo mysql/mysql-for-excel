@@ -81,10 +81,10 @@ namespace MySQL.ForExcel
       {
         if (ExportTable.IsNew)
         {
-          ExportTable.Columns.Add(new MySQLColumn(null, ExportTable));
-          ExportTable.Columns[colPos - 1].MappedDataColName = ExportTable.Columns[colPos - 1].ColumnName;
           FormattedExcelData.Columns.Add();
           UnformattedExcelData.Columns.Add();
+          ExportTable.Columns.Add(new MySQLColumn(null, ExportTable));
+          ExportTable.Columns[colPos - 1].MappedDataColName = FormattedExcelData.Columns[colPos - 1].ColumnName;
         }
         else
         {
