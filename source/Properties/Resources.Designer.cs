@@ -594,6 +594,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Current changes will be lost, are you sure you want to revert the data?.
+        /// </summary>
+        internal static string RevertDataConfirmation {
+            get {
+                return ResourceManager.GetString("RevertDataConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Selected DB Object used for this action must be of Type =Table..
         /// </summary>
         internal static string SelectedDBObjectNotTable {

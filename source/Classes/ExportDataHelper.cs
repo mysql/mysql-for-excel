@@ -243,7 +243,7 @@ namespace MySQL.ForExcel
                                  separator,
                                  column.ColumnName);
         separator = ",";
-        columnsRequireQuotes.Add(column.IsCharOrText || column.IsDate);
+        columnsRequireQuotes.Add(column.ColumnsRequireQuotes);
         mappedColumnNames.Add(ExportTable.Columns[colIdx].MappedDataColName);
       }
       queryString.Append(") VALUES ");

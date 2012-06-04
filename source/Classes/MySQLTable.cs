@@ -15,7 +15,8 @@ namespace MySQL.ForExcel
     public MySQLTable(MySqlWorkbenchConnection wbConnection, DataRow tableRow, DataTable columnsTable)
     {
       WBConnection = wbConnection;
-      _columns = new List<MySQLColumn>();
+      Columns = new List<MySQLColumn>();
+      Indexes = new List<MySQLIndex>();
 
       if (tableRow != null)
         parseTableData(tableRow);
@@ -39,6 +40,26 @@ namespace MySQL.ForExcel
     {
       get { return _columns; }
       private set { _columns = value; }
+    }
+
+    private List<MySQLIndex> _indexes;
+    [Browsable(false)]
+    public List<MySQLIndex> Indexes
+    {
+      get { return _indexes; }
+      private set { _indexes = value; }
+    }
+
+    [Browsable(false)]
+    public MySQLIndex PrimaryKey
+    {
+      get { return _indexes.Find(idx => idx.IsPrimary); }
+    }
+
+    [Browsable(false)]
+    public List<MySQLIndex> UniqueIndexes
+    {
+      get { return _indexes.FindAll(idx => idx.IsUnique); }
     }
 
     #region Table options
@@ -123,7 +144,6 @@ namespace MySQL.ForExcel
     }
 
     #endregion
-
     #region ShouldSerializeMethods
 
     bool ShouldSerializeName() { return false; }
@@ -167,6 +187,17 @@ namespace MySQL.ForExcel
       {
         MySQLColumn c = new MySQLColumn(row, this);
         Columns.Add(c);
+      }
+    }
+
+    private void loadIndexes()
+    {
+      string[] restrictions = new string[4] { null, WBConnection.Schema, Name, null };
+      DataTable indexesTable = Utilities.GetSchemaCollection(WBConnection, "Indexes", restrictions);
+      foreach (DataRow indexRow in indexesTable.Rows)
+      {
+        MySQLIndex index = new MySQLIndex(WBConnection, indexRow, this);
+        Indexes.Add(index);
       }
     }
 

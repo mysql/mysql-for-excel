@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using Excel = Microsoft.Office.Interop.Excel;
+using ExcelTools = Microsoft.Office.Tools.Excel;
 using MySQL.Utility;
 
 namespace MySQL.ForExcel
@@ -16,17 +17,19 @@ namespace MySQL.ForExcel
   {
     private Excel.Application excelApplication;
     private MySqlWorkbenchConnection connection;
+    private EditDataForm editForm = null;
+
+    public Excel.Worksheet ActiveWorksheet
+    {
+      get { return ((Excel.Worksheet)excelApplication.ActiveSheet); }
+    }
 
     public TaskPaneControl(Excel.Application app)
     {
       excelApplication = app;
       excelApplication.SheetSelectionChange += new Excel.AppEvents_SheetSelectionChangeEventHandler(excelApplication_SheetSelectionChange);
+      
       InitializeComponent();
-    }
-
-    public Excel.Worksheet ActiveWorksheet
-    {
-      get { return ((Excel.Worksheet)excelApplication.ActiveSheet); }
     }
 
     void excelApplication_SheetSelectionChange(object Sh, Excel.Range Target)
@@ -90,9 +93,9 @@ namespace MySQL.ForExcel
       schemaSelectionPanel1.BringToFront();
     }
 
-    private Excel.Range importDataTableToExelAtGivenCell(DataTable dt, bool importColumnNames, Excel.Range atCell)
+    public Excel.Range ImportDataTableToExcelAtGivenCell(DataTable dt, bool importColumnNames, Excel.Range atCell)
     {
-      Excel.Range endCell = null;
+      Excel.Range fillingRange = null;
 
       if (dt != null && dt.Rows.Count > 0)
       {
@@ -101,7 +104,7 @@ namespace MySQL.ForExcel
         int startingRow = (importColumnNames ? 1 : 0);
 
         Excel.Worksheet currentSheet = excelApplication.ActiveSheet as Excel.Worksheet;
-        Excel.Range fillingRange = atCell.get_Resize(rowsCount + startingRow, colsCount);
+        fillingRange = atCell.get_Resize(rowsCount + startingRow, colsCount);
         string[,] fillingArray = new string[rowsCount + startingRow, colsCount];
 
         if (importColumnNames)
@@ -122,26 +125,27 @@ namespace MySQL.ForExcel
           fillingRowIdx++;
         }
         fillingRange.set_Value(Type.Missing, fillingArray);
-        endCell = fillingRange.Cells[fillingRange.Rows.Count, fillingRange.Columns.Count] as Excel.Range;
       }
 
-      return endCell;
+      return fillingRange;
     }
 
     public void ImportDataToExcel(DataTable dt, bool importColumnNames)
     {
-      importDataTableToExelAtGivenCell(dt, importColumnNames, excelApplication.ActiveCell);
+      ImportDataTableToExcelAtGivenCell(dt, importColumnNames, excelApplication.ActiveCell);
     }
 
     public void ImportDataToExcel(DataSet ds, bool importColumnNames, ImportMultipleType importType)
     {
       Excel.Range atCell = excelApplication.ActiveCell;
       Excel.Range endCell = null;
+      Excel.Range fillingRange = null;
 
       int tableIdx = 0;
       foreach (DataTable dt in ds.Tables)
       {
-        endCell = importDataTableToExelAtGivenCell(dt, importColumnNames, atCell);
+        fillingRange = ImportDataTableToExcelAtGivenCell(dt, importColumnNames, atCell);
+        endCell = fillingRange.Cells[fillingRange.Rows.Count, fillingRange.Columns.Count] as Excel.Range;
         tableIdx++;
         if (tableIdx < ds.Tables.Count)
           switch (importType)
@@ -178,6 +182,47 @@ namespace MySQL.ForExcel
         dr = exportDataDialog.ShowDialog();
       }
       return dr == DialogResult.OK;
+    }
+
+    public bool EditTableData(DBObject tableObject)
+    {
+      // Import Data
+      ImportTableViewDialog importDialog = new ImportTableViewDialog(connection, tableObject);
+      DialogResult dr = importDialog.ShowDialog();
+      if (dr == DialogResult.Cancel)
+        return false;
+      if (importDialog.ImportDataTable == null)
+      {
+        string msg = String.Format(Properties.Resources.UnableToRetrieveData, tableObject.Name);
+        MessageBox.Show(msg, Properties.Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        return false;
+      }
+      Excel.Worksheet currentWorksheet = null;
+      if (excelApplication.ActiveWorkbook != null)
+        currentWorksheet = excelApplication.Sheets.Add(Type.Missing, excelApplication.ActiveSheet, Type.Missing, Type.Missing);
+      else
+      {
+        Excel.Workbook currentWorkbook = excelApplication.Workbooks.Add(Type.Missing);
+        currentWorksheet = (currentWorkbook.Worksheets[1] as Excel.Worksheet);
+      }
+      currentWorksheet.Name = tableObject.Name;
+      currentWorksheet.Activate();
+      Excel.Range atCell = currentWorksheet.get_Range("A1", Type.Missing);
+      atCell.Select();
+      Excel.Range editingRange = ImportDataTableToExcelAtGivenCell(importDialog.ImportDataTable, importDialog.ImportHeaders, atCell);
+      
+      // Edit Data
+      Utilities.AddExtendedProperties(ref importDialog.ImportDataTable, importDialog.ImportDataTable.ExtendedProperties["QueryString"].ToString(), importDialog.ImportHeaders, tableObject.Name);
+      editForm = new EditDataForm(connection, editingRange, importDialog.ImportDataTable, currentWorksheet);
+      editForm.CallerTaskPane = this;
+      editForm.Show();
+
+      return true;
+    }
+
+    public Excel.Range IntersectRanges(Excel.Range r1, Excel.Range r2)
+    {
+      return excelApplication.Intersect(r1, r2);
     }
 
     public void CloseAddIn()

@@ -11,7 +11,6 @@ namespace MySQL.ForExcel
   public class MySQLColumn
   {
     private string characterSet;
-    //public MySQLColumn OldColumn;
     private bool isNew;
 
     public MySQLColumn(DataRow row, MySQLTable table)
@@ -235,6 +234,15 @@ namespace MySQL.ForExcel
       {
         string toLowerDataType = _dataType.ToLowerInvariant();
         return toLowerDataType.Contains("date") || toLowerDataType == "timestamp";
+      }
+    }
+
+    [Browsable(false)]
+    public bool ColumnsRequireQuotes
+    {
+      get
+      {
+        return IsCharOrText || IsDate;
       }
     }
 

@@ -358,4 +358,7 @@
   <data name="mysql-header-img" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\mysql-header-img.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="RevertDataConfirmation" xml:space="preserve">
+    <value>Current changes will be lost, are you sure you want to revert the data?</value>
+  </data>
 </root>

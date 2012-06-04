@@ -216,6 +216,7 @@
     <Compile Include="Classes\ExportDataHelper.cs" />
     <Compile Include="Classes\MySQLColumn.cs" />
     <Compile Include="Classes\MySQLConnectionData.cs" />
+    <Compile Include="Classes\MySQLIndex.cs" />
     <Compile Include="Classes\MySQLTable.cs" />
     <Compile Include="Classes\Utilities.cs" />
     <Compile Include="Controls\HotLabel.cs">
@@ -256,6 +257,18 @@
     </Compile>
     <Compile Include="Forms\AppendDataToTableDialog.Designer.cs">
       <DependentUpon>AppendDataToTableDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\EditChangesDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\EditChangesDialog.Designer.cs">
+      <DependentUpon>EditChangesDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\EditDataDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\EditDataDialog.Designer.cs">
+      <DependentUpon>EditDataDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\ExportDataToTableDialog.cs">
       <SubType>Form</SubType>
@@ -331,6 +344,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\AppendDataToTableDialog.resx">
       <DependentUpon>AppendDataToTableDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\EditChangesDialog.resx">
+      <DependentUpon>EditChangesDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\EditDataDialog.resx">
+      <DependentUpon>EditDataDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ExportDataToTableDialog.resx">
       <DependentUpon>ExportDataToTableDialog.cs</DependentUpon>

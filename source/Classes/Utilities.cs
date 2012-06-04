@@ -10,6 +10,7 @@ using MySql.Data.MySqlClient;
 using MySQL.Utility;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Globalization;
 
 namespace MySQL.ForExcel
 {
@@ -98,41 +99,92 @@ namespace MySQL.ForExcel
       return retCount;
     }
 
-    public static DataTable GetDataFromTableOrView(MySqlWorkbenchConnection connection, DBObject dbo, List<string> columnsList, int firstRowIdx, int rowCount)
+    public static void AddExtendedProperties(ref DataTable dt, string queryString, bool importedHeaders, string tableName)
+    {
+      if (dt.ExtendedProperties.ContainsKey("QueryString"))
+        dt.ExtendedProperties["QueryString"] = queryString;
+      else
+        dt.ExtendedProperties.Add("QueryString", queryString);
+      if (dt.ExtendedProperties.ContainsKey("ImportedHeaders"))
+        dt.ExtendedProperties["ImportedHeaders"] = importedHeaders;
+      else
+        dt.ExtendedProperties.Add("ImportedHeaders", importedHeaders);
+      if (dt.ExtendedProperties.ContainsKey("TableName"))
+        dt.ExtendedProperties["TableName"] = tableName;
+      else
+        dt.ExtendedProperties.Add("TableName", tableName);
+    }
+
+    private static string assembleSelectQuery(DBObject dbo, List<string> columnsList, int firstRowIdx, int rowCount)
+    {
+      StringBuilder queryStringBuilder = new StringBuilder("SELECT ");
+      if (columnsList == null || columnsList.Count == 0)
+        queryStringBuilder.Append("*");
+      else
+      {
+        foreach (string columnName in columnsList)
+        {
+          queryStringBuilder.AppendFormat("`{0}`,", columnName);
+        }
+        queryStringBuilder.Remove(queryStringBuilder.Length - 1, 1);
+      }
+      queryStringBuilder.AppendFormat(" FROM `{0}`", dbo.Name);
+      if (firstRowIdx > 0)
+      {
+        string strCount = (rowCount >= 0 ? rowCount.ToString() : "18446744073709551615");
+        queryStringBuilder.AppendFormat(" LIMIT {0},{1}", firstRowIdx, strCount);
+      }
+      else if (rowCount >= 0)
+        queryStringBuilder.AppendFormat(" LIMIT {0}", rowCount);
+      return queryStringBuilder.ToString();
+    }
+
+    public static DataTable GetDataFromTableOrView(MySqlWorkbenchConnection connection, string query)
     {
       DataTable retTable = null;
-      
-      if (dbo.Type != DBObjectType.Routine)
+      DataSet ds = MySqlHelper.ExecuteDataset(GetConnectionString(connection), query);
+      if (ds.Tables.Count > 0)
       {
-        StringBuilder queryString = new StringBuilder("SELECT ");
-        if (columnsList == null || columnsList.Count == 0)
-          queryString.Append("*");
-        else
-        {
-          foreach (string columnName in columnsList)
-          {
-            queryString.AppendFormat("`{0}`,", columnName);
-          }
-          queryString.Remove(queryString.Length - 1, 1);
-        }
-        queryString.AppendFormat(" FROM `{0}`", dbo.Name);
-        if (firstRowIdx > 0)
-        {
-          string strCount = (rowCount >= 0 ? rowCount.ToString() : "18446744073709551615");
-          queryString.AppendFormat(" LIMIT {0},{1}", firstRowIdx, strCount);
-        }
-        else if (rowCount >= 0)
-          queryString.AppendFormat(" LIMIT {0}", rowCount);
-        DataSet ds = MySqlHelper.ExecuteDataset(GetConnectionString(connection), queryString.ToString());
-        retTable = (ds.Tables.Count > 0 ? ds.Tables[0] : null);
+        retTable = ds.Tables[0];
+        AddExtendedProperties(ref retTable, query, true, String.Empty);
       }
-
       return retTable;
+    }
+
+    public static DataTable GetDataFromTableOrView(MySqlWorkbenchConnection connection, DBObject dbo, List<string> columnsList, int firstRowIdx, int rowCount)
+    {
+      if (dbo.Type == DBObjectType.Routine)
+        return null;
+
+      string queryString = assembleSelectQuery(dbo, columnsList, firstRowIdx, rowCount);
+      return GetDataFromTableOrView(connection, queryString);
     }
 
     public static DataTable GetDataFromTableOrView(MySqlWorkbenchConnection connection, DBObject dbo, List<string> columnsList)
     {
       return GetDataFromTableOrView(connection, dbo, columnsList, -1, -1);
+    }
+
+    public static MySqlDataAdapter GetDataAdapterFromTable(MySqlWorkbenchConnection connection, string query)
+    {
+      MySqlDataAdapter retAdapter = new MySqlDataAdapter(query, GetConnectionString(connection));
+      MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(retAdapter);
+      retAdapter.UpdateCommand = commandBuilder.GetUpdateCommand();
+      return retAdapter;
+    }
+
+    public static MySqlDataAdapter GetDataAdapterFromTable(MySqlWorkbenchConnection connection, DBObject dbo, List<string> columnsList, int firstRowIdx, int rowCount)
+    {
+      if (dbo.Type != DBObjectType.Table)
+        return null;
+
+      string queryString = assembleSelectQuery(dbo, columnsList, firstRowIdx, rowCount);
+      return GetDataAdapterFromTable(connection, queryString);
+    }
+
+    public static MySqlDataAdapter GetDataAdapterFromTable(MySqlWorkbenchConnection connection, DBObject dbo, List<string> columnsList)
+    {
+      return GetDataAdapterFromTable(connection, dbo, columnsList, -1, -1);
     }
 
     public static DataSet GetDataSetFromRoutine(MySqlWorkbenchConnection connection, DBObject dbo, params MySqlParameter[] parameters)
@@ -220,6 +272,76 @@ namespace MySQL.ForExcel
             "enum(x,y,z)",
             "set(x,y,z)"});
       return retList;
+    }
+
+    public static MySqlDbType NameToType(string typeName, bool unsigned, bool realAsFloat)
+    {
+      switch (typeName.ToUpper(CultureInfo.InvariantCulture))
+      {
+        case "CHAR": return MySqlDbType.String;
+        case "VARCHAR": return MySqlDbType.VarChar;
+        case "DATE": return MySqlDbType.Date;
+        case "DATETIME": return MySqlDbType.DateTime;
+        case "NUMERIC":
+        case "DECIMAL":
+        case "DEC":
+        case "FIXED":
+          //if (connection.driver.Version.isAtLeast(5, 0, 3))
+          //  return MySqlDbType.NewDecimal;
+          //else
+            return MySqlDbType.Decimal;
+        case "YEAR":
+          return MySqlDbType.Year;
+        case "TIME":
+          return MySqlDbType.Time;
+        case "TIMESTAMP":
+          return MySqlDbType.Timestamp;
+        case "SET": return MySqlDbType.Set;
+        case "ENUM": return MySqlDbType.Enum;
+        case "BIT": return MySqlDbType.Bit;
+
+        case "TINYINT":
+          return unsigned ? MySqlDbType.UByte : MySqlDbType.Byte;
+        case "BOOL":
+        case "BOOLEAN":
+          return MySqlDbType.Byte;
+        case "SMALLINT":
+          return unsigned ? MySqlDbType.UInt16 : MySqlDbType.Int16;
+        case "MEDIUMINT":
+          return unsigned ? MySqlDbType.UInt24 : MySqlDbType.Int24;
+        case "INT":
+        case "INTEGER":
+          return unsigned ? MySqlDbType.UInt32 : MySqlDbType.Int32;
+        case "SERIAL":
+          return MySqlDbType.UInt64;
+        case "BIGINT":
+          return unsigned ? MySqlDbType.UInt64 : MySqlDbType.Int64;
+        case "FLOAT": return MySqlDbType.Float;
+        case "DOUBLE": return MySqlDbType.Double;
+        case "REAL": return
+           realAsFloat ? MySqlDbType.Float : MySqlDbType.Double;
+        case "TEXT":
+          return MySqlDbType.Text;
+        case "BLOB":
+          return MySqlDbType.Blob;
+        case "LONGBLOB":
+          return MySqlDbType.LongBlob;
+        case "LONGTEXT":
+          return MySqlDbType.LongText;
+        case "MEDIUMBLOB":
+          return MySqlDbType.MediumBlob;
+        case "MEDIUMTEXT":
+          return MySqlDbType.MediumText;
+        case "TINYBLOB":
+          return MySqlDbType.TinyBlob;
+        case "TINYTEXT":
+          return MySqlDbType.TinyText;
+        case "BINARY":
+          return MySqlDbType.Binary;
+        case "VARBINARY":
+          return MySqlDbType.VarBinary;
+      }
+      throw new Exception("Unhandled type encountered");
     }
 
     public static string GetMySQLDataType(object packedValue)

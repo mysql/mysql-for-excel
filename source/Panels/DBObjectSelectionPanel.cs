@@ -173,11 +173,6 @@ namespace MySQL.ForExcel
       return (Parent as TaskPaneControl).AppendDataToTable(appendToTable);
     }
 
-    private void editData_Click(object sender, EventArgs e)
-    {
-      MessageBox.Show("Editing Data...");
-    }
-
     private void appendData_Click(object sender, EventArgs e)
     {
       if (objectList.SelectedNode == null)
@@ -187,7 +182,6 @@ namespace MySQL.ForExcel
         exportDataToTable(selDBObject);
     }
 
-
     private void exportToNewTable_Click(object sender, EventArgs e)
     {
       bool success = exportDataToTable(null);
@@ -196,6 +190,14 @@ namespace MySQL.ForExcel
         objectList.Nodes[0].Nodes.Clear();
         LoadTables();
       }
+    }
+
+    private void editData_Click(object sender, EventArgs e)
+    {
+      DBObject selDBObject = (objectList.SelectedNode != null ? objectList.SelectedNode.Tag as DBObject : null);
+      if (selDBObject == null || selDBObject.Type != DBObjectType.Table)
+        return;
+      (Parent as TaskPaneControl).EditTableData(selDBObject);
     }
 
     private void btnHelp_Click(object sender, EventArgs e)
