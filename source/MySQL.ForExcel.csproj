@@ -18,7 +18,7 @@
       wrapped in this namespace at runtime.
   -->
   <PropertyGroup>
-    <SignManifests>false</SignManifests>
+    <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>MySQL.ForExcel_TemporaryKey.pfx</ManifestKeyFile>
@@ -174,6 +174,9 @@
     <Reference Include="Microsoft.VisualStudio.Tools.Applications.Runtime, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="MySql.Data">
       <HintPath>libraries\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="MySQL.Utility">
+      <HintPath>libraries\MySQL.Utility.dll</HintPath>
     </Reference>
     <Reference Include="Office, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -606,12 +609,6 @@
     <None Include="Resources\mysql-for-excel.ico" />
     <None Include="Resources\mysql-header-img.png" />
     <Content Include="Todo.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\MySQL.Utility\MySQL.Utility.csproj">
-      <Project>{B8A3BD3B-3CBD-48D5-84F5-076365655E0B}</Project>
-      <Name>MySQL.Utility</Name>
-    </ProjectReference>
   </ItemGroup>
   <!-- Include the build rules for a C# project. -->
   <PropertyGroup>
