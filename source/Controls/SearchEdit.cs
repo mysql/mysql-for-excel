@@ -24,7 +24,7 @@ namespace MySQL.ForExcel.Controls
       innerText_Leave(null, EventArgs.Empty);
     }
 
-    public string Text
+    public override string Text
     {
       get { return innerText.Text.Trim(); }
       set { innerText.Text = value; }

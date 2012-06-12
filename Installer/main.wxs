@@ -21,12 +21,21 @@
       <![CDATA[ Privileged  ]]>
     </Condition>
 
+    <!-- See if VSTO is installed -->
     <Property Id="VSTOINSTALLED">
       <RegistrySearch Id="RegVSTOSearch" Root="HKLM" Key="Software\Microsoft\VSTO Runtime Setup\v4" Name="Install" Type="raw"/>
     </Property>
     <Condition Message="The Microsoft Visual Studio Tools for Office Runtime must be installed prior to running this installation.">
       <![CDATA[Installed OR VSTOINSTALLED]]>
     </Condition>
+
+    <!-- See if Office is installed -->
+    <!--<Property Id="OFFICE14INSTALLED">
+      <RegistrySearch Id="RegOffice14Search" Root="HKCU" Key="Software\Microsoft\Office\14.0\Excel" Name="ExcelName" Type="raw"/>
+    </Property>
+    <Condition Message="Microsoft Office must be installed prior to running this installation.">
+      <![CDATA[Installed OR OFFICE14INSTALLED]]>
+    </Condition>-->
 
     <!-- First make sure that .NET is installed -->
     <PropertyRef Id="NETFRAMEWORK40CLIENT"/>
@@ -50,6 +59,15 @@
               <!--<File Id="_3259BD5CB475A992801BA08E894505C9" Name="Microsoft.VisualBasic.PowerPacks.Vs.dll" Source="SourceDir\File\_3259BD5CB475A992801BA08E894505C9" />
               <File Id="_F7FD2352BC6C3C2046F6B91527C61742" Name="Microsoft.VisualStudio.Tools.Applications.Runtime.dll" Assembly=".net" AssemblyManifest="_F7FD2352BC6C3C2046F6B91527C61742" AssemblyApplication="_F7FD2352BC6C3C2046F6B91527C61742" DiskId="1" Source="SourceDir\File\_F7FD2352BC6C3C2046F6B91527C61742" />-->
               <RemoveFolder Id="INSTALLDIR" On="uninstall" />
+            </Component>
+            <Component Id="RegistryItems" Guid="">
+              <RegistryKey Id="Addin" Root="HKCU" Action="createAndRemoveOnUninstall"
+                           Key="SOFTWARE\Microsoft\Office\Excel\Addins\MySQL.ForExcel">
+                <RegistryValue Id="IdDescription" Name="Description" Value="MySQL.ForExcel" Type="string"/>
+                <RegistryValue Id="IdFriendlyName" Name="FriendlyName" Value="MySQL.ForExcel" Type="string"/>
+                <RegistryValue Id="IDLoadBehavior" Name="LoadBehavior" Value="3" Type="integer"/>
+                <RegistryValue Id="IdManifest" Name="Manifest" Value="[#VSTOFile]|vstolocal" Type="string"/>
+              </RegistryKey>
             </Component>
           </Directory>
         </Directory>
@@ -88,6 +106,7 @@
 
     <Feature Id="DefaultFeature" ConfigurableDirectory="INSTALLDIR" Level="1" >
       <ComponentRef Id="MainItems" />
+      <ComponentRef Id="RegistryItems"/>
     </Feature>
 
 

@@ -17,6 +17,15 @@
       In C#, this specifies the namespace given to new files. In VB, all objects are
       wrapped in this namespace at runtime.
   -->
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>MySQL.ForExcel_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>D26080500097B35ACFDDBEAEBC1987DAFAD8CCD7</ManifestCertificateThumbprint>
+  </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <ProjectTypeGuids>{BAA0C2D2-18E2-41B9-852F-F413020CAA33};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -148,15 +157,6 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <PropertyGroup>
-    <SignManifests>true</SignManifests>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ManifestKeyFile>ExcelAddIn_TemporaryKey.pfx</ManifestKeyFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ManifestCertificateThumbprint>D26080500097B35ACFDDBEAEBC1987DAFAD8CCD7</ManifestCertificateThumbprint>
-  </PropertyGroup>
   <!--
     This section specifies references for the project.
   -->
@@ -174,10 +174,6 @@
     <Reference Include="Microsoft.VisualStudio.Tools.Applications.Runtime, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="MySql.Data">
       <HintPath>libraries\MySql.Data.dll</HintPath>
-    </Reference>
-    <Reference Include="MySQL.Utility, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>libraries\MySQL.Utility.dll</HintPath>
     </Reference>
     <Reference Include="Office, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -388,7 +384,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="MySQL.ForExcel_TemporaryKey.pfx" />
     <None Include="Properties\DataSources\MySQLColumn.datasource" />
     <None Include="Properties\DataSources\MySQLTable.datasource" />
     <None Include="Properties\Settings.settings">
@@ -607,7 +602,16 @@
     <Content Include="Resources\chain_link.24x24.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\mysql-for-excel-header.png" />
+    <None Include="Resources\mysql-for-excel.ico" />
+    <None Include="Resources\mysql-header-img.png" />
     <Content Include="Todo.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\MySQL.Utility\MySQL.Utility.csproj">
+      <Project>{B8A3BD3B-3CBD-48D5-84F5-076365655E0B}</Project>
+      <Name>MySQL.Utility</Name>
+    </ProjectReference>
   </ItemGroup>
   <!-- Include the build rules for a C# project. -->
   <PropertyGroup>
