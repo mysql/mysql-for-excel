@@ -283,7 +283,7 @@ namespace MySQL.ForExcel
 
     private void bindColsList_ListChanged(object sender, ListChangedEventArgs e)
     {
-      if (e.PropertyDescriptor.Name != "PrimaryKey")
+      if (e.PropertyDescriptor == null || e.PropertyDescriptor.Name != "PrimaryKey")
         return;
       List<MySQLColumn> realColumns = new List<MySQLColumn>(exportTable.Columns);
       realColumns.RemoveAt(0);
