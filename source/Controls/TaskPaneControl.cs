@@ -178,8 +178,10 @@ namespace MySQL.ForExcel
       }
       else
       {
-        ExportDataToTableDialog exportDataDialog = new ExportDataToTableDialog(connection, exportRange);
-        dr = exportDataDialog.ShowDialog();
+        ExportDataForm exportForm = new ExportDataForm(connection, exportRange, excelApplication.ActiveSheet as Excel.Worksheet);
+        dr = exportForm.ShowDialog();
+        //ExportDataToTableDialog exportDataDialog = new ExportDataToTableDialog(connection, exportRange);
+        //dr = exportDataDialog.ShowDialog();
       }
       return dr == DialogResult.OK;
     }

@@ -278,10 +278,14 @@ namespace MySQL.ForExcel
     {
       switch (typeName.ToUpper(CultureInfo.InvariantCulture))
       {
-        case "CHAR": return MySqlDbType.String;
-        case "VARCHAR": return MySqlDbType.VarChar;
-        case "DATE": return MySqlDbType.Date;
-        case "DATETIME": return MySqlDbType.DateTime;
+        case "CHAR":
+          return MySqlDbType.String;
+        case "VARCHAR":
+          return MySqlDbType.VarChar;
+        case "DATE":
+          return MySqlDbType.Date;
+        case "DATETIME":
+          return MySqlDbType.DateTime;
         case "NUMERIC":
         case "DECIMAL":
         case "DEC":
@@ -296,9 +300,12 @@ namespace MySQL.ForExcel
           return MySqlDbType.Time;
         case "TIMESTAMP":
           return MySqlDbType.Timestamp;
-        case "SET": return MySqlDbType.Set;
-        case "ENUM": return MySqlDbType.Enum;
-        case "BIT": return MySqlDbType.Bit;
+        case "SET":
+          return MySqlDbType.Set;
+        case "ENUM":
+          return MySqlDbType.Enum;
+        case "BIT":
+          return MySqlDbType.Bit;
 
         case "TINYINT":
           return unsigned ? MySqlDbType.UByte : MySqlDbType.Byte;
@@ -316,10 +323,12 @@ namespace MySQL.ForExcel
           return MySqlDbType.UInt64;
         case "BIGINT":
           return unsigned ? MySqlDbType.UInt64 : MySqlDbType.Int64;
-        case "FLOAT": return MySqlDbType.Float;
-        case "DOUBLE": return MySqlDbType.Double;
-        case "REAL": return
-           realAsFloat ? MySqlDbType.Float : MySqlDbType.Double;
+        case "FLOAT":
+          return MySqlDbType.Float;
+        case "DOUBLE":
+          return MySqlDbType.Double;
+        case "REAL":
+          return realAsFloat ? MySqlDbType.Float : MySqlDbType.Double;
         case "TEXT":
           return MySqlDbType.Text;
         case "BLOB":
@@ -414,6 +423,15 @@ namespace MySQL.ForExcel
       object objCount = MySqlHelper.ExecuteScalar(GetConnectionString(connection), sql);
       long retCount = (objCount != null ? (long)objCount : 0);
       return (retCount > 0);
+    }
+
+    public static bool IndexExistsInSchema(MySqlWorkbenchConnection connection, string schemaName, string tableName, string indexName)
+    {
+      if (String.IsNullOrEmpty(schemaName) || String.IsNullOrEmpty(indexName))
+        return false;
+
+      DataTable dt = GetSchemaCollection(connection, "Indexes", null, schemaName, tableName, indexName);
+      return dt.Rows.Count > 0;
     }
 
     public static void SetDoubleBuffered(System.Windows.Forms.Control c)

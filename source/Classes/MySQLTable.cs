@@ -5,6 +5,7 @@ using System.Text;
 using System.ComponentModel;
 using System.Data;
 using MySQL.Utility;
+using MySql.Data.MySqlClient;
 
 namespace MySQL.ForExcel
 {
@@ -239,6 +240,89 @@ namespace MySQL.ForExcel
         delimiter = ",\r\n";
       }
       return sql.ToString();
+    }
+
+    public void createUpdateCommand(ref MySqlDataAdapter dataAdapter, ref MySqlConnection connection)
+    {
+      if (dataAdapter == null || connection == null)
+        return;
+      dataAdapter.UpdateCommand = new MySqlCommand(String.Empty, connection);
+      StringBuilder queryString = new StringBuilder();
+      StringBuilder wClauseString = new StringBuilder(" WHERE ");
+      StringBuilder setClauseString = new StringBuilder();
+      string wClause = String.Empty;
+      MySqlParameter updateParam = null;
+
+      string wClauseSeparator = String.Empty;
+      string sClauseSeparator = String.Empty;
+      queryString.AppendFormat("USE {0}; UPDATE", _schema);
+      queryString.AppendFormat(" {0} SET ", _name);
+
+      foreach (MySQLColumn mysqlCol in _columns)
+      {
+        bool isPrimaryKeyColumn = PrimaryKey != null && PrimaryKey.Columns.Any(idx => idx.ColumnName == mysqlCol.ColumnName);
+        MySqlDbType mysqlColType = Utilities.NameToType(mysqlCol.DataType, mysqlCol.IsUnsigned, false);
+
+        updateParam = new MySqlParameter(String.Format("@W_{0}", mysqlCol.ColumnName), mysqlColType);
+        updateParam.SourceColumn = mysqlCol.ColumnName;
+        updateParam.SourceVersion = DataRowVersion.Original;
+        dataAdapter.UpdateCommand.Parameters.Add(updateParam);
+        wClauseString.AppendFormat("{0}{1}=@W_{1}", wClauseSeparator, mysqlCol.ColumnName);
+
+        if (!isPrimaryKeyColumn)
+        {
+          updateParam = new MySqlParameter(String.Format("@S_{0}", mysqlCol.ColumnName), mysqlColType);
+          updateParam.SourceColumn = mysqlCol.ColumnName;
+          dataAdapter.UpdateCommand.Parameters.Add(updateParam);
+          setClauseString.AppendFormat("{0}{1}=@S_{1}", sClauseSeparator, mysqlCol.ColumnName);
+        }
+        wClauseSeparator = " AND ";
+        sClauseSeparator = ",";
+      }
+      queryString.Append(setClauseString.ToString());
+      queryString.Append(wClauseString.ToString());
+      dataAdapter.UpdateCommand.CommandText = queryString.ToString();
+    }
+
+    public void createInsertCommand(ref MySqlDataAdapter dataAdapter, ref MySqlConnection connection)
+    {
+      if (dataAdapter == null || connection == null)
+        return;
+      dataAdapter.InsertCommand = new MySqlCommand(String.Empty, connection);
+      StringBuilder queryString = new StringBuilder();
+      StringBuilder wClauseString = new StringBuilder(" WHERE ");
+      StringBuilder setClauseString = new StringBuilder();
+      string wClause = String.Empty;
+      MySqlParameter updateParam = null;
+
+      string wClauseSeparator = String.Empty;
+      string sClauseSeparator = String.Empty;
+      queryString.AppendFormat("USE {0}; INSERT INTO {1} (", _schema, _name);
+
+      foreach (MySQLColumn mysqlCol in _columns)
+      {
+        bool isPrimaryKeyColumn = PrimaryKey != null && PrimaryKey.Columns.Any(idx => idx.ColumnName == mysqlCol.ColumnName);
+        MySqlDbType mysqlColType = Utilities.NameToType(mysqlCol.DataType, mysqlCol.IsUnsigned, false);
+
+        updateParam = new MySqlParameter(String.Format("@W_{0}", mysqlCol.ColumnName), mysqlColType);
+        updateParam.SourceColumn = mysqlCol.ColumnName;
+        updateParam.SourceVersion = DataRowVersion.Original;
+        dataAdapter.UpdateCommand.Parameters.Add(updateParam);
+        wClauseString.AppendFormat("{0}{1}=@W_{1}", wClauseSeparator, mysqlCol.ColumnName);
+
+        if (!isPrimaryKeyColumn)
+        {
+          updateParam = new MySqlParameter(String.Format("@S_{0}", mysqlCol.ColumnName), mysqlColType);
+          updateParam.SourceColumn = mysqlCol.ColumnName;
+          dataAdapter.UpdateCommand.Parameters.Add(updateParam);
+          setClauseString.AppendFormat("{0}{1}=@S_{1}", sClauseSeparator, mysqlCol.ColumnName);
+        }
+        wClauseSeparator = " AND ";
+        sClauseSeparator = ",";
+      }
+      queryString.Append(setClauseString.ToString());
+      queryString.Append(wClauseString.ToString());
+      dataAdapter.UpdateCommand.CommandText = queryString.ToString();
     }
   }
 

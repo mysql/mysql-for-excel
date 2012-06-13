@@ -30,8 +30,8 @@
     {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SchemaSelectionPanel));
-      System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Schemas");
-      System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("System Schemas");
+      System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Schemas");
+      System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("System Schemas");
       this.lblConnectionName = new System.Windows.Forms.Label();
       this.lblUserIP = new System.Windows.Forms.Label();
       this.picAddInLogo = new System.Windows.Forms.PictureBox();
@@ -172,17 +172,17 @@
       this.databaseList.Location = new System.Drawing.Point(14, 254);
       this.databaseList.Name = "databaseList";
       this.databaseList.NodeImages = this.largeImages;
-      treeNode1.BackColor = System.Drawing.SystemColors.ControlDark;
-      treeNode1.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode1.Name = "Node0";
-      treeNode1.Text = "Schemas";
-      treeNode2.BackColor = System.Drawing.SystemColors.ControlDark;
-      treeNode2.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode2.Name = "Node1";
-      treeNode2.Text = "System Schemas";
+      treeNode3.BackColor = System.Drawing.SystemColors.ControlDark;
+      treeNode3.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode3.Name = "Node0";
+      treeNode3.Text = "Schemas";
+      treeNode4.BackColor = System.Drawing.SystemColors.ControlDark;
+      treeNode4.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode4.Name = "Node1";
+      treeNode4.Text = "System Schemas";
       this.databaseList.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1,
-            treeNode2});
+            treeNode3,
+            treeNode4});
       this.databaseList.Size = new System.Drawing.Size(265, 338);
       this.databaseList.TabIndex = 23;
       this.databaseList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.databaseList_AfterSelect);
@@ -208,7 +208,7 @@
       this.createNewSchema.DescriptionFont = new System.Drawing.Font("Arial", 8.25F);
       this.createNewSchema.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.createNewSchema.HotTracking = true;
-      this.createNewSchema.Image = global::MySQL.ForExcel.Properties.Resources.db_Schema_add_32x32;
+      this.createNewSchema.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_SchemaPanel_NewSchema_32x32;
       this.createNewSchema.ImageSize = new System.Drawing.Size(32, 32);
       this.createNewSchema.Location = new System.Drawing.Point(14, 599);
       this.createNewSchema.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -224,7 +224,7 @@
       this.hotLabel1.DescriptionFont = new System.Drawing.Font("Arial", 8.25F);
       this.hotLabel1.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.hotLabel1.HotTracking = false;
-      this.hotLabel1.Image = global::MySQL.ForExcel.Properties.Resources.db_Schema_many_32x32;
+      this.hotLabel1.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_SchemaPanel_Schemas_32x32;
       this.hotLabel1.ImageSize = new System.Drawing.Size(32, 32);
       this.hotLabel1.Location = new System.Drawing.Point(14, 182);
       this.hotLabel1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);

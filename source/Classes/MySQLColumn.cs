@@ -5,10 +5,11 @@ using System.Text;
 using System.ComponentModel;
 using System.Data;
 using MySQL.Utility;
+using MySql.Data.MySqlClient;
 
 namespace MySQL.ForExcel
 {
-  public class MySQLColumn
+  public class MySQLColumn : INotifyPropertyChanged
   {
     private string characterSet;
     private bool isNew;
@@ -22,6 +23,8 @@ namespace MySQL.ForExcel
       AllowNull = true;
       MappedDataColName = null;
     }
+
+    public event PropertyChangedEventHandler PropertyChanged;
 
     #region Properties
 
@@ -37,7 +40,12 @@ namespace MySQL.ForExcel
     public string ColumnName
     {
       get { return _columnName; }
-      set { _columnName = value; }
+      set 
+      { 
+        _columnName = value;
+        if (PropertyChanged != null)
+          PropertyChanged(this, new PropertyChangedEventArgs("Name"));
+      }
     }
 
     private string _dataType;
@@ -52,6 +60,8 @@ namespace MySQL.ForExcel
       {
         _dataType = value;
         cleanDataType(false);
+        if (PropertyChanged != null)
+          PropertyChanged(this, new PropertyChangedEventArgs("DataType"));
       }
     }
 
@@ -111,7 +121,12 @@ namespace MySQL.ForExcel
     public bool PrimaryKey
     {
       get { return _primaryKey; }
-      set { _primaryKey = value; }
+      set
+      {
+        _primaryKey = value;
+        if (PropertyChanged != null)
+          PropertyChanged(this, new PropertyChangedEventArgs("PrimaryKey"));
+      }
     }
 
     private bool _uniqueKey;
@@ -244,6 +259,31 @@ namespace MySQL.ForExcel
       {
         return IsCharOrText || IsDate;
       }
+    }
+
+    [Browsable(false)]
+    public MySqlDbType MySQLDBType
+    {
+      get
+      {
+        return Utilities.NameToType(_dataType, _isUnsigned, false);
+      }
+    }
+
+    private bool _createIndex;
+    [Category("Export")]
+    public bool CreateIndex
+    {
+      get { return _createIndex; }
+      set { _createIndex = value; }
+    }
+
+    private bool _excludeColumn;
+    [Category("Export")]
+    public bool ExcludeColumn
+    {
+      get { return _excludeColumn; }
+      set { _excludeColumn = value; }
     }
 
     #endregion

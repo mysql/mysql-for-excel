@@ -246,12 +246,4 @@ namespace MySQL.ForExcel
       tablePropsButton_Click(tablePropsButton, EventArgs.Empty);
     }
   }
-
-  internal class ColumnGuessData
-  {
-    public string ColumnName = String.Empty;
-    public string MySQLType = "varchar";
-    public int StrLen = 10;
-    public bool MySQLTypeConsistentInAllRows = true;
-  };
 }

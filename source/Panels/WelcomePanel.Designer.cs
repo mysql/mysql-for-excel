@@ -41,7 +41,7 @@
       this.lblCopyright = new System.Windows.Forms.Label();
       this.lblAllRights = new System.Windows.Forms.Label();
       this.connectionList = new TreeViewTest.MyTreeView();
-      this.hotLabel1 = new MySQL.ForExcel.Controls.HotLabel();
+      this.openConnectionLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.manageConnectionsLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.newConnectionLabel = new MySQL.ForExcel.Controls.HotLabel();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
@@ -152,20 +152,20 @@
       this.connectionList.TabIndex = 22;
       this.connectionList.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.connectionList_NodeMouseDoubleClick);
       // 
-      // hotLabel1
+      // openConnectionLabel
       // 
-      this.hotLabel1.Description = "Double-Click a Connection to Start";
-      this.hotLabel1.DescriptionFont = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.hotLabel1.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.hotLabel1.HotTracking = false;
-      this.hotLabel1.Image = global::MySQL.ForExcel.Properties.Resources.lightning_32x32;
-      this.hotLabel1.ImageSize = new System.Drawing.Size(28, 28);
-      this.hotLabel1.Location = new System.Drawing.Point(14, 152);
-      this.hotLabel1.Margin = new System.Windows.Forms.Padding(4);
-      this.hotLabel1.Name = "hotLabel1";
-      this.hotLabel1.Size = new System.Drawing.Size(256, 44);
-      this.hotLabel1.TabIndex = 20;
-      this.hotLabel1.Title = "Open a MySQL Connection";
+      this.openConnectionLabel.Description = "Double-Click a Connection to Start";
+      this.openConnectionLabel.DescriptionFont = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.openConnectionLabel.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.openConnectionLabel.HotTracking = false;
+      this.openConnectionLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_WelcomePanel_Connection_32x32;
+      this.openConnectionLabel.ImageSize = new System.Drawing.Size(32, 32);
+      this.openConnectionLabel.Location = new System.Drawing.Point(14, 152);
+      this.openConnectionLabel.Margin = new System.Windows.Forms.Padding(4);
+      this.openConnectionLabel.Name = "openConnectionLabel";
+      this.openConnectionLabel.Size = new System.Drawing.Size(256, 44);
+      this.openConnectionLabel.TabIndex = 20;
+      this.openConnectionLabel.Title = "Open a MySQL Connection";
       // 
       // manageConnectionsLabel
       // 
@@ -175,8 +175,8 @@
       this.manageConnectionsLabel.DescriptionFont = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.manageConnectionsLabel.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.manageConnectionsLabel.HotTracking = true;
-      this.manageConnectionsLabel.Image = global::MySQL.ForExcel.Properties.Resources.db_mgmt_Connection_manage_32x32;
-      this.manageConnectionsLabel.ImageSize = new System.Drawing.Size(28, 28);
+      this.manageConnectionsLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_WelcomePanel_ManageConnection_32x32;
+      this.manageConnectionsLabel.ImageSize = new System.Drawing.Size(32, 32);
       this.manageConnectionsLabel.Location = new System.Drawing.Point(14, 526);
       this.manageConnectionsLabel.Margin = new System.Windows.Forms.Padding(4);
       this.manageConnectionsLabel.Name = "manageConnectionsLabel";
@@ -193,8 +193,8 @@
       this.newConnectionLabel.DescriptionFont = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.newConnectionLabel.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.newConnectionLabel.HotTracking = true;
-      this.newConnectionLabel.Image = global::MySQL.ForExcel.Properties.Resources.new_connection_32x32;
-      this.newConnectionLabel.ImageSize = new System.Drawing.Size(28, 28);
+      this.newConnectionLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_WelcomePanel_NewConnection_32x32;
+      this.newConnectionLabel.ImageSize = new System.Drawing.Size(32, 32);
       this.newConnectionLabel.Location = new System.Drawing.Point(14, 474);
       this.newConnectionLabel.Margin = new System.Windows.Forms.Padding(4);
       this.newConnectionLabel.Name = "newConnectionLabel";
@@ -206,7 +206,7 @@
       // WelcomePanel
       // 
       this.Controls.Add(this.connectionList);
-      this.Controls.Add(this.hotLabel1);
+      this.Controls.Add(this.openConnectionLabel);
       this.Controls.Add(this.manageConnectionsLabel);
       this.Controls.Add(this.lblInstructions);
       this.Controls.Add(this.newConnectionLabel);
@@ -234,7 +234,7 @@
     private System.Windows.Forms.Label lblAllRights;
     private Controls.HotLabel newConnectionLabel;
     private Controls.HotLabel manageConnectionsLabel;
-    private Controls.HotLabel hotLabel1;
+    private Controls.HotLabel openConnectionLabel;
     private TreeViewTest.MyTreeView connectionList;
   }
 }

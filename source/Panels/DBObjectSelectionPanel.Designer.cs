@@ -97,14 +97,12 @@
       // 
       // importDataToolStripMenuItem
       // 
-      this.importDataToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.import_data_16x16;
       this.importDataToolStripMenuItem.Name = "importDataToolStripMenuItem";
       this.importDataToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
       this.importDataToolStripMenuItem.Text = "Import MySQL Data";
       // 
       // editDataToolStripMenuItem
       // 
-      this.editDataToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.edit_data_16x16;
       this.editDataToolStripMenuItem.Name = "editDataToolStripMenuItem";
       this.editDataToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
       this.editDataToolStripMenuItem.Text = "Edit MySQL Data";
@@ -112,7 +110,6 @@
       // 
       // appendDataToolStripMenuItem
       // 
-      this.appendDataToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.export_excel_existing_table_16x16;
       this.appendDataToolStripMenuItem.Name = "appendDataToolStripMenuItem";
       this.appendDataToolStripMenuItem.Size = new System.Drawing.Size(218, 22);
       this.appendDataToolStripMenuItem.Text = "Append Excel Data to Table";
@@ -238,7 +235,7 @@
       this.appendData.Enabled = false;
       this.appendData.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.appendData.HotTracking = true;
-      this.appendData.Image = global::MySQL.ForExcel.Properties.Resources.export_excel_existing_table_32x32;
+      this.appendData.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ObjectPanel_AppendData_32x32;
       this.appendData.ImageSize = new System.Drawing.Size(32, 32);
       this.appendData.Location = new System.Drawing.Point(17, 587);
       this.appendData.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -256,7 +253,7 @@
       this.editData.Enabled = false;
       this.editData.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.editData.HotTracking = true;
-      this.editData.Image = global::MySQL.ForExcel.Properties.Resources.edit_data_32x32;
+      this.editData.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ObjectPanel_EditData_32x32;
       this.editData.ImageSize = new System.Drawing.Size(32, 32);
       this.editData.Location = new System.Drawing.Point(17, 535);
       this.editData.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -274,7 +271,7 @@
       this.importData.Enabled = false;
       this.importData.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.importData.HotTracking = true;
-      this.importData.Image = global::MySQL.ForExcel.Properties.Resources.import_data_32x32;
+      this.importData.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ObjectPanel_ImportData_32x32;
       this.importData.ImageSize = new System.Drawing.Size(32, 32);
       this.importData.Location = new System.Drawing.Point(17, 483);
       this.importData.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -290,7 +287,7 @@
       this.hotLabel2.DescriptionFont = new System.Drawing.Font("Arial", 8.25F);
       this.hotLabel2.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.hotLabel2.HotTracking = false;
-      this.hotLabel2.Image = global::MySQL.ForExcel.Properties.Resources.db_Objects_32x32;
+      this.hotLabel2.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ObjectPanel_SelectObject_32x32;
       this.hotLabel2.ImageSize = new System.Drawing.Size(32, 32);
       this.hotLabel2.Location = new System.Drawing.Point(16, 142);
       this.hotLabel2.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -306,7 +303,7 @@
       this.exportToNewTable.Enabled = false;
       this.exportToNewTable.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.exportToNewTable.HotTracking = true;
-      this.exportToNewTable.Image = global::MySQL.ForExcel.Properties.Resources.export_excel_new_table_32x32;
+      this.exportToNewTable.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ObjectPanel_ExportToMySQL_32x32;
       this.exportToNewTable.ImageSize = new System.Drawing.Size(32, 32);
       this.exportToNewTable.Location = new System.Drawing.Point(17, 84);
       this.exportToNewTable.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);

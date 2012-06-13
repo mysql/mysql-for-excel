@@ -269,11 +269,23 @@
     <Compile Include="Forms\EditDataDialog.Designer.cs">
       <DependentUpon>EditDataDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\ExportAdvancedOptionsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ExportAdvancedOptionsDialog.Designer.cs">
+      <DependentUpon>ExportAdvancedOptionsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\ExportDataToTableDialog.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\ExportDataToTableDialog.Designer.cs">
       <DependentUpon>ExportDataToTableDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ExportDataForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ExportDataForm.Designer.cs">
+      <DependentUpon>ExportDataForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\ImportRoutineDialog.cs">
       <SubType>Form</SubType>
@@ -350,8 +362,14 @@
     <EmbeddedResource Include="Forms\EditDataDialog.resx">
       <DependentUpon>EditDataDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ExportAdvancedOptionsDialog.resx">
+      <DependentUpon>ExportAdvancedOptionsDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\ExportDataToTableDialog.resx">
       <DependentUpon>ExportDataToTableDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ExportDataForm.resx">
+      <DependentUpon>ExportDataForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportRoutineDialog.resx">
       <DependentUpon>ImportRoutineDialog.cs</DependentUpon>
@@ -440,6 +458,29 @@
     <None Include="Resources\db.Objects.48x48.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\MySQLforExcel-WelcomePanel-Separator-Grey.png" />
+    <None Include="Resources\MySQLforExcel-WelcomePanel-Separator-Blue.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-ExportToMySQL-Disabled-32x32.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-ImportData-Disabled-32x32.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-EditData-Disabled-32x32.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-AppendData-Disabled-32x32.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-AppendData-32x32.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-EditData-32x32.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-ImportData-32x32.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-SelectObject-32x32.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-ExportToMySQL-32x32.png" />
+    <None Include="Resources\MySQLforExcel-Logo-48x48.png" />
+    <None Include="Resources\MySQLforExcel-SchemaPanel-NewSchema-32x32.png" />
+    <None Include="Resources\MySQLforExcel-SchemaPanel-Schemas-32x32.png" />
+    <None Include="Resources\MySQLforExcel-Logo-64x64.png" />
+    <None Include="Resources\MySQLforExcel-WelcomePanel-Title.png" />
+    <None Include="Resources\MySQLforExcel-WelcomePanel-ManageConnection-32x32.png" />
+    <None Include="Resources\MySQLforExcel-WelcomePanel-NewConnection-32x32.png" />
+    <None Include="Resources\MySQLforExcel-WelcomePanel-Connection-32x32.png" />
+    <None Include="Resources\MySQLforExcel-ExportDlg-ColumnOptions-32x32.png" />
+    <None Include="Resources\MySQLforExcel-ExportDlg-PrimaryKey-32x32.png" />
+    <None Include="Resources\MySQLforExcel-ExportDlg-TableName-32x32.png" />
+    <None Include="Resources\db.Column.16x16.png" />
     <None Include="Resources\db.Routine.16x16.png" />
   </ItemGroup>
   <ItemGroup>
@@ -591,23 +632,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\ExcelAddinFilter.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ArrowDown.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\ArrowRight.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.Column.16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\chain_link.24x24.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\mysql-for-excel-header.png" />
-    <None Include="Resources\mysql-for-excel.ico" />
-    <None Include="Resources\mysql-header-img.png" />
+    <Content Include="Resources\mysql-for-excel-header.png" />
+    <Content Include="Resources\mysql-for-excel.ico" />
+    <Content Include="Resources\mysql-header-img.png" />
+    <Content Include="Resources\Warning.png" />
     <Content Include="Todo.txt" />
   </ItemGroup>
   <!-- Include the build rules for a C# project. -->
