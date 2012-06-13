@@ -215,6 +215,9 @@
     <Compile Include="Classes\ExportDataHelper.cs" />
     <Compile Include="Classes\MySQLColumn.cs" />
     <Compile Include="Classes\MySQLConnectionData.cs" />
+    <Compile Include="Classes\MySQLDataTable.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Classes\MySQLIndex.cs" />
     <Compile Include="Classes\MySQLTable.cs" />
     <Compile Include="Classes\Utilities.cs" />

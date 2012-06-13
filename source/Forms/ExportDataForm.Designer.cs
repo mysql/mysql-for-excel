@@ -37,7 +37,6 @@
       this.picPrimaryKeyWarning = new System.Windows.Forms.PictureBox();
       this.grpColumnDistrict = new System.Windows.Forms.GroupBox();
       this.cmbDatatype = new System.Windows.Forms.ComboBox();
-      this.columnBindingSource = new System.Windows.Forms.BindingSource(this.components);
       this.chkExcludeColumn = new System.Windows.Forms.CheckBox();
       this.chkAllowEmpty = new System.Windows.Forms.CheckBox();
       this.chkPrimaryKey = new System.Windows.Forms.CheckBox();
@@ -75,16 +74,19 @@
       this.btnAdvanced = new System.Windows.Forms.Button();
       this.btnCopySQL = new System.Windows.Forms.Button();
       this.timerTextChanged = new System.Windows.Forms.Timer(this.components);
+      this.dataBindingSource = new System.Windows.Forms.BindingSource(this.components);
+      this.columnBindingSource = new System.Windows.Forms.BindingSource(this.components);
       this.ExportDataPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKeyWarning)).BeginInit();
       this.grpColumnDistrict.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.columnBindingSource)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnDistrictWarning)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTableNameWarning)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKey)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTable)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.dataBindingSource)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.columnBindingSource)).BeginInit();
       this.SuspendLayout();
       // 
       // ExportDataPanel
@@ -120,7 +122,7 @@
       this.ExportDataPanel.Controls.Add(this.lblExportData);
       this.ExportDataPanel.Location = new System.Drawing.Point(-1, -2);
       this.ExportDataPanel.Name = "ExportDataPanel";
-      this.ExportDataPanel.Size = new System.Drawing.Size(846, 560);
+      this.ExportDataPanel.Size = new System.Drawing.Size(846, 559);
       this.ExportDataPanel.TabIndex = 0;
       // 
       // lblPrimaryKeyWarning
@@ -161,7 +163,7 @@
       this.grpColumnDistrict.Controls.Add(this.lblColumnDistrictWarning);
       this.grpColumnDistrict.Controls.Add(this.picColumnDistrictWarning);
       this.grpColumnDistrict.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.grpColumnDistrict.Location = new System.Drawing.Point(83, 448);
+      this.grpColumnDistrict.Location = new System.Drawing.Point(83, 447);
       this.grpColumnDistrict.Name = "grpColumnDistrict";
       this.grpColumnDistrict.Size = new System.Drawing.Size(677, 100);
       this.grpColumnDistrict.TabIndex = 19;
@@ -180,12 +182,7 @@
       this.cmbDatatype.TabIndex = 4;
       this.cmbDatatype.DropDown += new System.EventHandler(this.cmbDatatype_DropDown);
       this.cmbDatatype.DropDownClosed += new System.EventHandler(this.cmbDatatype_DropDownClosed);
-      // 
-      // columnBindingSource
-      // 
-      this.columnBindingSource.DataSource = typeof(MySQL.ForExcel.MySQLColumn);
-      this.columnBindingSource.BindingComplete += new System.Windows.Forms.BindingCompleteEventHandler(this.columnBindingSource_BindingComplete);
-      this.columnBindingSource.CurrentChanged += new System.EventHandler(this.columnBindingSource_CurrentChanged);
+      this.cmbDatatype.SelectedValueChanged += new System.EventHandler(this.cmbDatatype_SelectedValueChanged);
       // 
       // chkExcludeColumn
       // 
@@ -198,6 +195,7 @@
       this.chkExcludeColumn.TabIndex = 9;
       this.chkExcludeColumn.Text = "Exclude Column";
       this.chkExcludeColumn.UseVisualStyleBackColor = true;
+      this.chkExcludeColumn.CheckedChanged += new System.EventHandler(this.chkExcludeColumn_CheckedChanged);
       // 
       // chkAllowEmpty
       // 
@@ -266,6 +264,7 @@
       this.txtColumnName.Name = "txtColumnName";
       this.txtColumnName.Size = new System.Drawing.Size(135, 23);
       this.txtColumnName.TabIndex = 2;
+      this.txtColumnName.TextChanged += new System.EventHandler(this.txtColumnName_TextChanged);
       // 
       // lblColumnName
       // 
@@ -352,7 +351,7 @@
       dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
       this.grdPreviewData.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
       this.grdPreviewData.RowHeadersVisible = false;
-      this.grdPreviewData.Size = new System.Drawing.Size(677, 159);
+      this.grdPreviewData.Size = new System.Drawing.Size(677, 158);
       this.grdPreviewData.TabIndex = 18;
       this.grdPreviewData.SelectionChanged += new System.EventHandler(this.grdPreviewData_SelectionChanged);
       // 
@@ -411,6 +410,8 @@
       // 
       // cmbPrimaryKeyColumns
       // 
+      this.cmbPrimaryKeyColumns.DisplayMember = "ColumnName";
+      this.cmbPrimaryKeyColumns.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
       this.cmbPrimaryKeyColumns.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.cmbPrimaryKeyColumns.FormattingEnabled = true;
       this.cmbPrimaryKeyColumns.Location = new System.Drawing.Point(639, 154);
@@ -576,7 +577,7 @@
       // 
       this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnCancel.Location = new System.Drawing.Point(757, 567);
+      this.btnCancel.Location = new System.Drawing.Point(757, 566);
       this.btnCancel.Name = "btnCancel";
       this.btnCancel.Size = new System.Drawing.Size(75, 23);
       this.btnCancel.TabIndex = 4;
@@ -587,7 +588,7 @@
       // 
       this.btnExport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnExport.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.btnExport.Location = new System.Drawing.Point(676, 567);
+      this.btnExport.Location = new System.Drawing.Point(676, 566);
       this.btnExport.Name = "btnExport";
       this.btnExport.Size = new System.Drawing.Size(75, 23);
       this.btnExport.TabIndex = 3;
@@ -598,7 +599,7 @@
       // btnAdvanced
       // 
       this.btnAdvanced.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.btnAdvanced.Location = new System.Drawing.Point(12, 567);
+      this.btnAdvanced.Location = new System.Drawing.Point(12, 566);
       this.btnAdvanced.Name = "btnAdvanced";
       this.btnAdvanced.Size = new System.Drawing.Size(131, 23);
       this.btnAdvanced.TabIndex = 1;
@@ -609,7 +610,7 @@
       // btnCopySQL
       // 
       this.btnCopySQL.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnCopySQL.Location = new System.Drawing.Point(595, 567);
+      this.btnCopySQL.Location = new System.Drawing.Point(595, 566);
       this.btnCopySQL.Name = "btnCopySQL";
       this.btnCopySQL.Size = new System.Drawing.Size(75, 23);
       this.btnCopySQL.TabIndex = 2;
@@ -623,12 +624,16 @@
       this.timerTextChanged.Interval = 800;
       this.timerTextChanged.Tick += new System.EventHandler(this.timerTextChanged_Tick);
       // 
+      // columnBindingSource
+      // 
+      this.columnBindingSource.DataSource = typeof(MySQL.ForExcel.MySQLColumn);
+      // 
       // ExportDataForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.btnCancel;
-      this.ClientSize = new System.Drawing.Size(844, 602);
+      this.ClientSize = new System.Drawing.Size(844, 601);
       this.Controls.Add(this.btnCopySQL);
       this.Controls.Add(this.btnAdvanced);
       this.Controls.Add(this.btnExport);
@@ -647,13 +652,14 @@
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKeyWarning)).EndInit();
       this.grpColumnDistrict.ResumeLayout(false);
       this.grpColumnDistrict.PerformLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.columnBindingSource)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnDistrictWarning)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTableNameWarning)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKey)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTable)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.dataBindingSource)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.columnBindingSource)).EndInit();
       this.ResumeLayout(false);
 
     }
@@ -703,5 +709,6 @@
     private System.Windows.Forms.Timer timerTextChanged;
     private System.Windows.Forms.Label lblPrimaryKeyWarning;
     private System.Windows.Forms.PictureBox picPrimaryKeyWarning;
+    private System.Windows.Forms.BindingSource dataBindingSource;
   }
 }
