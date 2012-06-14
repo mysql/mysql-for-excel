@@ -353,6 +353,62 @@ namespace MySQL.ForExcel
       throw new Exception("Unhandled type encountered");
     }
 
+    public static string GetMySQLExportDataType(object packedValue, out bool valueOverflow)
+    {
+      valueOverflow = false;
+      if (packedValue == null)
+        return String.Empty;
+
+      Type objUnpackedType = packedValue.GetType();
+      string strType = objUnpackedType.FullName;
+      string strValue = packedValue.ToString();
+      int strLength = strValue.Length;
+      int[] varCharApproxLen = new int[7] {5,12,25,45,255,4000,65535};
+      int[,] decimalApproxLen = new int[2,2] { {12,2}, {65,30} };
+
+      switch (strType)
+      {
+        case "System.String":
+          for (int i = 0; i < varCharApproxLen.Length; i++)
+          {
+            if (strLength <= varCharApproxLen[i])
+              return String.Format("Varchar({0})", varCharApproxLen[i]);
+          }
+          valueOverflow = true;
+          return "Varchar(65535)";
+        case "System.Byte":
+        case "System.UInt16":
+        case "System.Int16":
+        case "System.UInt32":
+        case "System.Int32":
+          return "Integer";
+        case "System.UInt64":
+        case "System.Int64":
+          return "BigInt";
+        case "System.Decimal":
+        case "System.Single":
+          int intLen = strValue.IndexOf(".");
+          int fractLen = strLength - intLen - 1;
+          if (intLen <= decimalApproxLen[0, 0] && fractLen <= decimalApproxLen[0, 1])
+            return "Decimal(12,2)";
+          else if (intLen <= decimalApproxLen[1, 0] && fractLen <= decimalApproxLen[1, 1])
+            return "Decimal(65,30)";
+          valueOverflow = true;
+          return "Decimal(65,30)";
+        case "System.Double":
+          return "Double";
+        case "System.Boolean":
+          return "Bool";
+        case "System.DateTime":
+          if (strValue.Contains(":"))
+            return "Datetime";
+          return "Date";
+        case "System.TimeSpan":
+          return "Time";
+      }
+      return String.Empty;
+    }
+
     public static string GetMySQLDataType(object packedValue)
     {
       string retType = String.Empty;

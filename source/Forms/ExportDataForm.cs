@@ -39,12 +39,11 @@ namespace MySQL.ForExcel
       InitializeComponent();
 
       //exportDataHelper = new ExportDataHelper(wbConnection, exportDataRange, null, false, true);
-      if (!exportingWorksheet.Name.ToLowerInvariant().StartsWith("sheet"))
-        dataTable.TableName = exportingWorksheet.Name.ToLower().Replace(' ', '_');
 
       LoadDataAndCreateColumns(exportDataRange);
       SetDefaultPrimaryKey();
-
+      if (!exportingWorksheet.Name.ToLowerInvariant().StartsWith("sheet"))
+        dataTable.TableName = exportingWorksheet.Name.ToLower().Replace(' ', '_');
       Text = String.Format("Export Data - {0} [{1}])", exportingWorksheet.Name, exportDataRange.Address.Replace("$", String.Empty));
 
       //bindColsList = new BindingList<MySQLColumn>(exportTable.Columns);
@@ -283,7 +282,7 @@ namespace MySQL.ForExcel
 
     private void chkFirstRowHeaders_CheckedChanged(object sender, EventArgs e)
     {
-      dataTable.UseFirstRowAsHeaders(chkFirstRowHeaders.Checked);
+      dataTable.UseFirstRowAsHeaders = chkFirstRowHeaders.Checked;
       LoadDataAndCreateColumns(null);
 
       //for (int i = 0; i < dataTable.Columns.Count; i++)
