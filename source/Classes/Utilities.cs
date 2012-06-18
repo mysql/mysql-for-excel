@@ -363,6 +363,7 @@ namespace MySQL.ForExcel
       string strType = objUnpackedType.FullName;
       string strValue = packedValue.ToString();
       int strLength = strValue.Length;
+      int decimalPointPos = strValue.IndexOf("."); ;
       int[] varCharApproxLen = new int[7] {5,12,25,45,255,4000,65535};
       int[,] decimalApproxLen = new int[2,2] { {12,2}, {65,30} };
 
@@ -376,6 +377,18 @@ namespace MySQL.ForExcel
           }
           valueOverflow = true;
           return "Varchar(65535)";
+        case "System.Double":
+          return "Double";
+        case "System.Decimal":
+        case "System.Single":
+          int intLen = decimalPointPos;
+          int fractLen = strLength - intLen - 1;
+          if (intLen <= decimalApproxLen[0, 0] && fractLen <= decimalApproxLen[0, 1])
+            return "Decimal(12,2)";
+          else if (intLen <= decimalApproxLen[1, 0] && fractLen <= decimalApproxLen[1, 1])
+            return "Decimal(65,30)";
+          valueOverflow = true;
+          return "Decimal(65,30)";
         case "System.Byte":
         case "System.UInt16":
         case "System.Int16":
@@ -385,18 +398,6 @@ namespace MySQL.ForExcel
         case "System.UInt64":
         case "System.Int64":
           return "BigInt";
-        case "System.Decimal":
-        case "System.Single":
-          int intLen = strValue.IndexOf(".");
-          int fractLen = strLength - intLen - 1;
-          if (intLen <= decimalApproxLen[0, 0] && fractLen <= decimalApproxLen[0, 1])
-            return "Decimal(12,2)";
-          else if (intLen <= decimalApproxLen[1, 0] && fractLen <= decimalApproxLen[1, 1])
-            return "Decimal(65,30)";
-          valueOverflow = true;
-          return "Decimal(65,30)";
-        case "System.Double":
-          return "Double";
         case "System.Boolean":
           return "Bool";
         case "System.DateTime":

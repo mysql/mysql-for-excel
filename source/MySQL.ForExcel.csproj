@@ -409,6 +409,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\DataSources\MySQLColumn.datasource" />
+    <None Include="Properties\DataSources\MySQLDataColumn.datasource" />
     <None Include="Properties\DataSources\MySQLTable.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

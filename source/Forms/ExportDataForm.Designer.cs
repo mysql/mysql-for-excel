@@ -35,7 +35,7 @@
       this.ExportDataPanel = new System.Windows.Forms.Panel();
       this.lblPrimaryKeyWarning = new System.Windows.Forms.Label();
       this.picPrimaryKeyWarning = new System.Windows.Forms.PictureBox();
-      this.grpColumnDistrict = new System.Windows.Forms.GroupBox();
+      this.grpColumnOptions = new System.Windows.Forms.GroupBox();
       this.cmbDatatype = new System.Windows.Forms.ComboBox();
       this.chkExcludeColumn = new System.Windows.Forms.CheckBox();
       this.chkAllowEmpty = new System.Windows.Forms.CheckBox();
@@ -74,18 +74,16 @@
       this.btnAdvanced = new System.Windows.Forms.Button();
       this.btnCopySQL = new System.Windows.Forms.Button();
       this.timerTextChanged = new System.Windows.Forms.Timer(this.components);
-      this.dataBindingSource = new System.Windows.Forms.BindingSource(this.components);
       this.columnBindingSource = new System.Windows.Forms.BindingSource(this.components);
       this.ExportDataPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKeyWarning)).BeginInit();
-      this.grpColumnDistrict.SuspendLayout();
+      this.grpColumnOptions.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnDistrictWarning)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTableNameWarning)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKey)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTable)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.dataBindingSource)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.columnBindingSource)).BeginInit();
       this.SuspendLayout();
       // 
@@ -97,7 +95,7 @@
       this.ExportDataPanel.BackColor = System.Drawing.SystemColors.Window;
       this.ExportDataPanel.Controls.Add(this.lblPrimaryKeyWarning);
       this.ExportDataPanel.Controls.Add(this.picPrimaryKeyWarning);
-      this.ExportDataPanel.Controls.Add(this.grpColumnDistrict);
+      this.ExportDataPanel.Controls.Add(this.grpColumnOptions);
       this.ExportDataPanel.Controls.Add(this.chkFirstRowHeaders);
       this.ExportDataPanel.Controls.Add(this.grdPreviewData);
       this.ExportDataPanel.Controls.Add(this.lblColumnOptionsSub);
@@ -147,34 +145,34 @@
       this.picPrimaryKeyWarning.TabStop = false;
       this.picPrimaryKeyWarning.Visible = false;
       // 
-      // grpColumnDistrict
+      // grpColumnOptions
       // 
-      this.grpColumnDistrict.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+      this.grpColumnOptions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.grpColumnDistrict.Controls.Add(this.cmbDatatype);
-      this.grpColumnDistrict.Controls.Add(this.chkExcludeColumn);
-      this.grpColumnDistrict.Controls.Add(this.chkAllowEmpty);
-      this.grpColumnDistrict.Controls.Add(this.chkPrimaryKey);
-      this.grpColumnDistrict.Controls.Add(this.chkUniqueIndex);
-      this.grpColumnDistrict.Controls.Add(this.chkCreateIndex);
-      this.grpColumnDistrict.Controls.Add(this.lblDatatype);
-      this.grpColumnDistrict.Controls.Add(this.txtColumnName);
-      this.grpColumnDistrict.Controls.Add(this.lblColumnName);
-      this.grpColumnDistrict.Controls.Add(this.lblColumnDistrictWarning);
-      this.grpColumnDistrict.Controls.Add(this.picColumnDistrictWarning);
-      this.grpColumnDistrict.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.grpColumnDistrict.Location = new System.Drawing.Point(83, 447);
-      this.grpColumnDistrict.Name = "grpColumnDistrict";
-      this.grpColumnDistrict.Size = new System.Drawing.Size(677, 100);
-      this.grpColumnDistrict.TabIndex = 19;
-      this.grpColumnDistrict.TabStop = false;
-      this.grpColumnDistrict.Text = "Column Options";
+      this.grpColumnOptions.Controls.Add(this.cmbDatatype);
+      this.grpColumnOptions.Controls.Add(this.chkExcludeColumn);
+      this.grpColumnOptions.Controls.Add(this.chkAllowEmpty);
+      this.grpColumnOptions.Controls.Add(this.chkPrimaryKey);
+      this.grpColumnOptions.Controls.Add(this.chkUniqueIndex);
+      this.grpColumnOptions.Controls.Add(this.chkCreateIndex);
+      this.grpColumnOptions.Controls.Add(this.lblDatatype);
+      this.grpColumnOptions.Controls.Add(this.txtColumnName);
+      this.grpColumnOptions.Controls.Add(this.lblColumnName);
+      this.grpColumnOptions.Controls.Add(this.lblColumnDistrictWarning);
+      this.grpColumnOptions.Controls.Add(this.picColumnDistrictWarning);
+      this.grpColumnOptions.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.grpColumnOptions.Location = new System.Drawing.Point(83, 447);
+      this.grpColumnOptions.Name = "grpColumnOptions";
+      this.grpColumnOptions.Size = new System.Drawing.Size(677, 100);
+      this.grpColumnOptions.TabIndex = 19;
+      this.grpColumnOptions.TabStop = false;
+      this.grpColumnOptions.Text = "Column Options";
       // 
       // cmbDatatype
       // 
       this.cmbDatatype.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.cmbDatatype.DataBindings.Add(new System.Windows.Forms.Binding("SelectedValue", this.columnBindingSource, "DataType", true));
+      this.cmbDatatype.DataBindings.Add(new System.Windows.Forms.Binding("SelectedValue", this.columnBindingSource, "MySQLDataType", true));
       this.cmbDatatype.FormattingEnabled = true;
       this.cmbDatatype.Location = new System.Drawing.Point(122, 62);
       this.cmbDatatype.Name = "cmbDatatype";
@@ -182,7 +180,6 @@
       this.cmbDatatype.TabIndex = 4;
       this.cmbDatatype.DropDown += new System.EventHandler(this.cmbDatatype_DropDown);
       this.cmbDatatype.DropDownClosed += new System.EventHandler(this.cmbDatatype_DropDownClosed);
-      this.cmbDatatype.SelectedValueChanged += new System.EventHandler(this.cmbDatatype_SelectedValueChanged);
       // 
       // chkExcludeColumn
       // 
@@ -220,6 +217,7 @@
       this.chkPrimaryKey.TabIndex = 7;
       this.chkPrimaryKey.Text = "Primary Key";
       this.chkPrimaryKey.UseVisualStyleBackColor = true;
+      this.chkPrimaryKey.CheckedChanged += new System.EventHandler(this.chkPrimaryKey_CheckedChanged);
       // 
       // chkUniqueIndex
       // 
@@ -259,7 +257,7 @@
       // 
       this.txtColumnName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.txtColumnName.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.columnBindingSource, "ColumnName", true));
+      this.txtColumnName.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.columnBindingSource, "DisplayName", true));
       this.txtColumnName.Location = new System.Drawing.Point(122, 33);
       this.txtColumnName.Name = "txtColumnName";
       this.txtColumnName.Size = new System.Drawing.Size(135, 23);
@@ -302,6 +300,8 @@
       // chkFirstRowHeaders
       // 
       this.chkFirstRowHeaders.AutoSize = true;
+      this.chkFirstRowHeaders.Checked = true;
+      this.chkFirstRowHeaders.CheckState = System.Windows.Forms.CheckState.Checked;
       this.chkFirstRowHeaders.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.chkFirstRowHeaders.Location = new System.Drawing.Point(83, 256);
       this.chkFirstRowHeaders.Name = "chkFirstRowHeaders";
@@ -351,8 +351,10 @@
       dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
       this.grdPreviewData.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
       this.grdPreviewData.RowHeadersVisible = false;
+      this.grdPreviewData.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
       this.grdPreviewData.Size = new System.Drawing.Size(677, 158);
       this.grdPreviewData.TabIndex = 18;
+      this.grdPreviewData.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.grdPreviewData_DataBindingComplete);
       this.grdPreviewData.SelectionChanged += new System.EventHandler(this.grdPreviewData_SelectionChanged);
       // 
       // lblColumnOptionsSub
@@ -410,14 +412,14 @@
       // 
       // cmbPrimaryKeyColumns
       // 
-      this.cmbPrimaryKeyColumns.DisplayMember = "ColumnName";
-      this.cmbPrimaryKeyColumns.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.cmbPrimaryKeyColumns.DisplayMember = "DisplayName";
       this.cmbPrimaryKeyColumns.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.cmbPrimaryKeyColumns.FormattingEnabled = true;
       this.cmbPrimaryKeyColumns.Location = new System.Drawing.Point(639, 154);
       this.cmbPrimaryKeyColumns.Name = "cmbPrimaryKeyColumns";
       this.cmbPrimaryKeyColumns.Size = new System.Drawing.Size(121, 23);
       this.cmbPrimaryKeyColumns.TabIndex = 14;
+      this.cmbPrimaryKeyColumns.ValueMember = "DisplayName";
       this.cmbPrimaryKeyColumns.SelectedIndexChanged += new System.EventHandler(this.cmbPrimaryKeyColumns_SelectedIndexChanged);
       this.cmbPrimaryKeyColumns.Validating += new System.ComponentModel.CancelEventHandler(this.cmbPrimaryKeyColumns_Validating);
       // 
@@ -463,8 +465,7 @@
       this.txtTableNameInput.Name = "txtTableNameInput";
       this.txtTableNameInput.Size = new System.Drawing.Size(219, 22);
       this.txtTableNameInput.TabIndex = 5;
-      this.txtTableNameInput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtTableNameInput_KeyDown);
-      this.txtTableNameInput.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtTableNameInput_KeyUp);
+      this.txtTableNameInput.TextChanged += new System.EventHandler(this.txtTableNameInput_TextChanged);
       this.txtTableNameInput.Validating += new System.ComponentModel.CancelEventHandler(this.txtTableNameInput_Validating);
       // 
       // lblTableNameInput
@@ -588,6 +589,7 @@
       // 
       this.btnExport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnExport.DialogResult = System.Windows.Forms.DialogResult.OK;
+      this.btnExport.Enabled = false;
       this.btnExport.Location = new System.Drawing.Point(676, 566);
       this.btnExport.Name = "btnExport";
       this.btnExport.Size = new System.Drawing.Size(75, 23);
@@ -626,14 +628,14 @@
       // 
       // columnBindingSource
       // 
-      this.columnBindingSource.DataSource = typeof(MySQL.ForExcel.MySQLColumn);
+      this.columnBindingSource.DataSource = typeof(MySQL.ForExcel.MySQLDataColumn);
       // 
       // ExportDataForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.btnCancel;
-      this.ClientSize = new System.Drawing.Size(844, 601);
+      this.ClientSize = new System.Drawing.Size(844, 602);
       this.Controls.Add(this.btnCopySQL);
       this.Controls.Add(this.btnAdvanced);
       this.Controls.Add(this.btnExport);
@@ -650,15 +652,14 @@
       this.ExportDataPanel.ResumeLayout(false);
       this.ExportDataPanel.PerformLayout();
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKeyWarning)).EndInit();
-      this.grpColumnDistrict.ResumeLayout(false);
-      this.grpColumnDistrict.PerformLayout();
+      this.grpColumnOptions.ResumeLayout(false);
+      this.grpColumnOptions.PerformLayout();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnDistrictWarning)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTableNameWarning)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKey)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTable)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.dataBindingSource)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.columnBindingSource)).EndInit();
       this.ResumeLayout(false);
 
@@ -691,7 +692,7 @@
     private System.Windows.Forms.Label lblColumnOptionsSub;
     private System.Windows.Forms.Label lblColumnOptionsMain;
     private System.Windows.Forms.PictureBox picColumnOptions;
-    private System.Windows.Forms.GroupBox grpColumnDistrict;
+    private System.Windows.Forms.GroupBox grpColumnOptions;
     private System.Windows.Forms.Label lblColumnDistrictWarning;
     private System.Windows.Forms.PictureBox picColumnDistrictWarning;
     private System.Windows.Forms.CheckBox chkFirstRowHeaders;
@@ -709,6 +710,5 @@
     private System.Windows.Forms.Timer timerTextChanged;
     private System.Windows.Forms.Label lblPrimaryKeyWarning;
     private System.Windows.Forms.PictureBox picPrimaryKeyWarning;
-    private System.Windows.Forms.BindingSource dataBindingSource;
   }
 }
