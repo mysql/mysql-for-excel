@@ -140,17 +140,17 @@ namespace MySQL.ForExcel
 
     private void importTableOrView(DBObject dbo)
     {
-      ImportTableViewDialog importDialog = new ImportTableViewDialog(connection, dbo);
-      DialogResult dr = importDialog.ShowDialog();
+      ImportTableViewForm importForm = new ImportTableViewForm(connection, dbo);
+      DialogResult dr = importForm.ShowDialog();
       if (dr == DialogResult.Cancel)
         return;
-      if (importDialog.ImportDataTable == null)
+      if (importForm.ImportDataTable == null)
       {
         string msg = String.Format(Resources.UnableToRetrieveData, dbo.Name);
         MessageBox.Show(msg, Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
         return;
       }
-      (Parent as TaskPaneControl).ImportDataToExcel(importDialog.ImportDataTable, importDialog.ImportHeaders);
+      (Parent as TaskPaneControl).ImportDataToExcel(importForm.ImportDataTable, importForm.ImportHeaders);
     }
 
     private void importRoutine(DBObject dbo)

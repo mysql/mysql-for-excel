@@ -260,6 +260,12 @@
     <Compile Include="Forms\AppendDataToTableDialog.Designer.cs">
       <DependentUpon>AppendDataToTableDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\ImportTableViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ImportTableViewForm.Designer.cs">
+      <DependentUpon>ImportTableViewForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\EditChangesDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -278,12 +284,6 @@
     <Compile Include="Forms\ExportAdvancedOptionsDialog.Designer.cs">
       <DependentUpon>ExportAdvancedOptionsDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\ExportDataToTableDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\ExportDataToTableDialog.Designer.cs">
-      <DependentUpon>ExportDataToTableDialog.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\ExportDataForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -295,12 +295,6 @@
     </Compile>
     <Compile Include="Forms\ImportRoutineDialog.Designer.cs">
       <DependentUpon>ImportRoutineDialog.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\ImportTableViewDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\ImportTableViewDialog.designer.cs">
-      <DependentUpon>ImportTableViewDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\NewConnectionDialog.cs">
       <SubType>Form</SubType>
@@ -359,6 +353,9 @@
     <EmbeddedResource Include="Forms\AppendDataToTableDialog.resx">
       <DependentUpon>AppendDataToTableDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ImportTableViewForm.resx">
+      <DependentUpon>ImportTableViewForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\EditChangesDialog.resx">
       <DependentUpon>EditChangesDialog.cs</DependentUpon>
     </EmbeddedResource>
@@ -368,17 +365,11 @@
     <EmbeddedResource Include="Forms\ExportAdvancedOptionsDialog.resx">
       <DependentUpon>ExportAdvancedOptionsDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ExportDataToTableDialog.resx">
-      <DependentUpon>ExportDataToTableDialog.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\ExportDataForm.resx">
       <DependentUpon>ExportDataForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportRoutineDialog.resx">
       <DependentUpon>ImportRoutineDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ImportTableViewDialog.resx">
-      <DependentUpon>ImportTableViewDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\NewConnectionDialog.resx">
       <DependentUpon>NewConnectionDialog.cs</DependentUpon>
