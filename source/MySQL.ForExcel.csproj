@@ -254,11 +254,11 @@
     <Compile Include="Controls\TaskPaneControl.Designer.cs">
       <DependentUpon>TaskPaneControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\AppendDataToTableDialog.cs">
+    <Compile Include="Forms\AppendDataForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\AppendDataToTableDialog.Designer.cs">
-      <DependentUpon>AppendDataToTableDialog.cs</DependentUpon>
+    <Compile Include="Forms\AppendDataForm.Designer.cs">
+      <DependentUpon>AppendDataForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\ImportRoutineForm.cs">
       <SubType>Form</SubType>
@@ -271,12 +271,6 @@
     </Compile>
     <Compile Include="Forms\ImportTableViewForm.Designer.cs">
       <DependentUpon>ImportTableViewForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\EditChangesDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\EditChangesDialog.Designer.cs">
-      <DependentUpon>EditChangesDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\EditDataDialog.cs">
       <SubType>Form</SubType>
@@ -350,17 +344,14 @@
     <EmbeddedResource Include="Controls\TaskPaneControl.resx">
       <DependentUpon>TaskPaneControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\AppendDataToTableDialog.resx">
-      <DependentUpon>AppendDataToTableDialog.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\AppendDataForm.resx">
+      <DependentUpon>AppendDataForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportRoutineForm.resx">
       <DependentUpon>ImportRoutineForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportTableViewForm.resx">
       <DependentUpon>ImportTableViewForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\EditChangesDialog.resx">
-      <DependentUpon>EditChangesDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\EditDataDialog.resx">
       <DependentUpon>EditDataDialog.cs</DependentUpon>
@@ -423,34 +414,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\action_eer_rev_eng_db.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\db.mgmt.Connection.16x16.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\db.mgmt.Connection.24x24.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\db.mgmt.Connection.32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.mgmt.Connection.48x48.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.mgmt.Connection.manage.24x24.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.mgmt.Connection.manage.32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.mgmt.Connection.manage.48x48.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.Objects.32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.Objects.48x48.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\MySQLforExcel-WelcomePanel-Separator-Grey.png" />
@@ -479,154 +446,32 @@
     <None Include="Resources\db.Routine.16x16.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\db.Routine.24x24.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\db.Routine.32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.Routine.48x48.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\db.Schema.16x16.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\db.Schema.24x24.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\db.Schema.32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.Schema.add.32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.Schema.add.48x48.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.Schema.many.32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.Schema.many.48x48.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\db.Table.16x16.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\db.Table.24x24.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\db.Table.32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.Table.48x48.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\db.View.16x16.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\db.View.24x24.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\db.View.32x32.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\db.View.48x48.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\edit_data.16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\edit_data.24x24.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\edit_data.32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\edit_data.48x48.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\excel-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\export_excel_existing_table.16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\export_excel_existing_table.32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\export_excel_existing_table.48x48.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\export_excel_existing_table.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\export_excel_new_table.16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\export_excel_new_table.32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\export_excel_new_table.48x48.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\export_excel_new_table.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\import_data.16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\import_data.32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\import_data.48x48.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\lightning_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\lightning_24x24.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\lightning_32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\lightning_48x48.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\lightning_86x86.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\MySQLExcelAddInLogo.16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\MySQLExcelAddInLogo.32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\MySQLExcelAddInLogo.48x48.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\MySQLExcelAddInLogo.64x64.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\MySQLExcelAddInLogo.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\MySQLExcelAddInLogo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new_connection_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new_connection_24x24.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new_connection_32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\new_connection_48x48.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\ExcelAddinFilter.png" />
+    <Content Include="Resources\ArrowDown.png" />
+    <Content Include="Resources\ArrowRight.png" />
+    <Content Include="Resources\Chain Link-32x32.png" />
+    <Content Include="Resources\chain_link.24x24.png" />
     <Content Include="Resources\mysql-for-excel-header.png" />
     <Content Include="Resources\mysql-for-excel.ico" />
     <Content Include="Resources\mysql-header-img.png" />

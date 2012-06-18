@@ -81,6 +81,13 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap Chain_Link_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("Chain_Link_32x32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to This column has already been mapped, do you want to overwrite existing mapping?.
         /// </summary>

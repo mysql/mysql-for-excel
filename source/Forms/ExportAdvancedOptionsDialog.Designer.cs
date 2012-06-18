@@ -67,7 +67,7 @@
       this.chkShowCopySQLButton.AutoSize = true;
       this.chkShowCopySQLButton.Location = new System.Drawing.Point(48, 285);
       this.chkShowCopySQLButton.Name = "chkShowCopySQLButton";
-      this.chkShowCopySQLButton.Size = new System.Drawing.Size(138, 17);
+      this.chkShowCopySQLButton.Size = new System.Drawing.Size(146, 17);
       this.chkShowCopySQLButton.TabIndex = 15;
       this.chkShowCopySQLButton.Text = "Show Copy SQL Button";
       this.chkShowCopySQLButton.UseVisualStyleBackColor = true;
@@ -88,7 +88,7 @@
       this.chkUseFormattedValues.AutoSize = true;
       this.chkUseFormattedValues.Location = new System.Drawing.Point(48, 218);
       this.chkUseFormattedValues.Name = "chkUseFormattedValues";
-      this.chkUseFormattedValues.Size = new System.Drawing.Size(126, 17);
+      this.chkUseFormattedValues.Size = new System.Drawing.Size(134, 17);
       this.chkUseFormattedValues.TabIndex = 11;
       this.chkUseFormattedValues.Text = "Use formatted values";
       this.chkUseFormattedValues.UseVisualStyleBackColor = true;
@@ -109,7 +109,7 @@
       this.chkAutoAllowEmptyNonIndexColumns.AutoSize = true;
       this.chkAutoAllowEmptyNonIndexColumns.Location = new System.Drawing.Point(48, 150);
       this.chkAutoAllowEmptyNonIndexColumns.Name = "chkAutoAllowEmptyNonIndexColumns";
-      this.chkAutoAllowEmptyNonIndexColumns.Size = new System.Drawing.Size(386, 17);
+      this.chkAutoAllowEmptyNonIndexColumns.Size = new System.Drawing.Size(419, 17);
       this.chkAutoAllowEmptyNonIndexColumns.TabIndex = 9;
       this.chkAutoAllowEmptyNonIndexColumns.Text = "Automatically check the Allow Empty checkbox for columns without an index";
       this.chkAutoAllowEmptyNonIndexColumns.UseVisualStyleBackColor = true;
@@ -119,7 +119,7 @@
       this.chkAutoIndexIntColumns.AutoSize = true;
       this.chkAutoIndexIntColumns.Location = new System.Drawing.Point(48, 127);
       this.chkAutoIndexIntColumns.Name = "chkAutoIndexIntColumns";
-      this.chkAutoIndexIntColumns.Size = new System.Drawing.Size(311, 17);
+      this.chkAutoIndexIntColumns.Size = new System.Drawing.Size(333, 17);
       this.chkAutoIndexIntColumns.TabIndex = 8;
       this.chkAutoIndexIntColumns.Text = "Automatically check the Index checkbox for Integer columns";
       this.chkAutoIndexIntColumns.UseVisualStyleBackColor = true;
@@ -129,7 +129,7 @@
       this.chkAddBufferToVarchar.AutoSize = true;
       this.chkAddBufferToVarchar.Location = new System.Drawing.Point(48, 104);
       this.chkAddBufferToVarchar.Name = "chkAddBufferToVarchar";
-      this.chkAddBufferToVarchar.Size = new System.Drawing.Size(384, 17);
+      this.chkAddBufferToVarchar.Size = new System.Drawing.Size(413, 17);
       this.chkAddBufferToVarchar.TabIndex = 7;
       this.chkAddBufferToVarchar.Text = "Add additional buffer to VARCHAR length (round up to 12, 25, 45, 125, 255)";
       this.chkAddBufferToVarchar.UseVisualStyleBackColor = true;
@@ -139,7 +139,7 @@
       this.chkDetectDatatype.AutoSize = true;
       this.chkDetectDatatype.Location = new System.Drawing.Point(48, 81);
       this.chkDetectDatatype.Name = "chkDetectDatatype";
-      this.chkDetectDatatype.Size = new System.Drawing.Size(373, 17);
+      this.chkDetectDatatype.Size = new System.Drawing.Size(405, 17);
       this.chkDetectDatatype.TabIndex = 6;
       this.chkDetectDatatype.Text = "Analyze and try to detect correct datatype based on column field contents";
       this.chkDetectDatatype.UseVisualStyleBackColor = true;
@@ -198,6 +198,7 @@
       this.Controls.Add(this.btnAccept);
       this.Controls.Add(this.btnCancel);
       this.Controls.Add(this.AdvancedExportOptionsPanel);
+      this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.MaximizeBox = false;
       this.MaximumSize = new System.Drawing.Size(540, 414);
       this.MinimizeBox = false;

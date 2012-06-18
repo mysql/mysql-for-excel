@@ -176,15 +176,13 @@ namespace MySQL.ForExcel
 
       if (toTableObject != null)
       {
-        AppendDataToTableDialog appendDataDialog = new AppendDataToTableDialog(connection, exportRange, toTableObject);
-        dr = appendDataDialog.ShowDialog();
+        AppendDataForm appendDataForm = new AppendDataForm(connection, exportRange, toTableObject);
+        dr = appendDataForm.ShowDialog();
       }
       else
       {
         ExportDataForm exportForm = new ExportDataForm(connection, exportRange, excelApplication.ActiveSheet as Excel.Worksheet);
         dr = exportForm.ShowDialog();
-        //ExportDataToTableDialog exportDataDialog = new ExportDataToTableDialog(connection, exportRange);
-        //dr = exportDataDialog.ShowDialog();
       }
       return dr == DialogResult.OK;
     }

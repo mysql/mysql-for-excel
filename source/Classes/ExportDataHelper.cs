@@ -73,13 +73,29 @@ namespace MySQL.ForExcel
       ExportTable = new MySQLTable(wbConnection, tablesData.Rows[0], columnsData);
     }
 
+    private object[,] getArrayFromRange(Excel.Range dataRange, bool formatted)
+    {
+      object[,] arrayFromRange;
+
+      // we have to treat a single cell specially.  It doesn't come in as an array but as a single value
+      if (dataRange.Count == 1)
+      {
+        arrayFromRange = new object[2, 2];
+        arrayFromRange[1, 1] = (formatted ? dataRange.Value : dataRange.Value2);
+      }
+      else
+        arrayFromRange = (formatted ? dataRange.Value : dataRange.Value2);
+
+      return arrayFromRange;
+    }
+
     private void fillDataTablesFromRange(bool addPKColumn)
     {
       FormattedExcelData = new DataTable();
       UnformattedExcelData = new DataTable();
+      object[,] formattedArrayFromRange = getArrayFromRange(ExportingRange, true);
+      object[,] unformattedArrayFromRange = getArrayFromRange(ExportingRange, false);
 
-      object[,] formattedArrayFromRange = ExportingRange.Value as object[,];
-      object[,] unformattedArrayFromRange = ExportingRange.Value2 as object[,];
       object valueFromArray = null;
       DataRow formattedRow;
       DataRow unformattedRow;
@@ -156,7 +172,7 @@ namespace MySQL.ForExcel
 
     public void GuessDataTypesFromData(bool guessTypes, bool addPKColumn)
     {
-      object[,] formattedArrayFromRange = ExportingRange.Value as object[,];
+      object[,] formattedArrayFromRange = getArrayFromRange(ExportingRange, true);
 
       int rowsCount = formattedArrayFromRange.GetUpperBound(0);
       int colsCount = formattedArrayFromRange.GetUpperBound(1);
