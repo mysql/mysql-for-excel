@@ -144,9 +144,12 @@ namespace MySQL.ForExcel
       int tableIdx = 0;
       foreach (DataTable dt in ds.Tables)
       {
-        fillingRange = ImportDataTableToExcelAtGivenCell(dt, importColumnNames, atCell);
-        endCell = fillingRange.Cells[fillingRange.Rows.Count, fillingRange.Columns.Count] as Excel.Range;
         tableIdx++;
+        fillingRange = ImportDataTableToExcelAtGivenCell(dt, importColumnNames, atCell);
+        if (fillingRange != null)
+          endCell = fillingRange.Cells[fillingRange.Rows.Count, fillingRange.Columns.Count] as Excel.Range;
+        else
+          continue;
         if (tableIdx < ds.Tables.Count)
           switch (importType)
           {
@@ -189,11 +192,11 @@ namespace MySQL.ForExcel
     public bool EditTableData(DBObject tableObject)
     {
       // Import Data
-      ImportTableViewDialog importDialog = new ImportTableViewDialog(connection, tableObject);
-      DialogResult dr = importDialog.ShowDialog();
+      ImportTableViewForm importForm = new ImportTableViewForm(connection, tableObject);
+      DialogResult dr = importForm.ShowDialog();
       if (dr == DialogResult.Cancel)
         return false;
-      if (importDialog.ImportDataTable == null)
+      if (importForm.ImportDataTable == null)
       {
         string msg = String.Format(Properties.Resources.UnableToRetrieveData, tableObject.Name);
         MessageBox.Show(msg, Properties.Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -211,11 +214,11 @@ namespace MySQL.ForExcel
       currentWorksheet.Activate();
       Excel.Range atCell = currentWorksheet.get_Range("A1", Type.Missing);
       atCell.Select();
-      Excel.Range editingRange = ImportDataTableToExcelAtGivenCell(importDialog.ImportDataTable, importDialog.ImportHeaders, atCell);
+      Excel.Range editingRange = ImportDataTableToExcelAtGivenCell(importForm.ImportDataTable, importForm.ImportHeaders, atCell);
       
       // Edit Data
-      Utilities.AddExtendedProperties(ref importDialog.ImportDataTable, importDialog.ImportDataTable.ExtendedProperties["QueryString"].ToString(), importDialog.ImportHeaders, tableObject.Name);
-      editForm = new EditDataForm(connection, editingRange, importDialog.ImportDataTable, currentWorksheet);
+      Utilities.AddExtendedProperties(ref importForm.ImportDataTable, importForm.ImportDataTable.ExtendedProperties["QueryString"].ToString(), importForm.ImportHeaders, tableObject.Name);
+      editForm = new EditDataForm(connection, editingRange, importForm.ImportDataTable, currentWorksheet);
       editForm.CallerTaskPane = this;
       editForm.Show();
 

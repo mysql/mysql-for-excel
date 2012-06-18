@@ -155,17 +155,17 @@ namespace MySQL.ForExcel
 
     private void importRoutine(DBObject dbo)
     {
-      ImportRoutineDialog importDialog = new ImportRoutineDialog(connection, dbo);
-      DialogResult dr = importDialog.ShowDialog();
+      ImportRoutineForm importRoutineForm = new ImportRoutineForm(connection, dbo);
+      DialogResult dr = importRoutineForm.ShowDialog();
       if (dr == DialogResult.Cancel)
         return;
-      if (importDialog.ImportDataSet == null)
+      if (importRoutineForm.ImportDataSet == null)
       {
         string msg = String.Format(Resources.UnableToRetrieveData, dbo.Name);
         MessageBox.Show(msg, Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
         return;
       }
-      (Parent as TaskPaneControl).ImportDataToExcel(importDialog.ImportDataSet, importDialog.ImportHeaders, importDialog.ImportType);
+      (Parent as TaskPaneControl).ImportDataToExcel(importRoutineForm.ImportDataSet, importRoutineForm.ImportHeaders, importRoutineForm.ImportType);
     }
 
     private bool exportDataToTable(DBObject appendToTable)
