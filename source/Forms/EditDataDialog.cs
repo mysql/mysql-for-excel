@@ -39,7 +39,6 @@ namespace MySQL.ForExcel
       getMySQLTableSchemaInfo(tableName);
       initializeDataAdapter();
 
-      lblRange.Text = String.Format("Editing Range: {0}", editDataRange.Address);
       grdPreview.DataSource = importTable;
       foreach (DataGridViewColumn dgvc in grdPreview.Columns)
       {
@@ -47,6 +46,7 @@ namespace MySQL.ForExcel
       }
       EditingWorksheet = editingWorksheet;
       EditingWorksheet.Change += new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
+      Text = String.Format("Edit Data - {0} [{1}]", editingWorksheet.Name, editDataRange.Address.Replace("$", String.Empty));
     }
 
     private void getMySQLTableSchemaInfo(string tableName)
@@ -190,24 +190,7 @@ namespace MySQL.ForExcel
 
     private void btnCommit_Click(object sender, EventArgs e)
     {
-      //DataTable changesTable = editingTable.GetChanges();
-      //EditChangesDialog changesDialog = new EditChangesDialog(changesTable);
-      //changesDialog.ShowDialog();
       pushDataChanges();
-    }
-
-    private void btnResizeForm_Click(object sender, EventArgs e)
-    {
-      if (Size.Height < 350)
-      {
-        Size = new Size(Size.Width, 350);
-        btnResizeForm.Text = "˄";
-      }
-      else
-      {
-        Size = new Size(Size.Width, 130);
-        btnResizeForm.Text = "˅";
-      }
     }
 
     private void grdPreview_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
