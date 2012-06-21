@@ -36,11 +36,11 @@ namespace MySQL.ForExcel
         bool containsIntegers = false;
         int res = 0;
         if (Columns.Count > 1)
-          containsIntegers = (Columns[2] as MySQLDataColumn).MySQLDataType.ToLowerInvariant() == "Integer";
+          containsIntegers = (Columns[1] as MySQLDataColumn).MySQLDataType.ToLowerInvariant() == "integer";
         if (!containsIntegers)
         {
           containsIntegers = true;
-          for (int rowIdx = 0; rowIdx < Math.Min(Rows.Count, 50); rowIdx++)
+          for (int rowIdx = (firstRowIsHeaders ? 1 : 0); rowIdx < Math.Min(Rows.Count, 50); rowIdx++)
           {
             containsIntegers = containsIntegers && Int32.TryParse(Rows[rowIdx][1].ToString(), out res);
           }
@@ -50,13 +50,7 @@ namespace MySQL.ForExcel
     }
     public int NumberOfPK
     {
-      get
-      {
-        int num = 0;
-        foreach (MySQLDataColumn c in Columns)
-          if (c.PrimaryKey) num++;
-        return AddPK ? num : num - 1;
-      }
+      get { return Columns.OfType<MySQLDataColumn>().Skip(1).Count(col => col.PrimaryKey); }
     }
 
     private void UseFirstRowAsHeaders(bool useFirstRow)
@@ -65,16 +59,18 @@ namespace MySQL.ForExcel
       for (int i = 1; i < Columns.Count; i++)
       {
         MySQLDataColumn col = Columns[i] as MySQLDataColumn;
-        col.DisplayName = useFirstRow ? row[i].ToString().Trim().Replace(" ", "_").Replace("(", String.Empty).Replace(")", String.Empty) : col.ColumnName;
+        col.DisplayName = (useFirstRow ? DataToColName(row[i].ToString()) : col.ColumnName);
+        col.MySQLDataType = (useFirstRow ? col.OtherRowsDataType : col.FirstRowDataType);
       }
-      int minus = (useFirstRow ? 1 : 0);
+      (Columns[0] as MySQLDataColumn).DisplayName = TableName + "_id";
+      int adjustIdx = (useFirstRow ? 0 : 1);
       for (int i = 0; i < Rows.Count; i++)
       {
-        Rows[i][0] = i - minus;
+        Rows[i][0] = i + adjustIdx;
       }
     }
 
-    public void SetData(Excel.Range dataRange, bool useFormattedData, bool detectTypes)
+    public void SetData(Excel.Range dataRange, bool useFormattedData, bool detectTypes, bool createIndexForIntColumns, bool allowEmptyNonIdxCols)
     {
       object[,] data;
 
@@ -100,11 +96,18 @@ namespace MySQL.ForExcel
         DataRow dataRow = NewRow();
         dataRow[0] = row;
         for (int col = 1; col <= numCols; col++)
+        {
           dataRow[col] = data[row, col];
+        }
         Rows.Add(dataRow);
       }
       if (detectTypes)
-        DetectTypes(data);
+        DetectTypes(data, createIndexForIntColumns);
+      if (allowEmptyNonIdxCols)
+        foreach (MySQLColumn mysqlCol in Columns.OfType<MySQLColumn>().Skip(1))
+        {
+          mysqlCol.AllowNull = !mysqlCol.CreateIndex;
+        }
     }
 
     private void DetectTypes()
@@ -113,48 +116,116 @@ namespace MySQL.ForExcel
         col.DetectType(firstRowIsHeaders);
     }
 
-    private void DetectTypes(object[,] data)
+    private void DetectTypes(object[,] data, bool createIndexForIntColumns)
     {
       int rowsCount = data.GetUpperBound(0);
       int colsCount = data.GetUpperBound(1);
-
-      object valueFromArray = null;
-      string proposedType = String.Empty;
-      string previousType = String.Empty;
-      string headerType = String.Empty;
-      bool typesConsistent = true;
-      bool valueOverflow = false;
       string dateFormat = "yyyy-MM-dd HH:mm:ss";
 
       for (int colPos = 1; colPos <= colsCount; colPos++)
       {
+        object valueFromArray = null;
+        string proposedType = String.Empty;
+        string strippedType = String.Empty;
+        string headerType = String.Empty;
+        bool typesConsistent = true;
+        bool valueOverflow = false;
+        List<string> typesList = new List<string>(rowsCount);
+        int[] varCharMaxLen = new int[2] { 0, 0 };
+        int[] decimalMaxLen = new int[2] { 0, 0 };
+        int lParensIndex = -1;
+
         for (int rowPos = 1; rowPos <= rowsCount; rowPos++)
         {
           valueFromArray = data[rowPos, colPos];
           if (valueFromArray == null)
             continue;
+
+          // Treat always as a Varchar value first in case all rows do not have a consistent datatype
+          proposedType = Utilities.GetMySQLExportDataType(valueFromArray.ToString(), out valueOverflow);
+          lParensIndex = proposedType.IndexOf("(");
+          varCharMaxLen[1] = Math.Max(Int32.Parse(proposedType.Substring(lParensIndex + 1, proposedType.Length - lParensIndex - 2)), varCharMaxLen[1]);
+
+          // Normal datatype detection
           proposedType = Utilities.GetMySQLExportDataType(valueFromArray, out valueOverflow);
-          if (proposedType.StartsWith("Date") && valueFromArray is DateTime)
+          lParensIndex = proposedType.IndexOf("(");
+          strippedType = (lParensIndex < 0 ? proposedType : proposedType.Substring(0, lParensIndex));
+          switch (strippedType)
           {
-            DateTime dtValue = (DateTime)valueFromArray;
-            Rows[rowPos - 1][colPos] = dtValue.ToString(dateFormat);
+            case "Date":
+            case "Datetime":
+              DateTime dtValue = (DateTime)valueFromArray;
+              Rows[rowPos - 1][colPos] = dtValue.ToString(dateFormat);
+              break;
+            case "Varchar":
+              if (rowPos > 1)
+                varCharMaxLen[0] = Math.Max(Int32.Parse(proposedType.Substring(lParensIndex + 1, proposedType.Length - lParensIndex - 2)), varCharMaxLen[0]);
+              break;
+            case "Decimal":
+              int commaPos = proposedType.IndexOf(",");
+              decimalMaxLen[0] = Math.Max(Int32.Parse(proposedType.Substring(lParensIndex + 1, commaPos - lParensIndex -1)), decimalMaxLen[0]);
+              decimalMaxLen[1] = Math.Max(Int32.Parse(proposedType.Substring(commaPos + 1, proposedType.Length - commaPos - 2)), decimalMaxLen[1]);
+              break;
           }
           if (rowPos == 1)
             headerType = proposedType;
           else
+            typesList.Add(strippedType);
+        }
+
+        typesConsistent = typesList.All(str => str == strippedType);
+        if (!typesConsistent)
+        {
+          if (typesList.Count(str => str == "Integer") + typesList.Count(str => str == "Bool") == typesList.Count)
           {
-            typesConsistent = typesConsistent && (rowPos > 2 ? previousType == proposedType : true);
-            previousType = proposedType;
+            typesConsistent = true;
+            proposedType = "Integer";
+          }
+          else if (typesList.Count(str => str == "Integer") + typesList.Count(str => str == "BigInt") == typesList.Count)
+          {
+            typesConsistent = true;
+            proposedType = "BigInt";
+          }
+          else if (typesList.Count(str => str == "Integer") + typesList.Count(str => str == "Decimal") == typesList.Count)
+          {
+            typesConsistent = true;
+            strippedType = "Decimal";
+          }
+          else if (typesList.Count(str => str == "Integer") + typesList.Count(str => str == "Decimal") + typesList.Count(str => str == "Double") == typesList.Count)
+          {
+            typesConsistent = true;
+            proposedType = "Double";
           }
         }
-        if (previousType.Length == 0)
-          previousType = "Varchar(255)";
-        if (headerType.Length == 0)
-          headerType = previousType;
+
+        if (typesConsistent)
+          switch (strippedType)
+          {
+            case "Varchar":
+              proposedType = String.Format("Varchar({0})", varCharMaxLen[0]);
+              break;
+            case "Decimal":
+              if (decimalMaxLen[0] > 12 || decimalMaxLen[1] > 2)
+              {
+                decimalMaxLen[0] = 65;
+                decimalMaxLen[1] = 30;
+              }
+              else
+              {
+                decimalMaxLen[0] = 12;
+                decimalMaxLen[1] = 2;
+              }
+              proposedType = String.Format("Decimal({0}, {1})", decimalMaxLen[0], decimalMaxLen[1]);
+              break;
+          }
+        else
+            proposedType = String.Format("Varchar({0})", varCharMaxLen[1]);
+
         MySQLDataColumn col = Columns[colPos] as MySQLDataColumn;
         col.FirstRowDataType = headerType;
-        col.OtherRowsDataType = previousType;
-        col.MySQLDataType = (firstRowIsHeaders ? headerType : previousType);
+        col.OtherRowsDataType = proposedType;
+        col.MySQLDataType = (firstRowIsHeaders ? headerType : proposedType);
+        col.CreateIndex = (createIndexForIntColumns && col.MySQLDataType == "Integer");
       }
     }
 
@@ -185,7 +256,7 @@ namespace MySQL.ForExcel
     {
       bool success = false;
       string connectionString = Utilities.GetConnectionString(wbConnection);
-      string queryString = GetCreateSQL();
+      string queryString = GetCreateSQL(false);
 
       try
       {
@@ -206,18 +277,21 @@ namespace MySQL.ForExcel
       return success;
     }
 
-    public string GetCreateSQL()
+    public string GetCreateSQL(bool formatNewLinesAndTabs)
     {
       StringBuilder sql = new StringBuilder();
-      sql.AppendFormat("CREATE TABLE `{0}` (", TableName);
+      string nl = (formatNewLinesAndTabs ? "\n" : " ");
+      string nlt = (formatNewLinesAndTabs ? "\n\t" : " ");
 
-      string delimiter = "";
+      sql.AppendFormat("CREATE TABLE `{0}`{1}(", TableName, nl);
+
+      string delimiter = nlt;
       foreach (MySQLDataColumn column in Columns)
       {
         if (column.ExcludeColumn)
           continue;
         sql.AppendFormat("{0}{1}", delimiter, column.GetSQL());
-        delimiter = ", ";
+        delimiter = "," + nlt;
       }
       foreach (MySQLDataColumn col in Columns)
       {
@@ -225,22 +299,24 @@ namespace MySQL.ForExcel
           continue;
         sql.AppendFormat("{0}INDEX {1}_idx ({1})", delimiter, col.DisplayName);
       }
+      sql.Append(nl);
       sql.Append(")");
       return sql.ToString();
     }
 
-    public string GetInsertSQL(int limit)
+    public string GetInsertSQL(int limit, bool formatNewLinesAndTabs)
     {
       int exportColsCount = Columns.Count;
       if (Rows.Count - (firstRowIsHeaders ? 1 : 0) < 1)
         return null;
 
-      StringBuilder queryString = new StringBuilder("INSERT INTO");
+      StringBuilder queryString = new StringBuilder();
+      string nl = (formatNewLinesAndTabs ? "\n" : " ");
       int rowIdx = 0;
       int colIdx = 0;
 
       string separator = String.Empty;
-      queryString.AppendFormat(" {0} (", TableName);
+      queryString.AppendFormat("INSERT INTO `{0}`{1}(", TableName, nl);
 
       for (colIdx = 0; colIdx < exportColsCount; colIdx++)
       {
@@ -252,7 +328,7 @@ namespace MySQL.ForExcel
                                  column.DisplayName);
         separator = ",";
       }
-      queryString.Append(") VALUES ");
+      queryString.AppendFormat("){0}VALUES{0}", nl);
 
       foreach (DataRow dr in Rows)
       {
@@ -271,13 +347,13 @@ namespace MySQL.ForExcel
           queryString.AppendFormat("{0}{1}{2}{1}",
                                    separator,
                                    (column.ColumnsRequireQuotes ? "'" : String.Empty),
-                                   dr[column.DisplayName].ToString());
+                                   dr[column.ColumnName].ToString());
           separator = ",";
         }        
-        queryString.Append("),");
+        queryString.AppendFormat("),{0}", nl);
       }
       if (Rows.Count > 0)
-        queryString.Remove(queryString.Length - 1, 1);
+        queryString.Remove(queryString.Length - 2, 2);
       return queryString.ToString();
     }
 
@@ -332,6 +408,7 @@ namespace MySQL.ForExcel
   public class MySQLDataColumn : DataColumn
   {
     private bool uniqueKey;
+    private string displayName;
 
     public bool AutoPK { get; set; }
     public bool CreateIndex { get; set; }
@@ -340,13 +417,28 @@ namespace MySQL.ForExcel
       get { return uniqueKey; }
       set { uniqueKey = value; if (uniqueKey) CreateIndex = true; }
     }
+    public string DisplayName
+    {
+      get { return displayName; }
+      set 
+      { 
+        string trimmedName = value.Trim();
+        displayName = trimmedName;
+        if (Table == null || Table.Columns.Count < 2)
+          return;
+        int colIdx = 1;
+        while (Table.Columns.OfType<MySQLDataColumn>().Count(col => col.DisplayName == displayName) > 1)
+        {
+          displayName = trimmedName + colIdx;
+        }
+      }
+    }
 
     public bool PrimaryKey { get; set; }
     public bool AllowNull { get; set; }
     public bool ExcludeColumn { get; set; }
     public string MySQLDataType { get; set; }
-    public string DisplayName { get; set; }
-    //public string SavedName { get; set; }
+    public string WarningText { get; set; }
     public string FirstRowDataType { get; set; }
     public string OtherRowsDataType { get; set; }
 
@@ -455,10 +547,10 @@ namespace MySQL.ForExcel
 
     public string GetSQL()
     {
-      if (String.IsNullOrEmpty(DisplayName))
+      if (String.IsNullOrEmpty(displayName))
         return null;
 
-      StringBuilder colDefinition = new StringBuilder(DisplayName);
+      StringBuilder colDefinition = new StringBuilder(displayName);
       colDefinition.AppendFormat(" {0}", MySQLDataType);
       if (AutoPK)
         colDefinition.Append(" primary key");

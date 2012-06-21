@@ -28,11 +28,11 @@
     /// </summary>
     private void InitializeComponent()
     {
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
       this.EditDataPanel = new System.Windows.Forms.Panel();
+      this.chkAutoCommit = new System.Windows.Forms.CheckBox();
       this.chkRefreshFromDB = new System.Windows.Forms.CheckBox();
       this.grdPreview = new System.Windows.Forms.DataGridView();
-      this.chkAutoCommit = new System.Windows.Forms.CheckBox();
       this.btnCommit = new System.Windows.Forms.Button();
       this.btnRevert = new System.Windows.Forms.Button();
       this.EditDataPanel.SuspendLayout();
@@ -52,6 +52,18 @@
       this.EditDataPanel.Name = "EditDataPanel";
       this.EditDataPanel.Size = new System.Drawing.Size(527, 302);
       this.EditDataPanel.TabIndex = 7;
+      // 
+      // chkAutoCommit
+      // 
+      this.chkAutoCommit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.chkAutoCommit.AutoSize = true;
+      this.chkAutoCommit.Location = new System.Drawing.Point(370, 282);
+      this.chkAutoCommit.Name = "chkAutoCommit";
+      this.chkAutoCommit.Size = new System.Drawing.Size(142, 17);
+      this.chkAutoCommit.TabIndex = 9;
+      this.chkAutoCommit.Text = "Auto-Commit Changes";
+      this.chkAutoCommit.UseVisualStyleBackColor = true;
+      this.chkAutoCommit.CheckedChanged += new System.EventHandler(this.chkAutoCommit_CheckedChanged);
       // 
       // chkRefreshFromDB
       // 
@@ -78,14 +90,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
       this.grdPreview.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
       this.grdPreview.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-      dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-      dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.Transparent;
-      dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdPreview.DefaultCellStyle = dataGridViewCellStyle2;
+      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
+      dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.Transparent;
+      dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.grdPreview.DefaultCellStyle = dataGridViewCellStyle1;
       this.grdPreview.Location = new System.Drawing.Point(12, 12);
       this.grdPreview.MultiSelect = false;
       this.grdPreview.Name = "grdPreview";
@@ -94,18 +106,6 @@
       this.grdPreview.Size = new System.Drawing.Size(500, 253);
       this.grdPreview.TabIndex = 10;
       this.grdPreview.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.grdPreview_DataBindingComplete);
-      // 
-      // chkAutoCommit
-      // 
-      this.chkAutoCommit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.chkAutoCommit.AutoSize = true;
-      this.chkAutoCommit.Location = new System.Drawing.Point(370, 282);
-      this.chkAutoCommit.Name = "chkAutoCommit";
-      this.chkAutoCommit.Size = new System.Drawing.Size(142, 17);
-      this.chkAutoCommit.TabIndex = 9;
-      this.chkAutoCommit.Text = "Auto-Commit Changes";
-      this.chkAutoCommit.UseVisualStyleBackColor = true;
-      this.chkAutoCommit.CheckedChanged += new System.EventHandler(this.chkAutoCommit_CheckedChanged);
       // 
       // btnCommit
       // 

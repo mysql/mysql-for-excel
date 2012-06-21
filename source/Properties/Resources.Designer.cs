@@ -89,6 +89,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Data in the current column is not unique..
+        /// </summary>
+        internal static string ColumnDataNotUniqueWarning {
+            get {
+                return ResourceManager.GetString("ColumnDataNotUniqueWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This column has already been mapped, do you want to overwrite existing mapping?.
         /// </summary>
         internal static string ColumnMappedOverwrite {
