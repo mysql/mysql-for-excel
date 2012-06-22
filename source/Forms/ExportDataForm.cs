@@ -39,6 +39,7 @@ namespace MySQL.ForExcel
       txtTableNameInput.SelectAll();
       btnCopySQL.Visible = Properties.Settings.Default.ExportShowCopySQLButton;
       chkFirstRowHeaders_CheckedChanged(chkFirstRowHeaders, EventArgs.Empty);
+      gridToolTip.SetToolTip(grdPreviewData, Resources.ExportColumnsGridToolTipCaption);
     }
 
     private void refreshPrimaryKeyColumnsCombo()
@@ -60,6 +61,7 @@ namespace MySQL.ForExcel
       if (exportDataRange != null)
       {
         dataTable = new MySQLDataTable();
+        dataTable.RemoveEmptyColumns = true;
         if (!String.IsNullOrEmpty(proposedTableName))
           dataTable.TableName = proposedTableName;
         dataTable.SetData(exportDataRange, 
@@ -132,12 +134,20 @@ namespace MySQL.ForExcel
       string picBoxName = String.Format("pic{0}", warningControlSuffix);
       string lblName = String.Format("lbl{0}", warningControlSuffix);
 
-      if (!ExportDataPanel.Controls.ContainsKey(picBoxName) || !ExportDataPanel.Controls.ContainsKey(lblName))
+      if (ExportDataPanel.Controls.ContainsKey(picBoxName) && ExportDataPanel.Controls.ContainsKey(lblName))
+      {
+        ExportDataPanel.Controls[picBoxName].Visible = show;
+        ExportDataPanel.Controls[lblName].Text = (String.IsNullOrEmpty(text) ? String.Empty : text);
+        ExportDataPanel.Controls[lblName].Visible = show;
         return;
-
-      ExportDataPanel.Controls[picBoxName].Visible = show;
-      ExportDataPanel.Controls[lblName].Text = (String.IsNullOrEmpty(text) ? String.Empty : text);
-      ExportDataPanel.Controls[lblName].Visible = show;
+      }
+      if (grpColumnOptions.Controls.ContainsKey(picBoxName) && grpColumnOptions.Controls.ContainsKey(lblName))
+      {
+        grpColumnOptions.Controls[picBoxName].Visible = show;
+        grpColumnOptions.Controls[lblName].Text = (String.IsNullOrEmpty(text) ? String.Empty : text);
+        grpColumnOptions.Controls[lblName].Visible = show;
+        return;
+      }
     }
 
     private void flagMultiColumnPrimaryKey(int pkQty)
@@ -153,8 +163,13 @@ namespace MySQL.ForExcel
 
     private void btnCopySQL_Click(object sender, EventArgs e)
     {
-      string queryString = dataTable.GetCreateSQL(true) + ";\n" + dataTable.GetInsertSQL(100, true) + ";";
-      Clipboard.SetText(queryString);
+      StringBuilder queryString = new StringBuilder();
+      queryString.AppendFormat("USE `{0}`;\n", wbConnection.Schema);
+      queryString.Append(dataTable.GetCreateSQL(true));
+      queryString.Append(";\n");
+      queryString.Append(dataTable.GetInsertSQL(100, true));
+      queryString.Append(";");
+      Clipboard.SetText(queryString.ToString());
     }
 
     private void btnExport_Click(object sender, EventArgs e)
@@ -234,6 +249,7 @@ namespace MySQL.ForExcel
         return;
       grdPreviewData.Columns[0].Visible = true;
       grdPreviewData.Columns[0].Selected = true;
+      grdPreviewData.FirstDisplayedScrollingColumnIndex = 0;
       cmbPrimaryKeyColumns.Text = String.Empty;
       cmbPrimaryKeyColumns.Enabled = false;
       txtAddPrimaryKey.Enabled = true;
@@ -246,6 +262,7 @@ namespace MySQL.ForExcel
         return;
       grdPreviewData.Columns[0].Visible = false;
       grdPreviewData.Columns[1].Selected = true;
+      grdPreviewData.FirstDisplayedScrollingColumnIndex = 1;
       cmbPrimaryKeyColumns.Enabled = true;
       cmbPrimaryKeyColumns.SelectedIndex = 0;
       txtAddPrimaryKey.Enabled = false;
@@ -263,7 +280,7 @@ namespace MySQL.ForExcel
       grpColumnOptions.Enabled = grdPreviewData.SelectedColumns.Count > 0;
       chkUniqueIndex.Enabled = chkCreateIndex.Enabled = chkExcludeColumn.Enabled = chkAllowEmpty.Enabled = !grdPreviewData.Columns[0].Selected;
       chkPrimaryKey.Enabled = !radAddPrimaryKey.Checked;
-      chkExcludeColumn.Enabled = !chkPrimaryKey.Checked;
+      chkExcludeColumn.Enabled = chkUniqueIndex.Enabled = chkCreateIndex.Enabled = !chkPrimaryKey.Checked;
     }
 
     private void cmbDatatype_DropDown(object sender, EventArgs e)
@@ -274,12 +291,6 @@ namespace MySQL.ForExcel
     private void cmbDatatype_DropDownClosed(object sender, EventArgs e)
     {
       cmbDatatype.DisplayMember = "Value";
-    }
-
-    private void cmbDatatype_SelectedIndexChanged(object sender, EventArgs e)
-    {
-      if (Settings.Default.ExportAutoIndexIntColumns && cmbDatatype.Text.StartsWith("Integer") && !chkCreateIndex.Checked)
-        chkCreateIndex.Checked = true;
     }
 
     private void cmbPrimaryKeyColumns_SelectedIndexChanged(object sender, EventArgs e)
@@ -297,7 +308,10 @@ namespace MySQL.ForExcel
       if (grdPreviewData.Columns[cmbPrimaryKeyColumns.SelectedIndex + 1].Selected)
         columnBindingSource.ResetCurrentItem();
       else
+      {
         grdPreviewData.Columns[cmbPrimaryKeyColumns.SelectedIndex + 1].Selected = true;
+        grdPreviewData.FirstDisplayedScrollingColumnIndex = cmbPrimaryKeyColumns.SelectedIndex + 1;
+      }
     }
 
     private void txtColumnName_TextChanged(object sender, EventArgs e)
@@ -334,7 +348,7 @@ namespace MySQL.ForExcel
       }
       gridCol.DefaultCellStyle.BackColor = good ? grdPreviewData.DefaultCellStyle.BackColor : Color.OrangeRed;
       column.WarningText = (good ? null : Properties.Resources.ColumnDataNotUniqueWarning);
-      showValidationWarning("ColumnOptionsWarning", good, column.WarningText);
+      showValidationWarning("ColumnOptionsWarning", !good, column.WarningText);
       chkCreateIndex.Checked = true;
     }
 
@@ -344,19 +358,15 @@ namespace MySQL.ForExcel
         return;
       DataGridViewColumn gridCol = grdPreviewData.SelectedColumns[0];
       gridCol.DefaultCellStyle.BackColor = chkExcludeColumn.Checked ? Color.LightGray : grdPreviewData.DefaultCellStyle.BackColor;
-      refreshPrimaryKeyColumnsCombo();
     }
 
     private void chkPrimaryKey_CheckedChanged(object sender, EventArgs e)
     {
       if (chkPrimaryKey.Checked == (columnBindingSource.Current as MySQLDataColumn).PrimaryKey)
         return;
-      int currentPKQty = dataTable.NumberOfPK + (chkPrimaryKey.Checked ? 1 : -1);
-      multiColumnPK = currentPKQty > 1;
-      flagMultiColumnPrimaryKey(currentPKQty);
       if (chkExcludeColumn.Checked && chkPrimaryKey.Checked)
-        chkExcludeColumn.Checked = false;
-      chkExcludeColumn.Enabled = !chkPrimaryKey.Checked;
+        chkExcludeColumn.Checked = chkUniqueIndex.Checked = chkCreateIndex.Checked = false;
+      chkExcludeColumn.Enabled = chkUniqueIndex.Enabled = chkCreateIndex.Enabled = !chkPrimaryKey.Checked;
     }
 
     private void chkCreateIndex_CheckedChanged(object sender, EventArgs e)
@@ -404,6 +414,69 @@ namespace MySQL.ForExcel
         int index = grdPreviewData.SelectedColumns[0].Index;
         if (index > 0)
           cmbPrimaryKeyColumns.Items[index - 1] = txtColumnName.Text;
+      }
+    }
+
+    private void chkExcludeColumn_Validated(object sender, EventArgs e)
+    {
+      refreshPrimaryKeyColumnsCombo();
+    }
+
+    private void chkPrimaryKey_Validated(object sender, EventArgs e)
+    {
+      int currentPKQty = dataTable.NumberOfPK;
+      multiColumnPK = currentPKQty > 1;
+      flagMultiColumnPrimaryKey(currentPKQty);
+    }
+
+    private void grdPreviewData_KeyDown(object sender, KeyEventArgs e)
+    {
+      if (grdPreviewData.SelectedColumns.Count == 0)
+        return;
+      if (e.Alt)
+      {
+        int currentSelectedIdx = grdPreviewData.SelectedColumns[0].Index;
+        int newIdx = 0;
+        switch (e.KeyCode.ToString())
+        {
+          case "P":
+            newIdx = currentSelectedIdx - 1;
+            if (newIdx >= (radAddPrimaryKey.Checked ? 0 : 1))
+            {
+              grdPreviewData.Columns[newIdx].Selected = true;
+              grdPreviewData.FirstDisplayedScrollingColumnIndex = newIdx;
+            }
+            break;
+          case "N":
+            newIdx = currentSelectedIdx + 1;
+            if (newIdx < grdPreviewData.Columns.Count)
+            {
+              grdPreviewData.Columns[newIdx].Selected = true;
+              grdPreviewData.FirstDisplayedScrollingColumnIndex = newIdx;
+            }
+            break;
+        }
+      }
+    }
+
+    private void cmbDatatype_SelectedIndexChanged(object sender, EventArgs e)
+    {
+      if (Settings.Default.ExportAutoIndexIntColumns && cmbDatatype.Text.StartsWith("Integer") && !chkCreateIndex.Checked)
+        chkCreateIndex.Checked = true;
+    }
+
+    private void cmbDatatype_Validating(object sender, CancelEventArgs e)
+    {
+      MySQLDataColumn currentCol = columnBindingSource.Current as MySQLDataColumn;
+      string selectedDataType = cmbDatatype.SelectedValue.ToString();
+      if (selectedDataType == currentCol.MySQLDataType)
+        return;
+      string compDataType = (dataTable.FirstRowIsHeaders ? currentCol.OtherRowsDataType : currentCol.FirstRowDataType);
+      if (selectedDataType != compDataType)
+      {
+        bool showWarning = !currentCol.CanBeOfMySQLDataType(selectedDataType);
+        currentCol.WarningText = (showWarning ? Properties.Resources.ExportDataTypeNotSuitableWarning : null);
+        showValidationWarning("ColumnOptionsWarning", showWarning, currentCol.WarningText);
       }
     }
 

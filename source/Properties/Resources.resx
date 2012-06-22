@@ -310,4 +310,10 @@
   <data name="ColumnDataNotUniqueWarning" xml:space="preserve">
     <value>Data in the current column is not unique.</value>
   </data>
+  <data name="ExportColumnsGridToolTipCaption" xml:space="preserve">
+    <value>Use &lt;Alt + N&gt; to move to the next column and &lt;Alt + P&gt; to move to the previous one.</value>
+  </data>
+  <data name="ExportDataTypeNotSuitableWarning" xml:space="preserve">
+    <value>Selected Data Type is not suitable for all the values in this column.</value>
+  </data>
 </root>

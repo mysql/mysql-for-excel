@@ -29,9 +29,9 @@
     private void InitializeComponent()
     {
       this.components = new System.ComponentModel.Container();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
       this.ExportDataPanel = new System.Windows.Forms.Panel();
       this.lblPrimaryKeyWarning = new System.Windows.Forms.Label();
       this.picPrimaryKeyWarning = new System.Windows.Forms.PictureBox();
@@ -45,8 +45,6 @@
       this.lblDatatype = new System.Windows.Forms.Label();
       this.txtColumnName = new System.Windows.Forms.TextBox();
       this.lblColumnName = new System.Windows.Forms.Label();
-      this.lblColumnOptionsWarning = new System.Windows.Forms.Label();
-      this.picColumnOptionsWarning = new System.Windows.Forms.PictureBox();
       this.chkFirstRowHeaders = new System.Windows.Forms.CheckBox();
       this.grdPreviewData = new System.Windows.Forms.DataGridView();
       this.lblColumnOptionsSub = new System.Windows.Forms.Label();
@@ -69,21 +67,24 @@
       this.lblTableNameMain = new System.Windows.Forms.Label();
       this.picTable = new System.Windows.Forms.PictureBox();
       this.lblExportData = new System.Windows.Forms.Label();
+      this.lblColumnOptionsWarning = new System.Windows.Forms.Label();
+      this.picColumnOptionsWarning = new System.Windows.Forms.PictureBox();
       this.btnCancel = new System.Windows.Forms.Button();
       this.btnExport = new System.Windows.Forms.Button();
       this.btnAdvanced = new System.Windows.Forms.Button();
       this.btnCopySQL = new System.Windows.Forms.Button();
       this.timerTextChanged = new System.Windows.Forms.Timer(this.components);
+      this.gridToolTip = new System.Windows.Forms.ToolTip(this.components);
       this.columnBindingSource = new System.Windows.Forms.BindingSource(this.components);
       this.ExportDataPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKeyWarning)).BeginInit();
       this.grpColumnOptions.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.picColumnOptionsWarning)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTableNameWarning)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKey)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTable)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.picColumnOptionsWarning)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.columnBindingSource)).BeginInit();
       this.SuspendLayout();
       // 
@@ -181,6 +182,7 @@
       this.cmbDatatype.DropDown += new System.EventHandler(this.cmbDatatype_DropDown);
       this.cmbDatatype.SelectedIndexChanged += new System.EventHandler(this.cmbDatatype_SelectedIndexChanged);
       this.cmbDatatype.DropDownClosed += new System.EventHandler(this.cmbDatatype_DropDownClosed);
+      this.cmbDatatype.Validating += new System.ComponentModel.CancelEventHandler(this.cmbDatatype_Validating);
       // 
       // chkExcludeColumn
       // 
@@ -194,6 +196,7 @@
       this.chkExcludeColumn.Text = "Exclude Column";
       this.chkExcludeColumn.UseVisualStyleBackColor = true;
       this.chkExcludeColumn.CheckedChanged += new System.EventHandler(this.chkExcludeColumn_CheckedChanged);
+      this.chkExcludeColumn.Validated += new System.EventHandler(this.chkExcludeColumn_Validated);
       // 
       // chkAllowEmpty
       // 
@@ -219,6 +222,7 @@
       this.chkPrimaryKey.Text = "Primary Key";
       this.chkPrimaryKey.UseVisualStyleBackColor = true;
       this.chkPrimaryKey.CheckedChanged += new System.EventHandler(this.chkPrimaryKey_CheckedChanged);
+      this.chkPrimaryKey.Validated += new System.EventHandler(this.chkPrimaryKey_Validated);
       // 
       // chkUniqueIndex
       // 
@@ -276,30 +280,6 @@
       this.lblColumnName.TabIndex = 1;
       this.lblColumnName.Text = "Column Name:";
       // 
-      // lblColumnOptionsWarning
-      // 
-      this.lblColumnOptionsWarning.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.lblColumnOptionsWarning.AutoSize = true;
-      this.lblColumnOptionsWarning.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblColumnOptionsWarning.ForeColor = System.Drawing.Color.Red;
-      this.lblColumnOptionsWarning.Location = new System.Drawing.Point(133, 0);
-      this.lblColumnOptionsWarning.Name = "lblColumnOptionsWarning";
-      this.lblColumnOptionsWarning.Size = new System.Drawing.Size(227, 12);
-      this.lblColumnOptionsWarning.TabIndex = 0;
-      this.lblColumnOptionsWarning.Text = "It is good practice to not use upper case letters or spaces.";
-      this.lblColumnOptionsWarning.Visible = false;
-      // 
-      // picColumnOptionsWarning
-      // 
-      this.picColumnOptionsWarning.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.picColumnOptionsWarning.Location = new System.Drawing.Point(111, -1);
-      this.picColumnOptionsWarning.Name = "picColumnOptionsWarning";
-      this.picColumnOptionsWarning.Size = new System.Drawing.Size(20, 20);
-      this.picColumnOptionsWarning.TabIndex = 24;
-      this.picColumnOptionsWarning.TabStop = false;
-      this.picColumnOptionsWarning.Visible = false;
-      // 
       // chkFirstRowHeaders
       // 
       this.chkFirstRowHeaders.AutoSize = true;
@@ -324,41 +304,43 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.grdPreviewData.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-      dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-      dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-      this.grdPreviewData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+      dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.grdPreviewData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle10;
       this.grdPreviewData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-      dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
-      dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdPreviewData.DefaultCellStyle = dataGridViewCellStyle5;
+      dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Window;
+      dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.grdPreviewData.DefaultCellStyle = dataGridViewCellStyle11;
       this.grdPreviewData.Location = new System.Drawing.Point(83, 279);
       this.grdPreviewData.MultiSelect = false;
       this.grdPreviewData.Name = "grdPreviewData";
       this.grdPreviewData.ReadOnly = true;
-      dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-      dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-      this.grdPreviewData.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+      dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle12.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle12.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.grdPreviewData.RowHeadersDefaultCellStyle = dataGridViewCellStyle12;
       this.grdPreviewData.RowHeadersVisible = false;
       this.grdPreviewData.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
       this.grdPreviewData.Size = new System.Drawing.Size(677, 158);
       this.grdPreviewData.TabIndex = 18;
+      this.gridToolTip.SetToolTip(this.grdPreviewData, "Mama");
       this.grdPreviewData.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.grdPreviewData_DataBindingComplete);
       this.grdPreviewData.SelectionChanged += new System.EventHandler(this.grdPreviewData_SelectionChanged);
+      this.grdPreviewData.KeyDown += new System.Windows.Forms.KeyEventHandler(this.grdPreviewData_KeyDown);
       // 
       // lblColumnOptionsSub
       // 
@@ -576,6 +558,30 @@
       this.lblExportData.TabIndex = 0;
       this.lblExportData.Text = "Export Data to MySQL";
       // 
+      // lblColumnOptionsWarning
+      // 
+      this.lblColumnOptionsWarning.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.lblColumnOptionsWarning.AutoSize = true;
+      this.lblColumnOptionsWarning.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblColumnOptionsWarning.ForeColor = System.Drawing.Color.Red;
+      this.lblColumnOptionsWarning.Location = new System.Drawing.Point(120, 0);
+      this.lblColumnOptionsWarning.Name = "lblColumnOptionsWarning";
+      this.lblColumnOptionsWarning.Size = new System.Drawing.Size(227, 12);
+      this.lblColumnOptionsWarning.TabIndex = 0;
+      this.lblColumnOptionsWarning.Text = "It is good practice to not use upper case letters or spaces.";
+      this.lblColumnOptionsWarning.Visible = false;
+      // 
+      // picColumnOptionsWarning
+      // 
+      this.picColumnOptionsWarning.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
+      this.picColumnOptionsWarning.Location = new System.Drawing.Point(98, -1);
+      this.picColumnOptionsWarning.Name = "picColumnOptionsWarning";
+      this.picColumnOptionsWarning.Size = new System.Drawing.Size(20, 20);
+      this.picColumnOptionsWarning.TabIndex = 24;
+      this.picColumnOptionsWarning.TabStop = false;
+      this.picColumnOptionsWarning.Visible = false;
+      // 
       // btnCancel
       // 
       this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -656,12 +662,12 @@
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKeyWarning)).EndInit();
       this.grpColumnOptions.ResumeLayout(false);
       this.grpColumnOptions.PerformLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.picColumnOptionsWarning)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTableNameWarning)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKey)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTable)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.picColumnOptionsWarning)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.columnBindingSource)).EndInit();
       this.ResumeLayout(false);
 
@@ -712,5 +718,6 @@
     private System.Windows.Forms.Timer timerTextChanged;
     private System.Windows.Forms.Label lblPrimaryKeyWarning;
     private System.Windows.Forms.PictureBox picPrimaryKeyWarning;
+    private System.Windows.Forms.ToolTip gridToolTip;
   }
 }

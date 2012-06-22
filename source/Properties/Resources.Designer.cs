@@ -271,6 +271,24 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Use &lt;Alt + N&gt; to move to the next column and &lt;Alt + P&gt; to move to the previous one..
+        /// </summary>
+        internal static string ExportColumnsGridToolTipCaption {
+            get {
+                return ResourceManager.GetString("ExportColumnsGridToolTipCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selected Data Type is not suitable for all the values in this column..
+        /// </summary>
+        internal static string ExportDataTypeNotSuitableWarning {
+            get {
+                return ResourceManager.GetString("ExportDataTypeNotSuitableWarning", resourceCulture);
+            }
+        }
+        
         internal static System.Drawing.Bitmap mysql_for_excel_header {
             get {
                 object obj = ResourceManager.GetObject("mysql_for_excel_header", resourceCulture);

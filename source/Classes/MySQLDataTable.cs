@@ -23,6 +23,7 @@ namespace MySQL.ForExcel
           (Columns[i] as MySQLDataColumn).PrimaryKey = false;
       }
     }
+    public bool RemoveEmptyColumns { get; set; }
     public bool IsFormatted { get; private set; }
     public bool FirstRowIsHeaders
     {
@@ -88,26 +89,57 @@ namespace MySQL.ForExcel
       int numRows = data.GetUpperBound(0);
       int numCols = data.GetUpperBound(1);
 
+      List<bool> coumnsHaveAnyDataList = new List<bool>(numCols + 1);
+      List<string> colsToDelete = new List<string>(numCols);
+
+      coumnsHaveAnyDataList.Add(true);
+      for (int colIdx = 1; colIdx <= numCols; colIdx++)
+      {
+        bool colHasAnyData = false;
+        for (int rowIdx = 1; rowIdx <= numRows; rowIdx++)
+        {
+          if (data[rowIdx, colIdx] == null)
+            continue;
+          colHasAnyData = true;
+          break;
+        }
+        coumnsHaveAnyDataList.Add(colHasAnyData);
+      }
+
       if (Columns.Count == 0)
         CreateColumns(numCols);
 
+      int pkRowValueAdjust = 0;
       for (int row = 1; row <= numRows; row++)
       {
+        bool rowHasAnyData = false;
         DataRow dataRow = NewRow();
-        dataRow[0] = row;
+        dataRow[0] = row - pkRowValueAdjust;
         for (int col = 1; col <= numCols; col++)
         {
+          MySQLDataColumn column = Columns[col] as MySQLDataColumn;
+          if (row == 1 && !coumnsHaveAnyDataList[col])
+          {
+            column.ExcludeColumn = true;
+            colsToDelete.Add(column.ColumnName);
+          }
+          rowHasAnyData = rowHasAnyData || data[row, col] != null;
           dataRow[col] = data[row, col];
         }
-        Rows.Add(dataRow);
+        if (rowHasAnyData)
+          Rows.Add(dataRow);
+        else
+          pkRowValueAdjust++;
       }
       if (detectTypes)
         DetectTypes(data, createIndexForIntColumns);
+
+      if (RemoveEmptyColumns)
+        foreach (string colName in colsToDelete)
+          Columns.Remove(Columns[colName]);
       if (allowEmptyNonIdxCols)
-        foreach (MySQLColumn mysqlCol in Columns.OfType<MySQLColumn>().Skip(1))
-        {
+      foreach (MySQLDataColumn mysqlCol in Columns)
           mysqlCol.AllowNull = !mysqlCol.CreateIndex;
-        }
     }
 
     private void DetectTypes()
@@ -124,6 +156,10 @@ namespace MySQL.ForExcel
 
       for (int colPos = 1; colPos <= colsCount; colPos++)
       {
+        MySQLDataColumn col = Columns[colPos] as MySQLDataColumn;
+        if (col.ExcludeColumn)
+          continue;
+
         object valueFromArray = null;
         string proposedType = String.Empty;
         string strippedType = String.Empty;
@@ -221,7 +257,6 @@ namespace MySQL.ForExcel
         else
             proposedType = String.Format("Varchar({0})", varCharMaxLen[1]);
 
-        MySQLDataColumn col = Columns[colPos] as MySQLDataColumn;
         col.FirstRowDataType = headerType;
         col.OtherRowsDataType = proposedType;
         col.MySQLDataType = (firstRowIsHeaders ? headerType : proposedType);
@@ -286,19 +321,25 @@ namespace MySQL.ForExcel
       sql.AppendFormat("CREATE TABLE `{0}`{1}(", TableName, nl);
 
       string delimiter = nlt;
-      foreach (MySQLDataColumn column in Columns)
+      int skipNum = (addPK ? 0 : 1);
+      foreach (MySQLDataColumn col in Columns.OfType<MySQLDataColumn>().Skip(skipNum).Where(c => !c.ExcludeColumn))
       {
-        if (column.ExcludeColumn)
-          continue;
-        sql.AppendFormat("{0}{1}", delimiter, column.GetSQL());
+        sql.AppendFormat("{0}{1}", delimiter, col.GetSQL());
         delimiter = "," + nlt;
       }
-      foreach (MySQLDataColumn col in Columns)
+      if (NumberOfPK > 1)
       {
-        if (col.AutoPK || col.PrimaryKey || col.UniqueKey || !col.CreateIndex)
-          continue;
-        sql.AppendFormat("{0}INDEX {1}_idx ({1})", delimiter, col.DisplayName);
+        string pkDelimiter = String.Empty;
+        sql.AppendFormat("{0}PRIMARY KEY (", delimiter);
+        foreach (MySQLDataColumn col in Columns.OfType<MySQLDataColumn>().Skip(1).Where(c => c.PrimaryKey))
+        {
+          sql.AppendFormat("{0}{1}", pkDelimiter, col.DisplayName);
+          pkDelimiter = ",";
+        }
+        sql.Append(")");
       }
+      foreach (MySQLDataColumn col in Columns.OfType<MySQLDataColumn>().Where(c => !(c.AutoPK || c.PrimaryKey || c.UniqueKey || c.ExcludeColumn || !c.CreateIndex)))
+        sql.AppendFormat("{0}INDEX {1}_idx ({1})", delimiter, col.DisplayName);
       sql.Append(nl);
       sql.Append(")");
       return sql.ToString();
@@ -314,11 +355,12 @@ namespace MySQL.ForExcel
       string nl = (formatNewLinesAndTabs ? "\n" : " ");
       int rowIdx = 0;
       int colIdx = 0;
+      int startingColNum = (addPK ? 0 : 1);
 
       string separator = String.Empty;
       queryString.AppendFormat("INSERT INTO `{0}`{1}(", TableName, nl);
 
-      for (colIdx = 0; colIdx < exportColsCount; colIdx++)
+      for (colIdx = startingColNum; colIdx < exportColsCount; colIdx++)
       {
         MySQLDataColumn column = Columns[colIdx] as MySQLDataColumn;
         if (column.ExcludeColumn)
@@ -338,7 +380,7 @@ namespace MySQL.ForExcel
           break;
         queryString.Append("(");
         separator = String.Empty;
-        for (colIdx = 0; colIdx < exportColsCount; colIdx++)
+        for (colIdx = startingColNum; colIdx < exportColsCount; colIdx++)
         {
           MySQLDataColumn column = Columns[colIdx] as MySQLDataColumn;
           if (column.ExcludeColumn)
@@ -366,7 +408,7 @@ namespace MySQL.ForExcel
       foreach (MySQLDataColumn col in Columns)
       {
         MySQLDataColumn copyCol = copyOriginal.Columns[col.ColumnName] as MySQLDataColumn;
-        if (col.ExcludeColumn)
+        if (col.ExcludeColumn || (!addPK && col.AutoPK))
           copyOriginal.Columns.Remove(copyCol);
         else
           copyCol.ColumnName = col.DisplayName;
@@ -379,12 +421,12 @@ namespace MySQL.ForExcel
       // Create & open a SqlConnection, and dispose of it after we are done.
       using (MySqlConnection connection = new MySqlConnection(connectionString))
       {
-        MySqlDataAdapter dataAdapter = new MySqlDataAdapter(String.Format("SELECT * FROM {0} LIMIT 0", TableName), connection);
+        MySqlDataAdapter dataAdapter = new MySqlDataAdapter(String.Format("SELECT * FROM {0}", TableName), connection);
         DataTable exportingDataTable = new DataTable();
-        dataAdapter.Fill(exportingDataTable);
+        dataAdapter.FillSchema(exportingDataTable, SchemaType.Source);
         foreach (DataRow row in copyOriginal.Rows)
         {
-          exportingDataTable.LoadDataRow(row.ItemArray, LoadOption.OverwriteChanges);
+          exportingDataTable.LoadDataRow(row.ItemArray, LoadOption.Upsert);
         }
         MySqlCommandBuilder commBuilder = new MySqlCommandBuilder(dataAdapter);
         dataAdapter.InsertCommand = commBuilder.GetInsertCommand();
@@ -545,6 +587,82 @@ namespace MySQL.ForExcel
       rowPos++;
     }
 
+    public bool CanBeOfMySQLDataType(string mySQLDataType)
+    {
+      bool result = true;
+
+      mySQLDataType = mySQLDataType.ToLowerInvariant();
+      bool isVarChar = mySQLDataType.StartsWith("varchar");
+      bool isDecimal = mySQLDataType.StartsWith("decimal");
+      int lParensIndex = mySQLDataType.IndexOf("(");
+      int commaPos = mySQLDataType.IndexOf(",");
+      int varcharLen = (isVarChar ? Int32.Parse(mySQLDataType.Substring(lParensIndex + 1, mySQLDataType.Length - lParensIndex - 2)) : 0);
+      int[] decimalLen = new int[2] { 0, 0 };
+      if (isDecimal)
+      {
+        decimalLen[0] = Int32.Parse(mySQLDataType.Substring(lParensIndex + 1, commaPos - lParensIndex - 1));
+        decimalLen[1] = Int32.Parse(mySQLDataType.Substring(commaPos + 1, mySQLDataType.Length - commaPos - 2));
+      }
+      int tryIntValue = 0;
+      long tryBigIntValue = 0;
+      decimal tryDecimalValue = 0;
+      double tryDoubleValue = 0;
+      DateTime tryDateTimeValue = DateTime.Now;
+      TimeSpan tryTimeSpanValue = TimeSpan.Zero;
+
+      foreach (DataRow dr in Table.Rows)
+      {
+        string strValueFromArray = dr[Ordinal].ToString();
+        if (isVarChar)
+        {
+          result = result && strValueFromArray.Length <= varcharLen;
+          continue;
+        }
+        if (isDecimal)
+        {
+          int pointPos = strValueFromArray.IndexOf(".");
+          bool success = Decimal.TryParse(strValueFromArray, out tryDecimalValue);
+          if (success)
+          {
+            if (pointPos >= 0)
+              success = strValueFromArray.Substring(0, pointPos).Length <= decimalLen[0] && strValueFromArray.Substring(pointPos + 1, strValueFromArray.Length - pointPos - 1).Length <= decimalLen[1];
+          }
+          result = result && success;
+          continue;
+        }
+        if (mySQLDataType == "integer")
+        {
+          result = result && Int32.TryParse(strValueFromArray, out tryIntValue);
+          continue;
+        }
+        if (mySQLDataType == "bigint")
+        {
+          result = result && Int64.TryParse(strValueFromArray, out tryBigIntValue);
+          continue;
+        }
+        if (mySQLDataType == "bool")
+        {
+          strValueFromArray = strValueFromArray.ToLowerInvariant();
+          result = result && (strValueFromArray == "true" || strValueFromArray == "false" || strValueFromArray == "0" || strValueFromArray == "1" || strValueFromArray == "yes" || strValueFromArray == "no" || strValueFromArray == "ja" || strValueFromArray == "nein");
+          continue;
+        }
+        if (mySQLDataType == "double")
+        {
+          result = result && Double.TryParse(strValueFromArray, out tryDoubleValue);
+        }
+        if (mySQLDataType.StartsWith("date"))
+        {
+          result = result && DateTime.TryParse(strValueFromArray, out tryDateTimeValue);
+        }
+        if (mySQLDataType == "time")
+        {
+          result = result && TimeSpan.TryParse(strValueFromArray, out tryTimeSpanValue);
+        }
+      }
+
+      return result;
+    }
+
     public string GetSQL()
     {
       if (String.IsNullOrEmpty(displayName))
@@ -552,7 +670,7 @@ namespace MySQL.ForExcel
 
       StringBuilder colDefinition = new StringBuilder(displayName);
       colDefinition.AppendFormat(" {0}", MySQLDataType);
-      if (AutoPK)
+      if (AutoPK || (PrimaryKey && (Table as MySQLDataTable).NumberOfPK == 1))
         colDefinition.Append(" primary key");
       else if (UniqueKey)
         colDefinition.Append(" unique key");
