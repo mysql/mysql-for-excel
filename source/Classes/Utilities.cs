@@ -381,7 +381,8 @@ namespace MySQL.ForExcel
         }
         else
           strType = "System.Decimal";
-      if (strType.StartsWith("Varchar") && (strValue == "Yes" || strValue == "No" || strValue == "Ja" || strValue == "Nein"))
+      strValue = strValue.ToLowerInvariant();
+      if (strType == "System.String" && (strValue == "yes" || strValue == "no" || strValue == "ja" || strValue == "nein"))
         strType = "System.Boolean";
 
       switch (strType)

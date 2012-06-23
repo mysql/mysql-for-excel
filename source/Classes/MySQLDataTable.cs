@@ -179,6 +179,8 @@ namespace MySQL.ForExcel
 
           // Treat always as a Varchar value first in case all rows do not have a consistent datatype
           proposedType = Utilities.GetMySQLExportDataType(valueFromArray.ToString(), out valueOverflow);
+          if (proposedType == "Bool")
+            proposedType = "Varchar(5)";
           lParensIndex = proposedType.IndexOf("(");
           varCharMaxLen[1] = Math.Max(Int32.Parse(proposedType.Substring(lParensIndex + 1, proposedType.Length - lParensIndex - 2)), varCharMaxLen[1]);
 
@@ -451,6 +453,7 @@ namespace MySQL.ForExcel
   {
     private bool uniqueKey;
     private string displayName;
+    private List<string> warningTextList = new List<string>(3);
 
     public bool AutoPK { get; set; }
     public bool CreateIndex { get; set; }
@@ -480,7 +483,7 @@ namespace MySQL.ForExcel
     public bool AllowNull { get; set; }
     public bool ExcludeColumn { get; set; }
     public string MySQLDataType { get; set; }
-    public string WarningText { get; set; }
+    public List<string> WarningTextList { get { return warningTextList; } }
     public string FirstRowDataType { get; set; }
     public string OtherRowsDataType { get; set; }
 
@@ -609,9 +612,13 @@ namespace MySQL.ForExcel
       double tryDoubleValue = 0;
       DateTime tryDateTimeValue = DateTime.Now;
       TimeSpan tryTimeSpanValue = TimeSpan.Zero;
+      MySQLDataTable parentTable = Table as MySQLDataTable;
+      int rowIdx = 0;
 
-      foreach (DataRow dr in Table.Rows)
+      foreach (DataRow dr in parentTable.Rows)
       {
+        if (parentTable.FirstRowIsHeaders && rowIdx++ == 0)
+          continue;
         string strValueFromArray = dr[Ordinal].ToString();
         if (isVarChar)
         {
