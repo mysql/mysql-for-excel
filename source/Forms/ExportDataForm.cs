@@ -39,7 +39,6 @@ namespace MySQL.ForExcel
       txtTableNameInput.SelectAll();
       btnCopySQL.Visible = Properties.Settings.Default.ExportShowCopySQLButton;
       chkFirstRowHeaders_CheckedChanged(chkFirstRowHeaders, EventArgs.Empty);
-      gridToolTip.SetToolTip(grdPreviewData, Resources.ExportColumnsGridToolTipCaption);
     }
 
     private void refreshPrimaryKeyColumnsCombo()
@@ -79,6 +78,8 @@ namespace MySQL.ForExcel
         MySQLDataColumn mysqlCol = dataTable.Columns[colIdx] as MySQLDataColumn;
         DataGridViewColumn gridCol = grdPreviewData.Columns[colIdx];
         gridCol.HeaderText = mysqlCol.DisplayName;
+        if (gridCol.ToolTipText.Length == 0)
+          gridCol.ToolTipText = Resources.ExportColumnsGridToolTipCaption;
         grdPreviewData.Columns[colIdx].SortMode = DataGridViewColumnSortMode.NotSortable;
       }
       refreshPrimaryKeyColumnsCombo();
@@ -126,7 +127,6 @@ namespace MySQL.ForExcel
       cmbDatatype.DataSource = dataTypesTable;
       cmbDatatype.ValueMember = "Value";
       cmbDatatype.DisplayMember = "Value";
-      cmbDatatype.DropDownWidth = 300;
     }
 
     private void showValidationWarning(string warningControlSuffix, bool show, string text)
@@ -283,16 +283,6 @@ namespace MySQL.ForExcel
       chkExcludeColumn.Enabled = chkUniqueIndex.Enabled = chkCreateIndex.Enabled = !chkPrimaryKey.Checked;
     }
 
-    private void cmbDatatype_DropDown(object sender, EventArgs e)
-    {
-      cmbDatatype.DisplayMember = "Description";
-    }
-
-    private void cmbDatatype_DropDownClosed(object sender, EventArgs e)
-    {
-      cmbDatatype.DisplayMember = "Value";
-    }
-
     private void cmbPrimaryKeyColumns_SelectedIndexChanged(object sender, EventArgs e)
     {
       if (multiColumnPK && cmbPrimaryKeyColumns.SelectedIndex == 0)
@@ -411,9 +401,12 @@ namespace MySQL.ForExcel
       if (txtColumnName.Text != (columnBindingSource.Current as MySQLDataColumn).DisplayName)
       {
         columnBindingSource.ResetCurrentItem();
-        int index = grdPreviewData.SelectedColumns[0].Index;
+        int index = (grdPreviewData.SelectedColumns.Count > 0 ? grdPreviewData.SelectedColumns[0].Index : -1);
         if (index > 0)
+        {
           cmbPrimaryKeyColumns.Items[index - 1] = txtColumnName.Text;
+          grdPreviewData.SelectedColumns[0].HeaderText = txtColumnName.Text;
+        }
       }
     }
 
@@ -461,23 +454,29 @@ namespace MySQL.ForExcel
 
     private void cmbDatatype_SelectedIndexChanged(object sender, EventArgs e)
     {
+      MySQLDataColumn currentCol = columnBindingSource.Current as MySQLDataColumn;
+      if (cmbDatatype.Text == currentCol.MySQLDataType || cmbDatatype.Text.Length == 0 || (cmbDatatype.DataSource as DataTable).Select(String.Format("Value = '{0}'", cmbDatatype.Text)).Length == 0)
+        return;
       if (Settings.Default.ExportAutoIndexIntColumns && cmbDatatype.Text.StartsWith("Integer") && !chkCreateIndex.Checked)
         chkCreateIndex.Checked = true;
+      bool showWarning = !currentCol.CanBeOfMySQLDataType(cmbDatatype.Text);
+      currentCol.WarningText = (showWarning ? Properties.Resources.ExportDataTypeNotSuitableWarning : null);
+      showValidationWarning("ColumnOptionsWarning", showWarning, currentCol.WarningText);
+      if (grdPreviewData.SelectedColumns.Count > 0)
+        grdPreviewData.SelectedColumns[0].DefaultCellStyle.BackColor = (showWarning ? Color.OrangeRed : grdPreviewData.DefaultCellStyle.BackColor);
+      currentCol.MySQLDataType = cmbDatatype.Text;
     }
 
-    private void cmbDatatype_Validating(object sender, CancelEventArgs e)
+    private void cmbDatatype_DrawItem(object sender, DrawItemEventArgs e)
     {
-      MySQLDataColumn currentCol = columnBindingSource.Current as MySQLDataColumn;
-      string selectedDataType = cmbDatatype.SelectedValue.ToString();
-      if (selectedDataType == currentCol.MySQLDataType)
-        return;
-      string compDataType = (dataTable.FirstRowIsHeaders ? currentCol.OtherRowsDataType : currentCol.FirstRowDataType);
-      if (selectedDataType != compDataType)
-      {
-        bool showWarning = !currentCol.CanBeOfMySQLDataType(selectedDataType);
-        currentCol.WarningText = (showWarning ? Properties.Resources.ExportDataTypeNotSuitableWarning : null);
-        showValidationWarning("ColumnOptionsWarning", showWarning, currentCol.WarningText);
-      }
+      e.DrawBackground();
+      e.Graphics.DrawString((cmbDatatype.Items[e.Index] as DataRowView)["Description"].ToString(), cmbDatatype.Font, System.Drawing.Brushes.Black, new RectangleF(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height));
+      e.DrawFocusRectangle();
+    }
+
+    private void grdPreviewData_CellToolTipTextNeeded(object sender, DataGridViewCellToolTipTextNeededEventArgs e)
+    {
+      e.ToolTipText = Resources.ExportColumnsGridToolTipCaption;
     }
 
   }

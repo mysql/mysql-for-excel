@@ -29,9 +29,9 @@
     private void InitializeComponent()
     {
       this.components = new System.ComponentModel.Container();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
       this.ExportDataPanel = new System.Windows.Forms.Panel();
       this.lblPrimaryKeyWarning = new System.Windows.Forms.Label();
       this.picPrimaryKeyWarning = new System.Windows.Forms.PictureBox();
@@ -45,6 +45,8 @@
       this.lblDatatype = new System.Windows.Forms.Label();
       this.txtColumnName = new System.Windows.Forms.TextBox();
       this.lblColumnName = new System.Windows.Forms.Label();
+      this.lblColumnOptionsWarning = new System.Windows.Forms.Label();
+      this.picColumnOptionsWarning = new System.Windows.Forms.PictureBox();
       this.chkFirstRowHeaders = new System.Windows.Forms.CheckBox();
       this.grdPreviewData = new System.Windows.Forms.DataGridView();
       this.lblColumnOptionsSub = new System.Windows.Forms.Label();
@@ -67,24 +69,21 @@
       this.lblTableNameMain = new System.Windows.Forms.Label();
       this.picTable = new System.Windows.Forms.PictureBox();
       this.lblExportData = new System.Windows.Forms.Label();
-      this.lblColumnOptionsWarning = new System.Windows.Forms.Label();
-      this.picColumnOptionsWarning = new System.Windows.Forms.PictureBox();
       this.btnCancel = new System.Windows.Forms.Button();
       this.btnExport = new System.Windows.Forms.Button();
       this.btnAdvanced = new System.Windows.Forms.Button();
       this.btnCopySQL = new System.Windows.Forms.Button();
       this.timerTextChanged = new System.Windows.Forms.Timer(this.components);
-      this.gridToolTip = new System.Windows.Forms.ToolTip(this.components);
       this.columnBindingSource = new System.Windows.Forms.BindingSource(this.components);
       this.ExportDataPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKeyWarning)).BeginInit();
       this.grpColumnOptions.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.picColumnOptionsWarning)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTableNameWarning)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKey)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTable)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picColumnOptionsWarning)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.columnBindingSource)).BeginInit();
       this.SuspendLayout();
       // 
@@ -173,16 +172,18 @@
       // 
       this.cmbDatatype.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.cmbDatatype.DataBindings.Add(new System.Windows.Forms.Binding("SelectedValue", this.columnBindingSource, "MySQLDataType", true));
+      this.cmbDatatype.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+      this.cmbDatatype.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+      this.cmbDatatype.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.columnBindingSource, "MySQLDataType", true));
+      this.cmbDatatype.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+      this.cmbDatatype.DropDownWidth = 400;
       this.cmbDatatype.FormattingEnabled = true;
       this.cmbDatatype.Location = new System.Drawing.Point(122, 62);
       this.cmbDatatype.Name = "cmbDatatype";
-      this.cmbDatatype.Size = new System.Drawing.Size(135, 23);
+      this.cmbDatatype.Size = new System.Drawing.Size(135, 24);
       this.cmbDatatype.TabIndex = 4;
-      this.cmbDatatype.DropDown += new System.EventHandler(this.cmbDatatype_DropDown);
+      this.cmbDatatype.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbDatatype_DrawItem);
       this.cmbDatatype.SelectedIndexChanged += new System.EventHandler(this.cmbDatatype_SelectedIndexChanged);
-      this.cmbDatatype.DropDownClosed += new System.EventHandler(this.cmbDatatype_DropDownClosed);
-      this.cmbDatatype.Validating += new System.ComponentModel.CancelEventHandler(this.cmbDatatype_Validating);
       // 
       // chkExcludeColumn
       // 
@@ -280,6 +281,30 @@
       this.lblColumnName.TabIndex = 1;
       this.lblColumnName.Text = "Column Name:";
       // 
+      // lblColumnOptionsWarning
+      // 
+      this.lblColumnOptionsWarning.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.lblColumnOptionsWarning.AutoSize = true;
+      this.lblColumnOptionsWarning.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblColumnOptionsWarning.ForeColor = System.Drawing.Color.Red;
+      this.lblColumnOptionsWarning.Location = new System.Drawing.Point(120, 0);
+      this.lblColumnOptionsWarning.Name = "lblColumnOptionsWarning";
+      this.lblColumnOptionsWarning.Size = new System.Drawing.Size(227, 12);
+      this.lblColumnOptionsWarning.TabIndex = 0;
+      this.lblColumnOptionsWarning.Text = "It is good practice to not use upper case letters or spaces.";
+      this.lblColumnOptionsWarning.Visible = false;
+      // 
+      // picColumnOptionsWarning
+      // 
+      this.picColumnOptionsWarning.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
+      this.picColumnOptionsWarning.Location = new System.Drawing.Point(98, -1);
+      this.picColumnOptionsWarning.Name = "picColumnOptionsWarning";
+      this.picColumnOptionsWarning.Size = new System.Drawing.Size(20, 20);
+      this.picColumnOptionsWarning.TabIndex = 24;
+      this.picColumnOptionsWarning.TabStop = false;
+      this.picColumnOptionsWarning.Visible = false;
+      // 
       // chkFirstRowHeaders
       // 
       this.chkFirstRowHeaders.AutoSize = true;
@@ -304,40 +329,43 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.grdPreviewData.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-      dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle10.BackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle10.ForeColor = System.Drawing.SystemColors.WindowText;
-      dataGridViewCellStyle10.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle10.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-      this.grdPreviewData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle10;
+      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.grdPreviewData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
       this.grdPreviewData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-      dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Window;
-      dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle11.ForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdPreviewData.DefaultCellStyle = dataGridViewCellStyle11;
+      dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+      dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.grdPreviewData.DefaultCellStyle = dataGridViewCellStyle2;
       this.grdPreviewData.Location = new System.Drawing.Point(83, 279);
       this.grdPreviewData.MultiSelect = false;
       this.grdPreviewData.Name = "grdPreviewData";
       this.grdPreviewData.ReadOnly = true;
-      dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle12.BackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle12.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle12.ForeColor = System.Drawing.SystemColors.WindowText;
-      dataGridViewCellStyle12.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle12.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle12.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-      this.grdPreviewData.RowHeadersDefaultCellStyle = dataGridViewCellStyle12;
+      dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.grdPreviewData.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
       this.grdPreviewData.RowHeadersVisible = false;
       this.grdPreviewData.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+      this.grdPreviewData.ShowCellErrors = false;
+      this.grdPreviewData.ShowEditingIcon = false;
+      this.grdPreviewData.ShowRowErrors = false;
       this.grdPreviewData.Size = new System.Drawing.Size(677, 158);
       this.grdPreviewData.TabIndex = 18;
-      this.gridToolTip.SetToolTip(this.grdPreviewData, "Mama");
+      this.grdPreviewData.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.grdPreviewData_CellToolTipTextNeeded);
       this.grdPreviewData.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.grdPreviewData_DataBindingComplete);
       this.grdPreviewData.SelectionChanged += new System.EventHandler(this.grdPreviewData_SelectionChanged);
       this.grdPreviewData.KeyDown += new System.Windows.Forms.KeyEventHandler(this.grdPreviewData_KeyDown);
@@ -397,6 +425,8 @@
       // 
       // cmbPrimaryKeyColumns
       // 
+      this.cmbPrimaryKeyColumns.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+      this.cmbPrimaryKeyColumns.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
       this.cmbPrimaryKeyColumns.DisplayMember = "DisplayName";
       this.cmbPrimaryKeyColumns.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.cmbPrimaryKeyColumns.FormattingEnabled = true;
@@ -558,30 +588,6 @@
       this.lblExportData.TabIndex = 0;
       this.lblExportData.Text = "Export Data to MySQL";
       // 
-      // lblColumnOptionsWarning
-      // 
-      this.lblColumnOptionsWarning.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.lblColumnOptionsWarning.AutoSize = true;
-      this.lblColumnOptionsWarning.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblColumnOptionsWarning.ForeColor = System.Drawing.Color.Red;
-      this.lblColumnOptionsWarning.Location = new System.Drawing.Point(120, 0);
-      this.lblColumnOptionsWarning.Name = "lblColumnOptionsWarning";
-      this.lblColumnOptionsWarning.Size = new System.Drawing.Size(227, 12);
-      this.lblColumnOptionsWarning.TabIndex = 0;
-      this.lblColumnOptionsWarning.Text = "It is good practice to not use upper case letters or spaces.";
-      this.lblColumnOptionsWarning.Visible = false;
-      // 
-      // picColumnOptionsWarning
-      // 
-      this.picColumnOptionsWarning.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.picColumnOptionsWarning.Location = new System.Drawing.Point(98, -1);
-      this.picColumnOptionsWarning.Name = "picColumnOptionsWarning";
-      this.picColumnOptionsWarning.Size = new System.Drawing.Size(20, 20);
-      this.picColumnOptionsWarning.TabIndex = 24;
-      this.picColumnOptionsWarning.TabStop = false;
-      this.picColumnOptionsWarning.Visible = false;
-      // 
       // btnCancel
       // 
       this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -662,12 +668,12 @@
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKeyWarning)).EndInit();
       this.grpColumnOptions.ResumeLayout(false);
       this.grpColumnOptions.PerformLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.picColumnOptionsWarning)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTableNameWarning)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKey)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTable)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picColumnOptionsWarning)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.columnBindingSource)).EndInit();
       this.ResumeLayout(false);
 
@@ -718,6 +724,5 @@
     private System.Windows.Forms.Timer timerTextChanged;
     private System.Windows.Forms.Label lblPrimaryKeyWarning;
     private System.Windows.Forms.PictureBox picPrimaryKeyWarning;
-    private System.Windows.Forms.ToolTip gridToolTip;
   }
 }
