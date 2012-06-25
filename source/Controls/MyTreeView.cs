@@ -26,7 +26,8 @@ namespace TreeViewTest
     public MyTreeView()
     {
       DrawMode = TreeViewDrawMode.OwnerDrawAll;
-      grayBrush = new SolidBrush(Color.Gray);
+      //grayBrush = new SolidBrush(Color.Gray);
+      grayBrush = new SolidBrush(Color.FromArgb(223, 227, 232));
       blackBrush = new SolidBrush(Color.Black);
       DoubleBuffered = true;
 
@@ -95,7 +96,7 @@ namespace TreeViewTest
     {
       Graphics g = e.Graphics;
       Brush brush = new SolidBrush(e.Node.BackColor);
-      g.FillRectangle(brush, e.Bounds);
+      g.FillRectangle(grayBrush, e.Bounds);
 
       Point pt = e.Bounds.Location;
 

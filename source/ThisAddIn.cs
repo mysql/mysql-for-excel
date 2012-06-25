@@ -23,10 +23,10 @@ namespace MySQL.ForExcel
     {
       taskPaneControl = new TaskPaneControl(Application);
       taskPaneControl.Dock = System.Windows.Forms.DockStyle.Fill;
-      taskPaneValue = CustomTaskPanes.Add(taskPaneControl, "MySQL Excel Add-In");
+      taskPaneValue = CustomTaskPanes.Add(taskPaneControl, "MySQL for Excel");
       taskPaneValue.VisibleChanged += taskPaneValue_VisibleChanged;
       taskPaneValue.DockPositionRestrict = Office.MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoHorizontal;
-      taskPaneValue.Width = 287;
+      taskPaneValue.Width = 250;
     }
 
     private void taskPaneValue_VisibleChanged(object sender, EventArgs e)

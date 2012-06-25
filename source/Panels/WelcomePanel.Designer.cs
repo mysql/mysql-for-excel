@@ -41,19 +41,21 @@
       this.lblCopyright = new System.Windows.Forms.Label();
       this.lblAllRights = new System.Windows.Forms.Label();
       this.connectionList = new TreeViewTest.MyTreeView();
-      this.openConnectionLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.manageConnectionsLabel = new MySQL.ForExcel.Controls.HotLabel();
+      this.openConnectionLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.newConnectionLabel = new MySQL.ForExcel.Controls.HotLabel();
+      this.picSeparator = new System.Windows.Forms.PictureBox();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
       this.connectionsContextMenu.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.picSeparator)).BeginInit();
       this.SuspendLayout();
       // 
       // picAddInLogo
       // 
       this.picAddInLogo.Image = global::MySQL.ForExcel.Properties.Resources.mysql_for_excel_header;
-      this.picAddInLogo.Location = new System.Drawing.Point(14, 13);
+      this.picAddInLogo.Location = new System.Drawing.Point(9, 12);
       this.picAddInLogo.Name = "picAddInLogo";
-      this.picAddInLogo.Size = new System.Drawing.Size(235, 68);
+      this.picAddInLogo.Size = new System.Drawing.Size(230, 68);
       this.picAddInLogo.TabIndex = 13;
       this.picAddInLogo.TabStop = false;
       // 
@@ -85,11 +87,11 @@
       // 
       // lblInstructions
       // 
-      this.lblInstructions.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblInstructions.ForeColor = System.Drawing.SystemColors.WindowText;
-      this.lblInstructions.Location = new System.Drawing.Point(11, 83);
+      this.lblInstructions.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblInstructions.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(151)))), ((int)(((byte)(178)))));
+      this.lblInstructions.Location = new System.Drawing.Point(6, 73);
       this.lblInstructions.Name = "lblInstructions";
-      this.lblInstructions.Size = new System.Drawing.Size(259, 83);
+      this.lblInstructions.Size = new System.Drawing.Size(233, 65);
       this.lblInstructions.TabIndex = 2;
       this.lblInstructions.Text = "MySQL for Excel allows you to work with the MySQL Database right from within the " +
     "MS Office Excel application. Excel is a powerful tool for data analysis and edit" +
@@ -97,26 +99,24 @@
       // 
       // lblCopyright
       // 
-      this.lblCopyright.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.lblCopyright.Font = new System.Drawing.Font("Arial", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblCopyright.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-      this.lblCopyright.Location = new System.Drawing.Point(12, 574);
+      this.lblCopyright.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+      this.lblCopyright.Font = new System.Drawing.Font("Segoe UI", 5.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblCopyright.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(151)))), ((int)(((byte)(178)))));
+      this.lblCopyright.Location = new System.Drawing.Point(7, 598);
       this.lblCopyright.Name = "lblCopyright";
-      this.lblCopyright.Size = new System.Drawing.Size(261, 14);
+      this.lblCopyright.Size = new System.Drawing.Size(232, 14);
       this.lblCopyright.TabIndex = 7;
       this.lblCopyright.Text = "Copyright © 2012 Oracle and/or its affiliates.";
       this.lblCopyright.TextAlign = System.Drawing.ContentAlignment.TopCenter;
       // 
       // lblAllRights
       // 
-      this.lblAllRights.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.lblAllRights.Font = new System.Drawing.Font("Arial", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblAllRights.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-      this.lblAllRights.Location = new System.Drawing.Point(12, 588);
+      this.lblAllRights.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+      this.lblAllRights.Font = new System.Drawing.Font("Segoe UI", 5.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblAllRights.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(151)))), ((int)(((byte)(178)))));
+      this.lblAllRights.Location = new System.Drawing.Point(7, 609);
       this.lblAllRights.Name = "lblAllRights";
-      this.lblAllRights.Size = new System.Drawing.Size(261, 14);
+      this.lblAllRights.Size = new System.Drawing.Size(232, 14);
       this.lblAllRights.TabIndex = 8;
       this.lblAllRights.Text = "All rights reserved.";
       this.lblAllRights.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -134,7 +134,7 @@
       this.connectionList.Font = new System.Drawing.Font("Arial", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.connectionList.Indent = 18;
       this.connectionList.ItemHeight = 20;
-      this.connectionList.Location = new System.Drawing.Point(14, 203);
+      this.connectionList.Location = new System.Drawing.Point(9, 203);
       this.connectionList.Name = "connectionList";
       this.connectionList.NodeImages = this.largeImages;
       treeNode1.BackColor = System.Drawing.SystemColors.ControlDark;
@@ -148,76 +148,100 @@
       this.connectionList.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode1,
             treeNode2});
-      this.connectionList.Size = new System.Drawing.Size(265, 264);
+      this.connectionList.Size = new System.Drawing.Size(230, 288);
       this.connectionList.TabIndex = 22;
       this.connectionList.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.connectionList_NodeMouseDoubleClick);
+      // 
+      // manageConnectionsLabel
+      // 
+      this.manageConnectionsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.manageConnectionsLabel.Description = "Launch MySQL Workbench";
+      this.manageConnectionsLabel.DescriptionColor = System.Drawing.Color.FromArgb(((int)(((byte)(126)))), ((int)(((byte)(151)))), ((int)(((byte)(194)))));
+      this.manageConnectionsLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.manageConnectionsLabel.DescriptionShadowOpacity = 0.3D;
+      this.manageConnectionsLabel.DrawShadow = true;
+      this.manageConnectionsLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.manageConnectionsLabel.HotTracking = true;
+      this.manageConnectionsLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_WelcomePanel_ManageConnection_32x32;
+      this.manageConnectionsLabel.ImageSize = new System.Drawing.Size(32, 32);
+      this.manageConnectionsLabel.Location = new System.Drawing.Point(9, 550);
+      this.manageConnectionsLabel.Margin = new System.Windows.Forms.Padding(4);
+      this.manageConnectionsLabel.Name = "manageConnectionsLabel";
+      this.manageConnectionsLabel.Size = new System.Drawing.Size(230, 44);
+      this.manageConnectionsLabel.TabIndex = 16;
+      this.manageConnectionsLabel.Title = "Manage Connections";
+      this.manageConnectionsLabel.TitleColor = System.Drawing.SystemColors.WindowText;
+      this.manageConnectionsLabel.TitleShadowOpacity = 0.3D;
+      this.manageConnectionsLabel.Click += new System.EventHandler(this.manageConnectionsLabel_Click);
       // 
       // openConnectionLabel
       // 
       this.openConnectionLabel.Description = "Double-Click a Connection to Start";
-      this.openConnectionLabel.DescriptionFont = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.openConnectionLabel.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.openConnectionLabel.DescriptionColor = System.Drawing.Color.FromArgb(((int)(((byte)(126)))), ((int)(((byte)(151)))), ((int)(((byte)(194)))));
+      this.openConnectionLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.openConnectionLabel.DescriptionShadowOpacity = 0.3D;
+      this.openConnectionLabel.DrawShadow = true;
+      this.openConnectionLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.openConnectionLabel.HotTracking = false;
       this.openConnectionLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_WelcomePanel_Connection_32x32;
       this.openConnectionLabel.ImageSize = new System.Drawing.Size(32, 32);
-      this.openConnectionLabel.Location = new System.Drawing.Point(14, 152);
+      this.openConnectionLabel.Location = new System.Drawing.Point(9, 161);
       this.openConnectionLabel.Margin = new System.Windows.Forms.Padding(4);
       this.openConnectionLabel.Name = "openConnectionLabel";
-      this.openConnectionLabel.Size = new System.Drawing.Size(256, 44);
+      this.openConnectionLabel.Size = new System.Drawing.Size(230, 44);
       this.openConnectionLabel.TabIndex = 20;
       this.openConnectionLabel.Title = "Open a MySQL Connection";
-      // 
-      // manageConnectionsLabel
-      // 
-      this.manageConnectionsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.manageConnectionsLabel.Description = "Launch MySQL Workbench";
-      this.manageConnectionsLabel.DescriptionFont = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.manageConnectionsLabel.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.manageConnectionsLabel.HotTracking = true;
-      this.manageConnectionsLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_WelcomePanel_ManageConnection_32x32;
-      this.manageConnectionsLabel.ImageSize = new System.Drawing.Size(32, 32);
-      this.manageConnectionsLabel.Location = new System.Drawing.Point(14, 526);
-      this.manageConnectionsLabel.Margin = new System.Windows.Forms.Padding(4);
-      this.manageConnectionsLabel.Name = "manageConnectionsLabel";
-      this.manageConnectionsLabel.Size = new System.Drawing.Size(222, 44);
-      this.manageConnectionsLabel.TabIndex = 16;
-      this.manageConnectionsLabel.Title = "Manage Connections";
-      this.manageConnectionsLabel.Click += new System.EventHandler(this.manageConnectionsLabel_Click);
+      this.openConnectionLabel.TitleColor = System.Drawing.SystemColors.WindowText;
+      this.openConnectionLabel.TitleShadowOpacity = 0.3D;
       // 
       // newConnectionLabel
       // 
-      this.newConnectionLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+      this.newConnectionLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.newConnectionLabel.Description = "Add a new Database Connection";
-      this.newConnectionLabel.DescriptionFont = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.newConnectionLabel.Font = new System.Drawing.Font("Arial", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.newConnectionLabel.DescriptionColor = System.Drawing.Color.FromArgb(((int)(((byte)(126)))), ((int)(((byte)(151)))), ((int)(((byte)(194)))));
+      this.newConnectionLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.newConnectionLabel.DescriptionShadowOpacity = 0.3D;
+      this.newConnectionLabel.DrawShadow = true;
+      this.newConnectionLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.newConnectionLabel.HotTracking = true;
       this.newConnectionLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_WelcomePanel_NewConnection_32x32;
       this.newConnectionLabel.ImageSize = new System.Drawing.Size(32, 32);
-      this.newConnectionLabel.Location = new System.Drawing.Point(14, 474);
+      this.newConnectionLabel.Location = new System.Drawing.Point(9, 498);
       this.newConnectionLabel.Margin = new System.Windows.Forms.Padding(4);
       this.newConnectionLabel.Name = "newConnectionLabel";
-      this.newConnectionLabel.Size = new System.Drawing.Size(222, 44);
+      this.newConnectionLabel.Size = new System.Drawing.Size(230, 44);
       this.newConnectionLabel.TabIndex = 15;
       this.newConnectionLabel.Title = "New Connection";
+      this.newConnectionLabel.TitleColor = System.Drawing.SystemColors.WindowText;
+      this.newConnectionLabel.TitleShadowOpacity = 0.3D;
       this.newConnectionLabel.Click += new System.EventHandler(this.newConnectionLabel_Click);
+      // 
+      // picSeparator
+      // 
+      this.picSeparator.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_WelcomePanel_Separator_Blue;
+      this.picSeparator.Location = new System.Drawing.Point(9, 133);
+      this.picSeparator.Name = "picSeparator";
+      this.picSeparator.Size = new System.Drawing.Size(235, 21);
+      this.picSeparator.TabIndex = 23;
+      this.picSeparator.TabStop = false;
       // 
       // WelcomePanel
       // 
+      this.Controls.Add(this.picSeparator);
       this.Controls.Add(this.connectionList);
       this.Controls.Add(this.openConnectionLabel);
       this.Controls.Add(this.manageConnectionsLabel);
       this.Controls.Add(this.lblInstructions);
-      this.Controls.Add(this.newConnectionLabel);
-      this.Controls.Add(this.lblCopyright);
       this.Controls.Add(this.picAddInLogo);
+      this.Controls.Add(this.lblCopyright);
+      this.Controls.Add(this.newConnectionLabel);
       this.Controls.Add(this.lblAllRights);
-      this.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.Name = "WelcomePanel";
-      this.Size = new System.Drawing.Size(290, 610);
+      this.Size = new System.Drawing.Size(250, 625);
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
       this.connectionsContextMenu.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.picSeparator)).EndInit();
       this.ResumeLayout(false);
 
     }
@@ -236,5 +260,6 @@
     private Controls.HotLabel manageConnectionsLabel;
     private Controls.HotLabel openConnectionLabel;
     private TreeViewTest.MyTreeView connectionList;
+    private System.Windows.Forms.PictureBox picSeparator;
   }
 }
