@@ -289,20 +289,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap mysql_for_excel_header {
-            get {
-                object obj = ResourceManager.GetObject("mysql_for_excel_header", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap mysql_header_img {
-            get {
-                object obj = ResourceManager.GetObject("mysql_header_img", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         internal static System.Drawing.Bitmap MySQLforExcel_ExportDlg_ColumnOptions_32x32 {
             get {
                 object obj = ResourceManager.GetObject("MySQLforExcel_ExportDlg_ColumnOptions_32x32", resourceCulture);

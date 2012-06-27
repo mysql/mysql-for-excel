@@ -44,6 +44,9 @@ namespace MySQL.ForExcel
       LoadTables();
       LoadViews();
       LoadRoutines();
+
+      if (objectList.Nodes[0].GetNodeCount(true) > 0)
+        objectList.Nodes[0].Expand();
     }
 
     private void LoadTables()

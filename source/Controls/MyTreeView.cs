@@ -6,14 +6,10 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Drawing;
 
-namespace TreeViewTest
+namespace MySQL.ForExcel
 {
   public class MyTreeView : TreeView
   {
-    private bool heightsSet;
-    private Brush grayBrush;
-    private Brush blackBrush;
-
     private const int TVM_SETITEMHEIGHT = 0x111B;
     private const int TVM_SETITEM = 0x113F;
     private const int TVIF_INTEGRAL = 0x80;
@@ -26,38 +22,27 @@ namespace TreeViewTest
     public MyTreeView()
     {
       DrawMode = TreeViewDrawMode.OwnerDrawAll;
-      //grayBrush = new SolidBrush(Color.Gray);
-      grayBrush = new SolidBrush(Color.FromArgb(223, 227, 232));
-      blackBrush = new SolidBrush(Color.Black);
       DoubleBuffered = true;
 
-      // Enable default double buffering processing (DoubleBuffered returns true)
-      //SetStyle(ControlStyles.OptimizedDoubleBuffer, true); // | ControlStyles.AllPaintingInWmPaint, true);
-      // Disable default CommCtrl painting on non-Vista systems
-      //if (Environment.OSVersion.Version.Major < 6)
-      //  SetStyle(ControlStyles.UserPaint, true);
+      ImageHorizontalPixelsOffset = 5;
+      ImageToTextHorizontalPixelsOffset = 5;
+      TitleColorOpacity = 0.8;
+      DescriptionColorOpacity = 0.6;
+      TitleTextVerticalPixelsOffset = 0;
+      DescriptionTextVerticalPixelsOffset = 0;
     }
 
+    public double TitleColorOpacity { get; set; }
     public Font DescriptionFont { get; set; }
     public Color DescriptionColor { get; set; }
+    public double DescriptionColorOpacity { get; set; }
     public Image CollapsedIcon { get; set; }
     public Image ExpandedIcon { get; set; }
     public ImageList NodeImages { get; set; }
-
-    //protected override void OnPaint(PaintEventArgs e)
-    //{
-    //  if (GetStyle(ControlStyles.UserPaint))
-    //  {
-    //    Message m = new Message();
-    //    m.HWnd = Handle;
-    //    m.Msg = WM_PRINTCLIENT;
-    //    m.WParam = e.Graphics.GetHdc();
-    //    m.LParam = (IntPtr)PRF_CLIENT;
-    //    DefWndProc(ref m);
-    //    e.Graphics.ReleaseHdc(m.WParam);
-    //  }
-    //  base.OnPaint(e);
-    //}
+    public int ImageHorizontalPixelsOffset { get; set; }
+    public int ImageToTextHorizontalPixelsOffset { get; set; }
+    public int TitleTextVerticalPixelsOffset { get; set; }
+    public int DescriptionTextVerticalPixelsOffset { get; set; }
 
     protected override void OnMouseClick(MouseEventArgs e)
     {
@@ -95,8 +80,8 @@ namespace TreeViewTest
     private void DrawTopLevelNode(DrawTreeNodeEventArgs e)
     {
       Graphics g = e.Graphics;
-      Brush brush = new SolidBrush(e.Node.BackColor);
-      g.FillRectangle(grayBrush, e.Bounds);
+      SolidBrush nodeBackbrush = new SolidBrush(e.Node.BackColor);
+      g.FillRectangle(nodeBackbrush, e.Bounds);
 
       Point pt = e.Bounds.Location;
 
@@ -105,51 +90,57 @@ namespace TreeViewTest
       pt.Y += (e.Bounds.Height - i.Height) / 2;
       e.Graphics.DrawImageUnscaled(i, pt.X, pt.Y, i.Width, i.Height);
 
-      brush = new SolidBrush(e.Node.ForeColor);
+      SolidBrush textBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), e.Node.ForeColor));
       Font f = e.Node.NodeFont != null ? e.Node.NodeFont : Font;
       SizeF size = g.MeasureString(e.Node.Text, f);
-      pt.X += (5 + i.Width);
+      pt.X += (ImageToTextHorizontalPixelsOffset + i.Width);
       pt.Y = e.Bounds.Top + ((e.Bounds.Height - (int)size.Height) / 2);
-      g.DrawString(e.Node.Text, Font, brush, pt.X, pt.Y);
+      g.DrawString(e.Node.Text, Font, textBrush, pt.X, pt.Y);
+
+      nodeBackbrush.Dispose();
+      textBrush.Dispose();
     }
 
     private void DrawChildNode(DrawTreeNodeEventArgs e)
     {
       Point pt = e.Bounds.Location;
+      string[] parts = e.Node.Text.Split('|');
+      SizeF titleStringSize = (parts != null && parts.Length > 0 ? e.Graphics.MeasureString(parts[0], Font) : SizeF.Empty);
+      SizeF descriptionStringSize = (parts != null && parts.Length > 1 ? e.Graphics.MeasureString(parts[1], DescriptionFont) : SizeF.Empty);
+      Image img = (NodeImages != null && NodeImages.Images.Count > 0 && e.Node.ImageIndex >= 0 && e.Node.ImageIndex < NodeImages.Images.Count ? NodeImages.Images[e.Node.ImageIndex] : null);
+      int textsHeight = Convert.ToInt32(titleStringSize.Height + descriptionStringSize.Height);
 
-      // paint background
-      Brush brush = new SolidBrush(e.Node.IsSelected ? SystemColors.MenuHighlight : SystemColors.Window);
-      e.Graphics.FillRectangle(brush, e.Bounds);
-
-      if (NodeImages != null)
+      // Paint background
+      SolidBrush bkBrush = new SolidBrush(e.Node.IsSelected ? SystemColors.MenuHighlight : SystemColors.Window);
+      e.Graphics.FillRectangle(bkBrush, e.Bounds);
+      
+      // Paint node Image
+      if (img != null)
       {
-        Image i = null;
-        if (NodeImages.Images.Count > 0 && e.Node.ImageIndex >= 0 && e.Node.ImageIndex < NodeImages.Images.Count)
-          i = NodeImages.Images[e.Node.ImageIndex];
-        if (i != null)
-        {
-          pt.X += 5;
-          int y = pt.Y + ((e.Bounds.Height - i.Height) / 2);
-          e.Graphics.DrawImage(i, pt.X, y, i.Width, i.Height);
-          pt.X += i.Width + 5;
-        }
+        pt.X += ImageHorizontalPixelsOffset;
+        int y = pt.Y + ((e.Bounds.Height - img.Height) / 2);
+        e.Graphics.DrawImage(img, pt.X, y, img.Width, img.Height);
+        pt.X += img.Width + ImageToTextHorizontalPixelsOffset;
+        pt.Y += TitleTextVerticalPixelsOffset;
       }
 
-      string[] parts = e.Node.Text.Split('|');
-
-      // draw the title if we have one
-      brush = new SolidBrush(ForeColor);
+      // Draw the title if we have one
+      SolidBrush titleBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), ForeColor));
       if (parts != null && parts.Length >= 1)
       {
-        e.Graphics.DrawString(parts[0], Font, brush, pt.X, pt.Y);
+        e.Graphics.DrawString(parts[0], Font, titleBrush, pt.X, pt.Y);
         SizeF stringSize = e.Graphics.MeasureString(parts[0], Font);
-        pt.Y += (int)(stringSize.Height + 3);
+        pt.Y += (int)(stringSize.Height) + DescriptionTextVerticalPixelsOffset;
       }
 
-      // draw the description if there is one
-      brush = new SolidBrush(DescriptionColor);
+      // Draw the description if there is one
+      SolidBrush descBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionColorOpacity * 255), DescriptionColor));
       if (parts != null && parts.Length >= 2)
-        e.Graphics.DrawString(parts[1], DescriptionFont, brush, pt.X, pt.Y);
+        e.Graphics.DrawString(parts[1], DescriptionFont, descBrush, pt.X, pt.Y);
+
+      bkBrush.Dispose();
+      titleBrush.Dispose();
+      descBrush.Dispose();
     }
 
     public TreeNode AddNode(TreeNode parent, string text)

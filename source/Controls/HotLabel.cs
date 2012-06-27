@@ -7,16 +7,13 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace MySQL.ForExcel.Controls
+namespace MySQL.ForExcel
 {
   public partial class HotLabel : UserControl
   {
     private Image image;
     private Image disabledImage;
     private bool tracking;
-    private SolidBrush titleBrush;
-    private SolidBrush trackingTitleBrush;
-    private SolidBrush descriptionBrush;
 
     public HotLabel()
     {
@@ -26,16 +23,23 @@ namespace MySQL.ForExcel.Controls
       DrawShadow = false;
       TitleColor = SystemColors.WindowText;
       DescriptionColor = SystemColors.GrayText;
+      TitleColorOpacity = 0.7;
+      DescriptionColorOpacity = 0.7;
       TitleShadowOpacity = 0.3;
       DescriptionShadowOpacity = 0.3;
+      TitleShadowPixelsXOffset = 0;
+      TitleShadowPixelsYOffset = 1;
+      DescriptionShadowPixelsXOffset = 0;
+      DescriptionShadowPixelsYOffset = 1;
+      TitleDescriptionPixelsSpacing = 4;
+      ImagePixelsXOffset = 0;
+      TitlePixelsXOffset = 0;
+      TitlePixelsYOffset = 3;
 
       FontFamily family = Parent != null && Parent.Font != null ? Parent.Font.FontFamily : FontFamily.GenericSansSerif;
       float size = Parent != null && Parent.Font != null ? Parent.Font.Size : 8.25f;
       Font = new Font(family, size * 1.25f, FontStyle.Bold);
       DescriptionFont = new Font(Font.FontFamily, Font.Size * 0.5f, FontStyle.Regular);
-      titleBrush = new SolidBrush(TitleColor);
-      trackingTitleBrush = new SolidBrush(SystemColors.HotTrack);
-      descriptionBrush = new SolidBrush(DescriptionColor);
     }
 
     public Image Image
@@ -57,9 +61,19 @@ namespace MySQL.ForExcel.Controls
     public bool HotTracking { get; set; }
     public bool DrawShadow { get; set; }
     public Color TitleColor { get; set; }
+    public double TitleColorOpacity { get; set; }
+    public int TitleDescriptionPixelsSpacing { get; set; }
     public Color DescriptionColor { get; set; }
+    public double DescriptionColorOpacity { get; set; }
     public double TitleShadowOpacity { get; set; }
+    public int TitleShadowPixelsXOffset { get; set; }
+    public int TitleShadowPixelsYOffset { get; set; }
     public double DescriptionShadowOpacity { get; set; }
+    public int DescriptionShadowPixelsXOffset { get; set; }
+    public int DescriptionShadowPixelsYOffset { get; set; }
+    public int ImagePixelsXOffset { get; set; }
+    public int TitlePixelsXOffset { get; set; }
+    public int TitlePixelsYOffset { get; set; }
 
     protected override void OnPaint(PaintEventArgs e)
     {
@@ -69,22 +83,36 @@ namespace MySQL.ForExcel.Controls
       if (i != null)
       {
         int y = (Height - ImageSize.Height) / 2;
-        e.Graphics.DrawImage(i, -5, y, ImageSize.Width, ImageSize.Height);
+        e.Graphics.DrawImage(i, ImagePixelsXOffset, y, ImageSize.Width, ImageSize.Height);
       }
-      Point pt = new Point(ImageSize.Width, 3);
+      Point pt = new Point(ImageSize.Width + TitlePixelsXOffset, TitlePixelsYOffset);
       if (!String.IsNullOrEmpty(Title))
       {
-        e.Graphics.DrawString(Title, Font, tracking ? trackingTitleBrush : titleBrush, pt.X, pt.Y);
         if (DrawShadow)
-          e.Graphics.DrawString(Title, Font, new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleShadowOpacity * 255), TitleColor)), pt.X + 0.75f, pt.Y + 0.75f);
+        {
+          SolidBrush titleShadowBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleShadowOpacity * 255), TitleColor));
+          e.Graphics.DrawString(Title, Font, titleShadowBrush, pt.X + TitleShadowPixelsXOffset, pt.Y + TitleShadowPixelsYOffset);
+          titleShadowBrush.Dispose();
+        }
+        Color currentTitleColor = (tracking ? SystemColors.HotTrack : TitleColor);
+        SolidBrush titleBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), currentTitleColor));
+        e.Graphics.DrawString(Title, Font, titleBrush, pt.X, pt.Y);
+        titleBrush.Dispose();
+        
         SizeF stringSize = e.Graphics.MeasureString(Title, Font);
-        pt.Y += (int)(stringSize.Height + 1);
+        pt.Y += (int)(stringSize.Height + TitleDescriptionPixelsSpacing);
       }
       if (!String.IsNullOrEmpty(Description))
       {
-        e.Graphics.DrawString(Description, DescriptionFont, descriptionBrush, pt.X, pt.Y);
         if (DrawShadow)
-          e.Graphics.DrawString(Description, DescriptionFont, new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionShadowOpacity * 255), DescriptionColor)), pt.X + 0.75f, pt.Y + 0.75f);
+        {
+          SolidBrush descriptionShadowBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionShadowOpacity * 255), Color.White));
+          e.Graphics.DrawString(Description, DescriptionFont, descriptionShadowBrush, pt.X + DescriptionShadowPixelsXOffset, pt.Y + DescriptionShadowPixelsYOffset);
+          descriptionShadowBrush.Dispose();
+        }
+        SolidBrush descriptionBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionColorOpacity * 255), DescriptionColor));
+        e.Graphics.DrawString(Description, DescriptionFont, descriptionBrush, pt.X, pt.Y);
+        descriptionBrush.Dispose();
       }
     }
 

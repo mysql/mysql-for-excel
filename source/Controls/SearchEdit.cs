@@ -8,11 +8,12 @@ using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Properties;
 
-namespace MySQL.ForExcel.Controls
+namespace MySQL.ForExcel
 {
   public partial class SearchEdit : UserControl
   {
     private bool isEmpty;
+    private bool initialPaint;
     private int width;
 
     public SearchEdit()
@@ -20,8 +21,8 @@ namespace MySQL.ForExcel.Controls
       InitializeComponent();
       DoubleBuffered = true;
       width = Resources.ExcelAddinFilter.Width;
-      innerText.Text = NoTextLabel;
-      innerText_Leave(null, EventArgs.Empty);
+      innerText.Text = String.Empty;
+      initialPaint = true;
     }
 
     public override string Text
@@ -34,6 +35,11 @@ namespace MySQL.ForExcel.Controls
 
     protected override void OnPaint(PaintEventArgs e)
     {
+      if (initialPaint)
+      {
+        innerText_Leave(innerText, EventArgs.Empty);
+        initialPaint = false;
+      }
       base.OnPaint(e);
       Image i = Resources.ExcelAddinFilter;
       int space = width * 3 / 2;

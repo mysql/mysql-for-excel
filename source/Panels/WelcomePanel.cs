@@ -27,12 +27,15 @@ namespace MySQL.ForExcel
         node.Nodes.Clear();
       foreach (MySqlWorkbenchConnection conn in MySqlWorkbench.Connections)
         AddConnectionToList(conn);
+      if (connectionList.Nodes[0].GetNodeCount(true) > 0)
+        connectionList.Nodes[0].Expand();
     }
 
     private void AddConnectionToList(MySqlWorkbenchConnection conn)
     {
+      int nodeIdx = (conn.Host == "127.0.0.1" || conn.Host.ToLowerInvariant() == "localhost" ? 0 : 1);
       string s = String.Format("{0}|{1}", conn.Name, String.Format("User: {0}, IP: {1}", conn.UserName, conn.Host)); ;
-      TreeNode node = connectionList.AddNode(connectionList.Nodes[0], s);
+      TreeNode node = connectionList.AddNode(connectionList.Nodes[nodeIdx], s);
       node.ImageIndex = 0;
       node.Tag = conn;
     }

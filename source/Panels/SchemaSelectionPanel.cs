@@ -66,6 +66,7 @@ namespace MySQL.ForExcel
       if (databases == null)
       {
         MessageBox.Show(Resources.UnableToLoadDatabases);
+        (Parent as TaskPaneControl).CloseConnection();
         return;
       }
 
@@ -79,12 +80,13 @@ namespace MySQL.ForExcel
         string lcSchemaName = schemaName.ToLowerInvariant();
         int index = (lcSchemaName == "mysql" || lcSchemaName == "information_schema") ? 1 : 0;
 
-        string text = String.Format("{0}|{1}", schemaName,
-          String.Format("CharSet: {0}", row["DEFAULT_CHARACTER_SET_NAME"].ToString()));
+        string text = schemaName;
         TreeNode node = databaseList.AddNode(databaseList.Nodes[index], text);
         node.Tag = schemaName;
         node.ImageIndex = 0;
       }
+      if (databaseList.Nodes[0].GetNodeCount(true) > 0)
+        databaseList.Nodes[0].Expand();
     }
 
     private void createNewSchema_Click(object sender, EventArgs e)

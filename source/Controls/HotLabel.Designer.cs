@@ -1,4 +1,4 @@
-﻿namespace MySQL.ForExcel.Controls
+﻿namespace MySQL.ForExcel
 {
   partial class HotLabel
   {

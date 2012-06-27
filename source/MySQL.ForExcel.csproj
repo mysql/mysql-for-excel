@@ -254,6 +254,9 @@
     <Compile Include="Controls\TaskPaneControl.Designer.cs">
       <DependentUpon>TaskPaneControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\TransparentLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Forms\AppendDataForm.cs">
       <SubType>Form</SubType>
     </Compile>
