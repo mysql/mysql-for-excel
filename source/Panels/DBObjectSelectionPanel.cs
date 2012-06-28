@@ -23,8 +23,8 @@ namespace MySQL.ForExcel
 
     public bool ExportDataActionEnabled
     {
-      set { exportToNewTable.Enabled = value; }
-      get { return exportToNewTable.Enabled; }
+      set { exportToNewTableLabel.Enabled = value; }
+      get { return exportToNewTableLabel.Enabled; }
     }
 
     public void SetConnection(MySqlWorkbenchConnection connection)

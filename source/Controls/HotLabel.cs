@@ -11,8 +11,6 @@ namespace MySQL.ForExcel
 {
   public partial class HotLabel : UserControl
   {
-    private Image image;
-    private Image disabledImage;
     private bool tracking;
 
     public HotLabel()
@@ -33,6 +31,7 @@ namespace MySQL.ForExcel
       DescriptionShadowPixelsYOffset = 1;
       TitleDescriptionPixelsSpacing = 4;
       ImagePixelsXOffset = 0;
+      ImagePixelsYOffset = 0;
       TitlePixelsXOffset = 0;
       TitlePixelsYOffset = 3;
 
@@ -42,19 +41,8 @@ namespace MySQL.ForExcel
       DescriptionFont = new Font(Font.FontFamily, Font.Size * 0.5f, FontStyle.Regular);
     }
 
-    public Image Image
-    {
-      get { return image; }
-      set 
-      { 
-        image = value; 
-        disabledImage = Utilities.MakeGrayscale(new Bitmap(Image));
-        if (ImageSize.IsEmpty)
-          ImageSize = image.Size;
-      }
-    }
-
-    public Size ImageSize { get; set; }
+    public Image Image { get; set; }
+    public Image DisabledImage { get; set; }
     public string Title { get; set; }
     public string Description { get; set; }
     public Font DescriptionFont { get; set; }
@@ -72,6 +60,7 @@ namespace MySQL.ForExcel
     public int DescriptionShadowPixelsXOffset { get; set; }
     public int DescriptionShadowPixelsYOffset { get; set; }
     public int ImagePixelsXOffset { get; set; }
+    public int ImagePixelsYOffset { get; set; }
     public int TitlePixelsXOffset { get; set; }
     public int TitlePixelsYOffset { get; set; }
 
@@ -79,13 +68,15 @@ namespace MySQL.ForExcel
     {
       base.OnPaint(e);
 
-      Image i = Enabled ? Image : disabledImage;
+      Image i = (Enabled ? Image : (DisabledImage == null && Image != null ? Utilities.MakeGrayscale(new Bitmap(Image)) : DisabledImage));
+      Size imageSize = Size.Empty;
       if (i != null)
       {
-        int y = (Height - ImageSize.Height) / 2;
-        e.Graphics.DrawImage(i, ImagePixelsXOffset, y, ImageSize.Width, ImageSize.Height);
+        imageSize = i.Size;
+        int y = (Height - imageSize.Height) / 2;
+        e.Graphics.DrawImage(i, ImagePixelsXOffset, y + ImagePixelsYOffset, imageSize.Width, imageSize.Height);
       }
-      Point pt = new Point(ImageSize.Width + TitlePixelsXOffset, TitlePixelsYOffset);
+      Point pt = new Point(imageSize.Width + TitlePixelsXOffset, TitlePixelsYOffset);
       if (!String.IsNullOrEmpty(Title))
       {
         if (DrawShadow)

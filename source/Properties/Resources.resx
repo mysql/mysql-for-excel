@@ -199,92 +199,11 @@
   <data name="MySQLforExcel_Logo_64x64" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySQLforExcel-Logo-64x64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="MySQLforExcel_ObjectPanel_AppendData_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-ObjectPanel-AppendData-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLforExcel_ObjectPanel_AppendData_Disabled_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-ObjectPanel-AppendData-Disabled-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLforExcel_ObjectPanel_EditData_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-ObjectPanel-EditData-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLforExcel_ObjectPanel_EditData_Disabled_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-ObjectPanel-EditData-Disabled-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLforExcel_ObjectPanel_ExportToMySQL_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-ObjectPanel-ExportToMySQL-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLforExcel_ObjectPanel_ExportToMySQL_Disabled_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-ObjectPanel-ExportToMySQL-Disabled-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLforExcel_ObjectPanel_ImportData_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-ObjectPanel-ImportData-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLforExcel_ObjectPanel_ImportData_Disabled_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-ObjectPanel-ImportData-Disabled-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLforExcel_ObjectPanel_SelectObject_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-ObjectPanel-SelectObject-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLforExcel_SchemaPanel_NewSchema_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-SchemaPanel-NewSchema-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLforExcel_SchemaPanel_Schemas_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-SchemaPanel-Schemas-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLforExcel_WelcomePanel_Connection_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-WelcomePanel-Connection-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLforExcel_WelcomePanel_ManageConnection_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-WelcomePanel-ManageConnection-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLforExcel_WelcomePanel_NewConnection_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-WelcomePanel-NewConnection-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLforExcel_WelcomePanel_Separator_Blue" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-WelcomePanel-Separator-Blue.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLforExcel_WelcomePanel_Separator_Grey" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-WelcomePanel-Separator-Grey.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="MySQLforExcel_WelcomePanel_Title" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySQLforExcel-WelcomePanel-Title.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Warning" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\warning.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Column_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Column.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_mgmt_Connection_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.mgmt.Connection.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_mgmt_Connection_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.mgmt.Connection.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Routine_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Routine.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Routine_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Routine.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Schema_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Schema.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Schema_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Schema.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Table_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Table.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_Table_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Table.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_View_16x16" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.View.16x16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="db_View_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.View.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="NamesWarning" xml:space="preserve">
     <value>It is good practice to not use upper case letters or spaces.</value>
@@ -309,5 +228,74 @@
   </data>
   <data name="ExportDataTypeNotSuitableWarning" xml:space="preserve">
     <value>Selected Data Type is not suitable for all the values in this column.</value>
+  </data>
+  <data name="MySQLforExcel_ObjectPanel_AppendData_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-ObjectPanel-AppendData-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_ObjectPanel_AppendData_Disabled_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-ObjectPanel-AppendData-Disabled-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_ObjectPanel_EditData_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-ObjectPanel-EditData-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_ObjectPanel_EditData_Disabled_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-ObjectPanel-EditData-Disabled-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_ObjectPanel_ExportToMySQL_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-ObjectPanel-ExportToMySQL-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_ObjectPanel_ExportToMySQL_Disabled_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-ObjectPanel-ExportToMySQL-Disabled-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_ObjectPanel_ImportData_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-ObjectPanel-ImportData-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_ObjectPanel_ImportData_Disabled_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-ObjectPanel-ImportData-Disabled-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_ObjectPanel_ListItem_Routine_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-ObjectPanel-ListItem-Routine-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_ObjectPanel_ListItem_Table_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-ObjectPanel-ListItem-Table-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_ObjectPanel_ListItem_View_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-ObjectPanel-ListItem-View-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_ObjectPanel_SelectObject_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-ObjectPanel-SelectObject-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_SchemaPanel_ListItem_Schema_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-SchemaPanel-ListItem-Schema-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_SchemaPanel_NewSchema_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-SchemaPanel-NewSchema-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_SchemaPanel_Schemas_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-SchemaPanel-Schemas-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_Separator" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-Separator.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_WelcomePanel_Connection_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-WelcomePanel-Connection-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_WelcomePanel_ListItem_Connection_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-WelcomePanel-ListItem-Connection-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_WelcomePanel_ManageConnection_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-WelcomePanel-ManageConnection-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_WelcomePanel_NewConnection_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-WelcomePanel-NewConnection-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="db_Table_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Table.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="db_Routine_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.Routine.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="db_View_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\db.View.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

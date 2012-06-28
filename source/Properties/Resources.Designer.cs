@@ -169,34 +169,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap db_Column_16x16 {
-            get {
-                object obj = ResourceManager.GetObject("db_Column_16x16", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap db_mgmt_Connection_16x16 {
-            get {
-                object obj = ResourceManager.GetObject("db_mgmt_Connection_16x16", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap db_mgmt_Connection_32x32 {
-            get {
-                object obj = ResourceManager.GetObject("db_mgmt_Connection_32x32", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap db_Routine_16x16 {
-            get {
-                object obj = ResourceManager.GetObject("db_Routine_16x16", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         internal static System.Drawing.Bitmap db_Routine_32x32 {
             get {
                 object obj = ResourceManager.GetObject("db_Routine_32x32", resourceCulture);
@@ -204,37 +176,9 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap db_Schema_16x16 {
-            get {
-                object obj = ResourceManager.GetObject("db_Schema_16x16", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap db_Schema_32x32 {
-            get {
-                object obj = ResourceManager.GetObject("db_Schema_32x32", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap db_Table_16x16 {
-            get {
-                object obj = ResourceManager.GetObject("db_Table_16x16", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         internal static System.Drawing.Bitmap db_Table_32x32 {
             get {
                 object obj = ResourceManager.GetObject("db_Table_32x32", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap db_View_16x16 {
-            get {
-                object obj = ResourceManager.GetObject("db_View_16x16", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -324,114 +268,142 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_AppendData_32x32 {
+        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_AppendData_24x24 {
             get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_AppendData_32x32", resourceCulture);
+                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_AppendData_24x24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_AppendData_Disabled_32x32 {
+        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_AppendData_Disabled_24x24 {
             get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_AppendData_Disabled_32x32", resourceCulture);
+                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_AppendData_Disabled_24x24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_EditData_32x32 {
+        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_EditData_24x24 {
             get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_EditData_32x32", resourceCulture);
+                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_EditData_24x24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_EditData_Disabled_32x32 {
+        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_EditData_Disabled_24x24 {
             get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_EditData_Disabled_32x32", resourceCulture);
+                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_EditData_Disabled_24x24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_ExportToMySQL_32x32 {
+        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_ExportToMySQL_24x24 {
             get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_ExportToMySQL_32x32", resourceCulture);
+                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_ExportToMySQL_24x24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_ExportToMySQL_Disabled_32x32 {
+        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_ExportToMySQL_Disabled_24x24 {
             get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_ExportToMySQL_Disabled_32x32", resourceCulture);
+                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_ExportToMySQL_Disabled_24x24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_ImportData_32x32 {
+        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_ImportData_24x24 {
             get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_ImportData_32x32", resourceCulture);
+                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_ImportData_24x24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_ImportData_Disabled_32x32 {
+        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_ImportData_Disabled_24x24 {
             get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_ImportData_Disabled_32x32", resourceCulture);
+                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_ImportData_Disabled_24x24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_SelectObject_32x32 {
+        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_ListItem_Routine_24x24 {
             get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_SelectObject_32x32", resourceCulture);
+                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_ListItem_Routine_24x24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap MySQLforExcel_SchemaPanel_NewSchema_32x32 {
+        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_ListItem_Table_24x24 {
             get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_SchemaPanel_NewSchema_32x32", resourceCulture);
+                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_ListItem_Table_24x24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap MySQLforExcel_SchemaPanel_Schemas_32x32 {
+        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_ListItem_View_24x24 {
             get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_SchemaPanel_Schemas_32x32", resourceCulture);
+                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_ListItem_View_24x24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap MySQLforExcel_WelcomePanel_Connection_32x32 {
+        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_SelectObject_24x24 {
             get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_WelcomePanel_Connection_32x32", resourceCulture);
+                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_SelectObject_24x24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap MySQLforExcel_WelcomePanel_ManageConnection_32x32 {
+        internal static System.Drawing.Bitmap MySQLforExcel_SchemaPanel_ListItem_Schema_24x24 {
             get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_WelcomePanel_ManageConnection_32x32", resourceCulture);
+                object obj = ResourceManager.GetObject("MySQLforExcel_SchemaPanel_ListItem_Schema_24x24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap MySQLforExcel_WelcomePanel_NewConnection_32x32 {
+        internal static System.Drawing.Bitmap MySQLforExcel_SchemaPanel_NewSchema_24x24 {
             get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_WelcomePanel_NewConnection_32x32", resourceCulture);
+                object obj = ResourceManager.GetObject("MySQLforExcel_SchemaPanel_NewSchema_24x24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap MySQLforExcel_WelcomePanel_Separator_Blue {
+        internal static System.Drawing.Bitmap MySQLforExcel_SchemaPanel_Schemas_24x24 {
             get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_WelcomePanel_Separator_Blue", resourceCulture);
+                object obj = ResourceManager.GetObject("MySQLforExcel_SchemaPanel_Schemas_24x24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
-        internal static System.Drawing.Bitmap MySQLforExcel_WelcomePanel_Separator_Grey {
+        internal static System.Drawing.Bitmap MySQLforExcel_Separator {
             get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_WelcomePanel_Separator_Grey", resourceCulture);
+                object obj = ResourceManager.GetObject("MySQLforExcel_Separator", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MySQLforExcel_WelcomePanel_Connection_24x24 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_WelcomePanel_Connection_24x24", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MySQLforExcel_WelcomePanel_ListItem_Connection_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_WelcomePanel_ListItem_Connection_32x32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MySQLforExcel_WelcomePanel_ManageConnection_24x24 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_WelcomePanel_ManageConnection_24x24", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MySQLforExcel_WelcomePanel_NewConnection_24x24 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_WelcomePanel_NewConnection_24x24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

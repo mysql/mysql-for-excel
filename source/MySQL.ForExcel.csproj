@@ -408,6 +408,9 @@
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>
     </Compile>
+    <None Include="Resources\db.Routine.32x32.png" />
+    <None Include="Resources\db.Table.32x32.png" />
+    <None Include="Resources\db.View.32x32.png" />
     <None Include="ThisAddIn.Designer.xml">
       <DependentUpon>ThisAddIn.cs</DependentUpon>
     </None>
@@ -417,57 +420,12 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\db.mgmt.Connection.16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.mgmt.Connection.32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\MySQLforExcel-WelcomePanel-Separator-Grey.png" />
-    <None Include="Resources\MySQLforExcel-WelcomePanel-Separator-Blue.png" />
-    <None Include="Resources\MySQLforExcel-ObjectPanel-ExportToMySQL-Disabled-32x32.png" />
-    <None Include="Resources\MySQLforExcel-ObjectPanel-ImportData-Disabled-32x32.png" />
-    <None Include="Resources\MySQLforExcel-ObjectPanel-EditData-Disabled-32x32.png" />
-    <None Include="Resources\MySQLforExcel-ObjectPanel-AppendData-Disabled-32x32.png" />
-    <None Include="Resources\MySQLforExcel-ObjectPanel-AppendData-32x32.png" />
-    <None Include="Resources\MySQLforExcel-ObjectPanel-EditData-32x32.png" />
-    <None Include="Resources\MySQLforExcel-ObjectPanel-ImportData-32x32.png" />
-    <None Include="Resources\MySQLforExcel-ObjectPanel-SelectObject-32x32.png" />
-    <None Include="Resources\MySQLforExcel-ObjectPanel-ExportToMySQL-32x32.png" />
     <None Include="Resources\MySQLforExcel-Logo-48x48.png" />
-    <None Include="Resources\MySQLforExcel-SchemaPanel-NewSchema-32x32.png" />
-    <None Include="Resources\MySQLforExcel-SchemaPanel-Schemas-32x32.png" />
     <None Include="Resources\MySQLforExcel-Logo-64x64.png" />
     <None Include="Resources\MySQLforExcel-WelcomePanel-Title.png" />
-    <None Include="Resources\MySQLforExcel-WelcomePanel-ManageConnection-32x32.png" />
-    <None Include="Resources\MySQLforExcel-WelcomePanel-NewConnection-32x32.png" />
-    <None Include="Resources\MySQLforExcel-WelcomePanel-Connection-32x32.png" />
     <None Include="Resources\MySQLforExcel-ExportDlg-ColumnOptions-32x32.png" />
     <None Include="Resources\MySQLforExcel-ExportDlg-PrimaryKey-32x32.png" />
     <None Include="Resources\MySQLforExcel-ExportDlg-TableName-32x32.png" />
-    <None Include="Resources\db.Column.16x16.png" />
-    <None Include="Resources\db.Routine.16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.Routine.32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.Schema.16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.Schema.32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.Table.16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.Table.32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.View.16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\db.View.32x32.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\ExcelAddinFilter.png" />
@@ -476,6 +434,26 @@
     <Content Include="Resources\Chain Link-32x32.png" />
     <Content Include="Resources\chain_link.24x24.png" />
     <Content Include="Resources\mysql-for-excel.ico" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-EditData-24x24.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-EditData-Disabled-24x24.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-ExportToMySQL-24x24.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-ExportToMySQL-Disabled-24x24.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-ImportData-24x24.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-ImportData-Disabled-24x24.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-ListItem-Routine-24x24.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-ListItem-Table-24x24.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-ListItem-View-24x24.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-SelectObject-24x24.png" />
+    <None Include="Resources\MySQLforExcel-SchemaPanel-ListItem-Schema-24x24.png" />
+    <None Include="Resources\MySQLforExcel-SchemaPanel-NewSchema-24x24.png" />
+    <None Include="Resources\MySQLforExcel-SchemaPanel-Schemas-24x24.png" />
+    <None Include="Resources\MySQLforExcel-Separator.png" />
+    <None Include="Resources\MySQLforExcel-WelcomePanel-Connection-24x24.png" />
+    <None Include="Resources\MySQLforExcel-WelcomePanel-ListItem-Connection-32x32.png" />
+    <None Include="Resources\MySQLforExcel-WelcomePanel-ManageConnection-24x24.png" />
+    <None Include="Resources\MySQLforExcel-WelcomePanel-NewConnection-24x24.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-AppendData-24x24.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-AppendData-Disabled-24x24.png" />
     <Content Include="Resources\Warning.png" />
     <Content Include="Todo.txt" />
   </ItemGroup>

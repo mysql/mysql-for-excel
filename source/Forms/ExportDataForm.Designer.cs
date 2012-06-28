@@ -37,6 +37,7 @@
       this.picPrimaryKeyWarning = new System.Windows.Forms.PictureBox();
       this.grpColumnOptions = new System.Windows.Forms.GroupBox();
       this.cmbDatatype = new System.Windows.Forms.ComboBox();
+      this.columnBindingSource = new System.Windows.Forms.BindingSource(this.components);
       this.chkExcludeColumn = new System.Windows.Forms.CheckBox();
       this.chkAllowEmpty = new System.Windows.Forms.CheckBox();
       this.chkPrimaryKey = new System.Windows.Forms.CheckBox();
@@ -74,17 +75,16 @@
       this.btnAdvanced = new System.Windows.Forms.Button();
       this.btnCopySQL = new System.Windows.Forms.Button();
       this.timerTextChanged = new System.Windows.Forms.Timer(this.components);
-      this.columnBindingSource = new System.Windows.Forms.BindingSource(this.components);
       this.ExportDataPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKeyWarning)).BeginInit();
       this.grpColumnOptions.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.columnBindingSource)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnOptionsWarning)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTableNameWarning)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKey)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTable)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.columnBindingSource)).BeginInit();
       this.SuspendLayout();
       // 
       // ExportDataPanel
@@ -147,8 +147,7 @@
       // 
       // grpColumnOptions
       // 
-      this.grpColumnOptions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+      this.grpColumnOptions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.grpColumnOptions.Controls.Add(this.cmbDatatype);
       this.grpColumnOptions.Controls.Add(this.chkExcludeColumn);
       this.grpColumnOptions.Controls.Add(this.chkAllowEmpty);
@@ -170,8 +169,6 @@
       // 
       // cmbDatatype
       // 
-      this.cmbDatatype.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
       this.cmbDatatype.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
       this.cmbDatatype.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
       this.cmbDatatype.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.columnBindingSource, "MySQLDataType", true));
@@ -184,6 +181,10 @@
       this.cmbDatatype.TabIndex = 4;
       this.cmbDatatype.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbDatatype_DrawItem);
       this.cmbDatatype.SelectedIndexChanged += new System.EventHandler(this.cmbDatatype_SelectedIndexChanged);
+      // 
+      // columnBindingSource
+      // 
+      this.columnBindingSource.DataSource = typeof(MySQL.ForExcel.MySQLDataColumn);
       // 
       // chkExcludeColumn
       // 
@@ -262,8 +263,6 @@
       // 
       // txtColumnName
       // 
-      this.txtColumnName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
       this.txtColumnName.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.columnBindingSource, "DisplayName", true));
       this.txtColumnName.Location = new System.Drawing.Point(122, 33);
       this.txtColumnName.Name = "txtColumnName";
@@ -640,10 +639,6 @@
       this.timerTextChanged.Interval = 800;
       this.timerTextChanged.Tick += new System.EventHandler(this.timerTextChanged_Tick);
       // 
-      // columnBindingSource
-      // 
-      this.columnBindingSource.DataSource = typeof(MySQL.ForExcel.MySQLDataColumn);
-      // 
       // ExportDataForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -668,13 +663,13 @@
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKeyWarning)).EndInit();
       this.grpColumnOptions.ResumeLayout(false);
       this.grpColumnOptions.PerformLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.columnBindingSource)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnOptionsWarning)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTableNameWarning)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKey)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picTable)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.columnBindingSource)).EndInit();
       this.ResumeLayout(false);
 
     }

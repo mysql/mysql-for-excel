@@ -20,6 +20,8 @@ namespace MySQL.ForExcel
     public SchemaSelectionPanel()
     {
       InitializeComponent();
+      databaseList.AddNode(null, "Schemas");
+      databaseList.AddNode(null, "System Schemas");
     }
 
     public void SetConnection(MySqlWorkbenchConnection connection)

@@ -10,6 +10,7 @@ namespace MySQL.ForExcel
 {
   public class MyTreeView : TreeView
   {
+    private int nodeHeightMultiple = 2;
     private const int TVM_SETITEMHEIGHT = 0x111B;
     private const int TVM_SETITEM = 0x113F;
     private const int TVIF_INTEGRAL = 0x80;
@@ -43,6 +44,16 @@ namespace MySQL.ForExcel
     public int ImageToTextHorizontalPixelsOffset { get; set; }
     public int TitleTextVerticalPixelsOffset { get; set; }
     public int DescriptionTextVerticalPixelsOffset { get; set; }
+    public int NodeHeightMultiple 
+    {
+      get { return nodeHeightMultiple; }
+      set 
+      {
+        if (value < 1)
+          throw new ArgumentOutOfRangeException("NodeHeightMultiple", "Value must be at least 1");
+        nodeHeightMultiple = value;
+      }
+    }
 
     protected override void OnMouseClick(MouseEventArgs e)
     {
@@ -108,7 +119,7 @@ namespace MySQL.ForExcel
       SizeF titleStringSize = (parts != null && parts.Length > 0 ? e.Graphics.MeasureString(parts[0], Font) : SizeF.Empty);
       SizeF descriptionStringSize = (parts != null && parts.Length > 1 ? e.Graphics.MeasureString(parts[1], DescriptionFont) : SizeF.Empty);
       Image img = (NodeImages != null && NodeImages.Images.Count > 0 && e.Node.ImageIndex >= 0 && e.Node.ImageIndex < NodeImages.Images.Count ? NodeImages.Images[e.Node.ImageIndex] : null);
-      int textsHeight = Convert.ToInt32(titleStringSize.Height + descriptionStringSize.Height);
+      int textInitialY = (parts.Length == 1 ? ((e.Bounds.Height - Convert.ToInt32(titleStringSize.Height) + Convert.ToInt32(descriptionStringSize.Height)) / 2) : 0);
 
       // Paint background
       SolidBrush bkBrush = new SolidBrush(e.Node.IsSelected ? SystemColors.MenuHighlight : SystemColors.Window);
@@ -120,9 +131,11 @@ namespace MySQL.ForExcel
         pt.X += ImageHorizontalPixelsOffset;
         int y = pt.Y + ((e.Bounds.Height - img.Height) / 2);
         e.Graphics.DrawImage(img, pt.X, y, img.Width, img.Height);
-        pt.X += img.Width + ImageToTextHorizontalPixelsOffset;
-        pt.Y += TitleTextVerticalPixelsOffset;
+        pt.X += img.Width;
       }
+
+      pt.X += ImageToTextHorizontalPixelsOffset;
+      pt.Y += textInitialY + TitleTextVerticalPixelsOffset;
 
       // Draw the title if we have one
       SolidBrush titleBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), ForeColor));
@@ -145,8 +158,13 @@ namespace MySQL.ForExcel
 
     public TreeNode AddNode(TreeNode parent, string text)
     {
-      TreeNode node = parent.Nodes.Add(text);
-      SetNodeHeight(node, parent != null ? 2 : 1);
+      TreeNode node = (parent != null ? parent.Nodes.Add(text) : Nodes.Add(text));
+      if (parent == null)
+      {
+        node.ForeColor = SystemColors.ControlText;
+        node.BackColor = SystemColors.ControlLight;
+      }
+      SetNodeHeight(node, parent != null ? nodeHeightMultiple : (nodeHeightMultiple > 1 ? nodeHeightMultiple - 1 : 1));
       return node;
     }
 
