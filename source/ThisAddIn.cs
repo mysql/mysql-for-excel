@@ -11,6 +11,8 @@ namespace MySQL.ForExcel
 {
   public partial class ThisAddIn
   {
+    private const int paneWidth = 250;
+    private const int minPaneHeight = 500;
     private TaskPaneControl taskPaneControl;
     private Microsoft.Office.Tools.CustomTaskPane taskPaneValue;
 
@@ -22,11 +24,25 @@ namespace MySQL.ForExcel
     private void ThisAddIn_Startup(object sender, System.EventArgs e)
     {
       taskPaneControl = new TaskPaneControl(Application);
-      taskPaneControl.Dock = System.Windows.Forms.DockStyle.Fill;
+      taskPaneControl.Dock = DockStyle.Fill;
+      taskPaneControl.SizeChanged += new EventHandler(taskPaneControl_SizeChanged);
       taskPaneValue = CustomTaskPanes.Add(taskPaneControl, "MySQL for Excel");
       taskPaneValue.VisibleChanged += taskPaneValue_VisibleChanged;
+      taskPaneValue.DockPosition = Office.MsoCTPDockPosition.msoCTPDockPositionRight;
       taskPaneValue.DockPositionRestrict = Office.MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoHorizontal;
-      taskPaneValue.Width = 250;
+      taskPaneValue.Width = paneWidth;
+    }
+
+    void taskPaneControl_SizeChanged(object sender, EventArgs e)
+    {
+      if (taskPaneValue != null && taskPaneValue.Visible && (taskPaneValue.Width != paneWidth || taskPaneValue.Height < minPaneHeight))
+      {
+        SendKeys.Send("{ESC}");
+        if (taskPaneValue.Width != paneWidth)
+          taskPaneValue.Width = paneWidth;
+        if (taskPaneValue.Height < minPaneHeight)
+          taskPaneValue.Height = minPaneHeight;
+      }
     }
 
     private void taskPaneValue_VisibleChanged(object sender, EventArgs e)

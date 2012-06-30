@@ -13,7 +13,7 @@ using MySQL.ForExcel.Properties;
 
 namespace MySQL.ForExcel
 {
-  public partial class ExportDataForm : Form
+  public partial class ExportDataForm : AutoStyleableBaseDialog
   {
     private MySQLDataTable dataTable;
     private MySqlWorkbenchConnection wbConnection;
@@ -134,11 +134,11 @@ namespace MySQL.ForExcel
       string picBoxName = String.Format("pic{0}", warningControlSuffix);
       string lblName = String.Format("lbl{0}", warningControlSuffix);
 
-      if (ExportDataPanel.Controls.ContainsKey(picBoxName) && ExportDataPanel.Controls.ContainsKey(lblName))
+      if (contentAreaPanel.Controls.ContainsKey(picBoxName) && contentAreaPanel.Controls.ContainsKey(lblName))
       {
-        ExportDataPanel.Controls[picBoxName].Visible = show;
-        ExportDataPanel.Controls[lblName].Text = (String.IsNullOrEmpty(text) ? String.Empty : text);
-        ExportDataPanel.Controls[lblName].Visible = show;
+        contentAreaPanel.Controls[picBoxName].Visible = show;
+        contentAreaPanel.Controls[lblName].Text = (String.IsNullOrEmpty(text) ? String.Empty : text);
+        contentAreaPanel.Controls[lblName].Visible = show;
         return;
       }
       if (grpColumnOptions.Controls.ContainsKey(picBoxName) && grpColumnOptions.Controls.ContainsKey(lblName))

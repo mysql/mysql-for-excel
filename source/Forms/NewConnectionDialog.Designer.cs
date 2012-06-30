@@ -28,10 +28,6 @@
     /// </summary>
     private void InitializeComponent()
     {
-      this.okButton = new System.Windows.Forms.Button();
-      this.cancelButton = new System.Windows.Forms.Button();
-      this.testButton = new System.Windows.Forms.Button();
-      this.panel1 = new System.Windows.Forms.Panel();
       this.tabControl1 = new System.Windows.Forms.TabControl();
       this.parametersPage = new System.Windows.Forms.TabPage();
       this.label10 = new System.Windows.Forms.Label();
@@ -58,72 +54,44 @@
       this.label2 = new System.Windows.Forms.Label();
       this.connectionName = new System.Windows.Forms.TextBox();
       this.label1 = new System.Windows.Forms.Label();
-      this.panel1.SuspendLayout();
+      this.testButton = new System.Windows.Forms.Button();
+      this.cancelButton = new System.Windows.Forms.Button();
+      this.okButton = new System.Windows.Forms.Button();
+      this.contentAreaPanel.SuspendLayout();
+      this.commandAreaPanel.SuspendLayout();
       this.tabControl1.SuspendLayout();
       this.parametersPage.SuspendLayout();
       this.advancedPage.SuspendLayout();
       this.SuspendLayout();
       // 
-      // okButton
+      // contentAreaPanel
       // 
-      this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.okButton.Location = new System.Drawing.Point(691, 444);
-      this.okButton.Name = "okButton";
-      this.okButton.Size = new System.Drawing.Size(75, 23);
-      this.okButton.TabIndex = 7;
-      this.okButton.Text = "OK";
-      this.okButton.UseVisualStyleBackColor = true;
-      this.okButton.Click += new System.EventHandler(this.okButton_Click);
+      this.contentAreaPanel.Controls.Add(this.tabControl1);
+      this.contentAreaPanel.Controls.Add(this.connectionMethod);
+      this.contentAreaPanel.Controls.Add(this.connectionType);
+      this.contentAreaPanel.Controls.Add(this.label4);
+      this.contentAreaPanel.Controls.Add(this.label2);
+      this.contentAreaPanel.Controls.Add(this.connectionName);
+      this.contentAreaPanel.Controls.Add(this.label1);
+      this.contentAreaPanel.Size = new System.Drawing.Size(782, 433);
       // 
-      // cancelButton
+      // commandAreaPanel
       // 
-      this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.cancelButton.Location = new System.Drawing.Point(610, 444);
-      this.cancelButton.Name = "cancelButton";
-      this.cancelButton.Size = new System.Drawing.Size(75, 23);
-      this.cancelButton.TabIndex = 8;
-      this.cancelButton.Text = "Cancel";
-      this.cancelButton.UseVisualStyleBackColor = true;
-      // 
-      // testButton
-      // 
-      this.testButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.testButton.Location = new System.Drawing.Point(476, 444);
-      this.testButton.Name = "testButton";
-      this.testButton.Size = new System.Drawing.Size(128, 23);
-      this.testButton.TabIndex = 9;
-      this.testButton.Text = "Test Connection";
-      this.testButton.UseVisualStyleBackColor = true;
-      // 
-      // panel1
-      // 
-      this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.panel1.BackColor = System.Drawing.SystemColors.Window;
-      this.panel1.Controls.Add(this.tabControl1);
-      this.panel1.Controls.Add(this.connectionMethod);
-      this.panel1.Controls.Add(this.connectionType);
-      this.panel1.Controls.Add(this.label4);
-      this.panel1.Controls.Add(this.label2);
-      this.panel1.Controls.Add(this.connectionName);
-      this.panel1.Controls.Add(this.label1);
-      this.panel1.Location = new System.Drawing.Point(0, 0);
-      this.panel1.Name = "panel1";
-      this.panel1.Size = new System.Drawing.Size(786, 438);
-      this.panel1.TabIndex = 18;
+      this.commandAreaPanel.Controls.Add(this.testButton);
+      this.commandAreaPanel.Controls.Add(this.cancelButton);
+      this.commandAreaPanel.Controls.Add(this.okButton);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 434);
+      this.commandAreaPanel.Size = new System.Drawing.Size(782, 44);
       // 
       // tabControl1
       // 
       this.tabControl1.Controls.Add(this.parametersPage);
       this.tabControl1.Controls.Add(this.advancedPage);
-      this.tabControl1.Location = new System.Drawing.Point(14, 78);
+      this.tabControl1.Location = new System.Drawing.Point(12, 75);
       this.tabControl1.Name = "tabControl1";
       this.tabControl1.SelectedIndex = 0;
       this.tabControl1.Size = new System.Drawing.Size(758, 346);
-      this.tabControl1.TabIndex = 13;
+      this.tabControl1.TabIndex = 20;
       // 
       // parametersPage
       // 
@@ -323,58 +291,95 @@
             "Standard (TCP/IP)",
             "Local Socket/Pipe",
             "Standard TCP/IP over SSH"});
-      this.connectionMethod.Location = new System.Drawing.Point(143, 43);
+      this.connectionMethod.Location = new System.Drawing.Point(141, 40);
       this.connectionMethod.Name = "connectionMethod";
       this.connectionMethod.Size = new System.Drawing.Size(373, 23);
-      this.connectionMethod.TabIndex = 12;
+      this.connectionMethod.TabIndex = 19;
       // 
       // connectionType
       // 
       this.connectionType.AutoSize = true;
+      this.connectionType.BackColor = System.Drawing.Color.Transparent;
       this.connectionType.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.connectionType.Location = new System.Drawing.Point(529, 46);
+      this.connectionType.Location = new System.Drawing.Point(527, 43);
       this.connectionType.Name = "connectionType";
       this.connectionType.Size = new System.Drawing.Size(220, 15);
-      this.connectionType.TabIndex = 11;
+      this.connectionType.TabIndex = 18;
       this.connectionType.Text = "Method to use to connect to the RDBMS";
       // 
       // label4
       // 
       this.label4.AutoSize = true;
+      this.label4.BackColor = System.Drawing.Color.Transparent;
       this.label4.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.label4.Location = new System.Drawing.Point(20, 46);
+      this.label4.Location = new System.Drawing.Point(18, 43);
       this.label4.Name = "label4";
       this.label4.Size = new System.Drawing.Size(117, 15);
-      this.label4.TabIndex = 10;
+      this.label4.TabIndex = 17;
       this.label4.Text = "Connection Method:";
       // 
       // label2
       // 
       this.label2.AutoSize = true;
+      this.label2.BackColor = System.Drawing.Color.Transparent;
       this.label2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.label2.Location = new System.Drawing.Point(529, 16);
+      this.label2.Location = new System.Drawing.Point(527, 13);
       this.label2.Name = "label2";
       this.label2.Size = new System.Drawing.Size(176, 15);
-      this.label2.TabIndex = 9;
+      this.label2.TabIndex = 16;
       this.label2.Text = "Type a name for the connection";
       // 
       // connectionName
       // 
       this.connectionName.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.connectionName.Location = new System.Drawing.Point(143, 14);
+      this.connectionName.Location = new System.Drawing.Point(141, 11);
       this.connectionName.Name = "connectionName";
       this.connectionName.Size = new System.Drawing.Size(373, 23);
-      this.connectionName.TabIndex = 8;
+      this.connectionName.TabIndex = 15;
       // 
       // label1
       // 
       this.label1.AutoSize = true;
+      this.label1.BackColor = System.Drawing.Color.Transparent;
       this.label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.label1.Location = new System.Drawing.Point(20, 16);
+      this.label1.Location = new System.Drawing.Point(18, 13);
       this.label1.Name = "label1";
       this.label1.Size = new System.Drawing.Size(107, 15);
-      this.label1.TabIndex = 7;
+      this.label1.TabIndex = 14;
       this.label1.Text = "Connection Name:";
+      // 
+      // testButton
+      // 
+      this.testButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.testButton.Location = new System.Drawing.Point(480, 10);
+      this.testButton.Name = "testButton";
+      this.testButton.Size = new System.Drawing.Size(128, 23);
+      this.testButton.TabIndex = 12;
+      this.testButton.Text = "Test Connection";
+      this.testButton.UseVisualStyleBackColor = true;
+      // 
+      // cancelButton
+      // 
+      this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.cancelButton.Location = new System.Drawing.Point(614, 10);
+      this.cancelButton.Name = "cancelButton";
+      this.cancelButton.Size = new System.Drawing.Size(75, 23);
+      this.cancelButton.TabIndex = 11;
+      this.cancelButton.Text = "Cancel";
+      this.cancelButton.UseVisualStyleBackColor = true;
+      // 
+      // okButton
+      // 
+      this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+      this.okButton.Location = new System.Drawing.Point(695, 10);
+      this.okButton.Name = "okButton";
+      this.okButton.Size = new System.Drawing.Size(75, 23);
+      this.okButton.TabIndex = 10;
+      this.okButton.Text = "OK";
+      this.okButton.UseVisualStyleBackColor = true;
+      this.okButton.Click += new System.EventHandler(this.okButton_Click);
       // 
       // NewConnectionDialog
       // 
@@ -383,19 +388,12 @@
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.cancelButton;
       this.ClientSize = new System.Drawing.Size(782, 479);
-      this.Controls.Add(this.panel1);
-      this.Controls.Add(this.testButton);
-      this.Controls.Add(this.cancelButton);
-      this.Controls.Add(this.okButton);
-      this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-      this.MaximizeBox = false;
-      this.MinimizeBox = false;
+      this.CommandAreaHeight = 44;
       this.Name = "NewConnectionDialog";
-      this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
       this.Text = "Setup New Connection";
-      this.panel1.ResumeLayout(false);
-      this.panel1.PerformLayout();
+      this.contentAreaPanel.ResumeLayout(false);
+      this.contentAreaPanel.PerformLayout();
+      this.commandAreaPanel.ResumeLayout(false);
       this.tabControl1.ResumeLayout(false);
       this.parametersPage.ResumeLayout(false);
       this.parametersPage.PerformLayout();
@@ -407,10 +405,6 @@
 
     #endregion
 
-    private System.Windows.Forms.Button okButton;
-    private System.Windows.Forms.Button cancelButton;
-    private System.Windows.Forms.Button testButton;
-    private System.Windows.Forms.Panel panel1;
     private System.Windows.Forms.TabControl tabControl1;
     private System.Windows.Forms.TabPage parametersPage;
     private System.Windows.Forms.Label label10;
@@ -437,5 +431,8 @@
     private System.Windows.Forms.Label label2;
     private System.Windows.Forms.TextBox connectionName;
     private System.Windows.Forms.Label label1;
+    private System.Windows.Forms.Button testButton;
+    private System.Windows.Forms.Button cancelButton;
+    private System.Windows.Forms.Button okButton;
   }
 }

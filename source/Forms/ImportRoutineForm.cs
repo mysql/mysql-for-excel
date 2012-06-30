@@ -13,7 +13,7 @@ using System.Reflection;
 
 namespace MySQL.ForExcel
 {
-  public partial class ImportRoutineForm : Form
+  public partial class ImportRoutineForm : AutoStyleableBaseDialog
   {
     private MySqlWorkbenchConnection wbConnection;
     private DBObject importDBObject;

@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace MySQL.ForExcel
 {
-  public partial class ExportAdvancedOptionsDialog : Form
+  public partial class ExportAdvancedOptionsDialog : AutoStyleableBaseDialog
   {
     public ExportAdvancedOptionsDialog()
     {
@@ -21,6 +21,8 @@ namespace MySQL.ForExcel
       chkAutoAllowEmptyNonIndexColumns.Checked = Properties.Settings.Default.ExportAutoAllowEmptyNonIndexColumns;
       chkUseFormattedValues.Checked = Properties.Settings.Default.ExportUseFormattedValues;
       chkShowCopySQLButton.Checked = Properties.Settings.Default.ExportShowCopySQLButton;
+
+      chkAddBufferToVarchar.Enabled = chkDetectDatatype.Checked;
     }
 
     private void btnAccept_Click(object sender, EventArgs e)
@@ -33,6 +35,13 @@ namespace MySQL.ForExcel
       Properties.Settings.Default.ExportShowCopySQLButton = chkShowCopySQLButton.Checked;
       DialogResult = DialogResult.OK;
       Close();
+    }
+
+    private void chkDetectDatatype_CheckedChanged(object sender, EventArgs e)
+    {
+      chkAddBufferToVarchar.Enabled = chkDetectDatatype.Checked;
+      if (!chkDetectDatatype.Checked)
+        chkAddBufferToVarchar.Checked = false;
     }
 
   }

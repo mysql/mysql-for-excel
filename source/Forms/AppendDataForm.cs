@@ -12,7 +12,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel
 {
-  public partial class AppendDataForm : Form
+  public partial class AppendDataForm : AutoStyleableBaseDialog
   {
     private MySqlWorkbenchConnection wbConnection;
     private ExportDataHelper exportDataHelper;

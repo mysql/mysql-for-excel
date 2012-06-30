@@ -176,7 +176,7 @@
             treeNode1,
             treeNode2,
             treeNode3});
-      this.objectList.Size = new System.Drawing.Size(232, 279);
+      this.objectList.Size = new System.Drawing.Size(232, 275);
       this.objectList.TabIndex = 24;
       this.objectList.TitleColorOpacity = 0.8D;
       this.objectList.TitleTextVerticalPixelsOffset = 0;
@@ -234,7 +234,7 @@
       this.editData.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ObjectPanel_EditData_24x24;
       this.editData.ImagePixelsXOffset = 0;
       this.editData.ImagePixelsYOffset = 1;
-      this.editData.Location = new System.Drawing.Point(9, 520);
+      this.editData.Location = new System.Drawing.Point(9, 518);
       this.editData.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.editData.Name = "editData";
       this.editData.Size = new System.Drawing.Size(232, 28);
@@ -268,7 +268,7 @@
       this.importData.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ObjectPanel_ImportData_24x24;
       this.importData.ImagePixelsXOffset = 0;
       this.importData.ImagePixelsYOffset = 2;
-      this.importData.Location = new System.Drawing.Point(9, 484);
+      this.importData.Location = new System.Drawing.Point(9, 480);
       this.importData.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.importData.Name = "importData";
       this.importData.Size = new System.Drawing.Size(232, 28);

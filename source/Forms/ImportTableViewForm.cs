@@ -10,7 +10,7 @@ using MySQL.Utility;
 
 namespace MySQL.ForExcel
 {
-  public partial class ImportTableViewForm : Form
+  public partial class ImportTableViewForm : AutoStyleableBaseDialog
   {
     private MySqlWorkbenchConnection wbConnection;
     private DBObject importDBObject;

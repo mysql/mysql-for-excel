@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace MySQL.ForExcel
 {
-  public partial class PasswordDialog : Form
+  public partial class PasswordDialog : AutoStyleableBaseDialog
   {
     public string PasswordText
     {

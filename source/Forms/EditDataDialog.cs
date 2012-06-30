@@ -12,7 +12,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel
 {
-  public partial class EditDataForm : Form
+  public partial class EditDataForm : AutoStyleableBaseDialog
   {
     private MySqlWorkbenchConnection wbConnection;
     private DataTable editingTable = null;
@@ -191,11 +191,6 @@ namespace MySQL.ForExcel
     private void btnCommit_Click(object sender, EventArgs e)
     {
       pushDataChanges();
-    }
-
-    private void grdPreview_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
-    {
-
     }
 
     private void EditDataForm_Activated(object sender, EventArgs e)

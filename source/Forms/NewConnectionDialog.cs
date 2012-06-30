@@ -10,7 +10,7 @@ using MySQL.Utility;
 
 namespace MySQL.ForExcel
 {
-  public partial class NewConnectionDialog : Form
+  public partial class NewConnectionDialog : AutoStyleableBaseDialog
   {
     private MySqlWorkbenchConnection connection;
 

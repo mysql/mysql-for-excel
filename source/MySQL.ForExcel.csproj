@@ -220,6 +220,7 @@
     </Compile>
     <Compile Include="Classes\MySQLIndex.cs" />
     <Compile Include="Classes\MySQLTable.cs" />
+    <Compile Include="Classes\StyleableHelper.cs" />
     <Compile Include="Classes\Utilities.cs" />
     <Compile Include="Controls\HotLabel.cs">
       <SubType>UserControl</SubType>
@@ -262,6 +263,18 @@
     </Compile>
     <Compile Include="Forms\AppendDataForm.Designer.cs">
       <DependentUpon>AppendDataForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\AutoStyleableBaseDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AutoStyleableBaseDialog.Designer.cs">
+      <DependentUpon>AutoStyleableBaseDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\AutoStyleableBaseForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AutoStyleableBaseForm.Designer.cs">
+      <DependentUpon>AutoStyleableBaseForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\ImportRoutineForm.cs">
       <SubType>Form</SubType>
@@ -349,6 +362,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\AppendDataForm.resx">
       <DependentUpon>AppendDataForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AutoStyleableBaseDialog.resx">
+      <DependentUpon>AutoStyleableBaseDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AutoStyleableBaseForm.resx">
+      <DependentUpon>AutoStyleableBaseForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportRoutineForm.resx">
       <DependentUpon>ImportRoutineForm.cs</DependentUpon>

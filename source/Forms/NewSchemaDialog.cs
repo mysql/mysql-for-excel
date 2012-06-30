@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace MySQL.ForExcel
 {
-  public partial class NewSchemaDialog : Form
+  public partial class NewSchemaDialog : AutoStyleableBaseDialog
   {
     public NewSchemaDialog()
     {
