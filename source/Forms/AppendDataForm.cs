@@ -39,7 +39,7 @@ namespace MySQL.ForExcel
       grdPreviewData.EnableHeadersVisualStyles = false;
       exportDataHelper = new ExportDataHelper(wbConnection, exportDataRange, importDBObject.Name);
       initializeToTableGrid(importDBObject);
-      Text = String.Format("Append Data [0])", exportDataRange.Address.Replace("$", String.Empty));
+      Text = String.Format("Append Data [{0}])", exportDataRange.Address.Replace("$", String.Empty));
       lblToTableName.Text = importDBObject.Name;
       chkUseFormatted.Checked = true;
       chkFirstRowHeaders_CheckedChanged(chkFirstRowHeaders, EventArgs.Empty);

@@ -139,9 +139,9 @@ namespace MySQL.ForExcel
       set { _uniqueKey = value; }
     }
 
-    private int _charMaxLength;
+    private long _charMaxLength;
     [DisplayName("Character Length")]
-    public int CharMaxLength
+    public long CharMaxLength
     {
       get { return _charMaxLength; }
       set { _charMaxLength = value; }
@@ -304,7 +304,7 @@ namespace MySQL.ForExcel
         index = columnType.Length;
       DataType = columnType.Substring(0, index);
       if (supportsCharMaxLength)
-        CharMaxLength = (row["CHARACTER_MAXIMUM_LENGTH"] == DBNull.Value ? 0 : Convert.ToInt32(row["CHARACTER_MAXIMUM_LENGTH"]));
+        CharMaxLength = (row["CHARACTER_MAXIMUM_LENGTH"] == DBNull.Value ? 0 : Convert.ToInt64(row["CHARACTER_MAXIMUM_LENGTH"]));
 
       columnType = columnType.Substring(index);
       IsUnsigned = columnType.IndexOf("unsigned") != -1;

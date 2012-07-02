@@ -40,7 +40,7 @@
       this.btnHelp = new System.Windows.Forms.Button();
       this.databaseList = new MySQL.ForExcel.MyTreeView();
       this.schemaFilter = new MySQL.ForExcel.SearchEdit();
-      this.createNewSchema = new MySQL.ForExcel.HotLabel();
+      this.createNewSchemaLabel = new MySQL.ForExcel.HotLabel();
       this.selectSchemaLabel = new MySQL.ForExcel.HotLabel();
       this.picSeparator = new System.Windows.Forms.PictureBox();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
@@ -173,38 +173,38 @@
       this.schemaFilter.TabIndex = 16;
       this.schemaFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.schemaFilter_KeyDown);
       // 
-      // createNewSchema
+      // createNewSchemaLabel
       // 
-      this.createNewSchema.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.createNewSchema.Description = "Add a new Database Schema";
-      this.createNewSchema.DescriptionColor = System.Drawing.SystemColors.WindowText;
-      this.createNewSchema.DescriptionColorOpacity = 0.6D;
-      this.createNewSchema.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.createNewSchema.DescriptionShadowOpacity = 0.8D;
-      this.createNewSchema.DescriptionShadowPixelsXOffset = 0;
-      this.createNewSchema.DescriptionShadowPixelsYOffset = 1;
-      this.createNewSchema.DisabledImage = null;
-      this.createNewSchema.DrawShadow = true;
-      this.createNewSchema.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.createNewSchema.HotTracking = true;
-      this.createNewSchema.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_SchemaPanel_NewSchema_24x24;
-      this.createNewSchema.ImagePixelsXOffset = 0;
-      this.createNewSchema.ImagePixelsYOffset = 0;
-      this.createNewSchema.Location = new System.Drawing.Point(9, 558);
-      this.createNewSchema.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-      this.createNewSchema.Name = "createNewSchema";
-      this.createNewSchema.Size = new System.Drawing.Size(232, 28);
-      this.createNewSchema.TabIndex = 15;
-      this.createNewSchema.Title = "Create New Schema";
-      this.createNewSchema.TitleColor = System.Drawing.SystemColors.WindowText;
-      this.createNewSchema.TitleColorOpacity = 0.8D;
-      this.createNewSchema.TitleDescriptionPixelsSpacing = 0;
-      this.createNewSchema.TitlePixelsXOffset = 0;
-      this.createNewSchema.TitlePixelsYOffset = 0;
-      this.createNewSchema.TitleShadowOpacity = 0.3D;
-      this.createNewSchema.TitleShadowPixelsXOffset = 0;
-      this.createNewSchema.TitleShadowPixelsYOffset = 1;
-      this.createNewSchema.Click += new System.EventHandler(this.createNewSchema_Click);
+      this.createNewSchemaLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.createNewSchemaLabel.Description = "Add a new Database Schema";
+      this.createNewSchemaLabel.DescriptionColor = System.Drawing.SystemColors.WindowText;
+      this.createNewSchemaLabel.DescriptionColorOpacity = 0.6D;
+      this.createNewSchemaLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.createNewSchemaLabel.DescriptionShadowOpacity = 0.4D;
+      this.createNewSchemaLabel.DescriptionShadowPixelsXOffset = 0;
+      this.createNewSchemaLabel.DescriptionShadowPixelsYOffset = 1;
+      this.createNewSchemaLabel.DisabledImage = null;
+      this.createNewSchemaLabel.DrawShadow = true;
+      this.createNewSchemaLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.createNewSchemaLabel.HotTracking = true;
+      this.createNewSchemaLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_SchemaPanel_NewSchema_24x24;
+      this.createNewSchemaLabel.ImagePixelsXOffset = 0;
+      this.createNewSchemaLabel.ImagePixelsYOffset = 0;
+      this.createNewSchemaLabel.Location = new System.Drawing.Point(9, 558);
+      this.createNewSchemaLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.createNewSchemaLabel.Name = "createNewSchemaLabel";
+      this.createNewSchemaLabel.Size = new System.Drawing.Size(232, 28);
+      this.createNewSchemaLabel.TabIndex = 15;
+      this.createNewSchemaLabel.Title = "Create New Schema";
+      this.createNewSchemaLabel.TitleColor = System.Drawing.SystemColors.WindowText;
+      this.createNewSchemaLabel.TitleColorOpacity = 0.95D;
+      this.createNewSchemaLabel.TitleDescriptionPixelsSpacing = 0;
+      this.createNewSchemaLabel.TitlePixelsXOffset = 0;
+      this.createNewSchemaLabel.TitlePixelsYOffset = 0;
+      this.createNewSchemaLabel.TitleShadowOpacity = 0.2D;
+      this.createNewSchemaLabel.TitleShadowPixelsXOffset = 0;
+      this.createNewSchemaLabel.TitleShadowPixelsYOffset = 1;
+      this.createNewSchemaLabel.Click += new System.EventHandler(this.createNewSchema_Click);
       // 
       // selectSchemaLabel
       // 
@@ -212,7 +212,7 @@
       this.selectSchemaLabel.DescriptionColor = System.Drawing.SystemColors.WindowText;
       this.selectSchemaLabel.DescriptionColorOpacity = 0.6D;
       this.selectSchemaLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.selectSchemaLabel.DescriptionShadowOpacity = 0.8D;
+      this.selectSchemaLabel.DescriptionShadowOpacity = 0.4D;
       this.selectSchemaLabel.DescriptionShadowPixelsXOffset = 0;
       this.selectSchemaLabel.DescriptionShadowPixelsYOffset = 1;
       this.selectSchemaLabel.DisabledImage = null;
@@ -229,11 +229,11 @@
       this.selectSchemaLabel.TabIndex = 14;
       this.selectSchemaLabel.Title = "Select a Database Schema";
       this.selectSchemaLabel.TitleColor = System.Drawing.SystemColors.WindowText;
-      this.selectSchemaLabel.TitleColorOpacity = 0.8D;
+      this.selectSchemaLabel.TitleColorOpacity = 0.95D;
       this.selectSchemaLabel.TitleDescriptionPixelsSpacing = 0;
       this.selectSchemaLabel.TitlePixelsXOffset = 0;
       this.selectSchemaLabel.TitlePixelsYOffset = 0;
-      this.selectSchemaLabel.TitleShadowOpacity = 0.3D;
+      this.selectSchemaLabel.TitleShadowOpacity = 0.2D;
       this.selectSchemaLabel.TitleShadowPixelsXOffset = 0;
       this.selectSchemaLabel.TitleShadowPixelsYOffset = 1;
       // 
@@ -255,7 +255,7 @@
       this.Controls.Add(this.databaseList);
       this.Controls.Add(this.schemaFilter);
       this.Controls.Add(this.selectSchemaLabel);
-      this.Controls.Add(this.createNewSchema);
+      this.Controls.Add(this.createNewSchemaLabel);
       this.Controls.Add(this.lblInstructions);
       this.Controls.Add(this.btnHelp);
       this.Controls.Add(this.btnNext);
@@ -283,7 +283,7 @@
     private System.Windows.Forms.Label lblInstructions;
     public System.Windows.Forms.Button btnHelp;
     private HotLabel selectSchemaLabel;
-    private HotLabel createNewSchema;
+    private HotLabel createNewSchemaLabel;
     private SearchEdit schemaFilter;
     private MyTreeView databaseList;
     private System.Windows.Forms.PictureBox picSeparator;

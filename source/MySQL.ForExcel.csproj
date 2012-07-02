@@ -324,6 +324,12 @@
     <Compile Include="Forms\PasswordDialog.designer.cs">
       <DependentUpon>PasswordDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Panels\AutoStyleableBasePanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Panels\AutoStyleableBasePanel.Designer.cs">
+      <DependentUpon>AutoStyleableBasePanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Panels\DBObjectSelectionPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>

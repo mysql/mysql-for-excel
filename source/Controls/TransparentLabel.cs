@@ -35,6 +35,9 @@ namespace MySQL.ForExcel
 
     protected override void OnPaint(PaintEventArgs e)
     {
+      string remainingText = Text.Trim();
+      if (remainingText.Length == 0)
+        return;
       if (ApplyAntiAlias)
       {
         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
@@ -43,30 +46,41 @@ namespace MySQL.ForExcel
       SolidBrush shadowBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(ShadowOpacity * 255), ShadowColor));
       SolidBrush textBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(ColorOpacity * 255), ForeColor));
       string textToDraw = String.Empty;
-      string remainingText = Text;
       SizeF stringSize = SizeF.Empty;
-      float delta = 0;
       int lengthToCut = 0;
-      double deltaPercentage = 0;
+      double trimPercentage = 0;
       Point p = e.ClipRectangle.Location;
       int width = e.ClipRectangle.Width;
-      int spacePos = -1;
+      int spaceAfterPos = -1;
+      int spaceBeforePos = -1;
+
       do
       {
         stringSize = e.Graphics.MeasureString(remainingText, Font);
-        delta = stringSize.Width - width;
-        deltaPercentage = (delta > 0 ? 1 - delta / stringSize.Width : 0);
-        lengthToCut = Convert.ToInt32(remainingText.Length * deltaPercentage);
-        spacePos = (lengthToCut > 0 ? remainingText.LastIndexOf(" ", lengthToCut - 1) : -1);
-        lengthToCut = (spacePos > -1 ? spacePos  : lengthToCut);
-        textToDraw = (lengthToCut > 0 ? remainingText.Substring(0, lengthToCut) : remainingText);
+        trimPercentage = width / stringSize.Width;
+        if (trimPercentage < 1)
+        {
+          lengthToCut = Convert.ToInt32(remainingText.Length * trimPercentage);
+          spaceBeforePos = lengthToCut = (lengthToCut > 0 ? lengthToCut - 1 : 0);
+          spaceAfterPos = remainingText.IndexOf(" ", lengthToCut);
+          textToDraw = (spaceAfterPos >= 0 ? remainingText.Substring(0, spaceAfterPos) : remainingText);
+          while (spaceBeforePos > -1 && e.Graphics.MeasureString(textToDraw, Font).Width > width)
+          {
+            spaceBeforePos = remainingText.LastIndexOf(" ", spaceBeforePos);
+            textToDraw = (spaceBeforePos >= 0 ? remainingText.Substring(0, spaceBeforePos) : textToDraw);
+            spaceBeforePos--;
+          }
+        }
+        else
+          textToDraw = remainingText;
+        textToDraw = textToDraw.Trim();
         if (DrawShadow)
           e.Graphics.DrawString(textToDraw, Font, shadowBrush, p.X + ShadowPixelsXOffset, p.Y + ShadowPixelsYOffset);
         e.Graphics.DrawString(textToDraw, Font, textBrush, p.X, p.Y);
-        remainingText = (lengthToCut > 0 ? remainingText.Substring(lengthToCut) : String.Empty);
+        remainingText = (textToDraw.Length < remainingText.Length ? remainingText.Substring(textToDraw.Length).Trim() : String.Empty);
         p.Y += Convert.ToInt32(stringSize.Height + PixelsSpacingAdjustment);
       }
-      while (remainingText.Length > 0 && stringSize.Width > width);
+      while (remainingText.Length > 0);
       textBrush.Dispose();
       shadowBrush.Dispose();
     }

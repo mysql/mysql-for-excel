@@ -30,8 +30,8 @@
     {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WelcomePanel));
-      System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Local Connections");
-      System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Remote Connections");
+      System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Local Connections");
+      System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Remote Connections");
       this.picAddInLogo = new System.Windows.Forms.PictureBox();
       this.largeImages = new System.Windows.Forms.ImageList(this.components);
       this.lblInstructions = new System.Windows.Forms.Label();
@@ -124,7 +124,7 @@
       this.manageConnectionsLabel.DescriptionColor = System.Drawing.SystemColors.WindowText;
       this.manageConnectionsLabel.DescriptionColorOpacity = 0.6D;
       this.manageConnectionsLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.manageConnectionsLabel.DescriptionShadowOpacity = 0.8D;
+      this.manageConnectionsLabel.DescriptionShadowOpacity = 0.4D;
       this.manageConnectionsLabel.DescriptionShadowPixelsXOffset = 0;
       this.manageConnectionsLabel.DescriptionShadowPixelsYOffset = 1;
       this.manageConnectionsLabel.DisabledImage = null;
@@ -141,11 +141,11 @@
       this.manageConnectionsLabel.TabIndex = 16;
       this.manageConnectionsLabel.Title = "Manage Connections";
       this.manageConnectionsLabel.TitleColor = System.Drawing.SystemColors.WindowText;
-      this.manageConnectionsLabel.TitleColorOpacity = 0.8D;
+      this.manageConnectionsLabel.TitleColorOpacity = 0.95D;
       this.manageConnectionsLabel.TitleDescriptionPixelsSpacing = 0;
       this.manageConnectionsLabel.TitlePixelsXOffset = 0;
       this.manageConnectionsLabel.TitlePixelsYOffset = -2;
-      this.manageConnectionsLabel.TitleShadowOpacity = 0.3D;
+      this.manageConnectionsLabel.TitleShadowOpacity = 0.2D;
       this.manageConnectionsLabel.TitleShadowPixelsXOffset = 0;
       this.manageConnectionsLabel.TitleShadowPixelsYOffset = 1;
       this.manageConnectionsLabel.Click += new System.EventHandler(this.manageConnectionsLabel_Click);
@@ -169,18 +169,19 @@
       this.connectionList.ItemHeight = 20;
       this.connectionList.Location = new System.Drawing.Point(9, 195);
       this.connectionList.Name = "connectionList";
+      this.connectionList.NodeHeightMultiple = 2;
       this.connectionList.NodeImages = this.largeImages;
-      treeNode1.BackColor = System.Drawing.SystemColors.ControlLight;
-      treeNode1.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode1.Name = "LocalConnectionsNode";
-      treeNode1.Text = "Local Connections";
-      treeNode2.BackColor = System.Drawing.SystemColors.ControlLight;
-      treeNode2.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode2.Name = "RemoteConnectionsNode";
-      treeNode2.Text = "Remote Connections";
+      treeNode3.BackColor = System.Drawing.SystemColors.ControlLight;
+      treeNode3.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode3.Name = "LocalConnectionsNode";
+      treeNode3.Text = "Local Connections";
+      treeNode4.BackColor = System.Drawing.SystemColors.ControlLight;
+      treeNode4.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode4.Name = "RemoteConnectionsNode";
+      treeNode4.Text = "Remote Connections";
       this.connectionList.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1,
-            treeNode2});
+            treeNode3,
+            treeNode4});
       this.connectionList.Size = new System.Drawing.Size(232, 315);
       this.connectionList.TabIndex = 22;
       this.connectionList.TitleColorOpacity = 0.8D;
@@ -194,7 +195,7 @@
       this.newConnectionLabel.DescriptionColor = System.Drawing.SystemColors.WindowText;
       this.newConnectionLabel.DescriptionColorOpacity = 0.6D;
       this.newConnectionLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.newConnectionLabel.DescriptionShadowOpacity = 0.8D;
+      this.newConnectionLabel.DescriptionShadowOpacity = 0.4D;
       this.newConnectionLabel.DescriptionShadowPixelsXOffset = 0;
       this.newConnectionLabel.DescriptionShadowPixelsYOffset = 1;
       this.newConnectionLabel.DisabledImage = null;
@@ -211,11 +212,11 @@
       this.newConnectionLabel.TabIndex = 15;
       this.newConnectionLabel.Title = "New Connection";
       this.newConnectionLabel.TitleColor = System.Drawing.SystemColors.WindowText;
-      this.newConnectionLabel.TitleColorOpacity = 0.8D;
+      this.newConnectionLabel.TitleColorOpacity = 0.95D;
       this.newConnectionLabel.TitleDescriptionPixelsSpacing = 0;
       this.newConnectionLabel.TitlePixelsXOffset = 0;
       this.newConnectionLabel.TitlePixelsYOffset = 0;
-      this.newConnectionLabel.TitleShadowOpacity = 0.3D;
+      this.newConnectionLabel.TitleShadowOpacity = 0.2D;
       this.newConnectionLabel.TitleShadowPixelsXOffset = 0;
       this.newConnectionLabel.TitleShadowPixelsYOffset = 1;
       this.newConnectionLabel.Click += new System.EventHandler(this.newConnectionLabel_Click);
@@ -226,7 +227,7 @@
       this.openConnectionLabel.DescriptionColor = System.Drawing.SystemColors.WindowText;
       this.openConnectionLabel.DescriptionColorOpacity = 0.6D;
       this.openConnectionLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.openConnectionLabel.DescriptionShadowOpacity = 0.8D;
+      this.openConnectionLabel.DescriptionShadowOpacity = 0.4D;
       this.openConnectionLabel.DescriptionShadowPixelsXOffset = 0;
       this.openConnectionLabel.DescriptionShadowPixelsYOffset = 1;
       this.openConnectionLabel.DisabledImage = null;
@@ -243,16 +244,17 @@
       this.openConnectionLabel.TabIndex = 20;
       this.openConnectionLabel.Title = "Open a MySQL Connection";
       this.openConnectionLabel.TitleColor = System.Drawing.SystemColors.WindowText;
-      this.openConnectionLabel.TitleColorOpacity = 0.8D;
+      this.openConnectionLabel.TitleColorOpacity = 0.95D;
       this.openConnectionLabel.TitleDescriptionPixelsSpacing = 0;
       this.openConnectionLabel.TitlePixelsXOffset = 2;
       this.openConnectionLabel.TitlePixelsYOffset = -3;
-      this.openConnectionLabel.TitleShadowOpacity = 0.3D;
+      this.openConnectionLabel.TitleShadowOpacity = 0.2D;
       this.openConnectionLabel.TitleShadowPixelsXOffset = 0;
       this.openConnectionLabel.TitleShadowPixelsYOffset = 1;
       // 
       // WelcomePanel
       // 
+      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.Controls.Add(this.picAddInLogoText);
       this.Controls.Add(this.picSeparator);
       this.Controls.Add(this.lblInstructions);

@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using System.Drawing.Drawing2D;
 
 namespace MySQL.ForExcel
 {
-  public partial class AutoStyleableBaseForm : Form
+  public partial class AutoStyleableBasePanel : UserControl
   {
     [Category("Appearance"), DefaultValue(true), Description("Indicates whether or not the form automatically uses the system default font.")]
     public bool UseSystemFont { get; set; }
@@ -19,12 +18,18 @@ namespace MySQL.ForExcel
     public bool InheritSystemFontToControls { get; set; }
 
     [Category("Appearance"), Description("List of control names that should inherit the System Font; when null all controls will inherit it.")]
+    [Editor(@"System.Windows.Forms.Design.StringCollectionEditor," +
+        "System.Design, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+       typeof(System.Drawing.Design.UITypeEditor))]
     public List<string> InheritFontToControlsList { get; set; }
 
     [Category("Appearance"), Description("List of control names that should NOT inherit the System Font.")]
+    [Editor(@"System.Windows.Forms.Design.StringCollectionEditor," +
+        "System.Design, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+       typeof(System.Drawing.Design.UITypeEditor))]
     public List<string> InheritFontToControlsExceptionList { get; set; }
 
-    public AutoStyleableBaseForm()
+    public AutoStyleableBasePanel()
     {
       InitializeComponent();
 
@@ -60,12 +65,6 @@ namespace MySQL.ForExcel
       }
       InheritFontToControls(Controls);
       base.OnLoad(e);
-    }
-
-    protected override void OnFormClosed(FormClosedEventArgs e)
-    {
-      base.OnFormClosed(e);
-      Microsoft.Win32.SystemEvents.UserPreferenceChanged -= new Microsoft.Win32.UserPreferenceChangedEventHandler(SystemEvents_UserPreferenceChanged);
     }
 
     private void SystemEvents_UserPreferenceChanged(object sender, Microsoft.Win32.UserPreferenceChangedEventArgs e)

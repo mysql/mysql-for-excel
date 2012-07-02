@@ -11,7 +11,7 @@ using MySQL.ForExcel.Properties;
 
 namespace MySQL.ForExcel
 {
-  public partial class DBObjectSelectionPanel : UserControl
+  public partial class DBObjectSelectionPanel : AutoStyleableBasePanel
   {
     private MySqlWorkbenchConnection connection;
     private string filter;
@@ -118,9 +118,9 @@ namespace MySQL.ForExcel
       if (e != null && e.Node != null && e.Node.Level > 0)
         o = e.Node.Tag as DBObject;
 
-      importData.Enabled = o != null;
-      editData.Enabled = o != null;
-      appendData.Enabled = o != null && o.Type == DBObjectType.Table;
+      importDataLabel.Enabled = o != null;
+      editDataLabel.Enabled = o != null;
+      appendDataLabel.Enabled = o != null && o.Type == DBObjectType.Table;
     }
 
     private void importData_Click(object sender, EventArgs e)
