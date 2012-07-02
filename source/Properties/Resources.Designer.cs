@@ -233,6 +233,27 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap MySQLforExcel_AppendDlg_Arrow_Down {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_AppendDlg_Arrow_Down", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MySQLforExcel_AppendDlg_ColumnMapping_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_AppendDlg_ColumnMapping_32x32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MySQLforExcel_AppendDlg_ManualColumnMapping_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_AppendDlg_ManualColumnMapping_32x32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap MySQLforExcel_ExportDlg_ColumnOptions_32x32 {
             get {
                 object obj = ResourceManager.GetObject("MySQLforExcel_ExportDlg_ColumnOptions_32x32", resourceCulture);
@@ -369,6 +390,13 @@ namespace MySQL.ForExcel.Properties {
         internal static System.Drawing.Bitmap MySQLforExcel_SchemaPanel_Schemas_24x24 {
             get {
                 object obj = ResourceManager.GetObject("MySQLforExcel_SchemaPanel_Schemas_24x24", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MySQLforExcel_Security {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_Security", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

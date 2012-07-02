@@ -479,6 +479,10 @@
     <None Include="Resources\MySQLforExcel-WelcomePanel-NewConnection-24x24.png" />
     <None Include="Resources\MySQLforExcel-ObjectPanel-AppendData-24x24.png" />
     <None Include="Resources\MySQLforExcel-ObjectPanel-AppendData-Disabled-24x24.png" />
+    <None Include="Resources\MySQLforExcel-Security.png" />
+    <None Include="Resources\MySQLforExcel-AppendDlg-Arrow-Down.png" />
+    <None Include="Resources\MySQLforExcel-AppendDlg-ColumnMapping-32x32.png" />
+    <None Include="Resources\MySQLforExcel-AppendDlg-ManualColumnMapping-32x32.png" />
     <Content Include="Resources\Warning.png" />
     <Content Include="Todo.txt" />
   </ItemGroup>

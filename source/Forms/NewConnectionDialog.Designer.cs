@@ -66,6 +66,7 @@
       // 
       // contentAreaPanel
       // 
+      this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
       this.contentAreaPanel.Controls.Add(this.tabControl1);
       this.contentAreaPanel.Controls.Add(this.connectionMethod);
       this.contentAreaPanel.Controls.Add(this.connectionType);
@@ -81,7 +82,7 @@
       this.commandAreaPanel.Controls.Add(this.cancelButton);
       this.commandAreaPanel.Controls.Add(this.okButton);
       this.commandAreaPanel.Location = new System.Drawing.Point(0, 434);
-      this.commandAreaPanel.Size = new System.Drawing.Size(782, 44);
+      this.commandAreaPanel.Size = new System.Drawing.Size(782, 45);
       // 
       // tabControl1
       // 
@@ -91,7 +92,7 @@
       this.tabControl1.Name = "tabControl1";
       this.tabControl1.SelectedIndex = 0;
       this.tabControl1.Size = new System.Drawing.Size(758, 346);
-      this.tabControl1.TabIndex = 20;
+      this.tabControl1.TabIndex = 0;
       // 
       // parametersPage
       // 
@@ -121,7 +122,7 @@
       this.label10.Location = new System.Drawing.Point(445, 76);
       this.label10.Name = "label10";
       this.label10.Size = new System.Drawing.Size(258, 15);
-      this.label10.TabIndex = 17;
+      this.label10.TabIndex = 10;
       this.label10.Text = "The schema that will be used as default schema";
       // 
       // label9
@@ -130,7 +131,7 @@
       this.label9.Location = new System.Drawing.Point(445, 51);
       this.label9.Name = "label9";
       this.label9.Size = new System.Drawing.Size(187, 15);
-      this.label9.TabIndex = 16;
+      this.label9.TabIndex = 7;
       this.label9.Text = "Name of the user to connect with.";
       // 
       // defaultSchema
@@ -138,28 +139,28 @@
       this.defaultSchema.Location = new System.Drawing.Point(119, 72);
       this.defaultSchema.Name = "defaultSchema";
       this.defaultSchema.Size = new System.Drawing.Size(317, 23);
-      this.defaultSchema.TabIndex = 15;
+      this.defaultSchema.TabIndex = 9;
       // 
       // port
       // 
       this.port.Location = new System.Drawing.Point(312, 19);
       this.port.Name = "port";
       this.port.Size = new System.Drawing.Size(124, 23);
-      this.port.TabIndex = 12;
+      this.port.TabIndex = 3;
       // 
       // userName
       // 
       this.userName.Location = new System.Drawing.Point(119, 45);
       this.userName.Name = "userName";
       this.userName.Size = new System.Drawing.Size(317, 23);
-      this.userName.TabIndex = 10;
+      this.userName.TabIndex = 6;
       // 
       // hostName
       // 
       this.hostName.Location = new System.Drawing.Point(119, 19);
       this.hostName.Name = "hostName";
       this.hostName.Size = new System.Drawing.Size(151, 23);
-      this.hostName.TabIndex = 8;
+      this.hostName.TabIndex = 1;
       // 
       // label8
       // 
@@ -167,7 +168,7 @@
       this.label8.Location = new System.Drawing.Point(14, 76);
       this.label8.Name = "label8";
       this.label8.Size = new System.Drawing.Size(93, 15);
-      this.label8.TabIndex = 14;
+      this.label8.TabIndex = 8;
       this.label8.Text = "Default Schema:";
       // 
       // label7
@@ -176,7 +177,7 @@
       this.label7.Location = new System.Drawing.Point(445, 20);
       this.label7.Name = "label7";
       this.label7.Size = new System.Drawing.Size(276, 15);
-      this.label7.TabIndex = 13;
+      this.label7.TabIndex = 4;
       this.label7.Text = "Name or IP address of the server host - TCP/IP port";
       // 
       // label6
@@ -185,7 +186,7 @@
       this.label6.Location = new System.Drawing.Point(276, 23);
       this.label6.Name = "label6";
       this.label6.Size = new System.Drawing.Size(32, 15);
-      this.label6.TabIndex = 11;
+      this.label6.TabIndex = 2;
       this.label6.Text = "Port:";
       // 
       // label5
@@ -194,7 +195,7 @@
       this.label5.Location = new System.Drawing.Point(15, 51);
       this.label5.Name = "label5";
       this.label5.Size = new System.Drawing.Size(63, 15);
-      this.label5.TabIndex = 9;
+      this.label5.TabIndex = 5;
       this.label5.Text = "Username:";
       // 
       // label3
@@ -203,7 +204,7 @@
       this.label3.Location = new System.Drawing.Point(14, 23);
       this.label3.Name = "label3";
       this.label3.Size = new System.Drawing.Size(65, 15);
-      this.label3.TabIndex = 7;
+      this.label3.TabIndex = 0;
       this.label3.Text = "Hostname:";
       // 
       // advancedPage
@@ -229,7 +230,7 @@
       this.label13.Location = new System.Drawing.Point(420, 84);
       this.label13.Name = "label13";
       this.label13.Size = new System.Drawing.Size(195, 15);
-      this.label13.TabIndex = 19;
+      this.label13.TabIndex = 5;
       this.label13.Text = "This option turns on SSL encryption";
       // 
       // label12
@@ -238,7 +239,7 @@
       this.label12.Location = new System.Drawing.Point(420, 53);
       this.label12.Name = "label12";
       this.label12.Size = new System.Drawing.Size(301, 15);
-      this.label12.TabIndex = 18;
+      this.label12.TabIndex = 3;
       this.label12.Text = "If enabled this option overwrites the server side settings.";
       // 
       // label11
@@ -247,7 +248,7 @@
       this.label11.Location = new System.Drawing.Point(420, 26);
       this.label11.Name = "label11";
       this.label11.Size = new System.Drawing.Size(215, 15);
-      this.label11.TabIndex = 17;
+      this.label11.TabIndex = 1;
       this.label11.Text = "Select this option for WAN connections";
       // 
       // useSSL
@@ -257,7 +258,7 @@
       this.useSSL.Location = new System.Drawing.Point(87, 84);
       this.useSSL.Name = "useSSL";
       this.useSSL.Size = new System.Drawing.Size(125, 19);
-      this.useSSL.TabIndex = 2;
+      this.useSSL.TabIndex = 4;
       this.useSSL.Text = "Use SSL if available";
       this.useSSL.UseVisualStyleBackColor = true;
       // 
@@ -268,7 +269,7 @@
       this.useANSI.Location = new System.Drawing.Point(87, 52);
       this.useANSI.Name = "useANSI";
       this.useANSI.Size = new System.Drawing.Size(216, 19);
-      this.useANSI.TabIndex = 1;
+      this.useANSI.TabIndex = 2;
       this.useANSI.Text = "Use ANSI quotes to quote identifiers";
       this.useANSI.UseVisualStyleBackColor = true;
       // 
@@ -294,7 +295,7 @@
       this.connectionMethod.Location = new System.Drawing.Point(141, 40);
       this.connectionMethod.Name = "connectionMethod";
       this.connectionMethod.Size = new System.Drawing.Size(373, 23);
-      this.connectionMethod.TabIndex = 19;
+      this.connectionMethod.TabIndex = 4;
       // 
       // connectionType
       // 
@@ -304,7 +305,7 @@
       this.connectionType.Location = new System.Drawing.Point(527, 43);
       this.connectionType.Name = "connectionType";
       this.connectionType.Size = new System.Drawing.Size(220, 15);
-      this.connectionType.TabIndex = 18;
+      this.connectionType.TabIndex = 5;
       this.connectionType.Text = "Method to use to connect to the RDBMS";
       // 
       // label4
@@ -315,7 +316,7 @@
       this.label4.Location = new System.Drawing.Point(18, 43);
       this.label4.Name = "label4";
       this.label4.Size = new System.Drawing.Size(117, 15);
-      this.label4.TabIndex = 17;
+      this.label4.TabIndex = 3;
       this.label4.Text = "Connection Method:";
       // 
       // label2
@@ -326,7 +327,7 @@
       this.label2.Location = new System.Drawing.Point(527, 13);
       this.label2.Name = "label2";
       this.label2.Size = new System.Drawing.Size(176, 15);
-      this.label2.TabIndex = 16;
+      this.label2.TabIndex = 2;
       this.label2.Text = "Type a name for the connection";
       // 
       // connectionName
@@ -335,7 +336,7 @@
       this.connectionName.Location = new System.Drawing.Point(141, 11);
       this.connectionName.Name = "connectionName";
       this.connectionName.Size = new System.Drawing.Size(373, 23);
-      this.connectionName.TabIndex = 15;
+      this.connectionName.TabIndex = 1;
       // 
       // label1
       // 
@@ -345,13 +346,13 @@
       this.label1.Location = new System.Drawing.Point(18, 13);
       this.label1.Name = "label1";
       this.label1.Size = new System.Drawing.Size(107, 15);
-      this.label1.TabIndex = 14;
+      this.label1.TabIndex = 0;
       this.label1.Text = "Connection Name:";
       // 
       // testButton
       // 
       this.testButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.testButton.Location = new System.Drawing.Point(480, 10);
+      this.testButton.Location = new System.Drawing.Point(480, 11);
       this.testButton.Name = "testButton";
       this.testButton.Size = new System.Drawing.Size(128, 23);
       this.testButton.TabIndex = 12;
@@ -362,7 +363,7 @@
       // 
       this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.cancelButton.Location = new System.Drawing.Point(614, 10);
+      this.cancelButton.Location = new System.Drawing.Point(614, 11);
       this.cancelButton.Name = "cancelButton";
       this.cancelButton.Size = new System.Drawing.Size(75, 23);
       this.cancelButton.TabIndex = 11;
@@ -373,7 +374,7 @@
       // 
       this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.okButton.Location = new System.Drawing.Point(695, 10);
+      this.okButton.Location = new System.Drawing.Point(695, 11);
       this.okButton.Name = "okButton";
       this.okButton.Size = new System.Drawing.Size(75, 23);
       this.okButton.TabIndex = 10;
@@ -387,8 +388,8 @@
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.cancelButton;
-      this.ClientSize = new System.Drawing.Size(782, 479);
-      this.CommandAreaHeight = 44;
+      this.ClientSize = new System.Drawing.Size(782, 480);
+      this.CommandAreaHeight = 45;
       this.Name = "NewConnectionDialog";
       this.Text = "Setup New Connection";
       this.contentAreaPanel.ResumeLayout(false);

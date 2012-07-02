@@ -28,7 +28,7 @@
     /// </summary>
     private void InitializeComponent()
     {
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
       this.btnCommit = new System.Windows.Forms.Button();
       this.btnRevert = new System.Windows.Forms.Button();
       this.chkAutoCommit = new System.Windows.Forms.CheckBox();
@@ -41,22 +41,23 @@
       // 
       // contentAreaPanel
       // 
+      this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
       this.contentAreaPanel.Controls.Add(this.chkAutoCommit);
       this.contentAreaPanel.Controls.Add(this.chkRefreshFromDB);
       this.contentAreaPanel.Controls.Add(this.grdPreview);
-      this.contentAreaPanel.Size = new System.Drawing.Size(524, 302);
+      this.contentAreaPanel.Size = new System.Drawing.Size(524, 301);
       // 
       // commandAreaPanel
       // 
       this.commandAreaPanel.Controls.Add(this.btnCommit);
       this.commandAreaPanel.Controls.Add(this.btnRevert);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 303);
-      this.commandAreaPanel.Size = new System.Drawing.Size(524, 44);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 302);
+      this.commandAreaPanel.Size = new System.Drawing.Size(524, 45);
       // 
       // btnCommit
       // 
       this.btnCommit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnCommit.Location = new System.Drawing.Point(370, 11);
+      this.btnCommit.Location = new System.Drawing.Point(370, 12);
       this.btnCommit.Name = "btnCommit";
       this.btnCommit.Size = new System.Drawing.Size(143, 23);
       this.btnCommit.TabIndex = 1;
@@ -67,7 +68,7 @@
       // btnRevert
       // 
       this.btnRevert.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.btnRevert.Location = new System.Drawing.Point(12, 11);
+      this.btnRevert.Location = new System.Drawing.Point(12, 12);
       this.btnRevert.Name = "btnRevert";
       this.btnRevert.Size = new System.Drawing.Size(110, 23);
       this.btnRevert.TabIndex = 0;
@@ -80,7 +81,7 @@
       this.chkAutoCommit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.chkAutoCommit.AutoSize = true;
       this.chkAutoCommit.BackColor = System.Drawing.Color.Transparent;
-      this.chkAutoCommit.Location = new System.Drawing.Point(382, 280);
+      this.chkAutoCommit.Location = new System.Drawing.Point(382, 279);
       this.chkAutoCommit.Name = "chkAutoCommit";
       this.chkAutoCommit.Size = new System.Drawing.Size(130, 17);
       this.chkAutoCommit.TabIndex = 2;
@@ -95,7 +96,7 @@
       this.chkRefreshFromDB.BackColor = System.Drawing.Color.Transparent;
       this.chkRefreshFromDB.Checked = true;
       this.chkRefreshFromDB.CheckState = System.Windows.Forms.CheckState.Checked;
-      this.chkRefreshFromDB.Location = new System.Drawing.Point(12, 280);
+      this.chkRefreshFromDB.Location = new System.Drawing.Point(12, 279);
       this.chkRefreshFromDB.Name = "chkRefreshFromDB";
       this.chkRefreshFromDB.Size = new System.Drawing.Size(104, 17);
       this.chkRefreshFromDB.TabIndex = 1;
@@ -114,20 +115,20 @@
             | System.Windows.Forms.AnchorStyles.Right)));
       this.grdPreview.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
       this.grdPreview.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Window;
-      dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.Transparent;
-      dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdPreview.DefaultCellStyle = dataGridViewCellStyle1;
+      dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+      dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.Transparent;
+      dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.grdPreview.DefaultCellStyle = dataGridViewCellStyle2;
       this.grdPreview.Location = new System.Drawing.Point(12, 11);
       this.grdPreview.MultiSelect = false;
       this.grdPreview.Name = "grdPreview";
       this.grdPreview.ReadOnly = true;
       this.grdPreview.RowHeadersVisible = false;
-      this.grdPreview.Size = new System.Drawing.Size(500, 253);
+      this.grdPreview.Size = new System.Drawing.Size(500, 252);
       this.grdPreview.TabIndex = 0;
       // 
       // EditDataForm
@@ -135,7 +136,7 @@
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.ClientSize = new System.Drawing.Size(524, 348);
-      this.CommandAreaHeight = 44;
+      this.CommandAreaHeight = 45;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
       this.MinimumSize = new System.Drawing.Size(300, 300);
       this.Name = "EditDataForm";

@@ -14,7 +14,17 @@ namespace MySQL.ForExcel
   {
     private bool displayFootNoteArea = false;
     private bool displayCommandArea = true;
+    private int panelsSeparatorWidth = 1;
     private Point renderingStartingPoint = Point.Empty;
+
+    [Category("Appearance"), DefaultValue(true), Description("Indicates if dialog should draw visual styles depending on the Windows version.")]
+    public bool AutoStyleDialog { get; set; }
+
+    [Category("Appearance"), DefaultValue(true), Description("Draws a thin line to separate panels.")]
+    public bool DrawPanelsSeparator { get; set; }
+
+    [Category("Appearance"), Description("Color of the panels separator.")]
+    public Color PanelsSeparatorColor { get; set; }
 
     [Category("Appearance"), DefaultValue(""), Description("Main instruction text for a Windows compliant dialog box.")]
     public string MainInstruction { get; set; }
@@ -53,7 +63,6 @@ namespace MySQL.ForExcel
         contentAreaPanel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         commandAreaPanel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         footNoteAreaPanel.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-        int proposedHeight = Height + delta;
         displayFootNoteArea = footNoteAreaPanel.Visible = (value > 0);
         footNoteAreaPanel.Height = value;
         Height += delta;
@@ -98,10 +107,28 @@ namespace MySQL.ForExcel
       }
     }
 
+    [Category("Appearance"), DefaultValue(1), Description("Width in pixels of the separator line.")]
+    public int PanelsSeparatorWidth 
+    {
+      get { return panelsSeparatorWidth; }
+      set
+      {
+        if (value < 0)
+          throw new ArgumentOutOfRangeException("PanelsSeparatorWidth", "Must be at least 0.");
+        int delta = value - panelsSeparatorWidth;
+        panelsSeparatorWidth = value;
+        CommandAreaHeight += delta;
+        FootNoteAreaHeight += delta;
+      }
+    }
+
     public AutoStyleableBaseDialog()
     {
       InitializeComponent();
 
+      AutoStyleDialog = false;
+      DrawPanelsSeparator = true;
+      PanelsSeparatorColor = SystemColors.ControlDark;
       MainInstruction = String.Empty;
       MainInstructionLocation = new Point(12, 9);
       MainInstructionLocationOffset = new Size(0, 0);
@@ -130,22 +157,43 @@ namespace MySQL.ForExcel
 
     private void contentAreaPanel_Paint(object sender, PaintEventArgs e)
     {
-      DrawThemeBackground(e.Graphics, CustomVisualStyleElements.TaskDialog.PrimaryPanel, contentAreaPanel.ClientRectangle, e.ClipRectangle);
-      renderingStartingPoint = DrawImage(e.Graphics, MainInstructionImage, MainInstructionLocation);
-      renderingStartingPoint.Offset(MainInstructionLocation.X, 0);
-      if (MainInstructionLocationOffset != null)
-        renderingStartingPoint.Offset(MainInstructionLocationOffset.Width, MainInstructionLocationOffset.Height);
-      StyleableHelper.DrawText(e.Graphics, MainInstruction, CustomVisualStyleElements.TextStyle.MainInstruction, new Font(Font, FontStyle.Bold), renderingStartingPoint, false, ClientSize.Width - renderingStartingPoint.X - MainInstructionLocation.X);
+      if (AutoStyleDialog)
+      {
+        DrawThemeBackground(e.Graphics, CustomVisualStyleElements.TaskDialog.PrimaryPanel, contentAreaPanel.ClientRectangle, e.ClipRectangle);
+        renderingStartingPoint = DrawImage(e.Graphics, MainInstructionImage, MainInstructionLocation);
+        renderingStartingPoint.Offset(MainInstructionLocation.X, 0);
+        if (MainInstructionLocationOffset != null)
+          renderingStartingPoint.Offset(MainInstructionLocationOffset.Width, MainInstructionLocationOffset.Height);
+        StyleableHelper.DrawText(e.Graphics, MainInstruction, CustomVisualStyleElements.TextStyle.MainInstruction, new Font(Font, FontStyle.Bold), renderingStartingPoint, false, ClientSize.Width - renderingStartingPoint.X - MainInstructionLocation.X);
+      }
     }
 
     private void commandAreaPanel_Paint(object sender, PaintEventArgs e)
     {
-      DrawThemeBackground(e.Graphics, CustomVisualStyleElements.TaskDialog.SecondaryPanel, commandAreaPanel.ClientRectangle, e.ClipRectangle);
+      if (!displayCommandArea)
+        return;
+      if (AutoStyleDialog)
+        DrawThemeBackground(e.Graphics, CustomVisualStyleElements.TaskDialog.SecondaryPanel, commandAreaPanel.ClientRectangle, e.ClipRectangle);
+      else if (DrawPanelsSeparator && panelsSeparatorWidth > 0)
+      {
+        Pen separatorPen = new Pen(PanelsSeparatorColor, panelsSeparatorWidth);
+        e.Graphics.DrawLine(separatorPen, 0, 0, e.ClipRectangle.Width, 0);
+        separatorPen.Dispose();
+      }
     }
 
     private void footNoteAreaPanel_Paint(object sender, PaintEventArgs e)
     {
-      DrawThemeBackground(e.Graphics, CustomVisualStyleElements.TaskDialog.SecondaryPanel, footNoteAreaPanel.ClientRectangle, e.ClipRectangle);
+      if (!displayFootNoteArea)
+        return;
+      if (AutoStyleDialog)
+        DrawThemeBackground(e.Graphics, CustomVisualStyleElements.TaskDialog.SecondaryPanel, footNoteAreaPanel.ClientRectangle, e.ClipRectangle);
+      else if (DrawPanelsSeparator && panelsSeparatorWidth > 0)
+      {
+        Pen separatorPen = new Pen(PanelsSeparatorColor, panelsSeparatorWidth);
+        e.Graphics.DrawLine(separatorPen, 0, 0, e.ClipRectangle.Width, 0);
+        separatorPen.Dispose();
+      }
     }
   }
 }

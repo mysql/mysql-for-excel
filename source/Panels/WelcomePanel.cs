@@ -11,7 +11,7 @@ using MySQL.Utility;
 
 namespace MySQL.ForExcel
 {
-  public partial class WelcomePanel : AutoStyleableBasePanel
+  public partial class WelcomePanel : UserControl
   {
     public WelcomePanel()
     {

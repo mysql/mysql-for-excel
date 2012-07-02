@@ -28,8 +28,8 @@
     /// </summary>
     private void InitializeComponent()
     {
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
       this.btnImport = new System.Windows.Forms.Button();
       this.btnCancel = new System.Windows.Forms.Button();
       this.btnCall = new System.Windows.Forms.Button();
@@ -48,6 +48,7 @@
       this.lblFromRoutineName = new System.Windows.Forms.Label();
       this.lblFromRoutineMain = new System.Windows.Forms.Label();
       this.picFrom = new System.Windows.Forms.PictureBox();
+      this.lblExportData = new System.Windows.Forms.Label();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
       this.grpOptions.SuspendLayout();
@@ -58,6 +59,8 @@
       // 
       // contentAreaPanel
       // 
+      this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
+      this.contentAreaPanel.Controls.Add(this.lblExportData);
       this.contentAreaPanel.Controls.Add(this.btnCall);
       this.contentAreaPanel.Controls.Add(this.lblFromRoutineSub2);
       this.contentAreaPanel.Controls.Add(this.lisResultSets);
@@ -71,21 +74,21 @@
       this.contentAreaPanel.Controls.Add(this.lblFromRoutineName);
       this.contentAreaPanel.Controls.Add(this.lblFromRoutineMain);
       this.contentAreaPanel.Controls.Add(this.picFrom);
-      this.contentAreaPanel.Size = new System.Drawing.Size(944, 416);
+      this.contentAreaPanel.Size = new System.Drawing.Size(944, 415);
       // 
       // commandAreaPanel
       // 
       this.commandAreaPanel.Controls.Add(this.btnImport);
       this.commandAreaPanel.Controls.Add(this.btnCancel);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 417);
-      this.commandAreaPanel.Size = new System.Drawing.Size(944, 44);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 416);
+      this.commandAreaPanel.Size = new System.Drawing.Size(944, 45);
       // 
       // btnImport
       // 
       this.btnImport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnImport.DialogResult = System.Windows.Forms.DialogResult.OK;
       this.btnImport.Enabled = false;
-      this.btnImport.Location = new System.Drawing.Point(776, 10);
+      this.btnImport.Location = new System.Drawing.Point(776, 11);
       this.btnImport.Name = "btnImport";
       this.btnImport.Size = new System.Drawing.Size(75, 23);
       this.btnImport.TabIndex = 0;
@@ -96,7 +99,7 @@
       // 
       this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnCancel.Location = new System.Drawing.Point(857, 10);
+      this.btnCancel.Location = new System.Drawing.Point(857, 11);
       this.btnCancel.Name = "btnCancel";
       this.btnCancel.Size = new System.Drawing.Size(75, 23);
       this.btnCancel.TabIndex = 1;
@@ -210,23 +213,23 @@
       this.grdPreviewData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.grdPreviewData.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-      dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.InactiveCaption;
-      dataGridViewCellStyle5.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
-      dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-      this.grdPreviewData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle5;
+      dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.InactiveCaption;
+      dataGridViewCellStyle3.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
+      dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.grdPreviewData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
       this.grdPreviewData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-      dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.InactiveCaption;
-      dataGridViewCellStyle6.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Window;
-      dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdPreviewData.DefaultCellStyle = dataGridViewCellStyle6;
+      dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.InactiveCaption;
+      dataGridViewCellStyle4.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Window;
+      dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.grdPreviewData.DefaultCellStyle = dataGridViewCellStyle4;
       this.grdPreviewData.Location = new System.Drawing.Point(406, 119);
       this.grdPreviewData.Name = "grdPreviewData";
       this.grdPreviewData.ReadOnly = true;
@@ -303,15 +306,25 @@
       this.picFrom.TabIndex = 20;
       this.picFrom.TabStop = false;
       // 
+      // lblExportData
+      // 
+      this.lblExportData.AutoSize = true;
+      this.lblExportData.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblExportData.ForeColor = System.Drawing.Color.Navy;
+      this.lblExportData.Location = new System.Drawing.Point(17, 17);
+      this.lblExportData.Name = "lblExportData";
+      this.lblExportData.Size = new System.Drawing.Size(176, 20);
+      this.lblExportData.TabIndex = 32;
+      this.lblExportData.Text = "Import Data from MySQL";
+      // 
       // ImportRoutineForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.btnCancel;
       this.ClientSize = new System.Drawing.Size(944, 462);
-      this.CommandAreaHeight = 44;
+      this.CommandAreaHeight = 45;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
-      this.MainInstruction = "Import Data from MySQL";
       this.MainInstructionLocation = new System.Drawing.Point(11, 15);
       this.MinimumSize = new System.Drawing.Size(960, 500);
       this.Name = "ImportRoutineForm";
@@ -348,5 +361,6 @@
     private System.Windows.Forms.Label lblFromRoutineName;
     private System.Windows.Forms.Label lblFromRoutineMain;
     private System.Windows.Forms.PictureBox picFrom;
+    private System.Windows.Forms.Label lblExportData;
   }
 }

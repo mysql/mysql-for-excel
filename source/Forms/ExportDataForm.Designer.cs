@@ -29,9 +29,9 @@
     private void InitializeComponent()
     {
       this.components = new System.ComponentModel.Container();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
       this.columnBindingSource = new System.Windows.Forms.BindingSource(this.components);
       this.timerTextChanged = new System.Windows.Forms.Timer(this.components);
       this.btnCopySQL = new System.Windows.Forms.Button();
@@ -73,6 +73,7 @@
       this.lblTableNameSub1 = new System.Windows.Forms.Label();
       this.lblTableNameMain = new System.Windows.Forms.Label();
       this.picTable = new System.Windows.Forms.PictureBox();
+      this.lblExportData = new System.Windows.Forms.Label();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.columnBindingSource)).BeginInit();
@@ -88,6 +89,8 @@
       // 
       // contentAreaPanel
       // 
+      this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
+      this.contentAreaPanel.Controls.Add(this.lblExportData);
       this.contentAreaPanel.Controls.Add(this.lblPrimaryKeyWarning);
       this.contentAreaPanel.Controls.Add(this.picPrimaryKeyWarning);
       this.contentAreaPanel.Controls.Add(this.grpColumnOptions);
@@ -112,7 +115,7 @@
       this.contentAreaPanel.Controls.Add(this.lblTableNameSub1);
       this.contentAreaPanel.Controls.Add(this.lblTableNameMain);
       this.contentAreaPanel.Controls.Add(this.picTable);
-      this.contentAreaPanel.Size = new System.Drawing.Size(844, 556);
+      this.contentAreaPanel.Size = new System.Drawing.Size(844, 555);
       // 
       // commandAreaPanel
       // 
@@ -120,8 +123,8 @@
       this.commandAreaPanel.Controls.Add(this.btnAdvanced);
       this.commandAreaPanel.Controls.Add(this.btnExport);
       this.commandAreaPanel.Controls.Add(this.btnCancel);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 557);
-      this.commandAreaPanel.Size = new System.Drawing.Size(844, 44);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 556);
+      this.commandAreaPanel.Size = new System.Drawing.Size(844, 45);
       // 
       // columnBindingSource
       // 
@@ -135,7 +138,7 @@
       // btnCopySQL
       // 
       this.btnCopySQL.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnCopySQL.Location = new System.Drawing.Point(595, 11);
+      this.btnCopySQL.Location = new System.Drawing.Point(595, 12);
       this.btnCopySQL.Name = "btnCopySQL";
       this.btnCopySQL.Size = new System.Drawing.Size(75, 23);
       this.btnCopySQL.TabIndex = 1;
@@ -147,7 +150,7 @@
       // btnAdvanced
       // 
       this.btnAdvanced.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.btnAdvanced.Location = new System.Drawing.Point(12, 11);
+      this.btnAdvanced.Location = new System.Drawing.Point(12, 12);
       this.btnAdvanced.Name = "btnAdvanced";
       this.btnAdvanced.Size = new System.Drawing.Size(131, 23);
       this.btnAdvanced.TabIndex = 0;
@@ -159,7 +162,7 @@
       // 
       this.btnExport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnExport.Enabled = false;
-      this.btnExport.Location = new System.Drawing.Point(676, 11);
+      this.btnExport.Location = new System.Drawing.Point(676, 12);
       this.btnExport.Name = "btnExport";
       this.btnExport.Size = new System.Drawing.Size(75, 23);
       this.btnExport.TabIndex = 2;
@@ -171,7 +174,7 @@
       // 
       this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnCancel.Location = new System.Drawing.Point(757, 11);
+      this.btnCancel.Location = new System.Drawing.Point(757, 12);
       this.btnCancel.Name = "btnCancel";
       this.btnCancel.Size = new System.Drawing.Size(75, 23);
       this.btnCancel.TabIndex = 3;
@@ -218,7 +221,7 @@
       this.grpColumnOptions.Controls.Add(this.lblColumnOptionsWarning);
       this.grpColumnOptions.Controls.Add(this.picColumnOptionsWarning);
       this.grpColumnOptions.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.grpColumnOptions.Location = new System.Drawing.Point(82, 445);
+      this.grpColumnOptions.Location = new System.Drawing.Point(82, 444);
       this.grpColumnOptions.Name = "grpColumnOptions";
       this.grpColumnOptions.Size = new System.Drawing.Size(677, 100);
       this.grpColumnOptions.TabIndex = 18;
@@ -339,6 +342,7 @@
       this.lblColumnOptionsWarning.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.lblColumnOptionsWarning.AutoSize = true;
+      this.lblColumnOptionsWarning.BackColor = System.Drawing.SystemColors.Window;
       this.lblColumnOptionsWarning.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblColumnOptionsWarning.ForeColor = System.Drawing.Color.Red;
       this.lblColumnOptionsWarning.Location = new System.Drawing.Point(120, 0);
@@ -350,6 +354,7 @@
       // 
       // picColumnOptionsWarning
       // 
+      this.picColumnOptionsWarning.BackColor = System.Drawing.SystemColors.Window;
       this.picColumnOptionsWarning.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
       this.picColumnOptionsWarning.Location = new System.Drawing.Point(98, -1);
       this.picColumnOptionsWarning.Name = "picColumnOptionsWarning";
@@ -383,41 +388,41 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.grdPreviewData.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-      dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-      dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-      this.grdPreviewData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.grdPreviewData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
       this.grdPreviewData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-      dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
-      dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdPreviewData.DefaultCellStyle = dataGridViewCellStyle5;
+      dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+      dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.grdPreviewData.DefaultCellStyle = dataGridViewCellStyle2;
       this.grdPreviewData.Location = new System.Drawing.Point(82, 277);
       this.grdPreviewData.MultiSelect = false;
       this.grdPreviewData.Name = "grdPreviewData";
       this.grdPreviewData.ReadOnly = true;
-      dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-      dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-      this.grdPreviewData.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+      dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.grdPreviewData.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
       this.grdPreviewData.RowHeadersVisible = false;
       this.grdPreviewData.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
       this.grdPreviewData.ShowCellErrors = false;
       this.grdPreviewData.ShowEditingIcon = false;
       this.grdPreviewData.ShowRowErrors = false;
-      this.grdPreviewData.Size = new System.Drawing.Size(677, 158);
+      this.grdPreviewData.Size = new System.Drawing.Size(677, 157);
       this.grdPreviewData.TabIndex = 17;
       this.grdPreviewData.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.grdPreviewData_CellToolTipTextNeeded);
       this.grdPreviewData.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.grdPreviewData_DataBindingComplete);
@@ -647,15 +652,25 @@
       this.picTable.TabIndex = 23;
       this.picTable.TabStop = false;
       // 
+      // lblExportData
+      // 
+      this.lblExportData.AutoSize = true;
+      this.lblExportData.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblExportData.ForeColor = System.Drawing.Color.Navy;
+      this.lblExportData.Location = new System.Drawing.Point(17, 17);
+      this.lblExportData.Name = "lblExportData";
+      this.lblExportData.Size = new System.Drawing.Size(156, 20);
+      this.lblExportData.TabIndex = 46;
+      this.lblExportData.Text = "Export Data to MySQL";
+      // 
       // ExportDataForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.btnCancel;
       this.ClientSize = new System.Drawing.Size(844, 602);
-      this.CommandAreaHeight = 44;
+      this.CommandAreaHeight = 45;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
-      this.MainInstruction = "Export Data to MySQL";
       this.MainInstructionLocation = new System.Drawing.Point(10, 15);
       this.MinimumSize = new System.Drawing.Size(860, 640);
       this.Name = "ExportDataForm";
@@ -720,5 +735,6 @@
     private System.Windows.Forms.Label lblTableNameSub1;
     private System.Windows.Forms.Label lblTableNameMain;
     private System.Windows.Forms.PictureBox picTable;
+    private System.Windows.Forms.Label lblExportData;
   }
 }

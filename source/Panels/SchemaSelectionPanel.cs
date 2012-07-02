@@ -12,7 +12,7 @@ using MySQL.ForExcel.Properties;
 
 namespace MySQL.ForExcel
 {
-  public partial class SchemaSelectionPanel : AutoStyleableBasePanel
+  public partial class SchemaSelectionPanel : UserControl
   {
     private MySqlWorkbenchConnection connection;
     private string filter;

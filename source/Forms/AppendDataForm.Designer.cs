@@ -28,8 +28,8 @@
     /// </summary>
     private void InitializeComponent()
     {
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
       this.picColorMapMapped = new System.Windows.Forms.PictureBox();
       this.btnAppend = new System.Windows.Forms.Button();
       this.lblColorMapMapped = new System.Windows.Forms.Label();
@@ -54,6 +54,7 @@
       this.lblToTableName = new System.Windows.Forms.Label();
       this.lblToTable = new System.Windows.Forms.Label();
       this.picToTable = new System.Windows.Forms.PictureBox();
+      this.lblExportData = new System.Windows.Forms.Label();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.picColorMapMapped)).BeginInit();
@@ -65,6 +66,8 @@
       // 
       // contentAreaPanel
       // 
+      this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
+      this.contentAreaPanel.Controls.Add(this.lblExportData);
       this.contentAreaPanel.Controls.Add(this.btnAutoMap);
       this.contentAreaPanel.Controls.Add(this.btnRemove);
       this.contentAreaPanel.Controls.Add(this.lblMappedColumnsCount);
@@ -83,7 +86,7 @@
       this.contentAreaPanel.Controls.Add(this.lblToTableName);
       this.contentAreaPanel.Controls.Add(this.lblToTable);
       this.contentAreaPanel.Controls.Add(this.picToTable);
-      this.contentAreaPanel.Size = new System.Drawing.Size(844, 516);
+      this.contentAreaPanel.Size = new System.Drawing.Size(844, 515);
       // 
       // commandAreaPanel
       // 
@@ -93,14 +96,14 @@
       this.commandAreaPanel.Controls.Add(this.picColorMapUnmapped);
       this.commandAreaPanel.Controls.Add(this.btnCancel);
       this.commandAreaPanel.Controls.Add(this.lblColorMapUnmapped);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 517);
-      this.commandAreaPanel.Size = new System.Drawing.Size(844, 44);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 516);
+      this.commandAreaPanel.Size = new System.Drawing.Size(844, 45);
       // 
       // picColorMapMapped
       // 
       this.picColorMapMapped.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.picColorMapMapped.BackColor = System.Drawing.Color.LightGreen;
-      this.picColorMapMapped.Location = new System.Drawing.Point(158, 11);
+      this.picColorMapMapped.Location = new System.Drawing.Point(158, 12);
       this.picColorMapMapped.Name = "picColorMapMapped";
       this.picColorMapMapped.Size = new System.Drawing.Size(23, 23);
       this.picColorMapMapped.TabIndex = 37;
@@ -109,7 +112,7 @@
       // btnAppend
       // 
       this.btnAppend.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnAppend.Location = new System.Drawing.Point(678, 11);
+      this.btnAppend.Location = new System.Drawing.Point(678, 12);
       this.btnAppend.Name = "btnAppend";
       this.btnAppend.Size = new System.Drawing.Size(75, 23);
       this.btnAppend.TabIndex = 2;
@@ -122,7 +125,7 @@
       this.lblColorMapMapped.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.lblColorMapMapped.AutoSize = true;
       this.lblColorMapMapped.BackColor = System.Drawing.Color.Transparent;
-      this.lblColorMapMapped.Location = new System.Drawing.Point(187, 16);
+      this.lblColorMapMapped.Location = new System.Drawing.Point(187, 17);
       this.lblColorMapMapped.Name = "lblColorMapMapped";
       this.lblColorMapMapped.Size = new System.Drawing.Size(84, 13);
       this.lblColorMapMapped.TabIndex = 1;
@@ -132,7 +135,7 @@
       // 
       this.picColorMapUnmapped.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.picColorMapUnmapped.BackColor = System.Drawing.Color.OrangeRed;
-      this.picColorMapUnmapped.Location = new System.Drawing.Point(10, 11);
+      this.picColorMapUnmapped.Location = new System.Drawing.Point(10, 12);
       this.picColorMapUnmapped.Name = "picColorMapUnmapped";
       this.picColorMapUnmapped.Size = new System.Drawing.Size(23, 23);
       this.picColorMapUnmapped.TabIndex = 35;
@@ -142,7 +145,7 @@
       // 
       this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnCancel.Location = new System.Drawing.Point(759, 11);
+      this.btnCancel.Location = new System.Drawing.Point(759, 12);
       this.btnCancel.Name = "btnCancel";
       this.btnCancel.Size = new System.Drawing.Size(75, 23);
       this.btnCancel.TabIndex = 3;
@@ -154,7 +157,7 @@
       this.lblColorMapUnmapped.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.lblColorMapUnmapped.AutoSize = true;
       this.lblColorMapUnmapped.BackColor = System.Drawing.Color.Transparent;
-      this.lblColorMapUnmapped.Location = new System.Drawing.Point(39, 16);
+      this.lblColorMapUnmapped.Location = new System.Drawing.Point(39, 17);
       this.lblColorMapUnmapped.Name = "lblColorMapUnmapped";
       this.lblColorMapUnmapped.Size = new System.Drawing.Size(97, 13);
       this.lblColorMapUnmapped.TabIndex = 0;
@@ -189,7 +192,7 @@
       this.lblMappedColumnsCount.BackColor = System.Drawing.Color.Transparent;
       this.lblMappedColumnsCount.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblMappedColumnsCount.ForeColor = System.Drawing.Color.Navy;
-      this.lblMappedColumnsCount.Location = new System.Drawing.Point(615, 488);
+      this.lblMappedColumnsCount.Location = new System.Drawing.Point(615, 487);
       this.lblMappedColumnsCount.Name = "lblMappedColumnsCount";
       this.lblMappedColumnsCount.Size = new System.Drawing.Size(13, 15);
       this.lblMappedColumnsCount.TabIndex = 14;
@@ -202,7 +205,7 @@
       this.lblRowsCountNum.BackColor = System.Drawing.Color.Transparent;
       this.lblRowsCountNum.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblRowsCountNum.ForeColor = System.Drawing.Color.Navy;
-      this.lblRowsCountNum.Location = new System.Drawing.Point(185, 488);
+      this.lblRowsCountNum.Location = new System.Drawing.Point(185, 487);
       this.lblRowsCountNum.Name = "lblRowsCountNum";
       this.lblRowsCountNum.Size = new System.Drawing.Size(13, 15);
       this.lblRowsCountNum.TabIndex = 12;
@@ -214,7 +217,7 @@
       this.lblRowsCount.AutoSize = true;
       this.lblRowsCount.BackColor = System.Drawing.Color.Transparent;
       this.lblRowsCount.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblRowsCount.Location = new System.Drawing.Point(79, 488);
+      this.lblRowsCount.Location = new System.Drawing.Point(79, 487);
       this.lblRowsCount.Name = "lblRowsCount";
       this.lblRowsCount.Size = new System.Drawing.Size(104, 15);
       this.lblRowsCount.TabIndex = 11;
@@ -235,7 +238,7 @@
       // btnUnmap
       // 
       this.btnUnmap.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnUnmap.Location = new System.Drawing.Point(648, 484);
+      this.btnUnmap.Location = new System.Drawing.Point(648, 483);
       this.btnUnmap.Name = "btnUnmap";
       this.btnUnmap.Size = new System.Drawing.Size(120, 23);
       this.btnUnmap.TabIndex = 15;
@@ -249,7 +252,7 @@
       this.lblMappedColumns.AutoSize = true;
       this.lblMappedColumns.BackColor = System.Drawing.Color.Transparent;
       this.lblMappedColumns.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblMappedColumns.Location = new System.Drawing.Point(504, 488);
+      this.lblMappedColumns.Location = new System.Drawing.Point(504, 487);
       this.lblMappedColumns.Name = "lblMappedColumns";
       this.lblMappedColumns.Size = new System.Drawing.Size(105, 15);
       this.lblMappedColumns.TabIndex = 13;
@@ -288,7 +291,7 @@
       this.grdToTable.ReadOnly = true;
       this.grdToTable.RowHeadersVisible = false;
       this.grdToTable.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.RowHeaderSelect;
-      this.grdToTable.Size = new System.Drawing.Size(686, 150);
+      this.grdToTable.Size = new System.Drawing.Size(686, 149);
       this.grdToTable.TabIndex = 10;
       this.grdToTable.SelectionChanged += new System.EventHandler(this.grdToTable_SelectionChanged);
       this.grdToTable.GridDragOver += new System.Windows.Forms.DragEventHandler(this.grdToTable_GridDragOver);
@@ -316,23 +319,23 @@
       this.grdPreviewData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.grdPreviewData.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-      dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-      dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.InactiveCaption;
-      dataGridViewCellStyle7.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
-      dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-      this.grdPreviewData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
+      dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+      dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.InactiveCaption;
+      dataGridViewCellStyle3.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
+      dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.grdPreviewData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
       this.grdPreviewData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-      dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle8.BackColor = System.Drawing.SystemColors.InactiveCaption;
-      dataGridViewCellStyle8.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle8.ForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Window;
-      dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdPreviewData.DefaultCellStyle = dataGridViewCellStyle8;
+      dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.InactiveCaption;
+      dataGridViewCellStyle4.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Window;
+      dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.grdPreviewData.DefaultCellStyle = dataGridViewCellStyle4;
       this.grdPreviewData.Location = new System.Drawing.Point(82, 94);
       this.grdPreviewData.Name = "grdPreviewData";
       this.grdPreviewData.ReadOnly = true;
@@ -416,15 +419,25 @@
       this.picToTable.TabIndex = 30;
       this.picToTable.TabStop = false;
       // 
+      // lblExportData
+      // 
+      this.lblExportData.AutoSize = true;
+      this.lblExportData.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblExportData.ForeColor = System.Drawing.Color.Navy;
+      this.lblExportData.Location = new System.Drawing.Point(17, 17);
+      this.lblExportData.Name = "lblExportData";
+      this.lblExportData.Size = new System.Drawing.Size(207, 20);
+      this.lblExportData.TabIndex = 37;
+      this.lblExportData.Text = "Append Data to MySQL Table";
+      // 
       // AppendDataForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.btnCancel;
       this.ClientSize = new System.Drawing.Size(844, 562);
-      this.CommandAreaHeight = 44;
+      this.CommandAreaHeight = 45;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
-      this.MainInstruction = "Append Data to MySQL Table";
       this.MainInstructionLocation = new System.Drawing.Point(11, 16);
       this.MinimumSize = new System.Drawing.Size(860, 600);
       this.Name = "AppendDataForm";
@@ -468,5 +481,6 @@
     private System.Windows.Forms.Label lblToTableName;
     private System.Windows.Forms.Label lblToTable;
     private System.Windows.Forms.PictureBox picToTable;
+    private System.Windows.Forms.Label lblExportData;
   }
 }

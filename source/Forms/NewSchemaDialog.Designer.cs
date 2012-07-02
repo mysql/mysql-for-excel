@@ -31,12 +31,18 @@
       this.btnOK = new System.Windows.Forms.Button();
       this.btnCancel = new System.Windows.Forms.Button();
       this.schemaName = new System.Windows.Forms.TextBox();
+      this.picLogo = new System.Windows.Forms.PictureBox();
+      this.lblEnterPassword = new System.Windows.Forms.Label();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.picLogo)).BeginInit();
       this.SuspendLayout();
       // 
       // contentAreaPanel
       // 
+      this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
+      this.contentAreaPanel.Controls.Add(this.lblEnterPassword);
+      this.contentAreaPanel.Controls.Add(this.picLogo);
       this.contentAreaPanel.Controls.Add(this.schemaName);
       this.contentAreaPanel.Size = new System.Drawing.Size(495, 90);
       // 
@@ -45,18 +51,18 @@
       this.commandAreaPanel.Controls.Add(this.btnOK);
       this.commandAreaPanel.Controls.Add(this.btnCancel);
       this.commandAreaPanel.Location = new System.Drawing.Point(0, 91);
-      this.commandAreaPanel.Size = new System.Drawing.Size(495, 44);
+      this.commandAreaPanel.Size = new System.Drawing.Size(495, 45);
       // 
       // btnOK
       // 
       this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
       this.btnOK.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnOK.Location = new System.Drawing.Point(327, 10);
+      this.btnOK.Location = new System.Drawing.Point(327, 11);
       this.btnOK.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.btnOK.Name = "btnOK";
       this.btnOK.Size = new System.Drawing.Size(75, 23);
-      this.btnOK.TabIndex = 9;
+      this.btnOK.TabIndex = 0;
       this.btnOK.Text = "OK";
       this.btnOK.UseVisualStyleBackColor = true;
       this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
@@ -66,11 +72,11 @@
       this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
       this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnCancel.Location = new System.Drawing.Point(408, 10);
+      this.btnCancel.Location = new System.Drawing.Point(408, 11);
       this.btnCancel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.btnCancel.Name = "btnCancel";
       this.btnCancel.Size = new System.Drawing.Size(75, 23);
-      this.btnCancel.TabIndex = 10;
+      this.btnCancel.TabIndex = 1;
       this.btnCancel.Text = "Cancel";
       this.btnCancel.UseVisualStyleBackColor = true;
       // 
@@ -80,7 +86,28 @@
       this.schemaName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.schemaName.Name = "schemaName";
       this.schemaName.Size = new System.Drawing.Size(402, 20);
-      this.schemaName.TabIndex = 10;
+      this.schemaName.TabIndex = 1;
+      // 
+      // picLogo
+      // 
+      this.picLogo.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Logo_64x64;
+      this.picLogo.Location = new System.Drawing.Point(14, 14);
+      this.picLogo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.picLogo.Name = "picLogo";
+      this.picLogo.Size = new System.Drawing.Size(64, 64);
+      this.picLogo.TabIndex = 11;
+      this.picLogo.TabStop = false;
+      // 
+      // lblEnterPassword
+      // 
+      this.lblEnterPassword.AutoSize = true;
+      this.lblEnterPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblEnterPassword.ForeColor = System.Drawing.Color.Navy;
+      this.lblEnterPassword.Location = new System.Drawing.Point(84, 28);
+      this.lblEnterPassword.Name = "lblEnterPassword";
+      this.lblEnterPassword.Size = new System.Drawing.Size(145, 18);
+      this.lblEnterPassword.TabIndex = 0;
+      this.lblEnterPassword.Text = "New Schema Name:";
       // 
       // NewSchemaDialog
       // 
@@ -88,19 +115,16 @@
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.btnCancel;
-      this.ClientSize = new System.Drawing.Size(495, 136);
-      this.CommandAreaHeight = 44;
-      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-      this.MainInstruction = "New Schema Name:";
-      this.MainInstructionImage = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Logo_64x64;
+      this.ClientSize = new System.Drawing.Size(495, 137);
+      this.CommandAreaHeight = 45;
       this.MainInstructionLocation = new System.Drawing.Point(13, 13);
       this.MainInstructionLocationOffset = new System.Drawing.Size(-10, 10);
       this.Name = "NewSchemaDialog";
-      this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
       this.Text = "Create New Schema";
       this.contentAreaPanel.ResumeLayout(false);
       this.contentAreaPanel.PerformLayout();
       this.commandAreaPanel.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.picLogo)).EndInit();
       this.ResumeLayout(false);
 
     }
@@ -110,5 +134,7 @@
     private System.Windows.Forms.Button btnOK;
     private System.Windows.Forms.Button btnCancel;
     private System.Windows.Forms.TextBox schemaName;
+    private System.Windows.Forms.Label lblEnterPassword;
+    private System.Windows.Forms.PictureBox picLogo;
   }
 }

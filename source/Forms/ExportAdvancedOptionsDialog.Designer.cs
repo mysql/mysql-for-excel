@@ -39,12 +39,15 @@
       this.chkAddBufferToVarchar = new System.Windows.Forms.CheckBox();
       this.chkDetectDatatype = new System.Windows.Forms.CheckBox();
       this.lblColumnDatatypeOptions = new System.Windows.Forms.Label();
+      this.lblAdvancedExportOptions = new System.Windows.Forms.Label();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
       this.SuspendLayout();
       // 
       // contentAreaPanel
       // 
+      this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
+      this.contentAreaPanel.Controls.Add(this.lblAdvancedExportOptions);
       this.contentAreaPanel.Controls.Add(this.chkShowCopySQLButton);
       this.contentAreaPanel.Controls.Add(this.lblOtherOptions);
       this.contentAreaPanel.Controls.Add(this.chkUseFormattedValues);
@@ -54,20 +57,20 @@
       this.contentAreaPanel.Controls.Add(this.chkAddBufferToVarchar);
       this.contentAreaPanel.Controls.Add(this.chkDetectDatatype);
       this.contentAreaPanel.Controls.Add(this.lblColumnDatatypeOptions);
-      this.contentAreaPanel.Size = new System.Drawing.Size(534, 340);
+      this.contentAreaPanel.Size = new System.Drawing.Size(534, 330);
       // 
       // commandAreaPanel
       // 
       this.commandAreaPanel.Controls.Add(this.btnAccept);
       this.commandAreaPanel.Controls.Add(this.btnCancel);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 341);
-      this.commandAreaPanel.Size = new System.Drawing.Size(534, 44);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 331);
+      this.commandAreaPanel.Size = new System.Drawing.Size(534, 45);
       // 
       // btnAccept
       // 
       this.btnAccept.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.btnAccept.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.btnAccept.Location = new System.Drawing.Point(366, 10);
+      this.btnAccept.Location = new System.Drawing.Point(366, 11);
       this.btnAccept.Name = "btnAccept";
       this.btnAccept.Size = new System.Drawing.Size(75, 23);
       this.btnAccept.TabIndex = 0;
@@ -79,7 +82,7 @@
       // 
       this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnCancel.Location = new System.Drawing.Point(447, 10);
+      this.btnCancel.Location = new System.Drawing.Point(447, 11);
       this.btnCancel.Name = "btnCancel";
       this.btnCancel.Size = new System.Drawing.Size(75, 23);
       this.btnCancel.TabIndex = 1;
@@ -189,14 +192,24 @@
       this.lblColumnDatatypeOptions.TabIndex = 0;
       this.lblColumnDatatypeOptions.Text = "Column Datatype Options";
       // 
+      // lblAdvancedExportOptions
+      // 
+      this.lblAdvancedExportOptions.AutoSize = true;
+      this.lblAdvancedExportOptions.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblAdvancedExportOptions.ForeColor = System.Drawing.Color.Navy;
+      this.lblAdvancedExportOptions.Location = new System.Drawing.Point(17, 17);
+      this.lblAdvancedExportOptions.Name = "lblAdvancedExportOptions";
+      this.lblAdvancedExportOptions.Size = new System.Drawing.Size(178, 20);
+      this.lblAdvancedExportOptions.TabIndex = 9;
+      this.lblAdvancedExportOptions.Text = "Advanced Export Options";
+      // 
       // ExportAdvancedOptionsDialog
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.btnCancel;
-      this.ClientSize = new System.Drawing.Size(534, 386);
-      this.CommandAreaHeight = 44;
-      this.MainInstruction = "Advanced Export Options";
+      this.ClientSize = new System.Drawing.Size(534, 377);
+      this.CommandAreaHeight = 45;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
       this.Name = "ExportAdvancedOptionsDialog";
       this.Text = "Advanced Options";
@@ -220,5 +233,6 @@
     private System.Windows.Forms.CheckBox chkAddBufferToVarchar;
     private System.Windows.Forms.CheckBox chkDetectDatatype;
     private System.Windows.Forms.Label lblColumnDatatypeOptions;
+    private System.Windows.Forms.Label lblAdvancedExportOptions;
   }
 }
