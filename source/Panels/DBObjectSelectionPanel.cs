@@ -19,6 +19,9 @@ namespace MySQL.ForExcel
     public DBObjectSelectionPanel()
     {
       InitializeComponent();
+      objectList.AddNode(null, "Tables");
+      objectList.AddNode(null, "Views");
+      objectList.AddNode(null, "Routines");
     }
 
     public bool ExportDataActionEnabled
@@ -61,7 +64,7 @@ namespace MySQL.ForExcel
         // check our filter
         if (!String.IsNullOrEmpty(filter) && String.Compare(filter, tableName, true) != 0) continue;
 
-        string text = String.Format("{0}|{1}", tableName, String.Format("Engine: {0}", tableRow["ENGINE"].ToString()));
+        string text = tableName;
 
         TreeNode node = objectList.AddNode(parent, text);
         node.Tag = new DBObject(tableName, DBObjectType.Table);
@@ -82,7 +85,7 @@ namespace MySQL.ForExcel
         // check our filter
         if (!String.IsNullOrEmpty(filter) && String.Compare(filter, viewName, true) != 0) continue;
 
-        string text = String.Format("{0}|{1}", viewName, String.Format("Updatable: {0}", viewRow["IS_UPDATABLE"].ToString()));
+        string text = viewName;
 
         TreeNode node = objectList.AddNode(parent, text);
         node.Tag = new DBObject(viewName, DBObjectType.View);
@@ -92,7 +95,7 @@ namespace MySQL.ForExcel
 
     private void LoadRoutines()
     {
-      DataTable procs = Utilities.GetSchemaCollection(connection, "Procedures", null, connection.Schema);
+      DataTable procs = Utilities.GetSchemaCollection(connection, "Procedures", null, connection.Schema, null, "PROCEDURE");
       if (procs == null) return;
 
       TreeNode parent = objectList.Nodes[2];
@@ -104,7 +107,7 @@ namespace MySQL.ForExcel
         if (!String.IsNullOrEmpty(filter) && String.Compare(filter, procName, true) != 0) continue;
 
         string type = routineRow["ROUTINE_TYPE"].ToString();
-        string text = String.Format("{0}|{1}", procName, String.Format("Type: {0}", type));
+        string text = procName;
 
         TreeNode node = objectList.AddNode(parent, text);
         node.Tag = new DBObject(procName, DBObjectType.Routine, (type == "PROCEDURE" ? RoutineType.Procedure : RoutineType.Function));

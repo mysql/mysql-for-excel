@@ -34,13 +34,13 @@
       System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Remote Connections");
       this.picAddInLogo = new System.Windows.Forms.PictureBox();
       this.largeImages = new System.Windows.Forms.ImageList(this.components);
-      this.lblInstructions = new System.Windows.Forms.Label();
-      this.lblCopyright = new System.Windows.Forms.Label();
-      this.lblAllRights = new System.Windows.Forms.Label();
       this.picSeparator = new System.Windows.Forms.PictureBox();
       this.picAddInLogoText = new System.Windows.Forms.PictureBox();
+      this.lblInstructions = new MySQL.ForExcel.TransparentLabel();
       this.manageConnectionsLabel = new MySQL.ForExcel.HotLabel();
       this.connectionList = new MySQL.ForExcel.MyTreeView();
+      this.lblCopyright = new MySQL.ForExcel.TransparentLabel();
+      this.lblAllRights = new MySQL.ForExcel.TransparentLabel();
       this.newConnectionLabel = new MySQL.ForExcel.HotLabel();
       this.openConnectionLabel = new MySQL.ForExcel.HotLabel();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
@@ -63,42 +63,6 @@
       this.largeImages.TransparentColor = System.Drawing.Color.Transparent;
       this.largeImages.Images.SetKeyName(0, "MySQLforExcel-WelcomePanel-ListItem-Connection-32x32.png");
       // 
-      // lblInstructions
-      // 
-      this.lblInstructions.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblInstructions.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(151)))), ((int)(((byte)(178)))));
-      this.lblInstructions.Location = new System.Drawing.Point(6, 73);
-      this.lblInstructions.Name = "lblInstructions";
-      this.lblInstructions.Size = new System.Drawing.Size(233, 65);
-      this.lblInstructions.TabIndex = 2;
-      this.lblInstructions.Text = "MySQL for Excel allows you to work with the MySQL Database right from within the " +
-    "MS Office Excel application. Excel is a powerful tool for data analysis and edit" +
-    "ing.";
-      // 
-      // lblCopyright
-      // 
-      this.lblCopyright.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-      this.lblCopyright.Font = new System.Drawing.Font("Segoe UI", 5.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblCopyright.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(151)))), ((int)(((byte)(178)))));
-      this.lblCopyright.Location = new System.Drawing.Point(7, 598);
-      this.lblCopyright.Name = "lblCopyright";
-      this.lblCopyright.Size = new System.Drawing.Size(232, 14);
-      this.lblCopyright.TabIndex = 7;
-      this.lblCopyright.Text = "Copyright © 2012 Oracle and/or its affiliates.";
-      this.lblCopyright.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-      // 
-      // lblAllRights
-      // 
-      this.lblAllRights.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-      this.lblAllRights.Font = new System.Drawing.Font("Segoe UI", 5.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblAllRights.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(151)))), ((int)(((byte)(178)))));
-      this.lblAllRights.Location = new System.Drawing.Point(7, 609);
-      this.lblAllRights.Name = "lblAllRights";
-      this.lblAllRights.Size = new System.Drawing.Size(232, 14);
-      this.lblAllRights.TabIndex = 8;
-      this.lblAllRights.Text = "All rights reserved.";
-      this.lblAllRights.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-      // 
       // picSeparator
       // 
       this.picSeparator.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Separator;
@@ -116,6 +80,22 @@
       this.picAddInLogoText.Size = new System.Drawing.Size(172, 36);
       this.picAddInLogoText.TabIndex = 24;
       this.picAddInLogoText.TabStop = false;
+      // 
+      // lblInstructions
+      // 
+      this.lblInstructions.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblInstructions.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.lblInstructions.Location = new System.Drawing.Point(9, 73);
+      this.lblInstructions.Name = "lblInstructions";
+      this.lblInstructions.PixelsSpacingAdjustment = -3;
+      this.lblInstructions.ShadowColor = System.Drawing.SystemColors.ControlText;
+      this.lblInstructions.ShadowOpacity = 0.7D;
+      this.lblInstructions.Size = new System.Drawing.Size(232, 54);
+      this.lblInstructions.TabIndex = 2;
+      this.lblInstructions.TextOpacity = 0.6D;
+      this.lblInstructions.TransparentText = "MySQL for Excel allows you to work with the MySQL Database right from within the " +
+    "MS Office Excel application. Excel is a powerful tool for data analysis and edit" +
+    "ing.";
       // 
       // manageConnectionsLabel
       // 
@@ -143,7 +123,7 @@
       this.manageConnectionsLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.manageConnectionsLabel.TitleColorOpacity = 0.95D;
       this.manageConnectionsLabel.TitleDescriptionPixelsSpacing = 0;
-      this.manageConnectionsLabel.TitlePixelsXOffset = 0;
+      this.manageConnectionsLabel.TitlePixelsXOffset = 3;
       this.manageConnectionsLabel.TitlePixelsYOffset = -2;
       this.manageConnectionsLabel.TitleShadowOpacity = 0.2D;
       this.manageConnectionsLabel.TitleShadowPixelsXOffset = 0;
@@ -188,6 +168,38 @@
       this.connectionList.TitleTextVerticalPixelsOffset = 2;
       this.connectionList.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.connectionList_NodeMouseDoubleClick);
       // 
+      // lblCopyright
+      // 
+      this.lblCopyright.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+      this.lblCopyright.Font = new System.Drawing.Font("Segoe UI", 5.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblCopyright.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.lblCopyright.Location = new System.Drawing.Point(7, 598);
+      this.lblCopyright.Name = "lblCopyright";
+      this.lblCopyright.ShadowColor = System.Drawing.SystemColors.ControlText;
+      this.lblCopyright.ShadowOpacity = 0.7D;
+      this.lblCopyright.ShadowPixelsXOffset = 0;
+      this.lblCopyright.Size = new System.Drawing.Size(232, 14);
+      this.lblCopyright.TabIndex = 7;
+      this.lblCopyright.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+      this.lblCopyright.TextOpacity = 0.6D;
+      this.lblCopyright.TransparentText = "Copyright © 2012 Oracle and/or its affiliates.";
+      // 
+      // lblAllRights
+      // 
+      this.lblAllRights.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+      this.lblAllRights.Font = new System.Drawing.Font("Segoe UI", 5.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblAllRights.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.lblAllRights.Location = new System.Drawing.Point(7, 609);
+      this.lblAllRights.Name = "lblAllRights";
+      this.lblAllRights.ShadowColor = System.Drawing.SystemColors.ControlText;
+      this.lblAllRights.ShadowOpacity = 0.7D;
+      this.lblAllRights.ShadowPixelsXOffset = 0;
+      this.lblAllRights.Size = new System.Drawing.Size(232, 14);
+      this.lblAllRights.TabIndex = 8;
+      this.lblAllRights.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+      this.lblAllRights.TextOpacity = 0.6D;
+      this.lblAllRights.TransparentText = "All rights reserved.";
+      // 
       // newConnectionLabel
       // 
       this.newConnectionLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -214,7 +226,7 @@
       this.newConnectionLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.newConnectionLabel.TitleColorOpacity = 0.95D;
       this.newConnectionLabel.TitleDescriptionPixelsSpacing = 0;
-      this.newConnectionLabel.TitlePixelsXOffset = 0;
+      this.newConnectionLabel.TitlePixelsXOffset = 3;
       this.newConnectionLabel.TitlePixelsYOffset = 0;
       this.newConnectionLabel.TitleShadowOpacity = 0.2D;
       this.newConnectionLabel.TitleShadowPixelsXOffset = 0;
@@ -246,7 +258,7 @@
       this.openConnectionLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.openConnectionLabel.TitleColorOpacity = 0.95D;
       this.openConnectionLabel.TitleDescriptionPixelsSpacing = 0;
-      this.openConnectionLabel.TitlePixelsXOffset = 2;
+      this.openConnectionLabel.TitlePixelsXOffset = 3;
       this.openConnectionLabel.TitlePixelsYOffset = -3;
       this.openConnectionLabel.TitleShadowOpacity = 0.2D;
       this.openConnectionLabel.TitleShadowPixelsXOffset = 0;
@@ -254,7 +266,6 @@
       // 
       // WelcomePanel
       // 
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.Controls.Add(this.picAddInLogoText);
       this.Controls.Add(this.picSeparator);
       this.Controls.Add(this.lblInstructions);
@@ -279,9 +290,9 @@
 
     private System.Windows.Forms.PictureBox picAddInLogo;
     private System.Windows.Forms.ImageList largeImages;
-    private System.Windows.Forms.Label lblInstructions;
-    private System.Windows.Forms.Label lblCopyright;
-    private System.Windows.Forms.Label lblAllRights;
+    private TransparentLabel lblInstructions;
+    private TransparentLabel lblCopyright;
+    private TransparentLabel lblAllRights;
     private HotLabel newConnectionLabel;
     private HotLabel manageConnectionsLabel;
     private HotLabel openConnectionLabel;

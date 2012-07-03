@@ -256,7 +256,7 @@
       <DependentUpon>TaskPaneControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\TransparentLabel.cs">
-      <SubType>Component</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Forms\AppendDataForm.cs">
       <SubType>Form</SubType>
@@ -483,6 +483,8 @@
     <None Include="Resources\MySQLforExcel-AppendDlg-Arrow-Down.png" />
     <None Include="Resources\MySQLforExcel-AppendDlg-ColumnMapping-32x32.png" />
     <None Include="Resources\MySQLforExcel-AppendDlg-ManualColumnMapping-32x32.png" />
+    <None Include="Resources\MySQLforExcel-ImportRoutineDlg-Params-32x32.png" />
+    <None Include="Resources\MySQLforExcel-ImportRoutineDlg-Options-32x32.png" />
     <Content Include="Resources\Warning.png" />
     <Content Include="Todo.txt" />
   </ItemGroup>

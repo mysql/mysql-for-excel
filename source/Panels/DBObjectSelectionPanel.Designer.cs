@@ -30,9 +30,6 @@
     {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DBObjectSelectionPanel));
-      System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Tables");
-      System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Views");
-      System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Routines");
       this.lblConnectionName = new System.Windows.Forms.Label();
       this.lblUserIP = new System.Windows.Forms.Label();
       this.picAddInLogo = new System.Windows.Forms.PictureBox();
@@ -151,31 +148,15 @@
       this.objectList.DescriptionTextVerticalPixelsOffset = 0;
       this.objectList.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawAll;
       this.objectList.ExpandedIcon = global::MySQL.ForExcel.Properties.Resources.ArrowDown;
-      this.objectList.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.objectList.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.objectList.ImageHorizontalPixelsOffset = 14;
       this.objectList.ImageToTextHorizontalPixelsOffset = 3;
       this.objectList.Indent = 18;
-      this.objectList.ItemHeight = 20;
+      this.objectList.ItemHeight = 10;
       this.objectList.Location = new System.Drawing.Point(9, 198);
       this.objectList.Name = "objectList";
-      this.objectList.NodeHeightMultiple = 2;
+      this.objectList.NodeHeightMultiple = 3;
       this.objectList.NodeImages = this.largeImages;
-      treeNode4.BackColor = System.Drawing.SystemColors.ControlLight;
-      treeNode4.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode4.Name = "TablesNode";
-      treeNode4.Text = "Tables";
-      treeNode5.BackColor = System.Drawing.SystemColors.ControlLight;
-      treeNode5.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode5.Name = "ViewsNode";
-      treeNode5.Text = "Views";
-      treeNode6.BackColor = System.Drawing.SystemColors.ControlLight;
-      treeNode6.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode6.Name = "RoutinesNode";
-      treeNode6.Text = "Routines";
-      this.objectList.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode4,
-            treeNode5,
-            treeNode6});
       this.objectList.Size = new System.Drawing.Size(232, 275);
       this.objectList.TabIndex = 24;
       this.objectList.TitleColorOpacity = 0.8D;
@@ -209,7 +190,7 @@
       this.appendDataLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.appendDataLabel.TitleColorOpacity = 0.95D;
       this.appendDataLabel.TitleDescriptionPixelsSpacing = 0;
-      this.appendDataLabel.TitlePixelsXOffset = 0;
+      this.appendDataLabel.TitlePixelsXOffset = 3;
       this.appendDataLabel.TitlePixelsYOffset = 0;
       this.appendDataLabel.TitleShadowOpacity = 0.2D;
       this.appendDataLabel.TitleShadowPixelsXOffset = 0;
@@ -243,7 +224,7 @@
       this.editDataLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.editDataLabel.TitleColorOpacity = 0.95D;
       this.editDataLabel.TitleDescriptionPixelsSpacing = 0;
-      this.editDataLabel.TitlePixelsXOffset = 0;
+      this.editDataLabel.TitlePixelsXOffset = 3;
       this.editDataLabel.TitlePixelsYOffset = 0;
       this.editDataLabel.TitleShadowOpacity = 0.2D;
       this.editDataLabel.TitleShadowPixelsXOffset = 0;
@@ -277,7 +258,7 @@
       this.importDataLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.importDataLabel.TitleColorOpacity = 0.95D;
       this.importDataLabel.TitleDescriptionPixelsSpacing = 0;
-      this.importDataLabel.TitlePixelsXOffset = 0;
+      this.importDataLabel.TitlePixelsXOffset = 3;
       this.importDataLabel.TitlePixelsYOffset = 0;
       this.importDataLabel.TitleShadowOpacity = 0.2D;
       this.importDataLabel.TitleShadowPixelsXOffset = 0;
@@ -309,7 +290,7 @@
       this.selectDatabaseObjectLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.selectDatabaseObjectLabel.TitleColorOpacity = 0.95D;
       this.selectDatabaseObjectLabel.TitleDescriptionPixelsSpacing = 0;
-      this.selectDatabaseObjectLabel.TitlePixelsXOffset = 0;
+      this.selectDatabaseObjectLabel.TitlePixelsXOffset = 3;
       this.selectDatabaseObjectLabel.TitlePixelsYOffset = 0;
       this.selectDatabaseObjectLabel.TitleShadowOpacity = 0.2D;
       this.selectDatabaseObjectLabel.TitleShadowPixelsXOffset = 0;
@@ -341,7 +322,7 @@
       this.exportToNewTableLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.exportToNewTableLabel.TitleColorOpacity = 0.95D;
       this.exportToNewTableLabel.TitleDescriptionPixelsSpacing = 0;
-      this.exportToNewTableLabel.TitlePixelsXOffset = 0;
+      this.exportToNewTableLabel.TitlePixelsXOffset = 3;
       this.exportToNewTableLabel.TitlePixelsYOffset = 0;
       this.exportToNewTableLabel.TitleShadowOpacity = 0.2D;
       this.exportToNewTableLabel.TitleShadowPixelsXOffset = 0;

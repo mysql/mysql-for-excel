@@ -275,6 +275,20 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap MySQLforExcel_ImportRoutineDlg_Options_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_ImportRoutineDlg_Options_32x32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MySQLforExcel_ImportRoutineDlg_Params_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_ImportRoutineDlg_Params_32x32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap MySQLforExcel_Logo_48x48 {
             get {
                 object obj = ResourceManager.GetObject("MySQLforExcel_Logo_48x48", resourceCulture);
