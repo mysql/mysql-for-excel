@@ -9,18 +9,18 @@ using System.Windows.Forms;
 
 namespace MySQL.ForExcel
 {
-  public partial class NewSchemaDialog : AutoStyleableBaseDialog
+  public partial class AppendNewColumnMappingDialog : AutoStyleableBaseDialog
   {
-    public NewSchemaDialog()
+    public AppendNewColumnMappingDialog()
     {
       InitializeComponent();
     }
 
-    public string SchemaName { get; set; }
+    public string ColumnMappingName { get; set; }
 
     private void btnOK_Click(object sender, EventArgs e)
     {
-      SchemaName = txtSchemaName.Text.Trim();
+      ColumnMappingName = txtMappingName.Text.Trim();
     }
   }
 }

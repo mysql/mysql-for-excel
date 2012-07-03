@@ -81,13 +81,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap Chain_Link_32x32 {
-            get {
-                object obj = ResourceManager.GetObject("Chain_Link_32x32", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         /// <summary>
         ///   Looks up a localized string similar to Data in the current column is not unique..
         /// </summary>
@@ -285,6 +278,13 @@ namespace MySQL.ForExcel.Properties {
         internal static System.Drawing.Bitmap MySQLforExcel_ImportRoutineDlg_Params_32x32 {
             get {
                 object obj = ResourceManager.GetObject("MySQLforExcel_ImportRoutineDlg_Params_32x32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MySQLforExcel_Input_64x64 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_Input_64x64", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

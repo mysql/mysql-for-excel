@@ -65,12 +65,10 @@
       this.radAddPrimaryKey = new System.Windows.Forms.RadioButton();
       this.txtTableNameInput = new System.Windows.Forms.TextBox();
       this.lblTableNameInput = new System.Windows.Forms.Label();
-      this.lblPrimaryKeySub2 = new System.Windows.Forms.Label();
-      this.lblPrimaryKeySub1 = new System.Windows.Forms.Label();
+      this.lblPrimaryKeySub = new System.Windows.Forms.Label();
       this.lblPrimaryKeyMain = new System.Windows.Forms.Label();
       this.picPrimaryKey = new System.Windows.Forms.PictureBox();
-      this.lblTableNameSub2 = new System.Windows.Forms.Label();
-      this.lblTableNameSub1 = new System.Windows.Forms.Label();
+      this.lblTableNameSub = new System.Windows.Forms.Label();
       this.lblTableNameMain = new System.Windows.Forms.Label();
       this.picTable = new System.Windows.Forms.PictureBox();
       this.lblExportData = new System.Windows.Forms.Label();
@@ -107,12 +105,10 @@
       this.contentAreaPanel.Controls.Add(this.radAddPrimaryKey);
       this.contentAreaPanel.Controls.Add(this.txtTableNameInput);
       this.contentAreaPanel.Controls.Add(this.lblTableNameInput);
-      this.contentAreaPanel.Controls.Add(this.lblPrimaryKeySub2);
-      this.contentAreaPanel.Controls.Add(this.lblPrimaryKeySub1);
+      this.contentAreaPanel.Controls.Add(this.lblPrimaryKeySub);
       this.contentAreaPanel.Controls.Add(this.lblPrimaryKeyMain);
       this.contentAreaPanel.Controls.Add(this.picPrimaryKey);
-      this.contentAreaPanel.Controls.Add(this.lblTableNameSub2);
-      this.contentAreaPanel.Controls.Add(this.lblTableNameSub1);
+      this.contentAreaPanel.Controls.Add(this.lblTableNameSub);
       this.contentAreaPanel.Controls.Add(this.lblTableNameMain);
       this.contentAreaPanel.Controls.Add(this.picTable);
       this.contentAreaPanel.Size = new System.Drawing.Size(844, 555);
@@ -560,29 +556,17 @@
       this.lblTableNameInput.TabIndex = 3;
       this.lblTableNameInput.Text = "Name:";
       // 
-      // lblPrimaryKeySub2
+      // lblPrimaryKeySub
       // 
-      this.lblPrimaryKeySub2.AutoSize = true;
-      this.lblPrimaryKeySub2.BackColor = System.Drawing.Color.Transparent;
-      this.lblPrimaryKeySub2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblPrimaryKeySub2.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblPrimaryKeySub2.Location = new System.Drawing.Point(459, 84);
-      this.lblPrimaryKeySub2.Name = "lblPrimaryKeySub2";
-      this.lblPrimaryKeySub2.Size = new System.Drawing.Size(170, 15);
-      this.lblPrimaryKeySub2.TabIndex = 8;
-      this.lblPrimaryKeySub2.Text = "that is used as the Primary Key.";
-      // 
-      // lblPrimaryKeySub1
-      // 
-      this.lblPrimaryKeySub1.AutoSize = true;
-      this.lblPrimaryKeySub1.BackColor = System.Drawing.Color.Transparent;
-      this.lblPrimaryKeySub1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblPrimaryKeySub1.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblPrimaryKeySub1.Location = new System.Drawing.Point(459, 69);
-      this.lblPrimaryKeySub1.Name = "lblPrimaryKeySub1";
-      this.lblPrimaryKeySub1.Size = new System.Drawing.Size(264, 15);
-      this.lblPrimaryKeySub1.TabIndex = 7;
-      this.lblPrimaryKeySub1.Text = "Each row of data needs to hold a unique number";
+      this.lblPrimaryKeySub.AutoSize = true;
+      this.lblPrimaryKeySub.BackColor = System.Drawing.Color.Transparent;
+      this.lblPrimaryKeySub.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblPrimaryKeySub.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.lblPrimaryKeySub.Location = new System.Drawing.Point(459, 69);
+      this.lblPrimaryKeySub.Name = "lblPrimaryKeySub";
+      this.lblPrimaryKeySub.Size = new System.Drawing.Size(264, 30);
+      this.lblPrimaryKeySub.TabIndex = 7;
+      this.lblPrimaryKeySub.Text = "Each row of data needs to hold a unique number\r\nthat is used as the Primary Key.";
       // 
       // lblPrimaryKeyMain
       // 
@@ -606,29 +590,18 @@
       this.picPrimaryKey.TabIndex = 28;
       this.picPrimaryKey.TabStop = false;
       // 
-      // lblTableNameSub2
+      // lblTableNameSub
       // 
-      this.lblTableNameSub2.AutoSize = true;
-      this.lblTableNameSub2.BackColor = System.Drawing.Color.Transparent;
-      this.lblTableNameSub2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblTableNameSub2.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblTableNameSub2.Location = new System.Drawing.Point(79, 89);
-      this.lblTableNameSub2.Name = "lblTableNameSub2";
-      this.lblTableNameSub2.Size = new System.Drawing.Size(232, 15);
-      this.lblTableNameSub2.TabIndex = 2;
-      this.lblTableNameSub2.Text = "Please specify a unique name for the table.";
-      // 
-      // lblTableNameSub1
-      // 
-      this.lblTableNameSub1.AutoSize = true;
-      this.lblTableNameSub1.BackColor = System.Drawing.Color.Transparent;
-      this.lblTableNameSub1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblTableNameSub1.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblTableNameSub1.Location = new System.Drawing.Point(79, 74);
-      this.lblTableNameSub1.Name = "lblTableNameSub1";
-      this.lblTableNameSub1.Size = new System.Drawing.Size(267, 15);
-      this.lblTableNameSub1.TabIndex = 1;
-      this.lblTableNameSub1.Text = "The selected data will be stored in a MySQL table.";
+      this.lblTableNameSub.AutoSize = true;
+      this.lblTableNameSub.BackColor = System.Drawing.Color.Transparent;
+      this.lblTableNameSub.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblTableNameSub.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.lblTableNameSub.Location = new System.Drawing.Point(79, 74);
+      this.lblTableNameSub.Name = "lblTableNameSub";
+      this.lblTableNameSub.Size = new System.Drawing.Size(267, 30);
+      this.lblTableNameSub.TabIndex = 1;
+      this.lblTableNameSub.Text = "The selected data will be stored in a MySQL table.\r\nPlease specify a unique name " +
+    "for the table.";
       // 
       // lblTableNameMain
       // 
@@ -727,12 +700,10 @@
     private System.Windows.Forms.RadioButton radAddPrimaryKey;
     private System.Windows.Forms.TextBox txtTableNameInput;
     private System.Windows.Forms.Label lblTableNameInput;
-    private System.Windows.Forms.Label lblPrimaryKeySub2;
-    private System.Windows.Forms.Label lblPrimaryKeySub1;
+    private System.Windows.Forms.Label lblPrimaryKeySub;
     private System.Windows.Forms.Label lblPrimaryKeyMain;
     private System.Windows.Forms.PictureBox picPrimaryKey;
-    private System.Windows.Forms.Label lblTableNameSub2;
-    private System.Windows.Forms.Label lblTableNameSub1;
+    private System.Windows.Forms.Label lblTableNameSub;
     private System.Windows.Forms.Label lblTableNameMain;
     private System.Windows.Forms.PictureBox picTable;
     private System.Windows.Forms.Label lblExportData;

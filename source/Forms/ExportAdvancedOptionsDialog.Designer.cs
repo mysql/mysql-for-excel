@@ -93,9 +93,10 @@
       // 
       this.chkShowCopySQLButton.AutoSize = true;
       this.chkShowCopySQLButton.BackColor = System.Drawing.Color.Transparent;
-      this.chkShowCopySQLButton.Location = new System.Drawing.Point(53, 289);
+      this.chkShowCopySQLButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.chkShowCopySQLButton.Location = new System.Drawing.Point(53, 294);
       this.chkShowCopySQLButton.Name = "chkShowCopySQLButton";
-      this.chkShowCopySQLButton.Size = new System.Drawing.Size(138, 17);
+      this.chkShowCopySQLButton.Size = new System.Drawing.Size(152, 19);
       this.chkShowCopySQLButton.TabIndex = 8;
       this.chkShowCopySQLButton.Text = "Show Copy SQL Button";
       this.chkShowCopySQLButton.UseVisualStyleBackColor = false;
@@ -106,7 +107,7 @@
       this.lblOtherOptions.BackColor = System.Drawing.Color.Transparent;
       this.lblOtherOptions.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblOtherOptions.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblOtherOptions.Location = new System.Drawing.Point(24, 260);
+      this.lblOtherOptions.Location = new System.Drawing.Point(24, 265);
       this.lblOtherOptions.Name = "lblOtherOptions";
       this.lblOtherOptions.Size = new System.Drawing.Size(91, 17);
       this.lblOtherOptions.TabIndex = 7;
@@ -116,9 +117,10 @@
       // 
       this.chkUseFormattedValues.AutoSize = true;
       this.chkUseFormattedValues.BackColor = System.Drawing.Color.Transparent;
-      this.chkUseFormattedValues.Location = new System.Drawing.Point(53, 222);
+      this.chkUseFormattedValues.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.chkUseFormattedValues.Location = new System.Drawing.Point(53, 228);
       this.chkUseFormattedValues.Name = "chkUseFormattedValues";
-      this.chkUseFormattedValues.Size = new System.Drawing.Size(126, 17);
+      this.chkUseFormattedValues.Size = new System.Drawing.Size(141, 19);
       this.chkUseFormattedValues.TabIndex = 6;
       this.chkUseFormattedValues.Text = "Use formatted values";
       this.chkUseFormattedValues.UseVisualStyleBackColor = false;
@@ -129,7 +131,7 @@
       this.lblFieldDataOptions.BackColor = System.Drawing.Color.Transparent;
       this.lblFieldDataOptions.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblFieldDataOptions.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblFieldDataOptions.Location = new System.Drawing.Point(24, 193);
+      this.lblFieldDataOptions.Location = new System.Drawing.Point(24, 199);
       this.lblFieldDataOptions.Name = "lblFieldDataOptions";
       this.lblFieldDataOptions.Size = new System.Drawing.Size(116, 17);
       this.lblFieldDataOptions.TabIndex = 5;
@@ -139,9 +141,10 @@
       // 
       this.chkAutoAllowEmptyNonIndexColumns.AutoSize = true;
       this.chkAutoAllowEmptyNonIndexColumns.BackColor = System.Drawing.Color.Transparent;
-      this.chkAutoAllowEmptyNonIndexColumns.Location = new System.Drawing.Point(53, 154);
+      this.chkAutoAllowEmptyNonIndexColumns.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.chkAutoAllowEmptyNonIndexColumns.Location = new System.Drawing.Point(53, 160);
       this.chkAutoAllowEmptyNonIndexColumns.Name = "chkAutoAllowEmptyNonIndexColumns";
-      this.chkAutoAllowEmptyNonIndexColumns.Size = new System.Drawing.Size(386, 17);
+      this.chkAutoAllowEmptyNonIndexColumns.Size = new System.Drawing.Size(436, 19);
       this.chkAutoAllowEmptyNonIndexColumns.TabIndex = 4;
       this.chkAutoAllowEmptyNonIndexColumns.Text = "Automatically check the Allow Empty checkbox for columns without an index";
       this.chkAutoAllowEmptyNonIndexColumns.UseVisualStyleBackColor = false;
@@ -150,9 +153,10 @@
       // 
       this.chkAutoIndexIntColumns.AutoSize = true;
       this.chkAutoIndexIntColumns.BackColor = System.Drawing.Color.Transparent;
-      this.chkAutoIndexIntColumns.Location = new System.Drawing.Point(53, 131);
+      this.chkAutoIndexIntColumns.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.chkAutoIndexIntColumns.Location = new System.Drawing.Point(53, 135);
       this.chkAutoIndexIntColumns.Name = "chkAutoIndexIntColumns";
-      this.chkAutoIndexIntColumns.Size = new System.Drawing.Size(311, 17);
+      this.chkAutoIndexIntColumns.Size = new System.Drawing.Size(349, 19);
       this.chkAutoIndexIntColumns.TabIndex = 3;
       this.chkAutoIndexIntColumns.Text = "Automatically check the Index checkbox for Integer columns";
       this.chkAutoIndexIntColumns.UseVisualStyleBackColor = false;
@@ -161,9 +165,10 @@
       // 
       this.chkAddBufferToVarchar.AutoSize = true;
       this.chkAddBufferToVarchar.BackColor = System.Drawing.Color.Transparent;
-      this.chkAddBufferToVarchar.Location = new System.Drawing.Point(73, 108);
+      this.chkAddBufferToVarchar.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.chkAddBufferToVarchar.Location = new System.Drawing.Point(73, 110);
       this.chkAddBufferToVarchar.Name = "chkAddBufferToVarchar";
-      this.chkAddBufferToVarchar.Size = new System.Drawing.Size(384, 17);
+      this.chkAddBufferToVarchar.Size = new System.Drawing.Size(431, 19);
       this.chkAddBufferToVarchar.TabIndex = 2;
       this.chkAddBufferToVarchar.Text = "Add additional buffer to VARCHAR length (round up to 12, 25, 45, 125, 255)";
       this.chkAddBufferToVarchar.UseVisualStyleBackColor = false;
@@ -172,9 +177,10 @@
       // 
       this.chkDetectDatatype.AutoSize = true;
       this.chkDetectDatatype.BackColor = System.Drawing.Color.Transparent;
+      this.chkDetectDatatype.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.chkDetectDatatype.Location = new System.Drawing.Point(53, 85);
       this.chkDetectDatatype.Name = "chkDetectDatatype";
-      this.chkDetectDatatype.Size = new System.Drawing.Size(373, 17);
+      this.chkDetectDatatype.Size = new System.Drawing.Size(418, 19);
       this.chkDetectDatatype.TabIndex = 1;
       this.chkDetectDatatype.Text = "Analyze and try to detect correct datatype based on column field contents";
       this.chkDetectDatatype.UseVisualStyleBackColor = false;

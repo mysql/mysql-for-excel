@@ -362,6 +362,8 @@ namespace MySQL.ForExcel
       showValidationWarning("ColumnOptionsWarning", !good, warningText);
       gridCol.DefaultCellStyle.BackColor = good ? grdPreviewData.DefaultCellStyle.BackColor : Color.OrangeRed;
       chkCreateIndex.Checked = true;
+      if (chkAllowEmpty.Checked && chkUniqueIndex.Checked)
+        chkAllowEmpty.Checked = false;
     }
 
     private void chkExcludeColumn_CheckedChanged(object sender, EventArgs e)
@@ -378,6 +380,8 @@ namespace MySQL.ForExcel
         return;
       if (chkExcludeColumn.Checked && chkPrimaryKey.Checked)
         chkExcludeColumn.Checked = chkUniqueIndex.Checked = chkCreateIndex.Checked = false;
+      if (chkAllowEmpty.Checked && chkPrimaryKey.Checked)
+        chkAllowEmpty.Checked = false;
       chkExcludeColumn.Enabled = chkUniqueIndex.Enabled = chkCreateIndex.Enabled = !chkPrimaryKey.Checked;
     }
 

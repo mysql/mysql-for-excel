@@ -95,10 +95,10 @@
       // 
       this.lblUserValue.AutoSize = true;
       this.lblUserValue.BackColor = System.Drawing.Color.Transparent;
-      this.lblUserValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblUserValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblUserValue.Location = new System.Drawing.Point(187, 78);
       this.lblUserValue.Name = "lblUserValue";
-      this.lblUserValue.Size = new System.Drawing.Size(22, 16);
+      this.lblUserValue.Size = new System.Drawing.Size(21, 15);
       this.lblUserValue.TabIndex = 4;
       this.lblUserValue.Text = "??";
       // 
@@ -106,20 +106,20 @@
       // 
       this.lblConnectionValue.AutoSize = true;
       this.lblConnectionValue.BackColor = System.Drawing.Color.Transparent;
-      this.lblConnectionValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblConnectionValue.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblConnectionValue.Location = new System.Drawing.Point(187, 56);
       this.lblConnectionValue.Name = "lblConnectionValue";
-      this.lblConnectionValue.Size = new System.Drawing.Size(22, 16);
+      this.lblConnectionValue.Size = new System.Drawing.Size(21, 15);
       this.lblConnectionValue.TabIndex = 2;
       this.lblConnectionValue.Text = "??";
       // 
       // txtPassword
       // 
-      this.txtPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.txtPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.txtPassword.Location = new System.Drawing.Point(187, 98);
       this.txtPassword.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.txtPassword.Name = "txtPassword";
-      this.txtPassword.Size = new System.Drawing.Size(315, 22);
+      this.txtPassword.Size = new System.Drawing.Size(315, 21);
       this.txtPassword.TabIndex = 6;
       this.txtPassword.UseSystemPasswordChar = true;
       // 
@@ -127,10 +127,10 @@
       // 
       this.lblPassword.AutoSize = true;
       this.lblPassword.BackColor = System.Drawing.Color.Transparent;
-      this.lblPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblPassword.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblPassword.Location = new System.Drawing.Point(103, 101);
       this.lblPassword.Name = "lblPassword";
-      this.lblPassword.Size = new System.Drawing.Size(71, 16);
+      this.lblPassword.Size = new System.Drawing.Size(64, 15);
       this.lblPassword.TabIndex = 5;
       this.lblPassword.Text = "Password:";
       // 
@@ -138,10 +138,10 @@
       // 
       this.lblUser.AutoSize = true;
       this.lblUser.BackColor = System.Drawing.Color.Transparent;
-      this.lblUser.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblUser.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblUser.Location = new System.Drawing.Point(103, 78);
       this.lblUser.Name = "lblUser";
-      this.lblUser.Size = new System.Drawing.Size(40, 16);
+      this.lblUser.Size = new System.Drawing.Size(36, 15);
       this.lblUser.TabIndex = 3;
       this.lblUser.Text = "User:";
       // 
@@ -149,10 +149,10 @@
       // 
       this.lblConnection.AutoSize = true;
       this.lblConnection.BackColor = System.Drawing.Color.Transparent;
-      this.lblConnection.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblConnection.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblConnection.Location = new System.Drawing.Point(103, 56);
       this.lblConnection.Name = "lblConnection";
-      this.lblConnection.Size = new System.Drawing.Size(78, 16);
+      this.lblConnection.Size = new System.Drawing.Size(72, 15);
       this.lblConnection.TabIndex = 1;
       this.lblConnection.Text = "Connection:";
       // 

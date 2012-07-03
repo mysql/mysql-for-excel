@@ -276,6 +276,18 @@
     <Compile Include="Forms\AutoStyleableBaseForm.Designer.cs">
       <DependentUpon>AutoStyleableBaseForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\AppendAdvancedOptionsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AppendAdvancedOptionsDialog.Designer.cs">
+      <DependentUpon>AppendAdvancedOptionsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\AppendNewColumnMappingDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AppendNewColumnMappingDialog.Designer.cs">
+      <DependentUpon>AppendNewColumnMappingDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\ImportRoutineForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -375,6 +387,12 @@
     <EmbeddedResource Include="Forms\AutoStyleableBaseForm.resx">
       <DependentUpon>AutoStyleableBaseForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AppendAdvancedOptionsDialog.resx">
+      <DependentUpon>AppendAdvancedOptionsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AppendNewColumnMappingDialog.resx">
+      <DependentUpon>AppendNewColumnMappingDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportRoutineForm.resx">
       <DependentUpon>ImportRoutineForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -418,6 +436,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="app.config" />
     <None Include="Properties\DataSources\MySQLColumn.datasource" />
     <None Include="Properties\DataSources\MySQLDataColumn.datasource" />
     <None Include="Properties\DataSources\MySQLTable.datasource" />
@@ -456,7 +475,6 @@
     <None Include="Resources\ExcelAddinFilter.png" />
     <Content Include="Resources\ArrowDown.png" />
     <Content Include="Resources\ArrowRight.png" />
-    <Content Include="Resources\Chain Link-32x32.png" />
     <Content Include="Resources\chain_link.24x24.png" />
     <Content Include="Resources\mysql-for-excel.ico" />
     <None Include="Resources\MySQLforExcel-ObjectPanel-EditData-24x24.png" />
@@ -485,6 +503,7 @@
     <None Include="Resources\MySQLforExcel-AppendDlg-ManualColumnMapping-32x32.png" />
     <None Include="Resources\MySQLforExcel-ImportRoutineDlg-Params-32x32.png" />
     <None Include="Resources\MySQLforExcel-ImportRoutineDlg-Options-32x32.png" />
+    <None Include="Resources\MySQLforExcel-Input-64x64.png" />
     <Content Include="Resources\Warning.png" />
     <Content Include="Todo.txt" />
   </ItemGroup>

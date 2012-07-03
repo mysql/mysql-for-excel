@@ -94,5 +94,53 @@ namespace MySQL.ForExcel.Properties {
                 this["ExportShowCopySQLButton"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AppendPerformAutoMap {
+            get {
+                return ((bool)(this["AppendPerformAutoMap"]));
+            }
+            set {
+                this["AppendPerformAutoMap"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AppendAutoStoreColumnMapping {
+            get {
+                return ((bool)(this["AppendAutoStoreColumnMapping"]));
+            }
+            set {
+                this["AppendAutoStoreColumnMapping"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AppendReloadColumnMapping {
+            get {
+                return ((bool)(this["AppendReloadColumnMapping"]));
+            }
+            set {
+                this["AppendReloadColumnMapping"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AppendUseFormattedValues {
+            get {
+                return ((bool)(this["AppendUseFormattedValues"]));
+            }
+            set {
+                this["AppendUseFormattedValues"] = value;
+            }
+        }
     }
 }

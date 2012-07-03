@@ -1,6 +1,6 @@
 ﻿namespace MySQL.ForExcel
 {
-  partial class NewSchemaDialog
+  partial class AppendNewColumnMappingDialog
   {
     /// <summary>
     /// Required designer variable.
@@ -30,11 +30,11 @@
     {
       this.btnOK = new System.Windows.Forms.Button();
       this.btnCancel = new System.Windows.Forms.Button();
-      this.txtSchemaName = new System.Windows.Forms.TextBox();
+      this.txtMappingName = new System.Windows.Forms.TextBox();
       this.picLogo = new System.Windows.Forms.PictureBox();
-      this.lblNewSchemaName = new System.Windows.Forms.Label();
+      this.lblColumnMappingName = new System.Windows.Forms.Label();
+      this.lblMappingName = new System.Windows.Forms.Label();
       this.lblInstructions = new System.Windows.Forms.Label();
-      this.lblSchemaName = new System.Windows.Forms.Label();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.picLogo)).BeginInit();
@@ -43,11 +43,11 @@
       // contentAreaPanel
       // 
       this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
-      this.contentAreaPanel.Controls.Add(this.lblSchemaName);
+      this.contentAreaPanel.Controls.Add(this.lblMappingName);
       this.contentAreaPanel.Controls.Add(this.lblInstructions);
-      this.contentAreaPanel.Controls.Add(this.lblNewSchemaName);
+      this.contentAreaPanel.Controls.Add(this.lblColumnMappingName);
       this.contentAreaPanel.Controls.Add(this.picLogo);
-      this.contentAreaPanel.Controls.Add(this.txtSchemaName);
+      this.contentAreaPanel.Controls.Add(this.txtMappingName);
       this.contentAreaPanel.Size = new System.Drawing.Size(514, 135);
       // 
       // commandAreaPanel
@@ -84,14 +84,13 @@
       this.btnCancel.Text = "Cancel";
       this.btnCancel.UseVisualStyleBackColor = true;
       // 
-      // txtSchemaName
+      // txtMappingName
       // 
-      this.txtSchemaName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.txtSchemaName.Location = new System.Drawing.Point(183, 95);
-      this.txtSchemaName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-      this.txtSchemaName.Name = "txtSchemaName";
-      this.txtSchemaName.Size = new System.Drawing.Size(319, 21);
-      this.txtSchemaName.TabIndex = 3;
+      this.txtMappingName.Location = new System.Drawing.Point(186, 95);
+      this.txtMappingName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.txtMappingName.Name = "txtMappingName";
+      this.txtMappingName.Size = new System.Drawing.Size(316, 20);
+      this.txtMappingName.TabIndex = 1;
       // 
       // picLogo
       // 
@@ -103,16 +102,26 @@
       this.picLogo.TabIndex = 11;
       this.picLogo.TabStop = false;
       // 
-      // lblNewSchemaName
+      // lblColumnMappingName
       // 
-      this.lblNewSchemaName.AutoSize = true;
-      this.lblNewSchemaName.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblNewSchemaName.ForeColor = System.Drawing.Color.Navy;
-      this.lblNewSchemaName.Location = new System.Drawing.Point(84, 23);
-      this.lblNewSchemaName.Name = "lblNewSchemaName";
-      this.lblNewSchemaName.Size = new System.Drawing.Size(145, 18);
-      this.lblNewSchemaName.TabIndex = 0;
-      this.lblNewSchemaName.Text = "New Schema Name:";
+      this.lblColumnMappingName.AutoSize = true;
+      this.lblColumnMappingName.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblColumnMappingName.ForeColor = System.Drawing.Color.Navy;
+      this.lblColumnMappingName.Location = new System.Drawing.Point(84, 23);
+      this.lblColumnMappingName.Name = "lblColumnMappingName";
+      this.lblColumnMappingName.Size = new System.Drawing.Size(202, 18);
+      this.lblColumnMappingName.TabIndex = 0;
+      this.lblColumnMappingName.Text = "New Column Mapping Name:";
+      // 
+      // lblMappingName
+      // 
+      this.lblMappingName.AutoSize = true;
+      this.lblMappingName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblMappingName.Location = new System.Drawing.Point(84, 98);
+      this.lblMappingName.Name = "lblMappingName";
+      this.lblMappingName.Size = new System.Drawing.Size(96, 15);
+      this.lblMappingName.TabIndex = 13;
+      this.lblMappingName.Text = "Mapping Name:";
       // 
       // lblInstructions
       // 
@@ -120,21 +129,11 @@
       this.lblInstructions.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblInstructions.Location = new System.Drawing.Point(84, 63);
       this.lblInstructions.Name = "lblInstructions";
-      this.lblInstructions.Size = new System.Drawing.Size(234, 15);
-      this.lblInstructions.TabIndex = 1;
-      this.lblInstructions.Text = "Please enter a name for the new schema.";
+      this.lblInstructions.Size = new System.Drawing.Size(283, 15);
+      this.lblInstructions.TabIndex = 12;
+      this.lblInstructions.Text = "Please enter a name for the new column mapping.";
       // 
-      // lblSchemaName
-      // 
-      this.lblSchemaName.AutoSize = true;
-      this.lblSchemaName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblSchemaName.Location = new System.Drawing.Point(84, 98);
-      this.lblSchemaName.Name = "lblSchemaName";
-      this.lblSchemaName.Size = new System.Drawing.Size(93, 15);
-      this.lblSchemaName.TabIndex = 2;
-      this.lblSchemaName.Text = "Schema Name:";
-      // 
-      // NewSchemaDialog
+      // AppendNewColumnMappingDialog
       // 
       this.AcceptButton = this.btnOK;
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -144,7 +143,7 @@
       this.CommandAreaHeight = 45;
       this.MainInstructionLocation = new System.Drawing.Point(13, 13);
       this.MainInstructionLocationOffset = new System.Drawing.Size(-10, 10);
-      this.Name = "NewSchemaDialog";
+      this.Name = "AppendNewColumnMappingDialog";
       this.Text = "Create New Schema";
       this.contentAreaPanel.ResumeLayout(false);
       this.contentAreaPanel.PerformLayout();
@@ -158,10 +157,10 @@
 
     private System.Windows.Forms.Button btnOK;
     private System.Windows.Forms.Button btnCancel;
-    private System.Windows.Forms.TextBox txtSchemaName;
-    private System.Windows.Forms.Label lblNewSchemaName;
+    private System.Windows.Forms.TextBox txtMappingName;
+    private System.Windows.Forms.Label lblColumnMappingName;
     private System.Windows.Forms.PictureBox picLogo;
-    private System.Windows.Forms.Label lblSchemaName;
+    private System.Windows.Forms.Label lblMappingName;
     private System.Windows.Forms.Label lblInstructions;
   }
 }
