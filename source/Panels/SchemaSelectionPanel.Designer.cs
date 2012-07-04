@@ -37,14 +37,13 @@
       this.btnBack = new System.Windows.Forms.Button();
       this.btnNext = new System.Windows.Forms.Button();
       this.btnHelp = new System.Windows.Forms.Button();
-      this.picSeparator = new System.Windows.Forms.PictureBox();
       this.databaseList = new MySQL.ForExcel.MyTreeView();
       this.schemaFilter = new MySQL.ForExcel.SearchEdit();
       this.selectSchemaLabel = new MySQL.ForExcel.HotLabel();
       this.createNewSchemaLabel = new MySQL.ForExcel.HotLabel();
       this.lblInstructions = new MySQL.ForExcel.TransparentLabel();
+      this.imgSeparator = new MySQL.ForExcel.OpacityControl();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picSeparator)).BeginInit();
       this.SuspendLayout();
       // 
       // lblConnectionName
@@ -120,15 +119,6 @@
       this.btnHelp.Visible = false;
       this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
       // 
-      // picSeparator
-      // 
-      this.picSeparator.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Separator;
-      this.picSeparator.Location = new System.Drawing.Point(9, 136);
-      this.picSeparator.Name = "picSeparator";
-      this.picSeparator.Size = new System.Drawing.Size(232, 21);
-      this.picSeparator.TabIndex = 24;
-      this.picSeparator.TabStop = false;
-      // 
       // databaseList
       // 
       this.databaseList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -150,6 +140,7 @@
       this.databaseList.Name = "databaseList";
       this.databaseList.NodeHeightMultiple = 3;
       this.databaseList.NodeImages = this.largeImages;
+      this.databaseList.ShowNodeToolTips = true;
       this.databaseList.Size = new System.Drawing.Size(232, 325);
       this.databaseList.TabIndex = 23;
       this.databaseList.TitleColorOpacity = 0.8D;
@@ -251,12 +242,22 @@
     "ection of tables that store data, views that hold selected data and routines tha" +
     "t generate data.";
       // 
+      // imgSeparator
+      // 
+      this.imgSeparator.BackColor = System.Drawing.Color.Transparent;
+      this.imgSeparator.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Separator;
+      this.imgSeparator.Location = new System.Drawing.Point(9, 136);
+      this.imgSeparator.Name = "imgSeparator";
+      this.imgSeparator.Opacity = 0.3F;
+      this.imgSeparator.Size = new System.Drawing.Size(232, 21);
+      this.imgSeparator.TabIndex = 26;
+      // 
       // SchemaSelectionPanel
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+      this.Controls.Add(this.imgSeparator);
       this.Controls.Add(this.lblUserIP);
-      this.Controls.Add(this.picSeparator);
       this.Controls.Add(this.databaseList);
       this.Controls.Add(this.schemaFilter);
       this.Controls.Add(this.selectSchemaLabel);
@@ -271,7 +272,6 @@
       this.Name = "SchemaSelectionPanel";
       this.Size = new System.Drawing.Size(250, 625);
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picSeparator)).EndInit();
       this.ResumeLayout(false);
       this.PerformLayout();
 
@@ -291,6 +291,6 @@
     private HotLabel createNewSchemaLabel;
     private SearchEdit schemaFilter;
     private MyTreeView databaseList;
-    private System.Windows.Forms.PictureBox picSeparator;
+    private OpacityControl imgSeparator;
   }
 }

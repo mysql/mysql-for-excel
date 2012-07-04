@@ -44,9 +44,8 @@
       this.importDataLabel = new MySQL.ForExcel.HotLabel();
       this.selectDatabaseObjectLabel = new MySQL.ForExcel.HotLabel();
       this.exportToNewTableLabel = new MySQL.ForExcel.HotLabel();
-      this.picSeparator = new System.Windows.Forms.PictureBox();
+      this.imgSeparator = new MySQL.ForExcel.OpacityControl();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picSeparator)).BeginInit();
       this.SuspendLayout();
       // 
       // lblConnectionName
@@ -157,6 +156,7 @@
       this.objectList.Name = "objectList";
       this.objectList.NodeHeightMultiple = 3;
       this.objectList.NodeImages = this.largeImages;
+      this.objectList.ShowNodeToolTips = true;
       this.objectList.Size = new System.Drawing.Size(232, 275);
       this.objectList.TabIndex = 24;
       this.objectList.TitleColorOpacity = 0.8D;
@@ -329,21 +329,22 @@
       this.exportToNewTableLabel.TitleShadowPixelsYOffset = 1;
       this.exportToNewTableLabel.Click += new System.EventHandler(this.exportToNewTable_Click);
       // 
-      // picSeparator
+      // imgSeparator
       // 
-      this.picSeparator.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Separator;
-      this.picSeparator.Location = new System.Drawing.Point(9, 108);
-      this.picSeparator.Name = "picSeparator";
-      this.picSeparator.Size = new System.Drawing.Size(232, 21);
-      this.picSeparator.TabIndex = 27;
-      this.picSeparator.TabStop = false;
+      this.imgSeparator.BackColor = System.Drawing.Color.Transparent;
+      this.imgSeparator.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Separator;
+      this.imgSeparator.Location = new System.Drawing.Point(9, 108);
+      this.imgSeparator.Name = "imgSeparator";
+      this.imgSeparator.Opacity = 0.3F;
+      this.imgSeparator.Size = new System.Drawing.Size(232, 22);
+      this.imgSeparator.TabIndex = 27;
       // 
       // DBObjectSelectionPanel
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+      this.Controls.Add(this.imgSeparator);
       this.Controls.Add(this.lblUserIP);
-      this.Controls.Add(this.picSeparator);
       this.Controls.Add(this.objectFilter);
       this.Controls.Add(this.appendDataLabel);
       this.Controls.Add(this.objectList);
@@ -360,7 +361,6 @@
       this.Name = "DBObjectSelectionPanel";
       this.Size = new System.Drawing.Size(250, 625);
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picSeparator)).EndInit();
       this.ResumeLayout(false);
       this.PerformLayout();
 
@@ -382,6 +382,6 @@
     private HotLabel appendDataLabel;
     private MyTreeView objectList;
     private SearchEdit objectFilter;
-    private System.Windows.Forms.PictureBox picSeparator;
+    private OpacityControl imgSeparator;
   }
 }

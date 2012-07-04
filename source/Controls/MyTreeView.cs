@@ -20,6 +20,9 @@ namespace MySQL.ForExcel
     public const int TVS_EX_DOUBLEBUFFER = 0x0004;
     public const int TVM_SETEXTENDEDSTYLE = 0x112C;
 
+    [DllImport("user32.dll")]
+    static public extern bool ShowScrollBar(System.IntPtr hWnd, int wBar, bool bShow);
+
     public MyTreeView()
     {
       DrawMode = TreeViewDrawMode.OwnerDrawAll;
@@ -31,6 +34,8 @@ namespace MySQL.ForExcel
       DescriptionColorOpacity = 0.6;
       TitleTextVerticalPixelsOffset = 0;
       DescriptionTextVerticalPixelsOffset = 0;
+      this.Scrollable = true;
+      ShowNodeToolTips = true;
     }
 
     public double TitleColorOpacity { get; set; }
@@ -86,6 +91,7 @@ namespace MySQL.ForExcel
         DrawTopLevelNode(e);
       else
         DrawChildNode(e);
+      ShowScrollBar(this.Handle, 0, false);
     }
 
     private void DrawTopLevelNode(DrawTreeNodeEventArgs e)
@@ -141,9 +147,18 @@ namespace MySQL.ForExcel
       SolidBrush titleBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), ForeColor));
       if (parts != null && parts.Length >= 1)
       {
-        e.Graphics.DrawString(parts[0], Font, titleBrush, pt.X, pt.Y);
+
         SizeF stringSize = e.Graphics.MeasureString(parts[0], Font);
+        if (stringSize.Width > e.Node.TreeView.Width - 10)
+        {
+          e.Graphics.DrawString(parts[0].Substring(0, parts[0].Length > 17 ? 17 : parts[0].Length) + "...", Font, titleBrush, pt.X, pt.Y);
+        }
+        else
+        {
+          e.Graphics.DrawString(parts[0], Font, titleBrush, pt.X, pt.Y);
+        }
         pt.Y += (int)(stringSize.Height) + DescriptionTextVerticalPixelsOffset;
+        e.Node.ToolTipText = parts[0];
       }
 
       // Draw the description if there is one

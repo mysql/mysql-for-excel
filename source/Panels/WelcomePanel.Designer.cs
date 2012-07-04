@@ -34,8 +34,8 @@
       System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Remote Connections");
       this.picAddInLogo = new System.Windows.Forms.PictureBox();
       this.largeImages = new System.Windows.Forms.ImageList(this.components);
-      this.picSeparator = new System.Windows.Forms.PictureBox();
       this.picAddInLogoText = new System.Windows.Forms.PictureBox();
+      this.imgSeparator = new MySQL.ForExcel.OpacityControl();
       this.lblInstructions = new MySQL.ForExcel.TransparentLabel();
       this.manageConnectionsLabel = new MySQL.ForExcel.HotLabel();
       this.connectionList = new MySQL.ForExcel.MyTreeView();
@@ -44,7 +44,6 @@
       this.newConnectionLabel = new MySQL.ForExcel.HotLabel();
       this.openConnectionLabel = new MySQL.ForExcel.HotLabel();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picSeparator)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogoText)).BeginInit();
       this.SuspendLayout();
       // 
@@ -63,15 +62,6 @@
       this.largeImages.TransparentColor = System.Drawing.Color.Transparent;
       this.largeImages.Images.SetKeyName(0, "MySQLforExcel-WelcomePanel-ListItem-Connection-32x32.png");
       // 
-      // picSeparator
-      // 
-      this.picSeparator.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Separator;
-      this.picSeparator.Location = new System.Drawing.Point(9, 133);
-      this.picSeparator.Name = "picSeparator";
-      this.picSeparator.Size = new System.Drawing.Size(232, 21);
-      this.picSeparator.TabIndex = 23;
-      this.picSeparator.TabStop = false;
-      // 
       // picAddInLogoText
       // 
       this.picAddInLogoText.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_WelcomePanel_Title;
@@ -80,6 +70,16 @@
       this.picAddInLogoText.Size = new System.Drawing.Size(172, 36);
       this.picAddInLogoText.TabIndex = 24;
       this.picAddInLogoText.TabStop = false;
+      // 
+      // imgSeparator
+      // 
+      this.imgSeparator.BackColor = System.Drawing.Color.Transparent;
+      this.imgSeparator.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Separator;
+      this.imgSeparator.Location = new System.Drawing.Point(9, 136);
+      this.imgSeparator.Name = "imgSeparator";
+      this.imgSeparator.Opacity = 0.3F;
+      this.imgSeparator.Size = new System.Drawing.Size(232, 21);
+      this.imgSeparator.TabIndex = 25;
       // 
       // lblInstructions
       // 
@@ -162,6 +162,7 @@
       this.connectionList.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode3,
             treeNode4});
+      this.connectionList.ShowNodeToolTips = true;
       this.connectionList.Size = new System.Drawing.Size(232, 315);
       this.connectionList.TabIndex = 22;
       this.connectionList.TitleColorOpacity = 0.8D;
@@ -266,8 +267,8 @@
       // 
       // WelcomePanel
       // 
+      this.Controls.Add(this.imgSeparator);
       this.Controls.Add(this.picAddInLogoText);
-      this.Controls.Add(this.picSeparator);
       this.Controls.Add(this.lblInstructions);
       this.Controls.Add(this.manageConnectionsLabel);
       this.Controls.Add(this.connectionList);
@@ -280,7 +281,6 @@
       this.Name = "WelcomePanel";
       this.Size = new System.Drawing.Size(250, 625);
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picSeparator)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogoText)).EndInit();
       this.ResumeLayout(false);
 
@@ -297,7 +297,7 @@
     private HotLabel manageConnectionsLabel;
     private HotLabel openConnectionLabel;
     private MyTreeView connectionList;
-    private System.Windows.Forms.PictureBox picSeparator;
     private System.Windows.Forms.PictureBox picAddInLogoText;
+    private OpacityControl imgSeparator;
   }
 }

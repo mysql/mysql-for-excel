@@ -336,6 +336,9 @@
     <Compile Include="Forms\PasswordDialog.designer.cs">
       <DependentUpon>PasswordDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\OpacityControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Panels\AutoStyleableBasePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
