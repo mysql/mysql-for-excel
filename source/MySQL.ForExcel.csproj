@@ -235,10 +235,7 @@
       <DependentUpon>ManageTaskPaneRibbon.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\MultiHeaderDataGridView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\MultiHeaderDataGridView.Designer.cs">
-      <DependentUpon>MultiHeaderDataGridView.cs</DependentUpon>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\MyTreeView.cs">
       <SubType>Component</SubType>
@@ -371,9 +368,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ManageTaskPaneRibbon.resx">
       <DependentUpon>ManageTaskPaneRibbon.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\MultiHeaderDataGridView.resx">
-      <DependentUpon>MultiHeaderDataGridView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\SearchEdit.resx">
       <DependentUpon>SearchEdit.cs</DependentUpon>

@@ -28,12 +28,12 @@
     /// </summary>
     private void InitializeComponent()
     {
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
       this.btnAppend = new System.Windows.Forms.Button();
       this.btnCancel = new System.Windows.Forms.Button();
       this.lblManuallyAdjustMappingMainSub = new System.Windows.Forms.Label();
-      this.grdToMySQLTable = new MySQL.ForExcel.MultiHeaderDataGridView();
       this.chkFirstRowHeaders = new System.Windows.Forms.CheckBox();
       this.grdFromExcelData = new System.Windows.Forms.DataGridView();
       this.lblChooseColumnMappingMainSub = new System.Windows.Forms.Label();
@@ -51,6 +51,7 @@
       this.cmbMappingMethod = new System.Windows.Forms.ComboBox();
       this.btnAdvanced = new System.Windows.Forms.Button();
       this.btnStoreMapping = new System.Windows.Forms.Button();
+      this.grdToMySQLTable = new MySQL.ForExcel.MultiHeaderDataGridView();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.grdFromExcelData)).BeginInit();
@@ -59,11 +60,13 @@
       ((System.ComponentModel.ISupportInitialize)(this.picColorMapMapped)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picColorMapUnmapped)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.grdToMySQLTable)).BeginInit();
       this.SuspendLayout();
       // 
       // contentAreaPanel
       // 
       this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
+      this.contentAreaPanel.Controls.Add(this.grdToMySQLTable);
       this.contentAreaPanel.Controls.Add(this.cmbMappingMethod);
       this.contentAreaPanel.Controls.Add(this.lblMappingMethod);
       this.contentAreaPanel.Controls.Add(this.pictureBox1);
@@ -73,7 +76,6 @@
       this.contentAreaPanel.Controls.Add(this.lblColorMapUnmapped);
       this.contentAreaPanel.Controls.Add(this.lblExportData);
       this.contentAreaPanel.Controls.Add(this.lblManuallyAdjustMappingMainSub);
-      this.contentAreaPanel.Controls.Add(this.grdToMySQLTable);
       this.contentAreaPanel.Controls.Add(this.chkFirstRowHeaders);
       this.contentAreaPanel.Controls.Add(this.grdFromExcelData);
       this.contentAreaPanel.Controls.Add(this.lblChooseColumnMappingMainSub);
@@ -127,37 +129,6 @@
       this.lblManuallyAdjustMappingMainSub.Text = "Manually change the column mapping if needed. Click\r\na column in the upper table " +
     "with the mouse and drag it\r\nonto a column in the lower table.";
       // 
-      // grdToMySQLTable
-      // 
-      this.grdToMySQLTable.AllowUserToAddRows = false;
-      this.grdToMySQLTable.AllowUserToDeleteRows = false;
-      this.grdToMySQLTable.AllowUserToResizeColumns = false;
-      this.grdToMySQLTable.AllowUserToResizeRows = false;
-      this.grdToMySQLTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.grdToMySQLTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-      this.grdToMySQLTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
-      this.grdToMySQLTable.DataSource = null;
-      this.grdToMySQLTable.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.grdToMySQLTable.GridAllowsDrop = true;
-      this.grdToMySQLTable.Location = new System.Drawing.Point(82, 360);
-      this.grdToMySQLTable.MultiSelect = false;
-      this.grdToMySQLTable.Name = "grdToMySQLTable";
-      this.grdToMySQLTable.ReadOnly = true;
-      this.grdToMySQLTable.RowHeadersVisible = false;
-      this.grdToMySQLTable.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.RowHeaderSelect;
-      this.grdToMySQLTable.Size = new System.Drawing.Size(686, 150);
-      this.grdToMySQLTable.TabIndex = 9;
-      this.grdToMySQLTable.GridDragOver += new System.Windows.Forms.DragEventHandler(this.grdToTable_GridDragOver);
-      this.grdToMySQLTable.GridDragDrop += new System.Windows.Forms.DragEventHandler(this.grdToTable_GridDragDrop);
-      this.grdToMySQLTable.GridDragLeave += new System.EventHandler(this.grdToMySQLTable_GridDragLeave);
-      this.grdToMySQLTable.GridGiveFeedback += new System.Windows.Forms.GiveFeedbackEventHandler(this.grdGiveFeedback);
-      this.grdToMySQLTable.GridQueryContinueDrag += new System.Windows.Forms.QueryContinueDragEventHandler(this.grdQueryContinueDrag);
-      this.grdToMySQLTable.GridMouseDown += new System.Windows.Forms.MouseEventHandler(this.grdMouseDown);
-      this.grdToMySQLTable.GridMouseUp += new System.Windows.Forms.MouseEventHandler(this.grdMouseUp);
-      this.grdToMySQLTable.GridMouseMove += new System.Windows.Forms.MouseEventHandler(this.grdMouseMove);
-      // 
       // chkFirstRowHeaders
       // 
       this.chkFirstRowHeaders.AutoSize = true;
@@ -180,23 +151,23 @@
       this.grdFromExcelData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.grdFromExcelData.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-      dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.InactiveCaption;
-      dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
-      dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-      this.grdFromExcelData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-      this.grdFromExcelData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-      dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
       dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.InactiveCaption;
       dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Window;
+      dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
+      dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Control;
       dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdFromExcelData.DefaultCellStyle = dataGridViewCellStyle2;
+      dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.grdFromExcelData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+      this.grdFromExcelData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+      dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.InactiveCaption;
+      dataGridViewCellStyle3.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Window;
+      dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.grdFromExcelData.DefaultCellStyle = dataGridViewCellStyle3;
       this.grdFromExcelData.Location = new System.Drawing.Point(82, 182);
       this.grdFromExcelData.Name = "grdFromExcelData";
       this.grdFromExcelData.ReadOnly = true;
@@ -204,7 +175,7 @@
       this.grdFromExcelData.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
       this.grdFromExcelData.Size = new System.Drawing.Size(686, 150);
       this.grdFromExcelData.TabIndex = 8;
-      this.grdFromExcelData.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.grdPreviewData_DataBindingComplete);
+      this.grdFromExcelData.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.grdFromExcelData_DataBindingComplete);
       this.grdFromExcelData.GiveFeedback += new System.Windows.Forms.GiveFeedbackEventHandler(this.grdGiveFeedback);
       this.grdFromExcelData.QueryContinueDrag += new System.Windows.Forms.QueryContinueDragEventHandler(this.grdQueryContinueDrag);
       this.grdFromExcelData.MouseDown += new System.Windows.Forms.MouseEventHandler(this.grdMouseDown);
@@ -367,6 +338,7 @@
       // btnStoreMapping
       // 
       this.btnStoreMapping.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.btnStoreMapping.Enabled = false;
       this.btnStoreMapping.Location = new System.Drawing.Point(572, 12);
       this.btnStoreMapping.Name = "btnStoreMapping";
       this.btnStoreMapping.Size = new System.Drawing.Size(100, 23);
@@ -374,6 +346,43 @@
       this.btnStoreMapping.Text = "Store Mapping";
       this.btnStoreMapping.UseVisualStyleBackColor = true;
       this.btnStoreMapping.Click += new System.EventHandler(this.btnStoreMapping_Click);
+      // 
+      // grdToMySQLTable
+      // 
+      this.grdToMySQLTable.AllowDrop = true;
+      this.grdToMySQLTable.AllowUserToAddRows = false;
+      this.grdToMySQLTable.AllowUserToDeleteRows = false;
+      this.grdToMySQLTable.AllowUserToResizeColumns = false;
+      this.grdToMySQLTable.AllowUserToResizeRows = false;
+      this.grdToMySQLTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.grdToMySQLTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomCenter;
+      dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.grdToMySQLTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+      this.grdToMySQLTable.ColumnHeadersHeight = 46;
+      this.grdToMySQLTable.Location = new System.Drawing.Point(82, 360);
+      this.grdToMySQLTable.MultiSelect = false;
+      this.grdToMySQLTable.Name = "grdToMySQLTable";
+      this.grdToMySQLTable.ReadOnly = true;
+      this.grdToMySQLTable.RowHeadersVisible = false;
+      this.grdToMySQLTable.Size = new System.Drawing.Size(686, 150);
+      this.grdToMySQLTable.TabIndex = 9;
+      this.grdToMySQLTable.SelectionChanged += new System.EventHandler(this.grdToMySQLTable_SelectionChanged);
+      this.grdToMySQLTable.DragDrop += new System.Windows.Forms.DragEventHandler(this.grdToMySQLTable_DragDrop);
+      this.grdToMySQLTable.DragOver += new System.Windows.Forms.DragEventHandler(this.grdToMySQLTable_DragOver);
+      this.grdToMySQLTable.DragLeave += new System.EventHandler(this.grdToMySQLTable_DragLeave);
+      this.grdToMySQLTable.GiveFeedback += new System.Windows.Forms.GiveFeedbackEventHandler(this.grdGiveFeedback);
+      this.grdToMySQLTable.QueryContinueDrag += new System.Windows.Forms.QueryContinueDragEventHandler(this.grdQueryContinueDrag);
+      this.grdToMySQLTable.MouseDown += new System.Windows.Forms.MouseEventHandler(this.grdMouseDown);
+      this.grdToMySQLTable.MouseMove += new System.Windows.Forms.MouseEventHandler(this.grdMouseMove);
+      this.grdToMySQLTable.MouseUp += new System.Windows.Forms.MouseEventHandler(this.grdMouseUp);
       // 
       // AppendDataForm
       // 
@@ -396,6 +405,7 @@
       ((System.ComponentModel.ISupportInitialize)(this.picColorMapMapped)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picColorMapUnmapped)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.grdToMySQLTable)).EndInit();
       this.ResumeLayout(false);
 
     }
@@ -405,7 +415,6 @@
     private System.Windows.Forms.Button btnAppend;
     private System.Windows.Forms.Button btnCancel;
     private System.Windows.Forms.Label lblManuallyAdjustMappingMainSub;
-    private MultiHeaderDataGridView grdToMySQLTable;
     private System.Windows.Forms.CheckBox chkFirstRowHeaders;
     private System.Windows.Forms.DataGridView grdFromExcelData;
     private System.Windows.Forms.Label lblChooseColumnMappingMainSub;
@@ -423,5 +432,6 @@
     private System.Windows.Forms.Label lblMappingMethod;
     private System.Windows.Forms.Button btnAdvanced;
     private System.Windows.Forms.Button btnStoreMapping;
+    private MultiHeaderDataGridView grdToMySQLTable;
   }
 }

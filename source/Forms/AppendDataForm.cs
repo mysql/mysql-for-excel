@@ -220,9 +220,9 @@ namespace MySQL.ForExcel
         }
         grdToMySQLTable.Refresh();
         grdFromExcelData.Refresh();
-        grdToTable_SelectionChanged(grdToMySQLTable, EventArgs.Empty);
+        grdToMySQLTable_SelectionChanged(grdToMySQLTable, EventArgs.Empty);
       }
-      btnStoreMapping.Enabled = currentColumnMapping.MappedQuantity > 0;
+      //btnStoreMapping.Enabled = currentColumnMapping.MappedQuantity > 0;
     }
 
     private void clearMappingsOnToTableGridAndMySQLTable()
@@ -247,8 +247,8 @@ namespace MySQL.ForExcel
       }
       grdToMySQLTable.Refresh();
       grdFromExcelData.Refresh();
-      grdToTable_SelectionChanged(grdToMySQLTable, EventArgs.Empty);
-      btnStoreMapping.Enabled = false;
+      grdToMySQLTable_SelectionChanged(grdToMySQLTable, EventArgs.Empty);
+      //btnStoreMapping.Enabled = false;
     }
 
     private void performManualSingleColumnMapping(int fromColumnIndex, int toColumnIndex, string mappedColName)
@@ -271,7 +271,7 @@ namespace MySQL.ForExcel
 
       grdToMySQLTable.Refresh();
       grdFromExcelData.Refresh();
-      grdToTable_SelectionChanged(grdToMySQLTable, EventArgs.Empty);
+      grdToMySQLTable_SelectionChanged(grdToMySQLTable, EventArgs.Empty);
     }
 
     private void changeFormattedDataSource()
@@ -314,12 +314,12 @@ namespace MySQL.ForExcel
         cmbMappingMethod_SelectedIndexChanged(cmbMappingMethod, EventArgs.Empty);
     }
 
-    private void grdPreviewData_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+    private void grdFromExcelData_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
     {
       grdFromExcelData.ClearSelection();
     }
 
-    private void grdToTable_SelectionChanged(object sender, EventArgs e)
+    private void grdToMySQLTable_SelectionChanged(object sender, EventArgs e)
     {
       bool anySelected = grdToMySQLTable.SelectedColumns.Count > 0;
       string mappedColName = (anySelected ? exportTable.Columns[grdToMySQLTable.SelectedColumns[0].DisplayIndex].MappedDataColName : null);
@@ -406,13 +406,13 @@ namespace MySQL.ForExcel
       }
     }
 
-    private void grdToMySQLTable_GridDragLeave(object sender, EventArgs e)
+    private void grdToMySQLTable_DragLeave(object sender, EventArgs e)
     {
       if (grdColumnIndexToDrag >- 1)
         performManualSingleColumnMapping(-1, grdColumnIndexToDrag, null);
     }
 
-    private void grdToTable_GridDragDrop(object sender, DragEventArgs e)
+    private void grdToMySQLTable_DragDrop(object sender, DragEventArgs e)
     {
       // Ensure that the dragged item is contained in the data.
       if (e.Data.GetDataPresent(typeof(System.Int32)))
@@ -439,7 +439,7 @@ namespace MySQL.ForExcel
       grdToTableColumnIndexToDrop = -1;
     }
 
-    private void grdToTable_GridDragOver(object sender, DragEventArgs e)
+    private void grdToMySQLTable_DragOver(object sender, DragEventArgs e)
     {
       // Determine whether string data exists in the drop data. If not, then the drop effect reflects that the drop cannot occur.
       if (!e.Data.GetDataPresent(typeof(System.String)))
