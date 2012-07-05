@@ -11,16 +11,25 @@ namespace MySQL.ForExcel
 {
   public partial class AppendNewColumnMappingDialog : AutoStyleableBaseDialog
   {
-    public AppendNewColumnMappingDialog()
+    public string ColumnMappingName
     {
-      InitializeComponent();
+      get { return txtMappingName.Text.Trim(); }
+      set { txtMappingName.Text = value; }
     }
 
-    public string ColumnMappingName { get; set; }
-
-    private void btnOK_Click(object sender, EventArgs e)
+    public AppendNewColumnMappingDialog(string proposedMappingName)
     {
-      ColumnMappingName = txtMappingName.Text.Trim();
+      InitializeComponent();
+      txtMappingName.SelectAll();
+    }
+
+    public AppendNewColumnMappingDialog() : this(String.Empty)
+    {
+    }
+
+    private void txtMappingName_TextChanged(object sender, EventArgs e)
+    {
+      btnOK.Enabled = ColumnMappingName.Length > 0;
     }
   }
 }

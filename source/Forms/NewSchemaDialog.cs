@@ -11,16 +11,20 @@ namespace MySQL.ForExcel
 {
   public partial class NewSchemaDialog : AutoStyleableBaseDialog
   {
+    public string SchemaName
+    {
+      get { return txtSchemaName.Text.Trim(); }
+      set { txtSchemaName.Text = value; }
+    }
+
     public NewSchemaDialog()
     {
       InitializeComponent();
     }
 
-    public string SchemaName { get; set; }
-
-    private void btnOK_Click(object sender, EventArgs e)
+    private void txtSchemaName_TextChanged(object sender, EventArgs e)
     {
-      SchemaName = txtSchemaName.Text.Trim();
+      btnOK.Enabled = SchemaName.Length > 0;
     }
   }
 }

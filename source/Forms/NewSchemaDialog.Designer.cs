@@ -69,7 +69,6 @@
       this.btnOK.TabIndex = 0;
       this.btnOK.Text = "OK";
       this.btnOK.UseVisualStyleBackColor = true;
-      this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
       // 
       // btnCancel
       // 
@@ -92,6 +91,7 @@
       this.txtSchemaName.Name = "txtSchemaName";
       this.txtSchemaName.Size = new System.Drawing.Size(319, 21);
       this.txtSchemaName.TabIndex = 3;
+      this.txtSchemaName.TextChanged += new System.EventHandler(this.txtSchemaName_TextChanged);
       // 
       // picLogo
       // 

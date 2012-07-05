@@ -205,6 +205,8 @@
       // 
       this.grpColumnOptions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.grpColumnOptions.BackColor = System.Drawing.Color.Transparent;
+      this.grpColumnOptions.Controls.Add(this.lblColumnOptionsWarning);
+      this.grpColumnOptions.Controls.Add(this.picColumnOptionsWarning);
       this.grpColumnOptions.Controls.Add(this.cmbDatatype);
       this.grpColumnOptions.Controls.Add(this.chkExcludeColumn);
       this.grpColumnOptions.Controls.Add(this.chkAllowEmpty);
@@ -214,8 +216,6 @@
       this.grpColumnOptions.Controls.Add(this.lblDatatype);
       this.grpColumnOptions.Controls.Add(this.txtColumnName);
       this.grpColumnOptions.Controls.Add(this.lblColumnName);
-      this.grpColumnOptions.Controls.Add(this.lblColumnOptionsWarning);
-      this.grpColumnOptions.Controls.Add(this.picColumnOptionsWarning);
       this.grpColumnOptions.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.grpColumnOptions.Location = new System.Drawing.Point(82, 444);
       this.grpColumnOptions.Name = "grpColumnOptions";
@@ -241,7 +241,6 @@
       // 
       // chkExcludeColumn
       // 
-      this.chkExcludeColumn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.chkExcludeColumn.AutoSize = true;
       this.chkExcludeColumn.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.columnBindingSource, "ExcludeColumn", true));
       this.chkExcludeColumn.Location = new System.Drawing.Point(529, 32);
@@ -255,7 +254,6 @@
       // 
       // chkAllowEmpty
       // 
-      this.chkAllowEmpty.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.chkAllowEmpty.AutoSize = true;
       this.chkAllowEmpty.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.columnBindingSource, "AllowNull", true));
       this.chkAllowEmpty.Location = new System.Drawing.Point(407, 64);
@@ -267,7 +265,6 @@
       // 
       // chkPrimaryKey
       // 
-      this.chkPrimaryKey.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.chkPrimaryKey.AutoSize = true;
       this.chkPrimaryKey.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.columnBindingSource, "PrimaryKey", true));
       this.chkPrimaryKey.Location = new System.Drawing.Point(407, 32);
@@ -281,7 +278,6 @@
       // 
       // chkUniqueIndex
       // 
-      this.chkUniqueIndex.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.chkUniqueIndex.AutoSize = true;
       this.chkUniqueIndex.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.columnBindingSource, "UniqueKey", true));
       this.chkUniqueIndex.Location = new System.Drawing.Point(283, 64);
@@ -294,7 +290,6 @@
       // 
       // chkCreateIndex
       // 
-      this.chkCreateIndex.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.chkCreateIndex.AutoSize = true;
       this.chkCreateIndex.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.columnBindingSource, "CreateIndex", true));
       this.chkCreateIndex.Location = new System.Drawing.Point(283, 32);
@@ -341,7 +336,7 @@
       this.lblColumnOptionsWarning.BackColor = System.Drawing.SystemColors.Window;
       this.lblColumnOptionsWarning.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblColumnOptionsWarning.ForeColor = System.Drawing.Color.Red;
-      this.lblColumnOptionsWarning.Location = new System.Drawing.Point(120, 0);
+      this.lblColumnOptionsWarning.Location = new System.Drawing.Point(120, 1);
       this.lblColumnOptionsWarning.Name = "lblColumnOptionsWarning";
       this.lblColumnOptionsWarning.Size = new System.Drawing.Size(227, 12);
       this.lblColumnOptionsWarning.TabIndex = 0;
@@ -352,7 +347,7 @@
       // 
       this.picColumnOptionsWarning.BackColor = System.Drawing.SystemColors.Window;
       this.picColumnOptionsWarning.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.picColumnOptionsWarning.Location = new System.Drawing.Point(98, -1);
+      this.picColumnOptionsWarning.Location = new System.Drawing.Point(98, 0);
       this.picColumnOptionsWarning.Name = "picColumnOptionsWarning";
       this.picColumnOptionsWarning.Size = new System.Drawing.Size(20, 20);
       this.picColumnOptionsWarning.TabIndex = 24;

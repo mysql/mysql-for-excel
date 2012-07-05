@@ -164,6 +164,11 @@ namespace MySQL.ForExcel
     public event DragEventHandler GridDragDrop;
     public event DragEventHandler GridDragEnter;
     public event EventHandler GridDragLeave;
+    public event GiveFeedbackEventHandler GridGiveFeedback;
+    public event QueryContinueDragEventHandler GridQueryContinueDrag;
+    public event MouseEventHandler GridMouseDown;
+    public event MouseEventHandler GridMouseUp;
+    public event MouseEventHandler GridMouseMove;
 
     private void grdView_SelectionChanged(object sender, EventArgs e)
     {
@@ -195,6 +200,36 @@ namespace MySQL.ForExcel
         GridDragLeave(sender, e);
     }
 
+    private void grdView_GiveFeedback(object sender, GiveFeedbackEventArgs e)
+    {
+      if (GridGiveFeedback != null)
+        GridGiveFeedback(sender, e);
+    }
+
+    private void grdView_QueryContinueDrag(object sender, QueryContinueDragEventArgs e)
+    {
+      if (GridQueryContinueDrag != null)
+        GridQueryContinueDrag(sender, e);
+    }
+
+    private void grdView_MouseDown(object sender, MouseEventArgs e)
+    {
+      if (GridMouseDown != null)
+        GridMouseDown(sender, e);
+    }
+
+    private void grdView_MouseUp(object sender, MouseEventArgs e)
+    {
+      if (GridMouseUp != null)
+        GridMouseUp(sender, e);
+    }
+
+    private void grdView_MouseMove(object sender, MouseEventArgs e)
+    {
+      if (GridMouseMove != null)
+        GridMouseMove(sender, e);
+    }
+
     #endregion Events
 
     public MultiHeaderDataGridView()
@@ -210,6 +245,11 @@ namespace MySQL.ForExcel
       grdView.DragDrop += new DragEventHandler(grdView_DragDrop);
       grdView.DragEnter += new DragEventHandler(grdView_DragEnter);
       grdView.DragLeave += new EventHandler(grdView_DragLeave);
+      grdView.GiveFeedback += new GiveFeedbackEventHandler(grdView_GiveFeedback);
+      grdView.QueryContinueDrag += new QueryContinueDragEventHandler(grdView_QueryContinueDrag);
+      grdView.MouseDown += new MouseEventHandler(grdView_MouseDown);
+      grdView.MouseUp += new MouseEventHandler(grdView_MouseUp);
+      grdView.MouseMove += new MouseEventHandler(grdView_MouseMove);
 
       MultiHeaderColumnList = new List<MultiHeaderColumn>();
     }

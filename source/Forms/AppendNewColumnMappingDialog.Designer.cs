@@ -69,7 +69,6 @@
       this.btnOK.TabIndex = 0;
       this.btnOK.Text = "OK";
       this.btnOK.UseVisualStyleBackColor = true;
-      this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
       // 
       // btnCancel
       // 
@@ -91,6 +90,7 @@
       this.txtMappingName.Name = "txtMappingName";
       this.txtMappingName.Size = new System.Drawing.Size(316, 20);
       this.txtMappingName.TabIndex = 1;
+      this.txtMappingName.TextChanged += new System.EventHandler(this.txtMappingName_TextChanged);
       // 
       // picLogo
       // 

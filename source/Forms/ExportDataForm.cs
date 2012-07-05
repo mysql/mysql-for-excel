@@ -333,7 +333,8 @@ namespace MySQL.ForExcel
 
     private void chkUniqueIndex_CheckedChanged(object sender, EventArgs e)
     {
-      if (chkUniqueIndex.Checked == (columnBindingSource.Current as MySQLDataColumn).UniqueKey)
+      MySQLDataColumn currentCol = columnBindingSource.Current as MySQLDataColumn;
+      if (chkUniqueIndex.Checked == currentCol.UniqueKey)
         return;
       DataGridViewColumn gridCol = grdPreviewData.SelectedColumns[0];
       MySQLDataColumn column = dataTable.Columns[gridCol.Index] as MySQLDataColumn;
@@ -361,9 +362,11 @@ namespace MySQL.ForExcel
           column.WarningTextList.Add(Resources.ColumnDataNotUniqueWarning);
       showValidationWarning("ColumnOptionsWarning", !good, warningText);
       gridCol.DefaultCellStyle.BackColor = good ? grdPreviewData.DefaultCellStyle.BackColor : Color.OrangeRed;
-      chkCreateIndex.Checked = true;
+      if (chkUniqueIndex.Checked && !chkCreateIndex.Checked)
+        chkCreateIndex.Checked = true;
       if (chkAllowEmpty.Checked && chkUniqueIndex.Checked)
         chkAllowEmpty.Checked = false;
+      currentCol.UniqueKey = chkUniqueIndex.Checked;
     }
 
     private void chkExcludeColumn_CheckedChanged(object sender, EventArgs e)
