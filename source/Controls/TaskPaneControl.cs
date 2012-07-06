@@ -105,7 +105,7 @@ namespace MySQL.ForExcel
 
         Excel.Worksheet currentSheet = excelApplication.ActiveSheet as Excel.Worksheet;
         fillingRange = atCell.get_Resize(rowsCount + startingRow, colsCount);
-        string[,] fillingArray = new string[rowsCount + startingRow, colsCount];
+        object[,] fillingArray = new object[rowsCount + startingRow, colsCount];
 
         if (importColumnNames)
         {
@@ -120,7 +120,7 @@ namespace MySQL.ForExcel
         {
           for (int currCol = 0; currCol < colsCount; currCol++)
           {
-            fillingArray[fillingRowIdx, currCol] = dt.Rows[currRow][currCol].ToString();
+            fillingArray[fillingRowIdx, currCol] = dt.Rows[currRow][currCol];
           }
           fillingRowIdx++;
         }

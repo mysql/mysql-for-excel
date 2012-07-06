@@ -57,13 +57,13 @@
       this.contentAreaPanel.Controls.Add(this.chkAddBufferToVarchar);
       this.contentAreaPanel.Controls.Add(this.chkDetectDatatype);
       this.contentAreaPanel.Controls.Add(this.lblColumnDatatypeOptions);
-      this.contentAreaPanel.Size = new System.Drawing.Size(534, 330);
+      this.contentAreaPanel.Size = new System.Drawing.Size(534, 265);
       // 
       // commandAreaPanel
       // 
       this.commandAreaPanel.Controls.Add(this.btnAccept);
       this.commandAreaPanel.Controls.Add(this.btnCancel);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 331);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 266);
       this.commandAreaPanel.Size = new System.Drawing.Size(534, 45);
       // 
       // btnAccept
@@ -100,6 +100,7 @@
       this.chkShowCopySQLButton.TabIndex = 8;
       this.chkShowCopySQLButton.Text = "Show Copy SQL Button";
       this.chkShowCopySQLButton.UseVisualStyleBackColor = false;
+      this.chkShowCopySQLButton.Visible = false;
       // 
       // lblOtherOptions
       // 
@@ -112,6 +113,7 @@
       this.lblOtherOptions.Size = new System.Drawing.Size(91, 17);
       this.lblOtherOptions.TabIndex = 7;
       this.lblOtherOptions.Text = "Other Options";
+      this.lblOtherOptions.Visible = false;
       // 
       // chkUseFormattedValues
       // 
@@ -214,7 +216,7 @@
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.btnCancel;
-      this.ClientSize = new System.Drawing.Size(534, 377);
+      this.ClientSize = new System.Drawing.Size(534, 312);
       this.CommandAreaHeight = 45;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
       this.Name = "ExportAdvancedOptionsDialog";

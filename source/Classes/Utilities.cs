@@ -16,6 +16,8 @@ namespace MySQL.ForExcel
 {
   public static class Utilities
   {
+    public const int VARCHAR_MAX_LEN = 65535;
+
     public static string GetConnectionString(MySqlWorkbenchConnection connection)
     {
       MySqlConnectionStringBuilder cs = new MySqlConnectionStringBuilder();
@@ -238,20 +240,24 @@ namespace MySQL.ForExcel
       }
     }
 
-    public static List<string> GetDataTypes()
+    public static List<string> GetDataTypes(out List<int> paramsInParenthesisList)
     {
       List<string> retList = new List<string>();
       retList.AddRange(new string[] {
             "bit",
             "tinyint",
-            "boolean",
             "smallint",
             "mediumint",
             "int",
-            "serial",
+            "integer",
+            "bigint",
             "float",
             "double",
             "decimal",
+            "numeric",
+            "real",
+            "bool",
+            "boolean",
             "date",
             "datetime",
             "timestamp",
@@ -269,9 +275,106 @@ namespace MySQL.ForExcel
             "mediumtext",
             "longblob",
             "longtext",
-            "enum(x,y,z)",
-            "set(x,y,z)"});
+            "enum",
+            "set"});
+      paramsInParenthesisList = new List<int>(retList.Count);
+      paramsInParenthesisList.AddRange(new int[] { 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1 });
       return retList;
+    }
+
+    public static List<string> GetDataTypes()
+    {
+      List<int> unused;
+      return GetDataTypes(out unused);
+    }
+
+    public static bool StringValueCanBeStoredWithMySQLType(string strValue, string mySQLDataType)
+    {
+      mySQLDataType = mySQLDataType.ToLowerInvariant();
+      bool isCharacter = mySQLDataType.StartsWith("varchar") || mySQLDataType.StartsWith("char");
+      bool isEnum = mySQLDataType.StartsWith("enum");
+      bool isSet = mySQLDataType.StartsWith("set");
+      bool mayContainFloatingPoint = mySQLDataType.StartsWith("decimal") || mySQLDataType.StartsWith("numeric") || mySQLDataType.StartsWith("double") || mySQLDataType.StartsWith("float") || mySQLDataType.StartsWith("real");
+      int lParensIndex = mySQLDataType.IndexOf("(");
+      int rParensIndex = mySQLDataType.IndexOf(")");
+      int commaPos = mySQLDataType.IndexOf(",");
+      int characterLen = (isCharacter ? (lParensIndex >= 0 ? Int32.Parse(mySQLDataType.Substring(lParensIndex + 1, mySQLDataType.Length - lParensIndex - 2)) : 1) : 0);
+      int[] decimalLen = new int[2] { -1, -1 };
+      List<string> setOrEnumMembers = null;
+      if (mayContainFloatingPoint && lParensIndex >= 0 && rParensIndex >= 0 && lParensIndex < rParensIndex)
+      {
+        decimalLen[0] = Int32.Parse(mySQLDataType.Substring(lParensIndex + 1, (commaPos >= 0 ? commaPos : rParensIndex) - lParensIndex - 1));
+        if (commaPos >= 0)
+          decimalLen[1] = Int32.Parse(mySQLDataType.Substring(commaPos + 1, rParensIndex - commaPos - 1));
+      }
+      if ((isSet || isEnum) && lParensIndex >= 0 && rParensIndex >= 0 && lParensIndex < rParensIndex)
+      {
+        setOrEnumMembers = new List<string>();
+        string membersString = mySQLDataType.Substring(lParensIndex + 1, rParensIndex - lParensIndex - 1);
+        string[] setMembersArray = membersString.Split(new char[] { ',' });
+        foreach (string s in setMembersArray)
+          setOrEnumMembers.Add(s.Trim(new char[] { '"', '\'' }));
+      }
+      ulong tryBitValue = 0;
+      byte tryByteValue = 0;
+      int tryIntValue = 0;
+      short trySmallIntValue = 0;
+      long tryBigIntValue = 0;
+      decimal tryDecimalValue = 0;
+      double tryDoubleValue = 0;
+      float tryFloatValue = 0;
+      DateTime tryDateTimeValue = DateTime.Now;
+      TimeSpan tryTimeSpanValue = TimeSpan.Zero;
+
+      int floatingPointPos = strValue.IndexOf(".");
+      bool floatingPointCompliant = true;
+      if (floatingPointPos >= 0)
+      {
+        bool lengthCompliant = strValue.Substring(0, floatingPointPos).Length <= decimalLen[0];
+        bool decimalPlacesCompliant = (decimalLen[1] >= 0 ? strValue.Substring(floatingPointPos + 1, strValue.Length - floatingPointPos - 1).Length <= decimalLen[1] : true);
+        floatingPointCompliant = lengthCompliant && decimalPlacesCompliant;
+      }
+
+      if (isCharacter)
+        return strValue.Length <= characterLen;
+      if (mySQLDataType.StartsWith("decimal") || mySQLDataType.StartsWith("numeric"))
+        return Decimal.TryParse(strValue, out tryDecimalValue) && floatingPointCompliant;
+      if (mySQLDataType.StartsWith("int") || mySQLDataType.StartsWith("mediumint") || mySQLDataType == "year")
+        return Int32.TryParse(strValue, out tryIntValue);
+      if (mySQLDataType.StartsWith("tinyint"))
+        return Byte.TryParse(strValue, out tryByteValue);
+      if (mySQLDataType.StartsWith("smallint"))
+        return Int16.TryParse(strValue, out trySmallIntValue);
+      if (mySQLDataType.StartsWith("bigint"))
+        return Int64.TryParse(strValue, out tryBigIntValue);
+      if (mySQLDataType.StartsWith("bool") || mySQLDataType == "bit" || mySQLDataType == "bit(1)")
+      {
+        strValue = strValue.ToLowerInvariant();
+        return (strValue == "true" || strValue == "false" || strValue == "0" || strValue == "1" || strValue == "yes" || strValue == "no" || strValue == "ja" || strValue == "nein");
+      }
+      if (mySQLDataType.StartsWith("bit"))
+        return UInt64.TryParse(strValue, out tryBitValue);
+      if (mySQLDataType.StartsWith("float"))
+        return Single.TryParse(strValue, out tryFloatValue);
+      if (mySQLDataType.StartsWith("double") || mySQLDataType.StartsWith("real"))
+        return Double.TryParse(strValue, out tryDoubleValue);
+      if (mySQLDataType == "date" || mySQLDataType == "datetime" || mySQLDataType == "timestamp")
+        return DateTime.TryParse(strValue, out tryDateTimeValue);
+      if (mySQLDataType == "time")
+        return TimeSpan.TryParse(strValue, out tryTimeSpanValue);
+      if (mySQLDataType == "blob" || mySQLDataType == "tinyblob" || mySQLDataType == "mediumblob" || mySQLDataType == "longblob" || mySQLDataType == "binary" || mySQLDataType == "varbinary")
+        return true;
+      if (isEnum)
+        return setOrEnumMembers.Contains(strValue.ToLowerInvariant());
+      if (isSet)
+      {
+        string[] valueSet = strValue.Split(new char[] { ',' });
+        bool setMatch = valueSet.Length > 0;
+        foreach (string val in valueSet)
+          setMatch = setMatch && setOrEnumMembers.Contains(val.ToLowerInvariant());
+        return setMatch;
+      }
+      return false;
     }
 
     public static MySqlDbType NameToType(string typeName, bool unsigned, bool realAsFloat)
@@ -364,7 +467,7 @@ namespace MySQL.ForExcel
       string strValue = packedValue.ToString();
       int strLength = strValue.Length;
       int decimalPointPos = strValue.IndexOf("."); ;
-      int[] varCharApproxLen = new int[7] {5,12,25,45,255,4000,65535};
+      int[] varCharApproxLen = new int[7] {5,12,25,45,255,4000,VARCHAR_MAX_LEN};
       int[,] decimalApproxLen = new int[2,2] { {12,2}, {65,30} };
       int intResult = 0;
       long longResult = 0;
@@ -394,7 +497,7 @@ namespace MySQL.ForExcel
               return String.Format("Varchar({0})", varCharApproxLen[i]);
           }
           valueOverflow = true;
-          return "Varchar(65535)";
+          return String.Format("Varchar({0})", VARCHAR_MAX_LEN);
         case "System.Double":
           return "Double";
         case "System.Decimal":
@@ -443,7 +546,7 @@ namespace MySQL.ForExcel
       switch (strType)
       {
         case "System.String":
-          if (strLength > 65535)
+          if (strLength > VARCHAR_MAX_LEN)
             retType = "text";
           else
             retType = "varchar";

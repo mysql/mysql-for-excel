@@ -88,6 +88,8 @@
       // contentAreaPanel
       // 
       this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
+      this.contentAreaPanel.Controls.Add(this.lblColumnOptionsWarning);
+      this.contentAreaPanel.Controls.Add(this.picColumnOptionsWarning);
       this.contentAreaPanel.Controls.Add(this.lblExportData);
       this.contentAreaPanel.Controls.Add(this.lblPrimaryKeyWarning);
       this.contentAreaPanel.Controls.Add(this.picPrimaryKeyWarning);
@@ -183,7 +185,7 @@
       this.lblPrimaryKeyWarning.BackColor = System.Drawing.Color.Transparent;
       this.lblPrimaryKeyWarning.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblPrimaryKeyWarning.ForeColor = System.Drawing.Color.Red;
-      this.lblPrimaryKeyWarning.Location = new System.Drawing.Point(485, 182);
+      this.lblPrimaryKeyWarning.Location = new System.Drawing.Point(485, 171);
       this.lblPrimaryKeyWarning.Name = "lblPrimaryKeyWarning";
       this.lblPrimaryKeyWarning.Size = new System.Drawing.Size(336, 12);
       this.lblPrimaryKeyWarning.TabIndex = 13;
@@ -194,7 +196,7 @@
       // 
       this.picPrimaryKeyWarning.BackColor = System.Drawing.Color.Transparent;
       this.picPrimaryKeyWarning.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.picPrimaryKeyWarning.Location = new System.Drawing.Point(462, 177);
+      this.picPrimaryKeyWarning.Location = new System.Drawing.Point(462, 166);
       this.picPrimaryKeyWarning.Name = "picPrimaryKeyWarning";
       this.picPrimaryKeyWarning.Size = new System.Drawing.Size(20, 20);
       this.picPrimaryKeyWarning.TabIndex = 45;
@@ -205,8 +207,6 @@
       // 
       this.grpColumnOptions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.grpColumnOptions.BackColor = System.Drawing.Color.Transparent;
-      this.grpColumnOptions.Controls.Add(this.lblColumnOptionsWarning);
-      this.grpColumnOptions.Controls.Add(this.picColumnOptionsWarning);
       this.grpColumnOptions.Controls.Add(this.cmbDatatype);
       this.grpColumnOptions.Controls.Add(this.chkExcludeColumn);
       this.grpColumnOptions.Controls.Add(this.chkAllowEmpty);
@@ -219,7 +219,7 @@
       this.grpColumnOptions.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.grpColumnOptions.Location = new System.Drawing.Point(82, 444);
       this.grpColumnOptions.Name = "grpColumnOptions";
-      this.grpColumnOptions.Size = new System.Drawing.Size(677, 100);
+      this.grpColumnOptions.Size = new System.Drawing.Size(677, 89);
       this.grpColumnOptions.TabIndex = 18;
       this.grpColumnOptions.TabStop = false;
       this.grpColumnOptions.Text = "Column Options";
@@ -232,18 +232,19 @@
       this.cmbDatatype.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
       this.cmbDatatype.DropDownWidth = 400;
       this.cmbDatatype.FormattingEnabled = true;
-      this.cmbDatatype.Location = new System.Drawing.Point(122, 62);
+      this.cmbDatatype.Location = new System.Drawing.Point(122, 51);
       this.cmbDatatype.Name = "cmbDatatype";
       this.cmbDatatype.Size = new System.Drawing.Size(135, 24);
       this.cmbDatatype.TabIndex = 4;
       this.cmbDatatype.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbDatatype_DrawItem);
       this.cmbDatatype.SelectedIndexChanged += new System.EventHandler(this.cmbDatatype_SelectedIndexChanged);
+      this.cmbDatatype.Validating += new System.ComponentModel.CancelEventHandler(this.cmbDatatype_Validating);
       // 
       // chkExcludeColumn
       // 
       this.chkExcludeColumn.AutoSize = true;
       this.chkExcludeColumn.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.columnBindingSource, "ExcludeColumn", true));
-      this.chkExcludeColumn.Location = new System.Drawing.Point(529, 32);
+      this.chkExcludeColumn.Location = new System.Drawing.Point(529, 21);
       this.chkExcludeColumn.Name = "chkExcludeColumn";
       this.chkExcludeColumn.Size = new System.Drawing.Size(112, 19);
       this.chkExcludeColumn.TabIndex = 9;
@@ -256,7 +257,7 @@
       // 
       this.chkAllowEmpty.AutoSize = true;
       this.chkAllowEmpty.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.columnBindingSource, "AllowNull", true));
-      this.chkAllowEmpty.Location = new System.Drawing.Point(407, 64);
+      this.chkAllowEmpty.Location = new System.Drawing.Point(407, 53);
       this.chkAllowEmpty.Name = "chkAllowEmpty";
       this.chkAllowEmpty.Size = new System.Drawing.Size(93, 19);
       this.chkAllowEmpty.TabIndex = 8;
@@ -267,7 +268,7 @@
       // 
       this.chkPrimaryKey.AutoSize = true;
       this.chkPrimaryKey.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.columnBindingSource, "PrimaryKey", true));
-      this.chkPrimaryKey.Location = new System.Drawing.Point(407, 32);
+      this.chkPrimaryKey.Location = new System.Drawing.Point(407, 21);
       this.chkPrimaryKey.Name = "chkPrimaryKey";
       this.chkPrimaryKey.Size = new System.Drawing.Size(89, 19);
       this.chkPrimaryKey.TabIndex = 7;
@@ -280,7 +281,7 @@
       // 
       this.chkUniqueIndex.AutoSize = true;
       this.chkUniqueIndex.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.columnBindingSource, "UniqueKey", true));
-      this.chkUniqueIndex.Location = new System.Drawing.Point(283, 64);
+      this.chkUniqueIndex.Location = new System.Drawing.Point(283, 53);
       this.chkUniqueIndex.Name = "chkUniqueIndex";
       this.chkUniqueIndex.Size = new System.Drawing.Size(95, 19);
       this.chkUniqueIndex.TabIndex = 6;
@@ -292,7 +293,7 @@
       // 
       this.chkCreateIndex.AutoSize = true;
       this.chkCreateIndex.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.columnBindingSource, "CreateIndex", true));
-      this.chkCreateIndex.Location = new System.Drawing.Point(283, 32);
+      this.chkCreateIndex.Location = new System.Drawing.Point(283, 21);
       this.chkCreateIndex.Name = "chkCreateIndex";
       this.chkCreateIndex.Size = new System.Drawing.Size(91, 19);
       this.chkCreateIndex.TabIndex = 5;
@@ -303,7 +304,7 @@
       // lblDatatype
       // 
       this.lblDatatype.AutoSize = true;
-      this.lblDatatype.Location = new System.Drawing.Point(28, 65);
+      this.lblDatatype.Location = new System.Drawing.Point(28, 54);
       this.lblDatatype.Name = "lblDatatype";
       this.lblDatatype.Size = new System.Drawing.Size(57, 15);
       this.lblDatatype.TabIndex = 3;
@@ -312,7 +313,7 @@
       // txtColumnName
       // 
       this.txtColumnName.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.columnBindingSource, "DisplayName", true));
-      this.txtColumnName.Location = new System.Drawing.Point(122, 33);
+      this.txtColumnName.Location = new System.Drawing.Point(122, 22);
       this.txtColumnName.Name = "txtColumnName";
       this.txtColumnName.Size = new System.Drawing.Size(135, 23);
       this.txtColumnName.TabIndex = 2;
@@ -322,7 +323,7 @@
       // lblColumnName
       // 
       this.lblColumnName.AutoSize = true;
-      this.lblColumnName.Location = new System.Drawing.Point(28, 36);
+      this.lblColumnName.Location = new System.Drawing.Point(28, 25);
       this.lblColumnName.Name = "lblColumnName";
       this.lblColumnName.Size = new System.Drawing.Size(88, 15);
       this.lblColumnName.TabIndex = 1;
@@ -330,13 +331,11 @@
       // 
       // lblColumnOptionsWarning
       // 
-      this.lblColumnOptionsWarning.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
       this.lblColumnOptionsWarning.AutoSize = true;
       this.lblColumnOptionsWarning.BackColor = System.Drawing.SystemColors.Window;
       this.lblColumnOptionsWarning.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblColumnOptionsWarning.ForeColor = System.Drawing.Color.Red;
-      this.lblColumnOptionsWarning.Location = new System.Drawing.Point(120, 1);
+      this.lblColumnOptionsWarning.Location = new System.Drawing.Point(208, 446);
       this.lblColumnOptionsWarning.Name = "lblColumnOptionsWarning";
       this.lblColumnOptionsWarning.Size = new System.Drawing.Size(227, 12);
       this.lblColumnOptionsWarning.TabIndex = 0;
@@ -347,7 +346,7 @@
       // 
       this.picColumnOptionsWarning.BackColor = System.Drawing.SystemColors.Window;
       this.picColumnOptionsWarning.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.picColumnOptionsWarning.Location = new System.Drawing.Point(98, 0);
+      this.picColumnOptionsWarning.Location = new System.Drawing.Point(186, 442);
       this.picColumnOptionsWarning.Name = "picColumnOptionsWarning";
       this.picColumnOptionsWarning.Size = new System.Drawing.Size(20, 20);
       this.picColumnOptionsWarning.TabIndex = 24;
@@ -448,7 +447,7 @@
       // 
       this.picColumnOptions.BackColor = System.Drawing.Color.Transparent;
       this.picColumnOptions.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
-      this.picColumnOptions.Location = new System.Drawing.Point(41, 210);
+      this.picColumnOptions.Location = new System.Drawing.Point(41, 207);
       this.picColumnOptions.Name = "picColumnOptions";
       this.picColumnOptions.Size = new System.Drawing.Size(32, 32);
       this.picColumnOptions.TabIndex = 41;
@@ -460,7 +459,7 @@
       this.lblTableNameWarning.BackColor = System.Drawing.Color.Transparent;
       this.lblTableNameWarning.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblTableNameWarning.ForeColor = System.Drawing.Color.Red;
-      this.lblTableNameWarning.Location = new System.Drawing.Point(150, 157);
+      this.lblTableNameWarning.Location = new System.Drawing.Point(150, 146);
       this.lblTableNameWarning.Name = "lblTableNameWarning";
       this.lblTableNameWarning.Size = new System.Drawing.Size(227, 12);
       this.lblTableNameWarning.TabIndex = 5;
@@ -471,7 +470,7 @@
       // 
       this.picTableNameWarning.BackColor = System.Drawing.Color.Transparent;
       this.picTableNameWarning.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.picTableNameWarning.Location = new System.Drawing.Point(127, 152);
+      this.picTableNameWarning.Location = new System.Drawing.Point(127, 141);
       this.picTableNameWarning.Name = "picTableNameWarning";
       this.picTableNameWarning.Size = new System.Drawing.Size(20, 20);
       this.picTableNameWarning.TabIndex = 38;
@@ -485,7 +484,7 @@
       this.cmbPrimaryKeyColumns.DisplayMember = "DisplayName";
       this.cmbPrimaryKeyColumns.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.cmbPrimaryKeyColumns.FormattingEnabled = true;
-      this.cmbPrimaryKeyColumns.Location = new System.Drawing.Point(638, 152);
+      this.cmbPrimaryKeyColumns.Location = new System.Drawing.Point(638, 144);
       this.cmbPrimaryKeyColumns.Name = "cmbPrimaryKeyColumns";
       this.cmbPrimaryKeyColumns.Size = new System.Drawing.Size(121, 23);
       this.cmbPrimaryKeyColumns.TabIndex = 12;
@@ -497,7 +496,7 @@
       this.radUseExistingColumn.AutoSize = true;
       this.radUseExistingColumn.BackColor = System.Drawing.Color.Transparent;
       this.radUseExistingColumn.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.radUseExistingColumn.Location = new System.Drawing.Point(462, 152);
+      this.radUseExistingColumn.Location = new System.Drawing.Point(462, 144);
       this.radUseExistingColumn.Name = "radUseExistingColumn";
       this.radUseExistingColumn.Size = new System.Drawing.Size(134, 19);
       this.radUseExistingColumn.TabIndex = 11;
@@ -509,7 +508,7 @@
       // txtAddPrimaryKey
       // 
       this.txtAddPrimaryKey.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.txtAddPrimaryKey.Location = new System.Drawing.Point(637, 124);
+      this.txtAddPrimaryKey.Location = new System.Drawing.Point(637, 116);
       this.txtAddPrimaryKey.Name = "txtAddPrimaryKey";
       this.txtAddPrimaryKey.Size = new System.Drawing.Size(122, 22);
       this.txtAddPrimaryKey.TabIndex = 10;
@@ -520,7 +519,7 @@
       this.radAddPrimaryKey.AutoSize = true;
       this.radAddPrimaryKey.BackColor = System.Drawing.Color.Transparent;
       this.radAddPrimaryKey.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.radAddPrimaryKey.Location = new System.Drawing.Point(462, 124);
+      this.radAddPrimaryKey.Location = new System.Drawing.Point(462, 116);
       this.radAddPrimaryKey.Name = "radAddPrimaryKey";
       this.radAddPrimaryKey.Size = new System.Drawing.Size(169, 19);
       this.radAddPrimaryKey.TabIndex = 9;
@@ -532,7 +531,7 @@
       // txtTableNameInput
       // 
       this.txtTableNameInput.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.txtTableNameInput.Location = new System.Drawing.Point(127, 124);
+      this.txtTableNameInput.Location = new System.Drawing.Point(127, 118);
       this.txtTableNameInput.Name = "txtTableNameInput";
       this.txtTableNameInput.Size = new System.Drawing.Size(219, 22);
       this.txtTableNameInput.TabIndex = 4;
@@ -545,7 +544,7 @@
       this.lblTableNameInput.BackColor = System.Drawing.Color.Transparent;
       this.lblTableNameInput.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblTableNameInput.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblTableNameInput.Location = new System.Drawing.Point(79, 126);
+      this.lblTableNameInput.Location = new System.Drawing.Point(79, 120);
       this.lblTableNameInput.Name = "lblTableNameInput";
       this.lblTableNameInput.Size = new System.Drawing.Size(42, 15);
       this.lblTableNameInput.TabIndex = 3;
@@ -557,7 +556,7 @@
       this.lblPrimaryKeySub.BackColor = System.Drawing.Color.Transparent;
       this.lblPrimaryKeySub.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblPrimaryKeySub.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblPrimaryKeySub.Location = new System.Drawing.Point(459, 69);
+      this.lblPrimaryKeySub.Location = new System.Drawing.Point(459, 71);
       this.lblPrimaryKeySub.Name = "lblPrimaryKeySub";
       this.lblPrimaryKeySub.Size = new System.Drawing.Size(264, 30);
       this.lblPrimaryKeySub.TabIndex = 7;
@@ -569,7 +568,7 @@
       this.lblPrimaryKeyMain.BackColor = System.Drawing.Color.Transparent;
       this.lblPrimaryKeyMain.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblPrimaryKeyMain.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblPrimaryKeyMain.Location = new System.Drawing.Point(459, 49);
+      this.lblPrimaryKeyMain.Location = new System.Drawing.Point(459, 54);
       this.lblPrimaryKeyMain.Name = "lblPrimaryKeyMain";
       this.lblPrimaryKeyMain.Size = new System.Drawing.Size(128, 17);
       this.lblPrimaryKeyMain.TabIndex = 6;
@@ -579,7 +578,7 @@
       // 
       this.picPrimaryKey.BackColor = System.Drawing.Color.Transparent;
       this.picPrimaryKey.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_PrimaryKey_32x32;
-      this.picPrimaryKey.Location = new System.Drawing.Point(421, 64);
+      this.picPrimaryKey.Location = new System.Drawing.Point(421, 57);
       this.picPrimaryKey.Name = "picPrimaryKey";
       this.picPrimaryKey.Size = new System.Drawing.Size(32, 32);
       this.picPrimaryKey.TabIndex = 28;
@@ -591,7 +590,7 @@
       this.lblTableNameSub.BackColor = System.Drawing.Color.Transparent;
       this.lblTableNameSub.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblTableNameSub.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblTableNameSub.Location = new System.Drawing.Point(79, 74);
+      this.lblTableNameSub.Location = new System.Drawing.Point(79, 71);
       this.lblTableNameSub.Name = "lblTableNameSub";
       this.lblTableNameSub.Size = new System.Drawing.Size(267, 30);
       this.lblTableNameSub.TabIndex = 1;
@@ -614,7 +613,7 @@
       // 
       this.picTable.BackColor = System.Drawing.Color.Transparent;
       this.picTable.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_TableName_32x32;
-      this.picTable.Location = new System.Drawing.Point(41, 69);
+      this.picTable.Location = new System.Drawing.Point(41, 57);
       this.picTable.Name = "picTable";
       this.picTable.Size = new System.Drawing.Size(32, 32);
       this.picTable.TabIndex = 23;

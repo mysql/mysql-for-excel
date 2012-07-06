@@ -65,7 +65,8 @@ namespace MySQL.ForExcel
           dataTable.TableName = proposedTableName;
         dataTable.SetData(exportDataRange, 
                           Settings.Default.ExportUseFormattedValues, 
-                          Settings.Default.ExportDetectDatatype, 
+                          Settings.Default.ExportDetectDatatype,
+                          Settings.Default.ExportAddBufferToVarchar,
                           Settings.Default.ExportAutoIndexIntColumns, 
                           Settings.Default.ExportAutoAllowEmptyNonIndexColumns);
         grdPreviewData.DataSource = dataTable;
@@ -161,6 +162,69 @@ namespace MySQL.ForExcel
       cmbPrimaryKeyColumns.SelectedIndex = 0;
     }
 
+    private bool testColumnDataTypeAgainstColumnData(MySQLDataColumn currentCol)
+    {
+      bool showWarning = !currentCol.CanBeOfMySQLDataType(cmbDatatype.Text);
+
+      string warningText = (showWarning ? Resources.ExportDataTypeNotSuitableWarning : null);
+      if (warningText == null)
+      {
+        currentCol.WarningTextList.Remove(Resources.ExportDataTypeNotSuitableWarning);
+        if (showWarning = currentCol.WarningTextList.Count > 0)
+          warningText = currentCol.WarningTextList.Last();
+      }
+      else
+        if (!currentCol.WarningTextList.Contains(Resources.ExportDataTypeNotSuitableWarning))
+          currentCol.WarningTextList.Add(Resources.ExportDataTypeNotSuitableWarning);
+      showValidationWarning("ColumnOptionsWarning", showWarning, warningText);
+      grdPreviewData.SelectedColumns[0].DefaultCellStyle.BackColor = (showWarning ? Color.OrangeRed : grdPreviewData.DefaultCellStyle.BackColor);
+
+      return !showWarning;
+    }
+
+    private bool validateUserDataType(MySQLDataColumn currentCol, string proposedUserType)
+    {
+      bool isValid = false;
+
+      List<int> paramsInParenthesis;
+      List<string> dataTypesList = Utilities.GetDataTypes(out paramsInParenthesis);
+      int rightParentFound = proposedUserType.IndexOf(")");
+      int leftParentFound = proposedUserType.IndexOf("(");
+      string pureDataType = String.Empty;
+      int typeParametersNum = 0;
+
+      proposedUserType = proposedUserType.Trim().Replace(" ", String.Empty);
+      if (rightParentFound >= 0)
+      {
+        if (leftParentFound < 0 || leftParentFound >= rightParentFound)
+          return false;
+        typeParametersNum = proposedUserType.Substring(leftParentFound + 1, rightParentFound - leftParentFound - 1).Count(c => c == ',') + 1;
+        pureDataType = proposedUserType.Substring(0, leftParentFound).ToLowerInvariant();
+      }
+      else
+        pureDataType = proposedUserType.ToLowerInvariant();
+      int typeFoundAt = dataTypesList.IndexOf(pureDataType);
+      int numOfValidParams = (typeFoundAt >= 0 ? paramsInParenthesis[typeFoundAt] : -1);
+      bool numParamsMatch = (pureDataType.StartsWith("var") ? (numOfValidParams >= 0 && numOfValidParams == typeParametersNum) : (numOfValidParams >= 0 && numOfValidParams == typeParametersNum) || (numOfValidParams < 0 && typeParametersNum > 0) || typeParametersNum == 0);
+      isValid = typeFoundAt >= 0 && numParamsMatch;
+
+      bool showWarning = !isValid;
+      string warningText = (showWarning ? Resources.ExportDataTypeNotValidWarning : null);
+      if (warningText == null)
+      {
+        currentCol.WarningTextList.Remove(Resources.ExportDataTypeNotValidWarning);
+        if (showWarning = currentCol.WarningTextList.Count > 0)
+          warningText = currentCol.WarningTextList.Last();
+      }
+      else
+        if (!currentCol.WarningTextList.Contains(Resources.ExportDataTypeNotValidWarning))
+          currentCol.WarningTextList.Add(Resources.ExportDataTypeNotValidWarning);
+      showValidationWarning("ColumnOptionsWarning", showWarning, warningText);
+      grdPreviewData.SelectedColumns[0].DefaultCellStyle.BackColor = (showWarning ? Color.OrangeRed : grdPreviewData.DefaultCellStyle.BackColor);
+
+      return isValid;
+    }
+
     private void btnCopySQL_Click(object sender, EventArgs e)
     {
       StringBuilder queryString = new StringBuilder();
@@ -187,8 +251,8 @@ namespace MySQL.ForExcel
     {
       ExportAdvancedOptionsDialog optionsDialog = new ExportAdvancedOptionsDialog();
       DialogResult dr = optionsDialog.ShowDialog();
-      if (dr == DialogResult.OK)
-        btnCopySQL.Visible = Settings.Default.ExportShowCopySQLButton;
+      //if (dr == DialogResult.OK)
+      //  btnCopySQL.Visible = Settings.Default.ExportShowCopySQLButton;
     }
 
     private void chkFirstRowHeaders_CheckedChanged(object sender, EventArgs e)
@@ -297,7 +361,10 @@ namespace MySQL.ForExcel
       if (cmbPrimaryKeyColumns.Items[0].ToString() == "<Multiple Items>")
         cmbPrimaryKeyColumns.Items.RemoveAt(0);
       if (grdPreviewData.Columns[cmbPrimaryKeyColumns.SelectedIndex + 1].Selected)
+      {
         columnBindingSource.ResetCurrentItem();
+        chkExcludeColumn.Enabled = chkUniqueIndex.Enabled = chkCreateIndex.Enabled = !chkPrimaryKey.Checked;
+      }
       else
       {
         grdPreviewData.Columns[cmbPrimaryKeyColumns.SelectedIndex + 1].Selected = true;
@@ -487,23 +554,10 @@ namespace MySQL.ForExcel
       MySQLDataColumn currentCol = columnBindingSource.Current as MySQLDataColumn;
       if (cmbDatatype.Text == currentCol.MySQLDataType || cmbDatatype.Text.Length == 0 || (cmbDatatype.DataSource as DataTable).Select(String.Format("Value = '{0}'", cmbDatatype.Text)).Length == 0)
         return;
+      currentCol.MySQLDataType = cmbDatatype.Text;
+      testColumnDataTypeAgainstColumnData(currentCol);
       if (Settings.Default.ExportAutoIndexIntColumns && cmbDatatype.Text.StartsWith("Integer") && !chkCreateIndex.Checked)
         chkCreateIndex.Checked = true;
-      bool showWarning = !currentCol.CanBeOfMySQLDataType(cmbDatatype.Text);
-
-      string warningText = (showWarning ? Resources.ExportDataTypeNotSuitableWarning : null);
-      if (warningText == null)
-      {
-        currentCol.WarningTextList.Remove(Resources.ExportDataTypeNotSuitableWarning);
-        if (showWarning = currentCol.WarningTextList.Count > 0)
-          warningText = currentCol.WarningTextList.Last();
-      }
-      else
-        if (!currentCol.WarningTextList.Contains(Resources.ExportDataTypeNotSuitableWarning))
-          currentCol.WarningTextList.Add(Resources.ExportDataTypeNotSuitableWarning);
-      showValidationWarning("ColumnOptionsWarning", showWarning, warningText);
-      grdPreviewData.SelectedColumns[0].DefaultCellStyle.BackColor = (showWarning ? Color.OrangeRed : grdPreviewData.DefaultCellStyle.BackColor);
-      currentCol.MySQLDataType = cmbDatatype.Text;
     }
 
     private void cmbDatatype_DrawItem(object sender, DrawItemEventArgs e)
@@ -516,6 +570,18 @@ namespace MySQL.ForExcel
     private void grdPreviewData_CellToolTipTextNeeded(object sender, DataGridViewCellToolTipTextNeededEventArgs e)
     {
       e.ToolTipText = Resources.ExportColumnsGridToolTipCaption;
+    }
+
+    private void cmbDatatype_Validating(object sender, CancelEventArgs e)
+    {
+      if (cmbDatatype.SelectedIndex >= 0)
+        return;
+      MySQLDataColumn currentCol = columnBindingSource.Current as MySQLDataColumn;
+      bool valid = validateUserDataType(currentCol, cmbDatatype.Text);
+      if (valid)
+        testColumnDataTypeAgainstColumnData(currentCol);
+      if (Settings.Default.ExportAutoIndexIntColumns && cmbDatatype.Text.StartsWith("Integer") && !chkCreateIndex.Checked)
+        chkCreateIndex.Checked = true;
     }
 
   }

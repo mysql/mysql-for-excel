@@ -71,7 +71,7 @@ namespace MySQL.ForExcel
       }
     }
 
-    public void SetData(Excel.Range dataRange, bool useFormattedData, bool detectTypes, bool createIndexForIntColumns, bool allowEmptyNonIdxCols)
+    public void SetData(Excel.Range dataRange, bool useFormattedData, bool detectTypes, bool addBufferToVarchar, bool createIndexForIntColumns, bool allowEmptyNonIdxCols)
     {
       object[,] data;
 
@@ -132,7 +132,7 @@ namespace MySQL.ForExcel
           pkRowValueAdjust++;
       }
       if (detectTypes)
-        DetectTypes(data, createIndexForIntColumns);
+        DetectTypes(data, addBufferToVarchar, createIndexForIntColumns);
 
       if (RemoveEmptyColumns)
         foreach (string colName in colsToDelete)
@@ -148,7 +148,7 @@ namespace MySQL.ForExcel
         col.DetectType(firstRowIsHeaders);
     }
 
-    private void DetectTypes(object[,] data, bool createIndexForIntColumns)
+    private void DetectTypes(object[,] data, bool addBufferToVarchar, bool createIndexForIntColumns)
     {
       int rowsCount = data.GetUpperBound(0);
       int colsCount = data.GetUpperBound(1);
@@ -164,12 +164,14 @@ namespace MySQL.ForExcel
         string proposedType = String.Empty;
         string strippedType = String.Empty;
         string headerType = String.Empty;
+        string valueAsString = String.Empty;
         bool typesConsistent = true;
         bool valueOverflow = false;
         List<string> typesList = new List<string>(rowsCount);
         int[] varCharMaxLen = new int[2] { 0, 0 };
         int[] decimalMaxLen = new int[2] { 0, 0 };
         int lParensIndex = -1;
+        int varCharValueLength = 0;
 
         for (int rowPos = 1; rowPos <= rowsCount; rowPos++)
         {
@@ -178,11 +180,13 @@ namespace MySQL.ForExcel
             continue;
 
           // Treat always as a Varchar value first in case all rows do not have a consistent datatype
-          proposedType = Utilities.GetMySQLExportDataType(valueFromArray.ToString(), out valueOverflow);
+          valueAsString = valueFromArray.ToString();
+          proposedType = Utilities.GetMySQLExportDataType(valueAsString, out valueOverflow);
           if (proposedType == "Bool")
             proposedType = "Varchar(5)";
           lParensIndex = proposedType.IndexOf("(");
-          varCharMaxLen[1] = Math.Max(Int32.Parse(proposedType.Substring(lParensIndex + 1, proposedType.Length - lParensIndex - 2)), varCharMaxLen[1]);
+          varCharValueLength = (addBufferToVarchar ? Int32.Parse(proposedType.Substring(lParensIndex + 1, proposedType.Length - lParensIndex - 2)) : valueAsString.Length);
+          varCharMaxLen[1] = Math.Max(varCharValueLength, varCharMaxLen[1]);
 
           // Normal datatype detection
           proposedType = Utilities.GetMySQLExportDataType(valueFromArray, out valueOverflow);
@@ -197,7 +201,10 @@ namespace MySQL.ForExcel
               break;
             case "Varchar":
               if (rowPos > 1)
-                varCharMaxLen[0] = Math.Max(Int32.Parse(proposedType.Substring(lParensIndex + 1, proposedType.Length - lParensIndex - 2)), varCharMaxLen[0]);
+              {
+                varCharValueLength = (addBufferToVarchar ? Int32.Parse(proposedType.Substring(lParensIndex + 1, proposedType.Length - lParensIndex - 2)) : valueAsString.Length);
+                varCharMaxLen[0] = Math.Max(varCharValueLength, varCharMaxLen[0]);
+              }
               break;
             case "Decimal":
               int commaPos = proposedType.IndexOf(",");
@@ -482,12 +489,12 @@ namespace MySQL.ForExcel
     public bool PrimaryKey { get; set; }
     public bool AllowNull { get; set; }
     public bool ExcludeColumn { get; set; }
-    public string MySQLDataType { get; set; }
+    public string MySQLDataType  { get; set; }
     public List<string> WarningTextList { get { return warningTextList; } }
     public string FirstRowDataType { get; set; }
     public string OtherRowsDataType { get; set; }
 
-    #region Properties
+    #region Getter Properties
 
     public bool IsDecimal
     {
@@ -548,7 +555,7 @@ namespace MySQL.ForExcel
       get { return IsCharOrText || IsDate; }
     }
 
-    #endregion Properties
+    #endregion Getter Properties
 
     public void DetectType(bool firstRowIsHeaders)
     {
@@ -594,77 +601,14 @@ namespace MySQL.ForExcel
     {
       bool result = true;
 
-      mySQLDataType = mySQLDataType.ToLowerInvariant();
-      bool isVarChar = mySQLDataType.StartsWith("varchar");
-      bool isDecimal = mySQLDataType.StartsWith("decimal");
-      int lParensIndex = mySQLDataType.IndexOf("(");
-      int commaPos = mySQLDataType.IndexOf(",");
-      int varcharLen = (isVarChar ? Int32.Parse(mySQLDataType.Substring(lParensIndex + 1, mySQLDataType.Length - lParensIndex - 2)) : 0);
-      int[] decimalLen = new int[2] { 0, 0 };
-      if (isDecimal)
-      {
-        decimalLen[0] = Int32.Parse(mySQLDataType.Substring(lParensIndex + 1, commaPos - lParensIndex - 1));
-        decimalLen[1] = Int32.Parse(mySQLDataType.Substring(commaPos + 1, mySQLDataType.Length - commaPos - 2));
-      }
-      int tryIntValue = 0;
-      long tryBigIntValue = 0;
-      decimal tryDecimalValue = 0;
-      double tryDoubleValue = 0;
-      DateTime tryDateTimeValue = DateTime.Now;
-      TimeSpan tryTimeSpanValue = TimeSpan.Zero;
       MySQLDataTable parentTable = Table as MySQLDataTable;
       int rowIdx = 0;
-
       foreach (DataRow dr in parentTable.Rows)
       {
         if (parentTable.FirstRowIsHeaders && rowIdx++ == 0)
           continue;
         string strValueFromArray = dr[Ordinal].ToString();
-        if (isVarChar)
-        {
-          result = result && strValueFromArray.Length <= varcharLen;
-          continue;
-        }
-        if (isDecimal)
-        {
-          int pointPos = strValueFromArray.IndexOf(".");
-          bool success = Decimal.TryParse(strValueFromArray, out tryDecimalValue);
-          if (success)
-          {
-            if (pointPos >= 0)
-              success = strValueFromArray.Substring(0, pointPos).Length <= decimalLen[0] && strValueFromArray.Substring(pointPos + 1, strValueFromArray.Length - pointPos - 1).Length <= decimalLen[1];
-          }
-          result = result && success;
-          continue;
-        }
-        if (mySQLDataType == "integer")
-        {
-          result = result && Int32.TryParse(strValueFromArray, out tryIntValue);
-          continue;
-        }
-        if (mySQLDataType == "bigint")
-        {
-          result = result && Int64.TryParse(strValueFromArray, out tryBigIntValue);
-          continue;
-        }
-        if (mySQLDataType == "bool")
-        {
-          strValueFromArray = strValueFromArray.ToLowerInvariant();
-          result = result && (strValueFromArray == "true" || strValueFromArray == "false" || strValueFromArray == "0" || strValueFromArray == "1" || strValueFromArray == "yes" || strValueFromArray == "no" || strValueFromArray == "ja" || strValueFromArray == "nein");
-          continue;
-        }
-        if (mySQLDataType == "double")
-        {
-          result = result && Double.TryParse(strValueFromArray, out tryDoubleValue);
-        }
-        if (mySQLDataType.StartsWith("date"))
-        {
-          result = result && DateTime.TryParse(strValueFromArray, out tryDateTimeValue);
-        }
-        if (mySQLDataType == "time")
-        {
-          result = result && TimeSpan.TryParse(strValueFromArray, out tryTimeSpanValue);
-        }
+        result = result && Utilities.StringValueCanBeStoredWithMySQLType(strValueFromArray, mySQLDataType);
       }
 
       return result;

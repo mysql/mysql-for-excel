@@ -226,6 +226,15 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Entered Data Type is not a MySQL recognized data type..
+        /// </summary>
+        internal static string ExportDataTypeNotValidWarning {
+            get {
+                return ResourceManager.GetString("ExportDataTypeNotValidWarning", resourceCulture);
+            }
+        }
+        
         internal static System.Drawing.Bitmap MySQLforExcel_AppendDlg_Arrow_Down {
             get {
                 object obj = ResourceManager.GetObject("MySQLforExcel_AppendDlg_Arrow_Down", resourceCulture);
