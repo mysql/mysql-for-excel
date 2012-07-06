@@ -52,7 +52,7 @@ namespace MySQL.ForExcel
     {
       if (!DesignMode && UseSystemFont)
       {
-        Font = System.Drawing.SystemFonts.IconTitleFont;
+        Font = new Font(System.Drawing.SystemFonts.IconTitleFont.FontFamily, Font.Size, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
         Microsoft.Win32.SystemEvents.UserPreferenceChanged += new Microsoft.Win32.UserPreferenceChangedEventHandler(SystemEvents_UserPreferenceChanged);
       }
       InheritFontToControls(Controls);
@@ -68,7 +68,7 @@ namespace MySQL.ForExcel
     private void SystemEvents_UserPreferenceChanged(object sender, Microsoft.Win32.UserPreferenceChangedEventArgs e)
     {
       if (e.Category == Microsoft.Win32.UserPreferenceCategory.Window && UseSystemFont)
-        this.Font = System.Drawing.SystemFonts.IconTitleFont;
+        Font = new Font(System.Drawing.SystemFonts.IconTitleFont.FontFamily, Font.Size, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
     }
   }
 }

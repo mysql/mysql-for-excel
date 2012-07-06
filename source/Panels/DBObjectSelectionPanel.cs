@@ -15,6 +15,18 @@ namespace MySQL.ForExcel
   {
     private MySqlWorkbenchConnection connection;
     private string filter;
+    private bool currentExcelSelectionContainsData = false;
+
+    public DBObject CurrentSelectedDBObject
+    {
+      get
+      {
+        if (objectList.Nodes.Count > 0 && objectList.SelectedNode != null && objectList.SelectedNode.Level > 0)
+          return (objectList.SelectedNode.Tag as DBObject);
+        else
+          return null;
+      }
+    }
 
     public DBObjectSelectionPanel()
     {
@@ -24,10 +36,14 @@ namespace MySQL.ForExcel
       objectList.AddNode(null, "Procedures");
     }
 
-    public bool ExportDataActionEnabled
+    public bool ExcelSelectionContainsData
     {
-      set { exportToNewTableLabel.Enabled = value; }
-      get { return exportToNewTableLabel.Enabled; }
+      set 
+      { 
+        currentExcelSelectionContainsData = value;
+        exportToNewTableLabel.Enabled = value;
+        appendDataLabel.Enabled = value && CurrentSelectedDBObject != null && CurrentSelectedDBObject.Type == DBObjectType.Table;
+      }
     }
 
     public void SetConnection(MySqlWorkbenchConnection connection)
@@ -117,13 +133,11 @@ namespace MySQL.ForExcel
 
     private void objectList_AfterSelect(object sender, TreeViewEventArgs e)
     {
-      DBObject o = null;
-      if (e != null && e.Node != null && e.Node.Level > 0)
-        o = e.Node.Tag as DBObject;
+      DBObject obj = CurrentSelectedDBObject;
 
-      importDataLabel.Enabled = o != null;
-      editDataLabel.Enabled = o != null;
-      appendDataLabel.Enabled = o != null && o.Type == DBObjectType.Table;
+      importDataLabel.Enabled = obj != null;
+      editDataLabel.Enabled = obj != null;
+      appendDataLabel.Enabled = obj != null && obj.Type == DBObjectType.Table && currentExcelSelectionContainsData;
     }
 
     private void importData_Click(object sender, EventArgs e)
@@ -146,7 +160,7 @@ namespace MySQL.ForExcel
 
     private void importTableOrView(DBObject dbo)
     {
-      ImportTableViewForm importForm = new ImportTableViewForm(connection, dbo);
+      ImportTableViewForm importForm = new ImportTableViewForm(connection, dbo, (Parent as TaskPaneControl).ActiveWorksheet);
       DialogResult dr = importForm.ShowDialog();
       if (dr == DialogResult.Cancel)
         return;

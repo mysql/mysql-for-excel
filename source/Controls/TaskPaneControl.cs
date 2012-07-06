@@ -56,7 +56,7 @@ namespace MySQL.ForExcel
           }
         }
       }
-      dbObjectSelectionPanel1.ExportDataActionEnabled = hasData;
+      dbObjectSelectionPanel1.ExcelSelectionContainsData = hasData;
     }
 
     public void OpenConnection(MySqlWorkbenchConnection connection)
@@ -103,7 +103,7 @@ namespace MySQL.ForExcel
         int colsCount = dt.Columns.Count;
         int startingRow = (importColumnNames ? 1 : 0);
 
-        Excel.Worksheet currentSheet = excelApplication.ActiveSheet as Excel.Worksheet;
+        Excel.Worksheet currentSheet = ActiveWorksheet;
         fillingRange = atCell.get_Resize(rowsCount + startingRow, colsCount);
         object[,] fillingArray = new object[rowsCount + startingRow, colsCount];
 
@@ -125,6 +125,7 @@ namespace MySQL.ForExcel
           fillingRowIdx++;
         }
         fillingRange.set_Value(Type.Missing, fillingArray);
+        excelApplication_SheetSelectionChange(currentSheet, excelApplication.ActiveCell);
       }
 
       return fillingRange;
@@ -172,12 +173,12 @@ namespace MySQL.ForExcel
 
       if (toTableObject != null)
       {
-        AppendDataForm appendDataForm = new AppendDataForm(connection, exportRange, toTableObject);
+        AppendDataForm appendDataForm = new AppendDataForm(connection, exportRange, toTableObject, ActiveWorksheet);
         dr = appendDataForm.ShowDialog();
       }
       else
       {
-        ExportDataForm exportForm = new ExportDataForm(connection, exportRange, excelApplication.ActiveSheet as Excel.Worksheet);
+        ExportDataForm exportForm = new ExportDataForm(connection, exportRange, ActiveWorksheet);
         dr = exportForm.ShowDialog();
       }
       return dr == DialogResult.OK;
@@ -186,7 +187,7 @@ namespace MySQL.ForExcel
     public bool EditTableData(DBObject tableObject)
     {
       // Import Data
-      ImportTableViewForm importForm = new ImportTableViewForm(connection, tableObject);
+      ImportTableViewForm importForm = new ImportTableViewForm(connection, tableObject, ActiveWorksheet);
       DialogResult dr = importForm.ShowDialog();
       if (dr == DialogResult.Cancel)
         return false;

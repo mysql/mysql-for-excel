@@ -33,7 +33,7 @@ namespace MySQL.ForExcel
     private MySQLColumnMapping currentColumnMapping = null;
     private List<MySQLColumnMapping> storedColumnMappingsList;
 
-    public AppendDataForm(MySqlWorkbenchConnection wbConnection, Excel.Range exportDataRange, DBObject importDBObject)
+    public AppendDataForm(MySqlWorkbenchConnection wbConnection, Excel.Range exportDataRange, DBObject importDBObject, Excel.Worksheet appendingWorksheet)
     {
       this.wbConnection = wbConnection;
       linkCursor = Utilities.CreateCursor(new Bitmap(Properties.Resources.chain_link_24x24), 3, 3);
@@ -44,7 +44,7 @@ namespace MySQL.ForExcel
       exportDataHelper = new ExportDataHelper(wbConnection, exportDataRange, importDBObject.Name);
       initializeToTableGrid(importDBObject);
       string excelRangeAddress = exportDataRange.Address.Replace("$", String.Empty);
-      Text = String.Format("Append Data [{0}])", excelRangeAddress);
+      Text = String.Format("Append Data - {0} [{1}]", appendingWorksheet.Name, excelRangeAddress);
       changeFormattedDataSource();
       chkFirstRowHeaders_CheckedChanged(chkFirstRowHeaders, EventArgs.Empty);
       maxMappingCols = Math.Min(grdToMySQLTable.Columns.Count, grdFromExcelData.Columns.Count);
@@ -140,7 +140,7 @@ namespace MySQL.ForExcel
           int fromColIdx = -1;
           foreach (DataGridViewColumn gridCol in grdFromExcelData.Columns)
           {
-            if (gridCol.HeaderText.ToLowerInvariant() == targetColName)
+            if (gridCol.HeaderText.ToLowerInvariant() == targetColName.ToLowerInvariant())
             {
               matchSourceName = gridCol.HeaderText;
               fromColIdx = gridCol.Index;
@@ -253,6 +253,9 @@ namespace MySQL.ForExcel
 
     private void performManualSingleColumnMapping(int fromColumnIndex, int toColumnIndex, string mappedColName)
     {
+      if (currentColumnMapping.Name != "Manual")
+        cmbMappingMethod.Text = "Manual";
+
       string previouslyMappedColName = exportTable.Columns[toColumnIndex].MappedDataColName;
       bool mapping = !String.IsNullOrEmpty(mappedColName) && fromColumnIndex >= 0;
 
@@ -489,9 +492,7 @@ namespace MySQL.ForExcel
       {
         case "Automatic":
           currentColumnMapping = createColumnMappingForAutomatic();
-          if (!currentColumnMapping.AllColumnsMapped)
-            cmbMappingMethod.SelectedIndex = 0;
-          else
+          if (currentColumnMapping.MappedQuantity == maxMappingCols)
             applySelectedStoredColumnMapping();
           break;
         case "Manual":

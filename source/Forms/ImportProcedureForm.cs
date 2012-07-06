@@ -53,7 +53,7 @@ namespace MySQL.ForExcel
       InitializeComponent();
 
       SelectedResultSet = -1;
-      Text = String.Format("Import Data - {0})", importToWorksheet.Name);
+      Text = String.Format("Import Data - {0}", importToWorksheet.Name);
       procedureParamsProperties = new PropertiesCollection();
       lblFromProcedureName.Text = importDBObject.Name;
       parametersGrid.SelectedObject = procedureParamsProperties;

@@ -162,20 +162,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap db_Table_32x32 {
-            get {
-                object obj = ResourceManager.GetObject("db_Table_32x32", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        internal static System.Drawing.Bitmap db_View_32x32 {
-            get {
-                object obj = ResourceManager.GetObject("db_View_32x32", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>

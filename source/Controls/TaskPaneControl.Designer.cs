@@ -45,7 +45,7 @@
       // dbObjectSelectionPanel1
       // 
       this.dbObjectSelectionPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.dbObjectSelectionPanel1.ExportDataActionEnabled = false;
+      this.dbObjectSelectionPanel1.ExcelSelectionContainsData = false;
       this.dbObjectSelectionPanel1.Font = new System.Drawing.Font("Arial", 9F);
       this.dbObjectSelectionPanel1.Location = new System.Drawing.Point(0, 0);
       this.dbObjectSelectionPanel1.Name = "dbObjectSelectionPanel1";

@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using MySQL.Utility;
 using System.IO;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel
 {
@@ -22,22 +23,19 @@ namespace MySQL.ForExcel
     public bool ImportHeaders { get { return chkIncludeHeaders.Checked; } }
     public long TotalRowsCount { get; set; }
 
-    public ImportTableViewForm(MySqlWorkbenchConnection wbConnection, DBObject importDBObject)
+    public ImportTableViewForm(MySqlWorkbenchConnection wbConnection, DBObject importDBObject, Excel.Worksheet importToWorksheet)
     {
       this.wbConnection = wbConnection;
       this.importDBObject = importDBObject;
 
       InitializeComponent();
+      grdPreviewData.DataError += new DataGridViewDataErrorEventHandler(grdPreviewData_DataError);
 
       chkIncludeHeaders.Checked = true;
       chkLimitRows.Checked = false;
-      lblFromMain.Text = String.Format("From {0}:", importDBObject.Type.ToString());
-      lblFromSub.Text = importDBObject.Name;
-      picFrom.Image = fromImageList.Images[(importDBObject.Type == DBObjectType.Table ? 0 : 1)];      
-
-      grdPreviewData.DataError += new DataGridViewDataErrorEventHandler(grdPreviewData_DataError);
-
-
+      lblTableNameMain.Text = String.Format("{0} Name:", importDBObject.Type.ToString());
+      Text = String.Format("Import Data - {0}", importToWorksheet.Name);
+      lblTableNameSub.Text = importDBObject.Name;
       fillPreviewGrid();
     }
 
@@ -104,14 +102,6 @@ namespace MySQL.ForExcel
       numRowsToReturn.Enabled = numFromRow.Enabled = chkLimitRows.Checked;
     }
 
-    private void btnSelectAll_Click(object sender, EventArgs e)
-    {
-      if (allColumnsSelected)
-        grdPreviewData.ClearSelection();
-      else
-        grdPreviewData.SelectAll();
-    }
-
     private void grdPreviewData_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
     {
       grdPreviewData.SelectAll();
@@ -119,12 +109,21 @@ namespace MySQL.ForExcel
 
     private void grdPreviewData_SelectionChanged(object sender, EventArgs e)
     {
-      btnSelectAll.Text = (allColumnsSelected ? "Select None" : "Select All");
+      contextMenuForGrid.Items[0].Text = (allColumnsSelected ? "Select None" : "Select All");
+      btnImport.Enabled = grdPreviewData.SelectedColumns.Count > 0;
     }
 
     private void numFromRow_ValueChanged(object sender, EventArgs e)
     {
       numRowsToReturn.Maximum = TotalRowsCount - numFromRow.Value + 1;
+    }
+
+    private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      if (allColumnsSelected)
+        grdPreviewData.ClearSelection();
+      else
+        grdPreviewData.SelectAll();
     }
 
   }
