@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using MySQL.Utility;
+using System.IO;
 
 namespace MySQL.ForExcel
 {
@@ -32,9 +33,32 @@ namespace MySQL.ForExcel
       chkLimitRows.Checked = false;
       lblFromMain.Text = String.Format("From {0}:", importDBObject.Type.ToString());
       lblFromSub.Text = importDBObject.Name;
-      picFrom.Image = fromImageList.Images[(importDBObject.Type == DBObjectType.Table ? 0 : 1)];
+      picFrom.Image = fromImageList.Images[(importDBObject.Type == DBObjectType.Table ? 0 : 1)];      
+
+      grdPreviewData.DataError += new DataGridViewDataErrorEventHandler(grdPreviewData_DataError);
+
 
       fillPreviewGrid();
+    }
+
+    void grdPreviewData_DataError(object sender, DataGridViewDataErrorEventArgs e)
+    {      
+       if (grdPreviewData.Rows[e.RowIndex].Cells[e.ColumnIndex].ValueType == Type.GetType("System.Byte[]"))
+       {
+         try
+         {
+           var img = (byte[])(grdPreviewData.Rows[e.RowIndex].Cells[e.ColumnIndex]).Value;
+           using (MemoryStream ms = new MemoryStream(img))
+             Image.FromStream(ms);
+         }
+         catch (ArgumentException)
+         {
+         }
+         catch (Exception ex)
+         {
+           MessageBox.Show("Loading Data Error " + ex.Message);
+         }
+       }           
     }
 
     private void fillPreviewGrid()

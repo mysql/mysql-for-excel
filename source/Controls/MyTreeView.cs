@@ -109,10 +109,13 @@ namespace MySQL.ForExcel
 
       SolidBrush textBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), e.Node.ForeColor));
       Font f = e.Node.NodeFont != null ? e.Node.NodeFont : Font;
+      if (!f.Bold)      
+        f = new Font(f.FontFamily, f.Size, FontStyle.Bold);
+
       SizeF size = g.MeasureString(e.Node.Text, f);
       pt.X += (ImageToTextHorizontalPixelsOffset + i.Width);
       pt.Y = e.Bounds.Top + ((e.Bounds.Height - (int)size.Height) / 2);
-      g.DrawString(e.Node.Text, Font, textBrush, pt.X, pt.Y);
+      g.DrawString(e.Node.Text, f, textBrush, pt.X, pt.Y);
 
       nodeBackbrush.Dispose();
       textBrush.Dispose();

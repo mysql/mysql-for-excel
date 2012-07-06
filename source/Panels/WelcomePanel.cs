@@ -56,7 +56,7 @@ namespace MySQL.ForExcel
 
     private void manageConnectionsLabel_Click(object sender, EventArgs e)
     {
-      MySqlWorkbench.LaunchConfigure(null);
+       MySqlWorkbench.OpenManageConnectionsDialog();
     }
 
     private void connectionList_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)

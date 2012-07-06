@@ -79,14 +79,21 @@ namespace MySQL.ForExcel
       Point pt = new Point(imageSize.Width + TitlePixelsXOffset, TitlePixelsYOffset);
       if (!String.IsNullOrEmpty(Title))
       {
-        if (DrawShadow)
+        SolidBrush titleBrush = null;
+        Color currentTitleColor = (tracking ? SystemColors.HotTrack : TitleColor);
+        if (DrawShadow && Enabled)
         {
           SolidBrush titleShadowBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleShadowOpacity * 255), TitleColor));
           e.Graphics.DrawString(Title, Font, titleShadowBrush, pt.X + TitleShadowPixelsXOffset, pt.Y + TitleShadowPixelsYOffset);
-          titleShadowBrush.Dispose();
+          titleShadowBrush.Dispose();         
+          titleBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), currentTitleColor));          
         }
-        Color currentTitleColor = (tracking ? SystemColors.HotTrack : TitleColor);
-        SolidBrush titleBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), currentTitleColor));
+        
+        if(!Enabled)
+        {
+          titleBrush = new SolidBrush(Color.FromArgb(80, 0, 0, 0));          
+        }
+        
         e.Graphics.DrawString(Title, Font, titleBrush, pt.X, pt.Y);
         titleBrush.Dispose();
         
@@ -95,16 +102,23 @@ namespace MySQL.ForExcel
       }
       if (!String.IsNullOrEmpty(Description))
       {
-        if (DrawShadow)
+        SolidBrush descriptionBrush = null;
+        if (DrawShadow && Enabled)
         {
           SolidBrush descriptionShadowBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionShadowOpacity * 255), Color.White));
           e.Graphics.DrawString(Description, DescriptionFont, descriptionShadowBrush, pt.X + DescriptionShadowPixelsXOffset, pt.Y + DescriptionShadowPixelsYOffset);
           descriptionShadowBrush.Dispose();
+
+          descriptionBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionColorOpacity * 255), DescriptionColor));
         }
-        SolidBrush descriptionBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionColorOpacity * 255), DescriptionColor));
+        if (!Enabled)
+        {
+          descriptionBrush = new SolidBrush(Color.FromArgb(80, 0, 0, 0));     
+        }
+
         e.Graphics.DrawString(Description, DescriptionFont, descriptionBrush, pt.X, pt.Y);
         descriptionBrush.Dispose();
-      }
+      }     
     }
 
     protected override void OnMouseEnter(EventArgs e)
