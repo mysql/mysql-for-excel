@@ -10,49 +10,53 @@ using MySQL.Utility;
 using System.Collections;
 using MySql.Data.MySqlClient;
 using System.Reflection;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel
 {
-  public partial class ImportRoutineForm : AutoStyleableBaseDialog
+  public partial class ImportProcedureForm : AutoStyleableBaseDialog
   {
     private MySqlWorkbenchConnection wbConnection;
     private DBObject importDBObject;
-    private PropertiesCollection routineParamsProperties;
+    private PropertiesCollection procedureParamsProperties;
     private MySqlParameter[] mysqlParameters;
     public DataSet ImportDataSet = null;
     public bool ImportHeaders { get { return chkIncludeHeaders.Checked; } }
+    public int SelectedResultSet { get; private set; }
     public ImportMultipleType ImportType
     {
       get
       {
-        ImportMultipleType retType = ImportMultipleType.SingleWorkSheetHorizontally;
-        int multTypeValue = (cmbMultipleResultSets != null && cmbMultipleResultSets.Items.Count > 0 ? (int)cmbMultipleResultSets.SelectedValue : 0);
+        ImportMultipleType retType = ImportMultipleType.SelectedResultSet;
+        int multTypeValue = (cmbImportResultsets != null && cmbImportResultsets.Items.Count > 0 ? (int)cmbImportResultsets.SelectedValue : 0);
         switch (multTypeValue)
         {
           case 0:
-            retType = ImportMultipleType.SingleWorkSheetHorizontally;
+            retType = ImportMultipleType.SelectedResultSet;
             break;
           case 1:
-            retType = ImportMultipleType.SingleWorkSheetVertically;
+            retType = ImportMultipleType.AllResultSetsHorizontally;
             break;
           case 2:
-            retType = ImportMultipleType.MultipleWorkSheets;
+            retType = ImportMultipleType.AllResultSetsVertically;
             break;
         }
         return retType;
       }
     }
 
-    public ImportRoutineForm(MySqlWorkbenchConnection wbConnection, DBObject importDBObject)
+    public ImportProcedureForm(MySqlWorkbenchConnection wbConnection, DBObject importDBObject, Excel.Worksheet importToWorksheet)
     {
       this.wbConnection = wbConnection;
       this.importDBObject = importDBObject;
 
       InitializeComponent();
 
-      routineParamsProperties = new PropertiesCollection();
-      lblFromRoutineName.Text = importDBObject.Name;
-      parametersGrid.SelectedObject = routineParamsProperties;
+      SelectedResultSet = -1;
+      Text = String.Format("Import Data - {0})", importToWorksheet.Name);
+      procedureParamsProperties = new PropertiesCollection();
+      lblFromProcedureName.Text = importDBObject.Name;
+      parametersGrid.SelectedObject = procedureParamsProperties;
 
       initializeMultipleResultSetsCombo();
       fillParameters();
@@ -65,20 +69,20 @@ namespace MySQL.ForExcel
       dt.Columns.Add("value", Type.GetType("System.Int32"));
       dt.Columns.Add("description", Type.GetType("System.String"));
       DataRow dr = dt.NewRow();
-      dr["value"] = ImportMultipleType.SingleWorkSheetHorizontally;
-      dr["description"] = "Single WorkSheet Horizontally";
+      dr["value"] = ImportMultipleType.SelectedResultSet;
+      dr["description"] = "Selected Result Set";
       dt.Rows.Add(dr);
       dr = dt.NewRow();
-      dr["value"] = ImportMultipleType.SingleWorkSheetVertically;
-      dr["description"] = "Single WorkSheet Vertically";
+      dr["value"] = ImportMultipleType.AllResultSetsHorizontally;
+      dr["description"] = "All Result Sets - Arranged Horizontally";
       dt.Rows.Add(dr);
       dr = dt.NewRow();
-      dr["value"] = ImportMultipleType.MultipleWorkSheets;
-      dr["description"] = "Multiple WorkSheets";
+      dr["value"] = ImportMultipleType.AllResultSetsVertically;
+      dr["description"] = "All Result Sets - Arranged Vertically";
       dt.Rows.Add(dr);
-      cmbMultipleResultSets.DataSource = dt;
-      cmbMultipleResultSets.DisplayMember = "description";
-      cmbMultipleResultSets.ValueMember = "value";
+      cmbImportResultsets.DataSource = dt;
+      cmbImportResultsets.DisplayMember = "description";
+      cmbImportResultsets.ValueMember = "value";
     }
 
     private void fillParameters()
@@ -196,7 +200,7 @@ namespace MySQL.ForExcel
         parameter = new CustomProperty(paramName, objValue, paramIsReadOnly, true);
         parameter.Description = String.Format("Direction: {0}, Data Type: {1}", paramDirection.ToString(), dataType);
         mysqlParameters[paramIdx] = new MySqlParameter(paramName, dbType, paramSize, paramDirection, false, paramPrecision, paramScale, null, DataRowVersion.Current, objValue);
-        routineParamsProperties.Add(parameter);
+        procedureParamsProperties.Add(parameter);
         paramIdx++;
       }
       FieldInfo fi = parametersGrid.GetType().GetField("gridView", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -212,11 +216,11 @@ namespace MySQL.ForExcel
     {
       // Prepare parameters and execute routine and create OutAndReturnValues table
       DataTable outParamsTable = new DataTable("OutAndReturnValues");
-      for (int paramIdx = 0; paramIdx < routineParamsProperties.Count; paramIdx++)
+      for (int paramIdx = 0; paramIdx < procedureParamsProperties.Count; paramIdx++)
       {
-        mysqlParameters[paramIdx].Value = routineParamsProperties[paramIdx].Value;
+        mysqlParameters[paramIdx].Value = procedureParamsProperties[paramIdx].Value;
         if (mysqlParameters[paramIdx].Direction == ParameterDirection.Output || mysqlParameters[paramIdx].Direction == ParameterDirection.ReturnValue)
-          outParamsTable.Columns.Add(routineParamsProperties[paramIdx].Name, routineParamsProperties[paramIdx].Value.GetType());
+          outParamsTable.Columns.Add(procedureParamsProperties[paramIdx].Name, procedureParamsProperties[paramIdx].Value.GetType());
       }
       ImportDataSet = Utilities.GetDataSetFromRoutine(wbConnection, importDBObject, mysqlParameters);
       if (ImportDataSet == null || ImportDataSet.Tables.Count == 0)
@@ -228,11 +232,11 @@ namespace MySQL.ForExcel
 
       // Refresh output/return parameter values in PropertyGrid and add them to OutAndReturnValues table
       DataRow valuesRow = outParamsTable.NewRow();
-      for (int paramIdx = 0; paramIdx < routineParamsProperties.Count; paramIdx++)
+      for (int paramIdx = 0; paramIdx < procedureParamsProperties.Count; paramIdx++)
       {
         if (mysqlParameters[paramIdx].Direction == ParameterDirection.Output || mysqlParameters[paramIdx].Direction == ParameterDirection.ReturnValue)
         {
-          routineParamsProperties[paramIdx].Value = mysqlParameters[paramIdx].Value;
+          procedureParamsProperties[paramIdx].Value = mysqlParameters[paramIdx].Value;
           valuesRow[mysqlParameters[paramIdx].ParameterName] = mysqlParameters[paramIdx].Value;
         }
       }
@@ -240,35 +244,40 @@ namespace MySQL.ForExcel
       ImportDataSet.Tables.Add(outParamsTable);
       parametersGrid.Refresh();
 
-      // Refresh list of ResultSets
-      lisResultSets.Items.Clear();
+      // Refresh ResultSets in Tab Control
+      tabResultSets.TabPages.Clear();
       for (int dtIdx = 0; dtIdx < ImportDataSet.Tables.Count; dtIdx++)
       {
-        lisResultSets.Items.Add(ImportDataSet.Tables[dtIdx].TableName);
+        tabResultSets.TabPages.Add(ImportDataSet.Tables[dtIdx].TableName);
       }
-      if (lisResultSets.Items.Count > 0)
-        lisResultSets.SelectedIndex = 0;
+      if (tabResultSets.TabPages.Count > 0)
+      {
+        SelectedResultSet = tabResultSets.SelectedIndex = 0;
+        tabResultSets_SelectedIndexChanged(tabResultSets, EventArgs.Empty);
+      }
     }
 
-    private void lisResultSets_SelectedIndexChanged(object sender, EventArgs e)
+    private void tabResultSets_SelectedIndexChanged(object sender, EventArgs e)
     {
-      if (lisResultSets.Items.Count > 0)
+      if (tabResultSets.SelectedIndex < 0)
+        return;
+      SelectedResultSet = tabResultSets.SelectedIndex;
+      tabResultSets.TabPages[SelectedResultSet].Controls.Add(grdResultSet);
+      grdResultSet.Dock = DockStyle.Fill;
+      grdResultSet.SelectionMode = DataGridViewSelectionMode.CellSelect;
+      grdResultSet.DataSource = ImportDataSet;
+      grdResultSet.DataMember = ImportDataSet.Tables[SelectedResultSet].TableName;
+      foreach (DataGridViewColumn gridCol in grdResultSet.Columns)
       {
-        grdPreviewData.SelectionMode = DataGridViewSelectionMode.CellSelect;
-        grdPreviewData.DataSource = ImportDataSet;
-        grdPreviewData.DataMember = ImportDataSet.Tables[lisResultSets.SelectedIndex].TableName;
-        foreach (DataGridViewColumn gridCol in grdPreviewData.Columns)
-        {
-          gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
-        }
-        grdPreviewData.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
+        gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
       }
+      grdResultSet.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
     }
   }
 
   public enum ImportMultipleType
   {
-    SingleWorkSheetHorizontally, SingleWorkSheetVertically, MultipleWorkSheets
+    SelectedResultSet, AllResultSetsHorizontally, AllResultSetsVertically
   };
 
   public class CustomProperty

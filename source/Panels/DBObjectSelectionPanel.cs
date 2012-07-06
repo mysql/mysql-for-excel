@@ -21,7 +21,7 @@ namespace MySQL.ForExcel
       InitializeComponent();
       objectList.AddNode(null, "Tables");
       objectList.AddNode(null, "Views");
-      objectList.AddNode(null, "Routines");
+      objectList.AddNode(null, "Procedures");
     }
 
     public bool ExportDataActionEnabled
@@ -46,7 +46,7 @@ namespace MySQL.ForExcel
 
       LoadTables();
       LoadViews();
-      LoadRoutines();
+      LoadProcedures();
 
       if (objectList.Nodes[0].GetNodeCount(true) > 0)
         objectList.Nodes[0].Expand();
@@ -93,20 +93,20 @@ namespace MySQL.ForExcel
       }
     }
 
-    private void LoadRoutines()
+    private void LoadProcedures()
     {
       DataTable procs = Utilities.GetSchemaCollection(connection, "Procedures", null, connection.Schema, null, "PROCEDURE");
       if (procs == null) return;
 
       TreeNode parent = objectList.Nodes[2];
-      foreach (DataRow routineRow in procs.Rows)
+      foreach (DataRow procedureRow in procs.Rows)
       {
-        string procName = routineRow["ROUTINE_NAME"].ToString();
+        string procName = procedureRow["ROUTINE_NAME"].ToString();
 
         // check our filter
         if (!String.IsNullOrEmpty(filter) && String.Compare(filter, procName, true) != 0) continue;
 
-        string type = routineRow["ROUTINE_TYPE"].ToString();
+        string type = procedureRow["ROUTINE_TYPE"].ToString();
         string text = procName;
 
         TreeNode node = objectList.AddNode(parent, text);
@@ -139,7 +139,7 @@ namespace MySQL.ForExcel
           importTableOrView(dbo);
           break;
         case DBObjectType.Routine:
-          importRoutine(dbo);
+          importProcedure(dbo);
           break;
       }
     }
@@ -159,19 +159,19 @@ namespace MySQL.ForExcel
       (Parent as TaskPaneControl).ImportDataToExcel(importForm.ImportDataTable, importForm.ImportHeaders);
     }
 
-    private void importRoutine(DBObject dbo)
+    private void importProcedure(DBObject dbo)
     {
-      ImportRoutineForm importRoutineForm = new ImportRoutineForm(connection, dbo);
-      DialogResult dr = importRoutineForm.ShowDialog();
+      ImportProcedureForm importProcedureForm = new ImportProcedureForm(connection, dbo, (Parent as TaskPaneControl).ActiveWorksheet);
+      DialogResult dr = importProcedureForm.ShowDialog();
       if (dr == DialogResult.Cancel)
         return;
-      if (importRoutineForm.ImportDataSet == null)
+      if (importProcedureForm.ImportDataSet == null)
       {
         string msg = String.Format(Resources.UnableToRetrieveData, dbo.Name);
         MessageBox.Show(msg, Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
         return;
       }
-      (Parent as TaskPaneControl).ImportDataToExcel(importRoutineForm.ImportDataSet, importRoutineForm.ImportHeaders, importRoutineForm.ImportType);
+      (Parent as TaskPaneControl).ImportDataToExcel(importProcedureForm.ImportDataSet, importProcedureForm.ImportHeaders, importProcedureForm.ImportType, importProcedureForm.SelectedResultSet);
     }
 
     private bool exportDataToTable(DBObject appendToTable)

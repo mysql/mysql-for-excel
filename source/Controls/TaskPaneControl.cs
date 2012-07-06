@@ -135,7 +135,7 @@ namespace MySQL.ForExcel
       ImportDataTableToExcelAtGivenCell(dt, importColumnNames, excelApplication.ActiveCell);
     }
 
-    public void ImportDataToExcel(DataSet ds, bool importColumnNames, ImportMultipleType importType)
+    public void ImportDataToExcel(DataSet ds, bool importColumnNames, ImportMultipleType importType, int selectedResultSet)
     {
       Excel.Range atCell = excelApplication.ActiveCell;
       Excel.Range endCell = null;
@@ -144,6 +144,8 @@ namespace MySQL.ForExcel
       int tableIdx = 0;
       foreach (DataTable dt in ds.Tables)
       {
+        if (importType == ImportMultipleType.SelectedResultSet && selectedResultSet < tableIdx)
+          continue;
         tableIdx++;
         fillingRange = ImportDataTableToExcelAtGivenCell(dt, importColumnNames, atCell);
         if (fillingRange != null)
@@ -153,17 +155,11 @@ namespace MySQL.ForExcel
         if (tableIdx < ds.Tables.Count)
           switch (importType)
           {
-            case ImportMultipleType.SingleWorkSheetHorizontally:
+            case ImportMultipleType.AllResultSetsHorizontally:
               atCell = endCell.get_Offset(atCell.Row - endCell.Row, 2);
               break;
-            case ImportMultipleType.SingleWorkSheetVertically:
+            case ImportMultipleType.AllResultSetsVertically:
               atCell = endCell.get_Offset(2, atCell.Column - endCell.Column);
-              break;
-            case ImportMultipleType.MultipleWorkSheets:
-              Excel.Worksheet wSheet = excelApplication.Sheets.Add(Type.Missing, excelApplication.ActiveSheet, Type.Missing, Type.Missing);
-              wSheet.Activate();
-              atCell = wSheet.get_Range("A1", Type.Missing);
-              atCell.Select();
               break;
           }
       }

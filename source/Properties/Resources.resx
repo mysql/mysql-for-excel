@@ -289,9 +289,6 @@
   <data name="db_Table_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\db.Table.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="db_Routine_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\db.Routine.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="db_View_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\db.View.32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
