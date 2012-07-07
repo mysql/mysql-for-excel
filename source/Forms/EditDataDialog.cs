@@ -5,15 +5,16 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
 using MySQL.Utility;
 using MySql.Data.MySqlClient;
+using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel
 {
-  public partial class EditDataForm : AutoStyleableBaseDialog
+  public partial class EditDataDialog : AutoStyleableBaseForm
   {
+    private Point mouseDownPoint = Point.Empty;
     private MySqlWorkbenchConnection wbConnection;
     private DataTable editingTable = null;
     private Excel.Range editDataRange;
@@ -26,7 +27,7 @@ namespace MySQL.ForExcel
     public Excel.Worksheet EditingWorksheet = null;
     public TaskPaneControl CallerTaskPane;
 
-    public EditDataForm(MySqlWorkbenchConnection wbConnection, Excel.Range editDataRange, DataTable importTable, Excel.Worksheet editingWorksheet)
+    public EditDataDialog(MySqlWorkbenchConnection wbConnection, Excel.Range editDataRange, DataTable importTable, Excel.Worksheet editingWorksheet)
     {
       InitializeComponent();
 
@@ -38,15 +39,19 @@ namespace MySQL.ForExcel
       queryString = importTable.ExtendedProperties["QueryString"].ToString();
       getMySQLTableSchemaInfo(tableName);
       initializeDataAdapter();
-
-      grdPreview.DataSource = importTable;
-      foreach (DataGridViewColumn dgvc in grdPreview.Columns)
-      {
-        dgvc.SortMode = DataGridViewColumnSortMode.NotSortable;
-      }
       EditingWorksheet = editingWorksheet;
       EditingWorksheet.Change += new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
-      Text = String.Format("Edit Data - {0} [{1}]", editingWorksheet.Name, editDataRange.Address.Replace("$", String.Empty));
+      EditingWorksheet.SelectionChange += new Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);
+    }
+
+    protected override void OnPaintBackground(PaintEventArgs e)
+    {
+      base.OnPaintBackground(e);
+      Pen pen = new Pen(Color.White, 3f);
+      e.Graphics.DrawRectangle(pen, 0, 0, this.Width - 2, this.Height - 2);
+      pen.Width = 1f;
+      e.Graphics.DrawLine(pen, 0, 25, this.Width, 25);
+      pen.Dispose();
     }
 
     private void getMySQLTableSchemaInfo(string tableName)
@@ -116,11 +121,8 @@ namespace MySQL.ForExcel
       }
       else
       {
-        grdPreview.DataSource = null;
         editingTable.RejectChanges();
-        grdPreview.DataSource = editingTable;
       }
-      grdPreview.DataSource = editingTable;
     }
 
     private void pushDataChanges()
@@ -139,14 +141,14 @@ namespace MySQL.ForExcel
         System.Diagnostics.Debug.WriteLine("Problem with Adapter Update, no rows were updated.");
         return;
       }
-      for (int rowIdx = 0; rowIdx < grdPreview.Rows.Count; rowIdx++)
-      {
-        for (int colIdx = 0; colIdx < grdPreview.Columns.Count; colIdx++)
-        {
-          if (grdPreview.Rows[rowIdx].Cells[colIdx].Style.BackColor == Color.OrangeRed)
-            grdPreview.Rows[rowIdx].Cells[colIdx].Style.BackColor = Color.LightGreen;
-        }
-      }
+      //for (int rowIdx = 0; rowIdx < grdPreview.Rows.Count; rowIdx++)
+      //{
+      //  for (int colIdx = 0; colIdx < grdPreview.Columns.Count; colIdx++)
+      //  {
+      //    if (grdPreview.Rows[rowIdx].Cells[colIdx].Style.BackColor == Color.OrangeRed)
+      //      grdPreview.Rows[rowIdx].Cells[colIdx].Style.BackColor = Color.LightGreen;
+      //  }
+      //}
     }
 
     private void EditingWorksheet_Change(Excel.Range Target)
@@ -173,11 +175,45 @@ namespace MySQL.ForExcel
           int absRow = startRow + rowIdx;
           int absCol = startCol + colIdx;
           editingTable.Rows[absRow][absCol] = formattedArrayFromRange[rowIdx + 1, colIdx + 1];
-          grdPreview.Rows[absRow].Cells[absCol].Style.BackColor = Color.OrangeRed;
+          //grdPreview.Rows[absRow].Cells[absCol].Style.BackColor = Color.OrangeRed;
         }
       }
       if (chkAutoCommit.Checked)
         pushDataChanges();
+    }
+
+    void EditingWorksheet_SelectionChange(Excel.Range Target)
+    {
+      Excel.Range intersectRange = CallerTaskPane.IntersectRanges(editDataRange, Target);
+      if (intersectRange == null || intersectRange.Count == 0)
+        Hide();
+      else
+        Show();
+    }
+
+    protected override void OnMouseDown(MouseEventArgs e)
+    {
+      base.OnMouseDown(e);
+      mouseDownPoint = new Point(e.X, e.Y);
+    }
+
+    protected override void OnMouseUp(MouseEventArgs e)
+    {
+      base.OnMouseUp(e);
+      mouseDownPoint = Point.Empty;
+    }
+
+    protected override void OnMouseMove(MouseEventArgs e)
+    {
+      base.OnMouseMove(e);
+      if (mouseDownPoint.IsEmpty)
+        return;
+      Location = new Point(Location.X + (e.X - mouseDownPoint.X), Location.Y + (e.Y - mouseDownPoint.Y));
+    }
+
+    private void exitEditModeToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      Close();
     }
 
     private void btnRevert_Click(object sender, EventArgs e)
@@ -185,22 +221,13 @@ namespace MySQL.ForExcel
       DialogResult dr = Utilities.ShowWarningBox(Properties.Resources.RevertDataConfirmation);
       if (dr != DialogResult.Yes)
         return;
-      revertDataChanges(chkRefreshFromDB.Checked);
+      //revertDataChanges(chkRefreshFromDB.Checked);
+      revertDataChanges(true);
     }
 
     private void btnCommit_Click(object sender, EventArgs e)
     {
       pushDataChanges();
-    }
-
-    private void EditDataForm_Activated(object sender, EventArgs e)
-    {
-      Opacity = 0.85;
-    }
-
-    private void EditDataForm_Deactivate(object sender, EventArgs e)
-    {
-      Opacity = 0.60;
     }
 
     private void chkAutoCommit_CheckedChanged(object sender, EventArgs e)
@@ -209,10 +236,14 @@ namespace MySQL.ForExcel
       btnRevert.Enabled = !chkAutoCommit.Checked;
     }
 
-    private void EditDataForm_FormClosed(object sender, FormClosedEventArgs e)
+    private void EditDataDialog_Activated(object sender, EventArgs e)
     {
-      connection.Close();
+      Opacity = 1;
     }
 
+    private void EditDataDialog_Deactivate(object sender, EventArgs e)
+    {
+      Opacity = 0.60;
+    }
   }
 }

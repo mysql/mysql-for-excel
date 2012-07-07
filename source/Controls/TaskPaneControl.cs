@@ -17,7 +17,7 @@ namespace MySQL.ForExcel
   {
     private Excel.Application excelApplication;
     private MySqlWorkbenchConnection connection;
-    private EditDataForm editForm = null;
+    private EditDataDialog editForm = null;
 
     public Excel.Worksheet ActiveWorksheet
     {
@@ -213,7 +213,7 @@ namespace MySQL.ForExcel
       
       // Edit Data
       Utilities.AddExtendedProperties(ref importForm.ImportDataTable, importForm.ImportDataTable.ExtendedProperties["QueryString"].ToString(), importForm.ImportHeaders, tableObject.Name);
-      editForm = new EditDataForm(connection, editingRange, importForm.ImportDataTable, currentWorksheet);
+      editForm = new EditDataDialog(connection, editingRange, importForm.ImportDataTable, currentWorksheet);
       editForm.CallerTaskPane = this;
       editForm.Show();
 

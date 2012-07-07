@@ -1,6 +1,6 @@
 ﻿namespace MySQL.ForExcel
 {
-  partial class EditDataForm
+  partial class EditDataDialog
   {
     /// <summary>
     /// Required designer variable.
@@ -28,136 +28,130 @@
     /// </summary>
     private void InitializeComponent()
     {
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-      this.btnCommit = new System.Windows.Forms.Button();
+      this.components = new System.ComponentModel.Container();
       this.btnRevert = new System.Windows.Forms.Button();
+      this.btnCommit = new System.Windows.Forms.Button();
+      this.picSakilaLogo = new System.Windows.Forms.PictureBox();
+      this.lblMySQLforExcel = new System.Windows.Forms.Label();
       this.chkAutoCommit = new System.Windows.Forms.CheckBox();
-      this.chkRefreshFromDB = new System.Windows.Forms.CheckBox();
-      this.grdPreview = new System.Windows.Forms.DataGridView();
-      this.contentAreaPanel.SuspendLayout();
-      this.commandAreaPanel.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.grdPreview)).BeginInit();
+      this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.exitEditModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      ((System.ComponentModel.ISupportInitialize)(this.picSakilaLogo)).BeginInit();
+      this.contextMenu.SuspendLayout();
       this.SuspendLayout();
-      // 
-      // contentAreaPanel
-      // 
-      this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
-      this.contentAreaPanel.Controls.Add(this.chkAutoCommit);
-      this.contentAreaPanel.Controls.Add(this.chkRefreshFromDB);
-      this.contentAreaPanel.Controls.Add(this.grdPreview);
-      this.contentAreaPanel.Size = new System.Drawing.Size(524, 301);
-      // 
-      // commandAreaPanel
-      // 
-      this.commandAreaPanel.Controls.Add(this.btnCommit);
-      this.commandAreaPanel.Controls.Add(this.btnRevert);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 302);
-      this.commandAreaPanel.Size = new System.Drawing.Size(524, 45);
-      // 
-      // btnCommit
-      // 
-      this.btnCommit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnCommit.Location = new System.Drawing.Point(370, 12);
-      this.btnCommit.Name = "btnCommit";
-      this.btnCommit.Size = new System.Drawing.Size(143, 23);
-      this.btnCommit.TabIndex = 1;
-      this.btnCommit.Text = "Commit Changes";
-      this.btnCommit.UseVisualStyleBackColor = true;
-      this.btnCommit.Click += new System.EventHandler(this.btnCommit_Click);
       // 
       // btnRevert
       // 
       this.btnRevert.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.btnRevert.Location = new System.Drawing.Point(12, 12);
+      this.btnRevert.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.btnRevert.Location = new System.Drawing.Point(16, 40);
       this.btnRevert.Name = "btnRevert";
-      this.btnRevert.Size = new System.Drawing.Size(110, 23);
-      this.btnRevert.TabIndex = 0;
+      this.btnRevert.Size = new System.Drawing.Size(101, 25);
+      this.btnRevert.TabIndex = 1;
       this.btnRevert.Text = "Revert Data";
       this.btnRevert.UseVisualStyleBackColor = true;
       this.btnRevert.Click += new System.EventHandler(this.btnRevert_Click);
+      // 
+      // btnCommit
+      // 
+      this.btnCommit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.btnCommit.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.btnCommit.Location = new System.Drawing.Point(123, 40);
+      this.btnCommit.Name = "btnCommit";
+      this.btnCommit.Size = new System.Drawing.Size(136, 25);
+      this.btnCommit.TabIndex = 2;
+      this.btnCommit.Text = "Commit Changes";
+      this.btnCommit.UseVisualStyleBackColor = true;
+      this.btnCommit.Click += new System.EventHandler(this.btnCommit_Click);
+      // 
+      // picSakilaLogo
+      // 
+      this.picSakilaLogo.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_EditDataDlg_Sakila_16x16;
+      this.picSakilaLogo.Location = new System.Drawing.Point(6, 6);
+      this.picSakilaLogo.Name = "picSakilaLogo";
+      this.picSakilaLogo.Size = new System.Drawing.Size(16, 16);
+      this.picSakilaLogo.TabIndex = 3;
+      this.picSakilaLogo.TabStop = false;
+      // 
+      // lblMySQLforExcel
+      // 
+      this.lblMySQLforExcel.AutoSize = true;
+      this.lblMySQLforExcel.BackColor = System.Drawing.Color.Transparent;
+      this.lblMySQLforExcel.ContextMenuStrip = this.contextMenu;
+      this.lblMySQLforExcel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblMySQLforExcel.ForeColor = System.Drawing.Color.White;
+      this.lblMySQLforExcel.Location = new System.Drawing.Point(28, 5);
+      this.lblMySQLforExcel.Name = "lblMySQLforExcel";
+      this.lblMySQLforExcel.Size = new System.Drawing.Size(108, 17);
+      this.lblMySQLforExcel.TabIndex = 4;
+      this.lblMySQLforExcel.Text = "MySQL for Excel";
       // 
       // chkAutoCommit
       // 
       this.chkAutoCommit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.chkAutoCommit.AutoSize = true;
       this.chkAutoCommit.BackColor = System.Drawing.Color.Transparent;
-      this.chkAutoCommit.Location = new System.Drawing.Point(382, 279);
+      this.chkAutoCommit.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.chkAutoCommit.ForeColor = System.Drawing.Color.White;
+      this.chkAutoCommit.Location = new System.Drawing.Point(168, 6);
       this.chkAutoCommit.Name = "chkAutoCommit";
-      this.chkAutoCommit.Size = new System.Drawing.Size(130, 17);
-      this.chkAutoCommit.TabIndex = 2;
-      this.chkAutoCommit.Text = "Auto-Commit Changes";
+      this.chkAutoCommit.Size = new System.Drawing.Size(101, 19);
+      this.chkAutoCommit.TabIndex = 5;
+      this.chkAutoCommit.Text = "Auto-Commit";
       this.chkAutoCommit.UseVisualStyleBackColor = false;
       this.chkAutoCommit.CheckedChanged += new System.EventHandler(this.chkAutoCommit_CheckedChanged);
       // 
-      // chkRefreshFromDB
+      // contextMenu
       // 
-      this.chkRefreshFromDB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.chkRefreshFromDB.AutoSize = true;
-      this.chkRefreshFromDB.BackColor = System.Drawing.Color.Transparent;
-      this.chkRefreshFromDB.Checked = true;
-      this.chkRefreshFromDB.CheckState = System.Windows.Forms.CheckState.Checked;
-      this.chkRefreshFromDB.Location = new System.Drawing.Point(12, 279);
-      this.chkRefreshFromDB.Name = "chkRefreshFromDB";
-      this.chkRefreshFromDB.Size = new System.Drawing.Size(104, 17);
-      this.chkRefreshFromDB.TabIndex = 1;
-      this.chkRefreshFromDB.Text = "Refresh from DB";
-      this.chkRefreshFromDB.UseVisualStyleBackColor = false;
+      this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exitEditModeToolStripMenuItem});
+      this.contextMenu.Name = "contextMenu";
+      this.contextMenu.Size = new System.Drawing.Size(150, 26);
       // 
-      // grdPreview
+      // exitEditModeToolStripMenuItem
       // 
-      this.grdPreview.AllowUserToAddRows = false;
-      this.grdPreview.AllowUserToDeleteRows = false;
-      this.grdPreview.AllowUserToOrderColumns = true;
-      this.grdPreview.AllowUserToResizeColumns = false;
-      this.grdPreview.AllowUserToResizeRows = false;
-      this.grdPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.grdPreview.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-      this.grdPreview.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-      dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-      dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.Transparent;
-      dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdPreview.DefaultCellStyle = dataGridViewCellStyle2;
-      this.grdPreview.Location = new System.Drawing.Point(12, 11);
-      this.grdPreview.MultiSelect = false;
-      this.grdPreview.Name = "grdPreview";
-      this.grdPreview.ReadOnly = true;
-      this.grdPreview.RowHeadersVisible = false;
-      this.grdPreview.Size = new System.Drawing.Size(500, 252);
-      this.grdPreview.TabIndex = 0;
+      this.exitEditModeToolStripMenuItem.Name = "exitEditModeToolStripMenuItem";
+      this.exitEditModeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.exitEditModeToolStripMenuItem.Text = "Exit Edit Mode";
+      this.exitEditModeToolStripMenuItem.Click += new System.EventHandler(this.exitEditModeToolStripMenuItem_Click);
       // 
-      // EditDataForm
+      // EditDataDialog
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(524, 348);
-      this.CommandAreaHeight = 45;
-      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
-      this.MinimumSize = new System.Drawing.Size(300, 300);
-      this.Name = "EditDataForm";
-      this.Text = "Edit Data - SheetName [Range]";
-      this.Activated += new System.EventHandler(this.EditDataForm_Activated);
-      this.Deactivate += new System.EventHandler(this.EditDataForm_Deactivate);
-      this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.EditDataForm_FormClosed);
-      this.contentAreaPanel.ResumeLayout(false);
-      this.contentAreaPanel.PerformLayout();
-      this.commandAreaPanel.ResumeLayout(false);
-      ((System.ComponentModel.ISupportInitialize)(this.grdPreview)).EndInit();
+      this.BackColor = System.Drawing.Color.Black;
+      this.ClientSize = new System.Drawing.Size(275, 78);
+      this.ControlBox = false;
+      this.Controls.Add(this.chkAutoCommit);
+      this.Controls.Add(this.lblMySQLforExcel);
+      this.Controls.Add(this.picSakilaLogo);
+      this.Controls.Add(this.btnCommit);
+      this.Controls.Add(this.btnRevert);
+      this.DoubleBuffered = true;
+      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+      this.MaximizeBox = false;
+      this.Name = "EditDataDialog";
+      this.Padding = new System.Windows.Forms.Padding(3);
+      this.ShowInTaskbar = false;
+      this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+      this.TopMost = true;
+      this.Activated += new System.EventHandler(this.EditDataDialog_Activated);
+      this.Deactivate += new System.EventHandler(this.EditDataDialog_Deactivate);
+      ((System.ComponentModel.ISupportInitialize)(this.picSakilaLogo)).EndInit();
+      this.contextMenu.ResumeLayout(false);
       this.ResumeLayout(false);
+      this.PerformLayout();
 
     }
 
     #endregion
 
-    private System.Windows.Forms.Button btnCommit;
     private System.Windows.Forms.Button btnRevert;
+    private System.Windows.Forms.Button btnCommit;
+    private System.Windows.Forms.PictureBox picSakilaLogo;
+    private System.Windows.Forms.Label lblMySQLforExcel;
     private System.Windows.Forms.CheckBox chkAutoCommit;
-    private System.Windows.Forms.CheckBox chkRefreshFromDB;
-    private System.Windows.Forms.DataGridView grdPreview;
+    private System.Windows.Forms.ContextMenuStrip contextMenu;
+    private System.Windows.Forms.ToolStripMenuItem exitEditModeToolStripMenuItem;
   }
 }

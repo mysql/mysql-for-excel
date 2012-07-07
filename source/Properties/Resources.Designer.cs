@@ -235,6 +235,34 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap MySQLforExcel_Cursor_Dragging_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_Cursor_Dragging_32x32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MySQLforExcel_Cursor_Dropable_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_Cursor_Dropable_32x32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MySQLforExcel_Cursor_Trash_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_Cursor_Trash_32x32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MySQLforExcel_EditDataDlg_Sakila_16x16 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_EditDataDlg_Sakila_16x16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap MySQLforExcel_ExportDlg_ColumnOptions_32x32 {
             get {
                 object obj = ResourceManager.GetObject("MySQLforExcel_ExportDlg_ColumnOptions_32x32", resourceCulture);
@@ -266,6 +294,20 @@ namespace MySQL.ForExcel.Properties {
         internal static System.Drawing.Bitmap MySQLforExcel_ImportRoutineDlg_Params_32x32 {
             get {
                 object obj = ResourceManager.GetObject("MySQLforExcel_ImportRoutineDlg_Params_32x32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MySQLforExcel_InfoDlg_Error_64x64 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_InfoDlg_Error_64x64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MySQLforExcel_InfoDlg_Success_64x64 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_InfoDlg_Success_64x64", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -413,6 +455,13 @@ namespace MySQL.ForExcel.Properties {
         internal static System.Drawing.Bitmap MySQLforExcel_WelcomePanel_Connection_24x24 {
             get {
                 object obj = ResourceManager.GetObject("MySQLforExcel_WelcomePanel_Connection_24x24", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MySQLforExcel_WelcomePanel_Connection_Disabled_24x24 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_WelcomePanel_Connection_Disabled_24x24", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
