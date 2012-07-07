@@ -25,6 +25,7 @@ namespace MySQL.ForExcel
       cs.UserID = connection.UserName;
       cs.Password = connection.Password;
       cs.Database = connection.Schema;
+      cs.Port = (uint)connection.Port;
       //TODO:  use additional necessary options
       return cs.ConnectionString;
     }
@@ -62,7 +63,7 @@ namespace MySQL.ForExcel
               mysqlAdapter = new MySqlDataAdapter("SHOW CHARSET", conn);
               dt = new DataTable();
               mysqlAdapter.Fill(dt);
-              break;
+              break;          
             default:
               dt = conn.GetSchema(collection, restrictions);
               break;

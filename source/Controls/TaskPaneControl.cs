@@ -198,14 +198,26 @@ namespace MySQL.ForExcel
         return false;
       }
       Excel.Worksheet currentWorksheet = null;
+      var nameSheet = tableObject.Name;
+
       if (excelApplication.ActiveWorkbook != null)
-        currentWorksheet = excelApplication.Sheets.Add(Type.Missing, excelApplication.ActiveSheet, Type.Missing, Type.Missing);
+      {
+        currentWorksheet = excelApplication.Sheets.Add(Type.Missing, excelApplication.ActiveSheet, Type.Missing, Type.Missing);        
+        int i = 0;
+        foreach (Excel.Worksheet ws in excelApplication.Worksheets)
+        {
+          if (ws.Name.Contains(nameSheet))
+            i++;
+        }
+        if (i > 0) nameSheet = String.Format("Copy ({0}) of {1}", i, nameSheet);
+      }
       else
       {
         Excel.Workbook currentWorkbook = excelApplication.Workbooks.Add(Type.Missing);
         currentWorksheet = (currentWorkbook.Worksheets[1] as Excel.Worksheet);
       }
-      currentWorksheet.Name = tableObject.Name;
+
+      currentWorksheet.Name = nameSheet;
       currentWorksheet.Activate();
       Excel.Range atCell = currentWorksheet.get_Range("A1", Type.Missing);
       atCell.Select();

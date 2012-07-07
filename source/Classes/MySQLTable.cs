@@ -180,6 +180,7 @@ namespace MySQL.ForExcel
         if (index != -1)
           CharacterSet = Collation.Substring(0, index);
       }
+      loadIndexes();
     }
 
     private void parseColumns(DataTable columnData)
