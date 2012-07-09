@@ -35,7 +35,11 @@ namespace MySQL.ForExcel
       TitleTextVerticalPixelsOffset = 0;
       DescriptionTextVerticalPixelsOffset = 0;
       this.Scrollable = true;
-      ShowNodeToolTips = true;
+
+      toolTipLowLevelNode = new ToolTip();
+      toolTipLowLevelNode.AutoPopDelay = 1000;
+      toolTipLowLevelNode.InitialDelay = 500;
+      toolTipLowLevelNode.SetToolTip(this, "");
     }
 
     public double TitleColorOpacity { get; set; }
@@ -49,6 +53,8 @@ namespace MySQL.ForExcel
     public int ImageToTextHorizontalPixelsOffset { get; set; }
     public int TitleTextVerticalPixelsOffset { get; set; }
     public int DescriptionTextVerticalPixelsOffset { get; set; }
+    private ToolTip toolTipLowLevelNode { get; set; }
+
     public int NodeHeightMultiple 
     {
       get { return nodeHeightMultiple; }
@@ -66,6 +72,30 @@ namespace MySQL.ForExcel
       if (node != null)
         SelectedNode = node;
       base.OnMouseClick(e);
+    }
+
+    protected override void OnMouseMove(MouseEventArgs e)
+    {
+      TreeNode node = GetNodeAt(e.Location);
+ 
+      if ((node != null))
+      {
+        string[] parts = node.Text.Split((char)'|');
+        string tooltip = parts.Length >= 1 ? parts[0] : "";
+        
+        if (node.Level > 0 && tooltip != toolTipLowLevelNode.GetToolTip(this))
+          {
+            toolTipLowLevelNode.Active = true;                
+            toolTipLowLevelNode.SetToolTip(this, parts[0]);            
+            toolTipLowLevelNode.Show(tooltip, this);
+          }
+      }        
+      else
+      {
+        toolTipLowLevelNode.Active = false;
+      }
+
+      base.OnMouseHover(e);
     }
 
     private void UpdateExtendedStyles()
@@ -149,8 +179,7 @@ namespace MySQL.ForExcel
       // Draw the title if we have one
       SolidBrush titleBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), ForeColor));
       if (parts != null && parts.Length >= 1)
-      {
-
+      {  
         SizeF stringSize = e.Graphics.MeasureString(parts[0], Font);
         if (stringSize.Width > e.Node.TreeView.Width - 10)
         {
@@ -160,8 +189,7 @@ namespace MySQL.ForExcel
         {
           e.Graphics.DrawString(parts[0], Font, titleBrush, pt.X, pt.Y);
         }
-        pt.Y += (int)(stringSize.Height) + DescriptionTextVerticalPixelsOffset;
-        e.Node.ToolTipText = parts[0];
+        pt.Y += (int)(stringSize.Height) + DescriptionTextVerticalPixelsOffset;        
       }
 
       // Draw the description if there is one

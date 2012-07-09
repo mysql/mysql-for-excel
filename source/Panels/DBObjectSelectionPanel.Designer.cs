@@ -156,7 +156,6 @@
       this.objectList.Name = "objectList";
       this.objectList.NodeHeightMultiple = 3;
       this.objectList.NodeImages = this.largeImages;
-      this.objectList.ShowNodeToolTips = true;
       this.objectList.Size = new System.Drawing.Size(242, 275);
       this.objectList.TabIndex = 24;
       this.objectList.TitleColorOpacity = 0.8D;

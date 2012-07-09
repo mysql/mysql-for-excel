@@ -162,7 +162,6 @@
       this.connectionList.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode1,
             treeNode2});
-      this.connectionList.ShowNodeToolTips = true;
       this.connectionList.Size = new System.Drawing.Size(242, 315);
       this.connectionList.TabIndex = 22;
       this.connectionList.TitleColorOpacity = 0.8D;

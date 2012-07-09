@@ -140,7 +140,6 @@
       this.databaseList.Name = "databaseList";
       this.databaseList.NodeHeightMultiple = 3;
       this.databaseList.NodeImages = this.largeImages;
-      this.databaseList.ShowNodeToolTips = true;
       this.databaseList.Size = new System.Drawing.Size(242, 325);
       this.databaseList.TabIndex = 23;
       this.databaseList.TitleColorOpacity = 0.8D;

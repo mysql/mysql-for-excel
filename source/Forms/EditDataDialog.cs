@@ -104,15 +104,20 @@ namespace MySQL.ForExcel
         updateParam.SourceColumn = mysqlCol.ColumnName;
         updateParam.SourceVersion = DataRowVersion.Original;
         dataAdapter.UpdateCommand.Parameters.Add(updateParam);
-        wClauseString.AppendFormat("{0}{1}=@W_{1}", wClauseSeparator, mysqlCol.ColumnName);
 
-        if (!isPrimaryKeyColumn)
-        {
-          updateParam = new MySqlParameter(String.Format("@S_{0}", mysqlCol.ColumnName), mysqlColType);
-          updateParam.SourceColumn = mysqlCol.ColumnName;
-          dataAdapter.UpdateCommand.Parameters.Add(updateParam);
-          setClauseString.AppendFormat("{0}{1}=@S_{1}", sClauseSeparator, mysqlCol.ColumnName);
-        }
+        if (isPrimaryKeyColumn)
+          wClauseString.AppendFormat("{0}{1}=@W_{1}", wClauseString.ToString().Equals(Environment.NewLine + "WHERE" + Environment.NewLine) ? "" : wClauseSeparator, mysqlCol.ColumnName);        
+        
+        if (editMySQLTable.PrimaryKey == null)
+          wClauseString.AppendFormat("{0}{1}=@W_{1}", wClauseString.ToString().Equals(Environment.NewLine + "WHERE" + Environment.NewLine) ? "" : wClauseSeparator, mysqlCol.ColumnName);        
+        
+        updateParam = new MySqlParameter(String.Format("@S_{0}", mysqlCol.ColumnName), mysqlColType);
+        updateParam.SourceColumn = mysqlCol.ColumnName;
+
+
+        dataAdapter.UpdateCommand.Parameters.Add(updateParam);
+        setClauseString.AppendFormat("{0}{1}=@S_{1}", setClauseString.ToString().Equals(String.Empty) ? "" : sClauseSeparator, mysqlCol.ColumnName);
+
         wClauseSeparator = " AND ";
         sClauseSeparator = ",";
       }
