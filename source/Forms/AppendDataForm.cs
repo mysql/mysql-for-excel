@@ -471,7 +471,7 @@ namespace MySQL.ForExcel
     private void grdToMySQLTable_DragOver(object sender, DragEventArgs e)
     {
       // Determine whether string data exists in the drop data. If not, then the drop effect reflects that the drop cannot occur.
-      if (!e.Data.GetDataPresent(typeof(System.String)))
+      if (!e.Data.GetDataPresent(typeof(System.Int32)))
       {
         e.Effect = DragDropEffects.None;
         grdToTableColumnIndexToDrop = -1;

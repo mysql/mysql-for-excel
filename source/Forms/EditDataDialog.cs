@@ -54,6 +54,7 @@ namespace MySQL.ForExcel
       toolTip.SetToolTip(this, String.Format("Editing data for Table {0} on Worksheet {1}", EditingTableName, editingWorksheet.Name));
       editingRowsQuantity = editingWorksheet.UsedRange.Rows.Count;
       editingColsQuantity = editingWorksheet.UsedRange.Columns.Count;
+      Opacity = 0.60;
     }
 
     protected override void OnPaintBackground(PaintEventArgs e)
@@ -187,6 +188,7 @@ namespace MySQL.ForExcel
       if (!chkAutoCommit.Checked)
       {
         InfoDialog infoDialog = new InfoDialog(pushSuccessful, operationSummary, operationDetails.ToString());
+        infoDialog.StartPosition = FormStartPosition.CenterScreen;
         DialogResult dr = infoDialog.ShowDialog();
         if (dr == DialogResult.Cancel)
           return;
@@ -331,16 +333,6 @@ namespace MySQL.ForExcel
     {
       btnCommit.Enabled = !chkAutoCommit.Checked;
       btnRevert.Enabled = !chkAutoCommit.Checked;
-    }
-
-    private void EditDataDialog_Activated(object sender, EventArgs e)
-    {
-      Opacity = 1;
-    }
-
-    private void EditDataDialog_Deactivate(object sender, EventArgs e)
-    {
-      Opacity = 0.60;
     }
 
   }

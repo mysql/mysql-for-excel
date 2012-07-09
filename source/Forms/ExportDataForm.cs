@@ -31,7 +31,6 @@ namespace MySQL.ForExcel
       Text = String.Format("Export Data - {0} [{1}])", exportingWorksheet.Name, exportDataRange.Address.Replace("$", String.Empty));
 
       LoadDataAndCreateColumns(exportDataRange, proposedTableName);
-      SetDefaultPrimaryKey();
       initializeDataTypeCombo();
 
       if (!String.IsNullOrEmpty(proposedTableName))
@@ -39,6 +38,7 @@ namespace MySQL.ForExcel
       txtTableNameInput.SelectAll();
       btnCopySQL.Visible = Properties.Settings.Default.ExportShowCopySQLButton;
       chkFirstRowHeaders_CheckedChanged(chkFirstRowHeaders, EventArgs.Empty);
+      SetDefaultPrimaryKey();
     }
 
     private void refreshPrimaryKeyColumnsCombo()

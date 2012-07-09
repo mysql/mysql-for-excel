@@ -152,8 +152,6 @@
       this.ShowInTaskbar = false;
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
       this.TopMost = true;
-      this.Activated += new System.EventHandler(this.EditDataDialog_Activated);
-      this.Deactivate += new System.EventHandler(this.EditDataDialog_Deactivate);
       ((System.ComponentModel.ISupportInitialize)(this.picSakilaLogo)).EndInit();
       this.contextMenu.ResumeLayout(false);
       this.ResumeLayout(false);

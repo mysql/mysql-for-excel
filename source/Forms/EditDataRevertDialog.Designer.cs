@@ -133,6 +133,7 @@
       this.MaximumSize = new System.Drawing.Size(500, 190);
       this.MinimumSize = new System.Drawing.Size(500, 190);
       this.Name = "EditDataRevertDialog";
+      this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
       this.Text = "MySQL for Excel";
       this.contentAreaPanel.ResumeLayout(false);
       this.contentAreaPanel.PerformLayout();
