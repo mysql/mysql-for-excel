@@ -285,6 +285,12 @@
     <Compile Include="Forms\AppendNewColumnMappingDialog.Designer.cs">
       <DependentUpon>AppendNewColumnMappingDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\EditDataRevertDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\EditDataRevertDialog.Designer.cs">
+      <DependentUpon>EditDataRevertDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\ImportProcedureForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -315,6 +321,12 @@
     <Compile Include="Forms\ExportDataForm.Designer.cs">
       <DependentUpon>ExportDataForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\InfoDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\InfoDialog.Designer.cs">
+      <DependentUpon>InfoDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\NewConnectionDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -333,7 +345,7 @@
     <Compile Include="Forms\PasswordDialog.designer.cs">
       <DependentUpon>PasswordDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\OpacityControl.cs">
+    <Compile Include="Controls\TransparentPictureBox.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Panels\AutoStyleableBasePanel.cs">
@@ -390,6 +402,9 @@
     <EmbeddedResource Include="Forms\AppendNewColumnMappingDialog.resx">
       <DependentUpon>AppendNewColumnMappingDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\EditDataRevertDialog.resx">
+      <DependentUpon>EditDataRevertDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportProcedureForm.resx">
       <DependentUpon>ImportProcedureForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -404,6 +419,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ExportDataForm.resx">
       <DependentUpon>ExportDataForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\InfoDialog.resx">
+      <DependentUpon>InfoDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\NewConnectionDialog.resx">
       <DependentUpon>NewConnectionDialog.cs</DependentUpon>

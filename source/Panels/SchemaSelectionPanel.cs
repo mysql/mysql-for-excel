@@ -24,13 +24,16 @@ namespace MySQL.ForExcel
       databaseList.AddNode(null, "System Schemas");
     }
 
-    public void SetConnection(MySqlWorkbenchConnection connection)
+    public bool SetConnection(MySqlWorkbenchConnection connection)
     {
+      bool schemasLoaded = false;
       this.connection = connection;
       lblConnectionName.Text = connection.Name;
       lblUserIP.Text = String.Format("User: {0}, IP: {1}", connection.UserName, connection.Host);
-      LoadSchemas();
-      databaseList_AfterSelect(null, null);
+      schemasLoaded = LoadSchemas();
+      if (schemasLoaded)
+        databaseList_AfterSelect(null, null);
+      return schemasLoaded;
     }
 
     private void databaseList_AfterSelect(object sender, TreeViewEventArgs e)
@@ -60,7 +63,7 @@ namespace MySQL.ForExcel
         btnNext_Click(this, EventArgs.Empty);
     }
 
-    private void LoadSchemas()
+    private bool LoadSchemas()
     {
       foreach (TreeNode node in databaseList.Nodes)
         node.Nodes.Clear();
@@ -69,7 +72,7 @@ namespace MySQL.ForExcel
       {
         MessageBox.Show(Resources.UnableToLoadDatabases);
         (Parent as TaskPaneControl).CloseConnection();
-        return;
+        return false;
       }
 
       foreach (DataRow row in databases.Rows)
@@ -89,6 +92,7 @@ namespace MySQL.ForExcel
       }
       if (databaseList.Nodes[0].GetNodeCount(true) > 0)
         databaseList.Nodes[0].Expand();
+      return true;
     }
 
     private void createNewSchema_Click(object sender, EventArgs e)

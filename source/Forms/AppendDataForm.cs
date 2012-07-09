@@ -330,18 +330,44 @@ namespace MySQL.ForExcel
 
     private void btnAppend_Click(object sender, EventArgs e)
     {
+      DialogResult dr;
       if (exportTable.Columns.Count(col => !String.IsNullOrEmpty(col.MappedDataColName)) < maxMappingCols)
       {
-        DialogResult dr = Utilities.ShowWarningBox(Properties.Resources.ColumnMappingIncomplete);
+        dr = Utilities.ShowWarningBox(Properties.Resources.ColumnMappingIncomplete);
         if (dr == DialogResult.No)
           return;
       }
-      bool success = exportDataHelper.InsertData(chkFirstRowHeaders.Checked, Settings.Default.AppendUseFormattedValues);
+
+      MySqlException exception;
+      string insertQuery;
+      string operationSummary;
+
+      bool success = exportDataHelper.InsertData(chkFirstRowHeaders.Checked, Settings.Default.AppendUseFormattedValues, out insertQuery, out exception);
+
       if (success)
+        operationSummary = String.Format("Excel data was appended successfully to MySQL Table {0}.", exportDataHelper.ExportTable.Name);
+      else
+        operationSummary = String.Format("Excel data could not be appended to MySQL Table {0}.", exportDataHelper.ExportTable.Name);
+      StringBuilder operationDetails = new StringBuilder();
+      operationDetails.AppendFormat("Inserting Excel data in MySQL Table \"{0}\"...{1}{1}", exportDataHelper.ExportTable.Name, Environment.NewLine);
+      operationDetails.Append(insertQuery);
+      operationDetails.Append(Environment.NewLine);
+      operationDetails.Append(Environment.NewLine);
+      if (success)
+        operationDetails.Append("Excel data was inserted successfully.");
+      else
       {
-        DialogResult = DialogResult.OK;
-        Close();
+        operationDetails.AppendFormat("MySQL Error {0}:{1}", exception.Number, Environment.NewLine);
+        operationDetails.Append(exception.Message);
       }
+
+      InfoDialog infoDialog = new InfoDialog(success, operationSummary, operationDetails.ToString());
+      dr = infoDialog.ShowDialog();
+      if (dr == DialogResult.Cancel)
+        return;
+
+      DialogResult = DialogResult.OK;
+      Close();
     }
 
     private void grdMouseDown(object sender, MouseEventArgs e)

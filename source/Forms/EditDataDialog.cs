@@ -20,12 +20,20 @@ namespace MySQL.ForExcel
     private Excel.Range editDataRange;
     private bool importedHeaders = false;
     private string queryString = String.Empty;
-    private string tableName = String.Empty;
     private MySQLTable editMySQLTable;
     private MySqlDataAdapter dataAdapter;
     private MySqlConnection connection;
+    private List<string> modifiedCellAddressesList;
+    private int commitedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#B8E5F7"));
+    private int uncommitedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#FF8282"));
+    private int newRowCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#FFFCC7"));
+    private int defaultCellsOLEColor = ColorTranslator.ToOle(Color.White);
+    private long editingRowsQuantity = 0;
+    private long editingColsQuantity = 0;
+
     public Excel.Worksheet EditingWorksheet = null;
     public TaskPaneControl CallerTaskPane;
+    public string EditingTableName { get; private set; }
 
     public EditDataDialog(MySqlWorkbenchConnection wbConnection, Excel.Range editDataRange, DataTable importTable, Excel.Worksheet editingWorksheet)
     {
@@ -34,14 +42,18 @@ namespace MySQL.ForExcel
       this.wbConnection = wbConnection;
       this.editingTable = importTable;
       this.editDataRange = editDataRange;
-      tableName = importTable.ExtendedProperties["TableName"].ToString();
+      EditingTableName = importTable.ExtendedProperties["TableName"].ToString();
       importedHeaders = (bool)importTable.ExtendedProperties["ImportedHeaders"];
       queryString = importTable.ExtendedProperties["QueryString"].ToString();
-      getMySQLTableSchemaInfo(tableName);
+      getMySQLTableSchemaInfo(EditingTableName);
       initializeDataAdapter();
       EditingWorksheet = editingWorksheet;
       EditingWorksheet.Change += new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
       EditingWorksheet.SelectionChange += new Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);
+      modifiedCellAddressesList = new List<string>(editDataRange.Count);
+      toolTip.SetToolTip(this, String.Format("Editing data for Table {0} on Worksheet {1}", EditingTableName, editingWorksheet.Name));
+      editingRowsQuantity = editingWorksheet.UsedRange.Rows.Count;
+      editingColsQuantity = editingWorksheet.UsedRange.Columns.Count;
     }
 
     protected override void OnPaintBackground(PaintEventArgs e)
@@ -72,15 +84,15 @@ namespace MySQL.ForExcel
       dataAdapter = new MySqlDataAdapter(this.queryString, connection);
       dataAdapter.UpdateCommand = new MySqlCommand(String.Empty, connection);
       StringBuilder queryString = new StringBuilder();
-      StringBuilder wClauseString = new StringBuilder(" WHERE ");
+      StringBuilder wClauseString = new StringBuilder();
+      wClauseString.AppendFormat("{0}WHERE{0}", Environment.NewLine);
       StringBuilder setClauseString = new StringBuilder();
       string wClause = String.Empty;
       MySqlParameter updateParam = null;
 
       string wClauseSeparator = String.Empty;
       string sClauseSeparator = String.Empty;
-      queryString.AppendFormat("USE {0}; UPDATE", wbConnection.Schema);
-      queryString.AppendFormat(" {0} SET ", editMySQLTable.Name);
+      queryString.AppendFormat("USE {0};{2}UPDATE {1}{2}SET{2}", wbConnection.Schema, EditingTableName, Environment.NewLine);
 
       foreach (MySQLColumn mysqlCol in editMySQLTable.Columns)
       {
@@ -108,47 +120,79 @@ namespace MySQL.ForExcel
       dataAdapter.UpdateCommand.CommandText = queryString.ToString();
     }
 
-    private void revertDataChanges(bool refetchFromDB)
+    private void changeExcelCellsColor(int oleColor)
     {
-      if (refetchFromDB)
+      Excel.Range modifiedRange = null;
+      foreach (string modifiedRangeAddress in modifiedCellAddressesList)
       {
-        //editingTable = Utilities.GetDataFromTableOrView(wbConnection, editingTable.ExtendedProperties["QueryString"].ToString());
+        string[] startAndEndRange = modifiedRangeAddress.Split(new char[] { ':' });
+        if (startAndEndRange.Length > 1)
+          modifiedRange = EditingWorksheet.get_Range(startAndEndRange[0], startAndEndRange[1]);
+        else
+          modifiedRange = EditingWorksheet.get_Range(modifiedRangeAddress);
+        modifiedRange.Interior.Color = oleColor;
+      }
+      modifiedCellAddressesList.Clear();
+    }
+
+    private void revertDataChanges(bool refreshFromDB)
+    {
+      if (refreshFromDB)
+      {
         editingTable.Clear();
         dataAdapter.Fill(editingTable);
-        Utilities.AddExtendedProperties(ref editingTable, queryString, importedHeaders, tableName);
-        Excel.Range topLeftCell = editDataRange.Cells[1, 1];
-        CallerTaskPane.ImportDataTableToExcelAtGivenCell(editingTable, importedHeaders, topLeftCell);
+        Utilities.AddExtendedProperties(ref editingTable, queryString, importedHeaders, EditingTableName);
       }
       else
       {
         editingTable.RejectChanges();
       }
+      Excel.Range topLeftCell = editDataRange.Cells[1, 1];
+      CallerTaskPane.ImportDataTableToExcelAtGivenCell(editingTable, importedHeaders, topLeftCell);
+      changeExcelCellsColor(defaultCellsOLEColor);
+      btnCommit.Enabled = false;
     }
 
     private void pushDataChanges()
     {
       int updatedCount = 0;
+      bool pushSuccessful = true;
+      string operationSummary = String.Format("Edited data for Table {0} was committed to MySQL successfully.", EditingTableName);
+      StringBuilder operationDetails = new StringBuilder();
+      operationDetails.AppendFormat("Updating data rows...{0}{0}", Environment.NewLine);
+      operationDetails.Append(dataAdapter.UpdateCommand.CommandText);
+      operationDetails.Append(Environment.NewLine);
+      operationDetails.Append(Environment.NewLine);
+
       try
       {
+        DataTable changesTable = editingTable.GetChanges();
+        int editingRowsCount = (changesTable != null ? changesTable.Rows.Count : 0);
         updatedCount = dataAdapter.Update(editingTable);
+        operationDetails.AppendFormat("{1}{0} rows have been updated successfully.", editingRowsCount, Environment.NewLine);
       }
-      catch (Exception ex)
+      catch (MySqlException ex)
       {
-        System.Diagnostics.Debug.WriteLine(ex.Message);
+        if (chkAutoCommit.Checked)
+        {
+          System.Diagnostics.Debug.WriteLine(ex.Message);
+          return;
+        }
+        pushSuccessful = false;
+        operationSummary = String.Format("Edited data for Table {0} could not be committed to MySQL.", EditingTableName);
+        operationDetails.AppendFormat("MySQL Error {0}:{1}", ex.Number, Environment.NewLine);
+        operationDetails.Append(ex.Message);
       }
-      if (updatedCount == 0)
+
+      if (!chkAutoCommit.Checked)
       {
-        System.Diagnostics.Debug.WriteLine("Problem with Adapter Update, no rows were updated.");
-        return;
+        InfoDialog infoDialog = new InfoDialog(pushSuccessful, operationSummary, operationDetails.ToString());
+        DialogResult dr = infoDialog.ShowDialog();
+        if (dr == DialogResult.Cancel)
+          return;
       }
-      //for (int rowIdx = 0; rowIdx < grdPreview.Rows.Count; rowIdx++)
-      //{
-      //  for (int colIdx = 0; colIdx < grdPreview.Columns.Count; colIdx++)
-      //  {
-      //    if (grdPreview.Rows[rowIdx].Cells[colIdx].Style.BackColor == Color.OrangeRed)
-      //      grdPreview.Rows[rowIdx].Cells[colIdx].Style.BackColor = Color.LightGreen;
-      //  }
-      //}
+      changeExcelCellsColor(commitedCellsOLEColor);
+      btnCommit.Enabled = false;
     }
 
     private void EditingWorksheet_Change(Excel.Range Target)
@@ -156,28 +200,56 @@ namespace MySQL.ForExcel
       Excel.Range intersectRange = CallerTaskPane.IntersectRanges(editDataRange, Target);
       if (intersectRange == null || intersectRange.Count == 0)
         return;
+      if (!chkAutoCommit.Checked && !modifiedCellAddressesList.Contains(intersectRange.Address))
+        modifiedCellAddressesList.Add(intersectRange.Address);
+      intersectRange.Interior.Color = (chkAutoCommit.Checked ? commitedCellsOLEColor : uncommitedCellsOLEColor);
+      
+      // We subtract from the Excel indexes since they start at 1, Row is subtracted by 2 if we imported headers.
       Excel.Range startCell = (intersectRange.Item[1, 1] as Excel.Range);
-      string startCellAddress = startCell.Address;
-      int startRow = startCell.Row - (importedHeaders ? 1 : 0) - 1;
-      int startCol = startCell.Column - 1;
-      object[,] formattedArrayFromRange;
-      if (intersectRange.Count > 1)
-        formattedArrayFromRange = intersectRange.Value as object[,];
+      int startDataTableRow = startCell.Row - (importedHeaders ? 2 : 1);
+      int startDataTableCol = startCell.Column - 1;
+
+      // Detect if a row was deleted and if so flag a row for deletion
+      if (EditingWorksheet.UsedRange.Rows.Count < editingRowsQuantity)
+      {
+        editingTable.Rows[startDataTableRow].Delete();
+        editingRowsQuantity = EditingWorksheet.UsedRange.Rows.Count;
+      }
+      // Detect if a column was deleted and if so remove the column from the Columns colletion
+      else if (EditingWorksheet.UsedRange.Columns.Count < editingColsQuantity)
+      {
+        editingTable.Columns.RemoveAt(startDataTableCol);
+      }
       else
       {
-        formattedArrayFromRange = new object[2, 2];
-        formattedArrayFromRange[1, 1] = intersectRange.Value;
-      }
-      for (int rowIdx = 0; rowIdx < intersectRange.Rows.Count; rowIdx++)
-      {
-        for (int colIdx = 0; colIdx < intersectRange.Columns.Count; colIdx++)
+        object[,] formattedArrayFromRange;
+        if (intersectRange.Count > 1)
+          formattedArrayFromRange = intersectRange.Value as object[,];
+        else
         {
-          int absRow = startRow + rowIdx;
-          int absCol = startCol + colIdx;
-          editingTable.Rows[absRow][absCol] = formattedArrayFromRange[rowIdx + 1, colIdx + 1];
-          //grdPreview.Rows[absRow].Cells[absCol].Style.BackColor = Color.OrangeRed;
+          formattedArrayFromRange = new object[2, 2];
+          formattedArrayFromRange[1, 1] = intersectRange.Value;
+        }
+        int startRangeRow = 1;
+        if (startDataTableRow < 0)
+        {
+          for (int colIdx = 1; colIdx <= intersectRange.Columns.Count; colIdx++)
+            editingTable.Columns[startDataTableCol + colIdx - 1].ColumnName = formattedArrayFromRange[startRangeRow, colIdx].ToString();
+          startDataTableRow++;
+          startRangeRow++;
+        }
+        for (int rowIdx = startRangeRow; rowIdx <= intersectRange.Rows.Count; rowIdx++)
+        {
+          for (int colIdx = 1; colIdx <= intersectRange.Columns.Count; colIdx++)
+          {
+            int absRow = startDataTableRow + rowIdx - 1;
+            int absCol = startDataTableCol + colIdx - 1;
+            editingTable.Rows[absRow][absCol] = formattedArrayFromRange[rowIdx, colIdx];
+          }
         }
       }
+
+      btnCommit.Enabled = intersectRange.Count > 0 && !chkAutoCommit.Checked;
       if (chkAutoCommit.Checked)
         pushDataChanges();
     }
@@ -191,38 +263,63 @@ namespace MySQL.ForExcel
         Show();
     }
 
+    private void GenericMouseDown(object sender, MouseEventArgs e)
+    {
+      if (e.Button == MouseButtons.Left)
+        mouseDownPoint = new Point(e.X, e.Y);
+    }
+
+    private void GenericMouseUp(object sender, MouseEventArgs e)
+    {
+      if (e.Button == MouseButtons.Left)
+        mouseDownPoint = Point.Empty;
+    }
+
+    private void GenericMouseMove(object sender, MouseEventArgs e)
+    {
+      if (e.Button == MouseButtons.Left)
+      {
+        if (mouseDownPoint.IsEmpty)
+          return;
+        Location = new Point(Location.X + (e.X - mouseDownPoint.X), Location.Y + (e.Y - mouseDownPoint.Y));
+      }
+    }
+
     protected override void OnMouseDown(MouseEventArgs e)
     {
       base.OnMouseDown(e);
-      mouseDownPoint = new Point(e.X, e.Y);
+      GenericMouseDown(this, e);
     }
 
     protected override void OnMouseUp(MouseEventArgs e)
     {
       base.OnMouseUp(e);
-      mouseDownPoint = Point.Empty;
+      GenericMouseUp(this, e);
     }
 
     protected override void OnMouseMove(MouseEventArgs e)
     {
       base.OnMouseMove(e);
-      if (mouseDownPoint.IsEmpty)
-        return;
-      Location = new Point(Location.X + (e.X - mouseDownPoint.X), Location.Y + (e.Y - mouseDownPoint.Y));
+      GenericMouseMove(this, e);
     }
 
     private void exitEditModeToolStripMenuItem_Click(object sender, EventArgs e)
     {
+      if (connection != null)
+        connection.Close();
       Close();
+      CallerTaskPane.TableNameEditFormsHashtable.Remove(EditingTableName);
+      CallerTaskPane.WorkSheetEditFormsHashtable.Remove(EditingWorksheet.Name);
+      Dispose();
     }
 
     private void btnRevert_Click(object sender, EventArgs e)
     {
-      DialogResult dr = Utilities.ShowWarningBox(Properties.Resources.RevertDataConfirmation);
-      if (dr != DialogResult.Yes)
+      EditDataRevertDialog reverDialog = new EditDataRevertDialog(chkAutoCommit.Checked);
+      DialogResult dr = reverDialog.ShowDialog();
+      if (dr == DialogResult.Cancel)
         return;
-      //revertDataChanges(chkRefreshFromDB.Checked);
-      revertDataChanges(true);
+      revertDataChanges(reverDialog.SelectedAction == EditDataRevertDialog.EditUndoAction.RefreshData);
     }
 
     private void btnCommit_Click(object sender, EventArgs e)
@@ -245,5 +342,6 @@ namespace MySQL.ForExcel
     {
       Opacity = 0.60;
     }
+
   }
 }

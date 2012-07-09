@@ -51,7 +51,7 @@
       // grpMySQLExcelAddIn
       // 
       this.grpMySQLExcelAddIn.Items.Add(this.togShowTaskPane);
-      this.grpMySQLExcelAddIn.Label = "MySQL";
+      this.grpMySQLExcelAddIn.Label = "Database";
       this.grpMySQLExcelAddIn.Name = "grpMySQLExcelAddIn";
       // 
       // togShowTaskPane

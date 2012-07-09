@@ -218,7 +218,10 @@
       this.CancelButton = this.btnCancel;
       this.ClientSize = new System.Drawing.Size(534, 312);
       this.CommandAreaHeight = 45;
+      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
+      this.MaximumSize = new System.Drawing.Size(550, 350);
+      this.MinimumSize = new System.Drawing.Size(550, 350);
       this.Name = "ExportAdvancedOptionsDialog";
       this.Text = "Advanced Options";
       this.contentAreaPanel.ResumeLayout(false);

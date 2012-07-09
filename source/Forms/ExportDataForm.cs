@@ -228,9 +228,9 @@ namespace MySQL.ForExcel
     private void btnCopySQL_Click(object sender, EventArgs e)
     {
       StringBuilder queryString = new StringBuilder();
-      queryString.AppendFormat("USE `{0}`;\n", wbConnection.Schema);
+      queryString.AppendFormat("USE `{0}`;{1}", wbConnection.Schema, Environment.NewLine);
       queryString.Append(dataTable.GetCreateSQL(true));
-      queryString.Append(";\n");
+      queryString.AppendFormat(";{0}", Environment.NewLine);
       queryString.Append(dataTable.GetInsertSQL(100, true));
       queryString.Append(";");
       Clipboard.SetText(queryString.ToString());
@@ -238,13 +238,40 @@ namespace MySQL.ForExcel
 
     private void btnExport_Click(object sender, EventArgs e)
     {
-      bool success = dataTable.CreateTable(wbConnection);
-      success = success && dataTable.InsertDataWithAdapter(wbConnection, chkFirstRowHeaders.Checked, Properties.Settings.Default.ExportUseFormattedValues);
+      MySqlException exception;
+      string operationSummary = String.Format("The MySQL Table \"{0}\"", dataTable.TableName);
+      StringBuilder operationDetails = new StringBuilder();
+      operationDetails.AppendFormat("Creating MySQL Table \"{0}\"...{1}{1}", dataTable.TableName, Environment.NewLine);
+      operationDetails.Append(dataTable.GetCreateSQL(true));
+      operationDetails.Append(Environment.NewLine);
+      operationDetails.Append(Environment.NewLine);
+      bool success = dataTable.CreateTable(wbConnection, out exception);
+      if (success)
+        operationDetails.Append("Table has been created successfully.");
+      else
+      {
+        operationDetails.AppendFormat("MySQL Error {0}:{1}", exception.Number, Environment.NewLine);
+        operationDetails.Append(exception.Message);
+      }
+
       if (success)
       {
-        DialogResult = DialogResult.OK;
-        Close();
+        success = dataTable.InsertDataWithAdapter(wbConnection, chkFirstRowHeaders.Checked, Properties.Settings.Default.ExportUseFormattedValues, out exception);
+        if (success)
+        {
+          operationDetails.AppendFormat("{0}Inserting data rows...{0}", Environment.NewLine);
+          operationDetails.AppendFormat("{0} rows have been added successfully.", dataTable.Rows.Count);
+        }
       }
+      operationSummary += (success ? "has been created." : "could not be created.");
+
+      InfoDialog infoDialog = new InfoDialog(success, operationSummary, operationDetails.ToString());
+      DialogResult dr = infoDialog.ShowDialog();
+      if (dr == DialogResult.Cancel)
+        return;
+
+      DialogResult = DialogResult.OK;
+      Close();
     }
 
     private void btnAdvanced_Click(object sender, EventArgs e)

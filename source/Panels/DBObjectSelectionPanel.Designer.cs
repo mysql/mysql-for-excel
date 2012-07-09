@@ -44,7 +44,7 @@
       this.importDataLabel = new MySQL.ForExcel.HotLabel();
       this.selectDatabaseObjectLabel = new MySQL.ForExcel.HotLabel();
       this.exportToNewTableLabel = new MySQL.ForExcel.HotLabel();
-      this.imgSeparator = new MySQL.ForExcel.OpacityControl();
+      this.imgSeparator = new MySQL.ForExcel.TransparentPictureBox();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
       this.SuspendLayout();
       // 
@@ -382,6 +382,6 @@
     private HotLabel appendDataLabel;
     private MyTreeView objectList;
     private SearchEdit objectFilter;
-    private OpacityControl imgSeparator;
+    private TransparentPictureBox imgSeparator;
   }
 }

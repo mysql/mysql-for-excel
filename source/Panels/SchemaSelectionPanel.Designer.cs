@@ -42,7 +42,7 @@
       this.selectSchemaLabel = new MySQL.ForExcel.HotLabel();
       this.createNewSchemaLabel = new MySQL.ForExcel.HotLabel();
       this.lblInstructions = new MySQL.ForExcel.TransparentLabel();
-      this.imgSeparator = new MySQL.ForExcel.OpacityControl();
+      this.imgSeparator = new MySQL.ForExcel.TransparentPictureBox();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
       this.SuspendLayout();
       // 
@@ -291,6 +291,6 @@
     private HotLabel createNewSchemaLabel;
     private SearchEdit schemaFilter;
     private MyTreeView databaseList;
-    private OpacityControl imgSeparator;
+    private TransparentPictureBox imgSeparator;
   }
 }

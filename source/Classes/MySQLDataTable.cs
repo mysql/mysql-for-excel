@@ -296,11 +296,12 @@ namespace MySQL.ForExcel
       return (dataValue != null ? dataValue.Replace(" ", "_").Replace("(", String.Empty).Replace(")", String.Empty) : String.Empty);
     }
 
-    public bool CreateTable(MySqlWorkbenchConnection wbConnection)
+    public bool CreateTable(MySqlWorkbenchConnection wbConnection, out MySqlException exception)
     {
       bool success = false;
       string connectionString = Utilities.GetConnectionString(wbConnection);
       string queryString = GetCreateSQL(false);
+      exception = null;
 
       try
       {
@@ -313,9 +314,9 @@ namespace MySQL.ForExcel
           success = true;
         }
       }
-      catch (Exception ex)
+      catch (MySqlException ex)
       {
-        System.Diagnostics.Debug.WriteLine(ex.Message);
+        exception = ex;
       }
 
       return success;
@@ -324,8 +325,8 @@ namespace MySQL.ForExcel
     public string GetCreateSQL(bool formatNewLinesAndTabs)
     {
       StringBuilder sql = new StringBuilder();
-      string nl = (formatNewLinesAndTabs ? "\n" : " ");
-      string nlt = (formatNewLinesAndTabs ? "\n\t" : " ");
+      string nl = (formatNewLinesAndTabs ? Environment.NewLine : " ");
+      string nlt = (formatNewLinesAndTabs ? String.Format("{0}\t", Environment.NewLine) : " ");
 
       sql.AppendFormat("CREATE TABLE `{0}`{1}(", TableName, nl);
 
@@ -361,7 +362,7 @@ namespace MySQL.ForExcel
         return null;
 
       StringBuilder queryString = new StringBuilder();
-      string nl = (formatNewLinesAndTabs ? "\n" : " ");
+      string nl = (formatNewLinesAndTabs ? Environment.NewLine : " ");
       int rowIdx = 0;
       int colIdx = 0;
       int startingColNum = (addPK ? 0 : 1);
@@ -408,9 +409,10 @@ namespace MySQL.ForExcel
       return queryString.ToString();
     }
 
-    public bool InsertDataWithAdapter(MySqlWorkbenchConnection wbConnection, bool firstRowHeader, bool useFormattedData)
+    public bool InsertDataWithAdapter(MySqlWorkbenchConnection wbConnection, bool firstRowHeader, bool useFormattedData, out MySqlException exception)
     {
       bool success = false;
+      exception = null;
 
       DataTable copyOriginal = this.Clone();
       copyOriginal.Merge(this);
@@ -430,21 +432,25 @@ namespace MySQL.ForExcel
       // Create & open a SqlConnection, and dispose of it after we are done.
       using (MySqlConnection connection = new MySqlConnection(connectionString))
       {
-        MySqlDataAdapter dataAdapter = new MySqlDataAdapter(String.Format("SELECT * FROM {0}", TableName), connection);
-        DataTable exportingDataTable = new DataTable();
-        dataAdapter.FillSchema(exportingDataTable, SchemaType.Source);
-        foreach (DataRow row in copyOriginal.Rows)
-        {
-          exportingDataTable.LoadDataRow(row.ItemArray, LoadOption.Upsert);
-        }
-        MySqlCommandBuilder commBuilder = new MySqlCommandBuilder(dataAdapter);
-        dataAdapter.InsertCommand = commBuilder.GetInsertCommand();
-
-        int updatedCount = 0;
         try
         {
+          MySqlDataAdapter dataAdapter = new MySqlDataAdapter(String.Format("SELECT * FROM {0}", TableName), connection);
+          DataTable exportingDataTable = new DataTable();
+          dataAdapter.FillSchema(exportingDataTable, SchemaType.Source);
+          foreach (DataRow row in copyOriginal.Rows)
+          {
+            exportingDataTable.LoadDataRow(row.ItemArray, LoadOption.Upsert);
+          }
+          MySqlCommandBuilder commBuilder = new MySqlCommandBuilder(dataAdapter);
+          dataAdapter.InsertCommand = commBuilder.GetInsertCommand();
+
+          int updatedCount = 0;
           updatedCount = dataAdapter.Update(exportingDataTable);
           success = updatedCount > 0;
+        }
+        catch (MySqlException mysqlEx)
+        {
+          exception = mysqlEx;
         }
         catch (Exception ex)
         {

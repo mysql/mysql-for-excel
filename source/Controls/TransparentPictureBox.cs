@@ -5,7 +5,7 @@ using System.Drawing.Imaging;
 
 namespace MySQL.ForExcel
 {
-  public class OpacityControl : UserControl
+  public class TransparentPictureBox : UserControl
   {
     
     private Image _image;
@@ -40,7 +40,7 @@ namespace MySQL.ForExcel
     }
 
 
-    public OpacityControl()
+    public TransparentPictureBox()
     {
       SetStyle(ControlStyles.SupportsTransparentBackColor, true);
       BackColor = Color.Transparent;     

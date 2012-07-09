@@ -85,7 +85,7 @@
       // 
       // txtMappingName
       // 
-      this.txtMappingName.Location = new System.Drawing.Point(186, 95);
+      this.txtMappingName.Location = new System.Drawing.Point(186, 90);
       this.txtMappingName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.txtMappingName.Name = "txtMappingName";
       this.txtMappingName.Size = new System.Drawing.Size(316, 20);
@@ -117,7 +117,7 @@
       // 
       this.lblMappingName.AutoSize = true;
       this.lblMappingName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblMappingName.Location = new System.Drawing.Point(84, 98);
+      this.lblMappingName.Location = new System.Drawing.Point(84, 91);
       this.lblMappingName.Name = "lblMappingName";
       this.lblMappingName.Size = new System.Drawing.Size(96, 15);
       this.lblMappingName.TabIndex = 13;
@@ -127,7 +127,7 @@
       // 
       this.lblInstructions.AutoSize = true;
       this.lblInstructions.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblInstructions.Location = new System.Drawing.Point(84, 63);
+      this.lblInstructions.Location = new System.Drawing.Point(84, 45);
       this.lblInstructions.Name = "lblInstructions";
       this.lblInstructions.Size = new System.Drawing.Size(283, 15);
       this.lblInstructions.TabIndex = 12;

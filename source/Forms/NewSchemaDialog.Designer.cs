@@ -86,7 +86,7 @@
       // txtSchemaName
       // 
       this.txtSchemaName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.txtSchemaName.Location = new System.Drawing.Point(183, 95);
+      this.txtSchemaName.Location = new System.Drawing.Point(183, 88);
       this.txtSchemaName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.txtSchemaName.Name = "txtSchemaName";
       this.txtSchemaName.Size = new System.Drawing.Size(319, 21);
@@ -118,7 +118,7 @@
       // 
       this.lblInstructions.AutoSize = true;
       this.lblInstructions.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblInstructions.Location = new System.Drawing.Point(84, 63);
+      this.lblInstructions.Location = new System.Drawing.Point(84, 45);
       this.lblInstructions.Name = "lblInstructions";
       this.lblInstructions.Size = new System.Drawing.Size(234, 15);
       this.lblInstructions.TabIndex = 1;
@@ -128,7 +128,7 @@
       // 
       this.lblSchemaName.AutoSize = true;
       this.lblSchemaName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblSchemaName.Location = new System.Drawing.Point(84, 98);
+      this.lblSchemaName.Location = new System.Drawing.Point(84, 91);
       this.lblSchemaName.Name = "lblSchemaName";
       this.lblSchemaName.Size = new System.Drawing.Size(93, 15);
       this.lblSchemaName.TabIndex = 2;

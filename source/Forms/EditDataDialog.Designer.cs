@@ -13,8 +13,16 @@
     /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
     protected override void Dispose(bool disposing)
     {
-      if (disposing && (components != null))
+      if (disposing)
       {
+        if (dataAdapter != null)
+          dataAdapter.Dispose();
+        if (connection != null)
+        {
+          connection.Close();
+          connection.Dispose();
+        }
+        if (components != null)
         components.Dispose();
       }
       base.Dispose(disposing);
@@ -33,9 +41,10 @@
       this.btnCommit = new System.Windows.Forms.Button();
       this.picSakilaLogo = new System.Windows.Forms.PictureBox();
       this.lblMySQLforExcel = new System.Windows.Forms.Label();
-      this.chkAutoCommit = new System.Windows.Forms.CheckBox();
       this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.exitEditModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.chkAutoCommit = new System.Windows.Forms.CheckBox();
+      this.toolTip = new System.Windows.Forms.ToolTip(this.components);
       ((System.ComponentModel.ISupportInitialize)(this.picSakilaLogo)).BeginInit();
       this.contextMenu.SuspendLayout();
       this.SuspendLayout();
@@ -55,6 +64,7 @@
       // btnCommit
       // 
       this.btnCommit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.btnCommit.Enabled = false;
       this.btnCommit.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.btnCommit.Location = new System.Drawing.Point(123, 40);
       this.btnCommit.Name = "btnCommit";
@@ -72,6 +82,9 @@
       this.picSakilaLogo.Size = new System.Drawing.Size(16, 16);
       this.picSakilaLogo.TabIndex = 3;
       this.picSakilaLogo.TabStop = false;
+      this.picSakilaLogo.MouseDown += new System.Windows.Forms.MouseEventHandler(this.GenericMouseDown);
+      this.picSakilaLogo.MouseMove += new System.Windows.Forms.MouseEventHandler(this.GenericMouseMove);
+      this.picSakilaLogo.MouseUp += new System.Windows.Forms.MouseEventHandler(this.GenericMouseUp);
       // 
       // lblMySQLforExcel
       // 
@@ -85,6 +98,23 @@
       this.lblMySQLforExcel.Size = new System.Drawing.Size(108, 17);
       this.lblMySQLforExcel.TabIndex = 4;
       this.lblMySQLforExcel.Text = "MySQL for Excel";
+      this.lblMySQLforExcel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.GenericMouseDown);
+      this.lblMySQLforExcel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.GenericMouseMove);
+      this.lblMySQLforExcel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.GenericMouseUp);
+      // 
+      // contextMenu
+      // 
+      this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.exitEditModeToolStripMenuItem});
+      this.contextMenu.Name = "contextMenu";
+      this.contextMenu.Size = new System.Drawing.Size(150, 26);
+      // 
+      // exitEditModeToolStripMenuItem
+      // 
+      this.exitEditModeToolStripMenuItem.Name = "exitEditModeToolStripMenuItem";
+      this.exitEditModeToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+      this.exitEditModeToolStripMenuItem.Text = "Exit Edit Mode";
+      this.exitEditModeToolStripMenuItem.Click += new System.EventHandler(this.exitEditModeToolStripMenuItem_Click);
       // 
       // chkAutoCommit
       // 
@@ -101,26 +131,13 @@
       this.chkAutoCommit.UseVisualStyleBackColor = false;
       this.chkAutoCommit.CheckedChanged += new System.EventHandler(this.chkAutoCommit_CheckedChanged);
       // 
-      // contextMenu
-      // 
-      this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exitEditModeToolStripMenuItem});
-      this.contextMenu.Name = "contextMenu";
-      this.contextMenu.Size = new System.Drawing.Size(150, 26);
-      // 
-      // exitEditModeToolStripMenuItem
-      // 
-      this.exitEditModeToolStripMenuItem.Name = "exitEditModeToolStripMenuItem";
-      this.exitEditModeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-      this.exitEditModeToolStripMenuItem.Text = "Exit Edit Mode";
-      this.exitEditModeToolStripMenuItem.Click += new System.EventHandler(this.exitEditModeToolStripMenuItem_Click);
-      // 
       // EditDataDialog
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.BackColor = System.Drawing.Color.Black;
       this.ClientSize = new System.Drawing.Size(275, 78);
+      this.ContextMenuStrip = this.contextMenu;
       this.ControlBox = false;
       this.Controls.Add(this.chkAutoCommit);
       this.Controls.Add(this.lblMySQLforExcel);
@@ -153,5 +170,6 @@
     private System.Windows.Forms.CheckBox chkAutoCommit;
     private System.Windows.Forms.ContextMenuStrip contextMenu;
     private System.Windows.Forms.ToolStripMenuItem exitEditModeToolStripMenuItem;
+    private System.Windows.Forms.ToolTip toolTip;
   }
 }

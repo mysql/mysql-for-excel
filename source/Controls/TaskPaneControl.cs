@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -17,8 +18,10 @@ namespace MySQL.ForExcel
   {
     private Excel.Application excelApplication;
     private MySqlWorkbenchConnection connection;
-    private EditDataDialog editForm = null;
+    private EditDataDialog editDialog = null;
 
+    public Hashtable WorkSheetEditFormsHashtable;
+    public Hashtable TableNameEditFormsHashtable;
     public Excel.Worksheet ActiveWorksheet
     {
       get { return ((Excel.Worksheet)excelApplication.ActiveSheet); }
@@ -28,8 +31,30 @@ namespace MySQL.ForExcel
     {
       excelApplication = app;
       excelApplication.SheetSelectionChange += new Excel.AppEvents_SheetSelectionChangeEventHandler(excelApplication_SheetSelectionChange);
+      excelApplication.SheetActivate += new Excel.AppEvents_SheetActivateEventHandler(excelApplication_SheetActivate);
+      excelApplication.SheetDeactivate += new Excel.AppEvents_SheetDeactivateEventHandler(excelApplication_SheetDeactivate);
       
       InitializeComponent();
+    }
+
+    void excelApplication_SheetDeactivate(object Sh)
+    {
+      Excel.Worksheet currentSheet = Sh as Excel.Worksheet;
+      if (WorkSheetEditFormsHashtable != null && WorkSheetEditFormsHashtable.Contains(currentSheet.Name))
+      {
+        editDialog = WorkSheetEditFormsHashtable[currentSheet.Name] as EditDataDialog;
+        editDialog.Hide();
+      }
+    }
+
+    void excelApplication_SheetActivate(object Sh)
+    {
+      Excel.Worksheet currentSheet = Sh as Excel.Worksheet;
+      if (WorkSheetEditFormsHashtable != null && WorkSheetEditFormsHashtable.Contains(currentSheet.Name))
+      {
+        editDialog = WorkSheetEditFormsHashtable[currentSheet.Name] as EditDataDialog;
+        editDialog.Show();
+      }
     }
 
     void excelApplication_SheetSelectionChange(object Sh, Excel.Range Target)
@@ -71,8 +96,9 @@ namespace MySQL.ForExcel
         if (dlg.ShowDialog() == DialogResult.Cancel) return;
         connection.Password = dlg.PasswordText;
       }
-      schemaSelectionPanel1.SetConnection(connection);
-      schemaSelectionPanel1.BringToFront();
+      bool schemasLoaded = schemaSelectionPanel1.SetConnection(connection);
+      if (schemasLoaded)
+        schemaSelectionPanel1.BringToFront();
     }
 
     public void CloseConnection()
@@ -91,6 +117,32 @@ namespace MySQL.ForExcel
     public void CloseSchema()
     {
       schemaSelectionPanel1.BringToFront();
+    }
+
+    public Excel.Worksheet GetActiveOrCreateWorksheet(string proposedName, bool alwaysCreate)
+    {
+      Excel.Worksheet currentWorksheet = excelApplication.ActiveSheet as Excel.Worksheet;
+      if (currentWorksheet != null && !alwaysCreate)
+        return currentWorksheet;
+      if (excelApplication.ActiveWorkbook != null)
+      {
+        currentWorksheet = excelApplication.Sheets.Add(Type.Missing, excelApplication.ActiveSheet, Type.Missing, Type.Missing);
+        int i = 0;
+        foreach (Excel.Worksheet ws in excelApplication.Worksheets)
+        {
+          if (ws.Name.Contains(proposedName))
+            i++;
+        }
+        if (i > 0)
+          proposedName = String.Format("Copy ({0}) of {1}", i, proposedName);
+      }
+      else
+      {
+        Excel.Workbook currentWorkbook = excelApplication.Workbooks.Add(Type.Missing);
+        currentWorksheet = (currentWorkbook.Worksheets[1] as Excel.Worksheet);
+      }
+      currentWorksheet.Name = proposedName;
+      return currentWorksheet;
     }
 
     public Excel.Range ImportDataTableToExcelAtGivenCell(DataTable dt, bool importColumnNames, Excel.Range atCell)
@@ -138,6 +190,8 @@ namespace MySQL.ForExcel
 
     public void ImportDataToExcel(DataSet ds, bool importColumnNames, ImportMultipleType importType, int selectedResultSet)
     {
+      Excel.Worksheet currentWorksheet = GetActiveOrCreateWorksheet("Sheet1", false);
+
       Excel.Range atCell = excelApplication.ActiveCell;
       Excel.Range endCell = null;
       Excel.Range fillingRange = null;
@@ -186,8 +240,19 @@ namespace MySQL.ForExcel
 
     public bool EditTableData(DBObject tableObject)
     {
+      if (TableNameEditFormsHashtable != null && TableNameEditFormsHashtable.Contains(tableObject.Name))
+      {
+        Utilities.ShowErrorBox(String.Format("Table {0} already has an Edit operation ongoing.", tableObject.Name));
+        return false;
+      }
+
+      Excel.Worksheet currentWorksheet = GetActiveOrCreateWorksheet(tableObject.Name, true);
+      currentWorksheet.Activate();
+      Excel.Range atCell = currentWorksheet.get_Range("A1", Type.Missing);
+      atCell.Select();
+
       // Import Data
-      ImportTableViewForm importForm = new ImportTableViewForm(connection, tableObject, ActiveWorksheet);
+      ImportTableViewForm importForm = new ImportTableViewForm(connection, tableObject, currentWorksheet);
       DialogResult dr = importForm.ShowDialog();
       if (dr == DialogResult.Cancel)
         return false;
@@ -197,37 +262,21 @@ namespace MySQL.ForExcel
         MessageBox.Show(msg, Properties.Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
         return false;
       }
-      Excel.Worksheet currentWorksheet = null;
-      var nameSheet = tableObject.Name;
-
-      if (excelApplication.ActiveWorkbook != null)
-      {
-        currentWorksheet = excelApplication.Sheets.Add(Type.Missing, excelApplication.ActiveSheet, Type.Missing, Type.Missing);        
-        int i = 0;
-        foreach (Excel.Worksheet ws in excelApplication.Worksheets)
-        {
-          if (ws.Name.Contains(nameSheet))
-            i++;
-        }
-        if (i > 0) nameSheet = String.Format("Copy ({0}) of {1}", i, nameSheet);
-      }
-      else
-      {
-        Excel.Workbook currentWorkbook = excelApplication.Workbooks.Add(Type.Missing);
-        currentWorksheet = (currentWorkbook.Worksheets[1] as Excel.Worksheet);
-      }
-
-      currentWorksheet.Name = nameSheet;
-      currentWorksheet.Activate();
-      Excel.Range atCell = currentWorksheet.get_Range("A1", Type.Missing);
-      atCell.Select();
       Excel.Range editingRange = ImportDataTableToExcelAtGivenCell(importForm.ImportDataTable, importForm.ImportHeaders, atCell);
       
       // Edit Data
       Utilities.AddExtendedProperties(ref importForm.ImportDataTable, importForm.ImportDataTable.ExtendedProperties["QueryString"].ToString(), importForm.ImportHeaders, tableObject.Name);
-      editForm = new EditDataDialog(connection, editingRange, importForm.ImportDataTable, currentWorksheet);
-      editForm.CallerTaskPane = this;
-      editForm.Show();
+      editDialog = new EditDataDialog(connection, editingRange, importForm.ImportDataTable, currentWorksheet);
+      editDialog.CallerTaskPane = this;
+      editDialog.Show(new NativeWindowWrapper(excelApplication.Hwnd));
+
+      // Maintain hashtables for open Edit Data Dialogs
+      if (WorkSheetEditFormsHashtable == null)
+        WorkSheetEditFormsHashtable = new Hashtable();
+      WorkSheetEditFormsHashtable.Add(tableObject.Name, editDialog);
+      if (TableNameEditFormsHashtable == null)
+        TableNameEditFormsHashtable = new Hashtable();
+      TableNameEditFormsHashtable.Add(tableObject.Name, editDialog);
 
       return true;
     }
@@ -240,7 +289,38 @@ namespace MySQL.ForExcel
     public void CloseAddIn()
     {
       CloseConnection();
+      if (TableNameEditFormsHashtable != null)
+      {
+        foreach (string key in TableNameEditFormsHashtable.Keys)
+        {
+          EditDataDialog editDlg = TableNameEditFormsHashtable[key] as EditDataDialog;
+          editDlg.Close();
+          editDlg.Dispose();
+        }
+        TableNameEditFormsHashtable.Clear();
+        TableNameEditFormsHashtable = null;
+      }
+      if (WorkSheetEditFormsHashtable != null)
+      {
+        WorkSheetEditFormsHashtable.Clear();
+        WorkSheetEditFormsHashtable = null;
+      }
       Globals.ThisAddIn.TaskPane.Visible = false;
+    }
+  }
+
+  class NativeWindowWrapper : IWin32Window
+  {
+    IntPtr _handle;
+
+    public NativeWindowWrapper(int Hwnd)
+    {
+      _handle = new IntPtr(Hwnd);
+    }
+
+    public IntPtr Handle
+    {
+      get { return _handle; }
     }
   }
 

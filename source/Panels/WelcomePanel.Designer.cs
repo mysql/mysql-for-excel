@@ -35,7 +35,7 @@
       this.picAddInLogo = new System.Windows.Forms.PictureBox();
       this.largeImages = new System.Windows.Forms.ImageList(this.components);
       this.picAddInLogoText = new System.Windows.Forms.PictureBox();
-      this.imgSeparator = new MySQL.ForExcel.OpacityControl();
+      this.imgSeparator = new MySQL.ForExcel.TransparentPictureBox();
       this.lblInstructions = new MySQL.ForExcel.TransparentLabel();
       this.manageConnectionsLabel = new MySQL.ForExcel.HotLabel();
       this.connectionList = new MySQL.ForExcel.MyTreeView();
@@ -298,6 +298,6 @@
     private HotLabel openConnectionLabel;
     private MyTreeView connectionList;
     private System.Windows.Forms.PictureBox picAddInLogoText;
-    private OpacityControl imgSeparator;
+    private TransparentPictureBox imgSeparator;
   }
 }

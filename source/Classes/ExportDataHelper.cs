@@ -319,9 +319,11 @@ namespace MySQL.ForExcel
       return success;
     }
 
-    public bool InsertData(bool firstRowHeader, bool useFormattedData)
+    public bool InsertData(bool firstRowHeader, bool useFormattedData, out string insertQuery, out MySqlException exception)
     {
       bool success = false;
+      insertQuery = String.Empty;
+      exception = null;
 
       DataTable insertingData = (useFormattedData ? FormattedExcelData : UnformattedExcelData);
       if (insertingData.Rows.Count - (firstRowHeader ? 1 : 0) < 1)
@@ -335,10 +337,11 @@ namespace MySQL.ForExcel
       List<bool> columnsRequireQuotes = new List<bool>();
       List<string> mappedColumnNames = new List<string>(ExportTable.Columns.Count);
       
-      string separator = String.Empty;
+      string colsSeparator = String.Empty;
+      string rowsSeparator = String.Empty;
 
-      queryString.AppendFormat("USE {0}; INSERT INTO", wbConnection.Schema);
-      queryString.AppendFormat(" {0} (", ExportTable.Name);
+      queryString.AppendFormat("USE {0};{1}INSERT INTO", wbConnection.Schema, Environment.NewLine);
+      queryString.AppendFormat(" {0}{1}(", ExportTable.Name, Environment.NewLine);
 
       for (colIdx = 0; colIdx < exportColsCount; colIdx++)
       {
@@ -346,33 +349,35 @@ namespace MySQL.ForExcel
           continue;
         MySQLColumn column = ExportTable.Columns[colIdx];
         queryString.AppendFormat("{0}{1}",
-                                 separator,
+                                 colsSeparator,
                                  column.ColumnName);
-        separator = ",";
+        colsSeparator = ",";
         columnsRequireQuotes.Add(column.ColumnsRequireQuotes);
         mappedColumnNames.Add(ExportTable.Columns[colIdx].MappedDataColName);
       }
-      queryString.Append(") VALUES ");
+      queryString.AppendFormat("){0}VALUES{0}", Environment.NewLine);
 
       foreach (DataRow dr in insertingData.Rows)
       {
         if (firstRowHeader && rowIdx++ == 0)
           continue;
-        queryString.Append("(");
-        separator = String.Empty;
+        queryString.AppendFormat("{0}(", rowsSeparator);
+        colsSeparator = String.Empty;
         for (colIdx = 0; colIdx < mappedColumnNames.Count; colIdx++)
         {
           queryString.AppendFormat("{0}{1}{2}{1}",
-                                   separator,
+                                   colsSeparator,
                                    (columnsRequireQuotes[colIdx] ? "'" : String.Empty),
                                    dr[mappedColumnNames[colIdx]].ToString());
-          separator = ",";
+          colsSeparator = ",";
         }
-        queryString.Append("),");
+        queryString.Append(")");
+        if (rowsSeparator.Length == 0)
+          rowsSeparator = "," + Environment.NewLine;
       }
-      if (insertingData.Rows.Count > 0)
-        queryString.Remove(queryString.Length - 1, 1);
       queryString.Append(";");
+
+      insertQuery = queryString.ToString();
 
       try
       {
@@ -380,17 +385,24 @@ namespace MySQL.ForExcel
         {
           conn.Open();
 
-          MySqlCommand cmd = new MySqlCommand(queryString.ToString(), conn);
+          MySqlCommand cmd = new MySqlCommand(insertQuery, conn);
           cmd.ExecuteNonQuery();
           success = true;
         }
       }
-      catch (Exception ex)
+      catch (MySqlException ex)
       {
-        System.Diagnostics.Debug.WriteLine(ex.Message);
+        exception = ex;
       }
 
       return success;
+    }
+
+    public bool InsertData(bool firstRowHeader, bool useFormattedData)
+    {
+      string insertQuery;
+      MySqlException exception;
+      return InsertData(firstRowHeader, useFormattedData, out insertQuery, out exception);
     }
 
   }
