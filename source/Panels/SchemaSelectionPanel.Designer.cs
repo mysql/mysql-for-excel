@@ -85,7 +85,7 @@
       // 
       this.btnBack.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
       this.btnBack.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnBack.Location = new System.Drawing.Point(90, 599);
+      this.btnBack.Location = new System.Drawing.Point(95, 599);
       this.btnBack.Name = "btnBack";
       this.btnBack.Size = new System.Drawing.Size(75, 23);
       this.btnBack.TabIndex = 7;
@@ -98,7 +98,7 @@
       this.btnNext.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
       this.btnNext.Enabled = false;
       this.btnNext.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnNext.Location = new System.Drawing.Point(166, 599);
+      this.btnNext.Location = new System.Drawing.Point(176, 599);
       this.btnNext.Name = "btnNext";
       this.btnNext.Size = new System.Drawing.Size(75, 23);
       this.btnNext.TabIndex = 8;
@@ -110,7 +110,7 @@
       // 
       this.btnHelp.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
       this.btnHelp.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnHelp.Location = new System.Drawing.Point(9, 599);
+      this.btnHelp.Location = new System.Drawing.Point(14, 599);
       this.btnHelp.Name = "btnHelp";
       this.btnHelp.Size = new System.Drawing.Size(75, 23);
       this.btnHelp.TabIndex = 6;
@@ -141,7 +141,7 @@
       this.databaseList.NodeHeightMultiple = 3;
       this.databaseList.NodeImages = this.largeImages;
       this.databaseList.ShowNodeToolTips = true;
-      this.databaseList.Size = new System.Drawing.Size(232, 325);
+      this.databaseList.Size = new System.Drawing.Size(242, 325);
       this.databaseList.TabIndex = 23;
       this.databaseList.TitleColorOpacity = 0.8D;
       this.databaseList.TitleTextVerticalPixelsOffset = 0;
@@ -157,7 +157,7 @@
       this.schemaFilter.Location = new System.Drawing.Point(9, 199);
       this.schemaFilter.Name = "schemaFilter";
       this.schemaFilter.NoTextLabel = "Filter Schemas";
-      this.schemaFilter.Size = new System.Drawing.Size(232, 21);
+      this.schemaFilter.Size = new System.Drawing.Size(242, 21);
       this.schemaFilter.TabIndex = 16;
       this.schemaFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.schemaFilter_KeyDown);
       // 
@@ -180,7 +180,7 @@
       this.selectSchemaLabel.Location = new System.Drawing.Point(10, 164);
       this.selectSchemaLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.selectSchemaLabel.Name = "selectSchemaLabel";
-      this.selectSchemaLabel.Size = new System.Drawing.Size(232, 28);
+      this.selectSchemaLabel.Size = new System.Drawing.Size(237, 28);
       this.selectSchemaLabel.TabIndex = 14;
       this.selectSchemaLabel.Title = "Select a Database Schema";
       this.selectSchemaLabel.TitleColor = System.Drawing.SystemColors.WindowText;
@@ -212,7 +212,7 @@
       this.createNewSchemaLabel.Location = new System.Drawing.Point(9, 558);
       this.createNewSchemaLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.createNewSchemaLabel.Name = "createNewSchemaLabel";
-      this.createNewSchemaLabel.Size = new System.Drawing.Size(232, 28);
+      this.createNewSchemaLabel.Size = new System.Drawing.Size(237, 28);
       this.createNewSchemaLabel.TabIndex = 15;
       this.createNewSchemaLabel.Title = "Create New Schema";
       this.createNewSchemaLabel.TitleColor = System.Drawing.SystemColors.WindowText;
@@ -235,7 +235,7 @@
       this.lblInstructions.ShadowColor = System.Drawing.SystemColors.ControlText;
       this.lblInstructions.ShadowOpacity = 0.7D;
       this.lblInstructions.ShadowPixelsXOffset = 0;
-      this.lblInstructions.Size = new System.Drawing.Size(234, 53);
+      this.lblInstructions.Size = new System.Drawing.Size(241, 53);
       this.lblInstructions.TabIndex = 2;
       this.lblInstructions.TextOpacity = 0.6D;
       this.lblInstructions.TransparentText = "Please select the MySQL schema you want to work with. Each schema can hold a coll" +
@@ -249,7 +249,7 @@
       this.imgSeparator.Location = new System.Drawing.Point(9, 136);
       this.imgSeparator.Name = "imgSeparator";
       this.imgSeparator.Opacity = 0.3F;
-      this.imgSeparator.Size = new System.Drawing.Size(232, 21);
+      this.imgSeparator.Size = new System.Drawing.Size(237, 21);
       this.imgSeparator.TabIndex = 26;
       // 
       // SchemaSelectionPanel
@@ -270,7 +270,7 @@
       this.Controls.Add(this.picAddInLogo);
       this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.Name = "SchemaSelectionPanel";
-      this.Size = new System.Drawing.Size(250, 625);
+      this.Size = new System.Drawing.Size(260, 625);
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
       this.ResumeLayout(false);
       this.PerformLayout();

@@ -54,13 +54,13 @@
       // 
       this.commandAreaPanel.Controls.Add(this.btnShowDetails);
       this.commandAreaPanel.Controls.Add(this.btnOK);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 267);
-      this.commandAreaPanel.Size = new System.Drawing.Size(564, 44);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 266);
+      this.commandAreaPanel.Size = new System.Drawing.Size(564, 45);
       // 
       // btnOK
       // 
       this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnOK.Location = new System.Drawing.Point(477, 10);
+      this.btnOK.Location = new System.Drawing.Point(477, 11);
       this.btnOK.Name = "btnOK";
       this.btnOK.Size = new System.Drawing.Size(75, 23);
       this.btnOK.TabIndex = 1;
@@ -71,7 +71,7 @@
       // btnShowDetails
       // 
       this.btnShowDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.btnShowDetails.Location = new System.Drawing.Point(12, 10);
+      this.btnShowDetails.Location = new System.Drawing.Point(12, 11);
       this.btnShowDetails.Name = "btnShowDetails";
       this.btnShowDetails.Size = new System.Drawing.Size(109, 23);
       this.btnShowDetails.TabIndex = 0;
@@ -121,6 +121,9 @@
       // 
       // txtDetails
       // 
+      this.txtDetails.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.txtDetails.BackColor = System.Drawing.SystemColors.Window;
       this.txtDetails.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.txtDetails.Location = new System.Drawing.Point(95, 102);
@@ -138,9 +141,8 @@
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.ClientSize = new System.Drawing.Size(564, 312);
-      this.CommandAreaHeight = 44;
+      this.CommandAreaHeight = 45;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
-      this.MaximumSize = new System.Drawing.Size(580, 350);
       this.MinimumSize = new System.Drawing.Size(580, 350);
       this.Name = "InfoDialog";
       this.Text = "MySQL for Excel";

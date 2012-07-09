@@ -89,7 +89,7 @@
       // 
       this.btnClose.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
       this.btnClose.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnClose.Location = new System.Drawing.Point(166, 597);
+      this.btnClose.Location = new System.Drawing.Point(176, 597);
       this.btnClose.Name = "btnClose";
       this.btnClose.Size = new System.Drawing.Size(75, 23);
       this.btnClose.TabIndex = 11;
@@ -101,7 +101,7 @@
       // 
       this.btnBack.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
       this.btnBack.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnBack.Location = new System.Drawing.Point(90, 597);
+      this.btnBack.Location = new System.Drawing.Point(95, 597);
       this.btnBack.Name = "btnBack";
       this.btnBack.Size = new System.Drawing.Size(75, 23);
       this.btnBack.TabIndex = 10;
@@ -113,7 +113,7 @@
       // 
       this.btnHelp.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
       this.btnHelp.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnHelp.Location = new System.Drawing.Point(9, 597);
+      this.btnHelp.Location = new System.Drawing.Point(14, 597);
       this.btnHelp.Name = "btnHelp";
       this.btnHelp.Size = new System.Drawing.Size(75, 23);
       this.btnHelp.TabIndex = 9;
@@ -131,7 +131,7 @@
       this.objectFilter.Location = new System.Drawing.Point(9, 171);
       this.objectFilter.Name = "objectFilter";
       this.objectFilter.NoTextLabel = "Filter Schema Objects";
-      this.objectFilter.Size = new System.Drawing.Size(232, 21);
+      this.objectFilter.Size = new System.Drawing.Size(242, 21);
       this.objectFilter.TabIndex = 26;
       this.objectFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.objectFilter_KeyDown);
       // 
@@ -157,7 +157,7 @@
       this.objectList.NodeHeightMultiple = 3;
       this.objectList.NodeImages = this.largeImages;
       this.objectList.ShowNodeToolTips = true;
-      this.objectList.Size = new System.Drawing.Size(232, 275);
+      this.objectList.Size = new System.Drawing.Size(242, 275);
       this.objectList.TabIndex = 24;
       this.objectList.TitleColorOpacity = 0.8D;
       this.objectList.TitleTextVerticalPixelsOffset = 0;
@@ -184,7 +184,7 @@
       this.appendDataLabel.Location = new System.Drawing.Point(9, 556);
       this.appendDataLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.appendDataLabel.Name = "appendDataLabel";
-      this.appendDataLabel.Size = new System.Drawing.Size(232, 28);
+      this.appendDataLabel.Size = new System.Drawing.Size(237, 28);
       this.appendDataLabel.TabIndex = 18;
       this.appendDataLabel.Title = "Append Excel Data to Table";
       this.appendDataLabel.TitleColor = System.Drawing.SystemColors.WindowText;
@@ -218,7 +218,7 @@
       this.editDataLabel.Location = new System.Drawing.Point(9, 518);
       this.editDataLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.editDataLabel.Name = "editDataLabel";
-      this.editDataLabel.Size = new System.Drawing.Size(232, 28);
+      this.editDataLabel.Size = new System.Drawing.Size(237, 28);
       this.editDataLabel.TabIndex = 17;
       this.editDataLabel.Title = "Edit MySQL Data";
       this.editDataLabel.TitleColor = System.Drawing.SystemColors.WindowText;
@@ -252,7 +252,7 @@
       this.importDataLabel.Location = new System.Drawing.Point(9, 480);
       this.importDataLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.importDataLabel.Name = "importDataLabel";
-      this.importDataLabel.Size = new System.Drawing.Size(232, 28);
+      this.importDataLabel.Size = new System.Drawing.Size(237, 28);
       this.importDataLabel.TabIndex = 16;
       this.importDataLabel.Title = "Import MySQL Data";
       this.importDataLabel.TitleColor = System.Drawing.SystemColors.WindowText;
@@ -284,7 +284,7 @@
       this.selectDatabaseObjectLabel.Location = new System.Drawing.Point(9, 136);
       this.selectDatabaseObjectLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.selectDatabaseObjectLabel.Name = "selectDatabaseObjectLabel";
-      this.selectDatabaseObjectLabel.Size = new System.Drawing.Size(232, 28);
+      this.selectDatabaseObjectLabel.Size = new System.Drawing.Size(237, 28);
       this.selectDatabaseObjectLabel.TabIndex = 15;
       this.selectDatabaseObjectLabel.Title = "Select a Database Object";
       this.selectDatabaseObjectLabel.TitleColor = System.Drawing.SystemColors.WindowText;
@@ -316,7 +316,7 @@
       this.exportToNewTableLabel.Location = new System.Drawing.Point(9, 73);
       this.exportToNewTableLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.exportToNewTableLabel.Name = "exportToNewTableLabel";
-      this.exportToNewTableLabel.Size = new System.Drawing.Size(232, 28);
+      this.exportToNewTableLabel.Size = new System.Drawing.Size(237, 28);
       this.exportToNewTableLabel.TabIndex = 14;
       this.exportToNewTableLabel.Title = "Export Excel Data to New Table";
       this.exportToNewTableLabel.TitleColor = System.Drawing.SystemColors.WindowText;
@@ -336,7 +336,7 @@
       this.imgSeparator.Location = new System.Drawing.Point(9, 108);
       this.imgSeparator.Name = "imgSeparator";
       this.imgSeparator.Opacity = 0.3F;
-      this.imgSeparator.Size = new System.Drawing.Size(232, 22);
+      this.imgSeparator.Size = new System.Drawing.Size(237, 22);
       this.imgSeparator.TabIndex = 27;
       // 
       // DBObjectSelectionPanel
@@ -359,7 +359,7 @@
       this.Controls.Add(this.picAddInLogo);
       this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.Name = "DBObjectSelectionPanel";
-      this.Size = new System.Drawing.Size(250, 625);
+      this.Size = new System.Drawing.Size(260, 625);
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
       this.ResumeLayout(false);
       this.PerformLayout();

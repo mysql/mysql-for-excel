@@ -52,8 +52,8 @@
       this.commandAreaPanel.Controls.Add(this.btnRefreshData);
       this.commandAreaPanel.Controls.Add(this.btnRevert);
       this.commandAreaPanel.Controls.Add(this.btnCancel);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 107);
-      this.commandAreaPanel.Size = new System.Drawing.Size(484, 44);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 106);
+      this.commandAreaPanel.Size = new System.Drawing.Size(484, 45);
       // 
       // lblOperationSummary
       // 
@@ -91,7 +91,7 @@
       // 
       this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnCancel.Location = new System.Drawing.Point(397, 10);
+      this.btnCancel.Location = new System.Drawing.Point(397, 11);
       this.btnCancel.Name = "btnCancel";
       this.btnCancel.Size = new System.Drawing.Size(75, 23);
       this.btnCancel.TabIndex = 0;
@@ -102,7 +102,7 @@
       // 
       this.btnRevert.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnRevert.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.btnRevert.Location = new System.Drawing.Point(235, 10);
+      this.btnRevert.Location = new System.Drawing.Point(235, 11);
       this.btnRevert.Name = "btnRevert";
       this.btnRevert.Size = new System.Drawing.Size(156, 23);
       this.btnRevert.TabIndex = 1;
@@ -114,7 +114,7 @@
       // 
       this.btnRefreshData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.btnRefreshData.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.btnRefreshData.Location = new System.Drawing.Point(85, 10);
+      this.btnRefreshData.Location = new System.Drawing.Point(85, 11);
       this.btnRefreshData.Name = "btnRefreshData";
       this.btnRefreshData.Size = new System.Drawing.Size(144, 23);
       this.btnRefreshData.TabIndex = 2;
@@ -128,7 +128,7 @@
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.btnCancel;
       this.ClientSize = new System.Drawing.Size(484, 152);
-      this.CommandAreaHeight = 44;
+      this.CommandAreaHeight = 45;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
       this.MaximumSize = new System.Drawing.Size(500, 190);
       this.MinimumSize = new System.Drawing.Size(500, 190);

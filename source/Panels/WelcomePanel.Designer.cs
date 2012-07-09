@@ -30,8 +30,8 @@
     {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WelcomePanel));
-      System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Local Connections");
-      System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Remote Connections");
+      System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Local Connections");
+      System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Remote Connections");
       this.picAddInLogo = new System.Windows.Forms.PictureBox();
       this.largeImages = new System.Windows.Forms.ImageList(this.components);
       this.picAddInLogoText = new System.Windows.Forms.PictureBox();
@@ -78,7 +78,7 @@
       this.imgSeparator.Location = new System.Drawing.Point(9, 136);
       this.imgSeparator.Name = "imgSeparator";
       this.imgSeparator.Opacity = 0.3F;
-      this.imgSeparator.Size = new System.Drawing.Size(232, 21);
+      this.imgSeparator.Size = new System.Drawing.Size(242, 21);
       this.imgSeparator.TabIndex = 25;
       // 
       // lblInstructions
@@ -90,7 +90,7 @@
       this.lblInstructions.PixelsSpacingAdjustment = -3;
       this.lblInstructions.ShadowColor = System.Drawing.SystemColors.ControlText;
       this.lblInstructions.ShadowOpacity = 0.7D;
-      this.lblInstructions.Size = new System.Drawing.Size(232, 54);
+      this.lblInstructions.Size = new System.Drawing.Size(237, 54);
       this.lblInstructions.TabIndex = 2;
       this.lblInstructions.TextOpacity = 0.6D;
       this.lblInstructions.TransparentText = "MySQL for Excel allows you to work with the MySQL Database right from within the " +
@@ -117,7 +117,7 @@
       this.manageConnectionsLabel.Location = new System.Drawing.Point(9, 558);
       this.manageConnectionsLabel.Margin = new System.Windows.Forms.Padding(4);
       this.manageConnectionsLabel.Name = "manageConnectionsLabel";
-      this.manageConnectionsLabel.Size = new System.Drawing.Size(232, 28);
+      this.manageConnectionsLabel.Size = new System.Drawing.Size(237, 28);
       this.manageConnectionsLabel.TabIndex = 16;
       this.manageConnectionsLabel.Title = "Manage Connections";
       this.manageConnectionsLabel.TitleColor = System.Drawing.SystemColors.WindowText;
@@ -151,19 +151,19 @@
       this.connectionList.Name = "connectionList";
       this.connectionList.NodeHeightMultiple = 2;
       this.connectionList.NodeImages = this.largeImages;
-      treeNode3.BackColor = System.Drawing.SystemColors.ControlLight;
-      treeNode3.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode3.Name = "LocalConnectionsNode";
-      treeNode3.Text = "Local Connections";
-      treeNode4.BackColor = System.Drawing.SystemColors.ControlLight;
-      treeNode4.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode4.Name = "RemoteConnectionsNode";
-      treeNode4.Text = "Remote Connections";
+      treeNode1.BackColor = System.Drawing.SystemColors.ControlLight;
+      treeNode1.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode1.Name = "LocalConnectionsNode";
+      treeNode1.Text = "Local Connections";
+      treeNode2.BackColor = System.Drawing.SystemColors.ControlLight;
+      treeNode2.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode2.Name = "RemoteConnectionsNode";
+      treeNode2.Text = "Remote Connections";
       this.connectionList.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode3,
-            treeNode4});
+            treeNode1,
+            treeNode2});
       this.connectionList.ShowNodeToolTips = true;
-      this.connectionList.Size = new System.Drawing.Size(232, 315);
+      this.connectionList.Size = new System.Drawing.Size(242, 315);
       this.connectionList.TabIndex = 22;
       this.connectionList.TitleColorOpacity = 0.8D;
       this.connectionList.TitleTextVerticalPixelsOffset = 2;
@@ -174,12 +174,12 @@
       this.lblCopyright.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
       this.lblCopyright.Font = new System.Drawing.Font("Segoe UI", 5.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblCopyright.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblCopyright.Location = new System.Drawing.Point(7, 598);
+      this.lblCopyright.Location = new System.Drawing.Point(12, 598);
       this.lblCopyright.Name = "lblCopyright";
       this.lblCopyright.ShadowColor = System.Drawing.SystemColors.ControlText;
       this.lblCopyright.ShadowOpacity = 0.7D;
       this.lblCopyright.ShadowPixelsXOffset = 0;
-      this.lblCopyright.Size = new System.Drawing.Size(232, 14);
+      this.lblCopyright.Size = new System.Drawing.Size(237, 14);
       this.lblCopyright.TabIndex = 7;
       this.lblCopyright.TextAlign = System.Drawing.ContentAlignment.TopCenter;
       this.lblCopyright.TextOpacity = 0.6D;
@@ -190,12 +190,12 @@
       this.lblAllRights.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
       this.lblAllRights.Font = new System.Drawing.Font("Segoe UI", 5.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblAllRights.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblAllRights.Location = new System.Drawing.Point(7, 609);
+      this.lblAllRights.Location = new System.Drawing.Point(12, 609);
       this.lblAllRights.Name = "lblAllRights";
       this.lblAllRights.ShadowColor = System.Drawing.SystemColors.ControlText;
       this.lblAllRights.ShadowOpacity = 0.7D;
       this.lblAllRights.ShadowPixelsXOffset = 0;
-      this.lblAllRights.Size = new System.Drawing.Size(232, 14);
+      this.lblAllRights.Size = new System.Drawing.Size(237, 14);
       this.lblAllRights.TabIndex = 8;
       this.lblAllRights.TextAlign = System.Drawing.ContentAlignment.TopCenter;
       this.lblAllRights.TextOpacity = 0.6D;
@@ -221,7 +221,7 @@
       this.newConnectionLabel.Location = new System.Drawing.Point(9, 520);
       this.newConnectionLabel.Margin = new System.Windows.Forms.Padding(4);
       this.newConnectionLabel.Name = "newConnectionLabel";
-      this.newConnectionLabel.Size = new System.Drawing.Size(232, 28);
+      this.newConnectionLabel.Size = new System.Drawing.Size(237, 28);
       this.newConnectionLabel.TabIndex = 15;
       this.newConnectionLabel.Title = "New Connection";
       this.newConnectionLabel.TitleColor = System.Drawing.SystemColors.WindowText;
@@ -253,7 +253,7 @@
       this.openConnectionLabel.Location = new System.Drawing.Point(9, 163);
       this.openConnectionLabel.Margin = new System.Windows.Forms.Padding(4);
       this.openConnectionLabel.Name = "openConnectionLabel";
-      this.openConnectionLabel.Size = new System.Drawing.Size(232, 28);
+      this.openConnectionLabel.Size = new System.Drawing.Size(242, 28);
       this.openConnectionLabel.TabIndex = 20;
       this.openConnectionLabel.Title = "Open a MySQL Connection";
       this.openConnectionLabel.TitleColor = System.Drawing.SystemColors.WindowText;
@@ -279,7 +279,7 @@
       this.Controls.Add(this.openConnectionLabel);
       this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.Name = "WelcomePanel";
-      this.Size = new System.Drawing.Size(250, 625);
+      this.Size = new System.Drawing.Size(260, 625);
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogoText)).EndInit();
       this.ResumeLayout(false);

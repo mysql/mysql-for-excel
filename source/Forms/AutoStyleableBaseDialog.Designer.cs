@@ -48,7 +48,7 @@
       // 
       this.commandAreaPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 171);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 170);
       this.commandAreaPanel.Name = "commandAreaPanel";
       this.commandAreaPanel.Size = new System.Drawing.Size(634, 40);
       this.commandAreaPanel.TabIndex = 1;
@@ -58,7 +58,7 @@
       // 
       this.footNoteAreaPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.footNoteAreaPanel.Location = new System.Drawing.Point(0, 202);
+      this.footNoteAreaPanel.Location = new System.Drawing.Point(0, 200);
       this.footNoteAreaPanel.Name = "footNoteAreaPanel";
       this.footNoteAreaPanel.Size = new System.Drawing.Size(634, 0);
       this.footNoteAreaPanel.TabIndex = 2;

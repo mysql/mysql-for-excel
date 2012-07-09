@@ -39,17 +39,16 @@
       this.welcomePanel1.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.welcomePanel1.Location = new System.Drawing.Point(0, 0);
       this.welcomePanel1.Name = "welcomePanel1";
-      this.welcomePanel1.Size = new System.Drawing.Size(250, 625);
+      this.welcomePanel1.Size = new System.Drawing.Size(260, 625);
       this.welcomePanel1.TabIndex = 0;
       // 
       // dbObjectSelectionPanel1
       // 
       this.dbObjectSelectionPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.dbObjectSelectionPanel1.ExcelSelectionContainsData = false;
       this.dbObjectSelectionPanel1.Font = new System.Drawing.Font("Arial", 9F);
       this.dbObjectSelectionPanel1.Location = new System.Drawing.Point(0, 0);
       this.dbObjectSelectionPanel1.Name = "dbObjectSelectionPanel1";
-      this.dbObjectSelectionPanel1.Size = new System.Drawing.Size(250, 625);
+      this.dbObjectSelectionPanel1.Size = new System.Drawing.Size(260, 625);
       this.dbObjectSelectionPanel1.TabIndex = 2;
       // 
       // schemaSelectionPanel1
@@ -58,7 +57,7 @@
       this.schemaSelectionPanel1.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.schemaSelectionPanel1.Location = new System.Drawing.Point(0, 0);
       this.schemaSelectionPanel1.Name = "schemaSelectionPanel1";
-      this.schemaSelectionPanel1.Size = new System.Drawing.Size(250, 625);
+      this.schemaSelectionPanel1.Size = new System.Drawing.Size(260, 625);
       this.schemaSelectionPanel1.TabIndex = 1;
       // 
       // TaskPaneControl
@@ -69,7 +68,7 @@
       this.Controls.Add(this.dbObjectSelectionPanel1);
       this.Controls.Add(this.schemaSelectionPanel1);
       this.Name = "TaskPaneControl";
-      this.Size = new System.Drawing.Size(250, 625);
+      this.Size = new System.Drawing.Size(260, 625);
       this.ResumeLayout(false);
 
     }

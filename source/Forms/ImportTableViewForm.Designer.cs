@@ -44,6 +44,8 @@
       this.lblOptionsWarning = new System.Windows.Forms.Label();
       this.picOptionsWarning = new System.Windows.Forms.PictureBox();
       this.grdPreviewData = new System.Windows.Forms.DataGridView();
+      this.contextMenuForGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.lblPickColumnsSub = new System.Windows.Forms.Label();
       this.lblPickColumnsMain = new System.Windows.Forms.Label();
       this.picColumnOptions = new System.Windows.Forms.PictureBox();
@@ -53,8 +55,6 @@
       this.btnImport = new System.Windows.Forms.Button();
       this.btnCancel = new System.Windows.Forms.Button();
       this.lblExportData = new System.Windows.Forms.Label();
-      this.contextMenuForGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
-      this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
       this.grpOptions.SuspendLayout();
@@ -62,8 +62,8 @@
       ((System.ComponentModel.ISupportInitialize)(this.numFromRow)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picOptionsWarning)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).BeginInit();
       this.contextMenuForGrid.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).BeginInit();
       this.SuspendLayout();
       // 
       // contentAreaPanel
@@ -88,7 +88,7 @@
       // 
       this.commandAreaPanel.Controls.Add(this.btnImport);
       this.commandAreaPanel.Controls.Add(this.btnCancel);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 551);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 550);
       this.commandAreaPanel.Size = new System.Drawing.Size(849, 45);
       // 
       // fromImageList
@@ -250,6 +250,21 @@
       this.grdPreviewData.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.grdPreviewData_DataBindingComplete);
       this.grdPreviewData.SelectionChanged += new System.EventHandler(this.grdPreviewData_SelectionChanged);
       // 
+      // contextMenuForGrid
+      // 
+      this.contextMenuForGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.selectAllToolStripMenuItem});
+      this.contextMenuForGrid.Name = "contextMenuForGrid";
+      this.contextMenuForGrid.Size = new System.Drawing.Size(123, 26);
+      // 
+      // selectAllToolStripMenuItem
+      // 
+      this.selectAllToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
+      this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
+      this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+      this.selectAllToolStripMenuItem.Text = "Select All";
+      this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.selectAllToolStripMenuItem_Click);
+      // 
       // lblPickColumnsSub
       // 
       this.lblPickColumnsSub.AutoSize = true;
@@ -357,21 +372,6 @@
       this.lblExportData.TabIndex = 30;
       this.lblExportData.Text = "Import Data from MySQL";
       // 
-      // contextMenuForGrid
-      // 
-      this.contextMenuForGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.selectAllToolStripMenuItem});
-      this.contextMenuForGrid.Name = "contextMenuForGrid";
-      this.contextMenuForGrid.Size = new System.Drawing.Size(123, 26);
-      // 
-      // selectAllToolStripMenuItem
-      // 
-      this.selectAllToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
-      this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-      this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
-      this.selectAllToolStripMenuItem.Text = "Select All";
-      this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.selectAllToolStripMenuItem_Click);
-      // 
       // ImportTableViewForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -395,8 +395,8 @@
       ((System.ComponentModel.ISupportInitialize)(this.numFromRow)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picOptionsWarning)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).EndInit();
       this.contextMenuForGrid.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).EndInit();
       this.ResumeLayout(false);
 
     }

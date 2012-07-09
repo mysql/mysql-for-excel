@@ -57,7 +57,7 @@
       // 
       this.commandAreaPanel.Controls.Add(this.btnAccept);
       this.commandAreaPanel.Controls.Add(this.btnCancel);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 256);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 255);
       this.commandAreaPanel.Size = new System.Drawing.Size(474, 45);
       // 
       // btnAccept

@@ -62,7 +62,7 @@
       this.commandAreaPanel.Controls.Add(this.btnOK);
       this.commandAreaPanel.Controls.Add(this.btnCancel);
       this.commandAreaPanel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 146);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 145);
       this.commandAreaPanel.Size = new System.Drawing.Size(514, 45);
       // 
       // btnOK

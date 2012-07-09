@@ -35,6 +35,8 @@ namespace MySQL.ForExcel
       excelApplication.SheetDeactivate += new Excel.AppEvents_SheetDeactivateEventHandler(excelApplication_SheetDeactivate);
       
       InitializeComponent();
+
+      dbObjectSelectionPanel1.ExcelSelectionContainsData = false;
     }
 
     void excelApplication_SheetDeactivate(object Sh)
