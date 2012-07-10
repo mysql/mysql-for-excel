@@ -34,7 +34,7 @@ namespace MySQL.ForExcel
 
     protected virtual void InheritFontToControls(Control.ControlCollection controls)
     {
-      if (!InheritSystemFontToControls || controls == null || controls.Count == 0)
+      if (controls == null || controls.Count == 0)
         return;
 
       foreach (Control c in controls)
@@ -49,13 +49,15 @@ namespace MySQL.ForExcel
 
     protected override void OnLoad(EventArgs e)
     {
+      base.OnLoad(e);
       if (!DesignMode && UseSystemFont)
       {
-        Font = new Font(System.Drawing.SystemFonts.IconTitleFont.FontFamily, Font.Size, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
+        if (Font.Name != System.Drawing.SystemFonts.IconTitleFont.Name)
+          Font = new Font(System.Drawing.SystemFonts.IconTitleFont.FontFamily, Font.Size, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
         Microsoft.Win32.SystemEvents.UserPreferenceChanged += new Microsoft.Win32.UserPreferenceChangedEventHandler(SystemEvents_UserPreferenceChanged);
+        if (InheritSystemFontToControls)
+          InheritFontToControls(Controls);
       }
-      InheritFontToControls(Controls);
-      base.OnLoad(e);
     }
 
     private void SystemEvents_UserPreferenceChanged(object sender, Microsoft.Win32.UserPreferenceChangedEventArgs e)
@@ -63,5 +65,6 @@ namespace MySQL.ForExcel
       if (e.Category == Microsoft.Win32.UserPreferenceCategory.Window && UseSystemFont)
         Font = new Font(System.Drawing.SystemFonts.IconTitleFont.FontFamily, Font.Size, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
     }
+
   }
 }

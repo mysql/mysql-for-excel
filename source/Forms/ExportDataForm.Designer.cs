@@ -53,7 +53,7 @@
       this.lblColumnOptionsWarning = new System.Windows.Forms.Label();
       this.picColumnOptionsWarning = new System.Windows.Forms.PictureBox();
       this.chkFirstRowHeaders = new System.Windows.Forms.CheckBox();
-      this.grdPreviewData = new System.Windows.Forms.DataGridView();
+      this.grdPreviewData = new MySQL.ForExcel.PreviewDataGridView();
       this.lblColumnOptionsSub = new System.Windows.Forms.Label();
       this.lblColumnOptionsMain = new System.Windows.Forms.Label();
       this.picColumnOptions = new System.Windows.Forms.PictureBox();
@@ -378,15 +378,16 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.grdPreviewData.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
       dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
       dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
       dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
       dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
       this.grdPreviewData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
       this.grdPreviewData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+      this.grdPreviewData.ColumnsMaximumWidth = 200;
       dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
       dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -682,7 +683,7 @@
     private System.Windows.Forms.Label lblColumnOptionsWarning;
     private System.Windows.Forms.PictureBox picColumnOptionsWarning;
     private System.Windows.Forms.CheckBox chkFirstRowHeaders;
-    private System.Windows.Forms.DataGridView grdPreviewData;
+    private PreviewDataGridView grdPreviewData;
     private System.Windows.Forms.Label lblColumnOptionsSub;
     private System.Windows.Forms.Label lblColumnOptionsMain;
     private System.Windows.Forms.PictureBox picColumnOptions;

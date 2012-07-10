@@ -277,10 +277,12 @@
       this.Controls.Add(this.newConnectionLabel);
       this.Controls.Add(this.openConnectionLabel);
       this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.InheritSystemFontToControls = false;
       this.Name = "WelcomePanel";
       this.Size = new System.Drawing.Size(260, 625);
-      ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
+      this.UseSystemFont = false;
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogoText)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
       this.ResumeLayout(false);
 
     }

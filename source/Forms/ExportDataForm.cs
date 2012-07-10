@@ -79,8 +79,6 @@ namespace MySQL.ForExcel
         MySQLDataColumn mysqlCol = dataTable.Columns[colIdx] as MySQLDataColumn;
         DataGridViewColumn gridCol = grdPreviewData.Columns[colIdx];
         gridCol.HeaderText = mysqlCol.DisplayName;
-        if (gridCol.ToolTipText.Length == 0)
-          gridCol.ToolTipText = Resources.ExportColumnsGridToolTipCaption;
         grdPreviewData.Columns[colIdx].SortMode = DataGridViewColumnSortMode.NotSortable;
       }
       refreshPrimaryKeyColumnsCombo();
@@ -596,7 +594,10 @@ namespace MySQL.ForExcel
 
     private void grdPreviewData_CellToolTipTextNeeded(object sender, DataGridViewCellToolTipTextNeededEventArgs e)
     {
-      e.ToolTipText = Resources.ExportColumnsGridToolTipCaption;
+      if (e.RowIndex >= 0)
+        e.ToolTipText = Resources.ExportColumnsGridToolTipCaption;
+      else
+        e.ToolTipText = grdPreviewData.Columns[e.ColumnIndex].HeaderText;
     }
 
     private void cmbDatatype_Validating(object sender, CancelEventArgs e)

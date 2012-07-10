@@ -357,8 +357,10 @@
       this.Controls.Add(this.exportToNewTableLabel);
       this.Controls.Add(this.picAddInLogo);
       this.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.InheritSystemFontToControls = false;
       this.Name = "DBObjectSelectionPanel";
       this.Size = new System.Drawing.Size(260, 625);
+      this.UseSystemFont = false;
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
       this.ResumeLayout(false);
       this.PerformLayout();

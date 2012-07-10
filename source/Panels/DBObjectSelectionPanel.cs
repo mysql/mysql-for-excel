@@ -11,7 +11,7 @@ using MySQL.ForExcel.Properties;
 
 namespace MySQL.ForExcel
 {
-  public partial class DBObjectSelectionPanel : UserControl
+  public partial class DBObjectSelectionPanel : AutoStyleableBasePanel
   {
     private MySqlWorkbenchConnection connection;
     private string filter;

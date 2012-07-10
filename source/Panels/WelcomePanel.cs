@@ -11,11 +11,16 @@ using MySQL.Utility;
 
 namespace MySQL.ForExcel
 {
-  public partial class WelcomePanel : UserControl
+  public partial class WelcomePanel : AutoStyleableBasePanel
   {
     public WelcomePanel()
     {
       InitializeComponent();
+
+      InheritFontToControlsExceptionList.Add("openConnectionLabel");
+      InheritFontToControlsExceptionList.Add("newConnectionLabel");
+      InheritFontToControlsExceptionList.Add("manageConnectionsLabel");
+
       DoubleBuffered = true;
       manageConnectionsLabel.Enabled = MySqlWorkbench.IsInstalled;
       LoadConnections();

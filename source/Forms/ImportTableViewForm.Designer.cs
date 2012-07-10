@@ -43,7 +43,7 @@
       this.chkIncludeHeaders = new System.Windows.Forms.CheckBox();
       this.lblOptionsWarning = new System.Windows.Forms.Label();
       this.picOptionsWarning = new System.Windows.Forms.PictureBox();
-      this.grdPreviewData = new System.Windows.Forms.DataGridView();
+      this.grdPreviewData = new MySQL.ForExcel.PreviewDataGridView();
       this.contextMenuForGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.lblPickColumnsSub = new System.Windows.Forms.Label();
@@ -222,15 +222,16 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.grdPreviewData.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
       dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.InactiveCaption;
       dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
       dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Control;
       dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
       this.grdPreviewData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
       this.grdPreviewData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+      this.grdPreviewData.ColumnsMaximumWidth = 200;
       this.grdPreviewData.ContextMenuStrip = this.contextMenuForGrid;
       dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.InactiveCaption;
@@ -245,6 +246,9 @@
       this.grdPreviewData.ReadOnly = true;
       this.grdPreviewData.RowHeadersVisible = false;
       this.grdPreviewData.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+      this.grdPreviewData.ShowCellErrors = false;
+      this.grdPreviewData.ShowEditingIcon = false;
+      this.grdPreviewData.ShowRowErrors = false;
       this.grdPreviewData.Size = new System.Drawing.Size(695, 265);
       this.grdPreviewData.TabIndex = 7;
       this.grdPreviewData.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.grdPreviewData_DataBindingComplete);
@@ -414,7 +418,7 @@
     private System.Windows.Forms.CheckBox chkIncludeHeaders;
     private System.Windows.Forms.Label lblOptionsWarning;
     private System.Windows.Forms.PictureBox picOptionsWarning;
-    private System.Windows.Forms.DataGridView grdPreviewData;
+    private PreviewDataGridView grdPreviewData;
     private System.Windows.Forms.Label lblPickColumnsSub;
     private System.Windows.Forms.Label lblPickColumnsMain;
     private System.Windows.Forms.PictureBox picColumnOptions;

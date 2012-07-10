@@ -46,7 +46,7 @@
       this.picFrom = new System.Windows.Forms.PictureBox();
       this.lblImportData = new System.Windows.Forms.Label();
       this.tabResultSets = new System.Windows.Forms.TabControl();
-      this.grdResultSet = new System.Windows.Forms.DataGridView();
+      this.grdResultSet = new MySQL.ForExcel.PreviewDataGridView();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).BeginInit();
@@ -268,15 +268,16 @@
       this.grdResultSet.AllowUserToResizeColumns = false;
       this.grdResultSet.AllowUserToResizeRows = false;
       this.grdResultSet.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
       dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.InactiveCaption;
       dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
       dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Control;
       dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
       this.grdResultSet.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
       this.grdResultSet.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+      this.grdResultSet.ColumnsMaximumWidth = 200;
       dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.InactiveCaption;
       dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -290,6 +291,9 @@
       this.grdResultSet.ReadOnly = true;
       this.grdResultSet.RowHeadersVisible = false;
       this.grdResultSet.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+      this.grdResultSet.ShowCellErrors = false;
+      this.grdResultSet.ShowEditingIcon = false;
+      this.grdResultSet.ShowRowErrors = false;
       this.grdResultSet.Size = new System.Drawing.Size(676, 238);
       this.grdResultSet.TabIndex = 9;
       // 
@@ -333,6 +337,6 @@
     private System.Windows.Forms.PictureBox picFrom;
     private System.Windows.Forms.Label lblImportData;
     private System.Windows.Forms.TabControl tabResultSets;
-    private System.Windows.Forms.DataGridView grdResultSet;
+    private PreviewDataGridView grdResultSet;
   }
 }

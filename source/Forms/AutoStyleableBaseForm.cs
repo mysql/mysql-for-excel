@@ -35,7 +35,7 @@ namespace MySQL.ForExcel
 
     protected virtual void InheritFontToControls(Control.ControlCollection controls)
     {
-      if (!InheritSystemFontToControls || controls == null || controls.Count == 0)
+      if (controls == null || controls.Count == 0)
         return;
 
       foreach (Control c in controls)
@@ -54,8 +54,9 @@ namespace MySQL.ForExcel
       {
         Font = new Font(System.Drawing.SystemFonts.IconTitleFont.FontFamily, Font.Size, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
         Microsoft.Win32.SystemEvents.UserPreferenceChanged += new Microsoft.Win32.UserPreferenceChangedEventHandler(SystemEvents_UserPreferenceChanged);
+        if (InheritSystemFontToControls)
+          InheritFontToControls(Controls);
       }
-      InheritFontToControls(Controls);
       base.OnLoad(e);
     }
 

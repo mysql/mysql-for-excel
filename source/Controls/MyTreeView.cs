@@ -98,6 +98,18 @@ namespace MySQL.ForExcel
       base.OnMouseHover(e);
     }
 
+    protected override void OnFontChanged(EventArgs e)
+    {
+      base.OnFontChanged(e);
+      if (DescriptionFont != null)
+      {
+        if (DescriptionFont.Name != Font.Name)
+          DescriptionFont = new Font(Font.FontFamily, DescriptionFont.Size, DescriptionFont.Style);
+      }
+      else
+        DescriptionFont = new Font(Font.FontFamily, Font.Size - 1, FontStyle.Regular);
+    }
+
     private void UpdateExtendedStyles()
     {
       int Style = 0;

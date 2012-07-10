@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace MySQL.ForExcel
 {
-  class MultiHeaderDataGridView : DataGridView
+  class MultiHeaderDataGridView : PreviewDataGridView
   {
     private const int columnHeadersHeight = 46;
 
