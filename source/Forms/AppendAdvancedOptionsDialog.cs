@@ -16,16 +16,16 @@ namespace MySQL.ForExcel
       InitializeComponent();
 
       chkDoNotPerformAutoMap.Checked = Properties.Settings.Default.AppendPerformAutoMap;
-      //chkAutoStoreColumnMapping.Checked = Properties.Settings.Default.AppendAutoStoreColumnMapping;
-      //chkReloadColumnMapping.Checked = Properties.Settings.Default.AppendReloadColumnMapping;
+      chkAutoStoreColumnMapping.Checked = Properties.Settings.Default.AppendAutoStoreColumnMapping;
+      chkReloadColumnMapping.Checked = Properties.Settings.Default.AppendReloadColumnMapping;
       chkUseFormattedValues.Checked = Properties.Settings.Default.AppendUseFormattedValues;
     }
 
     private void btnAccept_Click(object sender, EventArgs e)
     {
       Properties.Settings.Default.AppendPerformAutoMap = chkDoNotPerformAutoMap.Checked;
-      //Properties.Settings.Default.AppendAutoStoreColumnMapping = chkAutoStoreColumnMapping.Checked;
-      //Properties.Settings.Default.AppendReloadColumnMapping = chkReloadColumnMapping.Checked;
+      Properties.Settings.Default.AppendAutoStoreColumnMapping = chkAutoStoreColumnMapping.Checked;
+      Properties.Settings.Default.AppendReloadColumnMapping = chkReloadColumnMapping.Checked;
       Properties.Settings.Default.AppendUseFormattedValues = chkUseFormattedValues.Checked;
       DialogResult = DialogResult.OK;
       Close();

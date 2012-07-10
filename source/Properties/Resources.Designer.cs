@@ -74,13 +74,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap chain_link_24x24 {
-            get {
-                object obj = ResourceManager.GetObject("chain_link_24x24", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         /// <summary>
         ///   Looks up a localized string similar to Data in the current column is not unique..
         /// </summary>

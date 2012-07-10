@@ -12,6 +12,7 @@ namespace MySQL.ForExcel
   public partial class HotLabel : UserControl
   {
     private bool tracking;
+    private MouseButtons downButton;
 
     public HotLabel()
     {
@@ -119,6 +120,19 @@ namespace MySQL.ForExcel
         e.Graphics.DrawString(Description, DescriptionFont, descriptionBrush, pt.X, pt.Y);
         descriptionBrush.Dispose();
       }     
+    }
+
+    protected override void OnMouseDown(MouseEventArgs e)
+    {
+      base.OnMouseDown(e);
+      downButton = e.Button;
+    }
+
+    protected override void OnClick(EventArgs e)
+    {
+      if (downButton == null || downButton != MouseButtons.Left)
+        return;
+      base.OnClick(e);
     }
 
     protected override void OnMouseEnter(EventArgs e)

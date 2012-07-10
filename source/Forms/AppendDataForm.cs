@@ -29,14 +29,18 @@ namespace MySQL.ForExcel
     private int grdColumnIndexToDrag = -1;
     private int grdToTableColumnIndexToDrop = -1;
     private int maxMappingCols = 0;
-    private Cursor linkCursor;
+    private Cursor draggingCursor;
+    private Cursor trashCursor;
+    private Cursor droppableCursor;
     private MySQLColumnMapping currentColumnMapping = null;
     private List<MySQLColumnMapping> storedColumnMappingsList;
 
     public AppendDataForm(MySqlWorkbenchConnection wbConnection, Excel.Range exportDataRange, DBObject importDBObject, Excel.Worksheet appendingWorksheet)
     {
       this.wbConnection = wbConnection;
-      linkCursor = Utilities.CreateCursor(new Bitmap(Properties.Resources.chain_link_24x24), 3, 3);
+      draggingCursor = Utilities.CreateCursor(new Bitmap(Properties.Resources.MySQLforExcel_Cursor_Dragging_32x32), 3, 3);
+      droppableCursor = Utilities.CreateCursor(new Bitmap(Properties.Resources.MySQLforExcel_Cursor_Dropable_32x32), 3, 3);
+      trashCursor = Utilities.CreateCursor(new Bitmap(Properties.Resources.MySQLforExcel_Cursor_Trash_32x32), 3, 3);
 
       InitializeComponent();
 
@@ -222,7 +226,7 @@ namespace MySQL.ForExcel
         grdFromExcelData.Refresh();
         grdToMySQLTable_SelectionChanged(grdToMySQLTable, EventArgs.Empty);
       }
-      //btnStoreMapping.Enabled = currentColumnMapping.MappedQuantity > 0;
+      btnStoreMapping.Enabled = currentColumnMapping.MappedQuantity > 0;
     }
 
     private void clearMappingsOnToTableGridAndMySQLTable()
@@ -248,7 +252,7 @@ namespace MySQL.ForExcel
       grdToMySQLTable.Refresh();
       grdFromExcelData.Refresh();
       grdToMySQLTable_SelectionChanged(grdToMySQLTable, EventArgs.Empty);
-      //btnStoreMapping.Enabled = false;
+      btnStoreMapping.Enabled = false;
     }
 
     private void performManualSingleColumnMapping(int fromColumnIndex, int toColumnIndex, string mappedColName)
@@ -275,6 +279,8 @@ namespace MySQL.ForExcel
       grdToMySQLTable.Refresh();
       grdFromExcelData.Refresh();
       grdToMySQLTable_SelectionChanged(grdToMySQLTable, EventArgs.Empty);
+
+      btnStoreMapping.Enabled = currentColumnMapping.MappedQuantity > 0;
     }
 
     private void changeFormattedDataSource()
@@ -409,22 +415,35 @@ namespace MySQL.ForExcel
           screenOffset = SystemInformation.WorkingArea.Location;
 
           // Proceed with the drag-and-drop, passing in the list item.           
-          DragDropEffects dropEffect = gridObject.DoDragDrop(grdColumnIndexToDrag, DragDropEffects.All | DragDropEffects.Link);
+          DragDropEffects dropEffect = gridObject.DoDragDrop(grdColumnIndexToDrag, DragDropEffects.Link);
         }
       }
     }
 
     private void grdGiveFeedback(object sender, GiveFeedbackEventArgs e)
     {
+      bool feedBackFromGrid = (sender as DataGridView).Name == "grdFromExcelData";
+
       e.UseDefaultCursors = false;
-      if ((e.Effect & DragDropEffects.Link) == DragDropEffects.Link)
-        Cursor.Current = linkCursor;
-      else
-        Cursor.Current = Cursors.Default;
+      switch (e.Effect)
+      {
+        case DragDropEffects.Link:
+          Cursor.Current = (feedBackFromGrid ? droppableCursor : trashCursor);
+          break;
+        case DragDropEffects.None:
+          Cursor.Current = (feedBackFromGrid ? draggingCursor : Cursors.Default);
+          break;
+        default:
+          Cursor.Current = Cursors.Default;
+          break;
+      }
     }
 
     private void grdQueryContinueDrag(object sender, QueryContinueDragEventArgs e)
     {
+      if ((sender as DataGridView).Name == "grdFromExcelData" && Cursor.Current != Cursors.Default && Cursor.Current != droppableCursor && Cursor.Current != draggingCursor && Cursor.Current != trashCursor)
+        Cursor.Current = draggingCursor;
+
       // Cancel the drag if the mouse moves off the form. The screenOffset takes into account any desktop bands that may be at the top or left side of the screen.
       if (((Control.MousePosition.X - screenOffset.X) < this.DesktopBounds.Left) ||
           ((Control.MousePosition.X - screenOffset.X) > this.DesktopBounds.Right) ||

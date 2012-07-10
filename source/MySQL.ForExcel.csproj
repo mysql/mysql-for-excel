@@ -493,7 +493,6 @@
     <None Include="Resources\ExcelAddinFilter.png" />
     <Content Include="Resources\ArrowDown.png" />
     <Content Include="Resources\ArrowRight.png" />
-    <Content Include="Resources\chain_link.24x24.png" />
     <Content Include="Resources\mysql-for-excel.ico" />
     <None Include="Resources\MySQLforExcel-ObjectPanel-EditData-24x24.png" />
     <None Include="Resources\MySQLforExcel-ObjectPanel-EditData-Disabled-24x24.png" />
