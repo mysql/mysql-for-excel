@@ -71,21 +71,24 @@ namespace MySQL.ForExcel
     private void LoadDataObjects(DBObjectType dataObjectType)
     {
       DataTable objs = new DataTable();
+      TreeNode parent = new TreeNode();
+
       string objectName;
       if (dataObjectType == DBObjectType.Routine)
       {
         objs = Utilities.GetSchemaCollection(connection, "Procedures", null, connection.Schema, null, "PROCEDURE");
         objectName = "ROUTINE_NAME";
+        parent = objectList.Nodes[2];
       }
       else
       {
         objs = Utilities.GetSchemaCollection(connection, dataObjectType.ToString() + "s", null, connection.Schema);
         objectName = "TABLE_NAME";
+        parent = objectList.Nodes[(int)dataObjectType - 1];
       }
 
       if (objs == null) return;
 
-      TreeNode parent = objectList.Nodes[(int)dataObjectType];
       foreach (DataRow dataRow in objs.Rows)
       {
         string dataName = dataRow[objectName].ToString();
