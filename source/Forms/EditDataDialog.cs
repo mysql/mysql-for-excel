@@ -50,11 +50,16 @@ namespace MySQL.ForExcel
       EditingWorksheet = editingWorksheet;
       EditingWorksheet.Change += new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
       EditingWorksheet.SelectionChange += new Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);
-      modifiedCellAddressesList = new List<string>(editDataRange.Count);
       toolTip.SetToolTip(this, String.Format("Editing data for Table {0} on Worksheet {1}", EditingTableName, editingWorksheet.Name));
       editingRowsQuantity = editingWorksheet.UsedRange.Rows.Count;
       editingColsQuantity = editingWorksheet.UsedRange.Columns.Count;
       Opacity = 0.60;
+
+      if (editDataRange != null)
+        modifiedCellAddressesList = new List<string>(editDataRange.Count);
+      else
+        modifiedCellAddressesList = new List<string>(0);
+
     }
 
     protected override void OnPaintBackground(PaintEventArgs e)
@@ -207,6 +212,11 @@ namespace MySQL.ForExcel
       Excel.Range intersectRange = CallerTaskPane.IntersectRanges(editDataRange, Target);
       if (intersectRange == null || intersectRange.Count == 0)
         return;
+
+      //if change was done in the first row and we have headers we won't change the name of the column
+      if (intersectRange.Row == 1 && importedHeaders)
+        return;
+
       if (!chkAutoCommit.Checked && !modifiedCellAddressesList.Contains(intersectRange.Address))
         modifiedCellAddressesList.Add(intersectRange.Address);
       intersectRange.Interior.Color = (chkAutoCommit.Checked ? commitedCellsOLEColor : uncommitedCellsOLEColor);
