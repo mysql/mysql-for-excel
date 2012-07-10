@@ -328,4 +328,41 @@
   <data name="MySQLforExcel_WelcomePanel_Connection_Disabled_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySQLforExcel-WelcomePanel-Connection-Disabled-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="EditCommitDetailsUdatedRows" xml:space="preserve">
+    <value>{1}{0} rows have been updated successfully.</value>
+  </data>
+  <data name="EditCommitDetailsUpdatingRows" xml:space="preserve">
+    <value>Updating data rows...{0}{0}</value>
+  </data>
+  <data name="EditCommitSummaryError" xml:space="preserve">
+    <value>Edited data for Table {0} could not be committed to MySQL.</value>
+  </data>
+  <data name="EditCommitSummarySuccessful" xml:space="preserve">
+    <value>Edited data for Table {0} was committed to MySQL successfully.</value>
+  </data>
+  <data name="GenericMySQLError" xml:space="preserve">
+    <value>MySQL Error {0}:{1}</value>
+  </data>
+  <data name="TableWithOperationOngoingError" xml:space="preserve">
+    <value>Table {0} already has an Edit operation ongoing.</value>
+  </data>
+  <data name="EditOpenDetailsError" xml:space="preserve">
+    <value>In order to perform an UPDATE operation on the table data a primary key is needed. Without a primary key MySQL cannot guarantee that the correct rows in the table will be updated.
+
+For that reason it is advised to add a primary key to each MySQL table.
+To do that:
+
+1. Open MySQL Workbench, connect to the database with the SQL Editor and browse to the table.
+2. Click the table with the right mouse button and select ALTER TABLE.
+3. Check the PK checkbox of the column that uniquely identifies each row.
+4. Press Apply.
+5. Get back to MySQL for Excel and edit the MySQL table.</value>
+  </data>
+  <data name="EditOpenSatusError" xml:space="preserve">
+    <value>MySQL Table has no Primary Key</value>
+  </data>
+  <data name="EditOpenSummaryError" xml:space="preserve">
+    <value>Only MySQL tables that have a Primary Key defined can be edited.
+Please add a primary key to the table.</value>
+  </data>
 </root>

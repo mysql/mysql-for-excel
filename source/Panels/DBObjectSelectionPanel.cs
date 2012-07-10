@@ -137,7 +137,7 @@ namespace MySQL.ForExcel
 
     private void importTableOrView(DBObject dbo)
     {
-      ImportTableViewForm importForm = new ImportTableViewForm(connection, dbo, (Parent as TaskPaneControl).ActiveWorksheet);
+      ImportTableViewForm importForm = new ImportTableViewForm(connection, dbo, (Parent as TaskPaneControl).ActiveWorksheet.Name);
       DialogResult dr = importForm.ShowDialog();
       if (dr == DialogResult.Cancel)
         return;
@@ -152,7 +152,7 @@ namespace MySQL.ForExcel
 
     private void importProcedure(DBObject dbo)
     {
-      ImportProcedureForm importProcedureForm = new ImportProcedureForm(connection, dbo, (Parent as TaskPaneControl).ActiveWorksheet);
+      ImportProcedureForm importProcedureForm = new ImportProcedureForm(connection, dbo, (Parent as TaskPaneControl).ActiveWorksheet.Name);
       DialogResult dr = importProcedureForm.ShowDialog();
       if (dr == DialogResult.Cancel)
         return;

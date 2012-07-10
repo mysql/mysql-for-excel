@@ -19,16 +19,16 @@ namespace MySQL.ForExcel
     private MySqlWorkbenchConnection wbConnection;
     private bool multiColumnPK = false;
 
-    public ExportDataForm(MySqlWorkbenchConnection wbConnection, Excel.Range exportDataRange, Excel.Worksheet exportingWorksheet)
+    public ExportDataForm(MySqlWorkbenchConnection wbConnection, Excel.Range exportDataRange, string exportingWorksheetName)
     {
       string proposedTableName = String.Empty;
       this.wbConnection = wbConnection;
 
       InitializeComponent();
 
-      if (!exportingWorksheet.Name.ToLowerInvariant().StartsWith("sheet"))
-        proposedTableName = exportingWorksheet.Name.ToLower().Replace(' ', '_');
-      Text = String.Format("Export Data - {0} [{1}])", exportingWorksheet.Name, exportDataRange.Address.Replace("$", String.Empty));
+      if (!exportingWorksheetName.ToLowerInvariant().StartsWith("sheet"))
+        proposedTableName = exportingWorksheetName.ToLower().Replace(' ', '_');
+      Text = String.Format("Export Data - {0} [{1}])", exportingWorksheetName, exportDataRange.Address.Replace("$", String.Empty));
 
       LoadDataAndCreateColumns(exportDataRange, proposedTableName);
       initializeDataTypeCombo();

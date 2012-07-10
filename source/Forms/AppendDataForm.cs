@@ -35,7 +35,7 @@ namespace MySQL.ForExcel
     private MySQLColumnMapping currentColumnMapping = null;
     private List<MySQLColumnMapping> storedColumnMappingsList;
 
-    public AppendDataForm(MySqlWorkbenchConnection wbConnection, Excel.Range exportDataRange, DBObject importDBObject, Excel.Worksheet appendingWorksheet)
+    public AppendDataForm(MySqlWorkbenchConnection wbConnection, Excel.Range exportDataRange, DBObject importDBObject, string appendingWorksheetName)
     {
       this.wbConnection = wbConnection;
       draggingCursor = Utilities.CreateCursor(new Bitmap(Properties.Resources.MySQLforExcel_Cursor_Dragging_32x32), 3, 3);
@@ -48,7 +48,7 @@ namespace MySQL.ForExcel
       exportDataHelper = new ExportDataHelper(wbConnection, exportDataRange, importDBObject.Name);
       initializeToTableGrid(importDBObject);
       string excelRangeAddress = exportDataRange.Address.Replace("$", String.Empty);
-      Text = String.Format("Append Data - {0} [{1}]", appendingWorksheet.Name, excelRangeAddress);
+      Text = String.Format("Append Data - {0} [{1}]", appendingWorksheetName, excelRangeAddress);
       changeFormattedDataSource();
       chkFirstRowHeaders_CheckedChanged(chkFirstRowHeaders, EventArgs.Empty);
       maxMappingCols = Math.Min(grdToMySQLTable.Columns.Count, grdFromExcelData.Columns.Count);

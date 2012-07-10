@@ -14,14 +14,48 @@ namespace MySQL.ForExcel
     private const int COLLAPSED_HEIGHT = 215;
     private const int EXPANDED_HEIGHT = 350;
 
+    public string OperationStatusText
+    {
+      get { return lblOperationStatus.Text; }
+      set { lblOperationStatus.Text = value; }
+    }
+    public string OperationSummaryText
+    {
+      get { return lblOperationSummary.Text; }
+      set 
+      { 
+        lblOperationSummary.Text = value;
+        lblOperationSummary.Height = 17 * ((value.Length / 64) + 1);
+      }
+    }
+    public string OperationSummarySubText
+    {
+      get { return lblOperationSummarySub.Text; }
+      set { lblOperationSummarySub.Text = value; }
+    }
+    public string OperationDetailsText
+    {
+      get { return txtDetails.Text; }
+      set { txtDetails.Text = value; }
+    }
+    public bool WordWrapDetails
+    {
+      get { return txtDetails.WordWrap; }
+      set { txtDetails.WordWrap = value; }
+    }
+
     public InfoDialog(bool operationSuccessful, string operationSummary, string operationDetails)
     {
       InitializeComponent();
       picLogo.Image = (operationSuccessful ? Properties.Resources.MySQLforExcel_InfoDlg_Success_64x64 : Properties.Resources.MySQLforExcel_InfoDlg_Error_64x64);
-      lblOperationStatus.Text = (operationSuccessful ? "Operation Completed Successfully" : "An Error Ocurred");
-      lblOperationSummary.Text = operationSummary;
-      txtDetails.Text = operationDetails;
+      OperationStatusText = (operationSuccessful ? "Operation Completed Successfully" : "An Error Ocurred");
+      OperationSummaryText = operationSummary;
+      if (!String.IsNullOrEmpty(operationDetails))
+        txtDetails.Text = operationDetails;
+      else
+        btnShowDetails.Enabled = false;
       btnOK.Text = (operationSuccessful ? "OK" : "Back");
+      OperationSummarySubText = String.Format("Press {0} to continue.", btnOK.Text);
       btnOK.DialogResult = (operationSuccessful ? DialogResult.OK : DialogResult.Cancel);
       ChangeHeight(false);
     }
@@ -51,5 +85,6 @@ namespace MySQL.ForExcel
     {
       DialogResult = btnOK.DialogResult;
     }
+
   }
 }

@@ -156,6 +156,77 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {1}{0} rows have been updated successfully..
+        /// </summary>
+        internal static string EditCommitDetailsUdatedRows {
+            get {
+                return ResourceManager.GetString("EditCommitDetailsUdatedRows", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updating data rows...{0}{0}.
+        /// </summary>
+        internal static string EditCommitDetailsUpdatingRows {
+            get {
+                return ResourceManager.GetString("EditCommitDetailsUpdatingRows", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edited data for Table {0} could not be committed to MySQL..
+        /// </summary>
+        internal static string EditCommitSummaryError {
+            get {
+                return ResourceManager.GetString("EditCommitSummaryError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edited data for Table {0} was committed to MySQL successfully..
+        /// </summary>
+        internal static string EditCommitSummarySuccessful {
+            get {
+                return ResourceManager.GetString("EditCommitSummarySuccessful", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to In order to perform an UPDATE operation on the table data a primary key is needed. Without a primary key MySQL cannot guarantee that the correct rows in the table will be updated.
+        ///
+        ///For that reason it is advised to add a primary key to each MySQL table.
+        ///To do that:
+        ///
+        ///1. Open MySQL Workbench, connect to the database with the SQL Editor and browse to the table.
+        ///2. Click the table with the right mouse button and select ALTER TABLE.
+        ///3. Check the PK checkbox of the column that uniquely identifies each row.        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string EditOpenDetailsError {
+            get {
+                return ResourceManager.GetString("EditOpenDetailsError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MySQL Table has no Primary Key.
+        /// </summary>
+        internal static string EditOpenSatusError {
+            get {
+                return ResourceManager.GetString("EditOpenSatusError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only MySQL tables that have a Primary Key defined can be edited.
+        ///Please add a primary key to the table..
+        /// </summary>
+        internal static string EditOpenSummaryError {
+            get {
+                return ResourceManager.GetString("EditOpenSummaryError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error.
         /// </summary>
         internal static string Error {
@@ -204,6 +275,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string ExportDataTypeNotValidWarning {
             get {
                 return ResourceManager.GetString("ExportDataTypeNotValidWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MySQL Error {0}:{1}.
+        /// </summary>
+        internal static string GenericMySQLError {
+            get {
+                return ResourceManager.GetString("GenericMySQLError", resourceCulture);
             }
         }
         
@@ -574,6 +654,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string TableNotNewInCreate {
             get {
                 return ResourceManager.GetString("TableNotNewInCreate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Table {0} already has an Edit operation ongoing..
+        /// </summary>
+        internal static string TableWithOperationOngoingError {
+            get {
+                return ResourceManager.GetString("TableWithOperationOngoingError", resourceCulture);
             }
         }
         

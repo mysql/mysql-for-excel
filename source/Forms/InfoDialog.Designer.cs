@@ -33,7 +33,7 @@
       this.picLogo = new System.Windows.Forms.PictureBox();
       this.lblOperationStatus = new System.Windows.Forms.Label();
       this.lblOperationSummary = new System.Windows.Forms.Label();
-      this.lblPressButton = new System.Windows.Forms.Label();
+      this.lblOperationSummarySub = new System.Windows.Forms.Label();
       this.txtDetails = new System.Windows.Forms.TextBox();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
@@ -44,7 +44,7 @@
       // 
       this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
       this.contentAreaPanel.Controls.Add(this.txtDetails);
-      this.contentAreaPanel.Controls.Add(this.lblPressButton);
+      this.contentAreaPanel.Controls.Add(this.lblOperationSummarySub);
       this.contentAreaPanel.Controls.Add(this.lblOperationSummary);
       this.contentAreaPanel.Controls.Add(this.picLogo);
       this.contentAreaPanel.Controls.Add(this.lblOperationStatus);
@@ -109,15 +109,15 @@
       this.lblOperationSummary.TabIndex = 1;
       this.lblOperationSummary.Text = "Operation was performed.";
       // 
-      // lblPressButton
+      // lblOperationSummarySub
       // 
-      this.lblPressButton.AutoSize = true;
-      this.lblPressButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblPressButton.Location = new System.Drawing.Point(92, 73);
-      this.lblPressButton.Name = "lblPressButton";
-      this.lblPressButton.Size = new System.Drawing.Size(120, 15);
-      this.lblPressButton.TabIndex = 2;
-      this.lblPressButton.Text = "Press OK to continue.";
+      this.lblOperationSummarySub.AutoSize = true;
+      this.lblOperationSummarySub.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblOperationSummarySub.Location = new System.Drawing.Point(92, 73);
+      this.lblOperationSummarySub.Name = "lblOperationSummarySub";
+      this.lblOperationSummarySub.Size = new System.Drawing.Size(120, 15);
+      this.lblOperationSummarySub.TabIndex = 2;
+      this.lblOperationSummarySub.Text = "Press OK to continue.";
       // 
       // txtDetails
       // 
@@ -161,7 +161,7 @@
     private System.Windows.Forms.Label lblOperationSummary;
     private System.Windows.Forms.PictureBox picLogo;
     private System.Windows.Forms.Label lblOperationStatus;
-    private System.Windows.Forms.Label lblPressButton;
+    private System.Windows.Forms.Label lblOperationSummarySub;
     private System.Windows.Forms.TextBox txtDetails;
   }
 }

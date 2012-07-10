@@ -23,7 +23,7 @@ namespace MySQL.ForExcel
     public bool ImportHeaders { get { return chkIncludeHeaders.Checked; } }
     public long TotalRowsCount { get; set; }
 
-    public ImportTableViewForm(MySqlWorkbenchConnection wbConnection, DBObject importDBObject, Excel.Worksheet importToWorksheet)
+    public ImportTableViewForm(MySqlWorkbenchConnection wbConnection, DBObject importDBObject, string importToWorksheetName)
     {
       this.wbConnection = wbConnection;
       this.importDBObject = importDBObject;
@@ -34,7 +34,7 @@ namespace MySQL.ForExcel
       chkIncludeHeaders.Checked = true;
       chkLimitRows.Checked = false;
       lblTableNameMain.Text = String.Format("{0} Name:", importDBObject.Type.ToString());
-      Text = String.Format("Import Data - {0}", importToWorksheet.Name);
+      Text = String.Format("Import Data - {0}", importToWorksheetName);
       lblTableNameSub.Text = importDBObject.Name;
       fillPreviewGrid();
     }

@@ -121,14 +121,10 @@ namespace MySQL.ForExcel
       schemaSelectionPanel1.BringToFront();
     }
 
-    public Excel.Worksheet GetActiveOrCreateWorksheet(string proposedName, bool alwaysCreate)
+    private string GetWorksheetNameAvoidingDuplicates(string proposedName)
     {
-      Excel.Worksheet currentWorksheet = excelApplication.ActiveSheet as Excel.Worksheet;
-      if (currentWorksheet != null && !alwaysCreate)
-        return currentWorksheet;
       if (excelApplication.ActiveWorkbook != null)
       {
-        currentWorksheet = excelApplication.Sheets.Add(Type.Missing, excelApplication.ActiveSheet, Type.Missing, Type.Missing);
         int i = 0;
         foreach (Excel.Worksheet ws in excelApplication.Worksheets)
         {
@@ -138,6 +134,17 @@ namespace MySQL.ForExcel
         if (i > 0)
           proposedName = String.Format("Copy ({0}) of {1}", i, proposedName);
       }
+      return proposedName;
+    }
+
+    public Excel.Worksheet GetActiveOrCreateWorksheet(string proposedName, bool alwaysCreate, bool checkForDuplicates)
+    {
+      Excel.Worksheet currentWorksheet = excelApplication.ActiveSheet as Excel.Worksheet;
+      if (currentWorksheet != null && !alwaysCreate)
+        return currentWorksheet;
+      proposedName = (checkForDuplicates ? GetWorksheetNameAvoidingDuplicates(proposedName) : proposedName);
+      if (excelApplication.ActiveWorkbook != null)
+        currentWorksheet = excelApplication.Sheets.Add(Type.Missing, excelApplication.ActiveSheet, Type.Missing, Type.Missing);
       else
       {
         Excel.Workbook currentWorkbook = excelApplication.Workbooks.Add(Type.Missing);
@@ -192,7 +199,7 @@ namespace MySQL.ForExcel
 
     public void ImportDataToExcel(DataSet ds, bool importColumnNames, ImportMultipleType importType, int selectedResultSet)
     {
-      Excel.Worksheet currentWorksheet = GetActiveOrCreateWorksheet("Sheet1", false);
+      Excel.Worksheet currentWorksheet = GetActiveOrCreateWorksheet("Sheet1", false, true);
 
       Excel.Range atCell = excelApplication.ActiveCell;
       Excel.Range endCell = null;
@@ -229,12 +236,12 @@ namespace MySQL.ForExcel
 
       if (toTableObject != null)
       {
-        AppendDataForm appendDataForm = new AppendDataForm(connection, exportRange, toTableObject, ActiveWorksheet);
+        AppendDataForm appendDataForm = new AppendDataForm(connection, exportRange, toTableObject, ActiveWorksheet.Name);
         dr = appendDataForm.ShowDialog();
       }
       else
       {
-        ExportDataForm exportForm = new ExportDataForm(connection, exportRange, ActiveWorksheet);
+        ExportDataForm exportForm = new ExportDataForm(connection, exportRange, ActiveWorksheet.Name);
         dr = exportForm.ShowDialog();
       }
       return dr == DialogResult.OK;
@@ -242,19 +249,27 @@ namespace MySQL.ForExcel
 
     public bool EditTableData(DBObject tableObject)
     {
-      if (TableNameEditFormsHashtable != null && TableNameEditFormsHashtable.Contains(tableObject.Name))
+      if (!Utilities.TableHasPrimaryKey(connection, tableObject.Name))
       {
-        Utilities.ShowErrorBox(String.Format("Table {0} already has an Edit operation ongoing.", tableObject.Name));
+        InfoDialog infoDialog = new InfoDialog(false, Properties.Resources.EditOpenSummaryError, Properties.Resources.EditOpenDetailsError);
+        infoDialog.OperationStatusText = Properties.Resources.EditOpenSatusError;
+        infoDialog.OperationSummarySubText = String.Empty;
+        infoDialog.WordWrapDetails = true;
+        infoDialog.ShowDialog();
         return false;
       }
 
-      Excel.Worksheet currentWorksheet = GetActiveOrCreateWorksheet(tableObject.Name, true);
-      currentWorksheet.Activate();
-      Excel.Range atCell = currentWorksheet.get_Range("A1", Type.Missing);
-      atCell.Select();
+      if (TableNameEditFormsHashtable != null && TableNameEditFormsHashtable.Contains(tableObject.Name))
+      {
+        InfoDialog infoDialog = new InfoDialog(false, String.Format(Properties.Resources.TableWithOperationOngoingError, tableObject.Name), null);
+        infoDialog.OperationStatusText = "Editing not possible";
+        infoDialog.ShowDialog();
+        return false;
+      }
 
       // Import Data
-      ImportTableViewForm importForm = new ImportTableViewForm(connection, tableObject, currentWorksheet);
+      string proposedWorksheetName = GetWorksheetNameAvoidingDuplicates(tableObject.Name);
+      ImportTableViewForm importForm = new ImportTableViewForm(connection, tableObject, proposedWorksheetName);
       DialogResult dr = importForm.ShowDialog();
       if (dr == DialogResult.Cancel)
         return false;
@@ -264,6 +279,12 @@ namespace MySQL.ForExcel
         MessageBox.Show(msg, Properties.Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
         return false;
       }
+
+      // Create the new Excel Worksheet and import the editing data there
+      Excel.Worksheet currentWorksheet = GetActiveOrCreateWorksheet(proposedWorksheetName, true, false);
+      currentWorksheet.Activate();
+      Excel.Range atCell = currentWorksheet.get_Range("A1", Type.Missing);
+      atCell.Select();
       Excel.Range editingRange = ImportDataTableToExcelAtGivenCell(importForm.ImportDataTable, importForm.ImportHeaders, atCell);
       
       // Edit Data

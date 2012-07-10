@@ -593,6 +593,16 @@ namespace MySQL.ForExcel
       return retType;
     }
 
+    public static bool TableHasPrimaryKey(MySqlWorkbenchConnection connection, string tableName)
+    {
+      if (String.IsNullOrEmpty(tableName))
+        return false;
+
+      string sql = String.Format("SHOW KEYS FROM {0} IN {1} WHERE Key_name = 'PRIMARY';", tableName, connection.Schema);
+      DataTable dt = GetDataFromTableOrView(connection, sql);
+      return (dt != null ? dt.Rows.Count > 0 : false);
+    }
+
     public static bool TableExistsInSchema(MySqlWorkbenchConnection connection, string schemaName, string tableName)
     {
       if (String.IsNullOrEmpty(schemaName) || String.IsNullOrEmpty(tableName))
