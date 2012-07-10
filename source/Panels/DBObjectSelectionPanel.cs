@@ -38,8 +38,8 @@ namespace MySQL.ForExcel
 
     public bool ExcelSelectionContainsData
     {
-      set 
-      { 
+      set
+      {
         currentExcelSelectionContainsData = value;
         exportToNewTableLabel.Enabled = value;
         appendDataLabel.Enabled = value && CurrentSelectedDBObject != null && CurrentSelectedDBObject.Type == DBObjectType.Table;
@@ -60,74 +60,48 @@ namespace MySQL.ForExcel
       foreach (TreeNode node in objectList.Nodes)
         node.Nodes.Clear();
 
-      LoadTables();
-      LoadViews();
-      LoadProcedures();
+      LoadDataObjects(DBObjectType.Table);
+      LoadDataObjects(DBObjectType.View);
+      LoadDataObjects(DBObjectType.Routine);
 
       if (objectList.Nodes[0].GetNodeCount(true) > 0)
         objectList.Nodes[0].Expand();
     }
 
-    private void LoadTables()
+    private void LoadDataObjects(DBObjectType dataObjectType)
     {
-      DataTable tables = Utilities.GetSchemaCollection(connection, "Tables", null, connection.Schema);
-
-      TreeNode parent = objectList.Nodes[0];
-      foreach (DataRow tableRow in tables.Rows)
+      DataTable objs = new DataTable();
+      string objectName;
+      if (dataObjectType == DBObjectType.Routine)
       {
-        string tableName = tableRow["TABLE_NAME"].ToString();
-
-        // check our filter
-        if (!String.IsNullOrEmpty(filter) && String.Compare(filter, tableName, true) != 0) continue;
-
-        string text = tableName;
-
-        TreeNode node = objectList.AddNode(parent, text);
-        node.Tag = new DBObject(tableName, DBObjectType.Table);
-        node.ImageIndex = 0;
+        objs = Utilities.GetSchemaCollection(connection, "Procedures", null, connection.Schema, null, "PROCEDURE");
+        objectName = "ROUTINE_NAME";
       }
-    }
-
-    private void LoadViews()
-    {
-      DataTable views = Utilities.GetSchemaCollection(connection, "Views", null, connection.Schema);
-      if (views == null) return;
-
-      TreeNode parent = objectList.Nodes[1];
-      foreach (DataRow viewRow in views.Rows)
+      else
       {
-        string viewName = viewRow["TABLE_NAME"].ToString();
-
-        // check our filter
-        if (!String.IsNullOrEmpty(filter) && String.Compare(filter, viewName, true) != 0) continue;
-
-        string text = viewName;
-
-        TreeNode node = objectList.AddNode(parent, text);
-        node.Tag = new DBObject(viewName, DBObjectType.View);
-        node.ImageIndex = 1;
+        objs = Utilities.GetSchemaCollection(connection, dataObjectType.ToString() + "s", null, connection.Schema);
+        objectName = "TABLE_NAME";
       }
-    }
 
-    private void LoadProcedures()
-    {
-      DataTable procs = Utilities.GetSchemaCollection(connection, "Procedures", null, connection.Schema, null, "PROCEDURE");
-      if (procs == null) return;
+      if (objs == null) return;
 
-      TreeNode parent = objectList.Nodes[2];
-      foreach (DataRow procedureRow in procs.Rows)
+      TreeNode parent = objectList.Nodes[(int)dataObjectType];
+      foreach (DataRow dataRow in objs.Rows)
       {
-        string procName = procedureRow["ROUTINE_NAME"].ToString();
+        string dataName = dataRow[objectName].ToString();
 
         // check our filter
-        if (!String.IsNullOrEmpty(filter) && String.Compare(filter, procName, true) != 0) continue;
+        if (!String.IsNullOrEmpty(filter) && !dataName.ToUpper().Contains(filter)) continue;
 
-        string type = procedureRow["ROUTINE_TYPE"].ToString();
-        string text = procName;
+        string text = dataName;
 
         TreeNode node = objectList.AddNode(parent, text);
-        node.Tag = new DBObject(procName, DBObjectType.Routine, (type == "PROCEDURE" ? RoutineType.Procedure : RoutineType.Function));
-        node.ImageIndex = 2;
+        if (dataObjectType == DBObjectType.Routine)
+          node.Tag = new DBObject(dataName, dataObjectType,
+            ((dataRow["ROUTINE_TYPE"].ToString()) == "PROCEDURE" ? RoutineType.Procedure : RoutineType.Function));
+        else
+          node.Tag = new DBObject(dataName, dataObjectType);
+        node.ImageIndex = (int)dataObjectType;
       }
     }
 
@@ -208,7 +182,7 @@ namespace MySQL.ForExcel
       if (success)
       {
         objectList.Nodes[0].Nodes.Clear();
-        LoadTables();
+        LoadDataObjects(DBObjectType.Table);
       }
     }
 
@@ -223,7 +197,7 @@ namespace MySQL.ForExcel
     private void btnHelp_Click(object sender, EventArgs e)
     {
       MessageBox.Show("Showing Help...");
-    } 
+    }
 
     private void btnBack_Click(object sender, EventArgs e)
     {
@@ -239,7 +213,7 @@ namespace MySQL.ForExcel
     {
       if (e.KeyCode == Keys.Enter)
       {
-        filter = objectFilter.Text.Trim();
+        filter = objectFilter.Text.Trim().ToUpper();
         PopulateList();
       }
     }

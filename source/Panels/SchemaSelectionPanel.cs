@@ -79,8 +79,8 @@ namespace MySQL.ForExcel
       {
         string schemaName = row["DATABASE_NAME"].ToString();
 
-        // if the user has specified a filter then check it
-        if (!String.IsNullOrEmpty(filter) && String.Compare(filter, schemaName, true) != 0) continue;
+        // if the user has specified a filter then check it        
+        if (!String.IsNullOrEmpty(filter) && !schemaName.ToUpper().Contains(filter)) continue;
 
         string lcSchemaName = schemaName.ToLowerInvariant();
         int index = (lcSchemaName == "mysql" || lcSchemaName == "information_schema") ? 1 : 0;
@@ -119,7 +119,7 @@ namespace MySQL.ForExcel
     {
       if (e.KeyCode == Keys.Enter)
       {
-        filter = schemaFilter.Text.Trim();
+        filter = schemaFilter.Text.Trim().ToUpper();
         LoadSchemas();
       }
     }
