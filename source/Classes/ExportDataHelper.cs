@@ -347,10 +347,7 @@ namespace MySQL.ForExcel
       {
         if (String.IsNullOrEmpty(ExportTable.Columns[colIdx].MappedDataColName))
           continue;
-        MySQLColumn column = ExportTable.Columns[colIdx];
-
-        if (column.AutoIncrement)                  
-          continue;        
+        MySQLColumn column = ExportTable.Columns[colIdx];        
 
         queryString.AppendFormat("{0}{1}", colsSeparator, column.ColumnName);
         colsSeparator = ",";
@@ -367,10 +364,18 @@ namespace MySQL.ForExcel
         colsSeparator = String.Empty;
         for (colIdx = 0; colIdx < mappedColumnNames.Count; colIdx++)
         {
+
+          var valueToDB = string.Empty;
+          
+          if (columnsRequireQuotes[colIdx]) 
+            valueToDB = String.IsNullOrEmpty(dr[mappedColumnNames[colIdx]].ToString()) ? string.Empty : dr[mappedColumnNames[colIdx]].ToString();
+          else  // for numeric type then insert a null value if the dr doesn't have any value for this column
+            valueToDB = String.IsNullOrEmpty(dr[mappedColumnNames[colIdx]].ToString()) ? @"null" : dr[mappedColumnNames[colIdx]].ToString();
+
           queryString.AppendFormat("{0}{1}{2}{1}",
                                    colsSeparator,
                                    (columnsRequireQuotes[colIdx] ? "'" : String.Empty),
-                                   dr[mappedColumnNames[colIdx]].ToString());
+                                   valueToDB);
           colsSeparator = ",";
         }
         queryString.Append(")");
