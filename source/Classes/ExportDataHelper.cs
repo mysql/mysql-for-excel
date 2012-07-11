@@ -348,9 +348,11 @@ namespace MySQL.ForExcel
         if (String.IsNullOrEmpty(ExportTable.Columns[colIdx].MappedDataColName))
           continue;
         MySQLColumn column = ExportTable.Columns[colIdx];
-        queryString.AppendFormat("{0}{1}",
-                                 colsSeparator,
-                                 column.ColumnName);
+
+        if (column.AutoIncrement)                  
+          continue;        
+
+        queryString.AppendFormat("{0}{1}", colsSeparator, column.ColumnName);
         colsSeparator = ",";
         columnsRequireQuotes.Add(column.ColumnsRequireQuotes);
         mappedColumnNames.Add(ExportTable.Columns[colIdx].MappedDataColName);
