@@ -43,7 +43,7 @@ namespace MySQL.ForExcel
 
     private void refreshPrimaryKeyColumnsCombo()
     {
-      string selectedItem = (radUseExistingColumn.Checked ? cmbPrimaryKeyColumns.SelectedItem.ToString() : String.Empty);
+      int selectedIndex = cmbPrimaryKeyColumns.SelectedIndex;
       cmbPrimaryKeyColumns.Items.Clear();
       foreach (MySQLDataColumn mysqlCol in dataTable.Columns.OfType<MySQLDataColumn>().Skip(1))
       {
@@ -51,8 +51,9 @@ namespace MySQL.ForExcel
           continue;
         cmbPrimaryKeyColumns.Items.Add(mysqlCol.DisplayName);
       }
-      if (selectedItem.Length > 0)
-        cmbPrimaryKeyColumns.SelectedItem = selectedItem;
+      cmbPrimaryKeyColumns.SelectedIndex = selectedIndex;
+      if (selectedIndex < 0)
+        radAddPrimaryKey.Checked = true;
     }
 
     private void LoadDataAndCreateColumns(Excel.Range exportDataRange, string proposedTableName)
@@ -236,6 +237,15 @@ namespace MySQL.ForExcel
 
     private void btnExport_Click(object sender, EventArgs e)
     {
+      bool tableContainsDataToExport = dataTable.Rows.Count > 1 && !dataTable.FirstRowIsHeaders;
+
+      if (!tableContainsDataToExport)
+      {
+        WarningDialog wDiag = new WarningDialog(Properties.Resources.ExportDataNoDataToExportTitleWarning, Properties.Resources.ExportDataNoDataToExportDetailWarning);
+        if (wDiag.ShowDialog() == DialogResult.No)
+          return;
+      }
+
       Exception exception;
       string operationSummary = String.Format("The MySQL Table \"{0}\"", dataTable.TableName);
       StringBuilder operationDetails = new StringBuilder();
@@ -256,13 +266,14 @@ namespace MySQL.ForExcel
       }
       operationSummary += (success ? "has been created " : "could not be created.");
 
-      if (success)
+      if (success && tableContainsDataToExport)
       {
         success = dataTable.InsertDataWithAdapter(wbConnection, chkFirstRowHeaders.Checked, Properties.Settings.Default.ExportUseFormattedValues, out exception);
         if (success)
         {
           operationDetails.AppendFormat("{0}Inserting data rows...{0}", Environment.NewLine);
           operationDetails.AppendFormat("{0} rows have been added successfully.", dataTable.Rows.Count);
+          operationSummary += "with data.";
         }
         else
         {
@@ -272,9 +283,9 @@ namespace MySQL.ForExcel
           else
             operationDetails.AppendFormat("ADO.NET Error:{0}", Environment.NewLine);
           operationDetails.Append(exception.Message);
+          operationSummary += "with no data.";
         }
       }
-      operationSummary += (success ? "with data." : "with no data.");
 
       InfoDialog infoDialog = new InfoDialog(success, operationSummary, operationDetails.ToString());
       DialogResult dr = infoDialog.ShowDialog();
@@ -506,6 +517,8 @@ namespace MySQL.ForExcel
       if (e.ListChangedType != ListChangedType.Reset)
         return;
       grdPreviewData.Columns[0].Visible = radAddPrimaryKey.Checked;
+      if (grdPreviewData.Rows.Count <= 1 && chkFirstRowHeaders.Checked)
+        grdPreviewData.CurrentCell = null;
       grdPreviewData.Rows[0].Visible = !chkFirstRowHeaders.Checked;
     }
 

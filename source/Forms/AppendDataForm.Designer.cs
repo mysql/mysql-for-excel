@@ -383,7 +383,6 @@
       this.grdToMySQLTable.ShowRowErrors = false;
       this.grdToMySQLTable.Size = new System.Drawing.Size(686, 150);
       this.grdToMySQLTable.TabIndex = 9;
-      this.grdToMySQLTable.SelectionChanged += new System.EventHandler(this.grdToMySQLTable_SelectionChanged);
       this.grdToMySQLTable.DragDrop += new System.Windows.Forms.DragEventHandler(this.grdToMySQLTable_DragDrop);
       this.grdToMySQLTable.DragOver += new System.Windows.Forms.DragEventHandler(this.grdToMySQLTable_DragOver);
       this.grdToMySQLTable.DragLeave += new System.EventHandler(this.grdToMySQLTable_DragLeave);

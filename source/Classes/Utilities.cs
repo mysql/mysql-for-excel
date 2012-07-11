@@ -479,7 +479,7 @@ namespace MySQL.ForExcel
         if (decimalPointPos < 0)
         {
           if (Int32.TryParse(strValue, out intResult))
-            strType = (intResult == 0 || intResult == 1 ? "System.Boolean" : "System.Int32");
+            strType = "System.Int32";
           else if (Int64.TryParse(strValue, out longResult))
             strType = "System.Int64";
         }

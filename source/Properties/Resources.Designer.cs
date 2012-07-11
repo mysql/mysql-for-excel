@@ -86,9 +86,18 @@ namespace MySQL.ForExcel.Properties {
         /// <summary>
         ///   Looks up a localized string similar to This column has already been mapped, do you want to overwrite existing mapping?.
         /// </summary>
-        internal static string ColumnMappedOverwrite {
+        internal static string ColumnMappedOverwriteDetailWarning {
             get {
-                return ResourceManager.GetString("ColumnMappedOverwrite", resourceCulture);
+                return ResourceManager.GetString("ColumnMappedOverwriteDetailWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Column Already Mapped.
+        /// </summary>
+        internal static string ColumnMappedOverwriteTitleWarning {
+            get {
+                return ResourceManager.GetString("ColumnMappedOverwriteTitleWarning", resourceCulture);
             }
         }
         
@@ -104,18 +113,18 @@ namespace MySQL.ForExcel.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Column mapping for all columns in Excel selection is incomplete. Do you want to proceed with the current mapped data only?.
         /// </summary>
-        internal static string ColumnMappingIncomplete {
+        internal static string ColumnMappingIncompleteDetailWarning {
             get {
-                return ResourceManager.GetString("ColumnMappingIncomplete", resourceCulture);
+                return ResourceManager.GetString("ColumnMappingIncompleteDetailWarning", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Some columns have already been mapped, do you want to overwrite existing mappings?.
+        ///   Looks up a localized string similar to Column Mapping Incomplete.
         /// </summary>
-        internal static string ColumnsMappedOverwrite {
+        internal static string ColumnMappingIncompleteTitleWarning {
             get {
-                return ResourceManager.GetString("ColumnsMappedOverwrite", resourceCulture);
+                return ResourceManager.GetString("ColumnMappingIncompleteTitleWarning", resourceCulture);
             }
         }
         
@@ -257,6 +266,24 @@ namespace MySQL.ForExcel.Properties {
         internal static string ExportColumnsGridToolTipCaption {
             get {
                 return ResourceManager.GetString("ExportColumnsGridToolTipCaption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There is no current data to export to the new table, do you want to proceed just with the table creation?.
+        /// </summary>
+        internal static string ExportDataNoDataToExportDetailWarning {
+            get {
+                return ResourceManager.GetString("ExportDataNoDataToExportDetailWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Data to Export.
+        /// </summary>
+        internal static string ExportDataNoDataToExportTitleWarning {
+            get {
+                return ResourceManager.GetString("ExportDataNoDataToExportTitleWarning", resourceCulture);
             }
         }
         

@@ -197,6 +197,36 @@ namespace MySQL.ForExcel
       return manualMapping;
     }
 
+    private void applySingleMapping(int fromColumnIndex, int toColumnIndex, string mappedColName)
+    {
+      int previouslyMappedFromIndex = currentColumnMapping.MappedSourceIndexes[toColumnIndex];
+      bool mapping = !String.IsNullOrEmpty(mappedColName) && fromColumnIndex >= 0;
+      DataGridViewCellStyle newStyle;
+
+      // Change Text and Style of ToTable Column
+      MultiHeaderColumn multiHeaderCol = grdToMySQLTable.MultiHeaderColumnList[toColumnIndex];
+      multiHeaderCol.HeaderText = (mapping ? mappedColName : String.Empty);
+      multiHeaderCol.BackgroundColor = (mapping ? Color.LightGreen : Color.OrangeRed);
+
+      // Change Style of From Table Column being mapped or unmapped
+      if (mapping)
+      {
+        newStyle = new DataGridViewCellStyle(grdFromExcelData.Columns[fromColumnIndex].HeaderCell.Style);
+        newStyle.SelectionBackColor = newStyle.BackColor = Color.LightGreen;
+        grdFromExcelData.Columns[fromColumnIndex].HeaderCell.Style = newStyle;
+      }
+      else if (previouslyMappedFromIndex >= 0 && currentColumnMapping.MappedSourceIndexes.Count(fromIdx => fromIdx == previouslyMappedFromIndex) <= 1)
+      {
+        newStyle = new DataGridViewCellStyle(grdFromExcelData.Columns[previouslyMappedFromIndex].HeaderCell.Style);
+        newStyle.SelectionBackColor = newStyle.BackColor = SystemColors.Control;
+        grdFromExcelData.Columns[previouslyMappedFromIndex].HeaderCell.Style = newStyle;
+      }
+
+      // Store the actual mapping
+      exportTable.Columns[toColumnIndex].MappedDataColName = mappedColName;
+      currentColumnMapping.MappedSourceIndexes[toColumnIndex] = fromColumnIndex;
+    }
+
     private void applySelectedStoredColumnMapping()
     {
       if (currentColumnMapping != null)
@@ -206,25 +236,11 @@ namespace MySQL.ForExcel
         for (int mappedIdx = 0; mappedIdx < currentColumnMapping.MappedSourceIndexes.Length; mappedIdx++)
         {
           int currentMappedSourceIndex = currentColumnMapping.MappedSourceIndexes[mappedIdx];
-          string previouslyMappedColName = exportTable.Columns[mappedIdx].MappedDataColName;
-          bool mapped = currentMappedSourceIndex >= 0;
-          string mappedColName = (mapped ? currentColumnMapping.SourceColumns[currentMappedSourceIndex] : String.Empty);
-
-          MultiHeaderColumn multiHeaderCol = grdToMySQLTable.MultiHeaderColumnList[mappedIdx];
-          multiHeaderCol.HeaderText = mappedColName;
-          multiHeaderCol.BackgroundColor = (mapped ? Color.LightGreen : Color.OrangeRed);
-          exportTable.Columns[mappedIdx].MappedDataColName = (mapped ? mappedColName : null);
-
-          if (!String.IsNullOrEmpty(previouslyMappedColName))
-          {
-            DataGridViewCellStyle newStyle = new DataGridViewCellStyle(grdFromExcelData.Columns[previouslyMappedColName].HeaderCell.Style);
-            newStyle.BackColor = (mapped ? Color.LightGreen : SystemColors.Control);
-            grdFromExcelData.Columns[previouslyMappedColName].HeaderCell.Style = newStyle;
-          }
+          string currentMappedColName = (currentMappedSourceIndex >= 0 ? currentColumnMapping.SourceColumns[currentMappedSourceIndex] : null);
+          applySingleMapping(currentMappedSourceIndex, mappedIdx, currentMappedColName);
         }
         grdToMySQLTable.Refresh();
         grdFromExcelData.Refresh();
-        grdToMySQLTable_SelectionChanged(grdToMySQLTable, EventArgs.Empty);
       }
       btnStoreMapping.Enabled = currentColumnMapping.MappedQuantity > 0;
     }
@@ -244,14 +260,13 @@ namespace MySQL.ForExcel
         if (colIdx < grdFromExcelData.Columns.Count)
         {
           DataGridViewCellStyle newStyle = new DataGridViewCellStyle(grdFromExcelData.Columns[colIdx].HeaderCell.Style);
-          newStyle.BackColor = SystemColors.Control;
+          newStyle.SelectionBackColor = newStyle.BackColor = SystemColors.Control;
           grdFromExcelData.Columns[colIdx].HeaderCell.Style = newStyle;
         }
         exportTable.Columns[colIdx].MappedDataColName = null;
       }
       grdToMySQLTable.Refresh();
       grdFromExcelData.Refresh();
-      grdToMySQLTable_SelectionChanged(grdToMySQLTable, EventArgs.Empty);
       btnStoreMapping.Enabled = false;
     }
 
@@ -260,26 +275,11 @@ namespace MySQL.ForExcel
       if (currentColumnMapping.Name != "Manual")
         cmbMappingMethod.Text = "Manual";
 
-      string previouslyMappedColName = exportTable.Columns[toColumnIndex].MappedDataColName;
-      bool mapping = !String.IsNullOrEmpty(mappedColName) && fromColumnIndex >= 0;
+      applySingleMapping(fromColumnIndex, toColumnIndex, mappedColName);
 
-      MultiHeaderColumn multiHeaderCol = grdToMySQLTable.MultiHeaderColumnList[toColumnIndex];
-      multiHeaderCol.HeaderText = (mapping ? mappedColName : String.Empty);
-      multiHeaderCol.BackgroundColor = (mapping ? Color.LightGreen : Color.OrangeRed);
-      exportTable.Columns[toColumnIndex].MappedDataColName = mappedColName;
-      currentColumnMapping.MappedSourceIndexes[toColumnIndex] = fromColumnIndex;
-
-      if (!String.IsNullOrEmpty(previouslyMappedColName))
-      {
-        DataGridViewCellStyle newStyle = new DataGridViewCellStyle(grdFromExcelData.Columns[previouslyMappedColName].HeaderCell.Style);
-        newStyle.BackColor = (mapping ? Color.LightGreen : SystemColors.Control);
-        grdFromExcelData.Columns[previouslyMappedColName].HeaderCell.Style = newStyle;
-      }
-
+      // Refresh Grids
       grdToMySQLTable.Refresh();
       grdFromExcelData.Refresh();
-      grdToMySQLTable_SelectionChanged(grdToMySQLTable, EventArgs.Empty);
-
       btnStoreMapping.Enabled = currentColumnMapping.MappedQuantity > 0;
     }
 
@@ -328,19 +328,13 @@ namespace MySQL.ForExcel
       grdFromExcelData.ClearSelection();
     }
 
-    private void grdToMySQLTable_SelectionChanged(object sender, EventArgs e)
-    {
-      bool anySelected = grdToMySQLTable.SelectedColumns.Count > 0;
-      string mappedColName = (anySelected ? exportTable.Columns[grdToMySQLTable.SelectedColumns[0].DisplayIndex].MappedDataColName : null);
-    }
-
     private void btnAppend_Click(object sender, EventArgs e)
     {
       DialogResult dr;
       if (exportTable.Columns.Count(col => !String.IsNullOrEmpty(col.MappedDataColName)) < maxMappingCols)
       {
-        dr = Utilities.ShowWarningBox(Properties.Resources.ColumnMappingIncomplete);
-        if (dr == DialogResult.No)
+        WarningDialog wDiag = new WarningDialog(Properties.Resources.ColumnMappingIncompleteTitleWarning, Properties.Resources.ColumnMappingIncompleteDetailWarning);
+        if (wDiag.ShowDialog() == DialogResult.No)
           return;
       }
 
@@ -472,7 +466,12 @@ namespace MySQL.ForExcel
           if (!String.IsNullOrEmpty(exportTable.Columns[grdToTableColumnIndexToDrop].MappedDataColName))
           {
             bool isIdenticalMapping = exportTable.Columns[grdToTableColumnIndexToDrop].MappedDataColName == draggedColumnName;
-            DialogResult dr = (isIdenticalMapping ? DialogResult.No : Utilities.ShowWarningBox(Properties.Resources.ColumnMappedOverwrite));
+            DialogResult dr = DialogResult.No;
+            if (!isIdenticalMapping)
+            {
+              WarningDialog wDiag = new WarningDialog(Properties.Resources.ColumnMappedOverwriteTitleWarning, Properties.Resources.ColumnMappedOverwriteDetailWarning);
+              dr = wDiag.ShowDialog();
+            }
             if (dr == DialogResult.Yes)
               performManualSingleColumnMapping(-1, grdToTableColumnIndexToDrop, null);
             else

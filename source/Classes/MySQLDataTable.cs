@@ -40,8 +40,10 @@ namespace MySQL.ForExcel
           containsIntegers = (Columns[1] as MySQLDataColumn).MySQLDataType.ToLowerInvariant() == "integer";
         if (!containsIntegers)
         {
-          containsIntegers = true;
-          for (int rowIdx = (firstRowIsHeaders ? 1 : 0); rowIdx < Math.Min(Rows.Count, 50); rowIdx++)
+          int rowsToAnalyzeCount = Math.Min(Rows.Count, 50);
+          int startingRow = (firstRowIsHeaders ? 1 : 0);
+          containsIntegers = (startingRow < rowsToAnalyzeCount);
+          for (int rowIdx = startingRow; rowIdx < rowsToAnalyzeCount; rowIdx++)
           {
             containsIntegers = containsIntegers && Int32.TryParse(Rows[rowIdx][1].ToString(), out res);
           }
@@ -640,8 +642,8 @@ namespace MySQL.ForExcel
       if (String.IsNullOrEmpty(displayName))
         return null;
 
-      StringBuilder colDefinition = new StringBuilder(displayName);
-      colDefinition.AppendFormat(" {0}", MySQLDataType);
+      StringBuilder colDefinition = new StringBuilder();
+      colDefinition.AppendFormat("`{0}` {1}", displayName, MySQLDataType);
       if (AutoPK || (PrimaryKey && (Table as MySQLDataTable).NumberOfPK == 1))
         colDefinition.Append(" primary key");
       else if (UniqueKey)

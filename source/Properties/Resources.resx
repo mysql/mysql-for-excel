@@ -120,9 +120,6 @@
   <data name="SelectedDBSchemaNull" xml:space="preserve">
     <value>Empty or null DB Schema used for this action.  A valid Schema must be used.</value>
   </data>
-  <data name="ColumnsMappedOverwrite" xml:space="preserve">
-    <value>Some columns have already been mapped, do you want to overwrite existing mappings?</value>
-  </data>
   <data name="UnableToRetrieveData" xml:space="preserve">
     <value>Unable to retrieve data from '{0}'.</value>
   </data>
@@ -132,7 +129,7 @@
   <data name="TableNotNewInCreate" xml:space="preserve">
     <value>Table must be new in order to create it in MySQL DB.</value>
   </data>
-  <data name="ColumnMappingIncomplete" xml:space="preserve">
+  <data name="ColumnMappingIncompleteDetailWarning" xml:space="preserve">
     <value>Column mapping for all columns in Excel selection is incomplete. Do you want to proceed with the current mapped data only?</value>
   </data>
   <data name="ConnectionStringNotSet" xml:space="preserve">
@@ -162,7 +159,7 @@
   <data name="ErrorCreatingNewSchema" xml:space="preserve">
     <value>An error occurred creating a new schema: {0}</value>
   </data>
-  <data name="ColumnMappedOverwrite" xml:space="preserve">
+  <data name="ColumnMappedOverwriteDetailWarning" xml:space="preserve">
     <value>This column has already been mapped, do you want to overwrite existing mapping?</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
@@ -364,5 +361,17 @@ To do that:
   <data name="EditOpenSummaryError" xml:space="preserve">
     <value>Only MySQL tables that have a Primary Key defined can be edited.
 Please add a primary key to the table.</value>
+  </data>
+  <data name="ExportDataNoDataToExportDetailWarning" xml:space="preserve">
+    <value>There is no current data to export to the new table, do you want to proceed just with the table creation?</value>
+  </data>
+  <data name="ExportDataNoDataToExportTitleWarning" xml:space="preserve">
+    <value>No Data to Export</value>
+  </data>
+  <data name="ColumnMappedOverwriteTitleWarning" xml:space="preserve">
+    <value>Column Already Mapped</value>
+  </data>
+  <data name="ColumnMappingIncompleteTitleWarning" xml:space="preserve">
+    <value>Column Mapping Incomplete</value>
   </data>
 </root>
