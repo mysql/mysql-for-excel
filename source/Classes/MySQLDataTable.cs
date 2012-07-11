@@ -61,7 +61,7 @@ namespace MySQL.ForExcel
       {
         MySQLDataColumn col = Columns[i] as MySQLDataColumn;
         col.DisplayName = (useFirstRow ? DataToColName(row[i].ToString()) : col.ColumnName);
-        col.MySQLDataType = (useFirstRow ? col.OtherRowsDataType : col.FirstRowDataType);
+        col.MySQLDataType = (useFirstRow ? col.RowsFrom2ndDataType : col.RowsFrom1stDataType);
       }
       (Columns[0] as MySQLDataColumn).DisplayName = TableName + "_id";
       int adjustIdx = (useFirstRow ? 0 : 1);
@@ -148,6 +148,62 @@ namespace MySQL.ForExcel
         col.DetectType(firstRowIsHeaders);
     }
 
+    private string GetConsistentDataTypeOnAllRows(string proposedDataType, List<string> rowsDataTypesList, int[] decimalMaxLen, int[] varCharMaxLen)
+    {
+      string fullDataType = proposedDataType;
+      bool typesConsistent = true;
+
+      typesConsistent = rowsDataTypesList.All(str => str == proposedDataType);
+      if (!typesConsistent)
+      {
+        if (rowsDataTypesList.Count(str => str == "Integer") + rowsDataTypesList.Count(str => str == "Bool") == rowsDataTypesList.Count)
+        {
+          typesConsistent = true;
+          fullDataType = "Integer";
+        }
+        else if (rowsDataTypesList.Count(str => str == "Integer") + rowsDataTypesList.Count(str => str == "BigInt") == rowsDataTypesList.Count)
+        {
+          typesConsistent = true;
+          fullDataType = "BigInt";
+        }
+        else if (rowsDataTypesList.Count(str => str == "Integer") + rowsDataTypesList.Count(str => str == "Decimal") == rowsDataTypesList.Count)
+        {
+          typesConsistent = true;
+          proposedDataType = "Decimal";
+        }
+        else if (rowsDataTypesList.Count(str => str == "Integer") + rowsDataTypesList.Count(str => str == "Decimal") + rowsDataTypesList.Count(str => str == "Double") == rowsDataTypesList.Count)
+        {
+          typesConsistent = true;
+          fullDataType = "Double";
+        }
+      }
+
+      if (typesConsistent)
+        switch (proposedDataType)
+        {
+          case "Varchar":
+            fullDataType = String.Format("Varchar({0})", varCharMaxLen[0]);
+            break;
+          case "Decimal":
+            if (decimalMaxLen[0] > 12 || decimalMaxLen[1] > 2)
+            {
+              decimalMaxLen[0] = 65;
+              decimalMaxLen[1] = 30;
+            }
+            else
+            {
+              decimalMaxLen[0] = 12;
+              decimalMaxLen[1] = 2;
+            }
+            fullDataType = String.Format("Decimal({0}, {1})", decimalMaxLen[0], decimalMaxLen[1]);
+            break;
+        }
+      else
+        fullDataType = String.Format("Varchar({0})", varCharMaxLen[1]);
+
+      return fullDataType;
+    }
+
     private void DetectTypes(object[,] data, bool addBufferToVarchar, bool createIndexForIntColumns)
     {
       int rowsCount = data.GetUpperBound(0);
@@ -163,13 +219,12 @@ namespace MySQL.ForExcel
         object valueFromArray = null;
         string proposedType = String.Empty;
         string strippedType = String.Empty;
-        string headerType = String.Empty;
         string valueAsString = String.Empty;
-        bool typesConsistent = true;
         bool valueOverflow = false;
-        List<string> typesList = new List<string>(rowsCount);
-        int[] varCharMaxLen = new int[2] { 0, 0 };
-        int[] decimalMaxLen = new int[2] { 0, 0 };
+        List<string> typesListFor1stAndRest = new List<string>(2);
+        List<string> typesListFrom2ndRow = new List<string>(rowsCount - 1);
+        int[] varCharMaxLen = new int[2] { 0, 0 };    // 0 - All rows original datatype varcharmaxlen, 1 - All rows Varchar forced datatype maxlen
+        int[] decimalMaxLen = new int[2] { 0, 0 };    // 0 - Integral part max length, 1 - decimal part max length
         int lParensIndex = -1;
         int varCharValueLength = 0;
 
@@ -179,7 +234,7 @@ namespace MySQL.ForExcel
           if (valueFromArray == null)
             continue;
 
-          // Treat always as a Varchar value first in case all rows do not have a consistent datatype
+          // Treat always as a Varchar value first in case all rows do not have a consistent datatype just to see the varchar len calculated by GetMySQLExportDataType
           valueAsString = valueFromArray.ToString();
           proposedType = Utilities.GetMySQLExportDataType(valueAsString, out valueOverflow);
           if (proposedType == "Bool")
@@ -213,62 +268,22 @@ namespace MySQL.ForExcel
               break;
           }
           if (rowPos == 1)
-            headerType = proposedType;
+            typesListFor1stAndRest.Add(strippedType);
           else
-            typesList.Add(strippedType);
+            typesListFrom2ndRow.Add(strippedType);
         }
 
-        typesConsistent = typesList.All(str => str == strippedType);
-        if (!typesConsistent)
-        {
-          if (typesList.Count(str => str == "Integer") + typesList.Count(str => str == "Bool") == typesList.Count)
-          {
-            typesConsistent = true;
-            proposedType = "Integer";
-          }
-          else if (typesList.Count(str => str == "Integer") + typesList.Count(str => str == "BigInt") == typesList.Count)
-          {
-            typesConsistent = true;
-            proposedType = "BigInt";
-          }
-          else if (typesList.Count(str => str == "Integer") + typesList.Count(str => str == "Decimal") == typesList.Count)
-          {
-            typesConsistent = true;
-            strippedType = "Decimal";
-          }
-          else if (typesList.Count(str => str == "Integer") + typesList.Count(str => str == "Decimal") + typesList.Count(str => str == "Double") == typesList.Count)
-          {
-            typesConsistent = true;
-            proposedType = "Double";
-          }
-        }
+        // Get the consistent DataType for all rows except first one.
+        proposedType = GetConsistentDataTypeOnAllRows(strippedType, typesListFrom2ndRow, decimalMaxLen, varCharMaxLen);
+        col.RowsFrom2ndDataType = proposedType;
 
-        if (typesConsistent)
-          switch (strippedType)
-          {
-            case "Varchar":
-              proposedType = String.Format("Varchar({0})", varCharMaxLen[0]);
-              break;
-            case "Decimal":
-              if (decimalMaxLen[0] > 12 || decimalMaxLen[1] > 2)
-              {
-                decimalMaxLen[0] = 65;
-                decimalMaxLen[1] = 30;
-              }
-              else
-              {
-                decimalMaxLen[0] = 12;
-                decimalMaxLen[1] = 2;
-              }
-              proposedType = String.Format("Decimal({0}, {1})", decimalMaxLen[0], decimalMaxLen[1]);
-              break;
-          }
-        else
-            proposedType = String.Format("Varchar({0})", varCharMaxLen[1]);
+        // Get the consistent DataType between first row and the previously computed consistent DataType for the rest of the rows.
+        strippedType = (lParensIndex < 0 ? proposedType : proposedType.Substring(0, lParensIndex));
+        typesListFor1stAndRest.Add(strippedType);
+        proposedType = GetConsistentDataTypeOnAllRows(strippedType, typesListFor1stAndRest, decimalMaxLen, varCharMaxLen);
+        col.RowsFrom1stDataType = proposedType;
 
-        col.FirstRowDataType = headerType;
-        col.OtherRowsDataType = proposedType;
-        col.MySQLDataType = (firstRowIsHeaders ? headerType : proposedType);
+        col.MySQLDataType = (firstRowIsHeaders ? col.RowsFrom2ndDataType : col.RowsFrom1stDataType);
         col.CreateIndex = (createIndexForIntColumns && col.MySQLDataType == "Integer");
       }
     }
@@ -296,7 +311,7 @@ namespace MySQL.ForExcel
       return (dataValue != null ? dataValue.Replace(" ", "_").Replace("(", String.Empty).Replace(")", String.Empty) : String.Empty);
     }
 
-    public bool CreateTable(MySqlWorkbenchConnection wbConnection, out MySqlException exception)
+    public bool CreateTable(MySqlWorkbenchConnection wbConnection, out Exception exception)
     {
       bool success = false;
       string connectionString = Utilities.GetConnectionString(wbConnection);
@@ -409,7 +424,7 @@ namespace MySQL.ForExcel
       return queryString.ToString();
     }
 
-    public bool InsertDataWithAdapter(MySqlWorkbenchConnection wbConnection, bool firstRowHeader, bool useFormattedData, out MySqlException exception)
+    public bool InsertDataWithAdapter(MySqlWorkbenchConnection wbConnection, bool firstRowHeader, bool useFormattedData, out Exception exception)
     {
       bool success = false;
       exception = null;
@@ -497,8 +512,8 @@ namespace MySQL.ForExcel
     public bool ExcludeColumn { get; set; }
     public string MySQLDataType  { get; set; }
     public List<string> WarningTextList { get { return warningTextList; } }
-    public string FirstRowDataType { get; set; }
-    public string OtherRowsDataType { get; set; }
+    public string RowsFrom1stDataType { get; set; }
+    public string RowsFrom2ndDataType { get; set; }
 
     #region Getter Properties
 
@@ -597,8 +612,8 @@ namespace MySQL.ForExcel
         previousType = "Varchar(255)";
       if (headerType.Length == 0)
         headerType = previousType;
-      FirstRowDataType = headerType;
-      OtherRowsDataType = previousType;
+      RowsFrom1stDataType = headerType;
+      RowsFrom2ndDataType = previousType;
       MySQLDataType = (firstRowIsHeaders ? headerType : previousType);
       rowPos++;
     }

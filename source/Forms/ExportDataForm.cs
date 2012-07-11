@@ -236,7 +236,7 @@ namespace MySQL.ForExcel
 
     private void btnExport_Click(object sender, EventArgs e)
     {
-      MySqlException exception;
+      Exception exception;
       string operationSummary = String.Format("The MySQL Table \"{0}\"", dataTable.TableName);
       StringBuilder operationDetails = new StringBuilder();
       operationDetails.AppendFormat("Creating MySQL Table \"{0}\"...{1}{1}", dataTable.TableName, Environment.NewLine);
@@ -248,9 +248,13 @@ namespace MySQL.ForExcel
         operationDetails.Append("Table has been created successfully.");
       else
       {
-        operationDetails.AppendFormat("MySQL Error {0}:{1}", exception.Number, Environment.NewLine);
+        if (exception is MySqlException)
+          operationDetails.AppendFormat("MySQL Error {0}:{1}", (exception as MySqlException).Number, Environment.NewLine);
+        else
+          operationDetails.AppendFormat("ADO.NET Error:{0}", Environment.NewLine);
         operationDetails.Append(exception.Message);
       }
+      operationSummary += (success ? "has been created " : "could not be created.");
 
       if (success)
       {
@@ -260,8 +264,17 @@ namespace MySQL.ForExcel
           operationDetails.AppendFormat("{0}Inserting data rows...{0}", Environment.NewLine);
           operationDetails.AppendFormat("{0} rows have been added successfully.", dataTable.Rows.Count);
         }
+        else
+        {
+          operationDetails.AppendFormat("{0}Error while inserting rows...{0}", Environment.NewLine);
+          if (exception is MySqlException)
+            operationDetails.AppendFormat("MySQL Error {0}:{1}", (exception as MySqlException).Number, Environment.NewLine);
+          else
+            operationDetails.AppendFormat("ADO.NET Error:{0}", Environment.NewLine);
+          operationDetails.Append(exception.Message);
+        }
       }
-      operationSummary += (success ? "has been created." : "could not be created.");
+      operationSummary += (success ? "with data." : "with no data.");
 
       InfoDialog infoDialog = new InfoDialog(success, operationSummary, operationDetails.ToString());
       DialogResult dr = infoDialog.ShowDialog();
