@@ -39,7 +39,7 @@ namespace MySQL.ForExcel
       toolTipLowLevelNode = new ToolTip();
       toolTipLowLevelNode.AutoPopDelay = 1000;
       toolTipLowLevelNode.InitialDelay = 500;
-      toolTipLowLevelNode.SetToolTip(this, "");
+      toolTipLowLevelNode.SetToolTip(this, "");      
     }
 
     public double TitleColorOpacity { get; set; }
@@ -76,7 +76,7 @@ namespace MySQL.ForExcel
 
     protected override void OnMouseMove(MouseEventArgs e)
     {
-      TreeNode node = GetNodeAt(e.Location);
+      TreeNode node = GetNodeAt(e.Location);      
  
       if ((node != null))
       {
@@ -171,6 +171,7 @@ namespace MySQL.ForExcel
       SizeF descriptionStringSize = (parts != null && parts.Length > 1 ? e.Graphics.MeasureString(parts[1], DescriptionFont) : SizeF.Empty);
       Image img = (NodeImages != null && NodeImages.Images.Count > 0 && e.Node.ImageIndex >= 0 && e.Node.ImageIndex < NodeImages.Images.Count ? NodeImages.Images[e.Node.ImageIndex] : null);
       int textInitialY = (parts.Length == 1 ? ((e.Bounds.Height - Convert.ToInt32(titleStringSize.Height) + Convert.ToInt32(descriptionStringSize.Height)) / 2) : 0);
+      e.Node.ToolTipText = String.Empty;
 
       // Paint background
       SolidBrush bkBrush = new SolidBrush(e.Node.IsSelected ? SystemColors.MenuHighlight : SystemColors.Window);
@@ -201,7 +202,7 @@ namespace MySQL.ForExcel
         {
           e.Graphics.DrawString(parts[0], Font, titleBrush, pt.X, pt.Y);
         }
-        pt.Y += (int)(stringSize.Height) + DescriptionTextVerticalPixelsOffset;        
+        pt.Y += (int)(stringSize.Height) + DescriptionTextVerticalPixelsOffset;      
       }
 
       // Draw the description if there is one
