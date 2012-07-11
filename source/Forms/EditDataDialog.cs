@@ -9,11 +9,16 @@ using MySQL.Utility;
 using MySql.Data.MySqlClient;
 using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
+using System.Runtime.InteropServices;
 
 namespace MySQL.ForExcel
 {
   public partial class EditDataDialog : AutoStyleableBaseForm
   {
+    private const int SW_SHOWNOACTIVATE = 4;
+    private const int HWND_TOPMOST = -1;
+    private const uint SWP_NOACTIVATE = 0x0010;
+
     private Point mouseDownPoint = Point.Empty;
     private MySqlWorkbenchConnection wbConnection;
     private DataTable editingTable = null;
@@ -34,11 +39,13 @@ namespace MySQL.ForExcel
     public Excel.Worksheet EditingWorksheet = null;
     public TaskPaneControl CallerTaskPane;
     public string EditingTableName { get; private set; }
+    public IWin32Window ParentWindow { get; set; }
 
     public EditDataDialog(MySqlWorkbenchConnection wbConnection, Excel.Range editDataRange, DataTable importTable, Excel.Worksheet editingWorksheet)
     {
       InitializeComponent();
 
+      //SetParent(Handle, ParentWindow.Handle);
       this.wbConnection = wbConnection;
       this.editingTable = importTable;
       this.editDataRange = editDataRange;
@@ -58,8 +65,7 @@ namespace MySQL.ForExcel
       if (editDataRange != null)
         modifiedCellAddressesList = new List<string>(editDataRange.Count);
       else
-        modifiedCellAddressesList = new List<string>(0);
-
+        modifiedCellAddressesList = new List<string>();
     }
 
     protected override void OnPaintBackground(PaintEventArgs e)
@@ -277,7 +283,7 @@ namespace MySQL.ForExcel
       if (intersectRange == null || intersectRange.Count == 0)
         Hide();
       else
-        Show();
+        ShowInactiveTopmost();
     }
 
     private void GenericMouseDown(object sender, MouseEventArgs e)
@@ -346,8 +352,30 @@ namespace MySQL.ForExcel
 
     private void chkAutoCommit_CheckedChanged(object sender, EventArgs e)
     {
-      btnCommit.Enabled = !chkAutoCommit.Checked;
+      btnCommit.Enabled = !chkAutoCommit.Checked && modifiedCellAddressesList != null && modifiedCellAddressesList.Count > 0;
       btnRevert.Enabled = !chkAutoCommit.Checked;
+    }
+
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
+
+    [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
+    static extern bool SetWindowPos(
+         int hWnd,           // window handle
+         int hWndInsertAfter,    // placement-order handle
+         int X,          // horizontal position
+         int Y,          // vertical position
+         int cx,         // width
+         int cy,         // height
+         uint uFlags);       // window positioning flags
+
+    [DllImport("user32.dll")]
+    static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    public void ShowInactiveTopmost()
+    {
+      ShowWindow(Handle, SW_SHOWNOACTIVATE);
+      SetWindowPos(Handle.ToInt32(), HWND_TOPMOST, Left, Top, Width, Height, SWP_NOACTIVATE);
     }
 
   }

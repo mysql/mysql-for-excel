@@ -290,8 +290,9 @@ namespace MySQL.ForExcel
       // Edit Data
       Utilities.AddExtendedProperties(ref importForm.ImportDataTable, importForm.ImportDataTable.ExtendedProperties["QueryString"].ToString(), importForm.ImportHeaders, tableObject.Name);
       editDialog = new EditDataDialog(connection, editingRange, importForm.ImportDataTable, currentWorksheet);
+      editDialog.ParentWindow = new NativeWindowWrapper(excelApplication.Hwnd);
       editDialog.CallerTaskPane = this;
-      editDialog.Show(new NativeWindowWrapper(excelApplication.Hwnd));
+      editDialog.Show(editDialog.ParentWindow);
 
       // Maintain hashtables for open Edit Data Dialogs
       if (WorkSheetEditFormsHashtable == null)
