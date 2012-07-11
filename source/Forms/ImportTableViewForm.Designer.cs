@@ -30,15 +30,15 @@
     {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ImportTableViewForm));
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
       this.fromImageList = new System.Windows.Forms.ImageList(this.components);
       this.lblSubSetOfData = new System.Windows.Forms.Label();
       this.lblRowsCountSub = new System.Windows.Forms.Label();
       this.grpOptions = new System.Windows.Forms.GroupBox();
-      this.numRowsToReturn = new System.Windows.Forms.NumericUpDown();
-      this.lblRowsToReturn = new System.Windows.Forms.Label();
       this.numFromRow = new System.Windows.Forms.NumericUpDown();
+      this.lblRowsToReturn = new System.Windows.Forms.Label();
+      this.numRowsToReturn = new System.Windows.Forms.NumericUpDown();
       this.chkLimitRows = new System.Windows.Forms.CheckBox();
       this.chkIncludeHeaders = new System.Windows.Forms.CheckBox();
       this.lblOptionsWarning = new System.Windows.Forms.Label();
@@ -58,8 +58,8 @@
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
       this.grpOptions.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.numRowsToReturn)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.numFromRow)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.numRowsToReturn)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picOptionsWarning)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).BeginInit();
       this.contextMenuForGrid.SuspendLayout();
@@ -126,9 +126,9 @@
       // 
       this.grpOptions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.grpOptions.BackColor = System.Drawing.Color.Transparent;
-      this.grpOptions.Controls.Add(this.numRowsToReturn);
-      this.grpOptions.Controls.Add(this.lblRowsToReturn);
       this.grpOptions.Controls.Add(this.numFromRow);
+      this.grpOptions.Controls.Add(this.lblRowsToReturn);
+      this.grpOptions.Controls.Add(this.numRowsToReturn);
       this.grpOptions.Controls.Add(this.chkLimitRows);
       this.grpOptions.Controls.Add(this.chkIncludeHeaders);
       this.grpOptions.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -139,13 +139,24 @@
       this.grpOptions.TabStop = false;
       this.grpOptions.Text = "Options";
       // 
-      // numRowsToReturn
+      // numFromRow
       // 
-      this.numRowsToReturn.Enabled = false;
-      this.numRowsToReturn.Location = new System.Drawing.Point(616, 21);
-      this.numRowsToReturn.Name = "numRowsToReturn";
-      this.numRowsToReturn.Size = new System.Drawing.Size(60, 23);
-      this.numRowsToReturn.TabIndex = 6;
+      this.numFromRow.Enabled = false;
+      this.numFromRow.Location = new System.Drawing.Point(616, 21);
+      this.numFromRow.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+      this.numFromRow.Name = "numFromRow";
+      this.numFromRow.Size = new System.Drawing.Size(60, 23);
+      this.numFromRow.TabIndex = 6;
+      this.numFromRow.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+      this.numFromRow.ValueChanged += new System.EventHandler(this.numFromRow_ValueChanged);
       // 
       // lblRowsToReturn
       // 
@@ -156,14 +167,23 @@
       this.lblRowsToReturn.TabIndex = 5;
       this.lblRowsToReturn.Text = "Rows and Start with Row";
       // 
-      // numFromRow
+      // numRowsToReturn
       // 
-      this.numFromRow.Enabled = false;
-      this.numFromRow.Location = new System.Drawing.Point(407, 21);
-      this.numFromRow.Name = "numFromRow";
-      this.numFromRow.Size = new System.Drawing.Size(60, 23);
-      this.numFromRow.TabIndex = 4;
-      this.numFromRow.ValueChanged += new System.EventHandler(this.numFromRow_ValueChanged);
+      this.numRowsToReturn.Enabled = false;
+      this.numRowsToReturn.Location = new System.Drawing.Point(407, 21);
+      this.numRowsToReturn.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+      this.numRowsToReturn.Name = "numRowsToReturn";
+      this.numRowsToReturn.Size = new System.Drawing.Size(60, 23);
+      this.numRowsToReturn.TabIndex = 4;
+      this.numRowsToReturn.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
       // 
       // chkLimitRows
       // 
@@ -222,25 +242,25 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.grdPreviewData.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
-      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-      dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.InactiveCaption;
-      dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
-      dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdPreviewData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+      dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+      dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.InactiveCaption;
+      dataGridViewCellStyle3.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
+      dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.grdPreviewData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
       this.grdPreviewData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
       this.grdPreviewData.ColumnsMaximumWidth = 200;
       this.grdPreviewData.ContextMenuStrip = this.contextMenuForGrid;
-      dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.InactiveCaption;
-      dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Window;
-      dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdPreviewData.DefaultCellStyle = dataGridViewCellStyle2;
+      dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.InactiveCaption;
+      dataGridViewCellStyle4.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Window;
+      dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.grdPreviewData.DefaultCellStyle = dataGridViewCellStyle4;
       this.grdPreviewData.Location = new System.Drawing.Point(80, 164);
       this.grdPreviewData.Name = "grdPreviewData";
       this.grdPreviewData.ReadOnly = true;
@@ -395,8 +415,8 @@
       this.commandAreaPanel.ResumeLayout(false);
       this.grpOptions.ResumeLayout(false);
       this.grpOptions.PerformLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.numRowsToReturn)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.numFromRow)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.numRowsToReturn)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picOptionsWarning)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).EndInit();
       this.contextMenuForGrid.ResumeLayout(false);
@@ -411,9 +431,9 @@
     private System.Windows.Forms.Label lblSubSetOfData;
     private System.Windows.Forms.Label lblRowsCountSub;
     private System.Windows.Forms.GroupBox grpOptions;
-    private System.Windows.Forms.NumericUpDown numRowsToReturn;
-    private System.Windows.Forms.Label lblRowsToReturn;
     private System.Windows.Forms.NumericUpDown numFromRow;
+    private System.Windows.Forms.Label lblRowsToReturn;
+    private System.Windows.Forms.NumericUpDown numRowsToReturn;
     private System.Windows.Forms.CheckBox chkLimitRows;
     private System.Windows.Forms.CheckBox chkIncludeHeaders;
     private System.Windows.Forms.Label lblOptionsWarning;
