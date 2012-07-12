@@ -31,5 +31,18 @@ namespace MySQL.ForExcel
     {
       InitializeComponent();
     }
+
+    public PasswordDialog(string ConnectionName, string User)
+    {
+      InitializeComponent();
+      if (ConnectionName == null)
+        lblConnectionValue.Text = "New";
+      else
+        lblConnectionValue.Text = ConnectionName;
+      if (User == null)
+        lblUserValue.Text = "guest";
+      else
+        lblUserValue.Text = User;
+    }
   }
 }

@@ -14,6 +14,7 @@ namespace MySQL.ForExcel
   public partial class WelcomePanel : AutoStyleableBasePanel
   {
     private static string[] localValues = new string[] { string.Empty, "127.0.0.1", "localhost", "local" };
+    private MySqlWorkbenchConnectionCollection connCollection = new MySqlWorkbenchConnectionCollection();
 
     public WelcomePanel()
     {
@@ -40,6 +41,7 @@ namespace MySQL.ForExcel
 
     private void AddConnectionToList(MySqlWorkbenchConnection conn)
     {
+      connCollection.Add(conn);
       int nodeIdx = 1;
       string hostName = (conn.Host ?? string.Empty).Trim();
       if (conn.DriverType == MySqlWorkbenchConnectionType.Ssh)
@@ -70,13 +72,14 @@ namespace MySQL.ForExcel
       AddConnectionToList(dlg.NewConnection);
 
       // now add it to the workbench connection list
-      MySqlWorkbench.Connections.Add(dlg.NewConnection);
-      MySqlWorkbench.Connections.Save();
+      connCollection.Save();
+      //MySqlWorkbench.Connections.Add(dlg.NewConnection);
+      //MySqlWorkbench.Connections.Save();
     }
 
     private void manageConnectionsLabel_Click(object sender, EventArgs e)
     {
-       MySqlWorkbench.OpenManageConnectionsDialog();
+      MySqlWorkbench.OpenManageConnectionsDialog();
     }
 
     private void connectionList_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)

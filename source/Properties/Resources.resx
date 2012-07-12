@@ -374,4 +374,16 @@ Please add a primary key to the table.</value>
   <data name="ColumnMappingIncompleteTitleWarning" xml:space="preserve">
     <value>Column Mapping Incomplete</value>
   </data>
+  <data name="ConnectionDataDisplayFailed" xml:space="preserve">
+    <value>Failed to Connect to MySQL at {0}:{1} with user {2}</value>
+  </data>
+  <data name="ConnectionDataDisplaySuccess" xml:space="preserve">
+    <value>Connection at {0}:{1} with user {2}</value>
+  </data>
+  <data name="ConnectionFailed" xml:space="preserve">
+    <value>Can't connect to MySQL server on '{0}:{1}'</value>
+  </data>
+  <data name="ConnectionSuccessfull" xml:space="preserve">
+    <value>Connection parameters are correct.</value>
+  </data>
 </root>

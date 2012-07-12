@@ -28,32 +28,49 @@
     /// </summary>
     private void InitializeComponent()
     {
+      this.components = new System.ComponentModel.Container();
       this.tabControl1 = new System.Windows.Forms.TabControl();
       this.parametersPage = new System.Windows.Forms.TabPage();
-      this.label10 = new System.Windows.Forms.Label();
-      this.label9 = new System.Windows.Forms.Label();
+      this.labelHelpSocket = new System.Windows.Forms.Label();
+      this.labelPromptSocket = new System.Windows.Forms.Label();
+      this.socketPath = new System.Windows.Forms.TextBox();
+      this.bindingSource = new System.Windows.Forms.BindingSource(this.components);
+      this.labelHelpSchema = new System.Windows.Forms.Label();
+      this.labelHelpUserName = new System.Windows.Forms.Label();
       this.defaultSchema = new System.Windows.Forms.TextBox();
       this.port = new System.Windows.Forms.TextBox();
       this.userName = new System.Windows.Forms.TextBox();
       this.hostName = new System.Windows.Forms.TextBox();
-      this.label8 = new System.Windows.Forms.Label();
-      this.label7 = new System.Windows.Forms.Label();
-      this.label6 = new System.Windows.Forms.Label();
-      this.label5 = new System.Windows.Forms.Label();
-      this.label3 = new System.Windows.Forms.Label();
+      this.LabelPromptSchema = new System.Windows.Forms.Label();
+      this.labelHelpHostName = new System.Windows.Forms.Label();
+      this.labelPromptPort = new System.Windows.Forms.Label();
+      this.labelPromptUserName = new System.Windows.Forms.Label();
+      this.labelPromptHostName = new System.Windows.Forms.Label();
       this.advancedPage = new System.Windows.Forms.TabPage();
+      this.label21 = new System.Windows.Forms.Label();
+      this.label20 = new System.Windows.Forms.Label();
+      this.label19 = new System.Windows.Forms.Label();
+      this.textBox4 = new System.Windows.Forms.TextBox();
+      this.textBox3 = new System.Windows.Forms.TextBox();
+      this.textBox2 = new System.Windows.Forms.TextBox();
+      this.textBox1 = new System.Windows.Forms.TextBox();
+      this.label18 = new System.Windows.Forms.Label();
+      this.label17 = new System.Windows.Forms.Label();
+      this.label16 = new System.Windows.Forms.Label();
+      this.label15 = new System.Windows.Forms.Label();
+      this.label14 = new System.Windows.Forms.Label();
       this.label13 = new System.Windows.Forms.Label();
       this.label12 = new System.Windows.Forms.Label();
-      this.label11 = new System.Windows.Forms.Label();
+      this.labelCompression = new System.Windows.Forms.Label();
       this.useSSL = new System.Windows.Forms.CheckBox();
       this.useANSI = new System.Windows.Forms.CheckBox();
       this.useCompression = new System.Windows.Forms.CheckBox();
       this.connectionMethod = new System.Windows.Forms.ComboBox();
-      this.connectionType = new System.Windows.Forms.Label();
-      this.label4 = new System.Windows.Forms.Label();
-      this.label2 = new System.Windows.Forms.Label();
+      this.labelHelpMethod = new System.Windows.Forms.Label();
+      this.labelPromptMethod = new System.Windows.Forms.Label();
+      this.labelHelpName = new System.Windows.Forms.Label();
       this.connectionName = new System.Windows.Forms.TextBox();
-      this.label1 = new System.Windows.Forms.Label();
+      this.labelPromptName = new System.Windows.Forms.Label();
       this.testButton = new System.Windows.Forms.Button();
       this.cancelButton = new System.Windows.Forms.Button();
       this.okButton = new System.Windows.Forms.Button();
@@ -61,6 +78,7 @@
       this.commandAreaPanel.SuspendLayout();
       this.tabControl1.SuspendLayout();
       this.parametersPage.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.bindingSource)).BeginInit();
       this.advancedPage.SuspendLayout();
       this.SuspendLayout();
       // 
@@ -69,80 +87,120 @@
       this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
       this.contentAreaPanel.Controls.Add(this.tabControl1);
       this.contentAreaPanel.Controls.Add(this.connectionMethod);
-      this.contentAreaPanel.Controls.Add(this.connectionType);
-      this.contentAreaPanel.Controls.Add(this.label4);
-      this.contentAreaPanel.Controls.Add(this.label2);
+      this.contentAreaPanel.Controls.Add(this.labelHelpMethod);
+      this.contentAreaPanel.Controls.Add(this.labelPromptMethod);
+      this.contentAreaPanel.Controls.Add(this.labelHelpName);
       this.contentAreaPanel.Controls.Add(this.connectionName);
-      this.contentAreaPanel.Controls.Add(this.label1);
-      this.contentAreaPanel.Size = new System.Drawing.Size(782, 433);
+      this.contentAreaPanel.Controls.Add(this.labelPromptName);
+      this.contentAreaPanel.Location = new System.Drawing.Point(3, 2);
+      this.contentAreaPanel.Size = new System.Drawing.Size(793, 422);
       // 
       // commandAreaPanel
       // 
       this.commandAreaPanel.Controls.Add(this.testButton);
       this.commandAreaPanel.Controls.Add(this.cancelButton);
       this.commandAreaPanel.Controls.Add(this.okButton);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 434);
-      this.commandAreaPanel.Size = new System.Drawing.Size(782, 45);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 425);
+      this.commandAreaPanel.Size = new System.Drawing.Size(796, 45);
       // 
       // tabControl1
       // 
       this.tabControl1.Controls.Add(this.parametersPage);
       this.tabControl1.Controls.Add(this.advancedPage);
-      this.tabControl1.Location = new System.Drawing.Point(12, 75);
+      this.tabControl1.Location = new System.Drawing.Point(12, 69);
       this.tabControl1.Name = "tabControl1";
       this.tabControl1.SelectedIndex = 0;
-      this.tabControl1.Size = new System.Drawing.Size(758, 346);
+      this.tabControl1.Size = new System.Drawing.Size(769, 352);
       this.tabControl1.TabIndex = 0;
       // 
       // parametersPage
       // 
-      this.parametersPage.Controls.Add(this.label10);
-      this.parametersPage.Controls.Add(this.label9);
+      this.parametersPage.Controls.Add(this.labelHelpSocket);
+      this.parametersPage.Controls.Add(this.labelPromptSocket);
+      this.parametersPage.Controls.Add(this.socketPath);
+      this.parametersPage.Controls.Add(this.labelHelpSchema);
+      this.parametersPage.Controls.Add(this.labelHelpUserName);
       this.parametersPage.Controls.Add(this.defaultSchema);
       this.parametersPage.Controls.Add(this.port);
       this.parametersPage.Controls.Add(this.userName);
       this.parametersPage.Controls.Add(this.hostName);
-      this.parametersPage.Controls.Add(this.label8);
-      this.parametersPage.Controls.Add(this.label7);
-      this.parametersPage.Controls.Add(this.label6);
-      this.parametersPage.Controls.Add(this.label5);
-      this.parametersPage.Controls.Add(this.label3);
+      this.parametersPage.Controls.Add(this.LabelPromptSchema);
+      this.parametersPage.Controls.Add(this.labelHelpHostName);
+      this.parametersPage.Controls.Add(this.labelPromptPort);
+      this.parametersPage.Controls.Add(this.labelPromptUserName);
+      this.parametersPage.Controls.Add(this.labelPromptHostName);
       this.parametersPage.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.parametersPage.Location = new System.Drawing.Point(4, 22);
       this.parametersPage.Name = "parametersPage";
       this.parametersPage.Padding = new System.Windows.Forms.Padding(3);
-      this.parametersPage.Size = new System.Drawing.Size(750, 320);
+      this.parametersPage.Size = new System.Drawing.Size(761, 326);
       this.parametersPage.TabIndex = 0;
       this.parametersPage.Text = "Parameters";
       this.parametersPage.UseVisualStyleBackColor = true;
       // 
-      // label10
+      // labelHelpSocket
       // 
-      this.label10.AutoSize = true;
-      this.label10.Location = new System.Drawing.Point(445, 76);
-      this.label10.Name = "label10";
-      this.label10.Size = new System.Drawing.Size(258, 15);
-      this.label10.TabIndex = 10;
-      this.label10.Text = "The schema that will be used as default schema";
+      this.labelHelpSocket.AutoSize = true;
+      this.labelHelpSocket.Location = new System.Drawing.Point(445, 131);
+      this.labelHelpSocket.Name = "labelHelpSocket";
+      this.labelHelpSocket.Size = new System.Drawing.Size(303, 15);
+      this.labelHelpSocket.TabIndex = 13;
+      this.labelHelpSocket.Text = "Path to local socket or pipe file. Leave empty for default.";
+      this.labelHelpSocket.Visible = false;
       // 
-      // label9
+      // labelPromptSocket
       // 
-      this.label9.AutoSize = true;
-      this.label9.Location = new System.Drawing.Point(445, 51);
-      this.label9.Name = "label9";
-      this.label9.Size = new System.Drawing.Size(187, 15);
-      this.label9.TabIndex = 7;
-      this.label9.Text = "Name of the user to connect with.";
+      this.labelPromptSocket.AutoSize = true;
+      this.labelPromptSocket.Location = new System.Drawing.Point(7, 131);
+      this.labelPromptSocket.Name = "labelPromptSocket";
+      this.labelPromptSocket.Size = new System.Drawing.Size(100, 15);
+      this.labelPromptSocket.TabIndex = 12;
+      this.labelPromptSocket.Text = "Socket/Pipe Path:";
+      this.labelPromptSocket.Visible = false;
+      // 
+      // socketPath
+      // 
+      this.socketPath.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource, "Socket", true));
+      this.socketPath.Location = new System.Drawing.Point(119, 128);
+      this.socketPath.MaxLength = 484;
+      this.socketPath.Name = "socketPath";
+      this.socketPath.Size = new System.Drawing.Size(317, 23);
+      this.socketPath.TabIndex = 11;
+      this.socketPath.Visible = false;
+      // 
+      // bindingSource
+      // 
+      this.bindingSource.DataSource = typeof(MySQL.Utility.MySqlWorkbenchConnection);
+      // 
+      // labelHelpSchema
+      // 
+      this.labelHelpSchema.AutoSize = true;
+      this.labelHelpSchema.Location = new System.Drawing.Point(445, 88);
+      this.labelHelpSchema.Name = "labelHelpSchema";
+      this.labelHelpSchema.Size = new System.Drawing.Size(258, 15);
+      this.labelHelpSchema.TabIndex = 10;
+      this.labelHelpSchema.Text = "The schema that will be used as default schema";
+      // 
+      // labelHelpUserName
+      // 
+      this.labelHelpUserName.AutoSize = true;
+      this.labelHelpUserName.Location = new System.Drawing.Point(445, 55);
+      this.labelHelpUserName.Name = "labelHelpUserName";
+      this.labelHelpUserName.Size = new System.Drawing.Size(187, 15);
+      this.labelHelpUserName.TabIndex = 7;
+      this.labelHelpUserName.Text = "Name of the user to connect with.";
       // 
       // defaultSchema
       // 
-      this.defaultSchema.Location = new System.Drawing.Point(119, 72);
+      this.defaultSchema.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource, "Schema", true));
+      this.defaultSchema.Location = new System.Drawing.Point(119, 85);
       this.defaultSchema.Name = "defaultSchema";
       this.defaultSchema.Size = new System.Drawing.Size(317, 23);
       this.defaultSchema.TabIndex = 9;
       // 
       // port
       // 
+      this.port.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource, "Port", true));
       this.port.Location = new System.Drawing.Point(312, 19);
       this.port.Name = "port";
       this.port.Size = new System.Drawing.Size(124, 23);
@@ -150,68 +208,84 @@
       // 
       // userName
       // 
-      this.userName.Location = new System.Drawing.Point(119, 45);
+      this.userName.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource, "UserName", true));
+      this.userName.Location = new System.Drawing.Point(119, 52);
+      this.userName.MaxLength = 679;
       this.userName.Name = "userName";
       this.userName.Size = new System.Drawing.Size(317, 23);
       this.userName.TabIndex = 6;
       // 
       // hostName
       // 
+      this.hostName.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource, "Host", true));
       this.hostName.Location = new System.Drawing.Point(119, 19);
+      this.hostName.MaxLength = 484;
       this.hostName.Name = "hostName";
       this.hostName.Size = new System.Drawing.Size(151, 23);
       this.hostName.TabIndex = 1;
       // 
-      // label8
+      // LabelPromptSchema
       // 
-      this.label8.AutoSize = true;
-      this.label8.Location = new System.Drawing.Point(14, 76);
-      this.label8.Name = "label8";
-      this.label8.Size = new System.Drawing.Size(93, 15);
-      this.label8.TabIndex = 8;
-      this.label8.Text = "Default Schema:";
+      this.LabelPromptSchema.AutoSize = true;
+      this.LabelPromptSchema.Location = new System.Drawing.Point(14, 89);
+      this.LabelPromptSchema.Name = "LabelPromptSchema";
+      this.LabelPromptSchema.Size = new System.Drawing.Size(93, 15);
+      this.LabelPromptSchema.TabIndex = 8;
+      this.LabelPromptSchema.Text = "Default Schema:";
       // 
-      // label7
+      // labelHelpHostName
       // 
-      this.label7.AutoSize = true;
-      this.label7.Location = new System.Drawing.Point(445, 20);
-      this.label7.Name = "label7";
-      this.label7.Size = new System.Drawing.Size(276, 15);
-      this.label7.TabIndex = 4;
-      this.label7.Text = "Name or IP address of the server host - TCP/IP port";
+      this.labelHelpHostName.AutoSize = true;
+      this.labelHelpHostName.Location = new System.Drawing.Point(445, 22);
+      this.labelHelpHostName.Name = "labelHelpHostName";
+      this.labelHelpHostName.Size = new System.Drawing.Size(276, 15);
+      this.labelHelpHostName.TabIndex = 4;
+      this.labelHelpHostName.Text = "Name or IP address of the server host - TCP/IP port";
       // 
-      // label6
+      // labelPromptPort
       // 
-      this.label6.AutoSize = true;
-      this.label6.Location = new System.Drawing.Point(276, 23);
-      this.label6.Name = "label6";
-      this.label6.Size = new System.Drawing.Size(32, 15);
-      this.label6.TabIndex = 2;
-      this.label6.Text = "Port:";
+      this.labelPromptPort.AutoSize = true;
+      this.labelPromptPort.Location = new System.Drawing.Point(276, 23);
+      this.labelPromptPort.Name = "labelPromptPort";
+      this.labelPromptPort.Size = new System.Drawing.Size(32, 15);
+      this.labelPromptPort.TabIndex = 2;
+      this.labelPromptPort.Text = "Port:";
       // 
-      // label5
+      // labelPromptUserName
       // 
-      this.label5.AutoSize = true;
-      this.label5.Location = new System.Drawing.Point(15, 51);
-      this.label5.Name = "label5";
-      this.label5.Size = new System.Drawing.Size(63, 15);
-      this.label5.TabIndex = 5;
-      this.label5.Text = "Username:";
+      this.labelPromptUserName.AutoSize = true;
+      this.labelPromptUserName.Location = new System.Drawing.Point(44, 58);
+      this.labelPromptUserName.Name = "labelPromptUserName";
+      this.labelPromptUserName.Size = new System.Drawing.Size(63, 15);
+      this.labelPromptUserName.TabIndex = 5;
+      this.labelPromptUserName.Text = "Username:";
       // 
-      // label3
+      // labelPromptHostName
       // 
-      this.label3.AutoSize = true;
-      this.label3.Location = new System.Drawing.Point(14, 23);
-      this.label3.Name = "label3";
-      this.label3.Size = new System.Drawing.Size(65, 15);
-      this.label3.TabIndex = 0;
-      this.label3.Text = "Hostname:";
+      this.labelPromptHostName.AutoSize = true;
+      this.labelPromptHostName.Location = new System.Drawing.Point(42, 22);
+      this.labelPromptHostName.Name = "labelPromptHostName";
+      this.labelPromptHostName.Size = new System.Drawing.Size(65, 15);
+      this.labelPromptHostName.TabIndex = 0;
+      this.labelPromptHostName.Text = "Hostname:";
       // 
       // advancedPage
       // 
+      this.advancedPage.Controls.Add(this.label21);
+      this.advancedPage.Controls.Add(this.label20);
+      this.advancedPage.Controls.Add(this.label19);
+      this.advancedPage.Controls.Add(this.textBox4);
+      this.advancedPage.Controls.Add(this.textBox3);
+      this.advancedPage.Controls.Add(this.textBox2);
+      this.advancedPage.Controls.Add(this.textBox1);
+      this.advancedPage.Controls.Add(this.label18);
+      this.advancedPage.Controls.Add(this.label17);
+      this.advancedPage.Controls.Add(this.label16);
+      this.advancedPage.Controls.Add(this.label15);
+      this.advancedPage.Controls.Add(this.label14);
       this.advancedPage.Controls.Add(this.label13);
       this.advancedPage.Controls.Add(this.label12);
-      this.advancedPage.Controls.Add(this.label11);
+      this.advancedPage.Controls.Add(this.labelCompression);
       this.advancedPage.Controls.Add(this.useSSL);
       this.advancedPage.Controls.Add(this.useANSI);
       this.advancedPage.Controls.Add(this.useCompression);
@@ -219,10 +293,110 @@
       this.advancedPage.Location = new System.Drawing.Point(4, 22);
       this.advancedPage.Name = "advancedPage";
       this.advancedPage.Padding = new System.Windows.Forms.Padding(3);
-      this.advancedPage.Size = new System.Drawing.Size(750, 320);
+      this.advancedPage.Size = new System.Drawing.Size(761, 326);
       this.advancedPage.TabIndex = 1;
       this.advancedPage.Text = "Advanced";
       this.advancedPage.UseVisualStyleBackColor = true;
+      // 
+      // label21
+      // 
+      this.label21.AutoSize = true;
+      this.label21.Location = new System.Drawing.Point(420, 258);
+      this.label21.Name = "label21";
+      this.label21.Size = new System.Drawing.Size(323, 15);
+      this.label21.TabIndex = 17;
+      this.label21.Text = "Optional list of permissible ciphers to use for SSL encryption";
+      // 
+      // label20
+      // 
+      this.label20.AutoSize = true;
+      this.label20.Location = new System.Drawing.Point(420, 216);
+      this.label20.Name = "label20";
+      this.label20.Size = new System.Drawing.Size(109, 15);
+      this.label20.TabIndex = 16;
+      this.label20.Text = "Path to Key for SSL.";
+      // 
+      // label19
+      // 
+      this.label19.AutoSize = true;
+      this.label19.Location = new System.Drawing.Point(420, 175);
+      this.label19.Name = "label19";
+      this.label19.Size = new System.Drawing.Size(165, 15);
+      this.label19.TabIndex = 15;
+      this.label19.Text = "Path to Certificate File for SSL.";
+      // 
+      // textBox4
+      // 
+      this.textBox4.Location = new System.Drawing.Point(83, 255);
+      this.textBox4.Name = "textBox4";
+      this.textBox4.Size = new System.Drawing.Size(325, 23);
+      this.textBox4.TabIndex = 14;
+      // 
+      // textBox3
+      // 
+      this.textBox3.Location = new System.Drawing.Point(83, 208);
+      this.textBox3.Name = "textBox3";
+      this.textBox3.Size = new System.Drawing.Size(325, 23);
+      this.textBox3.TabIndex = 13;
+      // 
+      // textBox2
+      // 
+      this.textBox2.Location = new System.Drawing.Point(83, 167);
+      this.textBox2.Name = "textBox2";
+      this.textBox2.Size = new System.Drawing.Size(325, 23);
+      this.textBox2.TabIndex = 12;
+      // 
+      // textBox1
+      // 
+      this.textBox1.Location = new System.Drawing.Point(83, 127);
+      this.textBox1.Name = "textBox1";
+      this.textBox1.Size = new System.Drawing.Size(325, 23);
+      this.textBox1.TabIndex = 11;
+      // 
+      // label18
+      // 
+      this.label18.AutoSize = true;
+      this.label18.Location = new System.Drawing.Point(15, 263);
+      this.label18.Name = "label18";
+      this.label18.Size = new System.Drawing.Size(66, 15);
+      this.label18.TabIndex = 10;
+      this.label18.Text = "SSL Cipher:";
+      // 
+      // label17
+      // 
+      this.label17.AutoSize = true;
+      this.label17.Location = new System.Drawing.Point(12, 216);
+      this.label17.Name = "label17";
+      this.label17.Size = new System.Drawing.Size(71, 15);
+      this.label17.TabIndex = 9;
+      this.label17.Text = "SSL Key File:";
+      // 
+      // label16
+      // 
+      this.label16.AutoSize = true;
+      this.label16.Location = new System.Drawing.Point(3, 175);
+      this.label16.Name = "label16";
+      this.label16.Size = new System.Drawing.Size(80, 15);
+      this.label16.TabIndex = 8;
+      this.label16.Text = "SSL CERT File:";
+      // 
+      // label15
+      // 
+      this.label15.AutoSize = true;
+      this.label15.Location = new System.Drawing.Point(420, 134);
+      this.label15.Name = "label15";
+      this.label15.Size = new System.Drawing.Size(218, 15);
+      this.label15.TabIndex = 7;
+      this.label15.Text = "Path to Certificate Authority File for SSL.";
+      // 
+      // label14
+      // 
+      this.label14.AutoSize = true;
+      this.label14.Location = new System.Drawing.Point(15, 134);
+      this.label14.Name = "label14";
+      this.label14.Size = new System.Drawing.Size(68, 15);
+      this.label14.TabIndex = 6;
+      this.label14.Text = "SSL CA File:";
       // 
       // label13
       // 
@@ -242,14 +416,14 @@
       this.label12.TabIndex = 3;
       this.label12.Text = "If enabled this option overwrites the server side settings.";
       // 
-      // label11
+      // labelCompression
       // 
-      this.label11.AutoSize = true;
-      this.label11.Location = new System.Drawing.Point(420, 26);
-      this.label11.Name = "label11";
-      this.label11.Size = new System.Drawing.Size(215, 15);
-      this.label11.TabIndex = 1;
-      this.label11.Text = "Select this option for WAN connections";
+      this.labelCompression.AutoSize = true;
+      this.labelCompression.Location = new System.Drawing.Point(420, 26);
+      this.labelCompression.Name = "labelCompression";
+      this.labelCompression.Size = new System.Drawing.Size(215, 15);
+      this.labelCompression.TabIndex = 1;
+      this.labelCompression.Text = "Select this option for WAN connections";
       // 
       // useSSL
       // 
@@ -290,80 +464,84 @@
       this.connectionMethod.FormattingEnabled = true;
       this.connectionMethod.Items.AddRange(new object[] {
             "Standard (TCP/IP)",
-            "Local Socket/Pipe",
-            "Standard TCP/IP over SSH"});
-      this.connectionMethod.Location = new System.Drawing.Point(141, 40);
+            "Local Socket/Pipe"});
+      this.connectionMethod.Location = new System.Drawing.Point(135, 40);
       this.connectionMethod.Name = "connectionMethod";
-      this.connectionMethod.Size = new System.Drawing.Size(373, 23);
+      this.connectionMethod.Size = new System.Drawing.Size(420, 23);
       this.connectionMethod.TabIndex = 4;
+      this.connectionMethod.SelectedIndexChanged += new System.EventHandler(this.connectionMethod_SelectedIndexChanged);
       // 
-      // connectionType
+      // labelHelpMethod
       // 
-      this.connectionType.AutoSize = true;
-      this.connectionType.BackColor = System.Drawing.Color.Transparent;
-      this.connectionType.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.connectionType.Location = new System.Drawing.Point(527, 43);
-      this.connectionType.Name = "connectionType";
-      this.connectionType.Size = new System.Drawing.Size(220, 15);
-      this.connectionType.TabIndex = 5;
-      this.connectionType.Text = "Method to use to connect to the RDBMS";
+      this.labelHelpMethod.AutoSize = true;
+      this.labelHelpMethod.BackColor = System.Drawing.Color.Transparent;
+      this.labelHelpMethod.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.labelHelpMethod.Location = new System.Drawing.Point(561, 43);
+      this.labelHelpMethod.Name = "labelHelpMethod";
+      this.labelHelpMethod.Size = new System.Drawing.Size(220, 15);
+      this.labelHelpMethod.TabIndex = 5;
+      this.labelHelpMethod.Text = "Method to use to connect to the RDBMS";
       // 
-      // label4
+      // labelPromptMethod
       // 
-      this.label4.AutoSize = true;
-      this.label4.BackColor = System.Drawing.Color.Transparent;
-      this.label4.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.label4.Location = new System.Drawing.Point(18, 43);
-      this.label4.Name = "label4";
-      this.label4.Size = new System.Drawing.Size(117, 15);
-      this.label4.TabIndex = 3;
-      this.label4.Text = "Connection Method:";
+      this.labelPromptMethod.AutoSize = true;
+      this.labelPromptMethod.BackColor = System.Drawing.Color.Transparent;
+      this.labelPromptMethod.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.labelPromptMethod.Location = new System.Drawing.Point(12, 43);
+      this.labelPromptMethod.Name = "labelPromptMethod";
+      this.labelPromptMethod.Size = new System.Drawing.Size(117, 15);
+      this.labelPromptMethod.TabIndex = 3;
+      this.labelPromptMethod.Text = "Connection Method:";
       // 
-      // label2
+      // labelHelpName
       // 
-      this.label2.AutoSize = true;
-      this.label2.BackColor = System.Drawing.Color.Transparent;
-      this.label2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.label2.Location = new System.Drawing.Point(527, 13);
-      this.label2.Name = "label2";
-      this.label2.Size = new System.Drawing.Size(176, 15);
-      this.label2.TabIndex = 2;
-      this.label2.Text = "Type a name for the connection";
+      this.labelHelpName.AutoSize = true;
+      this.labelHelpName.BackColor = System.Drawing.Color.Transparent;
+      this.labelHelpName.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.labelHelpName.Location = new System.Drawing.Point(561, 14);
+      this.labelHelpName.Name = "labelHelpName";
+      this.labelHelpName.Size = new System.Drawing.Size(176, 15);
+      this.labelHelpName.TabIndex = 2;
+      this.labelHelpName.Text = "Type a name for the connection";
       // 
       // connectionName
       // 
+      this.connectionName.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource, "Name", true));
       this.connectionName.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.connectionName.Location = new System.Drawing.Point(141, 11);
+      this.connectionName.Location = new System.Drawing.Point(135, 11);
+      this.connectionName.MaxLength = 358;
       this.connectionName.Name = "connectionName";
-      this.connectionName.Size = new System.Drawing.Size(373, 23);
+      this.connectionName.Size = new System.Drawing.Size(420, 23);
       this.connectionName.TabIndex = 1;
+      this.connectionName.TextChanged += new System.EventHandler(this.connectionName_TextChanged);
       // 
-      // label1
+      // labelPromptName
       // 
-      this.label1.AutoSize = true;
-      this.label1.BackColor = System.Drawing.Color.Transparent;
-      this.label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.label1.Location = new System.Drawing.Point(18, 13);
-      this.label1.Name = "label1";
-      this.label1.Size = new System.Drawing.Size(107, 15);
-      this.label1.TabIndex = 0;
-      this.label1.Text = "Connection Name:";
+      this.labelPromptName.AutoSize = true;
+      this.labelPromptName.BackColor = System.Drawing.Color.Transparent;
+      this.labelPromptName.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.labelPromptName.Location = new System.Drawing.Point(22, 14);
+      this.labelPromptName.Name = "labelPromptName";
+      this.labelPromptName.Size = new System.Drawing.Size(107, 15);
+      this.labelPromptName.TabIndex = 0;
+      this.labelPromptName.Text = "Connection Name:";
       // 
       // testButton
       // 
       this.testButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.testButton.Location = new System.Drawing.Point(480, 11);
+      this.testButton.Location = new System.Drawing.Point(494, 11);
       this.testButton.Name = "testButton";
       this.testButton.Size = new System.Drawing.Size(128, 23);
       this.testButton.TabIndex = 12;
       this.testButton.Text = "Test Connection";
       this.testButton.UseVisualStyleBackColor = true;
+      this.testButton.Click += new System.EventHandler(this.testButton_Click);
       // 
       // cancelButton
       // 
       this.cancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.cancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.cancelButton.Location = new System.Drawing.Point(614, 11);
+      this.cancelButton.Location = new System.Drawing.Point(628, 11);
       this.cancelButton.Name = "cancelButton";
       this.cancelButton.Size = new System.Drawing.Size(75, 23);
       this.cancelButton.TabIndex = 11;
@@ -374,7 +552,8 @@
       // 
       this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.okButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.okButton.Location = new System.Drawing.Point(695, 11);
+      this.okButton.Enabled = false;
+      this.okButton.Location = new System.Drawing.Point(709, 11);
       this.okButton.Name = "okButton";
       this.okButton.Size = new System.Drawing.Size(75, 23);
       this.okButton.TabIndex = 10;
@@ -388,16 +567,18 @@
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.cancelButton;
-      this.ClientSize = new System.Drawing.Size(782, 480);
+      this.ClientSize = new System.Drawing.Size(796, 471);
       this.CommandAreaHeight = 45;
       this.Name = "NewConnectionDialog";
       this.Text = "Setup New Connection";
+      this.Load += new System.EventHandler(this.NewConnectionDialog_Load);
       this.contentAreaPanel.ResumeLayout(false);
       this.contentAreaPanel.PerformLayout();
       this.commandAreaPanel.ResumeLayout(false);
       this.tabControl1.ResumeLayout(false);
       this.parametersPage.ResumeLayout(false);
       this.parametersPage.PerformLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.bindingSource)).EndInit();
       this.advancedPage.ResumeLayout(false);
       this.advancedPage.PerformLayout();
       this.ResumeLayout(false);
@@ -408,32 +589,48 @@
 
     private System.Windows.Forms.TabControl tabControl1;
     private System.Windows.Forms.TabPage parametersPage;
-    private System.Windows.Forms.Label label10;
-    private System.Windows.Forms.Label label9;
+    private System.Windows.Forms.Label labelHelpSchema;
+    private System.Windows.Forms.Label labelHelpUserName;
     private System.Windows.Forms.TextBox defaultSchema;
     private System.Windows.Forms.TextBox port;
     private System.Windows.Forms.TextBox userName;
     private System.Windows.Forms.TextBox hostName;
-    private System.Windows.Forms.Label label8;
-    private System.Windows.Forms.Label label7;
-    private System.Windows.Forms.Label label6;
-    private System.Windows.Forms.Label label5;
-    private System.Windows.Forms.Label label3;
+    private System.Windows.Forms.Label LabelPromptSchema;
+    private System.Windows.Forms.Label labelHelpHostName;
+    private System.Windows.Forms.Label labelPromptPort;
+    private System.Windows.Forms.Label labelPromptUserName;
+    private System.Windows.Forms.Label labelPromptHostName;
     private System.Windows.Forms.TabPage advancedPage;
     private System.Windows.Forms.Label label13;
     private System.Windows.Forms.Label label12;
-    private System.Windows.Forms.Label label11;
+    private System.Windows.Forms.Label labelCompression;
     private System.Windows.Forms.CheckBox useSSL;
     private System.Windows.Forms.CheckBox useANSI;
     private System.Windows.Forms.CheckBox useCompression;
     private System.Windows.Forms.ComboBox connectionMethod;
-    private System.Windows.Forms.Label connectionType;
-    private System.Windows.Forms.Label label4;
-    private System.Windows.Forms.Label label2;
+    private System.Windows.Forms.Label labelHelpMethod;
+    private System.Windows.Forms.Label labelPromptMethod;
+    private System.Windows.Forms.Label labelHelpName;
     private System.Windows.Forms.TextBox connectionName;
-    private System.Windows.Forms.Label label1;
+    private System.Windows.Forms.Label labelPromptName;
     private System.Windows.Forms.Button testButton;
     private System.Windows.Forms.Button cancelButton;
     private System.Windows.Forms.Button okButton;
+    private System.Windows.Forms.Label label21;
+    private System.Windows.Forms.Label label20;
+    private System.Windows.Forms.Label label19;
+    private System.Windows.Forms.TextBox textBox4;
+    private System.Windows.Forms.TextBox textBox3;
+    private System.Windows.Forms.TextBox textBox2;
+    private System.Windows.Forms.TextBox textBox1;
+    private System.Windows.Forms.Label label18;
+    private System.Windows.Forms.Label label17;
+    private System.Windows.Forms.Label label16;
+    private System.Windows.Forms.Label label15;
+    private System.Windows.Forms.Label label14;
+    private System.Windows.Forms.BindingSource bindingSource;
+    private System.Windows.Forms.Label labelHelpSocket;
+    private System.Windows.Forms.Label labelPromptSocket;
+    private System.Windows.Forms.TextBox socketPath;
   }
 }

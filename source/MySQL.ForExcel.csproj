@@ -359,6 +359,8 @@
     <Compile Include="Controls\TransparentPictureBox.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Forms\ServiceController.cs" />
+    <Compile Include="Forms\ServiceProcess.cs" />
     <Compile Include="Panels\AutoStyleableBasePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -469,6 +471,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
+    <None Include="Properties\DataSources\MySQL.Utility.MySqlWorkbenchConnection.datasource" />
     <None Include="Properties\DataSources\MySQLColumn.datasource" />
     <None Include="Properties\DataSources\MySQLDataColumn.datasource" />
     <None Include="Properties\DataSources\MySQLTable.datasource" />
