@@ -359,8 +359,6 @@
     <Compile Include="Controls\TransparentPictureBox.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Forms\ServiceController.cs" />
-    <Compile Include="Forms\ServiceProcess.cs" />
     <Compile Include="Panels\AutoStyleableBasePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -476,14 +474,13 @@
     <None Include="Properties\DataSources\MySQLDataColumn.datasource" />
     <None Include="Properties\DataSources\MySQLTable.datasource" />
     <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>      
+      <Generator>SettingsSingleFileGenerator</Generator>
     </None>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Settings.cs" />
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>
     </Compile>
