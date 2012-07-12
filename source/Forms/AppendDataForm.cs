@@ -33,7 +33,11 @@ namespace MySQL.ForExcel
     private Cursor trashCursor;
     private Cursor droppableCursor;
     private MySQLColumnMapping currentColumnMapping = null;
-    private List<MySQLColumnMapping> storedColumnMappingsList;
+    private List<MySQLColumnMapping> storedColumnMappingsList
+    {
+      get { return new MySQLColumnMappingList().UserColumnMappingsList; }
+    
+    }    
 
     public AppendDataForm(MySqlWorkbenchConnection wbConnection, Excel.Range exportDataRange, DBObject importDBObject, string appendingWorksheetName)
     {
@@ -97,19 +101,16 @@ namespace MySQL.ForExcel
 
       if (storedColumnMappingsList != null)
         foreach (MySQLColumnMapping mapping in storedColumnMappingsList)
-          cmbMappingMethod.Items.Add(mapping.Name);
+          cmbMappingMethod.Items.Add(string.Format("{0} ({1}.{2})", mapping.Name, mapping.SchemaName, mapping.TableName));
       
       cmbMappingMethod.SelectedIndex = 0;
     }
 
+    /// <summary>
+    /// Loads all Stored Data Mappings from settings file
+    /// </summary>
     private void loadStoredColumnMappings()
-    {
-      storedColumnMappingsList = new List<MySQLColumnMapping>();
-
-      // TODO: Insert logic here to read from \users\<username>\AppData\Local\MySQL For Excel\column_mappings.xml
-      // and fill storedColumnMappingsList, Schema and TableName must match current Schema in wbConnection and
-      // the name of the table being appended to.
-
+    {                      
       refreshMappingMethodCombo();
     }
 
@@ -130,8 +131,12 @@ namespace MySQL.ForExcel
     private MySQLColumnMapping createColumnMappingForAutomatic()
     {
       MySQLColumnMapping autoMapping = new MySQLColumnMapping("Automatic", getColumnNamesArray(fromExcelDataTable), getColumnNamesArray(toMySQLDataTable));
+ 
       autoMapping.SchemaName = wbConnection.Schema;
       autoMapping.TableName = exportDataHelper.ExportTable.Name;
+      autoMapping.ConnectionName = wbConnection.Name;
+      autoMapping.Port = wbConnection.Port;
+      
       int autoMappedColumns = 0;
       
       // Attempt to auto-map using column names if the Excel data contains the column names
@@ -190,6 +195,8 @@ namespace MySQL.ForExcel
         manualMapping = new MySQLColumnMapping(getColumnNamesArray(fromExcelDataTable), getColumnNamesArray(toMySQLDataTable));
         manualMapping.SchemaName = wbConnection.Schema;
         manualMapping.TableName = exportDataHelper.ExportTable.Name;
+        manualMapping.ConnectionName = wbConnection.Name;
+        manualMapping.Port = wbConnection.Port;
       }
       else
         manualMapping = currentColumnMapping;
@@ -296,16 +303,16 @@ namespace MySQL.ForExcel
 
     private bool storeColumnMappingInFile(MySQLColumnMapping mapping)
     {
-      bool success = true;
-
-      // Insert logic to save the given mapping in XML file
+      bool result = false;
+      
       if (!storedColumnMappingsList.Contains(mapping))
       {
-        storedColumnMappingsList.Add(mapping);
-        refreshMappingMethodCombo();
+        MySQLColumnMappingList userList = new MySQLColumnMappingList();        
+        result = userList.Add(mapping);
+        if (result) 
+          refreshMappingMethodCombo();
       }
-
-      return success;
+      return result;
     }
 
     private void chkFirstRowHeaders_CheckedChanged(object sender, EventArgs e)
@@ -515,7 +522,14 @@ namespace MySQL.ForExcel
       DialogResult dr = newColumnMappingDialog.ShowDialog();
       if (dr == DialogResult.Cancel)
         return;
+
+      //initialize connection and dbobject information
       currentColumnMapping.Name = newColumnMappingDialog.ColumnMappingName;
+      currentColumnMapping.ConnectionName = wbConnection.Name;
+      currentColumnMapping.Port = wbConnection.Port;
+      currentColumnMapping.SchemaName = exportTable.Schema;
+      currentColumnMapping.TableName = exportTable.Name;
+
       storeColumnMappingInFile(currentColumnMapping);
     }
 
@@ -550,114 +564,5 @@ namespace MySQL.ForExcel
       }
     }
 
-  }
-
-  public class MySQLColumnMapping
-  {
-    public string Name { get; set; }
-    public string SchemaName { get; set; }
-    public string TableName { get; set; }
-    public string[] SourceColumns { get; set; }
-    public string[] TargetColumns { get; set; }
-    public int[] MappedSourceIndexes { get; set; }
-    public int MappedQuantity
-    {
-      get { return MappedSourceIndexes.Count(idx => idx >= 0); }
-    }
-    public bool AllColumnsMapped
-    {
-      get { return MappedQuantity == MappedSourceIndexes.Length; }
-    }
-
-    public MySQLColumnMapping(string mappingName, string[] sourceColNames, string[] targetColNames)
-    {
-      Name = mappingName;
-      SchemaName = String.Empty;
-      TableName = String.Empty;
-
-      if (sourceColNames != null)
-      {
-        SourceColumns = new string[sourceColNames.Length];
-        sourceColNames.CopyTo(SourceColumns, 0);
-      }
-      if (targetColNames != null)
-      {
-        TargetColumns = new string[targetColNames.Length];
-        targetColNames.CopyTo(TargetColumns, 0);
-        MappedSourceIndexes = new int[targetColNames.Length];
-      }
-
-      ClearMappings();
-    }
-
-    public MySQLColumnMapping(string[] sourceColNames, string[] targetColNames) : this(String.Empty, sourceColNames, targetColNames)
-    {
-    }
-
-    public void ClearMappings()
-    {
-      if (MappedSourceIndexes != null && TargetColumns != null)
-        for (int i = 0; i < TargetColumns.Length; i++)
-          MappedSourceIndexes[i] = -1;
-    }
-
-    public int GetMatchingColumnsQuantity(DataTable dataTable, bool sameOrdinals)
-    {
-      int matchingColumnsQty = 0;
-      if (dataTable != null && TargetColumns != null)
-      {
-        for (int colIdx = 0; colIdx < TargetColumns.Length; colIdx++)
-        {
-          string colName = TargetColumns[colIdx];
-          if (sameOrdinals)
-          {
-            if (dataTable.Columns[colIdx].ColumnName.ToLowerInvariant() == colName.ToLowerInvariant())
-              matchingColumnsQty++;
-          }
-          else
-          {
-            if (dataTable.Columns.Contains(colName))
-              matchingColumnsQty++;
-          }
-        }
-      }
-      return matchingColumnsQty;
-    }
-
-    public bool AllColumnsMatch(DataTable dataTable, bool sameOrdinals)
-    {
-      return (TargetColumns != null ? GetMatchingColumnsQuantity(dataTable, sameOrdinals) == TargetColumns.Length : false);
-    }
-
-    public int MatchWithOtherColumnMapping(MySQLColumnMapping otherColMapping, bool enforceSchemaAndTableEquality)
-    {
-      int columnsMatched = 0;
-
-      if (enforceSchemaAndTableEquality && otherColMapping.SchemaName.ToLowerInvariant() != SchemaName.ToLowerInvariant() && otherColMapping.TableName.ToLowerInvariant() != TableName.ToLowerInvariant())
-        return columnsMatched;
-
-      ClearMappings();
-      for (int thisTargetIdx = 0; thisTargetIdx < TargetColumns.Length; thisTargetIdx++)
-      {
-        string thisTargetColName = TargetColumns[thisTargetIdx].ToLowerInvariant();
-        int foundAtOtherTargetIndex = -1;
-        for (int otherTargetIdx = 0; otherTargetIdx < otherColMapping.TargetColumns.Length; otherTargetIdx++)
-        {
-          if (otherColMapping.TargetColumns[otherTargetIdx].ToLowerInvariant() == thisTargetColName)
-          {
-            foundAtOtherTargetIndex = otherTargetIdx;
-            break;
-          }
-        }
-        if (foundAtOtherTargetIndex >= 0)
-        {
-          MappedSourceIndexes[thisTargetIdx] = otherColMapping.MappedSourceIndexes[foundAtOtherTargetIndex];
-          columnsMatched++;
-        }
-      }
-
-      return columnsMatched;
-    }
-  }
-
+  } 
 }

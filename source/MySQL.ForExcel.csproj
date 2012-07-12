@@ -19,6 +19,21 @@
   -->
   <PropertyGroup>
     <SignManifests>true</SignManifests>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <PublishUrl>publish\</PublishUrl>
+    <InstallUrl />
+    <TargetCulture>en</TargetCulture>
+    <ApplicationVersion>1.0.0.0</ApplicationVersion>
+    <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>days</UpdateIntervalUnits>
+    <ProductName>MySQL.ForExcel</ProductName>
+    <PublisherName />
+    <SupportUrl />
+    <FriendlyName>MySQL.ForExcel</FriendlyName>
+    <OfficeApplicationDescription />
+    <LoadBehavior>3</LoadBehavior>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>MySQL.ForExcel_TemporaryKey.pfx</ManifestKeyFile>
@@ -46,21 +61,6 @@
     <OldToolsVersion>4.0</OldToolsVersion>
     <VSTO_TrustAssembliesLocation>true</VSTO_TrustAssembliesLocation>
     <IsWebBootstrapper>False</IsWebBootstrapper>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-    <PublishUrl>publish\</PublishUrl>
-    <InstallUrl />
-    <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.0</ApplicationVersion>
-    <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
-    <UpdateEnabled>true</UpdateEnabled>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>days</UpdateIntervalUnits>
-    <ProductName>MySQL.ForExcel</ProductName>
-    <PublisherName />
-    <SupportUrl />
-    <FriendlyName>MySQL.ForExcel</FriendlyName>
-    <OfficeApplicationDescription />
-    <LoadBehavior>3</LoadBehavior>
   </PropertyGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
@@ -214,6 +214,8 @@
   <ItemGroup>
     <Compile Include="Classes\ExportDataHelper.cs" />
     <Compile Include="Classes\MySQLColumn.cs" />
+    <Compile Include="Classes\MySQLColumnMapping.cs" />
+    <Compile Include="Classes\MySQLColumnMappingList.cs" />
     <Compile Include="Classes\MySQLConnectionData.cs" />
     <Compile Include="Classes\MySQLDataTable.cs">
       <SubType>Component</SubType>
@@ -479,6 +481,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Settings.cs" />
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>
     </Compile>
