@@ -109,9 +109,9 @@
       this.lblColumnMappingName.ForeColor = System.Drawing.Color.Navy;
       this.lblColumnMappingName.Location = new System.Drawing.Point(84, 23);
       this.lblColumnMappingName.Name = "lblColumnMappingName";
-      this.lblColumnMappingName.Size = new System.Drawing.Size(202, 18);
+      this.lblColumnMappingName.Size = new System.Drawing.Size(168, 18);
       this.lblColumnMappingName.TabIndex = 0;
-      this.lblColumnMappingName.Text = "New Column Mapping Name:";
+      this.lblColumnMappingName.Text = "Column Mapping Name:";
       // 
       // lblMappingName
       // 
@@ -129,9 +129,9 @@
       this.lblInstructions.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblInstructions.Location = new System.Drawing.Point(84, 45);
       this.lblInstructions.Name = "lblInstructions";
-      this.lblInstructions.Size = new System.Drawing.Size(283, 15);
+      this.lblInstructions.Size = new System.Drawing.Size(257, 15);
       this.lblInstructions.TabIndex = 12;
-      this.lblInstructions.Text = "Please enter a name for the new column mapping.";
+      this.lblInstructions.Text = "Please enter a name for the column mapping.";
       // 
       // AppendNewColumnMappingDialog
       // 
@@ -144,7 +144,7 @@
       this.MainInstructionLocation = new System.Drawing.Point(13, 13);
       this.MainInstructionLocationOffset = new System.Drawing.Size(-10, 10);
       this.Name = "AppendNewColumnMappingDialog";
-      this.Text = "Create New Schema";
+      this.Text = "MySQL for Excel";
       this.contentAreaPanel.ResumeLayout(false);
       this.contentAreaPanel.PerformLayout();
       this.commandAreaPanel.ResumeLayout(false);

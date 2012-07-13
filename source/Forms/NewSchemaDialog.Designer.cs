@@ -145,7 +145,7 @@
       this.MainInstructionLocation = new System.Drawing.Point(13, 13);
       this.MainInstructionLocationOffset = new System.Drawing.Size(-10, 10);
       this.Name = "NewSchemaDialog";
-      this.Text = "Create New Schema";
+      this.Text = "MySQL for Excel";
       this.contentAreaPanel.ResumeLayout(false);
       this.contentAreaPanel.PerformLayout();
       this.commandAreaPanel.ResumeLayout(false);

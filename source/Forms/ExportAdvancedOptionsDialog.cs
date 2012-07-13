@@ -33,6 +33,7 @@ namespace MySQL.ForExcel
       Properties.Settings.Default.ExportAutoAllowEmptyNonIndexColumns = chkAutoAllowEmptyNonIndexColumns.Checked;
       Properties.Settings.Default.ExportUseFormattedValues = chkUseFormattedValues.Checked;
       //Properties.Settings.Default.ExportShowCopySQLButton = chkShowCopySQLButton.Checked;
+      Properties.Settings.Default.Save();
       DialogResult = DialogResult.OK;
       Close();
     }

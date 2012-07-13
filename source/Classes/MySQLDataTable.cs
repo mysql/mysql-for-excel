@@ -12,15 +12,17 @@ namespace MySQL.ForExcel
   public class MySQLDataTable : DataTable
   {
     private bool firstRowIsHeaders;
-    private bool addPK;
+    private bool useFirstColumnAsPK;
 
-    public bool AddPK {
-      get { return addPK; }
+    public bool AddPrimaryKeyColumn { get; set; }
+    public bool UseFirstColumnAsPK {
+      get { return useFirstColumnAsPK; }
       set
       {
-        addPK = value;
-        for (int i = 1; i < Columns.Count && value; i++)
-          (Columns[i] as MySQLDataColumn).PrimaryKey = false;
+        useFirstColumnAsPK = value;
+        if (AddPrimaryKeyColumn)
+          for (int i = 1; i < Columns.Count && value; i++)
+            (Columns[i] as MySQLDataColumn).PrimaryKey = false;
       }
     }
     public bool RemoveEmptyColumns { get; set; }
@@ -53,27 +55,119 @@ namespace MySQL.ForExcel
     }
     public int NumberOfPK
     {
-      get { return Columns.OfType<MySQLDataColumn>().Skip(1).Count(col => col.PrimaryKey); }
+      get { return Columns.OfType<MySQLDataColumn>().Skip(1).Count(col => col.PrimaryKey && !col.ExcludeColumn); }
+    }
+    public int MappedColumnsQuantity
+    {
+      get
+      {
+        int mappedQty = 0;
+        for (int colIdx = 0; colIdx < Columns.Count; colIdx++)
+        {
+          if (!String.IsNullOrEmpty((Columns[colIdx] as MySQLDataColumn).MappedDataColName))
+            mappedQty++;
+        }
+        return mappedQty;
+      }
+    }
+
+    // Constructor used for Export Data
+    public MySQLDataTable(string proposedTableName, Excel.Range exportDataRange, bool addPrimaryKeyCol, bool useFormattedValues, bool detectDatatype, bool addBufferToVarchar, bool autoIndexIntColumns, bool autoAllowEmptyNonIndexColumns)
+      : this(proposedTableName)
+    {
+      AddPrimaryKeyColumn = addPrimaryKeyCol;
+      RemoveEmptyColumns = true;
+      IsFormatted = useFormattedValues;
+      SetData(exportDataRange, detectDatatype, addBufferToVarchar, autoIndexIntColumns, autoAllowEmptyNonIndexColumns);
+    }
+
+    // Constructor to only fetch Schema Information for columns
+    public MySQLDataTable(string tableName, bool fetchColumnsSchemaInfo, MySqlWorkbenchConnection wbConnection) : this(tableName)
+    {
+      if (fetchColumnsSchemaInfo)
+      {
+        List<string> primaryKeyColumnNames = new List<string>();
+        DataTable indexesInfoTable = MySQLDataUtilities.GetSchemaCollection(wbConnection, "IndexColumns", null, wbConnection.Schema, tableName, null);
+        if (indexesInfoTable != null)
+        {
+          foreach (DataRow indexInfoRow in indexesInfoTable.Rows)
+          {
+            if (indexInfoRow["INDEX_NAME"].ToString() == "PRIMARY")
+              primaryKeyColumnNames.Add(indexInfoRow["COLUMN_NAME"].ToString());
+          }
+        }
+        DataTable columnsInfoTable = MySQLDataUtilities.GetSchemaCollection(wbConnection, "Columns Short", null, wbConnection.Schema, tableName);
+        if (columnsInfoTable != null)
+          foreach (DataRow columnInfoRow in columnsInfoTable.Rows)
+          {
+            string colName = columnInfoRow["Field"].ToString();
+            string dataType = columnInfoRow["Type"].ToString();
+            bool allowNulls = columnInfoRow["Null"].ToString() == "YES";
+            bool isPrimaryKey = primaryKeyColumnNames.Contains(colName) || columnInfoRow["Key"].ToString() == "PRI";
+            string extraInfo = columnInfoRow["Extra"].ToString();
+            MySQLDataColumn column = new MySQLDataColumn(colName, dataType, allowNulls, isPrimaryKey, extraInfo);
+            Columns.Add(column);
+          }
+      }
+    }
+
+    // Constructor used for Append Data, totally dummy like the DataTable constructor
+    public MySQLDataTable(string tableName) : this()
+    {
+      if (!String.IsNullOrEmpty(tableName))
+        TableName = tableName;
+    }
+
+    // Basic constructor
+    public MySQLDataTable()
+    {
+      AddPrimaryKeyColumn = false;
+    }
+
+    private void CreateColumns(int numCols)
+    {
+      MySQLDataColumn column = null;
+      int startCol = (AddPrimaryKeyColumn ? 0 : 1);
+      for (int colIdx = startCol; colIdx <= numCols; colIdx++)
+      {
+        string name = "Column" + colIdx;
+        column = new MySQLDataColumn();
+        column.ColumnName = column.DisplayName = name;
+        Columns.Add(column);
+      }
+      if (AddPrimaryKeyColumn)
+      {
+        column = (Columns[0] as MySQLDataColumn);
+        column.PrimaryKey = true;
+        column.AutoPK = true;
+        column.ColumnName = column.DisplayName = TableName + "_id";
+        column.MySQLDataType = "Integer";
+        column.AutoIncrement = true;
+      }
     }
 
     private void UseFirstRowAsHeaders(bool useFirstRow)
     {
       DataRow row = Rows[0];
-      for (int i = 1; i < Columns.Count; i++)
+      int startRow = (AddPrimaryKeyColumn ? 1 : 0);
+      for (int i = startRow; i < Columns.Count; i++)
       {
         MySQLDataColumn col = Columns[i] as MySQLDataColumn;
         col.DisplayName = (useFirstRow ? DataToColName(row[i].ToString()) : col.ColumnName);
         col.MySQLDataType = (useFirstRow ? col.RowsFrom2ndDataType : col.RowsFrom1stDataType);
       }
-      (Columns[0] as MySQLDataColumn).DisplayName = TableName + "_id";
-      int adjustIdx = (useFirstRow ? 0 : 1);
-      for (int i = 0; i < Rows.Count; i++)
+      if (AddPrimaryKeyColumn)
       {
-        Rows[i][0] = i + adjustIdx;
+        (Columns[0] as MySQLDataColumn).DisplayName = TableName + "_id";
+        int adjustIdx = (useFirstRow ? 0 : 1);
+        for (int i = 0; i < Rows.Count; i++)
+        {
+          Rows[i][0] = i + adjustIdx;
+        }
       }
     }
 
-    public void SetData(Excel.Range dataRange, bool useFormattedData, bool detectTypes, bool addBufferToVarchar, bool createIndexForIntColumns, bool allowEmptyNonIdxCols)
+    public void SetData(Excel.Range dataRange, bool detectTypes, bool addBufferToVarchar, bool createIndexForIntColumns, bool allowEmptyNonIdxCols)
     {
       object[,] data;
 
@@ -81,20 +175,19 @@ namespace MySQL.ForExcel
       if (dataRange.Count == 1)
       {
         data = new object[2, 2];
-        data[1, 1] = useFormattedData ? dataRange.Value : dataRange.Value2;
+        data[1, 1] = IsFormatted ? dataRange.Value : dataRange.Value2;
       }
       else
-        data = useFormattedData ? dataRange.Value : dataRange.Value2;
-
-      IsFormatted = useFormattedData;
+        data = IsFormatted ? dataRange.Value : dataRange.Value2;
 
       int numRows = data.GetUpperBound(0);
       int numCols = data.GetUpperBound(1);
+      int colAdjustIdx = (AddPrimaryKeyColumn ? 0 : 1);
 
-      List<bool> coumnsHaveAnyDataList = new List<bool>(numCols + 1);
+      List<bool> columnsHaveAnyDataList = new List<bool>(numCols + 1);
       List<string> colsToDelete = new List<string>(numCols);
 
-      coumnsHaveAnyDataList.Add(true);
+      columnsHaveAnyDataList.Add(true);
       for (int colIdx = 1; colIdx <= numCols; colIdx++)
       {
         bool colHasAnyData = false;
@@ -105,7 +198,7 @@ namespace MySQL.ForExcel
           colHasAnyData = true;
           break;
         }
-        coumnsHaveAnyDataList.Add(colHasAnyData);
+        columnsHaveAnyDataList.Add(colHasAnyData);
       }
 
       if (Columns.Count == 0)
@@ -119,14 +212,15 @@ namespace MySQL.ForExcel
         dataRow[0] = row - pkRowValueAdjust;
         for (int col = 1; col <= numCols; col++)
         {
-          MySQLDataColumn column = Columns[col] as MySQLDataColumn;
-          if (row == 1 && !coumnsHaveAnyDataList[col])
+          int adjColIdx = col - colAdjustIdx;
+          MySQLDataColumn column = Columns[adjColIdx] as MySQLDataColumn;
+          if (row == 1 && !columnsHaveAnyDataList[col])
           {
             column.ExcludeColumn = true;
             colsToDelete.Add(column.ColumnName);
           }
           rowHasAnyData = rowHasAnyData || data[row, col] != null;
-          dataRow[col] = data[row, col];
+          dataRow[adjColIdx] = data[row, col];
         }
         if (rowHasAnyData)
           Rows.Add(dataRow);
@@ -140,70 +234,15 @@ namespace MySQL.ForExcel
         foreach (string colName in colsToDelete)
           Columns.Remove(Columns[colName]);
       if (allowEmptyNonIdxCols)
-      foreach (MySQLDataColumn mysqlCol in Columns)
+        foreach (MySQLDataColumn mysqlCol in Columns)
           mysqlCol.AllowNull = !mysqlCol.CreateIndex;
     }
 
+    [System.Obsolete("Use DetectTypes with parameters instead since this will analyze columns with all data as strings and will always detect everything as a Varchar.")]
     private void DetectTypes()
     {
       foreach (MySQLDataColumn col in Columns)
         col.DetectType(firstRowIsHeaders);
-    }
-
-    private string GetConsistentDataTypeOnAllRows(string proposedDataType, List<string> rowsDataTypesList, int[] decimalMaxLen, int[] varCharMaxLen)
-    {
-      string fullDataType = proposedDataType;
-      bool typesConsistent = true;
-
-      typesConsistent = rowsDataTypesList.All(str => str == proposedDataType);
-      if (!typesConsistent)
-      {
-        if (rowsDataTypesList.Count(str => str == "Integer") + rowsDataTypesList.Count(str => str == "Bool") == rowsDataTypesList.Count)
-        {
-          typesConsistent = true;
-          fullDataType = "Integer";
-        }
-        else if (rowsDataTypesList.Count(str => str == "Integer") + rowsDataTypesList.Count(str => str == "BigInt") == rowsDataTypesList.Count)
-        {
-          typesConsistent = true;
-          fullDataType = "BigInt";
-        }
-        else if (rowsDataTypesList.Count(str => str == "Integer") + rowsDataTypesList.Count(str => str == "Decimal") == rowsDataTypesList.Count)
-        {
-          typesConsistent = true;
-          proposedDataType = "Decimal";
-        }
-        else if (rowsDataTypesList.Count(str => str == "Integer") + rowsDataTypesList.Count(str => str == "Decimal") + rowsDataTypesList.Count(str => str == "Double") == rowsDataTypesList.Count)
-        {
-          typesConsistent = true;
-          fullDataType = "Double";
-        }
-      }
-
-      if (typesConsistent)
-        switch (proposedDataType)
-        {
-          case "Varchar":
-            fullDataType = String.Format("Varchar({0})", varCharMaxLen[0]);
-            break;
-          case "Decimal":
-            if (decimalMaxLen[0] > 12 || decimalMaxLen[1] > 2)
-            {
-              decimalMaxLen[0] = 65;
-              decimalMaxLen[1] = 30;
-            }
-            else
-            {
-              decimalMaxLen[0] = 12;
-              decimalMaxLen[1] = 2;
-            }
-            fullDataType = String.Format("Decimal({0}, {1})", decimalMaxLen[0], decimalMaxLen[1]);
-            break;
-        }
-      else
-        fullDataType = String.Format("Varchar({0})", varCharMaxLen[1]);
-
-      return fullDataType;
     }
 
     private void DetectTypes(object[,] data, bool addBufferToVarchar, bool createIndexForIntColumns)
@@ -211,10 +250,11 @@ namespace MySQL.ForExcel
       int rowsCount = data.GetUpperBound(0);
       int colsCount = data.GetUpperBound(1);
       string dateFormat = "yyyy-MM-dd HH:mm:ss";
+      int colAdjustIdx = (AddPrimaryKeyColumn ? 0 : 1);
 
-      for (int colPos = 1; colPos <= colsCount; colPos++)
+      for (int dataColPos = 1; dataColPos <= colsCount; dataColPos++)
       {
-        MySQLDataColumn col = Columns[colPos] as MySQLDataColumn;
+        MySQLDataColumn col = Columns[dataColPos - colAdjustIdx] as MySQLDataColumn;
         if (col.ExcludeColumn)
           continue;
 
@@ -232,13 +272,13 @@ namespace MySQL.ForExcel
 
         for (int rowPos = 1; rowPos <= rowsCount; rowPos++)
         {
-          valueFromArray = data[rowPos, colPos];
+          valueFromArray = data[rowPos, dataColPos];
           if (valueFromArray == null)
             continue;
 
           // Treat always as a Varchar value first in case all rows do not have a consistent datatype just to see the varchar len calculated by GetMySQLExportDataType
           valueAsString = valueFromArray.ToString();
-          proposedType = Utilities.GetMySQLExportDataType(valueAsString, out valueOverflow);
+          proposedType = DataTypeUtilities.GetMySQLExportDataType(valueAsString, out valueOverflow);
           if (proposedType == "Bool")
             proposedType = "Varchar(5)";
           lParensIndex = proposedType.IndexOf("(");
@@ -246,7 +286,7 @@ namespace MySQL.ForExcel
           varCharMaxLen[1] = Math.Max(varCharValueLength, varCharMaxLen[1]);
 
           // Normal datatype detection
-          proposedType = Utilities.GetMySQLExportDataType(valueFromArray, out valueOverflow);
+          proposedType = DataTypeUtilities.GetMySQLExportDataType(valueFromArray, out valueOverflow);
           lParensIndex = proposedType.IndexOf("(");
           strippedType = (lParensIndex < 0 ? proposedType : proposedType.Substring(0, lParensIndex));
           switch (strippedType)
@@ -254,14 +294,11 @@ namespace MySQL.ForExcel
             case "Date":
             case "Datetime":
               DateTime dtValue = (DateTime)valueFromArray;
-              Rows[rowPos - 1][colPos] = dtValue.ToString(dateFormat);
+              Rows[rowPos - 1][dataColPos - colAdjustIdx] = dtValue.ToString(dateFormat);
               break;
             case "Varchar":
-              if (rowPos > 1)
-              {
                 varCharValueLength = (addBufferToVarchar ? Int32.Parse(proposedType.Substring(lParensIndex + 1, proposedType.Length - lParensIndex - 2)) : valueAsString.Length);
                 varCharMaxLen[0] = Math.Max(varCharValueLength, varCharMaxLen[0]);
-              }
               break;
             case "Decimal":
               int commaPos = proposedType.IndexOf(",");
@@ -276,13 +313,14 @@ namespace MySQL.ForExcel
         }
 
         // Get the consistent DataType for all rows except first one.
-        proposedType = GetConsistentDataTypeOnAllRows(strippedType, typesListFrom2ndRow, decimalMaxLen, varCharMaxLen);
+        proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListFrom2ndRow, decimalMaxLen, varCharMaxLen);
         col.RowsFrom2ndDataType = proposedType;
 
-        // Get the consistent DataType between first row and the previously computed consistent DataType for the rest of the rows.
+        // Get the consistent DataType between first columnInfoRow and the previously computed consistent DataType for the rest of the rows.
+        lParensIndex = proposedType.IndexOf("(");
         strippedType = (lParensIndex < 0 ? proposedType : proposedType.Substring(0, lParensIndex));
         typesListFor1stAndRest.Add(strippedType);
-        proposedType = GetConsistentDataTypeOnAllRows(strippedType, typesListFor1stAndRest, decimalMaxLen, varCharMaxLen);
+        proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListFor1stAndRest, decimalMaxLen, varCharMaxLen);
         col.RowsFrom1stDataType = proposedType;
 
         col.MySQLDataType = (firstRowIsHeaders ? col.RowsFrom2ndDataType : col.RowsFrom1stDataType);
@@ -290,22 +328,14 @@ namespace MySQL.ForExcel
       }
     }
 
-    private void CreateColumns(int numCols)
+    public bool ColumnIsPrimaryKey(string columnName)
     {
-      MySQLDataColumn column = null;
-      for (int colIdx = 0; colIdx <= numCols; colIdx++)
+      foreach (MySQLDataColumn col in Columns)
       {
-        string name = "Column" + colIdx;
-        column = new MySQLDataColumn();
-        column.ColumnName = column.DisplayName = name;
-        Columns.Add(column);
+        if (col.DisplayName == columnName && col.PrimaryKey)
+          return true;
       }
-      column = (Columns[0] as MySQLDataColumn);
-      column.PrimaryKey = true;
-      column.AutoPK = true;
-      column.ColumnName = column.DisplayName = TableName + "_id";
-      column.MySQLDataType = "Integer";
-      column.AutoIncrement = true;
+      return false;
     }
 
     private string DataToColName(string dataValue)
@@ -316,7 +346,7 @@ namespace MySQL.ForExcel
     public bool CreateTable(MySqlWorkbenchConnection wbConnection, out Exception exception)
     {
       bool success = false;
-      string connectionString = Utilities.GetConnectionString(wbConnection);
+      string connectionString = MySQLDataUtilities.GetConnectionString(wbConnection);
       string queryString = GetCreateSQL(false);
       exception = null;
 
@@ -348,7 +378,7 @@ namespace MySQL.ForExcel
       sql.AppendFormat("CREATE TABLE `{0}`{1}(", TableName, nl);
 
       string delimiter = nlt;
-      int skipNum = (addPK ? 0 : 1);
+      int skipNum = (AddPrimaryKeyColumn ? (useFirstColumnAsPK ? 0 : 1) : 0);
       foreach (MySQLDataColumn col in Columns.OfType<MySQLDataColumn>().Skip(skipNum).Where(c => !c.ExcludeColumn))
       {
         sql.AppendFormat("{0}{1}", delimiter, col.GetSQL());
@@ -360,13 +390,13 @@ namespace MySQL.ForExcel
         sql.AppendFormat("{0}PRIMARY KEY (", delimiter);
         foreach (MySQLDataColumn col in Columns.OfType<MySQLDataColumn>().Skip(1).Where(c => c.PrimaryKey))
         {
-          sql.AppendFormat("{0}{1}", pkDelimiter, col.DisplayName);
+          sql.AppendFormat("{0}`{1}`", pkDelimiter, col.DisplayName);
           pkDelimiter = ",";
         }
         sql.Append(")");
       }
       foreach (MySQLDataColumn col in Columns.OfType<MySQLDataColumn>().Where(c => !(c.AutoPK || c.PrimaryKey || c.UniqueKey || c.ExcludeColumn || !c.CreateIndex)))
-        sql.AppendFormat("{0}INDEX {1}_idx ({1})", delimiter, col.DisplayName);
+        sql.AppendFormat("{0}INDEX `{1}_idx` (`{1}`)", delimiter, col.DisplayName);
       sql.Append(nl);
       sql.Append(")");
       return sql.ToString();
@@ -374,7 +404,12 @@ namespace MySQL.ForExcel
 
     public string GetInsertSQL(int limit, bool formatNewLinesAndTabs)
     {
-      int exportColsCount = Columns.Count;
+      return GetInsertSQL(limit, formatNewLinesAndTabs, false);
+    }
+
+    public string GetInsertSQL(int limit, bool formatNewLinesAndTabs, bool insertingMappedColumns)
+    {
+      int colsCount = Columns.Count;
       if (Rows.Count - (firstRowIsHeaders ? 1 : 0) < 1)
         return null;
 
@@ -382,51 +417,91 @@ namespace MySQL.ForExcel
       string nl = (formatNewLinesAndTabs ? Environment.NewLine : " ");
       int rowIdx = 0;
       int colIdx = 0;
-      int startingColNum = (addPK ? 0 : 1);
+      int startingColNum = (AddPrimaryKeyColumn ? (useFirstColumnAsPK ? 0 : 1) : 0);
+      List<bool> columnsRequireQuotes = new List<bool>(colsCount);
+      List<string> insertColumnNames = new List<string>(colsCount);
 
-      string separator = String.Empty;
+      string rowsSeparator = String.Empty;
+      string colsSeparator = String.Empty;
       queryString.AppendFormat("INSERT INTO `{0}`{1}(", TableName, nl);
 
-      for (colIdx = startingColNum; colIdx < exportColsCount; colIdx++)
+      for (colIdx = startingColNum; colIdx < colsCount; colIdx++)
       {
         MySQLDataColumn column = Columns[colIdx] as MySQLDataColumn;
-        if (column.ExcludeColumn)
+        if (column.ExcludeColumn || (insertingMappedColumns && String.IsNullOrEmpty(column.MappedDataColName)))
           continue;
-        queryString.AppendFormat("{0}{1}",
-                                 separator,
-                                 column.DisplayName);
-        separator = ",";
+        string insertIntoColName = (insertingMappedColumns ? column.MappedDataColName : column.DisplayName);
+        queryString.AppendFormat("{0}`{1}`",
+                                 colsSeparator,
+                                 insertIntoColName);
+        colsSeparator = ",";
+        columnsRequireQuotes.Add(column.ColumnsRequireQuotes);
+        insertColumnNames.Add(column.DisplayName);
       }
       queryString.AppendFormat("){0}VALUES{0}", nl);
 
+      colsCount = insertColumnNames.Count;
       foreach (DataRow dr in Rows)
       {
         if (firstRowIsHeaders && rowIdx++ == 0)
           continue;
         if (limit > 0 && rowIdx >= limit)
           break;
-        queryString.Append("(");
-        separator = String.Empty;
-        for (colIdx = startingColNum; colIdx < exportColsCount; colIdx++)
+        queryString.AppendFormat("{0}(", rowsSeparator);
+        colsSeparator = String.Empty;
+        for (colIdx = startingColNum; colIdx < colsCount; colIdx++)
         {
-          MySQLDataColumn column = Columns[colIdx] as MySQLDataColumn;
-          if (column.ExcludeColumn)
-            continue;
-          string toLowerDataType = column.MySQLDataType.ToLowerInvariant();
+          bool currColRequiresQuotes = columnsRequireQuotes[colIdx];
+          string curentStrValue = dr[insertColumnNames[colIdx]].ToString();
+          string valueToDB = String.Empty;
+
+          if (currColRequiresQuotes)
+            valueToDB = (String.IsNullOrEmpty(curentStrValue) ? String.Empty : curentStrValue);
+          else  // for numeric type then insert a null value if the dr doesn't have any value for this column
+            valueToDB = (String.IsNullOrEmpty(curentStrValue) ? @"null" : curentStrValue);
           queryString.AppendFormat("{0}{1}{2}{1}",
-                                   separator,
-                                   (column.ColumnsRequireQuotes ? "'" : String.Empty),
-                                   dr[column.ColumnName].ToString());
-          separator = ",";
-        }        
-        queryString.AppendFormat("),{0}", nl);
+                                   colsSeparator,
+                                   (currColRequiresQuotes ? "'" : String.Empty),
+                                   valueToDB);
+          colsSeparator = ",";
+        }
+        queryString.Append(")");
+        if (rowsSeparator.Length == 0)
+          rowsSeparator = "," + nl;
       }
-      if (Rows.Count > 0)
-        queryString.Remove(queryString.Length - 2, 2);
       return queryString.ToString();
     }
 
-    public bool InsertDataWithAdapter(MySqlWorkbenchConnection wbConnection, bool firstRowHeader, bool useFormattedData, out Exception exception)
+    public bool InsertDataWithManualQuery(MySqlWorkbenchConnection wbConnection, bool insertingMappedColumns, out Exception exception, out string sqlQuery)
+    {
+      bool success = false;
+      exception = null;
+      sqlQuery = GetInsertSQL(-1, true, insertingMappedColumns);
+
+      try
+      {
+        string connectionString = MySQLDataUtilities.GetConnectionString(wbConnection);
+        using (MySqlConnection conn = new MySqlConnection(connectionString))
+        {
+          conn.Open();
+          MySqlCommand cmd = new MySqlCommand(sqlQuery, conn);
+          cmd.ExecuteNonQuery();
+          success = true;
+        }
+      }
+      catch (MySqlException mysqlEx)
+      {
+        exception = mysqlEx;
+      }
+      catch (Exception ex)
+      {
+        exception = ex;
+      }
+
+      return success;
+    }
+
+    public bool InsertDataWithAdapter(MySqlWorkbenchConnection wbConnection, out Exception exception)
     {
       bool success = false;
       exception = null;
@@ -436,16 +511,16 @@ namespace MySQL.ForExcel
       foreach (MySQLDataColumn col in Columns)
       {
         MySQLDataColumn copyCol = copyOriginal.Columns[col.ColumnName] as MySQLDataColumn;
-        if (col.ExcludeColumn || (!addPK && col.AutoPK))
+        if (col.ExcludeColumn || (AddPrimaryKeyColumn && !useFirstColumnAsPK && col.AutoPK))
           copyOriginal.Columns.Remove(copyCol);
         else
           copyCol.ColumnName = col.DisplayName;
       }
-      if (firstRowHeader)
+      if (firstRowIsHeaders)
         copyOriginal.Rows.RemoveAt(0);
       copyOriginal.AcceptChanges();
 
-      string connectionString = Utilities.GetConnectionString(wbConnection);
+      string connectionString = MySQLDataUtilities.GetConnectionString(wbConnection);
       // Create & open a SqlConnection, and dispose of it after we are done.
       using (MySqlConnection connection = new MySqlConnection(connectionString))
       {
@@ -471,7 +546,7 @@ namespace MySQL.ForExcel
         }
         catch (Exception ex)
         {
-          System.Diagnostics.Debug.WriteLine(ex.Message);
+          exception = ex;
         }
       }
 
@@ -512,10 +587,12 @@ namespace MySQL.ForExcel
     public bool PrimaryKey { get; set; }
     public bool AllowNull { get; set; }
     public bool ExcludeColumn { get; set; }
+    public bool Unsigned { get; set; }
     public string MySQLDataType  { get; set; }
     public List<string> WarningTextList { get { return warningTextList; } }
     public string RowsFrom1stDataType { get; set; }
     public string RowsFrom2ndDataType { get; set; }
+    public string MappedDataColName { get; set; }
 
     #region Getter Properties
 
@@ -578,8 +655,54 @@ namespace MySQL.ForExcel
       get { return IsCharOrText || IsDate; }
     }
 
+    public string StrippedMySQLDataType
+    {
+      get
+      {
+        if (String.IsNullOrEmpty(MySQLDataType))
+          return MySQLDataType;
+        int lParensIndex = MySQLDataType.IndexOf("(");
+        return (lParensIndex < 0 ? MySQLDataType : MySQLDataType.Substring(0, lParensIndex));
+      }
+    }
+
+    public MySqlDbType MySQLDBType
+    {
+      get
+      {
+        string strippedType = StrippedMySQLDataType;
+        return (!String.IsNullOrEmpty(strippedType) ? DataTypeUtilities.NameToMySQLType(strippedType, Unsigned, false) : MySqlDbType.VarChar);
+      }
+    }
+
     #endregion Getter Properties
 
+    public MySQLDataColumn()
+    {
+      MappedDataColName = null;
+    }
+
+    public MySQLDataColumn(string columnName, string mySQLFullDataType, bool allowNulls, bool isPrimaryKey, string extraInfo) : this()
+    {
+      ColumnName = columnName;
+      AllowDBNull = AllowNull = allowNulls;
+      Unsigned = false;
+      AutoIncrement = false;
+      if (!String.IsNullOrEmpty(extraInfo))
+      {
+        Unsigned = extraInfo.Contains("unsigned");
+        AutoIncrement = extraInfo.Contains("auto_increment");
+      }
+      MySQLDataType = mySQLFullDataType;
+      DataType = DataTypeUtilities.NameToType(StrippedMySQLDataType, Unsigned);
+      PrimaryKey = isPrimaryKey;
+    }
+
+    public MySQLDataColumn(string columnName, string mySQLFullDataType) : this(columnName, mySQLFullDataType, false, false, String.Empty)
+    {
+    }
+
+    [System.Obsolete("This will analyze all data as strings and will always detect everything as a Varchar.")]
     public void DetectType(bool firstRowIsHeaders)
     {
       object valueFromArray = null;
@@ -596,7 +719,7 @@ namespace MySQL.ForExcel
         valueFromArray = dr[Ordinal];
         if (valueFromArray == null)
           continue;
-        proposedType = Utilities.GetMySQLExportDataType(valueFromArray, out valueOverflow);
+        proposedType = DataTypeUtilities.GetMySQLExportDataType(valueFromArray, out valueOverflow);
         if (proposedType.StartsWith("Date") && valueFromArray is DateTime)
         {
           DateTime dtValue = (DateTime)valueFromArray;
@@ -631,7 +754,7 @@ namespace MySQL.ForExcel
         if (parentTable.FirstRowIsHeaders && rowIdx++ == 0)
           continue;
         string strValueFromArray = dr[Ordinal].ToString();
-        result = result && Utilities.StringValueCanBeStoredWithMySQLType(strValueFromArray, mySQLDataType);
+        result = result && DataTypeUtilities.StringValueCanBeStoredWithMySQLType(strValueFromArray, mySQLDataType);
       }
 
       return result;

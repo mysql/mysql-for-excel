@@ -67,7 +67,7 @@ namespace MySQL.ForExcel
     {
       foreach (TreeNode node in databaseList.Nodes)
         node.Nodes.Clear();
-      DataTable databases = Utilities.GetSchemaCollection(connection, "Databases", null);
+      DataTable databases = MySQLDataUtilities.GetSchemaCollection(connection, "Databases", null);
       if (databases == null)
       {
         MessageBox.Show(Resources.UnableToLoadDatabases);
@@ -100,7 +100,7 @@ namespace MySQL.ForExcel
       NewSchemaDialog dlg = new NewSchemaDialog();
       if (dlg.ShowDialog() == DialogResult.Cancel) return;
 
-      string connectionString = Utilities.GetConnectionString(connection);
+      string connectionString = MySQLDataUtilities.GetConnectionString(connection);
       string sql = String.Format("CREATE DATABASE `{0}`", dlg.SchemaName);
       try
       {

@@ -69,7 +69,7 @@ namespace MySQL.ForExcel
     {
       base.OnPaint(e);
 
-      Image i = (Enabled ? Image : (DisabledImage == null && Image != null ? Utilities.MakeGrayscale(new Bitmap(Image)) : DisabledImage));
+      Image i = (Enabled ? Image : (DisabledImage == null && Image != null ? MiscUtilities.MakeGrayscale(new Bitmap(Image)) : DisabledImage));
       Size imageSize = Size.Empty;
       if (i != null)
       {

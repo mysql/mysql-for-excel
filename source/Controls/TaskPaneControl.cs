@@ -249,7 +249,7 @@ namespace MySQL.ForExcel
 
     public bool EditTableData(DBObject tableObject)
     {
-      if (!Utilities.TableHasPrimaryKey(connection, tableObject.Name))
+      if (!MySQLDataUtilities.TableHasPrimaryKey(connection, tableObject.Name))
       {
         InfoDialog infoDialog = new InfoDialog(false, Properties.Resources.EditOpenSummaryError, Properties.Resources.EditOpenDetailsError);
         infoDialog.OperationStatusText = Properties.Resources.EditOpenSatusError;
@@ -288,7 +288,7 @@ namespace MySQL.ForExcel
       Excel.Range editingRange = ImportDataTableToExcelAtGivenCell(importForm.ImportDataTable, importForm.ImportHeaders, atCell);
       
       // Edit Data
-      Utilities.AddExtendedProperties(ref importForm.ImportDataTable, importForm.ImportDataTable.ExtendedProperties["QueryString"].ToString(), importForm.ImportHeaders, tableObject.Name);
+      MySQLDataUtilities.AddExtendedProperties(ref importForm.ImportDataTable, importForm.ImportDataTable.ExtendedProperties["QueryString"].ToString(), importForm.ImportHeaders, tableObject.Name);
       editDialog = new EditDataDialog(connection, editingRange, importForm.ImportDataTable, currentWorksheet);
       editDialog.ParentWindow = new NativeWindowWrapper(excelApplication.Hwnd);
       editDialog.CallerTaskPane = this;

@@ -88,7 +88,7 @@ namespace MySQL.ForExcel
     private void fillParameters()
     {
       CustomProperty parameter = null;
-      DataTable parametersTable = Utilities.GetSchemaCollection(wbConnection, "Procedure Parameters", null, wbConnection.Schema, importDBObject.Name);
+      DataTable parametersTable = MySQLDataUtilities.GetSchemaCollection(wbConnection, "Procedure Parameters", null, wbConnection.Schema, importDBObject.Name);
       mysqlParameters = new MySqlParameter[parametersTable.Rows.Count];
       int paramIdx = 0;
       MySqlDbType dbType = MySqlDbType.Guid;
@@ -222,7 +222,7 @@ namespace MySQL.ForExcel
         if (mysqlParameters[paramIdx].Direction == ParameterDirection.Output || mysqlParameters[paramIdx].Direction == ParameterDirection.ReturnValue)
           outParamsTable.Columns.Add(procedureParamsProperties[paramIdx].Name, procedureParamsProperties[paramIdx].Value.GetType());
       }
-      ImportDataSet = Utilities.GetDataSetFromRoutine(wbConnection, importDBObject, mysqlParameters);
+      ImportDataSet = MySQLDataUtilities.GetDataSetFromRoutine(wbConnection, importDBObject, mysqlParameters);
       if (ImportDataSet == null || ImportDataSet.Tables.Count == 0)
       {
         btnImport.Enabled = false;

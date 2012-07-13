@@ -61,8 +61,8 @@ namespace MySQL.ForExcel
 
     private void fillPreviewGrid()
     {
-      previewDataTable = Utilities.GetDataFromTableOrView(wbConnection, importDBObject, null, 0, 10);
-      TotalRowsCount = Utilities.GetRowsCountFromTableOrView(wbConnection, importDBObject);
+      previewDataTable = MySQLDataUtilities.GetDataFromTableOrView(wbConnection, importDBObject, null, 0, 10);
+      TotalRowsCount = MySQLDataUtilities.GetRowsCountFromTableOrView(wbConnection, importDBObject);
       lblRowsCountSub.Text = TotalRowsCount.ToString();
       grdPreviewData.DataSource = previewDataTable;
       foreach (DataGridViewColumn gridCol in grdPreviewData.Columns)
@@ -92,9 +92,9 @@ namespace MySQL.ForExcel
         importColumns.Add(selCol.HeaderText);
       }
       if (chkLimitRows.Checked)
-        ImportDataTable = Utilities.GetDataFromTableOrView(wbConnection, importDBObject, importColumns, Convert.ToInt32(numFromRow.Value) - 1, Convert.ToInt32(numRowsToReturn.Value));
+        ImportDataTable = MySQLDataUtilities.GetDataFromTableOrView(wbConnection, importDBObject, importColumns, Convert.ToInt32(numFromRow.Value) - 1, Convert.ToInt32(numRowsToReturn.Value));
       else
-        ImportDataTable = Utilities.GetDataFromTableOrView(wbConnection, importDBObject, importColumns);
+        ImportDataTable = MySQLDataUtilities.GetDataFromTableOrView(wbConnection, importDBObject, importColumns);
     }
 
     private void chkLimitRows_CheckedChanged(object sender, EventArgs e)

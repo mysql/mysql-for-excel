@@ -212,16 +212,12 @@
     can be found.
   -->
   <ItemGroup>
-    <Compile Include="Classes\ExportDataHelper.cs" />
-    <Compile Include="Classes\MySQLColumn.cs" />
+    <Compile Include="Classes\DBObject.cs" />
     <Compile Include="Classes\MySQLColumnMapping.cs" />
     <Compile Include="Classes\MySQLColumnMappingList.cs" />
-    <Compile Include="Classes\MySQLConnectionData.cs" />
     <Compile Include="Classes\MySQLDataTable.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Classes\MySQLIndex.cs" />
-    <Compile Include="Classes\MySQLTable.cs" />
     <Compile Include="Controls\PreviewDataGridView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -539,6 +535,7 @@
     <None Include="Resources\MySQLforExcel-InfoDlg-Success-64x64.png" />
     <None Include="Resources\MySQLforExcel-WelcomePanel-Connection-Disabled-24x24.png" />
     <None Include="Resources\MySQLforExcel-Cursor-Dragging-32x32.png" />
+    <None Include="Resources\MySQLforExcel-InfoDlg-Warning-64x64.png" />
     <Content Include="Resources\Warning.png" />
     <Content Include="Todo.txt" />
   </ItemGroup>

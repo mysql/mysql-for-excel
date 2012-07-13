@@ -33,6 +33,7 @@ namespace MySQL.ForExcel
       Properties.Settings.Default.AppendAutoStoreColumnMapping = chkAutoStoreColumnMapping.Checked;
       Properties.Settings.Default.AppendReloadColumnMapping = chkReloadColumnMapping.Checked;
       Properties.Settings.Default.AppendUseFormattedValues = chkUseFormattedValues.Checked;
+      Properties.Settings.Default.Save();
       DialogResult = DialogResult.OK;
       Close();
     }

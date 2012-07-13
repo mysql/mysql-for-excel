@@ -60,16 +60,14 @@ namespace MySQL.ForExcel
     {
       if (exportDataRange != null)
       {
-        dataTable = new MySQLDataTable();
-        dataTable.RemoveEmptyColumns = true;
-        if (!String.IsNullOrEmpty(proposedTableName))
-          dataTable.TableName = proposedTableName;
-        dataTable.SetData(exportDataRange, 
-                          Settings.Default.ExportUseFormattedValues, 
-                          Settings.Default.ExportDetectDatatype,
-                          Settings.Default.ExportAddBufferToVarchar,
-                          Settings.Default.ExportAutoIndexIntColumns, 
-                          Settings.Default.ExportAutoAllowEmptyNonIndexColumns);
+        dataTable = new MySQLDataTable(proposedTableName,
+                                       exportDataRange,
+                                       true,
+                                       Settings.Default.ExportUseFormattedValues, 
+                                       Settings.Default.ExportDetectDatatype,
+                                       Settings.Default.ExportAddBufferToVarchar,
+                                       Settings.Default.ExportAutoIndexIntColumns, 
+                                       Settings.Default.ExportAutoAllowEmptyNonIndexColumns);
         grdPreviewData.DataSource = dataTable;
         columnBindingSource.DataSource = dataTable.Columns;
         return;
@@ -186,7 +184,7 @@ namespace MySQL.ForExcel
       bool isValid = false;
 
       List<int> paramsInParenthesis;
-      List<string> dataTypesList = Utilities.GetDataTypes(out paramsInParenthesis);
+      List<string> dataTypesList = DataTypeUtilities.GetMySQLDataTypes(out paramsInParenthesis);
       int rightParentFound = proposedUserType.IndexOf(")");
       int leftParentFound = proposedUserType.IndexOf("(");
       string pureDataType = String.Empty;
@@ -237,7 +235,7 @@ namespace MySQL.ForExcel
 
     private void btnExport_Click(object sender, EventArgs e)
     {
-      bool tableContainsDataToExport = dataTable.Rows.Count > 1 && !dataTable.FirstRowIsHeaders;
+      bool tableContainsDataToExport = dataTable.Rows.Count > (dataTable.FirstRowIsHeaders ? 1 : 0);
 
       if (!tableContainsDataToExport)
       {
@@ -268,7 +266,7 @@ namespace MySQL.ForExcel
 
       if (success && tableContainsDataToExport)
       {
-        success = dataTable.InsertDataWithAdapter(wbConnection, chkFirstRowHeaders.Checked, Properties.Settings.Default.ExportUseFormattedValues, out exception);
+        success = dataTable.InsertDataWithAdapter(wbConnection, out exception);
         if (success)
         {
           operationDetails.AppendFormat("{0}Inserting data rows...{0}", Environment.NewLine);
@@ -322,7 +320,7 @@ namespace MySQL.ForExcel
       dataTable.TableName = txtTableNameInput.Text;
 
       string cleanTableName = txtTableNameInput.Text.ToLowerInvariant().Replace(" ", "_");
-      bool tableExistsInSchema = Utilities.TableExistsInSchema(wbConnection, wbConnection.Schema, cleanTableName);
+      bool tableExistsInSchema = MySQLDataUtilities.TableExistsInSchema(wbConnection, wbConnection.Schema, cleanTableName);
       if (tableExistsInSchema)
       {
         showValidationWarning("TableNameWarning", true, Properties.Resources.TableNameExistsWarning);
@@ -366,7 +364,7 @@ namespace MySQL.ForExcel
       cmbPrimaryKeyColumns.Text = String.Empty;
       cmbPrimaryKeyColumns.Enabled = false;
       txtAddPrimaryKey.Enabled = true;
-      dataTable.AddPK = true;
+      dataTable.UseFirstColumnAsPK = true;
     }
 
     private void radUseExistingColumn_CheckedChanged(object sender, EventArgs e)
@@ -379,7 +377,7 @@ namespace MySQL.ForExcel
       cmbPrimaryKeyColumns.Enabled = true;
       cmbPrimaryKeyColumns.SelectedIndex = 0;
       txtAddPrimaryKey.Enabled = false;
-      dataTable.AddPK = false;
+      dataTable.UseFirstColumnAsPK = false;
     }
 
     private void grdPreviewData_SelectionChanged(object sender, EventArgs e)
@@ -516,9 +514,7 @@ namespace MySQL.ForExcel
     {
       if (e.ListChangedType != ListChangedType.Reset)
         return;
-      grdPreviewData.Columns[0].Visible = radAddPrimaryKey.Checked;
-      if (grdPreviewData.Rows.Count <= 1 && chkFirstRowHeaders.Checked)
-        grdPreviewData.CurrentCell = null;
+      grdPreviewData.CurrentCell = null;
       grdPreviewData.Rows[0].Visible = !chkFirstRowHeaders.Checked;
     }
 

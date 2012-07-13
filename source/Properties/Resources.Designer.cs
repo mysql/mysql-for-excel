@@ -448,6 +448,13 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap MySQLforExcel_InfoDlg_Warning_64x64 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_InfoDlg_Warning_64x64", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap MySQLforExcel_Input_64x64 {
             get {
                 object obj = ResourceManager.GetObject("MySQLforExcel_Input_64x64", resourceCulture);

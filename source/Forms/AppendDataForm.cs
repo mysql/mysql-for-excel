@@ -16,14 +16,8 @@ namespace MySQL.ForExcel
   public partial class AppendDataForm : AutoStyleableBaseDialog
   {
     private MySqlWorkbenchConnection wbConnection;
-    private ExportDataHelper exportDataHelper;
-    private MySQLTable exportTable { get { return exportDataHelper.ExportTable; } }
-    private List<ColumnGuessData> headerRowColumnsGuessData { get { return exportDataHelper.HeaderRowColumnsGuessData; } }
-    private List<ColumnGuessData> dataRowsColumnsGuessData { get { return exportDataHelper.DataRowsColumnsGuessData; } }
-    private DataTable formattedExcelData { get { return exportDataHelper.FormattedExcelData; } }
-    private DataTable unformattedExcelData { get { return exportDataHelper.UnformattedExcelData; } }
-    private DataTable fromExcelDataTable { get { return (Settings.Default.AppendUseFormattedValues ? formattedExcelData : unformattedExcelData); } }
-    private DataTable toMySQLDataTable = null;
+    private MySQLDataTable fromMySQLDataTable = null;
+    private MySQLDataTable toMySQLDataTable = null;
     private Rectangle dragBoxFromMouseDown = Rectangle.Empty;
     private Point screenOffset;
     private int grdColumnIndexToDrag = -1;
@@ -42,26 +36,63 @@ namespace MySQL.ForExcel
     public AppendDataForm(MySqlWorkbenchConnection wbConnection, Excel.Range exportDataRange, DBObject importDBObject, string appendingWorksheetName)
     {
       this.wbConnection = wbConnection;
-      draggingCursor = Utilities.CreateCursor(new Bitmap(Properties.Resources.MySQLforExcel_Cursor_Dragging_32x32), 3, 3);
-      droppableCursor = Utilities.CreateCursor(new Bitmap(Properties.Resources.MySQLforExcel_Cursor_Dropable_32x32), 3, 3);
-      trashCursor = Utilities.CreateCursor(new Bitmap(Properties.Resources.MySQLforExcel_Cursor_Trash_32x32), 3, 3);
+      draggingCursor = MiscUtilities.CreateCursor(new Bitmap(Properties.Resources.MySQLforExcel_Cursor_Dragging_32x32), 3, 3);
+      droppableCursor = MiscUtilities.CreateCursor(new Bitmap(Properties.Resources.MySQLforExcel_Cursor_Dropable_32x32), 3, 3);
+      trashCursor = MiscUtilities.CreateCursor(new Bitmap(Properties.Resources.MySQLforExcel_Cursor_Trash_32x32), 3, 3);
 
       InitializeComponent();
 
       grdFromExcelData.EnableHeadersVisualStyles = false;
-      exportDataHelper = new ExportDataHelper(wbConnection, exportDataRange, importDBObject.Name);
+
+      initializeFromTableGrid(importDBObject.Name, exportDataRange);
       initializeToTableGrid(importDBObject);
+
       string excelRangeAddress = exportDataRange.Address.Replace("$", String.Empty);
       Text = String.Format("Append Data - {0} [{1}]", appendingWorksheetName, excelRangeAddress);
-      changeFormattedDataSource();
-      chkFirstRowHeaders_CheckedChanged(chkFirstRowHeaders, EventArgs.Empty);
       maxMappingCols = Math.Min(grdToMySQLTable.Columns.Count, grdFromExcelData.Columns.Count);
       clearMappingsOnToTableGridAndMySQLTable();
       loadStoredColumnMappings();
-      if (Settings.Default.AppendPerformAutoMap)
-        cmbMappingMethod.SelectedIndex = 0;
-      else if (!selectStoredMappingForTargetTable())
-        cmbMappingMethod.SelectedIndex = 1;
+      if (!selectStoredMappingForTargetTable())
+        if (Settings.Default.AppendPerformAutoMap)
+          cmbMappingMethod.SelectedIndex = 0;
+        else
+          cmbMappingMethod.SelectedIndex = 1;
+    }
+
+    private void initializeFromTableGrid(string fromTableName, Excel.Range excelDataRange)
+    {
+      fromMySQLDataTable = new MySQLDataTable(fromTableName,
+                                              excelDataRange,
+                                              false,
+                                              Properties.Settings.Default.AppendUseFormattedValues,
+                                              true,
+                                              false,
+                                              false,
+                                              false);
+      grdFromExcelData.DataSource = fromMySQLDataTable;
+      foreach (DataGridViewColumn gridCol in grdFromExcelData.Columns)
+      {
+        gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
+      }
+      grdFromExcelData.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
+      chkFirstRowHeaders_CheckedChanged(chkFirstRowHeaders, EventArgs.Empty);
+    }
+
+    private void initializeToTableGrid(DBObject importDBObject)
+    {
+      toMySQLDataTable = new MySQLDataTable(importDBObject.Name, true, wbConnection);
+      DataTable dt = MySQLDataUtilities.GetDataFromTableOrView(wbConnection, importDBObject, null, 0, 10);
+      foreach (DataRow dr in dt.Rows)
+      {
+        toMySQLDataTable.ImportRow(dr);
+      }
+      long totalRowsCount = MySQLDataUtilities.GetRowsCountFromTableOrView(wbConnection, importDBObject);
+      grdToMySQLTable.DataSource = toMySQLDataTable;
+      foreach (DataGridViewColumn gridCol in grdToMySQLTable.Columns)
+      {
+        gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
+      }
+      grdToMySQLTable.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
     }
 
     private bool selectStoredMappingForTargetTable()
@@ -79,18 +110,6 @@ namespace MySQL.ForExcel
       }
 
       return appliedStoredMapping;
-    }
-
-    private void initializeToTableGrid(DBObject importDBObject)
-    {
-      toMySQLDataTable = Utilities.GetDataFromTableOrView(wbConnection, importDBObject, null, 0, 10);
-      long totalRowsCount = Utilities.GetRowsCountFromTableOrView(wbConnection, importDBObject);
-      grdToMySQLTable.DataSource = toMySQLDataTable;
-      foreach (DataGridViewColumn gridCol in grdToMySQLTable.Columns)
-      {
-        gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
-      }
-      grdToMySQLTable.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
     }
 
     private void refreshMappingMethodCombo()
@@ -130,13 +149,11 @@ namespace MySQL.ForExcel
 
     private MySQLColumnMapping createColumnMappingForAutomatic()
     {
-      MySQLColumnMapping autoMapping = new MySQLColumnMapping("Automatic", getColumnNamesArray(fromExcelDataTable), getColumnNamesArray(toMySQLDataTable));
- 
+      MySQLColumnMapping autoMapping = new MySQLColumnMapping("Automatic", getColumnNamesArray(fromMySQLDataTable), getColumnNamesArray(toMySQLDataTable));
       autoMapping.SchemaName = wbConnection.Schema;
-      autoMapping.TableName = exportDataHelper.ExportTable.Name;
+      autoMapping.TableName = toMySQLDataTable.TableName;
       autoMapping.ConnectionName = wbConnection.Name;
       autoMapping.Port = wbConnection.Port;
-      
       int autoMappedColumns = 0;
       
       // Attempt to auto-map using column names if the Excel data contains the column names
@@ -172,7 +189,9 @@ namespace MySQL.ForExcel
         {
           if (colIdx >= maxMappingCols)
             break;
-          if (exportDataHelper.ExportTable.Columns[colIdx].DataType.ToLowerInvariant() == exportDataHelper.DataRowsColumnsGuessData[colIdx].MySQLType.ToLowerInvariant())
+          MySQLDataColumn fromCol = fromMySQLDataTable.Columns[colIdx] as MySQLDataColumn;
+          MySQLDataColumn toCol = toMySQLDataTable.Columns[colIdx] as MySQLDataColumn;
+          if (DataTypeUtilities.Type1FitsIntoType2(toCol.StrippedMySQLDataType, fromCol.StrippedMySQLDataType))
           {
             autoMapping.MappedSourceIndexes[colIdx] = colIdx;
             autoMappedColumns++;
@@ -192,9 +211,9 @@ namespace MySQL.ForExcel
       MySQLColumnMapping manualMapping;
       if (currentColumnMapping == null)
       {
-        manualMapping = new MySQLColumnMapping(getColumnNamesArray(fromExcelDataTable), getColumnNamesArray(toMySQLDataTable));
+        manualMapping = new MySQLColumnMapping(getColumnNamesArray(fromMySQLDataTable), getColumnNamesArray(toMySQLDataTable));
         manualMapping.SchemaName = wbConnection.Schema;
-        manualMapping.TableName = exportDataHelper.ExportTable.Name;
+        manualMapping.TableName = toMySQLDataTable.TableName;
         manualMapping.ConnectionName = wbConnection.Name;
         manualMapping.Port = wbConnection.Port;
       }
@@ -230,7 +249,17 @@ namespace MySQL.ForExcel
       }
 
       // Store the actual mapping
-      exportTable.Columns[toColumnIndex].MappedDataColName = mappedColName;
+      MySQLDataColumn fromCol;
+      if (mapping)
+      {
+        fromCol = fromMySQLDataTable.Columns[fromColumnIndex] as MySQLDataColumn;
+        fromCol.MappedDataColName = toMySQLDataTable.Columns[toColumnIndex].ColumnName;
+      }
+      else if (previouslyMappedFromIndex >= 0)
+      {
+        fromCol = fromMySQLDataTable.Columns[previouslyMappedFromIndex] as MySQLDataColumn;
+        fromCol.MappedDataColName = null;
+      }
       currentColumnMapping.MappedSourceIndexes[toColumnIndex] = fromColumnIndex;
     }
 
@@ -270,7 +299,8 @@ namespace MySQL.ForExcel
           newStyle.SelectionBackColor = newStyle.BackColor = SystemColors.Control;
           grdFromExcelData.Columns[colIdx].HeaderCell.Style = newStyle;
         }
-        exportTable.Columns[colIdx].MappedDataColName = null;
+        MySQLDataColumn fromCol = fromMySQLDataTable.Columns[colIdx] as MySQLDataColumn;
+        fromCol.MappedDataColName = null;
       }
       grdToMySQLTable.Refresh();
       grdFromExcelData.Refresh();
@@ -279,7 +309,7 @@ namespace MySQL.ForExcel
 
     private void performManualSingleColumnMapping(int fromColumnIndex, int toColumnIndex, string mappedColName)
     {
-      if (currentColumnMapping.Name != "Manual")
+      if (currentColumnMapping.Name == "Automatic")
         cmbMappingMethod.Text = "Manual";
 
       applySingleMapping(fromColumnIndex, toColumnIndex, mappedColName);
@@ -288,17 +318,6 @@ namespace MySQL.ForExcel
       grdToMySQLTable.Refresh();
       grdFromExcelData.Refresh();
       btnStoreMapping.Enabled = currentColumnMapping.MappedQuantity > 0;
-    }
-
-    private void changeFormattedDataSource()
-    {
-      grdFromExcelData.DataSource = fromExcelDataTable;
-      foreach (DataGridViewColumn gridCol in grdFromExcelData.Columns)
-      {
-        gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
-      }
-      grdFromExcelData.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
-      chkFirstRowHeaders_CheckedChanged(chkFirstRowHeaders, EventArgs.Empty);
     }
 
     private bool storeColumnMappingInFile(MySQLColumnMapping mapping)
@@ -322,7 +341,7 @@ namespace MySQL.ForExcel
       bool firstRowColNames = chkFirstRowHeaders.Checked;
       grdFromExcelData.CurrentCell = null;
       foreach (DataGridViewColumn gridCol in grdFromExcelData.Columns)
-        gridCol.HeaderText = (firstRowColNames ? grdFromExcelData.Rows[0].Cells[gridCol.Index].Value.ToString() : formattedExcelData.Columns[gridCol.Index].ColumnName);
+        gridCol.HeaderText = (firstRowColNames ? grdFromExcelData.Rows[0].Cells[gridCol.Index].Value.ToString() : fromMySQLDataTable.Columns[gridCol.Index].ColumnName);
       grdFromExcelData.Rows[0].Visible = !firstRowColNames;
       if (!(chkFirstRowHeaders.Checked && grdFromExcelData.Rows.Count < 2))
         grdFromExcelData.FirstDisplayedScrollingRowIndex = (chkFirstRowHeaders.Checked ? 1 : 0);
@@ -338,25 +357,24 @@ namespace MySQL.ForExcel
     private void btnAppend_Click(object sender, EventArgs e)
     {
       DialogResult dr;
-      if (exportTable.Columns.Count(col => !String.IsNullOrEmpty(col.MappedDataColName)) < maxMappingCols)
+      if (fromMySQLDataTable.MappedColumnsQuantity < maxMappingCols)
       {
         WarningDialog wDiag = new WarningDialog(Properties.Resources.ColumnMappingIncompleteTitleWarning, Properties.Resources.ColumnMappingIncompleteDetailWarning);
         if (wDiag.ShowDialog() == DialogResult.No)
           return;
       }
 
-      MySqlException exception;
+      Exception exception;
       string insertQuery;
-      string operationSummary;
+      string operationSummary = String.Empty;
 
-      bool success = exportDataHelper.InsertData(chkFirstRowHeaders.Checked, Settings.Default.AppendUseFormattedValues, out insertQuery, out exception);
-
+      bool success = fromMySQLDataTable.InsertDataWithManualQuery(wbConnection, true, out exception, out insertQuery);
       if (success)
-        operationSummary = String.Format("Excel data was appended successfully to MySQL Table {0}.", exportDataHelper.ExportTable.Name);
+        operationSummary = String.Format("Excel data was appended successfully to MySQL Table {0}.", toMySQLDataTable.TableName);
       else
-        operationSummary = String.Format("Excel data could not be appended to MySQL Table {0}.", exportDataHelper.ExportTable.Name);
+        operationSummary = String.Format("Excel data could not be appended to MySQL Table {0}.", toMySQLDataTable.TableName);
       StringBuilder operationDetails = new StringBuilder();
-      operationDetails.AppendFormat("Inserting Excel data in MySQL Table \"{0}\"...{1}{1}", exportDataHelper.ExportTable.Name, Environment.NewLine);
+      operationDetails.AppendFormat("Inserting Excel data in MySQL Table \"{0}\"...{1}{1}", toMySQLDataTable.TableName, Environment.NewLine);
       operationDetails.Append(insertQuery);
       operationDetails.Append(Environment.NewLine);
       operationDetails.Append(Environment.NewLine);
@@ -364,7 +382,10 @@ namespace MySQL.ForExcel
         operationDetails.Append("Excel data was inserted successfully.");
       else
       {
-        operationDetails.AppendFormat("MySQL Error {0}:{1}", exception.Number, Environment.NewLine);
+        if (exception is MySqlException)
+          operationDetails.AppendFormat("MySQL Error {0}:{1}", (exception as MySqlException).Number, Environment.NewLine);
+        else
+          operationDetails.AppendFormat("ADO.NET Error:{0}", Environment.NewLine);
         operationDetails.Append(exception.Message);
       }
 
@@ -468,11 +489,13 @@ namespace MySQL.ForExcel
       {
         int fromColumnIndex = Convert.ToInt32(e.Data.GetData(typeof(System.Int32)));
         string draggedColumnName = grdFromExcelData.Columns[fromColumnIndex].HeaderText;
+        string droppedOntoColumnName = grdToMySQLTable.Columns[grdToTableColumnIndexToDrop].HeaderText;
         if (e.Effect == DragDropEffects.Link && grdToTableColumnIndexToDrop >= 0)
         {
-          if (!String.IsNullOrEmpty(exportTable.Columns[grdToTableColumnIndexToDrop].MappedDataColName))
+          MySQLDataColumn fromCol = fromMySQLDataTable.Columns[fromColumnIndex] as MySQLDataColumn;
+          if (!String.IsNullOrEmpty(fromCol.MappedDataColName))
           {
-            bool isIdenticalMapping = exportTable.Columns[grdToTableColumnIndexToDrop].MappedDataColName == draggedColumnName;
+            bool isIdenticalMapping = fromCol.MappedDataColName == droppedOntoColumnName;
             DialogResult dr = DialogResult.No;
             if (!isIdenticalMapping)
             {
@@ -514,7 +537,7 @@ namespace MySQL.ForExcel
       string proposedMappingName = String.Empty;
       do
       {
-        proposedMappingName = String.Format("{0}Mapping{1}", exportDataHelper.ExportTable.Name, (numericSuffix > 1 ? numericSuffix.ToString() : String.Empty));
+        proposedMappingName = String.Format("{0}Mapping{1}", toMySQLDataTable.TableName, (numericSuffix > 1 ? numericSuffix.ToString() : String.Empty));
         numericSuffix++;
       }
       while (storedColumnMappingsList.Any(mapping => mapping.Name == proposedMappingName));
@@ -527,21 +550,16 @@ namespace MySQL.ForExcel
       currentColumnMapping.Name = newColumnMappingDialog.ColumnMappingName;
       currentColumnMapping.ConnectionName = wbConnection.Name;
       currentColumnMapping.Port = wbConnection.Port;
-      currentColumnMapping.SchemaName = exportTable.Schema;
-      currentColumnMapping.TableName = exportTable.Name;
+      currentColumnMapping.SchemaName = wbConnection.Schema;
+      currentColumnMapping.TableName = toMySQLDataTable.TableName;
 
       storeColumnMappingInFile(currentColumnMapping);
     }
 
     private void btnAdvanced_Click(object sender, EventArgs e)
     {
-      bool previousUseFormattedValue = Settings.Default.AppendUseFormattedValues;
       AppendAdvancedOptionsDialog optionsDialog = new AppendAdvancedOptionsDialog();
       DialogResult dr = optionsDialog.ShowDialog();
-      if (dr == DialogResult.Cancel)
-        return;
-      if (previousUseFormattedValue != Settings.Default.AppendUseFormattedValues)
-        changeFormattedDataSource();
     }
 
     private void cmbMappingMethod_SelectedIndexChanged(object sender, EventArgs e)
@@ -555,7 +573,6 @@ namespace MySQL.ForExcel
           break;
         case "Manual":
           currentColumnMapping = createColumnMappingForManual();
-          applySelectedStoredColumnMapping();
           break;
         default:
           currentColumnMapping.MatchWithOtherColumnMapping(storedColumnMappingsList[cmbMappingMethod.SelectedIndex - 2], false);
@@ -564,5 +581,6 @@ namespace MySQL.ForExcel
       }
     }
 
-  } 
+  }
+
 }

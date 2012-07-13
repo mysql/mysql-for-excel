@@ -66,7 +66,7 @@
       // 
       // picLogo
       // 
-      this.picLogo.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Logo_64x64;
+      this.picLogo.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_InfoDlg_Warning_64x64;
       this.picLogo.Location = new System.Drawing.Point(21, 22);
       this.picLogo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.picLogo.Name = "picLogo";

@@ -25,7 +25,7 @@ namespace MySQL.ForExcel
     private Excel.Range editDataRange;
     private bool importedHeaders = false;
     private string queryString = String.Empty;
-    private MySQLTable editMySQLTable;
+    private MySQLDataTable editMySQLDataTable;
     private MySqlDataAdapter dataAdapter;
     private MySqlConnection connection;
     private List<string> modifiedCellAddressesList;
@@ -52,7 +52,7 @@ namespace MySQL.ForExcel
       EditingTableName = importTable.ExtendedProperties["TableName"].ToString();
       importedHeaders = (bool)importTable.ExtendedProperties["ImportedHeaders"];
       queryString = importTable.ExtendedProperties["QueryString"].ToString();
-      getMySQLTableSchemaInfo(EditingTableName);
+      editMySQLDataTable = new MySQLDataTable(EditingTableName, true, wbConnection);
       initializeDataAdapter();
       EditingWorksheet = editingWorksheet;
       EditingWorksheet.Change += new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
@@ -78,21 +78,9 @@ namespace MySQL.ForExcel
       pen.Dispose();
     }
 
-    private void getMySQLTableSchemaInfo(string tableName)
-    {
-      DataTable tablesData = Utilities.GetSchemaCollection(wbConnection, "Tables", null, wbConnection.Schema, tableName);
-      if (tablesData.Rows.Count == 0)
-      {
-        System.Diagnostics.Debug.WriteLine(String.Format("Schema info for table {0} not found.", tableName));
-        return;
-      }
-      DataTable columnsData = Utilities.GetSchemaCollection(wbConnection, "Columns", null, wbConnection.Schema, tableName);
-      editMySQLTable = new MySQLTable(wbConnection, tablesData.Rows[0], columnsData);
-    }
-
     private void initializeDataAdapter()
     {
-      connection = new MySqlConnection(Utilities.GetConnectionString(wbConnection));
+      connection = new MySqlConnection(MySQLDataUtilities.GetConnectionString(wbConnection));
       dataAdapter = new MySqlDataAdapter(this.queryString, connection);
       dataAdapter.UpdateCommand = new MySqlCommand(String.Empty, connection);
       StringBuilder queryString = new StringBuilder();
@@ -104,30 +92,29 @@ namespace MySQL.ForExcel
 
       string wClauseSeparator = String.Empty;
       string sClauseSeparator = String.Empty;
-      queryString.AppendFormat("USE {0};{2}UPDATE {1}{2}SET{2}", wbConnection.Schema, EditingTableName, Environment.NewLine);
+      queryString.AppendFormat("{1}UPDATE `{0}`{1}SET{1}", EditingTableName, Environment.NewLine);
 
-      foreach (MySQLColumn mysqlCol in editMySQLTable.Columns)
+      foreach (MySQLDataColumn mysqlCol in editMySQLDataTable.Columns)
       {
-        bool isPrimaryKeyColumn = editMySQLTable.PrimaryKey != null && editMySQLTable.PrimaryKey.Columns.Any(idx => idx.ColumnName == mysqlCol.ColumnName);
-        MySqlDbType mysqlColType = Utilities.NameToType(mysqlCol.DataType, mysqlCol.IsUnsigned, false);
+        MySqlDbType mysqlColType = mysqlCol.MySQLDBType;
+        int colSuffix = mysqlCol.Ordinal + 1;
 
-        updateParam = new MySqlParameter(String.Format("@W_{0}", mysqlCol.ColumnName), mysqlColType);
+        updateParam = new MySqlParameter(String.Format("@W_Column{0}", colSuffix), mysqlColType);
         updateParam.SourceColumn = mysqlCol.ColumnName;
         updateParam.SourceVersion = DataRowVersion.Original;
         dataAdapter.UpdateCommand.Parameters.Add(updateParam);
 
-        if (isPrimaryKeyColumn)
-          wClauseString.AppendFormat("{0}{1}=@W_{1}", wClauseString.ToString().Equals(Environment.NewLine + "WHERE" + Environment.NewLine) ? "" : wClauseSeparator, mysqlCol.ColumnName);        
+        if (mysqlCol.PrimaryKey)
+          wClauseString.AppendFormat("{0}`{1}`=@W_Column{2}", (mysqlCol.Ordinal == 0 ? String.Empty : wClauseSeparator), mysqlCol.ColumnName, colSuffix);
         
-        if (editMySQLTable.PrimaryKey == null)
-          wClauseString.AppendFormat("{0}{1}=@W_{1}", wClauseString.ToString().Equals(Environment.NewLine + "WHERE" + Environment.NewLine) ? "" : wClauseSeparator, mysqlCol.ColumnName);        
-        
-        updateParam = new MySqlParameter(String.Format("@S_{0}", mysqlCol.ColumnName), mysqlColType);
+        if (editMySQLDataTable.PrimaryKey == null)
+          wClauseString.AppendFormat("{0}`{1}`=@W_Column{2}", (mysqlCol.Ordinal == 0 ? String.Empty : wClauseSeparator), mysqlCol.ColumnName, colSuffix);
+
+        updateParam = new MySqlParameter(String.Format("@S_Column{0}", colSuffix), mysqlColType);
         updateParam.SourceColumn = mysqlCol.ColumnName;
 
-
         dataAdapter.UpdateCommand.Parameters.Add(updateParam);
-        setClauseString.AppendFormat("{0}{1}=@S_{1}", setClauseString.ToString().Equals(String.Empty) ? "" : sClauseSeparator, mysqlCol.ColumnName);
+        setClauseString.AppendFormat("{0}`{1}`=@S_Column{2}", sClauseSeparator, mysqlCol.ColumnName, colSuffix);
 
         wClauseSeparator = " AND ";
         sClauseSeparator = ",";
@@ -158,7 +145,7 @@ namespace MySQL.ForExcel
       {
         editingTable.Clear();
         dataAdapter.Fill(editingTable);
-        Utilities.AddExtendedProperties(ref editingTable, queryString, importedHeaders, EditingTableName);
+        MySQLDataUtilities.AddExtendedProperties(ref editingTable, queryString, importedHeaders, EditingTableName);
       }
       else
       {
@@ -219,7 +206,7 @@ namespace MySQL.ForExcel
       if (intersectRange == null || intersectRange.Count == 0)
         return;
 
-      //if change was done in the first row and we have headers we won't change the name of the column
+      //if change was done in the first columnInfoRow and we have headers we won't change the name of the column
       if (intersectRange.Row == 1 && importedHeaders)
         return;
 
@@ -232,7 +219,7 @@ namespace MySQL.ForExcel
       int startDataTableRow = startCell.Row - (importedHeaders ? 2 : 1);
       int startDataTableCol = startCell.Column - 1;
 
-      // Detect if a row was deleted and if so flag a row for deletion
+      // Detect if a columnInfoRow was deleted and if so flag a columnInfoRow for deletion
       if (EditingWorksheet.UsedRange.Rows.Count < editingRowsQuantity)
       {
         editingTable.Rows[startDataTableRow].Delete();

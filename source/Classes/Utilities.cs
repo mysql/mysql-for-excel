@@ -14,10 +14,91 @@ using System.Globalization;
 
 namespace MySQL.ForExcel
 {
-  public static class Utilities
+  public static class MiscUtilities
   {
-    public const int VARCHAR_MAX_LEN = 65535;
+    public static void SetDoubleBuffered(System.Windows.Forms.Control c)
+    {
+      if (SystemInformation.TerminalServerSession)
+        return;
 
+      PropertyInfo aProp =
+            typeof(System.Windows.Forms.Control).GetProperty(
+                  "DoubleBuffered",
+                  System.Reflection.BindingFlags.NonPublic |
+                  System.Reflection.BindingFlags.Instance);
+
+      aProp.SetValue(c, true, null);
+    }
+
+    public static Bitmap MakeGrayscale(Bitmap original)
+    {
+      // Create a blank bitmap the same size as original
+      Bitmap newBitmap = new Bitmap(original.Width, original.Height);
+
+      // Get a graphics object from the new image
+      Graphics g = Graphics.FromImage(newBitmap);
+
+      // Create the grayscale ColorMatrix
+      ColorMatrix colorMatrix = new ColorMatrix(
+         new float[][] 
+      {
+         new float[] {.3f, .3f, .3f, 0, 0},
+         new float[] {.59f, .59f, .59f, 0, 0},
+         new float[] {.11f, .11f, .11f, 0, 0},
+         new float[] {0, 0, 0, 1, 0},
+         new float[] {0, 0, 0, 0, 1}
+      });
+
+      // Create some image attributes
+      ImageAttributes attributes = new ImageAttributes();
+
+      // Set the color matrix attribute
+      attributes.SetColorMatrix(colorMatrix);
+
+      // Draw the original image on the new image using the grayscale color matrix
+      g.DrawImage(original, new Rectangle(0, 0, original.Width, original.Height),
+         0, 0, original.Width, original.Height, GraphicsUnit.Pixel, attributes);
+
+      // Dispose the Graphics object
+      g.Dispose();
+      return newBitmap;
+    }
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr CreateIconIndirect(ref IconInfo icon);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool GetIconInfo(IntPtr hIcon, ref IconInfo pIconInfo);
+
+    public static Cursor CreateCursor(Bitmap bmp, int xHotSpot, int yHotSpot)
+    {
+      IconInfo tmp = new IconInfo();
+      GetIconInfo(bmp.GetHicon(), ref tmp);
+      tmp.xHotspot = xHotSpot;
+      tmp.yHotspot = yHotSpot;
+      tmp.fIcon = false;
+      return new Cursor(CreateIconIndirect(ref tmp));
+    }
+
+    public static DialogResult ShowWarningBox(string warningMessage)
+    {
+      return MessageBox.Show(warningMessage, "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+    }
+
+    public static void ShowErrorBox(string errorMessage)
+    {
+      MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+    }
+
+    public static void ShowExceptionBox(Exception ex)
+    {
+      ShowErrorBox(ex.Message);
+    }
+  }
+
+  public static class MySQLDataUtilities
+  {
     public static string GetConnectionString(MySqlWorkbenchConnection connection)
     {
       MySqlConnectionStringBuilder cs = new MySqlConnectionStringBuilder();
@@ -44,6 +125,11 @@ namespace MySQL.ForExcel
 
           switch (collection.ToUpperInvariant())
           {
+            case "COLUMNS SHORT":
+              mysqlAdapter = new MySqlDataAdapter(String.Format("SHOW COLUMNS FROM {0}.{1}", restrictions[1], restrictions[2]), conn);
+              dt = new DataTable();
+              mysqlAdapter.Fill(dt);
+              break;
             case "ENGINES":
               mysqlAdapter = new MySqlDataAdapter("SELECT * FROM information_schema.engines ORDER BY engine", conn);
               dt = new DataTable();
@@ -63,7 +149,7 @@ namespace MySQL.ForExcel
               mysqlAdapter = new MySqlDataAdapter("SHOW CHARSET", conn);
               dt = new DataTable();
               mysqlAdapter.Fill(dt);
-              break;          
+              break;
             default:
               dt = conn.GetSchema(collection, restrictions);
               break;
@@ -193,7 +279,7 @@ namespace MySQL.ForExcel
     public static DataSet GetDataSetFromRoutine(MySqlWorkbenchConnection connection, DBObject dbo, params MySqlParameter[] parameters)
     {
       DataSet retDS = null;
-      
+
       if (dbo.Type == DBObjectType.Routine)
       {
         string sql = String.Format("`{0}`", dbo.Name);
@@ -241,7 +327,72 @@ namespace MySQL.ForExcel
       }
     }
 
-    public static List<string> GetDataTypes(out List<int> paramsInParenthesisList)
+    public static bool TableHasPrimaryKey(MySqlWorkbenchConnection connection, string tableName)
+    {
+      if (String.IsNullOrEmpty(tableName))
+        return false;
+
+      string sql = String.Format("SHOW KEYS FROM {0} IN {1} WHERE Key_name = 'PRIMARY';", tableName, connection.Schema);
+      DataTable dt = GetDataFromTableOrView(connection, sql);
+      return (dt != null ? dt.Rows.Count > 0 : false);
+    }
+
+    public static bool TableExistsInSchema(MySqlWorkbenchConnection connection, string schemaName, string tableName)
+    {
+      if (String.IsNullOrEmpty(schemaName) || String.IsNullOrEmpty(tableName))
+        return false;
+
+      string sql = String.Format("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{0}' and table_name = '{1}'", schemaName, tableName);
+      object objCount = MySqlHelper.ExecuteScalar(GetConnectionString(connection), sql);
+      long retCount = (objCount != null ? (long)objCount : 0);
+      return (retCount > 0);
+    }
+
+    public static bool IndexExistsInSchema(MySqlWorkbenchConnection connection, string schemaName, string tableName, string indexName)
+    {
+      if (String.IsNullOrEmpty(schemaName) || String.IsNullOrEmpty(indexName))
+        return false;
+
+      DataTable dt = GetSchemaCollection(connection, "Indexes", null, schemaName, tableName, indexName);
+      return dt.Rows.Count > 0;
+    }
+
+    public static List<string> DataRowsToList(DataRowCollection rowCollection, string colName)
+    {
+      List<string> retList = null;
+
+      if (rowCollection != null && rowCollection.Count > 0)
+      {
+        foreach (DataRow dr in rowCollection)
+        {
+          retList.Add(dr[colName].ToString());
+        }
+      }
+
+      return retList;
+    }
+
+    public static List<string> DataRowsToList(DataRow[] dataRows, string colName)
+    {
+      List<string> retList = null;
+
+      if (dataRows != null && dataRows.Length > 0)
+      {
+        foreach (DataRow dr in dataRows)
+        {
+          retList.Add(dr[colName].ToString());
+        }
+      }
+
+      return retList;
+    }
+  }
+
+  public static class DataTypeUtilities
+  {
+    public const int VARCHAR_MAX_LEN = 65535;
+
+    public static List<string> GetMySQLDataTypes(out List<int> paramsInParenthesisList)
     {
       List<string> retList = new List<string>();
       retList.AddRange(new string[] {
@@ -283,16 +434,63 @@ namespace MySQL.ForExcel
       return retList;
     }
 
-    public static List<string> GetDataTypes()
+    public static List<string> GetMySQLDataTypes()
     {
       List<int> unused;
-      return GetDataTypes(out unused);
+      return GetMySQLDataTypes(out unused);
+    }
+
+    public static bool Type1FitsIntoType2(string strippedType1, string strippedType2)
+    {
+      if (String.IsNullOrEmpty(strippedType1) || String.IsNullOrEmpty(strippedType2))
+        return false;
+      strippedType1 = strippedType1.ToLowerInvariant();
+      strippedType2 = strippedType2.ToLowerInvariant();
+      List<string> dataTypesList = GetMySQLDataTypes();
+      if (!dataTypesList.Contains(strippedType1) || !dataTypesList.Contains(strippedType2))
+      {
+        System.Diagnostics.Debug.WriteLine("Type1FitsIntoType2: One of the 2 types is Invalid.");
+        return false;
+      }
+      if (strippedType2 == strippedType1)
+        return true;
+
+      bool type1IsInt = strippedType1.Contains("int");
+      bool type2IsInt = strippedType2.Contains("int");
+      bool type1IsDecimal = strippedType1 == "float" || strippedType1 == "numeric" || strippedType1 == "decimal" || strippedType1 == "real" || strippedType1 == "double";
+      bool type2IsDecimal = strippedType2 == "float" || strippedType2 == "numeric" || strippedType2 == "decimal" || strippedType2 == "real" || strippedType2 == "double";
+      if (type1IsInt && (type2IsInt || type2IsDecimal))
+        return true;
+      if (type1IsDecimal && type2IsDecimal)
+        return true;
+
+      if (strippedType1.Contains("char") && strippedType2.Contains("char"))
+        return true;
+      if ((strippedType1.Contains("bool") || strippedType1 == "tinyint" || strippedType1 == "bit") && (strippedType2.Contains("bool") || strippedType2 == "tinyint" || strippedType2 == "bit"))
+        return true;
+
+      bool type1IsDate = strippedType1.Contains("date") || strippedType1 == "timestamp";
+      bool type2IsDate = strippedType2.Contains("date") || strippedType2 == "timestamp";
+      if (type1IsDate && type2IsDate)
+        return true;
+
+      if (strippedType1 == "time" && strippedType2 == "time")
+        return true;
+      if (strippedType1.Contains("text") && strippedType2.Contains("text"))
+        return true;
+      if (strippedType1.Contains("blob") && strippedType2.Contains("blob"))
+        return true;
+      if (strippedType1.Contains("binary") && strippedType2.Contains("binary"))
+        return true;
+      if ((strippedType1 == "enum" || strippedType1 == "set") && strippedType2.Contains("char"))
+        return true;
+      return false;
     }
 
     public static bool StringValueCanBeStoredWithMySQLType(string strValue, string mySQLDataType)
     {
       mySQLDataType = mySQLDataType.ToLowerInvariant();
-      bool isCharacter = mySQLDataType.StartsWith("varchar") || mySQLDataType.StartsWith("char");
+      bool isCharacter = mySQLDataType.StartsWith("varchar") || mySQLDataType.StartsWith("char") || mySQLDataType.Contains("text");
       bool isEnum = mySQLDataType.StartsWith("enum");
       bool isSet = mySQLDataType.StartsWith("set");
       bool mayContainFloatingPoint = mySQLDataType.StartsWith("decimal") || mySQLDataType.StartsWith("numeric") || mySQLDataType.StartsWith("double") || mySQLDataType.StartsWith("float") || mySQLDataType.StartsWith("real");
@@ -378,7 +576,66 @@ namespace MySQL.ForExcel
       return false;
     }
 
-    public static MySqlDbType NameToType(string typeName, bool unsigned, bool realAsFloat)
+    public static Type NameToType(string typeName, bool unsigned)
+    {
+      string upperType = typeName.ToUpper(CultureInfo.InvariantCulture);
+      switch (upperType)
+      {
+        case "CHAR":
+        case "VARCHAR":
+        case "SET":
+        case "ENUM":
+        case "TEXT":
+        case "MEDIUMTEXT":
+        case "TINYTEXT":
+        case "LONGTEXT":
+          return Type.GetType("System.String");
+        case "NUMERIC":
+        case "DECIMAL":
+        case "DEC":
+        case "FIXED":
+          return Type.GetType("System.Decimal");
+        case "INT":
+        case "INTEGER":
+        case "MEDIUMINT":
+        case "YEAR":
+          return (!unsigned || upperType == "YEAR" ? Type.GetType("System.Int32") : Type.GetType("System.UInt32"));
+        case "TINYINT":
+          return Type.GetType("System.Byte");
+        case "SMALLINT":
+          return (!unsigned ? Type.GetType("System.Int16") : Type.GetType("System.UInt16"));
+        case "BIGINT":
+          return (!unsigned ? Type.GetType("System.Int64") : Type.GetType("System.UInt64"));
+        case "BOOL":
+        case "BOOLEAN":
+        case "BIT(1)":
+          return Type.GetType("System.Boolean");
+        case "BIT":
+        case "SERIAL":
+          return Type.GetType("System.UInt64");
+        case "FLOAT":
+          return Type.GetType("System.Single");
+        case "DOUBLE":
+        case "REAL":
+          return Type.GetType("System.Double");
+        case "DATE":
+        case "DATETIME":
+        case "TIMESTAMP":
+          return Type.GetType("System.DateTime");
+        case "TIME":
+          return Type.GetType("System.TimeSpan");
+        case "BLOB":
+        case "LONGBLOB":
+        case "MEDIUMBLOB":
+        case "TINYBLOB":
+        case "BINARY":
+        case "VARBINARY":
+          return Type.GetType("System.Object");
+      }
+      throw new Exception("Unhandled type encountered");
+    }
+
+    public static MySqlDbType NameToMySQLType(string typeName, bool unsigned, bool realAsFloat)
     {
       switch (typeName.ToUpper(CultureInfo.InvariantCulture))
       {
@@ -397,7 +654,7 @@ namespace MySQL.ForExcel
           //if (connection.driver.Version.isAtLeast(5, 0, 3))
           //  return MySqlDbType.NewDecimal;
           //else
-            return MySqlDbType.Decimal;
+          return MySqlDbType.Decimal;
         case "YEAR":
           return MySqlDbType.Year;
         case "TIME":
@@ -468,8 +725,8 @@ namespace MySQL.ForExcel
       string strValue = packedValue.ToString();
       int strLength = strValue.Length;
       int decimalPointPos = strValue.IndexOf("."); ;
-      int[] varCharApproxLen = new int[7] {5,12,25,45,255,4000,VARCHAR_MAX_LEN};
-      int[,] decimalApproxLen = new int[2,2] { {12,2}, {65,30} };
+      int[] varCharApproxLen = new int[7] { 5, 12, 25, 45, 255, 4000, VARCHAR_MAX_LEN };
+      int[,] decimalApproxLen = new int[2, 2] { { 12, 2 }, { 65, 30 } };
       int intResult = 0;
       long longResult = 0;
       int intLen = 0;
@@ -593,145 +850,76 @@ namespace MySQL.ForExcel
       return retType;
     }
 
-    public static bool TableHasPrimaryKey(MySqlWorkbenchConnection connection, string tableName)
+    public static string GetConsistentDataTypeOnAllRows(string proposedStrippedDataType, List<string> rowsDataTypesList, int[] decimalMaxLen, int[] varCharMaxLen, out string consistentStrippedDataType)
     {
-      if (String.IsNullOrEmpty(tableName))
-        return false;
+      string fullDataType = proposedStrippedDataType;
+      bool typesConsistent = true;
 
-      string sql = String.Format("SHOW KEYS FROM {0} IN {1} WHERE Key_name = 'PRIMARY';", tableName, connection.Schema);
-      DataTable dt = GetDataFromTableOrView(connection, sql);
-      return (dt != null ? dt.Rows.Count > 0 : false);
-    }
-
-    public static bool TableExistsInSchema(MySqlWorkbenchConnection connection, string schemaName, string tableName)
-    {
-      if (String.IsNullOrEmpty(schemaName) || String.IsNullOrEmpty(tableName))
-        return false;
-
-      string sql = String.Format("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{0}' and table_name = '{1}'", schemaName, tableName);
-      object objCount = MySqlHelper.ExecuteScalar(GetConnectionString(connection), sql);
-      long retCount = (objCount != null ? (long)objCount : 0);
-      return (retCount > 0);
-    }
-
-    public static bool IndexExistsInSchema(MySqlWorkbenchConnection connection, string schemaName, string tableName, string indexName)
-    {
-      if (String.IsNullOrEmpty(schemaName) || String.IsNullOrEmpty(indexName))
-        return false;
-
-      DataTable dt = GetSchemaCollection(connection, "Indexes", null, schemaName, tableName, indexName);
-      return dt.Rows.Count > 0;
-    }
-
-    public static void SetDoubleBuffered(System.Windows.Forms.Control c)
-    {
-      if (SystemInformation.TerminalServerSession)
-        return;
-
-      PropertyInfo aProp =
-            typeof(System.Windows.Forms.Control).GetProperty(
-                  "DoubleBuffered",
-                  System.Reflection.BindingFlags.NonPublic |
-                  System.Reflection.BindingFlags.Instance);
-
-      aProp.SetValue(c, true, null);
-    }
-
-    public static Bitmap MakeGrayscale(Bitmap original)
-    {
-      // Create a blank bitmap the same size as original
-      Bitmap newBitmap = new Bitmap(original.Width, original.Height);
-
-      // Get a graphics object from the new image
-      Graphics g = Graphics.FromImage(newBitmap);
-
-      // Create the grayscale ColorMatrix
-      ColorMatrix colorMatrix = new ColorMatrix(
-         new float[][] 
+      typesConsistent = rowsDataTypesList.All(str => str == proposedStrippedDataType);
+      if (!typesConsistent)
       {
-         new float[] {.3f, .3f, .3f, 0, 0},
-         new float[] {.59f, .59f, .59f, 0, 0},
-         new float[] {.11f, .11f, .11f, 0, 0},
-         new float[] {0, 0, 0, 1, 0},
-         new float[] {0, 0, 0, 0, 1}
-      });
-
-      // Create some image attributes
-      ImageAttributes attributes = new ImageAttributes();
-
-      // Set the color matrix attribute
-      attributes.SetColorMatrix(colorMatrix);
-
-      // Draw the original image on the new image using the grayscale color matrix
-      g.DrawImage(original, new Rectangle(0, 0, original.Width, original.Height),
-         0, 0, original.Width, original.Height, GraphicsUnit.Pixel, attributes);
-
-      // Dispose the Graphics object
-      g.Dispose();
-      return newBitmap;
-    }
-
-    [DllImport("user32.dll")]
-    public static extern IntPtr CreateIconIndirect(ref IconInfo icon);
-
-    [DllImport("user32.dll")]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static extern bool GetIconInfo(IntPtr hIcon, ref IconInfo pIconInfo);
-
-    public static Cursor CreateCursor(Bitmap bmp, int xHotSpot, int yHotSpot)
-    {
-      IconInfo tmp = new IconInfo();
-      GetIconInfo(bmp.GetHicon(), ref tmp);
-      tmp.xHotspot = xHotSpot;
-      tmp.yHotspot = yHotSpot;
-      tmp.fIcon = false;
-      return new Cursor(CreateIconIndirect(ref tmp));
-    }
-
-    public static DialogResult ShowWarningBox(string warningMessage)
-    {
-      return MessageBox.Show(warningMessage, "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-    }
-
-    public static void ShowErrorBox(string errorMessage)
-    {
-      MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-    }
-
-    public static void ShowExceptionBox(Exception ex)
-    {
-      ShowErrorBox(ex.Message);
-    }
-
-    public static List<string> DataRowsToList(DataRowCollection rowCollection, string colName)
-    {
-      List<string> retList = null;
-
-      if (rowCollection != null && rowCollection.Count > 0)
-      {
-        foreach (DataRow dr in rowCollection)
+        if (rowsDataTypesList.Count(str => str == "Integer") + rowsDataTypesList.Count(str => str == "Bool") == rowsDataTypesList.Count)
         {
-          retList.Add(dr[colName].ToString());
+          typesConsistent = true;
+          fullDataType = "Integer";
+        }
+        else if (rowsDataTypesList.Count(str => str == "Integer") + rowsDataTypesList.Count(str => str == "BigInt") == rowsDataTypesList.Count)
+        {
+          typesConsistent = true;
+          fullDataType = "BigInt";
+        }
+        else if (rowsDataTypesList.Count(str => str == "Integer") + rowsDataTypesList.Count(str => str == "Decimal") == rowsDataTypesList.Count)
+        {
+          typesConsistent = true;
+          proposedStrippedDataType = "Decimal";
+        }
+        else if (rowsDataTypesList.Count(str => str == "Integer") + rowsDataTypesList.Count(str => str == "Decimal") + rowsDataTypesList.Count(str => str == "Double") == rowsDataTypesList.Count)
+        {
+          typesConsistent = true;
+          fullDataType = "Double";
         }
       }
 
-      return retList;
-    }
-
-    public static List<string> DataRowsToList(DataRow[] dataRows, string colName)
-    {
-      List<string> retList = null;
-
-      if (dataRows != null && dataRows.Length > 0)
-      {
-        foreach (DataRow dr in dataRows)
+      if (typesConsistent)
+        switch (proposedStrippedDataType)
         {
-          retList.Add(dr[colName].ToString());
+          case "Varchar":
+            consistentStrippedDataType = proposedStrippedDataType;
+            fullDataType = String.Format("Varchar({0})", varCharMaxLen[0]);
+            break;
+          case "Decimal":
+            consistentStrippedDataType = proposedStrippedDataType;
+            if (decimalMaxLen[0] > 12 || decimalMaxLen[1] > 2)
+            {
+              decimalMaxLen[0] = 65;
+              decimalMaxLen[1] = 30;
+            }
+            else
+            {
+              decimalMaxLen[0] = 12;
+              decimalMaxLen[1] = 2;
+            }
+            fullDataType = String.Format("Decimal({0}, {1})", decimalMaxLen[0], decimalMaxLen[1]);
+            break;
+          default:
+            consistentStrippedDataType = fullDataType;
+            break;
         }
+      else
+      {
+        consistentStrippedDataType = "Varchar";
+        fullDataType = String.Format("Varchar({0})", varCharMaxLen[1]);
       }
 
-      return retList;
+      return fullDataType;
     }
+
+    public static string GetConsistentDataTypeOnAllRows(string proposedStrippedDataType, List<string> rowsDataTypesList, int[] decimalMaxLen, int[] varCharMaxLen)
+    {
+      string outConsistentStrippedType;
+      return GetConsistentDataTypeOnAllRows(proposedStrippedDataType, rowsDataTypesList, decimalMaxLen, varCharMaxLen, out outConsistentStrippedType);
+    }
+
   }
 
   public struct IconInfo

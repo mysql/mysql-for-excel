@@ -36,7 +36,16 @@ namespace MySQL.ForExcel
     public string OperationDetailsText
     {
       get { return txtDetails.Text; }
-      set { txtDetails.Text = value; }
+      set 
+      {
+        if (!String.IsNullOrEmpty(value))
+        {
+          txtDetails.Text = value;
+          btnShowDetails.Visible = true;
+        }
+        else
+          btnShowDetails.Visible = false;
+      }
     }
     public bool WordWrapDetails
     {
@@ -50,10 +59,7 @@ namespace MySQL.ForExcel
       picLogo.Image = (operationSuccessful ? Properties.Resources.MySQLforExcel_InfoDlg_Success_64x64 : Properties.Resources.MySQLforExcel_InfoDlg_Error_64x64);
       OperationStatusText = (operationSuccessful ? "Operation Completed Successfully" : "An Error Ocurred");
       OperationSummaryText = operationSummary;
-      if (!String.IsNullOrEmpty(operationDetails))
-        txtDetails.Text = operationDetails;
-      else
-        btnShowDetails.Enabled = false;
+      OperationDetailsText = operationDetails;
       btnOK.Text = (operationSuccessful ? "OK" : "Back");
       OperationSummarySubText = String.Format("Press {0} to continue.", btnOK.Text);
       btnOK.DialogResult = (operationSuccessful ? DialogResult.OK : DialogResult.Cancel);
