@@ -14,7 +14,6 @@ namespace MySQL.ForExcel
   public partial class WelcomePanel : AutoStyleableBasePanel
   {
     private static string[] localValues = new string[] { string.Empty, "127.0.0.1", "localhost", "local" };
-    private MySqlWorkbenchConnectionCollection connCollection = new MySqlWorkbenchConnectionCollection();
 
     public WelcomePanel()
     {
@@ -31,8 +30,12 @@ namespace MySQL.ForExcel
 
     private void LoadConnections()
     {
+      MySqlWorkbench.Connections.Clear();
+      MySqlWorkbench.LoadData();
+
       foreach (TreeNode node in connectionList.Nodes)
         node.Nodes.Clear();
+
       foreach (MySqlWorkbenchConnection conn in MySqlWorkbench.Connections)
         AddConnectionToList(conn);
       if (connectionList.Nodes[0].GetNodeCount(true) > 0)
@@ -41,7 +44,6 @@ namespace MySQL.ForExcel
 
     private void AddConnectionToList(MySqlWorkbenchConnection conn)
     {
-      connCollection.Add(conn);
       int nodeIdx = 1;
       string hostName = (conn.Host ?? string.Empty).Trim();
       if (conn.DriverType == MySqlWorkbenchConnectionType.Ssh)
@@ -68,13 +70,9 @@ namespace MySQL.ForExcel
       DialogResult result = dlg.ShowDialog();
       if (result == DialogResult.Cancel) return;
 
-      // add it to our connection list
-      AddConnectionToList(dlg.NewConnection);
-
-      // now add it to the workbench connection list
-      connCollection.Save();
-      //MySqlWorkbench.Connections.Add(dlg.NewConnection);
-      //MySqlWorkbench.Connections.Save();
+      MySqlWorkbench.Connections.Add(dlg.NewConnection);
+      MySqlWorkbench.Connections.Save();
+      LoadConnections();
     }
 
     private void manageConnectionsLabel_Click(object sender, EventArgs e)
@@ -88,5 +86,30 @@ namespace MySQL.ForExcel
       MySqlWorkbenchConnection c = connectionList.SelectedNode.Tag as MySqlWorkbenchConnection;
       (Parent as TaskPaneControl).OpenConnection(c);
     }
+
+    private void connectionList_MouseClick(object sender, MouseEventArgs e)
+    {
+      if (e.Button == MouseButtons.Right)
+      {
+        ContextMenuStrip contextMenu = new ContextMenuStrip();
+
+        ToolStripMenuItem refreshItem = new ToolStripMenuItem("Refresh");
+        contextMenu.ShowImageMargin = false;
+        contextMenu.ShowCheckMargin = false;
+
+
+        refreshItem.Click += new EventHandler(refreshItem_Click);
+        contextMenu.Items.Clear();
+        contextMenu.Items.Add(refreshItem);
+
+        contextMenu.Show(connectionList, this.connectionList.PointToClient(Cursor.Position));
+      }
+    }
+
+    void refreshItem_Click(object sender, EventArgs e)
+    {
+      LoadConnections();
+    }
+
   }
 }

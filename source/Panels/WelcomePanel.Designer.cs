@@ -167,6 +167,7 @@
       this.connectionList.TitleColorOpacity = 0.8D;
       this.connectionList.TitleTextVerticalPixelsOffset = 2;
       this.connectionList.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.connectionList_NodeMouseDoubleClick);
+      this.connectionList.MouseClick += new System.Windows.Forms.MouseEventHandler(this.connectionList_MouseClick);
       // 
       // lblCopyright
       // 
@@ -281,8 +282,8 @@
       this.Name = "WelcomePanel";
       this.Size = new System.Drawing.Size(260, 625);
       this.UseSystemFont = false;
-      ((System.ComponentModel.ISupportInitialize)(this.picAddInLogoText)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.picAddInLogoText)).EndInit();
       this.ResumeLayout(false);
 
     }

@@ -571,7 +571,6 @@
       this.CommandAreaHeight = 45;
       this.Name = "NewConnectionDialog";
       this.Text = "Setup New Connection";
-      this.Load += new System.EventHandler(this.NewConnectionDialog_Load);
       this.contentAreaPanel.ResumeLayout(false);
       this.contentAreaPanel.PerformLayout();
       this.commandAreaPanel.ResumeLayout(false);

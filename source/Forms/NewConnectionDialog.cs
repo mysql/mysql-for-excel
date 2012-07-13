@@ -33,13 +33,14 @@ namespace MySQL.ForExcel
     private bool ValidateAndSave()
     {
       bool result = false;
-      // we need to validate things like port
+
       int validPort = 0;
       if (int.TryParse(WBconn.Port.ToString(), out validPort))
         result = true;
       else
         return false;
-      //More Validations
+
+      //TODO: Need to add More Validations
       return result;
     }
 
@@ -100,7 +101,9 @@ namespace MySQL.ForExcel
 
     private void connectionMethod_SelectedIndexChanged(object sender, EventArgs e)
     {
-      if (connectionMethod.SelectedIndex == 0)
+      bool standardConnection = (connectionMethod.SelectedIndex == 0);
+
+      if (standardConnection)
         WBconn.Host = "127.0.0.1";
       else
       {
@@ -114,29 +117,24 @@ namespace MySQL.ForExcel
       WBconn.UserName = "root";
       WBconn.Schema = "";
 
-      labelHelpHostName.Visible = (connectionMethod.SelectedIndex == 0);
-      labelPromptHostName.Enabled = (connectionMethod.SelectedIndex == 0);
-      labelPromptHostName.Visible = (connectionMethod.SelectedIndex == 0);
-      labelHelpHostName.Visible = (connectionMethod.SelectedIndex == 0);
-      labelPromptPort.Visible = (connectionMethod.SelectedIndex == 0);
-      labelPromptPort.Enabled = (connectionMethod.SelectedIndex == 0);
-      port.Enabled = (connectionMethod.SelectedIndex == 0);
-      port.Visible = (connectionMethod.SelectedIndex == 0);
+      labelHelpHostName.Visible = standardConnection;
+      labelPromptHostName.Enabled = standardConnection;
+      labelPromptHostName.Visible = standardConnection;
+      labelHelpHostName.Visible = standardConnection;
+      labelPromptPort.Visible = standardConnection;
+      labelPromptPort.Enabled = standardConnection;
+      port.Enabled = standardConnection;
+      port.Visible = standardConnection;
 
-      labelPromptSocket.Visible = !(connectionMethod.SelectedIndex == 0);
-      labelHelpSocket.Visible = !(connectionMethod.SelectedIndex == 0);
-      socketPath.Enabled = !(connectionMethod.SelectedIndex == 0);
-      socketPath.Visible = !(connectionMethod.SelectedIndex == 0);
+      labelPromptSocket.Visible = !standardConnection;
+      labelHelpSocket.Visible = !standardConnection;
+      socketPath.Enabled = !standardConnection;
+      socketPath.Visible = !standardConnection;
 
-      useCompression.Enabled = !(connectionMethod.SelectedIndex == 0);
-      labelCompression.Visible = !(connectionMethod.SelectedIndex == 0);
+      useCompression.Enabled = !standardConnection;
+      labelCompression.Visible = !standardConnection;
 
       bindingSource.ResetCurrentItem();
-    }
-
-    private void NewConnectionDialog_Load(object sender, EventArgs e)
-    {
-
     }
   }
 }
