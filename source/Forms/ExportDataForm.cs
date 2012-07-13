@@ -43,7 +43,9 @@ namespace MySQL.ForExcel
 
     private void refreshPrimaryKeyColumnsCombo()
     {
-      int selectedIndex = cmbPrimaryKeyColumns.SelectedIndex;
+      string selectedItem = null;
+      if (radUseExistingColumn.Checked)
+        selectedItem = (string)cmbPrimaryKeyColumns.SelectedItem;
       cmbPrimaryKeyColumns.Items.Clear();
       foreach (MySQLDataColumn mysqlCol in dataTable.Columns.OfType<MySQLDataColumn>().Skip(1))
       {
@@ -51,9 +53,7 @@ namespace MySQL.ForExcel
           continue;
         cmbPrimaryKeyColumns.Items.Add(mysqlCol.DisplayName);
       }
-      cmbPrimaryKeyColumns.SelectedIndex = selectedIndex;
-      if (selectedIndex < 0)
-        radAddPrimaryKey.Checked = true;
+      cmbPrimaryKeyColumns.SelectedItem = selectedItem;
     }
 
     private void LoadDataAndCreateColumns(Excel.Range exportDataRange, string proposedTableName)
@@ -490,7 +490,6 @@ namespace MySQL.ForExcel
     private void chkPrimaryKey_CheckedChanged(object sender, EventArgs e)
     {
       EnableChecks(chkPrimaryKey);
-      chkPrimaryKey.Focus();
     }
 
     private void chkCreateIndex_CheckedChanged(object sender, EventArgs e)
@@ -545,6 +544,7 @@ namespace MySQL.ForExcel
     private void chkExcludeColumn_Validated(object sender, EventArgs e)
     {
       refreshPrimaryKeyColumnsCombo();
+      EnableChecks(chkExcludeColumn);
     }
 
     private void chkPrimaryKey_Validated(object sender, EventArgs e)
@@ -644,10 +644,12 @@ namespace MySQL.ForExcel
       }
 
       chkExcludeColumn.Enabled = true;
-      chkPrimaryKey.Enabled = !chkExcludeColumn.Checked;
+      chkPrimaryKey.Enabled = !(chkExcludeColumn.Checked || radAddPrimaryKey.Checked);
       chkUniqueIndex.Enabled = !chkExcludeColumn.Checked;
       chkCreateIndex.Enabled = !(chkExcludeColumn.Checked || chkUniqueIndex.Checked || chkPrimaryKey.Checked);
       chkAllowEmpty.Enabled = !(chkExcludeColumn.Checked || chkPrimaryKey.Checked);
+      radUseExistingColumn.Enabled = !(dataTable.Columns.Cast<MySQLDataColumn>().Skip(1).All(i => i.ExcludeColumn));
+      cmbPrimaryKeyColumns.Enabled = radUseExistingColumn.Enabled && radUseExistingColumn.Checked;
 
       columnBindingSource.EndEdit();
     }
