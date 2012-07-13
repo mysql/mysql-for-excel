@@ -35,11 +35,7 @@ namespace MySQL.ForExcel
       TitleTextVerticalPixelsOffset = 0;
       DescriptionTextVerticalPixelsOffset = 0;
       this.Scrollable = true;
-
-      toolTipLowLevelNode = new ToolTip();
-      toolTipLowLevelNode.AutoPopDelay = 1000;
-      toolTipLowLevelNode.InitialDelay = 500;
-      toolTipLowLevelNode.SetToolTip(this, "");      
+      this.ShowNodeToolTips = true;      
     }
 
     public double TitleColorOpacity { get; set; }
@@ -72,30 +68,6 @@ namespace MySQL.ForExcel
       if (node != null)
         SelectedNode = node;
       base.OnMouseClick(e);
-    }
-
-    protected override void OnMouseMove(MouseEventArgs e)
-    {
-      TreeNode node = GetNodeAt(e.Location);      
- 
-      if ((node != null))
-      {
-        string[] parts = node.Text.Split((char)'|');
-        string tooltip = parts.Length >= 1 ? parts[0] : "";
-        
-        if (node.Level > 0 && tooltip != toolTipLowLevelNode.GetToolTip(this))
-          {
-            toolTipLowLevelNode.Active = true;                
-            toolTipLowLevelNode.SetToolTip(this, parts[0]);            
-            toolTipLowLevelNode.Show(tooltip, this);
-          }
-      }        
-      else
-      {
-        toolTipLowLevelNode.Active = false;
-      }
-
-      base.OnMouseHover(e);
     }
 
     protected override void OnFontChanged(EventArgs e)
@@ -202,7 +174,8 @@ namespace MySQL.ForExcel
         {
           e.Graphics.DrawString(parts[0], Font, titleBrush, pt.X, pt.Y);
         }
-        pt.Y += (int)(stringSize.Height) + DescriptionTextVerticalPixelsOffset;      
+        pt.Y += (int)(stringSize.Height) + DescriptionTextVerticalPixelsOffset;
+        e.Node.ToolTipText = parts[0];            
       }
 
       // Draw the description if there is one

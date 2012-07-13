@@ -40,24 +40,17 @@
       this.label1 = new System.Windows.Forms.Label();
       this.btnRenameMapping = new System.Windows.Forms.Button();
       this.btnDelete = new System.Windows.Forms.Button();
-      this.txtNewName = new System.Windows.Forms.TextBox();
-      this.picMappingNameWarning = new System.Windows.Forms.PictureBox();
-      this.lblMappingNameWarning = new System.Windows.Forms.Label();
       this.lstMappings = new System.Windows.Forms.ListView();
       this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.picMappingNameWarning)).BeginInit();
       this.SuspendLayout();
       // 
       // contentAreaPanel
       // 
       this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
       this.contentAreaPanel.Controls.Add(this.lstMappings);
-      this.contentAreaPanel.Controls.Add(this.lblMappingNameWarning);
-      this.contentAreaPanel.Controls.Add(this.picMappingNameWarning);
-      this.contentAreaPanel.Controls.Add(this.txtNewName);
       this.contentAreaPanel.Controls.Add(this.btnDelete);
       this.contentAreaPanel.Controls.Add(this.btnRenameMapping);
       this.contentAreaPanel.Controls.Add(this.label1);
@@ -200,7 +193,7 @@
       // btnRenameMapping
       // 
       this.btnRenameMapping.Enabled = false;
-      this.btnRenameMapping.Location = new System.Drawing.Point(257, 280);
+      this.btnRenameMapping.Location = new System.Drawing.Point(373, 290);
       this.btnRenameMapping.Name = "btnRenameMapping";
       this.btnRenameMapping.Size = new System.Drawing.Size(75, 25);
       this.btnRenameMapping.TabIndex = 12;
@@ -212,46 +205,13 @@
       // 
       this.btnDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.btnDelete.Enabled = false;
-      this.btnDelete.Location = new System.Drawing.Point(373, 332);
+      this.btnDelete.Location = new System.Drawing.Point(373, 321);
       this.btnDelete.Name = "btnDelete";
       this.btnDelete.Size = new System.Drawing.Size(75, 23);
       this.btnDelete.TabIndex = 13;
       this.btnDelete.Text = "Delete";
       this.btnDelete.UseVisualStyleBackColor = true;
       this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
-      // 
-      // txtNewName
-      // 
-      this.txtNewName.Location = new System.Drawing.Point(53, 283);
-      this.txtNewName.Name = "txtNewName";
-      this.txtNewName.Size = new System.Drawing.Size(198, 20);
-      this.txtNewName.TabIndex = 15;
-      this.txtNewName.TextChanged += new System.EventHandler(this.txtName_OnTextChanged);
-      this.txtNewName.Enter += new System.EventHandler(this.txtName_GotFocus);
-      // 
-      // picMappingNameWarning
-      // 
-      this.picMappingNameWarning.BackColor = System.Drawing.Color.Transparent;
-      this.picMappingNameWarning.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.picMappingNameWarning.Location = new System.Drawing.Point(56, 307);
-      this.picMappingNameWarning.Name = "picMappingNameWarning";
-      this.picMappingNameWarning.Size = new System.Drawing.Size(20, 20);
-      this.picMappingNameWarning.TabIndex = 39;
-      this.picMappingNameWarning.TabStop = false;
-      this.picMappingNameWarning.Visible = false;
-      // 
-      // lblMappingNameWarning
-      // 
-      this.lblMappingNameWarning.AutoSize = true;
-      this.lblMappingNameWarning.BackColor = System.Drawing.Color.Transparent;
-      this.lblMappingNameWarning.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblMappingNameWarning.ForeColor = System.Drawing.Color.Red;
-      this.lblMappingNameWarning.Location = new System.Drawing.Point(82, 312);
-      this.lblMappingNameWarning.Name = "lblMappingNameWarning";
-      this.lblMappingNameWarning.Size = new System.Drawing.Size(189, 12);
-      this.lblMappingNameWarning.TabIndex = 40;
-      this.lblMappingNameWarning.Text = "New name for column mapping  already exists.";
-      this.lblMappingNameWarning.Visible = false;
       // 
       // lstMappings
       // 
@@ -260,10 +220,10 @@
             this.columnHeader2});
       this.lstMappings.FullRowSelect = true;
       this.lstMappings.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-      this.lstMappings.Location = new System.Drawing.Point(53, 333);
+      this.lstMappings.Location = new System.Drawing.Point(53, 290);
       this.lstMappings.MultiSelect = false;
       this.lstMappings.Name = "lstMappings";
-      this.lstMappings.Size = new System.Drawing.Size(314, 84);
+      this.lstMappings.Size = new System.Drawing.Size(314, 127);
       this.lstMappings.TabIndex = 43;
       this.lstMappings.UseCompatibleStateImageBehavior = false;
       this.lstMappings.View = System.Windows.Forms.View.Details;
@@ -295,7 +255,6 @@
       this.contentAreaPanel.ResumeLayout(false);
       this.contentAreaPanel.PerformLayout();
       this.commandAreaPanel.ResumeLayout(false);
-      ((System.ComponentModel.ISupportInitialize)(this.picMappingNameWarning)).EndInit();
       this.ResumeLayout(false);
 
     }
@@ -314,9 +273,6 @@
     private System.Windows.Forms.Button btnDelete;
     private System.Windows.Forms.Button btnRenameMapping;
     private System.Windows.Forms.Label label1;
-    private System.Windows.Forms.TextBox txtNewName;
-    private System.Windows.Forms.PictureBox picMappingNameWarning;
-    private System.Windows.Forms.Label lblMappingNameWarning;
     private System.Windows.Forms.ListView lstMappings;
     private System.Windows.Forms.ColumnHeader columnHeader1;
     private System.Windows.Forms.ColumnHeader columnHeader2;

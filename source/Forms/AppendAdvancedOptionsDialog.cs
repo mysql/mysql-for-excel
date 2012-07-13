@@ -54,12 +54,13 @@ namespace MySQL.ForExcel
 
       if (lstMappings.Items.Count > 0)
       {
-        lstMappings.Items[0].Selected = true;
-        lstMappings.Focus();
-        btnDelete.Enabled = true;        
+        lstMappings.Items[0].Selected = true;                
       }
-
-      btnRenameMapping.Enabled = false;      
+      else
+      {
+        btnDelete.Enabled = false;
+        btnRenameMapping.Enabled = false;      
+      }
     }
 
     private void btnDelete_Click(object sender, EventArgs e)
@@ -75,51 +76,49 @@ namespace MySQL.ForExcel
       btnDelete.Enabled = lstMappings.SelectedItems.Count > 0;      
       selectedMapping = lstMappings.SelectedItems.Count > 0 ? lstMappings.SelectedItems[0].Tag as MySQLColumnMapping : null;
 
-      if (selectedMapping != null)
-      {
-        txtNewName.Text = selectedMapping.Name;
-        txtNewName.SelectionStart = 0;
-        txtNewName.SelectionLength = txtNewName.Text.Length;
-
-        if (selectedMapping.Name.Equals(txtNewName.Text))
-          btnRenameMapping.Enabled = false;
-      }
+      if (selectedMapping != null)      
+        btnRenameMapping.Enabled = true;
+      
     }
 
     private void btnRenameMapping_Click(object sender, EventArgs e)
     {
       if (selectedMapping == null) return;
+      var indexForName = 1;
+      
+      string proposedMappingName = String.Empty;
+      do
+      {
+        proposedMappingName = String.Format("{0}Mapping{1}", selectedMapping.TableName, (indexForName > 1 ? indexForName.ToString() : String.Empty));
+        indexForName++;
+      }
+      while (mappings.UserColumnMappingsList.Any(mapping => mapping.Name == proposedMappingName));
+
+      var newColumnMappingName = new AppendNewColumnMappingDialog(proposedMappingName);
+      DialogResult dr = newColumnMappingName.ShowDialog();
+      if (dr == DialogResult.Cancel)
+        return;
+
+      var newName = newColumnMappingName.ColumnMappingName;
+       
+      newColumnMappingName.Dispose();
 
       // show error if name already exists
-      if (mappings.UserColumnMappingsList.Where(t => t.Name.Equals(txtNewName.Text)).Count() > 0)
+      if (mappings.UserColumnMappingsList.Where(t => t.Name.Equals(newName)).Count() > 0)
       {
-        lblMappingNameWarning.Visible = true;
-        picMappingNameWarning.Visible = true;        
-        txtNewName.SelectionStart = 0;
-        txtNewName.SelectionLength = txtNewName.Text.Length;
-        txtNewName.Focus();
+        InfoDialog infoDialog = new InfoDialog(false, "Name is already in use", String.Format(@"Description Error: \""{0}\""", "Please try a different name for the mapping."));
+        infoDialog.ShowDialog();
         return;      
-      }      
-      mappings.Rename(selectedMapping, txtNewName.Text);
+      }
+
+      mappings.Rename(selectedMapping, newName);
       RefreshMappingList();
-      ListViewItem item = lstMappings.FindItemWithText(string.Format("{0} ({1}.{2})", txtNewName.Text , selectedMapping.SchemaName, selectedMapping.TableName));
+      ListViewItem item = lstMappings.FindItemWithText(string.Format("{0} ({1}.{2})", newName, selectedMapping.SchemaName, selectedMapping.TableName));
       if (item != null)
       {
         lstMappings.Items[item.Index].Selected = true;
       }
       lstMappings.Focus();
-    }
-
-    private void txtName_OnTextChanged(object sender, EventArgs e)
-    {
-      if (!txtNewName.Text.Equals(selectedMapping.Name))
-        btnRenameMapping.Enabled = true;
-    }
-
-    private void txtName_GotFocus(object sender, EventArgs e)
-    {            
-      txtNewName.SelectionStart = 0;
-      txtNewName.SelectionLength = txtNewName.Text.Length;
-    }
+    }    
   }
 }

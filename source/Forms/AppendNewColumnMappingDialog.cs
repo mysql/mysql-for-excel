@@ -20,6 +20,7 @@ namespace MySQL.ForExcel
     public AppendNewColumnMappingDialog(string proposedMappingName)
     {
       InitializeComponent();
+      txtMappingName.Text = proposedMappingName;
       txtMappingName.SelectAll();
     }
 
