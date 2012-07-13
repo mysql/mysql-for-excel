@@ -390,9 +390,9 @@ namespace MySQL.ForExcel
         showValidationWarning("ColumnOptionsWarning", !String.IsNullOrEmpty(warningText), warningText);
       }
       grpColumnOptions.Enabled = grdPreviewData.SelectedColumns.Count > 0;
-      chkUniqueIndex.Enabled = chkCreateIndex.Enabled = chkExcludeColumn.Enabled = chkAllowEmpty.Enabled = !grdPreviewData.Columns[0].Selected;
-      chkPrimaryKey.Enabled = !radAddPrimaryKey.Checked;
-      chkExcludeColumn.Enabled = chkUniqueIndex.Enabled = chkCreateIndex.Enabled = !chkPrimaryKey.Checked;
+      EnableChecks(null);
+      if (grdPreviewData.Columns[0].Selected)
+        chkUniqueIndex.Enabled = chkCreateIndex.Enabled = chkExcludeColumn.Enabled = chkAllowEmpty.Enabled = chkPrimaryKey.Enabled = false;
     }
 
     private void cmbPrimaryKeyColumns_SelectedIndexChanged(object sender, EventArgs e)
@@ -410,7 +410,7 @@ namespace MySQL.ForExcel
       if (grdPreviewData.Columns[cmbPrimaryKeyColumns.SelectedIndex + 1].Selected)
       {
         columnBindingSource.ResetCurrentItem();
-        chkExcludeColumn.Enabled = chkUniqueIndex.Enabled = chkCreateIndex.Enabled = !chkPrimaryKey.Checked;
+        EnableChecks(chkPrimaryKey);
       }
       else
       {
@@ -447,6 +447,7 @@ namespace MySQL.ForExcel
 
     private void chkUniqueIndex_CheckedChanged(object sender, EventArgs e)
     {
+      EnableChecks(chkUniqueIndex);
       MySQLDataColumn currentCol = columnBindingSource.Current as MySQLDataColumn;
       if (chkUniqueIndex.Checked == currentCol.UniqueKey)
         return;
@@ -476,38 +477,25 @@ namespace MySQL.ForExcel
           column.WarningTextList.Add(Resources.ColumnDataNotUniqueWarning);
       showValidationWarning("ColumnOptionsWarning", !good, warningText);
       gridCol.DefaultCellStyle.BackColor = good ? grdPreviewData.DefaultCellStyle.BackColor : Color.OrangeRed;
-      if (chkUniqueIndex.Checked && !chkCreateIndex.Checked)
-        chkCreateIndex.Checked = true;
-      if (chkAllowEmpty.Checked && chkUniqueIndex.Checked)
-        chkAllowEmpty.Checked = false;
       currentCol.UniqueKey = chkUniqueIndex.Checked;
     }
 
     private void chkExcludeColumn_CheckedChanged(object sender, EventArgs e)
     {
-      if (chkExcludeColumn.Checked == (columnBindingSource.Current as MySQLDataColumn).ExcludeColumn)
-        return;
+      EnableChecks(chkExcludeColumn);
       DataGridViewColumn gridCol = grdPreviewData.SelectedColumns[0];
       gridCol.DefaultCellStyle.BackColor = chkExcludeColumn.Checked ? Color.LightGray : grdPreviewData.DefaultCellStyle.BackColor;
     }
 
     private void chkPrimaryKey_CheckedChanged(object sender, EventArgs e)
     {
-      if (chkPrimaryKey.Checked == (columnBindingSource.Current as MySQLDataColumn).PrimaryKey)
-        return;
-      if (chkExcludeColumn.Checked && chkPrimaryKey.Checked)
-        chkExcludeColumn.Checked = chkUniqueIndex.Checked = chkCreateIndex.Checked = false;
-      if (chkAllowEmpty.Checked && chkPrimaryKey.Checked)
-        chkAllowEmpty.Checked = false;
-      chkExcludeColumn.Enabled = chkUniqueIndex.Enabled = chkCreateIndex.Enabled = !chkPrimaryKey.Checked;
+      EnableChecks(chkPrimaryKey);
+      chkPrimaryKey.Focus();
     }
 
     private void chkCreateIndex_CheckedChanged(object sender, EventArgs e)
     {
-      if (chkCreateIndex.Checked == (columnBindingSource.Current as MySQLDataColumn).CreateIndex)
-        return;
-      if (Settings.Default.ExportAutoAllowEmptyNonIndexColumns && !chkCreateIndex.Checked)
-        chkAllowEmpty.Checked = true;
+      EnableChecks(chkCreateIndex);
     }
 
     private void grdPreviewData_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
@@ -634,5 +622,34 @@ namespace MySQL.ForExcel
         chkCreateIndex.Checked = true;
     }
 
+    private void EnableChecks(CheckBox control)
+    {
+      MySQLDataColumn column = columnBindingSource.Current as MySQLDataColumn;
+
+      if (control == chkPrimaryKey && control.Checked)
+      {
+        chkCreateIndex.Checked = false;
+        chkUniqueIndex.Checked = false;
+        chkAllowEmpty.Checked = false;
+      }
+      if (control == chkUniqueIndex && control.Checked)
+      {
+        chkPrimaryKey.Checked = false;
+        chkCreateIndex.Checked = true;
+      }
+      if (control == chkCreateIndex && !control.Checked)
+      {
+        if (Settings.Default.ExportAutoAllowEmptyNonIndexColumns)
+          chkAllowEmpty.Checked = true;
+      }
+
+      chkExcludeColumn.Enabled = true;
+      chkPrimaryKey.Enabled = !chkExcludeColumn.Checked;
+      chkUniqueIndex.Enabled = !chkExcludeColumn.Checked;
+      chkCreateIndex.Enabled = !(chkExcludeColumn.Checked || chkUniqueIndex.Checked || chkPrimaryKey.Checked);
+      chkAllowEmpty.Enabled = !(chkExcludeColumn.Checked || chkPrimaryKey.Checked);
+
+      columnBindingSource.EndEdit();
+    }
   }
 }
