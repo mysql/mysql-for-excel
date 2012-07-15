@@ -30,7 +30,7 @@ namespace MySQL.ForExcel
         proposedTableName = exportingWorksheetName.ToLower().Replace(' ', '_');
       Text = String.Format("Export Data - {0} [{1}])", exportingWorksheetName, exportDataRange.Address.Replace("$", String.Empty));
 
-      LoadDataAndCreateColumns(exportDataRange, proposedTableName);
+      LoadDataAndCreateColumns(exportDataRange, wbConnection.Schema, proposedTableName);
       initializeDataTypeCombo();
 
       if (!String.IsNullOrEmpty(proposedTableName))
@@ -56,11 +56,12 @@ namespace MySQL.ForExcel
       cmbPrimaryKeyColumns.SelectedItem = selectedItem;
     }
 
-    private void LoadDataAndCreateColumns(Excel.Range exportDataRange, string proposedTableName)
+    private void LoadDataAndCreateColumns(Excel.Range exportDataRange, string schemaName, string proposedTableName)
     {
       if (exportDataRange != null)
       {
-        dataTable = new MySQLDataTable(proposedTableName,
+        dataTable = new MySQLDataTable(schemaName,
+                                       proposedTableName,
                                        exportDataRange,
                                        true,
                                        Settings.Default.ExportUseFormattedValues, 
@@ -225,7 +226,6 @@ namespace MySQL.ForExcel
     private void btnCopySQL_Click(object sender, EventArgs e)
     {
       StringBuilder queryString = new StringBuilder();
-      queryString.AppendFormat("USE `{0}`;{1}", wbConnection.Schema, Environment.NewLine);
       queryString.Append(dataTable.GetCreateSQL(true));
       queryString.AppendFormat(";{0}", Environment.NewLine);
       queryString.Append(dataTable.GetInsertSQL(100, true));
@@ -305,7 +305,7 @@ namespace MySQL.ForExcel
     private void chkFirstRowHeaders_CheckedChanged(object sender, EventArgs e)
     {
       dataTable.FirstRowIsHeaders = chkFirstRowHeaders.Checked;
-      LoadDataAndCreateColumns(null, null);
+      LoadDataAndCreateColumns(null, null, null);
       grdPreviewData.CurrentCell = null;
       grdPreviewData.Rows[0].Visible = !chkFirstRowHeaders.Checked;
       if (chkFirstRowHeaders.Checked && grdPreviewData.Rows.Count < 2)

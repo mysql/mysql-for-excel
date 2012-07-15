@@ -215,6 +215,9 @@
     <Compile Include="Classes\DBObject.cs" />
     <Compile Include="Classes\MySQLColumnMapping.cs" />
     <Compile Include="Classes\MySQLColumnMappingList.cs" />
+    <Compile Include="Classes\MySQLDataColumn.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Classes\MySQLDataTable.cs">
       <SubType>Component</SubType>
     </Compile>

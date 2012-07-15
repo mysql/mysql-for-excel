@@ -95,6 +95,60 @@ namespace MySQL.ForExcel
     {
       ShowErrorBox(ex.Message);
     }
+
+    public static int IndexOfStringInArray(string[] stringArray, string stringElement, bool caseSensitive)
+    {
+      int index = -1;
+      if (!caseSensitive)
+        stringElement = stringElement.ToLowerInvariant();
+
+      if (stringArray != null)
+        for (int i = 0; i < stringArray.Length; i++)
+        {
+          bool areEqual = stringElement == (caseSensitive ? stringArray[i] : stringArray[i].ToLowerInvariant());
+          if (areEqual)
+          {
+            index = i;
+            break;
+          }
+        }
+      return index;
+    }
+
+    public static int IndexOfIntInArray(int[] intArray, int intElement)
+    {
+      int index = -1;
+
+      if (intArray != null)
+        for (int i = 0; i < intArray.Length; i++)
+          if (intArray[i] == intElement)
+          {
+            index = i;
+            break;
+          }
+
+      return index;
+    }
+
+    public static bool SaveSettings()
+    {
+      try
+      {
+        for (int i = 0; i < 3; i++)
+        {
+          Properties.Settings.Default.Save();
+          break;
+        }
+      }
+      catch (Exception ex)
+      {
+        InfoDialog infoDialog = new InfoDialog(false, "An error ocurred when savings user settings file", String.Format(@"Description Error: \""{0}\""", ex.Message));
+        infoDialog.ShowDialog();
+        return false;
+      }
+      return true;
+    }
+
   }
 
   public static class MySQLDataUtilities
@@ -126,7 +180,7 @@ namespace MySQL.ForExcel
           switch (collection.ToUpperInvariant())
           {
             case "COLUMNS SHORT":
-              mysqlAdapter = new MySqlDataAdapter(String.Format("SHOW COLUMNS FROM {0}.{1}", restrictions[1], restrictions[2]), conn);
+              mysqlAdapter = new MySqlDataAdapter(String.Format("SHOW COLUMNS FROM `{0}`.`{1}`", restrictions[1], restrictions[2]), conn);
               dt = new DataTable();
               mysqlAdapter.Fill(dt);
               break;
@@ -164,25 +218,12 @@ namespace MySQL.ForExcel
       return dt;
     }
 
-    public static DataTable GetDataFromDbObject(MySqlWorkbenchConnection connection, DBObject dbo)
-    {
-      string sql;
-      if (dbo.Type == DBObjectType.Routine)
-        sql = String.Format("CALL `{0}`", dbo.Name);
-      else
-        sql = String.Format("SELECT * FROM `{0}`", dbo.Name);
-
-      DataSet ds = MySqlHelper.ExecuteDataset(GetConnectionString(connection), sql);
-      if (ds.Tables.Count == 0) return null;
-      return ds.Tables[0];
-    }
-
     public static long GetRowsCountFromTableOrView(MySqlWorkbenchConnection connection, DBObject dbo)
     {
       if (dbo.Type == DBObjectType.Routine)
         return 0;
 
-      string sql = String.Format("SELECT COUNT(*) FROM `{0}`", dbo.Name);
+      string sql = String.Format("SELECT COUNT(*) FROM `{0}`.`{1}`", connection.Schema, dbo.Name);
       object objCount = MySqlHelper.ExecuteScalar(GetConnectionString(connection), sql);
       long retCount = (objCount != null ? (long)objCount : 0);
       return retCount;
@@ -204,7 +245,7 @@ namespace MySQL.ForExcel
         dt.ExtendedProperties.Add("TableName", tableName);
     }
 
-    private static string assembleSelectQuery(DBObject dbo, List<string> columnsList, int firstRowIdx, int rowCount)
+    private static string assembleSelectQuery(string schemaName, DBObject dbo, List<string> columnsList, int firstRowIdx, int rowCount)
     {
       StringBuilder queryStringBuilder = new StringBuilder("SELECT ");
       if (columnsList == null || columnsList.Count == 0)
@@ -217,7 +258,7 @@ namespace MySQL.ForExcel
         }
         queryStringBuilder.Remove(queryStringBuilder.Length - 1, 1);
       }
-      queryStringBuilder.AppendFormat(" FROM `{0}`", dbo.Name);
+      queryStringBuilder.AppendFormat(" FROM `{0}`.`{1}`", schemaName, dbo.Name);
       if (firstRowIdx > 0)
       {
         string strCount = (rowCount >= 0 ? rowCount.ToString() : "18446744073709551615");
@@ -245,7 +286,7 @@ namespace MySQL.ForExcel
       if (dbo.Type == DBObjectType.Routine)
         return null;
 
-      string queryString = assembleSelectQuery(dbo, columnsList, firstRowIdx, rowCount);
+      string queryString = assembleSelectQuery(connection.Schema, dbo, columnsList, firstRowIdx, rowCount);
       return GetDataFromTableOrView(connection, queryString);
     }
 
@@ -254,35 +295,13 @@ namespace MySQL.ForExcel
       return GetDataFromTableOrView(connection, dbo, columnsList, -1, -1);
     }
 
-    public static MySqlDataAdapter GetDataAdapterFromTable(MySqlWorkbenchConnection connection, string query)
-    {
-      MySqlDataAdapter retAdapter = new MySqlDataAdapter(query, GetConnectionString(connection));
-      MySqlCommandBuilder commandBuilder = new MySqlCommandBuilder(retAdapter);
-      retAdapter.UpdateCommand = commandBuilder.GetUpdateCommand();
-      return retAdapter;
-    }
-
-    public static MySqlDataAdapter GetDataAdapterFromTable(MySqlWorkbenchConnection connection, DBObject dbo, List<string> columnsList, int firstRowIdx, int rowCount)
-    {
-      if (dbo.Type != DBObjectType.Table)
-        return null;
-
-      string queryString = assembleSelectQuery(dbo, columnsList, firstRowIdx, rowCount);
-      return GetDataAdapterFromTable(connection, queryString);
-    }
-
-    public static MySqlDataAdapter GetDataAdapterFromTable(MySqlWorkbenchConnection connection, DBObject dbo, List<string> columnsList)
-    {
-      return GetDataAdapterFromTable(connection, dbo, columnsList, -1, -1);
-    }
-
     public static DataSet GetDataSetFromRoutine(MySqlWorkbenchConnection connection, DBObject dbo, params MySqlParameter[] parameters)
     {
       DataSet retDS = null;
 
       if (dbo.Type == DBObjectType.Routine)
       {
-        string sql = String.Format("`{0}`", dbo.Name);
+        string sql = String.Format("`{0}`.`{1}`", connection.Schema, dbo.Name);
         retDS = ExecuteDatasetSP(GetConnectionString(connection), sql, parameters);
       }
 
@@ -332,7 +351,7 @@ namespace MySQL.ForExcel
       if (String.IsNullOrEmpty(tableName))
         return false;
 
-      string sql = String.Format("SHOW KEYS FROM {0} IN {1} WHERE Key_name = 'PRIMARY';", tableName, connection.Schema);
+      string sql = String.Format("SHOW KEYS FROM `{0}` IN `{1}` WHERE Key_name = 'PRIMARY';", tableName, connection.Schema);
       DataTable dt = GetDataFromTableOrView(connection, sql);
       return (dt != null ? dt.Rows.Count > 0 : false);
     }
@@ -454,18 +473,21 @@ namespace MySQL.ForExcel
       }
       if (strippedType2 == strippedType1)
         return true;
+      bool type2IsChar = strippedType2.Contains("char");
+      bool type2IsText = strippedType2.Contains("text");
+      if (type2IsChar || type2IsText)
+        return true;
+      bool type1IsChar = strippedType1.Contains("char");
 
       bool type1IsInt = strippedType1.Contains("int");
       bool type2IsInt = strippedType2.Contains("int");
       bool type1IsDecimal = strippedType1 == "float" || strippedType1 == "numeric" || strippedType1 == "decimal" || strippedType1 == "real" || strippedType1 == "double";
       bool type2IsDecimal = strippedType2 == "float" || strippedType2 == "numeric" || strippedType2 == "decimal" || strippedType2 == "real" || strippedType2 == "double";
-      if (type1IsInt && (type2IsInt || type2IsDecimal))
+      if ((type1IsInt || strippedType1 == "year") && (type2IsInt || type2IsDecimal || strippedType2 == "year"))
         return true;
       if (type1IsDecimal && type2IsDecimal)
         return true;
 
-      if (strippedType1.Contains("char") && strippedType2.Contains("char"))
-        return true;
       if ((strippedType1.Contains("bool") || strippedType1 == "tinyint" || strippedType1 == "bit") && (strippedType2.Contains("bool") || strippedType2 == "tinyint" || strippedType2 == "bit"))
         return true;
 
@@ -476,13 +498,9 @@ namespace MySQL.ForExcel
 
       if (strippedType1 == "time" && strippedType2 == "time")
         return true;
-      if (strippedType1.Contains("text") && strippedType2.Contains("text"))
-        return true;
       if (strippedType1.Contains("blob") && strippedType2.Contains("blob"))
         return true;
       if (strippedType1.Contains("binary") && strippedType2.Contains("binary"))
-        return true;
-      if ((strippedType1 == "enum" || strippedType1 == "set") && strippedType2.Contains("char"))
         return true;
       return false;
     }

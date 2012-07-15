@@ -106,8 +106,7 @@ namespace MySQL.ForExcel
 
         if (mysqlCol.PrimaryKey)
           wClauseString.AppendFormat("{0}`{1}`=@W_Column{2}", (mysqlCol.Ordinal == 0 ? String.Empty : wClauseSeparator), mysqlCol.ColumnName, colSuffix);
-        
-        if (editMySQLDataTable.PrimaryKey == null)
+        else if (editMySQLDataTable.PrimaryKey == null)
           wClauseString.AppendFormat("{0}`{1}`=@W_Column{2}", (mysqlCol.Ordinal == 0 ? String.Empty : wClauseSeparator), mysqlCol.ColumnName, colSuffix);
 
         updateParam = new MySqlParameter(String.Format("@S_Column{0}", colSuffix), mysqlColType);

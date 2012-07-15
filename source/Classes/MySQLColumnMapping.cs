@@ -80,6 +80,22 @@ namespace MySQL.ForExcel
     {
     }
 
+    public MySQLColumnMapping(MySQLColumnMapping likeMapping, string[] newSourceColNames, string[] newTargetColNames) 
+      : this(likeMapping.Name, newSourceColNames, newTargetColNames)
+    {
+      SchemaName = likeMapping.SchemaName;
+      TableName = likeMapping.TableName;
+      ConnectionName = likeMapping.ConnectionName;
+      Port = likeMapping.Port;
+    }
+
+    public MySQLColumnMapping(MySQLColumnMapping likeMapping)
+      : this(likeMapping, likeMapping.SourceColumns, likeMapping.TargetColumns)
+    {
+      for (int idx = 0; idx < likeMapping.MappedSourceIndexes.Length; idx++)
+        MappedSourceIndexes[idx] = likeMapping.MappedSourceIndexes[idx];
+    }
+
     public void ClearMappings()
     {
       if (MappedSourceIndexes != null && TargetColumns != null)
@@ -115,34 +131,19 @@ namespace MySQL.ForExcel
       return (TargetColumns != null ? GetMatchingColumnsQuantity(dataTable, sameOrdinals) == TargetColumns.Length : false);
     }
 
-    public int MatchWithOtherColumnMapping(MySQLColumnMapping otherColMapping, bool enforceSchemaAndTableEquality)
+    public int GetSourceColumnIndex(string colName)
     {
-      int columnsMatched = 0;
+      return MiscUtilities.IndexOfStringInArray(SourceColumns, colName, true);
+    }
 
-      if (enforceSchemaAndTableEquality && otherColMapping.SchemaName.ToLowerInvariant() != SchemaName.ToLowerInvariant() && otherColMapping.TableName.ToLowerInvariant() != TableName.ToLowerInvariant())
-        return columnsMatched;
+    public int GetTargetColumnIndex(string colName)
+    {
+      return MiscUtilities.IndexOfStringInArray(TargetColumns, colName, true);
+    }
 
-      ClearMappings();
-      for (int thisTargetIdx = 0; thisTargetIdx < TargetColumns.Length; thisTargetIdx++)
-      {
-        string thisTargetColName = TargetColumns[thisTargetIdx].ToLowerInvariant();
-        int foundAtOtherTargetIndex = -1;
-        for (int otherTargetIdx = 0; otherTargetIdx < otherColMapping.TargetColumns.Length; otherTargetIdx++)
-        {
-          if (otherColMapping.TargetColumns[otherTargetIdx].ToLowerInvariant() == thisTargetColName)
-          {
-            foundAtOtherTargetIndex = otherTargetIdx;
-            break;
-          }
-        }
-        if (foundAtOtherTargetIndex >= 0)
-        {
-          MappedSourceIndexes[thisTargetIdx] = otherColMapping.MappedSourceIndexes[foundAtOtherTargetIndex];
-          columnsMatched++;
-        }
-      }
-
-      return columnsMatched;
+    public int GetMappedSourceIndexIndex(int sourceIndex)
+    {
+      return MiscUtilities.IndexOfIntInArray(MappedSourceIndexes, sourceIndex);
     }
   }
 
