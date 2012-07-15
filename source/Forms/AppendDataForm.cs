@@ -167,7 +167,7 @@ namespace MySQL.ForExcel
             break;
           MySQLDataColumn fromCol = fromMySQLDataTable.Columns[colIdx] as MySQLDataColumn;
           MySQLDataColumn toCol = toMySQLDataTable.Columns[colIdx] as MySQLDataColumn;
-          if (DataTypeUtilities.Type1FitsIntoType2(toCol.StrippedMySQLDataType, fromCol.StrippedMySQLDataType))
+          if (DataTypeUtilities.Type1FitsIntoType2(fromCol.StrippedMySQLDataType, toCol.StrippedMySQLDataType))
           {
             autoMapping.MappedSourceIndexes[colIdx] = colIdx;
             autoMappedColumns++;

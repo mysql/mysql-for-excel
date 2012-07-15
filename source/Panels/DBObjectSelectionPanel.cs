@@ -186,6 +186,7 @@ namespace MySQL.ForExcel
       {
         objectList.Nodes[0].Nodes.Clear();
         LoadDataObjects(DBObjectType.Table);
+        objectList_AfterSelect(objectList, new TreeViewEventArgs(null));
       }
     }
 
