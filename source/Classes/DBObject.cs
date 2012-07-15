@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace MySQL.ForExcel
 {
-  public enum DBObjectType { Routine = 0, Table = 1, View = 2 };
+  public enum DBObjectType { Table = 0, View = 1, Routine = 2 };
   public enum RoutineType { None, Procedure, Function };
 
   public class DBObject

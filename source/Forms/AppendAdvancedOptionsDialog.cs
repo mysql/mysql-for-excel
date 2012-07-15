@@ -75,15 +75,13 @@ namespace MySQL.ForExcel
     {
       btnDelete.Enabled = lstMappings.SelectedItems.Count > 0;      
       selectedMapping = lstMappings.SelectedItems.Count > 0 ? lstMappings.SelectedItems[0].Tag as MySQLColumnMapping : null;
-
-      if (selectedMapping != null)      
-        btnRenameMapping.Enabled = true;
-      
+      btnRenameMapping.Enabled = selectedMapping != null;
     }
 
     private void btnRenameMapping_Click(object sender, EventArgs e)
     {
-      if (selectedMapping == null) return;
+      if (selectedMapping == null)
+        return;
       var indexForName = 1;
       
       string proposedMappingName = String.Empty;

@@ -57,14 +57,14 @@
       this.contentAreaPanel.Controls.Add(this.chkAddBufferToVarchar);
       this.contentAreaPanel.Controls.Add(this.chkDetectDatatype);
       this.contentAreaPanel.Controls.Add(this.lblColumnDatatypeOptions);
-      this.contentAreaPanel.Size = new System.Drawing.Size(534, 265);
+      this.contentAreaPanel.Size = new System.Drawing.Size(544, 269);
       // 
       // commandAreaPanel
       // 
       this.commandAreaPanel.Controls.Add(this.btnAccept);
       this.commandAreaPanel.Controls.Add(this.btnCancel);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 265);
-      this.commandAreaPanel.Size = new System.Drawing.Size(534, 45);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 269);
+      this.commandAreaPanel.Size = new System.Drawing.Size(544, 45);
       // 
       // btnAccept
       // 
@@ -97,7 +97,7 @@
       this.chkShowCopySQLButton.Location = new System.Drawing.Point(53, 294);
       this.chkShowCopySQLButton.Name = "chkShowCopySQLButton";
       this.chkShowCopySQLButton.Size = new System.Drawing.Size(152, 19);
-      this.chkShowCopySQLButton.TabIndex = 8;
+      this.chkShowCopySQLButton.TabIndex = 9;
       this.chkShowCopySQLButton.Text = "Show Copy SQL Button";
       this.chkShowCopySQLButton.UseVisualStyleBackColor = false;
       this.chkShowCopySQLButton.Visible = false;
@@ -111,7 +111,7 @@
       this.lblOtherOptions.Location = new System.Drawing.Point(24, 265);
       this.lblOtherOptions.Name = "lblOtherOptions";
       this.lblOtherOptions.Size = new System.Drawing.Size(91, 17);
-      this.lblOtherOptions.TabIndex = 7;
+      this.lblOtherOptions.TabIndex = 8;
       this.lblOtherOptions.Text = "Other Options";
       this.lblOtherOptions.Visible = false;
       // 
@@ -123,7 +123,7 @@
       this.chkUseFormattedValues.Location = new System.Drawing.Point(53, 228);
       this.chkUseFormattedValues.Name = "chkUseFormattedValues";
       this.chkUseFormattedValues.Size = new System.Drawing.Size(141, 19);
-      this.chkUseFormattedValues.TabIndex = 6;
+      this.chkUseFormattedValues.TabIndex = 7;
       this.chkUseFormattedValues.Text = "Use formatted values";
       this.chkUseFormattedValues.UseVisualStyleBackColor = false;
       // 
@@ -136,7 +136,7 @@
       this.lblFieldDataOptions.Location = new System.Drawing.Point(24, 199);
       this.lblFieldDataOptions.Name = "lblFieldDataOptions";
       this.lblFieldDataOptions.Size = new System.Drawing.Size(116, 17);
-      this.lblFieldDataOptions.TabIndex = 5;
+      this.lblFieldDataOptions.TabIndex = 6;
       this.lblFieldDataOptions.Text = "Field Data Options";
       // 
       // chkAutoAllowEmptyNonIndexColumns
@@ -147,7 +147,7 @@
       this.chkAutoAllowEmptyNonIndexColumns.Location = new System.Drawing.Point(53, 160);
       this.chkAutoAllowEmptyNonIndexColumns.Name = "chkAutoAllowEmptyNonIndexColumns";
       this.chkAutoAllowEmptyNonIndexColumns.Size = new System.Drawing.Size(436, 19);
-      this.chkAutoAllowEmptyNonIndexColumns.TabIndex = 4;
+      this.chkAutoAllowEmptyNonIndexColumns.TabIndex = 5;
       this.chkAutoAllowEmptyNonIndexColumns.Text = "Automatically check the Allow Empty checkbox for columns without an index";
       this.chkAutoAllowEmptyNonIndexColumns.UseVisualStyleBackColor = false;
       // 
@@ -159,7 +159,7 @@
       this.chkAutoIndexIntColumns.Location = new System.Drawing.Point(53, 135);
       this.chkAutoIndexIntColumns.Name = "chkAutoIndexIntColumns";
       this.chkAutoIndexIntColumns.Size = new System.Drawing.Size(349, 19);
-      this.chkAutoIndexIntColumns.TabIndex = 3;
+      this.chkAutoIndexIntColumns.TabIndex = 4;
       this.chkAutoIndexIntColumns.Text = "Automatically check the Index checkbox for Integer columns";
       this.chkAutoIndexIntColumns.UseVisualStyleBackColor = false;
       // 
@@ -171,7 +171,7 @@
       this.chkAddBufferToVarchar.Location = new System.Drawing.Point(73, 110);
       this.chkAddBufferToVarchar.Name = "chkAddBufferToVarchar";
       this.chkAddBufferToVarchar.Size = new System.Drawing.Size(431, 19);
-      this.chkAddBufferToVarchar.TabIndex = 2;
+      this.chkAddBufferToVarchar.TabIndex = 3;
       this.chkAddBufferToVarchar.Text = "Add additional buffer to VARCHAR length (round up to 12, 25, 45, 125, 255)";
       this.chkAddBufferToVarchar.UseVisualStyleBackColor = false;
       // 
@@ -183,7 +183,7 @@
       this.chkDetectDatatype.Location = new System.Drawing.Point(53, 85);
       this.chkDetectDatatype.Name = "chkDetectDatatype";
       this.chkDetectDatatype.Size = new System.Drawing.Size(418, 19);
-      this.chkDetectDatatype.TabIndex = 1;
+      this.chkDetectDatatype.TabIndex = 2;
       this.chkDetectDatatype.Text = "Analyze and try to detect correct datatype based on column field contents";
       this.chkDetectDatatype.UseVisualStyleBackColor = false;
       this.chkDetectDatatype.CheckedChanged += new System.EventHandler(this.chkDetectDatatype_CheckedChanged);
@@ -197,7 +197,7 @@
       this.lblColumnDatatypeOptions.Location = new System.Drawing.Point(24, 56);
       this.lblColumnDatatypeOptions.Name = "lblColumnDatatypeOptions";
       this.lblColumnDatatypeOptions.Size = new System.Drawing.Size(158, 17);
-      this.lblColumnDatatypeOptions.TabIndex = 0;
+      this.lblColumnDatatypeOptions.TabIndex = 1;
       this.lblColumnDatatypeOptions.Text = "Column Datatype Options";
       // 
       // lblAdvancedExportOptions
@@ -208,7 +208,7 @@
       this.lblAdvancedExportOptions.Location = new System.Drawing.Point(17, 17);
       this.lblAdvancedExportOptions.Name = "lblAdvancedExportOptions";
       this.lblAdvancedExportOptions.Size = new System.Drawing.Size(178, 20);
-      this.lblAdvancedExportOptions.TabIndex = 9;
+      this.lblAdvancedExportOptions.TabIndex = 0;
       this.lblAdvancedExportOptions.Text = "Advanced Export Options";
       // 
       // ExportAdvancedOptionsDialog
@@ -216,12 +216,9 @@
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.btnCancel;
-      this.ClientSize = new System.Drawing.Size(534, 312);
+      this.ClientSize = new System.Drawing.Size(544, 316);
       this.CommandAreaHeight = 45;
-      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
-      this.MaximumSize = new System.Drawing.Size(550, 350);
-      this.MinimumSize = new System.Drawing.Size(550, 350);
       this.Name = "ExportAdvancedOptionsDialog";
       this.Text = "Advanced Options";
       this.contentAreaPanel.ResumeLayout(false);

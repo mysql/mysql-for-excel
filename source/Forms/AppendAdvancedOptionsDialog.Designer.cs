@@ -37,7 +37,7 @@
       this.chkDoNotPerformAutoMap = new System.Windows.Forms.CheckBox();
       this.lblMappingOptions = new System.Windows.Forms.Label();
       this.lblAdvancedExportOptions = new System.Windows.Forms.Label();
-      this.label1 = new System.Windows.Forms.Label();
+      this.lblStoredColumnMappings = new System.Windows.Forms.Label();
       this.btnRenameMapping = new System.Windows.Forms.Button();
       this.btnDelete = new System.Windows.Forms.Button();
       this.lstMappings = new System.Windows.Forms.ListView();
@@ -53,7 +53,7 @@
       this.contentAreaPanel.Controls.Add(this.lstMappings);
       this.contentAreaPanel.Controls.Add(this.btnDelete);
       this.contentAreaPanel.Controls.Add(this.btnRenameMapping);
-      this.contentAreaPanel.Controls.Add(this.label1);
+      this.contentAreaPanel.Controls.Add(this.lblStoredColumnMappings);
       this.contentAreaPanel.Controls.Add(this.lblAdvancedExportOptions);
       this.contentAreaPanel.Controls.Add(this.chkUseFormattedValues);
       this.contentAreaPanel.Controls.Add(this.lblFieldDataOptions);
@@ -61,14 +61,14 @@
       this.contentAreaPanel.Controls.Add(this.chkAutoStoreColumnMapping);
       this.contentAreaPanel.Controls.Add(this.chkDoNotPerformAutoMap);
       this.contentAreaPanel.Controls.Add(this.lblMappingOptions);
-      this.contentAreaPanel.Size = new System.Drawing.Size(474, 435);
+      this.contentAreaPanel.Size = new System.Drawing.Size(484, 445);
       // 
       // commandAreaPanel
       // 
       this.commandAreaPanel.Controls.Add(this.btnAccept);
       this.commandAreaPanel.Controls.Add(this.btnCancel);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 435);
-      this.commandAreaPanel.Size = new System.Drawing.Size(474, 45);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 445);
+      this.commandAreaPanel.Size = new System.Drawing.Size(484, 45);
       // 
       // btnAccept
       // 
@@ -126,7 +126,7 @@
       this.chkReloadColumnMapping.Location = new System.Drawing.Point(53, 131);
       this.chkReloadColumnMapping.Name = "chkReloadColumnMapping";
       this.chkReloadColumnMapping.Size = new System.Drawing.Size(390, 19);
-      this.chkReloadColumnMapping.TabIndex = 3;
+      this.chkReloadColumnMapping.TabIndex = 4;
       this.chkReloadColumnMapping.Text = "Reload stored column mapping for the selected table automatically";
       this.chkReloadColumnMapping.UseVisualStyleBackColor = false;
       // 
@@ -139,7 +139,7 @@
       this.chkAutoStoreColumnMapping.Location = new System.Drawing.Point(53, 108);
       this.chkAutoStoreColumnMapping.Name = "chkAutoStoreColumnMapping";
       this.chkAutoStoreColumnMapping.Size = new System.Drawing.Size(343, 19);
-      this.chkAutoStoreColumnMapping.TabIndex = 2;
+      this.chkAutoStoreColumnMapping.TabIndex = 3;
       this.chkAutoStoreColumnMapping.Text = "Automatically store the column mapping for the given table";
       this.chkAutoStoreColumnMapping.UseVisualStyleBackColor = false;
       // 
@@ -151,7 +151,7 @@
       this.chkDoNotPerformAutoMap.Location = new System.Drawing.Point(53, 85);
       this.chkDoNotPerformAutoMap.Name = "chkDoNotPerformAutoMap";
       this.chkDoNotPerformAutoMap.Size = new System.Drawing.Size(303, 19);
-      this.chkDoNotPerformAutoMap.TabIndex = 1;
+      this.chkDoNotPerformAutoMap.TabIndex = 2;
       this.chkDoNotPerformAutoMap.Text = "Perform an automatic mapping when dialog opens";
       this.chkDoNotPerformAutoMap.UseVisualStyleBackColor = false;
       // 
@@ -164,7 +164,7 @@
       this.lblMappingOptions.Location = new System.Drawing.Point(24, 56);
       this.lblMappingOptions.Name = "lblMappingOptions";
       this.lblMappingOptions.Size = new System.Drawing.Size(111, 17);
-      this.lblMappingOptions.TabIndex = 0;
+      this.lblMappingOptions.TabIndex = 1;
       this.lblMappingOptions.Text = "Mapping Options";
       // 
       // lblAdvancedExportOptions
@@ -175,28 +175,28 @@
       this.lblAdvancedExportOptions.Location = new System.Drawing.Point(17, 17);
       this.lblAdvancedExportOptions.Name = "lblAdvancedExportOptions";
       this.lblAdvancedExportOptions.Size = new System.Drawing.Size(224, 20);
-      this.lblAdvancedExportOptions.TabIndex = 9;
+      this.lblAdvancedExportOptions.TabIndex = 0;
       this.lblAdvancedExportOptions.Text = "Advanced Append Data Options";
       // 
-      // label1
+      // lblStoredColumnMappings
       // 
-      this.label1.AutoSize = true;
-      this.label1.BackColor = System.Drawing.Color.Transparent;
-      this.label1.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.label1.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.label1.Location = new System.Drawing.Point(24, 249);
-      this.label1.Name = "label1";
-      this.label1.Size = new System.Drawing.Size(158, 17);
-      this.label1.TabIndex = 10;
-      this.label1.Text = "Stored Column Mappings";
+      this.lblStoredColumnMappings.AutoSize = true;
+      this.lblStoredColumnMappings.BackColor = System.Drawing.Color.Transparent;
+      this.lblStoredColumnMappings.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblStoredColumnMappings.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.lblStoredColumnMappings.Location = new System.Drawing.Point(24, 257);
+      this.lblStoredColumnMappings.Name = "lblStoredColumnMappings";
+      this.lblStoredColumnMappings.Size = new System.Drawing.Size(158, 17);
+      this.lblStoredColumnMappings.TabIndex = 7;
+      this.lblStoredColumnMappings.Text = "Stored Column Mappings";
       // 
       // btnRenameMapping
       // 
       this.btnRenameMapping.Enabled = false;
-      this.btnRenameMapping.Location = new System.Drawing.Point(373, 290);
+      this.btnRenameMapping.Location = new System.Drawing.Point(387, 290);
       this.btnRenameMapping.Name = "btnRenameMapping";
       this.btnRenameMapping.Size = new System.Drawing.Size(75, 25);
-      this.btnRenameMapping.TabIndex = 12;
+      this.btnRenameMapping.TabIndex = 9;
       this.btnRenameMapping.Text = "Rename";
       this.btnRenameMapping.UseVisualStyleBackColor = true;
       this.btnRenameMapping.Click += new System.EventHandler(this.btnRenameMapping_Click);
@@ -205,10 +205,10 @@
       // 
       this.btnDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.btnDelete.Enabled = false;
-      this.btnDelete.Location = new System.Drawing.Point(373, 321);
+      this.btnDelete.Location = new System.Drawing.Point(387, 321);
       this.btnDelete.Name = "btnDelete";
       this.btnDelete.Size = new System.Drawing.Size(75, 23);
-      this.btnDelete.TabIndex = 13;
+      this.btnDelete.TabIndex = 10;
       this.btnDelete.Text = "Delete";
       this.btnDelete.UseVisualStyleBackColor = true;
       this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
@@ -223,8 +223,8 @@
       this.lstMappings.Location = new System.Drawing.Point(53, 290);
       this.lstMappings.MultiSelect = false;
       this.lstMappings.Name = "lstMappings";
-      this.lstMappings.Size = new System.Drawing.Size(314, 127);
-      this.lstMappings.TabIndex = 43;
+      this.lstMappings.Size = new System.Drawing.Size(328, 127);
+      this.lstMappings.TabIndex = 8;
       this.lstMappings.UseCompatibleStateImageBehavior = false;
       this.lstMappings.View = System.Windows.Forms.View.Details;
       this.lstMappings.SelectedIndexChanged += new System.EventHandler(this.lstMappings_SelectedIndexChanged);
@@ -244,12 +244,9 @@
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.btnCancel;
-      this.ClientSize = new System.Drawing.Size(474, 482);
+      this.ClientSize = new System.Drawing.Size(484, 492);
       this.CommandAreaHeight = 45;
-      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
-      this.MaximumSize = new System.Drawing.Size(490, 520);
-      this.MinimumSize = new System.Drawing.Size(490, 340);
       this.Name = "AppendAdvancedOptionsDialog";
       this.Text = "Advanced Options";
       this.contentAreaPanel.ResumeLayout(false);
@@ -272,7 +269,7 @@
     private System.Windows.Forms.Label lblAdvancedExportOptions;
     private System.Windows.Forms.Button btnDelete;
     private System.Windows.Forms.Button btnRenameMapping;
-    private System.Windows.Forms.Label label1;
+    private System.Windows.Forms.Label lblStoredColumnMappings;
     private System.Windows.Forms.ListView lstMappings;
     private System.Windows.Forms.ColumnHeader columnHeader1;
     private System.Windows.Forms.ColumnHeader columnHeader2;

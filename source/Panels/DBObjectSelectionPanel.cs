@@ -84,7 +84,7 @@ namespace MySQL.ForExcel
       {
         objs = MySQLDataUtilities.GetSchemaCollection(connection, dataObjectType.ToString() + "s", null, connection.Schema);
         objectName = "TABLE_NAME";
-        parent = objectList.Nodes[(int)dataObjectType - 1];
+        parent = objectList.Nodes[(int)dataObjectType];
       }
 
       if (objs == null) return;

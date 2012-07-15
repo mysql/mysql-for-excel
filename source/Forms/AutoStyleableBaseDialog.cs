@@ -177,7 +177,7 @@ namespace MySQL.ForExcel
       else if (DrawPanelsSeparator && panelsSeparatorWidth > 0)
       {
         Pen separatorPen = new Pen(PanelsSeparatorColor, panelsSeparatorWidth);
-        e.Graphics.DrawLine(separatorPen, 0, 0, e.ClipRectangle.Width, 0);
+        e.Graphics.DrawLine(separatorPen, 0, 0, commandAreaPanel.Width, 0);
         separatorPen.Dispose();
       }
     }
@@ -191,7 +191,7 @@ namespace MySQL.ForExcel
       else if (DrawPanelsSeparator && panelsSeparatorWidth > 0)
       {
         Pen separatorPen = new Pen(PanelsSeparatorColor, panelsSeparatorWidth);
-        e.Graphics.DrawLine(separatorPen, 0, 0, e.ClipRectangle.Width, 0);
+        e.Graphics.DrawLine(separatorPen, 0, 0, footNoteAreaPanel.Width, 0);
         separatorPen.Dispose();
       }
     }
