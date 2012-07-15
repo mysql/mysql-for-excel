@@ -222,6 +222,24 @@ namespace MySQL.ForExcel
       }
     }
 
+    private void label_Paint(object sender, PaintEventArgs e)
+    {
+      Label label = sender as Label;
+      // Set a rectangle size with same width and larger height than label's
+      SizeF layoutSize = new SizeF(label.Width, label.Height + 1);
+      // Get the actual size of rectangle needed for all of text.
+      SizeF fullSize = e.Graphics.MeasureString(label.Text, label.Font, layoutSize);
+      // Set a tooltip if not all text fits in label's size.
+      if (fullSize.Width > label.Width || fullSize.Height > label.Height)
+      {
+        labelsToolTip.SetToolTip(label, label.Text);
+      }
+      else
+      {
+        labelsToolTip.SetToolTip(label, null);
+      }
+    }
+
   }
 
 }

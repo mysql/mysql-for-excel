@@ -43,28 +43,31 @@
       this.createNewSchemaLabel = new MySQL.ForExcel.HotLabel();
       this.lblInstructions = new MySQL.ForExcel.TransparentLabel();
       this.imgSeparator = new MySQL.ForExcel.TransparentPictureBox();
+      this.labelsToolTip = new System.Windows.Forms.ToolTip(this.components);
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
       this.SuspendLayout();
       // 
       // lblConnectionName
       // 
-      this.lblConnectionName.AutoSize = true;
+      this.lblConnectionName.AutoEllipsis = true;
       this.lblConnectionName.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblConnectionName.Location = new System.Drawing.Point(61, 18);
       this.lblConnectionName.Name = "lblConnectionName";
-      this.lblConnectionName.Size = new System.Drawing.Size(118, 17);
+      this.lblConnectionName.Size = new System.Drawing.Size(190, 18);
       this.lblConnectionName.TabIndex = 0;
       this.lblConnectionName.Text = "Connection Name";
+      this.lblConnectionName.Paint += new System.Windows.Forms.PaintEventHandler(this.label_Paint);
       // 
       // lblUserIP
       // 
-      this.lblUserIP.AutoSize = true;
+      this.lblUserIP.AutoEllipsis = true;
       this.lblUserIP.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblUserIP.Location = new System.Drawing.Point(61, 36);
       this.lblUserIP.Name = "lblUserIP";
-      this.lblUserIP.Size = new System.Drawing.Size(77, 13);
+      this.lblUserIP.Size = new System.Drawing.Size(190, 18);
       this.lblUserIP.TabIndex = 1;
       this.lblUserIP.Text = "User: ??, IP: ??";
+      this.lblUserIP.Paint += new System.Windows.Forms.PaintEventHandler(this.label_Paint);
       // 
       // picAddInLogo
       // 
@@ -140,6 +143,7 @@
       this.databaseList.Name = "databaseList";
       this.databaseList.NodeHeightMultiple = 3;
       this.databaseList.NodeImages = this.largeImages;
+      this.databaseList.ShowNodeToolTips = true;
       this.databaseList.Size = new System.Drawing.Size(242, 325);
       this.databaseList.TabIndex = 23;
       this.databaseList.TitleColorOpacity = 0.8D;
@@ -248,13 +252,12 @@
       this.imgSeparator.Location = new System.Drawing.Point(9, 136);
       this.imgSeparator.Name = "imgSeparator";
       this.imgSeparator.Opacity = 0.3F;
-      this.imgSeparator.Size = new System.Drawing.Size(237, 21);
+      this.imgSeparator.Size = new System.Drawing.Size(242, 21);
       this.imgSeparator.TabIndex = 26;
       // 
       // SchemaSelectionPanel
       // 
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.Controls.Add(this.imgSeparator);
       this.Controls.Add(this.lblUserIP);
       this.Controls.Add(this.databaseList);
@@ -274,7 +277,6 @@
       this.UseSystemFont = false;
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
       this.ResumeLayout(false);
-      this.PerformLayout();
 
     }
 
@@ -293,5 +295,6 @@
     private SearchEdit schemaFilter;
     private MyTreeView databaseList;
     private TransparentPictureBox imgSeparator;
+    private System.Windows.Forms.ToolTip labelsToolTip;
   }
 }
