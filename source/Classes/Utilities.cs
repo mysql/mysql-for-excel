@@ -405,6 +405,53 @@ namespace MySQL.ForExcel
 
       return retList;
     }
+
+    public static string EscapeString(string valueToScape)
+    {
+      const string quotesAndOtherDangerousChars =
+          "\\" + "\u2216" + "\uFF3C"               // backslashes
+        + "'" + "\u00B4" + "\u02B9" + "\u02BC" + "\u02C8" + "\u02CA"
+                +  "\u0301" + "\u2019" + "\u201A" + "\u2032"
+                + "\u275C" + "\uFF07"            // single-quotes
+        + "`" + "\u02CB" + "\u0300" + "\u2018" + "\u2035" + "\u275B"
+                + "\uFF40"                       // back-tick
+        + "\"" + "\u02BA" + "\u030E" + "\uFF02"; // double-quotes
+      
+      StringBuilder sb = new StringBuilder();
+      foreach (char c in valueToScape)
+      {
+        char escape = char.MinValue;
+        switch (c)
+        {
+          case '\u0000':          
+            escape = '0';
+            break;
+          case '\n':              
+            escape = 'n';
+            break;
+          case '\r':
+            escape = 'r';
+            break;
+          case '\u001F':          
+            escape = 'Z';
+            break;
+          default:
+            if (quotesAndOtherDangerousChars.IndexOf(c) >= 0)
+              escape = c;
+            break;
+        }
+        if (escape != char.MinValue)
+        {
+          sb.Append('\\');
+          sb.Append(escape);
+        }
+        else
+        {
+          sb.Append(c);
+        }
+      }
+      return sb.ToString();
+    }
   }
 
   public static class DataTypeUtilities

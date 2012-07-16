@@ -513,7 +513,7 @@ namespace MySQL.ForExcel
           string valueToDB = String.Empty;
 
           if (currColRequiresQuotes)
-            valueToDB = (String.IsNullOrEmpty(curentStrValue) ? String.Empty : curentStrValue);
+            valueToDB = (String.IsNullOrEmpty(curentStrValue) ? String.Empty : MySQLDataUtilities.EscapeString(curentStrValue));
           else  // for numeric type then insert a null value if the dr doesn't have any value for this column
             valueToDB = (String.IsNullOrEmpty(curentStrValue) ? @"null" : curentStrValue);
           queryString.AppendFormat("{0}{1}{2}{1}",
