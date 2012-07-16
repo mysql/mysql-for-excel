@@ -39,12 +39,15 @@
       this.lblInstructions = new MySQL.ForExcel.TransparentLabel();
       this.manageConnectionsLabel = new MySQL.ForExcel.HotLabel();
       this.connectionList = new MySQL.ForExcel.MyTreeView();
+      this.contextMenuStripRefresh = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.lblCopyright = new MySQL.ForExcel.TransparentLabel();
       this.lblAllRights = new MySQL.ForExcel.TransparentLabel();
       this.newConnectionLabel = new MySQL.ForExcel.HotLabel();
       this.openConnectionLabel = new MySQL.ForExcel.HotLabel();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogoText)).BeginInit();
+      this.contextMenuStripRefresh.SuspendLayout();
       this.SuspendLayout();
       // 
       // picAddInLogo
@@ -136,6 +139,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.connectionList.CollapsedIcon = global::MySQL.ForExcel.Properties.Resources.ArrowRight;
+      this.connectionList.ContextMenuStrip = this.contextMenuStripRefresh;
       this.connectionList.DescriptionColor = System.Drawing.Color.Silver;
       this.connectionList.DescriptionColorOpacity = 1D;
       this.connectionList.DescriptionFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -168,7 +172,21 @@
       this.connectionList.TitleColorOpacity = 0.8D;
       this.connectionList.TitleTextVerticalPixelsOffset = 2;
       this.connectionList.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.connectionList_NodeMouseDoubleClick);
-      this.connectionList.MouseClick += new System.Windows.Forms.MouseEventHandler(this.connectionList_MouseClick);
+      // 
+      // contextMenuStripRefresh
+      // 
+      this.contextMenuStripRefresh.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.refreshToolStripMenuItem});
+      this.contextMenuStripRefresh.Name = "contextMenuStripRefresh";
+      this.contextMenuStripRefresh.Size = new System.Drawing.Size(114, 26);
+      this.contextMenuStripRefresh.Text = "Refresh";
+      // 
+      // refreshToolStripMenuItem
+      // 
+      this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
+      this.refreshToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
+      this.refreshToolStripMenuItem.Text = "Refresh";
+      this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshItem_Click);
       // 
       // lblCopyright
       // 
@@ -284,6 +302,7 @@
       this.Size = new System.Drawing.Size(260, 625);
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogoText)).EndInit();
+      this.contextMenuStripRefresh.ResumeLayout(false);
       this.ResumeLayout(false);
 
     }
@@ -301,5 +320,7 @@
     private MyTreeView connectionList;
     private System.Windows.Forms.PictureBox picAddInLogoText;
     private TransparentPictureBox imgSeparator;
+    private System.Windows.Forms.ContextMenuStrip contextMenuStripRefresh;
+    private System.Windows.Forms.ToolStripMenuItem refreshToolStripMenuItem;
   }
 }

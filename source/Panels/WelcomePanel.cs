@@ -87,29 +87,9 @@ namespace MySQL.ForExcel
       (Parent as TaskPaneControl).OpenConnection(c);
     }
 
-    private void connectionList_MouseClick(object sender, MouseEventArgs e)
-    {
-      if (e.Button == MouseButtons.Right)
-      {
-        ContextMenuStrip contextMenu = new ContextMenuStrip();
-
-        ToolStripMenuItem refreshItem = new ToolStripMenuItem("Refresh");
-        contextMenu.ShowImageMargin = false;
-        contextMenu.ShowCheckMargin = false;
-
-
-        refreshItem.Click += new EventHandler(refreshItem_Click);
-        contextMenu.Items.Clear();
-        contextMenu.Items.Add(refreshItem);
-
-        contextMenu.Show(connectionList, this.connectionList.PointToClient(Cursor.Position));
-      }
-    }
-
     void refreshItem_Click(object sender, EventArgs e)
     {
       LoadConnections();
     }
-
   }
 }

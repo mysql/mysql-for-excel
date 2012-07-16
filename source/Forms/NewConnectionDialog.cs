@@ -72,19 +72,22 @@ namespace MySQL.ForExcel
       testConn.Server = WBconn.Host;
       testConn.Port = (uint)WBconn.Port;
       testConn.UserID = WBconn.UserName;
-      InfoDialog infoDialog = new InfoDialog(false, String.Format(Properties.Resources.ConnectionDataDisplayFailed, testConn.Server, testConn.Port, testConn.UserID), String.Format(Properties.Resources.ConnectionFailed, testConn.Server, testConn.Port));
+      string testHostName, testUserName;
+      testHostName = (WBconn.Host == string.Empty) ? "localhost" : WBconn.Host;
+      testUserName = (WBconn.UserName == string.Empty) ? "guest" : WBconn.UserName;
+
+      InfoDialog infoDialog = new InfoDialog(false, String.Format(Properties.Resources.ConnectionDataDisplayFailed, testHostName, testConn.Port, testUserName), string.Empty);
 
       try
       {
         if (TryOpenConnection(testConn) != null)
         {
-          infoDialog = new InfoDialog(true, String.Format(Properties.Resources.ConnectionDataDisplaySuccess, testConn.Server, testConn.Port, testConn.UserID), Properties.Resources.ConnectionSuccessfull);
-          infoDialog.OperationSummarySubText = Properties.Resources.ConnectionSuccessfull;
+          infoDialog = new InfoDialog(true, String.Format(Properties.Resources.ConnectionDataDisplaySuccess, testHostName, testConn.Port, testUserName), string.Empty);
         }
       }
       catch (Exception ex)
       {
-        infoDialog.OperationSummarySubText = ex.Message;
+        infoDialog.OperationDetailsText = ex.Message;
       }
       finally
       {
@@ -103,10 +106,14 @@ namespace MySQL.ForExcel
     {
       bool standardConnection = (connectionMethod.SelectedIndex == 0);
 
-      if (standardConnection)
-        WBconn.Host = "127.0.0.1";
-      else
+      if (connectionMethod.SelectedIndex == 0)
       {
+        WBconn.Host = "127.0.0.1";
+        WBconn.DriverType = MySqlWorkbenchConnectionType.Tcp;
+      }
+      else if (connectionMethod.SelectedIndex == 1)
+      {
+        WBconn.DriverType = MySqlWorkbenchConnectionType.NamedPipes;
         WBconn.Host = "";
         labelPromptSocket.Location = new Point(labelPromptSocket.Location.X, labelPromptHostName.Location.Y);
         labelHelpSocket.Location = new Point(labelHelpSocket.Location.X, labelHelpHostName.Location.Y);
@@ -116,23 +123,23 @@ namespace MySQL.ForExcel
       WBconn.Port = 3306;
       WBconn.UserName = "root";
       WBconn.Schema = "";
-
-      labelHelpHostName.Visible = standardConnection;
-      labelPromptHostName.Enabled = standardConnection;
+      
       labelPromptHostName.Visible = standardConnection;
+      hostName.Enabled = standardConnection;
+      hostName.Visible = standardConnection;
       labelHelpHostName.Visible = standardConnection;
-      labelPromptPort.Visible = standardConnection;
-      labelPromptPort.Enabled = standardConnection;
+      
+      labelPromptPort.Visible = standardConnection;      
       port.Enabled = standardConnection;
       port.Visible = standardConnection;
+      
+      useCompression.Enabled = standardConnection;
+      labelCompression.Visible = standardConnection;
 
-      labelPromptSocket.Visible = !standardConnection;
-      labelHelpSocket.Visible = !standardConnection;
+      labelPromptSocket.Visible = !standardConnection;      
       socketPath.Enabled = !standardConnection;
       socketPath.Visible = !standardConnection;
-
-      useCompression.Enabled = !standardConnection;
-      labelCompression.Visible = !standardConnection;
+      labelHelpSocket.Visible = !standardConnection;
 
       bindingSource.ResetCurrentItem();
     }

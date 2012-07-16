@@ -111,7 +111,7 @@
       this.tabControl1.Name = "tabControl1";
       this.tabControl1.SelectedIndex = 0;
       this.tabControl1.Size = new System.Drawing.Size(769, 352);
-      this.tabControl1.TabIndex = 0;
+      this.tabControl1.TabIndex = 2;
       // 
       // parametersPage
       // 
@@ -165,7 +165,7 @@
       this.socketPath.MaxLength = 484;
       this.socketPath.Name = "socketPath";
       this.socketPath.Size = new System.Drawing.Size(317, 23);
-      this.socketPath.TabIndex = 11;
+      this.socketPath.TabIndex = 4;
       this.socketPath.Visible = false;
       // 
       // bindingSource
@@ -196,7 +196,7 @@
       this.defaultSchema.Location = new System.Drawing.Point(119, 85);
       this.defaultSchema.Name = "defaultSchema";
       this.defaultSchema.Size = new System.Drawing.Size(317, 23);
-      this.defaultSchema.TabIndex = 9;
+      this.defaultSchema.TabIndex = 7;
       // 
       // port
       // 
@@ -204,7 +204,7 @@
       this.port.Location = new System.Drawing.Point(312, 19);
       this.port.Name = "port";
       this.port.Size = new System.Drawing.Size(124, 23);
-      this.port.TabIndex = 3;
+      this.port.TabIndex = 5;
       // 
       // userName
       // 
@@ -222,7 +222,7 @@
       this.hostName.MaxLength = 484;
       this.hostName.Name = "hostName";
       this.hostName.Size = new System.Drawing.Size(151, 23);
-      this.hostName.TabIndex = 1;
+      this.hostName.TabIndex = 3;
       // 
       // LabelPromptSchema
       // 
@@ -327,31 +327,35 @@
       // 
       // textBox4
       // 
+      this.textBox4.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource, "SSLCipher", true));
       this.textBox4.Location = new System.Drawing.Point(83, 255);
       this.textBox4.Name = "textBox4";
       this.textBox4.Size = new System.Drawing.Size(325, 23);
-      this.textBox4.TabIndex = 14;
+      this.textBox4.TabIndex = 15;
       // 
       // textBox3
       // 
+      this.textBox3.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource, "SSLKey", true));
       this.textBox3.Location = new System.Drawing.Point(83, 208);
       this.textBox3.Name = "textBox3";
       this.textBox3.Size = new System.Drawing.Size(325, 23);
-      this.textBox3.TabIndex = 13;
+      this.textBox3.TabIndex = 14;
       // 
       // textBox2
       // 
+      this.textBox2.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource, "SSLCert", true));
       this.textBox2.Location = new System.Drawing.Point(83, 167);
       this.textBox2.Name = "textBox2";
       this.textBox2.Size = new System.Drawing.Size(325, 23);
-      this.textBox2.TabIndex = 12;
+      this.textBox2.TabIndex = 13;
       // 
       // textBox1
       // 
+      this.textBox1.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource, "SSLCA", true));
       this.textBox1.Location = new System.Drawing.Point(83, 127);
       this.textBox1.Name = "textBox1";
       this.textBox1.Size = new System.Drawing.Size(325, 23);
-      this.textBox1.TabIndex = 11;
+      this.textBox1.TabIndex = 12;
       // 
       // label18
       // 
@@ -428,32 +432,33 @@
       // useSSL
       // 
       this.useSSL.AutoSize = true;
-      this.useSSL.Enabled = false;
+      this.useSSL.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.bindingSource, "UseSSL", true));
       this.useSSL.Location = new System.Drawing.Point(87, 84);
       this.useSSL.Name = "useSSL";
       this.useSSL.Size = new System.Drawing.Size(125, 19);
-      this.useSSL.TabIndex = 4;
+      this.useSSL.TabIndex = 11;
       this.useSSL.Text = "Use SSL if available";
       this.useSSL.UseVisualStyleBackColor = true;
       // 
       // useANSI
       // 
       this.useANSI.AutoSize = true;
-      this.useANSI.Enabled = false;
+      this.useANSI.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.bindingSource, "UseAnsiQuotes", true));
       this.useANSI.Location = new System.Drawing.Point(87, 52);
       this.useANSI.Name = "useANSI";
       this.useANSI.Size = new System.Drawing.Size(216, 19);
-      this.useANSI.TabIndex = 2;
+      this.useANSI.TabIndex = 10;
       this.useANSI.Text = "Use ANSI quotes to quote identifiers";
       this.useANSI.UseVisualStyleBackColor = true;
       // 
       // useCompression
       // 
       this.useCompression.AutoSize = true;
+      this.useCompression.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.bindingSource, "ClientCompress", true));
       this.useCompression.Location = new System.Drawing.Point(87, 22);
       this.useCompression.Name = "useCompression";
       this.useCompression.Size = new System.Drawing.Size(166, 19);
-      this.useCompression.TabIndex = 0;
+      this.useCompression.TabIndex = 9;
       this.useCompression.Text = "Use Compression protocol";
       this.useCompression.UseVisualStyleBackColor = true;
       // 
@@ -468,7 +473,7 @@
       this.connectionMethod.Location = new System.Drawing.Point(135, 40);
       this.connectionMethod.Name = "connectionMethod";
       this.connectionMethod.Size = new System.Drawing.Size(420, 23);
-      this.connectionMethod.TabIndex = 4;
+      this.connectionMethod.TabIndex = 1;
       this.connectionMethod.SelectedIndexChanged += new System.EventHandler(this.connectionMethod_SelectedIndexChanged);
       // 
       // labelHelpMethod
@@ -512,7 +517,7 @@
       this.connectionName.MaxLength = 358;
       this.connectionName.Name = "connectionName";
       this.connectionName.Size = new System.Drawing.Size(420, 23);
-      this.connectionName.TabIndex = 1;
+      this.connectionName.TabIndex = 0;
       this.connectionName.TextChanged += new System.EventHandler(this.connectionName_TextChanged);
       // 
       // labelPromptName
@@ -532,7 +537,7 @@
       this.testButton.Location = new System.Drawing.Point(494, 11);
       this.testButton.Name = "testButton";
       this.testButton.Size = new System.Drawing.Size(128, 23);
-      this.testButton.TabIndex = 12;
+      this.testButton.TabIndex = 18;
       this.testButton.Text = "Test Connection";
       this.testButton.UseVisualStyleBackColor = true;
       this.testButton.Click += new System.EventHandler(this.testButton_Click);
@@ -544,7 +549,7 @@
       this.cancelButton.Location = new System.Drawing.Point(628, 11);
       this.cancelButton.Name = "cancelButton";
       this.cancelButton.Size = new System.Drawing.Size(75, 23);
-      this.cancelButton.TabIndex = 11;
+      this.cancelButton.TabIndex = 17;
       this.cancelButton.Text = "Cancel";
       this.cancelButton.UseVisualStyleBackColor = true;
       // 
@@ -556,7 +561,7 @@
       this.okButton.Location = new System.Drawing.Point(709, 11);
       this.okButton.Name = "okButton";
       this.okButton.Size = new System.Drawing.Size(75, 23);
-      this.okButton.TabIndex = 10;
+      this.okButton.TabIndex = 16;
       this.okButton.Text = "OK";
       this.okButton.UseVisualStyleBackColor = true;
       this.okButton.Click += new System.EventHandler(this.okButton_Click);
