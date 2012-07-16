@@ -20,6 +20,10 @@ namespace MySQL.ForExcel
     public SchemaSelectionPanel()
     {
       InitializeComponent();
+
+      InheritFontToControlsExceptionList.Add("selectSchemaLabel");
+      InheritFontToControlsExceptionList.Add("createNewSchemaLabel");
+
       databaseList.AddNode(null, "Schemas");
       databaseList.AddNode(null, "System Schemas");
     }

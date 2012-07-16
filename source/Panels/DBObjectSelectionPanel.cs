@@ -31,6 +31,13 @@ namespace MySQL.ForExcel
     public DBObjectSelectionPanel()
     {
       InitializeComponent();
+
+      InheritFontToControlsExceptionList.Add("exportToNewTableLabel");
+      InheritFontToControlsExceptionList.Add("selectDatabaseObjectLabel");
+      InheritFontToControlsExceptionList.Add("importDataLabel");
+      InheritFontToControlsExceptionList.Add("editDataLabel");
+      InheritFontToControlsExceptionList.Add("appendDataLabel");
+
       objectList.AddNode(null, "Tables");
       objectList.AddNode(null, "Views");
       objectList.AddNode(null, "Procedures");
@@ -113,7 +120,7 @@ namespace MySQL.ForExcel
       DBObject obj = CurrentSelectedDBObject;
 
       importDataLabel.Enabled = obj != null;
-      editDataLabel.Enabled = obj != null;
+      editDataLabel.Enabled = obj != null && obj.Type == DBObjectType.Table;
       appendDataLabel.Enabled = obj != null && obj.Type == DBObjectType.Table && currentExcelSelectionContainsData;
     }
 

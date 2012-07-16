@@ -162,6 +162,7 @@
       this.connectionList.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
             treeNode1,
             treeNode2});
+      this.connectionList.ShowNodeToolTips = true;
       this.connectionList.Size = new System.Drawing.Size(242, 315);
       this.connectionList.TabIndex = 22;
       this.connectionList.TitleColorOpacity = 0.8D;
@@ -267,6 +268,7 @@
       // 
       // WelcomePanel
       // 
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.Controls.Add(this.imgSeparator);
       this.Controls.Add(this.picAddInLogoText);
       this.Controls.Add(this.lblInstructions);
@@ -278,10 +280,8 @@
       this.Controls.Add(this.newConnectionLabel);
       this.Controls.Add(this.openConnectionLabel);
       this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.InheritSystemFontToControls = false;
       this.Name = "WelcomePanel";
       this.Size = new System.Drawing.Size(260, 625);
-      this.UseSystemFont = false;
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogoText)).EndInit();
       this.ResumeLayout(false);

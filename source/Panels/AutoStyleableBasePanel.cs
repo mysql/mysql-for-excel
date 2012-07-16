@@ -32,18 +32,18 @@ namespace MySQL.ForExcel
       InheritFontToControlsExceptionList = new List<string>();
     }
 
-    protected virtual void InheritFontToControls(Control.ControlCollection controls)
+    protected virtual void InheritFontToControls(Control.ControlCollection controls, Font inheritingFont)
     {
       if (controls == null || controls.Count == 0)
         return;
 
       foreach (Control c in controls)
       {
-        InheritFontToControls(c.Controls);
+        InheritFontToControls(c.Controls, inheritingFont);
         if (InheritFontToControlsExceptionList != null && InheritFontToControlsExceptionList.Contains(c.Name))
           continue;
-        if (c.Font.Name != Font.Name)
-          c.Font = new Font(Font.FontFamily, c.Font.Size, c.Font.Style);
+        if (c.Font.Name != inheritingFont.Name)
+          c.Font = new Font(inheritingFont.FontFamily, c.Font.Size, c.Font.Style);
       }
     }
 
@@ -52,11 +52,12 @@ namespace MySQL.ForExcel
       base.OnLoad(e);
       if (!DesignMode && UseSystemFont)
       {
+        Font inheritingFont = Font;
         if (Font.Name != System.Drawing.SystemFonts.IconTitleFont.Name)
-          Font = new Font(System.Drawing.SystemFonts.IconTitleFont.FontFamily, Font.Size, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
+          inheritingFont = new Font(System.Drawing.SystemFonts.IconTitleFont.FontFamily, Font.Size, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
         Microsoft.Win32.SystemEvents.UserPreferenceChanged += new Microsoft.Win32.UserPreferenceChangedEventHandler(SystemEvents_UserPreferenceChanged);
         if (InheritSystemFontToControls)
-          InheritFontToControls(Controls);
+          InheritFontToControls(Controls, inheritingFont);
       }
     }
 
