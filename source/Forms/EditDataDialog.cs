@@ -104,10 +104,11 @@ namespace MySQL.ForExcel
         updateParam.SourceVersion = DataRowVersion.Original;
         dataAdapter.UpdateCommand.Parameters.Add(updateParam);
 
-        if (mysqlCol.PrimaryKey)
-          wClauseString.AppendFormat("{0}`{1}`=@W_Column{2}", (mysqlCol.Ordinal == 0 ? String.Empty : wClauseSeparator), mysqlCol.ColumnName, colSuffix);
+        if (mysqlCol.PrimaryKey)        
+          wClauseString.AppendFormat("{0}`{1}`=@W_Column{2}", (wClauseString.ToString().Equals(Environment.NewLine + "WHERE" + Environment.NewLine) ? String.Empty : wClauseSeparator), mysqlCol.ColumnName, colSuffix);
+                  
         else if (editMySQLDataTable.PrimaryKey == null)
-          wClauseString.AppendFormat("{0}`{1}`=@W_Column{2}", (mysqlCol.Ordinal == 0 ? String.Empty : wClauseSeparator), mysqlCol.ColumnName, colSuffix);
+          wClauseString.AppendFormat("{0}`{1}`=@W_Column{2}", (wClauseString.ToString().Equals(Environment.NewLine + "WHERE" + Environment.NewLine) ? String.Empty : wClauseSeparator), mysqlCol.ColumnName, colSuffix);
 
         updateParam = new MySqlParameter(String.Format("@S_Column{0}", colSuffix), mysqlColType);
         updateParam.SourceColumn = mysqlCol.ColumnName;
