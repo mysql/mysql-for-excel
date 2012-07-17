@@ -64,6 +64,7 @@
       this.largeImages.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("largeImages.ImageStream")));
       this.largeImages.TransparentColor = System.Drawing.Color.Transparent;
       this.largeImages.Images.SetKeyName(0, "MySQLforExcel-WelcomePanel-ListItem-Connection-32x32.png");
+      this.largeImages.Images.SetKeyName(1, "MySQLforExcel-WelcomePanel-Connection-Disabled-24x24.png");
       // 
       // picAddInLogoText
       // 

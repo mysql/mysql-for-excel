@@ -86,14 +86,13 @@ namespace MySQL.ForExcel
         {
           SolidBrush titleShadowBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleShadowOpacity * 255), TitleColor));
           e.Graphics.DrawString(Title, Font, titleShadowBrush, pt.X + TitleShadowPixelsXOffset, pt.Y + TitleShadowPixelsYOffset);
-          titleShadowBrush.Dispose();         
-          titleBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), currentTitleColor));          
+          titleShadowBrush.Dispose();
         }
         
-        if(!Enabled)
-        {
-          titleBrush = new SolidBrush(Color.FromArgb(80, 0, 0, 0));          
-        }
+        if(Enabled)
+          titleBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), currentTitleColor));
+        else
+          titleBrush = new SolidBrush(Color.FromArgb(80, 0, 0, 0));
         
         e.Graphics.DrawString(Title, Font, titleBrush, pt.X, pt.Y);
         titleBrush.Dispose();

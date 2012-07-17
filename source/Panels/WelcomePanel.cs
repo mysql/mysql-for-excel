@@ -45,22 +45,26 @@ namespace MySQL.ForExcel
     private void AddConnectionToList(MySqlWorkbenchConnection conn)
     {
       int nodeIdx = 1;
+      bool isSSH = false;
+
       string hostName = (conn.Host ?? string.Empty).Trim();
       if (conn.DriverType == MySqlWorkbenchConnectionType.Ssh)
       {
+        isSSH = true;
         string[] sshConnection = conn.HostIdentifier.Split('@');
         string dbHost = sshConnection[1].Split(':')[0].Trim();
         string sshHost = sshConnection[2].Split(':')[0].Trim();
         if (localValues.Contains(sshHost.ToLowerInvariant()) && localValues.Contains(dbHost.ToLowerInvariant()))
           nodeIdx = 0;
-        hostName = dbHost + " (ssh)";
+        hostName = dbHost + " (SSH)";
       }
       else if (localValues.Contains(hostName.ToLowerInvariant()))
         nodeIdx = 0;
 
       string s = String.Format("{0}|{1}", conn.Name, String.Format("User: {0}, Host: {1}", conn.UserName, hostName));
       TreeNode node = connectionList.AddNode(connectionList.Nodes[nodeIdx], s);
-      node.ImageIndex = 0;
+      node.ImageIndex = (isSSH ? 1 : 0);
+      node.Name = String.Format("{0}_{1}", (isSSH ? "DISABLED" : "ENABLED"), conn.Name);
       node.Tag = conn;
     }
 
@@ -82,7 +86,8 @@ namespace MySQL.ForExcel
 
     private void connectionList_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
     {
-      if (e.Node == null || e.Node.Level == 0) return;
+      if (e.Node == null || e.Node.Level == 0 || e.Node.ImageIndex > 0)
+        return;
       MySqlWorkbenchConnection c = connectionList.SelectedNode.Tag as MySqlWorkbenchConnection;
       (Parent as TaskPaneControl).OpenConnection(c);
     }

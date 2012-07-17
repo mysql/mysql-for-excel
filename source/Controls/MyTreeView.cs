@@ -137,6 +137,7 @@ namespace MySQL.ForExcel
 
     private void DrawChildNode(DrawTreeNodeEventArgs e)
     {
+      bool disabled = e.Node.Name.StartsWith("DISABLED_");
       Point pt = e.Bounds.Location;
       string[] parts = e.Node.Text.Split('|');
       SizeF titleStringSize = (parts != null && parts.Length > 0 ? e.Graphics.MeasureString(parts[0], Font) : SizeF.Empty);
@@ -162,7 +163,11 @@ namespace MySQL.ForExcel
       pt.Y += textInitialY + TitleTextVerticalPixelsOffset;
 
       // Draw the title if we have one
-      SolidBrush titleBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), ForeColor));
+      SolidBrush titleBrush  = null;
+      if (disabled)
+        titleBrush = new SolidBrush(Color.FromArgb(80, 0, 0, 0));
+      else
+        titleBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), ForeColor));
       if (parts != null && parts.Length >= 1)
       {  
         SizeF stringSize = e.Graphics.MeasureString(parts[0], Font);
@@ -179,7 +184,11 @@ namespace MySQL.ForExcel
       }
 
       // Draw the description if there is one
-      SolidBrush descBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionColorOpacity * 255), DescriptionColor));
+      SolidBrush descBrush = null;
+      if (disabled)
+        descBrush = new SolidBrush(Color.FromArgb(80, 0, 0, 0));
+      else
+        descBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionColorOpacity * 255), DescriptionColor));
       if (parts != null && parts.Length >= 2)
         e.Graphics.DrawString(parts[1], DescriptionFont, descBrush, pt.X, pt.Y);
 
