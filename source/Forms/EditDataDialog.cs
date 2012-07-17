@@ -350,7 +350,7 @@ namespace MySQL.ForExcel
         {
           for (int colIdx = 1; colIdx <= intersectRange.Columns.Count; colIdx++)
           {
-            int absRow = startDataTableRow + rowIdx - 1;
+            int absRow = startDataTableRow + rowIdx - 1 - (importedHeaders ? 1 : 0);
             int absCol = startDataTableCol + colIdx - 1;
             MySQLDataColumn currCol = editMySQLDataTable.GetColumnAtIndex(absCol);
             object insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(formattedArrayFromRange[rowIdx, colIdx], currCol);
