@@ -76,7 +76,7 @@ namespace MySQL.ForExcel
 
       for (int colIdx = 0; colIdx < dataTable.Columns.Count; colIdx++)
       {
-        MySQLDataColumn mysqlCol = dataTable.Columns[colIdx] as MySQLDataColumn;
+        MySQLDataColumn mysqlCol = dataTable.GetColumnAtIndex(colIdx);
         DataGridViewColumn gridCol = grdPreviewData.Columns[colIdx];
         gridCol.HeaderText = mysqlCol.DisplayName;
         grdPreviewData.Columns[colIdx].SortMode = DataGridViewColumnSortMode.NotSortable;
@@ -228,7 +228,7 @@ namespace MySQL.ForExcel
       StringBuilder queryString = new StringBuilder();
       queryString.Append(dataTable.GetCreateSQL(true));
       queryString.AppendFormat(";{0}", Environment.NewLine);
-      queryString.Append(dataTable.GetInsertSQL(100, true));
+      queryString.Append(dataTable.GetInsertSQL(100, true, true));
       queryString.Append(";");
       Clipboard.SetText(queryString.ToString());
     }
@@ -248,9 +248,9 @@ namespace MySQL.ForExcel
       string operationSummary = String.Format("The MySQL Table \"{0}\"", dataTable.TableName);
       StringBuilder operationDetails = new StringBuilder();
       operationDetails.AppendFormat("Creating MySQL Table \"{0}\"...{1}{1}", dataTable.TableName, Environment.NewLine);
-      operationDetails.Append(dataTable.GetCreateSQL(true));
-      operationDetails.Append(Environment.NewLine);
-      operationDetails.Append(Environment.NewLine);
+      string queryString = dataTable.GetCreateSQL(true);
+      operationDetails.Append(queryString);
+      operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
       bool success = dataTable.CreateTable(wbConnection, out exception);
       if (success)
         operationDetails.Append("Table has been created successfully.");
@@ -266,16 +266,22 @@ namespace MySQL.ForExcel
 
       if (success && tableContainsDataToExport)
       {
-        success = dataTable.InsertDataWithAdapter(wbConnection, out exception);
+        int insertedCount = 0;
+        success = dataTable.InsertDataWithAdapter(wbConnection, true, out exception, out insertedCount);
+        queryString = dataTable.GetInsertSQL(-1, true, true);
         if (success)
         {
-          operationDetails.AppendFormat("{0}Inserting data rows...{0}", Environment.NewLine);
-          operationDetails.AppendFormat("{0} rows have been added successfully.", dataTable.Rows.Count);
+          operationDetails.AppendFormat("{0}{0}Inserting data rows...{0}{0}", Environment.NewLine);
+          operationDetails.Append(queryString);
+          operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
+          operationDetails.AppendFormat("{0} rows have been added successfully.", insertedCount);
           operationSummary += "with data.";
         }
         else
         {
-          operationDetails.AppendFormat("{0}Error while inserting rows...{0}", Environment.NewLine);
+          operationDetails.AppendFormat("{0}{0}Error while inserting rows...{0}{0}", Environment.NewLine);
+          operationDetails.Append(queryString);
+          operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
           if (exception is MySqlException)
             operationDetails.AppendFormat("MySQL Error {0}:{1}", (exception as MySqlException).Number, Environment.NewLine);
           else
@@ -336,6 +342,7 @@ namespace MySQL.ForExcel
       }
       
       showValidationWarning("TableNameWarning", false, null);
+      dataTable.RefreshSelectQuery();
       btnExport.Enabled = true;
     }
 
@@ -402,7 +409,7 @@ namespace MySQL.ForExcel
       multiColumnPK = false;
       for (int coldIdx = 1; coldIdx < dataTable.Columns.Count; coldIdx++)
       {
-        MySQLDataColumn col = (dataTable.Columns[coldIdx] as MySQLDataColumn);
+        MySQLDataColumn col = dataTable.GetColumnAtIndex(coldIdx);
         col.PrimaryKey = (col.DisplayName == cmbPrimaryKeyColumns.Text);
       }
       if (cmbPrimaryKeyColumns.Items[0].ToString() == "<Multiple Items>")
@@ -452,7 +459,7 @@ namespace MySQL.ForExcel
       if (chkUniqueIndex.Checked == currentCol.UniqueKey)
         return;
       DataGridViewColumn gridCol = grdPreviewData.SelectedColumns[0];
-      MySQLDataColumn column = dataTable.Columns[gridCol.Index] as MySQLDataColumn;
+      MySQLDataColumn column = dataTable.GetColumnAtIndex(gridCol.Index);
       bool good = true;
       try
       {
@@ -511,7 +518,7 @@ namespace MySQL.ForExcel
       string warningText = null;
       for (int colIdx = 1; colIdx < dataTable.Columns.Count; colIdx++)
       {
-        MySQLDataColumn col = dataTable.Columns[colIdx] as MySQLDataColumn;
+        MySQLDataColumn col = dataTable.GetColumnAtIndex(colIdx);
         showWarning = showWarning || col.DisplayName.ToLowerInvariant() == txtAddPrimaryKey.Text.ToLowerInvariant();
         if (showWarning)
         {
@@ -521,7 +528,7 @@ namespace MySQL.ForExcel
       }
       btnExport.Enabled = !showWarning;
       showValidationWarning("PrimaryKeyWarning", showWarning, Properties.Resources.PrimaryKeyColumnExistsWarning);
-      (dataTable.Columns[0] as MySQLDataColumn).DisplayName = txtAddPrimaryKey.Text;
+      dataTable.GetColumnAtIndex(0).DisplayName = txtAddPrimaryKey.Text;
       grdPreviewData.Columns[0].HeaderText = txtAddPrimaryKey.Text;
       if (columnBindingSource.Position == 0)
         columnBindingSource.ResetCurrentItem();

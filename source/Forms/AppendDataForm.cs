@@ -146,8 +146,8 @@ namespace MySQL.ForExcel
           int fromColIdx = fromMySQLDataTable.GetColumnIndex(targetColName, true, false);
           if (fromColIdx >= 0)
           {
-            MySQLDataColumn fromCol = fromMySQLDataTable.Columns[fromColIdx] as MySQLDataColumn;
-            MySQLDataColumn toCol = toMySQLDataTable.Columns[toColIdx] as MySQLDataColumn;
+            MySQLDataColumn fromCol = fromMySQLDataTable.GetColumnAtIndex(fromColIdx);
+            MySQLDataColumn toCol = toMySQLDataTable.GetColumnAtIndex(toColIdx);
             if (DataTypeUtilities.Type1FitsIntoType2(fromCol.StrippedMySQLDataType, toCol.StrippedMySQLDataType))
             {
               autoMapping.MappedSourceIndexes[toColIdx] = fromColIdx;
@@ -165,8 +165,8 @@ namespace MySQL.ForExcel
         {
           if (colIdx >= maxMappingCols)
             break;
-          MySQLDataColumn fromCol = fromMySQLDataTable.Columns[colIdx] as MySQLDataColumn;
-          MySQLDataColumn toCol = toMySQLDataTable.Columns[colIdx] as MySQLDataColumn;
+          MySQLDataColumn fromCol = fromMySQLDataTable.GetColumnAtIndex(colIdx);
+          MySQLDataColumn toCol = toMySQLDataTable.GetColumnAtIndex(colIdx);
           if (DataTypeUtilities.Type1FitsIntoType2(fromCol.StrippedMySQLDataType, toCol.StrippedMySQLDataType))
           {
             autoMapping.MappedSourceIndexes[colIdx] = colIdx;
@@ -210,7 +210,7 @@ namespace MySQL.ForExcel
         int targetColumnIndex = matchedMapping.GetTargetColumnIndex(storedMappedColName);
         if (targetColumnIndex < 0)
           continue;
-        MySQLDataColumn toCol = toMySQLDataTable.Columns[targetColumnIndex] as MySQLDataColumn;
+        MySQLDataColumn toCol = toMySQLDataTable.GetColumnAtIndex(targetColumnIndex);
 
         // Check if mapped source column from Stored Mapping matches with a Source Column in current "From Table"
         //  in column name and its data type matches its corresponding target column, if so we are good to map it
@@ -219,7 +219,7 @@ namespace MySQL.ForExcel
         int sourceColFoundInFromTableIdx = fromMySQLDataTable.GetColumnIndex(mappedSourceColName, true);
         if (sourceColFoundInFromTableIdx >= 0)
         {
-          MySQLDataColumn fromCol = fromMySQLDataTable.Columns[sourceColFoundInFromTableIdx] as MySQLDataColumn;
+          MySQLDataColumn fromCol = fromMySQLDataTable.GetColumnAtIndex(sourceColFoundInFromTableIdx);
           if (DataTypeUtilities.Type1FitsIntoType2(fromCol.StrippedMySQLDataType, toCol.StrippedMySQLDataType))
             matchedMapping.MappedSourceIndexes[targetColumnIndex] = sourceColFoundInFromTableIdx;
         }
@@ -227,13 +227,13 @@ namespace MySQL.ForExcel
         //  with the From column in that source index only if that From Column name is not in any source mapping.
         else if (matchedMapping.MappedSourceIndexes[targetColumnIndex] < 0 && proposedSourceMapping < fromMySQLDataTable.Columns.Count)
         {
-          string fromTableColName = (fromMySQLDataTable.Columns[proposedSourceMapping] as MySQLDataColumn).DisplayName;
+          string fromTableColName = fromMySQLDataTable.GetColumnAtIndex(proposedSourceMapping).DisplayName;
           int fromTableColNameFoundInStoredMappingSourceColumnsIdx = currentColumnMapping.GetSourceColumnIndex(fromTableColName);
           if (fromTableColNameFoundInStoredMappingSourceColumnsIdx >= 0
             && fromTableColNameFoundInStoredMappingSourceColumnsIdx != proposedSourceMapping
             && currentColumnMapping.GetMappedSourceIndexIndex(fromTableColNameFoundInStoredMappingSourceColumnsIdx) >= 0)
             continue;
-          MySQLDataColumn fromCol = fromMySQLDataTable.Columns[proposedSourceMapping] as MySQLDataColumn;
+          MySQLDataColumn fromCol = fromMySQLDataTable.GetColumnAtIndex(proposedSourceMapping);
           if (DataTypeUtilities.Type1FitsIntoType2(fromCol.StrippedMySQLDataType, toCol.StrippedMySQLDataType))
             matchedMapping.MappedSourceIndexes[targetColumnIndex] = proposedSourceMapping;
         }
@@ -272,12 +272,12 @@ namespace MySQL.ForExcel
       MySQLDataColumn fromCol;
       if (mapping)
       {
-        fromCol = fromMySQLDataTable.Columns[fromColumnIndex] as MySQLDataColumn;
+        fromCol = fromMySQLDataTable.GetColumnAtIndex(fromColumnIndex);
         fromCol.MappedDataColName = toMySQLDataTable.Columns[toColumnIndex].ColumnName;
       }
       else if (previouslyMappedFromIndex >= 0)
       {
-        fromCol = fromMySQLDataTable.Columns[previouslyMappedFromIndex] as MySQLDataColumn;
+        fromCol = fromMySQLDataTable.GetColumnAtIndex(previouslyMappedFromIndex);
         fromCol.MappedDataColName = null;
       }
       currentColumnMapping.MappedSourceIndexes[toColumnIndex] = fromColumnIndex;
@@ -320,7 +320,7 @@ namespace MySQL.ForExcel
           DataGridViewCellStyle newStyle = new DataGridViewCellStyle(grdFromExcelData.Columns[colIdx].HeaderCell.Style);
           newStyle.SelectionBackColor = newStyle.BackColor = SystemColors.Control;
           grdFromExcelData.Columns[colIdx].HeaderCell.Style = newStyle;
-          MySQLDataColumn fromCol = fromMySQLDataTable.Columns[colIdx] as MySQLDataColumn;
+          MySQLDataColumn fromCol = fromMySQLDataTable.GetColumnAtIndex(colIdx);
           fromCol.MappedDataColName = null;
         }        
       }
@@ -365,7 +365,7 @@ namespace MySQL.ForExcel
       // Flag the property in the "From" table
       fromMySQLDataTable.FirstRowIsHeaders = firstRowColNames;
 
-      // Refresh the "From"/"Source" Grid and "From"/"Source" column names in the current mapping and
+      // Refresh the "From"/"Source" Grid and "From"/"Source" column names in the current mapping
       grdFromExcelData.CurrentCell = null;
       for (int colIdx = 0; colIdx < grdFromExcelData.Columns.Count; colIdx++)
       {
@@ -412,7 +412,7 @@ namespace MySQL.ForExcel
       string insertQuery;
       string operationSummary = String.Empty;
 
-      bool success = fromMySQLDataTable.InsertDataWithManualQuery(wbConnection, true, out exception, out insertQuery);
+      bool success = fromMySQLDataTable.InsertExistingDataWithManualQuery(wbConnection, toMySQLDataTable, out exception, out insertQuery);
       if (success)
         operationSummary = String.Format("Excel data was appended successfully to MySQL Table {0}.", toMySQLDataTable.TableName);
       else
@@ -536,7 +536,7 @@ namespace MySQL.ForExcel
         string droppedOntoColumnName = grdToMySQLTable.Columns[grdToTableColumnIndexToDrop].HeaderText;
         if (e.Effect == DragDropEffects.Link && grdToTableColumnIndexToDrop >= 0)
         {
-          MySQLDataColumn fromCol = fromMySQLDataTable.Columns[fromColumnIndex] as MySQLDataColumn;
+          MySQLDataColumn fromCol = fromMySQLDataTable.GetColumnAtIndex(fromColumnIndex);
           if (!String.IsNullOrEmpty(fromCol.MappedDataColName))
           {
             bool isIdenticalMapping = fromCol.MappedDataColName == droppedOntoColumnName;

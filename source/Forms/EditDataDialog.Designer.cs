@@ -150,7 +150,7 @@
       this.Name = "EditDataDialog";
       this.Padding = new System.Windows.Forms.Padding(3);
       this.ShowInTaskbar = false;
-      this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+      this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
       this.TopMost = true;
       ((System.ComponentModel.ISupportInitialize)(this.picSakilaLogo)).EndInit();
       this.contextMenu.ResumeLayout(false);

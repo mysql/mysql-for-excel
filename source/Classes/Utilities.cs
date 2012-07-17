@@ -142,7 +142,7 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog infoDialog = new InfoDialog(false, "An error ocurred when savings user settings file", String.Format(@"Description Error: \""{0}\""", ex.Message));
+        InfoDialog infoDialog = new InfoDialog(false, "An error ocurred when savings user settings file", ex.Message);
         infoDialog.ShowDialog();
         return false;
       }
@@ -161,6 +161,7 @@ namespace MySQL.ForExcel
       cs.Password = connection.Password;
       cs.Database = connection.Schema;
       cs.Port = (uint)connection.Port;
+      cs.AllowZeroDateTime = true;
       //TODO:  use additional necessary options
       return cs.ConnectionString;
     }
@@ -230,6 +231,22 @@ namespace MySQL.ForExcel
     }
 
     public static void AddExtendedProperties(ref DataTable dt, string queryString, bool importedHeaders, string tableName)
+    {
+      if (dt.ExtendedProperties.ContainsKey("QueryString"))
+        dt.ExtendedProperties["QueryString"] = queryString;
+      else
+        dt.ExtendedProperties.Add("QueryString", queryString);
+      if (dt.ExtendedProperties.ContainsKey("ImportedHeaders"))
+        dt.ExtendedProperties["ImportedHeaders"] = importedHeaders;
+      else
+        dt.ExtendedProperties.Add("ImportedHeaders", importedHeaders);
+      if (dt.ExtendedProperties.ContainsKey("TableName"))
+        dt.ExtendedProperties["TableName"] = tableName;
+      else
+        dt.ExtendedProperties.Add("TableName", tableName);
+    }
+
+    public static void AddExtendedProperties(ref MySQLDataTable dt, string queryString, bool importedHeaders, string tableName)
     {
       if (dt.ExtendedProperties.ContainsKey("QueryString"))
         dt.ExtendedProperties["QueryString"] = queryString;
@@ -983,6 +1000,48 @@ namespace MySQL.ForExcel
     {
       string outConsistentStrippedType;
       return GetConsistentDataTypeOnAllRows(proposedStrippedDataType, rowsDataTypesList, decimalMaxLen, varCharMaxLen, out outConsistentStrippedType);
+    }
+
+    public static object GetInsertingValueForColumnType(object rawValue, MySQLDataColumn column)
+    {
+      object retValue = null;
+
+      bool cellWithNoData = rawValue == null || rawValue == DBNull.Value;
+      if (cellWithNoData)
+      {
+        if (column.AllowNull)
+          retValue = DBNull.Value;
+        else
+        {
+          if (column.IsNumeric || column.IsBinary)
+            retValue = 0;
+          else if (column.IsBool)
+            retValue = false;
+          else if (column.IsDate)
+            retValue = "0000-00-00 00:00:00";
+          else if (column.IsCharOrText)
+            retValue = String.Empty;
+        }
+      }
+      else
+      {
+        if (column.IsBool)
+        {
+          string rawValueAsString = rawValue.ToString().ToLowerInvariant();
+          if (rawValueAsString == "ja" || rawValueAsString == "yes" || rawValueAsString == "true" || rawValueAsString == "1")
+            retValue = true;
+          else if (rawValueAsString == "nein" || rawValueAsString == "no" || rawValueAsString == "false" || rawValueAsString == "0")
+            retValue = false;
+          else
+            retValue = rawValue;
+        }
+        else if (column.IsCharOrText)
+          retValue = MySQLDataUtilities.EscapeString(rawValue.ToString());
+        else
+          retValue = rawValue;
+      }
+
+      return retValue;
     }
 
   }

@@ -15,6 +15,7 @@ namespace MySQL.ForExcel
     private bool useFirstColumnAsPK;
 
     public string SchemaName { get; set; }
+    public string SelectQuery { get; set; }
     public bool AddPrimaryKeyColumn { get; set; }
     public bool UseFirstColumnAsPK {
       get { return useFirstColumnAsPK; }
@@ -83,7 +84,8 @@ namespace MySQL.ForExcel
     }
 
     // Constructor used for Append Data, fetching Schema Information for columns
-    public MySQLDataTable(string tableName, bool fetchColumnsSchemaInfo, MySqlWorkbenchConnection wbConnection) : this(tableName, wbConnection.Schema)
+    public MySQLDataTable(string tableName, bool fetchColumnsSchemaInfo, MySqlWorkbenchConnection wbConnection)
+      : this(wbConnection.Schema, tableName)
     {
       if (fetchColumnsSchemaInfo)
       {
@@ -112,6 +114,22 @@ namespace MySQL.ForExcel
       }
     }
 
+    // Constructor used for Edit Data where we copy the contents of a table imported to Excel for edition
+    public MySQLDataTable(string tableName, DataTable filledTable, MySqlWorkbenchConnection wbConnection)
+      : this(tableName, true, wbConnection)
+    {
+      try
+      {
+        foreach (DataRow dr in filledTable.Rows)
+          ImportRow(dr);
+      }
+      catch (Exception ex)
+      {
+        InfoDialog infoDialog = new InfoDialog(false, ex.Message, ex.StackTrace);
+        infoDialog.ShowDialog();
+      }
+    }
+
     // Constructor setting just the Table Name
     public MySQLDataTable(string schemaName, string tableName) : this()
     {
@@ -119,13 +137,21 @@ namespace MySQL.ForExcel
         SchemaName = schemaName;
       if (!String.IsNullOrEmpty(tableName))
         TableName = tableName;
+      SelectQuery = String.Format("SELECT * FROM `{0}`.`{1}`", schemaName, tableName);
     }
 
     // Dummy constructor
     public MySQLDataTable()
     {
       SchemaName = String.Empty;
+      SelectQuery = String.Format("SELECT * FROM `{0}`", TableName);
       AddPrimaryKeyColumn = false;
+    }
+
+    public void RefreshSelectQuery()
+    {
+      string schemaPiece = (!String.IsNullOrEmpty(SchemaName) ? String.Format("`{0}`.", SchemaName) : String.Empty);
+      SelectQuery = String.Format("SELECT * FROM {0}`{1}`", schemaPiece, TableName);
     }
 
     private void CreateColumns(int numCols)
@@ -368,6 +394,16 @@ namespace MySQL.ForExcel
       return index;
     }
 
+    public MySQLDataColumn GetColumnAtIndex(int index)
+    {
+      MySQLDataColumn col = null;
+
+      if (index < Columns.Count)
+        col = Columns[index] as MySQLDataColumn;
+
+      return col;
+    }
+
     public int GetColumnIndex(string columnName, bool displayName)
     {
       return GetColumnIndex(columnName, displayName, true);
@@ -459,24 +495,24 @@ namespace MySQL.ForExcel
       return sql.ToString();
     }
 
-    public string GetInsertSQL(int limit, bool formatNewLinesAndTabs)
+    public string GetInsertSQL(int limit, bool formatNewLinesAndTabs, bool existingData)
     {
-      return GetInsertSQL(limit, formatNewLinesAndTabs, false);
+      return GetInsertSQL(limit, formatNewLinesAndTabs, existingData, null);
     }
 
-    public string GetInsertSQL(int limit, bool formatNewLinesAndTabs, bool insertingMappedColumns)
+    public string GetInsertSQL(int limit, bool formatNewLinesAndTabs, bool existingData, MySQLDataTable mappingTargetTable)
     {
       int colsCount = Columns.Count;
       if (Rows.Count - (firstRowIsHeaders ? 1 : 0) < 1)
         return null;
+      bool insertingMappedColumns = mappingTargetTable != null;
 
       StringBuilder queryString = new StringBuilder();
       string nl = (formatNewLinesAndTabs ? Environment.NewLine : " ");
       int rowIdx = 0;
       int colIdx = 0;
       int startingColNum = (AddPrimaryKeyColumn ? (useFirstColumnAsPK ? 0 : 1) : 0);
-      List<bool> columnsRequireQuotes = new List<bool>(colsCount);
-      List<string> insertColumnNames = new List<string>(colsCount);
+      SortedList<int, string> insertColumnNames = new SortedList<int, string>(colsCount);
 
       string rowsSeparator = String.Empty;
       string colsSeparator = String.Empty;
@@ -492,48 +528,61 @@ namespace MySQL.ForExcel
                                  colsSeparator,
                                  insertIntoColName);
         colsSeparator = ",";
-        columnsRequireQuotes.Add(column.ColumnsRequireQuotes);
-        insertColumnNames.Add(column.ColumnName);
+        if (insertingMappedColumns)
+          insertColumnNames.Add(mappingTargetTable.Columns[column.MappedDataColName].Ordinal, column.ColumnName);
+        else
+          insertColumnNames.Add(colIdx, column.ColumnName);
       }
       queryString.AppendFormat("){0}VALUES{0}", nl);
 
-      colsCount = insertColumnNames.Count;
-      foreach (DataRow dr in Rows)
+      DataRowCollection valueRows = null;
+      if (existingData)
+        valueRows = Rows;
+      else
       {
-        if (firstRowIsHeaders && rowIdx++ == 0)
-          continue;
-        if (limit > 0 && rowIdx >= limit)
-          break;
-        queryString.AppendFormat("{0}(", rowsSeparator);
-        colsSeparator = String.Empty;
-        for (colIdx = startingColNum; colIdx < colsCount; colIdx++)
-        {
-          bool currColRequiresQuotes = columnsRequireQuotes[colIdx];
-          string curentStrValue = dr[insertColumnNames[colIdx]].ToString();
-          string valueToDB = String.Empty;
-
-          if (currColRequiresQuotes)
-            valueToDB = (String.IsNullOrEmpty(curentStrValue) ? String.Empty : MySQLDataUtilities.EscapeString(curentStrValue));
-          else  // for numeric type then insert a null value if the dr doesn't have any value for this column
-            valueToDB = (String.IsNullOrEmpty(curentStrValue) ? @"null" : curentStrValue);
-          queryString.AppendFormat("{0}{1}{2}{1}",
-                                   colsSeparator,
-                                   (currColRequiresQuotes ? "'" : String.Empty),
-                                   valueToDB);
-          colsSeparator = ",";
-        }
-        queryString.Append(")");
-        if (rowsSeparator.Length == 0)
-          rowsSeparator = "," + nl;
+        DataTable changesTable = GetChanges(DataRowState.Added);
+        valueRows = (changesTable != null ? changesTable.Rows : null);
       }
+
+      if (valueRows != null)
+      {
+        for (rowIdx = 0; rowIdx < valueRows.Count; rowIdx++)
+        {
+          DataRow dr = valueRows[rowIdx];
+          if (firstRowIsHeaders && rowIdx == 0)
+            continue;
+          if (limit > 0 && rowIdx >= limit)
+            break;
+          queryString.AppendFormat("{0}(", rowsSeparator);
+          colsSeparator = String.Empty;
+          foreach (string insertingColName in insertColumnNames.Values)
+          {
+            MySQLDataColumn column = Columns[insertingColName] as MySQLDataColumn;
+            if (insertingMappedColumns)
+              column = (mappingTargetTable.Columns[column.MappedDataColName] as MySQLDataColumn) ?? column;
+            object insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(dr[insertingColName], column);
+            bool insertingValueIsNull = insertingValue == null || insertingValue == DBNull.Value;
+            string valueToDB = (insertingValueIsNull ? @"null" : insertingValue.ToString());
+            queryString.AppendFormat("{0}{1}{2}{1}",
+                                     colsSeparator,
+                                     (column.ColumnsRequireQuotes && !insertingValueIsNull ? "'" : String.Empty),
+                                     valueToDB);
+            colsSeparator = ",";
+          }
+          queryString.Append(")");
+          if (rowsSeparator.Length == 0)
+            rowsSeparator = "," + nl;
+        }
+      }
+
       return queryString.ToString();
     }
 
-    public bool InsertDataWithManualQuery(MySqlWorkbenchConnection wbConnection, bool insertingMappedColumns, out Exception exception, out string sqlQuery)
+    public bool InsertExistingDataWithManualQuery(MySqlWorkbenchConnection wbConnection, MySQLDataTable mappingTargetTable, out Exception exception, out string sqlQuery)
     {
       bool success = false;
       exception = null;
-      sqlQuery = GetInsertSQL(-1, true, insertingMappedColumns);
+      sqlQuery = GetInsertSQL(-1, true, true, mappingTargetTable);
 
       try
       {
@@ -558,24 +607,60 @@ namespace MySQL.ForExcel
       return success;
     }
 
-    public bool InsertDataWithAdapter(MySqlWorkbenchConnection wbConnection, out Exception exception)
+    public bool InsertNewDataWithManualQuery(MySqlWorkbenchConnection wbConnection, out Exception exception, out string sqlQuery)
     {
       bool success = false;
       exception = null;
+      sqlQuery = GetInsertSQL(-1, true, false);
 
-      DataTable copyOriginal = this.Clone();
-      copyOriginal.Merge(this);
-      foreach (MySQLDataColumn col in Columns)
+      try
       {
-        MySQLDataColumn copyCol = copyOriginal.Columns[col.ColumnName] as MySQLDataColumn;
-        if (col.ExcludeColumn || (AddPrimaryKeyColumn && !useFirstColumnAsPK && col.AutoPK))
-          copyOriginal.Columns.Remove(copyCol);
-        else
-          copyCol.ColumnName = col.DisplayName;
+        string connectionString = MySQLDataUtilities.GetConnectionString(wbConnection);
+        using (MySqlConnection conn = new MySqlConnection(connectionString))
+        {
+          conn.Open();
+          MySqlCommand cmd = new MySqlCommand(sqlQuery, conn);
+          cmd.ExecuteNonQuery();
+          success = true;
+        }
       }
-      if (firstRowIsHeaders)
-        copyOriginal.Rows.RemoveAt(0);
-      copyOriginal.AcceptChanges();
+      catch (MySqlException mysqlEx)
+      {
+        exception = mysqlEx;
+      }
+      catch (Exception ex)
+      {
+        exception = ex;
+      }
+
+      return success;
+    }
+
+    public bool InsertDataWithAdapter(MySqlWorkbenchConnection wbConnection, bool existingData, out Exception exception, out int updatedCount)
+    {
+      bool success = false;
+      exception = null;
+      updatedCount = 0;
+      DataTable copyOriginal = null;
+
+      if (existingData)
+      {
+        copyOriginal = this.Clone();
+        copyOriginal.Merge(this, true);
+        foreach (MySQLDataColumn col in Columns)
+        {
+          DataColumn copyCol = copyOriginal.Columns[col.ColumnName];
+          if (col.ExcludeColumn || (AddPrimaryKeyColumn && !useFirstColumnAsPK && col.AutoPK))
+            copyOriginal.Columns.Remove(copyCol);
+          //else
+          //  copyCol.ColumnName = col.DisplayName;
+        }
+        if (firstRowIsHeaders)
+          copyOriginal.Rows.RemoveAt(0);
+        copyOriginal.AcceptChanges();
+      }
+      else
+        copyOriginal = this;
 
       string connectionString = MySQLDataUtilities.GetConnectionString(wbConnection);
       // Create & open a SqlConnection, and dispose of it after we are done.
@@ -583,17 +668,40 @@ namespace MySQL.ForExcel
       {
         try
         {
-          MySqlDataAdapter dataAdapter = new MySqlDataAdapter(String.Format("SELECT * FROM `{0}`.`{1}`", wbConnection.Schema, TableName), connection);
+          MySqlDataAdapter dataAdapter = new MySqlDataAdapter(SelectQuery, connection);
           DataTable exportingDataTable = new DataTable();
           dataAdapter.FillSchema(exportingDataTable, SchemaType.Source);
-          foreach (DataRow row in copyOriginal.Rows)
+
+          DataRowCollection valueRows = null;
+          if (existingData)
+            valueRows = copyOriginal.Rows;
+          else
           {
-            exportingDataTable.LoadDataRow(row.ItemArray, LoadOption.Upsert);
+            DataTable changesTable = GetChanges(DataRowState.Added);
+            valueRows = (changesTable != null ? changesTable.Rows : null);
           }
+          if (valueRows != null)
+            for (int rowIdx = 0; rowIdx < valueRows.Count; rowIdx++)
+            {
+              DataRow row = valueRows[rowIdx];
+
+              row.BeginEdit();
+              for (int colIdx = 0; colIdx < copyOriginal.Columns.Count; colIdx++)
+              {
+                string copyOriginalColName = copyOriginal.Columns[colIdx].ColumnName;
+                MySQLDataColumn column = Columns[copyOriginalColName] as MySQLDataColumn;
+                object insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(row[colIdx], column);
+                if (insertingValue.Equals("0000-00-00 00:00:00"))
+                  insertingValue = DateTime.MinValue;
+                row[colIdx] = insertingValue;
+              }
+              row.EndEdit();
+              exportingDataTable.LoadDataRow(row.ItemArray, LoadOption.Upsert);
+            }
+
           MySqlCommandBuilder commBuilder = new MySqlCommandBuilder(dataAdapter);
           dataAdapter.InsertCommand = commBuilder.GetInsertCommand();
 
-          int updatedCount = 0;
           updatedCount = dataAdapter.Update(exportingDataTable);
           success = updatedCount > 0;
         }
@@ -609,6 +717,221 @@ namespace MySQL.ForExcel
 
       return success;
     }
+
+    private List<string> getChangedColumns(DataRow changesRow)
+    {
+      List<string> changedColNamesList = null;
+
+      if (changesRow != null)
+      {
+        changedColNamesList = new List<string>(changesRow.Table.Columns.Count);
+        foreach (DataColumn col in changesRow.Table.Columns)
+        {
+          if (!changedColNamesList.Contains(col.ColumnName) && !changesRow[col, DataRowVersion.Original].Equals(changesRow[col, DataRowVersion.Current]))
+            changedColNamesList.Add(col.ColumnName);
+        }
+      }
+
+      return changedColNamesList;
+    }
+
+    public string GetUpdateSQL(int limit, bool formatNewLinesAndTabs)
+    {
+      DataTable changesTable = GetChanges(DataRowState.Modified);
+      if (changesTable == null || changesTable.Rows.Count == 0)
+        return String.Empty;
+
+      StringBuilder queryString = new StringBuilder();
+      string nl = (formatNewLinesAndTabs ? Environment.NewLine : " ");
+      int rowIdx = 0;
+      string rowsSeparator = String.Empty;
+      string colsSeparator = String.Empty;
+
+      for (rowIdx = 0; rowIdx < changesTable.Rows.Count; rowIdx++)
+      {
+        DataRow changesRow = changesTable.Rows[rowIdx];
+        List<string> changedColNamesList = getChangedColumns(changesRow);
+        queryString.AppendFormat("{0}UPDATE `{1}`.`{2}` SET ",
+                                 rowsSeparator,
+                                 SchemaName,
+                                 TableName);
+        colsSeparator = String.Empty;
+        foreach (string colName in changedColNamesList)
+        {
+          MySQLDataColumn column = Columns[colName] as MySQLDataColumn;
+          bool insertingValueIsNull = changesRow[colName] == null || changesRow[colName] == DBNull.Value;
+          string valueToDB = (insertingValueIsNull ? @"null" : changesRow[colName].ToString());
+          queryString.AppendFormat("{0}`{1}`={2}{3}{2}",
+                                    colsSeparator,
+                                    colName,
+                                    (column.ColumnsRequireQuotes && !insertingValueIsNull ? "'" : String.Empty),
+                                    valueToDB);
+          colsSeparator = ",";
+        }
+        queryString.Append(" WHERE ");
+        colsSeparator = String.Empty;
+        foreach (DataColumn pkCol in PrimaryKey)
+        {
+          MySQLDataColumn column = Columns[pkCol.ColumnName] as MySQLDataColumn;
+          queryString.AppendFormat("{0}`{1}`={2}{3}{2}",
+                                    colsSeparator,
+                                    pkCol.ColumnName,
+                                    (column.ColumnsRequireQuotes ? "'" : String.Empty),
+                                    changesRow[pkCol].ToString());
+          colsSeparator = " AND ";
+        }
+        rowsSeparator = ";" + nl;
+      }
+
+      return queryString.ToString();
+    }
+
+    public bool UpdateDataWithAdapter(MySqlWorkbenchConnection wbConnection, out Exception exception, out int updatedCount)
+    {
+      bool success = false;
+      int targetUpdateCount = 0;
+      updatedCount = 0;
+      exception = null;
+
+      string connectionString = MySQLDataUtilities.GetConnectionString(wbConnection);
+      // Create & open a SqlConnection, and dispose of it after we are done.
+      using (MySqlConnection connection = new MySqlConnection(connectionString))
+      {
+        try
+        {
+          MySqlDataAdapter dataAdapter = new MySqlDataAdapter(SelectQuery, connection);
+          DataTable changesTable = GetChanges(DataRowState.Modified);
+          if (changesTable.Rows != null)
+            targetUpdateCount = changesTable.Rows.Count;
+
+          MySqlCommandBuilder commBuilder = new MySqlCommandBuilder(dataAdapter);
+          dataAdapter.UpdateCommand = commBuilder.GetUpdateCommand();
+
+          updatedCount = dataAdapter.Update(this);
+          success = updatedCount == targetUpdateCount;
+        }
+        catch (MySqlException mysqlEx)
+        {
+          exception = mysqlEx;
+        }
+        catch (Exception ex)
+        {
+          exception = ex;
+        }
+      }
+
+      return success;
+    }
+
+    public string GetDeleteSQL(int limit, bool formatNewLinesAndTabs)
+    {
+      DataTable changesTable = GetChanges(DataRowState.Deleted);
+      if (changesTable == null || changesTable.Rows.Count == 0)
+        return String.Empty;
+
+      StringBuilder queryString = new StringBuilder();
+      string nl = (formatNewLinesAndTabs ? Environment.NewLine : " ");
+      int rowIdx = 0;
+      string rowsSeparator = String.Empty;
+      string colsSeparator = String.Empty;
+
+      for (rowIdx = 0; rowIdx < changesTable.Rows.Count; rowIdx++)
+      {
+        DataRow changesRow = changesTable.Rows[rowIdx];
+        queryString.AppendFormat("{0}DELETE FROM `{1}`.`{2}` WHERE ",
+                                 rowsSeparator,
+                                 SchemaName,
+                                 TableName);
+        colsSeparator = String.Empty;
+        foreach (DataColumn pkCol in PrimaryKey)
+        {
+          MySQLDataColumn column = Columns[pkCol.ColumnName] as MySQLDataColumn;
+          queryString.AppendFormat("{0}`{1}`={2}{3}{2}",
+                                    colsSeparator,
+                                    pkCol.ColumnName,
+                                    (column.ColumnsRequireQuotes ? "'" : String.Empty),
+                                    changesRow[pkCol].ToString());
+          colsSeparator = " AND ";
+        }
+        rowsSeparator = ";" + nl;
+      }
+
+      return queryString.ToString();
+    }
+
+    public bool DeleteDataWithAdapter(MySqlWorkbenchConnection wbConnection, out Exception exception, out int updatedCount)
+    {
+      bool success = false;
+      exception = null;
+      updatedCount = 0;
+      int targetDeleteCount = 0;
+
+      string connectionString = MySQLDataUtilities.GetConnectionString(wbConnection);
+      // Create & open a SqlConnection, and dispose of it after we are done.
+      using (MySqlConnection connection = new MySqlConnection(connectionString))
+      {
+        try
+        {
+          MySqlDataAdapter dataAdapter = new MySqlDataAdapter(SelectQuery, connection);
+          MySqlCommandBuilder commBuilder = new MySqlCommandBuilder(dataAdapter);
+          dataAdapter.DeleteCommand = commBuilder.GetDeleteCommand();
+          
+          DataTable changesTable = GetChanges(DataRowState.Deleted);
+          if (changesTable.Rows != null)
+            targetDeleteCount = changesTable.Rows.Count;
+
+          updatedCount = dataAdapter.Update(this);
+          success = updatedCount == targetDeleteCount;
+        }
+        catch (MySqlException mysqlEx)
+        {
+          exception = mysqlEx;
+        }
+        catch (Exception ex)
+        {
+          exception = ex;
+        }
+      }
+
+      return success;
+    }
+
+    public bool RevertData(bool refreshFromDB, MySqlWorkbenchConnection wbConnection, out Exception exception)
+    {
+      bool success = true;
+      exception = null;
+
+      if (!refreshFromDB)
+      {
+        RejectChanges();
+        return success;
+      }
+
+      string connectionString = MySQLDataUtilities.GetConnectionString(wbConnection);
+      // Create & open a SqlConnection, and dispose of it after we are done.
+      using (MySqlConnection connection = new MySqlConnection(connectionString))
+      {
+        try
+        {
+          MySqlDataAdapter dataAdapter = new MySqlDataAdapter(SelectQuery, connection);
+          Clear();
+          dataAdapter.Fill(this);
+        }
+        catch (MySqlException mysqlEx)
+        {
+          exception = mysqlEx;
+          success = false;
+        }
+        catch (Exception ex)
+        {
+          exception = ex;
+          success = false;
+        }
+      }
+
+      return success;
+    }
+
   }
   
 }

@@ -186,6 +186,7 @@ namespace MySQL.ForExcel
           fillingRowIdx++;
         }
         fillingRange.set_Value(Type.Missing, fillingArray);
+        fillingRange.Columns.AutoFit();
         excelApplication_SheetSelectionChange(currentSheet, excelApplication.ActiveCell);
       }
 
@@ -289,7 +290,7 @@ namespace MySQL.ForExcel
       
       // Edit Data
       MySQLDataUtilities.AddExtendedProperties(ref importForm.ImportDataTable, importForm.ImportDataTable.ExtendedProperties["QueryString"].ToString(), importForm.ImportHeaders, tableObject.Name);
-      editDialog = new EditDataDialog(connection, editingRange, importForm.ImportDataTable, currentWorksheet);
+      editDialog = new EditDataDialog(connection, editingRange, importForm.ImportDataTable, currentWorksheet, true);
       editDialog.ParentWindow = new NativeWindowWrapper(excelApplication.Hwnd);
       editDialog.CallerTaskPane = this;
       editDialog.Show(editDialog.ParentWindow);
@@ -297,7 +298,7 @@ namespace MySQL.ForExcel
       // Maintain hashtables for open Edit Data Dialogs
       if (WorkSheetEditFormsHashtable == null)
         WorkSheetEditFormsHashtable = new Hashtable();
-      WorkSheetEditFormsHashtable.Add(tableObject.Name, editDialog);
+      WorkSheetEditFormsHashtable.Add(currentWorksheet.Name, editDialog);
       if (TableNameEditFormsHashtable == null)
         TableNameEditFormsHashtable = new Hashtable();
       TableNameEditFormsHashtable.Add(tableObject.Name, editDialog);

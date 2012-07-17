@@ -7,7 +7,7 @@ using MySql.Data.MySqlClient;
 
 namespace MySQL.ForExcel
 {
-  class MySQLDataColumn : DataColumn
+  public class MySQLDataColumn : DataColumn
   {
     private bool uniqueKey;
     private string displayName;
@@ -53,7 +53,9 @@ namespace MySQL.ForExcel
     {
       get
       {
-        string toLowerDataType = MySQLDataType.ToLowerInvariant();
+        if (String.IsNullOrEmpty(StrippedMySQLDataType))
+          return false;
+        string toLowerDataType = StrippedMySQLDataType.ToLowerInvariant();
         return toLowerDataType == "real" || toLowerDataType == "double" || toLowerDataType == "float" || toLowerDataType == "decimal" || toLowerDataType == "numeric";
       }
     }
@@ -62,7 +64,9 @@ namespace MySQL.ForExcel
     {
       get
       {
-        string toLowerDataType = MySQLDataType.ToLowerInvariant();
+        if (String.IsNullOrEmpty(StrippedMySQLDataType))
+          return false;
+        string toLowerDataType = StrippedMySQLDataType.ToLowerInvariant();
         return IsDecimal || toLowerDataType.Contains("int");
       }
     }
@@ -71,7 +75,9 @@ namespace MySQL.ForExcel
     {
       get
       {
-        string toLowerDataType = MySQLDataType.ToLowerInvariant();
+        if (String.IsNullOrEmpty(StrippedMySQLDataType))
+          return false;
+        string toLowerDataType = StrippedMySQLDataType.ToLowerInvariant();
         return toLowerDataType.Contains("char");
       }
     }
@@ -80,8 +86,21 @@ namespace MySQL.ForExcel
     {
       get
       {
-        string toLowerDataType = MySQLDataType.ToLowerInvariant();
+        if (String.IsNullOrEmpty(StrippedMySQLDataType))
+          return false;
+        string toLowerDataType = StrippedMySQLDataType.ToLowerInvariant();
         return toLowerDataType.Contains("char") || toLowerDataType.Contains("text");
+      }
+    }
+
+    public bool IsBool
+    {
+      get
+      {
+        if (String.IsNullOrEmpty(StrippedMySQLDataType))
+          return false;
+        string toLowerDataType = MySQLDataType.ToLowerInvariant();
+        return toLowerDataType.StartsWith("bool") || toLowerDataType == "tinyint(1)" || toLowerDataType == "bit(1)";
       }
     }
 
@@ -89,7 +108,9 @@ namespace MySQL.ForExcel
     {
       get
       {
-        string toLowerDataType = MySQLDataType.ToLowerInvariant();
+        if (String.IsNullOrEmpty(StrippedMySQLDataType))
+          return false;
+        string toLowerDataType = StrippedMySQLDataType.ToLowerInvariant();
         return toLowerDataType.Contains("binary");
       }
     }
@@ -98,7 +119,9 @@ namespace MySQL.ForExcel
     {
       get
       {
-        string toLowerDataType = MySQLDataType.ToLowerInvariant();
+        if (String.IsNullOrEmpty(StrippedMySQLDataType))
+          return false;
+        string toLowerDataType = StrippedMySQLDataType.ToLowerInvariant();
         return toLowerDataType.Contains("date") || toLowerDataType == "timestamp";
       }
     }
@@ -139,7 +162,7 @@ namespace MySQL.ForExcel
       : this()
     {
       DisplayName = ColumnName = columnName;
-      AllowDBNull = AllowNull = allowNulls;
+      AllowNull = allowNulls;
       Unsigned = false;
       AutoIncrement = false;
       if (!String.IsNullOrEmpty(extraInfo))
@@ -223,13 +246,19 @@ namespace MySQL.ForExcel
       StringBuilder colDefinition = new StringBuilder();
       colDefinition.AppendFormat("`{0}` {1}", displayName, MySQLDataType);
       if (AutoPK || (PrimaryKey && (Table as MySQLDataTable).NumberOfPK == 1))
+      {
+        if (AutoIncrement)
+          colDefinition.Append(" auto_increment");
         colDefinition.Append(" primary key");
-      else if (UniqueKey)
-        colDefinition.Append(" unique key");
-      if (AllowNull)
-        colDefinition.Append(" null");
-      if (AutoIncrement)
-        colDefinition.Append(" auto_increment");
+      }
+      else
+      {
+        colDefinition.AppendFormat(" {0}null", (AllowNull ? String.Empty : "not "));
+        if (AutoIncrement)
+          colDefinition.Append(" auto_increment");
+        if (UniqueKey)
+          colDefinition.Append(" unique key");
+      }
 
       return colDefinition.ToString();
     }
