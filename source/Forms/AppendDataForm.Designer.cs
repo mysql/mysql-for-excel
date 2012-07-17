@@ -28,6 +28,7 @@
     /// </summary>
     private void InitializeComponent()
     {
+      this.components = new System.ComponentModel.Container();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -53,6 +54,9 @@
       this.btnAdvanced = new System.Windows.Forms.Button();
       this.btnStoreMapping = new System.Windows.Forms.Button();
       this.grdToMySQLTable = new MySQL.ForExcel.MultiHeaderDataGridView();
+      this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.removeColumnMappingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.clearAllMappingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.grdFromExcelData)).BeginInit();
@@ -62,6 +66,7 @@
       ((System.ComponentModel.ISupportInitialize)(this.picColorMapUnmapped)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.grdToMySQLTable)).BeginInit();
+      this.contextMenu.SuspendLayout();
       this.SuspendLayout();
       // 
       // contentAreaPanel
@@ -374,6 +379,7 @@
       this.grdToMySQLTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
       this.grdToMySQLTable.ColumnHeadersHeight = 46;
       this.grdToMySQLTable.ColumnsMaximumWidth = 200;
+      this.grdToMySQLTable.ContextMenuStrip = this.contextMenu;
       dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
       dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -402,6 +408,29 @@
       this.grdToMySQLTable.MouseMove += new System.Windows.Forms.MouseEventHandler(this.grdMouseMove);
       this.grdToMySQLTable.MouseUp += new System.Windows.Forms.MouseEventHandler(this.grdMouseUp);
       // 
+      // contextMenu
+      // 
+      this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.removeColumnMappingToolStripMenuItem,
+            this.clearAllMappingsToolStripMenuItem});
+      this.contextMenu.Name = "contextMenu";
+      this.contextMenu.Size = new System.Drawing.Size(215, 70);
+      this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
+      // 
+      // removeColumnMappingToolStripMenuItem
+      // 
+      this.removeColumnMappingToolStripMenuItem.Name = "removeColumnMappingToolStripMenuItem";
+      this.removeColumnMappingToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
+      this.removeColumnMappingToolStripMenuItem.Text = "Remove Column Mapping";
+      this.removeColumnMappingToolStripMenuItem.Click += new System.EventHandler(this.removeColumnMappingToolStripMenuItem_Click);
+      // 
+      // clearAllMappingsToolStripMenuItem
+      // 
+      this.clearAllMappingsToolStripMenuItem.Name = "clearAllMappingsToolStripMenuItem";
+      this.clearAllMappingsToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
+      this.clearAllMappingsToolStripMenuItem.Text = "Clear All Mappings";
+      this.clearAllMappingsToolStripMenuItem.Click += new System.EventHandler(this.clearAllMappingsToolStripMenuItem_Click);
+      // 
       // AppendDataForm
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -414,6 +443,8 @@
       this.MinimumSize = new System.Drawing.Size(860, 635);
       this.Name = "AppendDataForm";
       this.Text = "Append Data";
+      this.Controls.SetChildIndex(this.contentAreaPanel, 0);
+      this.Controls.SetChildIndex(this.commandAreaPanel, 0);
       this.contentAreaPanel.ResumeLayout(false);
       this.contentAreaPanel.PerformLayout();
       this.commandAreaPanel.ResumeLayout(false);
@@ -424,6 +455,7 @@
       ((System.ComponentModel.ISupportInitialize)(this.picColorMapUnmapped)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.grdToMySQLTable)).EndInit();
+      this.contextMenu.ResumeLayout(false);
       this.ResumeLayout(false);
 
     }
@@ -451,5 +483,8 @@
     private System.Windows.Forms.Button btnAdvanced;
     private System.Windows.Forms.Button btnStoreMapping;
     private MultiHeaderDataGridView grdToMySQLTable;
+    private System.Windows.Forms.ContextMenuStrip contextMenu;
+    private System.Windows.Forms.ToolStripMenuItem removeColumnMappingToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem clearAllMappingsToolStripMenuItem;
   }
 }

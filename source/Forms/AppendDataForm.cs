@@ -21,6 +21,7 @@ namespace MySQL.ForExcel
     private Rectangle dragBoxFromMouseDown = Rectangle.Empty;
     private Point screenOffset;
     private int grdColumnIndexToDrag = -1;
+    private int grdColumnClicked = -1;
     private int grdToTableColumnIndexToDrop = -1;
     private int maxMappingCols = 0;
     private Cursor draggingCursor;
@@ -51,7 +52,7 @@ namespace MySQL.ForExcel
       string excelRangeAddress = exportDataRange.Address.Replace("$", String.Empty);
       Text = String.Format("Append Data - {0} [{1}]", appendingWorksheetName, excelRangeAddress);
       maxMappingCols = Math.Min(grdToMySQLTable.Columns.Count, grdFromExcelData.Columns.Count);
-      clearMappingsOnToTableGridAndMySQLTable();
+      clearMappings(true);
       refreshMappingMethodCombo();
       if (!selectStoredMappingForTargetTable())
         if (Settings.Default.AppendPerformAutoMap)
@@ -287,7 +288,7 @@ namespace MySQL.ForExcel
     {
       if (currentColumnMapping != null)
       {
-        clearMappingsOnToTableGridAndMySQLTable();
+        clearMappings(true);
 
         for (int mappedIdx = 0; mappedIdx < currentColumnMapping.MappedSourceIndexes.Length; mappedIdx++)
         {
@@ -303,7 +304,7 @@ namespace MySQL.ForExcel
       btnStoreMapping.Enabled = currentColumnMapping.MappedQuantity > 0;
     }
 
-    private void clearMappingsOnToTableGridAndMySQLTable()
+    private void clearMappings(bool onlyGrids)
     {
       bool newMappings = grdToMySQLTable.MultiHeaderColumnList.Count == 0;
       for (int colIdx = 0; colIdx < grdToMySQLTable.Columns.Count; colIdx++)
@@ -324,6 +325,8 @@ namespace MySQL.ForExcel
           fromCol.MappedDataColName = null;
         }        
       }
+      if (currentColumnMapping != null && !onlyGrids)
+        currentColumnMapping.ClearMappings();
       grdToMySQLTable.Refresh();
       grdFromExcelData.Refresh();
       btnStoreMapping.Enabled = false;
@@ -444,22 +447,28 @@ namespace MySQL.ForExcel
 
     private void grdMouseDown(object sender, MouseEventArgs e)
     {
-      if (e.Button != MouseButtons.Left)
-        return;
       DataGridView gridObject = (sender as DataGridView);
       DataGridView.HitTestInfo info = gridObject.HitTest(e.X, e.Y);
-      grdColumnIndexToDrag = info.ColumnIndex;
-      if (grdColumnIndexToDrag >= 0)
+      grdColumnClicked = -1;
+      if (e.Button == MouseButtons.Left)
       {
-        // Remember the point where the mouse down occurred. The DragSize indicates the size that the mouse can move before a drag event should be started.  
-        Size dragSize = SystemInformation.DragSize;
+        grdColumnIndexToDrag = info.ColumnIndex;
+        if (grdColumnIndexToDrag >= 0)
+        {
+          // Remember the point where the mouse down occurred. The DragSize indicates the size that the mouse can move before a drag event should be started.  
+          Size dragSize = SystemInformation.DragSize;
 
-        // Create a rectangle using the DragSize, with the mouse position being at the center of the rectangle.
-        dragBoxFromMouseDown = new Rectangle(new Point(e.X - (dragSize.Width / 2), e.Y - (dragSize.Height / 2)), dragSize);
+          // Create a rectangle using the DragSize, with the mouse position being at the center of the rectangle.
+          dragBoxFromMouseDown = new Rectangle(new Point(e.X - (dragSize.Width / 2), e.Y - (dragSize.Height / 2)), dragSize);
+        }
+        else
+          // Reset the rectangle if the mouse is not over an item.
+          dragBoxFromMouseDown = Rectangle.Empty;
       }
-      else
-        // Reset the rectangle if the mouse is not over an item in the ListBox.
-        dragBoxFromMouseDown = Rectangle.Empty;
+      else if (e.Button == MouseButtons.Right)
+      {
+        grdColumnClicked = info.ColumnIndex;
+      }
     }
 
     private void grdMouseUp(object sender, MouseEventArgs e)
@@ -622,6 +631,27 @@ namespace MySQL.ForExcel
           createColumnMappingForStoredMapping();
           break;
       }
+    }
+
+    private void removeColumnMappingToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      if (grdColumnClicked > -1)
+        performManualSingleColumnMapping(-1, grdColumnClicked, null);
+    }
+
+    private void clearAllMappingsToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      clearMappings(false);
+      if (currentColumnMapping.Name == "Automatic")
+        cmbMappingMethod.SelectedIndex = 0;
+    }
+
+    private void contextMenu_Opening(object sender, CancelEventArgs e)
+    {
+      if (grdColumnClicked < 0 || currentColumnMapping == null || currentColumnMapping.MappedQuantity == 0)
+        e.Cancel = true;
+      contextMenu.Items["removeColumnMappingToolStripMenuItem"].Visible = (grdColumnClicked > -1 && currentColumnMapping.GetMappedSourceIndexIndex(grdColumnClicked) >= 0);
+      contextMenu.Items["clearAllMappingsToolStripMenuItem"].Visible = (currentColumnMapping != null && currentColumnMapping.MappedQuantity > 0);
     }
 
   }
