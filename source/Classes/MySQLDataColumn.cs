@@ -244,7 +244,7 @@ namespace MySQL.ForExcel
         return null;
 
       StringBuilder colDefinition = new StringBuilder();
-      colDefinition.AppendFormat("`{0}` {1}", displayName, MySQLDataType);
+      colDefinition.AppendFormat("`{0}` {1}", displayName.Replace("`", "``"), MySQLDataType);
       if (AutoPK || (PrimaryKey && (Table as MySQLDataTable).NumberOfPK == 1))
       {
         if (AutoIncrement)

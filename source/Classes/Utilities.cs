@@ -378,7 +378,7 @@ namespace MySQL.ForExcel
       if (String.IsNullOrEmpty(schemaName) || String.IsNullOrEmpty(tableName))
         return false;
 
-      string sql = String.Format("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{0}' and table_name = '{1}'", schemaName, tableName);
+      string sql = String.Format("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{0}' and table_name = '{1}'", schemaName, MySQLDataUtilities.EscapeString(tableName));
       object objCount = MySqlHelper.ExecuteScalar(GetConnectionString(connection), sql);
       long retCount = (objCount != null ? (long)objCount : 0);
       return (retCount > 0);

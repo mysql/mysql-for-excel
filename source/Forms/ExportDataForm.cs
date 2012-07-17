@@ -338,6 +338,9 @@ namespace MySQL.ForExcel
     {
       timerTextChanged.Stop();
 
+      if (txtTableNameInput.Text.IndexOf('`') != -1)
+        txtTableNameInput.Text = txtTableNameInput.Text.Replace("`", "");
+      
       dataTable.TableName = txtTableNameInput.Text;
 
       string cleanTableName = txtTableNameInput.Text.ToLowerInvariant().Replace(" ", "_");

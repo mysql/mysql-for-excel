@@ -468,7 +468,7 @@ namespace MySQL.ForExcel
       string nl = (formatNewLinesAndTabs ? Environment.NewLine : " ");
       string nlt = (formatNewLinesAndTabs ? String.Format("{0}\t", Environment.NewLine) : " ");
 
-      sql.AppendFormat("CREATE TABLE `{0}`.`{1}`{2}(", SchemaName, TableName, nl);
+      sql.AppendFormat("CREATE TABLE `{0}`.`{1}`{2}(", SchemaName, TableName.Replace("`", "``"), nl);
 
       string delimiter = nlt;
       int skipNum = (AddPrimaryKeyColumn ? (useFirstColumnAsPK ? 0 : 1) : 0);
@@ -483,13 +483,13 @@ namespace MySQL.ForExcel
         sql.AppendFormat("{0}PRIMARY KEY (", delimiter);
         foreach (MySQLDataColumn col in Columns.OfType<MySQLDataColumn>().Skip(1).Where(c => c.PrimaryKey))
         {
-          sql.AppendFormat("{0}`{1}`", pkDelimiter, col.DisplayName);
+          sql.AppendFormat("{0}`{1}`", pkDelimiter, col.DisplayName.Replace("`", "``"));
           pkDelimiter = ",";
         }
         sql.Append(")");
       }
       foreach (MySQLDataColumn col in Columns.OfType<MySQLDataColumn>().Where(c => !(c.AutoPK || c.PrimaryKey || c.UniqueKey || c.ExcludeColumn || !c.CreateIndex)))
-        sql.AppendFormat("{0}INDEX `{1}_idx` (`{1}`)", delimiter, col.DisplayName);
+        sql.AppendFormat("{0}INDEX `{1}_idx` (`{1}`)", delimiter, col.DisplayName.Replace("`", "``"));
       sql.Append(nl);
       sql.Append(")");
       return sql.ToString();
@@ -516,7 +516,7 @@ namespace MySQL.ForExcel
 
       string rowsSeparator = String.Empty;
       string colsSeparator = String.Empty;
-      queryString.AppendFormat("INSERT INTO `{0}`.`{1}`{2}(", SchemaName, TableName, nl);
+      queryString.AppendFormat("INSERT INTO `{0}`.`{1}`{2}(", SchemaName, TableName.Replace("`", "``"), nl);
 
       for (colIdx = startingColNum; colIdx < colsCount; colIdx++)
       {
@@ -526,7 +526,7 @@ namespace MySQL.ForExcel
         string insertIntoColName = (insertingMappedColumns ? column.MappedDataColName : column.DisplayName);
         queryString.AppendFormat("{0}`{1}`",
                                  colsSeparator,
-                                 insertIntoColName);
+                                 insertIntoColName.Replace("`", "``"));
         colsSeparator = ",";
         if (insertingMappedColumns)
           insertColumnNames.Add(mappingTargetTable.Columns[column.MappedDataColName].Ordinal, column.ColumnName);
