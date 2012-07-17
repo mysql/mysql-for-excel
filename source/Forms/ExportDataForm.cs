@@ -18,6 +18,7 @@ namespace MySQL.ForExcel
     private MySQLDataTable dataTable;
     private MySqlWorkbenchConnection wbConnection;
     private bool multiColumnPK = false;
+    private bool isChanging = false;
 
     public ExportDataForm(MySqlWorkbenchConnection wbConnection, Excel.Range exportDataRange, string exportingWorksheetName)
     {
@@ -46,7 +47,11 @@ namespace MySQL.ForExcel
       string selectedItem = null;
       if (radUseExistingColumn.Checked)
         selectedItem = (string)cmbPrimaryKeyColumns.SelectedItem;
+      cmbPrimaryKeyColumns.BeginUpdate();
+      cmbPrimaryKeyColumns.Text = string.Empty;
       cmbPrimaryKeyColumns.Items.Clear();
+      if (selectedItem == "<Multiple Items>")
+        cmbPrimaryKeyColumns.Items.Add("<Multiple Items>");
       foreach (MySQLDataColumn mysqlCol in dataTable.Columns.OfType<MySQLDataColumn>().Skip(1))
       {
         if (mysqlCol.ExcludeColumn)
@@ -54,6 +59,7 @@ namespace MySQL.ForExcel
         cmbPrimaryKeyColumns.Items.Add(mysqlCol.DisplayName);
       }
       cmbPrimaryKeyColumns.SelectedItem = selectedItem;
+      cmbPrimaryKeyColumns.EndUpdate();
     }
 
     private void LoadDataAndCreateColumns(Excel.Range exportDataRange, string schemaName, string proposedTableName)
@@ -93,6 +99,7 @@ namespace MySQL.ForExcel
       {
         radUseExistingColumn.Checked = true;
         cmbPrimaryKeyColumns.SelectedIndex = 0;
+        columnBindingSource.Position = 1;
       }
       else
       {
@@ -153,11 +160,19 @@ namespace MySQL.ForExcel
     {
       radAddPrimaryKey.Checked = pkQty == 0;
       radUseExistingColumn.Checked = pkQty > 0;
+      if (cmbPrimaryKeyColumns.Items.Count == 0)
+        return;
       if (pkQty < 2 && cmbPrimaryKeyColumns.Items[0].ToString() == "<Multiple Items>")
+      {
         cmbPrimaryKeyColumns.Items.RemoveAt(0);
+        var name = dataTable.Columns.Cast<MySQLDataColumn>().Skip(1).First(i => i.PrimaryKey == true);
+        cmbPrimaryKeyColumns.SelectedItem = name.DisplayName;
+      }
       else if (pkQty > 1 && cmbPrimaryKeyColumns.Items[0].ToString() != "<Multiple Items>")
+      {
         cmbPrimaryKeyColumns.Items.Insert(0, "<Multiple Items>");
-      cmbPrimaryKeyColumns.SelectedIndex = 0;
+        cmbPrimaryKeyColumns.SelectedIndex = 0;
+      }
     }
 
     private bool testColumnDataTypeAgainstColumnData(MySQLDataColumn currentCol)
@@ -365,26 +380,35 @@ namespace MySQL.ForExcel
     {
       if (!radAddPrimaryKey.Checked)
         return;
+      isChanging = true;
       grdPreviewData.Columns[0].Visible = true;
       grdPreviewData.Columns[0].Selected = true;
       grdPreviewData.FirstDisplayedScrollingColumnIndex = 0;
       cmbPrimaryKeyColumns.Text = String.Empty;
+      cmbPrimaryKeyColumns.SelectedIndex = -1;
       cmbPrimaryKeyColumns.Enabled = false;
       txtAddPrimaryKey.Enabled = true;
       dataTable.UseFirstColumnAsPK = true;
+      isChanging = false;
+      //EnableChecks(null);
     }
 
     private void radUseExistingColumn_CheckedChanged(object sender, EventArgs e)
     {
       if (!radUseExistingColumn.Checked)
         return;
+      isChanging = true;
       grdPreviewData.Columns[0].Visible = false;
       grdPreviewData.Columns[1].Selected = true;
       grdPreviewData.FirstDisplayedScrollingColumnIndex = 1;
       cmbPrimaryKeyColumns.Enabled = true;
+      multiColumnPK = false;
       cmbPrimaryKeyColumns.SelectedIndex = 0;
+      columnBindingSource.ResetCurrentItem();
       txtAddPrimaryKey.Enabled = false;
       dataTable.UseFirstColumnAsPK = false;
+      EnableChecks(null);
+      isChanging = false;
     }
 
     private void grdPreviewData_SelectionChanged(object sender, EventArgs e)
@@ -404,38 +428,45 @@ namespace MySQL.ForExcel
 
     private void cmbPrimaryKeyColumns_SelectedIndexChanged(object sender, EventArgs e)
     {
+      if (cmbPrimaryKeyColumns.SelectedIndex == -1)
+        return;
       if (multiColumnPK && cmbPrimaryKeyColumns.SelectedIndex == 0)
         return;
       multiColumnPK = false;
+      if (cmbPrimaryKeyColumns.Items[0].ToString() == "<Multiple Items>")
+      {
+        cmbPrimaryKeyColumns.Items.RemoveAt(0);
+        cmbPrimaryKeyColumns.SelectedIndex = 0;
+      }
       for (int coldIdx = 1; coldIdx < dataTable.Columns.Count; coldIdx++)
       {
         MySQLDataColumn col = dataTable.GetColumnAtIndex(coldIdx);
         col.PrimaryKey = (col.DisplayName == cmbPrimaryKeyColumns.Text);
       }
-      if (cmbPrimaryKeyColumns.Items[0].ToString() == "<Multiple Items>")
-        cmbPrimaryKeyColumns.Items.RemoveAt(0);
-      if (grdPreviewData.Columns[cmbPrimaryKeyColumns.SelectedIndex + 1].Selected)
-      {
-        columnBindingSource.ResetCurrentItem();
-        EnableChecks(chkPrimaryKey);
-      }
-      else
-      {
-        grdPreviewData.Columns[cmbPrimaryKeyColumns.SelectedIndex + 1].Selected = true;
-        grdPreviewData.FirstDisplayedScrollingColumnIndex = cmbPrimaryKeyColumns.SelectedIndex + 1;
-      }
+      //if (grdPreviewData.Columns[cmbPrimaryKeyColumns.SelectedIndex + 1].Selected)
+      //{
+      //  columnBindingSource.ResetCurrentItem();
+      //  EnableChecks(null);
+      //}
+      //else
+      //{
+      //  grdPreviewData.Columns[cmbPrimaryKeyColumns.SelectedIndex + 1].Selected = true;
+      //  grdPreviewData.FirstDisplayedScrollingColumnIndex = cmbPrimaryKeyColumns.SelectedIndex + 1;
+      //}
     }
 
     private void txtColumnName_TextChanged(object sender, EventArgs e)
     {
       if (txtColumnName.Text == (columnBindingSource.Current as MySQLDataColumn).DisplayName)
         return;
+      isChanging = true;
       string name = txtColumnName.Text.Trim();
       int index = grdPreviewData.SelectedColumns[0].Index;
       grdPreviewData.Columns[index].HeaderText = name;
 
       bool showWarning = (txtTableNameInput.Text.Contains(" ") || txtTableNameInput.Text.Any(char.IsUpper));
       MySQLDataColumn column = columnBindingSource.Current as MySQLDataColumn;
+      column.DisplayName = name;
       string warningText = (showWarning ? Resources.NamesWarning : null);
       if (warningText == null)
       {
@@ -449,7 +480,12 @@ namespace MySQL.ForExcel
       showValidationWarning("ColumnOptionsWarning", showWarning, warningText);
 
       if (index > 0)
+      {
+        cmbPrimaryKeyColumns.BeginUpdate();
         cmbPrimaryKeyColumns.Items[index - 1] = txtColumnName.Text;
+        cmbPrimaryKeyColumns.EndUpdate();
+      }
+      isChanging = false;
     }
 
     private void chkUniqueIndex_CheckedChanged(object sender, EventArgs e)
@@ -489,14 +525,18 @@ namespace MySQL.ForExcel
 
     private void chkExcludeColumn_CheckedChanged(object sender, EventArgs e)
     {
-      EnableChecks(chkExcludeColumn);
+      (columnBindingSource.Current as MySQLDataColumn).ExcludeColumn = chkExcludeColumn.Checked;
       DataGridViewColumn gridCol = grdPreviewData.SelectedColumns[0];
       gridCol.DefaultCellStyle.BackColor = chkExcludeColumn.Checked ? Color.LightGray : grdPreviewData.DefaultCellStyle.BackColor;
+      EnableChecks(chkExcludeColumn);
+      chkExcludeColumn_Validated(sender, e);
     }
 
     private void chkPrimaryKey_CheckedChanged(object sender, EventArgs e)
     {
+      (columnBindingSource.Current as MySQLDataColumn).PrimaryKey = chkPrimaryKey.Checked;
       EnableChecks(chkPrimaryKey);
+      chkPrimaryKey_Validated(sender, e);
     }
 
     private void chkCreateIndex_CheckedChanged(object sender, EventArgs e)
@@ -536,6 +576,7 @@ namespace MySQL.ForExcel
 
     private void txtColumnName_Validated(object sender, EventArgs e)
     {
+      isChanging = true;
       if (txtColumnName.Text != (columnBindingSource.Current as MySQLDataColumn).DisplayName)
       {
         columnBindingSource.ResetCurrentItem();
@@ -546,6 +587,7 @@ namespace MySQL.ForExcel
           grdPreviewData.SelectedColumns[0].HeaderText = txtColumnName.Text;
         }
       }
+      isChanging = false;
     }
 
     private void chkExcludeColumn_Validated(object sender, EventArgs e)
@@ -556,9 +598,12 @@ namespace MySQL.ForExcel
 
     private void chkPrimaryKey_Validated(object sender, EventArgs e)
     {
-      int currentPKQty = dataTable.NumberOfPK;
-      multiColumnPK = currentPKQty > 1;
-      flagMultiColumnPrimaryKey(currentPKQty);
+      if (!isChanging)
+      {
+        int currentPKQty = dataTable.NumberOfPK;
+        multiColumnPK = currentPKQty > 1;
+        flagMultiColumnPrimaryKey(currentPKQty);
+      }
     }
 
     private void grdPreviewData_KeyDown(object sender, KeyEventArgs e)
@@ -633,6 +678,18 @@ namespace MySQL.ForExcel
     {
       MySQLDataColumn column = columnBindingSource.Current as MySQLDataColumn;
 
+      if (control == chkExcludeColumn && control.Checked)
+      {
+        if (chkPrimaryKey.Checked)
+        {
+          //chkPrimaryKey.Checked = false;
+          chkPrimaryKey.CheckedChanged -= chkPrimaryKey_CheckedChanged;
+          chkPrimaryKey.Checked = false;
+          column.PrimaryKey = false;
+          chkPrimaryKey_Validated(null, EventArgs.Empty);
+          chkPrimaryKey.CheckedChanged += chkPrimaryKey_CheckedChanged;
+        }
+      }
       if (control == chkPrimaryKey && control.Checked)
       {
         chkCreateIndex.Checked = false;
@@ -650,6 +707,9 @@ namespace MySQL.ForExcel
           chkAllowEmpty.Checked = true;
       }
 
+      //column.ExcludeColumn = chkExcludeColumn.Checked;
+      columnBindingSource.EndEdit();
+
       chkExcludeColumn.Enabled = true;
       chkPrimaryKey.Enabled = !(chkExcludeColumn.Checked || radAddPrimaryKey.Checked);
       chkUniqueIndex.Enabled = !chkExcludeColumn.Checked;
@@ -658,7 +718,8 @@ namespace MySQL.ForExcel
       radUseExistingColumn.Enabled = !(dataTable.Columns.Cast<MySQLDataColumn>().Skip(1).All(i => i.ExcludeColumn));
       cmbPrimaryKeyColumns.Enabled = radUseExistingColumn.Enabled && radUseExistingColumn.Checked;
 
-      columnBindingSource.EndEdit();
+      if(columnBindingSource.Position == 0)
+        chkUniqueIndex.Enabled = chkCreateIndex.Enabled = chkExcludeColumn.Enabled = chkAllowEmpty.Enabled = chkPrimaryKey.Enabled = false;
     }
   }
 }
