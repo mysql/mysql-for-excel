@@ -8,6 +8,7 @@ using System.Text;
 using System.IO;
 using System.Windows.Forms;
 using MySQL.Utility;
+using MySQL.ForExcel.Properties;
 
 namespace MySQL.ForExcel
 {
@@ -70,6 +71,13 @@ namespace MySQL.ForExcel
 
     private void newConnectionLabel_Click(object sender, EventArgs e)
     {
+      // if Workbench is running we can't allow adding new connections
+      if (MySqlWorkbench.IsRunning)
+      {
+        MessageBox.Show(Resources.UnableToAddConnectionsWhenWBRunning, Resources.AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        return;
+      }
+
       NewConnectionDialog dlg = new NewConnectionDialog();
       DialogResult result = dlg.ShowDialog();
       if (result == DialogResult.Cancel) return;

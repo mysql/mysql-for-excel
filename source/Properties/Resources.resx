@@ -389,4 +389,10 @@ Please add a primary key to the table.</value>
   <data name="ConnectionSuccessfull" xml:space="preserve">
     <value>Connection parameters are correct.</value>
   </data>
+  <data name="UnableToAddConnectionsWhenWBRunning" xml:space="preserve">
+    <value>Adding new connections is not allowed when MySQL Workbench is running.  If you want to create a new connection, please close MySQL Workbench.</value>
+  </data>
+  <data name="AppName" xml:space="preserve">
+    <value>MySQL For Excel</value>
+  </data>
 </root>
