@@ -720,6 +720,7 @@ namespace MySQL.ForExcel
       chkAllowEmpty.Enabled = !(chkExcludeColumn.Checked || chkPrimaryKey.Checked);
       radUseExistingColumn.Enabled = !(dataTable.Columns.Cast<MySQLDataColumn>().Skip(1).All(i => i.ExcludeColumn));
       cmbPrimaryKeyColumns.Enabled = radUseExistingColumn.Enabled && radUseExistingColumn.Checked;
+      cmbDatatype.Enabled = !column.AutoPK;
 
       if(columnBindingSource.Position == 0)
         chkUniqueIndex.Enabled = chkCreateIndex.Enabled = chkExcludeColumn.Enabled = chkAllowEmpty.Enabled = chkPrimaryKey.Enabled = false;
