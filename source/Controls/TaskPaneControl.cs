@@ -96,7 +96,7 @@ namespace MySQL.ForExcel
         if (connection.Password == null || failed)
         {
           PasswordDialog dlg = new PasswordDialog();
-          dlg.HostIdentifier = connection.HostIdentifier;
+          dlg.HostIdentifier = connection.Name + " - " + connection.HostIdentifier;
           dlg.UserName = connection.UserName;
           dlg.PasswordText = String.Empty;
           if (dlg.ShowDialog() == DialogResult.Cancel) return;
