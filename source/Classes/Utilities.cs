@@ -271,7 +271,7 @@ namespace MySQL.ForExcel
       {
         foreach (string columnName in columnsList)
         {
-          queryStringBuilder.AppendFormat("`{0}`,", columnName);
+          queryStringBuilder.AppendFormat("`{0}`,", columnName.Replace("`", "``"));
         }
         queryStringBuilder.Remove(queryStringBuilder.Length - 1, 1);
       }

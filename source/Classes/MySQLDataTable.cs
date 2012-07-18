@@ -137,21 +137,21 @@ namespace MySQL.ForExcel
         SchemaName = schemaName;
       if (!String.IsNullOrEmpty(tableName))
         TableName = tableName;
-      SelectQuery = String.Format("SELECT * FROM `{0}`.`{1}`", schemaName, tableName);
+      SelectQuery = String.Format("SELECT * FROM `{0}`.`{1}`", schemaName, tableName.Replace("`", "``"));
     }
 
     // Dummy constructor
     public MySQLDataTable()
     {
       SchemaName = String.Empty;
-      SelectQuery = String.Format("SELECT * FROM `{0}`", TableName);
+      SelectQuery = String.Format("SELECT * FROM `{0}`", TableName.Replace("`", "``"));
       AddPrimaryKeyColumn = false;
     }
 
     public void RefreshSelectQuery()
     {
       string schemaPiece = (!String.IsNullOrEmpty(SchemaName) ? String.Format("`{0}`.", SchemaName) : String.Empty);
-      SelectQuery = String.Format("SELECT * FROM {0}`{1}`", schemaPiece, TableName);
+      SelectQuery = String.Format("SELECT * FROM {0}`{1}`", schemaPiece, TableName.Replace("`", "``"));
     }
 
     private void CreateColumns(int numCols)
@@ -754,7 +754,7 @@ namespace MySQL.ForExcel
         queryString.AppendFormat("{0}UPDATE `{1}`.`{2}` SET ",
                                  rowsSeparator,
                                  SchemaName,
-                                 TableName);
+                                 TableName.Replace("`", "``"));
         colsSeparator = String.Empty;
         foreach (string colName in changedColNamesList)
         {
@@ -763,21 +763,20 @@ namespace MySQL.ForExcel
           string valueToDB = (insertingValueIsNull ? @"null" : changesRow[colName].ToString());
           queryString.AppendFormat("{0}`{1}`={2}{3}{2}",
                                     colsSeparator,
-                                    colName,
+                                    colName.Replace("`", "``"),
                                     (column.ColumnsRequireQuotes && !insertingValueIsNull ? "'" : String.Empty),
                                     valueToDB);
           colsSeparator = ",";
         }
         queryString.Append(" WHERE ");
         colsSeparator = String.Empty;
-        foreach (DataColumn pkCol in PrimaryKey)
+        foreach (MySQLDataColumn pkCol in Columns.OfType<MySQLDataColumn>().Where(i => i.PrimaryKey))
         {
-          MySQLDataColumn column = Columns[pkCol.ColumnName] as MySQLDataColumn;
           queryString.AppendFormat("{0}`{1}`={2}{3}{2}",
                                     colsSeparator,
-                                    pkCol.ColumnName,
-                                    (column.ColumnsRequireQuotes ? "'" : String.Empty),
-                                    changesRow[pkCol].ToString());
+                                    pkCol.ColumnName.Replace("`", "``"),
+                                    (pkCol.ColumnsRequireQuotes ? "'" : String.Empty),
+                                    changesRow[pkCol.ColumnName]);
           colsSeparator = " AND ";
         }
         rowsSeparator = ";" + nl;
@@ -841,14 +840,14 @@ namespace MySQL.ForExcel
         queryString.AppendFormat("{0}DELETE FROM `{1}`.`{2}` WHERE ",
                                  rowsSeparator,
                                  SchemaName,
-                                 TableName);
+                                 TableName.Replace("`", "``"));
         colsSeparator = String.Empty;
         foreach (DataColumn pkCol in PrimaryKey)
         {
           MySQLDataColumn column = Columns[pkCol.ColumnName] as MySQLDataColumn;
           queryString.AppendFormat("{0}`{1}`={2}{3}{2}",
                                     colsSeparator,
-                                    pkCol.ColumnName,
+                                    pkCol.ColumnName.Replace("`", "``"),
                                     (column.ColumnsRequireQuotes ? "'" : String.Empty),
                                     changesRow[pkCol].ToString());
           colsSeparator = " AND ";
