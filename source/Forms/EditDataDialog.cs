@@ -57,7 +57,8 @@ namespace MySQL.ForExcel
       if (importTable.ExtendedProperties.ContainsKey("TableName") && !String.IsNullOrEmpty(importTable.ExtendedProperties["TableName"].ToString()))
         EditingTableName = importTable.ExtendedProperties["TableName"].ToString();
       editMySQLDataTable = new MySQLDataTable(EditingTableName, importTable, wbConnection);
-      //initializeDataAdapter();
+      if (importTable.ExtendedProperties.ContainsKey("QueryString") && !String.IsNullOrEmpty(importTable.ExtendedProperties["QueryString"].ToString()))
+        editMySQLDataTable.SelectQuery = importTable.ExtendedProperties["QueryString"].ToString();
       EditingWorksheet = editingWorksheet;
       EditingWorksheet.Change += new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
       EditingWorksheet.SelectionChange += new Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);

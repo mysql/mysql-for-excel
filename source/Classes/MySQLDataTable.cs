@@ -468,7 +468,7 @@ namespace MySQL.ForExcel
       string nl = (formatNewLinesAndTabs ? Environment.NewLine : " ");
       string nlt = (formatNewLinesAndTabs ? String.Format("{0}\t", Environment.NewLine) : " ");
 
-      sql.AppendFormat("CREATE TABLE `{0}`.`{1}`{2}(", SchemaName, TableName.Replace("`", "``"), nl);
+      sql.AppendFormat("CREATE TABLE `{0}`.`{1}`{2}(", SchemaName, TableName, nl);
 
       string delimiter = nlt;
       int skipNum = (AddPrimaryKeyColumn ? (useFirstColumnAsPK ? 0 : 1) : 0);
