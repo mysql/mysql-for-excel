@@ -107,18 +107,28 @@ namespace MySQL.ForExcel
 
     private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      //TODO: Improve, selection should be different than headers.
-      if (connectionList.SelectedNode == null && connectionList.SelectedNode.Index > 1) return;
+      InfoDialog id = new InfoDialog(false, "WorkBench is Running, please close it before attempting to delete connections", string.Empty);
+      if (MySqlWorkbench.IsRunning) { id.ShowDialog(); return; }
+      if (connectionList.SelectedNode.Name == "LocalConnectionsNode" || connectionList.SelectedNode.Text == "RemoteConnectionsNode" || connectionList.SelectedNode == null) return;
       MySqlWorkbenchConnectionCollection wbcollect = new MySqlWorkbenchConnectionCollection();
-      if (MessageBox.Show("Are you sure you want to delete the selected connection?", "Confirm Delete", MessageBoxButtons.OKCancel) == DialogResult.Cancel) return;
+      WarningDialog wd = new WarningDialog("Confirm Delete", "Are you sure you want to delete the selected connection?");
+      if ( wd.ShowDialog() == DialogResult.No) return;
+      MySqlWorkbenchConnection connectionToRemove = new MySqlWorkbenchConnection();
       foreach (MySqlWorkbenchConnection c in MySqlWorkbench.Connections)
         if (c.Name == connectionList.SelectedNode.Tag.ToString())
-          //TODO: mark to delete/or delete immediatly : c.Id
-          //TODO: delete from MySQLutility, perhaps?
-      //MySqlWorkbench.Connections.Clear();
-      //MySqlWorkbench.Connections = wbcollect;
-      //MySqlWorkbench.Connections.Save();
+        {
+          connectionToRemove = c;
+          break;
+        }
+      MySqlWorkbench.Connections.Remove(connectionToRemove);
       LoadConnections();
+    }
+
+    private void contextMenuStrip_Opened(object sender, EventArgs e)
+    {
+      contextMenuStrip.Items["deleteToolStripMenuItem"].Visible = (connectionList.SelectedNode == null ||
+        connectionList.SelectedNode.Name == "LocalConnectionsNode" || connectionList.SelectedNode.Name == "RemoteConnectionsNode" ||
+        MySqlWorkbench.Connections.Count <= 0) ? false : true;
     }
   }
 }

@@ -39,17 +39,16 @@
       this.lblInstructions = new MySQL.ForExcel.TransparentLabel();
       this.manageConnectionsLabel = new MySQL.ForExcel.HotLabel();
       this.connectionList = new MySQL.ForExcel.MyTreeView();
-      this.contextMenuStripRefresh = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.lblCopyright = new MySQL.ForExcel.TransparentLabel();
       this.lblAllRights = new MySQL.ForExcel.TransparentLabel();
       this.newConnectionLabel = new MySQL.ForExcel.HotLabel();
       this.openConnectionLabel = new MySQL.ForExcel.HotLabel();
-      this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-      this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogoText)).BeginInit();
-      this.contextMenuStripRefresh.SuspendLayout();
+      this.contextMenuStrip.SuspendLayout();
       this.SuspendLayout();
       // 
       // picAddInLogo
@@ -138,11 +137,11 @@
       // 
       // connectionList
       // 
-      this.connectionList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+      this.connectionList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.connectionList.CollapsedIcon = global::MySQL.ForExcel.Properties.Resources.ArrowRight;
-      this.connectionList.ContextMenuStrip = this.contextMenuStripRefresh;
+      this.connectionList.ContextMenuStrip = this.contextMenuStrip;
       this.connectionList.DescriptionColor = System.Drawing.Color.Silver;
       this.connectionList.DescriptionColorOpacity = 1D;
       this.connectionList.DescriptionFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -176,22 +175,29 @@
       this.connectionList.TitleTextVerticalPixelsOffset = 2;
       this.connectionList.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.connectionList_NodeMouseDoubleClick);
       // 
-      // contextMenuStripRefresh
+      // contextMenuStrip
       // 
-      this.contextMenuStripRefresh.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.refreshToolStripMenuItem,
-            this.toolStripSeparator1,
-            this.deleteToolStripMenuItem});
-      this.contextMenuStripRefresh.Name = "contextMenuStripRefresh";
-      this.contextMenuStripRefresh.Size = new System.Drawing.Size(153, 76);
-      this.contextMenuStripRefresh.Text = "Refresh";
+      this.contextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.deleteToolStripMenuItem,
+            this.refreshToolStripMenuItem});
+      this.contextMenuStrip.Name = "contextMenuStripRefresh";
+      this.contextMenuStrip.Size = new System.Drawing.Size(184, 70);
+      this.contextMenuStrip.Text = "Refresh";
+      this.contextMenuStrip.Opened += new System.EventHandler(this.contextMenuStrip_Opened);
       // 
       // refreshToolStripMenuItem
       // 
       this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
-      this.refreshToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-      this.refreshToolStripMenuItem.Text = "Refresh";
+      this.refreshToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+      this.refreshToolStripMenuItem.Text = "Refresh Connections";
       this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshItem_Click);
+      // 
+      // deleteToolStripMenuItem
+      // 
+      this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+      this.deleteToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+      this.deleteToolStripMenuItem.Text = "Delete Connection";
+      this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
       // 
       // lblCopyright
       // 
@@ -289,18 +295,6 @@
       this.openConnectionLabel.TitleShadowPixelsXOffset = 0;
       this.openConnectionLabel.TitleShadowPixelsYOffset = 1;
       // 
-      // toolStripSeparator1
-      // 
-      this.toolStripSeparator1.Name = "toolStripSeparator1";
-      this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
-      // 
-      // deleteToolStripMenuItem
-      // 
-      this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
-      this.deleteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-      this.deleteToolStripMenuItem.Text = "Delete";
-      this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
-      // 
       // WelcomePanel
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -319,7 +313,7 @@
       this.Size = new System.Drawing.Size(260, 625);
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogoText)).EndInit();
-      this.contextMenuStripRefresh.ResumeLayout(false);
+      this.contextMenuStrip.ResumeLayout(false);
       this.ResumeLayout(false);
 
     }
@@ -337,9 +331,8 @@
     private MyTreeView connectionList;
     private System.Windows.Forms.PictureBox picAddInLogoText;
     private TransparentPictureBox imgSeparator;
-    private System.Windows.Forms.ContextMenuStrip contextMenuStripRefresh;
+    private System.Windows.Forms.ContextMenuStrip contextMenuStrip;
     private System.Windows.Forms.ToolStripMenuItem refreshToolStripMenuItem;
-    private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
     private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
   }
 }
