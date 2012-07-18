@@ -395,4 +395,7 @@ Please add a primary key to the table.</value>
   <data name="AppName" xml:space="preserve">
     <value>MySQL For Excel</value>
   </data>
+  <data name="ConnectFailedTryNewPassword" xml:space="preserve">
+    <value>Connection attempt failed.  Please re-enter your password to try again.</value>
+  </data>
 </root>

@@ -138,6 +138,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Connection attempt failed.  Please re-enter your password to try again..
+        /// </summary>
+        internal static string ConnectFailedTryNewPassword {
+            get {
+                return ResourceManager.GetString("ConnectFailedTryNewPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MySQL Connection is closed, must be opened first to perform action.
         /// </summary>
         internal static string ConnectionClosedError {

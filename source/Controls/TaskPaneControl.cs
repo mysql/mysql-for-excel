@@ -11,6 +11,7 @@ using MySql.Data.MySqlClient;
 using Excel = Microsoft.Office.Interop.Excel;
 using ExcelTools = Microsoft.Office.Tools.Excel;
 using MySQL.Utility;
+using MySQL.ForExcel.Properties;
 
 namespace MySQL.ForExcel
 {
@@ -89,14 +90,21 @@ namespace MySQL.ForExcel
     public void OpenConnection(MySqlWorkbenchConnection connection)
     {
       this.connection = connection;
-      if (connection.Password == null)
+      bool failed = false;
+      while (true)
       {
-        PasswordDialog dlg = new PasswordDialog();
-        dlg.HostIdentifier = connection.HostIdentifier;
-        dlg.UserName = connection.UserName;
-        dlg.PasswordText = String.Empty;
-        if (dlg.ShowDialog() == DialogResult.Cancel) return;
-        connection.Password = dlg.PasswordText;
+        if (connection.Password == null || failed)
+        {
+          PasswordDialog dlg = new PasswordDialog();
+          dlg.HostIdentifier = connection.HostIdentifier;
+          dlg.UserName = connection.UserName;
+          dlg.PasswordText = String.Empty;
+          if (dlg.ShowDialog() == DialogResult.Cancel) return;
+          connection.Password = dlg.PasswordText;
+        }
+        if (connection.TestConnection()) break;
+        MessageBox.Show(Resources.ConnectFailedTryNewPassword, Resources.AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        failed = true;
       }
       bool schemasLoaded = schemaSelectionPanel1.SetConnection(connection);
       if (schemasLoaded)
