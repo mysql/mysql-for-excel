@@ -45,6 +45,8 @@
       this.lblAllRights = new MySQL.ForExcel.TransparentLabel();
       this.newConnectionLabel = new MySQL.ForExcel.HotLabel();
       this.openConnectionLabel = new MySQL.ForExcel.HotLabel();
+      this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+      this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogoText)).BeginInit();
       this.contextMenuStripRefresh.SuspendLayout();
@@ -136,8 +138,8 @@
       // 
       // connectionList
       // 
-      this.connectionList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+      this.connectionList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
       this.connectionList.CollapsedIcon = global::MySQL.ForExcel.Properties.Resources.ArrowRight;
       this.connectionList.ContextMenuStrip = this.contextMenuStripRefresh;
@@ -177,15 +179,17 @@
       // contextMenuStripRefresh
       // 
       this.contextMenuStripRefresh.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.refreshToolStripMenuItem});
+            this.refreshToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.deleteToolStripMenuItem});
       this.contextMenuStripRefresh.Name = "contextMenuStripRefresh";
-      this.contextMenuStripRefresh.Size = new System.Drawing.Size(114, 26);
+      this.contextMenuStripRefresh.Size = new System.Drawing.Size(153, 76);
       this.contextMenuStripRefresh.Text = "Refresh";
       // 
       // refreshToolStripMenuItem
       // 
       this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
-      this.refreshToolStripMenuItem.Size = new System.Drawing.Size(113, 22);
+      this.refreshToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
       this.refreshToolStripMenuItem.Text = "Refresh";
       this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshItem_Click);
       // 
@@ -285,6 +289,18 @@
       this.openConnectionLabel.TitleShadowPixelsXOffset = 0;
       this.openConnectionLabel.TitleShadowPixelsYOffset = 1;
       // 
+      // toolStripSeparator1
+      // 
+      this.toolStripSeparator1.Name = "toolStripSeparator1";
+      this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+      // 
+      // deleteToolStripMenuItem
+      // 
+      this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
+      this.deleteToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.deleteToolStripMenuItem.Text = "Delete";
+      this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+      // 
       // WelcomePanel
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -323,5 +339,7 @@
     private TransparentPictureBox imgSeparator;
     private System.Windows.Forms.ContextMenuStrip contextMenuStripRefresh;
     private System.Windows.Forms.ToolStripMenuItem refreshToolStripMenuItem;
+    private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+    private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
   }
 }

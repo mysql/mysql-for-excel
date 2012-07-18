@@ -44,30 +44,37 @@ namespace MySQL.ForExcel
       return result;
     }
 
-    public MySqlConnection TryOpenConnection(MySqlConnectionStringBuilder connectionString)
+    public bool TryOpenConnection(MySqlConnectionStringBuilder connectionString)
     {
       MySqlConnection conn = new MySqlConnection(connectionString.ConnectionString);
 
       try
       {
         conn.Open();
+        return true;
       }
       catch (MySqlException)
       {
         PasswordDialog pwdDialog = new PasswordDialog(WBconn.Name, WBconn.UserName);
-        if (pwdDialog.ShowDialog(this) == DialogResult.OK)
-        {
-          connectionString.Password = pwdDialog.PasswordText;
-          conn = new MySqlConnection(connectionString.ConnectionString);
-          conn.Open();
-        }
+        if (pwdDialog.ShowDialog(this) == DialogResult.Cancel) return false;
+        connectionString.Password = pwdDialog.PasswordText;
         pwdDialog.Dispose();
+        conn = new MySqlConnection(connectionString.ConnectionString);
+        try
+        {
+          conn.Open();
+          return true;
+        }
+        catch
+        {
+          throw;
+        }
       }
-      return conn;
     }
 
     private void testButton_Click(object sender, EventArgs e)
     {
+      bool result = false;
       MySqlConnectionStringBuilder testConn = new MySqlConnectionStringBuilder();
       testConn.Server = WBconn.Host;
       testConn.Port = (uint)WBconn.Port;
@@ -80,21 +87,16 @@ namespace MySQL.ForExcel
 
       try
       {
-        if (TryOpenConnection(testConn) != null)
-        {
-          infoDialog = new InfoDialog(true, String.Format(Properties.Resources.ConnectionDataDisplaySuccess, testHostName, testConn.Port, testUserName), string.Empty);
-        }
+        if (!TryOpenConnection(testConn)) return;
+        infoDialog = new InfoDialog(true, String.Format(Properties.Resources.ConnectionDataDisplaySuccess, testHostName, testConn.Port, testUserName), string.Empty);
       }
       catch (Exception ex)
       {
         infoDialog.OperationDetailsText = ex.Message;
       }
-      finally
-      {
-        infoDialog.WordWrapDetails = true;
-        infoDialog.ShowDialog();
-        infoDialog.Dispose();
-      }
+      infoDialog.WordWrapDetails = true;
+      infoDialog.ShowDialog();
+      infoDialog.Dispose();
     }
 
     private void connectionName_TextChanged(object sender, EventArgs e)
@@ -123,20 +125,20 @@ namespace MySQL.ForExcel
       WBconn.Port = 3306;
       WBconn.UserName = "root";
       WBconn.Schema = "";
-      
+
       labelPromptHostName.Visible = standardConnection;
       hostName.Enabled = standardConnection;
       hostName.Visible = standardConnection;
       labelHelpHostName.Visible = standardConnection;
-      
-      labelPromptPort.Visible = standardConnection;      
+
+      labelPromptPort.Visible = standardConnection;
       port.Enabled = standardConnection;
       port.Visible = standardConnection;
-      
+
       useCompression.Enabled = standardConnection;
       labelCompression.Visible = standardConnection;
 
-      labelPromptSocket.Visible = !standardConnection;      
+      labelPromptSocket.Visible = !standardConnection;
       socketPath.Enabled = !standardConnection;
       socketPath.Visible = !standardConnection;
       labelHelpSocket.Visible = !standardConnection;

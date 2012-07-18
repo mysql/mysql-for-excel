@@ -104,5 +104,21 @@ namespace MySQL.ForExcel
     {
       LoadConnections();
     }
+
+    private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      //TODO: Improve, selection should be different than headers.
+      if (connectionList.SelectedNode == null && connectionList.SelectedNode.Index > 1) return;
+      MySqlWorkbenchConnectionCollection wbcollect = new MySqlWorkbenchConnectionCollection();
+      if (MessageBox.Show("Are you sure you want to delete the selected connection?", "Confirm Delete", MessageBoxButtons.OKCancel) == DialogResult.Cancel) return;
+      foreach (MySqlWorkbenchConnection c in MySqlWorkbench.Connections)
+        if (c.Name == connectionList.SelectedNode.Tag.ToString())
+          //TODO: mark to delete/or delete immediatly : c.Id
+          //TODO: delete from MySQLutility, perhaps?
+      //MySqlWorkbench.Connections.Clear();
+      //MySqlWorkbench.Connections = wbcollect;
+      //MySqlWorkbench.Connections.Save();
+      LoadConnections();
+    }
   }
 }
