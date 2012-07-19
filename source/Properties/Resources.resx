@@ -398,4 +398,7 @@ Please add a primary key to the table.</value>
   <data name="ConnectFailedTryNewPassword" xml:space="preserve">
     <value>Connection attempt failed.  Please re-enter your password to try again.</value>
   </data>
+  <data name="ColumnMappedExchangeDetailWarning" xml:space="preserve">
+    <value>This column has already been mapped, do you want to exchange mappings on the two columns?</value>
+  </data>
 </root>

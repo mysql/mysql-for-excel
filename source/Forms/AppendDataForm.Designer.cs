@@ -31,6 +31,7 @@
       this.components = new System.ComponentModel.Container();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AppendDataForm));
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
       this.btnAppend = new System.Windows.Forms.Button();
@@ -71,6 +72,7 @@
       // 
       // contentAreaPanel
       // 
+      this.contentAreaPanel.AllowDrop = true;
       this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
       this.contentAreaPanel.Controls.Add(this.grdToMySQLTable);
       this.contentAreaPanel.Controls.Add(this.cmbMappingMethod);
@@ -90,6 +92,9 @@
       this.contentAreaPanel.Controls.Add(this.lblManuallyAdjustMappingMain);
       this.contentAreaPanel.Controls.Add(this.picManuallyAdjustMapping);
       this.contentAreaPanel.Size = new System.Drawing.Size(844, 550);
+      this.contentAreaPanel.DragDrop += new System.Windows.Forms.DragEventHandler(this.contentAreaPanel_DragDrop);
+      this.contentAreaPanel.DragOver += new System.Windows.Forms.DragEventHandler(this.contentAreaPanel_DragOver);
+      this.contentAreaPanel.QueryContinueDrag += new System.Windows.Forms.QueryContinueDragEventHandler(this.contentAreaPanel_QueryContinueDrag);
       // 
       // commandAreaPanel
       // 
@@ -219,7 +224,7 @@
       // picChooseColumnMapping
       // 
       this.picChooseColumnMapping.BackColor = System.Drawing.Color.Transparent;
-      this.picChooseColumnMapping.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_AppendDlg_ColumnMapping_32x32;
+      this.picChooseColumnMapping.Image = ((System.Drawing.Image)(resources.GetObject("picChooseColumnMapping.Image")));
       this.picChooseColumnMapping.Location = new System.Drawing.Point(41, 59);
       this.picChooseColumnMapping.Name = "picChooseColumnMapping";
       this.picChooseColumnMapping.Size = new System.Drawing.Size(32, 32);
@@ -241,7 +246,7 @@
       // picManuallyAdjustMapping
       // 
       this.picManuallyAdjustMapping.BackColor = System.Drawing.Color.Transparent;
-      this.picManuallyAdjustMapping.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_AppendDlg_ManualColumnMapping_32x32;
+      this.picManuallyAdjustMapping.Image = ((System.Drawing.Image)(resources.GetObject("picManuallyAdjustMapping.Image")));
       this.picManuallyAdjustMapping.Location = new System.Drawing.Point(432, 60);
       this.picManuallyAdjustMapping.Name = "picManuallyAdjustMapping";
       this.picManuallyAdjustMapping.Size = new System.Drawing.Size(32, 32);
@@ -305,7 +310,7 @@
       // 
       // pictureBox1
       // 
-      this.pictureBox1.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_AppendDlg_Arrow_Down;
+      this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
       this.pictureBox1.Location = new System.Drawing.Point(414, 340);
       this.pictureBox1.Name = "pictureBox1";
       this.pictureBox1.Size = new System.Drawing.Size(17, 11);
@@ -401,7 +406,6 @@
       this.grdToMySQLTable.TabIndex = 9;
       this.grdToMySQLTable.DragDrop += new System.Windows.Forms.DragEventHandler(this.grdToMySQLTable_DragDrop);
       this.grdToMySQLTable.DragOver += new System.Windows.Forms.DragEventHandler(this.grdToMySQLTable_DragOver);
-      this.grdToMySQLTable.DragLeave += new System.EventHandler(this.grdToMySQLTable_DragLeave);
       this.grdToMySQLTable.GiveFeedback += new System.Windows.Forms.GiveFeedbackEventHandler(this.grdGiveFeedback);
       this.grdToMySQLTable.QueryContinueDrag += new System.Windows.Forms.QueryContinueDragEventHandler(this.grdQueryContinueDrag);
       this.grdToMySQLTable.MouseDown += new System.Windows.Forms.MouseEventHandler(this.grdMouseDown);

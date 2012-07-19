@@ -93,6 +93,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This column has already been mapped, do you want to exchange mappings on the two columns?.
+        /// </summary>
+        internal static string ColumnMappedExchangeDetailWarning {
+            get {
+                return ResourceManager.GetString("ColumnMappedExchangeDetailWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This column has already been mapped, do you want to overwrite existing mapping?.
         /// </summary>
         internal static string ColumnMappedOverwriteDetailWarning {

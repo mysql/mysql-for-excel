@@ -338,6 +338,29 @@ namespace MySQL.ForExcel
       btnStoreMapping.Enabled = currentColumnMapping.MappedQuantity > 0;
     }
 
+    private void swapMappings(int mappingSourceIndex1, int mappingSourceIndex2)
+    {
+      int mappingsCount = (currentColumnMapping != null ? currentColumnMapping.MappedSourceIndexes.Length : 0);
+      if (mappingsCount == 0 || mappingSourceIndex1 < 0 || mappingSourceIndex1 >= mappingsCount || mappingSourceIndex2 < 0 || mappingSourceIndex2 >= mappingsCount)
+        return;
+
+      string mapping1ColName = grdToMySQLTable.MultiHeaderColumnList[mappingSourceIndex1].HeaderText;
+      int mapping1Index = currentColumnMapping.MappedSourceIndexes[mappingSourceIndex1];
+      string mapping2ColName = grdToMySQLTable.MultiHeaderColumnList[mappingSourceIndex2].HeaderText;
+      int mapping2Index = currentColumnMapping.MappedSourceIndexes[mappingSourceIndex2];
+
+      applySingleMapping(mapping1Index, mappingSourceIndex2, mapping1ColName);
+      applySingleMapping(mapping2Index, mappingSourceIndex1, mapping2ColName);
+
+      currentColumnMapping.MappedSourceIndexes[mappingSourceIndex1] = mapping2Index;
+      currentColumnMapping.MappedSourceIndexes[mappingSourceIndex2] = mapping1Index;
+
+      // Refresh Grids
+      grdToMySQLTable.Refresh();
+      grdFromExcelData.Refresh();
+      btnStoreMapping.Enabled = currentColumnMapping.MappedQuantity > 0;
+    }
+
     private bool storeColumnMappingInFile(MySQLColumnMapping mapping)
     {
       bool result = false;
@@ -483,8 +506,17 @@ namespace MySQL.ForExcel
           // The screenOffset is used to account for any desktop bands that may be at the top or left side of the screen when determining when to cancel the drag drop operation.
           screenOffset = SystemInformation.WorkingArea.Location;
 
-          // Proceed with the drag-and-drop, passing in the list item.           
-          DragDropEffects dropEffect = gridObject.DoDragDrop(grdColumnIndexToDrag, DragDropEffects.Link);
+          // Proceed with the drag-and-drop, passing in the list item.
+          switch (gridObject.Name)
+          {
+            case "grdFromExcelData":
+              gridObject.DoDragDrop(grdColumnIndexToDrag, DragDropEffects.Link);
+              break;
+            case "grdToMySQLTable":
+              if (grdColumnIndexToDrag >= 0 && currentColumnMapping != null && currentColumnMapping.MappedSourceIndexes[grdColumnIndexToDrag] >= 0)
+                gridObject.DoDragDrop(grdColumnIndexToDrag, DragDropEffects.Move);
+              break;
+          }
         }
       }
     }
@@ -497,10 +529,13 @@ namespace MySQL.ForExcel
       switch (e.Effect)
       {
         case DragDropEffects.Link:
-          Cursor.Current = (feedBackFromGrid ? droppableCursor : trashCursor);
+          Cursor.Current = (feedBackFromGrid ? droppableCursor : Cursors.No);
+          break;
+        case DragDropEffects.Move:
+          Cursor.Current = (feedBackFromGrid ? Cursors.No : (grdToTableColumnIndexToDrop >= 0 ? droppableCursor : trashCursor));
           break;
         case DragDropEffects.None:
-          Cursor.Current = (feedBackFromGrid ? draggingCursor : Cursors.Default);
+          Cursor.Current = (feedBackFromGrid ? draggingCursor : trashCursor);
           break;
         default:
           Cursor.Current = Cursors.Default;
@@ -510,9 +545,6 @@ namespace MySQL.ForExcel
 
     private void grdQueryContinueDrag(object sender, QueryContinueDragEventArgs e)
     {
-      if ((sender as DataGridView).Name == "grdFromExcelData" && Cursor.Current != Cursors.Default && Cursor.Current != droppableCursor && Cursor.Current != draggingCursor && Cursor.Current != trashCursor)
-        Cursor.Current = draggingCursor;
-
       // Cancel the drag if the mouse moves off the form. The screenOffset takes into account any desktop bands that may be at the top or left side of the screen.
       if (((Control.MousePosition.X - screenOffset.X) < this.DesktopBounds.Left) ||
           ((Control.MousePosition.X - screenOffset.X) > this.DesktopBounds.Right) ||
@@ -520,46 +552,8 @@ namespace MySQL.ForExcel
           ((Control.MousePosition.Y - screenOffset.Y) > this.DesktopBounds.Bottom))
       {
         e.Action = DragAction.Cancel;
+        return;
       }
-    }
-
-    private void grdToMySQLTable_DragLeave(object sender, EventArgs e)
-    {
-      if (grdColumnIndexToDrag >- 1)
-        performManualSingleColumnMapping(-1, grdColumnIndexToDrag, null);
-    }
-
-    private void grdToMySQLTable_DragDrop(object sender, DragEventArgs e)
-    {
-      // Ensure that the dragged item is contained in the data.
-      if (e.Data.GetDataPresent(typeof(System.Int32)))
-      {
-        int fromColumnIndex = Convert.ToInt32(e.Data.GetData(typeof(System.Int32)));
-        string draggedColumnName = grdFromExcelData.Columns[fromColumnIndex].HeaderText;
-        if (e.Effect == DragDropEffects.Link && grdToTableColumnIndexToDrop >= 0)
-        {
-          MySQLDataColumn toCol = toMySQLDataTable.GetColumnAtIndex(grdToTableColumnIndexToDrop);
-          if (!String.IsNullOrEmpty(toCol.MappedDataColName))
-          {
-            bool isIdenticalMapping = toCol.MappedDataColName == draggedColumnName;
-            DialogResult dr = DialogResult.No;
-            if (!isIdenticalMapping)
-            {
-              WarningDialog wDiag = new WarningDialog(Properties.Resources.ColumnMappedOverwriteTitleWarning, Properties.Resources.ColumnMappedOverwriteDetailWarning);
-              dr = wDiag.ShowDialog();
-            }
-            if (dr == DialogResult.Yes)
-              performManualSingleColumnMapping(-1, grdToTableColumnIndexToDrop, null);
-            else
-            {
-              e.Effect = DragDropEffects.None;
-              return;
-            }
-          }
-          performManualSingleColumnMapping(fromColumnIndex, grdToTableColumnIndexToDrop, draggedColumnName);
-        }
-      }
-      grdToTableColumnIndexToDrop = -1;
     }
 
     private void grdToMySQLTable_DragOver(object sender, DragEventArgs e)
@@ -571,10 +565,120 @@ namespace MySQL.ForExcel
         grdToTableColumnIndexToDrop = -1;
         return;
       }
-      e.Effect = DragDropEffects.Link;
-      Point clientPoint = grdToMySQLTable.PointToClient(new Point(e.X, e.Y));
-      DataGridView.HitTestInfo info = grdToMySQLTable.HitTest(clientPoint.X, clientPoint.Y);
-      grdToTableColumnIndexToDrop = info.ColumnIndex;
+      if ((e.AllowedEffect & DragDropEffects.Link) == DragDropEffects.Link)
+      {
+        e.Effect = DragDropEffects.Link;
+        Point clientPoint = grdToMySQLTable.PointToClient(new Point(e.X, e.Y));
+        DataGridView.HitTestInfo info = grdToMySQLTable.HitTest(clientPoint.X, clientPoint.Y);
+        grdToTableColumnIndexToDrop = info.ColumnIndex;
+      }
+      else if ((e.AllowedEffect & DragDropEffects.Move) == DragDropEffects.Move)
+      {
+        e.Effect = DragDropEffects.Move;
+        Point clientPoint = grdToMySQLTable.PointToClient(new Point(e.X, e.Y));
+        DataGridView.HitTestInfo info = grdToMySQLTable.HitTest(clientPoint.X, clientPoint.Y);
+        grdToTableColumnIndexToDrop = info.ColumnIndex;
+      }
+    }
+
+    private void grdToMySQLTable_DragDrop(object sender, DragEventArgs e)
+    {
+      // Ensure that the dragged item is contained in the data.
+      if (e.Data.GetDataPresent(typeof(System.Int32)))
+      {
+        int fromColumnIndex = Convert.ToInt32(e.Data.GetData(typeof(System.Int32)));
+        string draggedColumnName = grdFromExcelData.Columns[fromColumnIndex].HeaderText;
+        if (grdToTableColumnIndexToDrop >= 0)
+        {
+          switch (e.Effect)
+          {
+            // We are mapping a column from the Source Grid to the Target Grid
+            case DragDropEffects.Link:
+              MySQLDataColumn toCol = toMySQLDataTable.GetColumnAtIndex(grdToTableColumnIndexToDrop);
+              if (!String.IsNullOrEmpty(toCol.MappedDataColName))
+              {
+                bool isIdenticalMapping = toCol.MappedDataColName == draggedColumnName;
+                DialogResult dr = DialogResult.No;
+                if (!isIdenticalMapping)
+                {
+                  WarningDialog wDiag = new WarningDialog(Properties.Resources.ColumnMappedOverwriteTitleWarning, Properties.Resources.ColumnMappedOverwriteDetailWarning);
+                  dr = wDiag.ShowDialog();
+                }
+                if (dr == DialogResult.Yes)
+                  performManualSingleColumnMapping(-1, grdToTableColumnIndexToDrop, null);
+                else
+                {
+                  e.Effect = DragDropEffects.None;
+                  return;
+                }
+              }
+              performManualSingleColumnMapping(fromColumnIndex, grdToTableColumnIndexToDrop, draggedColumnName);
+              break;
+
+            // We are moving a column mapping from a column on the Target Grid to another column in the same grid
+            case DragDropEffects.Move:
+              if (currentColumnMapping == null)
+                return;
+              int mappedIndexFromDraggedTargetColumn = currentColumnMapping.MappedSourceIndexes[fromColumnIndex];
+              int mappedIndexInDropTargetColumn = currentColumnMapping.MappedSourceIndexes[grdToTableColumnIndexToDrop];
+              if (mappedIndexInDropTargetColumn >= 0)
+              {
+                bool isIdenticalMapping = mappedIndexInDropTargetColumn == mappedIndexFromDraggedTargetColumn;
+                DialogResult dr = DialogResult.No;
+                if (!isIdenticalMapping)
+                {
+                  WarningDialog wDiag = new WarningDialog(Properties.Resources.ColumnMappedOverwriteTitleWarning, Properties.Resources.ColumnMappedExchangeDetailWarning);
+                  dr = wDiag.ShowDialog();
+                }
+                if (dr == DialogResult.No)
+                {
+                  e.Effect = DragDropEffects.None;
+                  return;
+                }
+              }
+              swapMappings(fromColumnIndex, grdToTableColumnIndexToDrop);
+              break;
+          }
+        }
+      }
+      grdToTableColumnIndexToDrop = -1;
+    }
+
+    private void contentAreaPanel_QueryContinueDrag(object sender, QueryContinueDragEventArgs e)
+    {
+      // Cancel the drag if the mouse moves off the form. The screenOffset takes into account any desktop bands that may be at the top or left side of the screen.
+      if (((Control.MousePosition.X - screenOffset.X) < this.DesktopBounds.Left) ||
+          ((Control.MousePosition.X - screenOffset.X) > this.DesktopBounds.Right) ||
+          ((Control.MousePosition.Y - screenOffset.Y) < this.DesktopBounds.Top) ||
+          ((Control.MousePosition.Y - screenOffset.Y) > this.DesktopBounds.Bottom))
+      {
+        e.Action = DragAction.Cancel;
+        return;
+      }
+    }
+
+    private void contentAreaPanel_DragOver(object sender, DragEventArgs e)
+    {
+      // Determine whether data exists in the drop data. If not, then the drop effect reflects that the drop cannot occur.
+      if (!e.Data.GetDataPresent(typeof(System.Int32)))
+      {
+        e.Effect = DragDropEffects.None;
+        return;
+      }
+      if ((e.AllowedEffect & DragDropEffects.Move) == DragDropEffects.Move)
+      {
+        e.Effect = DragDropEffects.Move;
+        grdToTableColumnIndexToDrop = -1;
+      }
+    }
+
+    private void contentAreaPanel_DragDrop(object sender, DragEventArgs e)
+    {
+      if (e.Effect == DragDropEffects.Move && e.Data.GetDataPresent(typeof(System.Int32)))
+      {
+        if (grdColumnIndexToDrag > -1)
+          performManualSingleColumnMapping(-1, grdColumnIndexToDrag, null);
+      }
     }
 
     private void btnStoreMapping_Click(object sender, EventArgs e)
