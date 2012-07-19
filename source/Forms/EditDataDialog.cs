@@ -153,8 +153,8 @@ namespace MySQL.ForExcel
     private void revertDataChanges(bool refreshFromDB)
     {
       Exception exception = null;
-      bool success = editMySQLDataTable.RevertData(refreshFromDB, wbConnection, out exception);
-      if (!success)
+      editMySQLDataTable.RevertData(refreshFromDB, wbConnection, out exception);
+      if (exception != null)
       {
         InfoDialog infoDialog = new InfoDialog(false, String.Format("{0} Data Error", (refreshFromDB ? "Refresh" : "Revert")), exception.Message);
         infoDialog.ShowDialog();
@@ -190,10 +190,11 @@ namespace MySQL.ForExcel
         if (!autoCommitOn)
         {
           operationDetails.AppendFormat("Adding {0} rows to MySQL Table \"{1}\"...{2}{2}", addingRowsCount, editMySQLDataTable.TableName, Environment.NewLine);
-          operationDetails.Append(editMySQLDataTable.GetInsertSQL(-1, true, false));
+          operationDetails.Append(editMySQLDataTable.GetInsertSQL(-1, true, true));
           operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
         }
-        success = editMySQLDataTable.InsertDataWithAdapter(wbConnection, false, out exception, out updatedCount);
+        updatedCount = editMySQLDataTable.InsertDataWithAdapter(wbConnection, true, out exception);
+        success = exception == null;
         if (success)
         {
           changeExcelCellsColor(addedRowAddressesList, commitedCellsOLEColor);
@@ -229,7 +230,8 @@ namespace MySQL.ForExcel
           operationDetails.Append(editMySQLDataTable.GetDeleteSQL(-1, true));
           operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
         }
-        success = editMySQLDataTable.DeleteDataWithAdapter(wbConnection, out exception, out updatedCount);
+        updatedCount = editMySQLDataTable.DeleteDataWithAdapter(wbConnection, out exception);
+        success = exception == null;
         if (success)
         {
           if (!autoCommitOn)
@@ -264,7 +266,8 @@ namespace MySQL.ForExcel
           operationDetails.Append(editMySQLDataTable.GetUpdateSQL(-1, true));
           operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
         }
-        success = editMySQLDataTable.UpdateDataWithAdapter(wbConnection, out exception, out updatedCount);
+        updatedCount = editMySQLDataTable.UpdateDataWithAdapter(wbConnection, out exception);
+        success = exception == null;
         if (success)
         {
           changeExcelCellsColor(modifiedCellAddressesList, commitedCellsOLEColor);

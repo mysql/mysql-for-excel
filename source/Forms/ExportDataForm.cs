@@ -243,7 +243,7 @@ namespace MySQL.ForExcel
       StringBuilder queryString = new StringBuilder();
       queryString.Append(dataTable.GetCreateSQL(true));
       queryString.AppendFormat(";{0}", Environment.NewLine);
-      queryString.Append(dataTable.GetInsertSQL(100, true, true));
+      queryString.Append(dataTable.GetInsertSQL(100, true, false));
       queryString.Append(";");
       Clipboard.SetText(queryString.ToString());
     }
@@ -263,10 +263,11 @@ namespace MySQL.ForExcel
       string operationSummary = String.Format("The MySQL Table \"{0}\"", dataTable.TableName);
       StringBuilder operationDetails = new StringBuilder();
       operationDetails.AppendFormat("Creating MySQL Table \"{0}\"...{1}{1}", dataTable.TableName, Environment.NewLine);
-      string queryString = dataTable.GetCreateSQL(true);
+      string queryString = String.Empty;
+      dataTable.CreateTable(wbConnection, out exception, out queryString);
+      bool success = exception == null;
       operationDetails.Append(queryString);
       operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
-      bool success = dataTable.CreateTable(wbConnection, out exception);
       if (success)
         operationDetails.Append("Table has been created successfully.");
       else
@@ -282,8 +283,8 @@ namespace MySQL.ForExcel
       if (success && tableContainsDataToExport)
       {
         int insertedCount = 0;
-        success = dataTable.InsertDataWithAdapter(wbConnection, true, out exception, out insertedCount);
-        queryString = dataTable.GetInsertSQL(-1, true, true);
+        insertedCount = dataTable.InsertDataWithManualQuery(wbConnection, false, out exception, out queryString);
+        success = exception == null;
         if (success)
         {
           operationDetails.AppendFormat("{0}{0}Inserting data rows...{0}{0}", Environment.NewLine);
@@ -707,7 +708,7 @@ namespace MySQL.ForExcel
           chkAllowEmpty.Checked = true;
       }
 
-      //column.ExcludeColumn = chkExcludeColumn.Checked;
+      //toColumn.ExcludeColumn = chkExcludeColumn.Checked;
       columnBindingSource.EndEdit();
 
       chkExcludeColumn.Enabled = true;

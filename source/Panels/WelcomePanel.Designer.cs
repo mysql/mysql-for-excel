@@ -40,8 +40,8 @@
       this.manageConnectionsLabel = new MySQL.ForExcel.HotLabel();
       this.connectionList = new MySQL.ForExcel.MyTreeView();
       this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-      this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.lblCopyright = new MySQL.ForExcel.TransparentLabel();
       this.lblAllRights = new MySQL.ForExcel.TransparentLabel();
       this.newConnectionLabel = new MySQL.ForExcel.HotLabel();
@@ -185,19 +185,19 @@
       this.contextMenuStrip.Text = "Refresh";
       this.contextMenuStrip.Opened += new System.EventHandler(this.contextMenuStrip_Opened);
       // 
-      // refreshToolStripMenuItem
-      // 
-      this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
-      this.refreshToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
-      this.refreshToolStripMenuItem.Text = "Refresh Connections";
-      this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshItem_Click);
-      // 
       // deleteToolStripMenuItem
       // 
       this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
       this.deleteToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
       this.deleteToolStripMenuItem.Text = "Delete Connection";
       this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+      // 
+      // refreshToolStripMenuItem
+      // 
+      this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
+      this.refreshToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+      this.refreshToolStripMenuItem.Text = "Refresh Connections";
+      this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshItem_Click);
       // 
       // lblCopyright
       // 

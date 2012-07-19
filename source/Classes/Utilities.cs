@@ -1004,7 +1004,9 @@ namespace MySQL.ForExcel
 
     public static object GetInsertingValueForColumnType(object rawValue, MySQLDataColumn column)
     {
-      object retValue = null;
+      object retValue = rawValue;
+      if (column == null)
+        return rawValue;
 
       bool cellWithNoData = rawValue == null || rawValue == DBNull.Value;
       if (cellWithNoData)

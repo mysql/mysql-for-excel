@@ -138,7 +138,7 @@ namespace MySQL.ForExcel
       autoMapping.Port = wbConnection.Port;
       int autoMappedColumns = 0;
       
-      // Attempt to auto-map using column names regardless of positioning if the data types match
+      // Attempt to auto-map using toColumn names regardless of positioning if the data types match
       if (chkFirstRowHeaders.Checked)
       {
         for (int toColIdx = 0; toColIdx < toMySQLDataTable.Columns.Count; toColIdx++)
@@ -202,7 +202,7 @@ namespace MySQL.ForExcel
       MySQLColumnMapping matchedMapping = new MySQLColumnMapping(currentColumnMapping, fromMySQLDataTable.GetColumnNamesArray(), toMySQLDataTable.GetColumnNamesArray());
 
       // Check if Target Columns still match with the Target Table, switch mapped indexes if columns changed positions
-      //  and remove mapped indexes if target column in stored mapping is not present anymore in Target Table
+      //  and remove mapped indexes if target toColumn in stored mapping is not present anymore in Target Table
       for (int storedMappedIdx = 0; storedMappedIdx < currentColumnMapping.TargetColumns.Length; storedMappedIdx++)
       {
         // Check if Target Column in Stored Mapping is found within any of the TargetColumns of the matching mapping.
@@ -213,8 +213,8 @@ namespace MySQL.ForExcel
           continue;
         MySQLDataColumn toCol = toMySQLDataTable.GetColumnAtIndex(targetColumnIndex);
 
-        // Check if mapped source column from Stored Mapping matches with a Source Column in current "From Table"
-        //  in column name and its data type matches its corresponding target column, if so we are good to map it
+        // Check if mapped source toColumn from Stored Mapping matches with a Source Column in current "From Table"
+        //  in toColumn name and its data type matches its corresponding target toColumn, if so we are good to map it
         int proposedSourceMapping = currentColumnMapping.MappedSourceIndexes[storedMappedIdx];
         string mappedSourceColName = currentColumnMapping.SourceColumns[proposedSourceMapping];
         int sourceColFoundInFromTableIdx = fromMySQLDataTable.GetColumnIndex(mappedSourceColName, true);
@@ -224,8 +224,8 @@ namespace MySQL.ForExcel
           if (DataTypeUtilities.Type1FitsIntoType2(fromCol.StrippedMySQLDataType, toCol.StrippedMySQLDataType))
             matchedMapping.MappedSourceIndexes[targetColumnIndex] = sourceColFoundInFromTableIdx;
         }
-        // Since source columns do not match in name and type, try to match the mapped source column's datatype
-        //  with the From column in that source index only if that From Column name is not in any source mapping.
+        // Since source columns do not match in name and type, try to match the mapped source toColumn's datatype
+        //  with the From toColumn in that source index only if that From Column name is not in any source mapping.
         else if (matchedMapping.MappedSourceIndexes[targetColumnIndex] < 0 && proposedSourceMapping < fromMySQLDataTable.Columns.Count)
         {
           string fromTableColName = fromMySQLDataTable.GetColumnAtIndex(proposedSourceMapping).DisplayName;
@@ -270,17 +270,10 @@ namespace MySQL.ForExcel
       }
 
       // Store the actual mapping
-      MySQLDataColumn fromCol;
-      if (mapping)
-      {
-        fromCol = fromMySQLDataTable.GetColumnAtIndex(fromColumnIndex);
-        fromCol.MappedDataColName = toMySQLDataTable.Columns[toColumnIndex].ColumnName;
-      }
-      else if (previouslyMappedFromIndex >= 0)
-      {
-        fromCol = fromMySQLDataTable.GetColumnAtIndex(previouslyMappedFromIndex);
-        fromCol.MappedDataColName = null;
-      }
+      MySQLDataColumn fromCol = (mapping ? fromMySQLDataTable.GetColumnAtIndex(fromColumnIndex) : null);
+      MySQLDataColumn toCol = toMySQLDataTable.GetColumnAtIndex(toColumnIndex);
+      toCol.MappedDataColName = (mapping ? fromCol.ColumnName : null);
+
       currentColumnMapping.MappedSourceIndexes[toColumnIndex] = fromColumnIndex;
     }
 
@@ -313,16 +306,16 @@ namespace MySQL.ForExcel
           grdToMySQLTable.MultiHeaderColumnList.Add(new MultiHeaderColumn(String.Empty, colIdx, colIdx));
         else
           grdToMySQLTable.MultiHeaderColumnList[colIdx].HeaderText = String.Empty;
-
         grdToMySQLTable.MultiHeaderColumnList[colIdx].BackgroundColor = Color.OrangeRed;
+
+        MySQLDataColumn toCol = toMySQLDataTable.Columns[colIdx] as MySQLDataColumn;
+        toCol.MappedDataColName = null;
 
         if (colIdx < grdFromExcelData.Columns.Count)
         {
           DataGridViewCellStyle newStyle = new DataGridViewCellStyle(grdFromExcelData.Columns[colIdx].HeaderCell.Style);
           newStyle.SelectionBackColor = newStyle.BackColor = SystemColors.Control;
           grdFromExcelData.Columns[colIdx].HeaderCell.Style = newStyle;
-          MySQLDataColumn fromCol = fromMySQLDataTable.GetColumnAtIndex(colIdx);
-          fromCol.MappedDataColName = null;
         }        
       }
       if (currentColumnMapping != null && !onlyGrids)
@@ -368,7 +361,7 @@ namespace MySQL.ForExcel
       // Flag the property in the "From" table
       fromMySQLDataTable.FirstRowIsHeaders = firstRowColNames;
 
-      // Refresh the "From"/"Source" Grid and "From"/"Source" column names in the current mapping
+      // Refresh the "From"/"Source" Grid and "From"/"Source" toColumn names in the current mapping
       grdFromExcelData.CurrentCell = null;
       for (int colIdx = 0; colIdx < grdFromExcelData.Columns.Count; colIdx++)
       {
@@ -404,7 +397,7 @@ namespace MySQL.ForExcel
     private void btnAppend_Click(object sender, EventArgs e)
     {
       DialogResult dr;
-      if (fromMySQLDataTable.MappedColumnsQuantity < maxMappingCols)
+      if (toMySQLDataTable.MappedColumnsQuantity < maxMappingCols)
       {
         WarningDialog wDiag = new WarningDialog(Properties.Resources.ColumnMappingIncompleteTitleWarning, Properties.Resources.ColumnMappingIncompleteDetailWarning);
         if (wDiag.ShowDialog() == DialogResult.No)
@@ -415,7 +408,8 @@ namespace MySQL.ForExcel
       string insertQuery;
       string operationSummary = String.Empty;
 
-      bool success = fromMySQLDataTable.InsertExistingDataWithManualQuery(wbConnection, toMySQLDataTable, out exception, out insertQuery);
+      int appendCount = toMySQLDataTable.AppendDataWithManualQuery(wbConnection, fromMySQLDataTable, out exception, out insertQuery);
+      bool success = exception == null;
       if (success)
         operationSummary = String.Format("Excel data was appended successfully to MySQL Table {0}.", toMySQLDataTable.TableName);
       else
@@ -426,7 +420,7 @@ namespace MySQL.ForExcel
       operationDetails.Append(Environment.NewLine);
       operationDetails.Append(Environment.NewLine);
       if (success)
-        operationDetails.Append("Excel data was inserted successfully.");
+        operationDetails.AppendFormat("{0} rows were appended successfully.", appendCount);
       else
       {
         if (exception is MySqlException)
@@ -542,13 +536,12 @@ namespace MySQL.ForExcel
       {
         int fromColumnIndex = Convert.ToInt32(e.Data.GetData(typeof(System.Int32)));
         string draggedColumnName = grdFromExcelData.Columns[fromColumnIndex].HeaderText;
-        string droppedOntoColumnName = grdToMySQLTable.Columns[grdToTableColumnIndexToDrop].HeaderText;
         if (e.Effect == DragDropEffects.Link && grdToTableColumnIndexToDrop >= 0)
         {
-          MySQLDataColumn fromCol = fromMySQLDataTable.GetColumnAtIndex(fromColumnIndex);
-          if (!String.IsNullOrEmpty(fromCol.MappedDataColName))
+          MySQLDataColumn toCol = toMySQLDataTable.GetColumnAtIndex(grdToTableColumnIndexToDrop);
+          if (!String.IsNullOrEmpty(toCol.MappedDataColName))
           {
-            bool isIdenticalMapping = fromCol.MappedDataColName == droppedOntoColumnName;
+            bool isIdenticalMapping = toCol.MappedDataColName == draggedColumnName;
             DialogResult dr = DialogResult.No;
             if (!isIdenticalMapping)
             {
@@ -650,7 +643,7 @@ namespace MySQL.ForExcel
     {
       if (grdColumnClicked < 0 || currentColumnMapping == null || currentColumnMapping.MappedQuantity == 0)
         e.Cancel = true;
-      contextMenu.Items["removeColumnMappingToolStripMenuItem"].Visible = (grdColumnClicked > -1 && currentColumnMapping.GetMappedSourceIndexIndex(grdColumnClicked) >= 0);
+      contextMenu.Items["removeColumnMappingToolStripMenuItem"].Visible = (grdColumnClicked > -1 && currentColumnMapping.MappedSourceIndexes[grdColumnClicked] >= 0);
       contextMenu.Items["clearAllMappingsToolStripMenuItem"].Visible = (currentColumnMapping != null && currentColumnMapping.MappedQuantity > 0);
     }
 
