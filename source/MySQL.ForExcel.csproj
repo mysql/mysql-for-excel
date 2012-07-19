@@ -175,6 +175,10 @@
     <Reference Include="MySql.Data">
       <HintPath>libraries\MySql.Data.dll</HintPath>
     </Reference>
+    <Reference Include="MySQL.Utility, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>libraries\MySQL.Utility.dll</HintPath>
+    </Reference>
     <Reference Include="Office, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
@@ -542,12 +546,6 @@
     <None Include="Resources\MySQLforExcel-InfoDlg-Warning-64x64.png" />
     <Content Include="Resources\Warning.png" />
     <Content Include="Todo.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\MySQL.Utility\trunk\Source\MySQL.Utility.csproj">
-      <Project>{B8A3BD3B-3CBD-48D5-84F5-076365655E0B}</Project>
-      <Name>MySQL.Utility</Name>
-    </ProjectReference>
   </ItemGroup>
   <!-- Include the build rules for a C# project. -->
   <PropertyGroup>
