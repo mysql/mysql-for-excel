@@ -390,7 +390,7 @@ Please add a primary key to the table.</value>
     <value>Connection parameters are correct.</value>
   </data>
   <data name="UnableToAddConnectionsWhenWBRunning" xml:space="preserve">
-    <value>Adding new connections is not allowed when MySQL Workbench is running.  If you want to create a new connection, please close MySQL Workbench.</value>
+    <value>Adding new connections is not allowed when MySQL Workbench is running.</value>
   </data>
   <data name="AppName" xml:space="preserve">
     <value>MySQL For Excel</value>
@@ -400,5 +400,14 @@ Please add a primary key to the table.</value>
   </data>
   <data name="ColumnMappedExchangeDetailWarning" xml:space="preserve">
     <value>This column has already been mapped, do you want to exchange mappings on the two columns?</value>
+  </data>
+  <data name="CloseWBAdviceToAdd" xml:space="preserve">
+    <value>If you want to create a new connection, please close MySQL Workbench.</value>
+  </data>
+  <data name="UnableToDeleteConnectionsWhenWBRunning" xml:space="preserve">
+    <value>Deleting connections is not allowed while MySQL Workbench is running.</value>
+  </data>
+  <data name="CloseWBAdviceToDelete" xml:space="preserve">
+    <value>If you want to remove a connection, please close MySQL Workbench.</value>
   </data>
 </root>

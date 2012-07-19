@@ -72,9 +72,11 @@ namespace MySQL.ForExcel
     private void newConnectionLabel_Click(object sender, EventArgs e)
     {
       // if Workbench is running we can't allow adding new connections
+      InfoDialog id = new InfoDialog(false, Resources.UnableToAddConnectionsWhenWBRunning, string.Empty);
+      id.OperationSummarySubText = Resources.CloseWBAdviceToAdd;
       if (MySqlWorkbench.IsRunning)
       {
-        MessageBox.Show(Resources.UnableToAddConnectionsWhenWBRunning, Resources.AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        id.ShowDialog();
         return;
       }
 
@@ -107,12 +109,13 @@ namespace MySQL.ForExcel
 
     private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      InfoDialog id = new InfoDialog(false, "WorkBench is Running, please close it before attempting to delete connections", string.Empty);
+      InfoDialog id = new InfoDialog(false, Resources.UnableToDeleteConnectionsWhenWBRunning, string.Empty);
+      id.OperationSummarySubText = Resources.CloseWBAdviceToDelete;
       if (MySqlWorkbench.IsRunning) { id.ShowDialog(); return; }
       if (connectionList.SelectedNode.Name == "LocalConnectionsNode" || connectionList.SelectedNode.Text == "RemoteConnectionsNode" || connectionList.SelectedNode == null) return;
       MySqlWorkbenchConnectionCollection wbcollect = new MySqlWorkbenchConnectionCollection();
       WarningDialog wd = new WarningDialog("Confirm Delete", "Are you sure you want to delete the selected connection?");
-      if ( wd.ShowDialog() == DialogResult.No) return;
+      if (wd.ShowDialog() == DialogResult.No) return;
       MySqlWorkbenchConnection connectionToRemove = new MySqlWorkbenchConnection();
       foreach (MySqlWorkbenchConnection c in MySqlWorkbench.Connections)
         if (c.Name == connectionList.SelectedNode.Tag.ToString())

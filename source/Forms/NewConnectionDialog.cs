@@ -70,6 +70,10 @@ namespace MySQL.ForExcel
           throw;
         }
       }
+      finally
+      {
+        conn.Close();
+      }
     }
 
     private void testButton_Click(object sender, EventArgs e)
