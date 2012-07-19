@@ -175,9 +175,6 @@
     <Reference Include="MySql.Data">
       <HintPath>libraries\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="MySQL.Utility">
-      <HintPath>libraries\MySQL.Utility.dll</HintPath>
-    </Reference>
     <Reference Include="Office, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
@@ -185,6 +182,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -221,6 +219,7 @@
     <Compile Include="Classes\MySQLDataTable.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Classes\MySQLForExcelSettings.cs" />
     <Compile Include="Controls\PreviewDataGridView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -475,6 +474,7 @@
     <None Include="Properties\DataSources\MySQLTable.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings1.Designer.cs</LastGenOutput>
     </None>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -542,6 +542,12 @@
     <None Include="Resources\MySQLforExcel-InfoDlg-Warning-64x64.png" />
     <Content Include="Resources\Warning.png" />
     <Content Include="Todo.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MySQL.Utility\trunk\Source\MySQL.Utility.csproj">
+      <Project>{B8A3BD3B-3CBD-48D5-84F5-076365655E0B}</Project>
+      <Name>MySQL.Utility</Name>
+    </ProjectReference>
   </ItemGroup>
   <!-- Include the build rules for a C# project. -->
   <PropertyGroup>

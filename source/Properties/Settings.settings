@@ -2,37 +2,37 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="MySQL.ForExcel.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="ExportDetectDatatype" Type="System.Boolean" Scope="User">
+    <Setting Name="ExportDetectDatatype" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ExportAddBufferToVarchar" Type="System.Boolean" Scope="User">
+    <Setting Name="ExportAddBufferToVarchar" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ExportAutoIndexIntColumns" Type="System.Boolean" Scope="User">
+    <Setting Name="ExportAutoIndexIntColumns" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ExportAutoAllowEmptyNonIndexColumns" Type="System.Boolean" Scope="User">
+    <Setting Name="ExportAutoAllowEmptyNonIndexColumns" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ExportUseFormattedValues" Type="System.Boolean" Scope="User">
+    <Setting Name="ExportUseFormattedValues" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ExportShowCopySQLButton" Type="System.Boolean" Scope="User">
+    <Setting Name="ExportShowCopySQLButton" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="AppendPerformAutoMap" Type="System.Boolean" Scope="User">
+    <Setting Name="AppendPerformAutoMap" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="AppendAutoStoreColumnMapping" Type="System.Boolean" Scope="User">
+    <Setting Name="AppendAutoStoreColumnMapping" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="AppendReloadColumnMapping" Type="System.Boolean" Scope="User">
+    <Setting Name="AppendReloadColumnMapping" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="AppendUseFormattedValues" Type="System.Boolean" Scope="User">
+    <Setting Name="AppendUseFormattedValues" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="StoredDataMappings" Type="System.Collections.Generic.List&lt;MySQLColumnMapping&gt;" Scope="User">
+    <Setting Name="StoredDataMappings" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Collections.Generic.List&lt;MySQLColumnMapping&gt;" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>
