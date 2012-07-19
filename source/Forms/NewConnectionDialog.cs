@@ -55,7 +55,7 @@ namespace MySQL.ForExcel
       }
       catch (MySqlException)
       {
-        PasswordDialog pwdDialog = new PasswordDialog(WBconn.Name, WBconn.UserName);
+        PasswordDialog pwdDialog = new PasswordDialog(WBconn.Host, WBconn.Port, WBconn.UserName);
         if (pwdDialog.ShowDialog(this) == DialogResult.Cancel) return false;
         connectionString.Password = pwdDialog.PasswordText;
         pwdDialog.Dispose();
@@ -77,8 +77,7 @@ namespace MySQL.ForExcel
     }
 
     private void testButton_Click(object sender, EventArgs e)
-    {
-      bool result = false;
+    {      
       MySqlConnectionStringBuilder testConn = new MySqlConnectionStringBuilder();
       testConn.Server = WBconn.Host;
       testConn.Port = (uint)WBconn.Port;

@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using MySQL.Utility;
 
 namespace MySQL.ForExcel
 {
@@ -32,17 +33,12 @@ namespace MySQL.ForExcel
       InitializeComponent();
     }
 
-    public PasswordDialog(string ConnectionName, string User)
+    public PasswordDialog(string Host, int Port, string User)
     {
       InitializeComponent();
-      if (ConnectionName == null)
-        lblConnectionValue.Text = "New";
-      else
-        lblConnectionValue.Text = ConnectionName;
-      if (User == null)
-        lblUserValue.Text = "guest";
-      else
-        lblUserValue.Text = User;
+      lblConnection.Text = "Service:";
+      HostIdentifier = "Mysql@" + Host + ":" + Port;
+      UserName = User ?? "guest";
     }
   }
 }
