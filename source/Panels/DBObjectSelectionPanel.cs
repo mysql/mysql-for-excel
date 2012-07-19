@@ -62,6 +62,12 @@ namespace MySQL.ForExcel
       objectList_AfterSelect(null, null);
     }
 
+    private void refreshDatabaseObjectsToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      PopulateList();
+      objectList_AfterSelect(null, null);
+    }
+
     private void PopulateList()
     {
       foreach (TreeNode node in objectList.Nodes)

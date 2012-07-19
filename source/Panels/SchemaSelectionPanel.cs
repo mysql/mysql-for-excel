@@ -40,6 +40,13 @@ namespace MySQL.ForExcel
       return schemasLoaded;
     }
 
+
+    private void refreshSchemasToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      if (LoadSchemas())
+        databaseList_AfterSelect(null, null);
+    }
+
     private void databaseList_AfterSelect(object sender, TreeViewEventArgs e)
     {
       btnNext.Enabled = e != null && e.Node != null && e.Node.Level > 0;
@@ -145,6 +152,5 @@ namespace MySQL.ForExcel
         labelsToolTip.SetToolTip(label, null);
       }
     }
-
   }
 }

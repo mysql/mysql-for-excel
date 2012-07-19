@@ -46,7 +46,10 @@
       this.exportToNewTableLabel = new MySQL.ForExcel.HotLabel();
       this.imgSeparator = new MySQL.ForExcel.TransparentPictureBox();
       this.labelsToolTip = new System.Windows.Forms.ToolTip(this.components);
+      this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.refreshDatabaseObjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
+      this.contextMenuStrip.SuspendLayout();
       this.SuspendLayout();
       // 
       // lblConnectionName
@@ -144,6 +147,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.objectList.CollapsedIcon = global::MySQL.ForExcel.Properties.Resources.ArrowRight;
+      this.objectList.ContextMenuStrip = this.contextMenuStrip;
       this.objectList.DescriptionColor = System.Drawing.Color.Silver;
       this.objectList.DescriptionColorOpacity = 1D;
       this.objectList.DescriptionFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -342,6 +346,20 @@
       this.imgSeparator.Size = new System.Drawing.Size(237, 22);
       this.imgSeparator.TabIndex = 27;
       // 
+      // contextMenuStrip
+      // 
+      this.contextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.refreshDatabaseObjectsToolStripMenuItem});
+      this.contextMenuStrip.Name = "contextMenuStrip";
+      this.contextMenuStrip.Size = new System.Drawing.Size(208, 26);
+      // 
+      // refreshDatabaseObjectsToolStripMenuItem
+      // 
+      this.refreshDatabaseObjectsToolStripMenuItem.Name = "refreshDatabaseObjectsToolStripMenuItem";
+      this.refreshDatabaseObjectsToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+      this.refreshDatabaseObjectsToolStripMenuItem.Text = "Refresh Database Objects";
+      this.refreshDatabaseObjectsToolStripMenuItem.Click += new System.EventHandler(this.refreshDatabaseObjectsToolStripMenuItem_Click);
+      // 
       // DBObjectSelectionPanel
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -363,6 +381,7 @@
       this.Name = "DBObjectSelectionPanel";
       this.Size = new System.Drawing.Size(260, 625);
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
+      this.contextMenuStrip.ResumeLayout(false);
       this.ResumeLayout(false);
 
     }
@@ -385,5 +404,7 @@
     private SearchEdit objectFilter;
     private TransparentPictureBox imgSeparator;
     private System.Windows.Forms.ToolTip labelsToolTip;
+    private System.Windows.Forms.ContextMenuStrip contextMenuStrip;
+    private System.Windows.Forms.ToolStripMenuItem refreshDatabaseObjectsToolStripMenuItem;
   }
 }
