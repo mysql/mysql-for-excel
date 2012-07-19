@@ -37,12 +37,17 @@ namespace MySQL.ForExcel
     private int defaultCellsOLEColor = ColorTranslator.ToOle(Color.White);
     private long editingRowsQuantity = 0;
     private long editingColsQuantity = 0;
+    private string editingWorksheetName = String.Empty;
 
     public Excel.Worksheet EditingWorksheet = null;
     public TaskPaneControl CallerTaskPane;
     public string EditingTableName { get; private set; }
     public IWin32Window ParentWindow { get; set; }
     public bool LockByProtectingWorksheet { get; set; }
+    public string SchemaAndTableName
+    {
+      get { return String.Format("{0}.{1}", wbConnection.Schema, EditingTableName); }
+    }
 
     public EditDataDialog(MySqlWorkbenchConnection wbConnection, Excel.Range editDataRange, DataTable importTable, Excel.Worksheet editingWorksheet, bool protectWorksheet)
     {
@@ -60,9 +65,10 @@ namespace MySQL.ForExcel
       if (importTable.ExtendedProperties.ContainsKey("QueryString") && !String.IsNullOrEmpty(importTable.ExtendedProperties["QueryString"].ToString()))
         editMySQLDataTable.SelectQuery = importTable.ExtendedProperties["QueryString"].ToString();
       EditingWorksheet = editingWorksheet;
+      editingWorksheetName = editingWorksheet.Name;
       EditingWorksheet.Change += new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
       EditingWorksheet.SelectionChange += new Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);
-      toolTip.SetToolTip(this, String.Format("Editing data for Table {0} on Worksheet {1}", EditingTableName, editingWorksheet.Name));
+      toolTip.SetToolTip(this, String.Format("Editing data for Table {0} on Worksheet {1}", EditingTableName, editingWorksheetName));
       editingRowsQuantity = editingWorksheet.UsedRange.Rows.Count;
       editingColsQuantity = editingWorksheet.UsedRange.Columns.Count;
       Opacity = 0.60;
@@ -96,7 +102,12 @@ namespace MySQL.ForExcel
     protected override void OnClosing(CancelEventArgs e)
     {
       base.OnClosing(e);
-      EditingWorksheet.Unprotect(Type.Missing);
+      if (CallerTaskPane.WorksheetExists(editingWorksheetName))
+        EditingWorksheet.Unprotect(Type.Missing);
+      if (CallerTaskPane.TableNameEditFormsHashtable.ContainsKey(SchemaAndTableName))
+        CallerTaskPane.TableNameEditFormsHashtable.Remove(SchemaAndTableName);
+      if (CallerTaskPane.WorkSheetEditFormsHashtable.ContainsKey(editingWorksheetName))
+        CallerTaskPane.WorkSheetEditFormsHashtable.Remove(editingWorksheetName);
     }
 
     private void initializeWorksheetProtection(Excel.Range permittedRange)
@@ -425,8 +436,6 @@ namespace MySQL.ForExcel
       if (connection != null)
         connection.Close();
       Close();
-      CallerTaskPane.TableNameEditFormsHashtable.Remove(EditingTableName);
-      CallerTaskPane.WorkSheetEditFormsHashtable.Remove(EditingWorksheet.Name);
       Dispose();
     }
 

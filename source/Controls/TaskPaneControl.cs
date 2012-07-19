@@ -20,6 +20,7 @@ namespace MySQL.ForExcel
     private Excel.Application excelApplication;
     private MySqlWorkbenchConnection connection;
     private EditDataDialog editDialog = null;
+    private string lastDeactivatedSheetName = String.Empty;
 
     public Hashtable WorkSheetEditFormsHashtable;
     public Hashtable TableNameEditFormsHashtable;
@@ -42,21 +43,37 @@ namespace MySQL.ForExcel
 
     void excelApplication_SheetDeactivate(object Sh)
     {
-      Excel.Worksheet currentSheet = Sh as Excel.Worksheet;
-      if (WorkSheetEditFormsHashtable != null && WorkSheetEditFormsHashtable.Contains(currentSheet.Name))
+      Excel.Worksheet deactivatedSheet = Sh as Excel.Worksheet;
+      lastDeactivatedSheetName = (deactivatedSheet != null ? deactivatedSheet.Name : String.Empty);
+      if (lastDeactivatedSheetName.Length > 0 && WorkSheetEditFormsHashtable != null && WorkSheetEditFormsHashtable.Contains(lastDeactivatedSheetName))
       {
-        editDialog = WorkSheetEditFormsHashtable[currentSheet.Name] as EditDataDialog;
+        editDialog = WorkSheetEditFormsHashtable[lastDeactivatedSheetName] as EditDataDialog;
         editDialog.Hide();
       }
     }
 
     void excelApplication_SheetActivate(object Sh)
     {
-      Excel.Worksheet currentSheet = Sh as Excel.Worksheet;
-      if (WorkSheetEditFormsHashtable != null && WorkSheetEditFormsHashtable.Contains(currentSheet.Name))
+      Excel.Worksheet activeSheet = Sh as Excel.Worksheet;
+      string activeSheetName = (activeSheet != null ? activeSheet.Name : String.Empty);
+      if (activeSheetName.Length > 0 && WorkSheetEditFormsHashtable != null && WorkSheetEditFormsHashtable.Contains(activeSheetName))
       {
-        editDialog = WorkSheetEditFormsHashtable[currentSheet.Name] as EditDataDialog;
+        editDialog = WorkSheetEditFormsHashtable[activeSheetName] as EditDataDialog;
         editDialog.Show();
+      }
+
+      if (lastDeactivatedSheetName.Length > 0 && !WorksheetExists(lastDeactivatedSheetName))
+      {
+        // Worksheet was deleted or renamed
+        if (WorkSheetEditFormsHashtable != null && WorkSheetEditFormsHashtable.ContainsKey(lastDeactivatedSheetName))
+        {
+          EditDataDialog editDlg = WorkSheetEditFormsHashtable[lastDeactivatedSheetName] as EditDataDialog;
+          if (editDlg != null)
+          {
+            editDlg.Close();
+            editDlg.Dispose();
+          }
+        }
       }
     }
 
@@ -85,6 +102,27 @@ namespace MySQL.ForExcel
         }
       }
       dbObjectSelectionPanel1.ExcelSelectionContainsData = hasData;
+    }
+
+    public bool WorksheetExists(string workSheetName)
+    {
+      bool exists = false;
+
+      if (workSheetName.Length > 0)
+      {
+        // Maybe the last deactivated sheet has been deleted?
+        try
+        {
+          Excel._Worksheet wSheet = excelApplication.Worksheets[workSheetName] as Excel.Worksheet;
+          exists = true;
+        }
+        catch
+        {
+          exists = false;
+        }
+      }
+
+      return exists;
     }
 
     public void OpenConnection(MySqlWorkbenchConnection connection)
@@ -258,6 +296,7 @@ namespace MySQL.ForExcel
 
     public bool EditTableData(DBObject tableObject)
     {
+      // Check if selected Table has a Primary Key, it it does not we prompt an error and exit since Editing on such table is not permitted
       if (!MySQLDataUtilities.TableHasPrimaryKey(connection, tableObject.Name))
       {
         InfoDialog infoDialog = new InfoDialog(false, Properties.Resources.EditOpenSummaryError, Properties.Resources.EditOpenDetailsError);
@@ -268,15 +307,17 @@ namespace MySQL.ForExcel
         return false;
       }
 
-      if (TableNameEditFormsHashtable != null && TableNameEditFormsHashtable.Contains(tableObject.Name))
+      // Check if selected Table has already an Editing operation ongoing that has not been closed, if so prompt error and exit
+      string schemaAndTableNames = String.Format("{0}.{1}", connection.Schema, tableObject.Name);
+      if (TableNameEditFormsHashtable != null && TableNameEditFormsHashtable.ContainsKey(schemaAndTableNames))
       {
-        InfoDialog infoDialog = new InfoDialog(false, String.Format(Properties.Resources.TableWithOperationOngoingError, tableObject.Name), null);
+        InfoDialog infoDialog = new InfoDialog(false, String.Format(Properties.Resources.TableWithOperationOngoingError, schemaAndTableNames), null);
         infoDialog.OperationStatusText = "Editing not possible";
         infoDialog.ShowDialog();
         return false;
       }
 
-      // Import Data
+      // Attempt to Import Data unless the yser cancels the import operation
       string proposedWorksheetName = GetWorksheetNameAvoidingDuplicates(tableObject.Name);
       ImportTableViewForm importForm = new ImportTableViewForm(connection, tableObject, proposedWorksheetName);
       DialogResult dr = importForm.ShowDialog();
@@ -289,6 +330,14 @@ namespace MySQL.ForExcel
         return false;
       }
 
+      // Before creating the new Excel Worksheet check if ActiveWorksheet is in Editing Mode and if so hide its Edit Dialog
+      if (WorkSheetEditFormsHashtable != null && WorkSheetEditFormsHashtable.ContainsKey(ActiveWorksheet.Name))
+      {
+        EditDataDialog editDlg = WorkSheetEditFormsHashtable[ActiveWorksheet.Name] as EditDataDialog;
+        if (editDlg != null)
+          editDlg.Hide();
+      }
+
       // Create the new Excel Worksheet and import the editing data there
       Excel.Worksheet currentWorksheet = GetActiveOrCreateWorksheet(proposedWorksheetName, true, false);
       currentWorksheet.Activate();
@@ -296,7 +345,7 @@ namespace MySQL.ForExcel
       atCell.Select();
       Excel.Range editingRange = ImportDataTableToExcelAtGivenCell(importForm.ImportDataTable, importForm.ImportHeaders, atCell);
       
-      // Edit Data
+      // Create and show the Edit Data Dialog
       MySQLDataUtilities.AddExtendedProperties(ref importForm.ImportDataTable, importForm.ImportDataTable.ExtendedProperties["QueryString"].ToString(), importForm.ImportHeaders, tableObject.Name);
       editDialog = new EditDataDialog(connection, editingRange, importForm.ImportDataTable, currentWorksheet, true);
       editDialog.ParentWindow = new NativeWindowWrapper(excelApplication.Hwnd);
@@ -309,7 +358,7 @@ namespace MySQL.ForExcel
       WorkSheetEditFormsHashtable.Add(currentWorksheet.Name, editDialog);
       if (TableNameEditFormsHashtable == null)
         TableNameEditFormsHashtable = new Hashtable();
-      TableNameEditFormsHashtable.Add(tableObject.Name, editDialog);
+      TableNameEditFormsHashtable.Add(schemaAndTableNames, editDialog);
 
       return true;
     }
@@ -327,8 +376,11 @@ namespace MySQL.ForExcel
         foreach (string key in TableNameEditFormsHashtable.Keys)
         {
           EditDataDialog editDlg = TableNameEditFormsHashtable[key] as EditDataDialog;
-          editDlg.Close();
-          editDlg.Dispose();
+          if (editDlg != null)
+          {
+            editDlg.Close();
+            editDlg.Dispose();
+          }
         }
         TableNameEditFormsHashtable.Clear();
         TableNameEditFormsHashtable = null;
