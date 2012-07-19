@@ -96,6 +96,7 @@ namespace MySQL.ForExcel
       catch (Exception ex)
       {
         infoDialog.OperationDetailsText = ex.Message;
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
       }
       infoDialog.WordWrapDetails = true;
       infoDialog.ShowDialog();

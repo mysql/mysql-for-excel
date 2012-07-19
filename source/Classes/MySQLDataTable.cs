@@ -127,6 +127,7 @@ namespace MySQL.ForExcel
       {
         InfoDialog infoDialog = new InfoDialog(false, ex.Message, ex.StackTrace);
         infoDialog.ShowDialog();
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLDataTable - " + (ex.Message + " " + ex.InnerException), 1);
       }
     }
 
@@ -588,6 +589,7 @@ namespace MySQL.ForExcel
       catch (Exception ex)
       {
         exception = ex;
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on InsertDataWithManualQuery - " + (ex.Message + " " + ex.InnerException), 1);
       }
 
       return insertedRows;
@@ -669,6 +671,7 @@ namespace MySQL.ForExcel
         catch (Exception ex)
         {
           exception = ex;
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
         }
       }
       return insertedCount;
@@ -787,6 +790,7 @@ namespace MySQL.ForExcel
       catch (Exception ex)
       {
         exception = ex;
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
       }
 
       return insertedCount;
@@ -870,6 +874,7 @@ namespace MySQL.ForExcel
         catch (Exception ex)
         {
           exception = ex;
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
         }
       }
 
@@ -946,6 +951,7 @@ namespace MySQL.ForExcel
         catch (Exception ex)
         {
           exception = ex;
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
         }
       }
 
@@ -985,6 +991,7 @@ namespace MySQL.ForExcel
         catch (Exception ex)
         {
           exception = ex;
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
         }
       }
     }

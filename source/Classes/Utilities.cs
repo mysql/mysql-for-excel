@@ -11,6 +11,8 @@ using MySQL.Utility;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Globalization;
+using System.Diagnostics;
+
 
 namespace MySQL.ForExcel
 {
@@ -144,9 +146,16 @@ namespace MySQL.ForExcel
       {
         InfoDialog infoDialog = new InfoDialog(false, "An error ocurred when savings user settings file", ex.Message);
         infoDialog.ShowDialog();
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
         return false;
       }
       return true;
+    }
+
+    public static MySQLSourceTrace GetSourceTrace()
+    {
+      var logPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Oracle\MySQL For Excel";
+      return new MySQLSourceTrace("MySQLForExcel", logPath + @"\MySQLForExcel.log", "", SourceLevels.Warning);
     }
 
   }
@@ -214,6 +223,7 @@ namespace MySQL.ForExcel
       catch (Exception ex)
       {
         System.Diagnostics.Debug.WriteLine(ex.Message);
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
       }
 
       return dt;

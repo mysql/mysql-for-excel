@@ -203,38 +203,49 @@ namespace MySQL.ForExcel
     public Excel.Range ImportDataTableToExcelAtGivenCell(DataTable dt, bool importColumnNames, Excel.Range atCell)
     {
       Excel.Range fillingRange = null;
-
-      if (dt != null && dt.Rows.Count > 0)
+      try
       {
-        int rowsCount = dt.Rows.Count;
-        int colsCount = dt.Columns.Count;
-        int startingRow = (importColumnNames ? 1 : 0);
-
-        Excel.Worksheet currentSheet = ActiveWorksheet;
-        fillingRange = atCell.get_Resize(rowsCount + startingRow, colsCount);
-        object[,] fillingArray = new object[rowsCount + startingRow, colsCount];
-
-        if (importColumnNames)
+        if (dt != null && dt.Rows.Count > 0)
         {
-          for (int currCol = 0; currCol < colsCount; currCol++)
-          {
-            fillingArray[0, currCol] = dt.Columns[currCol].ColumnName;
-          }
-        }
+          int rowsCount = dt.Rows.Count;
+          int colsCount = dt.Columns.Count;
+          int startingRow = (importColumnNames ? 1 : 0);
 
-        int fillingRowIdx = startingRow;
-        for (int currRow = 0; currRow < rowsCount; currRow++)
-        {
-          for (int currCol = 0; currCol < colsCount; currCol++)
+          Excel.Worksheet currentSheet = ActiveWorksheet;
+          fillingRange = atCell.get_Resize(rowsCount + startingRow, colsCount);
+          object[,] fillingArray = new object[rowsCount + startingRow, colsCount];
+
+          if (importColumnNames)
           {
-            fillingArray[fillingRowIdx, currCol] = dt.Rows[currRow][currCol];
+            for (int currCol = 0; currCol < colsCount; currCol++)
+            {
+              fillingArray[0, currCol] = dt.Columns[currCol].ColumnName;
+            }
           }
-          fillingRowIdx++;
+
+          int fillingRowIdx = startingRow;
+          for (int currRow = 0; currRow < rowsCount; currRow++)
+          {
+            for (int currCol = 0; currCol < colsCount; currCol++)
+            {
+              fillingArray[fillingRowIdx, currCol] = dt.Rows[currRow][currCol];
+            }
+            fillingRowIdx++;
+          }
+          fillingRange.set_Value(Type.Missing, fillingArray);
+          fillingRange.Columns.AutoFit();
+          excelApplication_SheetSelectionChange(currentSheet, excelApplication.ActiveCell);
         }
-        fillingRange.set_Value(Type.Missing, fillingArray);
-        fillingRange.Columns.AutoFit();
-        excelApplication_SheetSelectionChange(currentSheet, excelApplication.ActiveCell);
       }
+      catch (Exception ex)
+      {
+        using (var errorDialog = new InfoDialog(false, "Operation Error", "An error ocurred when trying to import the data."))
+        {
+          errorDialog.ShowDialog();
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
+        }
+      }
+      
 
       return fillingRange;
     }
