@@ -11,9 +11,11 @@ namespace MySQL.ForExcel
 {
   public partial class InfoDialog : AutoStyleableBaseDialog
   {
+    private const int MIN_WIDTH = 580;
     private const int COLLAPSED_HEIGHT = 215;
     private const int EXPANDED_HEIGHT = 350;
 
+    public bool ExpandedState { get; set; }
     public string OperationStatusText
     {
       get { return lblOperationStatus.Text; }
@@ -63,28 +65,21 @@ namespace MySQL.ForExcel
       btnOK.Text = (operationSuccessful ? "OK" : "Back");
       OperationSummarySubText = String.Format("Press {0} to continue.", btnOK.Text);
       btnOK.DialogResult = (operationSuccessful ? DialogResult.OK : DialogResult.Cancel);
-      ChangeHeight(false);
+      ExpandedState = false;
+      ChangeHeight();
     }
 
-    private void ChangeHeight(bool expand)
+    private void ChangeHeight()
     {
-      if (expand)
-      {
-        txtDetails.Visible = true;
-        MaximumSize = MinimumSize = new Size(Width, EXPANDED_HEIGHT);
-        Height = EXPANDED_HEIGHT;
-      }
-      else
-      {
-        txtDetails.Visible = false;
-        MaximumSize = MinimumSize = new Size(Width, COLLAPSED_HEIGHT);
-        Height = COLLAPSED_HEIGHT;
-      }
+      txtDetails.Visible = ExpandedState;
+      Size = MinimumSize = new Size(MIN_WIDTH, (ExpandedState ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT));
+      MaximumSize = (ExpandedState ? new Size(0, 0) : MinimumSize);
     }
 
     private void btnShowDetails_Click(object sender, EventArgs e)
     {
-      ChangeHeight(Height == COLLAPSED_HEIGHT);
+      ExpandedState = !ExpandedState;
+      ChangeHeight();
     }
 
     private void btnOK_Click(object sender, EventArgs e)
