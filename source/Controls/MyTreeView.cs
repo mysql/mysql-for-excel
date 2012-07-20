@@ -163,6 +163,7 @@ namespace MySQL.ForExcel
       pt.Y += textInitialY + TitleTextVerticalPixelsOffset;
 
       // Draw the title if we have one
+      string truncatedText = null;
       SolidBrush titleBrush  = null;
       if (disabled)
         titleBrush = new SolidBrush(Color.FromArgb(80, 0, 0, 0));
@@ -171,16 +172,11 @@ namespace MySQL.ForExcel
       if (parts != null && parts.Length >= 1)
       {  
         SizeF stringSize = e.Graphics.MeasureString(parts[0], Font);
-        if (stringSize.Width > e.Node.TreeView.Width - 10)
-        {
-          e.Graphics.DrawString(parts[0].Substring(0, parts[0].Length > 17 ? 17 : parts[0].Length) + "...", Font, titleBrush, pt.X, pt.Y);
-        }
-        else
-        {
-          e.Graphics.DrawString(parts[0], Font, titleBrush, pt.X, pt.Y);
-        }
+        truncatedText = MiscUtilities.TruncateString(parts[0], e.Node.TreeView.ClientRectangle.Width - pt.X, e.Graphics, Font);
+        e.Graphics.DrawString(truncatedText, Font, titleBrush, pt.X, pt.Y);
         pt.Y += (int)(stringSize.Height) + DescriptionTextVerticalPixelsOffset;
-        e.Node.ToolTipText = parts[0];            
+        if (truncatedText != parts[0])
+          e.Node.ToolTipText = parts[0];
       }
 
       // Draw the description if there is one
@@ -190,13 +186,18 @@ namespace MySQL.ForExcel
       else
         descBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionColorOpacity * 255), DescriptionColor));
       if (parts != null && parts.Length >= 2)
-        e.Graphics.DrawString(parts[1], DescriptionFont, descBrush, pt.X, pt.Y);
+      {
+        truncatedText = MiscUtilities.TruncateString(parts[1], e.Node.TreeView.ClientRectangle.Width - pt.X, e.Graphics, DescriptionFont);
+        e.Graphics.DrawString(truncatedText, DescriptionFont, descBrush, pt.X, pt.Y);
+        if (truncatedText != parts[1])
+          e.Node.ToolTipText += (string.IsNullOrWhiteSpace(e.Node.ToolTipText) ? string.Empty : Environment.NewLine) + parts[1];
+      }
 
       bkBrush.Dispose();
       titleBrush.Dispose();
       descBrush.Dispose();
     }
-
+    
     public TreeNode AddNode(TreeNode parent, string text)
     {
       TreeNode node = (parent != null ? parent.Nodes.Add(text) : Nodes.Add(text));

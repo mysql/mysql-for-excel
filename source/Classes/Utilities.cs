@@ -158,6 +158,43 @@ namespace MySQL.ForExcel
       return new MySQLSourceTrace("MySQLForExcel", logPath + @"\MySQLForExcel.log", "", SourceLevels.Warning);
     }
 
+    public static string TruncateString(string text, float maxWidth, Graphics graphics, Font font)
+    {
+      const string ellipsis = "...";
+      string newText = text;
+      float sizeText = graphics.MeasureString(newText, font).Width;
+      if (sizeText > maxWidth)
+      {
+        int index = (int)((maxWidth / sizeText) * text.Length);
+        newText = text.Substring(0, index);
+        sizeText = graphics.MeasureString(newText + ellipsis, font).Width;
+        if (sizeText < maxWidth)
+        {
+          while (sizeText < maxWidth)
+          {
+            newText = text.Substring(0, ++index);
+            sizeText = graphics.MeasureString(newText + ellipsis, font).Width;
+            if (sizeText > maxWidth)
+            {
+              newText = newText.Substring(0, newText.Length - 1);
+              break;
+            }
+          }
+        }
+        else
+        {
+          while (sizeText > maxWidth)
+          {
+            newText = text.Substring(0, --index);
+            sizeText = graphics.MeasureString(newText + ellipsis, font).Width;
+          }
+        }
+        newText += ellipsis;
+      }
+
+      return newText;
+    }
+
   }
 
   public static class MySQLDataUtilities
