@@ -59,7 +59,7 @@ namespace MySQL.ForExcel
       if (activeSheetName.Length > 0 && WorkSheetEditFormsHashtable != null && WorkSheetEditFormsHashtable.Contains(activeSheetName))
       {
         editDialog = WorkSheetEditFormsHashtable[activeSheetName] as EditDataDialog;
-        editDialog.Show();
+        editDialog.Show(editDialog.ParentWindow);
       }
 
       if (lastDeactivatedSheetName.Length > 0 && !WorksheetExists(lastDeactivatedSheetName))

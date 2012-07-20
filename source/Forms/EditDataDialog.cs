@@ -53,7 +53,6 @@ namespace MySQL.ForExcel
     {
       InitializeComponent();
 
-      //SetParent(Handle, ParentWindow.Handle);
       this.wbConnection = wbConnection;
       this.editDataRange = editDataRange;
       importedHeaders = (bool)importTable.ExtendedProperties["ImportedHeaders"];
@@ -459,9 +458,6 @@ namespace MySQL.ForExcel
       btnRevert.Enabled = !chkAutoCommit.Checked;
     }
 
-    [DllImport("user32.dll", SetLastError = true)]
-    static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
-
     [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
     static extern bool SetWindowPos(
          int hWnd,           // window handle
@@ -475,10 +471,14 @@ namespace MySQL.ForExcel
     [DllImport("user32.dll")]
     static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
+    [DllImport("user32.dll", SetLastError = true)]
+    static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
+
     public void ShowInactiveTopmost()
     {
       ShowWindow(Handle, SW_SHOWNOACTIVATE);
       SetWindowPos(Handle.ToInt32(), HWND_TOPMOST, Left, Top, Width, Height, SWP_NOACTIVATE);
+      //SetParent(Handle, ParentWindow.Handle);
     }
 
   }
