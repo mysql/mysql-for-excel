@@ -194,6 +194,7 @@
       // 
       // refreshToolStripMenuItem
       // 
+      this.refreshToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.refresh_sidebar;
       this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
       this.refreshToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
       this.refreshToolStripMenuItem.Text = "Refresh Connections";

@@ -544,6 +544,7 @@
     <None Include="Resources\MySQLforExcel-WelcomePanel-Connection-Disabled-24x24.png" />
     <None Include="Resources\MySQLforExcel-Cursor-Dragging-32x32.png" />
     <None Include="Resources\MySQLforExcel-InfoDlg-Warning-64x64.png" />
+    <Content Include="Resources\refresh_sidebar.png" />
     <Content Include="Resources\Warning.png" />
     <Content Include="Todo.txt" />
   </ItemGroup>

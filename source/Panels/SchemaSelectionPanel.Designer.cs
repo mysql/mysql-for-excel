@@ -38,14 +38,14 @@
       this.btnNext = new System.Windows.Forms.Button();
       this.btnHelp = new System.Windows.Forms.Button();
       this.databaseList = new MySQL.ForExcel.MyTreeView();
+      this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.refreshSchemasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.schemaFilter = new MySQL.ForExcel.SearchEdit();
       this.selectSchemaLabel = new MySQL.ForExcel.HotLabel();
       this.createNewSchemaLabel = new MySQL.ForExcel.HotLabel();
       this.lblInstructions = new MySQL.ForExcel.TransparentLabel();
       this.imgSeparator = new MySQL.ForExcel.TransparentPictureBox();
       this.labelsToolTip = new System.Windows.Forms.ToolTip(this.components);
-      this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-      this.refreshSchemasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
       this.contextMenuStrip.SuspendLayout();
       this.SuspendLayout();
@@ -155,6 +155,21 @@
       this.databaseList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.databaseList_AfterSelect);
       this.databaseList.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.databaseList_NodeMouseDoubleClick);
       // 
+      // contextMenuStrip
+      // 
+      this.contextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.refreshSchemasToolStripMenuItem});
+      this.contextMenuStrip.Name = "contextMenuStrip";
+      this.contextMenuStrip.Size = new System.Drawing.Size(164, 48);
+      // 
+      // refreshSchemasToolStripMenuItem
+      // 
+      this.refreshSchemasToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.refresh_sidebar;
+      this.refreshSchemasToolStripMenuItem.Name = "refreshSchemasToolStripMenuItem";
+      this.refreshSchemasToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+      this.refreshSchemasToolStripMenuItem.Text = "Refresh Schemas";
+      this.refreshSchemasToolStripMenuItem.Click += new System.EventHandler(this.refreshSchemasToolStripMenuItem_Click);
+      // 
       // schemaFilter
       // 
       this.schemaFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -258,20 +273,6 @@
       this.imgSeparator.Opacity = 0.3F;
       this.imgSeparator.Size = new System.Drawing.Size(242, 21);
       this.imgSeparator.TabIndex = 26;
-      // 
-      // contextMenuStrip
-      // 
-      this.contextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.refreshSchemasToolStripMenuItem});
-      this.contextMenuStrip.Name = "contextMenuStrip";
-      this.contextMenuStrip.Size = new System.Drawing.Size(164, 48);
-      // 
-      // refreshSchemasToolStripMenuItem
-      // 
-      this.refreshSchemasToolStripMenuItem.Name = "refreshSchemasToolStripMenuItem";
-      this.refreshSchemasToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
-      this.refreshSchemasToolStripMenuItem.Text = "Refresh Schemas";
-      this.refreshSchemasToolStripMenuItem.Click += new System.EventHandler(this.refreshSchemasToolStripMenuItem_Click);
       // 
       // SchemaSelectionPanel
       // 

@@ -39,6 +39,8 @@
       this.btnHelp = new System.Windows.Forms.Button();
       this.objectFilter = new MySQL.ForExcel.SearchEdit();
       this.objectList = new MySQL.ForExcel.MyTreeView();
+      this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.refreshDatabaseObjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.appendDataLabel = new MySQL.ForExcel.HotLabel();
       this.editDataLabel = new MySQL.ForExcel.HotLabel();
       this.importDataLabel = new MySQL.ForExcel.HotLabel();
@@ -46,8 +48,6 @@
       this.exportToNewTableLabel = new MySQL.ForExcel.HotLabel();
       this.imgSeparator = new MySQL.ForExcel.TransparentPictureBox();
       this.labelsToolTip = new System.Windows.Forms.ToolTip(this.components);
-      this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-      this.refreshDatabaseObjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
       this.contextMenuStrip.SuspendLayout();
       this.SuspendLayout();
@@ -169,6 +169,21 @@
       this.objectList.TitleColorOpacity = 0.8D;
       this.objectList.TitleTextVerticalPixelsOffset = 0;
       this.objectList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.objectList_AfterSelect);
+      // 
+      // contextMenuStrip
+      // 
+      this.contextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.refreshDatabaseObjectsToolStripMenuItem});
+      this.contextMenuStrip.Name = "contextMenuStrip";
+      this.contextMenuStrip.Size = new System.Drawing.Size(208, 48);
+      // 
+      // refreshDatabaseObjectsToolStripMenuItem
+      // 
+      this.refreshDatabaseObjectsToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.refresh_sidebar;
+      this.refreshDatabaseObjectsToolStripMenuItem.Name = "refreshDatabaseObjectsToolStripMenuItem";
+      this.refreshDatabaseObjectsToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+      this.refreshDatabaseObjectsToolStripMenuItem.Text = "Refresh Database Objects";
+      this.refreshDatabaseObjectsToolStripMenuItem.Click += new System.EventHandler(this.refreshDatabaseObjectsToolStripMenuItem_Click);
       // 
       // appendDataLabel
       // 
@@ -345,20 +360,6 @@
       this.imgSeparator.Opacity = 0.3F;
       this.imgSeparator.Size = new System.Drawing.Size(237, 22);
       this.imgSeparator.TabIndex = 27;
-      // 
-      // contextMenuStrip
-      // 
-      this.contextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.refreshDatabaseObjectsToolStripMenuItem});
-      this.contextMenuStrip.Name = "contextMenuStrip";
-      this.contextMenuStrip.Size = new System.Drawing.Size(208, 26);
-      // 
-      // refreshDatabaseObjectsToolStripMenuItem
-      // 
-      this.refreshDatabaseObjectsToolStripMenuItem.Name = "refreshDatabaseObjectsToolStripMenuItem";
-      this.refreshDatabaseObjectsToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
-      this.refreshDatabaseObjectsToolStripMenuItem.Text = "Refresh Database Objects";
-      this.refreshDatabaseObjectsToolStripMenuItem.Click += new System.EventHandler(this.refreshDatabaseObjectsToolStripMenuItem_Click);
       // 
       // DBObjectSelectionPanel
       // 
