@@ -569,8 +569,7 @@
       // NewConnectionDialog
       // 
       this.AcceptButton = this.okButton;
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.cancelButton;
       this.ClientSize = new System.Drawing.Size(796, 471);
       this.CommandAreaHeight = 45;
