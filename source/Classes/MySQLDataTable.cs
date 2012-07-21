@@ -312,6 +312,8 @@ namespace MySQL.ForExcel
           proposedType = DataTypeUtilities.GetMySQLExportDataType(valueAsString, out valueOverflow);
           if (proposedType == "Bool")
             proposedType = "Varchar(5)";
+          else if (proposedType.StartsWith("Date"))
+            proposedType = String.Format("Varchar({0})", valueAsString.Length);
           lParensIndex = proposedType.IndexOf("(");
           varCharValueLength = (addBufferToVarchar ? Int32.Parse(proposedType.Substring(lParensIndex + 1, proposedType.Length - lParensIndex - 2)) : valueAsString.Length);
           varCharMaxLen[1] = Math.Max(varCharValueLength, varCharMaxLen[1]);
@@ -324,6 +326,9 @@ namespace MySQL.ForExcel
           {
             case "Date":
             case "Datetime":
+              bool zeroDate = valueAsString.StartsWith("0000-00-00") || valueAsString.StartsWith("00-00-00");
+              if (zeroDate)
+                break;
               DateTime dtValue = (DateTime)valueFromArray;
               Rows[rowPos - 1][dataColPos - colAdjustIdx] = dtValue.ToString(dateFormat);
               break;
@@ -536,6 +541,7 @@ namespace MySQL.ForExcel
 
       if (valueRows != null)
       {
+        string valueToDB = String.Empty;
         for (rowIdx = 0; rowIdx < valueRows.Count; rowIdx++)
         {
           DataRow dr = valueRows[rowIdx];
@@ -550,7 +556,15 @@ namespace MySQL.ForExcel
             MySQLDataColumn column = Columns[insertingColName] as MySQLDataColumn;
             object insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(dr[insertingColName], column);
             bool insertingValueIsNull = insertingValue == null || insertingValue == DBNull.Value;
-            string valueToDB = (insertingValueIsNull ? @"null" : insertingValue.ToString());
+            if (insertingValueIsNull)
+              valueToDB = @"null";
+            else
+            {
+              if (insertingValue.Equals(DateTime.MinValue))
+                valueToDB = "0000-00-00 00:00:00";
+              else
+                valueToDB = insertingValue.ToString();
+            }
             queryString.AppendFormat("{0}{1}{2}{1}",
                                      colsSeparator,
                                      (column.ColumnsRequireQuotes && !insertingValueIsNull ? "'" : String.Empty),
@@ -650,10 +664,7 @@ namespace MySQL.ForExcel
               {
                 string copyOriginalColName = copyOriginal.Columns[colIdx].ColumnName;
                 MySQLDataColumn column = Columns[copyOriginalColName] as MySQLDataColumn;
-                object insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(row[colIdx], column);
-                if (insertingValue.Equals("0000-00-00 00:00:00"))
-                  insertingValue = DateTime.MinValue;
-                row[colIdx] = insertingValue;
+                row[colIdx] = DataTypeUtilities.GetInsertingValueForColumnType(row[colIdx], column);
               }
               row.EndEdit();
               exportingDataTable.LoadDataRow(row.ItemArray, LoadOption.Upsert);
@@ -736,6 +747,7 @@ namespace MySQL.ForExcel
       }
       queryString.AppendFormat("){0}VALUES{0}", nl);
 
+      string valueToDB = String.Empty;
       for (rowIdx = 0; rowIdx < mappingFromTable.Rows.Count; rowIdx++)
       {
         DataRow dr = mappingFromTable.Rows[rowIdx];
@@ -752,7 +764,15 @@ namespace MySQL.ForExcel
           MySQLDataColumn toColumn = Columns[toColumnName] as MySQLDataColumn;
           object insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(dr[fromColumnName], toColumn);
           bool insertingValueIsNull = insertingValue == null || insertingValue == DBNull.Value;
-          string valueToDB = (insertingValueIsNull ? @"null" : insertingValue.ToString());
+          if (insertingValueIsNull)
+            valueToDB = @"null";
+          else
+          {
+            if (insertingValue.Equals(DateTime.MinValue))
+              valueToDB = "0000-00-00 00:00:00";
+            else
+              valueToDB = insertingValue.ToString();
+          }
           queryString.AppendFormat("{0}{1}{2}{1}",
                                     colsSeparator,
                                     (toColumn.ColumnsRequireQuotes && !insertingValueIsNull ? "'" : String.Empty),

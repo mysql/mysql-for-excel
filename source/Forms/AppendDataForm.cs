@@ -87,7 +87,12 @@ namespace MySQL.ForExcel
       DataTable dt = MySQLDataUtilities.GetDataFromTableOrView(wbConnection, importDBObject, null, 0, 10);
       foreach (DataRow dr in dt.Rows)
       {
-        toMySQLDataTable.ImportRow(dr);
+        object[] rowValues = dr.ItemArray;
+        for (int colIdx = 0; colIdx < dt.Columns.Count; colIdx++)
+        {
+          rowValues[colIdx] = DataTypeUtilities.GetImportingValueForDateType(rowValues[colIdx]);
+        }
+        toMySQLDataTable.LoadDataRow(rowValues, true);
       }
       long totalRowsCount = MySQLDataUtilities.GetRowsCountFromTableOrView(wbConnection, importDBObject);
       grdToMySQLTable.DataSource = toMySQLDataTable;

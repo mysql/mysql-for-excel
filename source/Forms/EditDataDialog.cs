@@ -367,8 +367,7 @@ namespace MySQL.ForExcel
             int absRow = startDataTableRow + rowIdx - 1 - (importedHeaders ? 1 : 0);
             int absCol = startDataTableCol + colIdx - 1;
             MySQLDataColumn currCol = editMySQLDataTable.GetColumnAtIndex(absCol);
-            object insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(formattedArrayFromRange[rowIdx, colIdx], currCol);
-            editMySQLDataTable.Rows[absRow][absCol] = insertingValue;
+            editMySQLDataTable.Rows[absRow][absCol] = DataTypeUtilities.GetInsertingValueForColumnType(formattedArrayFromRange[rowIdx, colIdx], currCol);
           }
         }
         if (!chkAutoCommit.Checked && !modifiedCellAddressesList.Contains(intersectRange.Address))

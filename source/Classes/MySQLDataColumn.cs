@@ -232,6 +232,8 @@ namespace MySQL.ForExcel
         if (parentTable.FirstRowIsHeaders && rowIdx++ == 0)
           continue;
         string strValueFromArray = dr[Ordinal].ToString();
+        if (strValueFromArray.Length == 0)
+          continue;
         result = result && DataTypeUtilities.StringValueCanBeStoredWithMySQLType(strValueFromArray, mySQLDataType);
       }
 

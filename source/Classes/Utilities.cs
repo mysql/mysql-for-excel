@@ -199,7 +199,7 @@ namespace MySQL.ForExcel
 
   public static class MySQLDataUtilities
   {
-    public static string GetConnectionString(MySqlWorkbenchConnection connection)
+    public static string GetConnectionString(MySqlWorkbenchConnection connection, bool allowZeroDateTimeValues)
     {
       MySqlConnectionStringBuilder cs = new MySqlConnectionStringBuilder();
       cs.Server = connection.Host;
@@ -207,9 +207,14 @@ namespace MySQL.ForExcel
       cs.Password = connection.Password;
       cs.Database = connection.Schema;
       cs.Port = (uint)connection.Port;
-      cs.AllowZeroDateTime = true;
+      cs.AllowZeroDateTime = allowZeroDateTimeValues;
       //TODO:  use additional necessary options
       return cs.ConnectionString;
+    }
+
+    public static string GetConnectionString(MySqlWorkbenchConnection connection)
+    {
+      return GetConnectionString(connection, true);
     }
 
     public static DataTable GetSchemaCollection(MySqlWorkbenchConnection wbConnection, string collection, params string[] restrictions)
@@ -687,7 +692,12 @@ namespace MySQL.ForExcel
       if (mySQLDataType.StartsWith("double") || mySQLDataType.StartsWith("real"))
         return Double.TryParse(strValue, out tryDoubleValue);
       if (mySQLDataType == "date" || mySQLDataType == "datetime" || mySQLDataType == "timestamp")
-        return DateTime.TryParse(strValue, out tryDateTimeValue);
+      {
+        if (strValue.StartsWith("0000-00-00") || strValue.StartsWith("00-00-00"))
+          return true;
+        else
+          return DateTime.TryParse(strValue, out tryDateTimeValue);
+      }
       if (mySQLDataType == "time")
         return TimeSpan.TryParse(strValue, out tryTimeSpanValue);
       if (mySQLDataType == "blob" || mySQLDataType == "tinyblob" || mySQLDataType == "mediumblob" || mySQLDataType == "longblob" || mySQLDataType == "binary" || mySQLDataType == "varbinary")
@@ -872,8 +882,13 @@ namespace MySQL.ForExcel
         else
           strType = "System.Decimal";
       strValue = strValue.ToLowerInvariant();
-      if (strType == "System.String" && (strValue == "yes" || strValue == "no" || strValue == "ja" || strValue == "nein"))
-        strType = "System.Boolean";
+      if (strType == "System.String")
+      {
+        if (strValue == "yes" || strValue == "no" || strValue == "ja" || strValue == "nein")
+          strType = "System.Boolean";
+        else if (strValue.StartsWith("0000-00-00") || strValue.StartsWith("00-00-00"))
+          strType = "MySql.Data.Types.MySqlDateTime";
+      }
 
       switch (strType)
       {
@@ -909,6 +924,7 @@ namespace MySQL.ForExcel
         case "System.Boolean":
           return "Bool";
         case "System.DateTime":
+        case "MySql.Data.Types.MySqlDateTime":
           if (strValue.Contains(":"))
             return "Datetime";
           return "Date";
@@ -966,6 +982,7 @@ namespace MySQL.ForExcel
           retType = "bit";
           break;
         case "System.DateTime":
+        case "MySql.Data.Types.MySqlDateTime":
           retType = "datetime";
           break;
         case "System.TimeSpan":
@@ -1006,6 +1023,11 @@ namespace MySQL.ForExcel
         {
           typesConsistent = true;
           fullDataType = "Double";
+        }
+        else if (rowsDataTypesList.Count(str => str == "Datetime") + rowsDataTypesList.Count(str => str == "Date") == rowsDataTypesList.Count)
+        {
+          typesConsistent = true;
+          fullDataType = "Datetime";
         }
       }
 
@@ -1049,6 +1071,22 @@ namespace MySQL.ForExcel
       return GetConsistentDataTypeOnAllRows(proposedStrippedDataType, rowsDataTypesList, decimalMaxLen, varCharMaxLen, out outConsistentStrippedType);
     }
 
+    public static object GetImportingValueForDateType(object rawValue)
+    {
+      object importingVaue = rawValue;
+
+      if (rawValue != null && rawValue is MySql.Data.Types.MySqlDateTime)
+      {
+        MySql.Data.Types.MySqlDateTime mysqlDate = (MySql.Data.Types.MySqlDateTime)rawValue;
+        if (mysqlDate.IsValidDateTime)
+          importingVaue = new DateTime(mysqlDate.Year, mysqlDate.Month, mysqlDate.Day, mysqlDate.Hour, mysqlDate.Minute, mysqlDate.Second);
+        else
+          importingVaue = DateTime.MinValue;
+      }
+
+      return importingVaue;
+    }
+
     public static object GetInsertingValueForColumnType(object rawValue, MySQLDataColumn column)
     {
       object retValue = rawValue;
@@ -1067,27 +1105,35 @@ namespace MySQL.ForExcel
           else if (column.IsBool)
             retValue = false;
           else if (column.IsDate)
-            retValue = "0000-00-00 00:00:00";
+            retValue = DateTime.MinValue;
           else if (column.IsCharOrText)
             retValue = String.Empty;
         }
       }
       else
       {
-        if (column.IsBool)
+        retValue = rawValue;
+        if (column.IsDate)
+        {
+          string rawValueAsString = rawValue.ToString();
+          if (rawValue.Equals(DateTime.MinValue) || rawValueAsString.StartsWith("0000-00-00") || rawValueAsString.StartsWith("00-00-00"))
+          {
+            if (column.AllowNull)
+              retValue = DBNull.Value;
+            else
+              retValue = DateTime.MinValue;
+          }
+        }
+        else if (column.IsBool)
         {
           string rawValueAsString = rawValue.ToString().ToLowerInvariant();
           if (rawValueAsString == "ja" || rawValueAsString == "yes" || rawValueAsString == "true" || rawValueAsString == "1")
             retValue = true;
           else if (rawValueAsString == "nein" || rawValueAsString == "no" || rawValueAsString == "false" || rawValueAsString == "0")
             retValue = false;
-          else
-            retValue = rawValue;
         }
         else if (column.IsCharOrText)
-          retValue = MySQLDataUtilities.EscapeString(rawValue.ToString());
-        else
-          retValue = rawValue;
+          retValue = MySQLDataUtilities.EscapeString(rawValue.ToString());  
       }
 
       return retValue;

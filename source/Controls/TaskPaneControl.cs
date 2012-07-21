@@ -228,7 +228,7 @@ namespace MySQL.ForExcel
           {
             for (int currCol = 0; currCol < colsCount; currCol++)
             {
-              fillingArray[fillingRowIdx, currCol] = dt.Rows[currRow][currCol];
+              fillingArray[fillingRowIdx, currCol] = DataTypeUtilities.GetImportingValueForDateType(dt.Rows[currRow][currCol]);
             }
             fillingRowIdx++;
           }
