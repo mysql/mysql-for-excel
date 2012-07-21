@@ -185,8 +185,10 @@ namespace MySQL.ForExcel
     private void pushDataChanges()
     {
       bool success = true;
+      bool warningsFound = false;
       int updatedCount = 0;
       Exception exception;
+      DataTable warningsTable;
       bool autoCommitOn = chkAutoCommit.Checked;
 
       string operationSummary = String.Format("Edited data for Table {0} ", EditingTableName);
@@ -203,13 +205,30 @@ namespace MySQL.ForExcel
           operationDetails.Append(editMySQLDataTable.GetInsertSQL(-1, true, true));
           operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
         }
-        updatedCount = editMySQLDataTable.InsertDataWithAdapter(wbConnection, true, out exception);
+        warningsTable = editMySQLDataTable.InsertDataWithAdapter(wbConnection, true, out exception, out updatedCount);
         success = exception == null;
         if (success)
         {
           changeExcelCellsColor(addedRowAddressesList, commitedCellsOLEColor);
           if (!autoCommitOn)
-            operationDetails.AppendFormat("{0} rows have been added successfully.", updatedCount);
+          {
+            operationDetails.AppendFormat("{0} rows have been added", updatedCount);
+            if (warningsTable != null && warningsTable.Rows.Count > 0)
+            {
+              warningsFound = true;
+              operationDetails.AppendFormat(" with {0} warnings:", warningsTable.Rows.Count);
+              foreach (DataRow warningRow in warningsTable.Rows)
+              {
+                operationDetails.AppendFormat("{2}Code {0} - {1}",
+                                              warningRow[1].ToString(),
+                                              warningRow[2].ToString(),
+                                              Environment.NewLine);
+              }
+              operationDetails.Append(Environment.NewLine);
+            }
+            else
+              operationDetails.Append(" successfully.");
+          }
         }
         else
         {
@@ -240,12 +259,29 @@ namespace MySQL.ForExcel
           operationDetails.Append(editMySQLDataTable.GetDeleteSQL(-1, true));
           operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
         }
-        updatedCount = editMySQLDataTable.DeleteDataWithAdapter(wbConnection, out exception);
+        warningsTable = editMySQLDataTable.DeleteDataWithAdapter(wbConnection, out exception, out updatedCount);
         success = exception == null;
         if (success)
         {
           if (!autoCommitOn)
-            operationDetails.AppendFormat("{0} rows have been deleted successfully.", updatedCount);
+          {
+            operationDetails.AppendFormat("{0} rows have been deleted", updatedCount);
+            if (warningsTable != null && warningsTable.Rows.Count > 0)
+            {
+              warningsFound = true;
+              operationDetails.AppendFormat(" with {0} warnings:", warningsTable.Rows.Count);
+              foreach (DataRow warningRow in warningsTable.Rows)
+              {
+                operationDetails.AppendFormat("{2}Code {0} - {1}",
+                                              warningRow[1].ToString(),
+                                              warningRow[2].ToString(),
+                                              Environment.NewLine);
+              }
+              operationDetails.Append(Environment.NewLine);
+            }
+            else
+              operationDetails.Append(" successfully.");
+          }
         }
         else
         {
@@ -276,13 +312,30 @@ namespace MySQL.ForExcel
           operationDetails.Append(editMySQLDataTable.GetUpdateSQL(-1, true));
           operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
         }
-        updatedCount = editMySQLDataTable.UpdateDataWithAdapter(wbConnection, out exception);
+        warningsTable = editMySQLDataTable.UpdateDataWithAdapter(wbConnection, out exception, out updatedCount);
         success = exception == null;
         if (success)
         {
           changeExcelCellsColor(modifiedCellAddressesList, commitedCellsOLEColor);
           if (!autoCommitOn)
-            operationDetails.AppendFormat("Changes on {0} rows have been committed successfully.", updatedCount);
+          {
+            operationDetails.AppendFormat("Changes on {0} rows have been committed", updatedCount);
+            if (warningsTable != null && warningsTable.Rows.Count > 0)
+            {
+              warningsFound = true;
+              operationDetails.AppendFormat(" with {0} warnings:", warningsTable.Rows.Count);
+              foreach (DataRow warningRow in warningsTable.Rows)
+              {
+                operationDetails.AppendFormat("{2}Code {0} - {1}",
+                                              warningRow[1].ToString(),
+                                              warningRow[2].ToString(),
+                                              Environment.NewLine);
+              }
+              operationDetails.Append(Environment.NewLine);
+            }
+            else
+              operationDetails.Append(" successfully.");
+          }
         }
         else
         {
@@ -302,8 +355,26 @@ namespace MySQL.ForExcel
 
       if (!autoCommitOn)
       {
-        operationSummary += (success ? "was committed to MySQL successfully." : "had errors on commit.");
-        InfoDialog infoDialog = new InfoDialog(success, operationSummary, operationDetails.ToString());
+        InfoDialog.InfoType operationsType;
+        if (success)
+        {
+          if (warningsFound)
+          {
+            operationSummary += "was committed to MySQL with warnings.";
+            operationsType = InfoDialog.InfoType.Warning;
+          }
+          else
+          {
+            operationSummary += "was committed to MySQL successfully.";
+            operationsType = InfoDialog.InfoType.Success;
+          }
+        }
+        else
+        {
+          operationSummary += "had errors on commit.";
+          operationsType = InfoDialog.InfoType.Error;
+        }
+        InfoDialog infoDialog = new InfoDialog(operationsType, operationSummary, operationDetails.ToString());
         infoDialog.StartPosition = FormStartPosition.CenterScreen;
         DialogResult dr = infoDialog.ShowDialog();
         btnCommit.Enabled = (modifiedCellAddressesList.Count + deletedRowAddressesList.Count + addedRowAddressesList.Count) > 0;

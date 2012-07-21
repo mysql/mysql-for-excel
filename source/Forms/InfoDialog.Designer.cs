@@ -28,6 +28,8 @@
     /// </summary>
     private void InitializeComponent()
     {
+      this.components = new System.ComponentModel.Container();
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(InfoDialog));
       this.btnOK = new System.Windows.Forms.Button();
       this.btnShowDetails = new System.Windows.Forms.Button();
       this.picLogo = new System.Windows.Forms.PictureBox();
@@ -35,6 +37,7 @@
       this.lblOperationSummary = new System.Windows.Forms.Label();
       this.lblOperationSummarySub = new System.Windows.Forms.Label();
       this.txtDetails = new System.Windows.Forms.TextBox();
+      this.iconsList = new System.Windows.Forms.ImageList(this.components);
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.picLogo)).BeginInit();
@@ -135,6 +138,14 @@
       this.txtDetails.TabIndex = 3;
       this.txtDetails.WordWrap = false;
       // 
+      // iconsList
+      // 
+      this.iconsList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("iconsList.ImageStream")));
+      this.iconsList.TransparentColor = System.Drawing.Color.Transparent;
+      this.iconsList.Images.SetKeyName(0, "MySQLforExcel-InfoDlg-Success-64x64.png");
+      this.iconsList.Images.SetKeyName(1, "MySQLforExcel-InfoDlg-Error-64x64.png");
+      this.iconsList.Images.SetKeyName(2, "MySQLforExcel-InfoDlg-Warning-64x64.png");
+      // 
       // InfoDialog
       // 
       this.AcceptButton = this.btnOK;
@@ -162,5 +173,6 @@
     private System.Windows.Forms.Label lblOperationStatus;
     private System.Windows.Forms.Label lblOperationSummarySub;
     private System.Windows.Forms.TextBox txtDetails;
+    private System.Windows.Forms.ImageList iconsList;
   }
 }

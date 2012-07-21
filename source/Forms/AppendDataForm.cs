@@ -433,24 +433,39 @@ namespace MySQL.ForExcel
       }
 
       Exception exception;
+      bool warningsFound = false;
+      int appendCount = 0;
       string insertQuery;
       string operationSummary = String.Empty;
 
-      int appendCount = toMySQLDataTable.AppendDataWithManualQuery(wbConnection, fromMySQLDataTable, out exception, out insertQuery);
+      DataTable warningsTable = toMySQLDataTable.AppendDataWithManualQuery(wbConnection, fromMySQLDataTable, out exception, out insertQuery, out appendCount);
       bool success = exception == null;
-      if (success)
-        operationSummary = String.Format("Excel data was appended successfully to MySQL Table {0}.", toMySQLDataTable.TableName);
-      else
-        operationSummary = String.Format("Excel data could not be appended to MySQL Table {0}.", toMySQLDataTable.TableName);
       StringBuilder operationDetails = new StringBuilder();
-      operationDetails.AppendFormat("Inserting Excel data in MySQL Table \"{0}\"...{1}{1}", toMySQLDataTable.TableName, Environment.NewLine);
-      operationDetails.Append(insertQuery);
-      operationDetails.Append(Environment.NewLine);
-      operationDetails.Append(Environment.NewLine);
+      operationDetails.AppendFormat("Inserting Excel data in MySQL Table \"{0}\" with query...{1}{1}{2}{1}{1}",
+                                    toMySQLDataTable.TableName,
+                                    Environment.NewLine,
+                                    insertQuery);
       if (success)
-        operationDetails.AppendFormat("{0} rows were appended successfully.", appendCount);
+      {
+        operationDetails.AppendFormat("{0} rows were appended", appendCount);
+        if (warningsTable != null && warningsTable.Rows.Count > 0)
+        {
+          warningsFound = true;
+          operationDetails.AppendFormat(" with {0} warnings:", warningsTable.Rows.Count);
+          foreach (DataRow warningRow in warningsTable.Rows)
+          {
+            operationDetails.AppendFormat("{2}Code {0} - {1}",
+                                          warningRow[1].ToString(),
+                                          warningRow[2].ToString(),
+                                          Environment.NewLine);
+          }
+        }
+        else
+          operationDetails.Append(" successfully.");
+      }
       else
       {
+        operationDetails.AppendFormat("Error while appending rows...{0}{0}", Environment.NewLine);
         if (exception is MySqlException)
           operationDetails.AppendFormat("MySQL Error {0}:{1}", (exception as MySqlException).Number, Environment.NewLine);
         else
@@ -458,7 +473,27 @@ namespace MySQL.ForExcel
         operationDetails.Append(exception.Message);
       }
 
-      InfoDialog infoDialog = new InfoDialog(success, operationSummary, operationDetails.ToString());
+      InfoDialog.InfoType operationsType;
+      if (success)
+      {
+        if (warningsFound)
+        {
+          operationSummary = String.Format("Excel data was appended with warnings to MySQL Table \"{0}\".", toMySQLDataTable.TableName);
+          operationsType = InfoDialog.InfoType.Warning;
+        }
+        else
+        {
+          operationSummary = String.Format("Excel data was appended successfully to MySQL Table \"{0}\".", toMySQLDataTable.TableName);
+          operationsType = InfoDialog.InfoType.Success;
+        }
+      }
+      else
+      {
+        operationSummary = String.Format("Excel data could not be appended to MySQL Table \"{0}\".", toMySQLDataTable.TableName);
+        operationsType = InfoDialog.InfoType.Error;
+      }
+
+      InfoDialog infoDialog = new InfoDialog(operationsType, operationSummary, operationDetails.ToString());
       dr = infoDialog.ShowDialog();
       if (dr == DialogResult.Cancel)
         return;

@@ -475,8 +475,9 @@ namespace MySQL.ForExcel
       return sql.ToString();
     }
 
-    public void CreateTable(MySqlWorkbenchConnection wbConnection, out Exception exception, out string sqlQuery)
+    public DataTable CreateTable(MySqlWorkbenchConnection wbConnection, out Exception exception, out string sqlQuery)
     {
+      DataSet warningsDS = null;
       string connectionString = MySQLDataUtilities.GetConnectionString(wbConnection);
       exception = null;
       sqlQuery = GetCreateSQL(true);
@@ -489,12 +490,15 @@ namespace MySQL.ForExcel
 
           MySqlCommand cmd = new MySqlCommand(sqlQuery, conn);
           cmd.ExecuteNonQuery();
+          warningsDS = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");
         }
       }
       catch (MySqlException ex)
       {
         exception = ex;
       }
+
+      return (warningsDS != null && warningsDS.Tables.Count > 0 ? warningsDS.Tables[0] : null);
     }
 
     public string GetInsertSQL(int limit, bool formatNewLinesAndTabs, bool newRowsOnly)
@@ -580,9 +584,10 @@ namespace MySQL.ForExcel
       return queryString.ToString();
     }
 
-    public int InsertDataWithManualQuery(MySqlWorkbenchConnection wbConnection, bool newRowsOnly, out Exception exception, out string sqlQuery)
+    public DataTable InsertDataWithManualQuery(MySqlWorkbenchConnection wbConnection, bool newRowsOnly, out Exception exception, out string sqlQuery, out int insertedRows)
     {
-      int insertedRows = 0;
+      DataSet warningsDS = null;
+      insertedRows = 0;
       exception = null;
       sqlQuery = GetInsertSQL(-1, true, newRowsOnly);
 
@@ -594,6 +599,7 @@ namespace MySQL.ForExcel
           conn.Open();
           MySqlCommand cmd = new MySqlCommand(sqlQuery, conn);
           insertedRows = cmd.ExecuteNonQuery();
+          warningsDS = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");
         }
       }
       catch (MySqlException mysqlEx)
@@ -606,14 +612,15 @@ namespace MySQL.ForExcel
         MiscUtilities.GetSourceTrace().WriteError("Application Exception on InsertDataWithManualQuery - " + (ex.Message + " " + ex.InnerException), 1);
       }
 
-      return insertedRows;
+      return (warningsDS != null && warningsDS.Tables.Count > 0 ? warningsDS.Tables[0] : null);
     }
 
-    public int InsertDataWithAdapter(MySqlWorkbenchConnection wbConnection, bool newRowsOnly, out Exception exception, out int targetInsertCount)
+    public DataTable InsertDataWithAdapter(MySqlWorkbenchConnection wbConnection, bool newRowsOnly, out Exception exception, out int targetInsertCount, out int insertedRows)
     {
+      DataSet warningsDS = null;
       exception = null;
-      int insertedCount = 0;
       targetInsertCount = 0;
+      insertedRows = 0;
       DataTable copyOriginal = null;
 
       if (newRowsOnly)
@@ -673,7 +680,8 @@ namespace MySQL.ForExcel
 
           MySqlCommandBuilder commBuilder = new MySqlCommandBuilder(dataAdapter);
           dataAdapter.InsertCommand = commBuilder.GetInsertCommand();
-          insertedCount = dataAdapter.Update(exportingDataTable);
+          insertedRows = dataAdapter.Update(exportingDataTable);
+          warningsDS = MySqlHelper.ExecuteDataset(connection, "SHOW WARNINGS");
         }
         catch (MySqlException mysqlEx)
         {
@@ -685,13 +693,13 @@ namespace MySQL.ForExcel
           MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
         }
       }
-      return insertedCount;
+      return (warningsDS != null && warningsDS.Tables.Count > 0 ? warningsDS.Tables[0] : null);
     }
 
-    public int InsertDataWithAdapter(MySqlWorkbenchConnection wbConnection, bool newRowsOnly, out Exception exception)
+    public DataTable InsertDataWithAdapter(MySqlWorkbenchConnection wbConnection, bool newRowsOnly, out Exception exception, out int insertedRows)
     {
       int targetInsertCount = 0;
-      return InsertDataWithAdapter(wbConnection, newRowsOnly, out exception, out targetInsertCount);
+      return InsertDataWithAdapter(wbConnection, newRowsOnly, out exception, out targetInsertCount, out insertedRows);
     }
 
     private List<string> getChangedColumns(DataRow changesRow)
@@ -787,9 +795,10 @@ namespace MySQL.ForExcel
       return queryString.ToString();
     }
 
-    public int AppendDataWithManualQuery(MySqlWorkbenchConnection wbConnection, MySQLDataTable mappingFromTable, out Exception exception, out string sqlQuery)
+    public DataTable AppendDataWithManualQuery(MySqlWorkbenchConnection wbConnection, MySQLDataTable mappingFromTable, out Exception exception, out string sqlQuery, out int insertedCount)
     {
-      int insertedCount = 0;
+      DataSet warningsDS = null;
+      insertedCount = 0;
       exception = null;
       sqlQuery = GetAppendSQL(-1, true, mappingFromTable);
 
@@ -801,6 +810,7 @@ namespace MySQL.ForExcel
           conn.Open();
           MySqlCommand cmd = new MySqlCommand(sqlQuery, conn);
           insertedCount = cmd.ExecuteNonQuery();
+          warningsDS = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");
         }
       }
       catch (MySqlException mysqlEx)
@@ -813,7 +823,7 @@ namespace MySQL.ForExcel
         MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
       }
 
-      return insertedCount;
+      return (warningsDS != null && warningsDS.Tables.Count > 0 ? warningsDS.Tables[0] : null);
     }
 
     public string GetUpdateSQL(int limit, bool formatNewLinesAndTabs)
@@ -866,10 +876,11 @@ namespace MySQL.ForExcel
       return queryString.ToString();
     }
 
-    public int UpdateDataWithAdapter(MySqlWorkbenchConnection wbConnection, out Exception exception, out int targetUpdateCount)
+    public DataTable UpdateDataWithAdapter(MySqlWorkbenchConnection wbConnection, out Exception exception, out int targetUpdateCount, out int updatedCount)
     {
+      DataSet warningsDS = null;
       targetUpdateCount = 0;
-      int updatedCount = 0;
+      updatedCount = 0;
       exception = null;
 
       string connectionString = MySQLDataUtilities.GetConnectionString(wbConnection);
@@ -886,6 +897,7 @@ namespace MySQL.ForExcel
           MySqlCommandBuilder commBuilder = new MySqlCommandBuilder(dataAdapter);
           dataAdapter.UpdateCommand = commBuilder.GetUpdateCommand();
           updatedCount = dataAdapter.Update(this);
+          warningsDS = MySqlHelper.ExecuteDataset(connection, "SHOW WARNINGS");
         }
         catch (MySqlException mysqlEx)
         {
@@ -898,13 +910,13 @@ namespace MySQL.ForExcel
         }
       }
 
-      return updatedCount;
+      return (warningsDS != null && warningsDS.Tables.Count > 0 ? warningsDS.Tables[0] : null);
     }
 
-    public int UpdateDataWithAdapter(MySqlWorkbenchConnection wbConnection, out Exception exception)
+    public DataTable UpdateDataWithAdapter(MySqlWorkbenchConnection wbConnection, out Exception exception, out int updatedCount)
     {
       int targetUpdateCount = 0;
-      return UpdateDataWithAdapter(wbConnection, out exception, out targetUpdateCount);
+      return UpdateDataWithAdapter(wbConnection, out exception, out targetUpdateCount, out updatedCount);
     }
 
     public string GetDeleteSQL(int limit, bool formatNewLinesAndTabs)
@@ -943,10 +955,11 @@ namespace MySQL.ForExcel
       return queryString.ToString();
     }
 
-    public int DeleteDataWithAdapter(MySqlWorkbenchConnection wbConnection, out Exception exception, out int targetDeleteCount)
+    public DataTable DeleteDataWithAdapter(MySqlWorkbenchConnection wbConnection, out Exception exception, out int targetDeleteCount, out int deletedCount)
     {
+      DataSet warningsDS = null;
       exception = null;
-      int deletedCount = 0;
+      deletedCount = 0;
       targetDeleteCount = 0;
 
       string connectionString = MySQLDataUtilities.GetConnectionString(wbConnection);
@@ -963,6 +976,7 @@ namespace MySQL.ForExcel
           if (changesTable.Rows != null)
             targetDeleteCount = changesTable.Rows.Count;
           deletedCount = dataAdapter.Update(this);
+          warningsDS = MySqlHelper.ExecuteDataset(connection, "SHOW WARNINGS");
         }
         catch (MySqlException mysqlEx)
         {
@@ -975,13 +989,13 @@ namespace MySQL.ForExcel
         }
       }
 
-      return deletedCount;
+      return (warningsDS != null && warningsDS.Tables.Count > 0 ? warningsDS.Tables[0] : null);
     }
 
-    public int DeleteDataWithAdapter(MySqlWorkbenchConnection wbConnection, out Exception exception)
+    public DataTable DeleteDataWithAdapter(MySqlWorkbenchConnection wbConnection, out Exception exception, out int deletedCount)
     {
       int targetDeleteCount = 0;
-      return DeleteDataWithAdapter(wbConnection, out exception, out targetDeleteCount);
+      return DeleteDataWithAdapter(wbConnection, out exception, out targetDeleteCount, out deletedCount);
     }
 
     public void RevertData(bool refreshFromDB, MySqlWorkbenchConnection wbConnection, out Exception exception)

@@ -15,7 +15,11 @@ namespace MySQL.ForExcel
     private const int COLLAPSED_HEIGHT = 215;
     private const int EXPANDED_HEIGHT = 350;
 
+    public enum InfoType { Success = 0, Error = 1, Warning = 2 };
+
     public bool ExpandedState { get; set; }
+    public InfoType OperationType { get; set; }
+
     public string OperationStatusText
     {
       get { return lblOperationStatus.Text; }
@@ -55,18 +59,39 @@ namespace MySQL.ForExcel
       set { txtDetails.WordWrap = value; }
     }
 
-    public InfoDialog(bool operationSuccessful, string operationSummary, string operationDetails)
+    public InfoDialog(InfoType operationsType, string operationSummary, string operationDetails)
     {
       InitializeComponent();
-      picLogo.Image = (operationSuccessful ? Properties.Resources.MySQLforExcel_InfoDlg_Success_64x64 : Properties.Resources.MySQLforExcel_InfoDlg_Error_64x64);
-      OperationStatusText = (operationSuccessful ? "Operation Completed Successfully" : "An Error Ocurred");
+      OperationType = operationsType;
+      picLogo.Image = iconsList.Images[(int)operationsType];
+      switch (operationsType)
+      {
+        case InfoType.Success:
+          OperationStatusText = "Operation Completed Successfully";
+          btnOK.Text = "OK";
+          btnOK.DialogResult = DialogResult.OK;
+          break;
+        case InfoType.Warning:
+          OperationStatusText = "Operation Completed With Warnings";
+          btnOK.Text = "OK";
+          btnOK.DialogResult = DialogResult.OK;
+          break;
+        case InfoType.Error:
+          OperationStatusText = "An Error Ocurred";
+          btnOK.Text = "Back";
+          btnOK.DialogResult = DialogResult.Cancel;
+          break;
+      }
       OperationSummaryText = operationSummary;
       OperationDetailsText = operationDetails;
-      btnOK.Text = (operationSuccessful ? "OK" : "Back");
       OperationSummarySubText = String.Format("Press {0} to continue.", btnOK.Text);
-      btnOK.DialogResult = (operationSuccessful ? DialogResult.OK : DialogResult.Cancel);
       ExpandedState = false;
       ChangeHeight();
+    }
+
+    public InfoDialog(bool operationSuccessful, string operationSummary, string operationDetails)
+      : this((operationSuccessful ? InfoType.Success : InfoType.Error), operationSummary, operationDetails)
+    {
     }
 
     private void ChangeHeight()

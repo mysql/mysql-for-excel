@@ -260,16 +260,35 @@ namespace MySQL.ForExcel
       }
 
       Exception exception;
+      DataTable warningsTable;
+      bool warningsFound = false;
       string operationSummary = String.Format("The MySQL Table \"{0}\"", dataTable.TableName);
       StringBuilder operationDetails = new StringBuilder();
-      operationDetails.AppendFormat("Creating MySQL Table \"{0}\"...{1}{1}", dataTable.TableName, Environment.NewLine);
+      operationDetails.AppendFormat("Creating MySQL Table \"{0}\" with query...{1}{1}", dataTable.TableName, Environment.NewLine);
       string queryString = String.Empty;
-      dataTable.CreateTable(wbConnection, out exception, out queryString);
+      warningsTable = dataTable.CreateTable(wbConnection, out exception, out queryString);
       bool success = exception == null;
       operationDetails.Append(queryString);
       operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
       if (success)
-        operationDetails.Append("Table has been created successfully.");
+      {
+        operationDetails.Append("Table has been created");
+        if (warningsTable != null && warningsTable.Rows.Count > 0)
+        {
+          warningsFound = true;
+          operationDetails.AppendFormat(" with {0} warnings:", warningsTable.Rows.Count);
+          foreach (DataRow warningRow in warningsTable.Rows)
+          {
+            operationDetails.AppendFormat("{2}Code {0} - {1}",
+                                          warningRow[1].ToString(),
+                                          warningRow[2].ToString(),
+                                          Environment.NewLine);
+          }
+          operationDetails.Append(Environment.NewLine);
+        }
+        else
+          operationDetails.Append(" successfully.");
+      }
       else
       {
         if (exception is MySqlException)
@@ -283,21 +302,35 @@ namespace MySQL.ForExcel
       if (success && tableContainsDataToExport)
       {
         int insertedCount = 0;
-        insertedCount = dataTable.InsertDataWithManualQuery(wbConnection, false, out exception, out queryString);
+        warningsTable = dataTable.InsertDataWithManualQuery(wbConnection, false, out exception, out queryString, out insertedCount);
+        operationDetails.AppendFormat("{1}{1}Inserting Excel data in MySQL Table \"{0}\" with query...{1}{1}{2}{1}{1}",
+                                    dataTable.TableName,
+                                    Environment.NewLine,
+                                    queryString);
         success = exception == null;
         if (success)
         {
-          operationDetails.AppendFormat("{0}{0}Inserting data rows...{0}{0}", Environment.NewLine);
-          operationDetails.Append(queryString);
-          operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
-          operationDetails.AppendFormat("{0} rows have been added successfully.", insertedCount);
+          operationDetails.AppendFormat("{0} rows have been inserted", insertedCount);
           operationSummary += "with data.";
+          if (warningsTable != null && warningsTable.Rows.Count > 0)
+          {
+            warningsFound = true;
+            operationDetails.AppendFormat(" with {0} warnings:", warningsTable.Rows.Count);
+            foreach (DataRow warningRow in warningsTable.Rows)
+            {
+              operationDetails.AppendFormat("{2}Code {0} - {1}",
+                                            warningRow[1].ToString(),
+                                            warningRow[2].ToString(),
+                                            Environment.NewLine);
+            }
+            operationDetails.Append(Environment.NewLine);
+          }
+          else
+            operationDetails.Append(" successfully.");
         }
         else
         {
-          operationDetails.AppendFormat("{0}{0}Error while inserting rows...{0}{0}", Environment.NewLine);
-          operationDetails.Append(queryString);
-          operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
+          operationDetails.AppendFormat("Error while inserting rows...{0}{0}", Environment.NewLine);
           if (exception is MySqlException)
             operationDetails.AppendFormat("MySQL Error {0}:{1}", (exception as MySqlException).Number, Environment.NewLine);
           else
@@ -307,7 +340,8 @@ namespace MySQL.ForExcel
         }
       }
 
-      InfoDialog infoDialog = new InfoDialog(success, operationSummary, operationDetails.ToString());
+      InfoDialog.InfoType operationsType = (success ? (warningsFound ? InfoDialog.InfoType.Warning : InfoDialog.InfoType.Success) : InfoDialog.InfoType.Error);
+      InfoDialog infoDialog = new InfoDialog(operationsType, operationSummary, operationDetails.ToString());
       DialogResult dr = infoDialog.ShowDialog();
       if (dr == DialogResult.Cancel)
         return;
