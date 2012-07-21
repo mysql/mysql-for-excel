@@ -165,11 +165,21 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Connection attempt failed.  Please re-enter your password to try again..
+        ///   Looks up a localized string similar to Connection attempt failed.
+        ///Please re-enter your password to try again..
         /// </summary>
-        internal static string ConnectFailedTryNewPassword {
+        internal static string ConnectFailedDetailWarning {
             get {
-                return ResourceManager.GetString("ConnectFailedTryNewPassword", resourceCulture);
+                return ResourceManager.GetString("ConnectFailedDetailWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong Password.
+        /// </summary>
+        internal static string ConnectFailedTitleWarning {
+            get {
+                return ResourceManager.GetString("ConnectFailedTitleWarning", resourceCulture);
             }
         }
         

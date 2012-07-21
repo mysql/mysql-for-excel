@@ -56,7 +56,6 @@
       // btnYes
       // 
       this.btnYes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnYes.DialogResult = System.Windows.Forms.DialogResult.Yes;
       this.btnYes.Location = new System.Drawing.Point(316, 11);
       this.btnYes.Name = "btnYes";
       this.btnYes.Size = new System.Drawing.Size(75, 23);
@@ -97,7 +96,6 @@
       // btnNo
       // 
       this.btnNo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnNo.DialogResult = System.Windows.Forms.DialogResult.No;
       this.btnNo.Location = new System.Drawing.Point(397, 11);
       this.btnNo.Name = "btnNo";
       this.btnNo.Size = new System.Drawing.Size(75, 23);
@@ -109,6 +107,7 @@
       // 
       this.AcceptButton = this.btnYes;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.CancelButton = this.btnNo;
       this.ClientSize = new System.Drawing.Size(484, 154);
       this.CommandAreaHeight = 45;
       this.Name = "WarningDialog";

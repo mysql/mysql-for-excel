@@ -137,11 +137,18 @@ namespace MySQL.ForExcel
           dlg.HostIdentifier = connection.Name + " - " + connection.HostIdentifier;
           dlg.UserName = connection.UserName;
           dlg.PasswordText = String.Empty;
-          if (dlg.ShowDialog() == DialogResult.Cancel) return;
+          if (dlg.ShowDialog() == DialogResult.Cancel)
+          {
+            connection.Password = null;
+            return;
+          }
           connection.Password = dlg.PasswordText;
         }
-        if (connection.TestConnection()) break;
-        MessageBox.Show(Resources.ConnectFailedTryNewPassword, Resources.AppName, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        if (connection.TestConnection())
+          break;
+        WarningDialog warningDlg = new WarningDialog(WarningDialog.WarningButtons.OK, Resources.ConnectFailedTitleWarning, Resources.ConnectFailedDetailWarning);
+        warningDlg.StartPosition = FormStartPosition.CenterScreen;
+        warningDlg.ShowDialog();
         failed = true;
       }
       bool schemasLoaded = schemaSelectionPanel1.SetConnection(connection);
