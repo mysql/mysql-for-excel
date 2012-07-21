@@ -266,6 +266,7 @@ namespace MySQL.ForExcel
       {
         System.Diagnostics.Debug.WriteLine(ex.Message);
         MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
+        throw;
       }
 
       return dt;

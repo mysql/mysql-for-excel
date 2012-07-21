@@ -64,8 +64,16 @@ namespace MySQL.ForExcel
 
     private void btnNext_Click(object sender, EventArgs e)
     {
-      string databaseName = databaseList.SelectedNode.Tag as string;
-      (Parent as TaskPaneControl).OpenSchema(databaseName);
+      try
+      {
+        string databaseName = databaseList.SelectedNode.Tag as string;
+        (Parent as TaskPaneControl).OpenSchema(databaseName);
+      }
+      catch (Exception ex)
+      {
+        InfoDialog dialog = new InfoDialog(false, ex.Message, null);
+        dialog.ShowDialog();
+      }
     }
 
     private void databaseList_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -76,34 +84,36 @@ namespace MySQL.ForExcel
 
     private bool LoadSchemas()
     {
-      foreach (TreeNode node in databaseList.Nodes)
-        node.Nodes.Clear();
-      DataTable databases = MySQLDataUtilities.GetSchemaCollection(connection, "Databases", null);
-      if (databases == null)
+      try
       {
-        MessageBox.Show(Resources.UnableToLoadDatabases);
-        (Parent as TaskPaneControl).CloseConnection();
+        foreach (TreeNode node in databaseList.Nodes)
+          node.Nodes.Clear();
+        DataTable databases = MySQLDataUtilities.GetSchemaCollection(connection, "Databases", null);
+        foreach (DataRow row in databases.Rows)
+        {
+          string schemaName = row["DATABASE_NAME"].ToString();
+
+          // if the user has specified a filter then check it        
+          if (!String.IsNullOrEmpty(filter) && !schemaName.ToUpper().Contains(filter)) continue;
+
+          string lcSchemaName = schemaName.ToLowerInvariant();
+          int index = (lcSchemaName == "mysql" || lcSchemaName == "information_schema") ? 1 : 0;
+
+          string text = schemaName;
+          TreeNode node = databaseList.AddNode(databaseList.Nodes[index], text);
+          node.Tag = schemaName;
+          node.ImageIndex = 0;
+        }
+        if (databaseList.Nodes[0].GetNodeCount(true) > 0)
+          databaseList.Nodes[0].Expand();
+        return true;
+      }
+      catch (Exception ex)
+      {
+        InfoDialog dialog = new InfoDialog(false, ex.Message, null);
+        dialog.ShowDialog();
         return false;
       }
-
-      foreach (DataRow row in databases.Rows)
-      {
-        string schemaName = row["DATABASE_NAME"].ToString();
-
-        // if the user has specified a filter then check it        
-        if (!String.IsNullOrEmpty(filter) && !schemaName.ToUpper().Contains(filter)) continue;
-
-        string lcSchemaName = schemaName.ToLowerInvariant();
-        int index = (lcSchemaName == "mysql" || lcSchemaName == "information_schema") ? 1 : 0;
-
-        string text = schemaName;
-        TreeNode node = databaseList.AddNode(databaseList.Nodes[index], text);
-        node.Tag = schemaName;
-        node.ImageIndex = 0;
-      }
-      if (databaseList.Nodes[0].GetNodeCount(true) > 0)
-        databaseList.Nodes[0].Expand();
-      return true;
     }
 
     private void createNewSchema_Click(object sender, EventArgs e)

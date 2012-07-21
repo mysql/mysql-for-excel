@@ -407,6 +407,7 @@
       this.MinimumSize = new System.Drawing.Size(865, 635);
       this.Name = "ImportTableViewForm";
       this.Text = "Import Data";
+      this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ImportTableViewForm_FormClosing);
       this.Controls.SetChildIndex(this.contentAreaPanel, 0);
       this.Controls.SetChildIndex(this.commandAreaPanel, 0);
       this.contentAreaPanel.ResumeLayout(false);

@@ -214,46 +214,54 @@ namespace MySQL.ForExcel
 
     private void btnCall_Click(object sender, EventArgs e)
     {
-      // Prepare parameters and execute routine and create OutAndReturnValues table
-      DataTable outParamsTable = new DataTable("OutAndReturnValues");
-      for (int paramIdx = 0; paramIdx < procedureParamsProperties.Count; paramIdx++)
+      try
       {
-        mysqlParameters[paramIdx].Value = procedureParamsProperties[paramIdx].Value;
-        if (mysqlParameters[paramIdx].Direction == ParameterDirection.Output || mysqlParameters[paramIdx].Direction == ParameterDirection.ReturnValue)
-          outParamsTable.Columns.Add(procedureParamsProperties[paramIdx].Name, procedureParamsProperties[paramIdx].Value.GetType());
-      }
-      ImportDataSet = MySQLDataUtilities.GetDataSetFromRoutine(wbConnection, importDBObject, mysqlParameters);
-      if (ImportDataSet == null || ImportDataSet.Tables.Count == 0)
-      {
-        btnImport.Enabled = false;
-        return;
-      }
-      btnImport.Enabled = true;
-
-      // Refresh output/return parameter values in PropertyGrid and add them to OutAndReturnValues table
-      DataRow valuesRow = outParamsTable.NewRow();
-      for (int paramIdx = 0; paramIdx < procedureParamsProperties.Count; paramIdx++)
-      {
-        if (mysqlParameters[paramIdx].Direction == ParameterDirection.Output || mysqlParameters[paramIdx].Direction == ParameterDirection.ReturnValue)
+        // Prepare parameters and execute routine and create OutAndReturnValues table
+        DataTable outParamsTable = new DataTable("OutAndReturnValues");
+        for (int paramIdx = 0; paramIdx < procedureParamsProperties.Count; paramIdx++)
         {
-          procedureParamsProperties[paramIdx].Value = mysqlParameters[paramIdx].Value;
-          valuesRow[mysqlParameters[paramIdx].ParameterName] = mysqlParameters[paramIdx].Value;
+          mysqlParameters[paramIdx].Value = procedureParamsProperties[paramIdx].Value;
+          if (mysqlParameters[paramIdx].Direction == ParameterDirection.Output || mysqlParameters[paramIdx].Direction == ParameterDirection.ReturnValue)
+            outParamsTable.Columns.Add(procedureParamsProperties[paramIdx].Name, procedureParamsProperties[paramIdx].Value.GetType());
+        }
+        ImportDataSet = MySQLDataUtilities.GetDataSetFromRoutine(wbConnection, importDBObject, mysqlParameters);
+        if (ImportDataSet == null || ImportDataSet.Tables.Count == 0)
+        {
+          btnImport.Enabled = false;
+          return;
+        }
+        btnImport.Enabled = true;
+
+        // Refresh output/return parameter values in PropertyGrid and add them to OutAndReturnValues table
+        DataRow valuesRow = outParamsTable.NewRow();
+        for (int paramIdx = 0; paramIdx < procedureParamsProperties.Count; paramIdx++)
+        {
+          if (mysqlParameters[paramIdx].Direction == ParameterDirection.Output || mysqlParameters[paramIdx].Direction == ParameterDirection.ReturnValue)
+          {
+            procedureParamsProperties[paramIdx].Value = mysqlParameters[paramIdx].Value;
+            valuesRow[mysqlParameters[paramIdx].ParameterName] = mysqlParameters[paramIdx].Value;
+          }
+        }
+        outParamsTable.Rows.Add(valuesRow);
+        ImportDataSet.Tables.Add(outParamsTable);
+        parametersGrid.Refresh();
+
+        // Refresh ResultSets in Tab Control
+        tabResultSets.TabPages.Clear();
+        for (int dtIdx = 0; dtIdx < ImportDataSet.Tables.Count; dtIdx++)
+        {
+          tabResultSets.TabPages.Add(ImportDataSet.Tables[dtIdx].TableName);
+        }
+        if (tabResultSets.TabPages.Count > 0)
+        {
+          SelectedResultSet = tabResultSets.SelectedIndex = 0;
+          tabResultSets_SelectedIndexChanged(tabResultSets, EventArgs.Empty);
         }
       }
-      outParamsTable.Rows.Add(valuesRow);
-      ImportDataSet.Tables.Add(outParamsTable);
-      parametersGrid.Refresh();
-
-      // Refresh ResultSets in Tab Control
-      tabResultSets.TabPages.Clear();
-      for (int dtIdx = 0; dtIdx < ImportDataSet.Tables.Count; dtIdx++)
+      catch (Exception ex)
       {
-        tabResultSets.TabPages.Add(ImportDataSet.Tables[dtIdx].TableName);
-      }
-      if (tabResultSets.TabPages.Count > 0)
-      {
-        SelectedResultSet = tabResultSets.SelectedIndex = 0;
-        tabResultSets_SelectedIndexChanged(tabResultSets, EventArgs.Empty);
+        InfoDialog dialog = new InfoDialog(false, ex.Message, null);
+        dialog.ShowDialog();
       }
     }
 

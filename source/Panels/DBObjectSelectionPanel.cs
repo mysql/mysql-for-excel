@@ -64,8 +64,16 @@ namespace MySQL.ForExcel
 
     private void refreshDatabaseObjectsToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      PopulateList();
-      objectList_AfterSelect(null, null);
+      try
+      {
+        PopulateList();
+        objectList_AfterSelect(null, null);
+      }
+      catch (Exception ex)
+      {
+        InfoDialog dialog = new InfoDialog(false, ex.Message, null);
+        dialog.ShowDialog();
+      }
     }
 
     private void PopulateList()
@@ -135,16 +143,24 @@ namespace MySQL.ForExcel
       if (objectList.SelectedNode == null)
         return;
 
-      DBObject dbo = objectList.SelectedNode.Tag as DBObject;
-      switch (dbo.Type)
+      try
       {
-        case DBObjectType.Table:
-        case DBObjectType.View:
-          importTableOrView(dbo);
-          break;
-        case DBObjectType.Routine:
-          importProcedure(dbo);
-          break;
+        DBObject dbo = objectList.SelectedNode.Tag as DBObject;
+        switch (dbo.Type)
+        {
+          case DBObjectType.Table:
+          case DBObjectType.View:
+            importTableOrView(dbo);
+            break;
+          case DBObjectType.Routine:
+            importProcedure(dbo);
+            break;
+        }
+      }
+      catch (Exception ex)
+      {
+        InfoDialog dialg = new InfoDialog(false, ex.Message, null);
+        dialg.ShowDialog();
       }
     }
 
@@ -187,9 +203,17 @@ namespace MySQL.ForExcel
     {
       if (objectList.SelectedNode == null)
         return;
-      DBObject selDBObject = (objectList.SelectedNode.Tag as DBObject);
-      if (selDBObject.Type == DBObjectType.Table)
-        exportDataToTable(selDBObject);
+      try
+      {
+        DBObject selDBObject = (objectList.SelectedNode.Tag as DBObject);
+        if (selDBObject.Type == DBObjectType.Table)
+          exportDataToTable(selDBObject);
+      }
+      catch (Exception ex)
+      {
+        InfoDialog dialog = new InfoDialog(false, ex.Message, null);
+        dialog.ShowDialog();
+      }
     }
 
     private void exportToNewTable_Click(object sender, EventArgs e)
@@ -231,7 +255,15 @@ namespace MySQL.ForExcel
       if (e.KeyCode == Keys.Enter)
       {
         filter = objectFilter.Text.Trim().ToUpper();
-        PopulateList();
+        try
+        {
+          PopulateList();
+        }
+        catch (Exception ex)
+        {
+          InfoDialog dialog = new InfoDialog(false, ex.Message, null);
+          dialog.ShowDialog();
+        }
       }
     }
 

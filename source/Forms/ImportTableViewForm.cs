@@ -22,6 +22,7 @@ namespace MySQL.ForExcel
     public DataTable ImportDataTable = null;
     public bool ImportHeaders { get { return chkIncludeHeaders.Checked; } }
     public long TotalRowsCount { get; set; }
+    private bool hasError = false;
 
     public ImportTableViewForm(MySqlWorkbenchConnection wbConnection, DBObject importDBObject, string importToWorksheetName)
     {
@@ -91,10 +92,19 @@ namespace MySQL.ForExcel
       {
         importColumns.Add(selCol.HeaderText);
       }
-      if (chkLimitRows.Checked)
-        ImportDataTable = MySQLDataUtilities.GetDataFromTableOrView(wbConnection, importDBObject, importColumns, Convert.ToInt32(numFromRow.Value) - 1, Convert.ToInt32(numRowsToReturn.Value));
-      else
-        ImportDataTable = MySQLDataUtilities.GetDataFromTableOrView(wbConnection, importDBObject, importColumns);
+      try
+      {
+        if (chkLimitRows.Checked)
+          ImportDataTable = MySQLDataUtilities.GetDataFromTableOrView(wbConnection, importDBObject, importColumns, Convert.ToInt32(numFromRow.Value) - 1, Convert.ToInt32(numRowsToReturn.Value));
+        else
+          ImportDataTable = MySQLDataUtilities.GetDataFromTableOrView(wbConnection, importDBObject, importColumns);
+      }
+      catch (Exception ex)
+      {
+        InfoDialog dialog = new InfoDialog(false, ex.Message, null);
+        dialog.ShowDialog();
+        hasError = true;
+      }
     }
 
     private void chkLimitRows_CheckedChanged(object sender, EventArgs e)
@@ -124,6 +134,12 @@ namespace MySQL.ForExcel
         grdPreviewData.ClearSelection();
       else
         grdPreviewData.SelectAll();
+    }
+
+    private void ImportTableViewForm_FormClosing(object sender, FormClosingEventArgs e)
+    {
+      e.Cancel = hasError;
+      hasError = false;
     }
 
   }
