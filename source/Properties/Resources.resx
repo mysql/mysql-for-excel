@@ -417,4 +417,13 @@ Please re-enter your password to try again.</value>
   <data name="ConnectFailedTitleWarning" xml:space="preserve">
     <value>Wrong Password</value>
   </data>
+  <data name="DeleteHS" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\DeleteHS.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="clear_output" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\clear_output.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="remove_col_mapping" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\remove_col_mapping.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

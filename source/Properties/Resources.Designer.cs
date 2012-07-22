@@ -83,6 +83,13 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap clear_output {
+            get {
+                object obj = ResourceManager.GetObject("clear_output", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to If you want to create a new connection, please close MySQL Workbench..
         /// </summary>
@@ -252,6 +259,13 @@ namespace MySQL.ForExcel.Properties {
         internal static string CurrentChangesLostConfirmation {
             get {
                 return ResourceManager.GetString("CurrentChangesLostConfirmation", resourceCulture);
+            }
+        }
+        
+        internal static System.Drawing.Bitmap DeleteHS {
+            get {
+                object obj = ResourceManager.GetObject("DeleteHS", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -713,6 +727,13 @@ namespace MySQL.ForExcel.Properties {
         internal static System.Drawing.Bitmap refresh_sidebar {
             get {
                 object obj = ResourceManager.GetObject("refresh_sidebar", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap remove_col_mapping {
+            get {
+                object obj = ResourceManager.GetObject("remove_col_mapping", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

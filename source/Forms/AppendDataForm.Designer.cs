@@ -442,6 +442,7 @@ namespace MySQL.ForExcel
       // 
       // removeColumnMappingToolStripMenuItem
       // 
+      this.removeColumnMappingToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.remove_col_mapping;
       this.removeColumnMappingToolStripMenuItem.Name = "removeColumnMappingToolStripMenuItem";
       this.removeColumnMappingToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
       this.removeColumnMappingToolStripMenuItem.Text = "Remove Column Mapping";
@@ -449,6 +450,7 @@ namespace MySQL.ForExcel
       // 
       // clearAllMappingsToolStripMenuItem
       // 
+      this.clearAllMappingsToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.clear_output;
       this.clearAllMappingsToolStripMenuItem.Name = "clearAllMappingsToolStripMenuItem";
       this.clearAllMappingsToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
       this.clearAllMappingsToolStripMenuItem.Text = "Clear All Mappings";

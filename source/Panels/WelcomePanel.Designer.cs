@@ -206,6 +206,7 @@ namespace MySQL.ForExcel
       // 
       // deleteToolStripMenuItem
       // 
+      this.deleteToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.DeleteHS;
       this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
       this.deleteToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
       this.deleteToolStripMenuItem.Text = "Delete Connection";
