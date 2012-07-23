@@ -325,6 +325,7 @@ namespace MySQL.ForExcel
       this.label21.Size = new System.Drawing.Size(323, 15);
       this.label21.TabIndex = 17;
       this.label21.Text = "Optional list of permissible ciphers to use for SSL encryption";
+      this.label21.Visible = false;
       // 
       // label20
       // 
@@ -334,6 +335,7 @@ namespace MySQL.ForExcel
       this.label20.Size = new System.Drawing.Size(109, 15);
       this.label20.TabIndex = 16;
       this.label20.Text = "Path to Key for SSL.";
+      this.label20.Visible = false;
       // 
       // label19
       // 
@@ -343,6 +345,7 @@ namespace MySQL.ForExcel
       this.label19.Size = new System.Drawing.Size(165, 15);
       this.label19.TabIndex = 15;
       this.label19.Text = "Path to Certificate File for SSL.";
+      this.label19.Visible = false;
       // 
       // textBox4
       // 
@@ -351,6 +354,7 @@ namespace MySQL.ForExcel
       this.textBox4.Name = "textBox4";
       this.textBox4.Size = new System.Drawing.Size(325, 23);
       this.textBox4.TabIndex = 15;
+      this.textBox4.Visible = false;
       // 
       // textBox3
       // 
@@ -359,6 +363,7 @@ namespace MySQL.ForExcel
       this.textBox3.Name = "textBox3";
       this.textBox3.Size = new System.Drawing.Size(325, 23);
       this.textBox3.TabIndex = 14;
+      this.textBox3.Visible = false;
       // 
       // textBox2
       // 
@@ -367,6 +372,7 @@ namespace MySQL.ForExcel
       this.textBox2.Name = "textBox2";
       this.textBox2.Size = new System.Drawing.Size(325, 23);
       this.textBox2.TabIndex = 13;
+      this.textBox2.Visible = false;
       // 
       // textBox1
       // 
@@ -375,6 +381,7 @@ namespace MySQL.ForExcel
       this.textBox1.Name = "textBox1";
       this.textBox1.Size = new System.Drawing.Size(325, 23);
       this.textBox1.TabIndex = 12;
+      this.textBox1.Visible = false;
       // 
       // label18
       // 
@@ -384,6 +391,7 @@ namespace MySQL.ForExcel
       this.label18.Size = new System.Drawing.Size(66, 15);
       this.label18.TabIndex = 10;
       this.label18.Text = "SSL Cipher:";
+      this.label18.Visible = false;
       // 
       // label17
       // 
@@ -393,6 +401,7 @@ namespace MySQL.ForExcel
       this.label17.Size = new System.Drawing.Size(71, 15);
       this.label17.TabIndex = 9;
       this.label17.Text = "SSL Key File:";
+      this.label17.Visible = false;
       // 
       // label16
       // 
@@ -402,6 +411,7 @@ namespace MySQL.ForExcel
       this.label16.Size = new System.Drawing.Size(80, 15);
       this.label16.TabIndex = 8;
       this.label16.Text = "SSL CERT File:";
+      this.label16.Visible = false;
       // 
       // label15
       // 
@@ -411,6 +421,7 @@ namespace MySQL.ForExcel
       this.label15.Size = new System.Drawing.Size(218, 15);
       this.label15.TabIndex = 7;
       this.label15.Text = "Path to Certificate Authority File for SSL.";
+      this.label15.Visible = false;
       // 
       // label14
       // 
@@ -420,6 +431,7 @@ namespace MySQL.ForExcel
       this.label14.Size = new System.Drawing.Size(68, 15);
       this.label14.TabIndex = 6;
       this.label14.Text = "SSL CA File:";
+      this.label14.Visible = false;
       // 
       // label13
       // 
@@ -429,6 +441,7 @@ namespace MySQL.ForExcel
       this.label13.Size = new System.Drawing.Size(195, 15);
       this.label13.TabIndex = 5;
       this.label13.Text = "This option turns on SSL encryption";
+      this.label13.Visible = false;
       // 
       // label12
       // 
@@ -458,6 +471,7 @@ namespace MySQL.ForExcel
       this.useSSL.TabIndex = 11;
       this.useSSL.Text = "Use SSL if available";
       this.useSSL.UseVisualStyleBackColor = true;
+      this.useSSL.Visible = false;
       // 
       // useANSI
       // 

@@ -66,24 +66,34 @@ namespace MySQL.ForExcel
     {
       int nodeIdx = 1;
       bool isSSH = false;
+      bool isSSL = false;
 
       string hostName = (conn.Host ?? string.Empty).Trim();
       if (conn.DriverType == MySqlWorkbenchConnectionType.Ssh)
-      {
         isSSH = true;
+      if (conn.UseSSL == 1 || (conn.SSLCA != String.Empty || conn.SSLCert != String.Empty || conn.SSLCipher != String.Empty || conn.SSLKey != String.Empty))
+        isSSL = true;
+
+      if (isSSH || isSSL)
+      {
         string[] sshConnection = conn.HostIdentifier.Split('@');
         string dbHost = sshConnection[1].Split(':')[0].Trim();
         if (localValues.Contains(dbHost.ToLowerInvariant()))
           nodeIdx = 0;
-        hostName = dbHost + " (SSH)";
+        if (isSSH && isSSL)
+          hostName = dbHost + " (SSH+SSL)";
+        else if (isSSH)
+          hostName = dbHost + " (SSH)";
+        else
+          hostName = dbHost + " (SSL)";
       }
       else if (localValues.Contains(hostName.ToLowerInvariant()))
         nodeIdx = 0;
 
       string subtitle = String.Format("User: {0}, Host: {1}", conn.UserName, hostName);
       MyTreeNode node = connectionList.AddNode(connectionList.Nodes[nodeIdx], conn.Name, subtitle);
-      node.ImageIndex = (isSSH ? 1 : 0);
-      node.Enable = !isSSH;
+      node.ImageIndex = ((isSSH || isSSL) ? 1 : 0);
+      node.Enable = !(isSSH || isSSL);
       node.Tag = conn;
     }
 
