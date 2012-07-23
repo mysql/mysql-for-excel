@@ -226,7 +226,10 @@ namespace MySQL.ForExcel
       cs.Password = connection.Password;
       cs.Database = connection.Schema;
       cs.Port = (uint)connection.Port;
+      cs.PipeName = connection.Socket;
+      cs.UseCompression = (connection.ClientCompress == 1) ? true : false;
       cs.AllowZeroDateTime = allowZeroDateTimeValues;
+      cs.ConnectionProtocol = (connection.DriverType == MySqlWorkbenchConnectionType.Tcp) ? MySqlConnectionProtocol.Tcp : MySqlConnectionProtocol.NamedPipe;
       //TODO:  use additional necessary options
       return cs.ConnectionString;
     }
