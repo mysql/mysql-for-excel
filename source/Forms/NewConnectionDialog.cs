@@ -74,7 +74,7 @@ namespace MySQL.ForExcel
       }
       catch (MySqlException)
       {
-        PasswordDialog pwdDialog = new PasswordDialog(WBconn.Host, WBconn.Port, WBconn.UserName);
+        PasswordDialog pwdDialog = new PasswordDialog(WBconn.HostIdentifier, WBconn.UserName);
         if (pwdDialog.ShowDialog(this) == DialogResult.Cancel) return false;
         connectionString.Password = pwdDialog.PasswordText;
         pwdDialog.Dispose();

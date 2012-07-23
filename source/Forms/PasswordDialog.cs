@@ -52,12 +52,12 @@ namespace MySQL.ForExcel
       InitializeComponent();
     }
 
-    public PasswordDialog(string Host, int Port, string User)
+    public PasswordDialog(string hostIdentifier, string User)
     {
       InitializeComponent();
       lblConnection.Text = "Service:";
-      HostIdentifier = "Mysql@" + Host + ":" + Port;
-      UserName = User ?? "guest";
+      HostIdentifier = hostIdentifier;
+      UserName = User;
     }
   }
 }
