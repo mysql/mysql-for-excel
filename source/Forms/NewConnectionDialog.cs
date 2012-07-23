@@ -65,7 +65,9 @@ namespace MySQL.ForExcel
 
     public bool TryOpenConnection(MySqlConnectionStringBuilder connectionString)
     {
+      MySqlConnection WinAuthconn = new MySqlConnection(connectionString.ConnectionString + "; Integrated Security=True");
       MySqlConnection conn = new MySqlConnection(connectionString.ConnectionString);
+      MySqlConnection connPass = conn;
 
       try
       {
@@ -74,24 +76,34 @@ namespace MySQL.ForExcel
       }
       catch (MySqlException)
       {
-        PasswordDialog pwdDialog = new PasswordDialog(WBconn.HostIdentifier, WBconn.UserName);
-        if (pwdDialog.ShowDialog(this) == DialogResult.Cancel) return false;
-        connectionString.Password = pwdDialog.PasswordText;
-        pwdDialog.Dispose();
-        conn = new MySqlConnection(connectionString.ConnectionString);
         try
         {
-          conn.Open();
+          WinAuthconn.Open();
           return true;
         }
-        catch
+        catch (MySqlException)
         {
-          throw;
+          try
+          {
+            PasswordDialog pwdDialog = new PasswordDialog(WBconn.HostIdentifier, WBconn.UserName);
+            if (pwdDialog.ShowDialog(this) == DialogResult.Cancel) return false;
+            connectionString.Password = pwdDialog.PasswordText;
+            pwdDialog.Dispose();
+            connPass = new MySqlConnection(connectionString.ConnectionString);
+            connPass.Open();
+            return true;
+          }
+          catch
+          {
+            throw;
+          }
         }
       }
       finally
       {
+        WinAuthconn.Close();
         conn.Close();
+        connPass.Close();
       }
     }
 
@@ -101,9 +113,10 @@ namespace MySQL.ForExcel
       testConn.Server = WBconn.Host;
       testConn.Port = (uint)WBconn.Port;
       testConn.UserID = WBconn.UserName;
+      testConn.ConnectionProtocol = (WBconn.DriverType == MySqlWorkbenchConnectionType.Tcp) ? MySqlConnectionProtocol.Tcp : MySqlConnectionProtocol.NamedPipe;
       string testHostName, testUserName;
       testHostName = (WBconn.Host == string.Empty) ? "localhost" : WBconn.Host;
-      testUserName = (WBconn.UserName == string.Empty) ? "guest" : WBconn.UserName;
+      testUserName = WBconn.UserName;
 
       InfoDialog infoDialog = new InfoDialog(false, String.Format(Properties.Resources.ConnectionDataDisplayFailed, testHostName, testConn.Port, testUserName), string.Empty);
 
