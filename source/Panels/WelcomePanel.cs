@@ -73,18 +73,17 @@ namespace MySQL.ForExcel
         isSSH = true;
         string[] sshConnection = conn.HostIdentifier.Split('@');
         string dbHost = sshConnection[1].Split(':')[0].Trim();
-        string sshHost = sshConnection[2].Split(':')[0].Trim();
-        if (localValues.Contains(sshHost.ToLowerInvariant()) && localValues.Contains(dbHost.ToLowerInvariant()))
+        if (localValues.Contains(dbHost.ToLowerInvariant()))
           nodeIdx = 0;
         hostName = dbHost + " (SSH)";
       }
       else if (localValues.Contains(hostName.ToLowerInvariant()))
         nodeIdx = 0;
 
-      string s = String.Format("{0}|{1}", conn.Name, String.Format("User: {0}, Host: {1}", conn.UserName, hostName));
-      TreeNode node = connectionList.AddNode(connectionList.Nodes[nodeIdx], s);
+      string subtitle = String.Format("User: {0}, Host: {1}", conn.UserName, hostName);
+      MyTreeNode node = connectionList.AddNode(connectionList.Nodes[nodeIdx], conn.Name, subtitle);
       node.ImageIndex = (isSSH ? 1 : 0);
-      node.Name = String.Format("{0}_{1}", (isSSH ? "DISABLED" : "ENABLED"), conn.Name);
+      node.Enable = !isSSH;
       node.Tag = conn;
     }
 

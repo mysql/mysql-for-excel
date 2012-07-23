@@ -179,6 +179,8 @@ namespace MySQL.ForExcel
 
     public static string TruncateString(string text, float maxWidth, Graphics graphics, Font font)
     {
+      if (string.IsNullOrEmpty(text))
+        return text;
       const string ellipsis = "...";
       string newText = text;
       float sizeText = graphics.MeasureString(newText, font).Width;

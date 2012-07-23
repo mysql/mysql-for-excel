@@ -99,6 +99,7 @@ namespace MySQL.ForExcel
       }
       else
         DescriptionFont = new Font(Font.FontFamily, Font.Size - 1, FontStyle.Regular);
+      MarkTruncate(Nodes);
     }
 
     private void UpdateExtendedStyles()
@@ -154,76 +155,100 @@ namespace MySQL.ForExcel
       textBrush.Dispose();
     }
 
-    private void DrawChildNode(DrawTreeNodeEventArgs e)
+    protected override void OnResize(EventArgs e)
     {
-      bool disabled = e.Node.Name.StartsWith("DISABLED_");
-      Point pt = e.Bounds.Location;
-      string[] parts = e.Node.Text.Split('|');
-      SizeF titleStringSize = (parts != null && parts.Length > 0 ? e.Graphics.MeasureString(parts[0], Font) : SizeF.Empty);
-      SizeF descriptionStringSize = (parts != null && parts.Length > 1 ? e.Graphics.MeasureString(parts[1], DescriptionFont) : SizeF.Empty);
-      Image img = (NodeImages != null && NodeImages.Images.Count > 0 && e.Node.ImageIndex >= 0 && e.Node.ImageIndex < NodeImages.Images.Count ? NodeImages.Images[e.Node.ImageIndex] : null);
-      int textInitialY = (parts.Length == 1 ? ((e.Bounds.Height - Convert.ToInt32(titleStringSize.Height) + Convert.ToInt32(descriptionStringSize.Height)) / 2) : 0);
-      e.Node.ToolTipText = String.Empty;
-
-      // Paint background
-      SolidBrush bkBrush = new SolidBrush(e.Node.IsSelected ? SystemColors.MenuHighlight : SystemColors.Window);
-      e.Graphics.FillRectangle(bkBrush, e.Bounds);
-      
-      // Paint node Image
-      if (img != null)
-      {
-        pt.X += ImageHorizontalPixelsOffset;
-        int y = pt.Y + ((e.Bounds.Height - img.Height) / 2);
-        e.Graphics.DrawImage(img, pt.X, y, img.Width, img.Height);
-        pt.X += img.Width;
-      }
-
-      pt.X += ImageToTextHorizontalPixelsOffset;
-      pt.Y += textInitialY + TitleTextVerticalPixelsOffset;
-
-      // Draw the title if we have one
-      string truncatedText = null;
-      SolidBrush titleBrush  = null;
-      if (disabled)
-        titleBrush = new SolidBrush(Color.FromArgb(80, 0, 0, 0));
-      else
-        titleBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), ForeColor));
-      if (parts != null && parts.Length >= 1)
-      {  
-        SizeF stringSize = e.Graphics.MeasureString(parts[0], Font);
-        truncatedText = MiscUtilities.TruncateString(parts[0], e.Node.TreeView.ClientRectangle.Width - pt.X, e.Graphics, Font);
-        e.Graphics.DrawString(truncatedText, Font, titleBrush, pt.X, pt.Y);
-        pt.Y += (int)(stringSize.Height) + DescriptionTextVerticalPixelsOffset;
-        if (truncatedText != parts[0])
-          e.Node.ToolTipText = parts[0];
-      }
-
-      // Draw the description if there is one
-      SolidBrush descBrush = null;
-      if (disabled)
-        descBrush = new SolidBrush(Color.FromArgb(80, 0, 0, 0));
-      else
-        descBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionColorOpacity * 255), DescriptionColor));
-      if (parts != null && parts.Length >= 2)
-      {
-        truncatedText = MiscUtilities.TruncateString(parts[1], e.Node.TreeView.ClientRectangle.Width - pt.X, e.Graphics, DescriptionFont);
-        e.Graphics.DrawString(truncatedText, DescriptionFont, descBrush, pt.X, pt.Y);
-        if (truncatedText != parts[1])
-          e.Node.ToolTipText += (string.IsNullOrWhiteSpace(e.Node.ToolTipText) ? string.Empty : Environment.NewLine) + parts[1];
-      }
-
-      bkBrush.Dispose();
-      titleBrush.Dispose();
-      descBrush.Dispose();
+      base.OnResize(e);
+      MarkTruncate(Nodes);
     }
     
-    public TreeNode AddNode(TreeNode parent, string text)
+    private void DrawChildNode(DrawTreeNodeEventArgs e)
     {
-      TreeNode node = (parent != null ? parent.Nodes.Add(text) : Nodes.Add(text));
+      if (e.Node is MyTreeNode)
+      {
+        MyTreeNode myNode = e.Node as MyTreeNode;
+
+        bool disabled = !myNode.Enable;
+        Point pt = e.Bounds.Location;
+        SizeF titleStringSize = e.Graphics.MeasureString(myNode.Title, Font);
+        SizeF descriptionStringSize = e.Graphics.MeasureString(myNode.Subtitle, DescriptionFont);
+        Image img = (NodeImages != null && NodeImages.Images.Count > 0 && e.Node.ImageIndex >= 0 && e.Node.ImageIndex < NodeImages.Images.Count ? NodeImages.Images[e.Node.ImageIndex] : null);
+        int textInitialY = (myNode.Subtitle == null ? ((e.Bounds.Height - Convert.ToInt32(titleStringSize.Height) + Convert.ToInt32(descriptionStringSize.Height)) / 2) : 0);
+        myNode.ToolTipText = String.Empty;
+
+        // Paint background
+        SolidBrush bkBrush = new SolidBrush(myNode.IsSelected ? SystemColors.MenuHighlight : SystemColors.Window);
+        e.Graphics.FillRectangle(bkBrush, e.Bounds);
+
+        // Paint node Image
+        if (img != null)
+        {
+          pt.X += ImageHorizontalPixelsOffset;
+          int y = pt.Y + ((e.Bounds.Height - img.Height) / 2);
+          e.Graphics.DrawImage(img, pt.X, y, img.Width, img.Height);
+          pt.X += img.Width;
+        }
+
+        pt.X += ImageToTextHorizontalPixelsOffset;
+        pt.Y += textInitialY + TitleTextVerticalPixelsOffset;
+
+        // Draw the title if we have one
+        string truncatedText = null;
+        SolidBrush titleBrush = null;
+        if (disabled)
+          titleBrush = new SolidBrush(Color.FromArgb(80, 0, 0, 0));
+        else
+          titleBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), ForeColor));
+
+        // Draw the title
+        if (myNode.Title != null)
+        {
+          SizeF stringSize = e.Graphics.MeasureString(myNode.Title, Font);
+          truncatedText = myNode.GetTruncatedTitle(e.Node.TreeView.ClientRectangle.Width - pt.X, e.Graphics, Font);
+          e.Graphics.DrawString(truncatedText, Font, titleBrush, pt.X, pt.Y);
+          pt.Y += (int)(stringSize.Height) + DescriptionTextVerticalPixelsOffset;
+          if (truncatedText != myNode.Title)
+            e.Node.ToolTipText = myNode.Title;
+        }
+
+        // Draw the description if there is one
+        SolidBrush descBrush = null;
+        if (disabled)
+          descBrush = new SolidBrush(Color.FromArgb(80, 0, 0, 0));
+        else
+          descBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionColorOpacity * 255), DescriptionColor));
+        if (myNode.Subtitle != null)
+        {
+          truncatedText = myNode.GetTruncatedSubtitle(e.Node.TreeView.ClientRectangle.Width - pt.X, e.Graphics, DescriptionFont);
+          e.Graphics.DrawString(truncatedText, DescriptionFont, descBrush, pt.X, pt.Y);
+          if (truncatedText != myNode.Subtitle)
+            e.Node.ToolTipText += (string.IsNullOrWhiteSpace(e.Node.ToolTipText) ? string.Empty : Environment.NewLine) + myNode.Subtitle;
+        }
+
+        bkBrush.Dispose();
+        titleBrush.Dispose();
+        descBrush.Dispose();
+      }
+      else
+      {
+        if (!string.IsNullOrWhiteSpace(e.Node.Text))
+        {
+          //e.Graphics.DrawString(e.Node.Text, Font,)
+        }
+      }
+    }
+    
+    public MyTreeNode AddNode(TreeNode parent, string title, string subtitle = null)
+    {
+      MyTreeNode node = null;
       if (parent == null)
       {
+        node = Nodes[Nodes.Add(new MyTreeNode(title, subtitle))] as MyTreeNode;
         node.ForeColor = SystemColors.ControlText;
         node.BackColor = SystemColors.ControlLight;
+      }
+      else
+      {
+        node = parent.Nodes[parent.Nodes.Add(new MyTreeNode(title, subtitle))] as MyTreeNode;
       }
       SetNodeHeight(node, parent != null ? nodeHeightMultiple : (nodeHeightMultiple > 1 ? nodeHeightMultiple - 1 : 1));
       return node;
@@ -243,8 +268,80 @@ namespace MySQL.ForExcel
         Marshal.FreeHGlobal(ptr);
     }
 
+    private void MarkTruncate(TreeNodeCollection nodes)
+    {
+      foreach (TreeNode child in nodes)
+      {
+        MyTreeNode myChild = child as MyTreeNode;
+        if (myChild != null)
+        {
+          myChild.UpdateTruncatedTitle = true;
+          myChild.UpdateTruncatedSubtitle = true;
+        }
+        MarkTruncate(child.Nodes);
+      }
+    }
+
     [DllImport("user32.dll")]
     static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+  }
+
+  public class MyTreeNode : TreeNode
+  {
+    private string _title;
+    private string _subtitle;
+    private string _truncatedTitle;
+    private string _truncatedSubtitle;
+    public bool Enable { get; set; }
+    public string Title
+    {
+      get { return _title; }
+      set
+      {
+        _title = value;
+        UpdateTruncatedTitle = true;
+      }
+    }
+    public string Subtitle
+    {
+      get { return _subtitle; }
+      set
+      {
+        _subtitle = value;
+        UpdateTruncatedSubtitle = true;
+      }
+    }
+    public bool UpdateTruncatedTitle { get; set; }
+    public bool UpdateTruncatedSubtitle { get; set; }
+
+    public MyTreeNode():base() { }
+    public MyTreeNode(string title) : this(title, null) { }
+    public MyTreeNode(string title, string subtitle)
+      : base(title)
+    {
+      Title = title;
+      Subtitle = subtitle;
+    }
+
+    public string GetTruncatedTitle(float maxWidth, Graphics graphics, Font font)
+    {
+      if (UpdateTruncatedTitle)
+      {
+        _truncatedTitle = MiscUtilities.TruncateString(Title, maxWidth, graphics, font);
+        UpdateTruncatedTitle = false;
+      }
+      return _truncatedTitle;
+    }
+
+    public string GetTruncatedSubtitle(float maxWidth, Graphics graphics, Font font)
+    {
+      if (UpdateTruncatedSubtitle)
+      {
+        _truncatedSubtitle = MiscUtilities.TruncateString(Subtitle, maxWidth, graphics, font);
+        UpdateTruncatedSubtitle = false;
+      }
+      return _truncatedSubtitle;
+    }
   }
 
   // struct used to set node properties
