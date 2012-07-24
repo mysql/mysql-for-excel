@@ -82,15 +82,8 @@ namespace MySQL.ForExcel
 
     private void initializeFromTableGrid(string schemaName, string fromTableName, Excel.Range excelDataRange)
     {
-      fromMySQLDataTable = new MySQLDataTable(schemaName,
-                                              fromTableName,
-                                              excelDataRange,
-                                              false,
-                                              Properties.Settings.Default.AppendUseFormattedValues,
-                                              true,
-                                              false,
-                                              false,
-                                              false);
+      fromMySQLDataTable = new MySQLDataTable(schemaName, fromTableName, false, Properties.Settings.Default.AppendUseFormattedValues);
+      fromMySQLDataTable.SetData(excelDataRange, true, true, false, false, false);
       grdFromExcelData.DataSource = fromMySQLDataTable;
       foreach (DataGridViewColumn gridCol in grdFromExcelData.Columns)
       {
@@ -451,6 +444,7 @@ namespace MySQL.ForExcel
           return;
       }
 
+      this.Cursor = Cursors.WaitCursor;
       Exception exception;
       bool warningsFound = false;
       int appendCount = 0;
@@ -511,6 +505,7 @@ namespace MySQL.ForExcel
         operationSummary = String.Format("Excel data could not be appended to MySQL Table \"{0}\".", toMySQLDataTable.TableName);
         operationsType = InfoDialog.InfoType.Error;
       }
+      this.Cursor = Cursors.Default;
 
       InfoDialog infoDialog = new InfoDialog(operationsType, operationSummary, operationDetails.ToString());
       dr = infoDialog.ShowDialog();

@@ -37,16 +37,18 @@ namespace MySQL.ForExcel
     private DBObject importDBObject;
     private DataTable previewDataTable = null;
     private bool allColumnsSelected { get { return (grdPreviewData.SelectedColumns.Count == grdPreviewData.Columns.Count); } }
+    private bool workSheetInCompatibilityMode = false;
 
     public DataTable ImportDataTable = null;
     public bool ImportHeaders { get { return chkIncludeHeaders.Checked; } }
     public long TotalRowsCount { get; set; }
     private bool hasError = false;
 
-    public ImportTableViewForm(MySqlWorkbenchConnection wbConnection, DBObject importDBObject, string importToWorksheetName)
+    public ImportTableViewForm(MySqlWorkbenchConnection wbConnection, DBObject importDBObject, string importToWorksheetName, bool workSheetInCompatibilityMode)
     {
       this.wbConnection = wbConnection;
       this.importDBObject = importDBObject;
+      this.workSheetInCompatibilityMode = workSheetInCompatibilityMode;
 
       InitializeComponent();
       grdPreviewData.DataError += new DataGridViewDataErrorEventHandler(grdPreviewData_DataError);
@@ -79,6 +81,14 @@ namespace MySQL.ForExcel
        }           
     }
 
+    private void initCompatibilityWarning(bool show)
+    {
+      if (lblOptionsWarning.Text.Length == 0)
+        lblOptionsWarning.Text = Properties.Resources.WorkSheetInCompatibilityModeWarning;
+      lblOptionsWarning.Visible = show;
+      picOptionsWarning.Visible = show;
+    }
+
     private void fillPreviewGrid()
     {
       previewDataTable = MySQLDataUtilities.GetDataFromTableOrView(wbConnection, importDBObject, null, 0, 10);
@@ -90,8 +100,10 @@ namespace MySQL.ForExcel
         gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
       }
       grdPreviewData.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
-      numFromRow.Maximum = TotalRowsCount;
-      numRowsToReturn.Maximum = TotalRowsCount - numFromRow.Value + 1;
+      bool cappingAtMaxCompatRows = workSheetInCompatibilityMode && TotalRowsCount > UInt16.MaxValue;
+      initCompatibilityWarning(cappingAtMaxCompatRows);
+      numFromRow.Maximum = (cappingAtMaxCompatRows ? UInt16.MaxValue : TotalRowsCount);
+      numRowsToReturn.Maximum = numFromRow.Maximum - numFromRow.Value + 1;
     }
 
     private void btnImport_Click(object sender, EventArgs e)
@@ -113,8 +125,11 @@ namespace MySQL.ForExcel
       }
       try
       {
+        this.Cursor = Cursors.WaitCursor;
         if (chkLimitRows.Checked)
           ImportDataTable = MySQLDataUtilities.GetDataFromTableOrView(wbConnection, importDBObject, importColumns, Convert.ToInt32(numFromRow.Value) - 1, Convert.ToInt32(numRowsToReturn.Value));
+        else if (workSheetInCompatibilityMode)
+          ImportDataTable = MySQLDataUtilities.GetDataFromTableOrView(wbConnection, importDBObject, importColumns, 0, UInt16.MaxValue);
         else
           ImportDataTable = MySQLDataUtilities.GetDataFromTableOrView(wbConnection, importDBObject, importColumns);
       }
@@ -124,6 +139,7 @@ namespace MySQL.ForExcel
         dialog.ShowDialog();
         hasError = true;
       }
+      this.Cursor = Cursors.Default;
     }
 
     private void chkLimitRows_CheckedChanged(object sender, EventArgs e)
@@ -144,7 +160,8 @@ namespace MySQL.ForExcel
 
     private void numFromRow_ValueChanged(object sender, EventArgs e)
     {
-      numRowsToReturn.Maximum = TotalRowsCount - numFromRow.Value + 1;
+      bool cappingAtMaxCompatRows = workSheetInCompatibilityMode && TotalRowsCount > UInt16.MaxValue;
+      numRowsToReturn.Maximum = numFromRow.Maximum - numFromRow.Value + 1;
     }
 
     private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)

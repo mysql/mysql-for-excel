@@ -39,6 +39,8 @@ namespace MySQL.ForExcel
     private DBObject importDBObject;
     private PropertiesCollection procedureParamsProperties;
     private MySqlParameter[] mysqlParameters;
+    private bool workSheetInCompatibilityMode = false;
+
     public DataSet ImportDataSet = null;
     public bool ImportHeaders { get { return chkIncludeHeaders.Checked; } }
     public int SelectedResultSet { get; private set; }
@@ -64,10 +66,11 @@ namespace MySQL.ForExcel
       }
     }
 
-    public ImportProcedureForm(MySqlWorkbenchConnection wbConnection, DBObject importDBObject, string importToWorksheetName)
+    public ImportProcedureForm(MySqlWorkbenchConnection wbConnection, DBObject importDBObject, string importToWorksheetName, bool workSheetInCompatibilityMode)
     {
       this.wbConnection = wbConnection;
       this.importDBObject = importDBObject;
+      this.workSheetInCompatibilityMode = workSheetInCompatibilityMode;
 
       InitializeComponent();
 
@@ -80,6 +83,14 @@ namespace MySQL.ForExcel
       initializeMultipleResultSetsCombo();
       fillParameters();
       chkIncludeHeaders.Checked = true;
+    }
+
+    private void initCompatibilityWarning(bool show)
+    {
+      if (lblOptionsWarning.Text.Length == 0)
+        lblOptionsWarning.Text = Properties.Resources.WorkSheetInCompatibilityModeWarning;
+      lblOptionsWarning.Visible = show;
+      picOptionsWarning.Visible = show;
     }
 
     private void initializeMultipleResultSetsCombo()
@@ -233,6 +244,7 @@ namespace MySQL.ForExcel
 
     private void btnCall_Click(object sender, EventArgs e)
     {
+      this.Cursor = Cursors.WaitCursor;
       try
       {
         // Prepare parameters and execute routine and create OutAndReturnValues table
@@ -276,9 +288,12 @@ namespace MySQL.ForExcel
           SelectedResultSet = tabResultSets.SelectedIndex = 0;
           tabResultSets_SelectedIndexChanged(tabResultSets, EventArgs.Empty);
         }
+
+        this.Cursor = Cursors.Default;
       }
       catch (Exception ex)
       {
+        this.Cursor = Cursors.Default;
         InfoDialog dialog = new InfoDialog(false, ex.Message, null);
         dialog.ShowDialog();
       }
@@ -294,6 +309,8 @@ namespace MySQL.ForExcel
       grdResultSet.SelectionMode = DataGridViewSelectionMode.CellSelect;
       grdResultSet.DataSource = ImportDataSet;
       grdResultSet.DataMember = ImportDataSet.Tables[SelectedResultSet].TableName;
+      bool cappingAtMaxCompatRows = workSheetInCompatibilityMode && ImportDataSet.Tables[SelectedResultSet].Rows.Count > UInt16.MaxValue;
+      initCompatibilityWarning(cappingAtMaxCompatRows);
       foreach (DataGridViewColumn gridCol in grdResultSet.Columns)
       {
         gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;

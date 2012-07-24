@@ -27,6 +27,7 @@ using System.Text;
 using System.Windows.Forms;
 using MySQL.Utility;
 using MySQL.ForExcel.Properties;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel
 {
@@ -185,7 +186,7 @@ namespace MySQL.ForExcel
 
     private void importTableOrView(DBObject dbo)
     {
-      ImportTableViewForm importForm = new ImportTableViewForm(connection, dbo, (Parent as TaskPaneControl).ActiveWorksheet.Name);
+      ImportTableViewForm importForm = new ImportTableViewForm(connection, dbo, (Parent as TaskPaneControl).ActiveWorksheet.Name, (Parent as TaskPaneControl).ActiveWorkbook.Excel8CompatibilityMode);
       DialogResult dr = importForm.ShowDialog();
       if (dr == DialogResult.Cancel)
         return;
@@ -200,7 +201,7 @@ namespace MySQL.ForExcel
 
     private void importProcedure(DBObject dbo)
     {
-      ImportProcedureForm importProcedureForm = new ImportProcedureForm(connection, dbo, (Parent as TaskPaneControl).ActiveWorksheet.Name);
+      ImportProcedureForm importProcedureForm = new ImportProcedureForm(connection, dbo, (Parent as TaskPaneControl).ActiveWorksheet.Name, (Parent as TaskPaneControl).ActiveWorkbook.Excel8CompatibilityMode);
       DialogResult dr = importProcedureForm.ShowDialog();
       if (dr == DialogResult.Cancel)
         return;

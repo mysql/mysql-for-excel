@@ -35,5 +35,8 @@
     <Setting Name="StoredDataMappings" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Collections.Generic.List&lt;MySQLColumnMapping&gt;" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="ExportLimitPreviewRowsQuantity" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

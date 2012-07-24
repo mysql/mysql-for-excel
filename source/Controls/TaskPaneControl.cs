@@ -45,7 +45,11 @@ namespace MySQL.ForExcel
     public Hashtable TableNameEditFormsHashtable;
     public Excel.Worksheet ActiveWorksheet
     {
-      get { return ((Excel.Worksheet)excelApplication.ActiveSheet); }
+      get { return (Excel.Worksheet)excelApplication.ActiveSheet; }
+    }
+    public Excel.Workbook ActiveWorkbook
+    {
+      get { return (Excel.Workbook)excelApplication.ActiveWorkbook; }
     }
 
     public TaskPaneControl(Excel.Application app)
@@ -320,12 +324,16 @@ namespace MySQL.ForExcel
 
       if (toTableObject != null)
       {
+        this.Cursor = Cursors.WaitCursor;
         AppendDataForm appendDataForm = new AppendDataForm(connection, exportRange, toTableObject, ActiveWorksheet.Name);
+        this.Cursor = Cursors.Default;
         dr = appendDataForm.ShowDialog();
       }
       else
       {
+        this.Cursor = Cursors.WaitCursor;
         ExportDataForm exportForm = new ExportDataForm(connection, exportRange, ActiveWorksheet.Name);
+        this.Cursor = Cursors.Default;
         dr = exportForm.ShowDialog();
       }
       return dr == DialogResult.OK;
@@ -356,7 +364,7 @@ namespace MySQL.ForExcel
 
       // Attempt to Import Data unless the yser cancels the import operation
       string proposedWorksheetName = GetWorksheetNameAvoidingDuplicates(tableObject.Name);
-      ImportTableViewForm importForm = new ImportTableViewForm(connection, tableObject, proposedWorksheetName);
+      ImportTableViewForm importForm = new ImportTableViewForm(connection, tableObject, proposedWorksheetName, ActiveWorkbook.Excel8CompatibilityMode);
       DialogResult dr = importForm.ShowDialog();
       if (dr == DialogResult.Cancel)
         return false;

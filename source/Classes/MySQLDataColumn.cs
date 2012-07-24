@@ -240,6 +240,17 @@ namespace MySQL.ForExcel
       rowPos++;
     }
 
+    public MySQLDataColumn CloneSchema()
+    {
+      MySQLDataColumn clonedColumn = new MySQLDataColumn(this.ColumnName, this.MySQLDataType, this.AllowNull, this.PrimaryKey, null);
+      clonedColumn.DisplayName = this.displayName;
+      clonedColumn.Unsigned = Unsigned;
+      clonedColumn.AutoIncrement = AutoIncrement;
+      clonedColumn.UniqueKey = UniqueKey;
+      clonedColumn.ExcludeColumn = ExcludeColumn;
+      return clonedColumn;
+    }
+
     public bool CanBeOfMySQLDataType(string mySQLDataType)
     {
       bool result = true;

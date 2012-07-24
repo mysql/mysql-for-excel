@@ -861,5 +861,14 @@ namespace MySQL.ForExcel.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Excel WorkSheet is in Compatibility Mode which has a row limit of 65,535 rows..
+        /// </summary>
+        internal static string WorkSheetInCompatibilityModeWarning {
+            get {
+                return ResourceManager.GetString("WorkSheetInCompatibilityModeWarning", resourceCulture);
+            }
+        }
     }
 }

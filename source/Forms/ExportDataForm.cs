@@ -34,15 +34,18 @@ namespace MySQL.ForExcel
 {
   public partial class ExportDataForm : AutoStyleableBaseDialog
   {
-    private MySQLDataTable dataTable;
+    private MySQLDataTable previewDataTable;
+    private MySQLDataTable exportDataTable;
     private MySqlWorkbenchConnection wbConnection;
     private bool multiColumnPK = false;
     private bool isChanging = false;
+    private Excel.Range exportDataRange;
 
     public ExportDataForm(MySqlWorkbenchConnection wbConnection, Excel.Range exportDataRange, string exportingWorksheetName)
     {
       string proposedTableName = String.Empty;
       this.wbConnection = wbConnection;
+      this.exportDataRange = exportDataRange;
 
       InitializeComponent();
 
@@ -50,7 +53,8 @@ namespace MySQL.ForExcel
         proposedTableName = exportingWorksheetName.ToLower().Replace(' ', '_');
       Text = String.Format("Export Data - {0} [{1}])", exportingWorksheetName, exportDataRange.Address.Replace("$", String.Empty));
 
-      LoadDataAndCreateColumns(exportDataRange, wbConnection.Schema, proposedTableName);
+      LoadPreviewData(wbConnection.Schema, proposedTableName);
+      RecreateColumns();
       initializeDataTypeCombo();
 
       if (!String.IsNullOrEmpty(proposedTableName))
@@ -71,7 +75,7 @@ namespace MySQL.ForExcel
       cmbPrimaryKeyColumns.Items.Clear();
       if (selectedItem == "<Multiple Items>")
         cmbPrimaryKeyColumns.Items.Add("<Multiple Items>");
-      foreach (MySQLDataColumn mysqlCol in dataTable.Columns.OfType<MySQLDataColumn>().Skip(1))
+      foreach (MySQLDataColumn mysqlCol in previewDataTable.Columns.OfType<MySQLDataColumn>().Skip(1))
       {
         if (mysqlCol.ExcludeColumn)
           continue;
@@ -81,27 +85,28 @@ namespace MySQL.ForExcel
       cmbPrimaryKeyColumns.EndUpdate();
     }
 
-    private void LoadDataAndCreateColumns(Excel.Range exportDataRange, string schemaName, string proposedTableName)
+    private void LoadPreviewData(string schemaName, string proposedTableName)
     {
-      if (exportDataRange != null)
-      {
-        dataTable = new MySQLDataTable(schemaName,
-                                       proposedTableName,
-                                       exportDataRange,
-                                       true,
-                                       Settings.Default.ExportUseFormattedValues, 
-                                       Settings.Default.ExportDetectDatatype,
-                                       Settings.Default.ExportAddBufferToVarchar,
-                                       Settings.Default.ExportAutoIndexIntColumns, 
-                                       Settings.Default.ExportAutoAllowEmptyNonIndexColumns);
-        grdPreviewData.DataSource = dataTable;
-        columnBindingSource.DataSource = dataTable.Columns;
+      if (this.exportDataRange == null)
         return;
-      }
+      previewDataTable = new MySQLDataTable(schemaName, proposedTableName, true, Settings.Default.ExportUseFormattedValues);
+      int previewRowsQty = Math.Min(this.exportDataRange.Rows.Count, Settings.Default.ExportLimitPreviewRowsQuantity);
+      Excel.Range previewRange = this.exportDataRange.get_Resize(previewRowsQty, this.exportDataRange.Columns.Count);
+      previewDataTable.SetData(previewRange,
+                               true,
+                               Settings.Default.ExportDetectDatatype,
+                               Settings.Default.ExportAddBufferToVarchar,
+                               Settings.Default.ExportAutoIndexIntColumns,
+                               Settings.Default.ExportAutoAllowEmptyNonIndexColumns);
+      grdPreviewData.DataSource = previewDataTable;
+      columnBindingSource.DataSource = previewDataTable.Columns;
+    }
 
-      for (int colIdx = 0; colIdx < dataTable.Columns.Count; colIdx++)
+    private void RecreateColumns()
+    {
+      for (int colIdx = 0; colIdx < previewDataTable.Columns.Count; colIdx++)
       {
-        MySQLDataColumn mysqlCol = dataTable.GetColumnAtIndex(colIdx);
+        MySQLDataColumn mysqlCol = previewDataTable.GetColumnAtIndex(colIdx);
         DataGridViewColumn gridCol = grdPreviewData.Columns[colIdx];
         gridCol.HeaderText = mysqlCol.DisplayName;
         grdPreviewData.Columns[colIdx].SortMode = DataGridViewColumnSortMode.NotSortable;
@@ -112,8 +117,8 @@ namespace MySQL.ForExcel
 
     private void SetDefaultPrimaryKey()
     {
-      txtAddPrimaryKey.DataBindings.Add(new Binding("Text", dataTable.Columns[0], "DisplayName"));
-      if (dataTable.FirstColumnContainsIntegers)
+      txtAddPrimaryKey.DataBindings.Add(new Binding("Text", previewDataTable.Columns[0], "DisplayName"));
+      if (previewDataTable.FirstColumnContainsIntegers)
       {
         radUseExistingColumn.Checked = true;
         columnBindingSource.Position = 1;
@@ -184,7 +189,7 @@ namespace MySQL.ForExcel
       if (pkQty < 2 && cmbPrimaryKeyColumns.Items[0].ToString() == "<Multiple Items>")
       {
         cmbPrimaryKeyColumns.Items.RemoveAt(0);
-        var name = dataTable.Columns.Cast<MySQLDataColumn>().Skip(1).First(i => i.PrimaryKey == true);
+        var name = previewDataTable.Columns.Cast<MySQLDataColumn>().Skip(1).First(i => i.PrimaryKey == true);
         cmbPrimaryKeyColumns.SelectedItem = name.DisplayName;
       }
       else if (pkQty > 1 && cmbPrimaryKeyColumns.Items[0].ToString() != "<Multiple Items>")
@@ -260,17 +265,25 @@ namespace MySQL.ForExcel
     private void btnCopySQL_Click(object sender, EventArgs e)
     {
       StringBuilder queryString = new StringBuilder();
-      queryString.Append(dataTable.GetCreateSQL(true));
+      queryString.Append(exportDataTable.GetCreateSQL(true));
       queryString.AppendFormat(";{0}", Environment.NewLine);
-      queryString.Append(dataTable.GetInsertSQL(100, true, false));
-      queryString.Append(";");
+      queryString.Append(exportDataTable.GetInsertSQL(100, true, false));
       Clipboard.SetText(queryString.ToString());
     }
 
     private void btnExport_Click(object sender, EventArgs e)
     {
-      bool tableContainsDataToExport = dataTable.Rows.Count > (dataTable.FirstRowIsHeaders ? 1 : 0);
+      this.Cursor = Cursors.WaitCursor;
+      if (exportDataTable == null)
+      {
+        exportDataTable = previewDataTable.CloneSchema();
+        exportDataTable.SetData(this.exportDataRange, false, false, false, false, false);
+      }
+      else
+        exportDataTable.SyncSchema(previewDataTable);
+      this.Cursor = Cursors.Default;
 
+      bool tableContainsDataToExport = exportDataTable.Rows.Count > (exportDataTable.FirstRowIsHeaders ? 1 : 0);
       if (!tableContainsDataToExport)
       {
         WarningDialog wDiag = new WarningDialog(Properties.Resources.ExportDataNoDataToExportTitleWarning, Properties.Resources.ExportDataNoDataToExportDetailWarning);
@@ -278,14 +291,15 @@ namespace MySQL.ForExcel
           return;
       }
 
+      this.Cursor = Cursors.WaitCursor;
       Exception exception;
       DataTable warningsTable;
       bool warningsFound = false;
-      string operationSummary = String.Format("The MySQL Table \"{0}\"", dataTable.TableName);
+      string operationSummary = String.Format("The MySQL Table \"{0}\"", exportDataTable.TableName);
       StringBuilder operationDetails = new StringBuilder();
-      operationDetails.AppendFormat("Creating MySQL Table \"{0}\" with query...{1}{1}", dataTable.TableName, Environment.NewLine);
+      operationDetails.AppendFormat("Creating MySQL Table \"{0}\" with query...{1}{1}", exportDataTable.TableName, Environment.NewLine);
       string queryString = String.Empty;
-      warningsTable = dataTable.CreateTable(wbConnection, out exception, out queryString);
+      warningsTable = exportDataTable.CreateTable(wbConnection, out exception, out queryString);
       bool success = exception == null;
       operationDetails.Append(queryString);
       operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
@@ -321,9 +335,9 @@ namespace MySQL.ForExcel
       if (success && tableContainsDataToExport)
       {
         int insertedCount = 0;
-        warningsTable = dataTable.InsertDataWithManualQuery(wbConnection, false, out exception, out queryString, out insertedCount);
+        warningsTable = exportDataTable.InsertDataWithManualQuery(wbConnection, false, out exception, out queryString, out insertedCount);
         operationDetails.AppendFormat("{1}{1}Inserting Excel data in MySQL Table \"{0}\" with query...{1}{1}{2}{1}{1}",
-                                    dataTable.TableName,
+                                    exportDataTable.TableName,
                                     Environment.NewLine,
                                     queryString);
         success = exception == null;
@@ -358,6 +372,7 @@ namespace MySQL.ForExcel
           operationSummary += "with no data.";
         }
       }
+      this.Cursor = Cursors.Default;
 
       InfoDialog.InfoType operationsType = (success ? (warningsFound ? InfoDialog.InfoType.Warning : InfoDialog.InfoType.Success) : InfoDialog.InfoType.Error);
       InfoDialog infoDialog = new InfoDialog(operationsType, operationSummary, operationDetails.ToString());
@@ -381,8 +396,8 @@ namespace MySQL.ForExcel
     {
       int cmbIndex = cmbPrimaryKeyColumns.SelectedIndex;
       int grdIndex = columnBindingSource.Position;
-      dataTable.FirstRowIsHeaders = chkFirstRowHeaders.Checked;
-      LoadDataAndCreateColumns(null, null, null);
+      previewDataTable.FirstRowIsHeaders = chkFirstRowHeaders.Checked;
+      RecreateColumns();
       grdPreviewData.CurrentCell = null;
       grdPreviewData.Rows[0].Visible = !chkFirstRowHeaders.Checked;
       cmbPrimaryKeyColumns.SelectedIndex = cmbIndex;
@@ -397,7 +412,7 @@ namespace MySQL.ForExcel
     {
       timerTextChanged.Stop();
 
-      dataTable.TableName = txtTableNameInput.Text;
+      previewDataTable.TableName = txtTableNameInput.Text;
 
       string cleanTableName = txtTableNameInput.Text.ToLowerInvariant().Replace(" ", "_");
       bool tableExistsInSchema = MySQLDataUtilities.TableExistsInSchema(wbConnection, wbConnection.Schema, cleanTableName);
@@ -416,7 +431,7 @@ namespace MySQL.ForExcel
       }
       
       showValidationWarning("TableNameWarning", false, null);
-      dataTable.RefreshSelectQuery();
+      previewDataTable.RefreshSelectQuery();
       btnExport.Enabled = true;
     }
 
@@ -424,8 +439,8 @@ namespace MySQL.ForExcel
     {
       timerTextChanged.Stop();
       string name = txtTableNameInput.Text.Trim();
-      if (dataTable != null)
-        dataTable.TableName = name;
+      if (previewDataTable != null)
+        previewDataTable.TableName = name;
       txtAddPrimaryKey.Text = (name.Length > 0 ? name + "_id" : name);
       timerTextChanged.Start();
     }
@@ -447,7 +462,7 @@ namespace MySQL.ForExcel
       cmbPrimaryKeyColumns.SelectedIndex = -1;
       cmbPrimaryKeyColumns.Enabled = false;
       txtAddPrimaryKey.Enabled = true;
-      dataTable.UseFirstColumnAsPK = true;
+      previewDataTable.UseFirstColumnAsPK = true;
       isChanging = false;
       //EnableChecks(null);
     }
@@ -464,7 +479,7 @@ namespace MySQL.ForExcel
       cmbPrimaryKeyColumns.SelectedIndex = 0;
       columnBindingSource.ResetCurrentItem();
       txtAddPrimaryKey.Enabled = false;
-      dataTable.UseFirstColumnAsPK = false;
+      previewDataTable.UseFirstColumnAsPK = false;
       EnableChecks(null);
       isChanging = false;
     }
@@ -502,9 +517,9 @@ namespace MySQL.ForExcel
           cmbPrimaryKeyColumns.SelectedIndex = 0;
         cmbPrimaryKeyColumns.EndUpdate();
       }
-      for (int coldIdx = 1; coldIdx < dataTable.Columns.Count; coldIdx++)
+      for (int coldIdx = 1; coldIdx < previewDataTable.Columns.Count; coldIdx++)
       {
-        MySQLDataColumn col = dataTable.GetColumnAtIndex(coldIdx);
+        MySQLDataColumn col = previewDataTable.GetColumnAtIndex(coldIdx);
         col.PrimaryKey = (col.DisplayName == cmbPrimaryKeyColumns.Text);
         if (col.PrimaryKey)
         {
@@ -555,7 +570,7 @@ namespace MySQL.ForExcel
         return;
       currentCol.UniqueKey = chkUniqueIndex.Checked;
       DataGridViewColumn gridCol = grdPreviewData.SelectedColumns[0];
-      MySQLDataColumn column = dataTable.GetColumnAtIndex(gridCol.Index);
+      MySQLDataColumn column = previewDataTable.GetColumnAtIndex(gridCol.Index);
       bool good = true;
       try
       {
@@ -624,9 +639,9 @@ namespace MySQL.ForExcel
     {
       bool showWarning = false;
       string warningText = null;
-      for (int colIdx = 1; colIdx < dataTable.Columns.Count; colIdx++)
+      for (int colIdx = 1; colIdx < previewDataTable.Columns.Count; colIdx++)
       {
-        MySQLDataColumn col = dataTable.GetColumnAtIndex(colIdx);
+        MySQLDataColumn col = previewDataTable.GetColumnAtIndex(colIdx);
         showWarning = showWarning || col.DisplayName.ToLowerInvariant() == txtAddPrimaryKey.Text.ToLowerInvariant();
         if (showWarning)
         {
@@ -636,7 +651,7 @@ namespace MySQL.ForExcel
       }
       btnExport.Enabled = !showWarning;
       showValidationWarning("PrimaryKeyWarning", showWarning, Properties.Resources.PrimaryKeyColumnExistsWarning);
-      dataTable.GetColumnAtIndex(0).DisplayName = txtAddPrimaryKey.Text;
+      previewDataTable.GetColumnAtIndex(0).DisplayName = txtAddPrimaryKey.Text;
       grdPreviewData.Columns[0].HeaderText = txtAddPrimaryKey.Text;
       if (columnBindingSource.Position == 0)
         columnBindingSource.ResetCurrentItem();
@@ -662,7 +677,7 @@ namespace MySQL.ForExcel
     {
       if (!isChanging)
       {
-        int currentPKQty = dataTable.NumberOfPK;
+        int currentPKQty = previewDataTable.NumberOfPK;
         multiColumnPK = currentPKQty > 1;
         flagMultiColumnPrimaryKey(currentPKQty);
       }
@@ -780,7 +795,7 @@ namespace MySQL.ForExcel
       chkUniqueIndex.Enabled = !chkExcludeColumn.Checked;
       chkCreateIndex.Enabled = !(chkExcludeColumn.Checked || chkUniqueIndex.Checked || chkPrimaryKey.Checked);
       chkAllowEmpty.Enabled = !(chkExcludeColumn.Checked || chkPrimaryKey.Checked);
-      radUseExistingColumn.Enabled = !(dataTable.Columns.Cast<MySQLDataColumn>().Skip(1).All(i => i.ExcludeColumn));
+      radUseExistingColumn.Enabled = !(previewDataTable.Columns.Cast<MySQLDataColumn>().Skip(1).All(i => i.ExcludeColumn));
       cmbPrimaryKeyColumns.Enabled = radUseExistingColumn.Enabled && radUseExistingColumn.Checked;
       cmbDatatype.Enabled = !column.AutoPK;
 

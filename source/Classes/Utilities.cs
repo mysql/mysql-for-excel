@@ -303,8 +303,21 @@ namespace MySQL.ForExcel
 
       string sql = String.Format("SELECT COUNT(*) FROM `{0}`.`{1}`", connection.Schema, dbo.Name);
       object objCount = MySqlHelper.ExecuteScalar(GetConnectionString(connection), sql);
-      long retCount = (objCount != null ? (long)objCount : 0);
-      return retCount;
+      return (objCount != null ? (long)objCount : 0);
+    }
+
+    public static ulong GetMySQLServerMaxAllowedPacket(MySqlWorkbenchConnection connection)
+    {
+      string sql = "SELECT @@max_allowed_packet";
+      object objCount = MySqlHelper.ExecuteScalar(GetConnectionString(connection), sql);
+      return (objCount != null ? (ulong)objCount : 0);
+    }
+
+    public static ulong GetMySQLServerMaxAllowedPacket(MySqlConnection connection)
+    {
+      string sql = "SELECT @@max_allowed_packet";
+      object objCount = MySqlHelper.ExecuteScalar(connection, sql);
+      return (objCount != null ? (ulong)objCount : 0);
     }
 
     public static void AddExtendedProperties(ref DataTable dt, string queryString, bool importedHeaders, string tableName)

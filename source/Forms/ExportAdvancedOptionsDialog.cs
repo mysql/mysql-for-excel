@@ -34,6 +34,7 @@ namespace MySQL.ForExcel
     {
       InitializeComponent();
 
+      numPreviewRowsQuantity.Value = Math.Min(numPreviewRowsQuantity.Maximum, Properties.Settings.Default.ExportLimitPreviewRowsQuantity);
       chkDetectDatatype.Checked = Properties.Settings.Default.ExportDetectDatatype;
       chkAddBufferToVarchar.Checked = Properties.Settings.Default.ExportAddBufferToVarchar;
       chkAutoIndexIntColumns.Checked = Properties.Settings.Default.ExportAutoIndexIntColumns;
@@ -46,6 +47,7 @@ namespace MySQL.ForExcel
 
     private void btnAccept_Click(object sender, EventArgs e)
     {
+      Properties.Settings.Default.ExportLimitPreviewRowsQuantity = (int)numPreviewRowsQuantity.Value;
       Properties.Settings.Default.ExportDetectDatatype = chkDetectDatatype.Checked;
       Properties.Settings.Default.ExportAddBufferToVarchar = chkAddBufferToVarchar.Checked;
       Properties.Settings.Default.ExportAutoIndexIntColumns = chkAutoIndexIntColumns.Checked;

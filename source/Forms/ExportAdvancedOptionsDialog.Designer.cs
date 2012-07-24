@@ -59,13 +59,20 @@ namespace MySQL.ForExcel
       this.chkDetectDatatype = new System.Windows.Forms.CheckBox();
       this.lblColumnDatatypeOptions = new System.Windows.Forms.Label();
       this.lblAdvancedExportOptions = new System.Windows.Forms.Label();
+      this.lblPreviewRowsQuantity1 = new System.Windows.Forms.Label();
+      this.lblPreviewRowsQuantity2 = new System.Windows.Forms.Label();
+      this.numPreviewRowsQuantity = new System.Windows.Forms.NumericUpDown();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.numPreviewRowsQuantity)).BeginInit();
       this.SuspendLayout();
       // 
       // contentAreaPanel
       // 
       this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
+      this.contentAreaPanel.Controls.Add(this.numPreviewRowsQuantity);
+      this.contentAreaPanel.Controls.Add(this.lblPreviewRowsQuantity2);
+      this.contentAreaPanel.Controls.Add(this.lblPreviewRowsQuantity1);
       this.contentAreaPanel.Controls.Add(this.lblAdvancedExportOptions);
       this.contentAreaPanel.Controls.Add(this.chkShowCopySQLButton);
       this.contentAreaPanel.Controls.Add(this.lblOtherOptions);
@@ -76,13 +83,13 @@ namespace MySQL.ForExcel
       this.contentAreaPanel.Controls.Add(this.chkAddBufferToVarchar);
       this.contentAreaPanel.Controls.Add(this.chkDetectDatatype);
       this.contentAreaPanel.Controls.Add(this.lblColumnDatatypeOptions);
-      this.contentAreaPanel.Size = new System.Drawing.Size(544, 269);
+      this.contentAreaPanel.Size = new System.Drawing.Size(544, 290);
       // 
       // commandAreaPanel
       // 
       this.commandAreaPanel.Controls.Add(this.btnAccept);
       this.commandAreaPanel.Controls.Add(this.btnCancel);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 269);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 290);
       this.commandAreaPanel.Size = new System.Drawing.Size(544, 45);
       // 
       // btnAccept
@@ -113,10 +120,10 @@ namespace MySQL.ForExcel
       this.chkShowCopySQLButton.AutoSize = true;
       this.chkShowCopySQLButton.BackColor = System.Drawing.Color.Transparent;
       this.chkShowCopySQLButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.chkShowCopySQLButton.Location = new System.Drawing.Point(53, 294);
+      this.chkShowCopySQLButton.Location = new System.Drawing.Point(53, 319);
       this.chkShowCopySQLButton.Name = "chkShowCopySQLButton";
       this.chkShowCopySQLButton.Size = new System.Drawing.Size(152, 19);
-      this.chkShowCopySQLButton.TabIndex = 9;
+      this.chkShowCopySQLButton.TabIndex = 12;
       this.chkShowCopySQLButton.Text = "Show Copy SQL Button";
       this.chkShowCopySQLButton.UseVisualStyleBackColor = false;
       this.chkShowCopySQLButton.Visible = false;
@@ -127,10 +134,10 @@ namespace MySQL.ForExcel
       this.lblOtherOptions.BackColor = System.Drawing.Color.Transparent;
       this.lblOtherOptions.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblOtherOptions.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblOtherOptions.Location = new System.Drawing.Point(24, 265);
+      this.lblOtherOptions.Location = new System.Drawing.Point(24, 290);
       this.lblOtherOptions.Name = "lblOtherOptions";
       this.lblOtherOptions.Size = new System.Drawing.Size(91, 17);
-      this.lblOtherOptions.TabIndex = 8;
+      this.lblOtherOptions.TabIndex = 11;
       this.lblOtherOptions.Text = "Other Options";
       this.lblOtherOptions.Visible = false;
       // 
@@ -139,10 +146,10 @@ namespace MySQL.ForExcel
       this.chkUseFormattedValues.AutoSize = true;
       this.chkUseFormattedValues.BackColor = System.Drawing.Color.Transparent;
       this.chkUseFormattedValues.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.chkUseFormattedValues.Location = new System.Drawing.Point(53, 228);
+      this.chkUseFormattedValues.Location = new System.Drawing.Point(53, 253);
       this.chkUseFormattedValues.Name = "chkUseFormattedValues";
       this.chkUseFormattedValues.Size = new System.Drawing.Size(141, 19);
-      this.chkUseFormattedValues.TabIndex = 7;
+      this.chkUseFormattedValues.TabIndex = 10;
       this.chkUseFormattedValues.Text = "Use formatted values";
       this.chkUseFormattedValues.UseVisualStyleBackColor = false;
       // 
@@ -152,10 +159,10 @@ namespace MySQL.ForExcel
       this.lblFieldDataOptions.BackColor = System.Drawing.Color.Transparent;
       this.lblFieldDataOptions.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblFieldDataOptions.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblFieldDataOptions.Location = new System.Drawing.Point(24, 199);
+      this.lblFieldDataOptions.Location = new System.Drawing.Point(24, 224);
       this.lblFieldDataOptions.Name = "lblFieldDataOptions";
       this.lblFieldDataOptions.Size = new System.Drawing.Size(116, 17);
-      this.lblFieldDataOptions.TabIndex = 6;
+      this.lblFieldDataOptions.TabIndex = 9;
       this.lblFieldDataOptions.Text = "Field Data Options";
       // 
       // chkAutoAllowEmptyNonIndexColumns
@@ -163,10 +170,10 @@ namespace MySQL.ForExcel
       this.chkAutoAllowEmptyNonIndexColumns.AutoSize = true;
       this.chkAutoAllowEmptyNonIndexColumns.BackColor = System.Drawing.Color.Transparent;
       this.chkAutoAllowEmptyNonIndexColumns.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.chkAutoAllowEmptyNonIndexColumns.Location = new System.Drawing.Point(53, 160);
+      this.chkAutoAllowEmptyNonIndexColumns.Location = new System.Drawing.Point(53, 185);
       this.chkAutoAllowEmptyNonIndexColumns.Name = "chkAutoAllowEmptyNonIndexColumns";
       this.chkAutoAllowEmptyNonIndexColumns.Size = new System.Drawing.Size(436, 19);
-      this.chkAutoAllowEmptyNonIndexColumns.TabIndex = 5;
+      this.chkAutoAllowEmptyNonIndexColumns.TabIndex = 8;
       this.chkAutoAllowEmptyNonIndexColumns.Text = "Automatically check the Allow Empty checkbox for columns without an index";
       this.chkAutoAllowEmptyNonIndexColumns.UseVisualStyleBackColor = false;
       // 
@@ -175,10 +182,10 @@ namespace MySQL.ForExcel
       this.chkAutoIndexIntColumns.AutoSize = true;
       this.chkAutoIndexIntColumns.BackColor = System.Drawing.Color.Transparent;
       this.chkAutoIndexIntColumns.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.chkAutoIndexIntColumns.Location = new System.Drawing.Point(53, 135);
+      this.chkAutoIndexIntColumns.Location = new System.Drawing.Point(53, 160);
       this.chkAutoIndexIntColumns.Name = "chkAutoIndexIntColumns";
       this.chkAutoIndexIntColumns.Size = new System.Drawing.Size(349, 19);
-      this.chkAutoIndexIntColumns.TabIndex = 4;
+      this.chkAutoIndexIntColumns.TabIndex = 7;
       this.chkAutoIndexIntColumns.Text = "Automatically check the Index checkbox for Integer columns";
       this.chkAutoIndexIntColumns.UseVisualStyleBackColor = false;
       // 
@@ -187,10 +194,10 @@ namespace MySQL.ForExcel
       this.chkAddBufferToVarchar.AutoSize = true;
       this.chkAddBufferToVarchar.BackColor = System.Drawing.Color.Transparent;
       this.chkAddBufferToVarchar.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.chkAddBufferToVarchar.Location = new System.Drawing.Point(73, 110);
+      this.chkAddBufferToVarchar.Location = new System.Drawing.Point(73, 135);
       this.chkAddBufferToVarchar.Name = "chkAddBufferToVarchar";
       this.chkAddBufferToVarchar.Size = new System.Drawing.Size(431, 19);
-      this.chkAddBufferToVarchar.TabIndex = 3;
+      this.chkAddBufferToVarchar.TabIndex = 6;
       this.chkAddBufferToVarchar.Text = "Add additional buffer to VARCHAR length (round up to 12, 25, 45, 125, 255)";
       this.chkAddBufferToVarchar.UseVisualStyleBackColor = false;
       // 
@@ -199,10 +206,10 @@ namespace MySQL.ForExcel
       this.chkDetectDatatype.AutoSize = true;
       this.chkDetectDatatype.BackColor = System.Drawing.Color.Transparent;
       this.chkDetectDatatype.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.chkDetectDatatype.Location = new System.Drawing.Point(53, 85);
+      this.chkDetectDatatype.Location = new System.Drawing.Point(53, 110);
       this.chkDetectDatatype.Name = "chkDetectDatatype";
       this.chkDetectDatatype.Size = new System.Drawing.Size(418, 19);
-      this.chkDetectDatatype.TabIndex = 2;
+      this.chkDetectDatatype.TabIndex = 5;
       this.chkDetectDatatype.Text = "Analyze and try to detect correct datatype based on column field contents";
       this.chkDetectDatatype.UseVisualStyleBackColor = false;
       this.chkDetectDatatype.CheckedChanged += new System.EventHandler(this.chkDetectDatatype_CheckedChanged);
@@ -230,11 +237,54 @@ namespace MySQL.ForExcel
       this.lblAdvancedExportOptions.TabIndex = 0;
       this.lblAdvancedExportOptions.Text = "Advanced Export Options";
       // 
+      // lblPreviewRowsQuantity1
+      // 
+      this.lblPreviewRowsQuantity1.AutoSize = true;
+      this.lblPreviewRowsQuantity1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblPreviewRowsQuantity1.Location = new System.Drawing.Point(50, 85);
+      this.lblPreviewRowsQuantity1.Name = "lblPreviewRowsQuantity1";
+      this.lblPreviewRowsQuantity1.Size = new System.Drawing.Size(71, 15);
+      this.lblPreviewRowsQuantity1.TabIndex = 2;
+      this.lblPreviewRowsQuantity1.Text = "Use the first";
+      // 
+      // lblPreviewRowsQuantity2
+      // 
+      this.lblPreviewRowsQuantity2.AutoSize = true;
+      this.lblPreviewRowsQuantity2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblPreviewRowsQuantity2.Location = new System.Drawing.Point(185, 85);
+      this.lblPreviewRowsQuantity2.Name = "lblPreviewRowsQuantity2";
+      this.lblPreviewRowsQuantity2.Size = new System.Drawing.Size(285, 15);
+      this.lblPreviewRowsQuantity2.TabIndex = 4;
+      this.lblPreviewRowsQuantity2.Text = "Excel data rows to preview and calculate datatypes.";
+      // 
+      // numPreviewRowsQuantity
+      // 
+      this.numPreviewRowsQuantity.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.numPreviewRowsQuantity.Location = new System.Drawing.Point(127, 83);
+      this.numPreviewRowsQuantity.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+      this.numPreviewRowsQuantity.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+      this.numPreviewRowsQuantity.Name = "numPreviewRowsQuantity";
+      this.numPreviewRowsQuantity.Size = new System.Drawing.Size(52, 21);
+      this.numPreviewRowsQuantity.TabIndex = 3;
+      this.numPreviewRowsQuantity.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+      // 
       // ExportAdvancedOptionsDialog
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.btnCancel;
-      this.ClientSize = new System.Drawing.Size(544, 316);
+      this.ClientSize = new System.Drawing.Size(544, 337);
       this.CommandAreaHeight = 45;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
       this.Name = "ExportAdvancedOptionsDialog";
@@ -242,6 +292,7 @@ namespace MySQL.ForExcel
       this.contentAreaPanel.ResumeLayout(false);
       this.contentAreaPanel.PerformLayout();
       this.commandAreaPanel.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.numPreviewRowsQuantity)).EndInit();
       this.ResumeLayout(false);
 
     }
@@ -260,5 +311,8 @@ namespace MySQL.ForExcel
     private System.Windows.Forms.CheckBox chkDetectDatatype;
     private System.Windows.Forms.Label lblColumnDatatypeOptions;
     private System.Windows.Forms.Label lblAdvancedExportOptions;
+    private System.Windows.Forms.NumericUpDown numPreviewRowsQuantity;
+    private System.Windows.Forms.Label lblPreviewRowsQuantity2;
+    private System.Windows.Forms.Label lblPreviewRowsQuantity1;
   }
 }

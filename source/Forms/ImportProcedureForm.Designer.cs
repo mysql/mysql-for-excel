@@ -66,17 +66,22 @@ namespace MySQL.ForExcel
       this.lblImportData = new System.Windows.Forms.Label();
       this.tabResultSets = new System.Windows.Forms.TabControl();
       this.grdResultSet = new MySQL.ForExcel.PreviewDataGridView();
+      this.lblOptionsWarning = new System.Windows.Forms.Label();
+      this.picOptionsWarning = new System.Windows.Forms.PictureBox();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.picFrom)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.grdResultSet)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.picOptionsWarning)).BeginInit();
       this.SuspendLayout();
       // 
       // contentAreaPanel
       // 
       this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
+      this.contentAreaPanel.Controls.Add(this.lblOptionsWarning);
       this.contentAreaPanel.Controls.Add(this.tabResultSets);
+      this.contentAreaPanel.Controls.Add(this.picOptionsWarning);
       this.contentAreaPanel.Controls.Add(this.cmbImportResultsets);
       this.contentAreaPanel.Controls.Add(this.lblImportResultsets);
       this.contentAreaPanel.Controls.Add(this.lblImportData);
@@ -316,6 +321,32 @@ namespace MySQL.ForExcel
       this.grdResultSet.Size = new System.Drawing.Size(676, 238);
       this.grdResultSet.TabIndex = 9;
       // 
+      // lblOptionsWarning
+      // 
+      this.lblOptionsWarning.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.lblOptionsWarning.AutoSize = true;
+      this.lblOptionsWarning.BackColor = System.Drawing.SystemColors.Window;
+      this.lblOptionsWarning.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblOptionsWarning.ForeColor = System.Drawing.Color.Red;
+      this.lblOptionsWarning.Location = new System.Drawing.Point(104, 518);
+      this.lblOptionsWarning.Name = "lblOptionsWarning";
+      this.lblOptionsWarning.Size = new System.Drawing.Size(76, 12);
+      this.lblOptionsWarning.TabIndex = 25;
+      this.lblOptionsWarning.Text = "Warning Message";
+      this.lblOptionsWarning.Visible = false;
+      // 
+      // picOptionsWarning
+      // 
+      this.picOptionsWarning.BackColor = System.Drawing.SystemColors.Window;
+      this.picOptionsWarning.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
+      this.picOptionsWarning.Location = new System.Drawing.Point(82, 513);
+      this.picOptionsWarning.Name = "picOptionsWarning";
+      this.picOptionsWarning.Size = new System.Drawing.Size(20, 20);
+      this.picOptionsWarning.TabIndex = 26;
+      this.picOptionsWarning.TabStop = false;
+      this.picOptionsWarning.Visible = false;
+      // 
       // ImportProcedureForm
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -333,6 +364,7 @@ namespace MySQL.ForExcel
       ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.picFrom)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.grdResultSet)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.picOptionsWarning)).EndInit();
       this.ResumeLayout(false);
 
     }
@@ -356,5 +388,7 @@ namespace MySQL.ForExcel
     private System.Windows.Forms.Label lblImportData;
     private System.Windows.Forms.TabControl tabResultSets;
     private PreviewDataGridView grdResultSet;
+    private System.Windows.Forms.Label lblOptionsWarning;
+    private System.Windows.Forms.PictureBox picOptionsWarning;
   }
 }

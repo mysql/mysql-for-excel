@@ -30,6 +30,7 @@ namespace MySQL.ForExcel
 {
   public class MySQLDataTable : DataTable
   {
+    private ulong mysqlMaxAllowedPacket = 0;
     private bool firstRowIsHeaders;
     private bool useFirstColumnAsPK;
 
@@ -93,13 +94,12 @@ namespace MySQL.ForExcel
     }
 
     // Constructor used for Export Data
-    public MySQLDataTable(string schemaName, string proposedTableName, Excel.Range exportDataRange, bool addPrimaryKeyCol, bool useFormattedValues, bool detectDatatype, bool addBufferToVarchar, bool autoIndexIntColumns, bool autoAllowEmptyNonIndexColumns)
+    public MySQLDataTable(string schemaName, string proposedTableName, bool addPrimaryKeyCol, bool useFormattedValues)
       : this(schemaName, proposedTableName)
     {
       AddPrimaryKeyColumn = addPrimaryKeyCol;
       RemoveEmptyColumns = true;
       IsFormatted = useFormattedValues;
-      SetData(exportDataRange, detectDatatype, addBufferToVarchar, autoIndexIntColumns, autoAllowEmptyNonIndexColumns);
     }
 
     // Constructor used for Append Data, fetching Schema Information for columns
@@ -131,6 +131,7 @@ namespace MySQL.ForExcel
             Columns.Add(column);
           }
       }
+      mysqlMaxAllowedPacket = MySQLDataUtilities.GetMySQLServerMaxAllowedPacket(wbConnection);
     }
 
     // Constructor used for Edit Data where we copy the contents of a table imported to Excel for edition
@@ -217,9 +218,10 @@ namespace MySQL.ForExcel
       }
     }
 
-    public void SetData(Excel.Range dataRange, bool detectTypes, bool addBufferToVarchar, bool createIndexForIntColumns, bool allowEmptyNonIdxCols)
+    public void SetData(Excel.Range dataRange, bool recreateColumnsFromData, bool detectTypes, bool addBufferToVarchar, bool createIndexForIntColumns, bool allowEmptyNonIdxCols)
     {
       object[,] data;
+      Clear();
 
       // we have to treat a single cell specially.  It doesn't come in as an array but as a single value
       if (dataRange.Count == 1)
@@ -251,8 +253,12 @@ namespace MySQL.ForExcel
         columnsHaveAnyDataList.Add(colHasAnyData);
       }
 
-      if (Columns.Count == 0)
+      if (recreateColumnsFromData || Columns.Count == 0)
+      {
+        if (Columns.Count > 0)
+          Columns.Clear();
         CreateColumns(numCols);
+      }
 
       int pkRowValueAdjust = 0;
       for (int row = 1; row <= numRows; row++)
@@ -380,6 +386,39 @@ namespace MySQL.ForExcel
 
         col.MySQLDataType = (firstRowIsHeaders ? col.RowsFrom2ndDataType : col.RowsFrom1stDataType);
         col.CreateIndex = (createIndexForIntColumns && col.MySQLDataType == "Integer");
+      }
+    }
+
+    public MySQLDataTable CloneSchema()
+    {
+      MySQLDataTable clonedTable = new MySQLDataTable(this.SchemaName, this.TableName, this.AddPrimaryKeyColumn, this.IsFormatted);
+
+      foreach (MySQLDataColumn column in Columns)
+      {
+        MySQLDataColumn clonedColumn = column.CloneSchema();
+        clonedTable.Columns.Add(clonedColumn);
+      }
+
+      return clonedTable;
+    }
+
+    public void SyncSchema(MySQLDataTable syncFromTable)
+    {
+      if (syncFromTable.Columns.Count != Columns.Count)
+        return;
+
+      for (int colIdx = 0; colIdx < Columns.Count; colIdx++)
+      {
+        MySQLDataColumn thisColumn = Columns[colIdx] as MySQLDataColumn;
+        MySQLDataColumn syncFromColumn = syncFromTable.Columns[colIdx] as MySQLDataColumn;
+
+        thisColumn.DisplayName = syncFromColumn.DisplayName;
+        thisColumn.MySQLDataType = syncFromColumn.MySQLDataType;
+        thisColumn.PrimaryKey = syncFromColumn.PrimaryKey;
+        thisColumn.AllowNull = syncFromColumn.AllowNull;
+        thisColumn.UniqueKey = syncFromColumn.UniqueKey;
+        thisColumn.CreateIndex = syncFromColumn.CreateIndex;
+        thisColumn.ExcludeColumn = syncFromColumn.ExcludeColumn;
       }
     }
 
@@ -520,12 +559,21 @@ namespace MySQL.ForExcel
       return (warningsDS != null && warningsDS.Tables.Count > 0 ? warningsDS.Tables[0] : null);
     }
 
-    public string GetInsertSQL(int limit, bool formatNewLinesAndTabs, bool newRowsOnly)
+    public string GetInsertSQL(int startRow, int limit, bool formatNewLinesAndTabs, bool newRowsOnly, out int nextRow)
     {
       int colsCount = Columns.Count;
-      if (Rows.Count - (firstRowIsHeaders ? 1 : 0) < 1)
+      int rowsCount = Rows.Count - (!newRowsOnly && firstRowIsHeaders ? 1 : 0);
+      ulong maxByteCount = (mysqlMaxAllowedPacket > 0 ? mysqlMaxAllowedPacket - 10 : 0);
+
+      nextRow = -1;
+      if (startRow < 0)
+        startRow = 0;
+      if (!newRowsOnly && firstRowIsHeaders && startRow == 0)
+        startRow++;
+      if (!newRowsOnly && startRow >= rowsCount)
         return null;
 
+      ulong queryStringByteCount = 0;
       StringBuilder queryString = new StringBuilder();
       string nl = (formatNewLinesAndTabs ? Environment.NewLine : " ");
       int rowIdx = 0;
@@ -558,21 +606,34 @@ namespace MySQL.ForExcel
       {
         DataTable changesTable = GetChanges(DataRowState.Added);
         valueRows = (changesTable != null ? changesTable.Rows : null);
+        rowsCount = valueRows.Count;
       }
       else
         valueRows = Rows;
 
       if (valueRows != null)
       {
+        int absRowIdx = 0;
         string valueToDB = String.Empty;
-        for (rowIdx = 0; rowIdx < valueRows.Count; rowIdx++)
+        StringBuilder singleRowValuesBuilder = new StringBuilder();
+        string singleRowValuesString = String.Empty;
+        if (maxByteCount > 0)
+          queryStringByteCount = (ulong)ASCIIEncoding.ASCII.GetByteCount(queryString.ToString());
+
+        for (rowIdx = startRow; rowIdx < rowsCount; rowIdx++)
         {
-          DataRow dr = valueRows[rowIdx];
-          if (firstRowIsHeaders && rowIdx == 0)
-            continue;
-          if (limit > 0 && rowIdx >= limit)
+          if (limit > 0 && absRowIdx > limit)
+          {
+            if (rowIdx < rowsCount)
+              nextRow = rowIdx;
             break;
-          queryString.AppendFormat("{0}(", rowsSeparator);
+          }
+          else
+            absRowIdx++;
+          DataRow dr = valueRows[rowIdx];
+          singleRowValuesBuilder.Clear();
+          singleRowValuesString = String.Empty;
+          singleRowValuesBuilder.AppendFormat("{0}(", rowsSeparator);
           colsSeparator = String.Empty;
           foreach (string insertingColName in insertColumnNames)
           {
@@ -582,25 +643,42 @@ namespace MySQL.ForExcel
             if (insertingValueIsNull)
               valueToDB = @"null";
             else
-            {
-              if (insertingValue.Equals(DateTime.MinValue))
-                valueToDB = "0000-00-00 00:00:00";
-              else
-                valueToDB = insertingValue.ToString();
-            }
-            queryString.AppendFormat("{0}{1}{2}{1}",
-                                     colsSeparator,
-                                     (column.ColumnsRequireQuotes && !insertingValueIsNull ? "'" : String.Empty),
-                                     valueToDB);
+              valueToDB = (insertingValue.Equals(DateTime.MinValue) ? "0000-00-00 00:00:00" : insertingValue.ToString());
+            singleRowValuesBuilder.AppendFormat("{0}{1}{2}{1}",
+                                                colsSeparator,
+                                                (column.ColumnsRequireQuotes && !insertingValueIsNull ? "'" : String.Empty),
+                                                valueToDB);
             colsSeparator = ",";
           }
-          queryString.Append(")");
+          singleRowValuesBuilder.Append(")");
+
+          singleRowValuesString = singleRowValuesBuilder.ToString();
+          if (maxByteCount > 0)
+          {
+            ulong singleValueRowQueryByteCount = (ulong)ASCIIEncoding.ASCII.GetByteCount(singleRowValuesString);
+            if (queryStringByteCount + singleValueRowQueryByteCount > maxByteCount)
+            {
+              nextRow = rowIdx;
+              break;
+            }
+            queryStringByteCount += singleValueRowQueryByteCount;
+          }
+
+          queryString.Append(singleRowValuesString);
           if (rowsSeparator.Length == 0)
             rowsSeparator = "," + nl;
         }
+        if (nextRow >= 0)
+          queryString.AppendFormat(";{0}", nl);
       }
 
       return queryString.ToString();
+    }
+
+    public string GetInsertSQL(int limit, bool formatNewLinesAndTabs, bool newRowsOnly)
+    {
+      int nextRow = -1;
+      return GetInsertSQL(0, limit, formatNewLinesAndTabs, newRowsOnly, out nextRow);
     }
 
     public DataTable InsertDataWithManualQuery(MySqlWorkbenchConnection wbConnection, bool newRowsOnly, out Exception exception, out string sqlQuery, out int insertedRows)
@@ -608,27 +686,43 @@ namespace MySQL.ForExcel
       DataSet warningsDS = null;
       insertedRows = 0;
       exception = null;
-      sqlQuery = GetInsertSQL(-1, true, newRowsOnly);
+      MySqlTransaction transaction = null;
+      string chunkQuery = sqlQuery = String.Empty;
 
-      try
+      string connectionString = MySQLDataUtilities.GetConnectionString(wbConnection);
+      using (MySqlConnection conn = new MySqlConnection(connectionString))
       {
-        string connectionString = MySQLDataUtilities.GetConnectionString(wbConnection);
-        using (MySqlConnection conn = new MySqlConnection(connectionString))
+        try
         {
           conn.Open();
-          MySqlCommand cmd = new MySqlCommand(sqlQuery, conn);
-          insertedRows = cmd.ExecuteNonQuery();
+          if (mysqlMaxAllowedPacket == 0)
+            mysqlMaxAllowedPacket = MySQLDataUtilities.GetMySQLServerMaxAllowedPacket(conn);
+          transaction = conn.BeginTransaction();
+          MySqlCommand cmd = new MySqlCommand(String.Empty, conn, transaction);
+          int nextRow = 0;
+          while (nextRow >= 0)
+          {
+            chunkQuery = GetInsertSQL(nextRow, -1, true, newRowsOnly, out nextRow);
+            cmd.CommandText = chunkQuery;
+            insertedRows += cmd.ExecuteNonQuery();
+            sqlQuery += chunkQuery;
+          }
+          transaction.Commit();
           warningsDS = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");
         }
-      }
-      catch (MySqlException mysqlEx)
-      {
-        exception = mysqlEx;
-      }
-      catch (Exception ex)
-      {
-        exception = ex;
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception on InsertDataWithManualQuery - " + (ex.Message + " " + ex.InnerException), 1);
+        catch (MySqlException mysqlEx)
+        {
+          if (transaction != null)
+            transaction.Rollback();
+          exception = mysqlEx;
+        }
+        catch (Exception ex)
+        {
+          if (transaction != null)
+            transaction.Rollback();
+          exception = ex;
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception on InsertDataWithManualQuery - " + (ex.Message + " " + ex.InnerException), 1);
+        }
       }
 
       return (warningsDS != null && warningsDS.Tables.Count > 0 ? warningsDS.Tables[0] : null);
@@ -738,12 +832,23 @@ namespace MySQL.ForExcel
       return changedColNamesList;
     }
 
-    public string GetAppendSQL(int limit, bool formatNewLinesAndTabs, MySQLDataTable mappingFromTable)
+    public string GetAppendSQL(int startRow, int limit, bool formatNewLinesAndTabs, MySQLDataTable mappingFromTable, out int nextRow)
     {
+      nextRow = -1;
+      ulong maxByteCount = (mysqlMaxAllowedPacket > 0 ? mysqlMaxAllowedPacket - 10 : 0);
       int colsCount = Columns.Count;
+      int rowsCount = mappingFromTable.Rows.Count;
+
+      if (startRow < 0)
+        startRow = 0;
+      if (mappingFromTable.FirstRowIsHeaders && startRow == 0)
+        startRow++;
       if (mappingFromTable != null && mappingFromTable.Rows.Count - (mappingFromTable.FirstRowIsHeaders ? 1 : 0) < 1)
         return null;
+      if (startRow > rowsCount)
+        return null;
 
+      ulong queryStringByteCount = 0;
       StringBuilder queryString = new StringBuilder();
       string nl = (formatNewLinesAndTabs ? Environment.NewLine : " ");
       int rowIdx = 0;
@@ -775,14 +880,26 @@ namespace MySQL.ForExcel
       queryString.AppendFormat("){0}VALUES{0}", nl);
 
       string valueToDB = String.Empty;
-      for (rowIdx = 0; rowIdx < mappingFromTable.Rows.Count; rowIdx++)
+      int absRowIdx = 0;
+      StringBuilder singleRowValuesBuilder = new StringBuilder();
+      string singleRowValuesString = String.Empty;
+      if (maxByteCount > 0)
+        queryStringByteCount = (ulong)ASCIIEncoding.ASCII.GetByteCount(queryString.ToString());
+
+      for (rowIdx = startRow; rowIdx < rowsCount; rowIdx++)
       {
         DataRow dr = mappingFromTable.Rows[rowIdx];
-        if (mappingFromTable.FirstRowIsHeaders && rowIdx == 0)
-          continue;
-        if (limit > 0 && rowIdx >= limit)
+        if (limit > 0 && absRowIdx > limit)
+        {
+          if (rowIdx < rowsCount)
+            nextRow = rowIdx;
           break;
-        queryString.AppendFormat("{0}(", rowsSeparator);
+        }
+        else
+          absRowIdx++;
+        singleRowValuesBuilder.Clear();
+        singleRowValuesString = String.Empty;
+        singleRowValuesBuilder.AppendFormat("{0}(", rowsSeparator);
         colsSeparator = String.Empty;
         for (colIdx = 0; colIdx < toColumnNames.Count; colIdx++)
         {
@@ -794,22 +911,33 @@ namespace MySQL.ForExcel
           if (insertingValueIsNull)
             valueToDB = @"null";
           else
-          {
-            if (insertingValue.Equals(DateTime.MinValue))
-              valueToDB = "0000-00-00 00:00:00";
-            else
-              valueToDB = insertingValue.ToString();
-          }
-          queryString.AppendFormat("{0}{1}{2}{1}",
-                                    colsSeparator,
-                                    (toColumn.ColumnsRequireQuotes && !insertingValueIsNull ? "'" : String.Empty),
-                                    valueToDB);
+            valueToDB = (insertingValue.Equals(DateTime.MinValue) ? "0000-00-00 00:00:00" : insertingValue.ToString());
+          singleRowValuesBuilder.AppendFormat("{0}{1}{2}{1}",
+                                              colsSeparator,
+                                              (toColumn.ColumnsRequireQuotes && !insertingValueIsNull ? "'" : String.Empty),
+                                              valueToDB);
           colsSeparator = ",";
         }
-        queryString.Append(")");
+        singleRowValuesBuilder.Append(")");
+
+        singleRowValuesString = singleRowValuesBuilder.ToString();
+        if (maxByteCount > 0)
+        {
+          ulong singleValueRowQueryByteCount = (ulong)ASCIIEncoding.ASCII.GetByteCount(singleRowValuesString);
+          if (queryStringByteCount + singleValueRowQueryByteCount > maxByteCount)
+          {
+            nextRow = rowIdx;
+            break;
+          }
+          queryStringByteCount += singleValueRowQueryByteCount;
+        }
+
+        queryString.Append(singleRowValuesString);
         if (rowsSeparator.Length == 0)
           rowsSeparator = "," + nl;
       }
+      if (nextRow >= 0)
+        queryString.AppendFormat(";{0}", nl);
 
       return queryString.ToString();
     }
@@ -819,27 +947,43 @@ namespace MySQL.ForExcel
       DataSet warningsDS = null;
       insertedCount = 0;
       exception = null;
-      sqlQuery = GetAppendSQL(-1, true, mappingFromTable);
+      MySqlTransaction transaction = null;
+      string chunkQuery = sqlQuery = String.Empty;
 
-      try
+      string connectionString = MySQLDataUtilities.GetConnectionString(wbConnection);
+      using (MySqlConnection conn = new MySqlConnection(connectionString))
       {
-        string connectionString = MySQLDataUtilities.GetConnectionString(wbConnection);
-        using (MySqlConnection conn = new MySqlConnection(connectionString))
+        try
         {
           conn.Open();
-          MySqlCommand cmd = new MySqlCommand(sqlQuery, conn);
-          insertedCount = cmd.ExecuteNonQuery();
+          if (mysqlMaxAllowedPacket == 0)
+            mysqlMaxAllowedPacket = MySQLDataUtilities.GetMySQLServerMaxAllowedPacket(conn);
+          transaction = conn.BeginTransaction();
+          MySqlCommand cmd = new MySqlCommand(String.Empty, conn, transaction);
+          int nextRow = 0;
+          while (nextRow >= 0)
+          {
+            chunkQuery = GetAppendSQL(nextRow, -1, true, mappingFromTable, out nextRow);
+            cmd.CommandText = chunkQuery;
+            insertedCount += cmd.ExecuteNonQuery();
+            sqlQuery += chunkQuery;
+          }
+          transaction.Commit();
           warningsDS = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");
         }
-      }
-      catch (MySqlException mysqlEx)
-      {
-        exception = mysqlEx;
-      }
-      catch (Exception ex)
-      {
-        exception = ex;
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
+        catch (MySqlException mysqlEx)
+        {
+          if (transaction != null)
+            transaction.Rollback();
+          exception = mysqlEx;
+        }
+        catch (Exception ex)
+        {
+          if (transaction != null)
+            transaction.Rollback();
+          exception = ex;
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
+        }
       }
 
       return (warningsDS != null && warningsDS.Tables.Count > 0 ? warningsDS.Tables[0] : null);
