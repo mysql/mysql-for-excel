@@ -1,11 +1,10 @@
-MySQL Notifier 1.0
+Excel for MySQL 1.0
 
-This is a release of MySQL Notifier, Oracle's dual-
-license utility application for simple monitoring of MySQL
-servers on Windows.  For the avoidance of
+This is a release of Excel for MySQL, Oracle's dual-
+license utility addin for Microsoft Excel.  For the avoidance of
 doubt, this particular copy of the software is released
 under the version 2 of the GNU General Public License.
-MySQL Notifier is brought to you by Oracle.
+MySQL for Excel is brought to you by Oracle.
 
 Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
 

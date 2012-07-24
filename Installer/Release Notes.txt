@@ -1,0 +1,14 @@
+MySQL for Excel 1.0 Release Notes
+------------------------------------
+
+Welcome to the release notes for MySQL for Excel 1.0
+
+Features
+--------------------
+[list major features here]
+
+
+Known Issues
+--------------------
+[list known issues here]
+
