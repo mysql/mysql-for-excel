@@ -321,6 +321,7 @@ namespace MySQL.ForExcel
     {
       Title = title;
       Subtitle = subtitle;
+      Enable = true;
     }
 
     public string GetTruncatedTitle(float maxWidth, Graphics graphics, Font font)
