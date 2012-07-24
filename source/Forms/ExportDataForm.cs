@@ -106,9 +106,8 @@ namespace MySQL.ForExcel
         gridCol.HeaderText = mysqlCol.DisplayName;
         grdPreviewData.Columns[colIdx].SortMode = DataGridViewColumnSortMode.NotSortable;
       }
-      refreshPrimaryKeyColumnsCombo();
-
       grdPreviewData.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
+      refreshPrimaryKeyColumnsCombo();
     }
 
     private void SetDefaultPrimaryKey()
@@ -117,8 +116,9 @@ namespace MySQL.ForExcel
       if (dataTable.FirstColumnContainsIntegers)
       {
         radUseExistingColumn.Checked = true;
-        cmbPrimaryKeyColumns.SelectedIndex = 0;
         columnBindingSource.Position = 1;
+        cmbPrimaryKeyColumns.SelectedIndex = 0;
+        grdPreviewData.Columns[1].Selected = true;
       }
       else
       {
@@ -379,10 +379,15 @@ namespace MySQL.ForExcel
 
     private void chkFirstRowHeaders_CheckedChanged(object sender, EventArgs e)
     {
+      int cmbIndex = cmbPrimaryKeyColumns.SelectedIndex;
+      int grdIndex = columnBindingSource.Position;
       dataTable.FirstRowIsHeaders = chkFirstRowHeaders.Checked;
       LoadDataAndCreateColumns(null, null, null);
       grdPreviewData.CurrentCell = null;
       grdPreviewData.Rows[0].Visible = !chkFirstRowHeaders.Checked;
+      cmbPrimaryKeyColumns.SelectedIndex = cmbIndex;
+      grdPreviewData.Columns[grdIndex].Selected = true;
+      grdPreviewData.FirstDisplayedScrollingColumnIndex = grdIndex;
       if (chkFirstRowHeaders.Checked && grdPreviewData.Rows.Count < 2)
         return;
       grdPreviewData.FirstDisplayedScrollingRowIndex = (chkFirstRowHeaders.Checked ? 1 : 0);
@@ -453,7 +458,6 @@ namespace MySQL.ForExcel
         return;
       isChanging = true;
       grdPreviewData.Columns[0].Visible = false;
-      grdPreviewData.Columns[1].Selected = true;
       grdPreviewData.FirstDisplayedScrollingColumnIndex = 1;
       cmbPrimaryKeyColumns.Enabled = true;
       multiColumnPK = false;
@@ -467,6 +471,7 @@ namespace MySQL.ForExcel
 
     private void grdPreviewData_SelectionChanged(object sender, EventArgs e)
     {
+      isChanging = true;
       if (grdPreviewData.SelectedColumns.Count > 0)
       {
         columnBindingSource.Position = grdPreviewData.SelectedColumns[0].Index;
@@ -478,6 +483,7 @@ namespace MySQL.ForExcel
       EnableChecks(null);
       if (grdPreviewData.Columns[0].Selected)
         chkUniqueIndex.Enabled = chkCreateIndex.Enabled = chkExcludeColumn.Enabled = chkAllowEmpty.Enabled = chkPrimaryKey.Enabled = false;
+      isChanging = false;
     }
 
     private void cmbPrimaryKeyColumns_SelectedIndexChanged(object sender, EventArgs e)
@@ -489,24 +495,24 @@ namespace MySQL.ForExcel
       multiColumnPK = false;
       if (cmbPrimaryKeyColumns.Items[0].ToString() == "<Multiple Items>")
       {
+        cmbPrimaryKeyColumns.BeginUpdate();
+        int index = cmbPrimaryKeyColumns.SelectedIndex;
         cmbPrimaryKeyColumns.Items.RemoveAt(0);
-        cmbPrimaryKeyColumns.SelectedIndex = 0;
+        if (index == 0)
+          cmbPrimaryKeyColumns.SelectedIndex = 0;
+        cmbPrimaryKeyColumns.EndUpdate();
       }
       for (int coldIdx = 1; coldIdx < dataTable.Columns.Count; coldIdx++)
       {
         MySQLDataColumn col = dataTable.GetColumnAtIndex(coldIdx);
         col.PrimaryKey = (col.DisplayName == cmbPrimaryKeyColumns.Text);
+        if (col.PrimaryKey)
+        {
+          col.CreateIndex = col.UniqueKey = col.AllowNull = col.ExcludeColumn = false;
+          grdPreviewData.Columns[col.ColumnName].Selected = true;
+          grdPreviewData.FirstDisplayedScrollingColumnIndex = grdPreviewData.Columns[col.ColumnName].Index;
+        }
       }
-      //if (grdPreviewData.Columns[cmbPrimaryKeyColumns.SelectedIndex + 1].Selected)
-      //{
-      //  columnBindingSource.ResetCurrentItem();
-      //  EnableChecks(null);
-      //}
-      //else
-      //{
-      //  grdPreviewData.Columns[cmbPrimaryKeyColumns.SelectedIndex + 1].Selected = true;
-      //  grdPreviewData.FirstDisplayedScrollingColumnIndex = cmbPrimaryKeyColumns.SelectedIndex + 1;
-      //}
     }
 
     private void txtColumnName_TextChanged(object sender, EventArgs e)
@@ -544,10 +550,10 @@ namespace MySQL.ForExcel
 
     private void chkUniqueIndex_CheckedChanged(object sender, EventArgs e)
     {
-      EnableChecks(chkUniqueIndex);
       MySQLDataColumn currentCol = columnBindingSource.Current as MySQLDataColumn;
       if (chkUniqueIndex.Checked == currentCol.UniqueKey)
         return;
+      currentCol.UniqueKey = chkUniqueIndex.Checked;
       DataGridViewColumn gridCol = grdPreviewData.SelectedColumns[0];
       MySQLDataColumn column = dataTable.GetColumnAtIndex(gridCol.Index);
       bool good = true;
@@ -574,20 +580,26 @@ namespace MySQL.ForExcel
           column.WarningTextList.Add(Resources.ColumnDataNotUniqueWarning);
       showValidationWarning("ColumnOptionsWarning", !good, warningText);
       gridCol.DefaultCellStyle.BackColor = good ? grdPreviewData.DefaultCellStyle.BackColor : Color.OrangeRed;
-      currentCol.UniqueKey = chkUniqueIndex.Checked;
+      EnableChecks(chkUniqueIndex);
     }
 
     private void chkExcludeColumn_CheckedChanged(object sender, EventArgs e)
     {
+      if (chkExcludeColumn.Checked == (columnBindingSource.Current as MySQLDataColumn).ExcludeColumn)
+        return;
       (columnBindingSource.Current as MySQLDataColumn).ExcludeColumn = chkExcludeColumn.Checked;
       DataGridViewColumn gridCol = grdPreviewData.SelectedColumns[0];
       gridCol.DefaultCellStyle.BackColor = chkExcludeColumn.Checked ? Color.LightGray : grdPreviewData.DefaultCellStyle.BackColor;
+      int grdIndex = grdPreviewData.SelectedColumns[0].Index;
       EnableChecks(chkExcludeColumn);
-      chkExcludeColumn_Validated(sender, e);
+      refreshPrimaryKeyColumnsCombo();
+      grdPreviewData.Columns[grdIndex].Selected = true;
     }
 
     private void chkPrimaryKey_CheckedChanged(object sender, EventArgs e)
     {
+      if (chkPrimaryKey.Checked == (columnBindingSource.Current as MySQLDataColumn).PrimaryKey)
+        return;
       (columnBindingSource.Current as MySQLDataColumn).PrimaryKey = chkPrimaryKey.Checked;
       EnableChecks(chkPrimaryKey);
       chkPrimaryKey_Validated(sender, e);
@@ -595,6 +607,8 @@ namespace MySQL.ForExcel
 
     private void chkCreateIndex_CheckedChanged(object sender, EventArgs e)
     {
+      if (chkCreateIndex.Checked == (columnBindingSource.Current as MySQLDataColumn).CreateIndex)
+        return;
       EnableChecks(chkCreateIndex);
     }
 
@@ -642,12 +656,6 @@ namespace MySQL.ForExcel
         }
       }
       isChanging = false;
-    }
-
-    private void chkExcludeColumn_Validated(object sender, EventArgs e)
-    {
-      refreshPrimaryKeyColumnsCombo();
-      EnableChecks(chkExcludeColumn);
     }
 
     private void chkPrimaryKey_Validated(object sender, EventArgs e)
@@ -736,7 +744,6 @@ namespace MySQL.ForExcel
       {
         if (chkPrimaryKey.Checked)
         {
-          //chkPrimaryKey.Checked = false;
           chkPrimaryKey.CheckedChanged -= chkPrimaryKey_CheckedChanged;
           chkPrimaryKey.Checked = false;
           column.PrimaryKey = false;
@@ -752,8 +759,12 @@ namespace MySQL.ForExcel
       }
       if (control == chkUniqueIndex && control.Checked)
       {
-        chkPrimaryKey.Checked = false;
         chkCreateIndex.Checked = true;
+        chkPrimaryKey.CheckedChanged -= chkPrimaryKey_CheckedChanged;
+        chkPrimaryKey.Checked = false;
+        column.PrimaryKey = false;
+        chkPrimaryKey_Validated(null, EventArgs.Empty);
+        chkPrimaryKey.CheckedChanged += chkPrimaryKey_CheckedChanged;
       }
       if (control == chkCreateIndex && !control.Checked)
       {
@@ -775,6 +786,11 @@ namespace MySQL.ForExcel
 
       if(columnBindingSource.Position == 0)
         chkUniqueIndex.Enabled = chkCreateIndex.Enabled = chkExcludeColumn.Enabled = chkAllowEmpty.Enabled = chkPrimaryKey.Enabled = false;
+    }
+
+    private void ExportDataForm_Load(object sender, EventArgs e)
+    {
+      grdPreviewData.Columns[grdPreviewData.Columns[0].Visible ? 0 : 1].Selected = true;
     }
   }
 }

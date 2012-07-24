@@ -270,7 +270,6 @@ namespace MySQL.ForExcel
       this.chkExcludeColumn.Text = "Exclude Column";
       this.chkExcludeColumn.UseVisualStyleBackColor = true;
       this.chkExcludeColumn.CheckedChanged += new System.EventHandler(this.chkExcludeColumn_CheckedChanged);
-      this.chkExcludeColumn.Validated += new System.EventHandler(this.chkExcludeColumn_Validated);
       // 
       // chkAllowEmpty
       // 
@@ -661,6 +660,7 @@ namespace MySQL.ForExcel
       this.MinimumSize = new System.Drawing.Size(860, 640);
       this.Name = "ExportDataForm";
       this.Text = "Export Data";
+      this.Load += new System.EventHandler(this.ExportDataForm_Load);
       this.contentAreaPanel.ResumeLayout(false);
       this.contentAreaPanel.PerformLayout();
       this.commandAreaPanel.ResumeLayout(false);
