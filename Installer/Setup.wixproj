@@ -4,7 +4,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>3.5</ProductVersion>
-    <ProjectGuid>{ec7dad39-2206-484c-9966-ab256269a6d4}</ProjectGuid>
+    <ProjectGuid>{3ef00207-0f9c-4014-99dd-2ee0a73b3aaa}</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
     <OutputName>MySQLForExcel</OutputName>
     <OutputType>Package</OutputType>
@@ -14,13 +14,14 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>bin\debug\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <DefineConstants>Debug;</DefineConstants>
+    <DefineConstants>Debug;IsGPL=1</DefineConstants>
     <Cultures>en-US</Cultures>
     <SuppressValidation>True</SuppressValidation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\release\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <DefineConstants>IsGPL=1</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="main.wxs" />
@@ -36,6 +37,10 @@
       <Name>WixUIExtension</Name>
     </WixExtension>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="COPYING" />
+    <Content Include="README" />
+  </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.
@@ -45,4 +50,30 @@
 	<Target Name="AfterBuild">
 	</Target>
 	-->
+  <Target Name="SetVariables">
+    <GetAssemblyIdentity AssemblyFiles="$(SolutionDir)Source\bin\release\MySql.ForExcel.dll">
+      <Output TaskParameter="Assemblies" ItemName="AssemblyVersions" />
+    </GetAssemblyIdentity>
+    <CreateProperty Value="%(AssemblyVersions.Version)">
+      <Output TaskParameter="Value" PropertyName="FullVersion" />
+    </CreateProperty>
+    <CreateProperty Value="$(FullVersion.Substring(0, $(FullVersion.LastIndexOf('.'))))">
+      <Output TaskParameter="Value" PropertyName="Version" />
+    </CreateProperty>
+    <CreateProperty Value="Version=$(Version);$(DefineConstants)">
+      <Output TaskParameter="Value" PropertyName="DefineConstants" />
+    </CreateProperty>
+    <CreateProperty Value="mysql-excel-$(Version)">
+      <Output TaskParameter="Value" PropertyName="TargetName" />
+    </CreateProperty>
+    <CreateProperty Value="$(TargetName)$(TargetExt)">
+      <Output TaskParameter="Value" PropertyName="TargetFileName" />
+    </CreateProperty>
+    <CreateProperty Value="$(TargetDir)$(TargetFileName)">
+      <Output TaskParameter="Value" PropertyName="TargetPath" />
+    </CreateProperty>
+  </Target>
+  <PropertyGroup>
+    <BuildDependsOn>SetVariables;$(BuildDependsOn)</BuildDependsOn>
+  </PropertyGroup>
 </Project>

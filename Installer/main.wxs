@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?define ProductName="MySQL For Excel 1.0"?>
+<?define ProductName="MySQL For Excel $(var.Version)"?>
 <?define Version="1.0"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
-  <Product Name="$(var.ProductName)" Id ="17E3FD69-D9E7-45E3-8C57-67BB34F0CCF6" Manufacturer="Oracle" Language="1033" Version="1.0" 
+  <Product Name="$(var.ProductName)" Id ="*" Manufacturer="Oracle" Language="1033" Version="$(var.Version)" 
            UpgradeCode="30162E4E-2EED-48D1-BBC0-8D4A517DB004">
     <Package Id="*" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" InstallPrivileges="elevated"/>
 
@@ -48,7 +48,13 @@
               <File Id="MySql.Data" Name="MySql.Data.dll" Source="..\Source\bin\release\mysql.data.dll" />
               <File Id="v40Utilities" Name="Microsoft.Office.Tools.Common.v4.0.Utilities.dll" Source="..\Source\bin\release\Microsoft.Office.Tools.Common.v4.0.Utilities.dll" />
               <File Id="VSTOFile" Name="MySQL.ForExcel.vsto" Source="..\Source\bin\release\MySQL.ForExcel.vsto" />
-              <File Id="AddIn" Name="MySQL.ForExcel.dll" KeyPath="yes" Source="..\Source\bin\release\MySQL.ForExcel.dll" />              
+              <File Id="AddIn" Name="MySQL.ForExcel.dll" KeyPath="yes" Source="..\Source\bin\release\MySQL.ForExcel.dll" />
+              <?if $(var.IsGPL) = 1?>
+              <File Id='ReadMe' Name='README' Source='README'/>
+              <File Id="COPYING" Name="COPYING" Source="COPYING" DiskId="1" />
+              <?else?>
+              <File Id="README2" Name="README" Source="README-Commercial" DiskId="1"/>
+              <?endif?>
               <RemoveFolder Id="INSTALLDIR" On="uninstall" />
             </Component>
             <Component Id="RegistryItems" Guid="*">
