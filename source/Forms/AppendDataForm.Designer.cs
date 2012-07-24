@@ -77,6 +77,7 @@ namespace MySQL.ForExcel
       this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.removeColumnMappingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.clearAllMappingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.lblSubSetOfData = new System.Windows.Forms.Label();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.grdFromExcelData)).BeginInit();
@@ -93,6 +94,7 @@ namespace MySQL.ForExcel
       // 
       this.contentAreaPanel.AllowDrop = true;
       this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
+      this.contentAreaPanel.Controls.Add(this.lblSubSetOfData);
       this.contentAreaPanel.Controls.Add(this.grdToMySQLTable);
       this.contentAreaPanel.Controls.Add(this.cmbMappingMethod);
       this.contentAreaPanel.Controls.Add(this.lblMappingMethod);
@@ -164,7 +166,7 @@ namespace MySQL.ForExcel
       this.chkFirstRowHeaders.AutoSize = true;
       this.chkFirstRowHeaders.BackColor = System.Drawing.Color.Transparent;
       this.chkFirstRowHeaders.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.chkFirstRowHeaders.Location = new System.Drawing.Point(82, 157);
+      this.chkFirstRowHeaders.Location = new System.Drawing.Point(82, 158);
       this.chkFirstRowHeaders.Name = "chkFirstRowHeaders";
       this.chkFirstRowHeaders.Size = new System.Drawing.Size(210, 19);
       this.chkFirstRowHeaders.TabIndex = 7;
@@ -208,7 +210,7 @@ namespace MySQL.ForExcel
       this.grdFromExcelData.ShowEditingIcon = false;
       this.grdFromExcelData.ShowRowErrors = false;
       this.grdFromExcelData.Size = new System.Drawing.Size(686, 150);
-      this.grdFromExcelData.TabIndex = 8;
+      this.grdFromExcelData.TabIndex = 9;
       this.grdFromExcelData.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.grdFromExcelData_DataBindingComplete);
       this.grdFromExcelData.GiveFeedback += new System.Windows.Forms.GiveFeedbackEventHandler(this.grdGiveFeedback);
       this.grdFromExcelData.QueryContinueDrag += new System.Windows.Forms.QueryContinueDragEventHandler(this.grdQueryContinueDrag);
@@ -302,7 +304,7 @@ namespace MySQL.ForExcel
       this.lblColorMapMapped.Location = new System.Drawing.Point(244, 516);
       this.lblColorMapMapped.Name = "lblColorMapMapped";
       this.lblColorMapMapped.Size = new System.Drawing.Size(89, 13);
-      this.lblColorMapMapped.TabIndex = 11;
+      this.lblColorMapMapped.TabIndex = 12;
       this.lblColorMapMapped.Text = "Mapped Columns";
       // 
       // picColorMapUnmapped
@@ -324,7 +326,7 @@ namespace MySQL.ForExcel
       this.lblColorMapUnmapped.Location = new System.Drawing.Point(97, 516);
       this.lblColorMapUnmapped.Name = "lblColorMapUnmapped";
       this.lblColorMapUnmapped.Size = new System.Drawing.Size(102, 13);
-      this.lblColorMapUnmapped.TabIndex = 10;
+      this.lblColorMapUnmapped.TabIndex = 11;
       this.lblColorMapUnmapped.Text = "Unmapped Columns";
       // 
       // pictureBox1
@@ -422,7 +424,7 @@ namespace MySQL.ForExcel
       this.grdToMySQLTable.ShowEditingIcon = false;
       this.grdToMySQLTable.ShowRowErrors = false;
       this.grdToMySQLTable.Size = new System.Drawing.Size(686, 150);
-      this.grdToMySQLTable.TabIndex = 9;
+      this.grdToMySQLTable.TabIndex = 10;
       this.grdToMySQLTable.DragDrop += new System.Windows.Forms.DragEventHandler(this.grdToMySQLTable_DragDrop);
       this.grdToMySQLTable.DragOver += new System.Windows.Forms.DragEventHandler(this.grdToMySQLTable_DragOver);
       this.grdToMySQLTable.GiveFeedback += new System.Windows.Forms.GiveFeedbackEventHandler(this.grdGiveFeedback);
@@ -455,6 +457,19 @@ namespace MySQL.ForExcel
       this.clearAllMappingsToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
       this.clearAllMappingsToolStripMenuItem.Text = "Clear All Mappings";
       this.clearAllMappingsToolStripMenuItem.Click += new System.EventHandler(this.clearAllMappingsToolStripMenuItem_Click);
+      // 
+      // lblSubSetOfData
+      // 
+      this.lblSubSetOfData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.lblSubSetOfData.AutoSize = true;
+      this.lblSubSetOfData.BackColor = System.Drawing.Color.Transparent;
+      this.lblSubSetOfData.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblSubSetOfData.ForeColor = System.Drawing.SystemColors.InactiveCaption;
+      this.lblSubSetOfData.Location = new System.Drawing.Point(449, 159);
+      this.lblSubSetOfData.Name = "lblSubSetOfData";
+      this.lblSubSetOfData.Size = new System.Drawing.Size(319, 15);
+      this.lblSubSetOfData.TabIndex = 8;
+      this.lblSubSetOfData.Text = "This is a small subset of the data for preview purposes only.";
       // 
       // AppendDataForm
       // 
@@ -510,5 +525,6 @@ namespace MySQL.ForExcel
     private System.Windows.Forms.ContextMenuStrip contextMenu;
     private System.Windows.Forms.ToolStripMenuItem removeColumnMappingToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem clearAllMappingsToolStripMenuItem;
+    private System.Windows.Forms.Label lblSubSetOfData;
   }
 }

@@ -119,6 +119,7 @@ namespace MySQL.ForExcel
       // 
       // lblSubSetOfData
       // 
+      this.lblSubSetOfData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.lblSubSetOfData.AutoSize = true;
       this.lblSubSetOfData.BackColor = System.Drawing.Color.Transparent;
       this.lblSubSetOfData.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));

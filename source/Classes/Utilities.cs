@@ -564,6 +564,7 @@ namespace MySQL.ForExcel
   public static class DataTypeUtilities
   {
     public const int VARCHAR_MAX_LEN = 65535;
+    public const string DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     public static List<string> GetMySQLDataTypes(out List<int> paramsInParenthesisList)
     {
@@ -1153,7 +1154,10 @@ namespace MySQL.ForExcel
         retValue = rawValue;
         if (column.IsDate)
         {
+          DateTime dtValue;
           string rawValueAsString = rawValue.ToString();
+          if (DateTime.TryParse(rawValueAsString, out dtValue))
+            rawValueAsString = dtValue.ToString(DataTypeUtilities.DATE_FORMAT);
           if (rawValue.Equals(DateTime.MinValue) || rawValueAsString.StartsWith("0000-00-00") || rawValueAsString.StartsWith("00-00-00"))
           {
             if (column.AllowNull)
@@ -1161,6 +1165,8 @@ namespace MySQL.ForExcel
             else
               retValue = DateTime.MinValue;
           }
+          else
+            retValue = rawValueAsString;
         }
         else if (column.IsBool)
         {

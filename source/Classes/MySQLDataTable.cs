@@ -52,7 +52,11 @@ namespace MySQL.ForExcel
     public bool FirstRowIsHeaders
     {
       get { return firstRowIsHeaders; }
-      set { firstRowIsHeaders = value; UseFirstRowAsHeaders(value); }
+      set 
+      { 
+        firstRowIsHeaders = value;
+        UseFirstRowAsHeaders(); 
+      }
     }
     public bool FirstColumnContainsIntegers
     {
@@ -194,28 +198,35 @@ namespace MySQL.ForExcel
         column.ColumnName = column.DisplayName = TableName + "_id";
         column.MySQLDataType = "Integer";
         column.AutoIncrement = true;
+        column.AllowNull = false;
       }
     }
 
-    private void UseFirstRowAsHeaders(bool useFirstRow)
+    private void AdjustAutoPKValues()
     {
-      DataRow row = Rows[0];
-      int startRow = (AddPrimaryKeyColumn ? 1 : 0);
-      for (int i = startRow; i < Columns.Count; i++)
+      if (AddPrimaryKeyColumn && Columns.Count > 0)
       {
-        MySQLDataColumn col = Columns[i] as MySQLDataColumn;
-        col.DisplayName = (useFirstRow ? DataToColName(row[i].ToString()) : col.ColumnName);
-        col.MySQLDataType = (useFirstRow ? col.RowsFrom2ndDataType : col.RowsFrom1stDataType);
-      }
-      if (AddPrimaryKeyColumn)
-      {
-        (Columns[0] as MySQLDataColumn).DisplayName = TableName + "_id";
-        int adjustIdx = (useFirstRow ? 0 : 1);
+        int adjustIdx = (firstRowIsHeaders ? 0 : 1);
         for (int i = 0; i < Rows.Count; i++)
         {
           Rows[i][0] = i + adjustIdx;
         }
       }
+    }
+
+    private void UseFirstRowAsHeaders()
+    {
+      if (Rows.Count == 0)
+        return;
+      DataRow row = Rows[0];
+      int startRow = (AddPrimaryKeyColumn ? 1 : 0);
+      for (int i = startRow; i < Columns.Count; i++)
+      {
+        MySQLDataColumn col = Columns[i] as MySQLDataColumn;
+        col.DisplayName = (firstRowIsHeaders ? DataToColName(row[i].ToString()) : col.ColumnName);
+        col.MySQLDataType = (firstRowIsHeaders ? col.RowsFrom2ndDataType : col.RowsFrom1stDataType);
+      }
+      AdjustAutoPKValues();
     }
 
     public void SetData(Excel.Range dataRange, bool recreateColumnsFromData, bool detectTypes, bool addBufferToVarchar, bool createIndexForIntColumns, bool allowEmptyNonIdxCols)
@@ -260,7 +271,7 @@ namespace MySQL.ForExcel
         CreateColumns(numCols);
       }
 
-      int pkRowValueAdjust = 0;
+      int pkRowValueAdjust = (firstRowIsHeaders ? 1 : 0);
       for (int row = 1; row <= numRows; row++)
       {
         bool rowHasAnyData = false;
@@ -392,6 +403,10 @@ namespace MySQL.ForExcel
     public MySQLDataTable CloneSchema()
     {
       MySQLDataTable clonedTable = new MySQLDataTable(this.SchemaName, this.TableName, this.AddPrimaryKeyColumn, this.IsFormatted);
+      clonedTable.UseFirstColumnAsPK = UseFirstColumnAsPK;
+      clonedTable.RemoveEmptyColumns = RemoveEmptyColumns;
+      clonedTable.IsFormatted = IsFormatted;
+      clonedTable.FirstRowIsHeaders = FirstRowIsHeaders;
 
       foreach (MySQLDataColumn column in Columns)
       {

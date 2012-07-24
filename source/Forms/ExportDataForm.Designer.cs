@@ -91,6 +91,7 @@ namespace MySQL.ForExcel
       this.lblTableNameMain = new System.Windows.Forms.Label();
       this.picTable = new System.Windows.Forms.PictureBox();
       this.lblExportData = new System.Windows.Forms.Label();
+      this.lblSubSetOfData = new System.Windows.Forms.Label();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.columnBindingSource)).BeginInit();
@@ -107,6 +108,7 @@ namespace MySQL.ForExcel
       // contentAreaPanel
       // 
       this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
+      this.contentAreaPanel.Controls.Add(this.lblSubSetOfData);
       this.contentAreaPanel.Controls.Add(this.lblColumnOptionsWarning);
       this.contentAreaPanel.Controls.Add(this.picColumnOptionsWarning);
       this.contentAreaPanel.Controls.Add(this.lblExportData);
@@ -239,7 +241,7 @@ namespace MySQL.ForExcel
       this.grpColumnOptions.Location = new System.Drawing.Point(82, 444);
       this.grpColumnOptions.Name = "grpColumnOptions";
       this.grpColumnOptions.Size = new System.Drawing.Size(677, 89);
-      this.grpColumnOptions.TabIndex = 18;
+      this.grpColumnOptions.TabIndex = 19;
       this.grpColumnOptions.TabStop = false;
       this.grpColumnOptions.Text = "Column Options";
       // 
@@ -432,7 +434,7 @@ namespace MySQL.ForExcel
       this.grdPreviewData.ShowEditingIcon = false;
       this.grdPreviewData.ShowRowErrors = false;
       this.grdPreviewData.Size = new System.Drawing.Size(677, 157);
-      this.grdPreviewData.TabIndex = 17;
+      this.grdPreviewData.TabIndex = 18;
       this.grdPreviewData.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.grdPreviewData_CellToolTipTextNeeded);
       this.grdPreviewData.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.grdPreviewData_DataBindingComplete);
       this.grdPreviewData.SelectionChanged += new System.EventHandler(this.grdPreviewData_SelectionChanged);
@@ -649,6 +651,19 @@ namespace MySQL.ForExcel
       this.lblExportData.TabIndex = 46;
       this.lblExportData.Text = "Export Data to MySQL";
       // 
+      // lblSubSetOfData
+      // 
+      this.lblSubSetOfData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.lblSubSetOfData.AutoSize = true;
+      this.lblSubSetOfData.BackColor = System.Drawing.Color.Transparent;
+      this.lblSubSetOfData.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblSubSetOfData.ForeColor = System.Drawing.SystemColors.InactiveCaption;
+      this.lblSubSetOfData.Location = new System.Drawing.Point(440, 255);
+      this.lblSubSetOfData.Name = "lblSubSetOfData";
+      this.lblSubSetOfData.Size = new System.Drawing.Size(319, 15);
+      this.lblSubSetOfData.TabIndex = 17;
+      this.lblSubSetOfData.Text = "This is a small subset of the data for preview purposes only.";
+      // 
       // ExportDataForm
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -720,5 +735,6 @@ namespace MySQL.ForExcel
     private System.Windows.Forms.Label lblTableNameMain;
     private System.Windows.Forms.PictureBox picTable;
     private System.Windows.Forms.Label lblExportData;
+    private System.Windows.Forms.Label lblSubSetOfData;
   }
 }

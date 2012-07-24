@@ -38,5 +38,8 @@
     <Setting Name="ExportLimitPreviewRowsQuantity" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">100</Value>
     </Setting>
+    <Setting Name="AppendLimitPreviewRowsQuantity" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

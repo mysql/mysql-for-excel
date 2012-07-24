@@ -177,5 +177,18 @@ namespace MySQL.ForExcel.Properties {
                 this["ExportLimitPreviewRowsQuantity"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.MySQLForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int AppendLimitPreviewRowsQuantity {
+            get {
+                return ((int)(this["AppendLimitPreviewRowsQuantity"]));
+            }
+            set {
+                this["AppendLimitPreviewRowsQuantity"] = value;
+            }
+        }
     }
 }

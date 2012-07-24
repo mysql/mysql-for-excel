@@ -242,8 +242,14 @@ namespace MySQL.ForExcel
 
     public MySQLDataColumn CloneSchema()
     {
-      MySQLDataColumn clonedColumn = new MySQLDataColumn(this.ColumnName, this.MySQLDataType, this.AllowNull, this.PrimaryKey, null);
+      MySQLDataColumn clonedColumn = new MySQLDataColumn();
+      clonedColumn.ColumnName = this.ColumnName;
       clonedColumn.DisplayName = this.displayName;
+      clonedColumn.DataType = this.DataType;
+      clonedColumn.MySQLDataType = MySQLDataType;
+      clonedColumn.AutoPK = AutoPK;
+      clonedColumn.AllowNull = AllowNull;
+      clonedColumn.PrimaryKey = PrimaryKey;
       clonedColumn.Unsigned = Unsigned;
       clonedColumn.AutoIncrement = AutoIncrement;
       clonedColumn.UniqueKey = UniqueKey;

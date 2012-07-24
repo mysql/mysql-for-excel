@@ -62,13 +62,20 @@ namespace MySQL.ForExcel
       this.lstMappings = new System.Windows.Forms.ListView();
       this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+      this.numPreviewRowsQuantity = new System.Windows.Forms.NumericUpDown();
+      this.lblPreviewRowsQuantity2 = new System.Windows.Forms.Label();
+      this.lblPreviewRowsQuantity1 = new System.Windows.Forms.Label();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.numPreviewRowsQuantity)).BeginInit();
       this.SuspendLayout();
       // 
       // contentAreaPanel
       // 
       this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
+      this.contentAreaPanel.Controls.Add(this.numPreviewRowsQuantity);
+      this.contentAreaPanel.Controls.Add(this.lblPreviewRowsQuantity2);
+      this.contentAreaPanel.Controls.Add(this.lblPreviewRowsQuantity1);
       this.contentAreaPanel.Controls.Add(this.lstMappings);
       this.contentAreaPanel.Controls.Add(this.btnDelete);
       this.contentAreaPanel.Controls.Add(this.btnRenameMapping);
@@ -80,13 +87,13 @@ namespace MySQL.ForExcel
       this.contentAreaPanel.Controls.Add(this.chkAutoStoreColumnMapping);
       this.contentAreaPanel.Controls.Add(this.chkDoNotPerformAutoMap);
       this.contentAreaPanel.Controls.Add(this.lblMappingOptions);
-      this.contentAreaPanel.Size = new System.Drawing.Size(484, 445);
+      this.contentAreaPanel.Size = new System.Drawing.Size(484, 468);
       // 
       // commandAreaPanel
       // 
       this.commandAreaPanel.Controls.Add(this.btnAccept);
       this.commandAreaPanel.Controls.Add(this.btnCancel);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 445);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 468);
       this.commandAreaPanel.Size = new System.Drawing.Size(484, 45);
       // 
       // btnAccept
@@ -117,7 +124,7 @@ namespace MySQL.ForExcel
       this.chkUseFormattedValues.AutoSize = true;
       this.chkUseFormattedValues.BackColor = System.Drawing.Color.Transparent;
       this.chkUseFormattedValues.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.chkUseFormattedValues.Location = new System.Drawing.Point(53, 211);
+      this.chkUseFormattedValues.Location = new System.Drawing.Point(53, 234);
       this.chkUseFormattedValues.Name = "chkUseFormattedValues";
       this.chkUseFormattedValues.Size = new System.Drawing.Size(141, 19);
       this.chkUseFormattedValues.TabIndex = 6;
@@ -203,7 +210,7 @@ namespace MySQL.ForExcel
       this.lblStoredColumnMappings.BackColor = System.Drawing.Color.Transparent;
       this.lblStoredColumnMappings.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblStoredColumnMappings.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblStoredColumnMappings.Location = new System.Drawing.Point(24, 257);
+      this.lblStoredColumnMappings.Location = new System.Drawing.Point(24, 280);
       this.lblStoredColumnMappings.Name = "lblStoredColumnMappings";
       this.lblStoredColumnMappings.Size = new System.Drawing.Size(158, 17);
       this.lblStoredColumnMappings.TabIndex = 7;
@@ -212,7 +219,7 @@ namespace MySQL.ForExcel
       // btnRenameMapping
       // 
       this.btnRenameMapping.Enabled = false;
-      this.btnRenameMapping.Location = new System.Drawing.Point(387, 290);
+      this.btnRenameMapping.Location = new System.Drawing.Point(387, 313);
       this.btnRenameMapping.Name = "btnRenameMapping";
       this.btnRenameMapping.Size = new System.Drawing.Size(75, 25);
       this.btnRenameMapping.TabIndex = 9;
@@ -224,7 +231,7 @@ namespace MySQL.ForExcel
       // 
       this.btnDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.btnDelete.Enabled = false;
-      this.btnDelete.Location = new System.Drawing.Point(387, 321);
+      this.btnDelete.Location = new System.Drawing.Point(387, 344);
       this.btnDelete.Name = "btnDelete";
       this.btnDelete.Size = new System.Drawing.Size(75, 23);
       this.btnDelete.TabIndex = 10;
@@ -239,7 +246,7 @@ namespace MySQL.ForExcel
             this.columnHeader2});
       this.lstMappings.FullRowSelect = true;
       this.lstMappings.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-      this.lstMappings.Location = new System.Drawing.Point(53, 290);
+      this.lstMappings.Location = new System.Drawing.Point(53, 313);
       this.lstMappings.MultiSelect = false;
       this.lstMappings.Name = "lstMappings";
       this.lstMappings.Size = new System.Drawing.Size(328, 127);
@@ -258,11 +265,54 @@ namespace MySQL.ForExcel
       this.columnHeader2.Text = "";
       this.columnHeader2.Width = 0;
       // 
+      // numPreviewRowsQuantity
+      // 
+      this.numPreviewRowsQuantity.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.numPreviewRowsQuantity.Location = new System.Drawing.Point(127, 209);
+      this.numPreviewRowsQuantity.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+      this.numPreviewRowsQuantity.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+      this.numPreviewRowsQuantity.Name = "numPreviewRowsQuantity";
+      this.numPreviewRowsQuantity.Size = new System.Drawing.Size(52, 21);
+      this.numPreviewRowsQuantity.TabIndex = 12;
+      this.numPreviewRowsQuantity.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+      // 
+      // lblPreviewRowsQuantity2
+      // 
+      this.lblPreviewRowsQuantity2.AutoSize = true;
+      this.lblPreviewRowsQuantity2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblPreviewRowsQuantity2.Location = new System.Drawing.Point(185, 211);
+      this.lblPreviewRowsQuantity2.Name = "lblPreviewRowsQuantity2";
+      this.lblPreviewRowsQuantity2.Size = new System.Drawing.Size(285, 15);
+      this.lblPreviewRowsQuantity2.TabIndex = 13;
+      this.lblPreviewRowsQuantity2.Text = "Excel data rows to preview and calculate datatypes.";
+      // 
+      // lblPreviewRowsQuantity1
+      // 
+      this.lblPreviewRowsQuantity1.AutoSize = true;
+      this.lblPreviewRowsQuantity1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblPreviewRowsQuantity1.Location = new System.Drawing.Point(50, 211);
+      this.lblPreviewRowsQuantity1.Name = "lblPreviewRowsQuantity1";
+      this.lblPreviewRowsQuantity1.Size = new System.Drawing.Size(71, 15);
+      this.lblPreviewRowsQuantity1.TabIndex = 11;
+      this.lblPreviewRowsQuantity1.Text = "Use the first";
+      // 
       // AppendAdvancedOptionsDialog
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.btnCancel;
-      this.ClientSize = new System.Drawing.Size(484, 492);
+      this.ClientSize = new System.Drawing.Size(484, 515);
       this.CommandAreaHeight = 45;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
       this.Name = "AppendAdvancedOptionsDialog";
@@ -270,6 +320,7 @@ namespace MySQL.ForExcel
       this.contentAreaPanel.ResumeLayout(false);
       this.contentAreaPanel.PerformLayout();
       this.commandAreaPanel.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.numPreviewRowsQuantity)).EndInit();
       this.ResumeLayout(false);
 
     }
@@ -291,5 +342,8 @@ namespace MySQL.ForExcel
     private System.Windows.Forms.ListView lstMappings;
     private System.Windows.Forms.ColumnHeader columnHeader1;
     private System.Windows.Forms.ColumnHeader columnHeader2;
+    private System.Windows.Forms.NumericUpDown numPreviewRowsQuantity;
+    private System.Windows.Forms.Label lblPreviewRowsQuantity2;
+    private System.Windows.Forms.Label lblPreviewRowsQuantity1;
   }
 }

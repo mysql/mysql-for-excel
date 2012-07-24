@@ -42,6 +42,7 @@ namespace MySQL.ForExcel
       chkAutoStoreColumnMapping.Checked = Properties.Settings.Default.AppendAutoStoreColumnMapping;
       chkReloadColumnMapping.Checked = Properties.Settings.Default.AppendReloadColumnMapping;
       chkUseFormattedValues.Checked = Properties.Settings.Default.AppendUseFormattedValues;
+      numPreviewRowsQuantity.Value = Math.Min(numPreviewRowsQuantity.Maximum, Properties.Settings.Default.AppendLimitPreviewRowsQuantity);
       mappings = new MySQLColumnMappingList();
       RefreshMappingList();
     }
@@ -52,6 +53,7 @@ namespace MySQL.ForExcel
       Properties.Settings.Default.AppendAutoStoreColumnMapping = chkAutoStoreColumnMapping.Checked;
       Properties.Settings.Default.AppendReloadColumnMapping = chkReloadColumnMapping.Checked;
       Properties.Settings.Default.AppendUseFormattedValues = chkUseFormattedValues.Checked;
+      Properties.Settings.Default.AppendLimitPreviewRowsQuantity = (int)numPreviewRowsQuantity.Value;
       MiscUtilities.SaveSettings();
       DialogResult = DialogResult.OK;
       Close();
