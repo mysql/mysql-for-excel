@@ -3,12 +3,16 @@ MySQL for Excel 1.0 Release Notes
 
 Welcome to the release notes for MySQL for Excel 1.0
 
-Features
---------------------
-[list major features here]
-
+MySQL For Excel provides the following features:
+* Integrates seamlessly with Excel 2007 and 2010
+* Uses the MySQL Workbench connections you have already established
+* Allows importing of data from MySQL into Excel spreadsheets
+* Allows appending of Excel data onto existing MySQL tables
+* Allows exporting of Excel data into new MySQL tables
+* Seamless synchronization  of connections with MySQL Workbench
 
 Known Issues
 --------------------
-[list known issues here]
-
+* Export Data dialog's preview grid can truncate some column names
+* Connections cannot be edited currently.  Please use MySQL Workbench to edit your connections
+* Export Data dialog can change the name of an autoadded primary key when changing first row checkbox
