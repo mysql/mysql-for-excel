@@ -25,6 +25,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 using Office = Microsoft.Office.Core;
 using Microsoft.Office.Tools.Excel;
 using System.Windows.Forms;
+using System.IO;
 
 namespace MySQL.ForExcel
 {
@@ -42,6 +43,10 @@ namespace MySQL.ForExcel
 
     private void ThisAddIn_Startup(object sender, System.EventArgs e)
     {
+      // make sure our settings dir exists
+      string dir = String.Format(@"{0}\Oracle\MySQL for Excel", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+      Directory.CreateDirectory(dir);
+
       taskPaneControl = new TaskPaneControl(Application);
       taskPaneControl.Dock = DockStyle.Fill;
       taskPaneControl.SizeChanged += new EventHandler(taskPaneControl_SizeChanged);
