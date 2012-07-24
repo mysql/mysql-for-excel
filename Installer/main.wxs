@@ -70,7 +70,7 @@
       </Directory>
     </Directory>
 
-    <Feature Id="DefaultFeature" Title="MySQLForExcel" ConfigurableDirectory="INSTALLDIR" Level="1" >
+    <Feature Id="DefaultFeature" Title="MySQL for Excel" ConfigurableDirectory="INSTALLDIR" Level="1" >
       <ComponentRef Id="MainItems" />
       <ComponentRef Id="RegistryItems"/>
     </Feature>
