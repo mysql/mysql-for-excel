@@ -68,6 +68,7 @@ namespace MySQL.ForExcel
       this.grdResultSet = new MySQL.ForExcel.PreviewDataGridView();
       this.lblOptionsWarning = new System.Windows.Forms.Label();
       this.picOptionsWarning = new System.Windows.Forms.PictureBox();
+      this.lblSubSetOfData = new System.Windows.Forms.Label();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).BeginInit();
@@ -96,6 +97,7 @@ namespace MySQL.ForExcel
       this.contentAreaPanel.Controls.Add(this.lblProcedureParametersMain);
       this.contentAreaPanel.Controls.Add(this.picFrom);
       this.contentAreaPanel.Controls.Add(this.grdResultSet);
+      this.contentAreaPanel.Controls.Add(this.lblSubSetOfData);
       this.contentAreaPanel.Size = new System.Drawing.Size(846, 547);
       // 
       // commandAreaPanel
@@ -323,13 +325,12 @@ namespace MySQL.ForExcel
       // 
       // lblOptionsWarning
       // 
-      this.lblOptionsWarning.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+      this.lblOptionsWarning.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.lblOptionsWarning.AutoSize = true;
       this.lblOptionsWarning.BackColor = System.Drawing.SystemColors.Window;
       this.lblOptionsWarning.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.lblOptionsWarning.ForeColor = System.Drawing.Color.Red;
-      this.lblOptionsWarning.Location = new System.Drawing.Point(104, 518);
+      this.lblOptionsWarning.Location = new System.Drawing.Point(104, 510);
       this.lblOptionsWarning.Name = "lblOptionsWarning";
       this.lblOptionsWarning.Size = new System.Drawing.Size(76, 12);
       this.lblOptionsWarning.TabIndex = 25;
@@ -338,20 +339,34 @@ namespace MySQL.ForExcel
       // 
       // picOptionsWarning
       // 
+      this.picOptionsWarning.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.picOptionsWarning.BackColor = System.Drawing.SystemColors.Window;
       this.picOptionsWarning.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.picOptionsWarning.Location = new System.Drawing.Point(82, 513);
+      this.picOptionsWarning.Location = new System.Drawing.Point(82, 505);
       this.picOptionsWarning.Name = "picOptionsWarning";
       this.picOptionsWarning.Size = new System.Drawing.Size(20, 20);
       this.picOptionsWarning.TabIndex = 26;
       this.picOptionsWarning.TabStop = false;
       this.picOptionsWarning.Visible = false;
       // 
+      // lblSubSetOfData
+      // 
+      this.lblSubSetOfData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.lblSubSetOfData.AutoSize = true;
+      this.lblSubSetOfData.BackColor = System.Drawing.Color.Transparent;
+      this.lblSubSetOfData.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblSubSetOfData.ForeColor = System.Drawing.SystemColors.InactiveCaption;
+      this.lblSubSetOfData.Location = new System.Drawing.Point(434, 508);
+      this.lblSubSetOfData.Name = "lblSubSetOfData";
+      this.lblSubSetOfData.Size = new System.Drawing.Size(319, 15);
+      this.lblSubSetOfData.TabIndex = 7;
+      this.lblSubSetOfData.Text = "This is a small subset of the data for preview purposes only.";
+      // 
       // ImportProcedureForm
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.btnCancel;
-      this.ClientSize = new System.Drawing.Size(846, 594);
+      this.ClientSize = new System.Drawing.Size(846, 602);
       this.CommandAreaHeight = 45;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
       this.MainInstructionLocation = new System.Drawing.Point(11, 15);
@@ -390,5 +405,6 @@ namespace MySQL.ForExcel
     private PreviewDataGridView grdResultSet;
     private System.Windows.Forms.Label lblOptionsWarning;
     private System.Windows.Forms.PictureBox picOptionsWarning;
+    private System.Windows.Forms.Label lblSubSetOfData;
   }
 }

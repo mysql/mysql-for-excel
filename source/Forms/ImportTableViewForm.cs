@@ -56,6 +56,7 @@ namespace MySQL.ForExcel
       chkIncludeHeaders.Checked = true;
       chkLimitRows.Checked = false;
       lblTableNameMain.Text = String.Format("{0} Name:", importDBObject.Type.ToString());
+      lblOptionsWarning.Text = Properties.Resources.WorkSheetInCompatibilityModeWarning;
       Text = String.Format("Import Data - {0}", importToWorksheetName);
       lblTableNameSub.Text = importDBObject.Name;
       fillPreviewGrid();
@@ -83,8 +84,6 @@ namespace MySQL.ForExcel
 
     private void initCompatibilityWarning(bool show)
     {
-      if (lblOptionsWarning.Text.Length == 0)
-        lblOptionsWarning.Text = Properties.Resources.WorkSheetInCompatibilityModeWarning;
       lblOptionsWarning.Visible = show;
       picOptionsWarning.Visible = show;
     }

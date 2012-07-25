@@ -252,13 +252,15 @@ namespace MySQL.ForExcel
       {
         if (dt != null && dt.Rows.Count > 0)
         {
+          int currentRow = atCell.Row - 1;
           int rowsCount = dt.Rows.Count;
           int colsCount = dt.Columns.Count;
           int startingRow = (importColumnNames ? 1 : 0);
+          int cappedNumRows = (ActiveWorkbook.Excel8CompatibilityMode ? Math.Min(rowsCount + startingRow, UInt16.MaxValue - currentRow) : rowsCount + startingRow);
 
           Excel.Worksheet currentSheet = ActiveWorksheet;
-          fillingRange = atCell.get_Resize(rowsCount + startingRow, colsCount);
-          object[,] fillingArray = new object[rowsCount + startingRow, colsCount];
+          fillingRange = atCell.get_Resize(cappedNumRows, colsCount);
+          object[,] fillingArray = new object[cappedNumRows, colsCount];
 
           if (importColumnNames)
           {
@@ -269,7 +271,8 @@ namespace MySQL.ForExcel
           }
 
           int fillingRowIdx = startingRow;
-          for (int currRow = 0; currRow < rowsCount; currRow++)
+          cappedNumRows -= startingRow;
+          for (int currRow = 0; currRow < cappedNumRows; currRow++)
           {
             for (int currCol = 0; currCol < colsCount; currCol++)
             {
@@ -284,7 +287,7 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        using (var errorDialog = new InfoDialog(false, "Operation Error", "An error ocurred when trying to import the data."))
+        using (var errorDialog = new InfoDialog(false, "An error ocurred when trying to import the data.", ex.Message))
         {
           errorDialog.ShowDialog();
           MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);

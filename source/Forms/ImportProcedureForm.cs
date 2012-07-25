@@ -40,6 +40,7 @@ namespace MySQL.ForExcel
     private PropertiesCollection procedureParamsProperties;
     private MySqlParameter[] mysqlParameters;
     private bool workSheetInCompatibilityMode = false;
+    private DataSet previewDataSet = null;
 
     public DataSet ImportDataSet = null;
     public bool ImportHeaders { get { return chkIncludeHeaders.Checked; } }
@@ -78,6 +79,7 @@ namespace MySQL.ForExcel
       Text = String.Format("Import Data - {0}", importToWorksheetName);
       procedureParamsProperties = new PropertiesCollection();
       lblFromProcedureName.Text = importDBObject.Name;
+      lblOptionsWarning.Text = Properties.Resources.WorkSheetInCompatibilityModeWarning;
       parametersGrid.SelectedObject = procedureParamsProperties;
 
       initializeMultipleResultSetsCombo();
@@ -87,8 +89,6 @@ namespace MySQL.ForExcel
 
     private void initCompatibilityWarning(bool show)
     {
-      if (lblOptionsWarning.Text.Length == 0)
-        lblOptionsWarning.Text = Properties.Resources.WorkSheetInCompatibilityModeWarning;
       lblOptionsWarning.Visible = show;
       picOptionsWarning.Visible = show;
     }
@@ -277,6 +277,15 @@ namespace MySQL.ForExcel
         ImportDataSet.Tables.Add(outParamsTable);
         parametersGrid.Refresh();
 
+        // Prepare Preview DataSet to show it on Grids
+        previewDataSet = ImportDataSet.Clone();
+        for (int tableIdx = 0; tableIdx < ImportDataSet.Tables.Count; tableIdx++)
+        {
+          int limitRows = Math.Min(ImportDataSet.Tables[tableIdx].Rows.Count, 10);
+          for (int rowIdx = 0; rowIdx < limitRows; rowIdx++)
+            previewDataSet.Tables[tableIdx].ImportRow(ImportDataSet.Tables[tableIdx].Rows[rowIdx]);
+        }
+
         // Refresh ResultSets in Tab Control
         tabResultSets.TabPages.Clear();
         for (int dtIdx = 0; dtIdx < ImportDataSet.Tables.Count; dtIdx++)
@@ -307,8 +316,9 @@ namespace MySQL.ForExcel
       tabResultSets.TabPages[SelectedResultSet].Controls.Add(grdResultSet);
       grdResultSet.Dock = DockStyle.Fill;
       grdResultSet.SelectionMode = DataGridViewSelectionMode.CellSelect;
-      grdResultSet.DataSource = ImportDataSet;
-      grdResultSet.DataMember = ImportDataSet.Tables[SelectedResultSet].TableName;
+      if (grdResultSet.DataSource == null)
+        grdResultSet.DataSource = previewDataSet;
+      grdResultSet.DataMember = previewDataSet.Tables[SelectedResultSet].TableName;
       bool cappingAtMaxCompatRows = workSheetInCompatibilityMode && ImportDataSet.Tables[SelectedResultSet].Rows.Count > UInt16.MaxValue;
       initCompatibilityWarning(cappingAtMaxCompatRows);
       foreach (DataGridViewColumn gridCol in grdResultSet.Columns)
