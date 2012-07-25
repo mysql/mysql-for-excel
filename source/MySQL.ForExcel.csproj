@@ -189,6 +189,8 @@
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -223,7 +225,9 @@
     <Compile Include="Classes\MySQLDataTable.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Classes\MySQLForExcelConnectionsFile.cs" />
     <Compile Include="Classes\MySQLForExcelSettings.cs" />
+    <Compile Include="Classes\Options.cs" />
     <Compile Include="Controls\PreviewDataGridView.cs">
       <SubType>Component</SubType>
     </Compile>

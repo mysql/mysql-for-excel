@@ -283,7 +283,7 @@ namespace MySQL.ForExcel
       this.newConnectionLabel.TitlePixelsYOffset = 0;
       this.newConnectionLabel.TitleShadowOpacity = 0.2D;
       this.newConnectionLabel.TitleShadowPixelsXOffset = 0;
-      this.newConnectionLabel.TitleShadowPixelsYOffset = 1;
+      this.newConnectionLabel.TitleShadowPixelsYOffset = 1;      
       this.newConnectionLabel.Click += new System.EventHandler(this.newConnectionLabel_Click);
       // 
       // openConnectionLabel

@@ -50,9 +50,14 @@ namespace MySQL.ForExcel
 
     private void LoadConnections()
     {
+      string pathFile = string.Empty;
+      //TODO: CHECK if we need to clear list
       MySqlWorkbench.Connections.Clear();
-      MySqlWorkbench.LoadData();
+      
+      MySqlWorkbenchConnectionCollection connections;
 
+      connections = GetConnections();
+      
       foreach (TreeNode node in connectionList.Nodes)
         node.Nodes.Clear();
 
@@ -60,7 +65,36 @@ namespace MySQL.ForExcel
         AddConnectionToList(conn);
       if (connectionList.Nodes[0].GetNodeCount(true) > 0)
         connectionList.Nodes[0].Expand();
+      
     }
+
+
+    private MySqlWorkbenchConnectionCollection GetConnections()
+    {
+
+      string pathFile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Oracle\MySQL For Excel\connections.xml";
+
+
+      /* check if mysql excel connections file not exists*/
+      if (!File.Exists(pathFile))      
+      {
+        /*create new file and load WB Connections file */
+        string pathWorkbench = String.Format(@"{0}\MySQL\Workbench\connections.xml", Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData));        
+        
+        var newConnectionsFileClass = new MySQLForExcelConnectionsFile();
+        newConnectionsFileClass.CreateXMLFile(File.Exists(pathWorkbench), pathWorkbench);
+      
+      }
+
+       var connections = new MySqlWorkbenchConnectionCollection(@pathFile);
+
+        MySqlWorkbench workbench = new MySqlWorkbench(@pathFile);
+
+        workbench.LoadDataWithFile();
+
+        return MySqlWorkbench.Connections;
+    }
+
 
     private void AddConnectionToList(MySqlWorkbenchConnection conn)
     {
@@ -104,8 +138,9 @@ namespace MySQL.ForExcel
       DialogResult result = dlg.ShowDialog();
       if (result == DialogResult.Cancel) return;
 
-      MySqlWorkbench.Connections.Add(dlg.NewConnection);
-      MySqlWorkbench.Connections.Save();
+      var mysqlforExcelConnectionsFile = new MySQLForExcelConnectionsFile();
+      mysqlforExcelConnectionsFile.Save(dlg.NewConnection);
+      
       LoadConnections();
     }
 
@@ -152,6 +187,6 @@ namespace MySQL.ForExcel
       contextMenuStrip.Items["deleteToolStripMenuItem"].Visible = (connectionList.SelectedNode == null ||
         connectionList.SelectedNode.Name == "LocalConnectionsNode" || connectionList.SelectedNode.Name == "RemoteConnectionsNode" ||
         MySqlWorkbench.Connections.Count <= 0) ? false : true;
-    }
+    }    
   }
 }
