@@ -152,6 +152,7 @@ namespace MySQL.ForExcel
       this.manageConnectionsLabel.TitleShadowOpacity = 0.2D;
       this.manageConnectionsLabel.TitleShadowPixelsXOffset = 0;
       this.manageConnectionsLabel.TitleShadowPixelsYOffset = 1;
+      this.manageConnectionsLabel.Visible = false;
       this.manageConnectionsLabel.Click += new System.EventHandler(this.manageConnectionsLabel_Click);
       // 
       // connectionList
@@ -188,7 +189,7 @@ namespace MySQL.ForExcel
             treeNode1,
             treeNode2});
       this.connectionList.ShowNodeToolTips = true;
-      this.connectionList.Size = new System.Drawing.Size(242, 315);
+      this.connectionList.Size = new System.Drawing.Size(242, 356);
       this.connectionList.TabIndex = 22;
       this.connectionList.TitleColorOpacity = 0.8D;
       this.connectionList.TitleTextVerticalPixelsOffset = 2;
@@ -200,7 +201,7 @@ namespace MySQL.ForExcel
             this.deleteToolStripMenuItem,
             this.refreshToolStripMenuItem});
       this.contextMenuStrip.Name = "contextMenuStripRefresh";
-      this.contextMenuStrip.Size = new System.Drawing.Size(184, 70);
+      this.contextMenuStrip.Size = new System.Drawing.Size(184, 48);
       this.contextMenuStrip.Text = "Refresh";
       this.contextMenuStrip.Opened += new System.EventHandler(this.contextMenuStrip_Opened);
       // 
@@ -269,7 +270,7 @@ namespace MySQL.ForExcel
       this.newConnectionLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_WelcomePanel_NewConnection_24x24;
       this.newConnectionLabel.ImagePixelsXOffset = 0;
       this.newConnectionLabel.ImagePixelsYOffset = 0;
-      this.newConnectionLabel.Location = new System.Drawing.Point(9, 520);
+      this.newConnectionLabel.Location = new System.Drawing.Point(9, 558);
       this.newConnectionLabel.Margin = new System.Windows.Forms.Padding(4);
       this.newConnectionLabel.Name = "newConnectionLabel";
       this.newConnectionLabel.Size = new System.Drawing.Size(237, 28);
@@ -319,6 +320,7 @@ namespace MySQL.ForExcel
       // WelcomePanel
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.Controls.Add(this.newConnectionLabel);
       this.Controls.Add(this.imgSeparator);
       this.Controls.Add(this.picAddInLogoText);
       this.Controls.Add(this.lblInstructions);
@@ -327,7 +329,6 @@ namespace MySQL.ForExcel
       this.Controls.Add(this.picAddInLogo);
       this.Controls.Add(this.lblCopyright);
       this.Controls.Add(this.lblAllRights);
-      this.Controls.Add(this.newConnectionLabel);
       this.Controls.Add(this.openConnectionLabel);
       this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.Name = "WelcomePanel";
