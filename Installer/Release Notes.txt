@@ -16,3 +16,14 @@ Known Issues
 * Export Data dialog's preview grid can truncate some column names
 * Connections cannot be edited currently.  Please use MySQL Workbench to edit your connections
 * Export Data dialog can change the name of an autoadded primary key when changing first row checkbox
+* Windows Authentication only works with a proxy user, for example:
+	the following script can be used to implement proxy scenario: 
+	CREATE USER myuser1 IDENTIFIED WITH authentication_windows as 
+	'machine\\\\user1=foo_user' 
+	create user foo_user identified by 'pass' 
+	grant all privileges on *.* to 'foo_user'@'%' 
+	grant proxy on foo_user to myuser1 
+
+Then, from MySql Excel addin, a connection can be created/opened by 
+@ specifying user "myuser1" and no password (assuming windows current user is 
+machine\\user1). 
