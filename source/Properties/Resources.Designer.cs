@@ -430,6 +430,24 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Rows in all result sets exceed the limit of 65,535 rows in Compatibility Mode, one or more Result Sets will be truncated..
+        /// </summary>
+        internal static string ImportVerticallyExceedsMaxRowsDetailWarning {
+            get {
+                return ResourceManager.GetString("ImportVerticallyExceedsMaxRowsDetailWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import Exceeds Compatibility Mode Limit.
+        /// </summary>
+        internal static string ImportVerticallyExceedsMaxRowsTitleWarning {
+            get {
+                return ResourceManager.GetString("ImportVerticallyExceedsMaxRowsTitleWarning", resourceCulture);
+            }
+        }
+        
         internal static System.Drawing.Bitmap MySQLforExcel_AppendDlg_Arrow_Down {
             get {
                 object obj = ResourceManager.GetObject("MySQLforExcel_AppendDlg_Arrow_Down", resourceCulture);

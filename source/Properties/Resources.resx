@@ -434,4 +434,10 @@ Please re-enter your password to try again.</value>
 
 Please check with the Administrator if you require a SSL Connection or if he can authorize your user to login without a SSL connection.</value>
   </data>
+  <data name="ImportVerticallyExceedsMaxRowsDetailWarning" xml:space="preserve">
+    <value>Rows in all result sets exceed the limit of 65,535 rows in Compatibility Mode, one or more Result Sets will be truncated.</value>
+  </data>
+  <data name="ImportVerticallyExceedsMaxRowsTitleWarning" xml:space="preserve">
+    <value>Import Exceeds Compatibility Mode Limit</value>
+  </data>
 </root>

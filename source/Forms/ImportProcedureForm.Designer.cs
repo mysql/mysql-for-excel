@@ -118,6 +118,7 @@ namespace MySQL.ForExcel
       this.btnImport.TabIndex = 0;
       this.btnImport.Text = "Import";
       this.btnImport.UseVisualStyleBackColor = true;
+      this.btnImport.Click += new System.EventHandler(this.btnImport_Click);
       // 
       // btnCancel
       // 

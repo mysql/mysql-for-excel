@@ -40,6 +40,7 @@ namespace MySQL.ForExcel
     private PropertiesCollection procedureParamsProperties;
     private MySqlParameter[] mysqlParameters;
     private bool workSheetInCompatibilityMode = false;
+    private bool sumOfResultSetsExceedsMaxCompatibilityRows = false;
     private DataSet previewDataSet = null;
 
     public DataSet ImportDataSet = null;
@@ -264,23 +265,30 @@ namespace MySQL.ForExcel
         btnImport.Enabled = true;
 
         // Refresh output/return parameter values in PropertyGrid and add them to OutAndReturnValues table
-        DataRow valuesRow = outParamsTable.NewRow();
-        for (int paramIdx = 0; paramIdx < procedureParamsProperties.Count; paramIdx++)
+        if (outParamsTable != null && outParamsTable.Columns.Count > 0)
         {
-          if (mysqlParameters[paramIdx].Direction == ParameterDirection.Output || mysqlParameters[paramIdx].Direction == ParameterDirection.ReturnValue)
+          DataRow valuesRow = outParamsTable.NewRow();
+          for (int paramIdx = 0; paramIdx < procedureParamsProperties.Count; paramIdx++)
           {
-            procedureParamsProperties[paramIdx].Value = mysqlParameters[paramIdx].Value;
-            valuesRow[mysqlParameters[paramIdx].ParameterName] = mysqlParameters[paramIdx].Value;
+            if (mysqlParameters[paramIdx].Direction == ParameterDirection.Output || mysqlParameters[paramIdx].Direction == ParameterDirection.ReturnValue)
+            {
+              procedureParamsProperties[paramIdx].Value = mysqlParameters[paramIdx].Value;
+              valuesRow[mysqlParameters[paramIdx].ParameterName] = mysqlParameters[paramIdx].Value;
+            }
           }
+          outParamsTable.Rows.Add(valuesRow);
+          ImportDataSet.Tables.Add(outParamsTable);
+          parametersGrid.Refresh();
         }
-        outParamsTable.Rows.Add(valuesRow);
-        ImportDataSet.Tables.Add(outParamsTable);
-        parametersGrid.Refresh();
 
         // Prepare Preview DataSet to show it on Grids
         previewDataSet = ImportDataSet.Clone();
+        int resultSetsRowSum = 0;
         for (int tableIdx = 0; tableIdx < ImportDataSet.Tables.Count; tableIdx++)
         {
+          resultSetsRowSum += ImportDataSet.Tables[tableIdx].Rows.Count;
+          if (workSheetInCompatibilityMode)
+            sumOfResultSetsExceedsMaxCompatibilityRows = sumOfResultSetsExceedsMaxCompatibilityRows || resultSetsRowSum > UInt16.MaxValue;
           int limitRows = Math.Min(ImportDataSet.Tables[tableIdx].Rows.Count, 10);
           for (int rowIdx = 0; rowIdx < limitRows; rowIdx++)
             previewDataSet.Tables[tableIdx].ImportRow(ImportDataSet.Tables[tableIdx].Rows[rowIdx]);
@@ -326,6 +334,17 @@ namespace MySQL.ForExcel
         gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
       }
       grdResultSet.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
+    }
+
+    private void btnImport_Click(object sender, EventArgs e)
+    {
+      if (sumOfResultSetsExceedsMaxCompatibilityRows && ImportType == ImportMultipleType.AllResultSetsVertically && ImportDataSet.Tables.Count > 1)
+      {
+        WarningDialog warningDlg = new WarningDialog(WarningDialog.WarningButtons.OK,
+                                                     Properties.Resources.ImportVerticallyExceedsMaxRowsTitleWarning,
+                                                     Properties.Resources.ImportVerticallyExceedsMaxRowsDetailWarning);
+        warningDlg.ShowDialog();
+      }
     }
   }
 

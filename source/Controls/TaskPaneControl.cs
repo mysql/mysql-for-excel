@@ -329,6 +329,8 @@ namespace MySQL.ForExcel
               atCell = endCell.get_Offset(atCell.Row - endCell.Row, 2);
               break;
             case ImportMultipleType.AllResultSetsVertically:
+              if (ActiveWorkbook.Excel8CompatibilityMode && endCell.Row + 2 > UInt16.MaxValue)
+                return;
               atCell = endCell.get_Offset(2, atCell.Column - endCell.Column);
               break;
           }
