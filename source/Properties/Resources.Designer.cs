@@ -254,6 +254,17 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A possible fail reason could be that your user requires a SSL connection that is not supported by MySQL for Excel.
+        ///
+        ///Please check with the Administrator if you require a SSL Connection or if he can authorize your user to login without a SSL connection..
+        /// </summary>
+        internal static string ConnectSSLFailedDetailWarning {
+            get {
+                return ResourceManager.GetString("ConnectSSLFailedDetailWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Current changes will be lost, do you want to continue?.
         /// </summary>
         internal static string CurrentChangesLostConfirmation {

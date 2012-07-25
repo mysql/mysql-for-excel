@@ -429,4 +429,9 @@ Please re-enter your password to try again.</value>
   <data name="WorkSheetInCompatibilityModeWarning" xml:space="preserve">
     <value>Excel WorkSheet is in Compatibility Mode which has a row limit of 65,535 rows.</value>
   </data>
+  <data name="ConnectSSLFailedDetailWarning" xml:space="preserve">
+    <value>A possible fail reason could be that your user requires a SSL connection that is not supported by MySQL for Excel.
+
+Please check with the Administrator if you require a SSL Connection or if he can authorize your user to login without a SSL connection.</value>
+  </data>
 </root>

@@ -169,9 +169,24 @@ namespace MySQL.ForExcel
         }
         if (connection.TestConnection())
           break;
-        WarningDialog warningDlg = new WarningDialog(WarningDialog.WarningButtons.OK, Resources.ConnectFailedTitleWarning, Resources.ConnectFailedDetailWarning);
-        warningDlg.StartPosition = FormStartPosition.CenterScreen;
-        warningDlg.ShowDialog();
+
+        bool isSSL = false;
+        if (connection.UseSSL == 1 ||
+            !(string.IsNullOrWhiteSpace(connection.SSLCA) &&
+              string.IsNullOrWhiteSpace(connection.SSLCert) &&
+              string.IsNullOrWhiteSpace(connection.SSLCipher) &&
+              string.IsNullOrWhiteSpace(connection.SSLKey))
+        )
+          isSSL = true;
+
+        InfoDialog infoDialog = new InfoDialog(InfoDialog.InfoType.Warning, Resources.ConnectFailedDetailWarning, null);
+        infoDialog.OperationStatusText = Resources.ConnectFailedTitleWarning;
+        infoDialog.OperationSummarySubText = string.Empty;
+        if (isSSL)
+        {
+          infoDialog.OperationDetailsText = Resources.ConnectSSLFailedDetailWarning;
+        }
+        infoDialog.ShowDialog();
         failed = true;
       }
       bool schemasLoaded = schemaSelectionPanel1.SetConnection(connection);
