@@ -9,10 +9,11 @@ MySQL For Excel provides the following features:
 * Allows importing of data from MySQL into Excel spreadsheets
 * Allows appending of Excel data onto existing MySQL tables
 * Allows exporting of Excel data into new MySQL tables
-* Seamless synchronization  of connections with MySQL Workbench
 
 Known Issues
 --------------------
+* Seamless sync of Workbench connections is not working in this release.  
+  The connections you make in MySQL for Excel will not be available in Workbench.
 * Export Data dialog's preview grid can truncate some column names
 * Connections cannot be edited currently.  Please use MySQL Workbench to edit your connections
 * Export Data dialog can change the name of an autoadded primary key when changing first row checkbox
