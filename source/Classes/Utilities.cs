@@ -232,6 +232,10 @@ namespace MySQL.ForExcel
       cs.UseCompression = (connection.ClientCompress == 1) ? true : false;
       cs.AllowZeroDateTime = allowZeroDateTimeValues;
       cs.ConnectionProtocol = (connection.DriverType == MySqlWorkbenchConnectionType.Tcp) ? MySqlConnectionProtocol.Tcp : MySqlConnectionProtocol.NamedPipe;
+      // force to populate IntegratedSecurity
+      connection.TestConnection();
+      cs.IntegratedSecurity = connection.IntegratedSecurity;
+      
       //TODO:  use additional necessary options
       return cs.ConnectionString;
     }
