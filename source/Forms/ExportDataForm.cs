@@ -40,6 +40,8 @@ namespace MySQL.ForExcel
     private bool multiColumnPK = false;
     private bool isChanging = false;
     private Excel.Range exportDataRange;
+    private bool isTableNameValid = false;
+    private bool isColumnPKValid = true;
 
     public ExportDataForm(MySqlWorkbenchConnection wbConnection, Excel.Range exportDataRange, string exportingWorksheetName)
     {
@@ -412,6 +414,13 @@ namespace MySQL.ForExcel
     {
       timerTextChanged.Stop();
 
+      if (string.IsNullOrWhiteSpace(txtTableNameInput.Text))
+      {
+        isTableNameValid = false;
+        btnExport.Enabled = false;
+        return;
+      }
+
       previewDataTable.TableName = txtTableNameInput.Text;
 
       string cleanTableName = txtTableNameInput.Text.ToLowerInvariant().Replace(" ", "_");
@@ -420,19 +429,22 @@ namespace MySQL.ForExcel
       {
         showValidationWarning("TableNameWarning", true, Properties.Resources.TableNameExistsWarning);
         btnExport.Enabled = false;
+        isTableNameValid = false;
         return;
       }
 
       if (txtTableNameInput.Text.Contains(" ") || txtTableNameInput.Text.Any(char.IsUpper))
       {
         showValidationWarning("TableNameWarning", true, Properties.Resources.NamesWarning);
-        btnExport.Enabled = true;
+        btnExport.Enabled = isColumnPKValid;
+        isTableNameValid = true;
         return;
       }
       
       showValidationWarning("TableNameWarning", false, null);
       previewDataTable.RefreshSelectQuery();
-      btnExport.Enabled = true;
+      isTableNameValid = true;
+      btnExport.Enabled = isColumnPKValid;
     }
 
     private void txtTableNameInput_TextChanged(object sender, EventArgs e)
@@ -649,7 +661,8 @@ namespace MySQL.ForExcel
           break;
         }
       }
-      btnExport.Enabled = !showWarning;
+      isColumnPKValid = !showWarning;
+      btnExport.Enabled = isColumnPKValid && isTableNameValid;
       showValidationWarning("PrimaryKeyWarning", showWarning, Properties.Resources.PrimaryKeyColumnExistsWarning);
       previewDataTable.GetColumnAtIndex(0).DisplayName = txtAddPrimaryKey.Text;
       grdPreviewData.Columns[0].HeaderText = txtAddPrimaryKey.Text;
