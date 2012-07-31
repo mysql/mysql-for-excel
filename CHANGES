@@ -1,1 +1,4 @@
-- Disabled Export button when table name is empty.
+- Fixed code so now "text" columns can be automatically mapped to set or enum columns.
+  Fixed code to properly change mapped column names when checking/unchecking the "First Row Contains Column Names" checkbox in the Append Data Form.
+  Oracle Bug 14370049 - THE AUTO MAPPING IS NOT WORKING PROPERLY)
+- Disabled Export button when table name is empty (Oracle Bug 14389853 - EXPORT BUTTON IS ENABLED WHEN TABLE NAME IS EMPTY)

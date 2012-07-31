@@ -719,8 +719,8 @@ namespace MySQL.ForExcel
           {
             chunkQuery = GetInsertSQL(nextRow, -1, true, newRowsOnly, out nextRow);
             cmd.CommandText = chunkQuery;
-            insertedRows += cmd.ExecuteNonQuery();
             sqlQuery += chunkQuery;
+            insertedRows += cmd.ExecuteNonQuery();
           }
           transaction.Commit();
           warningsDS = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");
@@ -980,8 +980,8 @@ namespace MySQL.ForExcel
           {
             chunkQuery = GetAppendSQL(nextRow, -1, true, mappingFromTable, out nextRow);
             cmd.CommandText = chunkQuery;
-            insertedCount += cmd.ExecuteNonQuery();
             sqlQuery += chunkQuery;
+            insertedCount += cmd.ExecuteNonQuery();
           }
           transaction.Commit();
           warningsDS = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");

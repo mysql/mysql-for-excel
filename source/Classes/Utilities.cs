@@ -632,9 +632,7 @@ namespace MySQL.ForExcel
       }
       if (strippedType2 == strippedType1)
         return true;
-      bool type2IsChar = strippedType2.Contains("char");
-      bool type2IsText = strippedType2.Contains("text");
-      if (type2IsChar || type2IsText)
+      if (strippedType2.Contains("char") || strippedType2.Contains("text") || strippedType2.Contains("enum") || strippedType2.Contains("set"))
         return true;
       bool type1IsChar = strippedType1.Contains("char");
 
@@ -1149,7 +1147,7 @@ namespace MySQL.ForExcel
             retValue = false;
           else if (column.IsDate)
             retValue = DateTime.MinValue;
-          else if (column.IsCharOrText)
+          else if (column.ColumnsRequireQuotes)
             retValue = String.Empty;
         }
       }
@@ -1180,7 +1178,7 @@ namespace MySQL.ForExcel
           else if (rawValueAsString == "nein" || rawValueAsString == "no" || rawValueAsString == "false" || rawValueAsString == "0")
             retValue = false;
         }
-        else if (column.IsCharOrText)
+        else if (column.ColumnsRequireQuotes)
           retValue = MySQLDataUtilities.EscapeString(rawValue.ToString());  
       }
 

@@ -112,6 +112,17 @@ namespace MySQL.ForExcel
       }
     }
 
+    public bool IsSetOrEnum
+    {
+      get
+      {
+        if (String.IsNullOrEmpty(StrippedMySQLDataType))
+          return false;
+        string toLowerDataType = StrippedMySQLDataType.ToLowerInvariant();
+        return toLowerDataType.StartsWith("set") || toLowerDataType.StartsWith("enum");
+      }
+    }
+
     public bool IsBool
     {
       get
@@ -147,7 +158,7 @@ namespace MySQL.ForExcel
 
     public bool ColumnsRequireQuotes
     {
-      get { return IsCharOrText || IsDate; }
+      get { return IsCharOrText || IsDate || IsSetOrEnum ; }
     }
 
     public string StrippedMySQLDataType

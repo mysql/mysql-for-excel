@@ -154,7 +154,7 @@ namespace MySQL.ForExcel
 
     private MySQLColumnMapping createColumnMappingForAutomatic()
     {
-      MySQLColumnMapping autoMapping = new MySQLColumnMapping("Automatic", fromMySQLPreviewDataTable.GetColumnNamesArray(), toMySQLDataTable.GetColumnNamesArray());
+      MySQLColumnMapping autoMapping = new MySQLColumnMapping("Automatic", fromMySQLPreviewDataTable.GetColumnNamesArray(true), toMySQLDataTable.GetColumnNamesArray());
       autoMapping.SchemaName = wbConnection.Schema;
       autoMapping.TableName = toMySQLDataTable.TableName;
       autoMapping.ConnectionName = wbConnection.Name;
