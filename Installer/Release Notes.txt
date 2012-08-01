@@ -1,3 +1,26 @@
+
+MySQL for Excel 1.0.7 Release Notes
+------------------------------------
+
+Welcome to the release notes for MySQL for Excel 1.0.7
+
+* Windows Authentication is now working for both proxy & non proxy scenarios,
+  for proxy use the SQL receipt like this:
+	CREATE USER myuser1 IDENTIFIED WITH authentication_windows as 
+	'machine\\\\user1=foo_user' 
+	create user foo_user identified by 'pass' 
+	grant all privileges on *.* to 'foo_user'@'%' 
+	grant proxy on foo_user to myuser1 
+
+  while for non proxy use a SQL receipt like this
+	CREATE USER myuser1 IDENTIFIED WITH authentication_windows as 'myuser1, Administrators'
+	grant all privileges on *.* to 'myuser1'@'%'
+  where myuser1 is supposed to be a member of the Windows Administrators group.
+   
+  In both cases you should be able to connect, Excel addin will still ask for the password, 
+  just leave it blank.
+
+
 MySQL for Excel 1.0 Release Notes
 ------------------------------------
 
@@ -28,3 +51,6 @@ Known Issues
 Then, from MySql Excel addin, a connection can be created/opened by 
 @ specifying user "myuser1" and no password (assuming windows current user is 
 machine\\user1). 
+
+
+
