@@ -1,5 +1,7 @@
+- Fixed code in custom PreviewDataViewGrid control to readjust the recalculation of the headers width when the HeaderText changes and to disable the AutoWidth feature of each
+  column header when the automatically recalculated width exceeds the ColumnsMaximumWidth property. (Oracle Bug 14350168 - EXPORT DATA DIALOG'S PREVIEW GRID TRUNCATES COLUMN NAMES)
 - Fixed code so now "text" columns can be automatically mapped to set or enum columns.
   Fixed code to properly change mapped column names when checking/unchecking the "First Row Contains Column Names" checkbox in the Append Data Form.
-  Oracle Bug 14370049 - THE AUTO MAPPING IS NOT WORKING PROPERLY)
+  (Oracle Bug 14370049 - THE AUTO MAPPING IS NOT WORKING PROPERLY)
 - Disabled Export button when table name is empty (Oracle Bug 14389853 - EXPORT BUTTON IS ENABLED WHEN TABLE NAME IS EMPTY)
 - Fix for Bug #14368158 - Connections created in MySQL For Excel unusable in Workbench.

@@ -51,22 +51,33 @@ namespace MySQL.ForExcel
       ColumnsMaximumWidth = 0;
     }
 
-    private void resetColumnWidth(DataGridViewColumn col)
-    {
-      if (ColumnsMaximumWidth > 0 && col.Width > ColumnsMaximumWidth && ColumnsMaximumWidth > col.MinimumWidth)
-      {
-        col.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-        skipWidthRecalculation = true;
-        col.Width = ColumnsMaximumWidth;
-        skipWidthRecalculation = false;
-      }
-    }
-
     protected override void OnColumnWidthChanged(DataGridViewColumnEventArgs e)
     {
+      if (skipWidthRecalculation)
+        return;
       base.OnColumnWidthChanged(e);
-      if (!skipWidthRecalculation)
-        resetColumnWidth(e.Column);
+      if (ColumnsMaximumWidth > 0 && e.Column.Width > ColumnsMaximumWidth && ColumnsMaximumWidth > e.Column.MinimumWidth)
+      {
+        skipWidthRecalculation = true;
+        e.Column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+        e.Column.HeaderCell.Style.WrapMode = DataGridViewTriState.False;
+        e.Column.Width = ColumnsMaximumWidth;
+        skipWidthRecalculation = false;
+      }
+      else
+        e.Column.HeaderCell.Style.WrapMode = DataGridViewTriState.True;
+    }
+
+    protected override void OnCellValueChanged(DataGridViewCellEventArgs e)
+    {
+      if (skipWidthRecalculation)
+        return;
+      base.OnCellValueChanged(e);
+      if (e.RowIndex < 0)
+      {
+        if (this.Columns[e.ColumnIndex].AutoSizeMode != DataGridViewAutoSizeColumnMode.AllCells)
+          this.Columns[e.ColumnIndex].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+      }
     }
 
   }
