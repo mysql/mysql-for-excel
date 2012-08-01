@@ -1,3 +1,4 @@
+- Added back in the Welcome Panel the Manage Connections action label. (Oracle bug 14368158 - CONNECTIONS CREATED IN MYSQL FOR EXCEL UNUSABLE IN WORKBENCH).
 - Fixed code in custom PreviewDataViewGrid control to readjust the recalculation of the headers width when the HeaderText changes and to disable the AutoWidth feature of each
   column header when the automatically recalculated width exceeds the ColumnsMaximumWidth property. (Oracle Bug 14350168 - EXPORT DATA DIALOG'S PREVIEW GRID TRUNCATES COLUMN NAMES)
 - Fixed code so now "text" columns can be automatically mapped to set or enum columns.
