@@ -2,3 +2,4 @@
   Fixed code to properly change mapped column names when checking/unchecking the "First Row Contains Column Names" checkbox in the Append Data Form.
   Oracle Bug 14370049 - THE AUTO MAPPING IS NOT WORKING PROPERLY)
 - Disabled Export button when table name is empty (Oracle Bug 14389853 - EXPORT BUTTON IS ENABLED WHEN TABLE NAME IS EMPTY)
+- Fix for Bug #14368158 - Connections created in MySQL For Excel unusable in Workbench.

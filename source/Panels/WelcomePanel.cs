@@ -45,54 +45,36 @@ namespace MySQL.ForExcel
 
       DoubleBuffered = true;
       manageConnectionsLabel.Enabled = MySqlWorkbench.IsInstalled;
-      LoadConnections();
+      LoadConnections();      
     }
 
     private void LoadConnections()
-    {
-      string pathFile = string.Empty;
-      //TODO: CHECK if we need to clear list
-      MySqlWorkbench.Connections.Clear();
-      
-      MySqlWorkbenchConnectionCollection connections;
+    {                  
+      List<MySqlWorkbenchConnection> connections = GetConnections();
 
-      connections = GetConnections();
-      
+      if (connections == null)
+        return;
+
       foreach (TreeNode node in connectionList.Nodes)
         node.Nodes.Clear();
 
-      foreach (MySqlWorkbenchConnection conn in MySqlWorkbench.Connections)
+      foreach (MySqlWorkbenchConnection conn in connections)
         AddConnectionToList(conn);
       if (connectionList.Nodes[0].GetNodeCount(true) > 0)
         connectionList.Nodes[0].Expand();
       
     }
 
-
-    private MySqlWorkbenchConnectionCollection GetConnections()
+    private List<MySqlWorkbenchConnection> GetConnections()
     {
 
-      string pathFile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Oracle\MySQL For Excel\connections.xml";
+      if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\MySQL\Workbench\connections.xml"))
+        MySQLForExcelConnectionsFile.CreateXMLFile();
 
+      if (MySqlWorkbench.Connections != null)
+        return MySqlWorkbench.Connections.Where(t => !String.IsNullOrEmpty(t.Name)).ToList();
 
-      /* check if mysql excel connections file not exists*/
-      if (!File.Exists(pathFile))      
-      {
-        /*create new file and load WB Connections file */
-        string pathWorkbench = String.Format(@"{0}\MySQL\Workbench\connections.xml", Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData));        
-        
-        var newConnectionsFileClass = new MySQLForExcelConnectionsFile();
-        newConnectionsFileClass.CreateXMLFile(File.Exists(pathWorkbench), pathWorkbench);
-      
-      }
-
-       var connections = new MySqlWorkbenchConnectionCollection(@pathFile);
-
-        MySqlWorkbench workbench = new MySqlWorkbench(@pathFile);
-
-        workbench.LoadDataWithFile();
-
-        return MySqlWorkbench.Connections;
+      return null;
     }
 
 
@@ -137,9 +119,8 @@ namespace MySQL.ForExcel
       NewConnectionDialog dlg = new NewConnectionDialog();
       DialogResult result = dlg.ShowDialog();
       if (result == DialogResult.Cancel) return;
-
-      var mysqlforExcelConnectionsFile = new MySQLForExcelConnectionsFile();
-      mysqlforExcelConnectionsFile.Save(dlg.NewConnection);
+      
+      MySQLForExcelConnectionsFile.Save(dlg.NewConnection);
       
       LoadConnections();
     }
