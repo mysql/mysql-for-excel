@@ -32,7 +32,6 @@ namespace MySQL.ForExcel
   public partial class ThisAddIn
   {
     private const int paneWidth = 260;
-    private const int minPaneHeight = 500;
     private TaskPaneControl taskPaneControl;
     private Microsoft.Office.Tools.CustomTaskPane taskPaneValue;
 
@@ -59,13 +58,20 @@ namespace MySQL.ForExcel
 
     void taskPaneControl_SizeChanged(object sender, EventArgs e)
     {
-      if (taskPaneValue != null && taskPaneValue.Visible && (taskPaneValue.Width != paneWidth || taskPaneValue.Height < minPaneHeight))
+      if (taskPaneValue == null || !taskPaneValue.Visible)
+        return;
+      bool shouldResetWidth = taskPaneValue.Width != paneWidth && this.Application.Width >= paneWidth;
+      if (shouldResetWidth)
       {
-        SendKeys.Send("{ESC}");
-        if (taskPaneValue.Width != paneWidth)
+        try
+        {
+          SendKeys.Send("{ESC}");
           taskPaneValue.Width = paneWidth;
-        if (taskPaneValue.Height < minPaneHeight)
-          taskPaneValue.Height = minPaneHeight;
+        }
+        catch (Exception ex)
+        {
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
+        }
       }
     }
 

@@ -1,3 +1,5 @@
+- Removed the code that reset the TaskPaneControl's height since the height can't be changed for a right-docking of the panel.
+  (Oracle bug 14369568 - EXCEL WINDOW CAN'T BE RESIZED IF STARTS WITH A SMALL SIZE).
 - Added back in the Welcome Panel the Manage Connections action label. (Oracle bug 14368158 - CONNECTIONS CREATED IN MYSQL FOR EXCEL UNUSABLE IN WORKBENCH).
 - Fixed code in custom PreviewDataViewGrid control to readjust the recalculation of the headers width when the HeaderText changes and to disable the AutoWidth feature of each
   column header when the automatically recalculated width exceeds the ColumnsMaximumWidth property. (Oracle Bug 14350168 - EXPORT DATA DIALOG'S PREVIEW GRID TRUNCATES COLUMN NAMES)
