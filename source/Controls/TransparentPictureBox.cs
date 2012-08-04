@@ -26,43 +26,42 @@ namespace MySQL.ForExcel
 {
   public class TransparentPictureBox : UserControl
   {
-    
-    private Image _image;
     private float _opacity = 0;
+    private ImageAttributes ia = null;
 
-    public Image Image
-    {
-      get
-      {
-        return _image;
-      }
-      set
-      {
-        _image = value;
-        RecreateHandle();
-      }
-    }
+    public Image Image { set; get; }
 
     public float Opacity
     {
       get
-      {
-        return _opacity;            
-      }
+      { return _opacity; }
       set
       {
         if (!(value <= 1 && value >= 0))
           throw new ArgumentOutOfRangeException("Value is out of range");
-        else
-          _opacity = value;      
+        _opacity = value;
+        ColorMatrix cm = new ColorMatrix();
+        cm.Matrix00 = cm.Matrix11 = cm.Matrix22 = cm.Matrix44 = 1;
+        cm.Matrix33 = _opacity;
+        ia = new ImageAttributes();
+        ia.SetColorMatrix(cm);
       }    
     }
-
 
     public TransparentPictureBox()
     {
       SetStyle(ControlStyles.SupportsTransparentBackColor, true);
-      BackColor = Color.Transparent;     
+      BackColor = Color.Transparent;
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+      if (disposing)
+      {
+        if (ia != null)
+          ia.Dispose();
+      }
+      base.Dispose(disposing);
     }
 
     protected override CreateParams CreateParams
@@ -77,31 +76,14 @@ namespace MySQL.ForExcel
   
     protected override void OnPaint(PaintEventArgs e)
     {
-      if (_image != null)
-      {
-        ColorMatrix cm = new ColorMatrix();
-        cm.Matrix00 = cm.Matrix11 = cm.Matrix22 = cm.Matrix44 = 1;
-        cm.Matrix33 = _opacity;
-        
-        ImageAttributes ia = new ImageAttributes();
-        ia.SetColorMatrix(cm);  
-        e.Graphics.DrawImage(_image, new Rectangle(0, 0, _image.Width, _image.Height), 0, 0, _image.Width, _image.Height, GraphicsUnit.Pixel, ia);                
-      }
+      base.OnPaint(e);
+      if (Image != null)
+        e.Graphics.DrawImage(Image, new Rectangle(0, 0, Image.Width, Image.Height), 0, 0, Image.Width, Image.Height, GraphicsUnit.Pixel, ia);
     }
 
     protected override void OnPaintBackground(PaintEventArgs e)
     {
       //Don't paint background so we can keep transparency
-    }
-
-    protected override void OnMove(EventArgs e)
-    {
-      RecreateHandle();
-    }
-
-    public void Redraw()
-    {
-      RecreateHandle();
     }
    
   }

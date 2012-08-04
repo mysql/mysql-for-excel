@@ -1,3 +1,7 @@
+1.0.7
+- Refactoring on TransparentPictureBox control to fix some flickering when resizing the Excel form.
+  Added an upperPanel that contains all controls above the MyTreeView controls to all panels so when the form is resized to have a very small size the controls at the bottom
+  actually go behind the new upperPanel so there is no overlapping at all. (Oracle bug 14406412 - OVERLAPPING CONTROLS ON ALL PANELS WHEN EXCEL WINDOW IS SMALL).
 - Removed the code that reset the TaskPaneControl's height since the height can't be changed for a right-docking of the panel.
   (Oracle bug 14369568 - EXCEL WINDOW CAN'T BE RESIZED IF STARTS WITH A SMALL SIZE).
 - Added back in the Welcome Panel the Manage Connections action label. (Oracle bug 14368158 - CONNECTIONS CREATED IN MYSQL FOR EXCEL UNUSABLE IN WORKBENCH).

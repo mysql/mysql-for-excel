@@ -49,58 +49,29 @@ namespace MySQL.ForExcel
     {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DBObjectSelectionPanel));
-      this.lblConnectionName = new System.Windows.Forms.Label();
-      this.lblUserIP = new System.Windows.Forms.Label();
-      this.picAddInLogo = new System.Windows.Forms.PictureBox();
       this.largeImages = new System.Windows.Forms.ImageList(this.components);
       this.btnClose = new System.Windows.Forms.Button();
       this.btnBack = new System.Windows.Forms.Button();
       this.btnHelp = new System.Windows.Forms.Button();
-      this.objectFilter = new MySQL.ForExcel.SearchEdit();
       this.objectList = new MySQL.ForExcel.MyTreeView();
       this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.refreshDatabaseObjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.appendDataLabel = new MySQL.ForExcel.HotLabel();
       this.editDataLabel = new MySQL.ForExcel.HotLabel();
       this.importDataLabel = new MySQL.ForExcel.HotLabel();
-      this.selectDatabaseObjectLabel = new MySQL.ForExcel.HotLabel();
-      this.exportToNewTableLabel = new MySQL.ForExcel.HotLabel();
-      this.imgSeparator = new MySQL.ForExcel.TransparentPictureBox();
       this.labelsToolTip = new System.Windows.Forms.ToolTip(this.components);
-      ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
+      this.upperPanel = new System.Windows.Forms.Panel();
+      this.imgSeparator = new MySQL.ForExcel.TransparentPictureBox();
+      this.lblUserIP = new System.Windows.Forms.Label();
+      this.objectFilter = new MySQL.ForExcel.SearchEdit();
+      this.selectDatabaseObjectLabel = new MySQL.ForExcel.HotLabel();
+      this.lblConnectionName = new System.Windows.Forms.Label();
+      this.exportToNewTableLabel = new MySQL.ForExcel.HotLabel();
+      this.picAddInLogo = new System.Windows.Forms.PictureBox();
       this.contextMenuStrip.SuspendLayout();
+      this.upperPanel.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
       this.SuspendLayout();
-      // 
-      // lblConnectionName
-      // 
-      this.lblConnectionName.AutoEllipsis = true;
-      this.lblConnectionName.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblConnectionName.Location = new System.Drawing.Point(61, 18);
-      this.lblConnectionName.Name = "lblConnectionName";
-      this.lblConnectionName.Size = new System.Drawing.Size(190, 18);
-      this.lblConnectionName.TabIndex = 1;
-      this.lblConnectionName.Text = "Connection Name";
-      this.lblConnectionName.Paint += new System.Windows.Forms.PaintEventHandler(this.label_Paint);
-      // 
-      // lblUserIP
-      // 
-      this.lblUserIP.AutoEllipsis = true;
-      this.lblUserIP.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblUserIP.Location = new System.Drawing.Point(61, 36);
-      this.lblUserIP.Name = "lblUserIP";
-      this.lblUserIP.Size = new System.Drawing.Size(190, 18);
-      this.lblUserIP.TabIndex = 2;
-      this.lblUserIP.Text = "User: ??, IP: ??";
-      this.lblUserIP.Paint += new System.Windows.Forms.PaintEventHandler(this.label_Paint);
-      // 
-      // picAddInLogo
-      // 
-      this.picAddInLogo.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Logo_64x64;
-      this.picAddInLogo.Location = new System.Drawing.Point(9, 11);
-      this.picAddInLogo.Name = "picAddInLogo";
-      this.picAddInLogo.Size = new System.Drawing.Size(64, 64);
-      this.picAddInLogo.TabIndex = 13;
-      this.picAddInLogo.TabStop = false;
       // 
       // largeImages
       // 
@@ -146,19 +117,6 @@ namespace MySQL.ForExcel
       this.btnHelp.UseVisualStyleBackColor = true;
       this.btnHelp.Visible = false;
       this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
-      // 
-      // objectFilter
-      // 
-      this.objectFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.objectFilter.BackColor = System.Drawing.SystemColors.Window;
-      this.objectFilter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-      this.objectFilter.Location = new System.Drawing.Point(9, 171);
-      this.objectFilter.Name = "objectFilter";
-      this.objectFilter.NoTextLabel = "Filter Schema Objects";
-      this.objectFilter.Size = new System.Drawing.Size(242, 21);
-      this.objectFilter.TabIndex = 26;
-      this.objectFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.objectFilter_KeyDown);
       // 
       // objectList
       // 
@@ -307,6 +265,50 @@ namespace MySQL.ForExcel
       this.importDataLabel.TitleShadowPixelsYOffset = 1;
       this.importDataLabel.Click += new System.EventHandler(this.importData_Click);
       // 
+      // upperPanel
+      // 
+      this.upperPanel.Controls.Add(this.imgSeparator);
+      this.upperPanel.Controls.Add(this.lblUserIP);
+      this.upperPanel.Controls.Add(this.objectFilter);
+      this.upperPanel.Controls.Add(this.selectDatabaseObjectLabel);
+      this.upperPanel.Controls.Add(this.lblConnectionName);
+      this.upperPanel.Controls.Add(this.exportToNewTableLabel);
+      this.upperPanel.Controls.Add(this.picAddInLogo);
+      this.upperPanel.Location = new System.Drawing.Point(0, 0);
+      this.upperPanel.Name = "upperPanel";
+      this.upperPanel.Size = new System.Drawing.Size(260, 195);
+      this.upperPanel.TabIndex = 28;
+      // 
+      // imgSeparator
+      // 
+      this.imgSeparator.BackColor = System.Drawing.Color.Transparent;
+      this.imgSeparator.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Separator;
+      this.imgSeparator.Location = new System.Drawing.Point(9, 108);
+      this.imgSeparator.Name = "imgSeparator";
+      this.imgSeparator.Opacity = 0.3F;
+      this.imgSeparator.Size = new System.Drawing.Size(237, 22);
+      this.imgSeparator.TabIndex = 34;
+      // 
+      // lblUserIP
+      // 
+      this.lblUserIP.AutoEllipsis = true;
+      this.lblUserIP.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblUserIP.Location = new System.Drawing.Point(61, 36);
+      this.lblUserIP.Name = "lblUserIP";
+      this.lblUserIP.Size = new System.Drawing.Size(190, 18);
+      this.lblUserIP.TabIndex = 29;
+      this.lblUserIP.Text = "User: ??, IP: ??";
+      // 
+      // objectFilter
+      // 
+      this.objectFilter.BackColor = System.Drawing.SystemColors.Window;
+      this.objectFilter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+      this.objectFilter.Location = new System.Drawing.Point(9, 171);
+      this.objectFilter.Name = "objectFilter";
+      this.objectFilter.NoTextLabel = "Filter Schema Objects";
+      this.objectFilter.Size = new System.Drawing.Size(242, 21);
+      this.objectFilter.TabIndex = 33;
+      // 
       // selectDatabaseObjectLabel
       // 
       this.selectDatabaseObjectLabel.Description = "Then click on an action item below";
@@ -327,7 +329,7 @@ namespace MySQL.ForExcel
       this.selectDatabaseObjectLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.selectDatabaseObjectLabel.Name = "selectDatabaseObjectLabel";
       this.selectDatabaseObjectLabel.Size = new System.Drawing.Size(237, 28);
-      this.selectDatabaseObjectLabel.TabIndex = 15;
+      this.selectDatabaseObjectLabel.TabIndex = 32;
       this.selectDatabaseObjectLabel.Title = "Select a Database Object";
       this.selectDatabaseObjectLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.selectDatabaseObjectLabel.TitleColorOpacity = 0.95D;
@@ -337,6 +339,16 @@ namespace MySQL.ForExcel
       this.selectDatabaseObjectLabel.TitleShadowOpacity = 0.2D;
       this.selectDatabaseObjectLabel.TitleShadowPixelsXOffset = 0;
       this.selectDatabaseObjectLabel.TitleShadowPixelsYOffset = 1;
+      // 
+      // lblConnectionName
+      // 
+      this.lblConnectionName.AutoEllipsis = true;
+      this.lblConnectionName.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblConnectionName.Location = new System.Drawing.Point(61, 18);
+      this.lblConnectionName.Name = "lblConnectionName";
+      this.lblConnectionName.Size = new System.Drawing.Size(190, 18);
+      this.lblConnectionName.TabIndex = 28;
+      this.lblConnectionName.Text = "Connection Name";
       // 
       // exportToNewTableLabel
       // 
@@ -359,7 +371,7 @@ namespace MySQL.ForExcel
       this.exportToNewTableLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.exportToNewTableLabel.Name = "exportToNewTableLabel";
       this.exportToNewTableLabel.Size = new System.Drawing.Size(237, 28);
-      this.exportToNewTableLabel.TabIndex = 14;
+      this.exportToNewTableLabel.TabIndex = 31;
       this.exportToNewTableLabel.Title = "Export Excel Data to New Table";
       this.exportToNewTableLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.exportToNewTableLabel.TitleColorOpacity = 0.95D;
@@ -369,63 +381,57 @@ namespace MySQL.ForExcel
       this.exportToNewTableLabel.TitleShadowOpacity = 0.2D;
       this.exportToNewTableLabel.TitleShadowPixelsXOffset = 0;
       this.exportToNewTableLabel.TitleShadowPixelsYOffset = 1;
-      this.exportToNewTableLabel.Click += new System.EventHandler(this.exportToNewTable_Click);
       // 
-      // imgSeparator
+      // picAddInLogo
       // 
-      this.imgSeparator.BackColor = System.Drawing.Color.Transparent;
-      this.imgSeparator.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Separator;
-      this.imgSeparator.Location = new System.Drawing.Point(9, 108);
-      this.imgSeparator.Name = "imgSeparator";
-      this.imgSeparator.Opacity = 0.3F;
-      this.imgSeparator.Size = new System.Drawing.Size(237, 22);
-      this.imgSeparator.TabIndex = 27;
+      this.picAddInLogo.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Logo_64x64;
+      this.picAddInLogo.Location = new System.Drawing.Point(9, 11);
+      this.picAddInLogo.Name = "picAddInLogo";
+      this.picAddInLogo.Size = new System.Drawing.Size(64, 64);
+      this.picAddInLogo.TabIndex = 30;
+      this.picAddInLogo.TabStop = false;
       // 
       // DBObjectSelectionPanel
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-      this.Controls.Add(this.imgSeparator);
-      this.Controls.Add(this.lblUserIP);
-      this.Controls.Add(this.objectFilter);
+      this.Controls.Add(this.upperPanel);
       this.Controls.Add(this.appendDataLabel);
       this.Controls.Add(this.objectList);
       this.Controls.Add(this.importDataLabel);
-      this.Controls.Add(this.selectDatabaseObjectLabel);
       this.Controls.Add(this.btnHelp);
       this.Controls.Add(this.editDataLabel);
       this.Controls.Add(this.btnClose);
       this.Controls.Add(this.btnBack);
-      this.Controls.Add(this.lblConnectionName);
-      this.Controls.Add(this.exportToNewTableLabel);
-      this.Controls.Add(this.picAddInLogo);
       this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.Name = "DBObjectSelectionPanel";
       this.Size = new System.Drawing.Size(260, 625);
-      ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
       this.contextMenuStrip.ResumeLayout(false);
+      this.upperPanel.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
       this.ResumeLayout(false);
 
     }
 
     #endregion
 
-    private System.Windows.Forms.Label lblConnectionName;
-    private System.Windows.Forms.Label lblUserIP;
-    private System.Windows.Forms.PictureBox picAddInLogo;
     public System.Windows.Forms.Button btnClose;
     public System.Windows.Forms.Button btnBack;
     private System.Windows.Forms.ImageList largeImages;
     public System.Windows.Forms.Button btnHelp;
-    private HotLabel exportToNewTableLabel;
-    private HotLabel selectDatabaseObjectLabel;
     private HotLabel importDataLabel;
     private HotLabel editDataLabel;
     private HotLabel appendDataLabel;
     private MyTreeView objectList;
-    private SearchEdit objectFilter;
-    private TransparentPictureBox imgSeparator;
     private System.Windows.Forms.ToolTip labelsToolTip;
     private System.Windows.Forms.ContextMenuStrip contextMenuStrip;
     private System.Windows.Forms.ToolStripMenuItem refreshDatabaseObjectsToolStripMenuItem;
+    private System.Windows.Forms.Panel upperPanel;
+    private TransparentPictureBox imgSeparator;
+    private System.Windows.Forms.Label lblUserIP;
+    private SearchEdit objectFilter;
+    private HotLabel selectDatabaseObjectLabel;
+    private System.Windows.Forms.Label lblConnectionName;
+    private HotLabel exportToNewTableLabel;
+    private System.Windows.Forms.PictureBox picAddInLogo;
   }
 }
