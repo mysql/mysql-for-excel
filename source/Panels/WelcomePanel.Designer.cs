@@ -49,13 +49,9 @@ namespace MySQL.ForExcel
     {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WelcomePanel));
-      System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Local Connections");
-      System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Remote Connections");
-      this.picAddInLogo = new System.Windows.Forms.PictureBox();
+      System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Local Connections");
+      System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Remote Connections");
       this.largeImages = new System.Windows.Forms.ImageList(this.components);
-      this.picAddInLogoText = new System.Windows.Forms.PictureBox();
-      this.imgSeparator = new MySQL.ForExcel.TransparentPictureBox();
-      this.lblInstructions = new MySQL.ForExcel.TransparentLabel();
       this.manageConnectionsLabel = new MySQL.ForExcel.HotLabel();
       this.connectionList = new MySQL.ForExcel.MyTreeView();
       this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -64,20 +60,17 @@ namespace MySQL.ForExcel
       this.lblCopyright = new MySQL.ForExcel.TransparentLabel();
       this.lblAllRights = new MySQL.ForExcel.TransparentLabel();
       this.newConnectionLabel = new MySQL.ForExcel.HotLabel();
+      this.upperPanel = new System.Windows.Forms.Panel();
+      this.imgSeparator = new MySQL.ForExcel.TransparentPictureBox();
+      this.picAddInLogoText = new System.Windows.Forms.PictureBox();
+      this.lblInstructions = new MySQL.ForExcel.TransparentLabel();
+      this.picAddInLogo = new System.Windows.Forms.PictureBox();
       this.openConnectionLabel = new MySQL.ForExcel.HotLabel();
-      ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picAddInLogoText)).BeginInit();
       this.contextMenuStrip.SuspendLayout();
+      this.upperPanel.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.picAddInLogoText)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
       this.SuspendLayout();
-      // 
-      // picAddInLogo
-      // 
-      this.picAddInLogo.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Logo_64x64;
-      this.picAddInLogo.Location = new System.Drawing.Point(9, 12);
-      this.picAddInLogo.Name = "picAddInLogo";
-      this.picAddInLogo.Size = new System.Drawing.Size(64, 64);
-      this.picAddInLogo.TabIndex = 13;
-      this.picAddInLogo.TabStop = false;
       // 
       // largeImages
       // 
@@ -85,41 +78,6 @@ namespace MySQL.ForExcel
       this.largeImages.TransparentColor = System.Drawing.Color.Transparent;
       this.largeImages.Images.SetKeyName(0, "MySQLforExcel-WelcomePanel-ListItem-Connection-32x32.png");
       this.largeImages.Images.SetKeyName(1, "MySQLforExcel-WelcomePanel-Connection-Disabled-24x24.png");
-      // 
-      // picAddInLogoText
-      // 
-      this.picAddInLogoText.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_WelcomePanel_Title;
-      this.picAddInLogoText.Location = new System.Drawing.Point(69, 22);
-      this.picAddInLogoText.Name = "picAddInLogoText";
-      this.picAddInLogoText.Size = new System.Drawing.Size(172, 36);
-      this.picAddInLogoText.TabIndex = 24;
-      this.picAddInLogoText.TabStop = false;
-      // 
-      // imgSeparator
-      // 
-      this.imgSeparator.BackColor = System.Drawing.Color.Transparent;
-      this.imgSeparator.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Separator;
-      this.imgSeparator.Location = new System.Drawing.Point(9, 136);
-      this.imgSeparator.Name = "imgSeparator";
-      this.imgSeparator.Opacity = 0.3F;
-      this.imgSeparator.Size = new System.Drawing.Size(242, 21);
-      this.imgSeparator.TabIndex = 25;
-      // 
-      // lblInstructions
-      // 
-      this.lblInstructions.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblInstructions.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblInstructions.Location = new System.Drawing.Point(9, 73);
-      this.lblInstructions.Name = "lblInstructions";
-      this.lblInstructions.PixelsSpacingAdjustment = -3;
-      this.lblInstructions.ShadowColor = System.Drawing.SystemColors.ControlText;
-      this.lblInstructions.ShadowOpacity = 0.7D;
-      this.lblInstructions.Size = new System.Drawing.Size(237, 54);
-      this.lblInstructions.TabIndex = 2;
-      this.lblInstructions.TextOpacity = 0.6D;
-      this.lblInstructions.TransparentText = "MySQL for Excel allows you to work with the MySQL Database right from within the " +
-    "MS Office Excel application. Excel is a powerful tool for data analysis and edit" +
-    "ing.";
       // 
       // manageConnectionsLabel
       // 
@@ -176,17 +134,17 @@ namespace MySQL.ForExcel
       this.connectionList.Name = "connectionList";
       this.connectionList.NodeHeightMultiple = 2;
       this.connectionList.NodeImages = this.largeImages;
-      treeNode1.BackColor = System.Drawing.SystemColors.ControlLight;
-      treeNode1.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode1.Name = "LocalConnectionsNode";
-      treeNode1.Text = "Local Connections";
-      treeNode2.BackColor = System.Drawing.SystemColors.ControlLight;
-      treeNode2.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode2.Name = "RemoteConnectionsNode";
-      treeNode2.Text = "Remote Connections";
+      treeNode3.BackColor = System.Drawing.SystemColors.ControlLight;
+      treeNode3.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode3.Name = "LocalConnectionsNode";
+      treeNode3.Text = "Local Connections";
+      treeNode4.BackColor = System.Drawing.SystemColors.ControlLight;
+      treeNode4.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode4.Name = "RemoteConnectionsNode";
+      treeNode4.Text = "Remote Connections";
       this.connectionList.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1,
-            treeNode2});
+            treeNode3,
+            treeNode4});
       this.connectionList.ShowNodeToolTips = true;
       this.connectionList.Size = new System.Drawing.Size(242, 315);
       this.connectionList.TabIndex = 22;
@@ -285,6 +243,63 @@ namespace MySQL.ForExcel
       this.newConnectionLabel.TitleShadowPixelsYOffset = 1;
       this.newConnectionLabel.Click += new System.EventHandler(this.newConnectionLabel_Click);
       // 
+      // upperPanel
+      // 
+      this.upperPanel.BackColor = System.Drawing.SystemColors.Control;
+      this.upperPanel.Controls.Add(this.imgSeparator);
+      this.upperPanel.Controls.Add(this.picAddInLogoText);
+      this.upperPanel.Controls.Add(this.lblInstructions);
+      this.upperPanel.Controls.Add(this.picAddInLogo);
+      this.upperPanel.Controls.Add(this.openConnectionLabel);
+      this.upperPanel.Location = new System.Drawing.Point(0, 0);
+      this.upperPanel.Name = "upperPanel";
+      this.upperPanel.Size = new System.Drawing.Size(260, 191);
+      this.upperPanel.TabIndex = 26;
+      // 
+      // imgSeparator
+      // 
+      this.imgSeparator.BackColor = System.Drawing.Color.Transparent;
+      this.imgSeparator.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Separator;
+      this.imgSeparator.Location = new System.Drawing.Point(9, 135);
+      this.imgSeparator.Name = "imgSeparator";
+      this.imgSeparator.Opacity = 0.3F;
+      this.imgSeparator.Size = new System.Drawing.Size(242, 21);
+      this.imgSeparator.TabIndex = 30;
+      // 
+      // picAddInLogoText
+      // 
+      this.picAddInLogoText.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_WelcomePanel_Title;
+      this.picAddInLogoText.Location = new System.Drawing.Point(69, 21);
+      this.picAddInLogoText.Name = "picAddInLogoText";
+      this.picAddInLogoText.Size = new System.Drawing.Size(172, 36);
+      this.picAddInLogoText.TabIndex = 29;
+      this.picAddInLogoText.TabStop = false;
+      // 
+      // lblInstructions
+      // 
+      this.lblInstructions.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblInstructions.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.lblInstructions.Location = new System.Drawing.Point(9, 72);
+      this.lblInstructions.Name = "lblInstructions";
+      this.lblInstructions.PixelsSpacingAdjustment = -3;
+      this.lblInstructions.ShadowColor = System.Drawing.SystemColors.ControlText;
+      this.lblInstructions.ShadowOpacity = 0.7D;
+      this.lblInstructions.Size = new System.Drawing.Size(237, 54);
+      this.lblInstructions.TabIndex = 26;
+      this.lblInstructions.TextOpacity = 0.6D;
+      this.lblInstructions.TransparentText = "MySQL for Excel allows you to work with the MySQL Database right from within the " +
+    "MS Office Excel application. Excel is a powerful tool for data analysis and edit" +
+    "ing.";
+      // 
+      // picAddInLogo
+      // 
+      this.picAddInLogo.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Logo_64x64;
+      this.picAddInLogo.Location = new System.Drawing.Point(9, 11);
+      this.picAddInLogo.Name = "picAddInLogo";
+      this.picAddInLogo.Size = new System.Drawing.Size(64, 64);
+      this.picAddInLogo.TabIndex = 27;
+      this.picAddInLogo.TabStop = false;
+      // 
       // openConnectionLabel
       // 
       this.openConnectionLabel.Description = "Double-Click a Connection to Start";
@@ -301,11 +316,11 @@ namespace MySQL.ForExcel
       this.openConnectionLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_WelcomePanel_Connection_24x24;
       this.openConnectionLabel.ImagePixelsXOffset = 0;
       this.openConnectionLabel.ImagePixelsYOffset = -2;
-      this.openConnectionLabel.Location = new System.Drawing.Point(9, 163);
+      this.openConnectionLabel.Location = new System.Drawing.Point(9, 162);
       this.openConnectionLabel.Margin = new System.Windows.Forms.Padding(4);
       this.openConnectionLabel.Name = "openConnectionLabel";
       this.openConnectionLabel.Size = new System.Drawing.Size(242, 28);
-      this.openConnectionLabel.TabIndex = 20;
+      this.openConnectionLabel.TabIndex = 28;
       this.openConnectionLabel.Title = "Open a MySQL Connection";
       this.openConnectionLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.openConnectionLabel.TitleColorOpacity = 0.95D;
@@ -319,41 +334,39 @@ namespace MySQL.ForExcel
       // WelcomePanel
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.Controls.Add(this.upperPanel);
       this.Controls.Add(this.newConnectionLabel);
-      this.Controls.Add(this.imgSeparator);
-      this.Controls.Add(this.picAddInLogoText);
-      this.Controls.Add(this.lblInstructions);
       this.Controls.Add(this.manageConnectionsLabel);
       this.Controls.Add(this.connectionList);
-      this.Controls.Add(this.picAddInLogo);
       this.Controls.Add(this.lblCopyright);
       this.Controls.Add(this.lblAllRights);
-      this.Controls.Add(this.openConnectionLabel);
       this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.Name = "WelcomePanel";
       this.Size = new System.Drawing.Size(260, 625);
-      ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picAddInLogoText)).EndInit();
       this.contextMenuStrip.ResumeLayout(false);
+      this.upperPanel.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.picAddInLogoText)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
       this.ResumeLayout(false);
 
     }
 
     #endregion
 
-    private System.Windows.Forms.PictureBox picAddInLogo;
     private System.Windows.Forms.ImageList largeImages;
-    private TransparentLabel lblInstructions;
     private TransparentLabel lblCopyright;
     private TransparentLabel lblAllRights;
     private HotLabel newConnectionLabel;
     private HotLabel manageConnectionsLabel;
-    private HotLabel openConnectionLabel;
     private MyTreeView connectionList;
-    private System.Windows.Forms.PictureBox picAddInLogoText;
-    private TransparentPictureBox imgSeparator;
     private System.Windows.Forms.ContextMenuStrip contextMenuStrip;
     private System.Windows.Forms.ToolStripMenuItem refreshToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
+    private System.Windows.Forms.Panel upperPanel;
+    private TransparentPictureBox imgSeparator;
+    private System.Windows.Forms.PictureBox picAddInLogoText;
+    private TransparentLabel lblInstructions;
+    private System.Windows.Forms.PictureBox picAddInLogo;
+    private HotLabel openConnectionLabel;
   }
 }
