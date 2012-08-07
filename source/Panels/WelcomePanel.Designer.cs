@@ -49,8 +49,8 @@ namespace MySQL.ForExcel
     {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WelcomePanel));
-      System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Local Connections");
-      System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Remote Connections");
+      System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Local Connections");
+      System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Remote Connections");
       this.largeImages = new System.Windows.Forms.ImageList(this.components);
       this.manageConnectionsLabel = new MySQL.ForExcel.HotLabel();
       this.connectionList = new MySQL.ForExcel.MyTreeView();
@@ -134,17 +134,17 @@ namespace MySQL.ForExcel
       this.connectionList.Name = "connectionList";
       this.connectionList.NodeHeightMultiple = 2;
       this.connectionList.NodeImages = this.largeImages;
-      treeNode3.BackColor = System.Drawing.SystemColors.ControlLight;
-      treeNode3.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode3.Name = "LocalConnectionsNode";
-      treeNode3.Text = "Local Connections";
-      treeNode4.BackColor = System.Drawing.SystemColors.ControlLight;
-      treeNode4.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode4.Name = "RemoteConnectionsNode";
-      treeNode4.Text = "Remote Connections";
+      treeNode1.BackColor = System.Drawing.SystemColors.ControlLight;
+      treeNode1.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode1.Name = "LocalConnectionsNode";
+      treeNode1.Text = "Local Connections";
+      treeNode2.BackColor = System.Drawing.SystemColors.ControlLight;
+      treeNode2.ForeColor = System.Drawing.SystemColors.WindowText;
+      treeNode2.Name = "RemoteConnectionsNode";
+      treeNode2.Text = "Remote Connections";
       this.connectionList.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode3,
-            treeNode4});
+            treeNode1,
+            treeNode2});
       this.connectionList.ShowNodeToolTips = true;
       this.connectionList.Size = new System.Drawing.Size(242, 315);
       this.connectionList.TabIndex = 22;
@@ -245,6 +245,8 @@ namespace MySQL.ForExcel
       // 
       // upperPanel
       // 
+      this.upperPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.upperPanel.BackColor = System.Drawing.SystemColors.Control;
       this.upperPanel.Controls.Add(this.imgSeparator);
       this.upperPanel.Controls.Add(this.picAddInLogoText);

@@ -195,6 +195,8 @@ namespace MySQL.ForExcel
       // 
       // upperPanel
       // 
+      this.upperPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.upperPanel.Controls.Add(this.imgSeparator);
       this.upperPanel.Controls.Add(this.lblUserIP);
       this.upperPanel.Controls.Add(this.schemaFilter);
@@ -229,15 +231,14 @@ namespace MySQL.ForExcel
       // 
       // schemaFilter
       // 
-      this.schemaFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
       this.schemaFilter.BackColor = System.Drawing.SystemColors.Window;
       this.schemaFilter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
       this.schemaFilter.Location = new System.Drawing.Point(9, 199);
       this.schemaFilter.Name = "schemaFilter";
       this.schemaFilter.NoTextLabel = "Filter Schemas";
-      this.schemaFilter.Size = new System.Drawing.Size(195, 21);
+      this.schemaFilter.Size = new System.Drawing.Size(242, 21);
       this.schemaFilter.TabIndex = 32;
+      this.schemaFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.schemaFilter_KeyDown);
       // 
       // selectSchemaLabel
       // 

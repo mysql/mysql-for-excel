@@ -31,7 +31,7 @@ namespace MySQL.ForExcel
 {
   public partial class ThisAddIn
   {
-    private const int paneWidth = 260;
+    private const int paneWidth = 266;
     private TaskPaneControl taskPaneControl;
     private Microsoft.Office.Tools.CustomTaskPane taskPaneValue;
 
