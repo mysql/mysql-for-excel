@@ -1,14 +1,16 @@
 1.0.7
+- Manage Connections action label is available in the Welcome Panel when MySQL Workbench 5.2.42 is installed.
+  Database connections are shared with MySQL Workbench if version 5.2.42 or later is installed (meaning they are read from and saved to the Workbench connections file and on the
+  first run of MySQL for Excel it will attempt to migrate all local connections to the Workbench connection file and delete the local connections file, otherwise they are still
+  managed locally within MySQL for Excel. (Oracle bug 14368158 - CONNECTIONS CREATED IN MYSQL FOR EXCEL UNUSABLE IN WORKBENCH)
 - Refactoring on TransparentPictureBox control to fix some flickering when resizing the Excel form.
   Added an upperPanel that contains all controls above the MyTreeView controls to all panels so when the form is resized to have a very small size the controls at the bottom
   actually go behind the new upperPanel so there is no overlapping at all. (Oracle bug 14406412 - OVERLAPPING CONTROLS ON ALL PANELS WHEN EXCEL WINDOW IS SMALL).
 - Removed the code that reset the TaskPaneControl's height since the height can't be changed for a right-docking of the panel.
   (Oracle bug 14369568 - EXCEL WINDOW CAN'T BE RESIZED IF STARTS WITH A SMALL SIZE).
-- Added back in the Welcome Panel the Manage Connections action label. (Oracle bug 14368158 - CONNECTIONS CREATED IN MYSQL FOR EXCEL UNUSABLE IN WORKBENCH).
 - Fixed code in custom PreviewDataViewGrid control to readjust the recalculation of the headers width when the HeaderText changes and to disable the AutoWidth feature of each
   column header when the automatically recalculated width exceeds the ColumnsMaximumWidth property. (Oracle Bug 14350168 - EXPORT DATA DIALOG'S PREVIEW GRID TRUNCATES COLUMN NAMES)
 - Fixed code so now "text" columns can be automatically mapped to set or enum columns.
   Fixed code to properly change mapped column names when checking/unchecking the "First Row Contains Column Names" checkbox in the Append Data Form.
   (Oracle Bug 14370049 - THE AUTO MAPPING IS NOT WORKING PROPERLY)
 - Disabled Export button when table name is empty (Oracle Bug 14389853 - EXPORT BUTTON IS ENABLED WHEN TABLE NAME IS EMPTY)
-- Fix for Bug #14368158 - Connections created in MySQL For Excel unusable in Workbench.

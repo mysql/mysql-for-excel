@@ -34,7 +34,7 @@ namespace MySQL.ForExcel
     private const int COLLAPSED_HEIGHT = 215;
     private const int EXPANDED_HEIGHT = 350;
 
-    public enum InfoType { Success = 0, Error = 1, Warning = 2 };
+    public enum InfoType { Success = 0, Error = 1, Warning = 2, Info = 3 };
 
     public bool ExpandedState { get; set; }
     public InfoType OperationType { get; set; }
@@ -99,6 +99,11 @@ namespace MySQL.ForExcel
           OperationStatusText = "An Error Ocurred";
           btnOK.Text = "Back";
           btnOK.DialogResult = DialogResult.Cancel;
+          break;
+        case InfoType.Info:
+          OperationStatusText = "Information";
+          btnOK.Text = "OK";
+          btnOK.DialogResult = DialogResult.OK;
           break;
       }
       OperationSummaryText = operationSummary;

@@ -46,6 +46,9 @@ namespace MySQL.ForExcel
       string dir = String.Format(@"{0}\Oracle\MySQL for Excel", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
       Directory.CreateDirectory(dir);
 
+      // This method is used to migrate all connections created with 1.0.6 (in a local connections file) to the Workbench connections file.
+      MySQLForExcelConnectionsHelper.MigrateConnectionsFromMySQLForExcelToWorkbench();
+
       taskPaneControl = new TaskPaneControl(Application);
       taskPaneControl.Dock = DockStyle.Fill;
       taskPaneControl.SizeChanged += new EventHandler(taskPaneControl_SizeChanged);
@@ -56,7 +59,7 @@ namespace MySQL.ForExcel
       taskPaneValue.Width = paneWidth;
     }
 
-    void taskPaneControl_SizeChanged(object sender, EventArgs e)
+    private void taskPaneControl_SizeChanged(object sender, EventArgs e)
     {
       if (taskPaneValue == null || !taskPaneValue.Visible)
         return;

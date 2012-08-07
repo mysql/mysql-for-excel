@@ -51,7 +51,7 @@ namespace MySQL.ForExcel
         int colIdx = 1;
         while (Table.Columns.OfType<MySQLDataColumn>().Count(col => col.DisplayName == displayName) > 1)
         {
-          displayName = trimmedName + colIdx;
+          displayName = trimmedName + colIdx++;
         }
       }
     }
