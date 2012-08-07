@@ -267,6 +267,8 @@ namespace MySQL.ForExcel
       // 
       // upperPanel
       // 
+      this.upperPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.upperPanel.Controls.Add(this.imgSeparator);
       this.upperPanel.Controls.Add(this.lblUserIP);
       this.upperPanel.Controls.Add(this.objectFilter);
@@ -308,6 +310,7 @@ namespace MySQL.ForExcel
       this.objectFilter.NoTextLabel = "Filter Schema Objects";
       this.objectFilter.Size = new System.Drawing.Size(242, 21);
       this.objectFilter.TabIndex = 33;
+      this.objectFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.objectFilter_KeyDown);
       // 
       // selectDatabaseObjectLabel
       // 
@@ -328,7 +331,7 @@ namespace MySQL.ForExcel
       this.selectDatabaseObjectLabel.Location = new System.Drawing.Point(9, 136);
       this.selectDatabaseObjectLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.selectDatabaseObjectLabel.Name = "selectDatabaseObjectLabel";
-      this.selectDatabaseObjectLabel.Size = new System.Drawing.Size(237, 28);
+      this.selectDatabaseObjectLabel.Size = new System.Drawing.Size(242, 28);
       this.selectDatabaseObjectLabel.TabIndex = 32;
       this.selectDatabaseObjectLabel.Title = "Select a Database Object";
       this.selectDatabaseObjectLabel.TitleColor = System.Drawing.SystemColors.WindowText;
@@ -370,7 +373,7 @@ namespace MySQL.ForExcel
       this.exportToNewTableLabel.Location = new System.Drawing.Point(9, 73);
       this.exportToNewTableLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.exportToNewTableLabel.Name = "exportToNewTableLabel";
-      this.exportToNewTableLabel.Size = new System.Drawing.Size(237, 28);
+      this.exportToNewTableLabel.Size = new System.Drawing.Size(242, 28);
       this.exportToNewTableLabel.TabIndex = 31;
       this.exportToNewTableLabel.Title = "Export Excel Data to New Table";
       this.exportToNewTableLabel.TitleColor = System.Drawing.SystemColors.WindowText;
@@ -381,6 +384,7 @@ namespace MySQL.ForExcel
       this.exportToNewTableLabel.TitleShadowOpacity = 0.2D;
       this.exportToNewTableLabel.TitleShadowPixelsXOffset = 0;
       this.exportToNewTableLabel.TitleShadowPixelsYOffset = 1;
+      this.exportToNewTableLabel.Click += new System.EventHandler(this.exportToNewTable_Click);
       // 
       // picAddInLogo
       // 
