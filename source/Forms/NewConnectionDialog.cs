@@ -41,7 +41,7 @@ namespace MySQL.ForExcel
 
     private void okButton_Click(object sender, EventArgs e)
     {
-      if (!ValidateAndSave())
+      if (!ValidateConnection())
       {
         DialogResult = DialogResult.None;
         return;
@@ -49,7 +49,7 @@ namespace MySQL.ForExcel
       NewConnection = WBconn;
     }
 
-    private bool ValidateAndSave()
+    private bool ValidateConnection()
     {
       bool result = false;
 

@@ -273,6 +273,24 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure you want to delete the selected connection?.
+        /// </summary>
+        internal static string DeleteConnectionWarningDetail {
+            get {
+                return ResourceManager.GetString("DeleteConnectionWarningDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete Connection Confirmation.
+        /// </summary>
+        internal static string DeleteConnectionWarningTitle {
+            get {
+                return ResourceManager.GetString("DeleteConnectionWarningTitle", resourceCulture);
+            }
+        }
+        
         internal static System.Drawing.Bitmap DeleteHS {
             get {
                 object obj = ResourceManager.GetObject("DeleteHS", resourceCulture);
@@ -445,6 +463,36 @@ namespace MySQL.ForExcel.Properties {
         internal static string ImportVerticallyExceedsMaxRowsTitleWarning {
             get {
                 return ResourceManager.GetString("ImportVerticallyExceedsMaxRowsTitleWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MySQL for Excel now works with the connections file used by MySQL Workbench if it is installed.
+        ///MySQL for Excel will attempt to merge all existing connections with MySQL Workbench and in order to do this MySQLWorkbench must not be running.
+        ///
+        ///Please make sure MySQL Workbench is closed to continue with the merging operation..
+        /// </summary>
+        internal static string MigrateConnectionsToWorkbenchInfoDetail {
+            get {
+                return ResourceManager.GetString("MigrateConnectionsToWorkbenchInfoDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Database connections will be migrated..
+        /// </summary>
+        internal static string MigrateConnectionsToWorkbenchInfoHeader {
+            get {
+                return ResourceManager.GetString("MigrateConnectionsToWorkbenchInfoHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connections will be migrated to use MySQLWorkbench connections file..
+        /// </summary>
+        internal static string MigrateConnectionsToWorkbenchInfoTitle {
+            get {
+                return ResourceManager.GetString("MigrateConnectionsToWorkbenchInfoTitle", resourceCulture);
             }
         }
         
@@ -858,11 +906,29 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable to remove connection..
+        /// </summary>
+        internal static string UnableToDeleteConnectionError {
+            get {
+                return ResourceManager.GetString("UnableToDeleteConnectionError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Deleting connections is not allowed while MySQL Workbench is running..
         /// </summary>
         internal static string UnableToDeleteConnectionsWhenWBRunning {
             get {
                 return ResourceManager.GetString("UnableToDeleteConnectionsWhenWBRunning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to delete local database connections file..
+        /// </summary>
+        internal static string UnableToDeleteLocalConnectionsFileError {
+            get {
+                return ResourceManager.GetString("UnableToDeleteLocalConnectionsFileError", resourceCulture);
             }
         }
         
@@ -876,11 +942,41 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to MySQL for Excel now works with the connections file used by MySQL Workbench if it is installed.
+        ///MySQL for Excel attempted to merge all existing connections with MySQL Workbench but is unable to do that if MySQLWorkbench is running.
+        ///
+        ///Please close MySQL Workbench and restart MySQL for Excel to perform the merge..
+        /// </summary>
+        internal static string UnableToMergeConnectionsErrorDetail {
+            get {
+                return ResourceManager.GetString("UnableToMergeConnectionsErrorDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to merge existing connections with MySQL Workbench..
+        /// </summary>
+        internal static string UnableToMergeConnectionsErrorTitle {
+            get {
+                return ResourceManager.GetString("UnableToMergeConnectionsErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to retrieve data from &apos;{0}&apos;..
         /// </summary>
         internal static string UnableToRetrieveData {
             get {
                 return ResourceManager.GetString("UnableToRetrieveData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to save database connections file.
+        /// </summary>
+        internal static string UnableToSaveConnectionsFileError {
+            get {
+                return ResourceManager.GetString("UnableToSaveConnectionsFileError", resourceCulture);
             }
         }
         

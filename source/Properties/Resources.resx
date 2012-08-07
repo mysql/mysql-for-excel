@@ -440,4 +440,40 @@ Please check with the Administrator if you require a SSL Connection or if he can
   <data name="ImportVerticallyExceedsMaxRowsTitleWarning" xml:space="preserve">
     <value>Import Exceeds Compatibility Mode Limit</value>
   </data>
+  <data name="UnableToMergeConnectionsErrorDetail" xml:space="preserve">
+    <value>MySQL for Excel now works with the connections file used by MySQL Workbench if it is installed.
+MySQL for Excel attempted to merge all existing connections with MySQL Workbench but is unable to do that if MySQLWorkbench is running.
+
+Please close MySQL Workbench and restart MySQL for Excel to perform the merge.</value>
+  </data>
+  <data name="UnableToMergeConnectionsErrorTitle" xml:space="preserve">
+    <value>Unable to merge existing connections with MySQL Workbench.</value>
+  </data>
+  <data name="DeleteConnectionWarningDetail" xml:space="preserve">
+    <value>Are you sure you want to delete the selected connection?</value>
+  </data>
+  <data name="DeleteConnectionWarningTitle" xml:space="preserve">
+    <value>Delete Connection Confirmation</value>
+  </data>
+  <data name="UnableToDeleteLocalConnectionsFileError" xml:space="preserve">
+    <value>Unable to delete local database connections file.</value>
+  </data>
+  <data name="UnableToSaveConnectionsFileError" xml:space="preserve">
+    <value>Unable to save database connections file</value>
+  </data>
+  <data name="MigrateConnectionsToWorkbenchInfoDetail" xml:space="preserve">
+    <value>MySQL for Excel now works with the connections file used by MySQL Workbench if it is installed.
+MySQL for Excel will attempt to merge all existing connections with MySQL Workbench and in order to do this MySQLWorkbench must not be running.
+
+Please make sure MySQL Workbench is closed to continue with the merging operation.</value>
+  </data>
+  <data name="MigrateConnectionsToWorkbenchInfoHeader" xml:space="preserve">
+    <value>Database connections will be migrated.</value>
+  </data>
+  <data name="MigrateConnectionsToWorkbenchInfoTitle" xml:space="preserve">
+    <value>Connections will be migrated to use MySQLWorkbench connections file.</value>
+  </data>
+  <data name="UnableToDeleteConnectionError" xml:space="preserve">
+    <value>Unable to remove connection.</value>
+  </data>
 </root>

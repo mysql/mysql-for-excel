@@ -164,6 +164,7 @@ namespace MySQL.ForExcel
       this.iconsList.Images.SetKeyName(0, "MySQLforExcel-InfoDlg-Success-64x64.png");
       this.iconsList.Images.SetKeyName(1, "MySQLforExcel-InfoDlg-Error-64x64.png");
       this.iconsList.Images.SetKeyName(2, "MySQLforExcel-InfoDlg-Warning-64x64.png");
+      this.iconsList.Images.SetKeyName(3, "MySQLforExcel-Logo-64x64.png");
       // 
       // InfoDialog
       // 

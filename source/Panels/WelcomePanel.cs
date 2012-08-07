@@ -44,13 +44,13 @@ namespace MySQL.ForExcel
       InheritFontToControlsExceptionList.Add("manageConnectionsLabel");
 
       DoubleBuffered = true;
-      manageConnectionsLabel.Enabled = MySqlWorkbench.IsInstalled;
+      manageConnectionsLabel.Enabled = MySqlWorkbench.AllowsExternalConnectionsManagement;
       LoadConnections();      
     }
 
     private void LoadConnections()
-    {                  
-      List<MySqlWorkbenchConnection> connections = GetConnections();
+    {
+      List<MySqlWorkbenchConnection> connections = MySQLForExcelConnectionsHelper.GetConnections();
 
       if (connections == null)
         return;
@@ -62,21 +62,7 @@ namespace MySQL.ForExcel
         AddConnectionToList(conn);
       if (connectionList.Nodes[0].GetNodeCount(true) > 0)
         connectionList.Nodes[0].Expand();
-      
     }
-
-    private List<MySqlWorkbenchConnection> GetConnections()
-    {
-
-      if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\MySQL\Workbench\connections.xml"))
-        MySQLForExcelConnectionsFile.CreateXMLFile();
-
-      if (MySqlWorkbench.Connections != null)
-        return MySqlWorkbench.Connections.Where(t => !String.IsNullOrEmpty(t.Name)).ToList();
-
-      return null;
-    }
-
 
     private void AddConnectionToList(MySqlWorkbenchConnection conn)
     {
@@ -107,11 +93,11 @@ namespace MySQL.ForExcel
 
     private void newConnectionLabel_Click(object sender, EventArgs e)
     {
-      // if Workbench is running we can't allow adding new connections
-      InfoDialog id = new InfoDialog(false, Resources.UnableToAddConnectionsWhenWBRunning, string.Empty);
-      id.OperationSummarySubText = Resources.CloseWBAdviceToAdd;
       if (MySqlWorkbench.IsRunning)
       {
+        // if Workbench is running we can't allow adding new connections
+        InfoDialog id = new InfoDialog(false, Resources.UnableToAddConnectionsWhenWBRunning, string.Empty);
+        id.OperationSummarySubText = Resources.CloseWBAdviceToAdd;
         id.ShowDialog();
         return;
       }
@@ -120,7 +106,7 @@ namespace MySQL.ForExcel
       DialogResult result = dlg.ShowDialog();
       if (result == DialogResult.Cancel) return;
       
-      MySQLForExcelConnectionsFile.Save(dlg.NewConnection);
+      MySQLForExcelConnectionsHelper.SaveConnection(dlg.NewConnection);
       
       LoadConnections();
     }
@@ -145,21 +131,13 @@ namespace MySQL.ForExcel
 
     private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      InfoDialog id = new InfoDialog(false, Resources.UnableToDeleteConnectionsWhenWBRunning, string.Empty);
-      id.OperationSummarySubText = Resources.CloseWBAdviceToDelete;
-      if (MySqlWorkbench.IsRunning) { id.ShowDialog(); return; }
-      if (connectionList.SelectedNode.Name == "LocalConnectionsNode" || connectionList.SelectedNode.Text == "RemoteConnectionsNode" || connectionList.SelectedNode == null) return;
-      MySqlWorkbenchConnectionCollection wbcollect = new MySqlWorkbenchConnectionCollection();
-      WarningDialog wd = new WarningDialog("Confirm Delete", "Are you sure you want to delete the selected connection?");
-      if (wd.ShowDialog() == DialogResult.No) return;
-      MySqlWorkbenchConnection connectionToRemove = new MySqlWorkbenchConnection();
-      foreach (MySqlWorkbenchConnection c in MySqlWorkbench.Connections)
-        if (c.Name == connectionList.SelectedNode.Tag.ToString())
-        {
-          connectionToRemove = c;
-          break;
-        }
-      MySqlWorkbench.Connections.Remove(connectionToRemove);
+      if (connectionList.SelectedNode == null || connectionList.SelectedNode.Level == 0)
+        return;
+      WarningDialog warningDlg = new WarningDialog(Resources.DeleteConnectionWarningTitle, Resources.DeleteConnectionWarningDetail);
+      if (warningDlg.ShowDialog() == DialogResult.No)
+        return;
+      MySqlWorkbenchConnection connectionToRemove = connectionList.SelectedNode.Tag as MySqlWorkbenchConnection;
+      MySQLForExcelConnectionsHelper.RemoveConnection(connectionToRemove.Id);
       LoadConnections();
     }
 
