@@ -99,7 +99,8 @@ namespace MySQL.ForExcel
                                Settings.Default.ExportDetectDatatype,
                                Settings.Default.ExportAddBufferToVarchar,
                                Settings.Default.ExportAutoIndexIntColumns,
-                               Settings.Default.ExportAutoAllowEmptyNonIndexColumns);
+                               Settings.Default.ExportAutoAllowEmptyNonIndexColumns,
+                               true);
       grdPreviewData.DataSource = previewDataTable;
       columnBindingSource.DataSource = previewDataTable.Columns;
     }
@@ -279,7 +280,7 @@ namespace MySQL.ForExcel
       if (exportDataTable == null)
       {
         exportDataTable = previewDataTable.CloneSchema();
-        exportDataTable.SetData(this.exportDataRange, false, false, false, false, false);
+        exportDataTable.SetData(this.exportDataRange, false, false, false, false, false, true);
       }
       else
         exportDataTable.SyncSchema(previewDataTable);

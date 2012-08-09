@@ -89,7 +89,7 @@ namespace MySQL.ForExcel
       fromMySQLPreviewDataTable = new MySQLDataTable(schemaName, fromTableName, false, Properties.Settings.Default.AppendUseFormattedValues);
       int previewRowsQty = Math.Min(this.appendDataRange.Rows.Count, Settings.Default.AppendLimitPreviewRowsQuantity);
       Excel.Range previewRange = this.appendDataRange.get_Resize(previewRowsQty, this.appendDataRange.Columns.Count);
-      fromMySQLPreviewDataTable.SetData(previewRange, true, true, false, false, false);
+      fromMySQLPreviewDataTable.SetData(previewRange, true, true, false, false, false, false);
       grdFromExcelData.DataSource = fromMySQLPreviewDataTable;
       foreach (DataGridViewColumn gridCol in grdFromExcelData.Columns)
       {
@@ -454,7 +454,7 @@ namespace MySQL.ForExcel
       if (fromMySQLCompleteDataTable == null)
       {
         fromMySQLCompleteDataTable = fromMySQLPreviewDataTable.CloneSchema();
-        fromMySQLCompleteDataTable.SetData(this.appendDataRange, false, false, false, false, false);
+        fromMySQLCompleteDataTable.SetData(this.appendDataRange, false, false, false, false, false, false);
       }
       else
         fromMySQLCompleteDataTable.SyncSchema(fromMySQLPreviewDataTable);

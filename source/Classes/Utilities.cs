@@ -620,7 +620,9 @@ namespace MySQL.ForExcel
 
     public static bool Type1FitsIntoType2(string strippedType1, string strippedType2)
     {
-      if (String.IsNullOrEmpty(strippedType1) || String.IsNullOrEmpty(strippedType2))
+      if (String.IsNullOrEmpty(strippedType1))
+        return true;
+      if (String.IsNullOrEmpty(strippedType2))
         return false;
       strippedType1 = strippedType1.ToLowerInvariant();
       strippedType2 = strippedType2.ToLowerInvariant();
@@ -1040,9 +1042,14 @@ namespace MySQL.ForExcel
     public static string GetConsistentDataTypeOnAllRows(string proposedStrippedDataType, List<string> rowsDataTypesList, int[] decimalMaxLen, int[] varCharMaxLen, out string consistentStrippedDataType)
     {
       string fullDataType = proposedStrippedDataType;
-      bool typesConsistent = true;
 
-      typesConsistent = rowsDataTypesList.All(str => str == proposedStrippedDataType);
+      if (rowsDataTypesList.Count == 0)
+      {
+        consistentStrippedDataType = String.Empty;
+        return String.Empty;
+      }
+
+      bool typesConsistent = rowsDataTypesList.All(str => str == proposedStrippedDataType);
       if (!typesConsistent)
       {
         if (rowsDataTypesList.Count(str => str == "Integer") + rowsDataTypesList.Count(str => str == "Bool") == rowsDataTypesList.Count)

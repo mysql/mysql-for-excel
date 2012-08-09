@@ -229,7 +229,7 @@ namespace MySQL.ForExcel
       AdjustAutoPKValues();
     }
 
-    public void SetData(Excel.Range dataRange, bool recreateColumnsFromData, bool detectTypes, bool addBufferToVarchar, bool createIndexForIntColumns, bool allowEmptyNonIdxCols)
+    public void SetData(Excel.Range dataRange, bool recreateColumnsFromData, bool detectTypes, bool addBufferToVarchar, bool createIndexForIntColumns, bool allowEmptyNonIdxCols, bool emptyColumnsToVarchar)
     {
       object[,] data;
       Clear();
@@ -295,7 +295,7 @@ namespace MySQL.ForExcel
           pkRowValueAdjust++;
       }
       if (detectTypes)
-        DetectTypes(data, addBufferToVarchar, createIndexForIntColumns);
+        DetectTypes(data, addBufferToVarchar, createIndexForIntColumns, emptyColumnsToVarchar);
 
       if (RemoveEmptyColumns)
         foreach (string colName in colsToDelete)
@@ -312,7 +312,7 @@ namespace MySQL.ForExcel
         col.DetectType(firstRowIsHeaders);
     }
 
-    private void DetectTypes(object[,] data, bool addBufferToVarchar, bool createIndexForIntColumns)
+    private void DetectTypes(object[,] data, bool addBufferToVarchar, bool createIndexForIntColumns, bool emptyColumnsToVarchar)
     {
       int rowsCount = data.GetUpperBound(0);
       int colsCount = data.GetUpperBound(1);
@@ -339,6 +339,7 @@ namespace MySQL.ForExcel
 
         for (int rowPos = 1; rowPos <= rowsCount; rowPos++)
         {
+          proposedType = strippedType = valueAsString = String.Empty;
           valueFromArray = data[rowPos, dataColPos];
           if (valueFromArray == null)
             continue;
@@ -386,6 +387,8 @@ namespace MySQL.ForExcel
 
         // Get the consistent DataType for all rows except first one.
         proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListFrom2ndRow, decimalMaxLen, varCharMaxLen);
+        if (emptyColumnsToVarchar && String.IsNullOrEmpty(proposedType))
+          proposedType = "Varchar(255)";
         col.RowsFrom2ndDataType = proposedType;
 
         // Get the consistent DataType between first columnInfoRow and the previously computed consistent DataType for the rest of the rows.
