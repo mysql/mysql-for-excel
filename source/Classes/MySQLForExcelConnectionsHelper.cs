@@ -122,15 +122,40 @@ namespace MySQL.ForExcel
 
     public static List<MySqlWorkbenchConnection> GetConnections(bool useWorkbenchConnectionsFile)
     {
-      string connectionsFile = (useWorkbenchConnectionsFile ? WorkbenchConnectionsFile : MySQLForExcelConnectionsFile);
-      if (!File.Exists(connectionsFile))
-        if (!CreateXMLFile())
-          return null;
-      if (!useWorkbenchConnectionsFile)
-        MySqlWorkbench.LoadExternalConnections(MySQLForExcelConnectionsFile);
-      if (MySqlWorkbench.Connections != null)
-        return MySqlWorkbench.Connections.Where(t => !String.IsNullOrEmpty(t.Name)).ToList();
-      return null;
+      if (useWorkbenchConnectionsFile)
+      {
+        if (!File.Exists(WorkbenchConnectionsFile))
+          if (!CreateXMLFile(true))
+            return null;
+      }
+      else
+      {
+        if (!File.Exists(MySQLForExcelConnectionsFile))
+        {
+          if (MySqlWorkbench.Connections == null)
+            return null;
+          try
+          {
+            CreateXMLFile(false);
+            foreach (MySqlWorkbenchConnection conn in MySqlWorkbench.Connections)
+            {
+              conn.New = true;
+              conn.Id = Guid.NewGuid().ToString();
+            }
+            MySqlWorkbench.Connections.Save(MySQLForExcelConnectionsFile);
+          }
+          catch (Exception ex)
+          {
+            InfoDialog infoDialog = new InfoDialog(false, Properties.Resources.UnableToSaveConnectionsFileError, String.Format(@"Description Error: \""{0}\""", ex.Message));
+            infoDialog.ShowDialog();
+          }
+        }
+        else
+          MySqlWorkbench.LoadExternalConnections(MySQLForExcelConnectionsFile);
+      }
+      if (MySqlWorkbench.Connections == null)
+        return null;
+      return MySqlWorkbench.Connections.Where(c => !String.IsNullOrEmpty(c.Name)).ToList();
     }
 
     public static List<MySqlWorkbenchConnection> GetConnections()
@@ -167,40 +192,6 @@ namespace MySQL.ForExcel
     public static bool SaveConnection(MySqlWorkbenchConnection newConnection)
     {
       return SaveConnection(newConnection, MySqlWorkbench.AllowsExternalConnectionsManagement);
-    }
-
-    public static bool SaveConnections(List<MySqlWorkbenchConnection> connectionsList, bool useWorkbenchConnectionsFile, bool throwException)
-    {
-      bool success = true;
-      string connectionsFile = (useWorkbenchConnectionsFile ? WorkbenchConnectionsFile : MySQLForExcelConnectionsFile);
-
-      if (!File.Exists(connectionsFile))
-        if (!CreateXMLFile())
-          return false;
-      
-      try
-      {
-        foreach (MySqlWorkbenchConnection conn in connectionsList)
-          MySqlWorkbench.Connections.Add(conn);
-        if (useWorkbenchConnectionsFile)
-          MySqlWorkbench.Connections.Save();
-        else
-          MySqlWorkbench.Connections.Save(MySQLForExcelConnectionsFile);
-      }
-      catch (Exception ex)
-      {
-        if (throwException)
-          throw ex;
-        InfoDialog infoDialog = new InfoDialog(false, Properties.Resources.UnableToSaveConnectionsFileError, String.Format(@"Description Error: \""{0}\""", ex.Message));
-        infoDialog.ShowDialog();
-        success = false;              
-      }
-      return success;
-    }
-
-    public static bool SaveConnections(List<MySqlWorkbenchConnection> connectionsList)
-    {
-      return SaveConnections(connectionsList, MySqlWorkbench.AllowsExternalConnectionsManagement, false);
     }
 
     public static bool RemoveConnection(string connectionID, bool useWorkbenchConnectionsFile)
@@ -247,12 +238,14 @@ namespace MySQL.ForExcel
       // Inform users we are about to migrate connections
       InfoDialog infoDlg = new InfoDialog(InfoDialog.InfoType.Info, Properties.Resources.MigrateConnectionsToWorkbenchInfoTitle, Properties.Resources.MigrateConnectionsToWorkbenchInfoDetail);
       infoDlg.OperationStatusText = Properties.Resources.MigrateConnectionsToWorkbenchInfoHeader;
+      infoDlg.WordWrapDetails = true;
       infoDlg.ShowDialog();
 
       // If Workbench is running we won't be able to migrate since the file will be in use, issue an error and exit, attempt to migrate next time.
       if (MySqlWorkbench.IsRunning)
       {
         infoDlg = new InfoDialog(false, Properties.Resources.UnableToMergeConnectionsErrorTitle, Properties.Resources.UnableToMergeConnectionsErrorDetail);
+        infoDlg.WordWrapDetails = true;
         infoDlg.ShowDialog();
         return;
       }
@@ -282,6 +275,7 @@ namespace MySQL.ForExcel
       catch (Exception ex)
       {
         infoDlg = new InfoDialog(false, Properties.Resources.UnableToDeleteLocalConnectionsFileError, String.Format(@"Description Error: \""{0}\""", ex.Message));
+        infoDlg.WordWrapDetails = true;
         infoDlg.ShowDialog();
         return;
       }
@@ -316,6 +310,7 @@ namespace MySQL.ForExcel
 
       // Inform users the results of the migration
       infoDlg = new InfoDialog(saveException == null, infoTitle, infoDetail.ToString());
+      infoDlg.WordWrapDetails = true;
       infoDlg.ShowDialog();
     }
 

@@ -1,4 +1,7 @@
 1.0.7
+- Updated code so that when Workbench version 5.2.41 or earlier is installed and there are still no connections created in MySQL for Excel the Workbench connections are copied
+  from Workbench to the MySQL for Excel connections file. (Internal bug - Workbench connections are not copied to MySql for Excel).
+- Updated version in AssemblyInfo to 1.0.7.
 - Manage Connections action label is available in the Welcome Panel when MySQL Workbench 5.2.42 is installed.
   Database connections are shared with MySQL Workbench if version 5.2.42 or later is installed (meaning they are read from and saved to the Workbench connections file and on the
   first run of MySQL for Excel it will attempt to migrate all local connections to the Workbench connection file and delete the local connections file, otherwise they are still
