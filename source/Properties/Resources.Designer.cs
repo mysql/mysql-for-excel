@@ -468,6 +468,7 @@ namespace MySQL.ForExcel.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to MySQL for Excel now works with the connections file used by MySQL Workbench if it is installed.
+        ///
         ///MySQL for Excel will attempt to merge all existing connections with MySQL Workbench and in order to do this MySQLWorkbench must not be running.
         ///
         ///Please make sure MySQL Workbench is closed to continue with the merging operation..
@@ -943,6 +944,7 @@ namespace MySQL.ForExcel.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to MySQL for Excel now works with the connections file used by MySQL Workbench if it is installed.
+        ///
         ///MySQL for Excel attempted to merge all existing connections with MySQL Workbench but is unable to do that if MySQLWorkbench is running.
         ///
         ///Please close MySQL Workbench and restart MySQL for Excel to perform the merge..
