@@ -580,7 +580,7 @@ namespace MySQL.ForExcel
     public string GetInsertSQL(int startRow, int limit, bool formatNewLinesAndTabs, bool newRowsOnly, out int nextRow)
     {
       int colsCount = Columns.Count;
-      int rowsCount = Rows.Count - (!newRowsOnly && firstRowIsHeaders ? 1 : 0);
+      int rowsCount = Rows.Count;
       ulong maxByteCount = (mysqlMaxAllowedPacket > 0 ? mysqlMaxAllowedPacket - 10 : 0);
 
       nextRow = -1;

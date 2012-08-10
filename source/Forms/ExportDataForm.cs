@@ -284,6 +284,7 @@ namespace MySQL.ForExcel
       }
       else
         exportDataTable.SyncSchema(previewDataTable);
+      exportDataTable.TableName = previewDataTable.TableName;
       this.Cursor = Cursors.Default;
 
       bool tableContainsDataToExport = exportDataTable.Rows.Count > (exportDataTable.FirstRowIsHeaders ? 1 : 0);
