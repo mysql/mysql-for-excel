@@ -141,7 +141,7 @@ namespace MySQL.ForExcel
       this.objectList.NodeHeightMultiple = 3;
       this.objectList.NodeImages = this.largeImages;
       this.objectList.ShowNodeToolTips = true;
-      this.objectList.Size = new System.Drawing.Size(242, 313);
+      this.objectList.Size = new System.Drawing.Size(242, 275);
       this.objectList.TabIndex = 24;
       this.objectList.TitleColorOpacity = 0.8D;
       this.objectList.TitleTextVerticalPixelsOffset = 0;
@@ -228,7 +228,6 @@ namespace MySQL.ForExcel
       this.editDataLabel.TitleShadowOpacity = 0.2D;
       this.editDataLabel.TitleShadowPixelsXOffset = 0;
       this.editDataLabel.TitleShadowPixelsYOffset = 1;
-      this.editDataLabel.Visible = false;
       this.editDataLabel.Click += new System.EventHandler(this.editData_Click);
       // 
       // importDataLabel
@@ -249,7 +248,7 @@ namespace MySQL.ForExcel
       this.importDataLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ObjectPanel_ImportData_24x24;
       this.importDataLabel.ImagePixelsXOffset = 0;
       this.importDataLabel.ImagePixelsYOffset = 2;
-      this.importDataLabel.Location = new System.Drawing.Point(9, 518);
+      this.importDataLabel.Location = new System.Drawing.Point(9, 480);
       this.importDataLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.importDataLabel.Name = "importDataLabel";
       this.importDataLabel.Size = new System.Drawing.Size(237, 28);

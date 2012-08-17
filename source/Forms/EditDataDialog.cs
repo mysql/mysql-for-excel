@@ -53,7 +53,6 @@ namespace MySQL.ForExcel
     private int uncommitedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#FF8282"));
     private int newRowCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#FFFCC7"));
     private int lockedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#D7D7D7"));
-    private int defaultCellsOLEColor = ColorTranslator.ToOle(Color.White);
     private long editingRowsQuantity = 0;
     private long editingColsQuantity = 0;
     private string editingWorksheetName = String.Empty;
@@ -160,7 +159,10 @@ namespace MySQL.ForExcel
 
     private void lockRange(Excel.Range range, bool lockRange)
     {
-      range.Interior.Color = (lockRange ? lockedCellsOLEColor : defaultCellsOLEColor);
+      if (lockRange)
+        range.Interior.Color = lockedCellsOLEColor;
+      else
+        range.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
       range.Locked = lockRange;
     }
 
@@ -174,7 +176,10 @@ namespace MySQL.ForExcel
           modifiedRange = EditingWorksheet.get_Range(startAndEndRange[0], startAndEndRange[1]);
         else
           modifiedRange = EditingWorksheet.get_Range(modifiedRangeAddress);
-        modifiedRange.Interior.Color = oleColor;
+        if (oleColor > 0)
+          modifiedRange.Interior.Color = oleColor;
+        else
+          modifiedRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
       }
       cellAddressesList.Clear();
     }
@@ -193,9 +198,9 @@ namespace MySQL.ForExcel
       EditingWorksheet.Unprotect();
       Excel.Range topLeftCell = editDataRange.Cells[1, 1];
       editDataRange = CallerTaskPane.ImportDataTableToExcelAtGivenCell(editMySQLDataTable, importedHeaders, topLeftCell);
-      changeExcelCellsColor(modifiedCellAddressesList, defaultCellsOLEColor);
-      changeExcelCellsColor(addedRowAddressesList, defaultCellsOLEColor);
-      changeExcelCellsColor(deletedRowAddressesList, defaultCellsOLEColor);
+      changeExcelCellsColor(modifiedCellAddressesList, 0);
+      changeExcelCellsColor(addedRowAddressesList, 0);
+      changeExcelCellsColor(deletedRowAddressesList, 0);
       btnCommit.Enabled = false;
       EditingWorksheet.Change += new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
       initializeWorksheetProtection(editDataRange);
@@ -211,21 +216,26 @@ namespace MySQL.ForExcel
       bool autoCommitOn = chkAutoCommit.Checked;
 
       string operationSummary = String.Format("Edited data for Table {0} ", EditingTableName);
+      string sqlQuery = String.Empty;
       StringBuilder operationDetails = new StringBuilder();
+      this.Cursor = Cursors.WaitCursor;
 
-      // Added Rows that will be working until 1.1
+      // Added Rows
       DataTable changesTable = editMySQLDataTable.GetChanges(DataRowState.Added);
       int addingRowsCount = (changesTable != null ? changesTable.Rows.Count : 0);
       if (addingRowsCount > 0)
       {
         if (!autoCommitOn)
-        {
-          operationDetails.AppendFormat("Adding {0} rows to MySQL Table \"{1}\"...{2}{2}", addingRowsCount, editMySQLDataTable.TableName, Environment.NewLine);
-          operationDetails.Append(editMySQLDataTable.GetInsertSQL(-1, true, true));
-          operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
-        }
-        warningsTable = editMySQLDataTable.InsertDataWithAdapter(wbConnection, true, out exception, out updatedCount);
+          operationDetails.AppendFormat("Adding {0} rows to MySQL Table \"{1}\"...{2}{2}",
+                                        addingRowsCount,
+                                        editMySQLDataTable.TableName,
+                                        Environment.NewLine);
+        warningsTable = editMySQLDataTable.InsertDataWithManualQuery(wbConnection, true, out exception, out sqlQuery, out updatedCount);
         success = exception == null;
+        if (!autoCommitOn)
+          operationDetails.AppendFormat("{0}{1}{1}",
+                                        sqlQuery,
+                                        Environment.NewLine);
         if (success)
         {
           changeExcelCellsColor(addedRowAddressesList, commitedCellsOLEColor);
@@ -265,21 +275,23 @@ namespace MySQL.ForExcel
         }
       }
       
-      // Delete Rows
+      // Deleted Rows
       changesTable = editMySQLDataTable.GetChanges(DataRowState.Deleted);
       int deletingRowsCount = (changesTable != null ? changesTable.Rows.Count : 0);
       if (deletingRowsCount > 0)
       {
         if (!autoCommitOn)
-        {
-          if (operationDetails.Length > 0)
-            operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
-          operationDetails.AppendFormat("Deleting {0} rows on MySQL Table \"{1}\"...{2}{2}", deletingRowsCount, editMySQLDataTable.TableName, Environment.NewLine);
-          operationDetails.Append(editMySQLDataTable.GetDeleteSQL(-1, true));
-          operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
-        }
-        warningsTable = editMySQLDataTable.DeleteDataWithAdapter(wbConnection, out exception, out updatedCount);
+          operationDetails.AppendFormat("{3}{3}Deleting {0} rows on MySQL Table \"{1}\"...{2}{2}",
+                                        deletingRowsCount,
+                                        editMySQLDataTable.TableName,
+                                        Environment.NewLine,
+                                        (operationDetails.Length > 0 ? Environment.NewLine : String.Empty));
+        warningsTable = editMySQLDataTable.DeleteDataWithManualQuery(wbConnection, out exception, out sqlQuery, out updatedCount);
         success = exception == null;
+        if (!autoCommitOn)
+          operationDetails.AppendFormat("{0}{1}{1}",
+                                        sqlQuery,
+                                        Environment.NewLine);
         if (success)
         {
           if (!autoCommitOn)
@@ -324,15 +336,17 @@ namespace MySQL.ForExcel
       if (modifiedRowsCount > 0)
       {
         if (!autoCommitOn)
-        {
-          if (operationDetails.Length > 0)
-            operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
-          operationDetails.AppendFormat("Committing changes on {0} rows on MySQL Table \"{1}\"...{2}{2}", modifiedRowsCount, editMySQLDataTable.TableName, Environment.NewLine);
-          operationDetails.Append(editMySQLDataTable.GetUpdateSQL(-1, true));
-          operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
-        }
-        warningsTable = editMySQLDataTable.UpdateDataWithAdapter(wbConnection, out exception, out updatedCount);
+          operationDetails.AppendFormat("{3}{3}Committing changes on {0} rows on MySQL Table \"{1}\"...{2}{2}",
+                                        modifiedRowsCount,
+                                        editMySQLDataTable.TableName,
+                                        Environment.NewLine,
+                                        (operationDetails.Length > 0 ? Environment.NewLine : String.Empty));
+        warningsTable = editMySQLDataTable.UpdateDataWithManualQuery(wbConnection, out exception, out sqlQuery, out updatedCount);
         success = exception == null;
+        if (!autoCommitOn)
+          operationDetails.AppendFormat("{0}{1}{1}",
+                                        sqlQuery,
+                                        Environment.NewLine);
         if (success)
         {
           changeExcelCellsColor(modifiedCellAddressesList, commitedCellsOLEColor);
@@ -400,6 +414,8 @@ namespace MySQL.ForExcel
         if (dr == DialogResult.Cancel)
           return;
       }
+
+      this.Cursor = Cursors.Default;
     }
 
     private void EditingWorksheet_Change(Excel.Range Target)

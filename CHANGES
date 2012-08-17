@@ -1,1 +1,4 @@
-1.1.0
+- All operations done through Edit Data use now constructed queries sent directly to MySQL instead of performing the operations via the Connector/NET DataAdapter.
+  This way we are consistent on how operations are performed by the Export Data and Append Data operations and ensure the query appearing on the General Query Log
+  and the one we display to the users are identical. (Oracle bug 14355970 - CONFIRMATION DETAILS LIE ABOUT SQL ISSUED).
+  

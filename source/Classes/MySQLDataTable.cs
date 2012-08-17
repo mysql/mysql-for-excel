@@ -579,25 +579,34 @@ namespace MySQL.ForExcel
 
     public string GetInsertSQL(int startRow, int limit, bool formatNewLinesAndTabs, bool newRowsOnly, out int nextRow)
     {
-      int colsCount = Columns.Count;
-      int rowsCount = Rows.Count;
-      ulong maxByteCount = (mysqlMaxAllowedPacket > 0 ? mysqlMaxAllowedPacket - 10 : 0);
-
       nextRow = -1;
+      DataRowCollection valueRows = null;
+
+      if (newRowsOnly)
+      {
+        DataTable changesTable = GetChanges(DataRowState.Added);
+        valueRows = (changesTable != null ? changesTable.Rows : null);
+      }
+      else
+        valueRows = Rows;
+      if (valueRows == null)
+        return null;
+
       if (startRow < 0)
         startRow = 0;
       if (!newRowsOnly && firstRowIsHeaders && startRow == 0)
         startRow++;
-      if (!newRowsOnly && startRow >= rowsCount)
+      if (startRow >= valueRows.Count)
         return null;
 
+      ulong maxByteCount = (mysqlMaxAllowedPacket > 0 ? mysqlMaxAllowedPacket - 10 : 0);
       ulong queryStringByteCount = 0;
       StringBuilder queryString = new StringBuilder();
       string nl = (formatNewLinesAndTabs ? Environment.NewLine : " ");
       int rowIdx = 0;
       int colIdx = 0;
       int startingColNum = (AddPrimaryKeyColumn ? (useFirstColumnAsPK ? 0 : 1) : 0);
-      List<string> insertColumnNames = new List<string>(colsCount);
+      List<string> insertColumnNames = new List<string>(Columns.Count);
 
       string rowsSeparator = String.Empty;
       string colsSeparator = String.Empty;
@@ -606,7 +615,7 @@ namespace MySQL.ForExcel
                                TableName.Replace("`", "``"),
                                nl);
 
-      for (colIdx = startingColNum; colIdx < colsCount; colIdx++)
+      for (colIdx = startingColNum; colIdx < Columns.Count; colIdx++)
       {
         MySQLDataColumn column = Columns[colIdx] as MySQLDataColumn;
         if (column.ExcludeColumn)
@@ -619,16 +628,6 @@ namespace MySQL.ForExcel
       }
       queryString.AppendFormat("){0}VALUES{0}", nl);
 
-      DataRowCollection valueRows = null;
-      if (newRowsOnly)
-      {
-        DataTable changesTable = GetChanges(DataRowState.Added);
-        valueRows = (changesTable != null ? changesTable.Rows : null);
-        rowsCount = valueRows.Count;
-      }
-      else
-        valueRows = Rows;
-
       if (valueRows != null)
       {
         int absRowIdx = 0;
@@ -638,11 +637,11 @@ namespace MySQL.ForExcel
         if (maxByteCount > 0)
           queryStringByteCount = (ulong)ASCIIEncoding.ASCII.GetByteCount(queryString.ToString());
 
-        for (rowIdx = startRow; rowIdx < rowsCount; rowIdx++)
+        for (rowIdx = startRow; rowIdx < valueRows.Count; rowIdx++)
         {
           if (limit > 0 && absRowIdx > limit)
           {
-            if (rowIdx < rowsCount)
+            if (rowIdx < valueRows.Count)
               nextRow = rowIdx;
             break;
           }
@@ -726,6 +725,8 @@ namespace MySQL.ForExcel
             insertedRows += cmd.ExecuteNonQuery();
           }
           transaction.Commit();
+          if (newRowsOnly)
+            AcceptChanges();
           warningsDS = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");
         }
         catch (MySqlException mysqlEx)
@@ -744,93 +745,6 @@ namespace MySQL.ForExcel
       }
 
       return (warningsDS != null && warningsDS.Tables.Count > 0 ? warningsDS.Tables[0] : null);
-    }
-
-    public DataTable InsertDataWithAdapter(MySqlWorkbenchConnection wbConnection, bool newRowsOnly, out Exception exception, out int targetInsertCount, out int insertedRows)
-    {
-      DataSet warningsDS = null;
-      exception = null;
-      targetInsertCount = 0;
-      insertedRows = 0;
-      DataTable copyOriginal = null;
-
-      if (newRowsOnly)
-        copyOriginal = this;
-      else
-      {
-        copyOriginal = this.Clone();
-        copyOriginal.Merge(this, true);
-        foreach (MySQLDataColumn col in Columns)
-        {
-          DataColumn copyCol = copyOriginal.Columns[col.ColumnName];
-          if (col.ExcludeColumn || (AddPrimaryKeyColumn && !useFirstColumnAsPK && col.AutoPK))
-            copyOriginal.Columns.Remove(copyCol);
-        }
-        if (firstRowIsHeaders)
-          copyOriginal.Rows.RemoveAt(0);
-        copyOriginal.AcceptChanges();
-      }
-
-      string connectionString = MySQLDataUtilities.GetConnectionString(wbConnection);
-      // Create & open a SqlConnection, and dispose of it after we are done.
-      using (MySqlConnection connection = new MySqlConnection(connectionString))
-      {
-        try
-        {
-          MySqlDataAdapter dataAdapter = new MySqlDataAdapter(SelectQuery, connection);
-          DataTable exportingDataTable = new DataTable();
-          dataAdapter.FillSchema(exportingDataTable, SchemaType.Source);
-
-          DataRowCollection valueRows = null;
-          if (newRowsOnly)
-          {
-            DataTable changesTable = GetChanges(DataRowState.Added);
-            valueRows = (changesTable != null ? changesTable.Rows : null);
-          }
-          else
-            valueRows = copyOriginal.Rows;
-
-          if (valueRows != null)
-          {
-            targetInsertCount = valueRows.Count;
-            for (int rowIdx = 0; rowIdx < valueRows.Count; rowIdx++)
-            {
-              DataRow row = valueRows[rowIdx];
-
-              row.BeginEdit();
-              for (int colIdx = 0; colIdx < copyOriginal.Columns.Count; colIdx++)
-              {
-                string copyOriginalColName = copyOriginal.Columns[colIdx].ColumnName;
-                MySQLDataColumn column = Columns[copyOriginalColName] as MySQLDataColumn;
-                row[colIdx] = DataTypeUtilities.GetInsertingValueForColumnType(row[colIdx], column);
-              }
-              row.EndEdit();
-              exportingDataTable.LoadDataRow(row.ItemArray, LoadOption.Upsert);
-            }
-          }
-
-          MySqlCommandBuilder commBuilder = new MySqlCommandBuilder(dataAdapter);
-          dataAdapter.InsertCommand = commBuilder.GetInsertCommand();
-          insertedRows = dataAdapter.Update(exportingDataTable);
-          warningsDS = MySqlHelper.ExecuteDataset(connection, "SHOW WARNINGS");
-        }
-        catch (MySqlException mysqlEx)
-        {
-          exception = mysqlEx;
-        }
-        catch (Exception ex)
-        {
-          exception = ex;
-          MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
-        }
-      }
-      return (warningsDS != null && warningsDS.Tables.Count > 0 ? warningsDS.Tables[0] : null);
-    }
-
-    public DataTable InsertDataWithAdapter(MySqlWorkbenchConnection wbConnection, bool newRowsOnly, out Exception exception, out int insertedRows)
-    {
-      int targetInsertCount = 0;
-      return InsertDataWithAdapter(wbConnection, newRowsOnly, out exception, out targetInsertCount, out insertedRows);
     }
 
     private List<string> getChangedColumns(DataRow changesRow)
@@ -1007,17 +921,21 @@ namespace MySQL.ForExcel
       return (warningsDS != null && warningsDS.Tables.Count > 0 ? warningsDS.Tables[0] : null);
     }
 
-    public string GetUpdateSQL(int limit, bool formatNewLinesAndTabs)
+    public string GetUpdateSQL(int startRow, int limit, bool formatNewLinesAndTabs, out int nextRow)
     {
+      nextRow = -1;
       DataTable changesTable = GetChanges(DataRowState.Modified);
       if (changesTable == null || changesTable.Rows.Count == 0)
-        return String.Empty;
+        return null;
 
+      ulong maxByteCount = (mysqlMaxAllowedPacket > 0 ? mysqlMaxAllowedPacket - 10 : 0);
       StringBuilder queryString = new StringBuilder();
+      StringBuilder wClauseString = new StringBuilder();
       string nl = (formatNewLinesAndTabs ? Environment.NewLine : " ");
       int rowIdx = 0;
       string rowsSeparator = String.Empty;
       string colsSeparator = String.Empty;
+      string wClauseColsSeparator = String.Empty;
 
       for (rowIdx = 0; rowIdx < changesTable.Rows.Count; rowIdx++)
       {
@@ -1027,65 +945,85 @@ namespace MySQL.ForExcel
                                  rowsSeparator,
                                  SchemaName,
                                  TableName.Replace("`", "``"));
-        colsSeparator = String.Empty;
-        foreach (string colName in changedColNamesList)
+        wClauseString.Clear();
+        wClauseString.Append(" WHERE ");
+        wClauseColsSeparator = colsSeparator = String.Empty;
+        foreach (MySQLDataColumn column in Columns)
         {
-          MySQLDataColumn column = Columns[colName] as MySQLDataColumn;
-          bool insertingValueIsNull = changesRow[colName] == null || changesRow[colName] == DBNull.Value;
-          string valueToDB = (insertingValueIsNull ? @"null" : changesRow[colName].ToString());
+          string valueToDB = String.Empty;
+          string finalColName = column.ColumnName.Replace("`", "``");
+          object updatingValue = DataTypeUtilities.GetInsertingValueForColumnType(changesRow[column.ColumnName], column);
+          bool updatingValueIsNull = updatingValue == null || updatingValue == DBNull.Value;
+          if (updatingValueIsNull)
+            valueToDB = @"null";
+          else
+            valueToDB = (updatingValue.Equals(DateTime.MinValue) ? "0000-00-00 00:00:00" : updatingValue.ToString());
+
+          if (column.PrimaryKey)
+          {
+            wClauseString.AppendFormat("{0}`{1}`={2}{3}{2}",
+                                       colsSeparator,
+                                       finalColName,
+                                       (column.ColumnsRequireQuotes && !updatingValueIsNull ? "'" : String.Empty),
+                                       valueToDB);
+            wClauseColsSeparator = " AND ";
+          }
+          if (!changedColNamesList.Contains(column.ColumnName))
+            continue;
           queryString.AppendFormat("{0}`{1}`={2}{3}{2}",
                                     colsSeparator,
-                                    colName.Replace("`", "``"),
-                                    (column.ColumnsRequireQuotes && !insertingValueIsNull ? "'" : String.Empty),
+                                    finalColName,
+                                    (column.ColumnsRequireQuotes && !updatingValueIsNull ? "'" : String.Empty),
                                     valueToDB);
           colsSeparator = ",";
         }
-        queryString.Append(" WHERE ");
-        colsSeparator = String.Empty;
-        foreach (MySQLDataColumn pkCol in Columns.OfType<MySQLDataColumn>().Where(i => i.PrimaryKey))
-        {
-          queryString.AppendFormat("{0}`{1}`={2}{3}{2}",
-                                    colsSeparator,
-                                    pkCol.ColumnName.Replace("`", "``"),
-                                    (pkCol.ColumnsRequireQuotes ? "'" : String.Empty),
-                                    changesRow[pkCol.ColumnName]);
-          colsSeparator = " AND ";
-        }
         rowsSeparator = ";" + nl;
+        queryString.Append(wClauseString.ToString());
       }
 
       return queryString.ToString();
     }
 
-    public DataTable UpdateDataWithAdapter(MySqlWorkbenchConnection wbConnection, out Exception exception, out int targetUpdateCount, out int updatedCount)
+    public DataTable UpdateDataWithManualQuery(MySqlWorkbenchConnection wbConnection, out Exception exception, out string sqlQuery, out int updatedCount)
     {
       DataSet warningsDS = null;
-      targetUpdateCount = 0;
       updatedCount = 0;
       exception = null;
+      MySqlTransaction transaction = null;
+      string chunkQuery = sqlQuery = String.Empty;
 
       string connectionString = MySQLDataUtilities.GetConnectionString(wbConnection);
-      // Create & open a SqlConnection, and dispose of it after we are done.
-      using (MySqlConnection connection = new MySqlConnection(connectionString))
+      using (MySqlConnection conn = new MySqlConnection(connectionString))
       {
         try
         {
-          MySqlDataAdapter dataAdapter = new MySqlDataAdapter(SelectQuery, connection);
-          DataTable changesTable = GetChanges(DataRowState.Modified);
-          if (changesTable.Rows != null)
-            targetUpdateCount = changesTable.Rows.Count;
-
-          MySqlCommandBuilder commBuilder = new MySqlCommandBuilder(dataAdapter);
-          dataAdapter.UpdateCommand = commBuilder.GetUpdateCommand();
-          updatedCount = dataAdapter.Update(this);
-          warningsDS = MySqlHelper.ExecuteDataset(connection, "SHOW WARNINGS");
+          conn.Open();
+          if (mysqlMaxAllowedPacket == 0)
+            mysqlMaxAllowedPacket = MySQLDataUtilities.GetMySQLServerMaxAllowedPacket(conn);
+          transaction = conn.BeginTransaction();
+          MySqlCommand cmd = new MySqlCommand(String.Empty, conn, transaction);
+          int nextRow = 0;
+          while (nextRow >= 0)
+          {
+            chunkQuery = GetUpdateSQL(nextRow, -1, true, out nextRow);
+            cmd.CommandText = chunkQuery;
+            sqlQuery += chunkQuery;
+            updatedCount += cmd.ExecuteNonQuery();
+          }
+          transaction.Commit();
+          AcceptChanges();
+          warningsDS = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");
         }
         catch (MySqlException mysqlEx)
         {
+          if (transaction != null)
+            transaction.Rollback();
           exception = mysqlEx;
         }
         catch (Exception ex)
         {
+          if (transaction != null)
+            transaction.Rollback();
           exception = ex;
           MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
         }
@@ -1094,18 +1032,14 @@ namespace MySQL.ForExcel
       return (warningsDS != null && warningsDS.Tables.Count > 0 ? warningsDS.Tables[0] : null);
     }
 
-    public DataTable UpdateDataWithAdapter(MySqlWorkbenchConnection wbConnection, out Exception exception, out int updatedCount)
+    public string GetDeleteSQL(int startRow, int limit, bool formatNewLinesAndTabs, out int nextRow)
     {
-      int targetUpdateCount = 0;
-      return UpdateDataWithAdapter(wbConnection, out exception, out targetUpdateCount, out updatedCount);
-    }
-
-    public string GetDeleteSQL(int limit, bool formatNewLinesAndTabs)
-    {
+      nextRow = -1;
       DataTable changesTable = GetChanges(DataRowState.Deleted);
       if (changesTable == null || changesTable.Rows.Count == 0)
-        return String.Empty;
+        return null;
 
+      ulong maxByteCount = (mysqlMaxAllowedPacket > 0 ? mysqlMaxAllowedPacket - 10 : 0);
       StringBuilder queryString = new StringBuilder();
       string nl = (formatNewLinesAndTabs ? Environment.NewLine : " ");
       int rowIdx = 0;
@@ -1120,14 +1054,20 @@ namespace MySQL.ForExcel
                                  SchemaName,
                                  TableName.Replace("`", "``"));
         colsSeparator = String.Empty;
-        foreach (DataColumn pkCol in PrimaryKey)
+        foreach (MySQLDataColumn pkCol in PrimaryKey)
         {
-          MySQLDataColumn column = Columns[pkCol.ColumnName] as MySQLDataColumn;
+          string valueToDB = String.Empty;
+          object updatingValue = DataTypeUtilities.GetInsertingValueForColumnType(changesRow[pkCol.ColumnName], pkCol);
+          bool updatingValueIsNull = updatingValue == null || updatingValue == DBNull.Value;
+          if (updatingValueIsNull)
+            valueToDB = @"null";
+          else
+            valueToDB = (updatingValue.Equals(DateTime.MinValue) ? "0000-00-00 00:00:00" : updatingValue.ToString());
           queryString.AppendFormat("{0}`{1}`={2}{3}{2}",
                                     colsSeparator,
                                     pkCol.ColumnName.Replace("`", "``"),
-                                    (column.ColumnsRequireQuotes ? "'" : String.Empty),
-                                    changesRow[pkCol].ToString());
+                                    (pkCol.ColumnsRequireQuotes ? "'" : String.Empty),
+                                    valueToDB);
           colsSeparator = " AND ";
         }
         rowsSeparator = ";" + nl;
@@ -1136,47 +1076,52 @@ namespace MySQL.ForExcel
       return queryString.ToString();
     }
 
-    public DataTable DeleteDataWithAdapter(MySqlWorkbenchConnection wbConnection, out Exception exception, out int targetDeleteCount, out int deletedCount)
+    public DataTable DeleteDataWithManualQuery(MySqlWorkbenchConnection wbConnection, out Exception exception, out string sqlQuery, out int deletedCount)
     {
       DataSet warningsDS = null;
-      exception = null;
       deletedCount = 0;
-      targetDeleteCount = 0;
+      exception = null;
+      MySqlTransaction transaction = null;
+      string chunkQuery = sqlQuery = String.Empty;
 
       string connectionString = MySQLDataUtilities.GetConnectionString(wbConnection);
-      // Create & open a SqlConnection, and dispose of it after we are done.
-      using (MySqlConnection connection = new MySqlConnection(connectionString))
+      using (MySqlConnection conn = new MySqlConnection(connectionString))
       {
         try
         {
-          MySqlDataAdapter dataAdapter = new MySqlDataAdapter(SelectQuery, connection);
-          MySqlCommandBuilder commBuilder = new MySqlCommandBuilder(dataAdapter);
-          dataAdapter.DeleteCommand = commBuilder.GetDeleteCommand();
-          
-          DataTable changesTable = GetChanges(DataRowState.Deleted);
-          if (changesTable.Rows != null)
-            targetDeleteCount = changesTable.Rows.Count;
-          deletedCount = dataAdapter.Update(this);
-          warningsDS = MySqlHelper.ExecuteDataset(connection, "SHOW WARNINGS");
+          conn.Open();
+          if (mysqlMaxAllowedPacket == 0)
+            mysqlMaxAllowedPacket = MySQLDataUtilities.GetMySQLServerMaxAllowedPacket(conn);
+          transaction = conn.BeginTransaction();
+          MySqlCommand cmd = new MySqlCommand(String.Empty, conn, transaction);
+          int nextRow = 0;
+          while (nextRow >= 0)
+          {
+            chunkQuery = GetDeleteSQL(nextRow, -1, true, out nextRow);
+            cmd.CommandText = chunkQuery;
+            sqlQuery += chunkQuery;
+            deletedCount += cmd.ExecuteNonQuery();
+          }
+          transaction.Commit();
+          AcceptChanges();
+          warningsDS = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");
         }
         catch (MySqlException mysqlEx)
         {
+          if (transaction != null)
+            transaction.Rollback();
           exception = mysqlEx;
         }
         catch (Exception ex)
         {
+          if (transaction != null)
+            transaction.Rollback();
           exception = ex;
           MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
         }
       }
 
       return (warningsDS != null && warningsDS.Tables.Count > 0 ? warningsDS.Tables[0] : null);
-    }
-
-    public DataTable DeleteDataWithAdapter(MySqlWorkbenchConnection wbConnection, out Exception exception, out int deletedCount)
-    {
-      int targetDeleteCount = 0;
-      return DeleteDataWithAdapter(wbConnection, out exception, out targetDeleteCount, out deletedCount);
     }
 
     public void RevertData(bool refreshFromDB, MySqlWorkbenchConnection wbConnection, out Exception exception)
