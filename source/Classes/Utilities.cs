@@ -569,6 +569,7 @@ namespace MySQL.ForExcel
   {
     public const int VARCHAR_MAX_LEN = 65535;
     public const string DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public const string EMPTY_DATE = "0000-00-00 00:00:00";
 
     public static List<string> GetMySQLDataTypes(out List<int> paramsInParenthesisList)
     {
@@ -1135,33 +1136,33 @@ namespace MySQL.ForExcel
       return importingVaue;
     }
 
-    public static object GetInsertingValueForColumnType(object rawValue, MySQLDataColumn column)
+    public static object GetInsertingValueForColumnType(object rawValue, MySQLDataColumn againstTypeColumn)
     {
       object retValue = rawValue;
-      if (column == null)
+      if (againstTypeColumn == null)
         return rawValue;
 
       bool cellWithNoData = rawValue == null || rawValue == DBNull.Value;
       if (cellWithNoData)
       {
-        if (column.AllowNull)
+        if (againstTypeColumn.AllowNull)
           retValue = DBNull.Value;
         else
         {
-          if (column.IsNumeric || column.IsBinary)
+          if (againstTypeColumn.IsNumeric || againstTypeColumn.IsBinary)
             retValue = 0;
-          else if (column.IsBool)
+          else if (againstTypeColumn.IsBool)
             retValue = false;
-          else if (column.IsDate)
+          else if (againstTypeColumn.IsDate)
             retValue = DateTime.MinValue;
-          else if (column.ColumnsRequireQuotes)
+          else if (againstTypeColumn.ColumnsRequireQuotes)
             retValue = String.Empty;
         }
       }
       else
       {
         retValue = rawValue;
-        if (column.IsDate)
+        if (againstTypeColumn.IsDate)
         {
           DateTime dtValue;
           string rawValueAsString = rawValue.ToString();
@@ -1169,7 +1170,7 @@ namespace MySQL.ForExcel
             rawValueAsString = dtValue.ToString(DataTypeUtilities.DATE_FORMAT);
           if (rawValue.Equals(DateTime.MinValue) || rawValueAsString.StartsWith("0000-00-00") || rawValueAsString.StartsWith("00-00-00"))
           {
-            if (column.AllowNull)
+            if (againstTypeColumn.AllowNull)
               retValue = DBNull.Value;
             else
               retValue = DateTime.MinValue;
@@ -1177,7 +1178,7 @@ namespace MySQL.ForExcel
           else
             retValue = rawValueAsString;
         }
-        else if (column.IsBool)
+        else if (againstTypeColumn.IsBool)
         {
           string rawValueAsString = rawValue.ToString().ToLowerInvariant();
           if (rawValueAsString == "ja" || rawValueAsString == "yes" || rawValueAsString == "true" || rawValueAsString == "1")
@@ -1185,11 +1186,30 @@ namespace MySQL.ForExcel
           else if (rawValueAsString == "nein" || rawValueAsString == "no" || rawValueAsString == "false" || rawValueAsString == "0")
             retValue = false;
         }
-        else if (column.ColumnsRequireQuotes)
+        else if (againstTypeColumn.ColumnsRequireQuotes)
           retValue = MySQLDataUtilities.EscapeString(rawValue.ToString());  
       }
 
       return retValue;
+    }
+
+    public static string GetStringValueForColumn(object rawValue, MySQLDataColumn againstTypeColumn, bool dataForInsertion, out bool valueIsNull)
+    {
+      valueIsNull = true;
+      string valueToDB = @"null";
+
+      object valueObject = (dataForInsertion ? DataTypeUtilities.GetInsertingValueForColumnType(rawValue, againstTypeColumn) : rawValue);
+      valueIsNull = valueObject == null || valueObject == DBNull.Value;
+      if (!valueIsNull)
+        valueToDB = (valueObject.Equals(DateTime.MinValue) ? EMPTY_DATE : valueObject.ToString());
+
+      return valueToDB;
+    }
+
+    public static string GetStringValueForColumn(object rawValue, MySQLDataColumn againstTypeColumn, bool dataForInsertion)
+    {
+      bool valueIsNull = false;
+      return GetStringValueForColumn(rawValue, againstTypeColumn, dataForInsertion, out valueIsNull);
     }
 
   }

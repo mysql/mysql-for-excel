@@ -630,6 +630,7 @@ namespace MySQL.ForExcel
 
       if (valueRows != null)
       {
+        bool insertingValueIsNull = false;
         int absRowIdx = 0;
         string valueToDB = String.Empty;
         StringBuilder singleRowValuesBuilder = new StringBuilder();
@@ -655,12 +656,7 @@ namespace MySQL.ForExcel
           foreach (string insertingColName in insertColumnNames)
           {
             MySQLDataColumn column = Columns[insertingColName] as MySQLDataColumn;
-            object insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(dr[insertingColName], column);
-            bool insertingValueIsNull = insertingValue == null || insertingValue == DBNull.Value;
-            if (insertingValueIsNull)
-              valueToDB = @"null";
-            else
-              valueToDB = (insertingValue.Equals(DateTime.MinValue) ? "0000-00-00 00:00:00" : insertingValue.ToString());
+            valueToDB = DataTypeUtilities.GetStringValueForColumn(dr[insertingColName], column, true, out insertingValueIsNull);
             singleRowValuesBuilder.AppendFormat("{0}{1}{2}{1}",
                                                 colsSeparator,
                                                 (column.ColumnsRequireQuotes && !insertingValueIsNull ? "'" : String.Empty),
@@ -838,12 +834,8 @@ namespace MySQL.ForExcel
           string fromColumnName = fromColumnNames[colIdx];
           string toColumnName = toColumnNames[colIdx];
           MySQLDataColumn toColumn = Columns[toColumnName] as MySQLDataColumn;
-          object insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(dr[fromColumnName], toColumn);
-          bool insertingValueIsNull = insertingValue == null || insertingValue == DBNull.Value;
-          if (insertingValueIsNull)
-            valueToDB = @"null";
-          else
-            valueToDB = (insertingValue.Equals(DateTime.MinValue) ? "0000-00-00 00:00:00" : insertingValue.ToString());
+          bool insertingValueIsNull = false;
+          valueToDB = DataTypeUtilities.GetStringValueForColumn(dr[fromColumnName], toColumn, true, out insertingValueIsNull);
           singleRowValuesBuilder.AppendFormat("{0}{1}{2}{1}",
                                               colsSeparator,
                                               (toColumn.ColumnsRequireQuotes && !insertingValueIsNull ? "'" : String.Empty),
@@ -950,17 +942,13 @@ namespace MySQL.ForExcel
         wClauseColsSeparator = colsSeparator = String.Empty;
         foreach (MySQLDataColumn column in Columns)
         {
+          bool updatingValueIsNull = false;
           string valueToDB = String.Empty;
           string finalColName = column.ColumnName.Replace("`", "``");
-          object updatingValue = DataTypeUtilities.GetInsertingValueForColumnType(changesRow[column.ColumnName], column);
-          bool updatingValueIsNull = updatingValue == null || updatingValue == DBNull.Value;
-          if (updatingValueIsNull)
-            valueToDB = @"null";
-          else
-            valueToDB = (updatingValue.Equals(DateTime.MinValue) ? "0000-00-00 00:00:00" : updatingValue.ToString());
 
           if (column.PrimaryKey)
           {
+            valueToDB = DataTypeUtilities.GetStringValueForColumn(changesRow[column.ColumnName, DataRowVersion.Original], column, false, out updatingValueIsNull);
             wClauseString.AppendFormat("{0}`{1}`={2}{3}{2}",
                                        colsSeparator,
                                        finalColName,
@@ -968,14 +956,16 @@ namespace MySQL.ForExcel
                                        valueToDB);
             wClauseColsSeparator = " AND ";
           }
-          if (!changedColNamesList.Contains(column.ColumnName))
-            continue;
-          queryString.AppendFormat("{0}`{1}`={2}{3}{2}",
-                                    colsSeparator,
-                                    finalColName,
-                                    (column.ColumnsRequireQuotes && !updatingValueIsNull ? "'" : String.Empty),
-                                    valueToDB);
-          colsSeparator = ",";
+          if (changedColNamesList.Contains(column.ColumnName))
+          {
+            valueToDB = DataTypeUtilities.GetStringValueForColumn(changesRow[column.ColumnName], column, true, out updatingValueIsNull);
+            queryString.AppendFormat("{0}`{1}`={2}{3}{2}",
+                                      colsSeparator,
+                                      finalColName,
+                                      (column.ColumnsRequireQuotes && !updatingValueIsNull ? "'" : String.Empty),
+                                      valueToDB);
+            colsSeparator = ",";
+          }
         }
         rowsSeparator = ";" + nl;
         queryString.Append(wClauseString.ToString());
@@ -1045,6 +1035,7 @@ namespace MySQL.ForExcel
       int rowIdx = 0;
       string rowsSeparator = String.Empty;
       string colsSeparator = String.Empty;
+      bool pkValueIsNull = false;
 
       for (rowIdx = 0; rowIdx < changesTable.Rows.Count; rowIdx++)
       {
@@ -1056,17 +1047,11 @@ namespace MySQL.ForExcel
         colsSeparator = String.Empty;
         foreach (MySQLDataColumn pkCol in PrimaryKey)
         {
-          string valueToDB = String.Empty;
-          object updatingValue = DataTypeUtilities.GetInsertingValueForColumnType(changesRow[pkCol.ColumnName], pkCol);
-          bool updatingValueIsNull = updatingValue == null || updatingValue == DBNull.Value;
-          if (updatingValueIsNull)
-            valueToDB = @"null";
-          else
-            valueToDB = (updatingValue.Equals(DateTime.MinValue) ? "0000-00-00 00:00:00" : updatingValue.ToString());
+          string valueToDB = DataTypeUtilities.GetStringValueForColumn(changesRow[pkCol.ColumnName], pkCol, false, out pkValueIsNull);
           queryString.AppendFormat("{0}`{1}`={2}{3}{2}",
                                     colsSeparator,
                                     pkCol.ColumnName.Replace("`", "``"),
-                                    (pkCol.ColumnsRequireQuotes ? "'" : String.Empty),
+                                    (pkCol.ColumnsRequireQuotes && !pkValueIsNull ? "'" : String.Empty),
                                     valueToDB);
           colsSeparator = " AND ";
         }

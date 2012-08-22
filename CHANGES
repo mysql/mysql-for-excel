@@ -1,3 +1,8 @@
+- Edit Data was failing in this scenario when a table's primary key is being changed by the user. Fixed code in GetUpdateSQL method of MySQLDataTable class to assemble
+  the where clause using the original values in the row and not the updated values (since updated values in this scenario are not found but MySQL does not throw any
+  errors or warnings about not finding such records). (Oracle bug 14349192 - COMMIT FAILS).
+- Methods that handle Insert, Update and Delete operations (InsertDataWithManualQuery, AppendDataWithManualQuery, UpdateDataWithManualQuery, DeleteDataWithManualQuery)
+  are using transactions which are rolled back if an error occurs. (Oracle bug 14356054 - OPTIMISTIC LOCKING CAN CAUSE PARTIAL DATA UPDATES)
 - All operations done through Edit Data use now constructed queries sent directly to MySQL instead of performing the operations via the Connector/NET DataAdapter.
   This way we are consistent on how operations are performed by the Export Data and Append Data operations and ensure the query appearing on the General Query Log
   and the one we display to the users are identical. (Oracle bug 14355970 - CONFIRMATION DETAILS LIE ABOUT SQL ISSUED).
