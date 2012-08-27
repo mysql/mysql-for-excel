@@ -1,3 +1,8 @@
+- Changed comparison strategy for the value the user types in an Excel cell against the value already stored in the DataTable; for this a new method in the
+  DataTypeUtilities class called ExcelValueEqualsDataTableValue was created to do a comparison by data type and if what the user types equals what is in the DB
+  the change is disregarded and discarded for a commit. Also changed code to process Excel Sheet changes cell by cell instead of a whole range in order to paint the
+  cell's background if the change does not produce errors, in which case now the change is undone, an error is thrown and the cell is not colored; if the changed value
+  equals the one in the table no change is accounted for to commit. (Internal bug 75 - Edit Data generates wrong UPDATE query when typing identical value on cell).
 - Edit Data was failing in this scenario when a table's primary key is being changed by the user. Fixed code in GetUpdateSQL method of MySQLDataTable class to assemble
   the where clause using the original values in the row and not the updated values (since updated values in this scenario are not found but MySQL does not throw any
   errors or warnings about not finding such records). (Oracle bug 14349192 - COMMIT FAILS).

@@ -1212,6 +1212,115 @@ namespace MySQL.ForExcel
       return GetStringValueForColumn(rawValue, againstTypeColumn, dataForInsertion, out valueIsNull);
     }
 
+    public static bool ExcelValueEqualsDataTableValue(object dataTableValue, object excelValue)
+    {
+      bool areEqual = dataTableValue.Equals(excelValue);
+
+      if (!areEqual && dataTableValue != null)
+      {
+        string nativeDataTableType = dataTableValue.GetType().ToString();
+        switch(nativeDataTableType)
+        {
+          case "System.String":
+            areEqual = String.Compare(dataTableValue.ToString(), excelValue.ToString(), false) == 0;
+            break;
+          case "System.Byte":
+            byte byteTableValue = (byte)dataTableValue;
+            byte byteExcelValue = 0;
+            if (Byte.TryParse(excelValue.ToString(), out byteExcelValue))
+              areEqual = byteTableValue == byteExcelValue;
+            break;
+          case "System.UInt16":
+            ushort ushortTableValue = (ushort)dataTableValue;
+            ushort ushortExcelValue = 0;
+            if (UInt16.TryParse(excelValue.ToString(), out ushortExcelValue))
+              areEqual = ushortTableValue == ushortExcelValue;
+            break;
+          case "System.Int16":
+            short shortTableValue = (short)dataTableValue;
+            short shortExcelValue = 0;
+            if (Int16.TryParse(excelValue.ToString(), out shortExcelValue))
+              areEqual = shortTableValue == shortExcelValue;
+            break;
+          case "System.UInt32":
+            uint uintTableValue = (uint)dataTableValue;
+            uint uintExcelValue = 0;
+            if (UInt32.TryParse(excelValue.ToString(), out uintExcelValue))
+              areEqual = uintTableValue == uintExcelValue;
+            break;
+          case "System.Int32":
+            int intTableValue = (int)dataTableValue;
+            int intExcelValue = 0;
+            if (Int32.TryParse(excelValue.ToString(), out intExcelValue))
+              areEqual = intTableValue == intExcelValue;
+            break;
+          case "System.UInt64":
+            ulong ulongTableValue = (ulong)dataTableValue;
+            ulong ulongExcelValue = 0;
+            if (UInt64.TryParse(excelValue.ToString(), out ulongExcelValue))
+              areEqual = ulongTableValue == ulongExcelValue;
+            break;
+          case "System.Int64":
+            long longTableValue = (long)dataTableValue;
+            long longExcelValue = 0;
+            if (Int64.TryParse(excelValue.ToString(), out longExcelValue))
+              areEqual = longTableValue == longExcelValue;
+            break;
+          case "System.Decimal":
+            decimal decimalTableValue = (decimal)dataTableValue;
+            decimal decimalExcelValue = 0;
+            if (Decimal.TryParse(excelValue.ToString(), out decimalExcelValue))
+              areEqual = decimalTableValue == decimalExcelValue;
+            break;
+          case "System.Single":
+            float floatTableValue = (float)dataTableValue;
+            float floatExcelValue = 0;
+            if (Single.TryParse(excelValue.ToString(), out floatExcelValue))
+              areEqual = floatTableValue == floatExcelValue;
+            break;
+          case "System.Double":
+            double doubleTableValue = (double)dataTableValue;
+            double doubleExcelValue = 0;
+            if (Double.TryParse(excelValue.ToString(), out doubleExcelValue))
+              areEqual = doubleTableValue == doubleExcelValue;
+            break;
+          case "System.Boolean":
+            bool boolTableValue = (bool)dataTableValue;
+            bool boolExcelValue = false;
+            if (Boolean.TryParse(excelValue.ToString(), out boolExcelValue))
+              areEqual = boolTableValue == boolExcelValue;
+            break;
+          case "System.DateTime":
+            DateTime dateTableValue = (DateTime)dataTableValue;
+            DateTime dateExcelValue;
+            if (DateTime.TryParse(excelValue.ToString(), out dateExcelValue))
+              areEqual = dateTableValue == dateExcelValue;
+            break;
+          case "MySql.Data.Types.MySqlDateTime":
+            MySql.Data.Types.MySqlDateTime mySQLDateTableValue = (MySql.Data.Types.MySqlDateTime)dataTableValue;
+            MySql.Data.Types.MySqlDateTime mySQLDateExcelValue;
+            try
+            {
+              mySQLDateExcelValue = new MySql.Data.Types.MySqlDateTime(excelValue.ToString());
+            }
+            catch
+            {
+              break;
+            }
+            areEqual = mySQLDateTableValue.Equals(mySQLDateExcelValue);
+            break;
+          case "System.TimeSpan":
+            TimeSpan timeTableValue = (TimeSpan)dataTableValue;
+            TimeSpan timeExcelValue;
+            if (TimeSpan.TryParse(excelValue.ToString(), out timeExcelValue))
+              areEqual = timeTableValue == timeExcelValue;
+            break;
+        }
+      }
+
+      return areEqual;
+    }
+
   }
 
   public struct IconInfo

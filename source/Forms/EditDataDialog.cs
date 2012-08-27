@@ -458,27 +458,48 @@ namespace MySQL.ForExcel
       // The change was a modification of cell values
       else
       {
-        object[,] formattedArrayFromRange;
-        if (intersectRange.Count > 1)
-          formattedArrayFromRange = intersectRange.Value as object[,];
-        else
+        MySQLDataColumn currCol = null;
+        string operationSummary = null;
+        string operationDetails = null;
+        try
         {
-          formattedArrayFromRange = new object[2, 2];
-          formattedArrayFromRange[1, 1] = intersectRange.Value;
+          for (int rowIdx = 1; rowIdx <= intersectRange.Rows.Count; rowIdx++)
+            for (int colIdx = 1; colIdx <= intersectRange.Columns.Count; colIdx++)
+            {
+              Excel.Range cell = intersectRange.Cells[rowIdx, colIdx] as Excel.Range;
+              int absRow = startDataTableRow + rowIdx - 1 - (importedHeaders ? 1 : 0);
+              int absCol = startDataTableCol + colIdx - 1;
+              currCol = editMySQLDataTable.GetColumnAtIndex(absCol);
+              object insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(cell.Value, currCol);
+              if (DataTypeUtilities.ExcelValueEqualsDataTableValue(editMySQLDataTable.Rows[absRow][absCol], insertingValue))
+                continue;
+              editMySQLDataTable.Rows[absRow][absCol] = insertingValue;
+              if (!chkAutoCommit.Checked && !modifiedCellAddressesList.Contains(intersectRange.Address))
+                modifiedCellAddressesList.Add(intersectRange.Address);
+              intersectRange.Interior.Color = (chkAutoCommit.Checked ? commitedCellsOLEColor : uncommitedCellsOLEColor);
+            }
         }
-        for (int rowIdx = 1; rowIdx <= intersectRange.Rows.Count; rowIdx++)
+        catch (ArgumentException argEx)
         {
-          for (int colIdx = 1; colIdx <= intersectRange.Columns.Count; colIdx++)
+          operationSummary = String.Format("Invalid value for column of type: {0}", (currCol != null ? currCol.MySQLDataType : "Unknown"));
+          operationDetails = argEx.Message;
+        }
+        catch (Exception ex)
+        {
+          operationSummary = "Error modifying cell's value.";
+          operationDetails = ex.Message;
+        }
+        finally
+        {
+          if (operationSummary != null)
           {
-            int absRow = startDataTableRow + rowIdx - 1 - (importedHeaders ? 1 : 0);
-            int absCol = startDataTableCol + colIdx - 1;
-            MySQLDataColumn currCol = editMySQLDataTable.GetColumnAtIndex(absCol);
-            editMySQLDataTable.Rows[absRow][absCol] = DataTypeUtilities.GetInsertingValueForColumnType(formattedArrayFromRange[rowIdx, colIdx], currCol);
+            InfoDialog errorDialog = new InfoDialog(false, operationSummary, operationDetails);
+            errorDialog.WordWrapDetails = true;
+            errorDialog.StartPosition = FormStartPosition.CenterScreen;
+            errorDialog.ShowDialog();
+            EditingWorksheet.Application.Undo();
           }
         }
-        if (!chkAutoCommit.Checked && !modifiedCellAddressesList.Contains(intersectRange.Address))
-          modifiedCellAddressesList.Add(intersectRange.Address);
-        intersectRange.Interior.Color = (chkAutoCommit.Checked ? commitedCellsOLEColor : uncommitedCellsOLEColor);
       }
 
       btnCommit.Enabled = intersectRange.Count > 0 && !chkAutoCommit.Checked;
