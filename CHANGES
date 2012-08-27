@@ -1,3 +1,5 @@
+- Changed code so when changes are pushed to the MySQL Server we display an InfoDialog when errors or warnings were found during the data commit if the Auto-Commit
+  checkbox is checked (no errors were thrown when in Auto-Commit mode before). (Oracle bug 14349284 - AUTO-COMMIT EDITING APPEARS TO LACK ERROR NOTIFICATION).
 - Changed comparison strategy for the value the user types in an Excel cell against the value already stored in the DataTable; for this a new method in the
   DataTypeUtilities class called ExcelValueEqualsDataTableValue was created to do a comparison by data type and if what the user types equals what is in the DB
   the change is disregarded and discarded for a commit. Also changed code to process Excel Sheet changes cell by cell instead of a whole range in order to paint the
