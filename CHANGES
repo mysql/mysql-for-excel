@@ -1,3 +1,6 @@
+- Revert data resets ALL cells in the editing region to have a NO-FILL style when the Refresh Data from DB button is clicked; otherwise if the Revert Changed Data button
+  is clicked only the changed cells that haven't been committed are reset to have a NO-FILL style.
+  (Oracle bug 14350321 - REFRESH DATA FROM DB IS NOT CLEARING COLORED EXCEL CELLS FOR COMMITTED CELLS)
 - Changed code so when changes are pushed to the MySQL Server we display an InfoDialog when errors or warnings were found during the data commit if the Auto-Commit
   checkbox is checked (no errors were thrown when in Auto-Commit mode before). (Oracle bug 14349284 - AUTO-COMMIT EDITING APPEARS TO LACK ERROR NOTIFICATION).
 - Changed comparison strategy for the value the user types in an Excel cell against the value already stored in the DataTable; for this a new method in the

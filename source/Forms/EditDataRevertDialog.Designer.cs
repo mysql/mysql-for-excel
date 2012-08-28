@@ -125,7 +125,7 @@ namespace MySQL.ForExcel
       this.btnRevert.Name = "btnRevert";
       this.btnRevert.Size = new System.Drawing.Size(156, 23);
       this.btnRevert.TabIndex = 1;
-      this.btnRevert.Text = "Revert to Original Values";
+      this.btnRevert.Text = "Revert Changed Data";
       this.btnRevert.UseVisualStyleBackColor = true;
       this.btnRevert.Click += new System.EventHandler(this.btnRevert_Click);
       // 

@@ -170,6 +170,16 @@ namespace MySQL.ForExcel
       range.Locked = lockRange;
     }
 
+    private void changeExcelCellsColor(Excel.Range modifiedRange, int oleColor)
+    {
+      if (modifiedRange == null)
+        return;
+      if (oleColor > 0)
+        modifiedRange.Interior.Color = oleColor;
+      else
+        modifiedRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+    }
+
     private void changeExcelCellsColor(List<string> cellAddressesList, int oleColor)
     {
       Excel.Range modifiedRange = null;
@@ -180,10 +190,7 @@ namespace MySQL.ForExcel
           modifiedRange = EditingWorksheet.get_Range(startAndEndRange[0], startAndEndRange[1]);
         else
           modifiedRange = EditingWorksheet.get_Range(modifiedRangeAddress);
-        if (oleColor > 0)
-          modifiedRange.Interior.Color = oleColor;
-        else
-          modifiedRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+        changeExcelCellsColor(modifiedRange, oleColor);
       }
       cellAddressesList.Clear();
     }
@@ -202,9 +209,19 @@ namespace MySQL.ForExcel
       EditingWorksheet.Unprotect();
       Excel.Range topLeftCell = editDataRange.Cells[1, 1];
       editDataRange = CallerTaskPane.ImportDataTableToExcelAtGivenCell(editMySQLDataTable, importedHeaders, topLeftCell);
-      changeExcelCellsColor(modifiedCellAddressesList, 0);
-      changeExcelCellsColor(addedRowAddressesList, 0);
-      changeExcelCellsColor(deletedRowAddressesList, 0);
+      if (refreshFromDB)
+      {
+        changeExcelCellsColor(editDataRange, 0);
+        modifiedCellAddressesList.Clear();
+        addedRowAddressesList.Clear();
+        deletedRowAddressesList.Clear();
+      }
+      else
+      {
+        changeExcelCellsColor(modifiedCellAddressesList, 0);
+        changeExcelCellsColor(addedRowAddressesList, 0);
+        changeExcelCellsColor(deletedRowAddressesList, 0);
+      }
       btnCommit.Enabled = false;
       EditingWorksheet.Change += new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
       initializeWorksheetProtection(editDataRange);
