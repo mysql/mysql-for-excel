@@ -36,6 +36,7 @@ namespace MySQL.ForExcel
   {
     private const int SW_SHOWNOACTIVATE = 4;
     private const int HWND_TOPMOST = -1;
+    private const int HWND_NOTOPMOST = -2;
     private const uint SWP_NOACTIVATE = 0x0010;
 
     private Point mouseDownPoint = Point.Empty;
@@ -596,14 +597,10 @@ namespace MySQL.ForExcel
     [DllImport("user32.dll")]
     static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-    [DllImport("user32.dll", SetLastError = true)]
-    static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
-
     public void ShowInactiveTopmost()
     {
       ShowWindow(Handle, SW_SHOWNOACTIVATE);
-      SetWindowPos(Handle.ToInt32(), HWND_TOPMOST, Left, Top, Width, Height, SWP_NOACTIVATE);
-      //SetParent(Handle, ParentWindow.Handle);
+      SetWindowPos(Handle.ToInt32(), HWND_NOTOPMOST, Left, Top, Width, Height, SWP_NOACTIVATE);
     }
 
   }

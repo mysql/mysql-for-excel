@@ -1,3 +1,5 @@
+- Modified a flag of calls to the SetWindowPos method that was setting the Edit Data Dialog to be Topmost of every window, now it is Topmost of only the Excel window.
+  (Oracle bug 14349218 - COMMIT OVERLAY REMAINS TOP-LEVEL WHEN APP IS NOT IN FOCUS).
 - Revert data resets ALL cells in the editing region to have a NO-FILL style when the Refresh Data from DB button is clicked; otherwise if the Revert Changed Data button
   is clicked only the changed cells that haven't been committed are reset to have a NO-FILL style.
   (Oracle bug 14350321 - REFRESH DATA FROM DB IS NOT CLEARING COLORED EXCEL CELLS FOR COMMITTED CELLS)
