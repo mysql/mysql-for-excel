@@ -1,3 +1,6 @@
+- Changed the comparison of strategy for the value the user types in an Excel cell against the value already stored in the DataTable but now using the RowState.Original
+  version of the row so that way if the user changes the value but then types in the value originally retrieved the change is disregarded and the cell's style is set
+  back to NO-FILL. (Internal bug 75 - Edit Data generates wrong UPDATE query when typing identical value on cell).
 - Modified a flag of calls to the SetWindowPos method that was setting the Edit Data Dialog to be Topmost of every window, now it is Topmost of only the Excel window.
   (Oracle bug 14349218 - COMMIT OVERLAY REMAINS TOP-LEVEL WHEN APP IS NOT IN FOCUS).
 - Revert data resets ALL cells in the editing region to have a NO-FILL style when the Refresh Data from DB button is clicked; otherwise if the Revert Changed Data button

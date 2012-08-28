@@ -471,11 +471,22 @@ namespace MySQL.ForExcel
               int absCol = startDataTableCol + colIdx - 1;
               currCol = editMySQLDataTable.GetColumnAtIndex(absCol);
               object insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(cell.Value, currCol);
-              if (DataTypeUtilities.ExcelValueEqualsDataTableValue(editMySQLDataTable.Rows[absRow][absCol], insertingValue))
+              if (DataTypeUtilities.ExcelValueEqualsDataTableValue(editMySQLDataTable.Rows[absRow][absCol, DataRowVersion.Original], insertingValue))
+              {
+                if (modifiedCellAddressesList.Contains(cell.Address))
+                {
+                  changeExcelCellsColor(cell, 0);
+                  modifiedCellAddressesList.Remove(cell.Address);
+                  editMySQLDataTable.Rows[absRow][absCol] = insertingValue;
+                  int changedColsQty = editMySQLDataTable.GetChangedColumns(editMySQLDataTable.Rows[absRow]).Count;
+                  if (changedColsQty == 0)
+                    editMySQLDataTable.Rows[absRow].RejectChanges();
+                }
                 continue;
+              }
               editMySQLDataTable.Rows[absRow][absCol] = insertingValue;
-              if (!modifiedCellAddressesList.Contains(intersectRange.Address))
-                modifiedCellAddressesList.Add(intersectRange.Address);
+              if (!modifiedCellAddressesList.Contains(cell.Address))
+                modifiedCellAddressesList.Add(cell.Address);
               intersectRange.Interior.Color = uncommitedCellsOLEColor;
               editedQuantity++;
             }

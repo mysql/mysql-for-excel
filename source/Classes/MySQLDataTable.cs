@@ -743,7 +743,7 @@ namespace MySQL.ForExcel
       return (warningsDS != null && warningsDS.Tables.Count > 0 ? warningsDS.Tables[0] : null);
     }
 
-    private List<string> getChangedColumns(DataRow changesRow)
+    public List<string> GetChangedColumns(DataRow changesRow)
     {
       List<string> changedColNamesList = null;
 
@@ -932,7 +932,7 @@ namespace MySQL.ForExcel
       for (rowIdx = 0; rowIdx < changesTable.Rows.Count; rowIdx++)
       {
         DataRow changesRow = changesTable.Rows[rowIdx];
-        List<string> changedColNamesList = getChangedColumns(changesRow);
+        List<string> changedColNamesList = GetChangedColumns(changesRow);
         queryString.AppendFormat("{0}UPDATE `{1}`.`{2}` SET ",
                                  rowsSeparator,
                                  SchemaName,
