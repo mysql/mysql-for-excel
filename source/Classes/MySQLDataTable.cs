@@ -722,7 +722,9 @@ namespace MySQL.ForExcel
           }
           transaction.Commit();
           if (newRowsOnly)
-            AcceptChanges();
+            foreach (DataRow dr in Rows)
+              if (dr.RowState == DataRowState.Added)
+                dr.AcceptChanges();
           warningsDS = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");
         }
         catch (MySqlException mysqlEx)
@@ -1001,7 +1003,9 @@ namespace MySQL.ForExcel
             updatedCount += cmd.ExecuteNonQuery();
           }
           transaction.Commit();
-          AcceptChanges();
+          foreach (DataRow dr in Rows)
+            if (dr.RowState == DataRowState.Modified)
+              dr.AcceptChanges();
           warningsDS = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");
         }
         catch (MySqlException mysqlEx)
@@ -1088,7 +1092,9 @@ namespace MySQL.ForExcel
             deletedCount += cmd.ExecuteNonQuery();
           }
           transaction.Commit();
-          AcceptChanges();
+          foreach (DataRow dr in Rows)
+            if (dr.RowState == DataRowState.Deleted)
+              dr.AcceptChanges();
           warningsDS = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");
         }
         catch (MySqlException mysqlEx)

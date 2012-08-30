@@ -72,12 +72,12 @@ namespace MySQL.ForExcel
       get { return String.Format("{0}.{1}", wbConnection.Schema, EditingTableName); }
     }
 
-    public EditDataDialog(MySqlWorkbenchConnection wbConnection, Excel.Range editDataRange, DataTable importTable, Excel.Worksheet editingWorksheet, bool protectWorksheet)
+    public EditDataDialog(MySqlWorkbenchConnection wbConnection, Excel.Range originalEditDataRange, DataTable importTable, Excel.Worksheet editingWorksheet, bool protectWorksheet)
     {
       InitializeComponent();
 
       this.wbConnection = wbConnection;
-      this.editDataRange = editDataRange;
+      editDataRange = originalEditDataRange;
       importedHeaders = (bool)importTable.ExtendedProperties["ImportedHeaders"];
       queryString = importTable.ExtendedProperties["QueryString"].ToString();
       EditingTableName = importTable.TableName;
@@ -88,25 +88,22 @@ namespace MySQL.ForExcel
         editMySQLDataTable.SelectQuery = importTable.ExtendedProperties["QueryString"].ToString();
       EditingWorksheet = editingWorksheet;
       editingWorksheetName = editingWorksheet.Name;
-      EditingWorksheet.Change += new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
       EditingWorksheet.SelectionChange += new Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);
       toolTip.SetToolTip(this, String.Format("Editing data for Table {0} on Worksheet {1}", EditingTableName, editingWorksheetName));
-      editingRowsQuantity = editingWorksheet.UsedRange.Rows.Count;
       editingColsQuantity = editingWorksheet.UsedRange.Columns.Count;
       Opacity = 0.60;
       LockByProtectingWorksheet = protectWorksheet;
-      initializeWorksheetProtection(editDataRange);
+      addNewRowToEditingRange(false);
 
+      addedRowAddressesList = new List<string>();
       if (editDataRange != null)
       {
         modifiedCellAddressesList = new List<string>(editDataRange.Count);
-        addedRowAddressesList = new List<string>(editDataRange.Count);
-        deletedRowAddressesList = new List<string>(editDataRange.Count);
+        deletedRowAddressesList = new List<string>(editDataRange.Rows.Count);
       }
       else
       {
         modifiedCellAddressesList = new List<string>();
-        addedRowAddressesList = new List<string>();
         deletedRowAddressesList = new List<string>();
       }
     }
@@ -132,15 +129,15 @@ namespace MySQL.ForExcel
         CallerTaskPane.WorkSheetEditFormsHashtable.Remove(editingWorksheetName);
     }
 
-    private void initializeWorksheetProtection(Excel.Range permittedRange)
+    private void initializeWorksheetProtection()
     {
-      if (permittedRange != null)
+      if (editDataRange != null)
       {
-        permittedRange.Locked = false;
+        editDataRange.Locked = false;
         if (importedHeaders)
         {
           Excel.Range headersRange = EditingWorksheet.get_Range("A1");
-          headersRange = headersRange.get_Resize(1, permittedRange.Columns.Count);
+          headersRange = headersRange.get_Resize(1, editDataRange.Columns.Count);
           lockRange(headersRange, true);
         }
       }
@@ -148,7 +145,7 @@ namespace MySQL.ForExcel
                                false,
                                true,
                                true,
-                               Type.Missing,
+                               true,
                                true,
                                true,
                                false,
@@ -196,6 +193,40 @@ namespace MySQL.ForExcel
       cellAddressesList.Clear();
     }
 
+    private Excel.Range addNewRowToEditingRange(bool clearColoringOfOldNewRow)
+    {
+      Excel.Range rowRange = null;
+
+      if (editDataRange != null)
+      {
+        UnprotectEditingWorksheet();
+        editDataRange = editDataRange.get_Resize(editDataRange.Rows.Count + 1, editDataRange.Columns.Count);
+        rowRange = editDataRange.Rows[editDataRange.Rows.Count] as Excel.Range;
+        rowRange.Interior.Color = newRowCellsOLEColor;
+        editingRowsQuantity = editDataRange.Rows.Count;
+        ProtectEditingWorksheet();
+        if (clearColoringOfOldNewRow)
+        {
+          rowRange = editDataRange.Rows[editDataRange.Rows.Count - 1] as Excel.Range;
+          rowRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+        }
+      }
+
+      return rowRange;
+    }
+
+    private void UnprotectEditingWorksheet()
+    {
+      EditingWorksheet.Change -= new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
+      EditingWorksheet.Unprotect();
+    }
+
+    private void ProtectEditingWorksheet()
+    {
+      EditingWorksheet.Change += new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
+      initializeWorksheetProtection();
+    }
+
     private void revertDataChanges(bool refreshFromDB)
     {
       Exception exception = null;
@@ -206,9 +237,10 @@ namespace MySQL.ForExcel
         infoDialog.ShowDialog();
       }
 
-      EditingWorksheet.Change -= new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
-      EditingWorksheet.Unprotect();
+      UnprotectEditingWorksheet();
+      editDataRange.Clear();
       Excel.Range topLeftCell = editDataRange.Cells[1, 1];
+      topLeftCell.Select();
       editDataRange = CallerTaskPane.ImportDataTableToExcelAtGivenCell(editMySQLDataTable, importedHeaders, topLeftCell);
       if (refreshFromDB)
       {
@@ -224,8 +256,7 @@ namespace MySQL.ForExcel
         changeExcelCellsColor(deletedRowAddressesList, 0);
       }
       btnCommit.Enabled = false;
-      EditingWorksheet.Change += new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
-      initializeWorksheetProtection(editDataRange);
+      addNewRowToEditingRange(false);
     }
 
     private bool pushDataChanges()
@@ -306,6 +337,7 @@ namespace MySQL.ForExcel
                                       Environment.NewLine);
         if (success)
         {
+          deletedRowAddressesList.Clear();
           operationDetails.AppendFormat("{0} rows have been deleted", updatedCount);
           if (warningsTable != null && warningsTable.Rows.Count > 0)
           {
@@ -420,8 +452,9 @@ namespace MySQL.ForExcel
       Excel.Range intersectRange = CallerTaskPane.IntersectRanges(editDataRange, Target);
       if (intersectRange == null || intersectRange.Count == 0)
         return;
-      int editedQuantity = 0;
-      
+
+      bool undoChanges = false;
+
       // We substract from the Excel indexes since they start at 1, Row is subtracted by 2 if we imported headers.
       Excel.Range startCell = (intersectRange.Item[1, 1] as Excel.Range);
       int startDataTableRow = startCell.Row - 1;
@@ -435,29 +468,10 @@ namespace MySQL.ForExcel
         editingRowsQuantity = editDataRange.Rows.Count;
         if (!chkAutoCommit.Checked && !deletedRowAddressesList.Contains(intersectRange.Address))
           deletedRowAddressesList.Add(intersectRange.Address);
-        editedQuantity++;
       }
-      // Detect if a data row has been added by the user and if so flag it for addition
-      else if (false)
-      {
-        // Code here for Row Insertion (targeted to 1.1)
-        editDataRange = editDataRange.get_Resize(editDataRange.Rows.Count + 1, editDataRange.Columns.Count);
-        editingRowsQuantity = editDataRange.Rows.Count;
-        DataRow newRow = editMySQLDataTable.NewRow();
-        editMySQLDataTable.Rows.Add(newRow);
-        editingRowsQuantity = EditingWorksheet.UsedRange.Rows.Count;
-        if (!chkAutoCommit.Checked && !deletedRowAddressesList.Contains(intersectRange.Address))
-          deletedRowAddressesList.Add(intersectRange.Address);
-        // Actually paint the changed columns with the changed/committed color, the rest with uncommited and the 
-        //  new row range with the newcell color, the code below is dummy wrong code to remember the color.
-        intersectRange.Interior.Color = newRowCellsOLEColor;
-        if (!chkAutoCommit.Checked && !addedRowAddressesList.Contains(intersectRange.Address))
-          addedRowAddressesList.Add(intersectRange.Address);
-        editedQuantity++;
-      }
-      // The change was a modification of cell values
       else
       {
+        // The change was a modification of cell values
         MySQLDataColumn currCol = null;
         string operationSummary = null;
         string operationDetails = null;
@@ -469,48 +483,78 @@ namespace MySQL.ForExcel
               Excel.Range cell = intersectRange.Cells[rowIdx, colIdx] as Excel.Range;
               int absRow = startDataTableRow + rowIdx - 1 - (importedHeaders ? 1 : 0);
               int absCol = startDataTableCol + colIdx - 1;
+
+              // Detect if a data row has been added by the user and if so flag it for addition
+              if (cell.Row == editDataRange.Rows.Count)
+              {
+                if (cell.Value == null)
+                  continue;
+                Excel.Range insertingRowRange = addNewRowToEditingRange(true);
+                DataRow newRow = editMySQLDataTable.NewRow();
+                editMySQLDataTable.Rows.Add(newRow);
+                if (!addedRowAddressesList.Contains(insertingRowRange.Address))
+                  addedRowAddressesList.Add(insertingRowRange.Address);
+                insertingRowRange.Interior.Color = uncommitedCellsOLEColor;
+              }
+
               currCol = editMySQLDataTable.GetColumnAtIndex(absCol);
               object insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(cell.Value, currCol);
-              if (DataTypeUtilities.ExcelValueEqualsDataTableValue(editMySQLDataTable.Rows[absRow][absCol, DataRowVersion.Original], insertingValue))
+              if (editMySQLDataTable.Rows[absRow].RowState != DataRowState.Added)
               {
-                if (modifiedCellAddressesList.Contains(cell.Address))
+                if (DataTypeUtilities.ExcelValueEqualsDataTableValue(editMySQLDataTable.Rows[absRow][absCol, DataRowVersion.Original], insertingValue))
                 {
-                  changeExcelCellsColor(cell, 0);
-                  modifiedCellAddressesList.Remove(cell.Address);
-                  editMySQLDataTable.Rows[absRow][absCol] = insertingValue;
-                  int changedColsQty = editMySQLDataTable.GetChangedColumns(editMySQLDataTable.Rows[absRow]).Count;
-                  if (changedColsQty == 0)
-                    editMySQLDataTable.Rows[absRow].RejectChanges();
+                  if (modifiedCellAddressesList.Contains(cell.Address))
+                  {
+                    changeExcelCellsColor(cell, 0);
+                    modifiedCellAddressesList.Remove(cell.Address);
+                    editMySQLDataTable.Rows[absRow][absCol] = insertingValue;
+                    int changedColsQty = editMySQLDataTable.GetChangedColumns(editMySQLDataTable.Rows[absRow]).Count;
+                    if (changedColsQty == 0)
+                      editMySQLDataTable.Rows[absRow].RejectChanges();
+                  }
+                  continue;
                 }
-                continue;
+                // Need to set the value before coloring the cell in case there is an invalid value it does not reach the coloring code
+                editMySQLDataTable.Rows[absRow][absCol] = insertingValue;
+                if (!modifiedCellAddressesList.Contains(cell.Address))
+                  modifiedCellAddressesList.Add(cell.Address);
               }
-              editMySQLDataTable.Rows[absRow][absCol] = insertingValue;
-              if (!modifiedCellAddressesList.Contains(cell.Address))
-                modifiedCellAddressesList.Add(cell.Address);
-              intersectRange.Interior.Color = uncommitedCellsOLEColor;
-              editedQuantity++;
+              else
+                editMySQLDataTable.Rows[absRow][absCol] = insertingValue;
+              cell.Interior.Color = uncommitedCellsOLEColor;
             }
         }
         catch (ArgumentException argEx)
         {
+          undoChanges = true;
           operationSummary = String.Format("Invalid value for column of type: {0}", (currCol != null ? currCol.MySQLDataType : "Unknown"));
           operationDetails = argEx.Message;
         }
         catch (Exception ex)
         {
+          undoChanges = true;
           operationSummary = "Error modifying cell's value.";
           operationDetails = ex.Message;
         }
         finally
         {
-          if (operationSummary != null)
+          if (undoChanges)
           {
             InfoDialog errorDialog = new InfoDialog(false, operationSummary, operationDetails);
             errorDialog.WordWrapDetails = true;
             errorDialog.StartPosition = FormStartPosition.CenterScreen;
             errorDialog.ShowDialog();
+          }
+        }
+
+        if (undoChanges)
+        {
+          try
+          {
             EditingWorksheet.Application.Undo();
           }
+          catch
+          {  }
         }
       }
 

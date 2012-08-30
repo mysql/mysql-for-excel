@@ -1,3 +1,5 @@
+- Added code to support rows insertions within the Edit Data, as per design this works by always having a colored row at the end of the editing data range which if
+  modified it will create a new row for insertion into MySQL Server when data is committed. (Internal bug 67 - There is no way to insert a new row when Editing a table).
 - Changed the comparison of strategy for the value the user types in an Excel cell against the value already stored in the DataTable but now using the RowState.Original
   version of the row so that way if the user changes the value but then types in the value originally retrieved the change is disregarded and the cell's style is set
   back to NO-FILL. (Internal bug 75 - Edit Data generates wrong UPDATE query when typing identical value on cell).
