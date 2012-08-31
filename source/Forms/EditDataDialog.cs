@@ -125,11 +125,15 @@ namespace MySQL.ForExcel
     {
       base.OnClosing(e);
       if (CallerTaskPane.WorksheetExists(editingWorksheetName))
+      {
         EditingWorksheet.Unprotect("84308893-7292-49BE-97C0-3A28E81AA2EF");
+        EditingWorksheet.UsedRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+      }
       if (CallerTaskPane.TableNameEditFormsHashtable.ContainsKey(SchemaAndTableName))
         CallerTaskPane.TableNameEditFormsHashtable.Remove(SchemaAndTableName);
       if (CallerTaskPane.WorkSheetEditFormsHashtable.ContainsKey(editingWorksheetName))
-        CallerTaskPane.WorkSheetEditFormsHashtable.Remove(editingWorksheetName); 
+        CallerTaskPane.WorkSheetEditFormsHashtable.Remove(editingWorksheetName);
+      Dispose();
     }
 
     private void initializeWorksheetProtection()
@@ -756,11 +760,7 @@ namespace MySQL.ForExcel
 
     private void exitEditModeToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      if (connection != null)
-        connection.Close();
       Close();
-      Dispose();
-      EditingWorksheet.SelectionChange -= new Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);
     }
 
     private void btnRevert_Click(object sender, EventArgs e)

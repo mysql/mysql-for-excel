@@ -16,6 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 //
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel
 {
@@ -34,6 +35,11 @@ namespace MySQL.ForExcel
     {
       if (disposing)
       {
+        if (EditingWorksheet != null)
+        {
+          EditingWorksheet.Change -= new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
+          EditingWorksheet.SelectionChange -= new Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);
+        }
         if (dataAdapter != null)
           dataAdapter.Dispose();
         if (connection != null)

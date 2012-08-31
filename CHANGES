@@ -1,3 +1,5 @@
+- Added code to reset all cells in the Editing Region to have a NO-FILL style when the Edit Data dialog is closed.
+  (Internal bug 70 - Committed/uncommitted cells remain colored when exiting Edit Data Mode).
 - Added code to enable rows deletion on Edit Data, before all cells except the ones containing MySQL data were locked, but that way users can't delete an Excel row
   since the row contained locked cells and Excel does not permit deleting a row if even once cell in the row is locked, so now all rows with MySQL data are unlocked
   but if cells that are not in the Editing Range are modified an error will be thrown and changes undone. All other cells below the Editing Range remain locked.
