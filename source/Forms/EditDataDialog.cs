@@ -765,7 +765,7 @@ namespace MySQL.ForExcel
 
     private void btnRevert_Click(object sender, EventArgs e)
     {
-      EditDataRevertDialog revertDialog = new EditDataRevertDialog(chkAutoCommit.Checked);
+      EditDataRevertDialog revertDialog = new EditDataRevertDialog(!chkAutoCommit.Checked && uncommitedDataExists);
       DialogResult dr = revertDialog.ShowDialog();
       if (dr == DialogResult.Cancel)
         return;

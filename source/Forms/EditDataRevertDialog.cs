@@ -33,10 +33,10 @@ namespace MySQL.ForExcel
     public enum EditUndoAction { RefreshData, RevertData };
     public EditUndoAction SelectedAction { get; private set; }
 
-    public EditDataRevertDialog(bool autoCommitEnabled)
+    public EditDataRevertDialog(bool enableRevert)
     {
       InitializeComponent();
-      btnRevert.Enabled = !autoCommitEnabled;
+      btnRevert.Enabled = enableRevert;
     }
 
     private void btnRevert_Click(object sender, EventArgs e)
