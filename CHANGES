@@ -1,3 +1,4 @@
+- Bumped AssemblyVersion to 1.1.0.
 - Changed code to enable Revert Changes button when the Auto-Commit checkbox is not checked and only when there are changes pending to be committed.
   (Internal bug 92 - Edit Data, Revert Changes button remains enabled even if there are no changes to revert).
 - Added code to reset all cells in the Editing Region to have a NO-FILL style when the Edit Data dialog is closed.
