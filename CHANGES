@@ -1,3 +1,12 @@
+- Added code to enable rows deletion on Edit Data, before all cells except the ones containing MySQL data were locked, but that way users can't delete an Excel row
+  since the row contained locked cells and Excel does not permit deleting a row if even once cell in the row is locked, so now all rows with MySQL data are unlocked
+  but if cells that are not in the Editing Range are modified an error will be thrown and changes undone. All other cells below the Editing Range remain locked.
+  (Internal bug 68 - There is no way to delete an existing row when Editing a table).
+- Add a new Workbook if there is no workbook open when doing an Edit and Import Data. Also makes the release of the Uncompleted edit operations when closing a Workbook. 
+  Added new events Workbook Activated and Workbook Deactivated in TaskPaneControl. Changes in EditTableData method to release uncompleted edit operations. Added a new
+  WorkbookName property to identify sheets in EditDataDialog. Also added unattached of the EditingWorksheet.SelectionChange when exiting from edit mode to avoid
+  Exceptions. Changes to reference ActiveWorkbook to the TaskPaneControl correct property.
+  (Internal Bug 66 - Edit and Import Data throw an unhandled exception when there is no active worksheet).
 - Added code to support rows insertions within the Edit Data, as per design this works by always having a colored row at the end of the editing data range which if
   modified it will create a new row for insertion into MySQL Server when data is committed. (Internal bug 67 - There is no way to insert a new row when Editing a table).
 - Changed the comparison of strategy for the value the user types in an Excel cell against the value already stored in the DataTable but now using the RowState.Original

@@ -335,6 +335,44 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Deletion of the last row meant for a new row insertion is prohibited and will be undone..
+        /// </summary>
+        internal static string EditDataDeleteLastRowNotPermittedErrorDetail {
+            get {
+                return ResourceManager.GetString("EditDataDeleteLastRowNotPermittedErrorDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deleting last row for insertions is not permitted..
+        /// </summary>
+        internal static string EditDataDeleteLastRowNotPermittedErrorTitle {
+            get {
+                return ResourceManager.GetString("EditDataDeleteLastRowNotPermittedErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Changes on cell(s) outside the editing range are prohibited and will be undone.
+        ///
+        ///To be able to make modifications on cells not related to MySQL data please exit Editing Mode..
+        /// </summary>
+        internal static string EditDataOutsideEditingRangeNotPermittedErrorDetail {
+            get {
+                return ResourceManager.GetString("EditDataOutsideEditingRangeNotPermittedErrorDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Changes not permitted..
+        /// </summary>
+        internal static string EditDataOutsideEditingRangeNotPermittedErrorTitle {
+            get {
+                return ResourceManager.GetString("EditDataOutsideEditingRangeNotPermittedErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to In order to perform an UPDATE operation on the table data a primary key is needed. Without a primary key MySQL cannot guarantee that the correct rows in the table will be updated.
         ///
         ///For that reason it is advised to add a primary key to each MySQL table.

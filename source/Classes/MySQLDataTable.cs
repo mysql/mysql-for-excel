@@ -112,28 +112,20 @@ namespace MySQL.ForExcel
     {
       if (fetchColumnsSchemaInfo)
       {
-        List<string> primaryKeyColumnNames = new List<string>();
-        DataTable indexesInfoTable = MySQLDataUtilities.GetSchemaCollection(wbConnection, "IndexColumns", null, wbConnection.Schema, tableName, null);
-        if (indexesInfoTable != null)
-        {
-          foreach (DataRow indexInfoRow in indexesInfoTable.Rows)
-          {
-            if (indexInfoRow["INDEX_NAME"].ToString() == "PRIMARY")
-              primaryKeyColumnNames.Add(indexInfoRow["COLUMN_NAME"].ToString());
-          }
-        }
         DataTable columnsInfoTable = MySQLDataUtilities.GetSchemaCollection(wbConnection, "Columns Short", null, wbConnection.Schema, tableName);
         if (columnsInfoTable != null)
+        {
           foreach (DataRow columnInfoRow in columnsInfoTable.Rows)
           {
             string colName = columnInfoRow["Field"].ToString();
             string dataType = columnInfoRow["Type"].ToString();
             bool allowNulls = columnInfoRow["Null"].ToString() == "YES";
-            bool isPrimaryKey = primaryKeyColumnNames.Contains(colName) || columnInfoRow["Key"].ToString() == "PRI";
+            bool isPrimaryKey = columnInfoRow["Key"].ToString() == "PRI";
             string extraInfo = columnInfoRow["Extra"].ToString();
             MySQLDataColumn column = new MySQLDataColumn(colName, dataType, allowNulls, isPrimaryKey, extraInfo);
             Columns.Add(column);
           }
+        }
       }
       mysqlMaxAllowedPacket = MySQLDataUtilities.GetMySQLServerMaxAllowedPacket(wbConnection);
     }
@@ -1049,9 +1041,11 @@ namespace MySQL.ForExcel
                                  SchemaName,
                                  TableName.Replace("`", "``"));
         colsSeparator = String.Empty;
-        foreach (MySQLDataColumn pkCol in PrimaryKey)
+        foreach (MySQLDataColumn pkCol in Columns)
         {
-          string valueToDB = DataTypeUtilities.GetStringValueForColumn(changesRow[pkCol.ColumnName], pkCol, false, out pkValueIsNull);
+          if (!pkCol.PrimaryKey)
+            continue;
+          string valueToDB = DataTypeUtilities.GetStringValueForColumn(changesRow[pkCol.ColumnName, DataRowVersion.Original], pkCol, false, out pkValueIsNull);
           queryString.AppendFormat("{0}`{1}`={2}{3}{2}",
                                     colsSeparator,
                                     pkCol.ColumnName.Replace("`", "``"),
@@ -1092,9 +1086,15 @@ namespace MySQL.ForExcel
             deletedCount += cmd.ExecuteNonQuery();
           }
           transaction.Commit();
-          foreach (DataRow dr in Rows)
+          for (int rowIdx = 0; rowIdx < Rows.Count; rowIdx++)
+          {
+            DataRow dr = Rows[rowIdx];
             if (dr.RowState == DataRowState.Deleted)
+            {
               dr.AcceptChanges();
+              rowIdx--;
+            }
+          }
           warningsDS = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");
         }
         catch (MySqlException mysqlEx)

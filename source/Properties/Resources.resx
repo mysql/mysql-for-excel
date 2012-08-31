@@ -478,4 +478,18 @@ Please make sure MySQL Workbench is closed to continue with the merging operatio
   <data name="UnableToDeleteConnectionError" xml:space="preserve">
     <value>Unable to remove connection.</value>
   </data>
+  <data name="EditDataOutsideEditingRangeNotPermittedErrorDetail" xml:space="preserve">
+    <value>Changes on cell(s) outside the editing range are prohibited and will be undone.
+
+To be able to make modifications on cells not related to MySQL data please exit Editing Mode.</value>
+  </data>
+  <data name="EditDataOutsideEditingRangeNotPermittedErrorTitle" xml:space="preserve">
+    <value>Changes not permitted.</value>
+  </data>
+  <data name="EditDataDeleteLastRowNotPermittedErrorDetail" xml:space="preserve">
+    <value>Deletion of the last row meant for a new row insertion is prohibited and will be undone.</value>
+  </data>
+  <data name="EditDataDeleteLastRowNotPermittedErrorTitle" xml:space="preserve">
+    <value>Deleting last row for insertions is not permitted.</value>
+  </data>
 </root>
