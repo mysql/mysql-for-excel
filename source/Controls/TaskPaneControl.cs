@@ -40,16 +40,24 @@ namespace MySQL.ForExcel
     private MySqlWorkbenchConnection connection;
     private EditDataDialog editDialog = null;
     private string lastDeactivatedSheetName = String.Empty;
-
+    private string lastDeactivatedWorkbook { get; set; }
+  
     public Hashtable WorkSheetEditFormsHashtable;
     public Hashtable TableNameEditFormsHashtable;
     public Excel.Worksheet ActiveWorksheet
     {
       get { return (Excel.Worksheet)excelApplication.ActiveSheet; }
     }
+
     public Excel.Workbook ActiveWorkbook
     {
-      get { return (Excel.Workbook)excelApplication.ActiveWorkbook; }
+      get
+      {
+        if (excelApplication.ActiveWorkbook != null)
+          return (Excel.Workbook)excelApplication.ActiveWorkbook;
+        else
+          return excelApplication.Workbooks.Add(1);
+      }
     }
 
     public TaskPaneControl(Excel.Application app)
@@ -58,10 +66,60 @@ namespace MySQL.ForExcel
       excelApplication.SheetSelectionChange += new Excel.AppEvents_SheetSelectionChangeEventHandler(excelApplication_SheetSelectionChange);
       excelApplication.SheetActivate += new Excel.AppEvents_SheetActivateEventHandler(excelApplication_SheetActivate);
       excelApplication.SheetDeactivate += new Excel.AppEvents_SheetDeactivateEventHandler(excelApplication_SheetDeactivate);
-      
+      excelApplication.WorkbookDeactivate += new Excel.AppEvents_WorkbookDeactivateEventHandler(excelApplication_WorkbookDeactivate);
+      excelApplication.WorkbookActivate +=new Excel.AppEvents_WorkbookActivateEventHandler(excelApplication_WorkbookActivate);
+    
       InitializeComponent();
 
       dbObjectSelectionPanel1.ExcelSelectionContainsData = false;
+    }
+
+
+    void excelApplication_WorkbookActivate(object sh)
+    { 
+      // check if last active was closed or unactivated
+      if (String.IsNullOrEmpty(lastDeactivatedWorkbook)) return;
+
+      //search in the collection of Workbooks
+      var workbooks = Globals.ThisAddIn.Application.Workbooks;     
+      foreach (var workbook in workbooks)
+      {
+         if (((Excel.Workbook)workbook).Name == lastDeactivatedWorkbook)
+           return;
+      }
+      //Free resorces from the missing workbook
+      if (TableNameEditFormsHashtable != null)
+      {
+        foreach (DictionaryEntry entry in WorkSheetEditFormsHashtable)
+        {
+            var editDialog = WorkSheetEditFormsHashtable[entry.Key] as EditDataDialog;
+            if (editDialog != null && editDialog.WorkbookName == lastDeactivatedWorkbook)
+            {
+              editDialog.Close();
+              editDialog.Dispose();
+            }
+        }
+      }                       
+    }
+
+
+    void excelApplication_WorkbookDeactivate(object sh)
+    {
+      Excel.Workbook deactivatedSheet = sh as Excel.Workbook;
+      
+     
+      lastDeactivatedWorkbook = ((Excel.Workbook)sh).Name;
+      
+      // hide editDialogs from deactivated Workbook
+      if (lastDeactivatedSheetName.Length > 0 && WorkSheetEditFormsHashtable != null)
+      {
+        foreach (DictionaryEntry entry in WorkSheetEditFormsHashtable)
+        {
+          var editDialog = WorkSheetEditFormsHashtable[entry.Key] as EditDataDialog;
+          if (editDialog != null && editDialog.WorkbookName == lastDeactivatedWorkbook)
+            editDialog.Hide();
+        }
+      }
     }
 
     void excelApplication_SheetDeactivate(object Sh)
@@ -361,6 +419,19 @@ namespace MySQL.ForExcel
 
     public bool EditTableData(DBObject tableObject)
     {
+
+      string schemaAndTableNames = String.Format("{0}.{1}", connection.Schema, tableObject.Name);     
+
+      // Check if the current dbobject has an edit ongoing 
+      if (HasEditOnGoing(tableObject.Name))
+      {
+        // disable button and return
+        InfoDialog infoDialog = new InfoDialog(false, String.Format(Properties.Resources.TableWithOperationOngoingError, schemaAndTableNames), null);
+        infoDialog.OperationStatusText = "Editing not possible";
+        infoDialog.ShowDialog();        
+        return false;
+      }
+      
       // Check if selected Table has a Primary Key, it it does not we prompt an error and exit since Editing on such table is not permitted
       if (!MySQLDataUtilities.TableHasPrimaryKey(connection, tableObject.Name))
       {
@@ -371,27 +442,18 @@ namespace MySQL.ForExcel
         infoDialog.ShowDialog();
         return false;
       }
-
-      // Check if selected Table has already an Editing operation ongoing that has not been closed, if so prompt error and exit
-      string schemaAndTableNames = String.Format("{0}.{1}", connection.Schema, tableObject.Name);
-      if (TableNameEditFormsHashtable != null && TableNameEditFormsHashtable.ContainsKey(schemaAndTableNames))
-      {
-        InfoDialog infoDialog = new InfoDialog(false, String.Format(Properties.Resources.TableWithOperationOngoingError, schemaAndTableNames), null);
-        infoDialog.OperationStatusText = "Editing not possible";
-        infoDialog.ShowDialog();
-        return false;
-      }
-
-      // Attempt to Import Data unless the yser cancels the import operation
+     
+      // Attempt to Import Data unless the user cancels the import operation
       string proposedWorksheetName = GetWorksheetNameAvoidingDuplicates(tableObject.Name);
       ImportTableViewForm importForm = new ImportTableViewForm(connection, tableObject, proposedWorksheetName, ActiveWorkbook.Excel8CompatibilityMode);
       DialogResult dr = importForm.ShowDialog();
-      if (dr == DialogResult.Cancel)
+      if (dr == DialogResult.Cancel)              
         return false;
+      
       if (importForm.ImportDataTable == null)
       {
         string msg = String.Format(Properties.Resources.UnableToRetrieveData, tableObject.Name);
-        MessageBox.Show(msg, Properties.Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        MessageBox.Show(msg, Properties.Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);        
         return false;
       }
 
@@ -424,7 +486,7 @@ namespace MySQL.ForExcel
       if (TableNameEditFormsHashtable == null)
         TableNameEditFormsHashtable = new Hashtable();
       TableNameEditFormsHashtable.Add(schemaAndTableNames, editDialog);
-
+     
       return true;
     }
 
@@ -457,7 +519,41 @@ namespace MySQL.ForExcel
       }
       Globals.ThisAddIn.TaskPane.Visible = false;
     }
+
+    /// <summary>
+    /// If an Edit operation was not commpleted
+    /// release resources
+    /// </summary>
+    /// <param name="dbObjectSelectedName"></param>
+    /// <returns>true if the program has an edit on going</returns>
+    public bool HasEditOnGoing(string dbObjectSelectedName)
+    {
+      if (WorkSheetEditFormsHashtable == null) return false;
+      // search in the collection of edit data if exists     
+      if (WorkSheetEditFormsHashtable.Contains(dbObjectSelectedName) && TableNameEditFormsHashtable.Contains(connection.Schema + "." + dbObjectSelectedName))
+      {  // means has an edit ongoing we need to make sure the edit has a valid sheet otherwise we need to release it      
+        var editDialog = TableNameEditFormsHashtable[connection.Schema + "." + dbObjectSelectedName] as EditDataDialog;
+        if (editDialog != null)
+        {
+          var workbooks = Globals.ThisAddIn.Application.Workbooks;
+          foreach (var workbook in workbooks)
+          {
+            if (((Excel.Workbook)workbook).Name == editDialog.WorkbookName && editDialog.EditingTableName.Equals(dbObjectSelectedName)
+                && editDialog.SchemaAndTableName.Equals(connection.Schema + "." + dbObjectSelectedName))
+            {
+              return true;
+            }
+          }
+          editDialog.Close();
+          editDialog.Dispose();
+          return false;
+        }
+      }
+      return false;
+    }
   }
+
+  
 
   class NativeWindowWrapper : IWin32Window
   {

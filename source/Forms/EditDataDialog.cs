@@ -67,6 +67,7 @@ namespace MySQL.ForExcel
     public string EditingTableName { get; private set; }
     public IWin32Window ParentWindow { get; set; }
     public bool LockByProtectingWorksheet { get; set; }
+    public string WorkbookName { get; private set; }
     public string SchemaAndTableName
     {
       get { return String.Format("{0}.{1}", wbConnection.Schema, EditingTableName); }
@@ -93,6 +94,7 @@ namespace MySQL.ForExcel
       editingColsQuantity = editingWorksheet.UsedRange.Columns.Count;
       Opacity = 0.60;
       LockByProtectingWorksheet = protectWorksheet;
+      WorkbookName = Globals.ThisAddIn.Application.ActiveWorkbook.Name;
       addNewRowToEditingRange(false);
 
       addedRowAddressesList = new List<string>();
@@ -126,7 +128,7 @@ namespace MySQL.ForExcel
       if (CallerTaskPane.TableNameEditFormsHashtable.ContainsKey(SchemaAndTableName))
         CallerTaskPane.TableNameEditFormsHashtable.Remove(SchemaAndTableName);
       if (CallerTaskPane.WorkSheetEditFormsHashtable.ContainsKey(editingWorksheetName))
-        CallerTaskPane.WorkSheetEditFormsHashtable.Remove(editingWorksheetName);
+        CallerTaskPane.WorkSheetEditFormsHashtable.Remove(editingWorksheetName); 
     }
 
     private void initializeWorksheetProtection()
@@ -618,6 +620,7 @@ namespace MySQL.ForExcel
         connection.Close();
       Close();
       Dispose();
+      EditingWorksheet.SelectionChange -= new Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);
     }
 
     private void btnRevert_Click(object sender, EventArgs e)

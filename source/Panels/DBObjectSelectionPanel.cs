@@ -186,7 +186,9 @@ namespace MySQL.ForExcel
 
     private void importTableOrView(DBObject dbo)
     {
-      ImportTableViewForm importForm = new ImportTableViewForm(connection, dbo, (Parent as TaskPaneControl).ActiveWorksheet.Name, (Parent as TaskPaneControl).ActiveWorkbook.Excel8CompatibilityMode);
+      var taskPaneControl = (TaskPaneControl)Parent;
+      ImportTableViewForm importForm = new ImportTableViewForm(connection, dbo, taskPaneControl.ActiveWorkbook.ActiveSheet.Name, taskPaneControl.ActiveWorkbook.Excel8CompatibilityMode);
+      
       DialogResult dr = importForm.ShowDialog();
       if (dr == DialogResult.Cancel)
         return;
