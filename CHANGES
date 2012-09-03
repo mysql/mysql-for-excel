@@ -1,3 +1,5 @@
+- Added code to free up the list of active Edit Dialogs from all existing workbooks when the connection is closed which happens as well when the user goes back to the
+  welcome panel to select a connection. (Internal bug 96 - Edit Data Dialogs stay open when changing to another connection).
 - Added code to let the Import of data fill the Excel spreadsheet even if the table is empty but only if at least the column names are being imported. Also added code
   to force the import of headers and always all columns during an Edit operation. Fixed code in Edit Data dialog to support empty tables and to remove the check for
   imported column names since they will be always imported for an Edit operation. (Internal bug 103 - Edit Data does not work with empty tables).

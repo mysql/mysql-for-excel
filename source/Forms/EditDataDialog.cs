@@ -133,7 +133,7 @@ namespace MySQL.ForExcel
         EditingWorksheet.Unprotect("84308893-7292-49BE-97C0-3A28E81AA2EF");
         EditingWorksheet.UsedRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
       }
-      ActiveEditDialogContainer editContainer = CallerTaskPane.ActiveEditDialogsList.Find(ac => ac.SchemaName == wbConnection.Schema && ac.TableName == EditingTableName && ac.WorkBookName == WorkbookName && ac.WorkSheetName == editingWorksheetName);
+      ActiveEditDialogContainer editContainer = CallerTaskPane.ActiveEditDialogsList.Find(ac => ac.EditDialog.Equals(this));
       if (editContainer != null)
         CallerTaskPane.ActiveEditDialogsList.Remove(editContainer);
       Dispose();

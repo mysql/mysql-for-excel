@@ -113,14 +113,24 @@ namespace MySQL.ForExcel
       }
 
       //Free resorces from the missing workbook
-      foreach (ActiveEditDialogContainer activeEditContainer in ActiveEditDialogsList)
+      int listCount = ActiveEditDialogsList.Count;
+      for (int containerIndex = 0; containerIndex < listCount; containerIndex++)
       {
-        if (activeEditContainer.EditDialog != null && activeEditContainer.WorkBookName == lastDeactivatedWorkbookName)
-        {
-          editDialog.Close();
+        ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList[containerIndex];
+        if (activeEditContainer.WorkBookName != lastDeactivatedWorkbookName)
+          continue;
+        if (activeEditContainer.EditDialog != null)
+          activeEditContainer.EditDialog.Close();
+        if (ActiveEditDialogsList.Contains(activeEditContainer))
           ActiveEditDialogsList.Remove(activeEditContainer);
+        if (listCount != ActiveEditDialogsList.Count)
+        {
+          listCount = ActiveEditDialogsList.Count;
+          containerIndex--;
         }
       }
+      if (ActiveEditDialogsList.Count == 0)
+        ActiveEditDialogsList = null;
     }
 
     void excelApplication_WorkbookDeactivate(object sh)
@@ -166,7 +176,8 @@ namespace MySQL.ForExcel
         if (activeEditContainer != null && activeEditContainer.EditDialog != null)
         {
           activeEditContainer.EditDialog.Close();
-          ActiveEditDialogsList.Remove(activeEditContainer);
+          if (ActiveEditDialogsList.Contains(activeEditContainer))
+            ActiveEditDialogsList.Remove(activeEditContainer);
         }
       }
     }
@@ -277,10 +288,35 @@ namespace MySQL.ForExcel
         schemaSelectionPanel1.BringToFront();
     }
 
+    public void CloseAllEditingSessions()
+    {
+      if (ActiveEditDialogsList == null)
+        return;
+      int listCount = ActiveEditDialogsList.Count;
+      for (int containerIndex = 0; containerIndex < listCount; containerIndex++)
+      {
+        ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList[containerIndex];
+        if (activeEditContainer.EditDialog != null)
+          activeEditContainer.EditDialog.Close();
+        if (ActiveEditDialogsList.Contains(activeEditContainer))
+          ActiveEditDialogsList.Remove(activeEditContainer);
+        if (listCount != ActiveEditDialogsList.Count)
+        {
+          listCount = ActiveEditDialogsList.Count;
+          containerIndex--;
+        }
+      }
+      ActiveEditDialogsList.Clear();
+      ActiveEditDialogsList = null;
+    }
+
     public void CloseConnection()
     {
       connection = null;
       welcomePanel1.BringToFront();
+
+      // Free up open Edit Dialogs
+      CloseAllEditingSessions();
     }
 
     public void OpenSchema(string schema)
@@ -549,16 +585,6 @@ namespace MySQL.ForExcel
     public void CloseAddIn()
     {
       CloseConnection();
-      if (ActiveEditDialogsList != null)
-      {
-        foreach (ActiveEditDialogContainer activeEditContainer in ActiveEditDialogsList)
-        {
-          if (activeEditContainer.EditDialog != null)
-            activeEditContainer.EditDialog.Close();
-        }
-        ActiveEditDialogsList.Clear();
-        ActiveEditDialogsList = null;
-      }
       Globals.ThisAddIn.TaskPane.Visible = false;
     }
 
@@ -581,8 +607,10 @@ namespace MySQL.ForExcel
         if (workbook.Name == editContainer.WorkBookName)
           return true;
       }
-      editContainer.EditDialog.Close();
-      ActiveEditDialogsList.Remove(editContainer);
+      if (editContainer.EditDialog != null)
+        editContainer.EditDialog.Close();
+      if (ActiveEditDialogsList.Contains(editContainer))
+        ActiveEditDialogsList.Remove(editContainer);
       return false;
     }
 
