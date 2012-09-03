@@ -198,11 +198,12 @@ namespace MySQL.ForExcel
       AllowNull = allowNulls;
       Unsigned = false;
       AutoIncrement = false;
-      if (!String.IsNullOrEmpty(extraInfo))
-      {
-        Unsigned = extraInfo.Contains("unsigned");
+
+      Unsigned  = mySQLFullDataType.Contains("unsigned");
+      
+      if (!String.IsNullOrEmpty(extraInfo))              
         AutoIncrement = extraInfo.Contains("auto_increment");
-      }
+      
       MySQLDataType = mySQLFullDataType;
       DataType = DataTypeUtilities.NameToType(StrippedMySQLDataType, Unsigned);
       PrimaryKey = isPrimaryKey;
