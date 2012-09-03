@@ -331,20 +331,22 @@ namespace MySQL.ForExcel
       schemaSelectionPanel1.BringToFront();
     }
 
+    public string GetWorksheetNameAvoidingDuplicates(string proposedName, int copyIndex)
+    {
+      string retName = (copyIndex > 0 ? String.Format("Copy {0} of {1}", copyIndex, proposedName) : proposedName);
+      if (excelApplication.ActiveWorkbook == null)
+        return retName;
+      foreach (Excel.Worksheet ws in excelApplication.Worksheets)
+      {
+        if (ws.Name == retName)
+          return GetWorksheetNameAvoidingDuplicates(proposedName, copyIndex + 1);
+      }
+      return retName;
+    }
+
     public string GetWorksheetNameAvoidingDuplicates(string proposedName)
     {
-      if (excelApplication.ActiveWorkbook != null)
-      {
-        int i = 0;
-        foreach (Excel.Worksheet ws in excelApplication.Worksheets)
-        {
-          if (ws.Name.Contains(proposedName))
-            i++;
-        }
-        if (i > 0)
-          proposedName = String.Format("Copy ({0}) of {1}", i, proposedName);
-      }
-      return proposedName;
+      return GetWorksheetNameAvoidingDuplicates(proposedName, 0);
     }
 
     public Excel.Worksheet GetActiveOrCreateWorksheet(string proposedName, bool alwaysCreate, bool checkForDuplicates)

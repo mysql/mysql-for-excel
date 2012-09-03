@@ -1,3 +1,5 @@
+- Changed code that gets a new name for a Worksheet that already has the proposed name of the Data Table being imported/edited.
+  (Internal bug 101 - Edit Data generates wrong worksheet name for a table named "t").
 - Added code to free up the list of active Edit Dialogs from all existing workbooks when the connection is closed which happens as well when the user goes back to the
   welcome panel to select a connection. (Internal bug 96 - Edit Data Dialogs stay open when changing to another connection).
 - Added code to let the Import of data fill the Excel spreadsheet even if the table is empty but only if at least the column names are being imported. Also added code
