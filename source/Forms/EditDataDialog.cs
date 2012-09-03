@@ -66,9 +66,9 @@ namespace MySQL.ForExcel
     public Excel.Worksheet EditingWorksheet = null;
     public TaskPaneControl CallerTaskPane;
     public string EditingTableName { get; private set; }
-    public IWin32Window ParentWindow { get; set; }
     public bool LockByProtectingWorksheet { get; set; }
     public string WorkbookName { get; private set; }
+    public IWin32Window ParentWindow { get; set; }
     public string SchemaAndTableName
     {
       get { return String.Format("{0}.{1}", wbConnection.Schema, EditingTableName); }
@@ -83,6 +83,7 @@ namespace MySQL.ForExcel
       importedHeaders = (bool)importTable.ExtendedProperties["ImportedHeaders"];
       queryString = importTable.ExtendedProperties["QueryString"].ToString();
       EditingTableName = importTable.TableName;
+      WorkbookName = (editingWorksheet.Parent as Excel.Workbook).Name;
       if (importTable.ExtendedProperties.ContainsKey("TableName") && !String.IsNullOrEmpty(importTable.ExtendedProperties["TableName"].ToString()))
         EditingTableName = importTable.ExtendedProperties["TableName"].ToString();
       editMySQLDataTable = new MySQLDataTable(EditingTableName, importTable, wbConnection);
@@ -91,11 +92,15 @@ namespace MySQL.ForExcel
       EditingWorksheet = editingWorksheet;
       editingWorksheetName = editingWorksheet.Name;
       EditingWorksheet.SelectionChange += new Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);
-      toolTip.SetToolTip(this, String.Format("Editing data for Table {0} on Worksheet {1}", EditingTableName, editingWorksheetName));
+      toolTip.SetToolTip(this, String.Format("Editing data for:{0}Schema: {1}{0}Table: {2}{0}WorkBook: {3}{0}WorkSheet: {4}",
+                                             Environment.NewLine,
+                                             wbConnection.Schema,
+                                             EditingTableName,
+                                             WorkbookName,
+                                             editingWorksheetName));
       editingColsQuantity = editingWorksheet.UsedRange.Columns.Count;
       Opacity = 0.60;
       LockByProtectingWorksheet = protectWorksheet;
-      WorkbookName = Globals.ThisAddIn.Application.ActiveWorkbook.Name;
       addNewRowToEditingRange(false);
 
       addedRangesAndAddressesList = new List<RangeAndAddress>();
@@ -124,15 +129,15 @@ namespace MySQL.ForExcel
     protected override void OnClosing(CancelEventArgs e)
     {
       base.OnClosing(e);
-      if (CallerTaskPane.WorksheetExists(editingWorksheetName))
+      CallerTaskPane.RefreshDBObjectPanelActionLabelsEnabledStatus(EditingTableName, false);
+      if (CallerTaskPane.WorksheetExists(WorkbookName, editingWorksheetName))
       {
         EditingWorksheet.Unprotect("84308893-7292-49BE-97C0-3A28E81AA2EF");
         EditingWorksheet.UsedRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
       }
-      if (CallerTaskPane.TableNameEditFormsHashtable.ContainsKey(SchemaAndTableName))
-        CallerTaskPane.TableNameEditFormsHashtable.Remove(SchemaAndTableName);
-      if (CallerTaskPane.WorkSheetEditFormsHashtable.ContainsKey(editingWorksheetName))
-        CallerTaskPane.WorkSheetEditFormsHashtable.Remove(editingWorksheetName);
+      ActiveEditDialogContainer editContainer = CallerTaskPane.ActiveEditDialogsList.Find(ac => ac.SchemaName == wbConnection.Schema && ac.TableName == EditingTableName && ac.WorkBookName == WorkbookName && ac.WorkSheetName == editingWorksheetName);
+      if (editContainer != null)
+        CallerTaskPane.ActiveEditDialogsList.Remove(editContainer);
       Dispose();
     }
 
@@ -799,6 +804,13 @@ namespace MySQL.ForExcel
     {
       ShowWindow(Handle, SW_SHOWNOACTIVATE);
       SetWindowPos(Handle.ToInt32(), HWND_NOTOPMOST, Left, Top, Width, Height, SWP_NOACTIVATE);
+    }
+
+    private void EditDataDialog_Shown(object sender, EventArgs e)
+    {
+      // Need to call the ShowInactiveTopmost method when the form is shown in order to make it topmost and
+      // to avoid that the controls inside it activate so focus remains on excel cells.
+      ShowInactiveTopmost();
     }
 
   }

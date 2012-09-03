@@ -82,6 +82,24 @@ namespace MySQL.ForExcel
       objectList_AfterSelect(null, null);
     }
 
+    public void RefreshActionLabelsEnabledStatus(string tableName, bool editActive)
+    {
+      DBObject obj = CurrentSelectedDBObject;
+      if (obj == null)
+        return;
+      if (!String.IsNullOrEmpty(tableName))
+      {
+        if (obj.Name != tableName)
+          return;
+      }
+      else
+        editActive = obj.Type == DBObjectType.Table && (Parent as TaskPaneControl).TableHasEditOnGoing(CurrentSelectedDBObject.Name);
+
+      importDataLabel.Enabled = true;
+      editDataLabel.Enabled = obj.Type == DBObjectType.Table && !editActive;
+      appendDataLabel.Enabled = obj.Type == DBObjectType.Table && currentExcelSelectionContainsData;
+    }
+
     private void refreshDatabaseObjectsToolStripMenuItem_Click(object sender, EventArgs e)
     {
       try
@@ -151,21 +169,36 @@ namespace MySQL.ForExcel
 
     private void objectList_AfterSelect(object sender, TreeViewEventArgs e)
     {
-      DBObject obj = CurrentSelectedDBObject;
-
-      importDataLabel.Enabled = obj != null;
-      editDataLabel.Enabled = obj != null && obj.Type == DBObjectType.Table;
-      appendDataLabel.Enabled = obj != null && obj.Type == DBObjectType.Table && currentExcelSelectionContainsData;
+      RefreshActionLabelsEnabledStatus(null, false);
     }
 
     private void importData_Click(object sender, EventArgs e)
     {
       if (objectList.SelectedNode == null)
         return;
+      TaskPaneControl parentTaskPane = (Parent as TaskPaneControl);
+      if (parentTaskPane == null)
+        return;
+      DBObject dbo = objectList.SelectedNode.Tag as DBObject;
+      if (dbo == null)
+        return;
+
+      if (parentTaskPane.ActiveWorksheetInEditMode)
+      {
+        WarningDialog wDiag = new WarningDialog(Resources.WorkSheetInEditModeWarningTitle, Resources.WorkSheetInEditModeWarningDetail);
+        DialogResult dr = wDiag.ShowDialog();
+        if (dr == DialogResult.Yes)
+        {
+          Excel.Worksheet newWorksheet = parentTaskPane.CreateNewWorksheet(dbo.Name, true);
+          if (newWorksheet == null)
+            return;
+        }
+        else
+          return;
+      }
 
       try
       {
-        DBObject dbo = objectList.SelectedNode.Tag as DBObject;
         switch (dbo.Type)
         {
           case DBObjectType.Table:
@@ -254,7 +287,9 @@ namespace MySQL.ForExcel
       DBObject selDBObject = (objectList.SelectedNode != null ? objectList.SelectedNode.Tag as DBObject : null);
       if (selDBObject == null || selDBObject.Type != DBObjectType.Table)
         return;
-      (Parent as TaskPaneControl).EditTableData(selDBObject);
+      bool editActivated = (Parent as TaskPaneControl).EditTableData(selDBObject);
+      if (editActivated)
+        editDataLabel.Enabled = false;
     }
 
     private void btnHelp_Click(object sender, EventArgs e)

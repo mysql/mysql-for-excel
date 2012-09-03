@@ -1035,5 +1035,23 @@ namespace MySQL.ForExcel.Properties {
                 return ResourceManager.GetString("WorkSheetInCompatibilityModeWarning", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Data Imports cannot be done into a Worksheet in Edit Mode, do you want to import the data into a new Worksheet?.
+        /// </summary>
+        internal static string WorkSheetInEditModeWarningDetail {
+            get {
+                return ResourceManager.GetString("WorkSheetInEditModeWarningDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Active Workhsheet in Edit Mode.
+        /// </summary>
+        internal static string WorkSheetInEditModeWarningTitle {
+            get {
+                return ResourceManager.GetString("WorkSheetInEditModeWarningTitle", resourceCulture);
+            }
+        }
     }
 }

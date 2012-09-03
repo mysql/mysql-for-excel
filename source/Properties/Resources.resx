@@ -492,4 +492,10 @@ To be able to make modifications on cells not related to MySQL data please exit 
   <data name="EditDataDeleteLastRowNotPermittedErrorTitle" xml:space="preserve">
     <value>Deleting last row for insertions is not permitted.</value>
   </data>
+  <data name="WorkSheetInEditModeWarningDetail" xml:space="preserve">
+    <value>Data Imports cannot be done into a Worksheet in Edit Mode, do you want to import the data into a new Worksheet?</value>
+  </data>
+  <data name="WorkSheetInEditModeWarningTitle" xml:space="preserve">
+    <value>Active Workhsheet in Edit Mode</value>
+  </data>
 </root>

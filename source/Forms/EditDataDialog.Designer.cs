@@ -81,7 +81,7 @@ namespace MySQL.ForExcel
       this.btnRevert.Location = new System.Drawing.Point(16, 40);
       this.btnRevert.Name = "btnRevert";
       this.btnRevert.Size = new System.Drawing.Size(101, 25);
-      this.btnRevert.TabIndex = 1;
+      this.btnRevert.TabIndex = 2;
       this.btnRevert.Text = "Revert Data";
       this.btnRevert.UseVisualStyleBackColor = true;
       this.btnRevert.Click += new System.EventHandler(this.btnRevert_Click);
@@ -94,7 +94,7 @@ namespace MySQL.ForExcel
       this.btnCommit.Location = new System.Drawing.Point(123, 40);
       this.btnCommit.Name = "btnCommit";
       this.btnCommit.Size = new System.Drawing.Size(136, 25);
-      this.btnCommit.TabIndex = 2;
+      this.btnCommit.TabIndex = 3;
       this.btnCommit.Text = "Commit Changes";
       this.btnCommit.UseVisualStyleBackColor = true;
       this.btnCommit.Click += new System.EventHandler(this.btnCommit_Click);
@@ -121,7 +121,7 @@ namespace MySQL.ForExcel
       this.lblMySQLforExcel.Location = new System.Drawing.Point(28, 5);
       this.lblMySQLforExcel.Name = "lblMySQLforExcel";
       this.lblMySQLforExcel.Size = new System.Drawing.Size(108, 17);
-      this.lblMySQLforExcel.TabIndex = 4;
+      this.lblMySQLforExcel.TabIndex = 0;
       this.lblMySQLforExcel.Text = "MySQL for Excel";
       this.lblMySQLforExcel.MouseDown += new System.Windows.Forms.MouseEventHandler(this.GenericMouseDown);
       this.lblMySQLforExcel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.GenericMouseMove);
@@ -151,7 +151,7 @@ namespace MySQL.ForExcel
       this.chkAutoCommit.Location = new System.Drawing.Point(168, 6);
       this.chkAutoCommit.Name = "chkAutoCommit";
       this.chkAutoCommit.Size = new System.Drawing.Size(101, 19);
-      this.chkAutoCommit.TabIndex = 5;
+      this.chkAutoCommit.TabIndex = 1;
       this.chkAutoCommit.Text = "Auto-Commit";
       this.chkAutoCommit.UseVisualStyleBackColor = false;
       this.chkAutoCommit.CheckedChanged += new System.EventHandler(this.chkAutoCommit_CheckedChanged);
@@ -176,6 +176,7 @@ namespace MySQL.ForExcel
       this.ShowInTaskbar = false;
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
       this.TopMost = true;
+      this.Shown += new System.EventHandler(this.EditDataDialog_Shown);
       ((System.ComponentModel.ISupportInitialize)(this.picSakilaLogo)).EndInit();
       this.contextMenu.ResumeLayout(false);
       this.ResumeLayout(false);
