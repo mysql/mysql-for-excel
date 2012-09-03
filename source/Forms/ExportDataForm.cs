@@ -105,6 +105,30 @@ namespace MySQL.ForExcel
       columnBindingSource.DataSource = previewDataTable.Columns;
     }
 
+    private void RefreshColumnDataTypeWarning(int columnIndex)
+    {
+      if (columnIndex < 0 || columnIndex >= previewDataTable.Columns.Count)
+        return;
+      MySQLDataColumn mysqlCol = previewDataTable.GetColumnAtIndex(columnIndex);
+      DataGridViewColumn gridCol = grdPreviewData.Columns[columnIndex];
+      bool showWarning = mysqlCol.MySQLDataType.Length == 0;
+      string warningText = (showWarning ? Resources.ColumnDataTypeNotSetWarning : null);
+      if (warningText == null)
+      {
+        mysqlCol.WarningTextList.Remove(Resources.ColumnDataTypeNotSetWarning);
+        if (mysqlCol.WarningTextList.Count > 0)
+        {
+          showWarning = true;
+          warningText = mysqlCol.WarningTextList.Last();
+        }
+      }
+      else
+        if (!mysqlCol.WarningTextList.Contains(Resources.ColumnDataTypeNotSetWarning))
+          mysqlCol.WarningTextList.Add(Resources.ColumnDataTypeNotSetWarning);
+      showValidationWarning("ColumnOptionsWarning", showWarning, warningText);
+      gridCol.DefaultCellStyle.BackColor = (showWarning ? Color.OrangeRed : grdPreviewData.DefaultCellStyle.BackColor);
+    }
+
     private void RecreateColumns()
     {
       for (int colIdx = 0; colIdx < previewDataTable.Columns.Count; colIdx++)
@@ -113,6 +137,9 @@ namespace MySQL.ForExcel
         DataGridViewColumn gridCol = grdPreviewData.Columns[colIdx];
         gridCol.HeaderText = mysqlCol.DisplayName;
         grdPreviewData.Columns[colIdx].SortMode = DataGridViewColumnSortMode.NotSortable;
+
+        // Check if current DataType is empty, and if so add a warning for column
+        RefreshColumnDataTypeWarning(colIdx);
       }
       grdPreviewData.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
       refreshPrimaryKeyColumnsCombo();
@@ -204,7 +231,7 @@ namespace MySQL.ForExcel
 
     private bool testColumnDataTypeAgainstColumnData(MySQLDataColumn currentCol)
     {
-      bool showWarning = !currentCol.CanBeOfMySQLDataType(cmbDatatype.Text);
+      bool showWarning = cmbDatatype.Text.Length > 0 && !currentCol.CanBeOfMySQLDataType(cmbDatatype.Text);
 
       string warningText = (showWarning ? Resources.ExportDataTypeNotSuitableWarning : null);
       if (warningText == null)
@@ -226,27 +253,32 @@ namespace MySQL.ForExcel
     {
       bool isValid = false;
 
-      List<int> paramsInParenthesis;
-      List<string> dataTypesList = DataTypeUtilities.GetMySQLDataTypes(out paramsInParenthesis);
-      int rightParentFound = proposedUserType.IndexOf(")");
-      int leftParentFound = proposedUserType.IndexOf("(");
-      string pureDataType = String.Empty;
-      int typeParametersNum = 0;
-
-      proposedUserType = proposedUserType.Trim().Replace(" ", String.Empty);
-      if (rightParentFound >= 0)
+      if (proposedUserType.Length > 0)
       {
-        if (leftParentFound < 0 || leftParentFound >= rightParentFound)
-          return false;
-        typeParametersNum = proposedUserType.Substring(leftParentFound + 1, rightParentFound - leftParentFound - 1).Count(c => c == ',') + 1;
-        pureDataType = proposedUserType.Substring(0, leftParentFound).ToLowerInvariant();
+        List<int> paramsInParenthesis;
+        List<string> dataTypesList = DataTypeUtilities.GetMySQLDataTypes(out paramsInParenthesis);
+        int rightParentFound = proposedUserType.IndexOf(")");
+        int leftParentFound = proposedUserType.IndexOf("(");
+        string pureDataType = String.Empty;
+        int typeParametersNum = 0;
+
+        proposedUserType = proposedUserType.Trim().Replace(" ", String.Empty);
+        if (rightParentFound >= 0)
+        {
+          if (leftParentFound < 0 || leftParentFound >= rightParentFound)
+            return false;
+          typeParametersNum = proposedUserType.Substring(leftParentFound + 1, rightParentFound - leftParentFound - 1).Count(c => c == ',') + 1;
+          pureDataType = proposedUserType.Substring(0, leftParentFound).ToLowerInvariant();
+        }
+        else
+          pureDataType = proposedUserType.ToLowerInvariant();
+        int typeFoundAt = dataTypesList.IndexOf(pureDataType);
+        int numOfValidParams = (typeFoundAt >= 0 ? paramsInParenthesis[typeFoundAt] : -1);
+        bool numParamsMatch = (pureDataType.StartsWith("var") ? (numOfValidParams >= 0 && numOfValidParams == typeParametersNum) : (numOfValidParams >= 0 && numOfValidParams == typeParametersNum) || (numOfValidParams < 0 && typeParametersNum > 0) || typeParametersNum == 0);
+        isValid = typeFoundAt >= 0 && numParamsMatch;
       }
       else
-        pureDataType = proposedUserType.ToLowerInvariant();
-      int typeFoundAt = dataTypesList.IndexOf(pureDataType);
-      int numOfValidParams = (typeFoundAt >= 0 ? paramsInParenthesis[typeFoundAt] : -1);
-      bool numParamsMatch = (pureDataType.StartsWith("var") ? (numOfValidParams >= 0 && numOfValidParams == typeParametersNum) : (numOfValidParams >= 0 && numOfValidParams == typeParametersNum) || (numOfValidParams < 0 && typeParametersNum > 0) || typeParametersNum == 0);
-      isValid = typeFoundAt >= 0 && numParamsMatch;
+        isValid = true;
 
       bool showWarning = !isValid;
       string warningText = (showWarning ? Resources.ExportDataTypeNotValidWarning : null);
@@ -734,6 +766,7 @@ namespace MySQL.ForExcel
       if (cmbDatatype.Text == currentCol.MySQLDataType || cmbDatatype.Text.Length == 0 || (cmbDatatype.DataSource as DataTable).Select(String.Format("Value = '{0}'", cmbDatatype.Text)).Length == 0)
         return;
       currentCol.MySQLDataType = cmbDatatype.Text;
+      RefreshColumnDataTypeWarning(currentCol.Ordinal);
       testColumnDataTypeAgainstColumnData(currentCol);
       if (Settings.Default.ExportAutoIndexIntColumns && cmbDatatype.Text.StartsWith("Integer") && !chkCreateIndex.Checked)
         chkCreateIndex.Checked = true;
@@ -764,6 +797,17 @@ namespace MySQL.ForExcel
         testColumnDataTypeAgainstColumnData(currentCol);
       if (Settings.Default.ExportAutoIndexIntColumns && cmbDatatype.Text.StartsWith("Integer") && !chkCreateIndex.Checked)
         chkCreateIndex.Checked = true;
+    }
+
+    private void cmbDatatype_Validated(object sender, EventArgs e)
+    {
+      MySQLDataColumn currentCol = columnBindingSource.Current as MySQLDataColumn;
+      if (!Properties.Settings.Default.ExportDetectDatatype)
+      {
+        currentCol.RowsFrom1stDataType = currentCol.MySQLDataType;
+        currentCol.RowsFrom2ndDataType = currentCol.MySQLDataType;
+      }
+      RefreshColumnDataTypeWarning(currentCol.Ordinal);
     }
 
     private void EnableChecks(CheckBox control)

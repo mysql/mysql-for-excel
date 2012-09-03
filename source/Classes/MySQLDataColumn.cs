@@ -186,6 +186,9 @@ namespace MySQL.ForExcel
     public MySQLDataColumn()
     {
       MappedDataColName = null;
+      MySQLDataType = String.Empty;
+      RowsFrom1stDataType = String.Empty;
+      RowsFrom2ndDataType = String.Empty;
     }
 
     public MySQLDataColumn(string columnName, string mySQLFullDataType, bool allowNulls, bool isPrimaryKey, string extraInfo)

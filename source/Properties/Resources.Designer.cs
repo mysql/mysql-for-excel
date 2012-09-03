@@ -118,6 +118,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Column DataType has not been set..
+        /// </summary>
+        internal static string ColumnDataTypeNotSetWarning {
+            get {
+                return ResourceManager.GetString("ColumnDataTypeNotSetWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This column has already been mapped, do you want to exchange mappings on the two columns?.
         /// </summary>
         internal static string ColumnMappedExchangeDetailWarning {

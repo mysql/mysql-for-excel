@@ -495,4 +495,7 @@ To be able to make modifications on cells not related to MySQL data please exit 
   <data name="WorkSheetInEditModeWarningTitle" xml:space="preserve">
     <value>Active Workhsheet in Edit Mode</value>
   </data>
+  <data name="ColumnDataTypeNotSetWarning" xml:space="preserve">
+    <value>Column DataType has not been set.</value>
+  </data>
 </root>

@@ -1,3 +1,6 @@
+- Fixed code to always set an empty string instead of null to the MySQLDataColumn properties that stores MySQL data types (MySQLDataType, RowsFrom1stDataType and
+  RowsFrom2ndDataType). Added code to display a warning and color red a column which Data Type has not been set by the user or has been manually cleared.
+  (Internal bug 65 - Export excel data freezes when Auto Detect Data Types is off).
 - Added code to output to the application log exception messages consistently in all places where exceptions are catched.
 - Changed code that gets a new name for a Worksheet that already has the proposed name of the Data Table being imported/edited.
   (Internal bug 101 - Edit Data generates wrong worksheet name for a table named "t").

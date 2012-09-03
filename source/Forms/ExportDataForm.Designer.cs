@@ -260,6 +260,7 @@ namespace MySQL.ForExcel
       this.cmbDatatype.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbDatatype_DrawItem);
       this.cmbDatatype.SelectedIndexChanged += new System.EventHandler(this.cmbDatatype_SelectedIndexChanged);
       this.cmbDatatype.Validating += new System.ComponentModel.CancelEventHandler(this.cmbDatatype_Validating);
+      this.cmbDatatype.Validated += new System.EventHandler(this.cmbDatatype_Validated);
       // 
       // chkExcludeColumn
       // 
