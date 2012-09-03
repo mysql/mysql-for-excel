@@ -44,7 +44,7 @@ namespace MySQL.ForExcel
     public long TotalRowsCount { get; set; }
     private bool hasError = false;
 
-    public ImportTableViewForm(MySqlWorkbenchConnection wbConnection, DBObject importDBObject, string importToWorksheetName, bool workSheetInCompatibilityMode)
+    public ImportTableViewForm(MySqlWorkbenchConnection wbConnection, DBObject importDBObject, string importToWorksheetName, bool workSheetInCompatibilityMode, bool importForEditData)
     {
       this.wbConnection = wbConnection;
       this.importDBObject = importDBObject;
@@ -54,6 +54,8 @@ namespace MySQL.ForExcel
       grdPreviewData.DataError += new DataGridViewDataErrorEventHandler(grdPreviewData_DataError);
 
       chkIncludeHeaders.Checked = true;
+      chkIncludeHeaders.Enabled = !importForEditData;
+      grdPreviewData.Enabled = !importForEditData;
       chkLimitRows.Checked = false;
       lblTableNameMain.Text = String.Format("{0} Name:", importDBObject.Type.ToString());
       lblOptionsWarning.Text = Properties.Resources.WorkSheetInCompatibilityModeWarning;

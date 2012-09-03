@@ -342,7 +342,7 @@ namespace MySQL.ForExcel
       Excel.Range fillingRange = null;
       try
       {
-        if (dt != null && dt.Rows.Count > 0)
+        if (dt != null && (dt.Rows.Count > 0 || importColumnNames))
         {
           int currentRow = atCell.Row - 1;
           int rowsCount = dt.Rows.Count;
@@ -385,7 +385,6 @@ namespace MySQL.ForExcel
           MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
         }
       }
-      
 
       return fillingRange;
     }
@@ -474,40 +473,41 @@ namespace MySQL.ForExcel
 
     public bool EditTableData(DBObject tableObject)
     {
+      InfoDialog errorDialog = null;
       string schemaAndTableNames = String.Format("{0}.{1}", connection.Schema, tableObject.Name);     
 
       // Check if the current dbobject has an edit ongoing 
       if (TableHasEditOnGoing(tableObject.Name))
       {
         // Display an error since there is an ongoing Editing operation and return
-        InfoDialog infoDialog = new InfoDialog(false, String.Format(Properties.Resources.TableWithOperationOngoingError, schemaAndTableNames), null);
-        infoDialog.OperationStatusText = "Editing not possible";
-        infoDialog.ShowDialog();        
+        errorDialog = new InfoDialog(false, String.Format(Properties.Resources.TableWithOperationOngoingError, schemaAndTableNames), null);
+        errorDialog.OperationStatusText = "Editing not possible";
+        errorDialog.ShowDialog();        
         return false;
       }
       
       // Check if selected Table has a Primary Key, it it does not we prompt an error and exit since Editing on such table is not permitted
       if (!MySQLDataUtilities.TableHasPrimaryKey(connection, tableObject.Name))
       {
-        InfoDialog infoDialog = new InfoDialog(false, Properties.Resources.EditOpenSummaryError, Properties.Resources.EditOpenDetailsError);
-        infoDialog.OperationStatusText = Properties.Resources.EditOpenSatusError;
-        infoDialog.OperationSummarySubText = String.Empty;
-        infoDialog.WordWrapDetails = true;
-        infoDialog.ShowDialog();
+        errorDialog = new InfoDialog(false, Properties.Resources.EditOpenSummaryError, Properties.Resources.EditOpenDetailsError);
+        errorDialog.OperationStatusText = Properties.Resources.EditOpenSatusError;
+        errorDialog.OperationSummarySubText = String.Empty;
+        errorDialog.WordWrapDetails = true;
+        errorDialog.ShowDialog();
         return false;
       }
      
       // Attempt to Import Data unless the user cancels the import operation
       string proposedWorksheetName = GetWorksheetNameAvoidingDuplicates(tableObject.Name);
-      ImportTableViewForm importForm = new ImportTableViewForm(connection, tableObject, proposedWorksheetName, ActiveWorkbook.Excel8CompatibilityMode);
+      ImportTableViewForm importForm = new ImportTableViewForm(connection, tableObject, proposedWorksheetName, ActiveWorkbook.Excel8CompatibilityMode, true);
       DialogResult dr = importForm.ShowDialog();
-      if (dr == DialogResult.Cancel)              
+      if (dr == DialogResult.Cancel)
         return false;
       
-      if (importForm.ImportDataTable == null)
+      if (importForm.ImportDataTable == null || importForm.ImportDataTable.Columns == null || importForm.ImportDataTable.Columns.Count == 0)
       {
-        string msg = String.Format(Properties.Resources.UnableToRetrieveData, tableObject.Name);
-        MessageBox.Show(msg, Properties.Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);        
+        errorDialog = new InfoDialog(false, String.Format(Properties.Resources.UnableToRetrieveData, tableObject.Name), null);
+        errorDialog.ShowDialog();
         return false;
       }
 

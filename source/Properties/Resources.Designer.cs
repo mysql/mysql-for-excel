@@ -408,16 +408,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error.
-        /// </summary>
-        internal static string Error {
-            get {
-                return ResourceManager.GetString("Error", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An error occurred creating a new schema: {0}.
+        ///   Looks up a localized string similar to An error occurred creating a new schema..
         /// </summary>
         internal static string ErrorCreatingNewSchema {
             get {
@@ -1003,7 +994,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to retrieve data from &apos;{0}&apos;..
+        ///   Looks up a localized string similar to Unable to retrieve data from {0} &apos;{1}&apos;..
         /// </summary>
         internal static string UnableToRetrieveData {
             get {

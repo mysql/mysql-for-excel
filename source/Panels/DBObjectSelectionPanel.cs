@@ -220,15 +220,15 @@ namespace MySQL.ForExcel
     private void importTableOrView(DBObject dbo)
     {
       var taskPaneControl = (TaskPaneControl)Parent;
-      ImportTableViewForm importForm = new ImportTableViewForm(connection, dbo, taskPaneControl.ActiveWorkbook.ActiveSheet.Name, taskPaneControl.ActiveWorkbook.Excel8CompatibilityMode);
+      ImportTableViewForm importForm = new ImportTableViewForm(connection, dbo, taskPaneControl.ActiveWorkbook.ActiveSheet.Name, taskPaneControl.ActiveWorkbook.Excel8CompatibilityMode, false);
       
       DialogResult dr = importForm.ShowDialog();
       if (dr == DialogResult.Cancel)
         return;
       if (importForm.ImportDataTable == null)
       {
-        string msg = String.Format(Resources.UnableToRetrieveData, dbo.Name);
-        MessageBox.Show(msg, Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        InfoDialog errorDialog = new InfoDialog(false, String.Format(Resources.UnableToRetrieveData, dbo.Type.ToString().ToLowerInvariant(), dbo.Name), null);
+        errorDialog.ShowDialog();
         return;
       }
       (Parent as TaskPaneControl).ImportDataToExcel(importForm.ImportDataTable, importForm.ImportHeaders);
@@ -242,8 +242,8 @@ namespace MySQL.ForExcel
         return;
       if (importProcedureForm.ImportDataSet == null)
       {
-        string msg = String.Format(Resources.UnableToRetrieveData, dbo.Name);
-        MessageBox.Show(msg, Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        InfoDialog errorDialog = new InfoDialog(false, String.Format(Resources.UnableToRetrieveData, dbo.Type.ToString().ToLowerInvariant(), dbo.Name), null);
+        errorDialog.ShowDialog();
         return;
       }
       (Parent as TaskPaneControl).ImportDataToExcel(importProcedureForm.ImportDataSet, importProcedureForm.ImportHeaders, importProcedureForm.ImportType, importProcedureForm.SelectedResultSet);

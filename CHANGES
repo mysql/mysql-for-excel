@@ -1,3 +1,6 @@
+- Added code to let the Import of data fill the Excel spreadsheet even if the table is empty but only if at least the column names are being imported. Also added code
+  to force the import of headers and always all columns during an Edit operation. Fixed code in Edit Data dialog to support empty tables and to remove the check for
+  imported column names since they will be always imported for an Edit operation. (Internal bug 103 - Edit Data does not work with empty tables).
 - Added code to change the enabled status of the Edit action label when entering and exiting Editing Mode since once in Edit Mode it must be closed before opening
   another Edit session. Added code to avoid data import onto a worksheet that has an ongoing Edit session open for a table, a dialog is shown asking the user if he
   wants to do the import on a new Excel Worksheet. Changed the way editing sessions are stored to support mainting them for Tables in different Schemas and to support

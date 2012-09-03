@@ -149,8 +149,9 @@ namespace MySQL.ForExcel
       catch (Exception ex)
       {
         MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
-        string msg = String.Format(Resources.ErrorCreatingNewSchema, ex.Message);
-        MessageBox.Show(msg, Resources.Error, MessageBoxButtons.OK, MessageBoxIcon.Error);        
+        InfoDialog errorDialog = new InfoDialog(false, Resources.ErrorCreatingNewSchema, ex.Message);
+        errorDialog.WordWrapDetails = true;
+        errorDialog.ShowDialog();
         return;
       }
       LoadSchemas();
