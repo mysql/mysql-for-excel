@@ -419,8 +419,9 @@ namespace MySQL.ForExcel
       {
         using (var errorDialog = new InfoDialog(false, "An error ocurred when trying to import the data.", ex.Message))
         {
+          errorDialog.WordWrapDetails = true;
           errorDialog.ShowDialog();
-          MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception on TaskPaneControl.ImportDataTableToExcelAtGivenCell - " + (ex.Message + " " + ex.InnerException), 1);
         }
       }
 
@@ -503,7 +504,7 @@ namespace MySQL.ForExcel
         InfoDialog errorDialog = new InfoDialog(false, "Error while creating new Excel Worksheet", ex.Message);
         errorDialog.WordWrapDetails = true;
         errorDialog.ShowDialog();
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on TaskPaneControl.CreateNewWorksheet - " + (ex.Message + " " + ex.InnerException), 1);
       }
 
       return newWorksheet;

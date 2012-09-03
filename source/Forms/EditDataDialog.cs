@@ -473,7 +473,10 @@ namespace MySQL.ForExcel
       {
         EditingWorksheet.Application.Undo();
       }
-      catch { }
+      catch(Exception ex)
+      {
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on EditDataDialog.UndoChanges - " + (ex.Message + " " + ex.InnerException), 1);
+      }
       undoingChanges = false;
     }
 
@@ -700,6 +703,7 @@ namespace MySQL.ForExcel
           undoChanges = true;
           operationSummary = "Error modifying cell's value.";
           operationDetails = ex.Message;
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception on EditDataDialog.EditingWorksheet_Change - " + (ex.Message + " " + ex.InnerException), 1);
         }
         finally
         {

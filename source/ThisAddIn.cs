@@ -73,7 +73,7 @@ namespace MySQL.ForExcel
         }
         catch (Exception ex)
         {
-          MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception on ThisAddIn.taskPaneControl_SizeChanged - " + (ex.Message + " " + ex.InnerException), 1);
         }
       }
     }

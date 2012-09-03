@@ -311,8 +311,10 @@ namespace MySQL.ForExcel
       catch (Exception ex)
       {
         this.Cursor = Cursors.Default;
-        InfoDialog dialog = new InfoDialog(false, ex.Message, null);
-        dialog.ShowDialog();
+        InfoDialog errorDialog = new InfoDialog(false, ex.Message, null);
+        errorDialog.WordWrapDetails = true;
+        errorDialog.ShowDialog();
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on ImportProcedureForm.btnCall_Click - " + (ex.Message + " " + ex.InnerException), 1);
       }
     }
 

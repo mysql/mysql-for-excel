@@ -74,12 +74,14 @@ namespace MySQL.ForExcel
            using (MemoryStream ms = new MemoryStream(img))
              Image.FromStream(ms);
          }
-         catch (ArgumentException)
+         catch (ArgumentException argEx)
          {
+           MiscUtilities.GetSourceTrace().WriteError("Application Exception on ImportTableViewForm.grdPreviewData_DataError - " + (argEx.Message + " " + argEx.InnerException), 1);
          }
          catch (Exception ex)
          {
            MessageBox.Show("Loading Data Error " + ex.Message);
+           MiscUtilities.GetSourceTrace().WriteError("Application Exception on ImportTableViewForm.grdPreviewData_DataError - " + (ex.Message + " " + ex.InnerException), 1);
          }
        }           
     }
@@ -139,6 +141,7 @@ namespace MySQL.ForExcel
         InfoDialog dialog = new InfoDialog(false, ex.Message, null);
         dialog.ShowDialog();
         hasError = true;
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on ImportTableViewForm.btnImport_Click - " + (ex.Message + " " + ex.InnerException), 1);
       }
       this.Cursor = Cursors.Default;
     }

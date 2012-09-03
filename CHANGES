@@ -1,3 +1,4 @@
+- Added code to output to the application log exception messages consistently in all places where exceptions are catched.
 - Changed code that gets a new name for a Worksheet that already has the proposed name of the Data Table being imported/edited.
   (Internal bug 101 - Edit Data generates wrong worksheet name for a table named "t").
 - Added code to free up the list of active Edit Dialogs from all existing workbooks when the connection is closed which happens as well when the user goes back to the

@@ -143,7 +143,7 @@ namespace MySQL.ForExcel
       {
         InfoDialog infoDialog = new InfoDialog(false, ex.Message, ex.StackTrace);
         infoDialog.ShowDialog();
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLDataTable - " + (ex.Message + " " + ex.InnerException), 1);
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLDataTable constructor - " + (ex.Message + " " + ex.InnerException), 1);
       }
     }
 
@@ -564,6 +564,7 @@ namespace MySQL.ForExcel
       catch (MySqlException ex)
       {
         exception = ex;
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLDataTable.CreateTable - " + (ex.Message + " " + ex.InnerException), 1);
       }
 
       return (warningsDS != null && warningsDS.Tables.Count > 0 ? warningsDS.Tables[0] : null);
@@ -724,13 +725,14 @@ namespace MySQL.ForExcel
           if (transaction != null)
             transaction.Rollback();
           exception = mysqlEx;
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLDataTable.InsertDataWithManualQuery - " + (mysqlEx.Message + " " + mysqlEx.InnerException), 1);
         }
         catch (Exception ex)
         {
           if (transaction != null)
             transaction.Rollback();
           exception = ex;
-          MiscUtilities.GetSourceTrace().WriteError("Application Exception on InsertDataWithManualQuery - " + (ex.Message + " " + ex.InnerException), 1);
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLDataTable.InsertDataWithManualQuery - " + (ex.Message + " " + ex.InnerException), 1);
         }
       }
 
@@ -894,13 +896,14 @@ namespace MySQL.ForExcel
           if (transaction != null)
             transaction.Rollback();
           exception = mysqlEx;
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLDataTable.AppendDataWithManualQuery - " + (mysqlEx.Message + " " + mysqlEx.InnerException), 1);
         }
         catch (Exception ex)
         {
           if (transaction != null)
             transaction.Rollback();
           exception = ex;
-          MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLDataTable.AppendDataWithManualQuery- " + (ex.Message + " " + ex.InnerException), 1);
         }
       }
 
@@ -1005,13 +1008,14 @@ namespace MySQL.ForExcel
           if (transaction != null)
             transaction.Rollback();
           exception = mysqlEx;
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLDataTable.UpdateDataWithManualQuery - " + (mysqlEx.Message + " " + mysqlEx.InnerException), 1);
         }
         catch (Exception ex)
         {
           if (transaction != null)
             transaction.Rollback();
           exception = ex;
-          MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLDataTable.UpdateDataWithManualQuery - " + (ex.Message + " " + ex.InnerException), 1);
         }
       }
 
@@ -1102,13 +1106,14 @@ namespace MySQL.ForExcel
           if (transaction != null)
             transaction.Rollback();
           exception = mysqlEx;
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLDataTable.DeleteDataWithManualQuery - " + (mysqlEx.Message + " " + mysqlEx.InnerException), 1);
         }
         catch (Exception ex)
         {
           if (transaction != null)
             transaction.Rollback();
           exception = ex;
-          MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLDataTable.DeleteDataWithManualQuery - " + (ex.Message + " " + ex.InnerException), 1);
         }
       }
 
@@ -1138,11 +1143,12 @@ namespace MySQL.ForExcel
         catch (MySqlException mysqlEx)
         {
           exception = mysqlEx;
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLDataTable.RevertData - " + (mysqlEx.Message + " " + mysqlEx.InnerException), 1);
         }
         catch (Exception ex)
         {
           exception = ex;
-          MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
+          MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLDataTable.RevertData - " + (ex.Message + " " + ex.InnerException), 1);
         }
       }
     }

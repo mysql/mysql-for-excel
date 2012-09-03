@@ -109,6 +109,7 @@ namespace MySQL.ForExcel
       {
         InfoDialog infoDialog = new InfoDialog(false, "Error when loading database connections file", String.Format(@"Description Error: \""{0}\""", ex.Message));
         infoDialog.ShowDialog();
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLForExcelConnectionsHelper.CreateXMLFile - " + (ex.Message + " " + ex.InnerException), 1);
         success = false;              
       }
       
@@ -148,6 +149,7 @@ namespace MySQL.ForExcel
           {
             InfoDialog infoDialog = new InfoDialog(false, Properties.Resources.UnableToSaveConnectionsFileError, String.Format(@"Description Error: \""{0}\""", ex.Message));
             infoDialog.ShowDialog();
+            MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLForExcelConnectionsHelper.GetConnections - " + (ex.Message + " " + ex.InnerException), 1);
           }
         }
         else
@@ -184,6 +186,7 @@ namespace MySQL.ForExcel
       {
         InfoDialog infoDialog = new InfoDialog(false, "Error when saving database connections file", String.Format(@"Description Error: \""{0}\""", ex.Message));
         infoDialog.ShowDialog();
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLForExcelConnectionsHelper.SaveConnection - " + (ex.Message + " " + ex.InnerException), 1);
         success = false;              
       }
       return success;
@@ -219,6 +222,7 @@ namespace MySQL.ForExcel
       {
         InfoDialog infoDialog = new InfoDialog(false, Properties.Resources.UnableToDeleteConnectionError, String.Format(@"Description Error: \""{0}\""", ex.Message));
         infoDialog.ShowDialog();
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLForExcelConnectionsHelper.RemoveConnection - " + (ex.Message + " " + ex.InnerException), 1);
         success = false;
       }
       return success;
@@ -277,6 +281,7 @@ namespace MySQL.ForExcel
         infoDlg = new InfoDialog(false, Properties.Resources.UnableToDeleteLocalConnectionsFileError, String.Format(@"Description Error: \""{0}\""", ex.Message));
         infoDlg.WordWrapDetails = true;
         infoDlg.ShowDialog();
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLForExcelConnectionsHelper.MigrateConnectionsFromMySQLToWorkbench - " + (ex.Message + " " + ex.InnerException), 1);
         return;
       }
 
@@ -289,6 +294,7 @@ namespace MySQL.ForExcel
       catch (Exception ex)
       {
         saveException = ex;
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLForExcelConnectionsHelper.MigrateConnectionsFromMySQLToWorkbench - " + (ex.Message + " " + ex.InnerException), 1);
       }
       string infoTitle;
       StringBuilder infoDetail = new StringBuilder();

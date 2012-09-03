@@ -90,8 +90,10 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog dialog = new InfoDialog(false, ex.Message, null);
-        dialog.ShowDialog();
+        InfoDialog errorDialog = new InfoDialog(false, ex.Message, null);
+        errorDialog.WordWrapDetails = true;
+        errorDialog.ShowDialog();
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on SchemaSelectionPanel.btnNext_Click - " + (ex.Message + " " + ex.InnerException), 1);
       }
     }
 
@@ -129,8 +131,10 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog dialog = new InfoDialog(false, ex.Message, null);
-        dialog.ShowDialog();
+        InfoDialog errorDialog = new InfoDialog(false, ex.Message, null);
+        errorDialog.WordWrapDetails = true;
+        errorDialog.ShowDialog();
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on SchemaSelectionPanel.LoadSchemas - " + (ex.Message + " " + ex.InnerException), 1);
         return false;
       }
     }
@@ -148,10 +152,10 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
         InfoDialog errorDialog = new InfoDialog(false, Resources.ErrorCreatingNewSchema, ex.Message);
         errorDialog.WordWrapDetails = true;
         errorDialog.ShowDialog();
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on SchemaSelectionPanel.createNewSchema_Click - " + (ex.Message + " " + ex.InnerException), 1);
         return;
       }
       LoadSchemas();

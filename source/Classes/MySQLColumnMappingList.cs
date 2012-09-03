@@ -62,6 +62,7 @@ namespace MySQL.ForExcel
       {
         InfoDialog infoDialog = new InfoDialog(false, "Error when deleting Column Mapping", String.Format(@"Description Error: \""{0}\""", ex.Message));
         infoDialog.ShowDialog();
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLColumnMappingList.Remove - " + (ex.Message + " " + ex.InnerException), 1);
         return false;              
       }
       return false;
@@ -82,6 +83,7 @@ namespace MySQL.ForExcel
       {
         InfoDialog infoDialog = new InfoDialog(false, "Error when attempting to Rename a Column Mapping", String.Format(@"Description Error: \""{0}\""", ex.Message));
         infoDialog.ShowDialog();
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLColumnMappingList.Rename - " + (ex.Message + " " + ex.InnerException), 1);
         return false;     
       }
       return false;

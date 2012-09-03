@@ -165,7 +165,7 @@ namespace MySQL.ForExcel
       {
         InfoDialog infoDialog = new InfoDialog(false, "An error ocurred when savings user settings file", ex.Message);
         infoDialog.ShowDialog();
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MiscUtilities.SaveSettings - " + (ex.Message + " " + ex.InnerException), 1);
         return false;
       }
       return true;
@@ -293,7 +293,7 @@ namespace MySQL.ForExcel
       catch (Exception ex)
       {
         System.Diagnostics.Debug.WriteLine(ex.Message);
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception - " + (ex.Message + " " + ex.InnerException), 1);
+        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLDataUtilities.GetSchemaCollection - " + (ex.Message + " " + ex.InnerException), 1);
         throw;
       }
 
