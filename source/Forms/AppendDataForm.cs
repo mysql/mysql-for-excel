@@ -101,7 +101,7 @@ namespace MySQL.ForExcel
 
     private void initializeToTableGrid(DBObject importDBObject)
     {
-      toMySQLDataTable = new MySQLDataTable(importDBObject.Name, true, wbConnection);
+      toMySQLDataTable = new MySQLDataTable(importDBObject.Name, true, false, wbConnection);
       DataTable dt = MySQLDataUtilities.GetDataFromTableOrView(wbConnection, importDBObject, null, 0, 10);
       foreach (DataRow dr in dt.Rows)
       {

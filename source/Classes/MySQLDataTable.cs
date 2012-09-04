@@ -107,7 +107,7 @@ namespace MySQL.ForExcel
     }
 
     // Constructor used for Append Data, fetching Schema Information for columns
-    public MySQLDataTable(string tableName, bool fetchColumnsSchemaInfo, MySqlWorkbenchConnection wbConnection)
+    public MySQLDataTable(string tableName, bool fetchColumnsSchemaInfo, bool datesAsMySQLDates, MySqlWorkbenchConnection wbConnection)
       : this(wbConnection.Schema, tableName)
     {
       if (fetchColumnsSchemaInfo)
@@ -122,7 +122,7 @@ namespace MySQL.ForExcel
             bool allowNulls = columnInfoRow["Null"].ToString() == "YES";
             bool isPrimaryKey = columnInfoRow["Key"].ToString() == "PRI";
             string extraInfo = columnInfoRow["Extra"].ToString();
-            MySQLDataColumn column = new MySQLDataColumn(colName, dataType, allowNulls, isPrimaryKey, extraInfo);
+            MySQLDataColumn column = new MySQLDataColumn(colName, dataType, datesAsMySQLDates, allowNulls, isPrimaryKey, extraInfo);
             Columns.Add(column);
           }
         }
@@ -132,7 +132,7 @@ namespace MySQL.ForExcel
 
     // Constructor used for Edit Data where we copy the contents of a table imported to Excel for edition
     public MySQLDataTable(string tableName, DataTable filledTable, MySqlWorkbenchConnection wbConnection)
-      : this(tableName, true, wbConnection)
+      : this(tableName, true, true, wbConnection)
     {
       try
       {
@@ -279,7 +279,10 @@ namespace MySQL.ForExcel
             colsToDelete.Add(column.ColumnName);
           }
           rowHasAnyData = rowHasAnyData || data[row, col] != null;
-          dataRow[adjColIdx] = data[row, col];
+          if (data[row, col] != null && data[row, col].Equals(0.0) && column.IsDate)
+            dataRow[adjColIdx] = DataTypeUtilities.EMPTY_DATE;
+          else
+            dataRow[adjColIdx] = data[row, col];
         }
         if (rowHasAnyData)
           Rows.Add(dataRow);
@@ -308,7 +311,6 @@ namespace MySQL.ForExcel
     {
       int rowsCount = data.GetUpperBound(0);
       int colsCount = data.GetUpperBound(1);
-      string dateFormat = "yyyy-MM-dd HH:mm:ss";
       int colAdjustIdx = (AddPrimaryKeyColumn ? 0 : 1);
 
       for (int dataColPos = 1; dataColPos <= colsCount; dataColPos++)
@@ -359,7 +361,7 @@ namespace MySQL.ForExcel
               if (zeroDate)
                 break;
               DateTime dtValue = (DateTime)valueFromArray;
-              Rows[rowPos - 1][dataColPos - colAdjustIdx] = dtValue.ToString(dateFormat);
+              Rows[rowPos - 1][dataColPos - colAdjustIdx] = dtValue.ToString(DataTypeUtilities.DATE_FORMAT);
               break;
             case "Varchar":
                 varCharValueLength = (addBufferToVarchar ? Int32.Parse(proposedType.Substring(lParensIndex + 1, proposedType.Length - lParensIndex - 2)) : valueAsString.Length);
@@ -382,6 +384,12 @@ namespace MySQL.ForExcel
         if (emptyColumnsToVarchar && String.IsNullOrEmpty(proposedType))
           proposedType = "Varchar(255)";
         col.RowsFrom2ndDataType = proposedType;
+        if (proposedType == "Datetime")
+          foreach (DataRow dr in Rows)
+          {
+            if (dr[dataColPos - colAdjustIdx].ToString() == "0")
+              dr[dataColPos - colAdjustIdx] = DataTypeUtilities.EMPTY_DATE;
+          }
 
         // Get the consistent DataType between first columnInfoRow and the previously computed consistent DataType for the rest of the rows.
         lParensIndex = proposedType.IndexOf("(");

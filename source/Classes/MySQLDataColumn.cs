@@ -191,26 +191,23 @@ namespace MySQL.ForExcel
       RowsFrom2ndDataType = String.Empty;
     }
 
-    public MySQLDataColumn(string columnName, string mySQLFullDataType, bool allowNulls, bool isPrimaryKey, string extraInfo)
+    public MySQLDataColumn(string columnName, string mySQLFullDataType, bool datesAsMySQLDates, bool allowNulls, bool isPrimaryKey, string extraInfo)
       : this()
     {
       DisplayName = ColumnName = columnName;
       AllowNull = allowNulls;
       Unsigned = false;
       AutoIncrement = false;
-
       Unsigned  = mySQLFullDataType.Contains("unsigned");
-      
       if (!String.IsNullOrEmpty(extraInfo))              
         AutoIncrement = extraInfo.Contains("auto_increment");
-      
       MySQLDataType = mySQLFullDataType;
-      DataType = DataTypeUtilities.NameToType(StrippedMySQLDataType, Unsigned);
+      DataType = DataTypeUtilities.NameToType(StrippedMySQLDataType, Unsigned, datesAsMySQLDates);
       PrimaryKey = isPrimaryKey;
     }
 
-    public MySQLDataColumn(string columnName, string mySQLFullDataType)
-      : this(columnName, mySQLFullDataType, false, false, String.Empty)
+    public MySQLDataColumn(string columnName, string mySQLFullDataType, bool datesAsMySQLDates)
+      : this(columnName, mySQLFullDataType, datesAsMySQLDates, false, false, String.Empty)
     {
     }
 
@@ -223,7 +220,6 @@ namespace MySQL.ForExcel
       string headerType = String.Empty;
       bool typesConsistent = true;
       bool valueOverflow = false;
-      string dateFormat = "yyyy-MM-dd HH:mm:ss";
       int rowPos = 0;
 
       foreach (DataRow dr in Table.Rows)
@@ -235,7 +231,7 @@ namespace MySQL.ForExcel
         if (proposedType.StartsWith("Date") && valueFromArray is DateTime)
         {
           DateTime dtValue = (DateTime)valueFromArray;
-          dr[Ordinal] = dtValue.ToString(dateFormat);
+          dr[Ordinal] = dtValue.ToString(DataTypeUtilities.DATE_FORMAT);
         }
         if (rowPos == 1)
           headerType = proposedType;

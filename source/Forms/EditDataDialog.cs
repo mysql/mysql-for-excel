@@ -666,7 +666,9 @@ namespace MySQL.ForExcel
               int absCol = startDataTableCol + colIdx - 1;
 
               currCol = editMySQLDataTable.GetColumnAtIndex(absCol);
-              object insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(cell.Value, currCol);
+              object insertingValue = DBNull.Value;
+              if (cell.Value != null)
+                insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(cell.Value, currCol);
               if (editMySQLDataTable.Rows[absRow].RowState != DataRowState.Added)
               {
                 if (DataTypeUtilities.ExcelValueEqualsDataTableValue(editMySQLDataTable.Rows[absRow][absCol, DataRowVersion.Original], insertingValue))
