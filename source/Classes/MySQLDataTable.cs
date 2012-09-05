@@ -171,6 +171,20 @@ namespace MySQL.ForExcel
       SelectQuery = String.Format("SELECT * FROM {0}`{1}`", schemaPiece, TableName.Replace("`", "``"));
     }
 
+    public string GetNonDuplicateColumnName(string proposedName)
+    {
+      if (String.IsNullOrEmpty(proposedName) || Columns == null || Columns.Count == 0)
+        return proposedName;
+      proposedName = proposedName.Trim();
+      string nonDupName = proposedName;
+      int colIdx = 2;
+      while (Columns.OfType<MySQLDataColumn>().Count(col => col.DisplayName == nonDupName) > 0)
+      {
+        nonDupName = proposedName + colIdx++;
+      }
+      return nonDupName;
+    }
+
     private void CreateColumns(int numCols)
     {
       MySQLDataColumn column = null;
@@ -187,7 +201,7 @@ namespace MySQL.ForExcel
         column = (Columns[0] as MySQLDataColumn);
         column.PrimaryKey = true;
         column.AutoPK = true;
-        column.ColumnName = column.DisplayName = TableName + "_id";
+        column.ColumnName = column.DisplayName = String.Format("{0}{1}id", TableName, (TableName.Length > 0 ? "_" : String.Empty));
         column.MySQLDataType = "Integer";
         column.AutoIncrement = true;
         column.AllowNull = false;

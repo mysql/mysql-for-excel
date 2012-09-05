@@ -39,22 +39,7 @@ namespace MySQL.ForExcel
       get { return uniqueKey; }
       set { uniqueKey = value; if (uniqueKey) CreateIndex = true; }
     }
-    public string DisplayName
-    {
-      get { return displayName; }
-      set
-      {
-        string trimmedName = value.Trim();
-        displayName = trimmedName;
-        if (Table == null || Table.Columns.Count < 2)
-          return;
-        int colIdx = 1;
-        while (Table.Columns.OfType<MySQLDataColumn>().Count(col => col.DisplayName == displayName) > 1)
-        {
-          displayName = trimmedName + colIdx++;
-        }
-      }
-    }
+    public string DisplayName { get; set; }
 
     public bool PrimaryKey { get; set; }
     public bool AllowNull { get; set; }

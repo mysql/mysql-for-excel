@@ -105,28 +105,34 @@ namespace MySQL.ForExcel
       columnBindingSource.DataSource = previewDataTable.Columns;
     }
 
-    private void RefreshColumnDataTypeWarning(int columnIndex)
+    private void UpdateColumnWarning(int columnIndex, bool showWarning, string warningResourceText)
     {
       if (columnIndex < 0 || columnIndex >= previewDataTable.Columns.Count)
         return;
       MySQLDataColumn mysqlCol = previewDataTable.GetColumnAtIndex(columnIndex);
       DataGridViewColumn gridCol = grdPreviewData.Columns[columnIndex];
-      bool showWarning = mysqlCol.MySQLDataType.Length == 0;
-      string warningText = (showWarning ? Resources.ColumnDataTypeNotSetWarning : null);
-      if (warningText == null)
+      string currentWarningText = (showWarning ? warningResourceText : null);
+      if (!showWarning)
       {
-        mysqlCol.WarningTextList.Remove(Resources.ColumnDataTypeNotSetWarning);
+        mysqlCol.WarningTextList.Remove(warningResourceText);
         if (mysqlCol.WarningTextList.Count > 0)
         {
           showWarning = true;
-          warningText = mysqlCol.WarningTextList.Last();
+          currentWarningText = mysqlCol.WarningTextList.Last();
         }
       }
       else
-        if (!mysqlCol.WarningTextList.Contains(Resources.ColumnDataTypeNotSetWarning))
-          mysqlCol.WarningTextList.Add(Resources.ColumnDataTypeNotSetWarning);
-      showValidationWarning("ColumnOptionsWarning", showWarning, warningText);
+        if (!mysqlCol.WarningTextList.Contains(warningResourceText))
+          mysqlCol.WarningTextList.Add(warningResourceText);
+      showValidationWarning("ColumnOptionsWarning", showWarning, currentWarningText);
       gridCol.DefaultCellStyle.BackColor = (showWarning ? Color.OrangeRed : grdPreviewData.DefaultCellStyle.BackColor);
+    }
+
+    private void RefreshColumnDataTypeWarning(int columnIndex)
+    {
+      MySQLDataColumn mysqlCol = previewDataTable.GetColumnAtIndex(columnIndex);
+      bool showWarning = mysqlCol.MySQLDataType.Length == 0;
+      UpdateColumnWarning(columnIndex, showWarning, Resources.ColumnDataTypeNotSetWarning);
     }
 
     private void RecreateColumns()
@@ -232,20 +238,7 @@ namespace MySQL.ForExcel
     private bool testColumnDataTypeAgainstColumnData(MySQLDataColumn currentCol)
     {
       bool showWarning = cmbDatatype.Text.Length > 0 && !currentCol.CanBeOfMySQLDataType(cmbDatatype.Text);
-
-      string warningText = (showWarning ? Resources.ExportDataTypeNotSuitableWarning : null);
-      if (warningText == null)
-      {
-        currentCol.WarningTextList.Remove(Resources.ExportDataTypeNotSuitableWarning);
-        if (showWarning = currentCol.WarningTextList.Count > 0)
-          warningText = currentCol.WarningTextList.Last();
-      }
-      else
-        if (!currentCol.WarningTextList.Contains(Resources.ExportDataTypeNotSuitableWarning))
-          currentCol.WarningTextList.Add(Resources.ExportDataTypeNotSuitableWarning);
-      showValidationWarning("ColumnOptionsWarning", showWarning, warningText);
-      grdPreviewData.SelectedColumns[0].DefaultCellStyle.BackColor = (showWarning ? Color.OrangeRed : grdPreviewData.DefaultCellStyle.BackColor);
-
+      UpdateColumnWarning(currentCol.Ordinal, showWarning, Resources.ExportDataTypeNotSuitableWarning);
       return !showWarning;
     }
 
@@ -281,18 +274,7 @@ namespace MySQL.ForExcel
         isValid = true;
 
       bool showWarning = !isValid;
-      string warningText = (showWarning ? Resources.ExportDataTypeNotValidWarning : null);
-      if (warningText == null)
-      {
-        currentCol.WarningTextList.Remove(Resources.ExportDataTypeNotValidWarning);
-        if (showWarning = currentCol.WarningTextList.Count > 0)
-          warningText = currentCol.WarningTextList.Last();
-      }
-      else
-        if (!currentCol.WarningTextList.Contains(Resources.ExportDataTypeNotValidWarning))
-          currentCol.WarningTextList.Add(Resources.ExportDataTypeNotValidWarning);
-      showValidationWarning("ColumnOptionsWarning", showWarning, warningText);
-      grdPreviewData.SelectedColumns[0].DefaultCellStyle.BackColor = (showWarning ? Color.OrangeRed : grdPreviewData.DefaultCellStyle.BackColor);
+      UpdateColumnWarning(currentCol.Ordinal, showWarning, Resources.ExportDataTypeNotValidWarning);
 
       return isValid;
     }
@@ -487,7 +469,8 @@ namespace MySQL.ForExcel
       string name = txtTableNameInput.Text.Trim();
       if (previewDataTable != null)
         previewDataTable.TableName = name;
-      txtAddPrimaryKey.Text = (name.Length > 0 ? name + "_id" : name);
+      string autoPKColumnName = String.Format("{0}{1}id", name, (name.Length > 0 ? "_" : String.Empty));
+      txtAddPrimaryKey.Text = previewDataTable.GetNonDuplicateColumnName(autoPKColumnName);
       timerTextChanged.Start();
     }
 
@@ -581,24 +564,13 @@ namespace MySQL.ForExcel
       if (txtColumnName.Text == (columnBindingSource.Current as MySQLDataColumn).DisplayName)
         return;
       isChanging = true;
-      string name = txtColumnName.Text.Trim();
+      string name = previewDataTable.GetNonDuplicateColumnName(txtColumnName.Text);
       int index = grdPreviewData.SelectedColumns[0].Index;
       grdPreviewData.Columns[index].HeaderText = name;
-
-      bool showWarning = (txtTableNameInput.Text.Contains(" ") || txtTableNameInput.Text.Any(char.IsUpper));
       MySQLDataColumn column = columnBindingSource.Current as MySQLDataColumn;
       column.DisplayName = name;
-      string warningText = (showWarning ? Resources.NamesWarning : null);
-      if (warningText == null)
-      {
-        column.WarningTextList.Remove(Resources.NamesWarning);
-        if (showWarning = column.WarningTextList.Count > 0)
-          warningText = column.WarningTextList.Last();
-      }
-      else
-        if (!column.WarningTextList.Contains(Resources.NamesWarning))
-          column.WarningTextList.Add(Resources.NamesWarning);
-      showValidationWarning("ColumnOptionsWarning", showWarning, warningText);
+      if (txtColumnName.Text != name)
+        txtColumnName.Text = name;
 
       if (index > 0)
       {
@@ -626,21 +598,7 @@ namespace MySQL.ForExcel
       {
         good = false;
       }
-      string warningText = (good ? null : Resources.ColumnDataNotUniqueWarning);
-      if (warningText == null)
-      {
-        column.WarningTextList.Remove(Resources.ColumnDataNotUniqueWarning);
-        if (column.WarningTextList.Count > 0)
-        {
-          good = false;
-          warningText = column.WarningTextList.Last();
-        }
-      }
-      else
-        if (!column.WarningTextList.Contains(Resources.ColumnDataNotUniqueWarning))
-          column.WarningTextList.Add(Resources.ColumnDataNotUniqueWarning);
-      showValidationWarning("ColumnOptionsWarning", !good, warningText);
-      gridCol.DefaultCellStyle.BackColor = good ? grdPreviewData.DefaultCellStyle.BackColor : Color.OrangeRed;
+      UpdateColumnWarning(gridCol.Index, !good, Resources.ColumnDataNotUniqueWarning);
       EnableChecks(chkUniqueIndex);
     }
 
@@ -859,7 +817,7 @@ namespace MySQL.ForExcel
       cmbDatatype.Enabled = !column.AutoPK;
 
       if(columnBindingSource.Position == 0)
-        chkUniqueIndex.Enabled = chkCreateIndex.Enabled = chkExcludeColumn.Enabled = chkAllowEmpty.Enabled = chkPrimaryKey.Enabled = false;
+        cmbDatatype.Enabled = chkUniqueIndex.Enabled = chkCreateIndex.Enabled = chkExcludeColumn.Enabled = chkAllowEmpty.Enabled = chkPrimaryKey.Enabled = false;
     }
 
     private void ExportDataForm_Load(object sender, EventArgs e)
