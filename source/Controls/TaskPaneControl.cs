@@ -49,7 +49,7 @@ namespace MySQL.ForExcel
     }
     public bool ActiveWorksheetInEditMode
     {
-      get { return WorksheetInActiveWorkbookInEditMode(ActiveWorksheet.Name); }
+      get { return (ActiveWorksheet != null && WorksheetInActiveWorkbookInEditMode(ActiveWorksheet.Name)); }
     }
 
     public Excel.Workbook ActiveWorkbook
