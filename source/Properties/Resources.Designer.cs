@@ -61,6 +61,24 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All active editing sessions on the current schema will be terminated. Do you wish to continue?.
+        /// </summary>
+        internal static string ActiveEditingSessionsCloseWarningDetail {
+            get {
+                return ResourceManager.GetString("ActiveEditingSessionsCloseWarningDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Active editing sessions on current schema.
+        /// </summary>
+        internal static string ActiveEditingSessionsCloseWarningTitle {
+            get {
+                return ResourceManager.GetString("ActiveEditingSessionsCloseWarningTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MySQL For Excel.
         /// </summary>
         internal static string AppName {

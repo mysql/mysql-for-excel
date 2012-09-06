@@ -1,3 +1,5 @@
+- Changed code that manages the way Editing Sessions are stored so that the sessions are maintained when renaming the Excel Worksheets in Edit Mode and only closed
+  when those Worksheets are deleted. The Editing Sessions are closed when changing Schema as well. (Internal bug 108 - Edit dialog is showed in a wrong sheet).
 - Fixed code that renames the auto-generated Primary Key column when the Table name changes since it was not detecting if a column with the same name already existed
   in the table. The column duplication was not actually happening, it looked that way because the automatically generated PK column was not detecting a column had
   that same name. (Internal bug 110 - Export Data - Column is duplicated when Unique index is checked).

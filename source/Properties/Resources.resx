@@ -498,4 +498,10 @@ To be able to make modifications on cells not related to MySQL data please exit 
   <data name="ColumnDataTypeNotSetWarning" xml:space="preserve">
     <value>Column DataType has not been set.</value>
   </data>
+  <data name="ActiveEditingSessionsCloseWarningDetail" xml:space="preserve">
+    <value>All active editing sessions on the current schema will be terminated. Do you wish to continue?</value>
+  </data>
+  <data name="ActiveEditingSessionsCloseWarningTitle" xml:space="preserve">
+    <value>Active editing sessions on current schema</value>
+  </data>
 </root>

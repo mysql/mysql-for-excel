@@ -176,6 +176,7 @@ namespace MySQL.ForExcel
       this.ShowInTaskbar = false;
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
       this.TopMost = true;
+      this.Activated += new System.EventHandler(this.EditDataDialog_Activated);
       this.Shown += new System.EventHandler(this.EditDataDialog_Shown);
       ((System.ComponentModel.ISupportInitialize)(this.picSakilaLogo)).EndInit();
       this.contextMenu.ResumeLayout(false);

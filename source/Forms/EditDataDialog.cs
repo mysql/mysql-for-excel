@@ -55,7 +55,6 @@ namespace MySQL.ForExcel
     private int lockedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#D7D7D7"));
     private long editingRowsQuantity = 0;
     private long editingColsQuantity = 0;
-    private string editingWorksheetName = String.Empty;
     private bool undoingChanges = false;
     private bool uncommitedDataExists
     {
@@ -64,13 +63,63 @@ namespace MySQL.ForExcel
 
     public Excel.Worksheet EditingWorksheet = null;
     public TaskPaneControl CallerTaskPane;
-    public string EditingTableName { get; private set; }
     public bool LockByProtectingWorksheet { get; set; }
-    public string WorkbookName { get; private set; }
     public IWin32Window ParentWindow { get; set; }
-    public string SchemaAndTableName
+    public string EditingSchema
     {
-      get { return String.Format("{0}.{1}", wbConnection.Schema, EditingTableName); }
+      get { return (wbConnection != null ? wbConnection.Schema : null); }
+    }
+    public string EditingTableName
+    {
+      get { return (editMySQLDataTable != null ? editMySQLDataTable.TableName : null); }
+    }
+    public string WorksheetName
+    {
+      get 
+      {
+        try
+        {
+          return EditingWorksheet.Name;
+        }
+        catch
+        {
+          return null;
+        }
+      }
+    }
+    public string WorkbookName
+    {
+      get 
+      {
+        try
+        {
+          return (EditingWorksheet.Parent as Excel.Workbook).Name;
+        }
+        catch
+        {
+          return null;
+        }
+      }
+    }
+    public bool EditingWorksheetExists
+    {
+      get
+      {
+        bool exists = false;
+        if (EditingWorksheet != null)
+        {
+          try
+          {
+            Excel.Workbook wb = EditingWorksheet.Parent as Excel.Workbook;
+            exists = true;
+          }
+          catch
+          {
+            exists = false;
+          }
+        }
+        return exists;
+      }
     }
 
     public EditDataDialog(MySqlWorkbenchConnection wbConnection, Excel.Range originalEditDataRange, DataTable importTable, Excel.Worksheet editingWorksheet, bool protectWorksheet)
@@ -80,22 +129,15 @@ namespace MySQL.ForExcel
       this.wbConnection = wbConnection;
       editDataRange = originalEditDataRange;
       queryString = importTable.ExtendedProperties["QueryString"].ToString();
-      EditingTableName = importTable.TableName;
-      WorkbookName = (editingWorksheet.Parent as Excel.Workbook).Name;
+      string tableName = importTable.TableName;
       if (importTable.ExtendedProperties.ContainsKey("TableName") && !String.IsNullOrEmpty(importTable.ExtendedProperties["TableName"].ToString()))
-        EditingTableName = importTable.ExtendedProperties["TableName"].ToString();
-      editMySQLDataTable = new MySQLDataTable(EditingTableName, importTable, wbConnection);
+        tableName = importTable.ExtendedProperties["TableName"].ToString();
+      editMySQLDataTable = new MySQLDataTable(tableName, importTable, wbConnection);
       if (importTable.ExtendedProperties.ContainsKey("QueryString") && !String.IsNullOrEmpty(importTable.ExtendedProperties["QueryString"].ToString()))
         editMySQLDataTable.SelectQuery = importTable.ExtendedProperties["QueryString"].ToString();
       EditingWorksheet = editingWorksheet;
-      editingWorksheetName = editingWorksheet.Name;
       EditingWorksheet.SelectionChange += new Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);
-      toolTip.SetToolTip(this, String.Format("Editing data for:{0}Schema: {1}{0}Table: {2}{0}WorkBook: {3}{0}WorkSheet: {4}",
-                                             Environment.NewLine,
-                                             wbConnection.Schema,
-                                             EditingTableName,
-                                             WorkbookName,
-                                             editingWorksheetName));
+      ResetToolTip();
       editingColsQuantity = editingWorksheet.UsedRange.Columns.Count;
       Opacity = 0.60;
       LockByProtectingWorksheet = protectWorksheet;
@@ -114,6 +156,21 @@ namespace MySQL.ForExcel
       }
     }
 
+    private void EditDataDialog_Activated(object sender, EventArgs e)
+    {
+      ResetToolTip();
+    }
+
+    private void ResetToolTip()
+    {
+      toolTip.SetToolTip(this, String.Format("Editing data for:{0}Schema: {1}{0}Table: {2}{0}WorkBook: {3}{0}WorkSheet: {4}",
+                                             Environment.NewLine,
+                                             wbConnection.Schema,
+                                             EditingTableName,
+                                             WorkbookName,
+                                             WorksheetName));
+    }
+
     protected override void OnPaintBackground(PaintEventArgs e)
     {
       base.OnPaintBackground(e);
@@ -128,7 +185,7 @@ namespace MySQL.ForExcel
     {
       base.OnClosing(e);
       CallerTaskPane.RefreshDBObjectPanelActionLabelsEnabledStatus(EditingTableName, false);
-      if (CallerTaskPane.WorksheetExists(WorkbookName, editingWorksheetName))
+      if (EditingWorksheetExists)
       {
         EditingWorksheet.Unprotect("84308893-7292-49BE-97C0-3A28E81AA2EF");
         EditingWorksheet.UsedRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;

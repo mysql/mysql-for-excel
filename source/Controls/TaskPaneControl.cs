@@ -45,11 +45,14 @@ namespace MySQL.ForExcel
     public List<ActiveEditDialogContainer> ActiveEditDialogsList;
     public Excel.Worksheet ActiveWorksheet
     {
-      get { return (Excel.Worksheet)excelApplication.ActiveSheet; }
+      get { return excelApplication.ActiveSheet as Excel.Worksheet; }
     }
     public bool ActiveWorksheetInEditMode
     {
-      get { return (ActiveWorksheet != null && WorksheetInActiveWorkbookInEditMode(ActiveWorksheet.Name)); }
+      get { return (ActiveWorksheet != null 
+                    && ActiveEditDialogsList != null
+                    && ActiveEditDialogsList.Count > 0
+                    && ActiveEditDialogsList.Exists(ac => ac.EditDialog.EditingWorksheet == ActiveWorksheet)); }
     }
 
     public Excel.Workbook ActiveWorkbook
@@ -77,12 +80,12 @@ namespace MySQL.ForExcel
       dbObjectSelectionPanel1.ExcelSelectionContainsData = false;
     }
 
-    private void ChangeEditDialogVisibility(string workSheetName, bool show)
+    private void ChangeEditDialogVisibility(Excel.Worksheet workSheet, bool show)
     {
-      if (workSheetName.Length > 0 && ActiveEditDialogsList != null && ActiveEditDialogsList.Count > 0)
+      if (workSheet != null && ActiveEditDialogsList != null && ActiveEditDialogsList.Count > 0)
       {
-        ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList.Find(ac => ac.WorkBookName == ActiveWorkbook.Name && ac.WorkSheetName == workSheetName);
-        if (activeEditContainer != null && activeEditContainer.EditDialog != null)
+        ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList.Find(ac => ac.EditDialog.EditingWorksheet == workSheet);
+        if (activeEditContainer != null)
         {
           if (show)
             activeEditContainer.EditDialog.ShowInactiveTopmost();
@@ -98,7 +101,7 @@ namespace MySQL.ForExcel
         return;
 
       Excel.Workbook activeWorkbook = sh as Excel.Workbook;
-      ChangeEditDialogVisibility((activeWorkbook.ActiveSheet as Excel.Worksheet).Name, true);
+      ChangeEditDialogVisibility(activeWorkbook.ActiveSheet as Excel.Worksheet, true);
 
       // check if last active was closed or unactivated
       if (String.IsNullOrEmpty(lastDeactivatedWorkbookName))
@@ -117,10 +120,9 @@ namespace MySQL.ForExcel
       for (int containerIndex = 0; containerIndex < listCount; containerIndex++)
       {
         ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList[containerIndex];
-        if (activeEditContainer.WorkBookName != lastDeactivatedWorkbookName)
+        if (!String.IsNullOrEmpty(activeEditContainer.EditDialog.WorkbookName) && activeEditContainer.EditDialog.WorkbookName != lastDeactivatedWorkbookName)
           continue;
-        if (activeEditContainer.EditDialog != null)
-          activeEditContainer.EditDialog.Close();
+        activeEditContainer.EditDialog.Close();
         if (ActiveEditDialogsList.Contains(activeEditContainer))
           ActiveEditDialogsList.Remove(activeEditContainer);
         if (listCount != ActiveEditDialogsList.Count)
@@ -138,17 +140,13 @@ namespace MySQL.ForExcel
       if (ActiveEditDialogsList == null || ActiveEditDialogsList.Count == 0)
         return;
 
-      Excel.Workbook deactivatedSheet = sh as Excel.Workbook;
-      lastDeactivatedWorkbookName = ((Excel.Workbook)sh).Name;
+      Excel.Workbook deactivatedWorkbook = sh as Excel.Workbook;
+      lastDeactivatedWorkbookName = deactivatedWorkbook.Name;
       
-      // hide editDialogs from deactivated Workbook
-      if (lastDeactivatedWorkbookName.Length > 0)
+      // Hide editDialogs from deactivated Workbook
+      foreach (Excel.Worksheet wSheet in deactivatedWorkbook.Worksheets)
       {
-        foreach (ActiveEditDialogContainer activeEditContainer in ActiveEditDialogsList)
-        {
-          if (activeEditContainer.EditDialog != null && activeEditContainer.WorkBookName == lastDeactivatedWorkbookName)
-            activeEditContainer.EditDialog.Hide();
-        }
+        ChangeEditDialogVisibility(wSheet, false);
       }
     }
 
@@ -158,7 +156,7 @@ namespace MySQL.ForExcel
         return;
       Excel.Worksheet deactivatedSheet = Sh as Excel.Worksheet;
       lastDeactivatedSheetName = (deactivatedSheet != null ? deactivatedSheet.Name : String.Empty);
-      ChangeEditDialogVisibility(lastDeactivatedSheetName, false);
+      ChangeEditDialogVisibility(deactivatedSheet, false);
     }
 
     void excelApplication_SheetActivate(object Sh)
@@ -166,14 +164,13 @@ namespace MySQL.ForExcel
       if (ActiveEditDialogsList == null || ActiveEditDialogsList.Count == 0)
         return;
       Excel.Worksheet activeSheet = Sh as Excel.Worksheet;
-      string activeSheetName = (activeSheet != null ? activeSheet.Name : String.Empty);
-      ChangeEditDialogVisibility(activeSheetName, true);
+      ChangeEditDialogVisibility(activeSheet, true);
 
       if (lastDeactivatedSheetName.Length > 0 && !WorksheetExists(ActiveWorkbook.Name, lastDeactivatedSheetName))
       {
-        // Worksheet was deleted or renamed
-        ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList.Find(ac => ac.WorkBookName == ActiveWorkbook.Name && ac.WorkSheetName == lastDeactivatedSheetName);
-        if (activeEditContainer != null && activeEditContainer.EditDialog != null)
+        // Worksheet was deleted
+        ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList.Find(ac => !ac.EditDialog.EditingWorksheetExists);
+        if (activeEditContainer != null)
         {
           activeEditContainer.EditDialog.Close();
           if (ActiveEditDialogsList.Contains(activeEditContainer))
@@ -328,6 +325,15 @@ namespace MySQL.ForExcel
 
     public void CloseSchema()
     {
+      // If there are Active Edit sessions warn the users that by closing the schema the sessions will be terminated
+      if (ActiveEditDialogsList != null && ActiveEditDialogsList.Count > 0)
+      {
+        WarningDialog warningDiag = new WarningDialog(Resources.ActiveEditingSessionsCloseWarningTitle, Resources.ActiveEditingSessionsCloseWarningDetail);
+        DialogResult dr = warningDiag.ShowDialog();
+        if (dr == DialogResult.No)
+          return;
+        CloseAllEditingSessions();
+      }
       schemaSelectionPanel1.BringToFront();
     }
 
@@ -357,12 +363,12 @@ namespace MySQL.ForExcel
       proposedName = (checkForDuplicates ? GetWorksheetNameAvoidingDuplicates(proposedName) : proposedName);
       if (excelApplication.ActiveWorkbook != null)
       {
-        string currentActiveSheetName = (excelApplication.ActiveSheet as Excel.Worksheet).Name;
+        Excel.Worksheet currentActiveSheet = ActiveWorksheet;
         currentWorksheet = excelApplication.Sheets.Add(Type.Missing, excelApplication.ActiveSheet, Type.Missing, Type.Missing);
         if (ActiveEditDialogsList != null)
         {
-          ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList.Find(ac => ac.WorkBookName == excelApplication.ActiveWorkbook.Name && ac.WorkSheetName == currentActiveSheetName);
-          if (activeEditContainer != null && activeEditContainer.EditDialog != null && activeEditContainer.EditDialog.Visible)
+          ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList.Find(ac => ac.EditDialog.EditingWorksheet.Equals(currentActiveSheet));
+          if (activeEditContainer != null && activeEditContainer.EditDialog.Visible)
             activeEditContainer.EditDialog.Hide();
         }
       }
@@ -435,8 +441,6 @@ namespace MySQL.ForExcel
 
     public void ImportDataToExcel(DataSet ds, bool importColumnNames, ImportMultipleType importType, int selectedResultSet)
     {
-      Excel.Worksheet currentWorksheet = GetActiveOrCreateWorksheet("Sheet1", false, true);
-
       Excel.Range atCell = excelApplication.ActiveCell;
       Excel.Range endCell = null;
       Excel.Range fillingRange = null;
@@ -553,8 +557,8 @@ namespace MySQL.ForExcel
       // Before creating the new Excel Worksheet check if ActiveWorksheet is in Editing Mode and if so hide its Edit Dialog
       if (ActiveEditDialogsList != null)
       {
-        ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList.Find(ac => ac.WorkBookName == ActiveWorkbook.Name && ac.WorkSheetName == ActiveWorksheet.Name);
-          if (activeEditContainer != null && activeEditContainer.EditDialog != null)
+        ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList.Find(ac => ac.EditDialog.EditingWorksheet.Equals(ActiveWorksheet));
+          if (activeEditContainer != null && activeEditContainer.EditDialog.Visible)
             activeEditContainer.EditDialog.Hide();
       }
 
@@ -575,7 +579,7 @@ namespace MySQL.ForExcel
       // Maintain hashtables for open Edit Data Dialogs
       if (ActiveEditDialogsList == null)
         ActiveEditDialogsList = new List<ActiveEditDialogContainer>();
-      ActiveEditDialogsList.Add(new ActiveEditDialogContainer(connection.Schema, tableObject.Name, ActiveWorkbook.Name, ActiveWorksheet.Name, editDialog));
+      ActiveEditDialogsList.Add(new ActiveEditDialogContainer(tableObject.Name, editDialog));
      
       return true;
     }
@@ -601,44 +605,31 @@ namespace MySQL.ForExcel
     {
       if (ActiveEditDialogsList == null || ActiveEditDialogsList.Count == 0)
         return false;
-      ActiveEditDialogContainer editContainer = ActiveEditDialogsList.Find(ac => ac.SchemaName == connection.Schema && ac.TableName == tableName);
+      ActiveEditDialogContainer editContainer = ActiveEditDialogsList.Find(ac => ac.TableName == tableName);
       if (editContainer == null)
         return false;
       // Means has an edit ongoing we need to make sure the edit has a valid sheet otherwise we need to release it
-      foreach (Excel.Workbook workbook in excelApplication.Workbooks)
+      foreach (Excel.Worksheet workSheet in excelApplication.Worksheets)
       {
-        if (workbook.Name == editContainer.WorkBookName)
+        if (editContainer.EditDialog.EditingWorksheet.Equals(workSheet))
           return true;
       }
-      if (editContainer.EditDialog != null)
-        editContainer.EditDialog.Close();
+      editContainer.EditDialog.Close();
       if (ActiveEditDialogsList.Contains(editContainer))
         ActiveEditDialogsList.Remove(editContainer);
       return false;
     }
 
-    public bool WorksheetInActiveWorkbookInEditMode(string workSheetName)
-    {
-      if (ActiveEditDialogsList == null)
-        return false;   
-      return ActiveEditDialogsList.Find(ac => ac.WorkBookName == ActiveWorkbook.Name && ac.WorkSheetName == workSheetName) != null;
-    }
   }
 
   public class ActiveEditDialogContainer
   {
-    public string SchemaName;
     public string TableName;
-    public string WorkBookName;
-    public string WorkSheetName;
     public EditDataDialog EditDialog;
 
-    public ActiveEditDialogContainer(string schemaName, string tableName, string workBookName, string workSheetName, EditDataDialog editDialog)
+    public ActiveEditDialogContainer(string tableName, EditDataDialog editDialog)
     {
-      SchemaName = schemaName;
       TableName = tableName;
-      WorkBookName = workBookName;
-      WorkSheetName = workSheetName;
       EditDialog = editDialog;
     }
   }
