@@ -351,7 +351,7 @@ namespace MySQL.ForExcel
     private void performManualSingleColumnMapping(int fromColumnIndex, int toColumnIndex, string mappedColName)
     {
       if (currentColumnMapping.Name == "Automatic")
-        cmbMappingMethod.SelectedIndex = 0;
+        cmbMappingMethod.SelectedIndex = 1;
 
       applySingleMapping(fromColumnIndex, toColumnIndex, mappedColName);
 
