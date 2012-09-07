@@ -1169,24 +1169,46 @@ namespace MySQL.ForExcel
         retValue = rawValue;
         if (againstTypeColumn.IsDate)
         {
-          DateTime dtValue;
-          string rawValueAsString = rawValue.ToString();
-          if (DateTime.TryParse(rawValueAsString, out dtValue))
-            rawValueAsString = dtValue.ToString(DataTypeUtilities.DATE_FORMAT);
-          if (rawValue.Equals(DateTime.MinValue) || rawValueAsString.StartsWith("0000-00-00") || rawValueAsString.StartsWith("00-00-00"))
+          if (rawValue is DateTime)
           {
-            if (againstTypeColumn.AllowNull)
-              retValue = DBNull.Value;
+            DateTime dtValue = (DateTime)rawValue;
+            if (againstTypeColumn.DataType.Name == "DateTime")
+              retValue = dtValue;
             else
+              retValue = new MySql.Data.Types.MySqlDateTime(dtValue);
+          }
+          else if (rawValue is MySql.Data.Types.MySqlDateTime)
+          {
+            MySql.Data.Types.MySqlDateTime dtValue = (MySql.Data.Types.MySqlDateTime)rawValue;
+            if (againstTypeColumn.DataType.Name == "DateTime")
+              retValue = (!dtValue.IsValidDateTime ? DateTime.MinValue : dtValue.GetDateTime());
+            else
+              retValue = dtValue;
+          }
+          else
+          {
+            DateTime dtValue;
+            string rawValueAsString = rawValue.ToString();
+            if (rawValueAsString.StartsWith("0000-00-00") || rawValueAsString.StartsWith("00-00-00") || rawValueAsString.Equals("0"))
             {
               if (againstTypeColumn.DataType.Name == "DateTime")
                 retValue = DateTime.MinValue;
               else
                 retValue = new MySql.Data.Types.MySqlDateTime(0, 0, 0, 0, 0, 0, 0);
             }
+            else
+            {
+              if (DateTime.TryParse(rawValueAsString, out dtValue))
+              {
+                if (againstTypeColumn.DataType.Name == "DateTime")
+                  retValue = dtValue;
+                else
+                  retValue = new MySql.Data.Types.MySqlDateTime(dtValue);
+              }
+              else
+                retValue = rawValue;
+            }
           }
-          else
-            retValue = rawValueAsString;
         }
         else if (againstTypeColumn.IsBool)
         {
@@ -1211,7 +1233,32 @@ namespace MySQL.ForExcel
       object valueObject = (dataForInsertion ? DataTypeUtilities.GetInsertingValueForColumnType(rawValue, againstTypeColumn) : rawValue);
       valueIsNull = valueObject == null || valueObject == DBNull.Value;
       if (!valueIsNull)
-        valueToDB = (valueObject.Equals(DateTime.MinValue) || (valueObject is MySql.Data.Types.MySqlDateTime && !((MySql.Data.Types.MySqlDateTime)valueObject).IsValidDateTime) ? EMPTY_DATE : valueObject.ToString());
+      {
+        if (valueObject is DateTime)
+        {
+          DateTime dtValue = (DateTime)valueObject;
+          if (dtValue.Equals(DateTime.MinValue))
+          {
+            valueIsNull = againstTypeColumn.AllowNull;
+            valueToDB = (valueIsNull ? @"null" : EMPTY_DATE);
+          }
+          else
+            valueToDB = dtValue.ToString(DATE_FORMAT);
+        }
+        else if (valueObject is MySql.Data.Types.MySqlDateTime)
+        {
+          MySql.Data.Types.MySqlDateTime dtValue = (MySql.Data.Types.MySqlDateTime)valueObject;
+          if (!dtValue.IsValidDateTime || dtValue.GetDateTime().Equals(DateTime.MinValue))
+          {
+            valueIsNull = againstTypeColumn.AllowNull;
+            valueToDB = (valueIsNull ? @"null" : EMPTY_DATE);
+          }
+          else
+            valueToDB = dtValue.GetDateTime().ToString(DATE_FORMAT);
+        }
+        else
+          valueToDB = valueObject.ToString();
+      }
 
       return valueToDB;
     }

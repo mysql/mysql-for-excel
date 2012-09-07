@@ -1,3 +1,5 @@
+- Updated code that prepares a Date value for insertion into the DataTable to consider more scenarios, also updated the code that prepares Date values into string
+  representation to build the SQL queries. (Internal bug 128 - Edit Data generates error when updating a Date cell in Excel).
 - Fixed a GUID in the main wix configuration file so now previous versions are uninstalled during a new installation.
   (Internal bug 115 - MySQL for Excel installer is not validating the legacy builds installed).
 - Added an option to the Export Data's Advanced Options dialog to remove columns with no data, by default the Export Dialog will only flag those columns as Excluded.

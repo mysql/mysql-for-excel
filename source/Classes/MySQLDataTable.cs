@@ -968,7 +968,7 @@ namespace MySQL.ForExcel
           {
             valueToDB = DataTypeUtilities.GetStringValueForColumn(changesRow[column.ColumnName, DataRowVersion.Original], column, false, out updatingValueIsNull);
             wClauseString.AppendFormat("{0}`{1}`={2}{3}{2}",
-                                       colsSeparator,
+                                       wClauseColsSeparator,
                                        finalColName,
                                        (column.ColumnsRequireQuotes && !updatingValueIsNull ? "'" : String.Empty),
                                        valueToDB);
