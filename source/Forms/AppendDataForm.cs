@@ -86,7 +86,7 @@ namespace MySQL.ForExcel
 
     private void initializeFromTableGrid(string schemaName, string fromTableName)
     {
-      fromMySQLPreviewDataTable = new MySQLDataTable(schemaName, fromTableName, false, Properties.Settings.Default.AppendUseFormattedValues);
+      fromMySQLPreviewDataTable = new MySQLDataTable(schemaName, fromTableName, false, Properties.Settings.Default.AppendUseFormattedValues, false);
       int previewRowsQty = Math.Min(this.appendDataRange.Rows.Count, Settings.Default.AppendLimitPreviewRowsQuantity);
       Excel.Range previewRange = this.appendDataRange.get_Resize(previewRowsQty, this.appendDataRange.Columns.Count);
       fromMySQLPreviewDataTable.SetData(previewRange, true, true, false, false, false, false);

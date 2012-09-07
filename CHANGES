@@ -1,3 +1,9 @@
+- Added an option to the Export Data's Advanced Options dialog to remove columns with no data, by default the Export Dialog will only flag those columns as Excluded.
+  Added code to display a warning and paint a column red if the column name is not set, display a warning if the table name is not set, and stack warnings but not
+  display them if a column is Excluded, warnings are displayed normally for columns if they are not Excluded anymore.  Added code to prevent the Append and Export of
+  Data if more than 1 selection is made (selecting more than 1 area holding the Ctrl key while selecting Excel cells).
+  (Internal bug 69 - Export Data always removes empty columns when it should just flag them as Excluded).
+- Commit for Oraclebug #14521405 Unhandled exception is thrown when loading MySQL for Excel.
 - Changed code that manages the way Editing Sessions are stored so that the sessions are maintained when renaming the Excel Worksheets in Edit Mode and only closed
   when those Worksheets are deleted. The Editing Sessions are closed when changing Schema as well. (Internal bug 108 - Edit dialog is showed in a wrong sheet).
 - Fixed code that renames the auto-generated Primary Key column when the Table name changes since it was not detecting if a column with the same name already existed
@@ -60,5 +66,3 @@
   This way we are consistent on how operations are performed by the Export Data and Append Data operations and ensure the query appearing on the General Query Log
   and the one we display to the users are identical. (Oracle bug 14355970 - CONFIRMATION DETAILS LIE ABOUT SQL ISSUED).
 - Fixed Edit showing exception for unsigned small int is too large for the column. Changes in MySQLDataColumn Class that wasn't assigning the unsigned attribute in constructor.
-- Commit for Oraclebug #14521405 Unhandled exception is thrown when loading MySQL for Excel.
-  

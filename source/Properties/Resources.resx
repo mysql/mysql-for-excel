@@ -495,13 +495,25 @@ To be able to make modifications on cells not related to MySQL data please exit 
   <data name="WorkSheetInEditModeWarningTitle" xml:space="preserve">
     <value>Active Workhsheet in Edit Mode</value>
   </data>
-  <data name="ColumnDataTypeNotSetWarning" xml:space="preserve">
-    <value>Column DataType has not been set.</value>
+  <data name="ColumnDataTypeRequiredWarning" xml:space="preserve">
+    <value>Column DataType is required.</value>
   </data>
   <data name="ActiveEditingSessionsCloseWarningDetail" xml:space="preserve">
     <value>All active editing sessions on the current schema will be terminated. Do you wish to continue?</value>
   </data>
   <data name="ActiveEditingSessionsCloseWarningTitle" xml:space="preserve">
     <value>Active editing sessions on current schema</value>
+  </data>
+  <data name="ColumnNameRequiredWarning" xml:space="preserve">
+    <value>Column name is required.</value>
+  </data>
+  <data name="TableNameRequiredWarning" xml:space="preserve">
+    <value>Table name is required.</value>
+  </data>
+  <data name="MultipleAreasNotSupportedWarningDetail" xml:space="preserve">
+    <value>Operation can only be performed with 1 area selected, multiple selections are not supported.</value>
+  </data>
+  <data name="MultipleAreasNotSupportedWarningTitle" xml:space="preserve">
+    <value>Multiple Areas Not Supported</value>
   </data>
 </root>

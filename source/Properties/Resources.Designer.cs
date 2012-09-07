@@ -136,11 +136,11 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Column DataType has not been set..
+        ///   Looks up a localized string similar to Column DataType is required..
         /// </summary>
-        internal static string ColumnDataTypeNotSetWarning {
+        internal static string ColumnDataTypeRequiredWarning {
             get {
-                return ResourceManager.GetString("ColumnDataTypeNotSetWarning", resourceCulture);
+                return ResourceManager.GetString("ColumnDataTypeRequiredWarning", resourceCulture);
             }
         }
         
@@ -195,6 +195,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string ColumnMappingIncompleteTitleWarning {
             get {
                 return ResourceManager.GetString("ColumnMappingIncompleteTitleWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Column name is required..
+        /// </summary>
+        internal static string ColumnNameRequiredWarning {
+            get {
+                return ResourceManager.GetString("ColumnNameRequiredWarning", resourceCulture);
             }
         }
         
@@ -550,6 +559,24 @@ namespace MySQL.ForExcel.Properties {
         internal static string MigrateConnectionsToWorkbenchInfoTitle {
             get {
                 return ResourceManager.GetString("MigrateConnectionsToWorkbenchInfoTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Operation can only be performed with 1 area selected, multiple selections are not supported..
+        /// </summary>
+        internal static string MultipleAreasNotSupportedWarningDetail {
+            get {
+                return ResourceManager.GetString("MultipleAreasNotSupportedWarningDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple Areas Not Supported.
+        /// </summary>
+        internal static string MultipleAreasNotSupportedWarningTitle {
+            get {
+                return ResourceManager.GetString("MultipleAreasNotSupportedWarningTitle", resourceCulture);
             }
         }
         
@@ -932,6 +959,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string TableNameExistsWarning {
             get {
                 return ResourceManager.GetString("TableNameExistsWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Table name is required..
+        /// </summary>
+        internal static string TableNameRequiredWarning {
+            get {
+                return ResourceManager.GetString("TableNameRequiredWarning", resourceCulture);
             }
         }
         

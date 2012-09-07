@@ -62,6 +62,7 @@ namespace MySQL.ForExcel
       this.lblPreviewRowsQuantity1 = new System.Windows.Forms.Label();
       this.lblPreviewRowsQuantity2 = new System.Windows.Forms.Label();
       this.numPreviewRowsQuantity = new System.Windows.Forms.NumericUpDown();
+      this.chkRemoveEmptyColumns = new System.Windows.Forms.CheckBox();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.numPreviewRowsQuantity)).BeginInit();
@@ -70,6 +71,7 @@ namespace MySQL.ForExcel
       // contentAreaPanel
       // 
       this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
+      this.contentAreaPanel.Controls.Add(this.chkRemoveEmptyColumns);
       this.contentAreaPanel.Controls.Add(this.numPreviewRowsQuantity);
       this.contentAreaPanel.Controls.Add(this.lblPreviewRowsQuantity2);
       this.contentAreaPanel.Controls.Add(this.lblPreviewRowsQuantity1);
@@ -83,13 +85,13 @@ namespace MySQL.ForExcel
       this.contentAreaPanel.Controls.Add(this.chkAddBufferToVarchar);
       this.contentAreaPanel.Controls.Add(this.chkDetectDatatype);
       this.contentAreaPanel.Controls.Add(this.lblColumnDatatypeOptions);
-      this.contentAreaPanel.Size = new System.Drawing.Size(544, 290);
+      this.contentAreaPanel.Size = new System.Drawing.Size(544, 352);
       // 
       // commandAreaPanel
       // 
       this.commandAreaPanel.Controls.Add(this.btnAccept);
       this.commandAreaPanel.Controls.Add(this.btnCancel);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 290);
+      this.commandAreaPanel.Location = new System.Drawing.Point(0, 352);
       this.commandAreaPanel.Size = new System.Drawing.Size(544, 45);
       // 
       // btnAccept
@@ -120,10 +122,10 @@ namespace MySQL.ForExcel
       this.chkShowCopySQLButton.AutoSize = true;
       this.chkShowCopySQLButton.BackColor = System.Drawing.Color.Transparent;
       this.chkShowCopySQLButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.chkShowCopySQLButton.Location = new System.Drawing.Point(53, 319);
+      this.chkShowCopySQLButton.Location = new System.Drawing.Point(53, 344);
       this.chkShowCopySQLButton.Name = "chkShowCopySQLButton";
       this.chkShowCopySQLButton.Size = new System.Drawing.Size(152, 19);
-      this.chkShowCopySQLButton.TabIndex = 12;
+      this.chkShowCopySQLButton.TabIndex = 13;
       this.chkShowCopySQLButton.Text = "Show Copy SQL Button";
       this.chkShowCopySQLButton.UseVisualStyleBackColor = false;
       this.chkShowCopySQLButton.Visible = false;
@@ -139,7 +141,6 @@ namespace MySQL.ForExcel
       this.lblOtherOptions.Size = new System.Drawing.Size(91, 17);
       this.lblOtherOptions.TabIndex = 11;
       this.lblOtherOptions.Text = "Other Options";
-      this.lblOtherOptions.Visible = false;
       // 
       // chkUseFormattedValues
       // 
@@ -280,11 +281,23 @@ namespace MySQL.ForExcel
             0,
             0});
       // 
+      // chkRemoveEmptyColumns
+      // 
+      this.chkRemoveEmptyColumns.AutoSize = true;
+      this.chkRemoveEmptyColumns.BackColor = System.Drawing.Color.Transparent;
+      this.chkRemoveEmptyColumns.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.chkRemoveEmptyColumns.Location = new System.Drawing.Point(53, 319);
+      this.chkRemoveEmptyColumns.Name = "chkRemoveEmptyColumns";
+      this.chkRemoveEmptyColumns.Size = new System.Drawing.Size(445, 19);
+      this.chkRemoveEmptyColumns.TabIndex = 12;
+      this.chkRemoveEmptyColumns.Text = "Remove columns that contain no data, otherwise just flag them as \"Excluded\"";
+      this.chkRemoveEmptyColumns.UseVisualStyleBackColor = false;
+      // 
       // ExportAdvancedOptionsDialog
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.btnCancel;
-      this.ClientSize = new System.Drawing.Size(544, 337);
+      this.ClientSize = new System.Drawing.Size(544, 399);
       this.CommandAreaHeight = 45;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
       this.Name = "ExportAdvancedOptionsDialog";
@@ -314,5 +327,6 @@ namespace MySQL.ForExcel
     private System.Windows.Forms.NumericUpDown numPreviewRowsQuantity;
     private System.Windows.Forms.Label lblPreviewRowsQuantity2;
     private System.Windows.Forms.Label lblPreviewRowsQuantity1;
+    private System.Windows.Forms.CheckBox chkRemoveEmptyColumns;
   }
 }

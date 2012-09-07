@@ -476,6 +476,13 @@ namespace MySQL.ForExcel
       DialogResult dr = DialogResult.Cancel;
       Excel.Range exportRange = excelApplication.Selection as Excel.Range;
 
+      if (exportRange.Areas.Count > 1)
+      {
+        WarningDialog warningDiag = new WarningDialog(WarningDialog.WarningButtons.OK, Resources.MultipleAreasNotSupportedWarningTitle, Resources.MultipleAreasNotSupportedWarningDetail);
+        warningDiag.ShowDialog();
+        return false;
+      }
+
       if (toTableObject != null)
       {
         this.Cursor = Cursors.WaitCursor;

@@ -56,7 +56,6 @@ namespace MySQL.ForExcel
       Text = String.Format("Export Data - {0} [{1}])", exportingWorksheetName, exportDataRange.Address.Replace("$", String.Empty));
 
       LoadPreviewData(wbConnection.Schema, proposedTableName);
-      RecreateColumns();
       initializeDataTypeCombo();
 
       if (!String.IsNullOrEmpty(proposedTableName))
@@ -73,13 +72,13 @@ namespace MySQL.ForExcel
       if (radUseExistingColumn.Checked)
         selectedItem = (string)cmbPrimaryKeyColumns.SelectedItem;
       cmbPrimaryKeyColumns.BeginUpdate();
-      cmbPrimaryKeyColumns.Text = string.Empty;
+      //cmbPrimaryKeyColumns.Text = string.Empty;
       cmbPrimaryKeyColumns.Items.Clear();
       if (selectedItem == "<Multiple Items>")
         cmbPrimaryKeyColumns.Items.Add("<Multiple Items>");
-      foreach (MySQLDataColumn mysqlCol in previewDataTable.Columns.OfType<MySQLDataColumn>().Skip(1))
+      foreach (MySQLDataColumn mysqlCol in previewDataTable.Columns)
       {
-        if (mysqlCol.ExcludeColumn)
+        if (mysqlCol.Ordinal == 0 || mysqlCol.ExcludeColumn)
           continue;
         cmbPrimaryKeyColumns.Items.Add(mysqlCol.DisplayName);
       }
@@ -91,7 +90,7 @@ namespace MySQL.ForExcel
     {
       if (this.exportDataRange == null)
         return;
-      previewDataTable = new MySQLDataTable(schemaName, proposedTableName, true, Settings.Default.ExportUseFormattedValues);
+      previewDataTable = new MySQLDataTable(schemaName, proposedTableName, true, Settings.Default.ExportUseFormattedValues, Settings.Default.ExportRemoveEmptyColumns);
       int previewRowsQty = Math.Min(this.exportDataRange.Rows.Count, Settings.Default.ExportLimitPreviewRowsQuantity);
       Excel.Range previewRange = this.exportDataRange.get_Resize(previewRowsQty, this.exportDataRange.Columns.Count);
       previewDataTable.SetData(previewRange,
@@ -105,34 +104,52 @@ namespace MySQL.ForExcel
       columnBindingSource.DataSource = previewDataTable.Columns;
     }
 
-    private void UpdateColumnWarning(int columnIndex, bool showWarning, string warningResourceText)
+    private void UpdateColumnWarning(MySQLDataColumn mysqlCol, bool showWarning, string warningResourceText)
     {
-      if (columnIndex < 0 || columnIndex >= previewDataTable.Columns.Count)
-        return;
-      MySQLDataColumn mysqlCol = previewDataTable.GetColumnAtIndex(columnIndex);
+      int columnIndex = mysqlCol.Ordinal;
       DataGridViewColumn gridCol = grdPreviewData.Columns[columnIndex];
       string currentWarningText = (showWarning ? warningResourceText : null);
       if (!showWarning)
       {
-        mysqlCol.WarningTextList.Remove(warningResourceText);
-        if (mysqlCol.WarningTextList.Count > 0)
+        // We do not want to show a warning or we want to remove a warning if warningResourceText != null
+        if (!String.IsNullOrEmpty(warningResourceText))
         {
-          showWarning = true;
-          currentWarningText = mysqlCol.WarningTextList.Last();
+          // Remove the warning and check if there is an stored warning, if so we want to pull it and show it
+          mysqlCol.WarningTextList.Remove(warningResourceText);
+          if (mysqlCol.WarningTextList.Count > 0)
+          {
+            showWarning = true;
+            currentWarningText = mysqlCol.WarningTextList.Last();
+          }
         }
       }
       else
-        if (!mysqlCol.WarningTextList.Contains(warningResourceText))
+      {
+        // We want to show a warning, the last one stored if any, if not nothing will be shown
+        if (String.IsNullOrEmpty(warningResourceText))
+        {
+          currentWarningText = (mysqlCol.WarningTextList.Count > 0 ? mysqlCol.WarningTextList.Last() : null);
+          showWarning = !String.IsNullOrEmpty(currentWarningText);
+        }
+        else if (!mysqlCol.WarningTextList.Contains(warningResourceText))
           mysqlCol.WarningTextList.Add(warningResourceText);
+      }
+      showWarning = showWarning && !chkExcludeColumn.Checked;
+      currentWarningText = (showWarning ? currentWarningText : null);
       showValidationWarning("ColumnOptionsWarning", showWarning, currentWarningText);
-      gridCol.DefaultCellStyle.BackColor = (showWarning ? Color.OrangeRed : grdPreviewData.DefaultCellStyle.BackColor);
+      gridCol.DefaultCellStyle.BackColor = (mysqlCol.ExcludeColumn ? Color.LightGray : (showWarning ? Color.OrangeRed : grdPreviewData.DefaultCellStyle.BackColor));
     }
 
-    private void RefreshColumnDataTypeWarning(int columnIndex)
+    private void RefreshColumnDataTypeWarning(MySQLDataColumn mysqlCol)
     {
-      MySQLDataColumn mysqlCol = previewDataTable.GetColumnAtIndex(columnIndex);
       bool showWarning = mysqlCol.MySQLDataType.Length == 0;
-      UpdateColumnWarning(columnIndex, showWarning, Resources.ColumnDataTypeNotSetWarning);
+      UpdateColumnWarning(mysqlCol, showWarning, Resources.ColumnDataTypeRequiredWarning);
+    }
+
+    private void RefreshColumnNameWarning(MySQLDataColumn mysqlCol)
+    {
+      bool showWarning = mysqlCol.DisplayName.Length == 0;
+      UpdateColumnWarning(mysqlCol, showWarning, Resources.ColumnNameRequiredWarning);
     }
 
     private void RecreateColumns()
@@ -145,7 +162,10 @@ namespace MySQL.ForExcel
         grdPreviewData.Columns[colIdx].SortMode = DataGridViewColumnSortMode.NotSortable;
 
         // Check if current DataType is empty, and if so add a warning for column
-        RefreshColumnDataTypeWarning(colIdx);
+        RefreshColumnDataTypeWarning(mysqlCol);
+
+        // Check if Name is empty, and if so add a warning for column
+        RefreshColumnNameWarning(mysqlCol);
       }
       grdPreviewData.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
       refreshPrimaryKeyColumnsCombo();
@@ -197,6 +217,7 @@ namespace MySQL.ForExcel
 
     private void showValidationWarning(string warningControlSuffix, bool show, string text)
     {
+      show = show && !String.IsNullOrEmpty(text);
       string picBoxName = String.Format("pic{0}", warningControlSuffix);
       string lblName = String.Format("lbl{0}", warningControlSuffix);
 
@@ -238,7 +259,7 @@ namespace MySQL.ForExcel
     private bool testColumnDataTypeAgainstColumnData(MySQLDataColumn currentCol)
     {
       bool showWarning = cmbDatatype.Text.Length > 0 && !currentCol.CanBeOfMySQLDataType(cmbDatatype.Text);
-      UpdateColumnWarning(currentCol.Ordinal, showWarning, Resources.ExportDataTypeNotSuitableWarning);
+      UpdateColumnWarning(currentCol, showWarning, Resources.ExportDataTypeNotSuitableWarning);
       return !showWarning;
     }
 
@@ -274,7 +295,7 @@ namespace MySQL.ForExcel
         isValid = true;
 
       bool showWarning = !isValid;
-      UpdateColumnWarning(currentCol.Ordinal, showWarning, Resources.ExportDataTypeNotValidWarning);
+      UpdateColumnWarning(currentCol, showWarning, Resources.ExportDataTypeNotValidWarning);
 
       return isValid;
     }
@@ -432,6 +453,7 @@ namespace MySQL.ForExcel
 
       if (string.IsNullOrWhiteSpace(txtTableNameInput.Text))
       {
+        showValidationWarning("TableNameWarning", true, Properties.Resources.TableNameRequiredWarning);
         isTableNameValid = false;
         btnExport.Enabled = false;
         return;
@@ -520,8 +542,7 @@ namespace MySQL.ForExcel
       {
         columnBindingSource.Position = grdPreviewData.SelectedColumns[0].Index;
         MySQLDataColumn column = columnBindingSource.Current as MySQLDataColumn;
-        string warningText = (column.WarningTextList.Count > 0 ? column.WarningTextList.Last() : null);
-        showValidationWarning("ColumnOptionsWarning", !String.IsNullOrEmpty(warningText), warningText);
+        UpdateColumnWarning(column, true, null);
       }
       grpColumnOptions.Enabled = grdPreviewData.SelectedColumns.Count > 0;
       EnableChecks(null);
@@ -537,6 +558,7 @@ namespace MySQL.ForExcel
       if (multiColumnPK && cmbPrimaryKeyColumns.SelectedIndex == 0)
         return;
       multiColumnPK = false;
+      // If <Multiple Items> was previously selected we need to remove it since we are selecting a single column now as a primary key
       if (cmbPrimaryKeyColumns.Items[0].ToString() == "<Multiple Items>")
       {
         cmbPrimaryKeyColumns.BeginUpdate();
@@ -546,16 +568,21 @@ namespace MySQL.ForExcel
           cmbPrimaryKeyColumns.SelectedIndex = 0;
         cmbPrimaryKeyColumns.EndUpdate();
       }
+      // Now we need to adjust the index of the actual column we want to set the PrimaryKey flag for
+      int comboColumnIndex = 0;
       for (int coldIdx = 1; coldIdx < previewDataTable.Columns.Count; coldIdx++)
       {
         MySQLDataColumn col = previewDataTable.GetColumnAtIndex(coldIdx);
-        col.PrimaryKey = (col.DisplayName == cmbPrimaryKeyColumns.Text);
+        if (col.ExcludeColumn)
+          continue;
+        col.PrimaryKey = (comboColumnIndex == cmbPrimaryKeyColumns.SelectedIndex);
         if (col.PrimaryKey)
         {
           col.CreateIndex = col.UniqueKey = col.AllowNull = col.ExcludeColumn = false;
           grdPreviewData.Columns[col.ColumnName].Selected = true;
           grdPreviewData.FirstDisplayedScrollingColumnIndex = grdPreviewData.Columns[col.ColumnName].Index;
         }
+        comboColumnIndex++;
       }
     }
 
@@ -564,19 +591,39 @@ namespace MySQL.ForExcel
       if (txtColumnName.Text == (columnBindingSource.Current as MySQLDataColumn).DisplayName)
         return;
       isChanging = true;
-      string name = previewDataTable.GetNonDuplicateColumnName(txtColumnName.Text);
-      int index = grdPreviewData.SelectedColumns[0].Index;
-      grdPreviewData.Columns[index].HeaderText = name;
+      string name = txtColumnName.Text;
+      bool colNameEmpty = name.Length == 0;
+
+      int columnIndex = grdPreviewData.SelectedColumns[0].Index;
+      if (!colNameEmpty)
+      {
+        name = previewDataTable.GetNonDuplicateColumnName(name);
+        if (txtColumnName.Text != name)
+          txtColumnName.Text = name;
+      }
       MySQLDataColumn column = columnBindingSource.Current as MySQLDataColumn;
       column.DisplayName = name;
-      if (txtColumnName.Text != name)
-        txtColumnName.Text = name;
+      grdPreviewData.Columns[columnIndex].HeaderText = name;
+      UpdateColumnWarning(column, colNameEmpty, Resources.ColumnNameRequiredWarning);
 
-      if (index > 0)
+      if (cmbPrimaryKeyColumns.Items.Count > 0)
       {
-        cmbPrimaryKeyColumns.BeginUpdate();
-        cmbPrimaryKeyColumns.Items[index - 1] = txtColumnName.Text;
-        cmbPrimaryKeyColumns.EndUpdate();
+        // Update the columnIndex for the cmbPrimaryKeyColumns combo box since it does not include Excluded columns
+        int comboColumnIndex = -1;
+        for (int i = 1; i < previewDataTable.Columns.Count; i++)
+        {
+          column = previewDataTable.GetColumnAtIndex(i);
+          if (!column.ExcludeColumn)
+            comboColumnIndex++;
+          if (i == columnIndex)
+            break;
+        }
+        if (comboColumnIndex >= 0)
+        {
+          cmbPrimaryKeyColumns.BeginUpdate();
+          cmbPrimaryKeyColumns.Items[comboColumnIndex] = name;
+          cmbPrimaryKeyColumns.EndUpdate();
+        }
       }
       isChanging = false;
     }
@@ -598,7 +645,7 @@ namespace MySQL.ForExcel
       {
         good = false;
       }
-      UpdateColumnWarning(gridCol.Index, !good, Resources.ColumnDataNotUniqueWarning);
+      UpdateColumnWarning(column, !good, Resources.ColumnDataNotUniqueWarning);
       EnableChecks(chkUniqueIndex);
     }
 
@@ -606,9 +653,10 @@ namespace MySQL.ForExcel
     {
       if (chkExcludeColumn.Checked == (columnBindingSource.Current as MySQLDataColumn).ExcludeColumn)
         return;
-      (columnBindingSource.Current as MySQLDataColumn).ExcludeColumn = chkExcludeColumn.Checked;
+      MySQLDataColumn column = (columnBindingSource.Current as MySQLDataColumn);
+      column.ExcludeColumn = chkExcludeColumn.Checked;
       DataGridViewColumn gridCol = grdPreviewData.SelectedColumns[0];
-      gridCol.DefaultCellStyle.BackColor = chkExcludeColumn.Checked ? Color.LightGray : grdPreviewData.DefaultCellStyle.BackColor;
+      UpdateColumnWarning(column, !column.ExcludeColumn, null);
       int grdIndex = grdPreviewData.SelectedColumns[0].Index;
       EnableChecks(chkExcludeColumn);
       refreshPrimaryKeyColumnsCombo();
@@ -724,7 +772,7 @@ namespace MySQL.ForExcel
       if (cmbDatatype.Text == currentCol.MySQLDataType || cmbDatatype.Text.Length == 0 || (cmbDatatype.DataSource as DataTable).Select(String.Format("Value = '{0}'", cmbDatatype.Text)).Length == 0)
         return;
       currentCol.MySQLDataType = cmbDatatype.Text;
-      RefreshColumnDataTypeWarning(currentCol.Ordinal);
+      RefreshColumnDataTypeWarning(currentCol);
       testColumnDataTypeAgainstColumnData(currentCol);
       if (Settings.Default.ExportAutoIndexIntColumns && cmbDatatype.Text.StartsWith("Integer") && !chkCreateIndex.Checked)
         chkCreateIndex.Checked = true;
@@ -765,7 +813,7 @@ namespace MySQL.ForExcel
         currentCol.RowsFrom1stDataType = currentCol.MySQLDataType;
         currentCol.RowsFrom2ndDataType = currentCol.MySQLDataType;
       }
-      RefreshColumnDataTypeWarning(currentCol.Ordinal);
+      RefreshColumnDataTypeWarning(currentCol);
     }
 
     private void EnableChecks(CheckBox control)

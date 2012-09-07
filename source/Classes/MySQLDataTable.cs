@@ -98,11 +98,11 @@ namespace MySQL.ForExcel
     }
 
     // Constructor used for Export Data
-    public MySQLDataTable(string schemaName, string proposedTableName, bool addPrimaryKeyCol, bool useFormattedValues)
+    public MySQLDataTable(string schemaName, string proposedTableName, bool addPrimaryKeyCol, bool useFormattedValues, bool removeEmptyColumns)
       : this(schemaName, proposedTableName)
     {
       AddPrimaryKeyColumn = addPrimaryKeyCol;
-      RemoveEmptyColumns = true;
+      RemoveEmptyColumns = removeEmptyColumns;
       IsFormatted = useFormattedValues;
     }
 
@@ -419,9 +419,8 @@ namespace MySQL.ForExcel
 
     public MySQLDataTable CloneSchema()
     {
-      MySQLDataTable clonedTable = new MySQLDataTable(this.SchemaName, this.TableName, this.AddPrimaryKeyColumn, this.IsFormatted);
+      MySQLDataTable clonedTable = new MySQLDataTable(this.SchemaName, this.TableName, this.AddPrimaryKeyColumn, this.IsFormatted, this.RemoveEmptyColumns);
       clonedTable.UseFirstColumnAsPK = UseFirstColumnAsPK;
-      clonedTable.RemoveEmptyColumns = RemoveEmptyColumns;
       clonedTable.IsFormatted = IsFormatted;
       clonedTable.FirstRowIsHeaders = FirstRowIsHeaders;
 

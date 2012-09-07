@@ -190,5 +190,18 @@ namespace MySQL.ForExcel.Properties {
                 this["AppendLimitPreviewRowsQuantity"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.MySQLForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ExportRemoveEmptyColumns {
+            get {
+                return ((bool)(this["ExportRemoveEmptyColumns"]));
+            }
+            set {
+                this["ExportRemoveEmptyColumns"] = value;
+            }
+        }
     }
 }

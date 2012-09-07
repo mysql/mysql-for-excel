@@ -40,6 +40,7 @@ namespace MySQL.ForExcel
       chkAutoIndexIntColumns.Checked = Properties.Settings.Default.ExportAutoIndexIntColumns;
       chkAutoAllowEmptyNonIndexColumns.Checked = Properties.Settings.Default.ExportAutoAllowEmptyNonIndexColumns;
       chkUseFormattedValues.Checked = Properties.Settings.Default.ExportUseFormattedValues;
+      chkRemoveEmptyColumns.Checked = Properties.Settings.Default.ExportRemoveEmptyColumns;
       //chkShowCopySQLButton.Checked = Properties.Settings.Default.ExportShowCopySQLButton;
 
       chkAddBufferToVarchar.Enabled = chkDetectDatatype.Checked;
@@ -53,6 +54,7 @@ namespace MySQL.ForExcel
       Properties.Settings.Default.ExportAutoIndexIntColumns = chkAutoIndexIntColumns.Checked;
       Properties.Settings.Default.ExportAutoAllowEmptyNonIndexColumns = chkAutoAllowEmptyNonIndexColumns.Checked;
       Properties.Settings.Default.ExportUseFormattedValues = chkUseFormattedValues.Checked;
+      Properties.Settings.Default.ExportRemoveEmptyColumns = chkRemoveEmptyColumns.Checked;
       //Properties.Settings.Default.ExportShowCopySQLButton = chkShowCopySQLButton.Checked;
       MiscUtilities.SaveSettings();
       DialogResult = DialogResult.OK;
