@@ -120,6 +120,7 @@ namespace MySQL.ForExcel
 
     private void ChangeHeight()
     {
+      btnShowDetails.Text = (ExpandedState ? "Hide Details" : "Show Details");
       txtDetails.Visible = ExpandedState;
       Size = MinimumSize = new Size(MIN_WIDTH, (ExpandedState ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT));
       MaximumSize = (ExpandedState ? new Size(0, 0) : MinimumSize);

@@ -1,3 +1,5 @@
+- Added code to the InfoDialog class to set the button text to "Show Details" or "Hide Details" depending on the status of the Details text container.
+  (Internal bug 64 - InfoDialog Show Details button should change to Hide Details when details are shown).
 - Updated code that prepares a Date value for insertion into the DataTable to consider more scenarios, also updated the code that prepares Date values into string
   representation to build the SQL queries. (Internal bug 128 - Edit Data generates error when updating a Date cell in Excel).
 - Fixed a GUID in the main wix configuration file so now previous versions are uninstalled during a new installation.
