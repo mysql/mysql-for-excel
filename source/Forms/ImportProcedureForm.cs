@@ -295,6 +295,7 @@ namespace MySQL.ForExcel
         }
 
         // Refresh ResultSets in Tab Control
+        grdResultSet.DataSource = null;
         tabResultSets.TabPages.Clear();
         for (int dtIdx = 0; dtIdx < ImportDataSet.Tables.Count; dtIdx++)
         {
