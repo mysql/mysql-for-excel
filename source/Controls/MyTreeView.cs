@@ -328,7 +328,8 @@ namespace MySQL.ForExcel
     {
       if (UpdateTruncatedTitle)
       {
-        _truncatedTitle = MiscUtilities.TruncateString(Title, maxWidth, graphics, font);
+        if (maxWidth > 0)
+          _truncatedTitle = MiscUtilities.TruncateString(Title, maxWidth, graphics, font);
         UpdateTruncatedTitle = false;
       }
       return _truncatedTitle;
@@ -338,7 +339,8 @@ namespace MySQL.ForExcel
     {
       if (UpdateTruncatedSubtitle)
       {
-        _truncatedSubtitle = MiscUtilities.TruncateString(Subtitle, maxWidth, graphics, font);
+        if (maxWidth > 0)
+          _truncatedSubtitle = MiscUtilities.TruncateString(Subtitle, maxWidth, graphics, font);
         UpdateTruncatedSubtitle = false;
       }
       return _truncatedSubtitle;

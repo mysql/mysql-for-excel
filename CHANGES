@@ -60,4 +60,5 @@
   This way we are consistent on how operations are performed by the Export Data and Append Data operations and ensure the query appearing on the General Query Log
   and the one we display to the users are identical. (Oracle bug 14355970 - CONFIRMATION DETAILS LIE ABOUT SQL ISSUED).
 - Fixed Edit showing exception for unsigned small int is too large for the column. Changes in MySQLDataColumn Class that wasn't assigning the unsigned attribute in constructor.
+- Commit for Oraclebug #14521405 Unhandled exception is thrown when loading MySQL for Excel.
   
