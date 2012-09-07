@@ -6,7 +6,7 @@
            UpgradeCode="30162E4E-2EED-48D1-BBC0-8D4A517DB004">
     <Package Id="*" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" InstallPrivileges="elevated"/>
 
-    <Upgrade Id="3106FB9F-1793-4A0D-BEBB-742952D69CDB">
+    <Upgrade Id="30162E4E-2EED-48D1-BBC0-8D4A517DB004">
       <UpgradeVersion OnlyDetect="yes" Minimum="$(var.Version)" Property="NEWERVERSIONDETECTED" IncludeMinimum="no" />
       <UpgradeVersion OnlyDetect="no" Maximum="$(var.Version)" Property="OLDERVERSIONBEINGUPGRADED" IncludeMaximum="yes" />
     </Upgrade>    

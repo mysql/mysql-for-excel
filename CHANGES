@@ -1,3 +1,5 @@
+- Fixed a GUID in the main wix configuration file so now previous versions are uninstalled during a new installation.
+  (Internal bug 115 - MySQL for Excel installer is not validating the legacy builds installed).
 - Added an option to the Export Data's Advanced Options dialog to remove columns with no data, by default the Export Dialog will only flag those columns as Excluded.
   Added code to display a warning and paint a column red if the column name is not set, display a warning if the table name is not set, and stack warnings but not
   display them if a column is Excluded, warnings are displayed normally for columns if they are not Excluded anymore.  Added code to prevent the Append and Export of
