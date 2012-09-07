@@ -1,3 +1,4 @@
+- Added code to re-pull connections after connections are migrated from Excel to Workbench. (Internal bug 59 - Connections list not refreshed after import).
 - Fixed code so when the Automatic Mapping is performed any subsequent change on a mapping resets the mapping to a Manual Mapping.
   (Internal bug 114 - Append dialog does not update Mapping type combo when a Manual mapping is done).
 - Added code to the InfoDialog class to set the button text to "Show Details" or "Hide Details" depending on the status of the Details text container.

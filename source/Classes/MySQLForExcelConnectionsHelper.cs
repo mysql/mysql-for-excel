@@ -318,6 +318,9 @@ namespace MySQL.ForExcel
       infoDlg = new InfoDialog(saveException == null, infoTitle, infoDetail.ToString());
       infoDlg.WordWrapDetails = true;
       infoDlg.ShowDialog();
+
+      // Load Connections Again so they are ready for use in Excel
+      MySqlWorkbench.LoadData();
     }
 
     private struct MySQLStartupParameters
