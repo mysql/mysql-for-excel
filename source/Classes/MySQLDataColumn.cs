@@ -29,7 +29,6 @@ namespace MySQL.ForExcel
   public class MySQLDataColumn : DataColumn
   {
     private bool uniqueKey;
-    private string displayName;
     private List<string> warningTextList = new List<string>(3);
 
     public bool AutoPK { get; set; }
@@ -240,7 +239,7 @@ namespace MySQL.ForExcel
     {
       MySQLDataColumn clonedColumn = new MySQLDataColumn();
       clonedColumn.ColumnName = this.ColumnName;
-      clonedColumn.DisplayName = this.displayName;
+      clonedColumn.DisplayName = this.DisplayName;
       clonedColumn.DataType = this.DataType;
       clonedColumn.MySQLDataType = MySQLDataType;
       clonedColumn.AutoPK = AutoPK;
@@ -274,11 +273,11 @@ namespace MySQL.ForExcel
 
     public string GetSQL()
     {
-      if (String.IsNullOrEmpty(displayName))
+      if (String.IsNullOrEmpty(DisplayName))
         return null;
 
       StringBuilder colDefinition = new StringBuilder();
-      colDefinition.AppendFormat("`{0}` {1}", displayName.Replace("`", "``"), MySQLDataType);
+      colDefinition.AppendFormat("`{0}` {1}", DisplayName.Replace("`", "``"), MySQLDataType);
       if (AutoPK || (PrimaryKey && (Table as MySQLDataTable).NumberOfPK == 1))
       {
         if (AutoIncrement)
