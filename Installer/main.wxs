@@ -9,8 +9,13 @@
     <Upgrade Id="30162E4E-2EED-48D1-BBC0-8D4A517DB004">
       <UpgradeVersion OnlyDetect="yes" Minimum="$(var.Version)" Property="NEWERVERSIONDETECTED" IncludeMinimum="no" />
       <UpgradeVersion OnlyDetect="no" Maximum="$(var.Version)" Property="OLDERVERSIONBEINGUPGRADED" IncludeMaximum="yes" />
-    </Upgrade>    
-    
+    </Upgrade>
+
+    <!-- Do not install if a newer version is already installed. -->
+    <Condition Message="A later version of [ProductName] is already installed. Setup will now exit.">
+      NOT NEWERVERSIONDETECTED OR Installed
+    </Condition>
+
     <Property Id="ARPURLINFOABOUT" Value="http://www.mysql.com" />
     <Property Id="ARPURLUPDATEINFO" Value="http://dev.mysql.com"/>
     <Property Id="ARPPRODUCTICON" Value="MySQL.ForExcel.ico" />
