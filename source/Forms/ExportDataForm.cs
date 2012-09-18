@@ -305,7 +305,7 @@ namespace MySQL.ForExcel
       StringBuilder queryString = new StringBuilder();
       queryString.Append(exportDataTable.GetCreateSQL(true));
       queryString.AppendFormat(";{0}", Environment.NewLine);
-      queryString.Append(exportDataTable.GetInsertSQL(100, true, false));
+      queryString.Append(exportDataTable.GetInsertSQL(100, true));
       Clipboard.SetText(queryString.ToString());
     }
 
@@ -374,7 +374,10 @@ namespace MySQL.ForExcel
       if (success && tableContainsDataToExport)
       {
         int insertedCount = 0;
-        warningsTable = exportDataTable.InsertDataWithManualQuery(wbConnection, false, out exception, out queryString, out insertedCount);
+        int insertingCount = 0;
+        int warningsCount = 0;
+        warningsTable = exportDataTable.InsertDataWithManualQuery(wbConnection, out exception, out queryString, out insertingCount, out insertedCount);
+        warningsCount = (warningsTable != null ? warningsTable.Rows.Count : 0) + (insertingCount > insertedCount ? 1 : 0);
         operationDetails.AppendFormat("{1}{1}Inserting Excel data in MySQL Table \"{0}\" with query...{1}{1}{2}{1}{1}",
                                     exportDataTable.TableName,
                                     Environment.NewLine,
@@ -384,16 +387,26 @@ namespace MySQL.ForExcel
         {
           operationDetails.AppendFormat("{0} rows have been inserted", insertedCount);
           operationSummary += "with data.";
-          if (warningsTable != null && warningsTable.Rows.Count > 0)
+          if (warningsCount > 0)
           {
             warningsFound = true;
-            operationDetails.AppendFormat(" with {0} warnings:", warningsTable.Rows.Count);
-            foreach (DataRow warningRow in warningsTable.Rows)
+            operationDetails.AppendFormat(" with {0} warnings:", warningsCount);
+            if (insertingCount > insertedCount)
             {
-              operationDetails.AppendFormat("{2}Code {0} - {1}",
-                                            warningRow[1].ToString(),
-                                            warningRow[2].ToString(),
+              operationDetails.AppendFormat("{2}Attempted to insert {0} rows, but only {1} rows were inserted with no further errors. Please check the MySQL Server log for more information.",
+                                            insertingCount,
+                                            insertedCount,
                                             Environment.NewLine);
+            }
+            if (warningsTable != null)
+            {
+              foreach (DataRow warningRow in warningsTable.Rows)
+              {
+                operationDetails.AppendFormat("{2}Code {0} - {1}",
+                                              warningRow[1].ToString(),
+                                              warningRow[2].ToString(),
+                                              Environment.NewLine);
+              }
             }
             operationDetails.Append(Environment.NewLine);
           }

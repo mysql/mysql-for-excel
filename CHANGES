@@ -1,3 +1,6 @@
+- Changed Edit Data code so one single transaction is done for all operations (DELETEs, INSERTs, UPDATEs), and to give a warning message whenever the number of rows
+  to be affected during an edit differs the number of actually affected rows (for example when rows are no longer found in the server).
+  (Internal bug 139 - Edit Data states an UPDATE transaction completed successfully when there are unchanged rows).
 - Added code to the main wix configuration file to check if a newer version is already installad and if so abort the installtion.
   (Internal bug 135 - Installer does not check if a newer version is already installed to abort installation).
 - Fixed code to refresh the Import Procedure Form's preview grid's data source to repaint its contents every time the Call button is pressed.

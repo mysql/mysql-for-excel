@@ -40,13 +40,6 @@ namespace MySQL.ForExcel
           EditingWorksheet.Change -= new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
           EditingWorksheet.SelectionChange -= new Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);
         }
-        if (dataAdapter != null)
-          dataAdapter.Dispose();
-        if (connection != null)
-        {
-          connection.Close();
-          connection.Dispose();
-        }
         if (components != null)
         components.Dispose();
       }

@@ -371,6 +371,42 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error modifying cell&apos;s value..
+        /// </summary>
+        internal static string EditDataCellModificationError {
+            get {
+                return ResourceManager.GetString("EditDataCellModificationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deleted {0}, Inserted {1}, Updated {2} row(s)..
+        /// </summary>
+        internal static string EditDataCommittedText {
+            get {
+                return ResourceManager.GetString("EditDataCommittedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following {0} warning(s) were generated:.
+        /// </summary>
+        internal static string EditDataCommittedWarningsFound {
+            get {
+                return ResourceManager.GetString("EditDataCommittedWarningsFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deleting {0}, Inserting {1}, Updating {2} row(s) with the following SQL statement(s):.
+        /// </summary>
+        internal static string EditDataCommittingText {
+            get {
+                return ResourceManager.GetString("EditDataCommittingText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Deletion of the last row meant for a new row insertion is prohibited and will be undone..
         /// </summary>
         internal static string EditDataDeleteLastRowNotPermittedErrorDetail {
@@ -385,6 +421,24 @@ namespace MySQL.ForExcel.Properties {
         internal static string EditDataDeleteLastRowNotPermittedErrorTitle {
             get {
                 return ResourceManager.GetString("EditDataDeleteLastRowNotPermittedErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Editing data for:{0}Schema: {1}{0}Table: {2}{0}WorkBook: {3}{0}WorkSheet: {4}.
+        /// </summary>
+        internal static string EditDataFormTooltipText {
+            get {
+                return ResourceManager.GetString("EditDataFormTooltipText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid value for column of type: {0}.
+        /// </summary>
+        internal static string EditDataInvalidValueError {
+            get {
+                return ResourceManager.GetString("EditDataInvalidValueError", resourceCulture);
             }
         }
         
@@ -405,6 +459,42 @@ namespace MySQL.ForExcel.Properties {
         internal static string EditDataOutsideEditingRangeNotPermittedErrorTitle {
             get {
                 return ResourceManager.GetString("EditDataOutsideEditingRangeNotPermittedErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to had errors on commit; changes were rolled back..
+        /// </summary>
+        internal static string EditedDataCommittedError {
+            get {
+                return ResourceManager.GetString("EditedDataCommittedError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to was committed to MySQL successfully..
+        /// </summary>
+        internal static string EditedDataCommittedSucess {
+            get {
+                return ResourceManager.GetString("EditedDataCommittedSucess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to was committed to MySQL with warnings..
+        /// </summary>
+        internal static string EditedDataCommittedWarning {
+            get {
+                return ResourceManager.GetString("EditedDataCommittedWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edited data for Table {0} .
+        /// </summary>
+        internal static string EditedDataForTable {
+            get {
+                return ResourceManager.GetString("EditedDataForTable", resourceCulture);
             }
         }
         
@@ -882,6 +972,24 @@ namespace MySQL.ForExcel.Properties {
         internal static string PrimaryKeyColumnExistsWarning {
             get {
                 return ResourceManager.GetString("PrimaryKeyColumnExistsWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Query did not match any rows in the DB, Primary Key values in the row may have changed; please refresh values from the DB..
+        /// </summary>
+        internal static string QueryDidNotMatchRowsWarning {
+            get {
+                return ResourceManager.GetString("QueryDidNotMatchRowsWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Query exceeds MAX_ALLOWED_PACKET value; please increase the value of the MAX_ALLOWED_PACKET variable in the MySQL Server configuration..
+        /// </summary>
+        internal static string QueryExceedsMaxAllowedPacketError {
+            get {
+                return ResourceManager.GetString("QueryExceedsMaxAllowedPacketError", resourceCulture);
             }
         }
         

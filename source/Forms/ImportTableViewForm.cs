@@ -111,20 +111,24 @@ namespace MySQL.ForExcel
 
     private void btnImport_Click(object sender, EventArgs e)
     {
-      List<string> importColumns = new List<string>();
+      List<string> importColumns = null;
       List<DataGridViewColumn> selectedColumns = new List<DataGridViewColumn>();
-      foreach (DataGridViewColumn selCol in grdPreviewData.SelectedColumns)
+      if (grdPreviewData.SelectedColumns.Count < grdPreviewData.Columns.Count)
       {
-        selectedColumns.Add(selCol);
-      }
-      if (selectedColumns.Count > 1)
-        selectedColumns.Sort(delegate(DataGridViewColumn c1, DataGridViewColumn c2)
+        importColumns = new List<string>(grdPreviewData.SelectedColumns.Count);
+        foreach (DataGridViewColumn selCol in grdPreviewData.SelectedColumns)
         {
-          return c1.Index.CompareTo(c2.Index);
-        });
-      foreach (DataGridViewColumn selCol in selectedColumns)
-      {
-        importColumns.Add(selCol.HeaderText);
+          selectedColumns.Add(selCol);
+        }
+        if (selectedColumns.Count > 1)
+          selectedColumns.Sort(delegate(DataGridViewColumn c1, DataGridViewColumn c2)
+          {
+            return c1.Index.CompareTo(c2.Index);
+          });
+        foreach (DataGridViewColumn selCol in selectedColumns)
+        {
+          importColumns.Add(selCol.HeaderText);
+        }
       }
       try
       {
