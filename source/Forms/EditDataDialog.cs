@@ -46,8 +46,10 @@ namespace MySQL.ForExcel
     private string queryString = String.Empty;
     private MySQLDataTable editMySQLDataTable;
     private List<RangeAndAddress> rangesAndAddressesList;
+    private int whiteOLEColor = ColorTranslator.ToOle(Color.White);
     private int commitedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#B8E5F7"));
-    private int uncommitedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#FF8282"));
+    private int uncommitedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#7CC576"));
+    private int erroredCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#FF8282"));
     private int newRowCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#FFFCC7"));
     private int lockedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#D7D7D7"));
     private long editingRowsQuantity = 0;
@@ -242,14 +244,19 @@ namespace MySQL.ForExcel
       rangesAndAddressesList.Clear();
     }
 
-    private void changeExcelCellsToCommmitedColor()
+    private void changeExcelCellsToCommmitedColor(bool commitSuccessful)
     {
       if (rangesAndAddressesList == null)
         return;
       for (int idx = 0; idx < rangesAndAddressesList.Count; idx++)
       {
         RangeAndAddress ra = rangesAndAddressesList[idx];
-        if (ra.TableRow.RowError == MySQLDataTable.NO_MATCH)
+        if (ra.TableRow.HasErrors)
+        {
+          changeExcelCellsColor(ra.Range, erroredCellsOLEColor);
+          continue;
+        }
+        if (!commitSuccessful)
           continue;
         if (ra.TableRow.RowState != DataRowState.Detached && ra.TableRow.RowState != DataRowState.Deleted)
           changeExcelCellsColor(ra.Range, commitedCellsOLEColor);
@@ -389,8 +396,7 @@ namespace MySQL.ForExcel
                                     resultsDT.InsertedOperations,
                                     resultsDT.UpdatedOperations);
 
-      if (success)
-        changeExcelCellsToCommmitedColor();
+      changeExcelCellsToCommmitedColor(success);
 
       foreach (DataRow dr in editMySQLDataTable.Rows)
       {
@@ -561,7 +567,7 @@ namespace MySQL.ForExcel
           if (addedRA != null)
             rangesAndAddressesList.Remove(addedRA);
           else if (!rangesAndAddressesList.Exists(ra => ra.Modification == RangeAndAddress.RangeModification.Deleted && ra.Address == deletedRow.Address))
-            rangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Deleted, deletedRow, deletedRow.Address, deletedRow.Row, dr));
+            rangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Deleted, deletedRow, deletedRow.Address, (int)deletedRow.Interior.Color, deletedRow.Row, dr));
         }
         for (int rangeIdx = 0; rangeIdx < rangesAndAddressesList.Count; rangeIdx++)
         {
@@ -606,7 +612,7 @@ namespace MySQL.ForExcel
                 DataRow newRow = editMySQLDataTable.NewRow();
                 editMySQLDataTable.Rows.Add(newRow);
                 if (!rangesAndAddressesList.Exists(ra => ra.Modification == RangeAndAddress.RangeModification.Added && ra.Address == insertingRowRange.Address))
-                  rangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Added, insertingRowRange, insertingRowRange.Address, insertingRowRange.Row, newRow));
+                  rangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Added, insertingRowRange, insertingRowRange.Address, (int)insertingRowRange.Interior.Color, insertingRowRange.Row, newRow));
                 insertingRowRange.Interior.Color = uncommitedCellsOLEColor;
               }
 
@@ -622,9 +628,10 @@ namespace MySQL.ForExcel
               {
                 if (DataTypeUtilities.ExcelValueEqualsDataTableValue(editMySQLDataTable.Rows[absRow][absCol, DataRowVersion.Original], insertingValue))
                 {
-                  if (rangesAndAddressesList.Exists(ra => ra.Modification == RangeAndAddress.RangeModification.Updated && ra.Address == cell.Address))
+                  var existingRA = rangesAndAddressesList.Find(ra => ra.Modification == RangeAndAddress.RangeModification.Updated && ra.Address == cell.Address);
+                  if (existingRA != null)
                   {
-                    changeExcelCellsColor(cell, 0);
+                    changeExcelCellsColor(cell, (existingRA.RangeColor == whiteOLEColor ? 0 : existingRA.RangeColor));
                     rangesAndAddressesList.RemoveAll(ra => ra.Modification == RangeAndAddress.RangeModification.Updated && ra.Address == cell.Address);
                     editMySQLDataTable.Rows[absRow][absCol] = insertingValue;
                     int changedColsQty = editMySQLDataTable.GetChangedColumns(editMySQLDataTable.Rows[absRow]).Count;
@@ -637,7 +644,7 @@ namespace MySQL.ForExcel
                 DataRow dr = editMySQLDataTable.Rows[absRow];
                 dr[absCol] = insertingValue;
                 if (!rangesAndAddressesList.Exists(ra => ra.Modification == RangeAndAddress.RangeModification.Updated && ra.Address == cell.Address))
-                  rangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Updated, cell, cell.Address, cell.Row, dr));
+                  rangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Updated, cell, cell.Address, (int)cell.Interior.Color, cell.Row, dr));
               }
               else
                 editMySQLDataTable.Rows[absRow][absCol] = insertingValue;
@@ -782,14 +789,16 @@ namespace MySQL.ForExcel
     public RangeModification Modification;
     public Excel.Range Range;
     public string Address;
+    public int RangeColor;
     public int ExcelRow;
     public DataRow TableRow;
 
-    public RangeAndAddress(RangeModification modification, Excel.Range range, string address, int excelRow, DataRow tableRow)
+    public RangeAndAddress(RangeModification modification, Excel.Range range, string address, int rangeColor, int excelRow, DataRow tableRow)
     {
       Modification = modification;
       Range = range;
       Address = address;
+      RangeColor = rangeColor;
       ExcelRow = excelRow;
       TableRow = tableRow;
     }

@@ -1090,6 +1090,7 @@ namespace MySQL.ForExcel
       StringBuilder warningText = new StringBuilder();
       int executedCount = 0;
       int operationIndex = 0;
+      DataRow lastRow = null;
 
       using (MySqlConnection conn = new MySqlConnection(connectionString))
       {
@@ -1110,7 +1111,8 @@ namespace MySQL.ForExcel
               executedCount = 0;
               warningText.Clear();
               operationIndex++;
-              queryText = GetSQL(dr); 
+              lastRow = dr;
+              queryText = GetSQL(dr);
               cmd.CommandText = queryText;
               executedCount = cmd.ExecuteNonQuery();
               warningsDS = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");
@@ -1158,6 +1160,8 @@ namespace MySQL.ForExcel
         {
           if (transaction != null)
             transaction.Rollback();
+          if (lastRow != null)
+            lastRow.RowError = mysqlEx.Message;
           errorText = String.Format("MySQL Error {0}:{1}{2}", mysqlEx.Number, Environment.NewLine, mysqlEx.Message);
           resultsDT.AddResult(operationIndex, currentOperationType, PushResultsDataTable.OperationResult.Error, queryText, errorText, 0);
           MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLDataTable.DeleteDataWithManualQuery - " + (mysqlEx.Message + " " + mysqlEx.InnerException), 1);
@@ -1166,6 +1170,8 @@ namespace MySQL.ForExcel
         {
           if (transaction != null)
             transaction.Rollback();
+          if (lastRow != null)
+            lastRow.RowError = ex.Message;
           errorText = String.Format("ADO.NET Error:{0}{1}", Environment.NewLine, ex.Message);
           resultsDT.AddResult(operationIndex, currentOperationType, PushResultsDataTable.OperationResult.Error, queryText, errorText, 0);
           MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLDataTable.DeleteDataWithManualQuery - " + (ex.Message + " " + ex.InnerException), 1);

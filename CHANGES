@@ -1,3 +1,6 @@
+- Changed Excel Cells coloring to behave as follows: Before commit all changed cells have a BLUE (7CC576) color, after commit succesfully commited cells have a GREEN
+  (B8E5F7) color, cells that produced errors and not committed have a RED (FF8282) color. The cells with yellowish (FFFCC7) color are still meant for a new row
+  insertion. (Internal bug 155 - Edit Data - Modified cells have a red color which looks like an error).
 - Changed Edit Data code so one single transaction is done for all operations (DELETEs, INSERTs, UPDATEs), and to give a warning message whenever the number of rows
   to be affected during an edit differs the number of actually affected rows (for example when rows are no longer found in the server).
   (Internal bug 139 - Edit Data states an UPDATE transaction completed successfully when there are unchanged rows).
