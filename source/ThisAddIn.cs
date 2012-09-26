@@ -26,6 +26,7 @@ using Office = Microsoft.Office.Core;
 using Microsoft.Office.Tools.Excel;
 using System.Windows.Forms;
 using System.IO;
+using System.Diagnostics;
 
 namespace MySQL.ForExcel
 {
@@ -42,21 +43,31 @@ namespace MySQL.ForExcel
 
     private void ThisAddIn_Startup(object sender, System.EventArgs e)
     {
-      // make sure our settings dir exists
-      string dir = String.Format(@"{0}\Oracle\MySQL for Excel", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
-      Directory.CreateDirectory(dir);
+      try
+      {
+        // Log the Add-In's Startup
+        MiscUtilities.WriteToLog(Properties.Resources.StartupMessage, SourceLevels.Information);
 
-      // This method is used to migrate all connections created with 1.0.6 (in a local connections file) to the Workbench connections file.
-      MySQLForExcelConnectionsHelper.MigrateConnectionsFromMySQLForExcelToWorkbench();
+        // make sure our settings dir exists
+        string dir = String.Format(@"{0}\Oracle\MySQL for Excel", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+        Directory.CreateDirectory(dir);
 
-      taskPaneControl = new TaskPaneControl(Application);
-      taskPaneControl.Dock = DockStyle.Fill;
-      taskPaneControl.SizeChanged += new EventHandler(taskPaneControl_SizeChanged);
-      taskPaneValue = CustomTaskPanes.Add(taskPaneControl, "MySQL for Excel");
-      taskPaneValue.VisibleChanged += taskPaneValue_VisibleChanged;
-      taskPaneValue.DockPosition = Office.MsoCTPDockPosition.msoCTPDockPositionRight;
-      taskPaneValue.DockPositionRestrict = Office.MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoHorizontal;
-      taskPaneValue.Width = paneWidth;
+        // This method is used to migrate all connections created with 1.0.6 (in a local connections file) to the Workbench connections file.
+        MySQLForExcelConnectionsHelper.MigrateConnectionsFromMySQLForExcelToWorkbench();
+
+        taskPaneControl = new TaskPaneControl(Application);
+        taskPaneControl.Dock = DockStyle.Fill;
+        taskPaneControl.SizeChanged += new EventHandler(taskPaneControl_SizeChanged);
+        taskPaneValue = CustomTaskPanes.Add(taskPaneControl, "MySQL for Excel");
+        taskPaneValue.VisibleChanged += taskPaneValue_VisibleChanged;
+        taskPaneValue.DockPosition = Office.MsoCTPDockPosition.msoCTPDockPositionRight;
+        taskPaneValue.DockPositionRestrict = Office.MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoHorizontal;
+        taskPaneValue.Width = paneWidth;
+      }
+      catch (Exception ex)
+      {
+        MiscUtilities.WriteAppErrorToLog(ex);
+      }
     }
 
     private void taskPaneControl_SizeChanged(object sender, EventArgs e)
@@ -73,7 +84,7 @@ namespace MySQL.ForExcel
         }
         catch (Exception ex)
         {
-          MiscUtilities.GetSourceTrace().WriteError("Application Exception on ThisAddIn.taskPaneControl_SizeChanged - " + (ex.Message + " " + ex.InnerException), 1);
+          MiscUtilities.WriteAppErrorToLog(ex);
         }
       }
     }
@@ -85,6 +96,7 @@ namespace MySQL.ForExcel
     
     private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
     {
+      MiscUtilities.WriteToLog(Properties.Resources.ShutdownMessage, SourceLevels.Information);
       taskPaneControl.CloseAddIn();
     }
 

@@ -109,10 +109,10 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog errorDialog = new InfoDialog(false, ex.Message, null);
+        InfoDialog errorDialog = new InfoDialog(false, Resources.RefreshDBObjectsErrorTitle, ex.Message);
         errorDialog.WordWrapDetails = true;
         errorDialog.ShowDialog();
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception on DBObjectSelectionPanel.refreshDatabaseObjectsToolStripMenuItem_Click - " + (ex.Message + " " + ex.InnerException), 1);
+        MiscUtilities.WriteAppErrorToLog(ex);
       }
     }
 
@@ -214,10 +214,10 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog errorDialog = new InfoDialog(false, ex.Message, null);
+        InfoDialog errorDialog = new InfoDialog(false, Properties.Resources.ImportDataErrorTitle, ex.Message);
         errorDialog.WordWrapDetails = true;
         errorDialog.ShowDialog();
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception on DBObjectSelectionPanel.importData_Click - " + (ex.Message + " " + ex.InnerException), 1);
+        MiscUtilities.WriteAppErrorToLog(ex);
       }
     }
 
@@ -273,7 +273,7 @@ namespace MySQL.ForExcel
         InfoDialog errorDialog = new InfoDialog(false, ex.Message, null);
         errorDialog.WordWrapDetails = true;
         errorDialog.ShowDialog();
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception on DBObjectSelectionPanel.appendData_Click - " + (ex.Message + " " + ex.InnerException), 1);
+        MiscUtilities.WriteAppErrorToLog(ex);
       }
     }
 
@@ -327,7 +327,7 @@ namespace MySQL.ForExcel
           InfoDialog errorDialog = new InfoDialog(false, ex.Message, null);
           errorDialog.WordWrapDetails = true;
           errorDialog.ShowDialog();
-          MiscUtilities.GetSourceTrace().WriteError("Application Exception on DBObjectSelectionPanel.objectFilter_KeyDown - " + (ex.Message + " " + ex.InnerException), 1);
+          MiscUtilities.WriteAppErrorToLog(ex);
         }
       }
     }

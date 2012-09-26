@@ -37,6 +37,8 @@ namespace MySQL.ForExcel
 {
   public static class MiscUtilities
   {
+    private static string logFile;
+
     public static void SetDoubleBuffered(System.Windows.Forms.Control c)
     {
       if (SystemInformation.TerminalServerSession)
@@ -163,18 +165,45 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog infoDialog = new InfoDialog(false, "An error ocurred when savings user settings file", ex.Message);
-        infoDialog.ShowDialog();
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MiscUtilities.SaveSettings - " + (ex.Message + " " + ex.InnerException), 1);
+        InfoDialog errorDialog = new InfoDialog(false, Properties.Resources.SettingsFileSaveErrorTitle, ex.Message);
+        errorDialog.WordWrapDetails = true;
+        errorDialog.ShowDialog();
+        MiscUtilities.WriteAppErrorToLog(ex);
         return false;
       }
       return true;
     }
 
-    public static MySQLSourceTrace GetSourceTrace()
+    public static void WriteToLog(string message, SourceLevels messageType = SourceLevels.Error, int errorLevel = 1)
     {
-      var logPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Oracle\MySQL For Excel";
-      return new MySQLSourceTrace("MySQLForExcel", logPath + @"\MySQLForExcel.log", "", SourceLevels.Warning);
+      if (String.IsNullOrEmpty(logFile))
+        logFile = String.Format(Properties.Resources.LogFile, Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+      MySQLSourceTrace sourceTrace = new MySQLSourceTrace("MySQLForExcel", logFile, String.Empty, messageType);
+      switch (messageType)
+      {
+        case SourceLevels.Error:
+          sourceTrace.WriteError(message, errorLevel);
+          break;
+        case SourceLevels.Information:
+          sourceTrace.WriteInformation(message, errorLevel);
+          break;
+        case SourceLevels.Warning:
+          sourceTrace.WriteWarning(message, errorLevel);
+          break;
+        case SourceLevels.Critical:
+          sourceTrace.WriteCritical(message, errorLevel);
+          break;
+      }
+    }
+
+    public static void WriteAppErrorToLog(Exception ex)
+    {
+      MethodBase callingMethod = new StackFrame(1).GetMethod();
+      WriteToLog(String.Format(Properties.Resources.ApplicationExceptionForLog,
+                               callingMethod.DeclaringType.Name,
+                               callingMethod.Name,
+                               ex.Message,
+                               ex.InnerException));
     }
 
     public static string TruncateString(string text, float maxWidth, Graphics graphics, Font font)
@@ -292,8 +321,7 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        System.Diagnostics.Debug.WriteLine(ex.Message);
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLDataUtilities.GetSchemaCollection - " + (ex.Message + " " + ex.InnerException), 1);
+        MiscUtilities.WriteAppErrorToLog(ex);
         throw;
       }
 

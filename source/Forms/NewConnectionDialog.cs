@@ -128,7 +128,7 @@ namespace MySQL.ForExcel
       catch (Exception ex)
       {
         infoDialog.OperationDetailsText = ex.Message;
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception on NewConnectionDialog.testButton_Click - " + (ex.Message + " " + ex.InnerException), 1);
+        MiscUtilities.WriteAppErrorToLog(ex);
       }
       infoDialog.WordWrapDetails = true;
       infoDialog.ShowDialog();

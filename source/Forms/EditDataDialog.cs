@@ -445,7 +445,7 @@ namespace MySQL.ForExcel
       }
       catch(Exception ex)
       {
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception on EditDataDialog.UndoChanges - " + (ex.Message + " " + ex.InnerException), 1);
+        MiscUtilities.WriteAppErrorToLog(ex);
       }
       undoingChanges = false;
     }
@@ -662,7 +662,7 @@ namespace MySQL.ForExcel
           undoChanges = true;
           operationSummary = Properties.Resources.EditDataCellModificationError;
           operationDetails = ex.Message;
-          MiscUtilities.GetSourceTrace().WriteError("Application Exception on EditDataDialog.EditingWorksheet_Change - " + (ex.Message + " " + ex.InnerException), 1);
+          MiscUtilities.WriteAppErrorToLog(ex);
         }
         finally
         {

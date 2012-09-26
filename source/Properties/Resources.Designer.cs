@@ -79,6 +79,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Application Exception on {0}.{1} - {2} {3}.
+        /// </summary>
+        internal static string ApplicationExceptionForLog {
+            get {
+                return ResourceManager.GetString("ApplicationExceptionForLog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MySQL For Excel.
         /// </summary>
         internal static string AppName {
@@ -181,6 +190,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error when deleting Column Mapping.
+        /// </summary>
+        internal static string ColumnMappingDeletionErrorTitle {
+            get {
+                return ResourceManager.GetString("ColumnMappingDeletionErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Column mapping for all columns in Excel selection is incomplete. Do you want to proceed with the current mapped data only?.
         /// </summary>
         internal static string ColumnMappingIncompleteDetailWarning {
@@ -195,6 +213,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string ColumnMappingIncompleteTitleWarning {
             get {
                 return ResourceManager.GetString("ColumnMappingIncompleteTitleWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error when attempting to Rename a Column Mapping.
+        /// </summary>
+        internal static string ColumnMappingRenameErrorTitle {
+            get {
+                return ResourceManager.GetString("ColumnMappingRenameErrorTitle", resourceCulture);
             }
         }
         
@@ -272,6 +299,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error when saving database connections file.
+        /// </summary>
+        internal static string ConnectionsFileSavingErrorTitle {
+            get {
+                return ResourceManager.GetString("ConnectionsFileSavingErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can&apos;t open MySQL connection since connection string has not been set.
         /// </summary>
         internal static string ConnectionStringNotSet {
@@ -306,6 +342,24 @@ namespace MySQL.ForExcel.Properties {
         internal static string CurrentChangesLostConfirmation {
             get {
                 return ResourceManager.GetString("CurrentChangesLostConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error when loading database connections file.
+        /// </summary>
+        internal static string DatabaseConnectionsFileLoadingErrorTitle {
+            get {
+                return ResourceManager.GetString("DatabaseConnectionsFileLoadingErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error loading data..
+        /// </summary>
+        internal static string DataLoadingError {
+            get {
+                return ResourceManager.GetString("DataLoadingError", resourceCulture);
             }
         }
         
@@ -604,6 +658,33 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error importing data.
+        /// </summary>
+        internal static string ImportDataErrorTitle {
+            get {
+                return ResourceManager.GetString("ImportDataErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error importing procedure&apos;s data.
+        /// </summary>
+        internal static string ImportProcedureErrorTitle {
+            get {
+                return ResourceManager.GetString("ImportProcedureErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error importing table&apos;s data.
+        /// </summary>
+        internal static string ImportTableErrorTitle {
+            get {
+                return ResourceManager.GetString("ImportTableErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Rows in all result sets exceed the limit of 65,535 rows in Compatibility Mode, one or more Result Sets will be truncated..
         /// </summary>
         internal static string ImportVerticallyExceedsMaxRowsDetailWarning {
@@ -618,6 +699,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string ImportVerticallyExceedsMaxRowsTitleWarning {
             get {
                 return ResourceManager.GetString("ImportVerticallyExceedsMaxRowsTitleWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}\Oracle\MySQL For Excel\MySQLForExcel.log.
+        /// </summary>
+        internal static string LogFile {
+            get {
+                return ResourceManager.GetString("LogFile", resourceCulture);
             }
         }
         
@@ -1000,6 +1090,15 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Error refreshing database objects.
+        /// </summary>
+        internal static string RefreshDBObjectsErrorTitle {
+            get {
+                return ResourceManager.GetString("RefreshDBObjectsErrorTitle", resourceCulture);
+            }
+        }
+        
         internal static System.Drawing.Bitmap remove_col_mapping {
             get {
                 object obj = ResourceManager.GetObject("remove_col_mapping", resourceCulture);
@@ -1022,6 +1121,24 @@ namespace MySQL.ForExcel.Properties {
         internal static string RevertDataConfirmation {
             get {
                 return ResourceManager.GetString("RevertDataConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error opening schema.
+        /// </summary>
+        internal static string SchemaOpeningErrorTitle {
+            get {
+                return ResourceManager.GetString("SchemaOpeningErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error loading schemas.
+        /// </summary>
+        internal static string SchemasLoadingErrorTitle {
+            get {
+                return ResourceManager.GetString("SchemasLoadingErrorTitle", resourceCulture);
             }
         }
         
@@ -1058,6 +1175,42 @@ namespace MySQL.ForExcel.Properties {
         internal static string SelectedTableNull {
             get {
                 return ResourceManager.GetString("SelectedTableNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error ocurred when savings user settings file.
+        /// </summary>
+        internal static string SettingsFileSaveErrorTitle {
+            get {
+                return ResourceManager.GetString("SettingsFileSaveErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MySQL for Excel Shutdown.
+        /// </summary>
+        internal static string ShutdownMessage {
+            get {
+                return ResourceManager.GetString("ShutdownMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MySQL for Excel Startup.
+        /// </summary>
+        internal static string StartupMessage {
+            get {
+                return ResourceManager.GetString("StartupMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error copying table data.
+        /// </summary>
+        internal static string TableDataCopyErrorTitle {
+            get {
+                return ResourceManager.GetString("TableDataCopyErrorTitle", resourceCulture);
             }
         }
         

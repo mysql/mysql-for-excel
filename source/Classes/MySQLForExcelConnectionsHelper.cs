@@ -107,9 +107,10 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog infoDialog = new InfoDialog(false, "Error when loading database connections file", String.Format(@"Description Error: \""{0}\""", ex.Message));
-        infoDialog.ShowDialog();
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLForExcelConnectionsHelper.CreateXMLFile - " + (ex.Message + " " + ex.InnerException), 1);
+        InfoDialog errorDialog = new InfoDialog(false, Properties.Resources.DatabaseConnectionsFileLoadingErrorTitle, ex.Message);
+        errorDialog.WordWrapDetails = true;
+        errorDialog.ShowDialog();
+        MiscUtilities.WriteAppErrorToLog(ex);
         success = false;              
       }
       
@@ -147,9 +148,10 @@ namespace MySQL.ForExcel
           }
           catch (Exception ex)
           {
-            InfoDialog infoDialog = new InfoDialog(false, Properties.Resources.UnableToSaveConnectionsFileError, String.Format(@"Description Error: \""{0}\""", ex.Message));
-            infoDialog.ShowDialog();
-            MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLForExcelConnectionsHelper.GetConnections - " + (ex.Message + " " + ex.InnerException), 1);
+            InfoDialog errorDialog = new InfoDialog(false, Properties.Resources.UnableToSaveConnectionsFileError, ex.Message);
+            errorDialog.WordWrapDetails = true;
+            errorDialog.ShowDialog();
+            MiscUtilities.WriteAppErrorToLog(ex);
           }
         }
         else
@@ -184,9 +186,10 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog infoDialog = new InfoDialog(false, "Error when saving database connections file", String.Format(@"Description Error: \""{0}\""", ex.Message));
-        infoDialog.ShowDialog();
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLForExcelConnectionsHelper.SaveConnection - " + (ex.Message + " " + ex.InnerException), 1);
+        InfoDialog errorDialog = new InfoDialog(false, Properties.Resources.ConnectionsFileSavingErrorTitle, ex.Message);
+        errorDialog.WordWrapDetails = true;
+        errorDialog.ShowDialog();
+        MiscUtilities.WriteAppErrorToLog(ex);
         success = false;              
       }
       return success;
@@ -222,7 +225,7 @@ namespace MySQL.ForExcel
       {
         InfoDialog infoDialog = new InfoDialog(false, Properties.Resources.UnableToDeleteConnectionError, String.Format(@"Description Error: \""{0}\""", ex.Message));
         infoDialog.ShowDialog();
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLForExcelConnectionsHelper.RemoveConnection - " + (ex.Message + " " + ex.InnerException), 1);
+        MiscUtilities.WriteAppErrorToLog(ex);
         success = false;
       }
       return success;
@@ -240,17 +243,17 @@ namespace MySQL.ForExcel
         return;
 
       // Inform users we are about to migrate connections
-      InfoDialog infoDlg = new InfoDialog(InfoDialog.InfoType.Info, Properties.Resources.MigrateConnectionsToWorkbenchInfoTitle, Properties.Resources.MigrateConnectionsToWorkbenchInfoDetail);
-      infoDlg.OperationStatusText = Properties.Resources.MigrateConnectionsToWorkbenchInfoHeader;
-      infoDlg.WordWrapDetails = true;
-      infoDlg.ShowDialog();
+      InfoDialog errorDlg = new InfoDialog(InfoDialog.InfoType.Info, Properties.Resources.MigrateConnectionsToWorkbenchInfoTitle, Properties.Resources.MigrateConnectionsToWorkbenchInfoDetail);
+      errorDlg.OperationStatusText = Properties.Resources.MigrateConnectionsToWorkbenchInfoHeader;
+      errorDlg.WordWrapDetails = true;
+      errorDlg.ShowDialog();
 
       // If Workbench is running we won't be able to migrate since the file will be in use, issue an error and exit, attempt to migrate next time.
       if (MySqlWorkbench.IsRunning)
       {
-        infoDlg = new InfoDialog(false, Properties.Resources.UnableToMergeConnectionsErrorTitle, Properties.Resources.UnableToMergeConnectionsErrorDetail);
-        infoDlg.WordWrapDetails = true;
-        infoDlg.ShowDialog();
+        errorDlg = new InfoDialog(false, Properties.Resources.UnableToMergeConnectionsErrorTitle, Properties.Resources.UnableToMergeConnectionsErrorDetail);
+        errorDlg.WordWrapDetails = true;
+        errorDlg.ShowDialog();
         return;
       }
 
@@ -278,10 +281,10 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        infoDlg = new InfoDialog(false, Properties.Resources.UnableToDeleteLocalConnectionsFileError, String.Format(@"Description Error: \""{0}\""", ex.Message));
-        infoDlg.WordWrapDetails = true;
-        infoDlg.ShowDialog();
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLForExcelConnectionsHelper.MigrateConnectionsFromMySQLToWorkbench - " + (ex.Message + " " + ex.InnerException), 1);
+        errorDlg = new InfoDialog(false, Properties.Resources.UnableToDeleteLocalConnectionsFileError, String.Format(@"Description Error: \""{0}\""", ex.Message));
+        errorDlg.WordWrapDetails = true;
+        errorDlg.ShowDialog();
+        MiscUtilities.WriteAppErrorToLog(ex);
         return;
       }
 
@@ -294,7 +297,7 @@ namespace MySQL.ForExcel
       catch (Exception ex)
       {
         saveException = ex;
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLForExcelConnectionsHelper.MigrateConnectionsFromMySQLToWorkbench - " + (ex.Message + " " + ex.InnerException), 1);
+        MiscUtilities.WriteAppErrorToLog(ex);
       }
       string infoTitle;
       StringBuilder infoDetail = new StringBuilder();
@@ -315,9 +318,9 @@ namespace MySQL.ForExcel
       }
 
       // Inform users the results of the migration
-      infoDlg = new InfoDialog(saveException == null, infoTitle, infoDetail.ToString());
-      infoDlg.WordWrapDetails = true;
-      infoDlg.ShowDialog();
+      errorDlg = new InfoDialog(saveException == null, infoTitle, infoDetail.ToString());
+      errorDlg.WordWrapDetails = true;
+      errorDlg.ShowDialog();
 
       // Load Connections Again so they are ready for use in Excel
       MySqlWorkbench.LoadData();

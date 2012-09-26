@@ -552,4 +552,55 @@ To be able to make modifications on cells not related to MySQL data please exit 
   <data name="QueryDidNotMatchRowsWarning" xml:space="preserve">
     <value>Query did not match any rows in the DB, Primary Key values in the row may have changed; please refresh values from the DB.</value>
   </data>
+  <data name="LogFile" xml:space="preserve">
+    <value>{0}\Oracle\MySQL For Excel\MySQLForExcel.log</value>
+  </data>
+  <data name="ShutdownMessage" xml:space="preserve">
+    <value>MySQL for Excel Shutdown</value>
+  </data>
+  <data name="StartupMessage" xml:space="preserve">
+    <value>MySQL for Excel Startup</value>
+  </data>
+  <data name="ColumnMappingDeletionErrorTitle" xml:space="preserve">
+    <value>Error when deleting Column Mapping</value>
+  </data>
+  <data name="DatabaseConnectionsFileLoadingErrorTitle" xml:space="preserve">
+    <value>Error when loading database connections file</value>
+  </data>
+  <data name="ApplicationExceptionForLog" xml:space="preserve">
+    <value>Application Exception on {0}.{1} - {2} {3}</value>
+  </data>
+  <data name="ColumnMappingRenameErrorTitle" xml:space="preserve">
+    <value>Error when attempting to Rename a Column Mapping</value>
+  </data>
+  <data name="ConnectionsFileSavingErrorTitle" xml:space="preserve">
+    <value>Error when saving database connections file</value>
+  </data>
+  <data name="DataLoadingError" xml:space="preserve">
+    <value>Error loading data.</value>
+  </data>
+  <data name="ImportDataErrorTitle" xml:space="preserve">
+    <value>Error importing data</value>
+  </data>
+  <data name="ImportProcedureErrorTitle" xml:space="preserve">
+    <value>Error importing procedure's data</value>
+  </data>
+  <data name="ImportTableErrorTitle" xml:space="preserve">
+    <value>Error importing table's data</value>
+  </data>
+  <data name="RefreshDBObjectsErrorTitle" xml:space="preserve">
+    <value>Error refreshing database objects</value>
+  </data>
+  <data name="SchemaOpeningErrorTitle" xml:space="preserve">
+    <value>Error opening schema</value>
+  </data>
+  <data name="SchemasLoadingErrorTitle" xml:space="preserve">
+    <value>Error loading schemas</value>
+  </data>
+  <data name="SettingsFileSaveErrorTitle" xml:space="preserve">
+    <value>An error ocurred when savings user settings file</value>
+  </data>
+  <data name="TableDataCopyErrorTitle" xml:space="preserve">
+    <value>Error copying table data</value>
+  </data>
 </root>

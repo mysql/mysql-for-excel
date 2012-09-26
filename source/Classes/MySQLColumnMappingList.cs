@@ -60,9 +60,10 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog infoDialog = new InfoDialog(false, "Error when deleting Column Mapping", String.Format(@"Description Error: \""{0}\""", ex.Message));
-        infoDialog.ShowDialog();
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLColumnMappingList.Remove - " + (ex.Message + " " + ex.InnerException), 1);
+        InfoDialog errorDialog = new InfoDialog(false, Properties.Resources.ColumnMappingDeletionErrorTitle, ex.Message);
+        errorDialog.WordWrapDetails = true;
+        errorDialog.ShowDialog();
+        MiscUtilities.WriteAppErrorToLog(ex);
         return false;              
       }
       return false;
@@ -81,9 +82,10 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog infoDialog = new InfoDialog(false, "Error when attempting to Rename a Column Mapping", String.Format(@"Description Error: \""{0}\""", ex.Message));
-        infoDialog.ShowDialog();
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception on MySQLColumnMappingList.Rename - " + (ex.Message + " " + ex.InnerException), 1);
+        InfoDialog errorDialog = new InfoDialog(false, Properties.Resources.ColumnMappingRenameErrorTitle, ex.Message);
+        errorDialog.WordWrapDetails = true;
+        errorDialog.ShowDialog();
+        MiscUtilities.WriteAppErrorToLog(ex);
         return false;     
       }
       return false;

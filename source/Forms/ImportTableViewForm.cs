@@ -76,12 +76,14 @@ namespace MySQL.ForExcel
          }
          catch (ArgumentException argEx)
          {
-           MiscUtilities.GetSourceTrace().WriteError("Application Exception on ImportTableViewForm.grdPreviewData_DataError - " + (argEx.Message + " " + argEx.InnerException), 1);
+           MiscUtilities.WriteAppErrorToLog(argEx);
          }
          catch (Exception ex)
          {
-           MessageBox.Show("Loading Data Error " + ex.Message);
-           MiscUtilities.GetSourceTrace().WriteError("Application Exception on ImportTableViewForm.grdPreviewData_DataError - " + (ex.Message + " " + ex.InnerException), 1);
+           InfoDialog errorDialog = new InfoDialog(false, Properties.Resources.DataLoadingError, ex.Message);
+           errorDialog.WordWrapDetails = true;
+           errorDialog.ShowDialog();
+           MiscUtilities.WriteAppErrorToLog(ex);
          }
        }           
     }
@@ -142,10 +144,11 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog dialog = new InfoDialog(false, ex.Message, null);
-        dialog.ShowDialog();
+        InfoDialog errorDialog = new InfoDialog(false, Properties.Resources.ImportTableErrorTitle, ex.Message);
+        errorDialog.WordWrapDetails = true;
+        errorDialog.ShowDialog();
         hasError = true;
-        MiscUtilities.GetSourceTrace().WriteError("Application Exception on ImportTableViewForm.btnImport_Click - " + (ex.Message + " " + ex.InnerException), 1);
+        MiscUtilities.WriteAppErrorToLog(ex);
       }
       this.Cursor = Cursors.Default;
     }

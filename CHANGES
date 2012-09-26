@@ -1,3 +1,7 @@
+- Enclosed the Add-In's startup code in a try-catch block in order to log any possible error thrown during startup; and added information messages to the log at the
+  begginning of the Add-In's startup code and at the end of the shutdown code.  Also changed the wrapper method that calls the MySQLUtility to write messages to the
+  log to make logging easier, thus changed the log call throughout all the code that contains a try-catch block.
+  (Internal bug 157 - Add information messages to the log at add-in startup and shutdown).
 - Changed Excel Cells coloring to behave as follows: Before commit all changed cells have a BLUE (7CC576) color, after commit succesfully commited cells have a GREEN
   (B8E5F7) color, cells that produced errors and not committed have a RED (FF8282) color. The cells with yellowish (FFFCC7) color are still meant for a new row
   insertion. (Internal bug 155 - Edit Data - Modified cells have a red color which looks like an error).
