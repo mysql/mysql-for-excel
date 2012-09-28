@@ -275,6 +275,11 @@ namespace MySQL.ForExcel
         errorDialog.ShowDialog();
         MiscUtilities.WriteAppErrorToLog(ex);
       }
+      finally
+      {
+        if (Cursor == Cursors.WaitCursor)
+          Cursor = Cursors.Default;
+      }
     }
 
     private void exportToNewTable_Click(object sender, EventArgs e)

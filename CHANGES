@@ -1,3 +1,11 @@
+- Enabled the following checkboxes in the Append Data's Advanced Options dialog and added code in the Append Data dialog to use the checkboxes as follows:
+  * Automatically store the column mapping for the given table
+    - If checked the current mapping will be stored automatically after clicking the Append button if the append operation is successful and there is no mapping for
+	  the current connection.schema.table already; the new mapping is stored with a proposed name of Mapping.
+  * Reload stored column mapping for the selected table automatically
+    - If checked the first Stored Mapping found where all column names in the source grid match all column names in the target grid is automatically selected and
+	  applied when the Append Data dialog is loaded.
+  (Internal bug 161 - Append Data - Implement code to use 2 advanced options that are currently disabled)
 - Fixed code that applies a stored column mapping to skip target columns where the associated mapping is empty (saved as a -1).
   (Internal bug 160 - Append Data throws an error when a stored mapping exists)
 - Enclosed the Add-In's startup code in a try-catch block in order to log any possible error thrown during startup; and added information messages to the log at the

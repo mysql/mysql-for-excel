@@ -147,7 +147,6 @@ namespace MySQL.ForExcel
       // 
       this.chkReloadColumnMapping.AutoSize = true;
       this.chkReloadColumnMapping.BackColor = System.Drawing.Color.Transparent;
-      this.chkReloadColumnMapping.Enabled = false;
       this.chkReloadColumnMapping.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.chkReloadColumnMapping.Location = new System.Drawing.Point(53, 131);
       this.chkReloadColumnMapping.Name = "chkReloadColumnMapping";
@@ -160,7 +159,6 @@ namespace MySQL.ForExcel
       // 
       this.chkAutoStoreColumnMapping.AutoSize = true;
       this.chkAutoStoreColumnMapping.BackColor = System.Drawing.Color.Transparent;
-      this.chkAutoStoreColumnMapping.Enabled = false;
       this.chkAutoStoreColumnMapping.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.chkAutoStoreColumnMapping.Location = new System.Drawing.Point(53, 108);
       this.chkAutoStoreColumnMapping.Name = "chkAutoStoreColumnMapping";

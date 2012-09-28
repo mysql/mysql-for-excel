@@ -125,6 +125,9 @@ namespace MySQL.ForExcel
     {
       bool appliedStoredMapping = false;
 
+      if (!Settings.Default.AppendReloadColumnMapping)
+        return appliedStoredMapping;
+
       for (int mappingIdx = 0; mappingIdx < storedColumnMappingsList.Count; mappingIdx++)
       {
         MySQLColumnMapping mapping = storedColumnMappingsList[mappingIdx];
@@ -222,7 +225,7 @@ namespace MySQL.ForExcel
     private void createColumnMappingForStoredMapping()
     {
       // Create a copy of the current stored mapping but with no source columns mapped that we will be doing the best matching on
-      MySQLColumnMapping matchedMapping = new MySQLColumnMapping(currentColumnMapping, fromMySQLPreviewDataTable.GetColumnNamesArray(), toMySQLDataTable.GetColumnNamesArray());
+      MySQLColumnMapping matchedMapping = new MySQLColumnMapping(currentColumnMapping, fromMySQLPreviewDataTable.GetColumnNamesArray(true), toMySQLDataTable.GetColumnNamesArray());
 
       // Check if Target Columns still match with the Target Table, switch mapped indexes if columns changed positions
       //  and skip target column in stored mapping is not present anymore in Target Table
@@ -531,6 +534,9 @@ namespace MySQL.ForExcel
       if (dr == DialogResult.Cancel)
         return;
 
+      if (Settings.Default.AppendAutoStoreColumnMapping
+          && !storedColumnMappingsList.Exists(mapping => mapping.ConnectionName == wbConnection.Name && mapping.SchemaName == wbConnection.Schema && mapping.TableName == toMySQLDataTable.TableName))
+        StoreCurrentColumnMapping(false);
       DialogResult = DialogResult.OK;
       Close();
     }
@@ -754,7 +760,7 @@ namespace MySQL.ForExcel
       }
     }
 
-    private void btnStoreMapping_Click(object sender, EventArgs e)
+    private void StoreCurrentColumnMapping(bool showNewColumnMappingDialog)
     {
       int numericSuffix = 1;
       string proposedMappingName = String.Empty;
@@ -764,19 +770,29 @@ namespace MySQL.ForExcel
         numericSuffix++;
       }
       while (storedColumnMappingsList.Any(mapping => mapping.Name == proposedMappingName));
-      AppendNewColumnMappingDialog newColumnMappingDialog = new AppendNewColumnMappingDialog(proposedMappingName);
-      DialogResult dr = newColumnMappingDialog.ShowDialog();
-      if (dr == DialogResult.Cancel)
-        return;
+
+      if (showNewColumnMappingDialog)
+      {
+        AppendNewColumnMappingDialog newColumnMappingDialog = new AppendNewColumnMappingDialog(proposedMappingName);
+        DialogResult dr = newColumnMappingDialog.ShowDialog();
+        if (dr == DialogResult.Cancel)
+          return;
+        proposedMappingName = newColumnMappingDialog.ColumnMappingName;
+      }
 
       //initialize connection and dbobject information
-      currentColumnMapping.Name = newColumnMappingDialog.ColumnMappingName;
+      currentColumnMapping.Name = proposedMappingName;
       currentColumnMapping.ConnectionName = wbConnection.Name;
       currentColumnMapping.Port = wbConnection.Port;
       currentColumnMapping.SchemaName = wbConnection.Schema;
       currentColumnMapping.TableName = toMySQLDataTable.TableName;
 
       storeColumnMappingInFile(currentColumnMapping);
+    }
+
+    private void btnStoreMapping_Click(object sender, EventArgs e)
+    {
+      StoreCurrentColumnMapping(true);
     }
 
     private void btnAdvanced_Click(object sender, EventArgs e)
