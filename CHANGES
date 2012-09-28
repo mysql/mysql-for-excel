@@ -1,3 +1,5 @@
+- Fixed code that applies a stored column mapping to skip target columns where the associated mapping is empty (saved as a -1).
+  (Internal bug 160 - Append Data throws an error when a stored mapping exists)
 - Enclosed the Add-In's startup code in a try-catch block in order to log any possible error thrown during startup; and added information messages to the log at the
   begginning of the Add-In's startup code and at the end of the shutdown code.  Also changed the wrapper method that calls the MySQLUtility to write messages to the
   log to make logging easier, thus changed the log call throughout all the code that contains a try-catch block.

@@ -225,9 +225,15 @@ namespace MySQL.ForExcel
       MySQLColumnMapping matchedMapping = new MySQLColumnMapping(currentColumnMapping, fromMySQLPreviewDataTable.GetColumnNamesArray(), toMySQLDataTable.GetColumnNamesArray());
 
       // Check if Target Columns still match with the Target Table, switch mapped indexes if columns changed positions
-      //  and remove mapped indexes if target toColumn in stored mapping is not present anymore in Target Table
+      //  and skip target column in stored mapping is not present anymore in Target Table
       for (int storedMappedIdx = 0; storedMappedIdx < currentColumnMapping.TargetColumns.Length; storedMappedIdx++)
       {
+        // Get the source index of the stored mapping for the current tartet column, if -1 there was no mapping for the
+        // target column at that position so we skip it.
+        int proposedSourceMapping = currentColumnMapping.MappedSourceIndexes[storedMappedIdx];
+        if (proposedSourceMapping < 0)
+          continue;
+
         // Check if Target Column in Stored Mapping is found within any of the TargetColumns of the matching mapping.
         // If not found we should not map so we skip this Target Column.
         string storedMappedColName = currentColumnMapping.TargetColumns[storedMappedIdx];
@@ -236,9 +242,8 @@ namespace MySQL.ForExcel
           continue;
         MySQLDataColumn toCol = toMySQLDataTable.GetColumnAtIndex(targetColumnIndex);
 
-        // Check if mapped source toColumn from Stored Mapping matches with a Source Column in current "From Table"
-        //  in toColumn name and its data type matches its corresponding target toColumn, if so we are good to map it
-        int proposedSourceMapping = currentColumnMapping.MappedSourceIndexes[storedMappedIdx];
+        // Check if mapped source column from Stored Mapping matches a Source Column in current "From Table"
+        //  and if its data type matches its corresponding target column's data type, if so we are good to map it
         string mappedSourceColName = currentColumnMapping.SourceColumns[proposedSourceMapping];
         int sourceColFoundInFromTableIdx = fromMySQLPreviewDataTable.GetColumnIndex(mappedSourceColName, true);
         if (sourceColFoundInFromTableIdx >= 0)
@@ -247,8 +252,8 @@ namespace MySQL.ForExcel
           if (DataTypeUtilities.Type1FitsIntoType2(fromCol.StrippedMySQLDataType, toCol.StrippedMySQLDataType))
             matchedMapping.MappedSourceIndexes[targetColumnIndex] = sourceColFoundInFromTableIdx;
         }
-        // Since source columns do not match in name and type, try to match the mapped source toColumn's datatype
-        //  with the From toColumn in that source index only if that From Column name is not in any source mapping.
+        // Since source columns do not match in name and type, try to match the mapped source column's datatype
+        //  with the From column in that source index only if that From Column name is not in any source mapping.
         else if (matchedMapping.MappedSourceIndexes[targetColumnIndex] < 0 && proposedSourceMapping < fromMySQLPreviewDataTable.Columns.Count)
         {
           string fromTableColName = fromMySQLPreviewDataTable.GetColumnAtIndex(proposedSourceMapping).DisplayName;
