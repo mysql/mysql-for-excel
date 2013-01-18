@@ -146,6 +146,12 @@ namespace MySQL.ForExcel
       contextMenuStrip.Items["deleteToolStripMenuItem"].Visible = (connectionList.SelectedNode == null ||
         connectionList.SelectedNode.Name == "LocalConnectionsNode" || connectionList.SelectedNode.Name == "RemoteConnectionsNode" ||
         MySqlWorkbench.Connections.Count <= 0) ? false : true;
+    }
+
+    private void aboutLabel_Click(object sender, EventArgs e)
+    {
+      AboutBox b = new AboutBox();
+      b.ShowDialog();
     }    
   }
 }

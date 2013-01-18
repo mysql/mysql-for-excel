@@ -57,8 +57,6 @@ namespace MySQL.ForExcel
       this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.lblCopyright = new MySQL.ForExcel.TransparentLabel();
-      this.lblAllRights = new MySQL.ForExcel.TransparentLabel();
       this.newConnectionLabel = new MySQL.ForExcel.HotLabel();
       this.upperPanel = new System.Windows.Forms.Panel();
       this.imgSeparator = new MySQL.ForExcel.TransparentPictureBox();
@@ -66,6 +64,7 @@ namespace MySQL.ForExcel
       this.lblInstructions = new MySQL.ForExcel.TransparentLabel();
       this.picAddInLogo = new System.Windows.Forms.PictureBox();
       this.openConnectionLabel = new MySQL.ForExcel.HotLabel();
+      this.aboutLabel = new MySQL.ForExcel.HotLabel();
       this.contextMenuStrip.SuspendLayout();
       this.upperPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.picAddInLogoText)).BeginInit();
@@ -177,38 +176,6 @@ namespace MySQL.ForExcel
       this.refreshToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
       this.refreshToolStripMenuItem.Text = "Refresh Connections";
       this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshItem_Click);
-      // 
-      // lblCopyright
-      // 
-      this.lblCopyright.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-      this.lblCopyright.Font = new System.Drawing.Font("Segoe UI", 5.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblCopyright.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblCopyright.Location = new System.Drawing.Point(12, 598);
-      this.lblCopyright.Name = "lblCopyright";
-      this.lblCopyright.ShadowColor = System.Drawing.SystemColors.ControlText;
-      this.lblCopyright.ShadowOpacity = 0.7D;
-      this.lblCopyright.ShadowPixelsXOffset = 0;
-      this.lblCopyright.Size = new System.Drawing.Size(237, 14);
-      this.lblCopyright.TabIndex = 7;
-      this.lblCopyright.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-      this.lblCopyright.TextOpacity = 0.6D;
-      this.lblCopyright.TransparentText = "Copyright © 2012 Oracle and/or its affiliates.";
-      // 
-      // lblAllRights
-      // 
-      this.lblAllRights.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-      this.lblAllRights.Font = new System.Drawing.Font("Segoe UI", 5.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblAllRights.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblAllRights.Location = new System.Drawing.Point(12, 609);
-      this.lblAllRights.Name = "lblAllRights";
-      this.lblAllRights.ShadowColor = System.Drawing.SystemColors.ControlText;
-      this.lblAllRights.ShadowOpacity = 0.7D;
-      this.lblAllRights.ShadowPixelsXOffset = 0;
-      this.lblAllRights.Size = new System.Drawing.Size(237, 14);
-      this.lblAllRights.TabIndex = 8;
-      this.lblAllRights.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-      this.lblAllRights.TextOpacity = 0.6D;
-      this.lblAllRights.TransparentText = "All rights reserved.";
       // 
       // newConnectionLabel
       // 
@@ -333,15 +300,47 @@ namespace MySQL.ForExcel
       this.openConnectionLabel.TitleShadowPixelsXOffset = 0;
       this.openConnectionLabel.TitleShadowPixelsYOffset = 1;
       // 
+      // aboutLabel
+      // 
+      this.aboutLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.aboutLabel.Description = "";
+      this.aboutLabel.DescriptionColor = System.Drawing.SystemColors.WindowText;
+      this.aboutLabel.DescriptionColorOpacity = 0.6D;
+      this.aboutLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.aboutLabel.DescriptionShadowOpacity = 0.4D;
+      this.aboutLabel.DescriptionShadowPixelsXOffset = 0;
+      this.aboutLabel.DescriptionShadowPixelsYOffset = 1;
+      this.aboutLabel.DisabledImage = null;
+      this.aboutLabel.DrawShadow = true;
+      this.aboutLabel.Font = new System.Drawing.Font("Tahoma", 7F);
+      this.aboutLabel.HotTracking = true;
+      this.aboutLabel.Image = null;
+      this.aboutLabel.ImagePixelsXOffset = 0;
+      this.aboutLabel.ImagePixelsYOffset = 0;
+      this.aboutLabel.Location = new System.Drawing.Point(59, 599);
+      this.aboutLabel.Margin = new System.Windows.Forms.Padding(4);
+      this.aboutLabel.Name = "aboutLabel";
+      this.aboutLabel.Size = new System.Drawing.Size(113, 17);
+      this.aboutLabel.TabIndex = 27;
+      this.aboutLabel.Title = "About MySQL For Excel";
+      this.aboutLabel.TitleColor = System.Drawing.SystemColors.GrayText;
+      this.aboutLabel.TitleColorOpacity = 0.95D;
+      this.aboutLabel.TitleDescriptionPixelsSpacing = 0;
+      this.aboutLabel.TitlePixelsXOffset = 3;
+      this.aboutLabel.TitlePixelsYOffset = 0;
+      this.aboutLabel.TitleShadowOpacity = 0.2D;
+      this.aboutLabel.TitleShadowPixelsXOffset = 0;
+      this.aboutLabel.TitleShadowPixelsYOffset = 1;
+      this.aboutLabel.Click += new System.EventHandler(this.aboutLabel_Click);
+      // 
       // WelcomePanel
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.Controls.Add(this.aboutLabel);
       this.Controls.Add(this.upperPanel);
       this.Controls.Add(this.newConnectionLabel);
       this.Controls.Add(this.manageConnectionsLabel);
       this.Controls.Add(this.connectionList);
-      this.Controls.Add(this.lblCopyright);
-      this.Controls.Add(this.lblAllRights);
       this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.Name = "WelcomePanel";
       this.Size = new System.Drawing.Size(260, 625);
@@ -356,8 +355,6 @@ namespace MySQL.ForExcel
     #endregion
 
     private System.Windows.Forms.ImageList largeImages;
-    private TransparentLabel lblCopyright;
-    private TransparentLabel lblAllRights;
     private HotLabel newConnectionLabel;
     private HotLabel manageConnectionsLabel;
     private MyTreeView connectionList;
@@ -370,5 +367,6 @@ namespace MySQL.ForExcel
     private TransparentLabel lblInstructions;
     private System.Windows.Forms.PictureBox picAddInLogo;
     private HotLabel openConnectionLabel;
+    private HotLabel aboutLabel;
   }
 }
