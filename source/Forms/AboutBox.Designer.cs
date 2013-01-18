@@ -46,11 +46,11 @@
       // 
       this.installVersion.AutoSize = true;
       this.installVersion.ForeColor = System.Drawing.SystemColors.ControlDark;
-      this.installVersion.Location = new System.Drawing.Point(439, 143);
+      this.installVersion.Location = new System.Drawing.Point(448, 143);
       this.installVersion.Name = "installVersion";
-      this.installVersion.Size = new System.Drawing.Size(108, 13);
+      this.installVersion.Size = new System.Drawing.Size(99, 13);
       this.installVersion.TabIndex = 1;
-      this.installVersion.Text = "MySQL Installer 1.1.6";
+      this.installVersion.Text = "MySQL Installer 1.1";
       this.installVersion.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
       // 
       // AboutBox
