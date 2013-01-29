@@ -1,3 +1,6 @@
+1.1.0
+- Added Edit MySQL Data feature: users are now able to edit the data in a MySQL table using MS Excel in a very friendly and intuitive way. Edit Data supports
+  inserting new rows, deleting existing rows and updating existing data as easy as playing with data in an Excel’s spreadsheet and pushing changes back to the server.
 - Enabled the following checkboxes in the Append Data's Advanced Options dialog and added code in the Append Data dialog to use the checkboxes as follows:
   * Automatically store the column mapping for the given table
     - If checked the current mapping will be stored automatically after clicking the Append button if the append operation is successful and there is no mapping for
@@ -5,97 +8,25 @@
   * Reload stored column mapping for the selected table automatically
     - If checked the first Stored Mapping found where all column names in the source grid match all column names in the target grid is automatically selected and
 	  applied when the Append Data dialog is loaded.
-  (Internal bug 161 - Append Data - Implement code to use 2 advanced options that are currently disabled)
 - Fixed code that applies a stored column mapping to skip target columns where the associated mapping is empty (saved as a -1).
-  (Internal bug 160 - Append Data throws an error when a stored mapping exists)
 - Enclosed the Add-In's startup code in a try-catch block in order to log any possible error thrown during startup; and added information messages to the log at the
   begginning of the Add-In's startup code and at the end of the shutdown code.  Also changed the wrapper method that calls the MySQLUtility to write messages to the
   log to make logging easier, thus changed the log call throughout all the code that contains a try-catch block.
-  (Internal bug 157 - Add information messages to the log at add-in startup and shutdown).
-- Changed Excel Cells coloring to behave as follows: Before commit all changed cells have a BLUE (7CC576) color, after commit succesfully commited cells have a GREEN
-  (B8E5F7) color, cells that produced errors and not committed have a RED (FF8282) color. The cells with yellowish (FFFCC7) color are still meant for a new row
-  insertion. (Internal bug 155 - Edit Data - Modified cells have a red color which looks like an error).
-- Changed Edit Data code so one single transaction is done for all operations (DELETEs, INSERTs, UPDATEs), and to give a warning message whenever the number of rows
-  to be affected during an edit differs the number of actually affected rows (for example when rows are no longer found in the server).
-  (Internal bug 139 - Edit Data states an UPDATE transaction completed successfully when there are unchanged rows).
 - Added code to the main wix configuration file to check if a newer version is already installad and if so abort the installtion.
-  (Internal bug 135 - Installer does not check if a newer version is already installed to abort installation).
 - Fixed code to refresh the Import Procedure Form's preview grid's data source to repaint its contents every time the Call button is pressed.
-  (Internal bug 131 - Import Procedure Data - Preview grid shows wrong data after 2nd Call).
-- Added code to re-pull connections after connections are migrated from Excel to Workbench. (Internal bug 59 - Connections list not refreshed after import).
-- Fixed code so when the Automatic Mapping is performed any subsequent change on a mapping resets the mapping to a Manual Mapping.
-  (Internal bug 114 - Append dialog does not update Mapping type combo when a Manual mapping is done).
+- Added code to re-pull connections after connections are migrated from Excel to Workbench.
+- Fixed code so when the Append Data's Automatic Mapping is performed any subsequent change on a mapping resets the mapping to a Manual Mapping.
 - Added code to the InfoDialog class to set the button text to "Show Details" or "Hide Details" depending on the status of the Details text container.
-  (Internal bug 64 - InfoDialog Show Details button should change to Hide Details when details are shown).
-- Updated code that prepares a Date value for insertion into the DataTable to consider more scenarios, also updated the code that prepares Date values into string
-  representation to build the SQL queries. (Internal bug 128 - Edit Data generates error when updating a Date cell in Excel).
 - Fixed a GUID in the main wix configuration file so now previous versions are uninstalled during a new installation.
-  (Internal bug 115 - MySQL for Excel installer is not validating the legacy builds installed).
 - Added an option to the Export Data's Advanced Options dialog to remove columns with no data, by default the Export Dialog will only flag those columns as Excluded.
   Added code to display a warning and paint a column red if the column name is not set, display a warning if the table name is not set, and stack warnings but not
   display them if a column is Excluded, warnings are displayed normally for columns if they are not Excluded anymore.  Added code to prevent the Append and Export of
   Data if more than 1 selection is made (selecting more than 1 area holding the Ctrl key while selecting Excel cells).
-  (Internal bug 69 - Export Data always removes empty columns when it should just flag them as Excluded).
-- Commit for Oraclebug #14521405 Unhandled exception is thrown when loading MySQL for Excel.
-- Changed code that manages the way Editing Sessions are stored so that the sessions are maintained when renaming the Excel Worksheets in Edit Mode and only closed
-  when those Worksheets are deleted. The Editing Sessions are closed when changing Schema as well. (Internal bug 108 - Edit dialog is showed in a wrong sheet).
+- Fixed problem that prevented MySQL for Excel from loading when Display settings in Windows 7 is set to Adjust to Best Performance
+  (Oracle bug 14521405 - UNHANDLED EXCEPTION IS THROWN WHEN LOADING MYSQL FOR EXCEL).
 - Fixed code that renames the auto-generated Primary Key column when the Table name changes since it was not detecting if a column with the same name already existed
   in the table. The column duplication was not actually happening, it looked that way because the automatically generated PK column was not detecting a column had
-  that same name. (Internal bug 110 - Export Data - Column is duplicated when Unique index is checked).
-- Added code to do a better handling of null values and zero dates that work consistently among Import, Export, Append and Edit operations. DateTime.MinValue are
-  treated natively in Excel as a 0.0 value so conversions are performed consistently. (Internal bug 109 - Edit operation can edit a zero value DateTime column).
+  that same name.
 - Fixed code to always set an empty string instead of null to the MySQLDataColumn properties that stores MySQL data types (MySQLDataType, RowsFrom1stDataType and
   RowsFrom2ndDataType). Added code to display a warning and color red a column which Data Type has not been set by the user or has been manually cleared.
-  (Internal bug 65 - Export excel data freezes when Auto Detect Data Types is off).
 - Added code to output to the application log exception messages consistently in all places where exceptions are catched.
-- Changed code that gets a new name for a Worksheet that already has the proposed name of the Data Table being imported/edited.
-  (Internal bug 101 - Edit Data generates wrong worksheet name for a table named "t").
-- Added code to free up the list of active Edit Dialogs from all existing workbooks when the connection is closed which happens as well when the user goes back to the
-  welcome panel to select a connection. (Internal bug 96 - Edit Data Dialogs stay open when changing to another connection).
-- Added code to let the Import of data fill the Excel spreadsheet even if the table is empty but only if at least the column names are being imported. Also added code
-  to force the import of headers and always all columns during an Edit operation. Fixed code in Edit Data dialog to support empty tables and to remove the check for
-  imported column names since they will be always imported for an Edit operation. (Internal bug 103 - Edit Data does not work with empty tables).
-- Added code to change the enabled status of the Edit action label when entering and exiting Editing Mode since once in Edit Mode it must be closed before opening
-  another Edit session. Added code to avoid data import onto a worksheet that has an ongoing Edit session open for a table, a dialog is shown asking the user if he
-  wants to do the import on a new Excel Worksheet. Changed the way editing sessions are stored to support mainting them for Tables in different Schemas and to support
-  different Workbooks as well as different Worksheets. (Internal bug 100 - Edit Data has errors when an Import Data operation is done on Editing Worksheet).
-- Bumped AssemblyVersion to 1.1.0.
-- Changed code to enable Revert Changes button when the Auto-Commit checkbox is not checked and only when there are changes pending to be committed.
-  (Internal bug 92 - Edit Data, Revert Changes button remains enabled even if there are no changes to revert).
-- Added code to reset all cells in the Editing Region to have a NO-FILL style when the Edit Data dialog is closed.
-  (Internal bug 70 - Committed/uncommitted cells remain colored when exiting Edit Data Mode).
-- Added code to enable rows deletion on Edit Data, before all cells except the ones containing MySQL data were locked, but that way users can't delete an Excel row
-  since the row contained locked cells and Excel does not permit deleting a row if even once cell in the row is locked, so now all rows with MySQL data are unlocked
-  but if cells that are not in the Editing Range are modified an error will be thrown and changes undone. All other cells below the Editing Range remain locked.
-  (Internal bug 68 - There is no way to delete an existing row when Editing a table).
-- Add a new Workbook if there is no workbook open when doing an Edit and Import Data. Also makes the release of the Uncompleted edit operations when closing a Workbook. 
-  Added new events Workbook Activated and Workbook Deactivated in TaskPaneControl. Changes in EditTableData method to release uncompleted edit operations. Added a new
-  WorkbookName property to identify sheets in EditDataDialog. Also added unattached of the EditingWorksheet.SelectionChange when exiting from edit mode to avoid
-  Exceptions. Changes to reference ActiveWorkbook to the TaskPaneControl correct property.
-  (Internal Bug 66 - Edit and Import Data throw an unhandled exception when there is no active worksheet).
-- Added code to support rows insertions within the Edit Data, as per design this works by always having a colored row at the end of the editing data range which if
-  modified it will create a new row for insertion into MySQL Server when data is committed. (Internal bug 67 - There is no way to insert a new row when Editing a table).
-- Changed the comparison of strategy for the value the user types in an Excel cell against the value already stored in the DataTable but now using the RowState.Original
-  version of the row so that way if the user changes the value but then types in the value originally retrieved the change is disregarded and the cell's style is set
-  back to NO-FILL. (Internal bug 75 - Edit Data generates wrong UPDATE query when typing identical value on cell).
-- Modified a flag of calls to the SetWindowPos method that was setting the Edit Data Dialog to be Topmost of every window, now it is Topmost of only the Excel window.
-  (Oracle bug 14349218 - COMMIT OVERLAY REMAINS TOP-LEVEL WHEN APP IS NOT IN FOCUS).
-- Revert data resets ALL cells in the editing region to have a NO-FILL style when the Refresh Data from DB button is clicked; otherwise if the Revert Changed Data button
-  is clicked only the changed cells that haven't been committed are reset to have a NO-FILL style.
-  (Oracle bug 14350321 - REFRESH DATA FROM DB IS NOT CLEARING COLORED EXCEL CELLS FOR COMMITTED CELLS)
-- Changed code so when changes are pushed to the MySQL Server we display an InfoDialog when errors or warnings were found during the data commit if the Auto-Commit
-  checkbox is checked (no errors were thrown when in Auto-Commit mode before). (Oracle bug 14349284 - AUTO-COMMIT EDITING APPEARS TO LACK ERROR NOTIFICATION).
-- Changed comparison strategy for the value the user types in an Excel cell against the value already stored in the DataTable; for this a new method in the
-  DataTypeUtilities class called ExcelValueEqualsDataTableValue was created to do a comparison by data type and if what the user types equals what is in the DB
-  the change is disregarded and discarded for a commit. Also changed code to process Excel Sheet changes cell by cell instead of a whole range in order to paint the
-  cell's background if the change does not produce errors, in which case now the change is undone, an error is thrown and the cell is not colored; if the changed value
-  equals the one in the table no change is accounted for to commit. (Internal bug 75 - Edit Data generates wrong UPDATE query when typing identical value on cell).
-- Edit Data was failing in this scenario when a table's primary key is being changed by the user. Fixed code in GetUpdateSQL method of MySQLDataTable class to assemble
-  the where clause using the original values in the row and not the updated values (since updated values in this scenario are not found but MySQL does not throw any
-  errors or warnings about not finding such records). (Oracle bug 14349192 - COMMIT FAILS).
-- Methods that handle Insert, Update and Delete operations (InsertDataWithManualQuery, AppendDataWithManualQuery, UpdateDataWithManualQuery, DeleteDataWithManualQuery)
-  are using transactions which are rolled back if an error occurs. (Oracle bug 14356054 - OPTIMISTIC LOCKING CAN CAUSE PARTIAL DATA UPDATES)
-- All operations done through Edit Data use now constructed queries sent directly to MySQL instead of performing the operations via the Connector/NET DataAdapter.
-  This way we are consistent on how operations are performed by the Export Data and Append Data operations and ensure the query appearing on the General Query Log
-  and the one we display to the users are identical. (Oracle bug 14355970 - CONFIRMATION DETAILS LIE ABOUT SQL ISSUED).
-- Fixed Edit showing exception for unsigned small int is too large for the column. Changes in MySQLDataColumn Class that wasn't assigning the unsigned attribute in constructor.
