@@ -61,6 +61,24 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Version {0}.
+        /// </summary>
+        internal static string AboutMySQLForExcelVersion {
+            get {
+                return ResourceManager.GetString("AboutMySQLForExcelVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MySQL Installer 1.2.
+        /// </summary>
+        internal static string AboutMySQLInstallerVersion {
+            get {
+                return ResourceManager.GetString("AboutMySQLInstallerVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to All active editing sessions on the current schema will be terminated. Do you wish to continue?.
         /// </summary>
         internal static string ActiveEditingSessionsCloseWarningDetail {

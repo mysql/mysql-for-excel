@@ -1,4 +1,23 @@
-﻿namespace MySQL.ForExcel
+﻿//
+// Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as
+// published by the Free Software Foundation; version 2 of the
+// License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+// 02110-1301  USA
+//
+
+namespace MySQL.ForExcel
 {
   partial class AboutBox
   {
@@ -27,40 +46,43 @@
     /// </summary>
     private void InitializeComponent()
     {
-      this.version = new System.Windows.Forms.Label();
-      this.installVersion = new System.Windows.Forms.Label();
+      this.lblExcelVersion = new System.Windows.Forms.Label();
+      this.lblInstallerVersion = new System.Windows.Forms.Label();
       this.SuspendLayout();
       // 
-      // version
+      // lblExcelVersion
       // 
-      this.version.AutoSize = true;
-      this.version.ForeColor = System.Drawing.SystemColors.ControlDark;
-      this.version.Location = new System.Drawing.Point(478, 125);
-      this.version.Name = "version";
-      this.version.Size = new System.Drawing.Size(69, 13);
-      this.version.TabIndex = 0;
-      this.version.Text = "Version 1.1.1";
-      this.version.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+      this.lblExcelVersion.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.lblExcelVersion.BackColor = System.Drawing.Color.Transparent;
+      this.lblExcelVersion.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblExcelVersion.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+      this.lblExcelVersion.Location = new System.Drawing.Point(455, 125);
+      this.lblExcelVersion.Name = "lblExcelVersion";
+      this.lblExcelVersion.Size = new System.Drawing.Size(96, 13);
+      this.lblExcelVersion.TabIndex = 0;
+      this.lblExcelVersion.Text = "Version 1.1.2";
+      this.lblExcelVersion.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
       // 
-      // installVersion
+      // lblInstallerVersion
       // 
-      this.installVersion.AutoSize = true;
-      this.installVersion.ForeColor = System.Drawing.SystemColors.ControlDark;
-      this.installVersion.Location = new System.Drawing.Point(448, 143);
-      this.installVersion.Name = "installVersion";
-      this.installVersion.Size = new System.Drawing.Size(99, 13);
-      this.installVersion.TabIndex = 1;
-      this.installVersion.Text = "MySQL Installer 1.1";
-      this.installVersion.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+      this.lblInstallerVersion.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.lblInstallerVersion.BackColor = System.Drawing.Color.Transparent;
+      this.lblInstallerVersion.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.lblInstallerVersion.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+      this.lblInstallerVersion.Location = new System.Drawing.Point(431, 143);
+      this.lblInstallerVersion.Name = "lblInstallerVersion";
+      this.lblInstallerVersion.Size = new System.Drawing.Size(120, 13);
+      this.lblInstallerVersion.TabIndex = 1;
+      this.lblInstallerVersion.Text = "MySQL Installer 1.1";
+      this.lblInstallerVersion.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
       // 
       // AboutBox
       // 
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.BackgroundImage = global::MySQL.ForExcel.Properties.Resources.SplashScreenExcel;
       this.ClientSize = new System.Drawing.Size(557, 271);
-      this.Controls.Add(this.installVersion);
-      this.Controls.Add(this.version);
+      this.Controls.Add(this.lblInstallerVersion);
+      this.Controls.Add(this.lblExcelVersion);
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
       this.MaximizeBox = false;
       this.MinimizeBox = false;
@@ -71,15 +93,14 @@
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
       this.Text = "AboutBox";
       this.Click += new System.EventHandler(this.AboutBox_Click);
+      this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.AboutBox_KeyDown);
       this.ResumeLayout(false);
-      this.PerformLayout();
 
     }
 
     #endregion
 
-    private System.Windows.Forms.Label version;
-    private System.Windows.Forms.Label installVersion;
-
+    private System.Windows.Forms.Label lblExcelVersion;
+    private System.Windows.Forms.Label lblInstallerVersion;
   }
 }

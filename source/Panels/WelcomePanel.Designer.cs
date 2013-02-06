@@ -317,10 +317,10 @@ namespace MySQL.ForExcel
       this.aboutLabel.Image = null;
       this.aboutLabel.ImagePixelsXOffset = 0;
       this.aboutLabel.ImagePixelsYOffset = 0;
-      this.aboutLabel.Location = new System.Drawing.Point(59, 599);
+      this.aboutLabel.Location = new System.Drawing.Point(78, 599);
       this.aboutLabel.Margin = new System.Windows.Forms.Padding(4);
       this.aboutLabel.Name = "aboutLabel";
-      this.aboutLabel.Size = new System.Drawing.Size(113, 17);
+      this.aboutLabel.Size = new System.Drawing.Size(105, 22);
       this.aboutLabel.TabIndex = 27;
       this.aboutLabel.Title = "About MySQL For Excel";
       this.aboutLabel.TitleColor = System.Drawing.SystemColors.GrayText;
