@@ -254,14 +254,9 @@ namespace MySQL.ForExcel
       // 
       // grdPreviewData
       // 
-      this.grdPreviewData.AllowUserToAddRows = false;
-      this.grdPreviewData.AllowUserToDeleteRows = false;
-      this.grdPreviewData.AllowUserToResizeColumns = false;
-      this.grdPreviewData.AllowUserToResizeRows = false;
       this.grdPreviewData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.grdPreviewData.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
       dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
       dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.InactiveCaption;
       dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -270,7 +265,6 @@ namespace MySQL.ForExcel
       dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.ControlText;
       dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
       this.grdPreviewData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-      this.grdPreviewData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
       this.grdPreviewData.ColumnsMaximumWidth = 200;
       this.grdPreviewData.ContextMenuStrip = this.contextMenuForGrid;
       dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -283,12 +277,6 @@ namespace MySQL.ForExcel
       this.grdPreviewData.DefaultCellStyle = dataGridViewCellStyle2;
       this.grdPreviewData.Location = new System.Drawing.Point(80, 164);
       this.grdPreviewData.Name = "grdPreviewData";
-      this.grdPreviewData.ReadOnly = true;
-      this.grdPreviewData.RowHeadersVisible = false;
-      this.grdPreviewData.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-      this.grdPreviewData.ShowCellErrors = false;
-      this.grdPreviewData.ShowEditingIcon = false;
-      this.grdPreviewData.ShowRowErrors = false;
       this.grdPreviewData.Size = new System.Drawing.Size(695, 265);
       this.grdPreviewData.TabIndex = 7;
       this.grdPreviewData.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.grdPreviewData_DataBindingComplete);

@@ -391,14 +391,9 @@ namespace MySQL.ForExcel
       // 
       // grdPreviewData
       // 
-      this.grdPreviewData.AllowUserToAddRows = false;
-      this.grdPreviewData.AllowUserToDeleteRows = false;
-      this.grdPreviewData.AllowUserToResizeColumns = false;
-      this.grdPreviewData.AllowUserToResizeRows = false;
       this.grdPreviewData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.grdPreviewData.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
       dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
       dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
       dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -407,7 +402,6 @@ namespace MySQL.ForExcel
       dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
       dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
       this.grdPreviewData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-      this.grdPreviewData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
       this.grdPreviewData.ColumnsMaximumWidth = 200;
       dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
@@ -420,7 +414,6 @@ namespace MySQL.ForExcel
       this.grdPreviewData.Location = new System.Drawing.Point(82, 277);
       this.grdPreviewData.MultiSelect = false;
       this.grdPreviewData.Name = "grdPreviewData";
-      this.grdPreviewData.ReadOnly = true;
       dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
       dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -429,11 +422,6 @@ namespace MySQL.ForExcel
       dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
       dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
       this.grdPreviewData.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
-      this.grdPreviewData.RowHeadersVisible = false;
-      this.grdPreviewData.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-      this.grdPreviewData.ShowCellErrors = false;
-      this.grdPreviewData.ShowEditingIcon = false;
-      this.grdPreviewData.ShowRowErrors = false;
       this.grdPreviewData.Size = new System.Drawing.Size(677, 157);
       this.grdPreviewData.TabIndex = 18;
       this.grdPreviewData.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.grdPreviewData_CellToolTipTextNeeded);

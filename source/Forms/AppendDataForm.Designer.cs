@@ -176,13 +176,8 @@ namespace MySQL.ForExcel
       // 
       // grdFromExcelData
       // 
-      this.grdFromExcelData.AllowUserToAddRows = false;
-      this.grdFromExcelData.AllowUserToDeleteRows = false;
-      this.grdFromExcelData.AllowUserToResizeColumns = false;
-      this.grdFromExcelData.AllowUserToResizeRows = false;
       this.grdFromExcelData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.grdFromExcelData.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
       dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
       dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.InactiveCaption;
       dataGridViewCellStyle3.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -191,7 +186,6 @@ namespace MySQL.ForExcel
       dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.ControlText;
       dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
       this.grdFromExcelData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
-      this.grdFromExcelData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
       this.grdFromExcelData.ColumnsMaximumWidth = 200;
       dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
@@ -203,12 +197,6 @@ namespace MySQL.ForExcel
       this.grdFromExcelData.DefaultCellStyle = dataGridViewCellStyle4;
       this.grdFromExcelData.Location = new System.Drawing.Point(82, 182);
       this.grdFromExcelData.Name = "grdFromExcelData";
-      this.grdFromExcelData.ReadOnly = true;
-      this.grdFromExcelData.RowHeadersVisible = false;
-      this.grdFromExcelData.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-      this.grdFromExcelData.ShowCellErrors = false;
-      this.grdFromExcelData.ShowEditingIcon = false;
-      this.grdFromExcelData.ShowRowErrors = false;
       this.grdFromExcelData.Size = new System.Drawing.Size(686, 150);
       this.grdFromExcelData.TabIndex = 9;
       this.grdFromExcelData.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.grdFromExcelData_DataBindingComplete);
@@ -387,14 +375,9 @@ namespace MySQL.ForExcel
       // grdToMySQLTable
       // 
       this.grdToMySQLTable.AllowDrop = true;
-      this.grdToMySQLTable.AllowUserToAddRows = false;
-      this.grdToMySQLTable.AllowUserToDeleteRows = false;
-      this.grdToMySQLTable.AllowUserToResizeColumns = false;
-      this.grdToMySQLTable.AllowUserToResizeRows = false;
       this.grdToMySQLTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.grdToMySQLTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
       dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomCenter;
       dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
       dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -417,12 +400,6 @@ namespace MySQL.ForExcel
       this.grdToMySQLTable.Location = new System.Drawing.Point(82, 360);
       this.grdToMySQLTable.MultiSelect = false;
       this.grdToMySQLTable.Name = "grdToMySQLTable";
-      this.grdToMySQLTable.ReadOnly = true;
-      this.grdToMySQLTable.RowHeadersVisible = false;
-      this.grdToMySQLTable.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-      this.grdToMySQLTable.ShowCellErrors = false;
-      this.grdToMySQLTable.ShowEditingIcon = false;
-      this.grdToMySQLTable.ShowRowErrors = false;
       this.grdToMySQLTable.Size = new System.Drawing.Size(686, 150);
       this.grdToMySQLTable.TabIndex = 10;
       this.grdToMySQLTable.DragDrop += new System.Windows.Forms.DragEventHandler(this.grdToMySQLTable_DragDrop);

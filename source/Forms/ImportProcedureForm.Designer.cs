@@ -290,11 +290,6 @@ namespace MySQL.ForExcel
       // 
       // grdResultSet
       // 
-      this.grdResultSet.AllowUserToAddRows = false;
-      this.grdResultSet.AllowUserToDeleteRows = false;
-      this.grdResultSet.AllowUserToResizeColumns = false;
-      this.grdResultSet.AllowUserToResizeRows = false;
-      this.grdResultSet.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
       dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
       dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.InactiveCaption;
       dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -303,7 +298,6 @@ namespace MySQL.ForExcel
       dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.ControlText;
       dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
       this.grdResultSet.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-      this.grdResultSet.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
       this.grdResultSet.ColumnsMaximumWidth = 200;
       dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.InactiveCaption;
@@ -315,12 +309,6 @@ namespace MySQL.ForExcel
       this.grdResultSet.DefaultCellStyle = dataGridViewCellStyle2;
       this.grdResultSet.Location = new System.Drawing.Point(82, 269);
       this.grdResultSet.Name = "grdResultSet";
-      this.grdResultSet.ReadOnly = true;
-      this.grdResultSet.RowHeadersVisible = false;
-      this.grdResultSet.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-      this.grdResultSet.ShowCellErrors = false;
-      this.grdResultSet.ShowEditingIcon = false;
-      this.grdResultSet.ShowRowErrors = false;
       this.grdResultSet.Size = new System.Drawing.Size(676, 238);
       this.grdResultSet.TabIndex = 9;
       // 
