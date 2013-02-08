@@ -65,6 +65,7 @@ namespace MySQL.ForExcel
       this.grdPreviewData = new MySQL.ForExcel.PreviewDataGridView();
       this.contextMenuForGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.selectNoneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.lblPickColumnsSub = new System.Windows.Forms.Label();
       this.lblPickColumnsMain = new System.Windows.Forms.Label();
       this.picColumnOptions = new System.Windows.Forms.PictureBox();
@@ -285,17 +286,27 @@ namespace MySQL.ForExcel
       // contextMenuForGrid
       // 
       this.contextMenuForGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.selectAllToolStripMenuItem});
+            this.selectAllToolStripMenuItem,
+            this.selectNoneToolStripMenuItem});
       this.contextMenuForGrid.Name = "contextMenuForGrid";
-      this.contextMenuForGrid.Size = new System.Drawing.Size(123, 26);
+      this.contextMenuForGrid.Size = new System.Drawing.Size(153, 70);
+      this.contextMenuForGrid.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuForGrid_Opening);
       // 
       // selectAllToolStripMenuItem
       // 
       this.selectAllToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
       this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-      this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(122, 22);
+      this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
       this.selectAllToolStripMenuItem.Text = "Select All";
       this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.selectAllToolStripMenuItem_Click);
+      // 
+      // selectNoneToolStripMenuItem
+      // 
+      this.selectNoneToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
+      this.selectNoneToolStripMenuItem.Name = "selectNoneToolStripMenuItem";
+      this.selectNoneToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.selectNoneToolStripMenuItem.Text = "Select None";
+      this.selectNoneToolStripMenuItem.Click += new System.EventHandler(this.selectNoneToolStripMenuItem_Click);
       // 
       // lblPickColumnsSub
       // 
@@ -458,6 +469,7 @@ namespace MySQL.ForExcel
     private System.Windows.Forms.Label lblExportData;
     private System.Windows.Forms.ContextMenuStrip contextMenuForGrid;
     private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem selectNoneToolStripMenuItem;
 
   }
 }

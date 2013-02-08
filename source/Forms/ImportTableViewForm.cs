@@ -285,7 +285,6 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void grdPreviewData_SelectionChanged(object sender, EventArgs e)
     {
-      contextMenuForGrid.Items[0].Text = AllColumnsSelected ? "Select None" : "Select All";
       btnImport.Enabled = grdPreviewData.SelectedColumns.Count > 0;
     }
 
@@ -301,24 +300,38 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Event delegate method fired when the <see cref="contextMenuForGrid"/> context menu strip is opening.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void contextMenuForGrid_Opening(object sender, CancelEventArgs e)
+    {
+      selectAllToolStripMenuItem.Visible = grdPreviewData.SelectedColumns.Count < grdPreviewData.Columns.Count;
+      selectNoneToolStripMenuItem.Visible = grdPreviewData.SelectedColumns.Count > 0;
+    }
+
+    /// <summary>
     /// Event delegate method fired when the <see cref="selectAllToolStripMenuItem"/> context menu item is clicked.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
     private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      if (AllColumnsSelected)
-      {
-        grdPreviewData.ClearSelection();
-      }
-      else
-      {
-        grdPreviewData.SelectAll();
-      }
+      grdPreviewData.SelectAll();
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="ImportTableViewForm"/> is closed.
+    /// Event delegate method fired when the <see cref="selectNoneToolStripMenuItem"/> context menu item is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void selectNoneToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      grdPreviewData.ClearSelection();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="ImportTableViewForm"/> is closing.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
