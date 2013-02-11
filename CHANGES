@@ -1,3 +1,15 @@
+1.2.0
+- The context menu opened by right-clicking the preview grid in the Import Data Form is now showing context menu actions depending on the number of selected columns
+  as follows:
+    Select All: Visible when # of selected columns < total columns
+    Select None: Visible when # of selected columns > 0
+  (Bug #16238663 - IMPORT DATA - CONTEXT MENU SHOULD SMARTLY SHOW SELECT ACTIONS)
+- Removed the code that disabled the whole preview grid when the Import Form was used within an Edit Data operation, the disabling of the preview grid was disabling
+  the horizontal scrollbar as well. Now the grid is not disabled but columns selection in the grid is cancelled when the Import Form is used by Edit Data which was
+  the original intention since in Edit Data all columns must be imported to the worksheet. Disabled the context menu for the grid as well in this scenario.
+  (Bug #16239011 - EDIT DATA - IMPORT DIALOG'S PREVIEW GRID HAS HORIZONTAL SCROLLBAR DISABLED)
+- Added a link in the Welcome Panel to open an About box displaying the MySQLfor Excel version and copyright text. The About box can be closed by clicking on it or
+  pressing the ESC key.(Bug #16238860 - MYSQL FOR EXCEL VERSION NOT VISIBLE UNLESS GOING TO ADD/REMOVE PROGRAMS)
 1.1.0
 - Added Edit MySQL Data feature: users are now able to edit the data in a MySQL table using MS Excel in a very friendly and intuitive way. Edit Data supports
   inserting new rows, deleting existing rows and updating existing data as easy as playing with data in an Excel’s spreadsheet and pushing changes back to the server.
@@ -30,3 +42,25 @@
 - Fixed code to always set an empty string instead of null to the MySQLDataColumn properties that stores MySQL data types (MySQLDataType, RowsFrom1stDataType and
   RowsFrom2ndDataType). Added code to display a warning and color red a column which Data Type has not been set by the user or has been manually cleared.
 - Added code to output to the application log exception messages consistently in all places where exceptions are catched.
+1.0.7
+- Changed code to conditionally detect the datatype of a column with no data in any of its cells as either a Varchar(255) when Exporting data (empty column falls back to a "safe"
+  type that user can override) or as a null/empty datatype when Appending data so the empty column can be automatically mapped to any other column regardless of the target's
+  column datatype. (Internal bug 35 - Append Data detects a column with no data as a varchar column which does not map to any column).
+- Updated code so that when Workbench version 5.2.41 or earlier is installed and there are still no connections created in MySQL for Excel the Workbench connections are copied
+  from Workbench to the MySQL for Excel connections file. (Internal bug 49 - Workbench connections are not copied to MySql for Excel).
+- Updated version in AssemblyInfo to 1.0.7.
+- Manage Connections action label is available in the Welcome Panel when MySQL Workbench 5.2.42 is installed.
+  Database connections are shared with MySQL Workbench if version 5.2.42 or later is installed (meaning they are read from and saved to the Workbench connections file and on the
+  first run of MySQL for Excel it will attempt to migrate all local connections to the Workbench connection file and delete the local connections file, otherwise they are still
+  managed locally within MySQL for Excel. (Oracle bug 14368158 - CONNECTIONS CREATED IN MYSQL FOR EXCEL UNUSABLE IN WORKBENCH)
+- Refactoring on TransparentPictureBox control to fix some flickering when resizing the Excel form.
+  Added an upperPanel that contains all controls above the MyTreeView controls to all panels so when the form is resized to have a very small size the controls at the bottom
+  actually go behind the new upperPanel so there is no overlapping at all. (Oracle bug 14406412 - OVERLAPPING CONTROLS ON ALL PANELS WHEN EXCEL WINDOW IS SMALL).
+- Removed the code that reset the TaskPaneControl's height since the height can't be changed for a right-docking of the panel.
+  (Oracle bug 14369568 - EXCEL WINDOW CAN'T BE RESIZED IF STARTS WITH A SMALL SIZE).
+- Fixed code in custom PreviewDataViewGrid control to readjust the recalculation of the headers width when the HeaderText changes and to disable the AutoWidth feature of each
+  column header when the automatically recalculated width exceeds the ColumnsMaximumWidth property. (Oracle Bug 14350168 - EXPORT DATA DIALOG'S PREVIEW GRID TRUNCATES COLUMN NAMES)
+- Fixed code so now "text" columns can be automatically mapped to set or enum columns.
+  Fixed code to properly change mapped column names when checking/unchecking the "First Row Contains Column Names" checkbox in the Append Data Form.
+  (Oracle Bug 14370049 - THE AUTO MAPPING IS NOT WORKING PROPERLY)
+- Disabled Export button when table name is empty (Oracle Bug 14389853 - EXPORT BUTTON IS ENABLED WHEN TABLE NAME IS EMPTY)
