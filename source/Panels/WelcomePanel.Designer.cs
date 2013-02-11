@@ -19,6 +19,9 @@
 
 namespace MySQL.ForExcel
 {
+  /// <summary>
+  /// First panel shown to users within the Add-In's <seealso cref="TaskPaneControl"/>.
+  /// </summary>
   partial class WelcomePanel
   {
     /// <summary> 
@@ -157,9 +160,9 @@ namespace MySQL.ForExcel
             this.deleteToolStripMenuItem,
             this.refreshToolStripMenuItem});
       this.contextMenuStrip.Name = "contextMenuStripRefresh";
-      this.contextMenuStrip.Size = new System.Drawing.Size(184, 48);
+      this.contextMenuStrip.Size = new System.Drawing.Size(184, 70);
       this.contextMenuStrip.Text = "Refresh";
-      this.contextMenuStrip.Opened += new System.EventHandler(this.contextMenuStrip_Opened);
+      this.contextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip_Opening);
       // 
       // deleteToolStripMenuItem
       // 
