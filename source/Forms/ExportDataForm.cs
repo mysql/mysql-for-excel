@@ -745,7 +745,6 @@ namespace MySQL.ForExcel
       }
 
       ShowValidationWarning("TableNameWarning", false, null);
-      _previewDataTable.RefreshSelectQuery();
       _isTableNameValid = true;
       btnExport.Enabled = _isColumnPKValid;
     }
