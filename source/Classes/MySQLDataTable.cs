@@ -1940,6 +1940,7 @@ namespace MySQL.ForExcel
         proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListFor1stAndRest, decimalMaxLen, varCharMaxLen);
         col.RowsFrom1stDataType = proposedType;
         col.SetMySQLDataType(_firstRowIsHeaders ? col.RowsFrom2ndDataType : col.RowsFrom1stDataType);
+        col.CreateIndex = AutoIndexIntColumns && col.IsInteger;
       }
     }
 

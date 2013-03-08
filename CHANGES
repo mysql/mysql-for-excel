@@ -1,4 +1,6 @@
 1.1.1
+- Set the CreateIndex property value in each new column to be exported immediately after the column data type's is auto-detected.
+  (Bug #16238445 - EXPORT DATA - CREATE INDEX CHECKBOX IS NOT AUTO-CHECKED ON DATATYPE DETECTION)
 - Moved logic that handles Table and Column values and warnings from Export Form (frontend) to MySQLDataTable and MySQLDataColumn classes (backend).
 - Added code to expand each of the connection group nodes after they are initialized with existing connections.
   (Bug #16238782 - REMOTE CONNECTIONS SHOULD BE EXPANDED ON THE WELCOME PANEL)
