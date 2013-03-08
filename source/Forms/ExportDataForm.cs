@@ -538,7 +538,6 @@ namespace MySQL.ForExcel
       PreviewDataGrid.CurrentCell = null;
       PreviewDataGrid.Rows[0].Visible = !FirstRowHeadersCheckBox.Checked;
       PreviewDataGrid.Columns[grdIndex].Selected = true;
-      PreviewDataGrid.FirstDisplayedScrollingColumnIndex = grdIndex;
       if (FirstRowHeadersCheckBox.Checked && PreviewDataGrid.Rows.Count < 2)
       {
         return;

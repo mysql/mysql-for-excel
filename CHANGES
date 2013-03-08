@@ -1,4 +1,6 @@
 1.1.1
+- Removed code that always forced the FirstDisplayedScrollingColumnIndex of the preview grid to the currently selected column every time the First Row Contains
+  Column Names checkbox is checked or unchecked. (Bug #16419402 - EXPORT DATA FREEZES WHEN SWITCHING HEADERS ROW)
 - Set the CreateIndex property value in each new column to be exported immediately after the column data type's is auto-detected.
   (Bug #16238445 - EXPORT DATA - CREATE INDEX CHECKBOX IS NOT AUTO-CHECKED ON DATATYPE DETECTION)
 - Moved logic that handles Table and Column values and warnings from Export Form (frontend) to MySQLDataTable and MySQLDataColumn classes (backend).
