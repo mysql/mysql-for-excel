@@ -1,21 +1,19 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
 namespace MySQL.ForExcel
 {
@@ -27,10 +25,10 @@ namespace MySQL.ForExcel
   using System.Linq;
   using System.Text;
   using System.Windows.Forms;
-  using Excel = Microsoft.Office.Interop.Excel;
   using MySql.Data.MySqlClient;
   using MySQL.ForExcel.Properties;
   using MySQL.Utility;
+  using Excel = Microsoft.Office.Interop.Excel;
 
   /// <summary>
   /// Presents users with a wizard-like form to export selected Excel data to a new MySQL table.
@@ -40,44 +38,9 @@ namespace MySQL.ForExcel
     #region Fields
 
     /// <summary>
-    /// <see cref="MySQLDataTable"/> object containing a subset of the whole data which is shown in the preview grid.
+    /// Flag indicating whether when text changes on an input control was due user input or programatic.
     /// </summary>
-    private MySQLDataTable _previewDataTable;
-
-    /// <summary>
-    /// <see cref="MySQLDataTable"/> object containing the all data to be exported to a new MySQL table.
-    /// </summary>
-    private MySQLDataTable _exportDataTable;
-
-    /// <summary>
-    /// Connection to a MySQL server instance selected by users.
-    /// </summary>
-    private MySqlWorkbenchConnection _wbConnection;
-
-    /// <summary>
-    /// Flag indicating if the primary column is composed of more than 1 column.
-    /// </summary>
-    private bool _multiColumnPK;
-
-    /// <summary>
-    /// Flag indicating if any of the column or primary key properties are being changed.
-    /// </summary>
-    private bool _isChanging;
-
-    /// <summary>
-    /// Excel cells range containing the data being exported to a new MySQL table.
-    /// </summary>
-    private Excel.Range _exportDataRange;
-
-    /// <summary>
-    /// Flag indicating if the table name is valid so it would not throw errors when the MySQL table is created.
-    /// </summary>
-    private bool _isTableNameValid = false;
-
-    /// <summary>
-    /// Flag indicating if the column name for the automatically added Primary Key does not already exist in another column name.
-    /// </summary>
-    private bool _isColumnPKValid = true;
+    private bool _isUserInput;
 
     #endregion Fields
 
@@ -89,10 +52,9 @@ namespace MySQL.ForExcel
     /// <param name="exportingWorksheetName">Name of the Excel worksheet containing the data to export.</param>
     public ExportDataForm(MySqlWorkbenchConnection wbConnection, Excel.Range exportDataRange, string exportingWorksheetName)
     {
-      _multiColumnPK = false;
-      _isChanging = false;
-      _wbConnection = wbConnection;
-      _exportDataRange = exportDataRange;
+      _isUserInput = true;
+      WBConnection = wbConnection;
+      ExportDataRange = exportDataRange;
       string proposedTableName = string.Empty;
 
       InitializeComponent();
@@ -102,435 +64,318 @@ namespace MySQL.ForExcel
         proposedTableName = exportingWorksheetName.ToLower().Replace(' ', '_');
       }
 
-      Text = string.Format("Export Data - {0} [{1}])", exportingWorksheetName, exportDataRange.Address.Replace("$", string.Empty));
+      Text = string.Format("Export Data - {0} [{1}]", exportingWorksheetName, exportDataRange.Address.Replace("$", string.Empty));
       LoadPreviewData(wbConnection.Schema, proposedTableName);
       InitializeDataTypeCombo();
+      CopySQLButton.Visible = Properties.Settings.Default.ExportShowCopySQLButton;
+      FirstRowHeadersCheckBox_CheckedChanged(FirstRowHeadersCheckBox, EventArgs.Empty);
+      SetDefaultPrimaryKey();
 
       if (!string.IsNullOrEmpty(proposedTableName))
       {
-        txtTableNameInput.Text = proposedTableName;
-      }
-
-      txtTableNameInput.SelectAll();
-      btnCopySQL.Visible = Properties.Settings.Default.ExportShowCopySQLButton;
-      chkFirstRowHeaders_CheckedChanged(chkFirstRowHeaders, EventArgs.Empty);
-      SetDefaultPrimaryKey();
-    }
-
-    /// <summary>
-    /// Fills the <see cref="cmbPrimaryKeyColumns"/> combo box containing the names of column names to choose from to create a Primary Key.
-    /// </summary>
-    private void RefreshPrimaryKeyColumnsCombo()
-    {
-      string selectedItem = null;
-      if (radUseExistingColumn.Checked)
-      {
-        selectedItem = (string)cmbPrimaryKeyColumns.SelectedItem;
-      }
-
-      cmbPrimaryKeyColumns.BeginUpdate();
-      cmbPrimaryKeyColumns.Items.Clear();
-      if (selectedItem == "<Multiple Items>")
-      {
-        cmbPrimaryKeyColumns.Items.Add("<Multiple Items>");
-      }
-
-      foreach (MySQLDataColumn mysqlCol in _previewDataTable.Columns)
-      {
-        if (mysqlCol.Ordinal == 0 || mysqlCol.ExcludeColumn)
-        {
-          continue;
-        }
-
-        cmbPrimaryKeyColumns.Items.Add(mysqlCol.DisplayName);
-      }
-
-      cmbPrimaryKeyColumns.SelectedItem = selectedItem;
-      cmbPrimaryKeyColumns.EndUpdate();
-    }
-
-    /// <summary>
-    /// Creates the <see cref="MySQLDataTable"/> preview table and fills it with a subset of all the data to export.
-    /// </summary>
-    /// <param name="schemaName">Name of the schema where the MySQL table will be created.</param>
-    /// <param name="proposedTableName">Name of the new MySQL table that will be created.</param>
-    private void LoadPreviewData(string schemaName, string proposedTableName)
-    {
-      if (this._exportDataRange == null)
-      {
-        return;
-      }
-
-      _previewDataTable = new MySQLDataTable(schemaName, proposedTableName, true, Settings.Default.ExportUseFormattedValues, Settings.Default.ExportRemoveEmptyColumns);
-      int previewRowsQty = Math.Min(this._exportDataRange.Rows.Count, Settings.Default.ExportLimitPreviewRowsQuantity);
-      Excel.Range previewRange = this._exportDataRange.get_Resize(previewRowsQty, this._exportDataRange.Columns.Count);
-      _previewDataTable.SetData(
-        previewRange,
-        true,
-        Settings.Default.ExportDetectDatatype,
-        Settings.Default.ExportAddBufferToVarchar,
-        Settings.Default.ExportAutoIndexIntColumns,
-        Settings.Default.ExportAutoAllowEmptyNonIndexColumns,
-        true);
-      grdPreviewData.DataSource = _previewDataTable;
-      columnBindingSource.DataSource = _previewDataTable.Columns;
-    }
-
-    /// <summary>
-    /// Adds or removes warnings for a specific table column and updates the visual warning controls with the corresponding message.
-    /// </summary>
-    /// <param name="mysqlCol"><see cref="MySQLDataColumn"/> object representing the column to update.</param>
-    /// <param name="showWarning">true to add a new warning to the column's warnings collection, false to remove the given warning and display another existing warning.</param>
-    /// <param name="warningResourceText">Text to display to users about the specific warning related to a given table column.</param>
-    private void UpdateColumnWarning(MySQLDataColumn mysqlCol, bool showWarning, string warningResourceText)
-    {
-      int columnIndex = mysqlCol.Ordinal;
-      DataGridViewColumn gridCol = grdPreviewData.Columns[columnIndex];
-      string currentWarningText = showWarning ? warningResourceText : null;
-      if (!showWarning)
-      {
-        //// We do not want to show a warning or we want to remove a warning if warningResourceText != null
-        if (!string.IsNullOrEmpty(warningResourceText))
-        {
-          //// Remove the warning and check if there is an stored warning, if so we want to pull it and show it
-          mysqlCol.WarningTextList.Remove(warningResourceText);
-          if (mysqlCol.WarningTextList.Count > 0)
-          {
-            showWarning = true;
-            currentWarningText = mysqlCol.WarningTextList.Last();
-          }
-        }
+        SetControlTextValue(TableNameInputTextBox, proposedTableName);
       }
       else
       {
-        //// We want to show a warning, the last one stored if any, if not nothing will be shown
-        if (string.IsNullOrEmpty(warningResourceText))
-        {
-          currentWarningText = mysqlCol.WarningTextList.Count > 0 ? mysqlCol.WarningTextList.Last() : null;
-          showWarning = !string.IsNullOrEmpty(currentWarningText);
-        }
-        else if (!mysqlCol.WarningTextList.Contains(warningResourceText))
-        {
-          mysqlCol.WarningTextList.Add(warningResourceText);
-        }
+        PreviewTableWarningsChanged(PreviewDataTable, new TableWarningsChangedArgs(PreviewDataTable, false));
       }
 
-      showWarning = showWarning && !chkExcludeColumn.Checked;
-      currentWarningText = showWarning ? currentWarningText : null;
-      ShowValidationWarning("ColumnOptionsWarning", showWarning, currentWarningText);
-      gridCol.DefaultCellStyle.BackColor = mysqlCol.ExcludeColumn ? Color.LightGray : (showWarning ? Color.OrangeRed : grdPreviewData.DefaultCellStyle.BackColor);
+      TableNameInputTextBox.Focus();
+      TableNameInputTextBox.SelectAll();
     }
 
+    #region Properties
+
     /// <summary>
-    /// Updates the warnings related to the given <see cref="MySQLDataColumn"/> column's data type.
+    /// Gets the Excel cells range containing the data being exported to a new MySQL table.
     /// </summary>
-    /// <param name="mysqlCol"><see cref="MySQLDataColumn"/> object representing the column to update.</param>
-    private void RefreshColumnDataTypeWarning(MySQLDataColumn mysqlCol)
-    {
-      bool showWarning = mysqlCol.MySQLDataType.Length == 0;
-      UpdateColumnWarning(mysqlCol, showWarning, Resources.ColumnDataTypeRequiredWarning);
-    }
+    public Excel.Range ExportDataRange { get; private set; }
 
     /// <summary>
-    /// Updates the warnings related to the given <see cref="MySQLDataColumn"/> column's name.
+    /// Gets a <see cref="MySQLDataTable"/> object containing the all data to be exported to a new MySQL table.
     /// </summary>
-    /// <param name="mysqlCol"><see cref="MySQLDataColumn"/> object representing the column to update.</param>
-    private void RefreshColumnNameWarning(MySQLDataColumn mysqlCol)
-    {
-      bool showWarning = mysqlCol.DisplayName.Length == 0;
-      UpdateColumnWarning(mysqlCol, showWarning, Resources.ColumnNameRequiredWarning);
-    }
+    public MySQLDataTable ExportDataTable { get; private set; }
 
     /// <summary>
-    /// Refreshes the columns names and data types based on the data having the first row (not used as column names) or not.
+    /// Gets a <see cref="MySQLDataTable"/> object containing a subset of the whole data which is shown in the preview grid.
     /// </summary>
-    private void RecreateColumns()
-    {
-      for (int colIdx = 0; colIdx < _previewDataTable.Columns.Count; colIdx++)
-      {
-        MySQLDataColumn mysqlCol = _previewDataTable.GetColumnAtIndex(colIdx);
-        DataGridViewColumn gridCol = grdPreviewData.Columns[colIdx];
-        gridCol.HeaderText = mysqlCol.DisplayName;
-        grdPreviewData.Columns[colIdx].SortMode = DataGridViewColumnSortMode.NotSortable;
-
-        //// Check if current DataType is empty, and if so add a warning for column
-        RefreshColumnDataTypeWarning(mysqlCol);
-
-        //// Check if Name is empty, and if so add a warning for column
-        RefreshColumnNameWarning(mysqlCol);
-      }
-
-      grdPreviewData.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
-      RefreshPrimaryKeyColumnsCombo();
-    }
+    public MySQLDataTable PreviewDataTable { get; private set; }
 
     /// <summary>
-    /// Sets the default primary key column based on the data type of the first column.
+    /// Gets the connection to a MySQL server instance selected by users.
     /// </summary>
-    private void SetDefaultPrimaryKey()
-    {
-      txtAddPrimaryKey.DataBindings.Add(new Binding("Text", _previewDataTable.Columns[0], "DisplayName"));
-      if (_previewDataTable.FirstColumnContainsIntegers)
-      {
-        radUseExistingColumn.Checked = true;
-        columnBindingSource.Position = 1;
-        cmbPrimaryKeyColumns.SelectedIndex = 0;
-        grdPreviewData.Columns[1].Selected = true;
-      }
-      else
-      {
-        radAddPrimaryKey.Checked = true;
-      }
-    }
+    public MySqlWorkbenchConnection WBConnection { get; private set; }
+
+    #endregion Properties
 
     /// <summary>
-    /// Fills the data type combo with the valid values for the columns data type.
-    /// </summary>
-    private void InitializeDataTypeCombo()
-    {
-      DataTable dataTypesTable = new DataTable();
-      dataTypesTable.Columns.Add("Value");
-      dataTypesTable.Columns.Add("Description");
-
-      dataTypesTable.Rows.Add(new string[] { "Integer", "Integer - Default for whole-number columns" });
-      dataTypesTable.Rows.Add(new string[] { "Varchar(5)", "Varchar(5) - Small string up to 5 characters" });
-      dataTypesTable.Rows.Add(new string[] { "Varchar(12)", "Varchar(12) - Small string up to 12 characters" });
-      dataTypesTable.Rows.Add(new string[] { "Varchar(25)", "Varchar(25) - Small string up to 25 characters" });
-      dataTypesTable.Rows.Add(new string[] { "Varchar(45)", "Varchar(45) - Standard string up to 45 characters" });
-      dataTypesTable.Rows.Add(new string[] { "Varchar(255)", "Varchar(255) - Standard string up to 255 characters" });
-      dataTypesTable.Rows.Add(new string[] { "Varchar(4000)", "Varchar(4000) - Large string up to 4k characters" });
-      dataTypesTable.Rows.Add(new string[] { "Varchar(65535)", "Varchar(65535) - Maximum string up to 65k characters" });
-      dataTypesTable.Rows.Add(new string[] { "Datetime", "Datetime - For columns that store both, date and time" });
-      dataTypesTable.Rows.Add(new string[] { "Date", "Date - For columns that only store a date" });
-      dataTypesTable.Rows.Add(new string[] { "Time", "Time - For columns that only store a time" });
-      dataTypesTable.Rows.Add(new string[] { "Bool", "Bool - Holds values like (0, 1), (True, False) or (Yes, No)" });
-      dataTypesTable.Rows.Add(new string[] { "BigInt", "BigInt - For columns containing large whole-number integers with up to 19 digits" });
-      dataTypesTable.Rows.Add(new string[] { "Decimal(12, 2)", "Decimal(12, 2) - Exact decimal numbers with 12 digits with 2 of them after decimal point" });
-      dataTypesTable.Rows.Add(new string[] { "Decimal(65, 30)", "Decimal(65, 30) - Biggest exact decimal numbers with 65 digits with 30 of them after decimal point" });
-      dataTypesTable.Rows.Add(new string[] { "Double", "Double - Biggest float pointing number with approximately 15 decimal places" });
-
-      cmbDatatype.DataSource = dataTypesTable;
-      cmbDatatype.ValueMember = "Value";
-      cmbDatatype.DisplayMember = "Value";
-    }
-
-    /// <summary>
-    /// Shows or hides the visual controls to display warnings for columns or table name.
-    /// </summary>
-    /// <param name="warningControlSuffix">Suffix of the warning control names.</param>
-    /// <param name="show">true to show the warnings, false to hide them.</param>
-    /// <param name="text">Warning text to display.</param>
-    private void ShowValidationWarning(string warningControlSuffix, bool show, string text)
-    {
-      show = show && !string.IsNullOrEmpty(text);
-      string picBoxName = string.Format("pic{0}", warningControlSuffix);
-      string lblName = string.Format("lbl{0}", warningControlSuffix);
-
-      if (contentAreaPanel.Controls.ContainsKey(picBoxName) && contentAreaPanel.Controls.ContainsKey(lblName))
-      {
-        contentAreaPanel.Controls[picBoxName].Visible = show;
-        contentAreaPanel.Controls[lblName].Text = string.IsNullOrEmpty(text) ? string.Empty : text;
-        contentAreaPanel.Controls[lblName].Visible = show;
-        return;
-      }
-
-      if (grpColumnOptions.Controls.ContainsKey(picBoxName) && grpColumnOptions.Controls.ContainsKey(lblName))
-      {
-        grpColumnOptions.Controls[picBoxName].Visible = show;
-        grpColumnOptions.Controls[lblName].Text = string.IsNullOrEmpty(text) ? string.Empty : text;
-        grpColumnOptions.Controls[lblName].Visible = show;
-        return;
-      }
-    }
-
-    /// <summary>
-    /// Reflects in the Primary Key columns combo box if the index is composed of multiple columns or a single one.
-    /// </summary>
-    /// <param name="pkQty">Number of columns composing the Primary Key.</param>
-    private void FlagMultiColumnPrimaryKey(int pkQty)
-    {
-      radAddPrimaryKey.Checked = pkQty == 0;
-      radUseExistingColumn.Checked = pkQty > 0;
-      if (cmbPrimaryKeyColumns.Items.Count == 0)
-      {
-        return;
-      }
-
-      if (pkQty < 2 && cmbPrimaryKeyColumns.Items[0].ToString() == "<Multiple Items>")
-      {
-        cmbPrimaryKeyColumns.Items.RemoveAt(0);
-        var name = _previewDataTable.Columns.Cast<MySQLDataColumn>().Skip(1).First(i => i.PrimaryKey == true);
-        cmbPrimaryKeyColumns.SelectedItem = name.DisplayName;
-      }
-      else if (pkQty > 1 && cmbPrimaryKeyColumns.Items[0].ToString() != "<Multiple Items>")
-      {
-        cmbPrimaryKeyColumns.Items.Insert(0, "<Multiple Items>");
-        cmbPrimaryKeyColumns.SelectedIndex = 0;
-      }
-    }
-
-    /// <summary>
-    /// Checks if the given <see cref="MySQLDataColumn"/> column's data type is right for the column's current data.
-    /// </summary>
-    /// <param name="currentCol"><see cref="MySQLDataColumn"/> object representing the column to test.</param>
-    /// <returns>true if the column's data fits the data type, false otherwise.</returns>
-    private bool TestColumnDataTypeAgainstColumnData(MySQLDataColumn currentCol)
-    {
-      bool showWarning = cmbDatatype.Text.Length > 0 && !currentCol.CanBeOfMySQLDataType(cmbDatatype.Text);
-      UpdateColumnWarning(currentCol, showWarning, Resources.ExportDataTypeNotSuitableWarning);
-      return !showWarning;
-    }
-
-    /// <summary>
-    /// Validates that a user typed data type is a valid MySQL data type and that the given column's data fits into that type.
-    /// </summary>
-    /// <param name="currentCol"><see cref="MySQLDataColumn"/> object representing the column to validate.</param>
-    /// <param name="proposedUserType">Data type selected from the data type combo box or typed in by the user.</param>
-    /// <returns>true if the type is valid and data fits into it, false otherwise.</returns>
-    private bool ValidateUserDataType(MySQLDataColumn currentCol, string proposedUserType)
-    {
-      bool isValid = false;
-
-      if (proposedUserType.Length > 0)
-      {
-        List<int> paramsInParenthesis;
-        List<string> dataTypesList = DataTypeUtilities.GetMySQLDataTypes(out paramsInParenthesis);
-        int rightParentFound = proposedUserType.IndexOf(")");
-        int leftParentFound = proposedUserType.IndexOf("(");
-        string pureDataType = string.Empty;
-        int typeParametersNum = 0;
-
-        proposedUserType = proposedUserType.Trim().Replace(" ", string.Empty);
-        if (rightParentFound >= 0)
-        {
-          if (leftParentFound < 0 || leftParentFound >= rightParentFound)
-          {
-            return false;
-          }
-
-          typeParametersNum = proposedUserType.Substring(leftParentFound + 1, rightParentFound - leftParentFound - 1).Count(c => c == ',') + 1;
-          pureDataType = proposedUserType.Substring(0, leftParentFound).ToLowerInvariant();
-        }
-        else
-        {
-          pureDataType = proposedUserType.ToLowerInvariant();
-        }
-
-        int typeFoundAt = dataTypesList.IndexOf(pureDataType);
-        int numOfValidParams = typeFoundAt >= 0 ? paramsInParenthesis[typeFoundAt] : -1;
-        bool numParamsMatch = pureDataType.StartsWith("var") ? numOfValidParams >= 0 && numOfValidParams == typeParametersNum : (numOfValidParams >= 0 && numOfValidParams == typeParametersNum) || (numOfValidParams < 0 && typeParametersNum > 0) || typeParametersNum == 0;
-        isValid = typeFoundAt >= 0 && numParamsMatch;
-      }
-      else
-      {
-        isValid = true;
-      }
-
-      bool showWarning = !isValid;
-      UpdateColumnWarning(currentCol, showWarning, Resources.ExportDataTypeNotValidWarning);
-
-      return isValid;
-    }
-
-    /// <summary>
-    /// Checks or unchecks checkboxes in the form depending on specific rules.
-    /// </summary>
-    /// <param name="control"><see cref="CheckBox"/> control to apply rules to.</param>
-    private void EnableChecks(CheckBox control)
-    {
-      MySQLDataColumn column = columnBindingSource.Current as MySQLDataColumn;
-
-      if (control == chkExcludeColumn && control.Checked)
-      {
-        if (chkPrimaryKey.Checked)
-        {
-          chkPrimaryKey.CheckedChanged -= chkPrimaryKey_CheckedChanged;
-          chkPrimaryKey.Checked = false;
-          column.PrimaryKey = false;
-          chkPrimaryKey_Validated(null, EventArgs.Empty);
-          chkPrimaryKey.CheckedChanged += chkPrimaryKey_CheckedChanged;
-        }
-      }
-
-      if (control == chkPrimaryKey && control.Checked)
-      {
-        chkCreateIndex.Checked = false;
-        chkUniqueIndex.Checked = false;
-        chkAllowEmpty.Checked = false;
-      }
-
-      if (control == chkUniqueIndex && control.Checked)
-      {
-        chkCreateIndex.Checked = true;
-        chkPrimaryKey.CheckedChanged -= chkPrimaryKey_CheckedChanged;
-        chkPrimaryKey.Checked = false;
-        column.PrimaryKey = false;
-        chkPrimaryKey_Validated(null, EventArgs.Empty);
-        chkPrimaryKey.CheckedChanged += chkPrimaryKey_CheckedChanged;
-      }
-
-      if (control == chkCreateIndex && !control.Checked)
-      {
-        if (Settings.Default.ExportAutoAllowEmptyNonIndexColumns)
-        {
-          chkAllowEmpty.Checked = true;
-        }
-      }
-
-      //toColumn.ExcludeColumn = chkExcludeColumn.Checked;
-      columnBindingSource.EndEdit();
-
-      chkExcludeColumn.Enabled = true;
-      chkPrimaryKey.Enabled = !(chkExcludeColumn.Checked || radAddPrimaryKey.Checked);
-      chkUniqueIndex.Enabled = !chkExcludeColumn.Checked;
-      chkCreateIndex.Enabled = !(chkExcludeColumn.Checked || chkUniqueIndex.Checked || chkPrimaryKey.Checked);
-      chkAllowEmpty.Enabled = !(chkExcludeColumn.Checked || chkPrimaryKey.Checked);
-      radUseExistingColumn.Enabled = !_previewDataTable.Columns.Cast<MySQLDataColumn>().Skip(1).All(i => i.ExcludeColumn);
-      cmbPrimaryKeyColumns.Enabled = radUseExistingColumn.Enabled && radUseExistingColumn.Checked;
-      cmbDatatype.Enabled = !column.AutoPK;
-
-      if (columnBindingSource.Position == 0)
-      {
-        cmbDatatype.Enabled = chkUniqueIndex.Enabled = chkCreateIndex.Enabled = chkExcludeColumn.Enabled = chkAllowEmpty.Enabled = chkPrimaryKey.Enabled = false;
-      }
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="btnCopySQL"/> button is clicked.
+    /// Event delegate method fired when the <see cref="AddPrimaryKeyRadioButton"/> radio button checked state changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void btnCopySQL_Click(object sender, EventArgs e)
+    private void AddPrimaryKeyRadioButton_CheckedChanged(object sender, EventArgs e)
+    {
+      if (!AddPrimaryKeyRadioButton.Checked)
+      {
+        return;
+      }
+
+      PreviewDataGrid.Columns[0].Visible = true;
+      PreviewDataGrid.Columns[0].Selected = true;
+      PreviewDataGrid.FirstDisplayedScrollingColumnIndex = 0;
+      PrimaryKeyColumnsComboBox.Text = string.Empty;
+      PrimaryKeyColumnsComboBox.SelectedIndex = -1;
+      PrimaryKeyColumnsComboBox.Enabled = false;
+      AddPrimaryKeyTextBox.Enabled = true;
+      PreviewDataTable.UseFirstColumnAsPK = true;
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="AddPrimaryKeyTextBox"/> textbox's text changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void AddPrimaryKeyTextBox_TextChanged(object sender, EventArgs e)
+    {
+      ResetTextChangedTimer();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="AddPrimaryKeyTextBox"/> textbox is being validated.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void AddPrimaryKeyTextBox_Validating(object sender, CancelEventArgs e)
+    {
+      TextChangedTimer.Stop();
+      string newAutoPKName = AddPrimaryKeyTextBox.Text.Trim();
+      MySQLDataColumn pkColumn = PreviewDataTable.GetColumnAtIndex(0);
+      if (pkColumn.DisplayName == newAutoPKName)
+      {
+        return;
+      }
+
+      pkColumn.SetDisplayName(AddPrimaryKeyTextBox.Text);
+      PreviewDataGrid.Columns[0].HeaderText = pkColumn.DisplayName;
+      MySQLDataColumn currentColumn = GetCurrentMySQLDataColumn();
+      if (currentColumn != null && currentColumn.Ordinal == 0)
+      {
+        SetControlTextValue(ColumnNameTextBox, currentColumn.DisplayName);
+      }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="AdvancedOptionsButton"/> button is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void AdvancedOptionsButton_Click(object sender, EventArgs e)
+    {
+      ExportAdvancedOptionsDialog optionsDialog = new ExportAdvancedOptionsDialog();
+      DialogResult dr = optionsDialog.ShowDialog();
+      ////if (dr == DialogResult.OK)
+      ////  btnCopySQL.Visible = Settings.Default.ExportShowCopySQLButton;
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="AllowEmptyCheckBox"/> object's checked state changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="ea">Event arguments.</param>
+    private void AllowEmptyCheckBox_CheckedChanged(object sender, EventArgs ea)
+    {
+      MySQLDataColumn currentCol = GetCurrentMySQLDataColumn();
+      if (currentCol == null || AllowEmptyCheckBox.Checked == currentCol.AllowNull)
+      {
+        return;
+      }
+
+      currentCol.AllowNull = AllowEmptyCheckBox.Checked;
+      RefreshColumnControlsEnabledStatus(false);
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="ColumnNameTextBox"/> textbox's text changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ColumnNameTextBox_TextChanged(object sender, EventArgs e)
+    {
+      ResetTextChangedTimer();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="ColumnNameTextBox"/> textbox is being validated.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ColumnNameTextBox_Validating(object sender, CancelEventArgs e)
+    {
+      TextChangedTimer.Stop();
+      string newColumnName = ColumnNameTextBox.Text.Trim();
+      MySQLDataColumn column = GetCurrentMySQLDataColumn();
+      if (column == null || column.DisplayName == newColumnName)
+      {
+        return;
+      }
+
+      column.SetDisplayName(newColumnName, true);
+      PreviewDataGrid.Columns[column.Ordinal].HeaderText = column.DisplayName;
+      SetControlTextValue(AddPrimaryKeyTextBox, column.DisplayName);
+      if (ColumnNameTextBox.Text != column.DisplayName)
+      {
+        SetControlTextValue(ColumnNameTextBox, column.DisplayName);
+      }
+
+      if (PrimaryKeyColumnsComboBox.Items.Count > 0)
+      {
+        //// Update the columnIndex for the cmbPrimaryKeyColumns combo box since it does not include Excluded columns
+        int comboColumnIndex = -1;
+        for (int i = 1; i < PreviewDataTable.Columns.Count && i != column.Ordinal; i++)
+        {
+          column = PreviewDataTable.GetColumnAtIndex(i);
+          if (!column.ExcludeColumn)
+          {
+            comboColumnIndex++;
+          }
+        }
+
+        if (comboColumnIndex >= 0)
+        {
+          PrimaryKeyColumnsComboBox.BeginUpdate();
+          PrimaryKeyColumnsComboBox.Items[comboColumnIndex] = column.DisplayName;
+          PrimaryKeyColumnsComboBox.EndUpdate();
+        }
+      }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="CopySQLButton"/> button is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void CopySQLButton_Click(object sender, EventArgs e)
     {
       StringBuilder queryString = new StringBuilder();
-      queryString.Append(_exportDataTable.GetCreateSQL(true));
+      queryString.Append(ExportDataTable.GetCreateSQL(true));
       queryString.AppendFormat(";{0}", Environment.NewLine);
-      queryString.Append(_exportDataTable.GetInsertSQL(100, true));
+      queryString.Append(ExportDataTable.GetInsertSQL(100, true));
       Clipboard.SetText(queryString.ToString());
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="btnExport"/> button is clicked.
+    /// Event delegate method fired when the <see cref="CreateIndexCheckBox"/> object's checked state changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="ea">Event arguments.</param>
+    private void CreateIndexCheckBox_CheckedChanged(object sender, EventArgs ea)
+    {
+      MySQLDataColumn currentCol = GetCurrentMySQLDataColumn();
+      if (currentCol == null || CreateIndexCheckBox.Checked == currentCol.CreateIndex)
+      {
+        return;
+      }
+
+      currentCol.CreateIndex = CreateIndexCheckBox.Checked;
+      RefreshColumnControlsEnabledStatus(false);
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="DataTypeComboBox"/> combo box's selected index changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void btnExport_Click(object sender, EventArgs e)
+    private void DataTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+    {
+      MySQLDataColumn currentCol = GetCurrentMySQLDataColumn();
+      if (currentCol == null || DataTypeComboBox.Text.Length == 0 || DataTypeComboBox.Text == currentCol.MySQLDataType || (DataTypeComboBox.DataSource as DataTable).Select(string.Format("Value = '{0}'", DataTypeComboBox.Text)).Length == 0)
+      {
+        return;
+      }
+
+      currentCol.SetMySQLDataType(DataTypeComboBox.Text, false);
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="DataTypeComboBox"/> combo's text changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void DataTypeComboBox_TextChanged(object sender, EventArgs e)
+    {
+      ResetTextChangedTimer();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="DataTypeComboBox"/> combo box is validating.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void DataTypeComboBox_Validating(object sender, CancelEventArgs e)
+    {
+      TextChangedTimer.Stop();
+      string newDataType = DataTypeComboBox.Text.Trim();
+      MySQLDataColumn currentCol = GetCurrentMySQLDataColumn();
+      if (currentCol == null || DataTypeComboBox.SelectedIndex >= 0 || currentCol.MySQLDataType == newDataType)
+      {
+        return;
+      }
+
+      currentCol.SetMySQLDataType(newDataType, true);
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="DataTypeComboBox"/> combo box's draws each internal item.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void DataTypeComboBoxDrawItem(object sender, DrawItemEventArgs e)
+    {
+      e.DrawBackground();
+      e.Graphics.DrawString((DataTypeComboBox.Items[e.Index] as DataRowView)["Description"].ToString(), DataTypeComboBox.Font, System.Drawing.Brushes.Black, new RectangleF(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height));
+      e.DrawFocusRectangle();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="ExcludeColumnCheckBox"/> object's checked state changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="ea">Event arguments.</param>
+    private void ExcludeCheckBox_CheckedChanged(object sender, EventArgs ea)
+    {
+      MySQLDataColumn currentCol = GetCurrentMySQLDataColumn();
+      if (currentCol == null || ExcludeColumnCheckBox.Checked == currentCol.ExcludeColumn)
+      {
+        return;
+      }
+
+      currentCol.ExcludeColumn = ExcludeColumnCheckBox.Checked;
+      RefreshColumnControlsEnabledStatus(true);
+      RefreshPrimaryKeyColumnsCombo(false);
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="ExportButton"/> button is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ExportButton_Click(object sender, EventArgs e)
     {
       this.Cursor = Cursors.WaitCursor;
-      if (_exportDataTable == null)
+      if (ExportDataTable == null)
       {
-        _exportDataTable = _previewDataTable.CloneSchema();
-        _exportDataTable.SetData(this._exportDataRange, false, false, false, false, false, true);
+        ExportDataTable = PreviewDataTable.CloneSchema();
+        ExportDataTable.SetData(ExportDataRange, false, true);
       }
       else
       {
-        _exportDataTable.SyncSchema(_previewDataTable);
+        ExportDataTable.SyncSchema(PreviewDataTable);
       }
 
-      _exportDataTable.TableName = _previewDataTable.TableName;
+      ExportDataTable.TableName = PreviewDataTable.TableName;
       this.Cursor = Cursors.Default;
 
-      bool tableContainsDataToExport = _exportDataTable.Rows.Count > (_exportDataTable.FirstRowIsHeaders ? 1 : 0);
+      bool tableContainsDataToExport = ExportDataTable.Rows.Count > (ExportDataTable.FirstRowIsHeaders ? 1 : 0);
       if (!tableContainsDataToExport)
       {
         WarningDialog wDiag = new WarningDialog(Properties.Resources.ExportDataNoDataToExportTitleWarning, Properties.Resources.ExportDataNoDataToExportDetailWarning);
@@ -544,11 +389,11 @@ namespace MySQL.ForExcel
       Exception exception;
       DataTable warningsTable;
       bool warningsFound = false;
-      string operationSummary = string.Format("The MySQL Table \"{0}\"", _exportDataTable.TableName);
+      string operationSummary = string.Format("The MySQL Table \"{0}\"", ExportDataTable.TableName);
       StringBuilder operationDetails = new StringBuilder();
-      operationDetails.AppendFormat("Creating MySQL Table \"{0}\" with query...{1}{1}", _exportDataTable.TableName, Environment.NewLine);
+      operationDetails.AppendFormat("Creating MySQL Table \"{0}\" with query...{1}{1}", ExportDataTable.TableName, Environment.NewLine);
       string queryString = string.Empty;
-      warningsTable = _exportDataTable.CreateTable(_wbConnection, out exception, out queryString);
+      warningsTable = ExportDataTable.CreateTable(out exception, out queryString);
       bool success = exception == null;
       operationDetails.Append(queryString);
       operationDetails.AppendFormat("{0}{0}", Environment.NewLine);
@@ -595,11 +440,11 @@ namespace MySQL.ForExcel
         int insertedCount = 0;
         int insertingCount = 0;
         int warningsCount = 0;
-        warningsTable = _exportDataTable.InsertDataWithManualQuery(_wbConnection, out exception, out queryString, out insertingCount, out insertedCount);
+        warningsTable = ExportDataTable.InsertDataWithManualQuery(out exception, out queryString, out insertingCount, out insertedCount);
         warningsCount = (warningsTable != null ? warningsTable.Rows.Count : 0) + (insertingCount > insertedCount ? 1 : 0);
         operationDetails.AppendFormat(
           "{1}{1}Inserting Excel data in MySQL Table \"{0}\" with query...{1}{1}{2}{1}{1}",
-          _exportDataTable.TableName,
+          ExportDataTable.TableName,
           Environment.NewLine,
           queryString);
         success = exception == null;
@@ -671,550 +516,152 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="btnAdvanced"/> button is clicked.
+    /// Event delegate method fired when the <see cref="ExportDataForm"/> form is loaded.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void btnAdvanced_Click(object sender, EventArgs e)
+    private void ExportDataForm_Load(object sender, EventArgs e)
     {
-      ExportAdvancedOptionsDialog optionsDialog = new ExportAdvancedOptionsDialog();
-      DialogResult dr = optionsDialog.ShowDialog();
-      ////if (dr == DialogResult.OK)
-      ////  btnCopySQL.Visible = Settings.Default.ExportShowCopySQLButton;
+      PreviewDataGrid.Columns[PreviewDataGrid.Columns[0].Visible ? 0 : 1].Selected = true;
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="chkFirstRowHeaders"/> checkbox's checked state changes.
+    /// Event delegate method fired when the <see cref="FirstRowHeadersCheckBox"/> checkbox's checked state changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void chkFirstRowHeaders_CheckedChanged(object sender, EventArgs e)
+    private void FirstRowHeadersCheckBox_CheckedChanged(object sender, EventArgs e)
     {
-      int cmbIndex = cmbPrimaryKeyColumns.SelectedIndex;
-      int grdIndex = columnBindingSource.Position;
-      _previewDataTable.FirstRowIsHeaders = chkFirstRowHeaders.Checked;
+      int grdIndex = PreviewDataGrid.SelectedColumns.Count > 0 ? PreviewDataGrid.SelectedColumns[0].Index : 0;
+      PreviewDataTable.FirstRowIsHeaders = FirstRowHeadersCheckBox.Checked;
       RecreateColumns();
-      grdPreviewData.CurrentCell = null;
-      grdPreviewData.Rows[0].Visible = !chkFirstRowHeaders.Checked;
-      cmbPrimaryKeyColumns.SelectedIndex = cmbIndex;
-      grdPreviewData.Columns[grdIndex].Selected = true;
-      grdPreviewData.FirstDisplayedScrollingColumnIndex = grdIndex;
-      if (chkFirstRowHeaders.Checked && grdPreviewData.Rows.Count < 2)
+      PreviewDataGrid.CurrentCell = null;
+      PreviewDataGrid.Rows[0].Visible = !FirstRowHeadersCheckBox.Checked;
+      PreviewDataGrid.Columns[grdIndex].Selected = true;
+      PreviewDataGrid.FirstDisplayedScrollingColumnIndex = grdIndex;
+      if (FirstRowHeadersCheckBox.Checked && PreviewDataGrid.Rows.Count < 2)
       {
         return;
       }
 
-      grdPreviewData.FirstDisplayedScrollingRowIndex = chkFirstRowHeaders.Checked ? 1 : 0;
+      PreviewDataGrid.FirstDisplayedScrollingRowIndex = FirstRowHeadersCheckBox.Checked ? 1 : 0;
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="txtTableNameInput"/> textbox is being validated.
+    /// Reflects in the Primary Key columns combo box if the index is composed of multiple columns or a single one.
     /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void txtTableNameInput_Validating(object sender, CancelEventArgs e)
+    private void FlagMultiColumnPrimaryKey()
     {
-      timerTextChanged.Stop();
-
-      if (string.IsNullOrWhiteSpace(txtTableNameInput.Text))
-      {
-        ShowValidationWarning("TableNameWarning", true, Properties.Resources.TableNameRequiredWarning);
-        _isTableNameValid = false;
-        btnExport.Enabled = false;
-        return;
-      }
-
-      _previewDataTable.TableName = txtTableNameInput.Text;
-
-      string cleanTableName = txtTableNameInput.Text.ToLowerInvariant().Replace(" ", "_");
-      bool tableExistsInSchema = MySQLDataUtilities.TableExistsInSchema(_wbConnection, _wbConnection.Schema, cleanTableName);
-      if (tableExistsInSchema)
-      {
-        ShowValidationWarning("TableNameWarning", true, Properties.Resources.TableNameExistsWarning);
-        btnExport.Enabled = false;
-        _isTableNameValid = false;
-        return;
-      }
-
-      if (txtTableNameInput.Text.Contains(" ") || txtTableNameInput.Text.Any(char.IsUpper))
-      {
-        ShowValidationWarning("TableNameWarning", true, Properties.Resources.NamesWarning);
-        btnExport.Enabled = _isColumnPKValid;
-        _isTableNameValid = true;
-        return;
-      }
-
-      ShowValidationWarning("TableNameWarning", false, null);
-      _isTableNameValid = true;
-      btnExport.Enabled = _isColumnPKValid;
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="txtTableNameInput"/> textbox's text changes.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void txtTableNameInput_TextChanged(object sender, EventArgs e)
-    {
-      timerTextChanged.Stop();
-      string name = txtTableNameInput.Text.Trim();
-      if (_previewDataTable != null)
-      {
-        _previewDataTable.TableName = name;
-      }
-
-      string autoPKColumnName = string.Format("{0}{1}id", name, name.Length > 0 ? "_" : string.Empty);
-      txtAddPrimaryKey.Text = _previewDataTable.GetNonDuplicateColumnName(autoPKColumnName);
-      timerTextChanged.Start();
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="timerTextChanged"/> timer's elapses.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void timerTextChanged_Tick(object sender, EventArgs e)
-    {
-      txtTableNameInput_Validating(txtTableNameInput, new CancelEventArgs());
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="radAddPrimaryKey"/> radio button checked state changes.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void radAddPrimaryKey_CheckedChanged(object sender, EventArgs e)
-    {
-      if (!radAddPrimaryKey.Checked)
+      int pkQty = PreviewDataTable.NumberOfPK;
+      AddPrimaryKeyRadioButton.Checked = pkQty == 0;
+      UseExistingColumnRadioButton.Checked = pkQty > 0;
+      if (PrimaryKeyColumnsComboBox.Items.Count == 0)
       {
         return;
       }
 
-      _isChanging = true;
-      grdPreviewData.Columns[0].Visible = true;
-      grdPreviewData.Columns[0].Selected = true;
-      grdPreviewData.FirstDisplayedScrollingColumnIndex = 0;
-      cmbPrimaryKeyColumns.Text = string.Empty;
-      cmbPrimaryKeyColumns.SelectedIndex = -1;
-      cmbPrimaryKeyColumns.Enabled = false;
-      txtAddPrimaryKey.Enabled = true;
-      _previewDataTable.UseFirstColumnAsPK = true;
-      _isChanging = false;
-      ////EnableChecks(null);
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="radUseExistingColumn"/> radio button checked state changes.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void radUseExistingColumn_CheckedChanged(object sender, EventArgs e)
-    {
-      if (!radUseExistingColumn.Checked)
+      if (pkQty < 2 && PrimaryKeyColumnsComboBox.Items[0].ToString() == "<Multiple Items>")
       {
-        return;
-      }
-
-      _isChanging = true;
-      grdPreviewData.Columns[0].Visible = false;
-      grdPreviewData.FirstDisplayedScrollingColumnIndex = 1;
-      cmbPrimaryKeyColumns.Enabled = true;
-      _multiColumnPK = false;
-      cmbPrimaryKeyColumns.SelectedIndex = 0;
-      columnBindingSource.ResetCurrentItem();
-      txtAddPrimaryKey.Enabled = false;
-      _previewDataTable.UseFirstColumnAsPK = false;
-      EnableChecks(null);
-      _isChanging = false;
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="grdPreviewData"/> grid selection changes.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void grdPreviewData_SelectionChanged(object sender, EventArgs e)
-    {
-      _isChanging = true;
-      if (grdPreviewData.SelectedColumns.Count > 0)
-      {
-        columnBindingSource.Position = grdPreviewData.SelectedColumns[0].Index;
-        MySQLDataColumn column = columnBindingSource.Current as MySQLDataColumn;
-        UpdateColumnWarning(column, true, null);
-      }
-
-      grpColumnOptions.Enabled = grdPreviewData.SelectedColumns.Count > 0;
-      EnableChecks(null);
-      if (grdPreviewData.Columns[0].Selected)
-      {
-        chkUniqueIndex.Enabled = chkCreateIndex.Enabled = chkExcludeColumn.Enabled = chkAllowEmpty.Enabled = chkPrimaryKey.Enabled = false;
-      }
-
-      _isChanging = false;
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="cmbPrimaryKeyColumns"/> combo box selected index changes.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void cmbPrimaryKeyColumns_SelectedIndexChanged(object sender, EventArgs e)
-    {
-      if (cmbPrimaryKeyColumns.SelectedIndex == -1)
-      {
-        return;
-      }
-
-      if (_multiColumnPK && cmbPrimaryKeyColumns.SelectedIndex == 0)
-      {
-        return;
-      }
-
-      //// If <Multiple Items> was previously selected we need to remove it since we are selecting a single column now as a primary key
-      _multiColumnPK = false;
-      if (cmbPrimaryKeyColumns.Items[0].ToString() == "<Multiple Items>")
-      {
-        cmbPrimaryKeyColumns.BeginUpdate();
-        int index = cmbPrimaryKeyColumns.SelectedIndex;
-        cmbPrimaryKeyColumns.Items.RemoveAt(0);
-        if (index == 0)
+        PrimaryKeyColumnsComboBox.Items.RemoveAt(0);
+        var pkColumn = PreviewDataTable.Columns.Cast<MySQLDataColumn>().Skip(1).First(i => i.PrimaryKey == true);
+        if (pkColumn != null)
         {
-          cmbPrimaryKeyColumns.SelectedIndex = 0;
-        }
-
-        cmbPrimaryKeyColumns.EndUpdate();
-      }
-
-      //// Now we need to adjust the index of the actual column we want to set the PrimaryKey flag for
-      int comboColumnIndex = 0;
-      for (int coldIdx = 1; coldIdx < _previewDataTable.Columns.Count; coldIdx++)
-      {
-        MySQLDataColumn col = _previewDataTable.GetColumnAtIndex(coldIdx);
-        if (col.ExcludeColumn)
-        {
-          continue;
-        }
-
-        col.PrimaryKey = comboColumnIndex == cmbPrimaryKeyColumns.SelectedIndex;
-        if (col.PrimaryKey)
-        {
-          col.CreateIndex = col.UniqueKey = col.AllowNull = col.ExcludeColumn = false;
-          grdPreviewData.Columns[col.ColumnName].Selected = true;
-          grdPreviewData.FirstDisplayedScrollingColumnIndex = grdPreviewData.Columns[col.ColumnName].Index;
-        }
-
-        comboColumnIndex++;
-      }
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="txtColumnName"/> textbox's text changes.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void txtColumnName_TextChanged(object sender, EventArgs e)
-    {
-      if (txtColumnName.Text == (columnBindingSource.Current as MySQLDataColumn).DisplayName)
-      {
-        return;
-      }
-
-      _isChanging = true;
-      string name = txtColumnName.Text;
-      bool colNameEmpty = name.Length == 0;
-
-      int columnIndex = grdPreviewData.SelectedColumns[0].Index;
-      if (!colNameEmpty)
-      {
-        name = _previewDataTable.GetNonDuplicateColumnName(name);
-        if (txtColumnName.Text != name)
-        {
-          txtColumnName.Text = name;
+          PrimaryKeyColumnsComboBox.SelectedIndexChanged -= PrimaryKeyColumnsComboBox_SelectedIndexChanged;
+          PrimaryKeyColumnsComboBox.SelectedItem = pkColumn.DisplayName;
+          PrimaryKeyColumnsComboBox.SelectedIndexChanged += PrimaryKeyColumnsComboBox_SelectedIndexChanged;
         }
       }
-
-      MySQLDataColumn column = columnBindingSource.Current as MySQLDataColumn;
-      column.DisplayName = name;
-      grdPreviewData.Columns[columnIndex].HeaderText = name;
-      UpdateColumnWarning(column, colNameEmpty, Resources.ColumnNameRequiredWarning);
-
-      if (cmbPrimaryKeyColumns.Items.Count > 0)
+      else if (pkQty > 1 && PrimaryKeyColumnsComboBox.Items[0].ToString() != "<Multiple Items>")
       {
-        //// Update the columnIndex for the cmbPrimaryKeyColumns combo box since it does not include Excluded columns
-        int comboColumnIndex = -1;
-        for (int i = 1; i < _previewDataTable.Columns.Count; i++)
-        {
-          column = _previewDataTable.GetColumnAtIndex(i);
-          if (!column.ExcludeColumn)
-          {
-            comboColumnIndex++;
-          }
-
-          if (i == columnIndex)
-          {
-            break;
-          }
-        }
-
-        if (comboColumnIndex >= 0)
-        {
-          cmbPrimaryKeyColumns.BeginUpdate();
-          cmbPrimaryKeyColumns.Items[comboColumnIndex] = name;
-          cmbPrimaryKeyColumns.EndUpdate();
-        }
+        PrimaryKeyColumnsComboBox.Items.Insert(0, "<Multiple Items>");
+        PrimaryKeyColumnsComboBox.SelectedIndex = 0;
       }
-
-      _isChanging = false;
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="chkUniqueIndex"/> checkbox checked state changes.
+    /// Gets the MySQL Column bound to the currently selected grid column.
     /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void chkUniqueIndex_CheckedChanged(object sender, EventArgs e)
+    /// <returns><see cref="MySQLDataColumn"/> object bound to the currently selected grid column.</returns>
+    private MySQLDataColumn GetCurrentMySQLDataColumn()
     {
-      MySQLDataColumn currentCol = columnBindingSource.Current as MySQLDataColumn;
-      if (chkUniqueIndex.Checked == currentCol.UniqueKey)
+      MySQLDataColumn currentColumn = null;
+      if (PreviewDataGrid.SelectedColumns.Count > 0)
+      {
+        currentColumn = PreviewDataTable.GetColumnAtIndex(PreviewDataGrid.SelectedColumns[0].Index);
+      }
+
+      return currentColumn;
+    }
+
+    /// <summary>
+    /// Fills the data type combo with the valid values for the columns data type.
+    /// </summary>
+    private void InitializeDataTypeCombo()
+    {
+      DataTable dataTypesTable = new DataTable();
+      dataTypesTable.Columns.Add("Value");
+      dataTypesTable.Columns.Add("Description");
+
+      dataTypesTable.Rows.Add(new string[] { "Integer", "Integer - Default for whole-number columns" });
+      dataTypesTable.Rows.Add(new string[] { "Varchar(5)", "Varchar(5) - Small string up to 5 characters" });
+      dataTypesTable.Rows.Add(new string[] { "Varchar(12)", "Varchar(12) - Small string up to 12 characters" });
+      dataTypesTable.Rows.Add(new string[] { "Varchar(25)", "Varchar(25) - Small string up to 25 characters" });
+      dataTypesTable.Rows.Add(new string[] { "Varchar(45)", "Varchar(45) - Standard string up to 45 characters" });
+      dataTypesTable.Rows.Add(new string[] { "Varchar(255)", "Varchar(255) - Standard string up to 255 characters" });
+      dataTypesTable.Rows.Add(new string[] { "Varchar(4000)", "Varchar(4000) - Large string up to 4k characters" });
+      dataTypesTable.Rows.Add(new string[] { "Varchar(65535)", "Varchar(65535) - Maximum string up to 65k characters" });
+      dataTypesTable.Rows.Add(new string[] { "Datetime", "Datetime - For columns that store both, date and time" });
+      dataTypesTable.Rows.Add(new string[] { "Date", "Date - For columns that only store a date" });
+      dataTypesTable.Rows.Add(new string[] { "Time", "Time - For columns that only store a time" });
+      dataTypesTable.Rows.Add(new string[] { "Bool", "Bool - Holds values like (0, 1), (True, False) or (Yes, No)" });
+      dataTypesTable.Rows.Add(new string[] { "BigInt", "BigInt - For columns containing large whole-number integers with up to 19 digits" });
+      dataTypesTable.Rows.Add(new string[] { "Decimal(12, 2)", "Decimal(12, 2) - Exact decimal numbers with 12 digits with 2 of them after decimal point" });
+      dataTypesTable.Rows.Add(new string[] { "Decimal(65, 30)", "Decimal(65, 30) - Biggest exact decimal numbers with 65 digits with 30 of them after decimal point" });
+      dataTypesTable.Rows.Add(new string[] { "Double", "Double - Biggest float pointing number with approximately 15 decimal places" });
+
+      _isUserInput = false;
+      DataTypeComboBox.DataSource = dataTypesTable;
+      DataTypeComboBox.ValueMember = "Value";
+      DataTypeComboBox.DisplayMember = "Value";
+      _isUserInput = true;
+    }
+
+    /// <summary>
+    /// Creates the <see cref="MySQLDataTable"/> preview table and fills it with a subset of all the data to export.
+    /// </summary>
+    /// <param name="schemaName">Name of the schema where the MySQL table will be created.</param>
+    /// <param name="proposedTableName">Name of the new MySQL table that will be created.</param>
+    private void LoadPreviewData(string schemaName, string proposedTableName)
+    {
+      if (this.ExportDataRange == null)
       {
         return;
       }
 
-      currentCol.UniqueKey = chkUniqueIndex.Checked;
-      DataGridViewColumn gridCol = grdPreviewData.SelectedColumns[0];
-      MySQLDataColumn column = _previewDataTable.GetColumnAtIndex(gridCol.Index);
-      bool good = true;
-      try
-      {
-        column.Unique = chkUniqueIndex.Checked;
-      }
-      catch (InvalidConstraintException)
-      {
-        good = false;
-      }
-
-      UpdateColumnWarning(column, !good, Resources.ColumnDataNotUniqueWarning);
-      EnableChecks(chkUniqueIndex);
+      PreviewDataTable = new MySQLDataTable(
+        schemaName,
+        proposedTableName,
+        true,
+        Settings.Default.ExportUseFormattedValues,
+        Settings.Default.ExportRemoveEmptyColumns,
+        Settings.Default.ExportDetectDatatype,
+        Settings.Default.ExportAddBufferToVarchar,
+        Settings.Default.ExportAutoIndexIntColumns,
+        Settings.Default.ExportAutoAllowEmptyNonIndexColumns,
+        WBConnection);
+      PreviewDataTable.TableWarningsChanged += PreviewTableWarningsChanged;
+      int previewRowsQty = Math.Min(ExportDataRange.Rows.Count, Settings.Default.ExportLimitPreviewRowsQuantity);
+      Excel.Range previewRange = ExportDataRange.get_Resize(previewRowsQty, ExportDataRange.Columns.Count);
+      PreviewDataTable.SetData(previewRange, true, true);
+      PreviewDataGrid.DataSource = PreviewDataTable;
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="chkExcludeColumn"/> checkbox checked state changes.
+    /// Event delegate method fired when the <see cref="PreviewDataGrid"/> grid cells will display a tooltip.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void chkExcludeColumn_CheckedChanged(object sender, EventArgs e)
-    {
-      if (chkExcludeColumn.Checked == (columnBindingSource.Current as MySQLDataColumn).ExcludeColumn)
-      {
-        return;
-      }
-
-      MySQLDataColumn column = columnBindingSource.Current as MySQLDataColumn;
-      column.ExcludeColumn = chkExcludeColumn.Checked;
-      DataGridViewColumn gridCol = grdPreviewData.SelectedColumns[0];
-      UpdateColumnWarning(column, !column.ExcludeColumn, null);
-      int grdIndex = grdPreviewData.SelectedColumns[0].Index;
-      EnableChecks(chkExcludeColumn);
-      RefreshPrimaryKeyColumnsCombo();
-      grdPreviewData.Columns[grdIndex].Selected = true;
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="chkPrimaryKey"/> checkbox checked state changes.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void chkPrimaryKey_CheckedChanged(object sender, EventArgs e)
-    {
-      if (chkPrimaryKey.Checked == (columnBindingSource.Current as MySQLDataColumn).PrimaryKey)
-      {
-        return;
-      }
-
-      (columnBindingSource.Current as MySQLDataColumn).PrimaryKey = chkPrimaryKey.Checked;
-      EnableChecks(chkPrimaryKey);
-      chkPrimaryKey_Validated(sender, e);
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="chkCreateIndex"/> checkbox checked state changes.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void chkCreateIndex_CheckedChanged(object sender, EventArgs e)
-    {
-      if (chkCreateIndex.Checked == (columnBindingSource.Current as MySQLDataColumn).CreateIndex)
-      {
-        return;
-      }
-
-      EnableChecks(chkCreateIndex);
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="grdPreviewData"/> grid data binding operation completes.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void grdPreviewData_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
-    {
-      if (e.ListChangedType != ListChangedType.Reset)
-      {
-        return;
-      }
-
-      grdPreviewData.CurrentCell = null;
-      grdPreviewData.Rows[0].Visible = !chkFirstRowHeaders.Checked;
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="txtAddPrimaryKey"/> textbox's text changes.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void txtAddPrimaryKey_TextChanged(object sender, EventArgs e)
-    {
-      bool showWarning = false;
-      string warningText = null;
-      for (int colIdx = 1; colIdx < _previewDataTable.Columns.Count; colIdx++)
-      {
-        MySQLDataColumn col = _previewDataTable.GetColumnAtIndex(colIdx);
-        showWarning = showWarning || col.DisplayName.ToLowerInvariant() == txtAddPrimaryKey.Text.ToLowerInvariant();
-        if (showWarning)
-        {
-          warningText = Resources.PrimaryKeyColumnExistsWarning;
-          break;
-        }
-      }
-
-      _isColumnPKValid = !showWarning;
-      btnExport.Enabled = _isColumnPKValid && _isTableNameValid;
-      ShowValidationWarning("PrimaryKeyWarning", showWarning, Properties.Resources.PrimaryKeyColumnExistsWarning);
-      _previewDataTable.GetColumnAtIndex(0).DisplayName = txtAddPrimaryKey.Text;
-      grdPreviewData.Columns[0].HeaderText = txtAddPrimaryKey.Text;
-      if (columnBindingSource.Position == 0)
-      {
-        columnBindingSource.ResetCurrentItem();
-      }
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="txtColumnName"/> textbox completes validations.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void txtColumnName_Validated(object sender, EventArgs e)
-    {
-      _isChanging = true;
-      if (txtColumnName.Text != (columnBindingSource.Current as MySQLDataColumn).DisplayName)
-      {
-        columnBindingSource.ResetCurrentItem();
-        int index = grdPreviewData.SelectedColumns.Count > 0 ? grdPreviewData.SelectedColumns[0].Index : -1;
-        if (index > 0)
-        {
-          cmbPrimaryKeyColumns.Items[index - 1] = txtColumnName.Text;
-          grdPreviewData.SelectedColumns[0].HeaderText = txtColumnName.Text;
-        }
-      }
-
-      _isChanging = false;
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="chkPrimaryKey"/> checkbox completes validations.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void chkPrimaryKey_Validated(object sender, EventArgs e)
-    {
-      if (!_isChanging)
-      {
-        int currentPKQty = _previewDataTable.NumberOfPK;
-        _multiColumnPK = currentPKQty > 1;
-        FlagMultiColumnPrimaryKey(currentPKQty);
-      }
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="grdPreviewData"/> grid catches that a key is down.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void grdPreviewData_KeyDown(object sender, KeyEventArgs e)
-    {
-      if (grdPreviewData.SelectedColumns.Count == 0)
-      {
-        return;
-      }
-
-      if (e.Alt)
-      {
-        int currentSelectedIdx = grdPreviewData.SelectedColumns[0].Index;
-        int newIdx = 0;
-        switch (e.KeyCode.ToString())
-        {
-          case "P":
-            newIdx = currentSelectedIdx - 1;
-            if (newIdx >= (radAddPrimaryKey.Checked ? 0 : 1))
-            {
-              grdPreviewData.Columns[newIdx].Selected = true;
-              grdPreviewData.FirstDisplayedScrollingColumnIndex = newIdx;
-            }
-
-            break;
-          case "N":
-            newIdx = currentSelectedIdx + 1;
-            if (newIdx < grdPreviewData.Columns.Count)
-            {
-              grdPreviewData.Columns[newIdx].Selected = true;
-              grdPreviewData.FirstDisplayedScrollingColumnIndex = newIdx;
-            }
-
-            break;
-        }
-      }
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="cmbDatatype"/> combo box's selected index changes.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void cmbDatatype_SelectedIndexChanged(object sender, EventArgs e)
-    {
-      MySQLDataColumn currentCol = columnBindingSource.Current as MySQLDataColumn;
-      if (cmbDatatype.Text == currentCol.MySQLDataType || cmbDatatype.Text.Length == 0 || (cmbDatatype.DataSource as DataTable).Select(string.Format("Value = '{0}'", cmbDatatype.Text)).Length == 0)
-      {
-        return;
-      }
-
-      currentCol.MySQLDataType = cmbDatatype.Text;
-      RefreshColumnDataTypeWarning(currentCol);
-      TestColumnDataTypeAgainstColumnData(currentCol);
-      if (Settings.Default.ExportAutoIndexIntColumns && cmbDatatype.Text.StartsWith("Integer") && !chkCreateIndex.Checked)
-      {
-        chkCreateIndex.Checked = true;
-      }
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="cmbDatatype"/> combo box's draws each internal item.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void cmbDatatype_DrawItem(object sender, DrawItemEventArgs e)
-    {
-      e.DrawBackground();
-      e.Graphics.DrawString((cmbDatatype.Items[e.Index] as DataRowView)["Description"].ToString(), cmbDatatype.Font, System.Drawing.Brushes.Black, new RectangleF(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height));
-      e.DrawFocusRectangle();
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="grdPreviewData"/> grid cells will display a tooltip.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void grdPreviewData_CellToolTipTextNeeded(object sender, DataGridViewCellToolTipTextNeededEventArgs e)
+    private void PreviewDataGrid_CellToolTipTextNeeded(object sender, DataGridViewCellToolTipTextNeededEventArgs e)
     {
       if (e.RowIndex >= 0)
       {
@@ -1222,60 +669,503 @@ namespace MySQL.ForExcel
       }
       else
       {
-        e.ToolTipText = grdPreviewData.Columns[e.ColumnIndex].HeaderText;
+        e.ToolTipText = PreviewDataGrid.Columns[e.ColumnIndex].HeaderText;
       }
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="cmbDatatype"/> combo box is validating.
+    /// Event delegate method fired when the <see cref="PreviewDataGrid"/> grid data binding operation completes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void cmbDatatype_Validating(object sender, CancelEventArgs e)
+    private void PreviewDataGrid_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
     {
-      if (cmbDatatype.SelectedIndex >= 0)
+      if (e.ListChangedType != ListChangedType.Reset)
       {
         return;
       }
 
-      MySQLDataColumn currentCol = columnBindingSource.Current as MySQLDataColumn;
-      bool valid = ValidateUserDataType(currentCol, cmbDatatype.Text);
-      if (valid)
+      PreviewDataGrid.CurrentCell = null;
+      PreviewDataGrid.Rows[0].Visible = !FirstRowHeadersCheckBox.Checked;
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="PreviewDataGrid"/> grid catches that a key is down.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void PreviewDataGrid_KeyDown(object sender, KeyEventArgs e)
+    {
+      if (PreviewDataGrid.SelectedColumns.Count == 0)
       {
-        TestColumnDataTypeAgainstColumnData(currentCol);
+        return;
       }
 
-      if (Settings.Default.ExportAutoIndexIntColumns && cmbDatatype.Text.StartsWith("Integer") && !chkCreateIndex.Checked)
+      if (e.Alt)
       {
-        chkCreateIndex.Checked = true;
+        int currentSelectedIdx = PreviewDataGrid.SelectedColumns[0].Index;
+        int newIdx = 0;
+        switch (e.KeyCode.ToString())
+        {
+          case "P":
+            newIdx = currentSelectedIdx - 1;
+            if (newIdx >= (AddPrimaryKeyRadioButton.Checked ? 0 : 1))
+            {
+              PreviewDataGrid.Columns[newIdx].Selected = true;
+              PreviewDataGrid.FirstDisplayedScrollingColumnIndex = newIdx;
+            }
+
+            break;
+
+          case "N":
+            newIdx = currentSelectedIdx + 1;
+            if (newIdx < PreviewDataGrid.Columns.Count)
+            {
+              PreviewDataGrid.Columns[newIdx].Selected = true;
+              PreviewDataGrid.FirstDisplayedScrollingColumnIndex = newIdx;
+            }
+
+            break;
+        }
       }
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="cmbDatatype"/> combo box completed validations.
+    /// Event delegate method fired when the <see cref="PreviewDataGrid"/> grid selection changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void cmbDatatype_Validated(object sender, EventArgs e)
+    private void PreviewDataGrid_SelectionChanged(object sender, EventArgs e)
     {
-      MySQLDataColumn currentCol = columnBindingSource.Current as MySQLDataColumn;
-      if (!Properties.Settings.Default.ExportDetectDatatype)
-      {
-        currentCol.RowsFrom1stDataType = currentCol.MySQLDataType;
-        currentCol.RowsFrom2ndDataType = currentCol.MySQLDataType;
-      }
-
-      RefreshColumnDataTypeWarning(currentCol);
+      RefreshColumnControlsAndWarnings();
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="ExportDataForm"/> form is loaded.
+    /// Event delegate method fired when the warning texts list of any column in the <see cref="_previewDataTable"/> table changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="args">Event arguments.</param>
+    private void PreviewTableWarningsChanged(object sender, TableWarningsChangedArgs args)
+    {
+      bool showWarning = false;
+      switch (args.WarningsType)
+      {
+        case TableWarningsChangedArgs.TableWarningsType.AutoPrimaryKeyWarnings:
+          ShowValidationWarning("PrimaryKeyWarning", args.WarningsQuantity > 0, Properties.Resources.PrimaryKeyColumnExistsWarning);
+          break;
+        case TableWarningsChangedArgs.TableWarningsType.ColumnWarnings:
+          MySQLDataColumn column = sender as MySQLDataColumn;
+          DataGridViewColumn gridCol = PreviewDataGrid.Columns[column.Ordinal];
+          showWarning = args.WarningsQuantity > 0;
+          ShowValidationWarning("ColumnOptionsWarning", showWarning, args.CurrentWarning);
+          gridCol.DefaultCellStyle.BackColor = column.ExcludeColumn ? Color.LightGray : (showWarning ? Color.OrangeRed : PreviewDataGrid.DefaultCellStyle.BackColor);
+          break;
+        case TableWarningsChangedArgs.TableWarningsType.TableNameWarnings:
+          ShowValidationWarning("TableNameWarning", args.WarningsQuantity > 0, args.CurrentWarning);
+          break;
+      }
+
+      if (args.WarningsType != TableWarningsChangedArgs.TableWarningsType.ColumnWarnings)
+      {
+        ExportButton.Enabled = PreviewDataTable.IsTableNameValid && PreviewDataTable.IsAutoPKColumnNameValid;
+      }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="PrimaryKeyCheckBox"/> object's checked state changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="ea">Event arguments.</param>
+    private void PrimaryKeyCheckBox_CheckedChanged(object sender, EventArgs ea)
+    {
+      MySQLDataColumn currentCol = GetCurrentMySQLDataColumn();
+      if (currentCol == null || PrimaryKeyCheckBox.Checked == currentCol.PrimaryKey)
+      {
+        return;
+      }
+
+      currentCol.PrimaryKey = PrimaryKeyCheckBox.Checked;
+      FlagMultiColumnPrimaryKey();
+      RefreshColumnControlsEnabledStatus(false);
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="PrimaryKeyColumnsComboBox"/> combo box selected index changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void ExportDataForm_Load(object sender, EventArgs e)
+    private void PrimaryKeyColumnsComboBox_SelectedIndexChanged(object sender, EventArgs e)
     {
-      grdPreviewData.Columns[grdPreviewData.Columns[0].Visible ? 0 : 1].Selected = true;
+      if (PrimaryKeyColumnsComboBox.SelectedIndex == -1)
+      {
+        return;
+      }
+
+      if (PreviewDataTable.NumberOfPK > 1 && PrimaryKeyColumnsComboBox.SelectedIndex == 0)
+      {
+        return;
+      }
+
+      //// If <Multiple Items> was previously selected we need to remove it since we are selecting a single column now as a primary key
+      if (PrimaryKeyColumnsComboBox.Items[0].ToString() == "<Multiple Items>")
+      {
+        PrimaryKeyColumnsComboBox.BeginUpdate();
+        int index = PrimaryKeyColumnsComboBox.SelectedIndex;
+        PrimaryKeyColumnsComboBox.Items.RemoveAt(0);
+        if (index == 0)
+        {
+          PrimaryKeyColumnsComboBox.SelectedIndex = 0;
+        }
+
+        PrimaryKeyColumnsComboBox.EndUpdate();
+      }
+
+      //// Now we need to adjust the index of the actual column we want to set the PrimaryKey flag for
+      int comboColumnIndex = 0;
+      MySQLDataColumn currentColumn = GetCurrentMySQLDataColumn();
+      for (int coldIdx = 1; coldIdx < PreviewDataTable.Columns.Count; coldIdx++)
+      {
+        MySQLDataColumn col = PreviewDataTable.GetColumnAtIndex(coldIdx);
+        if (col.ExcludeColumn)
+        {
+          continue;
+        }
+
+        col.PrimaryKey = comboColumnIndex == PrimaryKeyColumnsComboBox.SelectedIndex;
+        if (col.PrimaryKey)
+        {
+          col.CreateIndex = col.UniqueKey = col.AllowNull = col.ExcludeColumn = false;
+          if (col != currentColumn)
+          {
+            PreviewDataGrid.Columns[col.ColumnName].Selected = true;
+            PreviewDataGrid.FirstDisplayedScrollingColumnIndex = PreviewDataGrid.Columns[col.ColumnName].Index;
+          }
+        }
+
+        comboColumnIndex++;
+      }
+    }
+
+    /// <summary>
+    /// Refreshes the columns names and data types based on the data having the first row (not used as column names) or not.
+    /// </summary>
+    private void RecreateColumns()
+    {
+      for (int colIdx = 0; colIdx < PreviewDataTable.Columns.Count; colIdx++)
+      {
+        MySQLDataColumn mysqlCol = PreviewDataTable.GetColumnAtIndex(colIdx);
+        DataGridViewColumn gridCol = PreviewDataGrid.Columns[colIdx];
+        gridCol.HeaderText = mysqlCol.DisplayName;
+        PreviewDataGrid.Columns[colIdx].SortMode = DataGridViewColumnSortMode.NotSortable;
+      }
+
+      PreviewDataGrid.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
+      RefreshPrimaryKeyColumnsCombo(true);
+    }
+
+    /// <summary>
+    /// Refreshes the values of controls tied to column properties and its related warning controls.
+    /// </summary>
+    private void RefreshColumnControlsAndWarnings()
+    {
+      bool columnSelected = PreviewDataGrid.SelectedColumns.Count > 0;
+      ColumnOptionsGroupBox.Enabled = columnSelected;
+      if (!columnSelected)
+      {
+        return;
+      }
+
+      //// Set current column
+      DataGridViewColumn gridCol = PreviewDataGrid.SelectedColumns[0];
+      MySQLDataColumn mysqlCol = PreviewDataTable.GetColumnAtIndex(gridCol.Index);
+
+      //// Set controls tied to column properties
+      SetControlTextValue(ColumnNameTextBox, mysqlCol.DisplayName);
+      SetControlTextValue(DataTypeComboBox, mysqlCol.MySQLDataType);
+      CreateIndexCheckBox.Checked = mysqlCol.CreateIndex;
+      UniqueIndexCheckBox.Checked = mysqlCol.UniqueKey;
+      PrimaryKeyCheckBox.Checked = mysqlCol.PrimaryKey;
+      AllowEmptyCheckBox.Checked = mysqlCol.AllowNull;
+      ExcludeColumnCheckBox.Checked = mysqlCol.ExcludeColumn;
+
+      //// Update column warnings
+      bool showWarning = !string.IsNullOrEmpty(mysqlCol.CurrentColumnWarningText);
+      ShowValidationWarning("ColumnOptionsWarning", showWarning, mysqlCol.CurrentColumnWarningText);
+
+      //// Refresh column controls enabled status and related grid column background color
+      RefreshColumnControlsEnabledStatus(true);
+    }
+
+    /// <summary>
+    /// Enables or disables checkboxes in the form depending on specific rules.
+    /// </summary>
+    /// <param name="refreshGridColumnBkColor">Flag indicating if the grid column's background color should be refreshed.</param>
+    private void RefreshColumnControlsEnabledStatus(bool refreshGridColumnBkColor)
+    {
+      if (PreviewDataGrid.SelectedColumns.Count == 0)
+      {
+        return;
+      }
+
+      MySQLDataColumn mysqlCol = GetCurrentMySQLDataColumn();
+      ExcludeColumnCheckBox.Enabled = true;
+      PrimaryKeyCheckBox.Enabled = !(ExcludeColumnCheckBox.Checked || AddPrimaryKeyRadioButton.Checked);
+      UniqueIndexCheckBox.Enabled = !ExcludeColumnCheckBox.Checked;
+      CreateIndexCheckBox.Enabled = !(ExcludeColumnCheckBox.Checked || UniqueIndexCheckBox.Checked || PrimaryKeyCheckBox.Checked);
+      AllowEmptyCheckBox.Enabled = !(ExcludeColumnCheckBox.Checked || PrimaryKeyCheckBox.Checked);
+      UseExistingColumnRadioButton.Enabled = !PreviewDataTable.Columns.Cast<MySQLDataColumn>().Skip(1).All(i => i.ExcludeColumn);
+      PrimaryKeyColumnsComboBox.Enabled = UseExistingColumnRadioButton.Enabled && UseExistingColumnRadioButton.Checked;
+      DataTypeComboBox.Enabled = !mysqlCol.AutoPK;
+
+      if (mysqlCol.Ordinal == 0)
+      {
+        DataTypeComboBox.Enabled = UniqueIndexCheckBox.Enabled = CreateIndexCheckBox.Enabled = ExcludeColumnCheckBox.Enabled = AllowEmptyCheckBox.Enabled = PrimaryKeyCheckBox.Enabled = false;
+      }
+
+      if (refreshGridColumnBkColor)
+      {
+        DataGridViewColumn gridCol = PreviewDataGrid.SelectedColumns[0];
+        gridCol.DefaultCellStyle.BackColor = mysqlCol.ExcludeColumn ? Color.LightGray : (mysqlCol.WarningsQuantity > 0 ? Color.OrangeRed : PreviewDataGrid.DefaultCellStyle.BackColor);
+      }
+    }
+
+    /// <summary>
+    /// Fills the <see cref="PrimaryKeyColumnsComboBox"/> combo box containing the names of column names to choose from to create a Primary Key.
+    /// </summary>
+    /// <param name="recreatingColumnNames">Flag indicating if the primarky key columns combobox is being refreshed due a recreation of all column names.</param>
+    private void RefreshPrimaryKeyColumnsCombo(bool recreatingColumnNames)
+    {
+      int selectedIndex = -1;
+      string selectedItem = null;
+      if (UseExistingColumnRadioButton.Checked)
+      {
+        selectedIndex = PrimaryKeyColumnsComboBox.SelectedIndex;
+        selectedItem = (string)PrimaryKeyColumnsComboBox.SelectedItem;
+      }
+
+      PrimaryKeyColumnsComboBox.BeginUpdate();
+      PrimaryKeyColumnsComboBox.Items.Clear();
+      if (selectedItem == "<Multiple Items>" && PreviewDataTable.NumberOfPK > 1)
+      {
+        PrimaryKeyColumnsComboBox.Items.Add("<Multiple Items>");
+      }
+
+      foreach (MySQLDataColumn mysqlCol in PreviewDataTable.Columns)
+      {
+        if (mysqlCol.Ordinal == 0 || mysqlCol.ExcludeColumn)
+        {
+          continue;
+        }
+
+        PrimaryKeyColumnsComboBox.Items.Add(mysqlCol.DisplayName);
+      }
+
+      PrimaryKeyColumnsComboBox.SelectedIndexChanged -= PrimaryKeyColumnsComboBox_SelectedIndexChanged;
+      if (recreatingColumnNames)
+      {
+        //// All columns are being recreated, so the amounts of non-excluded columns has not changed, we need to select the same index.
+        PrimaryKeyColumnsComboBox.SelectedIndex = selectedIndex;
+      }
+      else
+      {
+        //// A column is being excluded and it may have had its PrimaryKey property value set to true. We will try to set the saved SelectedItem
+        //// value back, if it is not assigned it means the excluded column was a Primary Key and we need to reset the combo selected value.
+        PrimaryKeyColumnsComboBox.SelectedItem = selectedItem;
+        if (PrimaryKeyColumnsComboBox.SelectedItem == null)
+        {
+          int pkQty = PreviewDataTable.NumberOfPK;
+          if (pkQty > 0)
+          {
+            var pkColumn = PreviewDataTable.Columns.Cast<MySQLDataColumn>().Skip(1).First(i => i.PrimaryKey == true);
+            if (pkColumn != null)
+            {
+              PrimaryKeyColumnsComboBox.SelectedItem = pkColumn.DisplayName;
+            }
+          }
+          else
+          {
+            AddPrimaryKeyRadioButton.Checked = pkQty == 0;
+            UseExistingColumnRadioButton.Checked = pkQty > 0;
+          }
+        }
+      }
+
+      PrimaryKeyColumnsComboBox.SelectedIndexChanged += PrimaryKeyColumnsComboBox_SelectedIndexChanged;
+      PrimaryKeyColumnsComboBox.EndUpdate();
+    }
+
+    /// <summary>
+    /// Resets the timer used on text changes only if there was a user input.
+    /// </summary>
+    private void ResetTextChangedTimer()
+    {
+      if (!_isUserInput)
+      {
+        return;
+      }
+
+      TextChangedTimer.Stop();
+      TextChangedTimer.Start();
+    }
+
+    /// <summary>
+    /// Sets the text property value of the given control.
+    /// </summary>
+    /// <param name="control">Any object inheriting from <see cref="Control"/>.</param>
+    /// <param name="textValue">Text to assign to the control's Text property.</param>
+    private void SetControlTextValue(Control control, string textValue)
+    {
+      if (control.Text == textValue)
+      {
+        return;
+      }
+
+      _isUserInput = false;
+      control.Text = textValue;
+      _isUserInput = true;
+    }
+
+    /// <summary>
+    /// Sets the default primary key column based on the data type of the first column.
+    /// </summary>
+    private void SetDefaultPrimaryKey()
+    {
+      SetControlTextValue(AddPrimaryKeyTextBox, PreviewDataTable.GetColumnAtIndex(0).DisplayName);
+      if (PreviewDataTable.FirstColumnContainsIntegers)
+      {
+        UseExistingColumnRadioButton.Checked = true;
+        PrimaryKeyColumnsComboBox.SelectedIndex = 0;
+        PreviewDataGrid.Columns[1].Selected = true;
+      }
+      else
+      {
+        AddPrimaryKeyRadioButton.Checked = true;
+      }
+    }
+    /// <summary>
+    /// Shows or hides the visual controls to display warnings for columns or table name.
+    /// </summary>
+    /// <param name="warningControlPrefix">Prefix of the warning control names.</param>
+    /// <param name="show">true to show the warnings, false to hide them.</param>
+    /// <param name="text">Warning text to display.</param>
+    private void ShowValidationWarning(string warningControlPrefix, bool show, string text)
+    {
+      show = show && !string.IsNullOrEmpty(text);
+      string pictureBoxControlName = warningControlPrefix + "Picture";
+      string labelControlName = warningControlPrefix + "Label";
+
+      if (contentAreaPanel.Controls.ContainsKey(pictureBoxControlName) && contentAreaPanel.Controls.ContainsKey(labelControlName))
+      {
+        contentAreaPanel.Controls[pictureBoxControlName].Visible = show;
+        contentAreaPanel.Controls[labelControlName].Text = string.IsNullOrEmpty(text) ? string.Empty : text;
+        contentAreaPanel.Controls[labelControlName].Visible = show;
+        return;
+      }
+
+      if (ColumnOptionsGroupBox.Controls.ContainsKey(pictureBoxControlName) && ColumnOptionsGroupBox.Controls.ContainsKey(labelControlName))
+      {
+        ColumnOptionsGroupBox.Controls[pictureBoxControlName].Visible = show;
+        ColumnOptionsGroupBox.Controls[labelControlName].Text = string.IsNullOrEmpty(text) ? string.Empty : text;
+        ColumnOptionsGroupBox.Controls[labelControlName].Visible = show;
+        return;
+      }
+    }
+    /// <summary>
+    /// Event delegate method fired when the <see cref="TableNameInputTextBox"/> textbox's text changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void TableNameInputTextBox_TextChanged(object sender, EventArgs e)
+    {
+      ResetTextChangedTimer();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="TableNameInputTextBox"/> textbox is being validated.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void TableNameInputTextBox_Validating(object sender, CancelEventArgs e)
+    {
+      TextChangedTimer.Stop();
+      string newTableName = TableNameInputTextBox.Text.Trim();
+      if (PreviewDataTable == null || PreviewDataTable.TableName == newTableName)
+      {
+        return;
+      }
+
+      PreviewDataTable.TableName = newTableName;
+      string autoPKColumnName = newTableName + (newTableName.Length > 0 ? "_" : string.Empty) + "id";
+      autoPKColumnName = PreviewDataTable.GetNonDuplicateColumnName(autoPKColumnName);
+      SetControlTextValue(AddPrimaryKeyTextBox, autoPKColumnName);
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="TextChangedTimer"/> timer's elapses.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void TextChangedTimerTick(object sender, EventArgs e)
+    {
+      if (TableNameInputTextBox.Focused)
+      {
+        TableNameInputTextBox_Validating(TableNameInputTextBox, new CancelEventArgs());
+      }
+      else if (AddPrimaryKeyTextBox.Focused)
+      {
+        AddPrimaryKeyTextBox_Validating(AddPrimaryKeyTextBox, new CancelEventArgs());
+      }
+      else if (ColumnNameTextBox.Focused)
+      {
+        ColumnNameTextBox_Validating(ColumnNameTextBox, new CancelEventArgs());
+      }
+      else if (DataTypeComboBox.Focused)
+      {
+        DataTypeComboBox_Validating(DataTypeComboBox, new CancelEventArgs());
+      }
+      else
+      {
+        //// The code should never hit this block in which case there is something wrong.
+        MiscUtilities.WriteToLog("TextChangedTimer's Tick event fired but no valid control had focus.");
+        TextChangedTimer.Stop();
+      }
+    }
+    /// <summary>
+    /// Event delegate method fired when the <see cref="UniqueIndexCheckBox"/> object's checked state changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="ea">Event arguments.</param>
+    private void UniqueIndexCheckBox_CheckedChanged(object sender, EventArgs ea)
+    {
+      MySQLDataColumn currentCol = GetCurrentMySQLDataColumn();
+      if (currentCol == null || UniqueIndexCheckBox.Checked == currentCol.UniqueKey)
+      {
+        return;
+      }
+
+      currentCol.UniqueKey = UniqueIndexCheckBox.Checked;
+      RefreshColumnControlsEnabledStatus(false);
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="UseExistingColumnRadioButton"/> radio button checked state changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void UseExistingColumnRadioButton_CheckedChanged(object sender, EventArgs e)
+    {
+      if (!UseExistingColumnRadioButton.Checked)
+      {
+        return;
+      }
+
+      PreviewDataGrid.Columns[0].Visible = false;
+      PreviewDataGrid.FirstDisplayedScrollingColumnIndex = 1;
+      PrimaryKeyColumnsComboBox.Enabled = true;
+      PrimaryKeyColumnsComboBox.SelectedIndex = 0;
+      AddPrimaryKeyTextBox.Enabled = false;
+      PreviewDataTable.UseFirstColumnAsPK = false;
+      PreviewDataGrid.Columns[1].Selected = true;
     }
   }
 }

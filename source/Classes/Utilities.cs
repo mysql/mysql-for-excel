@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -923,6 +923,50 @@ namespace MySQL.ForExcel
           return MySqlDbType.VarBinary;
       }
       throw new Exception("Unhandled type encountered");
+    }
+
+    /// <summary>
+    /// Validates that a user typed data type is a valid MySQL data type.
+    /// A blank data type is considered valid.
+    /// </summary>
+    /// <param name="dataType">A MySQL data type as specified for new columns in a CREATE TABLE statement.</param>
+    /// <returns>true if the type is a valid MySQL data type, false otherwise.</returns>
+    public static bool ValidateUserDataType(string proposedUserType)
+    {
+      bool isValid = true;
+
+      if (proposedUserType.Length > 0)
+      {
+        List<int> paramsInParenthesis;
+        List<string> dataTypesList = GetMySQLDataTypes(out paramsInParenthesis);
+        int rightParentFound = proposedUserType.IndexOf(")");
+        int leftParentFound = proposedUserType.IndexOf("(");
+        string pureDataType = string.Empty;
+        int typeParametersNum = 0;
+
+        proposedUserType = proposedUserType.Trim().Replace(" ", string.Empty);
+        if (rightParentFound >= 0)
+        {
+          if (leftParentFound < 0 || leftParentFound >= rightParentFound)
+          {
+            return false;
+          }
+
+          typeParametersNum = proposedUserType.Substring(leftParentFound + 1, rightParentFound - leftParentFound - 1).Count(c => c == ',') + 1;
+          pureDataType = proposedUserType.Substring(0, leftParentFound).ToLowerInvariant();
+        }
+        else
+        {
+          pureDataType = proposedUserType.ToLowerInvariant();
+        }
+
+        int typeFoundAt = dataTypesList.IndexOf(pureDataType);
+        int numOfValidParams = typeFoundAt >= 0 ? paramsInParenthesis[typeFoundAt] : -1;
+        bool numParamsMatch = pureDataType.StartsWith("var") ? numOfValidParams >= 0 && numOfValidParams == typeParametersNum : (numOfValidParams >= 0 && numOfValidParams == typeParametersNum) || (numOfValidParams < 0 && typeParametersNum > 0) || typeParametersNum == 0;
+        isValid = typeFoundAt >= 0 && numParamsMatch;
+      }
+
+      return isValid;
     }
 
     public static string GetMySQLExportDataType(object packedValue, out bool valueOverflow)

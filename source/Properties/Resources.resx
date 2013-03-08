@@ -612,4 +612,7 @@ To be able to make modifications on cells not related to MySQL data please exit 
   <data name="AboutMySQLInstallerVersion" xml:space="preserve">
     <value>MySQL Installer 1.2</value>
   </data>
+  <data name="ColumnExistsWarning" xml:space="preserve">
+    <value>Another column with this name already exists in the table.</value>
+  </data>
 </root>

@@ -75,7 +75,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets a value indicating whether the column that contains row headers is displayed.
     /// </summary>
-    [Browsable(false)]
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool RowHeadersVisible
     {
       get { return base.RowHeadersVisible; }
@@ -85,7 +85,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets a value indicating whether to show cell errors.
     /// </summary>
-    [Browsable(false)]
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool ShowCellErrors
     {
       get { return base.ShowCellErrors; }
@@ -95,7 +95,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets a value indicating whether or not the editing glyph is visible in the row header of the cell being edited.
     /// </summary>
-    [Browsable(false)]
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool ShowEditingIcon
     {
       get { return base.ShowEditingIcon; }
@@ -105,7 +105,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets a value indicating whether row headers will display error glyphs for each row that contains a data entry error.
     /// </summary>
-    [Browsable(false)]
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool ShowRowErrors
     {
       get { return base.ShowRowErrors; }
@@ -115,7 +115,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets a value indicating whether the option to add rows is displayed to the user.
     /// </summary>
-    [Browsable(false)]
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool AllowUserToAddRows
     {
       get { return base.AllowUserToAddRows; }
@@ -125,7 +125,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets a value indicating whether the user is allowed to delete rows from the DataGridView.
     /// </summary>
-    [Browsable(false)]
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool AllowUserToDeleteRows
     {
       get { return base.AllowUserToDeleteRows; }
@@ -135,7 +135,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets a value indicating whether manual column repositioning is enabled.
     /// </summary>
-    [Browsable(false)]
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool AllowUserToOrderColumns
     {
       get { return base.AllowUserToOrderColumns; }
@@ -145,7 +145,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets a value indicating whether users can resize columns.
     /// </summary>
-    [Browsable(false)]
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool AllowUserToResizeColumns
     {
       get { return base.AllowUserToResizeColumns; }
@@ -155,7 +155,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets a value indicating whether users can resize rows.
     /// </summary>
-    [Browsable(false)]
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool AllowUserToResizeRows
     {
       get { return base.AllowUserToResizeRows; }
@@ -165,7 +165,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets a value indicating whether the height of the column headers is adjustable and whether it can be adjusted by the user or is automatically adjusted to fit the contents of the headers.
     /// </summary>
-    [Browsable(false)]
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new DataGridViewColumnHeadersHeightSizeMode ColumnHeadersHeightSizeMode
     {
       get { return base.ColumnHeadersHeightSizeMode; }
@@ -175,7 +175,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets a value indicating whether the width of the row headers is adjustable and whether it can be adjusted by the user or is automatically adjusted to fit the contents of the headers.
     /// </summary>
-    [Browsable(false)]
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new DataGridViewRowHeadersWidthSizeMode RowHeadersWidthSizeMode
     {
       get { return base.RowHeadersWidthSizeMode; }
@@ -185,7 +185,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets a value indicating how column widths are determined.
     /// </summary>
-    [Browsable(false)]
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new DataGridViewAutoSizeColumnsMode AutoSizeColumnsMode
     {
       get { return base.AutoSizeColumnsMode; }
@@ -195,7 +195,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets a value indicating whether the user can edit the cells of the DataGridView control.
     /// </summary>
-    [Browsable(false)]
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool ReadOnly
     {
       get { return base.ReadOnly; }

@@ -86,10 +86,20 @@ namespace MySQL.ForExcel
 
     private void initializeFromTableGrid(string schemaName, string fromTableName)
     {
-      fromMySQLPreviewDataTable = new MySQLDataTable(schemaName, fromTableName, false, Properties.Settings.Default.AppendUseFormattedValues, false);
+      fromMySQLPreviewDataTable = new MySQLDataTable(
+        schemaName,
+        fromTableName,
+        false,
+        Properties.Settings.Default.AppendUseFormattedValues,
+        false,
+        true,
+        false,
+        false,
+        false,
+        wbConnection);
       int previewRowsQty = Math.Min(this.appendDataRange.Rows.Count, Settings.Default.AppendLimitPreviewRowsQuantity);
       Excel.Range previewRange = this.appendDataRange.get_Resize(previewRowsQty, this.appendDataRange.Columns.Count);
-      fromMySQLPreviewDataTable.SetData(previewRange, true, true, false, false, false, false);
+      fromMySQLPreviewDataTable.SetData(previewRange, true, false);
       grdFromExcelData.DataSource = fromMySQLPreviewDataTable;
       foreach (DataGridViewColumn gridCol in grdFromExcelData.Columns)
       {
@@ -462,7 +472,8 @@ namespace MySQL.ForExcel
       if (fromMySQLCompleteDataTable == null)
       {
         fromMySQLCompleteDataTable = fromMySQLPreviewDataTable.CloneSchema();
-        fromMySQLCompleteDataTable.SetData(this.appendDataRange, false, false, false, false, false, false);
+        fromMySQLCompleteDataTable.DetectDatatype = false;
+        fromMySQLCompleteDataTable.SetData(appendDataRange, false, false);
       }
       else
         fromMySQLCompleteDataTable.SyncSchema(fromMySQLPreviewDataTable);
@@ -473,7 +484,7 @@ namespace MySQL.ForExcel
       string insertQuery;
       string operationSummary = String.Empty;
 
-      DataTable warningsTable = toMySQLDataTable.AppendDataWithManualQuery(wbConnection, fromMySQLCompleteDataTable, out exception, out insertQuery, out appendCount);
+      DataTable warningsTable = toMySQLDataTable.AppendDataWithManualQuery(fromMySQLCompleteDataTable, out exception, out insertQuery, out appendCount);
       bool success = exception == null;
       StringBuilder operationDetails = new StringBuilder();
       operationDetails.AppendFormat("Inserting Excel data in MySQL Table \"{0}\" with query...{1}{1}{2}{1}{1}",

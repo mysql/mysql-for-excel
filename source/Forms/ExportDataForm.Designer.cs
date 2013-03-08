@@ -48,615 +48,602 @@ namespace MySQL.ForExcel
     private void InitializeComponent()
     {
       this.components = new System.ComponentModel.Container();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-      this.columnBindingSource = new System.Windows.Forms.BindingSource(this.components);
-      this.timerTextChanged = new System.Windows.Forms.Timer(this.components);
-      this.btnCopySQL = new System.Windows.Forms.Button();
-      this.btnAdvanced = new System.Windows.Forms.Button();
-      this.btnExport = new System.Windows.Forms.Button();
-      this.btnCancel = new System.Windows.Forms.Button();
-      this.lblPrimaryKeyWarning = new System.Windows.Forms.Label();
-      this.picPrimaryKeyWarning = new System.Windows.Forms.PictureBox();
-      this.grpColumnOptions = new System.Windows.Forms.GroupBox();
-      this.cmbDatatype = new System.Windows.Forms.ComboBox();
-      this.chkExcludeColumn = new System.Windows.Forms.CheckBox();
-      this.chkAllowEmpty = new System.Windows.Forms.CheckBox();
-      this.chkPrimaryKey = new System.Windows.Forms.CheckBox();
-      this.chkUniqueIndex = new System.Windows.Forms.CheckBox();
-      this.chkCreateIndex = new System.Windows.Forms.CheckBox();
-      this.lblDatatype = new System.Windows.Forms.Label();
-      this.txtColumnName = new System.Windows.Forms.TextBox();
-      this.lblColumnName = new System.Windows.Forms.Label();
-      this.lblColumnOptionsWarning = new System.Windows.Forms.Label();
-      this.picColumnOptionsWarning = new System.Windows.Forms.PictureBox();
-      this.chkFirstRowHeaders = new System.Windows.Forms.CheckBox();
-      this.grdPreviewData = new MySQL.ForExcel.PreviewDataGridView();
-      this.lblColumnOptionsSub = new System.Windows.Forms.Label();
-      this.lblColumnOptionsMain = new System.Windows.Forms.Label();
-      this.picColumnOptions = new System.Windows.Forms.PictureBox();
-      this.lblTableNameWarning = new System.Windows.Forms.Label();
-      this.picTableNameWarning = new System.Windows.Forms.PictureBox();
-      this.cmbPrimaryKeyColumns = new System.Windows.Forms.ComboBox();
-      this.radUseExistingColumn = new System.Windows.Forms.RadioButton();
-      this.txtAddPrimaryKey = new System.Windows.Forms.TextBox();
-      this.radAddPrimaryKey = new System.Windows.Forms.RadioButton();
-      this.txtTableNameInput = new System.Windows.Forms.TextBox();
-      this.lblTableNameInput = new System.Windows.Forms.Label();
-      this.lblPrimaryKeySub = new System.Windows.Forms.Label();
-      this.lblPrimaryKeyMain = new System.Windows.Forms.Label();
-      this.picPrimaryKey = new System.Windows.Forms.PictureBox();
-      this.lblTableNameSub = new System.Windows.Forms.Label();
-      this.lblTableNameMain = new System.Windows.Forms.Label();
-      this.picTable = new System.Windows.Forms.PictureBox();
-      this.lblExportData = new System.Windows.Forms.Label();
-      this.lblSubSetOfData = new System.Windows.Forms.Label();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+      this.TextChangedTimer = new System.Windows.Forms.Timer(this.components);
+      this.CopySQLButton = new System.Windows.Forms.Button();
+      this.AdvancedOptionsButton = new System.Windows.Forms.Button();
+      this.ExportButton = new System.Windows.Forms.Button();
+      this.CancelButton = new System.Windows.Forms.Button();
+      this.PrimaryKeyWarningLabel = new System.Windows.Forms.Label();
+      this.PrimaryKeyWarningPicture = new System.Windows.Forms.PictureBox();
+      this.ColumnOptionsGroupBox = new System.Windows.Forms.GroupBox();
+      this.DataTypeComboBox = new System.Windows.Forms.ComboBox();
+      this.ExcludeColumnCheckBox = new System.Windows.Forms.CheckBox();
+      this.AllowEmptyCheckBox = new System.Windows.Forms.CheckBox();
+      this.PrimaryKeyCheckBox = new System.Windows.Forms.CheckBox();
+      this.UniqueIndexCheckBox = new System.Windows.Forms.CheckBox();
+      this.CreateIndexCheckBox = new System.Windows.Forms.CheckBox();
+      this.DatatypeLabel = new System.Windows.Forms.Label();
+      this.ColumnNameTextBox = new System.Windows.Forms.TextBox();
+      this.ColumnNameLabel = new System.Windows.Forms.Label();
+      this.ColumnOptionsWarningLabel = new System.Windows.Forms.Label();
+      this.ColumnOptionsWarningPicture = new System.Windows.Forms.PictureBox();
+      this.FirstRowHeadersCheckBox = new System.Windows.Forms.CheckBox();
+      this.PreviewDataGrid = new MySQL.ForExcel.PreviewDataGridView();
+      this.ColumnOptionsSubLabel = new System.Windows.Forms.Label();
+      this.ColumnOptionsMainLabel = new System.Windows.Forms.Label();
+      this.ColumnOptionsPicture = new System.Windows.Forms.PictureBox();
+      this.TableNameWarningLabel = new System.Windows.Forms.Label();
+      this.TableNameWarningPicture = new System.Windows.Forms.PictureBox();
+      this.PrimaryKeyColumnsComboBox = new System.Windows.Forms.ComboBox();
+      this.UseExistingColumnRadioButton = new System.Windows.Forms.RadioButton();
+      this.AddPrimaryKeyTextBox = new System.Windows.Forms.TextBox();
+      this.AddPrimaryKeyRadioButton = new System.Windows.Forms.RadioButton();
+      this.TableNameInputTextBox = new System.Windows.Forms.TextBox();
+      this.TableNameInputLabel = new System.Windows.Forms.Label();
+      this.PrimaryKeySubLabel = new System.Windows.Forms.Label();
+      this.PrimaryKeyMainLabel = new System.Windows.Forms.Label();
+      this.PrimaryKeyPicture = new System.Windows.Forms.PictureBox();
+      this.TableNameSubLabel = new System.Windows.Forms.Label();
+      this.TableNameMainLabel = new System.Windows.Forms.Label();
+      this.TablePicture = new System.Windows.Forms.PictureBox();
+      this.ExportDataLabel = new System.Windows.Forms.Label();
+      this.SubSetOfDataLabel = new System.Windows.Forms.Label();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.columnBindingSource)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKeyWarning)).BeginInit();
-      this.grpColumnOptions.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.picColumnOptionsWarning)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picTableNameWarning)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKey)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picTable)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.PrimaryKeyWarningPicture)).BeginInit();
+      this.ColumnOptionsGroupBox.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.ColumnOptionsWarningPicture)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.PreviewDataGrid)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.ColumnOptionsPicture)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.TableNameWarningPicture)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.PrimaryKeyPicture)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.TablePicture)).BeginInit();
       this.SuspendLayout();
       // 
       // contentAreaPanel
       // 
       this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
-      this.contentAreaPanel.Controls.Add(this.lblSubSetOfData);
-      this.contentAreaPanel.Controls.Add(this.lblColumnOptionsWarning);
-      this.contentAreaPanel.Controls.Add(this.picColumnOptionsWarning);
-      this.contentAreaPanel.Controls.Add(this.lblExportData);
-      this.contentAreaPanel.Controls.Add(this.lblPrimaryKeyWarning);
-      this.contentAreaPanel.Controls.Add(this.picPrimaryKeyWarning);
-      this.contentAreaPanel.Controls.Add(this.grpColumnOptions);
-      this.contentAreaPanel.Controls.Add(this.chkFirstRowHeaders);
-      this.contentAreaPanel.Controls.Add(this.grdPreviewData);
-      this.contentAreaPanel.Controls.Add(this.lblColumnOptionsSub);
-      this.contentAreaPanel.Controls.Add(this.lblColumnOptionsMain);
-      this.contentAreaPanel.Controls.Add(this.picColumnOptions);
-      this.contentAreaPanel.Controls.Add(this.lblTableNameWarning);
-      this.contentAreaPanel.Controls.Add(this.picTableNameWarning);
-      this.contentAreaPanel.Controls.Add(this.cmbPrimaryKeyColumns);
-      this.contentAreaPanel.Controls.Add(this.radUseExistingColumn);
-      this.contentAreaPanel.Controls.Add(this.txtAddPrimaryKey);
-      this.contentAreaPanel.Controls.Add(this.radAddPrimaryKey);
-      this.contentAreaPanel.Controls.Add(this.txtTableNameInput);
-      this.contentAreaPanel.Controls.Add(this.lblTableNameInput);
-      this.contentAreaPanel.Controls.Add(this.lblPrimaryKeySub);
-      this.contentAreaPanel.Controls.Add(this.lblPrimaryKeyMain);
-      this.contentAreaPanel.Controls.Add(this.picPrimaryKey);
-      this.contentAreaPanel.Controls.Add(this.lblTableNameSub);
-      this.contentAreaPanel.Controls.Add(this.lblTableNameMain);
-      this.contentAreaPanel.Controls.Add(this.picTable);
+      this.contentAreaPanel.Controls.Add(this.SubSetOfDataLabel);
+      this.contentAreaPanel.Controls.Add(this.ColumnOptionsWarningLabel);
+      this.contentAreaPanel.Controls.Add(this.ColumnOptionsWarningPicture);
+      this.contentAreaPanel.Controls.Add(this.ExportDataLabel);
+      this.contentAreaPanel.Controls.Add(this.PrimaryKeyWarningLabel);
+      this.contentAreaPanel.Controls.Add(this.PrimaryKeyWarningPicture);
+      this.contentAreaPanel.Controls.Add(this.ColumnOptionsGroupBox);
+      this.contentAreaPanel.Controls.Add(this.FirstRowHeadersCheckBox);
+      this.contentAreaPanel.Controls.Add(this.PreviewDataGrid);
+      this.contentAreaPanel.Controls.Add(this.ColumnOptionsSubLabel);
+      this.contentAreaPanel.Controls.Add(this.ColumnOptionsMainLabel);
+      this.contentAreaPanel.Controls.Add(this.ColumnOptionsPicture);
+      this.contentAreaPanel.Controls.Add(this.TableNameWarningLabel);
+      this.contentAreaPanel.Controls.Add(this.TableNameWarningPicture);
+      this.contentAreaPanel.Controls.Add(this.PrimaryKeyColumnsComboBox);
+      this.contentAreaPanel.Controls.Add(this.UseExistingColumnRadioButton);
+      this.contentAreaPanel.Controls.Add(this.AddPrimaryKeyTextBox);
+      this.contentAreaPanel.Controls.Add(this.AddPrimaryKeyRadioButton);
+      this.contentAreaPanel.Controls.Add(this.TableNameInputTextBox);
+      this.contentAreaPanel.Controls.Add(this.TableNameInputLabel);
+      this.contentAreaPanel.Controls.Add(this.PrimaryKeySubLabel);
+      this.contentAreaPanel.Controls.Add(this.PrimaryKeyMainLabel);
+      this.contentAreaPanel.Controls.Add(this.PrimaryKeyPicture);
+      this.contentAreaPanel.Controls.Add(this.TableNameSubLabel);
+      this.contentAreaPanel.Controls.Add(this.TableNameMainLabel);
+      this.contentAreaPanel.Controls.Add(this.TablePicture);
       this.contentAreaPanel.Size = new System.Drawing.Size(844, 555);
       // 
       // commandAreaPanel
       // 
-      this.commandAreaPanel.Controls.Add(this.btnCopySQL);
-      this.commandAreaPanel.Controls.Add(this.btnAdvanced);
-      this.commandAreaPanel.Controls.Add(this.btnExport);
-      this.commandAreaPanel.Controls.Add(this.btnCancel);
+      this.commandAreaPanel.Controls.Add(this.CopySQLButton);
+      this.commandAreaPanel.Controls.Add(this.AdvancedOptionsButton);
+      this.commandAreaPanel.Controls.Add(this.ExportButton);
+      this.commandAreaPanel.Controls.Add(this.CancelButton);
       this.commandAreaPanel.Location = new System.Drawing.Point(0, 555);
       this.commandAreaPanel.Size = new System.Drawing.Size(844, 45);
       // 
-      // columnBindingSource
+      // TextChangedTimer
       // 
-      this.columnBindingSource.DataSource = typeof(MySQL.ForExcel.MySQLDataColumn);
+      this.TextChangedTimer.Interval = 800;
+      this.TextChangedTimer.Tick += new System.EventHandler(this.TextChangedTimerTick);
       // 
-      // timerTextChanged
+      // CopySQLButton
       // 
-      this.timerTextChanged.Interval = 800;
-      this.timerTextChanged.Tick += new System.EventHandler(this.timerTextChanged_Tick);
+      this.CopySQLButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.CopySQLButton.Location = new System.Drawing.Point(595, 12);
+      this.CopySQLButton.Name = "CopySQLButton";
+      this.CopySQLButton.Size = new System.Drawing.Size(75, 23);
+      this.CopySQLButton.TabIndex = 1;
+      this.CopySQLButton.Text = "Copy SQL";
+      this.CopySQLButton.UseVisualStyleBackColor = true;
+      this.CopySQLButton.Visible = false;
+      this.CopySQLButton.Click += new System.EventHandler(this.CopySQLButton_Click);
       // 
-      // btnCopySQL
+      // AdvancedOptionsButton
       // 
-      this.btnCopySQL.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnCopySQL.Location = new System.Drawing.Point(595, 12);
-      this.btnCopySQL.Name = "btnCopySQL";
-      this.btnCopySQL.Size = new System.Drawing.Size(75, 23);
-      this.btnCopySQL.TabIndex = 1;
-      this.btnCopySQL.Text = "Copy SQL";
-      this.btnCopySQL.UseVisualStyleBackColor = true;
-      this.btnCopySQL.Visible = false;
-      this.btnCopySQL.Click += new System.EventHandler(this.btnCopySQL_Click);
+      this.AdvancedOptionsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.AdvancedOptionsButton.Location = new System.Drawing.Point(12, 12);
+      this.AdvancedOptionsButton.Name = "AdvancedOptionsButton";
+      this.AdvancedOptionsButton.Size = new System.Drawing.Size(131, 23);
+      this.AdvancedOptionsButton.TabIndex = 0;
+      this.AdvancedOptionsButton.Text = "Advanced Options...";
+      this.AdvancedOptionsButton.UseVisualStyleBackColor = true;
+      this.AdvancedOptionsButton.Click += new System.EventHandler(this.AdvancedOptionsButton_Click);
       // 
-      // btnAdvanced
+      // ExportButton
       // 
-      this.btnAdvanced.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.btnAdvanced.Location = new System.Drawing.Point(12, 12);
-      this.btnAdvanced.Name = "btnAdvanced";
-      this.btnAdvanced.Size = new System.Drawing.Size(131, 23);
-      this.btnAdvanced.TabIndex = 0;
-      this.btnAdvanced.Text = "Advanced Options...";
-      this.btnAdvanced.UseVisualStyleBackColor = true;
-      this.btnAdvanced.Click += new System.EventHandler(this.btnAdvanced_Click);
+      this.ExportButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.ExportButton.Enabled = false;
+      this.ExportButton.Location = new System.Drawing.Point(676, 12);
+      this.ExportButton.Name = "ExportButton";
+      this.ExportButton.Size = new System.Drawing.Size(75, 23);
+      this.ExportButton.TabIndex = 2;
+      this.ExportButton.Text = "Export";
+      this.ExportButton.UseVisualStyleBackColor = true;
+      this.ExportButton.Click += new System.EventHandler(this.ExportButton_Click);
       // 
-      // btnExport
+      // CancelButton
       // 
-      this.btnExport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnExport.Enabled = false;
-      this.btnExport.Location = new System.Drawing.Point(676, 12);
-      this.btnExport.Name = "btnExport";
-      this.btnExport.Size = new System.Drawing.Size(75, 23);
-      this.btnExport.TabIndex = 2;
-      this.btnExport.Text = "Export";
-      this.btnExport.UseVisualStyleBackColor = true;
-      this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
+      this.CancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.CancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.CancelButton.Location = new System.Drawing.Point(757, 12);
+      this.CancelButton.Name = "CancelButton";
+      this.CancelButton.Size = new System.Drawing.Size(75, 23);
+      this.CancelButton.TabIndex = 3;
+      this.CancelButton.Text = "Cancel";
+      this.CancelButton.UseVisualStyleBackColor = true;
       // 
-      // btnCancel
+      // PrimaryKeyWarningLabel
       // 
-      this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnCancel.Location = new System.Drawing.Point(757, 12);
-      this.btnCancel.Name = "btnCancel";
-      this.btnCancel.Size = new System.Drawing.Size(75, 23);
-      this.btnCancel.TabIndex = 3;
-      this.btnCancel.Text = "Cancel";
-      this.btnCancel.UseVisualStyleBackColor = true;
+      this.PrimaryKeyWarningLabel.AutoSize = true;
+      this.PrimaryKeyWarningLabel.BackColor = System.Drawing.Color.Transparent;
+      this.PrimaryKeyWarningLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.PrimaryKeyWarningLabel.ForeColor = System.Drawing.Color.Red;
+      this.PrimaryKeyWarningLabel.Location = new System.Drawing.Point(485, 171);
+      this.PrimaryKeyWarningLabel.Name = "PrimaryKeyWarningLabel";
+      this.PrimaryKeyWarningLabel.Size = new System.Drawing.Size(336, 12);
+      this.PrimaryKeyWarningLabel.TabIndex = 13;
+      this.PrimaryKeyWarningLabel.Text = "Primary Key column cannot be created because another column has the same name.";
+      this.PrimaryKeyWarningLabel.Visible = false;
       // 
-      // lblPrimaryKeyWarning
+      // PrimaryKeyWarningPicture
       // 
-      this.lblPrimaryKeyWarning.AutoSize = true;
-      this.lblPrimaryKeyWarning.BackColor = System.Drawing.Color.Transparent;
-      this.lblPrimaryKeyWarning.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblPrimaryKeyWarning.ForeColor = System.Drawing.Color.Red;
-      this.lblPrimaryKeyWarning.Location = new System.Drawing.Point(485, 171);
-      this.lblPrimaryKeyWarning.Name = "lblPrimaryKeyWarning";
-      this.lblPrimaryKeyWarning.Size = new System.Drawing.Size(336, 12);
-      this.lblPrimaryKeyWarning.TabIndex = 13;
-      this.lblPrimaryKeyWarning.Text = "Primary Key column cannot be created because another column has the same name.";
-      this.lblPrimaryKeyWarning.Visible = false;
+      this.PrimaryKeyWarningPicture.BackColor = System.Drawing.Color.Transparent;
+      this.PrimaryKeyWarningPicture.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
+      this.PrimaryKeyWarningPicture.Location = new System.Drawing.Point(462, 166);
+      this.PrimaryKeyWarningPicture.Name = "PrimaryKeyWarningPicture";
+      this.PrimaryKeyWarningPicture.Size = new System.Drawing.Size(20, 20);
+      this.PrimaryKeyWarningPicture.TabIndex = 45;
+      this.PrimaryKeyWarningPicture.TabStop = false;
+      this.PrimaryKeyWarningPicture.Visible = false;
       // 
-      // picPrimaryKeyWarning
+      // ColumnOptionsGroupBox
       // 
-      this.picPrimaryKeyWarning.BackColor = System.Drawing.Color.Transparent;
-      this.picPrimaryKeyWarning.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.picPrimaryKeyWarning.Location = new System.Drawing.Point(462, 166);
-      this.picPrimaryKeyWarning.Name = "picPrimaryKeyWarning";
-      this.picPrimaryKeyWarning.Size = new System.Drawing.Size(20, 20);
-      this.picPrimaryKeyWarning.TabIndex = 45;
-      this.picPrimaryKeyWarning.TabStop = false;
-      this.picPrimaryKeyWarning.Visible = false;
+      this.ColumnOptionsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.ColumnOptionsGroupBox.BackColor = System.Drawing.Color.Transparent;
+      this.ColumnOptionsGroupBox.Controls.Add(this.DataTypeComboBox);
+      this.ColumnOptionsGroupBox.Controls.Add(this.ExcludeColumnCheckBox);
+      this.ColumnOptionsGroupBox.Controls.Add(this.AllowEmptyCheckBox);
+      this.ColumnOptionsGroupBox.Controls.Add(this.PrimaryKeyCheckBox);
+      this.ColumnOptionsGroupBox.Controls.Add(this.UniqueIndexCheckBox);
+      this.ColumnOptionsGroupBox.Controls.Add(this.CreateIndexCheckBox);
+      this.ColumnOptionsGroupBox.Controls.Add(this.DatatypeLabel);
+      this.ColumnOptionsGroupBox.Controls.Add(this.ColumnNameTextBox);
+      this.ColumnOptionsGroupBox.Controls.Add(this.ColumnNameLabel);
+      this.ColumnOptionsGroupBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ColumnOptionsGroupBox.Location = new System.Drawing.Point(82, 444);
+      this.ColumnOptionsGroupBox.Name = "ColumnOptionsGroupBox";
+      this.ColumnOptionsGroupBox.Size = new System.Drawing.Size(677, 89);
+      this.ColumnOptionsGroupBox.TabIndex = 19;
+      this.ColumnOptionsGroupBox.TabStop = false;
+      this.ColumnOptionsGroupBox.Text = "Column Options";
       // 
-      // grpColumnOptions
+      // DataTypeComboBox
       // 
-      this.grpColumnOptions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.grpColumnOptions.BackColor = System.Drawing.Color.Transparent;
-      this.grpColumnOptions.Controls.Add(this.cmbDatatype);
-      this.grpColumnOptions.Controls.Add(this.chkExcludeColumn);
-      this.grpColumnOptions.Controls.Add(this.chkAllowEmpty);
-      this.grpColumnOptions.Controls.Add(this.chkPrimaryKey);
-      this.grpColumnOptions.Controls.Add(this.chkUniqueIndex);
-      this.grpColumnOptions.Controls.Add(this.chkCreateIndex);
-      this.grpColumnOptions.Controls.Add(this.lblDatatype);
-      this.grpColumnOptions.Controls.Add(this.txtColumnName);
-      this.grpColumnOptions.Controls.Add(this.lblColumnName);
-      this.grpColumnOptions.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.grpColumnOptions.Location = new System.Drawing.Point(82, 444);
-      this.grpColumnOptions.Name = "grpColumnOptions";
-      this.grpColumnOptions.Size = new System.Drawing.Size(677, 89);
-      this.grpColumnOptions.TabIndex = 19;
-      this.grpColumnOptions.TabStop = false;
-      this.grpColumnOptions.Text = "Column Options";
+      this.DataTypeComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+      this.DataTypeComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+      this.DataTypeComboBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+      this.DataTypeComboBox.DropDownWidth = 400;
+      this.DataTypeComboBox.FormattingEnabled = true;
+      this.DataTypeComboBox.Location = new System.Drawing.Point(122, 51);
+      this.DataTypeComboBox.Name = "DataTypeComboBox";
+      this.DataTypeComboBox.Size = new System.Drawing.Size(135, 24);
+      this.DataTypeComboBox.TabIndex = 4;
+      this.DataTypeComboBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.DataTypeComboBoxDrawItem);
+      this.DataTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.DataTypeComboBox_SelectedIndexChanged);
+      this.DataTypeComboBox.TextChanged += new System.EventHandler(this.DataTypeComboBox_TextChanged);
+      this.DataTypeComboBox.Validating += new System.ComponentModel.CancelEventHandler(this.DataTypeComboBox_Validating);
       // 
-      // cmbDatatype
+      // ExcludeColumnCheckBox
       // 
-      this.cmbDatatype.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-      this.cmbDatatype.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-      this.cmbDatatype.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.columnBindingSource, "MySQLDataType", true));
-      this.cmbDatatype.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-      this.cmbDatatype.DropDownWidth = 400;
-      this.cmbDatatype.FormattingEnabled = true;
-      this.cmbDatatype.Location = new System.Drawing.Point(122, 51);
-      this.cmbDatatype.Name = "cmbDatatype";
-      this.cmbDatatype.Size = new System.Drawing.Size(135, 24);
-      this.cmbDatatype.TabIndex = 4;
-      this.cmbDatatype.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.cmbDatatype_DrawItem);
-      this.cmbDatatype.SelectedIndexChanged += new System.EventHandler(this.cmbDatatype_SelectedIndexChanged);
-      this.cmbDatatype.Validating += new System.ComponentModel.CancelEventHandler(this.cmbDatatype_Validating);
-      this.cmbDatatype.Validated += new System.EventHandler(this.cmbDatatype_Validated);
+      this.ExcludeColumnCheckBox.AutoSize = true;
+      this.ExcludeColumnCheckBox.Location = new System.Drawing.Point(529, 21);
+      this.ExcludeColumnCheckBox.Name = "ExcludeColumnCheckBox";
+      this.ExcludeColumnCheckBox.Size = new System.Drawing.Size(112, 19);
+      this.ExcludeColumnCheckBox.TabIndex = 9;
+      this.ExcludeColumnCheckBox.Text = "Exclude Column";
+      this.ExcludeColumnCheckBox.UseVisualStyleBackColor = true;
+      this.ExcludeColumnCheckBox.CheckedChanged += new System.EventHandler(this.ExcludeCheckBox_CheckedChanged);
       // 
-      // chkExcludeColumn
+      // AllowEmptyCheckBox
       // 
-      this.chkExcludeColumn.AutoSize = true;
-      this.chkExcludeColumn.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.columnBindingSource, "ExcludeColumn", true));
-      this.chkExcludeColumn.Location = new System.Drawing.Point(529, 21);
-      this.chkExcludeColumn.Name = "chkExcludeColumn";
-      this.chkExcludeColumn.Size = new System.Drawing.Size(112, 19);
-      this.chkExcludeColumn.TabIndex = 9;
-      this.chkExcludeColumn.Text = "Exclude Column";
-      this.chkExcludeColumn.UseVisualStyleBackColor = true;
-      this.chkExcludeColumn.CheckedChanged += new System.EventHandler(this.chkExcludeColumn_CheckedChanged);
+      this.AllowEmptyCheckBox.AutoSize = true;
+      this.AllowEmptyCheckBox.Location = new System.Drawing.Point(407, 53);
+      this.AllowEmptyCheckBox.Name = "AllowEmptyCheckBox";
+      this.AllowEmptyCheckBox.Size = new System.Drawing.Size(93, 19);
+      this.AllowEmptyCheckBox.TabIndex = 8;
+      this.AllowEmptyCheckBox.Text = "Allow Empty";
+      this.AllowEmptyCheckBox.UseVisualStyleBackColor = true;
+      this.AllowEmptyCheckBox.CheckedChanged += new System.EventHandler(this.AllowEmptyCheckBox_CheckedChanged);
       // 
-      // chkAllowEmpty
+      // PrimaryKeyCheckBox
       // 
-      this.chkAllowEmpty.AutoSize = true;
-      this.chkAllowEmpty.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.columnBindingSource, "AllowNull", true));
-      this.chkAllowEmpty.Location = new System.Drawing.Point(407, 53);
-      this.chkAllowEmpty.Name = "chkAllowEmpty";
-      this.chkAllowEmpty.Size = new System.Drawing.Size(93, 19);
-      this.chkAllowEmpty.TabIndex = 8;
-      this.chkAllowEmpty.Text = "Allow Empty";
-      this.chkAllowEmpty.UseVisualStyleBackColor = true;
+      this.PrimaryKeyCheckBox.AutoSize = true;
+      this.PrimaryKeyCheckBox.Location = new System.Drawing.Point(407, 21);
+      this.PrimaryKeyCheckBox.Name = "PrimaryKeyCheckBox";
+      this.PrimaryKeyCheckBox.Size = new System.Drawing.Size(89, 19);
+      this.PrimaryKeyCheckBox.TabIndex = 7;
+      this.PrimaryKeyCheckBox.Text = "Primary Key";
+      this.PrimaryKeyCheckBox.UseVisualStyleBackColor = true;
+      this.PrimaryKeyCheckBox.CheckedChanged += new System.EventHandler(this.PrimaryKeyCheckBox_CheckedChanged);
       // 
-      // chkPrimaryKey
+      // UniqueIndexCheckBox
       // 
-      this.chkPrimaryKey.AutoSize = true;
-      this.chkPrimaryKey.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.columnBindingSource, "PrimaryKey", true));
-      this.chkPrimaryKey.Location = new System.Drawing.Point(407, 21);
-      this.chkPrimaryKey.Name = "chkPrimaryKey";
-      this.chkPrimaryKey.Size = new System.Drawing.Size(89, 19);
-      this.chkPrimaryKey.TabIndex = 7;
-      this.chkPrimaryKey.Text = "Primary Key";
-      this.chkPrimaryKey.UseVisualStyleBackColor = true;
-      this.chkPrimaryKey.CheckedChanged += new System.EventHandler(this.chkPrimaryKey_CheckedChanged);
-      this.chkPrimaryKey.Validated += new System.EventHandler(this.chkPrimaryKey_Validated);
+      this.UniqueIndexCheckBox.AutoSize = true;
+      this.UniqueIndexCheckBox.Location = new System.Drawing.Point(283, 53);
+      this.UniqueIndexCheckBox.Name = "UniqueIndexCheckBox";
+      this.UniqueIndexCheckBox.Size = new System.Drawing.Size(95, 19);
+      this.UniqueIndexCheckBox.TabIndex = 6;
+      this.UniqueIndexCheckBox.Text = "Unique Index";
+      this.UniqueIndexCheckBox.UseVisualStyleBackColor = true;
+      this.UniqueIndexCheckBox.CheckedChanged += new System.EventHandler(this.UniqueIndexCheckBox_CheckedChanged);
       // 
-      // chkUniqueIndex
+      // CreateIndexCheckBox
       // 
-      this.chkUniqueIndex.AutoSize = true;
-      this.chkUniqueIndex.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.columnBindingSource, "UniqueKey", true));
-      this.chkUniqueIndex.Location = new System.Drawing.Point(283, 53);
-      this.chkUniqueIndex.Name = "chkUniqueIndex";
-      this.chkUniqueIndex.Size = new System.Drawing.Size(95, 19);
-      this.chkUniqueIndex.TabIndex = 6;
-      this.chkUniqueIndex.Text = "Unique Index";
-      this.chkUniqueIndex.UseVisualStyleBackColor = true;
-      this.chkUniqueIndex.CheckedChanged += new System.EventHandler(this.chkUniqueIndex_CheckedChanged);
+      this.CreateIndexCheckBox.AutoSize = true;
+      this.CreateIndexCheckBox.Location = new System.Drawing.Point(283, 21);
+      this.CreateIndexCheckBox.Name = "CreateIndexCheckBox";
+      this.CreateIndexCheckBox.Size = new System.Drawing.Size(91, 19);
+      this.CreateIndexCheckBox.TabIndex = 5;
+      this.CreateIndexCheckBox.Text = "Create Index";
+      this.CreateIndexCheckBox.UseVisualStyleBackColor = true;
+      this.CreateIndexCheckBox.CheckedChanged += new System.EventHandler(this.CreateIndexCheckBox_CheckedChanged);
       // 
-      // chkCreateIndex
+      // DatatypeLabel
       // 
-      this.chkCreateIndex.AutoSize = true;
-      this.chkCreateIndex.DataBindings.Add(new System.Windows.Forms.Binding("Checked", this.columnBindingSource, "CreateIndex", true));
-      this.chkCreateIndex.Location = new System.Drawing.Point(283, 21);
-      this.chkCreateIndex.Name = "chkCreateIndex";
-      this.chkCreateIndex.Size = new System.Drawing.Size(91, 19);
-      this.chkCreateIndex.TabIndex = 5;
-      this.chkCreateIndex.Text = "Create Index";
-      this.chkCreateIndex.UseVisualStyleBackColor = true;
-      this.chkCreateIndex.CheckedChanged += new System.EventHandler(this.chkCreateIndex_CheckedChanged);
+      this.DatatypeLabel.AutoSize = true;
+      this.DatatypeLabel.Location = new System.Drawing.Point(28, 54);
+      this.DatatypeLabel.Name = "DatatypeLabel";
+      this.DatatypeLabel.Size = new System.Drawing.Size(57, 15);
+      this.DatatypeLabel.TabIndex = 3;
+      this.DatatypeLabel.Text = "Datatype:";
       // 
-      // lblDatatype
+      // ColumnNameTextBox
       // 
-      this.lblDatatype.AutoSize = true;
-      this.lblDatatype.Location = new System.Drawing.Point(28, 54);
-      this.lblDatatype.Name = "lblDatatype";
-      this.lblDatatype.Size = new System.Drawing.Size(57, 15);
-      this.lblDatatype.TabIndex = 3;
-      this.lblDatatype.Text = "Datatype:";
+      this.ColumnNameTextBox.Location = new System.Drawing.Point(122, 22);
+      this.ColumnNameTextBox.Name = "ColumnNameTextBox";
+      this.ColumnNameTextBox.Size = new System.Drawing.Size(135, 23);
+      this.ColumnNameTextBox.TabIndex = 2;
+      this.ColumnNameTextBox.TextChanged += new System.EventHandler(this.ColumnNameTextBox_TextChanged);
+      this.ColumnNameTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.ColumnNameTextBox_Validating);
       // 
-      // txtColumnName
+      // ColumnNameLabel
       // 
-      this.txtColumnName.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.columnBindingSource, "DisplayName", true));
-      this.txtColumnName.Location = new System.Drawing.Point(122, 22);
-      this.txtColumnName.Name = "txtColumnName";
-      this.txtColumnName.Size = new System.Drawing.Size(135, 23);
-      this.txtColumnName.TabIndex = 2;
-      this.txtColumnName.TextChanged += new System.EventHandler(this.txtColumnName_TextChanged);
-      this.txtColumnName.Validated += new System.EventHandler(this.txtColumnName_Validated);
+      this.ColumnNameLabel.AutoSize = true;
+      this.ColumnNameLabel.Location = new System.Drawing.Point(28, 25);
+      this.ColumnNameLabel.Name = "ColumnNameLabel";
+      this.ColumnNameLabel.Size = new System.Drawing.Size(88, 15);
+      this.ColumnNameLabel.TabIndex = 1;
+      this.ColumnNameLabel.Text = "Column Name:";
       // 
-      // lblColumnName
+      // ColumnOptionsWarningLabel
       // 
-      this.lblColumnName.AutoSize = true;
-      this.lblColumnName.Location = new System.Drawing.Point(28, 25);
-      this.lblColumnName.Name = "lblColumnName";
-      this.lblColumnName.Size = new System.Drawing.Size(88, 15);
-      this.lblColumnName.TabIndex = 1;
-      this.lblColumnName.Text = "Column Name:";
+      this.ColumnOptionsWarningLabel.AutoSize = true;
+      this.ColumnOptionsWarningLabel.BackColor = System.Drawing.SystemColors.Window;
+      this.ColumnOptionsWarningLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ColumnOptionsWarningLabel.ForeColor = System.Drawing.Color.Red;
+      this.ColumnOptionsWarningLabel.Location = new System.Drawing.Point(208, 446);
+      this.ColumnOptionsWarningLabel.Name = "ColumnOptionsWarningLabel";
+      this.ColumnOptionsWarningLabel.Size = new System.Drawing.Size(227, 12);
+      this.ColumnOptionsWarningLabel.TabIndex = 0;
+      this.ColumnOptionsWarningLabel.Text = "It is good practice to not use upper case letters or spaces.";
+      this.ColumnOptionsWarningLabel.Visible = false;
       // 
-      // lblColumnOptionsWarning
+      // ColumnOptionsWarningPicture
       // 
-      this.lblColumnOptionsWarning.AutoSize = true;
-      this.lblColumnOptionsWarning.BackColor = System.Drawing.SystemColors.Window;
-      this.lblColumnOptionsWarning.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblColumnOptionsWarning.ForeColor = System.Drawing.Color.Red;
-      this.lblColumnOptionsWarning.Location = new System.Drawing.Point(208, 446);
-      this.lblColumnOptionsWarning.Name = "lblColumnOptionsWarning";
-      this.lblColumnOptionsWarning.Size = new System.Drawing.Size(227, 12);
-      this.lblColumnOptionsWarning.TabIndex = 0;
-      this.lblColumnOptionsWarning.Text = "It is good practice to not use upper case letters or spaces.";
-      this.lblColumnOptionsWarning.Visible = false;
+      this.ColumnOptionsWarningPicture.BackColor = System.Drawing.SystemColors.Window;
+      this.ColumnOptionsWarningPicture.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
+      this.ColumnOptionsWarningPicture.Location = new System.Drawing.Point(186, 442);
+      this.ColumnOptionsWarningPicture.Name = "ColumnOptionsWarningPicture";
+      this.ColumnOptionsWarningPicture.Size = new System.Drawing.Size(20, 20);
+      this.ColumnOptionsWarningPicture.TabIndex = 24;
+      this.ColumnOptionsWarningPicture.TabStop = false;
+      this.ColumnOptionsWarningPicture.Visible = false;
       // 
-      // picColumnOptionsWarning
+      // FirstRowHeadersCheckBox
       // 
-      this.picColumnOptionsWarning.BackColor = System.Drawing.SystemColors.Window;
-      this.picColumnOptionsWarning.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.picColumnOptionsWarning.Location = new System.Drawing.Point(186, 442);
-      this.picColumnOptionsWarning.Name = "picColumnOptionsWarning";
-      this.picColumnOptionsWarning.Size = new System.Drawing.Size(20, 20);
-      this.picColumnOptionsWarning.TabIndex = 24;
-      this.picColumnOptionsWarning.TabStop = false;
-      this.picColumnOptionsWarning.Visible = false;
+      this.FirstRowHeadersCheckBox.AutoSize = true;
+      this.FirstRowHeadersCheckBox.BackColor = System.Drawing.Color.Transparent;
+      this.FirstRowHeadersCheckBox.Checked = true;
+      this.FirstRowHeadersCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+      this.FirstRowHeadersCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.FirstRowHeadersCheckBox.Location = new System.Drawing.Point(82, 254);
+      this.FirstRowHeadersCheckBox.Name = "FirstRowHeadersCheckBox";
+      this.FirstRowHeadersCheckBox.Size = new System.Drawing.Size(210, 19);
+      this.FirstRowHeadersCheckBox.TabIndex = 16;
+      this.FirstRowHeadersCheckBox.Text = "First Row Contains Column Names";
+      this.FirstRowHeadersCheckBox.UseVisualStyleBackColor = false;
+      this.FirstRowHeadersCheckBox.CheckedChanged += new System.EventHandler(this.FirstRowHeadersCheckBox_CheckedChanged);
       // 
-      // chkFirstRowHeaders
+      // PreviewDataGrid
       // 
-      this.chkFirstRowHeaders.AutoSize = true;
-      this.chkFirstRowHeaders.BackColor = System.Drawing.Color.Transparent;
-      this.chkFirstRowHeaders.Checked = true;
-      this.chkFirstRowHeaders.CheckState = System.Windows.Forms.CheckState.Checked;
-      this.chkFirstRowHeaders.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.chkFirstRowHeaders.Location = new System.Drawing.Point(82, 254);
-      this.chkFirstRowHeaders.Name = "chkFirstRowHeaders";
-      this.chkFirstRowHeaders.Size = new System.Drawing.Size(210, 19);
-      this.chkFirstRowHeaders.TabIndex = 16;
-      this.chkFirstRowHeaders.Text = "First Row Contains Column Names";
-      this.chkFirstRowHeaders.UseVisualStyleBackColor = false;
-      this.chkFirstRowHeaders.CheckedChanged += new System.EventHandler(this.chkFirstRowHeaders_CheckedChanged);
-      // 
-      // grdPreviewData
-      // 
-      this.grdPreviewData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+      this.PreviewDataGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-      dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-      dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdPreviewData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-      this.grdPreviewData.ColumnsMaximumWidth = 200;
-      dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-      dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdPreviewData.DefaultCellStyle = dataGridViewCellStyle2;
-      this.grdPreviewData.Location = new System.Drawing.Point(82, 277);
-      this.grdPreviewData.MultiSelect = false;
-      this.grdPreviewData.Name = "grdPreviewData";
-      dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-      dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-      this.grdPreviewData.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
-      this.grdPreviewData.Size = new System.Drawing.Size(677, 157);
-      this.grdPreviewData.TabIndex = 18;
-      this.grdPreviewData.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.grdPreviewData_CellToolTipTextNeeded);
-      this.grdPreviewData.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.grdPreviewData_DataBindingComplete);
-      this.grdPreviewData.SelectionChanged += new System.EventHandler(this.grdPreviewData_SelectionChanged);
-      this.grdPreviewData.KeyDown += new System.Windows.Forms.KeyEventHandler(this.grdPreviewData_KeyDown);
+      dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+      dataGridViewCellStyle13.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle13.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle13.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.PreviewDataGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle13;
+      this.PreviewDataGrid.ColumnsMaximumWidth = 200;
+      dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle14.BackColor = System.Drawing.SystemColors.Window;
+      dataGridViewCellStyle14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle14.ForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle14.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.PreviewDataGrid.DefaultCellStyle = dataGridViewCellStyle14;
+      this.PreviewDataGrid.Location = new System.Drawing.Point(82, 277);
+      this.PreviewDataGrid.MultiSelect = false;
+      this.PreviewDataGrid.Name = "PreviewDataGrid";
+      dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle15.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle15.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle15.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.PreviewDataGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle15;
+      this.PreviewDataGrid.Size = new System.Drawing.Size(677, 157);
+      this.PreviewDataGrid.TabIndex = 18;
+      this.PreviewDataGrid.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.PreviewDataGrid_CellToolTipTextNeeded);
+      this.PreviewDataGrid.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.PreviewDataGrid_DataBindingComplete);
+      this.PreviewDataGrid.SelectionChanged += new System.EventHandler(this.PreviewDataGrid_SelectionChanged);
+      this.PreviewDataGrid.KeyDown += new System.Windows.Forms.KeyEventHandler(this.PreviewDataGrid_KeyDown);
       // 
-      // lblColumnOptionsSub
+      // ColumnOptionsSubLabel
       // 
-      this.lblColumnOptionsSub.AutoSize = true;
-      this.lblColumnOptionsSub.BackColor = System.Drawing.Color.Transparent;
-      this.lblColumnOptionsSub.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblColumnOptionsSub.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblColumnOptionsSub.Location = new System.Drawing.Point(79, 224);
-      this.lblColumnOptionsSub.Name = "lblColumnOptionsSub";
-      this.lblColumnOptionsSub.Size = new System.Drawing.Size(438, 15);
-      this.lblColumnOptionsSub.TabIndex = 15;
-      this.lblColumnOptionsSub.Text = "Click the header of a column to specify options like column name and a datatype.";
+      this.ColumnOptionsSubLabel.AutoSize = true;
+      this.ColumnOptionsSubLabel.BackColor = System.Drawing.Color.Transparent;
+      this.ColumnOptionsSubLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ColumnOptionsSubLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.ColumnOptionsSubLabel.Location = new System.Drawing.Point(79, 224);
+      this.ColumnOptionsSubLabel.Name = "ColumnOptionsSubLabel";
+      this.ColumnOptionsSubLabel.Size = new System.Drawing.Size(438, 15);
+      this.ColumnOptionsSubLabel.TabIndex = 15;
+      this.ColumnOptionsSubLabel.Text = "Click the header of a column to specify options like column name and a datatype.";
       // 
-      // lblColumnOptionsMain
+      // ColumnOptionsMainLabel
       // 
-      this.lblColumnOptionsMain.AutoSize = true;
-      this.lblColumnOptionsMain.BackColor = System.Drawing.Color.Transparent;
-      this.lblColumnOptionsMain.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblColumnOptionsMain.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblColumnOptionsMain.Location = new System.Drawing.Point(79, 204);
-      this.lblColumnOptionsMain.Name = "lblColumnOptionsMain";
-      this.lblColumnOptionsMain.Size = new System.Drawing.Size(161, 17);
-      this.lblColumnOptionsMain.TabIndex = 14;
-      this.lblColumnOptionsMain.Text = "3. Specify Column Options";
+      this.ColumnOptionsMainLabel.AutoSize = true;
+      this.ColumnOptionsMainLabel.BackColor = System.Drawing.Color.Transparent;
+      this.ColumnOptionsMainLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ColumnOptionsMainLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.ColumnOptionsMainLabel.Location = new System.Drawing.Point(79, 204);
+      this.ColumnOptionsMainLabel.Name = "ColumnOptionsMainLabel";
+      this.ColumnOptionsMainLabel.Size = new System.Drawing.Size(161, 17);
+      this.ColumnOptionsMainLabel.TabIndex = 14;
+      this.ColumnOptionsMainLabel.Text = "3. Specify Column Options";
       // 
-      // picColumnOptions
+      // ColumnOptionsPicture
       // 
-      this.picColumnOptions.BackColor = System.Drawing.Color.Transparent;
-      this.picColumnOptions.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
-      this.picColumnOptions.Location = new System.Drawing.Point(41, 207);
-      this.picColumnOptions.Name = "picColumnOptions";
-      this.picColumnOptions.Size = new System.Drawing.Size(32, 32);
-      this.picColumnOptions.TabIndex = 41;
-      this.picColumnOptions.TabStop = false;
+      this.ColumnOptionsPicture.BackColor = System.Drawing.Color.Transparent;
+      this.ColumnOptionsPicture.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
+      this.ColumnOptionsPicture.Location = new System.Drawing.Point(41, 207);
+      this.ColumnOptionsPicture.Name = "ColumnOptionsPicture";
+      this.ColumnOptionsPicture.Size = new System.Drawing.Size(32, 32);
+      this.ColumnOptionsPicture.TabIndex = 41;
+      this.ColumnOptionsPicture.TabStop = false;
       // 
-      // lblTableNameWarning
+      // TableNameWarningLabel
       // 
-      this.lblTableNameWarning.AutoSize = true;
-      this.lblTableNameWarning.BackColor = System.Drawing.Color.Transparent;
-      this.lblTableNameWarning.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblTableNameWarning.ForeColor = System.Drawing.Color.Red;
-      this.lblTableNameWarning.Location = new System.Drawing.Point(150, 146);
-      this.lblTableNameWarning.Name = "lblTableNameWarning";
-      this.lblTableNameWarning.Size = new System.Drawing.Size(227, 12);
-      this.lblTableNameWarning.TabIndex = 5;
-      this.lblTableNameWarning.Text = "It is good practice to not use upper case letters or spaces.";
-      this.lblTableNameWarning.Visible = false;
+      this.TableNameWarningLabel.AutoSize = true;
+      this.TableNameWarningLabel.BackColor = System.Drawing.Color.Transparent;
+      this.TableNameWarningLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.TableNameWarningLabel.ForeColor = System.Drawing.Color.Red;
+      this.TableNameWarningLabel.Location = new System.Drawing.Point(150, 146);
+      this.TableNameWarningLabel.Name = "TableNameWarningLabel";
+      this.TableNameWarningLabel.Size = new System.Drawing.Size(227, 12);
+      this.TableNameWarningLabel.TabIndex = 5;
+      this.TableNameWarningLabel.Text = "It is good practice to not use upper case letters or spaces.";
+      this.TableNameWarningLabel.Visible = false;
       // 
-      // picTableNameWarning
+      // TableNameWarningPicture
       // 
-      this.picTableNameWarning.BackColor = System.Drawing.Color.Transparent;
-      this.picTableNameWarning.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.picTableNameWarning.Location = new System.Drawing.Point(127, 141);
-      this.picTableNameWarning.Name = "picTableNameWarning";
-      this.picTableNameWarning.Size = new System.Drawing.Size(20, 20);
-      this.picTableNameWarning.TabIndex = 38;
-      this.picTableNameWarning.TabStop = false;
-      this.picTableNameWarning.Visible = false;
+      this.TableNameWarningPicture.BackColor = System.Drawing.Color.Transparent;
+      this.TableNameWarningPicture.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
+      this.TableNameWarningPicture.Location = new System.Drawing.Point(127, 141);
+      this.TableNameWarningPicture.Name = "TableNameWarningPicture";
+      this.TableNameWarningPicture.Size = new System.Drawing.Size(20, 20);
+      this.TableNameWarningPicture.TabIndex = 38;
+      this.TableNameWarningPicture.TabStop = false;
+      this.TableNameWarningPicture.Visible = false;
       // 
-      // cmbPrimaryKeyColumns
+      // PrimaryKeyColumnsComboBox
       // 
-      this.cmbPrimaryKeyColumns.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-      this.cmbPrimaryKeyColumns.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-      this.cmbPrimaryKeyColumns.DisplayMember = "DisplayName";
-      this.cmbPrimaryKeyColumns.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.cmbPrimaryKeyColumns.FormattingEnabled = true;
-      this.cmbPrimaryKeyColumns.Location = new System.Drawing.Point(638, 144);
-      this.cmbPrimaryKeyColumns.Name = "cmbPrimaryKeyColumns";
-      this.cmbPrimaryKeyColumns.Size = new System.Drawing.Size(121, 23);
-      this.cmbPrimaryKeyColumns.TabIndex = 12;
-      this.cmbPrimaryKeyColumns.ValueMember = "DisplayName";
-      this.cmbPrimaryKeyColumns.SelectedIndexChanged += new System.EventHandler(this.cmbPrimaryKeyColumns_SelectedIndexChanged);
+      this.PrimaryKeyColumnsComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+      this.PrimaryKeyColumnsComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+      this.PrimaryKeyColumnsComboBox.DisplayMember = "DisplayName";
+      this.PrimaryKeyColumnsComboBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.PrimaryKeyColumnsComboBox.FormattingEnabled = true;
+      this.PrimaryKeyColumnsComboBox.Location = new System.Drawing.Point(638, 144);
+      this.PrimaryKeyColumnsComboBox.Name = "PrimaryKeyColumnsComboBox";
+      this.PrimaryKeyColumnsComboBox.Size = new System.Drawing.Size(121, 23);
+      this.PrimaryKeyColumnsComboBox.TabIndex = 12;
+      this.PrimaryKeyColumnsComboBox.ValueMember = "DisplayName";
+      this.PrimaryKeyColumnsComboBox.SelectedIndexChanged += new System.EventHandler(this.PrimaryKeyColumnsComboBox_SelectedIndexChanged);
       // 
-      // radUseExistingColumn
+      // UseExistingColumnRadioButton
       // 
-      this.radUseExistingColumn.AutoSize = true;
-      this.radUseExistingColumn.BackColor = System.Drawing.Color.Transparent;
-      this.radUseExistingColumn.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.radUseExistingColumn.Location = new System.Drawing.Point(462, 144);
-      this.radUseExistingColumn.Name = "radUseExistingColumn";
-      this.radUseExistingColumn.Size = new System.Drawing.Size(134, 19);
-      this.radUseExistingColumn.TabIndex = 11;
-      this.radUseExistingColumn.TabStop = true;
-      this.radUseExistingColumn.Text = "Use existing column:";
-      this.radUseExistingColumn.UseVisualStyleBackColor = false;
-      this.radUseExistingColumn.CheckedChanged += new System.EventHandler(this.radUseExistingColumn_CheckedChanged);
+      this.UseExistingColumnRadioButton.AutoSize = true;
+      this.UseExistingColumnRadioButton.BackColor = System.Drawing.Color.Transparent;
+      this.UseExistingColumnRadioButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.UseExistingColumnRadioButton.Location = new System.Drawing.Point(462, 144);
+      this.UseExistingColumnRadioButton.Name = "UseExistingColumnRadioButton";
+      this.UseExistingColumnRadioButton.Size = new System.Drawing.Size(134, 19);
+      this.UseExistingColumnRadioButton.TabIndex = 11;
+      this.UseExistingColumnRadioButton.TabStop = true;
+      this.UseExistingColumnRadioButton.Text = "Use existing column:";
+      this.UseExistingColumnRadioButton.UseVisualStyleBackColor = false;
+      this.UseExistingColumnRadioButton.CheckedChanged += new System.EventHandler(this.UseExistingColumnRadioButton_CheckedChanged);
       // 
-      // txtAddPrimaryKey
+      // AddPrimaryKeyTextBox
       // 
-      this.txtAddPrimaryKey.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.txtAddPrimaryKey.Location = new System.Drawing.Point(637, 116);
-      this.txtAddPrimaryKey.Name = "txtAddPrimaryKey";
-      this.txtAddPrimaryKey.Size = new System.Drawing.Size(122, 22);
-      this.txtAddPrimaryKey.TabIndex = 10;
-      this.txtAddPrimaryKey.TextChanged += new System.EventHandler(this.txtAddPrimaryKey_TextChanged);
+      this.AddPrimaryKeyTextBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.AddPrimaryKeyTextBox.Location = new System.Drawing.Point(637, 116);
+      this.AddPrimaryKeyTextBox.Name = "AddPrimaryKeyTextBox";
+      this.AddPrimaryKeyTextBox.Size = new System.Drawing.Size(122, 22);
+      this.AddPrimaryKeyTextBox.TabIndex = 10;
+      this.AddPrimaryKeyTextBox.TextChanged += new System.EventHandler(this.AddPrimaryKeyTextBox_TextChanged);
+      this.AddPrimaryKeyTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.AddPrimaryKeyTextBox_Validating);
       // 
-      // radAddPrimaryKey
+      // AddPrimaryKeyRadioButton
       // 
-      this.radAddPrimaryKey.AutoSize = true;
-      this.radAddPrimaryKey.BackColor = System.Drawing.Color.Transparent;
-      this.radAddPrimaryKey.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.radAddPrimaryKey.Location = new System.Drawing.Point(462, 116);
-      this.radAddPrimaryKey.Name = "radAddPrimaryKey";
-      this.radAddPrimaryKey.Size = new System.Drawing.Size(169, 19);
-      this.radAddPrimaryKey.TabIndex = 9;
-      this.radAddPrimaryKey.TabStop = true;
-      this.radAddPrimaryKey.Text = "Add a Primary Key column:";
-      this.radAddPrimaryKey.UseVisualStyleBackColor = false;
-      this.radAddPrimaryKey.CheckedChanged += new System.EventHandler(this.radAddPrimaryKey_CheckedChanged);
+      this.AddPrimaryKeyRadioButton.AutoSize = true;
+      this.AddPrimaryKeyRadioButton.BackColor = System.Drawing.Color.Transparent;
+      this.AddPrimaryKeyRadioButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.AddPrimaryKeyRadioButton.Location = new System.Drawing.Point(462, 116);
+      this.AddPrimaryKeyRadioButton.Name = "AddPrimaryKeyRadioButton";
+      this.AddPrimaryKeyRadioButton.Size = new System.Drawing.Size(169, 19);
+      this.AddPrimaryKeyRadioButton.TabIndex = 9;
+      this.AddPrimaryKeyRadioButton.TabStop = true;
+      this.AddPrimaryKeyRadioButton.Text = "Add a Primary Key column:";
+      this.AddPrimaryKeyRadioButton.UseVisualStyleBackColor = false;
+      this.AddPrimaryKeyRadioButton.CheckedChanged += new System.EventHandler(this.AddPrimaryKeyRadioButton_CheckedChanged);
       // 
-      // txtTableNameInput
+      // TableNameInputTextBox
       // 
-      this.txtTableNameInput.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.txtTableNameInput.Location = new System.Drawing.Point(127, 118);
-      this.txtTableNameInput.Name = "txtTableNameInput";
-      this.txtTableNameInput.Size = new System.Drawing.Size(219, 22);
-      this.txtTableNameInput.TabIndex = 4;
-      this.txtTableNameInput.TextChanged += new System.EventHandler(this.txtTableNameInput_TextChanged);
-      this.txtTableNameInput.Validating += new System.ComponentModel.CancelEventHandler(this.txtTableNameInput_Validating);
+      this.TableNameInputTextBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.TableNameInputTextBox.Location = new System.Drawing.Point(127, 118);
+      this.TableNameInputTextBox.Name = "TableNameInputTextBox";
+      this.TableNameInputTextBox.Size = new System.Drawing.Size(219, 22);
+      this.TableNameInputTextBox.TabIndex = 4;
+      this.TableNameInputTextBox.TextChanged += new System.EventHandler(this.TableNameInputTextBox_TextChanged);
+      this.TableNameInputTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.TableNameInputTextBox_Validating);
       // 
-      // lblTableNameInput
+      // TableNameInputLabel
       // 
-      this.lblTableNameInput.AutoSize = true;
-      this.lblTableNameInput.BackColor = System.Drawing.Color.Transparent;
-      this.lblTableNameInput.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblTableNameInput.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblTableNameInput.Location = new System.Drawing.Point(79, 120);
-      this.lblTableNameInput.Name = "lblTableNameInput";
-      this.lblTableNameInput.Size = new System.Drawing.Size(42, 15);
-      this.lblTableNameInput.TabIndex = 3;
-      this.lblTableNameInput.Text = "Name:";
+      this.TableNameInputLabel.AutoSize = true;
+      this.TableNameInputLabel.BackColor = System.Drawing.Color.Transparent;
+      this.TableNameInputLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.TableNameInputLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.TableNameInputLabel.Location = new System.Drawing.Point(79, 120);
+      this.TableNameInputLabel.Name = "TableNameInputLabel";
+      this.TableNameInputLabel.Size = new System.Drawing.Size(42, 15);
+      this.TableNameInputLabel.TabIndex = 3;
+      this.TableNameInputLabel.Text = "Name:";
       // 
-      // lblPrimaryKeySub
+      // PrimaryKeySubLabel
       // 
-      this.lblPrimaryKeySub.AutoSize = true;
-      this.lblPrimaryKeySub.BackColor = System.Drawing.Color.Transparent;
-      this.lblPrimaryKeySub.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblPrimaryKeySub.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblPrimaryKeySub.Location = new System.Drawing.Point(459, 71);
-      this.lblPrimaryKeySub.Name = "lblPrimaryKeySub";
-      this.lblPrimaryKeySub.Size = new System.Drawing.Size(264, 30);
-      this.lblPrimaryKeySub.TabIndex = 7;
-      this.lblPrimaryKeySub.Text = "Each row of data needs to hold a unique number\r\nthat is used as the Primary Key.";
+      this.PrimaryKeySubLabel.AutoSize = true;
+      this.PrimaryKeySubLabel.BackColor = System.Drawing.Color.Transparent;
+      this.PrimaryKeySubLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.PrimaryKeySubLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.PrimaryKeySubLabel.Location = new System.Drawing.Point(459, 71);
+      this.PrimaryKeySubLabel.Name = "PrimaryKeySubLabel";
+      this.PrimaryKeySubLabel.Size = new System.Drawing.Size(264, 30);
+      this.PrimaryKeySubLabel.TabIndex = 7;
+      this.PrimaryKeySubLabel.Text = "Each row of data needs to hold a unique number\r\nthat is used as the Primary Key.";
       // 
-      // lblPrimaryKeyMain
+      // PrimaryKeyMainLabel
       // 
-      this.lblPrimaryKeyMain.AutoSize = true;
-      this.lblPrimaryKeyMain.BackColor = System.Drawing.Color.Transparent;
-      this.lblPrimaryKeyMain.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblPrimaryKeyMain.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblPrimaryKeyMain.Location = new System.Drawing.Point(459, 54);
-      this.lblPrimaryKeyMain.Name = "lblPrimaryKeyMain";
-      this.lblPrimaryKeyMain.Size = new System.Drawing.Size(128, 17);
-      this.lblPrimaryKeyMain.TabIndex = 6;
-      this.lblPrimaryKeyMain.Text = "2. Pick a Primary Key";
+      this.PrimaryKeyMainLabel.AutoSize = true;
+      this.PrimaryKeyMainLabel.BackColor = System.Drawing.Color.Transparent;
+      this.PrimaryKeyMainLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.PrimaryKeyMainLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.PrimaryKeyMainLabel.Location = new System.Drawing.Point(459, 54);
+      this.PrimaryKeyMainLabel.Name = "PrimaryKeyMainLabel";
+      this.PrimaryKeyMainLabel.Size = new System.Drawing.Size(128, 17);
+      this.PrimaryKeyMainLabel.TabIndex = 6;
+      this.PrimaryKeyMainLabel.Text = "2. Pick a Primary Key";
       // 
-      // picPrimaryKey
+      // PrimaryKeyPicture
       // 
-      this.picPrimaryKey.BackColor = System.Drawing.Color.Transparent;
-      this.picPrimaryKey.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_PrimaryKey_32x32;
-      this.picPrimaryKey.Location = new System.Drawing.Point(421, 57);
-      this.picPrimaryKey.Name = "picPrimaryKey";
-      this.picPrimaryKey.Size = new System.Drawing.Size(32, 32);
-      this.picPrimaryKey.TabIndex = 28;
-      this.picPrimaryKey.TabStop = false;
+      this.PrimaryKeyPicture.BackColor = System.Drawing.Color.Transparent;
+      this.PrimaryKeyPicture.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_PrimaryKey_32x32;
+      this.PrimaryKeyPicture.Location = new System.Drawing.Point(421, 57);
+      this.PrimaryKeyPicture.Name = "PrimaryKeyPicture";
+      this.PrimaryKeyPicture.Size = new System.Drawing.Size(32, 32);
+      this.PrimaryKeyPicture.TabIndex = 28;
+      this.PrimaryKeyPicture.TabStop = false;
       // 
-      // lblTableNameSub
+      // TableNameSubLabel
       // 
-      this.lblTableNameSub.AutoSize = true;
-      this.lblTableNameSub.BackColor = System.Drawing.Color.Transparent;
-      this.lblTableNameSub.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblTableNameSub.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblTableNameSub.Location = new System.Drawing.Point(79, 71);
-      this.lblTableNameSub.Name = "lblTableNameSub";
-      this.lblTableNameSub.Size = new System.Drawing.Size(267, 30);
-      this.lblTableNameSub.TabIndex = 1;
-      this.lblTableNameSub.Text = "The selected data will be stored in a MySQL table.\r\nPlease specify a unique name " +
+      this.TableNameSubLabel.AutoSize = true;
+      this.TableNameSubLabel.BackColor = System.Drawing.Color.Transparent;
+      this.TableNameSubLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.TableNameSubLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.TableNameSubLabel.Location = new System.Drawing.Point(79, 71);
+      this.TableNameSubLabel.Name = "TableNameSubLabel";
+      this.TableNameSubLabel.Size = new System.Drawing.Size(267, 30);
+      this.TableNameSubLabel.TabIndex = 1;
+      this.TableNameSubLabel.Text = "The selected data will be stored in a MySQL table.\r\nPlease specify a unique name " +
     "for the table.";
       // 
-      // lblTableNameMain
+      // TableNameMainLabel
       // 
-      this.lblTableNameMain.AutoSize = true;
-      this.lblTableNameMain.BackColor = System.Drawing.Color.Transparent;
-      this.lblTableNameMain.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblTableNameMain.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblTableNameMain.Location = new System.Drawing.Point(79, 54);
-      this.lblTableNameMain.Name = "lblTableNameMain";
-      this.lblTableNameMain.Size = new System.Drawing.Size(126, 17);
-      this.lblTableNameMain.TabIndex = 0;
-      this.lblTableNameMain.Text = "1. Set a Table Name";
+      this.TableNameMainLabel.AutoSize = true;
+      this.TableNameMainLabel.BackColor = System.Drawing.Color.Transparent;
+      this.TableNameMainLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.TableNameMainLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.TableNameMainLabel.Location = new System.Drawing.Point(79, 54);
+      this.TableNameMainLabel.Name = "TableNameMainLabel";
+      this.TableNameMainLabel.Size = new System.Drawing.Size(126, 17);
+      this.TableNameMainLabel.TabIndex = 0;
+      this.TableNameMainLabel.Text = "1. Set a Table Name";
       // 
-      // picTable
+      // TablePicture
       // 
-      this.picTable.BackColor = System.Drawing.Color.Transparent;
-      this.picTable.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_TableName_32x32;
-      this.picTable.Location = new System.Drawing.Point(41, 57);
-      this.picTable.Name = "picTable";
-      this.picTable.Size = new System.Drawing.Size(32, 32);
-      this.picTable.TabIndex = 23;
-      this.picTable.TabStop = false;
+      this.TablePicture.BackColor = System.Drawing.Color.Transparent;
+      this.TablePicture.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_TableName_32x32;
+      this.TablePicture.Location = new System.Drawing.Point(41, 57);
+      this.TablePicture.Name = "TablePicture";
+      this.TablePicture.Size = new System.Drawing.Size(32, 32);
+      this.TablePicture.TabIndex = 23;
+      this.TablePicture.TabStop = false;
       // 
-      // lblExportData
+      // ExportDataLabel
       // 
-      this.lblExportData.AutoSize = true;
-      this.lblExportData.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblExportData.ForeColor = System.Drawing.Color.Navy;
-      this.lblExportData.Location = new System.Drawing.Point(17, 17);
-      this.lblExportData.Name = "lblExportData";
-      this.lblExportData.Size = new System.Drawing.Size(156, 20);
-      this.lblExportData.TabIndex = 46;
-      this.lblExportData.Text = "Export Data to MySQL";
+      this.ExportDataLabel.AutoSize = true;
+      this.ExportDataLabel.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ExportDataLabel.ForeColor = System.Drawing.Color.Navy;
+      this.ExportDataLabel.Location = new System.Drawing.Point(17, 17);
+      this.ExportDataLabel.Name = "ExportDataLabel";
+      this.ExportDataLabel.Size = new System.Drawing.Size(156, 20);
+      this.ExportDataLabel.TabIndex = 46;
+      this.ExportDataLabel.Text = "Export Data to MySQL";
       // 
-      // lblSubSetOfData
+      // SubSetOfDataLabel
       // 
-      this.lblSubSetOfData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.lblSubSetOfData.AutoSize = true;
-      this.lblSubSetOfData.BackColor = System.Drawing.Color.Transparent;
-      this.lblSubSetOfData.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblSubSetOfData.ForeColor = System.Drawing.SystemColors.InactiveCaption;
-      this.lblSubSetOfData.Location = new System.Drawing.Point(440, 255);
-      this.lblSubSetOfData.Name = "lblSubSetOfData";
-      this.lblSubSetOfData.Size = new System.Drawing.Size(319, 15);
-      this.lblSubSetOfData.TabIndex = 17;
-      this.lblSubSetOfData.Text = "This is a small subset of the data for preview purposes only.";
+      this.SubSetOfDataLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.SubSetOfDataLabel.AutoSize = true;
+      this.SubSetOfDataLabel.BackColor = System.Drawing.Color.Transparent;
+      this.SubSetOfDataLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.SubSetOfDataLabel.ForeColor = System.Drawing.SystemColors.InactiveCaption;
+      this.SubSetOfDataLabel.Location = new System.Drawing.Point(440, 255);
+      this.SubSetOfDataLabel.Name = "SubSetOfDataLabel";
+      this.SubSetOfDataLabel.Size = new System.Drawing.Size(319, 15);
+      this.SubSetOfDataLabel.TabIndex = 17;
+      this.SubSetOfDataLabel.Text = "This is a small subset of the data for preview purposes only.";
       // 
       // ExportDataForm
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-      this.CancelButton = this.btnCancel;
       this.ClientSize = new System.Drawing.Size(844, 602);
       this.CommandAreaHeight = 45;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
@@ -668,62 +655,60 @@ namespace MySQL.ForExcel
       this.contentAreaPanel.ResumeLayout(false);
       this.contentAreaPanel.PerformLayout();
       this.commandAreaPanel.ResumeLayout(false);
-      ((System.ComponentModel.ISupportInitialize)(this.columnBindingSource)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKeyWarning)).EndInit();
-      this.grpColumnOptions.ResumeLayout(false);
-      this.grpColumnOptions.PerformLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.picColumnOptionsWarning)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picTableNameWarning)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picPrimaryKey)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picTable)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.PrimaryKeyWarningPicture)).EndInit();
+      this.ColumnOptionsGroupBox.ResumeLayout(false);
+      this.ColumnOptionsGroupBox.PerformLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.ColumnOptionsWarningPicture)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.PreviewDataGrid)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.ColumnOptionsPicture)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.TableNameWarningPicture)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.PrimaryKeyPicture)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.TablePicture)).EndInit();
       this.ResumeLayout(false);
 
     }
 
     #endregion
 
-    private System.Windows.Forms.BindingSource columnBindingSource;
-    private System.Windows.Forms.Timer timerTextChanged;
-    private System.Windows.Forms.Button btnCopySQL;
-    private System.Windows.Forms.Button btnAdvanced;
-    private System.Windows.Forms.Button btnExport;
-    private System.Windows.Forms.Button btnCancel;
-    private System.Windows.Forms.Label lblPrimaryKeyWarning;
-    private System.Windows.Forms.PictureBox picPrimaryKeyWarning;
-    private System.Windows.Forms.GroupBox grpColumnOptions;
-    private System.Windows.Forms.ComboBox cmbDatatype;
-    private System.Windows.Forms.CheckBox chkExcludeColumn;
-    private System.Windows.Forms.CheckBox chkAllowEmpty;
-    private System.Windows.Forms.CheckBox chkPrimaryKey;
-    private System.Windows.Forms.CheckBox chkUniqueIndex;
-    private System.Windows.Forms.CheckBox chkCreateIndex;
-    private System.Windows.Forms.Label lblDatatype;
-    private System.Windows.Forms.TextBox txtColumnName;
-    private System.Windows.Forms.Label lblColumnName;
-    private System.Windows.Forms.Label lblColumnOptionsWarning;
-    private System.Windows.Forms.PictureBox picColumnOptionsWarning;
-    private System.Windows.Forms.CheckBox chkFirstRowHeaders;
-    private PreviewDataGridView grdPreviewData;
-    private System.Windows.Forms.Label lblColumnOptionsSub;
-    private System.Windows.Forms.Label lblColumnOptionsMain;
-    private System.Windows.Forms.PictureBox picColumnOptions;
-    private System.Windows.Forms.Label lblTableNameWarning;
-    private System.Windows.Forms.PictureBox picTableNameWarning;
-    private System.Windows.Forms.ComboBox cmbPrimaryKeyColumns;
-    private System.Windows.Forms.RadioButton radUseExistingColumn;
-    private System.Windows.Forms.TextBox txtAddPrimaryKey;
-    private System.Windows.Forms.RadioButton radAddPrimaryKey;
-    private System.Windows.Forms.TextBox txtTableNameInput;
-    private System.Windows.Forms.Label lblTableNameInput;
-    private System.Windows.Forms.Label lblPrimaryKeySub;
-    private System.Windows.Forms.Label lblPrimaryKeyMain;
-    private System.Windows.Forms.PictureBox picPrimaryKey;
-    private System.Windows.Forms.Label lblTableNameSub;
-    private System.Windows.Forms.Label lblTableNameMain;
-    private System.Windows.Forms.PictureBox picTable;
-    private System.Windows.Forms.Label lblExportData;
-    private System.Windows.Forms.Label lblSubSetOfData;
+    private System.Windows.Forms.Timer TextChangedTimer;
+    private System.Windows.Forms.Button CopySQLButton;
+    private System.Windows.Forms.Button AdvancedOptionsButton;
+    private System.Windows.Forms.Button ExportButton;
+    private System.Windows.Forms.Button CancelButton;
+    private System.Windows.Forms.Label PrimaryKeyWarningLabel;
+    private System.Windows.Forms.PictureBox PrimaryKeyWarningPicture;
+    private System.Windows.Forms.GroupBox ColumnOptionsGroupBox;
+    private System.Windows.Forms.ComboBox DataTypeComboBox;
+    private System.Windows.Forms.CheckBox ExcludeColumnCheckBox;
+    private System.Windows.Forms.CheckBox AllowEmptyCheckBox;
+    private System.Windows.Forms.CheckBox PrimaryKeyCheckBox;
+    private System.Windows.Forms.CheckBox UniqueIndexCheckBox;
+    private System.Windows.Forms.CheckBox CreateIndexCheckBox;
+    private System.Windows.Forms.Label DatatypeLabel;
+    private System.Windows.Forms.TextBox ColumnNameTextBox;
+    private System.Windows.Forms.Label ColumnNameLabel;
+    private System.Windows.Forms.Label ColumnOptionsWarningLabel;
+    private System.Windows.Forms.PictureBox ColumnOptionsWarningPicture;
+    private System.Windows.Forms.CheckBox FirstRowHeadersCheckBox;
+    private PreviewDataGridView PreviewDataGrid;
+    private System.Windows.Forms.Label ColumnOptionsSubLabel;
+    private System.Windows.Forms.Label ColumnOptionsMainLabel;
+    private System.Windows.Forms.PictureBox ColumnOptionsPicture;
+    private System.Windows.Forms.Label TableNameWarningLabel;
+    private System.Windows.Forms.PictureBox TableNameWarningPicture;
+    private System.Windows.Forms.ComboBox PrimaryKeyColumnsComboBox;
+    private System.Windows.Forms.RadioButton UseExistingColumnRadioButton;
+    private System.Windows.Forms.TextBox AddPrimaryKeyTextBox;
+    private System.Windows.Forms.RadioButton AddPrimaryKeyRadioButton;
+    private System.Windows.Forms.TextBox TableNameInputTextBox;
+    private System.Windows.Forms.Label TableNameInputLabel;
+    private System.Windows.Forms.Label PrimaryKeySubLabel;
+    private System.Windows.Forms.Label PrimaryKeyMainLabel;
+    private System.Windows.Forms.PictureBox PrimaryKeyPicture;
+    private System.Windows.Forms.Label TableNameSubLabel;
+    private System.Windows.Forms.Label TableNameMainLabel;
+    private System.Windows.Forms.PictureBox TablePicture;
+    private System.Windows.Forms.Label ExportDataLabel;
+    private System.Windows.Forms.Label SubSetOfDataLabel;
   }
 }

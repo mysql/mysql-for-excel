@@ -181,6 +181,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Another column with this name already exists in the table..
+        /// </summary>
+        internal static string ColumnExistsWarning {
+            get {
+                return ResourceManager.GetString("ColumnExistsWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This column has already been mapped, do you want to exchange mappings on the two columns?.
         /// </summary>
         internal static string ColumnMappedExchangeDetailWarning {

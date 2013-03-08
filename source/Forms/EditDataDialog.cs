@@ -302,7 +302,7 @@ namespace MySQL.ForExcel
     private void revertDataChanges(bool refreshFromDB)
     {
       Exception exception = null;
-      editMySQLDataTable.RevertData(refreshFromDB, wbConnection, out exception);
+      editMySQLDataTable.RevertData(refreshFromDB, out exception);
       if (exception != null)
       {
         InfoDialog errorDialog = new InfoDialog(false, String.Format("{0} Data Error", (refreshFromDB ? "Refresh" : "Revert")), exception.Message);
@@ -344,7 +344,7 @@ namespace MySQL.ForExcel
                                     editMySQLDataTable.DeletingOperations,
                                     editMySQLDataTable.InsertingOperations,
                                     editMySQLDataTable.UpdatingOperations);
-      PushResultsDataTable resultsDT = editMySQLDataTable.PushData(wbConnection);
+      PushResultsDataTable resultsDT = editMySQLDataTable.PushData();
       operationDetails.Append(Environment.NewLine);
       foreach (DataRow operationRow in resultsDT.Rows)
       {

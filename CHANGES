@@ -1,4 +1,5 @@
 1.1.1
+- Moved logic that handles Table and Column values and warnings from Export Form (frontend) to MySQLDataTable and MySQLDataColumn classes (backend).
 - Added code to expand each of the connection group nodes after they are initialized with existing connections.
   (Bug #16238782 - REMOTE CONNECTIONS SHOULD BE EXPANDED ON THE WELCOME PANEL)
 - The context menu opened by right-clicking the preview grid in the Import Data Form is now showing context menu actions depending on the number of selected columns
