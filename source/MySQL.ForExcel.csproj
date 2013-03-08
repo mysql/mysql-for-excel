@@ -216,6 +216,7 @@
     can be found.
   -->
   <ItemGroup>
+    <Compile Include="Classes\ActiveEditDialogContainer.cs" />
     <Compile Include="Classes\DBObject.cs" />
     <Compile Include="Classes\MySQLColumnMapping.cs" />
     <Compile Include="Classes\MySQLColumnMappingList.cs" />

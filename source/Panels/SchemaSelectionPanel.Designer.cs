@@ -1,16 +1,16 @@
-﻿// 
-// Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+﻿//
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
@@ -49,301 +49,301 @@ namespace MySQL.ForExcel
     {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SchemaSelectionPanel));
-      this.largeImages = new System.Windows.Forms.ImageList(this.components);
-      this.btnBack = new System.Windows.Forms.Button();
-      this.btnNext = new System.Windows.Forms.Button();
-      this.btnHelp = new System.Windows.Forms.Button();
-      this.databaseList = new MySQL.ForExcel.MyTreeView();
-      this.contextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
-      this.refreshSchemasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.createNewSchemaLabel = new MySQL.ForExcel.HotLabel();
-      this.labelsToolTip = new System.Windows.Forms.ToolTip(this.components);
-      this.upperPanel = new System.Windows.Forms.Panel();
-      this.imgSeparator = new MySQL.ForExcel.TransparentPictureBox();
-      this.lblUserIP = new System.Windows.Forms.Label();
-      this.schemaFilter = new MySQL.ForExcel.SearchEdit();
-      this.selectSchemaLabel = new MySQL.ForExcel.HotLabel();
-      this.lblInstructions = new MySQL.ForExcel.TransparentLabel();
-      this.lblConnectionName = new System.Windows.Forms.Label();
-      this.picAddInLogo = new System.Windows.Forms.PictureBox();
-      this.contextMenuStrip.SuspendLayout();
-      this.upperPanel.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).BeginInit();
+      this.LargeImagesList = new System.Windows.Forms.ImageList(this.components);
+      this.BackButton = new System.Windows.Forms.Button();
+      this.NextButton = new System.Windows.Forms.Button();
+      this.HelpButton = new System.Windows.Forms.Button();
+      this.SchemasList = new MySQL.ForExcel.MyTreeView();
+      this.SchemasContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.RefreshSchemasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.CreateNewSchemaHotLabel = new MySQL.ForExcel.HotLabel();
+      this.LabelsToolTip = new System.Windows.Forms.ToolTip(this.components);
+      this.UpperPanel = new System.Windows.Forms.Panel();
+      this.SeparatorImage = new MySQL.ForExcel.TransparentPictureBox();
+      this.UserIPLabel = new System.Windows.Forms.Label();
+      this.SchemaFilter = new MySQL.ForExcel.SearchEdit();
+      this.SelectSchemaHotLabel = new MySQL.ForExcel.HotLabel();
+      this.InstructionsLabel = new MySQL.ForExcel.TransparentLabel();
+      this.ConnectionNameLabel = new System.Windows.Forms.Label();
+      this.MainLogoPictureBox = new System.Windows.Forms.PictureBox();
+      this.SchemasContextMenuStrip.SuspendLayout();
+      this.UpperPanel.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.MainLogoPictureBox)).BeginInit();
       this.SuspendLayout();
       // 
-      // largeImages
+      // LargeImagesList
       // 
-      this.largeImages.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("largeImages.ImageStream")));
-      this.largeImages.TransparentColor = System.Drawing.Color.Transparent;
-      this.largeImages.Images.SetKeyName(0, "MySQLforExcel-SchemaPanel-ListItem-Schema-24x24.png");
+      this.LargeImagesList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("LargeImagesList.ImageStream")));
+      this.LargeImagesList.TransparentColor = System.Drawing.Color.Transparent;
+      this.LargeImagesList.Images.SetKeyName(0, "MySQLforExcel-SchemaPanel-ListItem-Schema-24x24.png");
       // 
-      // btnBack
+      // BackButton
       // 
-      this.btnBack.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-      this.btnBack.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnBack.Location = new System.Drawing.Point(95, 599);
-      this.btnBack.Name = "btnBack";
-      this.btnBack.Size = new System.Drawing.Size(75, 23);
-      this.btnBack.TabIndex = 7;
-      this.btnBack.Text = "< Back";
-      this.btnBack.UseVisualStyleBackColor = true;
-      this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
+      this.BackButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+      this.BackButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.BackButton.Location = new System.Drawing.Point(95, 599);
+      this.BackButton.Name = "BackButton";
+      this.BackButton.Size = new System.Drawing.Size(75, 23);
+      this.BackButton.TabIndex = 7;
+      this.BackButton.Text = "< Back";
+      this.BackButton.UseVisualStyleBackColor = true;
+      this.BackButton.Click += new System.EventHandler(this.BackButton_Click);
       // 
-      // btnNext
+      // NextButton
       // 
-      this.btnNext.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-      this.btnNext.Enabled = false;
-      this.btnNext.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnNext.Location = new System.Drawing.Point(176, 599);
-      this.btnNext.Name = "btnNext";
-      this.btnNext.Size = new System.Drawing.Size(75, 23);
-      this.btnNext.TabIndex = 8;
-      this.btnNext.Text = "Next >";
-      this.btnNext.UseVisualStyleBackColor = true;
-      this.btnNext.Click += new System.EventHandler(this.btnNext_Click);
+      this.NextButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+      this.NextButton.Enabled = false;
+      this.NextButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.NextButton.Location = new System.Drawing.Point(176, 599);
+      this.NextButton.Name = "NextButton";
+      this.NextButton.Size = new System.Drawing.Size(75, 23);
+      this.NextButton.TabIndex = 8;
+      this.NextButton.Text = "Next >";
+      this.NextButton.UseVisualStyleBackColor = true;
+      this.NextButton.Click += new System.EventHandler(this.NextButton_Click);
       // 
-      // btnHelp
+      // HelpButton
       // 
-      this.btnHelp.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-      this.btnHelp.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnHelp.Location = new System.Drawing.Point(14, 599);
-      this.btnHelp.Name = "btnHelp";
-      this.btnHelp.Size = new System.Drawing.Size(75, 23);
-      this.btnHelp.TabIndex = 6;
-      this.btnHelp.Text = "Help";
-      this.btnHelp.UseVisualStyleBackColor = true;
-      this.btnHelp.Visible = false;
-      this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
+      this.HelpButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+      this.HelpButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.HelpButton.Location = new System.Drawing.Point(14, 599);
+      this.HelpButton.Name = "HelpButton";
+      this.HelpButton.Size = new System.Drawing.Size(75, 23);
+      this.HelpButton.TabIndex = 6;
+      this.HelpButton.Text = "Help";
+      this.HelpButton.UseVisualStyleBackColor = true;
+      this.HelpButton.Visible = false;
+      this.HelpButton.Click += new System.EventHandler(this.HelpButton_Click);
       // 
-      // databaseList
+      // SchemasList
       // 
-      this.databaseList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+      this.SchemasList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.databaseList.CollapsedIcon = global::MySQL.ForExcel.Properties.Resources.ArrowRight;
-      this.databaseList.ContextMenuStrip = this.contextMenuStrip;
-      this.databaseList.DescriptionColor = System.Drawing.Color.Silver;
-      this.databaseList.DescriptionColorOpacity = 1D;
-      this.databaseList.DescriptionFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.databaseList.DescriptionTextVerticalPixelsOffset = 0;
-      this.databaseList.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawAll;
-      this.databaseList.ExpandedIcon = global::MySQL.ForExcel.Properties.Resources.ArrowDown;
-      this.databaseList.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.databaseList.ImageHorizontalPixelsOffset = 14;
-      this.databaseList.ImageToTextHorizontalPixelsOffset = 3;
-      this.databaseList.Indent = 18;
-      this.databaseList.ItemHeight = 10;
-      this.databaseList.Location = new System.Drawing.Point(9, 226);
-      this.databaseList.Name = "databaseList";
-      this.databaseList.NodeHeightMultiple = 3;
-      this.databaseList.NodeImages = this.largeImages;
-      this.databaseList.ShowNodeToolTips = true;
-      this.databaseList.Size = new System.Drawing.Size(242, 325);
-      this.databaseList.TabIndex = 23;
-      this.databaseList.TitleColorOpacity = 0.8D;
-      this.databaseList.TitleTextVerticalPixelsOffset = 0;
-      this.databaseList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.databaseList_AfterSelect);
-      this.databaseList.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.databaseList_NodeMouseDoubleClick);
+      this.SchemasList.CollapsedIcon = global::MySQL.ForExcel.Properties.Resources.ArrowRight;
+      this.SchemasList.ContextMenuStrip = this.SchemasContextMenuStrip;
+      this.SchemasList.DescriptionColor = System.Drawing.Color.Silver;
+      this.SchemasList.DescriptionColorOpacity = 1D;
+      this.SchemasList.DescriptionFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.SchemasList.DescriptionTextVerticalPixelsOffset = 0;
+      this.SchemasList.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawAll;
+      this.SchemasList.ExpandedIcon = global::MySQL.ForExcel.Properties.Resources.ArrowDown;
+      this.SchemasList.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.SchemasList.ImageHorizontalPixelsOffset = 14;
+      this.SchemasList.ImageToTextHorizontalPixelsOffset = 3;
+      this.SchemasList.Indent = 18;
+      this.SchemasList.ItemHeight = 10;
+      this.SchemasList.Location = new System.Drawing.Point(9, 226);
+      this.SchemasList.Name = "SchemasList";
+      this.SchemasList.NodeHeightMultiple = 3;
+      this.SchemasList.NodeImages = this.LargeImagesList;
+      this.SchemasList.ShowNodeToolTips = true;
+      this.SchemasList.Size = new System.Drawing.Size(242, 325);
+      this.SchemasList.TabIndex = 23;
+      this.SchemasList.TitleColorOpacity = 0.8D;
+      this.SchemasList.TitleTextVerticalPixelsOffset = 0;
+      this.SchemasList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.SchemasList_AfterSelect);
+      this.SchemasList.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.SchemasList_NodeMouseDoubleClick);
       // 
-      // contextMenuStrip
+      // SchemasContextMenuStrip
       // 
-      this.contextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.refreshSchemasToolStripMenuItem});
-      this.contextMenuStrip.Name = "contextMenuStrip";
-      this.contextMenuStrip.Size = new System.Drawing.Size(164, 48);
+      this.SchemasContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.RefreshSchemasToolStripMenuItem});
+      this.SchemasContextMenuStrip.Name = "contextMenuStrip";
+      this.SchemasContextMenuStrip.Size = new System.Drawing.Size(164, 48);
       // 
-      // refreshSchemasToolStripMenuItem
+      // RefreshSchemasToolStripMenuItem
       // 
-      this.refreshSchemasToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.refresh_sidebar;
-      this.refreshSchemasToolStripMenuItem.Name = "refreshSchemasToolStripMenuItem";
-      this.refreshSchemasToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
-      this.refreshSchemasToolStripMenuItem.Text = "Refresh Schemas";
-      this.refreshSchemasToolStripMenuItem.Click += new System.EventHandler(this.refreshSchemasToolStripMenuItem_Click);
+      this.RefreshSchemasToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.refresh_sidebar;
+      this.RefreshSchemasToolStripMenuItem.Name = "RefreshSchemasToolStripMenuItem";
+      this.RefreshSchemasToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+      this.RefreshSchemasToolStripMenuItem.Text = "Refresh Schemas";
+      this.RefreshSchemasToolStripMenuItem.Click += new System.EventHandler(this.RefreshSchemasToolStripMenuItem_Click);
       // 
-      // createNewSchemaLabel
+      // CreateNewSchemaHotLabel
       // 
-      this.createNewSchemaLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.createNewSchemaLabel.Description = "Add a new Database Schema";
-      this.createNewSchemaLabel.DescriptionColor = System.Drawing.SystemColors.WindowText;
-      this.createNewSchemaLabel.DescriptionColorOpacity = 0.6D;
-      this.createNewSchemaLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.createNewSchemaLabel.DescriptionShadowOpacity = 0.4D;
-      this.createNewSchemaLabel.DescriptionShadowPixelsXOffset = 0;
-      this.createNewSchemaLabel.DescriptionShadowPixelsYOffset = 1;
-      this.createNewSchemaLabel.DisabledImage = null;
-      this.createNewSchemaLabel.DrawShadow = true;
-      this.createNewSchemaLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.createNewSchemaLabel.HotTracking = true;
-      this.createNewSchemaLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_SchemaPanel_NewSchema_24x24;
-      this.createNewSchemaLabel.ImagePixelsXOffset = 0;
-      this.createNewSchemaLabel.ImagePixelsYOffset = 0;
-      this.createNewSchemaLabel.Location = new System.Drawing.Point(9, 558);
-      this.createNewSchemaLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-      this.createNewSchemaLabel.Name = "createNewSchemaLabel";
-      this.createNewSchemaLabel.Size = new System.Drawing.Size(237, 28);
-      this.createNewSchemaLabel.TabIndex = 15;
-      this.createNewSchemaLabel.Title = "Create New Schema";
-      this.createNewSchemaLabel.TitleColor = System.Drawing.SystemColors.WindowText;
-      this.createNewSchemaLabel.TitleColorOpacity = 0.95D;
-      this.createNewSchemaLabel.TitleDescriptionPixelsSpacing = 0;
-      this.createNewSchemaLabel.TitlePixelsXOffset = 3;
-      this.createNewSchemaLabel.TitlePixelsYOffset = 0;
-      this.createNewSchemaLabel.TitleShadowOpacity = 0.2D;
-      this.createNewSchemaLabel.TitleShadowPixelsXOffset = 0;
-      this.createNewSchemaLabel.TitleShadowPixelsYOffset = 1;
-      this.createNewSchemaLabel.Click += new System.EventHandler(this.createNewSchema_Click);
+      this.CreateNewSchemaHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.CreateNewSchemaHotLabel.Description = "Add a new Database Schema";
+      this.CreateNewSchemaHotLabel.DescriptionColor = System.Drawing.SystemColors.WindowText;
+      this.CreateNewSchemaHotLabel.DescriptionColorOpacity = 0.6D;
+      this.CreateNewSchemaHotLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.CreateNewSchemaHotLabel.DescriptionShadowOpacity = 0.4D;
+      this.CreateNewSchemaHotLabel.DescriptionShadowPixelsXOffset = 0;
+      this.CreateNewSchemaHotLabel.DescriptionShadowPixelsYOffset = 1;
+      this.CreateNewSchemaHotLabel.DisabledImage = null;
+      this.CreateNewSchemaHotLabel.DrawShadow = true;
+      this.CreateNewSchemaHotLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.CreateNewSchemaHotLabel.HotTracking = true;
+      this.CreateNewSchemaHotLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_SchemaPanel_NewSchema_24x24;
+      this.CreateNewSchemaHotLabel.ImagePixelsXOffset = 0;
+      this.CreateNewSchemaHotLabel.ImagePixelsYOffset = 0;
+      this.CreateNewSchemaHotLabel.Location = new System.Drawing.Point(9, 558);
+      this.CreateNewSchemaHotLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.CreateNewSchemaHotLabel.Name = "CreateNewSchemaHotLabel";
+      this.CreateNewSchemaHotLabel.Size = new System.Drawing.Size(237, 28);
+      this.CreateNewSchemaHotLabel.TabIndex = 15;
+      this.CreateNewSchemaHotLabel.Title = "Create New Schema";
+      this.CreateNewSchemaHotLabel.TitleColor = System.Drawing.SystemColors.WindowText;
+      this.CreateNewSchemaHotLabel.TitleColorOpacity = 0.95D;
+      this.CreateNewSchemaHotLabel.TitleDescriptionPixelsSpacing = 0;
+      this.CreateNewSchemaHotLabel.TitlePixelsXOffset = 3;
+      this.CreateNewSchemaHotLabel.TitlePixelsYOffset = 0;
+      this.CreateNewSchemaHotLabel.TitleShadowOpacity = 0.2D;
+      this.CreateNewSchemaHotLabel.TitleShadowPixelsXOffset = 0;
+      this.CreateNewSchemaHotLabel.TitleShadowPixelsYOffset = 1;
+      this.CreateNewSchemaHotLabel.Click += new System.EventHandler(this.CreateNewSchemaHotLabel_Click);
       // 
-      // upperPanel
+      // UpperPanel
       // 
-      this.upperPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+      this.UpperPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.upperPanel.Controls.Add(this.imgSeparator);
-      this.upperPanel.Controls.Add(this.lblUserIP);
-      this.upperPanel.Controls.Add(this.schemaFilter);
-      this.upperPanel.Controls.Add(this.selectSchemaLabel);
-      this.upperPanel.Controls.Add(this.lblInstructions);
-      this.upperPanel.Controls.Add(this.lblConnectionName);
-      this.upperPanel.Controls.Add(this.picAddInLogo);
-      this.upperPanel.Location = new System.Drawing.Point(0, 0);
-      this.upperPanel.Name = "upperPanel";
-      this.upperPanel.Size = new System.Drawing.Size(260, 224);
-      this.upperPanel.TabIndex = 27;
+      this.UpperPanel.Controls.Add(this.SeparatorImage);
+      this.UpperPanel.Controls.Add(this.UserIPLabel);
+      this.UpperPanel.Controls.Add(this.SchemaFilter);
+      this.UpperPanel.Controls.Add(this.SelectSchemaHotLabel);
+      this.UpperPanel.Controls.Add(this.InstructionsLabel);
+      this.UpperPanel.Controls.Add(this.ConnectionNameLabel);
+      this.UpperPanel.Controls.Add(this.MainLogoPictureBox);
+      this.UpperPanel.Location = new System.Drawing.Point(0, 0);
+      this.UpperPanel.Name = "UpperPanel";
+      this.UpperPanel.Size = new System.Drawing.Size(260, 224);
+      this.UpperPanel.TabIndex = 27;
       // 
-      // imgSeparator
+      // SeparatorImage
       // 
-      this.imgSeparator.BackColor = System.Drawing.Color.Transparent;
-      this.imgSeparator.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Separator;
-      this.imgSeparator.Location = new System.Drawing.Point(9, 136);
-      this.imgSeparator.Name = "imgSeparator";
-      this.imgSeparator.Opacity = 0.3F;
-      this.imgSeparator.Size = new System.Drawing.Size(242, 21);
-      this.imgSeparator.TabIndex = 33;
+      this.SeparatorImage.BackColor = System.Drawing.Color.Transparent;
+      this.SeparatorImage.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Separator;
+      this.SeparatorImage.Location = new System.Drawing.Point(9, 136);
+      this.SeparatorImage.Name = "SeparatorImage";
+      this.SeparatorImage.Opacity = 0.3F;
+      this.SeparatorImage.Size = new System.Drawing.Size(242, 21);
+      this.SeparatorImage.TabIndex = 33;
       // 
-      // lblUserIP
+      // UserIPLabel
       // 
-      this.lblUserIP.AutoEllipsis = true;
-      this.lblUserIP.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblUserIP.Location = new System.Drawing.Point(61, 36);
-      this.lblUserIP.Name = "lblUserIP";
-      this.lblUserIP.Size = new System.Drawing.Size(190, 18);
-      this.lblUserIP.TabIndex = 28;
-      this.lblUserIP.Text = "User: ??, IP: ??";
+      this.UserIPLabel.AutoEllipsis = true;
+      this.UserIPLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.UserIPLabel.Location = new System.Drawing.Point(61, 36);
+      this.UserIPLabel.Name = "UserIPLabel";
+      this.UserIPLabel.Size = new System.Drawing.Size(190, 18);
+      this.UserIPLabel.TabIndex = 28;
+      this.UserIPLabel.Text = "User: ??, IP: ??";
       // 
-      // schemaFilter
+      // SchemaFilter
       // 
-      this.schemaFilter.BackColor = System.Drawing.SystemColors.Window;
-      this.schemaFilter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-      this.schemaFilter.Location = new System.Drawing.Point(9, 199);
-      this.schemaFilter.Name = "schemaFilter";
-      this.schemaFilter.NoTextLabel = "Filter Schemas";
-      this.schemaFilter.Size = new System.Drawing.Size(242, 21);
-      this.schemaFilter.TabIndex = 32;
-      this.schemaFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.schemaFilter_KeyDown);
+      this.SchemaFilter.BackColor = System.Drawing.SystemColors.Window;
+      this.SchemaFilter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+      this.SchemaFilter.Location = new System.Drawing.Point(9, 199);
+      this.SchemaFilter.Name = "SchemaFilter";
+      this.SchemaFilter.NoTextLabel = "Filter Schemas";
+      this.SchemaFilter.Size = new System.Drawing.Size(242, 21);
+      this.SchemaFilter.TabIndex = 32;
+      this.SchemaFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SchemaFilter_KeyDown);
       // 
-      // selectSchemaLabel
+      // SelectSchemaHotLabel
       // 
-      this.selectSchemaLabel.Description = "Then click the [Next>] button below";
-      this.selectSchemaLabel.DescriptionColor = System.Drawing.SystemColors.WindowText;
-      this.selectSchemaLabel.DescriptionColorOpacity = 0.6D;
-      this.selectSchemaLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.selectSchemaLabel.DescriptionShadowOpacity = 0.4D;
-      this.selectSchemaLabel.DescriptionShadowPixelsXOffset = 0;
-      this.selectSchemaLabel.DescriptionShadowPixelsYOffset = 1;
-      this.selectSchemaLabel.DisabledImage = null;
-      this.selectSchemaLabel.DrawShadow = true;
-      this.selectSchemaLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.selectSchemaLabel.HotTracking = false;
-      this.selectSchemaLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_SchemaPanel_Schemas_24x24;
-      this.selectSchemaLabel.ImagePixelsXOffset = 0;
-      this.selectSchemaLabel.ImagePixelsYOffset = 2;
-      this.selectSchemaLabel.Location = new System.Drawing.Point(10, 164);
-      this.selectSchemaLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-      this.selectSchemaLabel.Name = "selectSchemaLabel";
-      this.selectSchemaLabel.Size = new System.Drawing.Size(237, 28);
-      this.selectSchemaLabel.TabIndex = 31;
-      this.selectSchemaLabel.Title = "Select a Database Schema";
-      this.selectSchemaLabel.TitleColor = System.Drawing.SystemColors.WindowText;
-      this.selectSchemaLabel.TitleColorOpacity = 0.95D;
-      this.selectSchemaLabel.TitleDescriptionPixelsSpacing = 0;
-      this.selectSchemaLabel.TitlePixelsXOffset = 3;
-      this.selectSchemaLabel.TitlePixelsYOffset = 0;
-      this.selectSchemaLabel.TitleShadowOpacity = 0.2D;
-      this.selectSchemaLabel.TitleShadowPixelsXOffset = 0;
-      this.selectSchemaLabel.TitleShadowPixelsYOffset = 1;
+      this.SelectSchemaHotLabel.Description = "Then click the [Next>] button below";
+      this.SelectSchemaHotLabel.DescriptionColor = System.Drawing.SystemColors.WindowText;
+      this.SelectSchemaHotLabel.DescriptionColorOpacity = 0.6D;
+      this.SelectSchemaHotLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.SelectSchemaHotLabel.DescriptionShadowOpacity = 0.4D;
+      this.SelectSchemaHotLabel.DescriptionShadowPixelsXOffset = 0;
+      this.SelectSchemaHotLabel.DescriptionShadowPixelsYOffset = 1;
+      this.SelectSchemaHotLabel.DisabledImage = null;
+      this.SelectSchemaHotLabel.DrawShadow = true;
+      this.SelectSchemaHotLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.SelectSchemaHotLabel.HotTracking = false;
+      this.SelectSchemaHotLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_SchemaPanel_Schemas_24x24;
+      this.SelectSchemaHotLabel.ImagePixelsXOffset = 0;
+      this.SelectSchemaHotLabel.ImagePixelsYOffset = 2;
+      this.SelectSchemaHotLabel.Location = new System.Drawing.Point(10, 164);
+      this.SelectSchemaHotLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.SelectSchemaHotLabel.Name = "SelectSchemaHotLabel";
+      this.SelectSchemaHotLabel.Size = new System.Drawing.Size(237, 28);
+      this.SelectSchemaHotLabel.TabIndex = 31;
+      this.SelectSchemaHotLabel.Title = "Select a Database Schema";
+      this.SelectSchemaHotLabel.TitleColor = System.Drawing.SystemColors.WindowText;
+      this.SelectSchemaHotLabel.TitleColorOpacity = 0.95D;
+      this.SelectSchemaHotLabel.TitleDescriptionPixelsSpacing = 0;
+      this.SelectSchemaHotLabel.TitlePixelsXOffset = 3;
+      this.SelectSchemaHotLabel.TitlePixelsYOffset = 0;
+      this.SelectSchemaHotLabel.TitleShadowOpacity = 0.2D;
+      this.SelectSchemaHotLabel.TitleShadowPixelsXOffset = 0;
+      this.SelectSchemaHotLabel.TitleShadowPixelsYOffset = 1;
       // 
-      // lblInstructions
+      // InstructionsLabel
       // 
-      this.lblInstructions.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblInstructions.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblInstructions.Location = new System.Drawing.Point(10, 73);
-      this.lblInstructions.Name = "lblInstructions";
-      this.lblInstructions.PixelsSpacingAdjustment = -3;
-      this.lblInstructions.ShadowColor = System.Drawing.SystemColors.ControlText;
-      this.lblInstructions.ShadowOpacity = 0.7D;
-      this.lblInstructions.ShadowPixelsXOffset = 0;
-      this.lblInstructions.Size = new System.Drawing.Size(241, 53);
-      this.lblInstructions.TabIndex = 29;
-      this.lblInstructions.TextOpacity = 0.6D;
-      this.lblInstructions.TransparentText = "Please select the MySQL schema you want to work with. Each schema can hold a coll" +
+      this.InstructionsLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.InstructionsLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.InstructionsLabel.Location = new System.Drawing.Point(10, 73);
+      this.InstructionsLabel.Name = "InstructionsLabel";
+      this.InstructionsLabel.PixelsSpacingAdjustment = -3;
+      this.InstructionsLabel.ShadowColor = System.Drawing.SystemColors.ControlText;
+      this.InstructionsLabel.ShadowOpacity = 0.7D;
+      this.InstructionsLabel.ShadowPixelsXOffset = 0;
+      this.InstructionsLabel.Size = new System.Drawing.Size(241, 53);
+      this.InstructionsLabel.TabIndex = 29;
+      this.InstructionsLabel.TextOpacity = 0.6D;
+      this.InstructionsLabel.TransparentText = "Please select the MySQL schema you want to work with. Each schema can hold a coll" +
     "ection of tables that store data, views that hold selected data and routines tha" +
     "t generate data.";
       // 
-      // lblConnectionName
+      // ConnectionNameLabel
       // 
-      this.lblConnectionName.AutoEllipsis = true;
-      this.lblConnectionName.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblConnectionName.Location = new System.Drawing.Point(61, 18);
-      this.lblConnectionName.Name = "lblConnectionName";
-      this.lblConnectionName.Size = new System.Drawing.Size(190, 18);
-      this.lblConnectionName.TabIndex = 27;
-      this.lblConnectionName.Text = "Connection Name";
+      this.ConnectionNameLabel.AutoEllipsis = true;
+      this.ConnectionNameLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ConnectionNameLabel.Location = new System.Drawing.Point(61, 18);
+      this.ConnectionNameLabel.Name = "ConnectionNameLabel";
+      this.ConnectionNameLabel.Size = new System.Drawing.Size(190, 18);
+      this.ConnectionNameLabel.TabIndex = 27;
+      this.ConnectionNameLabel.Text = "Connection Name";
       // 
-      // picAddInLogo
+      // MainLogoPictureBox
       // 
-      this.picAddInLogo.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Logo_64x64;
-      this.picAddInLogo.Location = new System.Drawing.Point(9, 11);
-      this.picAddInLogo.Name = "picAddInLogo";
-      this.picAddInLogo.Size = new System.Drawing.Size(64, 64);
-      this.picAddInLogo.TabIndex = 30;
-      this.picAddInLogo.TabStop = false;
+      this.MainLogoPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Logo_64x64;
+      this.MainLogoPictureBox.Location = new System.Drawing.Point(9, 11);
+      this.MainLogoPictureBox.Name = "MainLogoPictureBox";
+      this.MainLogoPictureBox.Size = new System.Drawing.Size(64, 64);
+      this.MainLogoPictureBox.TabIndex = 30;
+      this.MainLogoPictureBox.TabStop = false;
       // 
       // SchemaSelectionPanel
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-      this.Controls.Add(this.upperPanel);
-      this.Controls.Add(this.databaseList);
-      this.Controls.Add(this.createNewSchemaLabel);
-      this.Controls.Add(this.btnHelp);
-      this.Controls.Add(this.btnNext);
-      this.Controls.Add(this.btnBack);
+      this.Controls.Add(this.UpperPanel);
+      this.Controls.Add(this.SchemasList);
+      this.Controls.Add(this.CreateNewSchemaHotLabel);
+      this.Controls.Add(this.HelpButton);
+      this.Controls.Add(this.NextButton);
+      this.Controls.Add(this.BackButton);
       this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.Name = "SchemaSelectionPanel";
       this.Size = new System.Drawing.Size(260, 625);
-      this.contextMenuStrip.ResumeLayout(false);
-      this.upperPanel.ResumeLayout(false);
-      ((System.ComponentModel.ISupportInitialize)(this.picAddInLogo)).EndInit();
+      this.SchemasContextMenuStrip.ResumeLayout(false);
+      this.UpperPanel.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.MainLogoPictureBox)).EndInit();
       this.ResumeLayout(false);
 
     }
 
     #endregion
 
-    public System.Windows.Forms.Button btnBack;
-    public System.Windows.Forms.Button btnNext;
-    private System.Windows.Forms.ImageList largeImages;
-    public System.Windows.Forms.Button btnHelp;
-    private HotLabel createNewSchemaLabel;
-    private MyTreeView databaseList;
-    private System.Windows.Forms.ToolTip labelsToolTip;
-    private System.Windows.Forms.ContextMenuStrip contextMenuStrip;
-    private System.Windows.Forms.ToolStripMenuItem refreshSchemasToolStripMenuItem;
-    private System.Windows.Forms.Panel upperPanel;
-    private TransparentPictureBox imgSeparator;
-    private System.Windows.Forms.Label lblUserIP;
-    private SearchEdit schemaFilter;
-    private HotLabel selectSchemaLabel;
-    private TransparentLabel lblInstructions;
-    private System.Windows.Forms.Label lblConnectionName;
-    private System.Windows.Forms.PictureBox picAddInLogo;
+    public System.Windows.Forms.Button BackButton;
+    public System.Windows.Forms.Button NextButton;
+    private System.Windows.Forms.ImageList LargeImagesList;
+    public System.Windows.Forms.Button HelpButton;
+    private HotLabel CreateNewSchemaHotLabel;
+    private MyTreeView SchemasList;
+    private System.Windows.Forms.ToolTip LabelsToolTip;
+    private System.Windows.Forms.ContextMenuStrip SchemasContextMenuStrip;
+    private System.Windows.Forms.ToolStripMenuItem RefreshSchemasToolStripMenuItem;
+    private System.Windows.Forms.Panel UpperPanel;
+    private TransparentPictureBox SeparatorImage;
+    private System.Windows.Forms.Label UserIPLabel;
+    private SearchEdit SchemaFilter;
+    private HotLabel SelectSchemaHotLabel;
+    private TransparentLabel InstructionsLabel;
+    private System.Windows.Forms.Label ConnectionNameLabel;
+    private System.Windows.Forms.PictureBox MainLogoPictureBox;
   }
 }

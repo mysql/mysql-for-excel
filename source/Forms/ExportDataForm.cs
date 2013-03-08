@@ -18,7 +18,6 @@
 namespace MySQL.ForExcel
 {
   using System;
-  using System.Collections.Generic;
   using System.ComponentModel;
   using System.Data;
   using System.Drawing;
@@ -752,6 +751,7 @@ namespace MySQL.ForExcel
         case TableWarningsChangedArgs.TableWarningsType.AutoPrimaryKeyWarnings:
           ShowValidationWarning("PrimaryKeyWarning", args.WarningsQuantity > 0, Properties.Resources.PrimaryKeyColumnExistsWarning);
           break;
+
         case TableWarningsChangedArgs.TableWarningsType.ColumnWarnings:
           MySQLDataColumn column = sender as MySQLDataColumn;
           DataGridViewColumn gridCol = PreviewDataGrid.Columns[column.Ordinal];
@@ -759,6 +759,7 @@ namespace MySQL.ForExcel
           ShowValidationWarning("ColumnOptionsWarning", showWarning, args.CurrentWarning);
           gridCol.DefaultCellStyle.BackColor = column.ExcludeColumn ? Color.LightGray : (showWarning ? Color.OrangeRed : PreviewDataGrid.DefaultCellStyle.BackColor);
           break;
+
         case TableWarningsChangedArgs.TableWarningsType.TableNameWarnings:
           ShowValidationWarning("TableNameWarning", args.WarningsQuantity > 0, args.CurrentWarning);
           break;
@@ -1041,6 +1042,7 @@ namespace MySQL.ForExcel
         AddPrimaryKeyRadioButton.Checked = true;
       }
     }
+
     /// <summary>
     /// Shows or hides the visual controls to display warnings for columns or table name.
     /// </summary>
@@ -1069,6 +1071,7 @@ namespace MySQL.ForExcel
         return;
       }
     }
+
     /// <summary>
     /// Event delegate method fired when the <see cref="TableNameInputTextBox"/> textbox's text changes.
     /// </summary>
@@ -1129,6 +1132,7 @@ namespace MySQL.ForExcel
         TextChangedTimer.Stop();
       }
     }
+
     /// <summary>
     /// Event delegate method fired when the <see cref="UniqueIndexCheckBox"/> object's checked state changes.
     /// </summary>

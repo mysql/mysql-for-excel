@@ -1,16 +1,16 @@
-﻿// 
-// Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+﻿//
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
@@ -47,45 +47,45 @@ namespace MySQL.ForExcel
     /// </summary>
     private void InitializeComponent()
     {
-      this.welcomePanel1 = new MySQL.ForExcel.WelcomePanel();
-      this.dbObjectSelectionPanel1 = new MySQL.ForExcel.DBObjectSelectionPanel();
-      this.schemaSelectionPanel1 = new MySQL.ForExcel.SchemaSelectionPanel();
+      this.WelcomePanel1 = new MySQL.ForExcel.WelcomePanel();
+      this.DBObjectSelectionPanel3 = new MySQL.ForExcel.DBObjectSelectionPanel();
+      this.SchemaSelectionPanel2 = new MySQL.ForExcel.SchemaSelectionPanel();
       this.SuspendLayout();
       // 
-      // welcomePanel1
+      // WelcomePanel1
       // 
-      this.welcomePanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.welcomePanel1.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.welcomePanel1.Location = new System.Drawing.Point(0, 0);
-      this.welcomePanel1.Name = "welcomePanel1";
-      this.welcomePanel1.Size = new System.Drawing.Size(260, 625);
-      this.welcomePanel1.TabIndex = 0;
+      this.WelcomePanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.WelcomePanel1.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.WelcomePanel1.Location = new System.Drawing.Point(0, 0);
+      this.WelcomePanel1.Name = "WelcomePanel1";
+      this.WelcomePanel1.Size = new System.Drawing.Size(260, 625);
+      this.WelcomePanel1.TabIndex = 0;
       // 
-      // dbObjectSelectionPanel1
+      // DBObjectSelectionPanel3
       // 
-      this.dbObjectSelectionPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.dbObjectSelectionPanel1.Font = new System.Drawing.Font("Arial", 9F);
-      this.dbObjectSelectionPanel1.Location = new System.Drawing.Point(0, 0);
-      this.dbObjectSelectionPanel1.Name = "dbObjectSelectionPanel1";
-      this.dbObjectSelectionPanel1.Size = new System.Drawing.Size(260, 625);
-      this.dbObjectSelectionPanel1.TabIndex = 2;
+      this.DBObjectSelectionPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.DBObjectSelectionPanel3.Font = new System.Drawing.Font("Arial", 9F);
+      this.DBObjectSelectionPanel3.Location = new System.Drawing.Point(0, 0);
+      this.DBObjectSelectionPanel3.Name = "DBObjectSelectionPanel3";
+      this.DBObjectSelectionPanel3.Size = new System.Drawing.Size(260, 625);
+      this.DBObjectSelectionPanel3.TabIndex = 2;
       // 
-      // schemaSelectionPanel1
+      // SchemaSelectionPanel2
       // 
-      this.schemaSelectionPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.schemaSelectionPanel1.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.schemaSelectionPanel1.Location = new System.Drawing.Point(0, 0);
-      this.schemaSelectionPanel1.Name = "schemaSelectionPanel1";
-      this.schemaSelectionPanel1.Size = new System.Drawing.Size(260, 625);
-      this.schemaSelectionPanel1.TabIndex = 1;
+      this.SchemaSelectionPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+      this.SchemaSelectionPanel2.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.SchemaSelectionPanel2.Location = new System.Drawing.Point(0, 0);
+      this.SchemaSelectionPanel2.Name = "SchemaSelectionPanel2";
+      this.SchemaSelectionPanel2.Size = new System.Drawing.Size(260, 625);
+      this.SchemaSelectionPanel2.TabIndex = 1;
       // 
       // TaskPaneControl
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.Controls.Add(this.welcomePanel1);
-      this.Controls.Add(this.dbObjectSelectionPanel1);
-      this.Controls.Add(this.schemaSelectionPanel1);
+      this.Controls.Add(this.WelcomePanel1);
+      this.Controls.Add(this.DBObjectSelectionPanel3);
+      this.Controls.Add(this.SchemaSelectionPanel2);
       this.Name = "TaskPaneControl";
       this.Size = new System.Drawing.Size(260, 625);
       this.ResumeLayout(false);
@@ -94,9 +94,9 @@ namespace MySQL.ForExcel
 
     #endregion
 
-    private WelcomePanel welcomePanel1;
-    private SchemaSelectionPanel schemaSelectionPanel1;
-    private DBObjectSelectionPanel dbObjectSelectionPanel1;
+    private WelcomePanel WelcomePanel1;
+    private SchemaSelectionPanel SchemaSelectionPanel2;
+    private DBObjectSelectionPanel DBObjectSelectionPanel3;
 
   }
 }

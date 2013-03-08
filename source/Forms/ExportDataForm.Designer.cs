@@ -48,14 +48,14 @@ namespace MySQL.ForExcel
     private void InitializeComponent()
     {
       this.components = new System.ComponentModel.Container();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
       this.TextChangedTimer = new System.Windows.Forms.Timer(this.components);
       this.CopySQLButton = new System.Windows.Forms.Button();
       this.AdvancedOptionsButton = new System.Windows.Forms.Button();
       this.ExportButton = new System.Windows.Forms.Button();
-      this.CancelButton = new System.Windows.Forms.Button();
+      this.ExportCancelButton = new System.Windows.Forms.Button();
       this.PrimaryKeyWarningLabel = new System.Windows.Forms.Label();
       this.PrimaryKeyWarningPicture = new System.Windows.Forms.PictureBox();
       this.ColumnOptionsGroupBox = new System.Windows.Forms.GroupBox();
@@ -139,7 +139,7 @@ namespace MySQL.ForExcel
       this.commandAreaPanel.Controls.Add(this.CopySQLButton);
       this.commandAreaPanel.Controls.Add(this.AdvancedOptionsButton);
       this.commandAreaPanel.Controls.Add(this.ExportButton);
-      this.commandAreaPanel.Controls.Add(this.CancelButton);
+      this.commandAreaPanel.Controls.Add(this.ExportCancelButton);
       this.commandAreaPanel.Location = new System.Drawing.Point(0, 555);
       this.commandAreaPanel.Size = new System.Drawing.Size(844, 45);
       // 
@@ -183,16 +183,16 @@ namespace MySQL.ForExcel
       this.ExportButton.UseVisualStyleBackColor = true;
       this.ExportButton.Click += new System.EventHandler(this.ExportButton_Click);
       // 
-      // CancelButton
+      // ExportCancelButton
       // 
-      this.CancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.CancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.CancelButton.Location = new System.Drawing.Point(757, 12);
-      this.CancelButton.Name = "CancelButton";
-      this.CancelButton.Size = new System.Drawing.Size(75, 23);
-      this.CancelButton.TabIndex = 3;
-      this.CancelButton.Text = "Cancel";
-      this.CancelButton.UseVisualStyleBackColor = true;
+      this.ExportCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.ExportCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.ExportCancelButton.Location = new System.Drawing.Point(757, 12);
+      this.ExportCancelButton.Name = "ExportCancelButton";
+      this.ExportCancelButton.Size = new System.Drawing.Size(75, 23);
+      this.ExportCancelButton.TabIndex = 3;
+      this.ExportCancelButton.Text = "Cancel";
+      this.ExportCancelButton.UseVisualStyleBackColor = true;
       // 
       // PrimaryKeyWarningLabel
       // 
@@ -381,34 +381,34 @@ namespace MySQL.ForExcel
       this.PreviewDataGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      dataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-      dataGridViewCellStyle13.BackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle13.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle13.ForeColor = System.Drawing.SystemColors.WindowText;
-      dataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle13.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.PreviewDataGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle13;
+      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+      dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.PreviewDataGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
       this.PreviewDataGrid.ColumnsMaximumWidth = 200;
-      dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle14.BackColor = System.Drawing.SystemColors.Window;
-      dataGridViewCellStyle14.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle14.ForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle14.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.PreviewDataGrid.DefaultCellStyle = dataGridViewCellStyle14;
+      dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+      dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.PreviewDataGrid.DefaultCellStyle = dataGridViewCellStyle2;
       this.PreviewDataGrid.Location = new System.Drawing.Point(82, 277);
       this.PreviewDataGrid.MultiSelect = false;
       this.PreviewDataGrid.Name = "PreviewDataGrid";
-      dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle15.BackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle15.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle15.ForeColor = System.Drawing.SystemColors.WindowText;
-      dataGridViewCellStyle15.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle15.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle15.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-      this.PreviewDataGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle15;
+      dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.PreviewDataGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
       this.PreviewDataGrid.Size = new System.Drawing.Size(677, 157);
       this.PreviewDataGrid.TabIndex = 18;
       this.PreviewDataGrid.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.PreviewDataGrid_CellToolTipTextNeeded);
@@ -674,7 +674,7 @@ namespace MySQL.ForExcel
     private System.Windows.Forms.Button CopySQLButton;
     private System.Windows.Forms.Button AdvancedOptionsButton;
     private System.Windows.Forms.Button ExportButton;
-    private System.Windows.Forms.Button CancelButton;
+    private System.Windows.Forms.Button ExportCancelButton;
     private System.Windows.Forms.Label PrimaryKeyWarningLabel;
     private System.Windows.Forms.PictureBox PrimaryKeyWarningPicture;
     private System.Windows.Forms.GroupBox ColumnOptionsGroupBox;

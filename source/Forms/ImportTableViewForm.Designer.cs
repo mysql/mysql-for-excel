@@ -51,211 +51,211 @@ namespace MySQL.ForExcel
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ImportTableViewForm));
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-      this.fromImageList = new System.Windows.Forms.ImageList(this.components);
-      this.lblSubSetOfData = new System.Windows.Forms.Label();
-      this.lblRowsCountSub = new System.Windows.Forms.Label();
-      this.grpOptions = new System.Windows.Forms.GroupBox();
-      this.numFromRow = new System.Windows.Forms.NumericUpDown();
-      this.lblRowsToReturn = new System.Windows.Forms.Label();
-      this.numRowsToReturn = new System.Windows.Forms.NumericUpDown();
-      this.chkLimitRows = new System.Windows.Forms.CheckBox();
-      this.chkIncludeHeaders = new System.Windows.Forms.CheckBox();
-      this.lblOptionsWarning = new System.Windows.Forms.Label();
-      this.picOptionsWarning = new System.Windows.Forms.PictureBox();
-      this.grdPreviewData = new MySQL.ForExcel.PreviewDataGridView();
-      this.contextMenuForGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
-      this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.selectNoneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.lblPickColumnsSub = new System.Windows.Forms.Label();
-      this.lblPickColumnsMain = new System.Windows.Forms.Label();
-      this.picColumnOptions = new System.Windows.Forms.PictureBox();
-      this.lblRowsCountMain = new System.Windows.Forms.Label();
-      this.lblTableNameSub = new System.Windows.Forms.Label();
-      this.lblTableNameMain = new System.Windows.Forms.Label();
-      this.btnImport = new System.Windows.Forms.Button();
-      this.btnCancel = new System.Windows.Forms.Button();
-      this.lblExportData = new System.Windows.Forms.Label();
+      this.FromImageList = new System.Windows.Forms.ImageList(this.components);
+      this.SubSetOfDataLabel = new System.Windows.Forms.Label();
+      this.RowsCountSubLabel = new System.Windows.Forms.Label();
+      this.OptionsGroupBox = new System.Windows.Forms.GroupBox();
+      this.FromRowNumericUpDown = new System.Windows.Forms.NumericUpDown();
+      this.RowsToReturnLabel = new System.Windows.Forms.Label();
+      this.RowsToReturnNumericUpDown = new System.Windows.Forms.NumericUpDown();
+      this.LimitRowsCheckBox = new System.Windows.Forms.CheckBox();
+      this.IncludeHeadersCheckBox = new System.Windows.Forms.CheckBox();
+      this.OptionsWarningLabel = new System.Windows.Forms.Label();
+      this.OptionsWarningPictureBox = new System.Windows.Forms.PictureBox();
+      this.PreviewDataGrid = new MySQL.ForExcel.PreviewDataGridView();
+      this.ContextMenuForGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.SelectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.SelectNoneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.PickColumnsSubLabel = new System.Windows.Forms.Label();
+      this.PickColumnsMainLabel = new System.Windows.Forms.Label();
+      this.ColumnOptionsPictureBox = new System.Windows.Forms.PictureBox();
+      this.RowsCountMainLabel = new System.Windows.Forms.Label();
+      this.TableNameSubLabel = new System.Windows.Forms.Label();
+      this.TableNameMainLabel = new System.Windows.Forms.Label();
+      this.ImportButton = new System.Windows.Forms.Button();
+      this.ImportCancelButton = new System.Windows.Forms.Button();
+      this.ExportDataLabel = new System.Windows.Forms.Label();
       this.contentAreaPanel.SuspendLayout();
       this.commandAreaPanel.SuspendLayout();
-      this.grpOptions.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.numFromRow)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.numRowsToReturn)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picOptionsWarning)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).BeginInit();
-      this.contextMenuForGrid.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).BeginInit();
+      this.OptionsGroupBox.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.FromRowNumericUpDown)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.RowsToReturnNumericUpDown)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.OptionsWarningPictureBox)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.PreviewDataGrid)).BeginInit();
+      this.ContextMenuForGrid.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.ColumnOptionsPictureBox)).BeginInit();
       this.SuspendLayout();
       // 
       // contentAreaPanel
       // 
       this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
-      this.contentAreaPanel.Controls.Add(this.lblOptionsWarning);
-      this.contentAreaPanel.Controls.Add(this.picOptionsWarning);
-      this.contentAreaPanel.Controls.Add(this.lblExportData);
-      this.contentAreaPanel.Controls.Add(this.lblSubSetOfData);
-      this.contentAreaPanel.Controls.Add(this.lblRowsCountSub);
-      this.contentAreaPanel.Controls.Add(this.grpOptions);
-      this.contentAreaPanel.Controls.Add(this.grdPreviewData);
-      this.contentAreaPanel.Controls.Add(this.lblPickColumnsSub);
-      this.contentAreaPanel.Controls.Add(this.lblPickColumnsMain);
-      this.contentAreaPanel.Controls.Add(this.picColumnOptions);
-      this.contentAreaPanel.Controls.Add(this.lblRowsCountMain);
-      this.contentAreaPanel.Controls.Add(this.lblTableNameSub);
-      this.contentAreaPanel.Controls.Add(this.lblTableNameMain);
+      this.contentAreaPanel.Controls.Add(this.OptionsWarningLabel);
+      this.contentAreaPanel.Controls.Add(this.OptionsWarningPictureBox);
+      this.contentAreaPanel.Controls.Add(this.ExportDataLabel);
+      this.contentAreaPanel.Controls.Add(this.SubSetOfDataLabel);
+      this.contentAreaPanel.Controls.Add(this.RowsCountSubLabel);
+      this.contentAreaPanel.Controls.Add(this.OptionsGroupBox);
+      this.contentAreaPanel.Controls.Add(this.PreviewDataGrid);
+      this.contentAreaPanel.Controls.Add(this.PickColumnsSubLabel);
+      this.contentAreaPanel.Controls.Add(this.PickColumnsMainLabel);
+      this.contentAreaPanel.Controls.Add(this.ColumnOptionsPictureBox);
+      this.contentAreaPanel.Controls.Add(this.RowsCountMainLabel);
+      this.contentAreaPanel.Controls.Add(this.TableNameSubLabel);
+      this.contentAreaPanel.Controls.Add(this.TableNameMainLabel);
       this.contentAreaPanel.Size = new System.Drawing.Size(849, 550);
       // 
       // commandAreaPanel
       // 
-      this.commandAreaPanel.Controls.Add(this.btnImport);
-      this.commandAreaPanel.Controls.Add(this.btnCancel);
+      this.commandAreaPanel.Controls.Add(this.ImportButton);
+      this.commandAreaPanel.Controls.Add(this.ImportCancelButton);
       this.commandAreaPanel.Location = new System.Drawing.Point(0, 550);
       this.commandAreaPanel.Size = new System.Drawing.Size(849, 45);
       // 
-      // fromImageList
+      // FromImageList
       // 
-      this.fromImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("fromImageList.ImageStream")));
-      this.fromImageList.TransparentColor = System.Drawing.Color.Transparent;
-      this.fromImageList.Images.SetKeyName(0, "db.Table.32x32.png");
-      this.fromImageList.Images.SetKeyName(1, "db.View.32x32.png");
+      this.FromImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("FromImageList.ImageStream")));
+      this.FromImageList.TransparentColor = System.Drawing.Color.Transparent;
+      this.FromImageList.Images.SetKeyName(0, "db.Table.32x32.png");
+      this.FromImageList.Images.SetKeyName(1, "db.View.32x32.png");
       // 
-      // lblSubSetOfData
+      // SubSetOfDataLabel
       // 
-      this.lblSubSetOfData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.lblSubSetOfData.AutoSize = true;
-      this.lblSubSetOfData.BackColor = System.Drawing.Color.Transparent;
-      this.lblSubSetOfData.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblSubSetOfData.ForeColor = System.Drawing.SystemColors.InactiveCaption;
-      this.lblSubSetOfData.Location = new System.Drawing.Point(456, 142);
-      this.lblSubSetOfData.Name = "lblSubSetOfData";
-      this.lblSubSetOfData.Size = new System.Drawing.Size(319, 15);
-      this.lblSubSetOfData.TabIndex = 6;
-      this.lblSubSetOfData.Text = "This is a small subset of the data for preview purposes only.";
+      this.SubSetOfDataLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.SubSetOfDataLabel.AutoSize = true;
+      this.SubSetOfDataLabel.BackColor = System.Drawing.Color.Transparent;
+      this.SubSetOfDataLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.SubSetOfDataLabel.ForeColor = System.Drawing.SystemColors.InactiveCaption;
+      this.SubSetOfDataLabel.Location = new System.Drawing.Point(456, 142);
+      this.SubSetOfDataLabel.Name = "SubSetOfDataLabel";
+      this.SubSetOfDataLabel.Size = new System.Drawing.Size(319, 15);
+      this.SubSetOfDataLabel.TabIndex = 6;
+      this.SubSetOfDataLabel.Text = "This is a small subset of the data for preview purposes only.";
       // 
-      // lblRowsCountSub
+      // RowsCountSubLabel
       // 
-      this.lblRowsCountSub.AutoSize = true;
-      this.lblRowsCountSub.BackColor = System.Drawing.Color.Transparent;
-      this.lblRowsCountSub.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblRowsCountSub.ForeColor = System.Drawing.Color.Navy;
-      this.lblRowsCountSub.Location = new System.Drawing.Point(169, 142);
-      this.lblRowsCountSub.Name = "lblRowsCountSub";
-      this.lblRowsCountSub.Size = new System.Drawing.Size(13, 15);
-      this.lblRowsCountSub.TabIndex = 3;
-      this.lblRowsCountSub.Text = "0";
+      this.RowsCountSubLabel.AutoSize = true;
+      this.RowsCountSubLabel.BackColor = System.Drawing.Color.Transparent;
+      this.RowsCountSubLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.RowsCountSubLabel.ForeColor = System.Drawing.Color.Navy;
+      this.RowsCountSubLabel.Location = new System.Drawing.Point(169, 142);
+      this.RowsCountSubLabel.Name = "RowsCountSubLabel";
+      this.RowsCountSubLabel.Size = new System.Drawing.Size(13, 15);
+      this.RowsCountSubLabel.TabIndex = 3;
+      this.RowsCountSubLabel.Text = "0";
       // 
-      // grpOptions
+      // OptionsGroupBox
       // 
-      this.grpOptions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.grpOptions.BackColor = System.Drawing.Color.Transparent;
-      this.grpOptions.Controls.Add(this.numFromRow);
-      this.grpOptions.Controls.Add(this.lblRowsToReturn);
-      this.grpOptions.Controls.Add(this.numRowsToReturn);
-      this.grpOptions.Controls.Add(this.chkLimitRows);
-      this.grpOptions.Controls.Add(this.chkIncludeHeaders);
-      this.grpOptions.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.grpOptions.Location = new System.Drawing.Point(80, 442);
-      this.grpOptions.Name = "grpOptions";
-      this.grpOptions.Size = new System.Drawing.Size(695, 60);
-      this.grpOptions.TabIndex = 8;
-      this.grpOptions.TabStop = false;
-      this.grpOptions.Text = "Options";
+      this.OptionsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.OptionsGroupBox.BackColor = System.Drawing.Color.Transparent;
+      this.OptionsGroupBox.Controls.Add(this.FromRowNumericUpDown);
+      this.OptionsGroupBox.Controls.Add(this.RowsToReturnLabel);
+      this.OptionsGroupBox.Controls.Add(this.RowsToReturnNumericUpDown);
+      this.OptionsGroupBox.Controls.Add(this.LimitRowsCheckBox);
+      this.OptionsGroupBox.Controls.Add(this.IncludeHeadersCheckBox);
+      this.OptionsGroupBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.OptionsGroupBox.Location = new System.Drawing.Point(80, 442);
+      this.OptionsGroupBox.Name = "OptionsGroupBox";
+      this.OptionsGroupBox.Size = new System.Drawing.Size(695, 60);
+      this.OptionsGroupBox.TabIndex = 8;
+      this.OptionsGroupBox.TabStop = false;
+      this.OptionsGroupBox.Text = "Options";
       // 
-      // numFromRow
+      // FromRowNumericUpDown
       // 
-      this.numFromRow.Enabled = false;
-      this.numFromRow.Location = new System.Drawing.Point(616, 21);
-      this.numFromRow.Minimum = new decimal(new int[] {
+      this.FromRowNumericUpDown.Enabled = false;
+      this.FromRowNumericUpDown.Location = new System.Drawing.Point(616, 21);
+      this.FromRowNumericUpDown.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-      this.numFromRow.Name = "numFromRow";
-      this.numFromRow.Size = new System.Drawing.Size(60, 23);
-      this.numFromRow.TabIndex = 6;
-      this.numFromRow.Value = new decimal(new int[] {
+      this.FromRowNumericUpDown.Name = "FromRowNumericUpDown";
+      this.FromRowNumericUpDown.Size = new System.Drawing.Size(60, 23);
+      this.FromRowNumericUpDown.TabIndex = 6;
+      this.FromRowNumericUpDown.Value = new decimal(new int[] {
             1,
             0,
             0,
             0});
-      this.numFromRow.ValueChanged += new System.EventHandler(this.numFromRow_ValueChanged);
+      this.FromRowNumericUpDown.ValueChanged += new System.EventHandler(this.FromRowNumericUpDown_ValueChanged);
       // 
-      // lblRowsToReturn
+      // RowsToReturnLabel
       // 
-      this.lblRowsToReturn.AutoSize = true;
-      this.lblRowsToReturn.Location = new System.Drawing.Point(473, 25);
-      this.lblRowsToReturn.Name = "lblRowsToReturn";
-      this.lblRowsToReturn.Size = new System.Drawing.Size(137, 15);
-      this.lblRowsToReturn.TabIndex = 5;
-      this.lblRowsToReturn.Text = "Rows and Start with Row";
+      this.RowsToReturnLabel.AutoSize = true;
+      this.RowsToReturnLabel.Location = new System.Drawing.Point(473, 25);
+      this.RowsToReturnLabel.Name = "RowsToReturnLabel";
+      this.RowsToReturnLabel.Size = new System.Drawing.Size(137, 15);
+      this.RowsToReturnLabel.TabIndex = 5;
+      this.RowsToReturnLabel.Text = "Rows and Start with Row";
       // 
-      // numRowsToReturn
+      // RowsToReturnNumericUpDown
       // 
-      this.numRowsToReturn.Enabled = false;
-      this.numRowsToReturn.Location = new System.Drawing.Point(407, 21);
-      this.numRowsToReturn.Minimum = new decimal(new int[] {
+      this.RowsToReturnNumericUpDown.Enabled = false;
+      this.RowsToReturnNumericUpDown.Location = new System.Drawing.Point(407, 21);
+      this.RowsToReturnNumericUpDown.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
-      this.numRowsToReturn.Name = "numRowsToReturn";
-      this.numRowsToReturn.Size = new System.Drawing.Size(60, 23);
-      this.numRowsToReturn.TabIndex = 4;
-      this.numRowsToReturn.Value = new decimal(new int[] {
+      this.RowsToReturnNumericUpDown.Name = "RowsToReturnNumericUpDown";
+      this.RowsToReturnNumericUpDown.Size = new System.Drawing.Size(60, 23);
+      this.RowsToReturnNumericUpDown.TabIndex = 4;
+      this.RowsToReturnNumericUpDown.Value = new decimal(new int[] {
             1,
             0,
             0,
             0});
       // 
-      // chkLimitRows
+      // LimitRowsCheckBox
       // 
-      this.chkLimitRows.AutoSize = true;
-      this.chkLimitRows.Location = new System.Drawing.Point(334, 22);
-      this.chkLimitRows.Name = "chkLimitRows";
-      this.chkLimitRows.Size = new System.Drawing.Size(67, 19);
-      this.chkLimitRows.TabIndex = 2;
-      this.chkLimitRows.Text = "Limit to";
-      this.chkLimitRows.UseVisualStyleBackColor = true;
-      this.chkLimitRows.CheckedChanged += new System.EventHandler(this.chkLimitRows_CheckedChanged);
+      this.LimitRowsCheckBox.AutoSize = true;
+      this.LimitRowsCheckBox.Location = new System.Drawing.Point(334, 22);
+      this.LimitRowsCheckBox.Name = "LimitRowsCheckBox";
+      this.LimitRowsCheckBox.Size = new System.Drawing.Size(67, 19);
+      this.LimitRowsCheckBox.TabIndex = 2;
+      this.LimitRowsCheckBox.Text = "Limit to";
+      this.LimitRowsCheckBox.UseVisualStyleBackColor = true;
+      this.LimitRowsCheckBox.CheckedChanged += new System.EventHandler(this.LimitRowsCheckBox_CheckedChanged);
       // 
-      // chkIncludeHeaders
+      // IncludeHeadersCheckBox
       // 
-      this.chkIncludeHeaders.AutoSize = true;
-      this.chkIncludeHeaders.Location = new System.Drawing.Point(18, 25);
-      this.chkIncludeHeaders.Name = "chkIncludeHeaders";
-      this.chkIncludeHeaders.Size = new System.Drawing.Size(211, 19);
-      this.chkIncludeHeaders.TabIndex = 1;
-      this.chkIncludeHeaders.Text = "Include Column Names as Headers";
-      this.chkIncludeHeaders.UseVisualStyleBackColor = true;
+      this.IncludeHeadersCheckBox.AutoSize = true;
+      this.IncludeHeadersCheckBox.Location = new System.Drawing.Point(18, 25);
+      this.IncludeHeadersCheckBox.Name = "IncludeHeadersCheckBox";
+      this.IncludeHeadersCheckBox.Size = new System.Drawing.Size(211, 19);
+      this.IncludeHeadersCheckBox.TabIndex = 1;
+      this.IncludeHeadersCheckBox.Text = "Include Column Names as Headers";
+      this.IncludeHeadersCheckBox.UseVisualStyleBackColor = true;
       // 
-      // lblOptionsWarning
+      // OptionsWarningLabel
       // 
-      this.lblOptionsWarning.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+      this.OptionsWarningLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.lblOptionsWarning.AutoSize = true;
-      this.lblOptionsWarning.BackColor = System.Drawing.SystemColors.Window;
-      this.lblOptionsWarning.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblOptionsWarning.ForeColor = System.Drawing.Color.Red;
-      this.lblOptionsWarning.Location = new System.Drawing.Point(160, 445);
-      this.lblOptionsWarning.Name = "lblOptionsWarning";
-      this.lblOptionsWarning.Size = new System.Drawing.Size(76, 12);
-      this.lblOptionsWarning.TabIndex = 0;
-      this.lblOptionsWarning.Text = "Warning Message";
-      this.lblOptionsWarning.Visible = false;
+      this.OptionsWarningLabel.AutoSize = true;
+      this.OptionsWarningLabel.BackColor = System.Drawing.SystemColors.Window;
+      this.OptionsWarningLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.OptionsWarningLabel.ForeColor = System.Drawing.Color.Red;
+      this.OptionsWarningLabel.Location = new System.Drawing.Point(160, 445);
+      this.OptionsWarningLabel.Name = "OptionsWarningLabel";
+      this.OptionsWarningLabel.Size = new System.Drawing.Size(76, 12);
+      this.OptionsWarningLabel.TabIndex = 0;
+      this.OptionsWarningLabel.Text = "Warning Message";
+      this.OptionsWarningLabel.Visible = false;
       // 
-      // picOptionsWarning
+      // OptionsWarningPictureBox
       // 
-      this.picOptionsWarning.BackColor = System.Drawing.SystemColors.Window;
-      this.picOptionsWarning.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.picOptionsWarning.Location = new System.Drawing.Point(138, 440);
-      this.picOptionsWarning.Name = "picOptionsWarning";
-      this.picOptionsWarning.Size = new System.Drawing.Size(20, 20);
-      this.picOptionsWarning.TabIndex = 24;
-      this.picOptionsWarning.TabStop = false;
-      this.picOptionsWarning.Visible = false;
+      this.OptionsWarningPictureBox.BackColor = System.Drawing.SystemColors.Window;
+      this.OptionsWarningPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
+      this.OptionsWarningPictureBox.Location = new System.Drawing.Point(138, 440);
+      this.OptionsWarningPictureBox.Name = "OptionsWarningPictureBox";
+      this.OptionsWarningPictureBox.Size = new System.Drawing.Size(20, 20);
+      this.OptionsWarningPictureBox.TabIndex = 24;
+      this.OptionsWarningPictureBox.TabStop = false;
+      this.OptionsWarningPictureBox.Visible = false;
       // 
-      // grdPreviewData
+      // PreviewDataGrid
       // 
-      this.grdPreviewData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+      this.PreviewDataGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
@@ -265,9 +265,9 @@ namespace MySQL.ForExcel
       dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Control;
       dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.ControlText;
       dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdPreviewData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-      this.grdPreviewData.ColumnsMaximumWidth = 200;
-      this.grdPreviewData.ContextMenuStrip = this.contextMenuForGrid;
+      this.PreviewDataGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+      this.PreviewDataGrid.ColumnsMaximumWidth = 200;
+      this.PreviewDataGrid.ContextMenuStrip = this.ContextMenuForGrid;
       dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.InactiveCaption;
       dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -275,150 +275,149 @@ namespace MySQL.ForExcel
       dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Window;
       dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.ControlText;
       dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdPreviewData.DefaultCellStyle = dataGridViewCellStyle2;
-      this.grdPreviewData.Location = new System.Drawing.Point(80, 164);
-      this.grdPreviewData.Name = "grdPreviewData";
-      this.grdPreviewData.Size = new System.Drawing.Size(695, 265);
-      this.grdPreviewData.TabIndex = 7;
-      this.grdPreviewData.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.grdPreviewData_DataBindingComplete);
-      this.grdPreviewData.SelectionChanged += new System.EventHandler(this.grdPreviewData_SelectionChanged);
+      this.PreviewDataGrid.DefaultCellStyle = dataGridViewCellStyle2;
+      this.PreviewDataGrid.Location = new System.Drawing.Point(80, 164);
+      this.PreviewDataGrid.Name = "PreviewDataGrid";
+      this.PreviewDataGrid.Size = new System.Drawing.Size(695, 265);
+      this.PreviewDataGrid.TabIndex = 7;
+      this.PreviewDataGrid.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.PreviewDataGrid_DataBindingComplete);
+      this.PreviewDataGrid.SelectionChanged += new System.EventHandler(this.PreviewDataGrid_SelectionChanged);
       // 
-      // contextMenuForGrid
+      // ContextMenuForGrid
       // 
-      this.contextMenuForGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.selectAllToolStripMenuItem,
-            this.selectNoneToolStripMenuItem});
-      this.contextMenuForGrid.Name = "contextMenuForGrid";
-      this.contextMenuForGrid.Size = new System.Drawing.Size(153, 70);
-      this.contextMenuForGrid.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuForGrid_Opening);
+      this.ContextMenuForGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.SelectAllToolStripMenuItem,
+            this.SelectNoneToolStripMenuItem});
+      this.ContextMenuForGrid.Name = "contextMenuForGrid";
+      this.ContextMenuForGrid.Size = new System.Drawing.Size(138, 48);
+      this.ContextMenuForGrid.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenuForGrid_Opening);
       // 
-      // selectAllToolStripMenuItem
+      // SelectAllToolStripMenuItem
       // 
-      this.selectAllToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
-      this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-      this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-      this.selectAllToolStripMenuItem.Text = "Select All";
-      this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.selectAllToolStripMenuItem_Click);
+      this.SelectAllToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
+      this.SelectAllToolStripMenuItem.Name = "SelectAllToolStripMenuItem";
+      this.SelectAllToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+      this.SelectAllToolStripMenuItem.Text = "Select All";
+      this.SelectAllToolStripMenuItem.Click += new System.EventHandler(this.SelectAllToolStripMenuItem_Click);
       // 
-      // selectNoneToolStripMenuItem
+      // SelectNoneToolStripMenuItem
       // 
-      this.selectNoneToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
-      this.selectNoneToolStripMenuItem.Name = "selectNoneToolStripMenuItem";
-      this.selectNoneToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-      this.selectNoneToolStripMenuItem.Text = "Select None";
-      this.selectNoneToolStripMenuItem.Click += new System.EventHandler(this.selectNoneToolStripMenuItem_Click);
+      this.SelectNoneToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
+      this.SelectNoneToolStripMenuItem.Name = "SelectNoneToolStripMenuItem";
+      this.SelectNoneToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+      this.SelectNoneToolStripMenuItem.Text = "Select None";
+      this.SelectNoneToolStripMenuItem.Click += new System.EventHandler(this.SelectNoneToolStripMenuItem_Click);
       // 
-      // lblPickColumnsSub
+      // PickColumnsSubLabel
       // 
-      this.lblPickColumnsSub.AutoSize = true;
-      this.lblPickColumnsSub.BackColor = System.Drawing.Color.Transparent;
-      this.lblPickColumnsSub.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblPickColumnsSub.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblPickColumnsSub.Location = new System.Drawing.Point(77, 73);
-      this.lblPickColumnsSub.Name = "lblPickColumnsSub";
-      this.lblPickColumnsSub.Size = new System.Drawing.Size(302, 30);
-      this.lblPickColumnsSub.TabIndex = 5;
-      this.lblPickColumnsSub.Text = "Click on column headers to exclude/include them when\r\nimporting the MySQL table d" +
+      this.PickColumnsSubLabel.AutoSize = true;
+      this.PickColumnsSubLabel.BackColor = System.Drawing.Color.Transparent;
+      this.PickColumnsSubLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.PickColumnsSubLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.PickColumnsSubLabel.Location = new System.Drawing.Point(77, 73);
+      this.PickColumnsSubLabel.Name = "PickColumnsSubLabel";
+      this.PickColumnsSubLabel.Size = new System.Drawing.Size(302, 30);
+      this.PickColumnsSubLabel.TabIndex = 5;
+      this.PickColumnsSubLabel.Text = "Click on column headers to exclude/include them when\r\nimporting the MySQL table d" +
     "ata in Excel.";
       // 
-      // lblPickColumnsMain
+      // PickColumnsMainLabel
       // 
-      this.lblPickColumnsMain.AutoSize = true;
-      this.lblPickColumnsMain.BackColor = System.Drawing.Color.Transparent;
-      this.lblPickColumnsMain.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblPickColumnsMain.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblPickColumnsMain.Location = new System.Drawing.Point(77, 56);
-      this.lblPickColumnsMain.Name = "lblPickColumnsMain";
-      this.lblPickColumnsMain.Size = new System.Drawing.Size(165, 17);
-      this.lblPickColumnsMain.TabIndex = 4;
-      this.lblPickColumnsMain.Text = "Choose Columns to Import";
+      this.PickColumnsMainLabel.AutoSize = true;
+      this.PickColumnsMainLabel.BackColor = System.Drawing.Color.Transparent;
+      this.PickColumnsMainLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.PickColumnsMainLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.PickColumnsMainLabel.Location = new System.Drawing.Point(77, 56);
+      this.PickColumnsMainLabel.Name = "PickColumnsMainLabel";
+      this.PickColumnsMainLabel.Size = new System.Drawing.Size(165, 17);
+      this.PickColumnsMainLabel.TabIndex = 4;
+      this.PickColumnsMainLabel.Text = "Choose Columns to Import";
       // 
-      // picColumnOptions
+      // ColumnOptionsPictureBox
       // 
-      this.picColumnOptions.BackColor = System.Drawing.Color.Transparent;
-      this.picColumnOptions.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
-      this.picColumnOptions.Location = new System.Drawing.Point(39, 56);
-      this.picColumnOptions.Name = "picColumnOptions";
-      this.picColumnOptions.Size = new System.Drawing.Size(32, 32);
-      this.picColumnOptions.TabIndex = 29;
-      this.picColumnOptions.TabStop = false;
+      this.ColumnOptionsPictureBox.BackColor = System.Drawing.Color.Transparent;
+      this.ColumnOptionsPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
+      this.ColumnOptionsPictureBox.Location = new System.Drawing.Point(39, 56);
+      this.ColumnOptionsPictureBox.Name = "ColumnOptionsPictureBox";
+      this.ColumnOptionsPictureBox.Size = new System.Drawing.Size(32, 32);
+      this.ColumnOptionsPictureBox.TabIndex = 29;
+      this.ColumnOptionsPictureBox.TabStop = false;
       // 
-      // lblRowsCountMain
+      // RowsCountMainLabel
       // 
-      this.lblRowsCountMain.AutoSize = true;
-      this.lblRowsCountMain.BackColor = System.Drawing.Color.Transparent;
-      this.lblRowsCountMain.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblRowsCountMain.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblRowsCountMain.Location = new System.Drawing.Point(76, 142);
-      this.lblRowsCountMain.Name = "lblRowsCountMain";
-      this.lblRowsCountMain.Size = new System.Drawing.Size(69, 15);
-      this.lblRowsCountMain.TabIndex = 2;
-      this.lblRowsCountMain.Text = "Row Count:";
+      this.RowsCountMainLabel.AutoSize = true;
+      this.RowsCountMainLabel.BackColor = System.Drawing.Color.Transparent;
+      this.RowsCountMainLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.RowsCountMainLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.RowsCountMainLabel.Location = new System.Drawing.Point(76, 142);
+      this.RowsCountMainLabel.Name = "RowsCountMainLabel";
+      this.RowsCountMainLabel.Size = new System.Drawing.Size(69, 15);
+      this.RowsCountMainLabel.TabIndex = 2;
+      this.RowsCountMainLabel.Text = "Row Count:";
       // 
-      // lblTableNameSub
+      // TableNameSubLabel
       // 
-      this.lblTableNameSub.AutoSize = true;
-      this.lblTableNameSub.BackColor = System.Drawing.Color.Transparent;
-      this.lblTableNameSub.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblTableNameSub.ForeColor = System.Drawing.Color.Navy;
-      this.lblTableNameSub.Location = new System.Drawing.Point(169, 127);
-      this.lblTableNameSub.Name = "lblTableNameSub";
-      this.lblTableNameSub.Size = new System.Drawing.Size(39, 15);
-      this.lblTableNameSub.TabIndex = 1;
-      this.lblTableNameSub.Text = "Name";
+      this.TableNameSubLabel.AutoSize = true;
+      this.TableNameSubLabel.BackColor = System.Drawing.Color.Transparent;
+      this.TableNameSubLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.TableNameSubLabel.ForeColor = System.Drawing.Color.Navy;
+      this.TableNameSubLabel.Location = new System.Drawing.Point(169, 127);
+      this.TableNameSubLabel.Name = "TableNameSubLabel";
+      this.TableNameSubLabel.Size = new System.Drawing.Size(39, 15);
+      this.TableNameSubLabel.TabIndex = 1;
+      this.TableNameSubLabel.Text = "Name";
       // 
-      // lblTableNameMain
+      // TableNameMainLabel
       // 
-      this.lblTableNameMain.AutoSize = true;
-      this.lblTableNameMain.BackColor = System.Drawing.Color.Transparent;
-      this.lblTableNameMain.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblTableNameMain.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblTableNameMain.Location = new System.Drawing.Point(76, 127);
-      this.lblTableNameMain.Name = "lblTableNameMain";
-      this.lblTableNameMain.Size = new System.Drawing.Size(74, 15);
-      this.lblTableNameMain.TabIndex = 0;
-      this.lblTableNameMain.Text = "Table Name:";
+      this.TableNameMainLabel.AutoSize = true;
+      this.TableNameMainLabel.BackColor = System.Drawing.Color.Transparent;
+      this.TableNameMainLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.TableNameMainLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.TableNameMainLabel.Location = new System.Drawing.Point(76, 127);
+      this.TableNameMainLabel.Name = "TableNameMainLabel";
+      this.TableNameMainLabel.Size = new System.Drawing.Size(74, 15);
+      this.TableNameMainLabel.TabIndex = 0;
+      this.TableNameMainLabel.Text = "Table Name:";
       // 
-      // btnImport
+      // ImportButton
       // 
-      this.btnImport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnImport.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.btnImport.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnImport.Location = new System.Drawing.Point(681, 11);
-      this.btnImport.Name = "btnImport";
-      this.btnImport.Size = new System.Drawing.Size(75, 23);
-      this.btnImport.TabIndex = 0;
-      this.btnImport.Text = "Import";
-      this.btnImport.UseVisualStyleBackColor = true;
-      this.btnImport.Click += new System.EventHandler(this.btnImport_Click);
+      this.ImportButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.ImportButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+      this.ImportButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ImportButton.Location = new System.Drawing.Point(681, 11);
+      this.ImportButton.Name = "ImportButton";
+      this.ImportButton.Size = new System.Drawing.Size(75, 23);
+      this.ImportButton.TabIndex = 0;
+      this.ImportButton.Text = "Import";
+      this.ImportButton.UseVisualStyleBackColor = true;
+      this.ImportButton.Click += new System.EventHandler(this.ImportButton_Click);
       // 
-      // btnCancel
+      // ImportCancelButton
       // 
-      this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnCancel.Location = new System.Drawing.Point(762, 11);
-      this.btnCancel.Name = "btnCancel";
-      this.btnCancel.Size = new System.Drawing.Size(75, 23);
-      this.btnCancel.TabIndex = 1;
-      this.btnCancel.Text = "Cancel";
-      this.btnCancel.UseVisualStyleBackColor = true;
+      this.ImportCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.ImportCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.ImportCancelButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ImportCancelButton.Location = new System.Drawing.Point(762, 11);
+      this.ImportCancelButton.Name = "ImportCancelButton";
+      this.ImportCancelButton.Size = new System.Drawing.Size(75, 23);
+      this.ImportCancelButton.TabIndex = 1;
+      this.ImportCancelButton.Text = "Cancel";
+      this.ImportCancelButton.UseVisualStyleBackColor = true;
       // 
-      // lblExportData
+      // ExportDataLabel
       // 
-      this.lblExportData.AutoSize = true;
-      this.lblExportData.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblExportData.ForeColor = System.Drawing.Color.Navy;
-      this.lblExportData.Location = new System.Drawing.Point(17, 17);
-      this.lblExportData.Name = "lblExportData";
-      this.lblExportData.Size = new System.Drawing.Size(176, 20);
-      this.lblExportData.TabIndex = 30;
-      this.lblExportData.Text = "Import Data from MySQL";
+      this.ExportDataLabel.AutoSize = true;
+      this.ExportDataLabel.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ExportDataLabel.ForeColor = System.Drawing.Color.Navy;
+      this.ExportDataLabel.Location = new System.Drawing.Point(17, 17);
+      this.ExportDataLabel.Name = "ExportDataLabel";
+      this.ExportDataLabel.Size = new System.Drawing.Size(176, 20);
+      this.ExportDataLabel.TabIndex = 30;
+      this.ExportDataLabel.Text = "Import Data from MySQL";
       // 
       // ImportTableViewForm
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-      this.CancelButton = this.btnCancel;
       this.ClientSize = new System.Drawing.Size(849, 597);
       this.CommandAreaHeight = 45;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
@@ -432,44 +431,44 @@ namespace MySQL.ForExcel
       this.contentAreaPanel.ResumeLayout(false);
       this.contentAreaPanel.PerformLayout();
       this.commandAreaPanel.ResumeLayout(false);
-      this.grpOptions.ResumeLayout(false);
-      this.grpOptions.PerformLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.numFromRow)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.numRowsToReturn)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picOptionsWarning)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.grdPreviewData)).EndInit();
-      this.contextMenuForGrid.ResumeLayout(false);
-      ((System.ComponentModel.ISupportInitialize)(this.picColumnOptions)).EndInit();
+      this.OptionsGroupBox.ResumeLayout(false);
+      this.OptionsGroupBox.PerformLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.FromRowNumericUpDown)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.RowsToReturnNumericUpDown)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.OptionsWarningPictureBox)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.PreviewDataGrid)).EndInit();
+      this.ContextMenuForGrid.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.ColumnOptionsPictureBox)).EndInit();
       this.ResumeLayout(false);
 
     }
 
     #endregion
 
-    private System.Windows.Forms.ImageList fromImageList;
-    private System.Windows.Forms.Label lblSubSetOfData;
-    private System.Windows.Forms.Label lblRowsCountSub;
-    private System.Windows.Forms.GroupBox grpOptions;
-    private System.Windows.Forms.NumericUpDown numFromRow;
-    private System.Windows.Forms.Label lblRowsToReturn;
-    private System.Windows.Forms.NumericUpDown numRowsToReturn;
-    private System.Windows.Forms.CheckBox chkLimitRows;
-    private System.Windows.Forms.CheckBox chkIncludeHeaders;
-    private System.Windows.Forms.Label lblOptionsWarning;
-    private System.Windows.Forms.PictureBox picOptionsWarning;
-    private PreviewDataGridView grdPreviewData;
-    private System.Windows.Forms.Label lblPickColumnsSub;
-    private System.Windows.Forms.Label lblPickColumnsMain;
-    private System.Windows.Forms.PictureBox picColumnOptions;
-    private System.Windows.Forms.Label lblRowsCountMain;
-    private System.Windows.Forms.Label lblTableNameSub;
-    private System.Windows.Forms.Label lblTableNameMain;
-    private System.Windows.Forms.Button btnImport;
-    private System.Windows.Forms.Button btnCancel;
-    private System.Windows.Forms.Label lblExportData;
-    private System.Windows.Forms.ContextMenuStrip contextMenuForGrid;
-    private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
-    private System.Windows.Forms.ToolStripMenuItem selectNoneToolStripMenuItem;
+    private System.Windows.Forms.ImageList FromImageList;
+    private System.Windows.Forms.Label SubSetOfDataLabel;
+    private System.Windows.Forms.Label RowsCountSubLabel;
+    private System.Windows.Forms.GroupBox OptionsGroupBox;
+    private System.Windows.Forms.NumericUpDown FromRowNumericUpDown;
+    private System.Windows.Forms.Label RowsToReturnLabel;
+    private System.Windows.Forms.NumericUpDown RowsToReturnNumericUpDown;
+    private System.Windows.Forms.CheckBox LimitRowsCheckBox;
+    private System.Windows.Forms.CheckBox IncludeHeadersCheckBox;
+    private System.Windows.Forms.Label OptionsWarningLabel;
+    private System.Windows.Forms.PictureBox OptionsWarningPictureBox;
+    private PreviewDataGridView PreviewDataGrid;
+    private System.Windows.Forms.Label PickColumnsSubLabel;
+    private System.Windows.Forms.Label PickColumnsMainLabel;
+    private System.Windows.Forms.PictureBox ColumnOptionsPictureBox;
+    private System.Windows.Forms.Label RowsCountMainLabel;
+    private System.Windows.Forms.Label TableNameSubLabel;
+    private System.Windows.Forms.Label TableNameMainLabel;
+    private System.Windows.Forms.Button ImportButton;
+    private System.Windows.Forms.Button ImportCancelButton;
+    private System.Windows.Forms.Label ExportDataLabel;
+    private System.Windows.Forms.ContextMenuStrip ContextMenuForGrid;
+    private System.Windows.Forms.ToolStripMenuItem SelectAllToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem SelectNoneToolStripMenuItem;
 
   }
 }

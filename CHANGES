@@ -1,9 +1,12 @@
 1.1.1
+- Refactored code in Panels (AutoStyleableBasePanel.cs, DBObjectSelectionPanel.cs, SchemaSelectionPanel.cs, WelcomePanel.cs), in TaskPanelControl.cs and in 
+  some Forms (ExportForm.cs, ImportTableViewForm.cs) to comply with StyleCop rules.
 - Removed code that always forced the FirstDisplayedScrollingColumnIndex of the preview grid to the currently selected column every time the First Row Contains
   Column Names checkbox is checked or unchecked. (Bug #16419402 - EXPORT DATA FREEZES WHEN SWITCHING HEADERS ROW)
 - Set the CreateIndex property value in each new column to be exported immediately after the column data type's is auto-detected.
   (Bug #16238445 - EXPORT DATA - CREATE INDEX CHECKBOX IS NOT AUTO-CHECKED ON DATATYPE DETECTION)
 - Moved logic that handles Table and Column values and warnings from Export Form (frontend) to MySQLDataTable and MySQLDataColumn classes (backend).
+  (Bug #16397637 - EXPORT DATA - FOCUS GOES TO FIRST COLUMN WHEN EXCLUDING ANY OTHER COLUMN)
 - Added code to expand each of the connection group nodes after they are initialized with existing connections.
   (Bug #16238782 - REMOTE CONNECTIONS SHOULD BE EXPANDED ON THE WELCOME PANEL)
 - The context menu opened by right-clicking the preview grid in the Import Data Form is now showing context menu actions depending on the number of selected columns
