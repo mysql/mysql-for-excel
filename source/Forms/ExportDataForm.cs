@@ -149,7 +149,7 @@ namespace MySQL.ForExcel
       TextChangedTimer.Stop();
       string newAutoPKName = AddPrimaryKeyTextBox.Text.Trim();
       MySQLDataColumn pkColumn = PreviewDataTable.GetColumnAtIndex(0);
-      if (pkColumn.DisplayName == newAutoPKName)
+      if (pkColumn.DisplayName == newAutoPKName && PreviewDataGrid.Columns[0].HeaderText == newAutoPKName)
       {
         return;
       }
@@ -269,6 +269,11 @@ namespace MySQL.ForExcel
     /// <param name="ea">Event arguments.</param>
     private void CreateIndexCheckBox_CheckedChanged(object sender, EventArgs ea)
     {
+      if (!_isUserInput)
+      {
+        return;
+      }
+
       MySQLDataColumn currentCol = GetCurrentMySQLDataColumn();
       if (currentCol == null || CreateIndexCheckBox.Checked == currentCol.CreateIndex)
       {
@@ -342,6 +347,11 @@ namespace MySQL.ForExcel
     /// <param name="ea">Event arguments.</param>
     private void ExcludeCheckBox_CheckedChanged(object sender, EventArgs ea)
     {
+      if (!_isUserInput)
+      {
+        return;
+      }
+
       MySQLDataColumn currentCol = GetCurrentMySQLDataColumn();
       if (currentCol == null || ExcludeColumnCheckBox.Checked == currentCol.ExcludeColumn)
       {
@@ -534,6 +544,7 @@ namespace MySQL.ForExcel
       int grdIndex = PreviewDataGrid.SelectedColumns.Count > 0 ? PreviewDataGrid.SelectedColumns[0].Index : 0;
       PreviewDataTable.FirstRowIsHeaders = FirstRowHeadersCheckBox.Checked;
       RecreateColumns();
+      SetControlTextValue(AddPrimaryKeyTextBox, PreviewDataTable.AutoPKName);
       PreviewDataGrid.CurrentCell = null;
       PreviewDataGrid.Rows[0].Visible = !FirstRowHeadersCheckBox.Checked;
       PreviewDataGrid.Columns[grdIndex].Selected = true;
@@ -647,6 +658,7 @@ namespace MySQL.ForExcel
         Settings.Default.ExportAutoIndexIntColumns,
         Settings.Default.ExportAutoAllowEmptyNonIndexColumns,
         WBConnection);
+      PreviewDataTable.TableColumnPropertyValueChanged += PreviewTableColumnPropertyValueChanged;
       PreviewDataTable.TableWarningsChanged += PreviewTableWarningsChanged;
       int previewRowsQty = Math.Min(ExportDataRange.Rows.Count, Settings.Default.ExportLimitPreviewRowsQuantity);
       Excel.Range previewRange = ExportDataRange.get_Resize(previewRowsQty, ExportDataRange.Columns.Count);
@@ -739,6 +751,55 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Event delegate method fired when a property value on any of the columns in the <see cref="_previewDataTable"/> table changes.
+    /// </summary>
+    /// <param name="sender">A <see cref="MySQLDataColumn"/> object representing the column with a changed property.</param>
+    /// <param name="args">Event arguments.</param>
+    public void PreviewTableColumnPropertyValueChanged(object sender, PropertyChangedEventArgs args)
+    {
+      MySQLDataColumn changedColumn = sender as MySQLDataColumn;
+      MySQLDataColumn currentColumn = GetCurrentMySQLDataColumn();
+      if (changedColumn != currentColumn)
+      {
+        return;
+      }
+
+      _isUserInput = false;
+      switch (args.PropertyName)
+      {
+        case "CreateIndex":
+          if (CreateIndexCheckBox.Checked != changedColumn.CreateIndex)
+          {
+            CreateIndexCheckBox.Checked = changedColumn.CreateIndex;
+          }
+          break;
+
+        case "ExcludeColumn":
+          if (ExcludeColumnCheckBox.Checked != changedColumn.ExcludeColumn)
+          {
+            ExcludeColumnCheckBox.Checked = changedColumn.ExcludeColumn;
+          }
+          break;
+
+        case "PrimaryKey":
+          if (PrimaryKeyCheckBox.Checked != changedColumn.PrimaryKey)
+          {
+            PrimaryKeyCheckBox.Checked = changedColumn.PrimaryKey;
+          }
+          break;
+
+        case "UniqueKey":
+          if (UniqueIndexCheckBox.Checked != changedColumn.UniqueKey)
+          {
+            UniqueIndexCheckBox.Checked = changedColumn.UniqueKey;
+          }
+          break;
+      }
+
+      _isUserInput = true;
+    }
+
+    /// <summary>
     /// Event delegate method fired when the warning texts list of any column in the <see cref="_previewDataTable"/> table changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -778,6 +839,11 @@ namespace MySQL.ForExcel
     /// <param name="ea">Event arguments.</param>
     private void PrimaryKeyCheckBox_CheckedChanged(object sender, EventArgs ea)
     {
+      if (!_isUserInput)
+      {
+        return;
+      }
+
       MySQLDataColumn currentCol = GetCurrentMySQLDataColumn();
       if (currentCol == null || PrimaryKeyCheckBox.Checked == currentCol.PrimaryKey)
       {
@@ -1030,7 +1096,7 @@ namespace MySQL.ForExcel
     /// </summary>
     private void SetDefaultPrimaryKey()
     {
-      SetControlTextValue(AddPrimaryKeyTextBox, PreviewDataTable.GetColumnAtIndex(0).DisplayName);
+      SetControlTextValue(AddPrimaryKeyTextBox, PreviewDataTable.AutoPKName);
       if (PreviewDataTable.FirstColumnContainsIntegers)
       {
         UseExistingColumnRadioButton.Checked = true;
@@ -1097,9 +1163,8 @@ namespace MySQL.ForExcel
       }
 
       PreviewDataTable.TableName = newTableName;
-      string autoPKColumnName = newTableName + (newTableName.Length > 0 ? "_" : string.Empty) + "id";
-      autoPKColumnName = PreviewDataTable.GetNonDuplicateColumnName(autoPKColumnName);
-      SetControlTextValue(AddPrimaryKeyTextBox, autoPKColumnName);
+      SetControlTextValue(AddPrimaryKeyTextBox, PreviewDataTable.AutoPKName);
+      AddPrimaryKeyTextBox_Validating(AddPrimaryKeyTextBox, new CancelEventArgs());
     }
 
     /// <summary>
@@ -1140,6 +1205,11 @@ namespace MySQL.ForExcel
     /// <param name="ea">Event arguments.</param>
     private void UniqueIndexCheckBox_CheckedChanged(object sender, EventArgs ea)
     {
+      if (!_isUserInput)
+      {
+        return;
+      }
+
       MySQLDataColumn currentCol = GetCurrentMySQLDataColumn();
       if (currentCol == null || UniqueIndexCheckBox.Checked == currentCol.UniqueKey)
       {

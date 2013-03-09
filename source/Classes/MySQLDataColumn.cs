@@ -67,6 +67,7 @@ namespace MySQL.ForExcel
       _columnWarningTextsList = new List<string>(3);
       AutoIncrement = false;
       DisplayName = string.Empty;
+      InExportMode = false;
       IsDisplayNameDuplicate = false;
       ExcludeColumn = false;
       IsMySQLDataTypeValid = true;
@@ -76,6 +77,16 @@ namespace MySQL.ForExcel
       RowsFrom1stDataType = string.Empty;
       RowsFrom2ndDataType = string.Empty;
       Unsigned = false;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MySQLDataColumn"/> class.
+    /// </summary>
+    /// <param name="inExportMode">Flag indicating if the column is being constructed for exporting it to a new MySQL table.</param>
+    public MySQLDataColumn(bool inExportMode)
+      :this()
+    {
+      InExportMode = inExportMode;
     }
 
     /// <summary>
@@ -127,9 +138,36 @@ namespace MySQL.ForExcel
     public bool AutoPK { get; set; }
 
     /// <summary>
+    /// Gets the <see cref="ColumnName"/> escaping the back-tick character.
+    /// </summary>
+    public string ColumnNameForSqlQueries
+    {
+      get
+      {
+        return ColumnName.Replace("`", "``");
+      }
+    }
+
+    /// <summary>
     /// Gets the name for this column, when its value is different than the one in <see cref="ColumnName"/> it means the latter represents an internal name and this property holds the real column name.
     /// </summary>
     public string DisplayName { get; private set; }
+
+    /// <summary>
+    /// Gets the <see cref="DisplayName"/> escaping the back-tick character.
+    /// </summary>
+    public string DisplayNameForSqlQueries
+    {
+      get
+      {
+        return DisplayName.Replace("`", "``");
+      }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the column is being constructed for exporting it to a new MySQL table.
+    /// </summary>
+    public bool InExportMode { get; private set; }
 
     /// <summary>
     /// Gets a value indicating if the <see cref="DisplayName"/> property value is not a duplicate of the one in another column.
@@ -179,6 +217,11 @@ namespace MySQL.ForExcel
       set
       {
         _createIndex = value;
+        if (!InExportMode)
+        {
+          return;
+        }
+
         if (!_createIndex && (Table as MySQLDataTable).AutoAllowEmptyNonIndexColumns)
         {
           AllowNull = true;
@@ -201,6 +244,11 @@ namespace MySQL.ForExcel
       set
       {
         _excludeColumn = value;
+        if (!InExportMode)
+        {
+          return;
+        }
+
         if (_excludeColumn && PrimaryKey)
         {
           PrimaryKey = false;
@@ -228,6 +276,11 @@ namespace MySQL.ForExcel
       set
       {
         _primaryKey = value;
+        if (!InExportMode)
+        {
+          return;
+        }
+
         if (_primaryKey)
         {
           CreateIndex = false;
@@ -252,6 +305,11 @@ namespace MySQL.ForExcel
       set
       {
         _uniqueKey = value;
+        if (!InExportMode)
+        {
+          return;
+        }
+
         if (_uniqueKey)
         {
           CreateIndex = true;

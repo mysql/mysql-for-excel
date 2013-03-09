@@ -245,6 +245,29 @@ namespace MySQL.ForExcel
       return newText;
     }
 
+    /// <summary>
+    /// Gets a text avoiding duplicates by adding a numeric suffix in case it already exists in the given list.
+    /// </summary>
+    /// <param name="listOfTexts">A list of texts.</param>
+    /// <param name="proposedText">Proposed text.</param>
+    /// <returns>Unique text.</returns>
+    public static string GetNonDuplicateText(List<string> listOfTexts, string proposedText)
+    {
+      if (string.IsNullOrEmpty(proposedText) || listOfTexts == null || listOfTexts.Count == 0)
+      {
+        return proposedText;
+      }
+
+      proposedText = proposedText.Trim();
+      string nonDuplicateText = proposedText;
+      int textSuffixNumber = 2;
+      while (listOfTexts.Exists(text => text == nonDuplicateText))
+      {
+        nonDuplicateText = proposedText + textSuffixNumber++;
+      }
+
+      return nonDuplicateText;
+    }
   }
 
   public static class MySQLDataUtilities

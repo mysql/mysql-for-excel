@@ -55,9 +55,19 @@ namespace MySQL.ForExcel
     private bool _firstRowIsHeaders;
 
     /// <summary>
+    /// Flag indicating if the column names where changed to use the first row of data.
+    /// </summary>
+    private bool _changedColumnNamesWithFirstRowOfData;
+
+    /// <summary>
     /// Contains the value of the max_allowed_packet system variable of the MySQL Server currently connected to.
     /// </summary>
     private ulong _mysqlMaxAllowedPacket;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private bool? _tableExistsInSchema;
 
     /// <summary>
     /// List of text strings containing warnings for users about the table properties that could cause errors when creating this table in the database.
@@ -93,8 +103,10 @@ namespace MySQL.ForExcel
       AutoAllowEmptyNonIndexColumns = AutoAllowEmptyNonIndexColumns;
       AutoIndexIntColumns = autoIndexIntColumns;
       DetectDatatype = detectDataType;
+      InExportMode = true;
       IsFormatted = useFormattedValues;
       RemoveEmptyColumns = removeEmptyColumns;
+      TableName = proposedTableName;
       WBConnection = wbConnection;
     }
 
@@ -149,7 +161,7 @@ namespace MySQL.ForExcel
         TableName = tableName;
       }
 
-      SelectQuery = string.Format("SELECT * FROM `{0}`.`{1}`", SchemaName, TableName.Replace("`", "``"));
+      SelectQuery = string.Format("SELECT * FROM `{0}`.`{1}`", SchemaName, TableNameForSqlQueries);
     }
 
     /// <summary>
@@ -157,8 +169,10 @@ namespace MySQL.ForExcel
     /// </summary>
     public MySQLDataTable()
     {
-      _mysqlMaxAllowedPacket = 0;
       _autoPKWarningTextsList = new List<string>(1);
+      _changedColumnNamesWithFirstRowOfData = false;
+      _mysqlMaxAllowedPacket = 0;
+      _tableExistsInSchema = null;
       _tableWarningsTextList = new List<string>(3);
       AddBufferToVarchar = false;
       AddPrimaryKeyColumn = false;
@@ -166,11 +180,12 @@ namespace MySQL.ForExcel
       AutoIndexIntColumns = false;
       DetectDatatype = false;
       FirstRowIsHeaders = false;
+      InExportMode = false;
       IsTableNameValid = !string.IsNullOrEmpty(TableName);
       IsFormatted = false;
       RemoveEmptyColumns = false;
       SchemaName = string.Empty;
-      SelectQuery = string.Format("SELECT * FROM `{0}`", TableName.Replace("`", "``"));
+      SelectQuery = string.Format("SELECT * FROM `{0}`", TableNameForSqlQueries);
       UseFirstColumnAsPK = false;
       WBConnection = null;
     }
@@ -196,6 +211,17 @@ namespace MySQL.ForExcel
     /// Gets a value indicating whether columns with an integer-based data-type will have their <see cref="CreateIndex"/> property value set to true.
     /// </summary>
     public bool AutoIndexIntColumns { get; private set; }
+
+    /// <summary>
+    /// Gets the name of the auto-generated primary key column.
+    /// </summary>
+    public string AutoPKName
+    {
+      get
+      {
+        return AddPrimaryKeyColumn && Columns.Count > 0 ? GetColumnAtIndex(0).DisplayName : string.Empty;
+      }
+    }
 
     /// <summary>
     /// Gets the number of warnings associated to the auto-generated primary key.
@@ -256,9 +282,10 @@ namespace MySQL.ForExcel
       {
         bool containsIntegers = false;
         int res = 0;
-        if (Columns.Count > 1)
+        int firstColIdx = AddPrimaryKeyColumn ? 1 : 0;
+        if (Columns.Count > firstColIdx)
         {
-          containsIntegers = (Columns[1] as MySQLDataColumn).MySQLDataType.ToLowerInvariant() == "integer";
+          containsIntegers = GetColumnAtIndex(firstColIdx).MySQLDataType.ToLowerInvariant() == "integer";
         }
 
         if (!containsIntegers)
@@ -292,6 +319,11 @@ namespace MySQL.ForExcel
         UseFirstRowAsHeaders();
       }
     }
+
+    /// <summary>
+    /// Gets a value indicating whether the table is being constructed for exporting it to a new MySQL table.
+    /// </summary>
+    public bool InExportMode { get; private set; }
 
     /// <summary>
     /// Gets the number of added rows meaning the number of pending INSERT operations in an Edit Data operation.
@@ -336,7 +368,7 @@ namespace MySQL.ForExcel
         int mappedQty = 0;
         for (int colIdx = 0; colIdx < Columns.Count; colIdx++)
         {
-          if (!string.IsNullOrEmpty((Columns[colIdx] as MySQLDataColumn).MappedDataColName))
+          if (!string.IsNullOrEmpty(GetColumnAtIndex(colIdx).MappedDataColName))
           {
             mappedQty++;
           }
@@ -373,6 +405,23 @@ namespace MySQL.ForExcel
     public string SelectQuery { get; set; }
 
     /// <summary>
+    /// Gets a value indicating whether there is a MySQL table in the connected schema with the same name as in <see cref="TableName"/>.
+    /// </summary>
+    public bool TableExistsInSchema
+    {
+      get
+      {
+        if (_tableExistsInSchema == null)
+        {
+          string cleanTableName = TableName.ToLowerInvariant().Replace(" ", "_");
+          _tableExistsInSchema = WBConnection != null ? MySQLDataUtilities.TableExistsInSchema(WBConnection, WBConnection.Schema, cleanTableName) : false;
+        }
+
+        return (bool)_tableExistsInSchema;
+      }
+    }
+
+    /// <summary>
     /// Gets or sets the name of the <see cref="MySQLDataTable"/>.
     /// </summary>
     public new string TableName
@@ -384,8 +433,31 @@ namespace MySQL.ForExcel
 
       set
       {
+        if (base.TableName != value)
+        {
+          _tableExistsInSchema = null;
+        }
+
         base.TableName = value;
+        if (!InExportMode)
+        {
+          return;
+        }
+
+        ResetAutoPKName();
+        UpdateTableSelectQuery();
         UpdateTableNameWarningsAndSelectQuery();
+      }
+    }
+
+    /// <summary>
+    /// Gets the <see cref="TableName"/> escaping the back-tick character.
+    /// </summary>
+    public string TableNameForSqlQueries
+    {
+      get
+      {
+        return TableName.Replace("`", "``");
       }
     }
 
@@ -429,7 +501,7 @@ namespace MySQL.ForExcel
         {
           for (int i = 1; i < Columns.Count && value; i++)
           {
-            (Columns[i] as MySQLDataColumn).PrimaryKey = false;
+            GetColumnAtIndex(i).PrimaryKey = false;
           }
         }
       }
@@ -672,13 +744,13 @@ namespace MySQL.ForExcel
       queryString.AppendFormat(
         "INSERT INTO `{0}`.`{1}`{2}(",
         SchemaName,
-        TableName.Replace("`", "``"),
+        TableNameForSqlQueries,
         nl);
 
       //// Loop columns to assemble the piece of the query that includes the column names that we will insert data into.
       for (colIdx = startingColNum; colIdx < colsCount; colIdx++)
       {
-        MySQLDataColumn toColumn = Columns[colIdx] as MySQLDataColumn;
+        MySQLDataColumn toColumn = GetColumnAtIndex(colIdx);
         string fromColumnName = toColumn.MappedDataColName;
         if (toColumn.ExcludeColumn || string.IsNullOrEmpty(fromColumnName))
         {
@@ -688,7 +760,7 @@ namespace MySQL.ForExcel
         queryString.AppendFormat(
           "{0}`{1}`",
           colsSeparator,
-          toColumn.ColumnName.Replace("`", "``"));
+          toColumn.ColumnNameForSqlQueries);
         colsSeparator = ",";
         fromColumnNames.Add(fromColumnName);
         toColumnNames.Add(toColumn.ColumnName);
@@ -874,7 +946,7 @@ namespace MySQL.ForExcel
         retArray = new string[Columns.Count];
         for (int i = 0; i < Columns.Count; i++)
         {
-          retArray[i] = useDisplayName ? (Columns[i] as MySQLDataColumn).DisplayName : Columns[i].ColumnName;
+          retArray[i] = useDisplayName ? GetColumnAtIndex(i).DisplayName : Columns[i].ColumnName;
         }
       }
 
@@ -917,7 +989,7 @@ namespace MySQL.ForExcel
         sql.AppendFormat("{0}PRIMARY KEY (", delimiter);
         foreach (MySQLDataColumn col in Columns.OfType<MySQLDataColumn>().Skip(1).Where(c => c.PrimaryKey))
         {
-          sql.AppendFormat("{0}`{1}`", pkDelimiter, col.DisplayName.Replace("`", "``"));
+          sql.AppendFormat("{0}`{1}`", pkDelimiter, col.DisplayNameForSqlQueries);
           pkDelimiter = ",";
         }
 
@@ -926,7 +998,7 @@ namespace MySQL.ForExcel
 
       foreach (MySQLDataColumn col in Columns.OfType<MySQLDataColumn>().Where(c => !(c.AutoPK || c.PrimaryKey || c.UniqueKey || c.ExcludeColumn || !c.CreateIndex)))
       {
-        sql.AppendFormat("{0}INDEX `{1}_idx` (`{1}`)", delimiter, col.DisplayName.Replace("`", "``"));
+        sql.AppendFormat("{0}INDEX `{1}_idx` (`{1}`)", delimiter, col.DisplayNameForSqlQueries);
       }
 
       sql.Append(nl);
@@ -977,13 +1049,13 @@ namespace MySQL.ForExcel
       queryString.AppendFormat(
         "INSERT INTO `{0}`.`{1}`{2}(",
         SchemaName,
-        TableName.Replace("`", "``"),
+        TableNameForSqlQueries,
         nl);
 
       //// Loop columns to assemble the piece of the query that includes the column names that we will insert data into.
       for (colIdx = startingColNum; colIdx < Columns.Count; colIdx++)
       {
-        MySQLDataColumn column = Columns[colIdx] as MySQLDataColumn;
+        MySQLDataColumn column = GetColumnAtIndex(colIdx);
         if (column.ExcludeColumn)
         {
           continue;
@@ -992,7 +1064,7 @@ namespace MySQL.ForExcel
         queryString.AppendFormat(
           "{0}`{1}`",
           colsSeparator,
-          column.DisplayName.Replace("`", "``"));
+          column.DisplayNameForSqlQueries);
         colsSeparator = ",";
         insertColumnNames.Add(column.ColumnName);
       }
@@ -1099,20 +1171,8 @@ namespace MySQL.ForExcel
     /// <returns>Unique column name.</returns>
     public string GetNonDuplicateColumnName(string proposedName, int forColumnIndex = -1)
     {
-      if (string.IsNullOrEmpty(proposedName) || Columns == null || Columns.Count == 0)
-      {
-        return proposedName;
-      }
-
-      proposedName = proposedName.Trim();
-      string nonDupName = proposedName;
-      int colIdx = 2;
-      while (Columns.OfType<MySQLDataColumn>().Count(col => col.DisplayName == nonDupName && col.Ordinal != forColumnIndex) > 0)
-      {
-        nonDupName = proposedName + colIdx++;
-      }
-
-      return nonDupName;
+      List<string> columnNames =  Columns != null && Columns.Count > 0 ? Columns.OfType<MySQLDataColumn>().Where(col => col.Ordinal != forColumnIndex).Select(col => col.DisplayName).ToList<string>() : null;
+      return MiscUtilities.GetNonDuplicateText(columnNames, proposedName);
     }
 
     /// <summary>
@@ -1140,7 +1200,7 @@ namespace MySQL.ForExcel
           queryString.AppendFormat(
             "DELETE FROM `{0}`.`{1}` WHERE ",
             SchemaName,
-            TableName.Replace("`", "``"));
+            TableNameForSqlQueries);
           foreach (MySQLDataColumn pkCol in Columns)
           {
             if (!pkCol.PrimaryKey)
@@ -1152,7 +1212,7 @@ namespace MySQL.ForExcel
             queryString.AppendFormat(
               "{0}`{1}`={2}{3}{2}",
               colsSeparator,
-              pkCol.ColumnName.Replace("`", "``"),
+              pkCol.ColumnNameForSqlQueries,
               pkCol.ColumnsRequireQuotes && !pkValueIsNull ? "'" : string.Empty,
               valueToDB);
             colsSeparator = " AND ";
@@ -1166,10 +1226,10 @@ namespace MySQL.ForExcel
           queryString.AppendFormat(
             "INSERT INTO `{0}`.`{1}` (",
             SchemaName,
-            TableName.Replace("`", "``"));
+            TableNameForSqlQueries);
           for (colIdx = startingColNum; colIdx < Columns.Count; colIdx++)
           {
-            MySQLDataColumn column = Columns[colIdx] as MySQLDataColumn;
+            MySQLDataColumn column = GetColumnAtIndex(colIdx);
             if (column.ExcludeColumn)
             {
               continue;
@@ -1178,7 +1238,7 @@ namespace MySQL.ForExcel
             queryString.AppendFormat(
               "{0}`{1}`",
               colsSeparator,
-              column.DisplayName.Replace("`", "``"));
+              column.DisplayNameForSqlQueries);
             colsSeparator = ",";
             insertColumnNames.Add(column.ColumnName);
           }
@@ -1208,11 +1268,11 @@ namespace MySQL.ForExcel
           queryString.AppendFormat(
             "UPDATE `{0}`.`{1}` SET ",
             SchemaName,
-            TableName.Replace("`", "``"));
+            TableNameForSqlQueries);
           foreach (MySQLDataColumn column in Columns)
           {
             bool updatingValueIsNull = false;
-            string finalColName = column.ColumnName.Replace("`", "``");
+            string finalColName = column.ColumnNameForSqlQueries;
             if (column.PrimaryKey)
             {
               valueToDB = DataTypeUtilities.GetStringValueForColumn(row[column.ColumnName, DataRowVersion.Original], column, false, out updatingValueIsNull);
@@ -1485,6 +1545,14 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Resets the name of the auto-generated primary key column.
+    /// </summary>
+    public void ResetAutoPKName()
+    {
+      SetupAutoPKColumn(false);
+    }
+
+    /// <summary>
     /// Reverts any changes done to the table since the last data push operation or refreshes its data with a fresh copy of the data.
     /// </summary>
     /// <param name="refreshFromDB">Flag indicating if instead of just reverting present changes a fresh copy of the data must be retrieved from the database.</param>
@@ -1586,7 +1654,7 @@ namespace MySQL.ForExcel
         for (int col = 1; col <= numCols; col++)
         {
           int adjColIdx = col - colAdjustIdx;
-          MySQLDataColumn column = Columns[adjColIdx] as MySQLDataColumn;
+          MySQLDataColumn column = GetColumnAtIndex(adjColIdx);
           if (row == 1 && !columnsHaveAnyDataList[col])
           {
             column.ExcludeColumn = true;
@@ -1645,9 +1713,8 @@ namespace MySQL.ForExcel
 
       for (int colIdx = 0; colIdx < Columns.Count; colIdx++)
       {
-        MySQLDataColumn thisColumn = Columns[colIdx] as MySQLDataColumn;
-        MySQLDataColumn syncFromColumn = syncFromTable.Columns[colIdx] as MySQLDataColumn;
-
+        MySQLDataColumn thisColumn = GetColumnAtIndex(colIdx);
+        MySQLDataColumn syncFromColumn = syncFromTable.GetColumnAtIndex(colIdx);
         thisColumn.SetDisplayName(syncFromColumn.DisplayName);
         thisColumn.SetMySQLDataType(syncFromColumn.MySQLDataType);
         thisColumn.PrimaryKey = syncFromColumn.PrimaryKey;
@@ -1765,25 +1832,15 @@ namespace MySQL.ForExcel
       int startCol = AddPrimaryKeyColumn ? 0 : 1;
       for (int colIdx = startCol; colIdx <= numCols; colIdx++)
       {
-        column = new MySQLDataColumn();
-        column.ColumnName = "Column" + colIdx;
+        column = new MySQLDataColumn(InExportMode);
+        column.ColumnName = AddPrimaryKeyColumn && colIdx == 0 ? "AutoPK" : "Column" + colIdx;
         column.SetDisplayName(column.ColumnName);
         column.ColumnWarningsChanged += ColumnWarningsChanged;
         column.PropertyChanged += ColumnPropertyValueChanged;
         Columns.Add(column);
       }
 
-      if (AddPrimaryKeyColumn)
-      {
-        column = Columns[0] as MySQLDataColumn;
-        column.PrimaryKey = true;
-        column.AutoPK = true;
-        column.ColumnName = TableName + (TableName.Length > 0 ? "_" : string.Empty) + "id";
-        column.SetDisplayName(column.ColumnName);
-        column.SetMySQLDataType("Integer");
-        column.AutoIncrement = true;
-        column.AllowNull = false;
-      }
+      SetupAutoPKColumn(true);
     }
 
     /// <summary>
@@ -1833,7 +1890,7 @@ namespace MySQL.ForExcel
 
       for (int dataColPos = 1; dataColPos <= colsCount; dataColPos++)
       {
-        MySQLDataColumn col = Columns[dataColPos - colAdjustIdx] as MySQLDataColumn;
+        MySQLDataColumn col = GetColumnAtIndex(dataColPos - colAdjustIdx);
         if (col.ExcludeColumn)
         {
           continue;
@@ -1945,6 +2002,38 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Updates the table's automatically generated primary key's name based on the current table name.
+    /// </summary>
+    /// <param name="firstSet">Flag indicating if the AutoPK column is a new column and all of its properties must be set.</param>
+    private void SetupAutoPKColumn(bool firstSet)
+    {
+      if (AddPrimaryKeyColumn && Columns.Count > 0)
+      {
+        MySQLDataColumn autoPKcolumn = GetColumnAtIndex(0);
+        string tableIdName = TableName + (TableName.Length > 0 ? "_" : string.Empty) + "id";
+        string autoPKName = GetNonDuplicateColumnName(tableIdName);
+        autoPKcolumn.SetDisplayName(autoPKName);
+        if (firstSet)
+        {
+          autoPKcolumn.PrimaryKey = true;
+          autoPKcolumn.AutoPK = true;
+          autoPKcolumn.SetMySQLDataType("Integer");
+          autoPKcolumn.AutoIncrement = true;
+          autoPKcolumn.AllowNull = false;
+        }
+      }
+    }
+
+    /// <summary>
+    /// Updates the table's SELECT query based on the current table name.
+    /// </summary>
+    private void UpdateTableSelectQuery()
+    {
+      string schemaPiece = !string.IsNullOrEmpty(SchemaName) ? string.Format("`{0}`.", SchemaName) : string.Empty;
+      SelectQuery = string.Format("SELECT * FROM {0}`{1}`", schemaPiece, TableNameForSqlQueries);
+    }
+
+    /// <summary>
     /// Updates the warnings related to the table name and the select query used to retrieve data based on the <see cref="TableName"/> property's value.
     /// </summary>
     private void UpdateTableNameWarningsAndSelectQuery()
@@ -1958,12 +2047,10 @@ namespace MySQL.ForExcel
       IsTableNameValid = !emptyTableName;
 
       //// Update warning stating a table with the given name already exists in the database
-      if (IsTableNameValid)
+      if (IsTableNameValid && WBConnection != null)
       {
-        string cleanTableName = TableName.ToLowerInvariant().Replace(" ", "_");
-        bool tableExistsInSchema = MySQLDataUtilities.TableExistsInSchema(WBConnection, WBConnection.Schema, cleanTableName);
-        warningsChanged = warningsChanged || UpdateWarnings(tableExistsInSchema, Properties.Resources.TableNameExistsWarning);
-        IsTableNameValid = !tableExistsInSchema;
+        warningsChanged = warningsChanged || UpdateWarnings(TableExistsInSchema, Properties.Resources.TableNameExistsWarning);
+        IsTableNameValid = !TableExistsInSchema;
       }
 
       //// Update warning stating the table name cannot be empty
@@ -1978,10 +2065,6 @@ namespace MySQL.ForExcel
       {
         OnTableWarningsChanged(false);
       }
-
-      //// Update table's SELECT query based on new table name
-      string schemaPiece = !string.IsNullOrEmpty(SchemaName) ? string.Format("`{0}`.", SchemaName) : string.Empty;
-      SelectQuery = string.Format("SELECT * FROM {0}`{1}`", schemaPiece, TableName.Replace("`", "``"));
     }
 
     /// <summary>
@@ -2029,16 +2112,25 @@ namespace MySQL.ForExcel
       }
 
       DataRow row = Rows[0];
-      int startRow = AddPrimaryKeyColumn ? 1 : 0;
-      for (int i = startRow; i < Columns.Count; i++)
+      if (!_changedColumnNamesWithFirstRowOfData && AddPrimaryKeyColumn && Columns.Count > 0)
       {
-        MySQLDataColumn col = Columns[i] as MySQLDataColumn;
+        MySQLDataColumn autoPKCol = GetColumnAtIndex(0);
+        string autoPKName = autoPKCol.DisplayName;
+        autoPKName = MiscUtilities.GetNonDuplicateText(row.ItemArray.Skip(1).Select(obj => obj.ToString()).ToList<string>(), autoPKName);
+        autoPKCol.SetDisplayName(autoPKName);
+      }
+
+      int startCol = AddPrimaryKeyColumn ? 1 : 0;
+      for (int i = startCol; i < Columns.Count; i++)
+      {
+        MySQLDataColumn col = GetColumnAtIndex(i);
         col.SetDisplayName(_firstRowIsHeaders ? DataToColName(row[i].ToString()) : col.ColumnName);
         col.SetMySQLDataType(_firstRowIsHeaders ? col.RowsFrom2ndDataType : col.RowsFrom1stDataType);
         col.CreateIndex = AutoIndexIntColumns && col.IsInteger;
       }
 
       AdjustAutoPKValues();
+      _changedColumnNamesWithFirstRowOfData = true;
     }
   }
 
