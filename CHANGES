@@ -1,4 +1,6 @@
 1.1.1
+- Added code that converts numbers to invariant culture strings when building the SQL statements used to push queries to the MySQL Server.
+  (Bug #15903921 - USING MYSQL FOR EXCEL IN FRANCE)
 - Refactored code in Panels (AutoStyleableBasePanel.cs, DBObjectSelectionPanel.cs, SchemaSelectionPanel.cs, WelcomePanel.cs), in TaskPanelControl.cs and in 
   some Forms (ExportForm.cs, ImportTableViewForm.cs) to comply with StyleCop rules.
 - Removed code that always forced the FirstDisplayedScrollingColumnIndex of the preview grid to the currently selected column every time the First Row Contains

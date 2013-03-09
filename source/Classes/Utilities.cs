@@ -1352,10 +1352,65 @@ namespace MySQL.ForExcel
             valueToDB = dtValue.GetDateTime().ToString(DATE_FORMAT);
         }
         else
-          valueToDB = valueObject.ToString();
+          valueToDB = GetStringRepresentationForNumericObject(valueObject);
       }
 
       return valueToDB;
+    }
+
+    public static string GetStringRepresentationForNumericObject(object boxedValue)
+    {
+      return GetStringRepresentationForNumericObject(boxedValue, CultureInfo.InvariantCulture);
+    }
+
+    public static string GetStringRepresentationForNumericObject(object boxedValue, CultureInfo ci)
+    {
+      if (boxedValue is sbyte)
+      {
+        return ((sbyte)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+      }
+      else if (boxedValue is byte)
+      {
+        return ((byte)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+      }
+      else if (boxedValue is short)
+      {
+        return ((short)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+      }
+      else if (boxedValue is ushort)
+      {
+        return ((ushort)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+      }
+      else if (boxedValue is int)
+      {
+        return ((int)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+      }
+      else if (boxedValue is uint)
+      {
+        return ((uint)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+      }
+      else if (boxedValue is long)
+      {
+        return ((long)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+      }
+      else if (boxedValue is ulong)
+      {
+        return ((ulong)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+      }
+      else if (boxedValue is float)
+      {
+        return ((float)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+      }
+      else if (boxedValue is double)
+      {
+        return ((double)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+      }
+      else if (boxedValue is decimal)
+      {
+        return ((decimal)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+      }
+
+      return boxedValue.ToString();
     }
 
     public static string GetStringValueForColumn(object rawValue, MySQLDataColumn againstTypeColumn, bool dataForInsertion)
