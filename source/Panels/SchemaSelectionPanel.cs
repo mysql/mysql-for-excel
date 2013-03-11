@@ -23,6 +23,7 @@ namespace MySQL.ForExcel
   using System.ComponentModel;
   using System.Data;
   using System.Drawing;
+  using System.Linq;
   using System.Windows.Forms;
   using MySql.Data.MySqlClient;
   using MySQL.ForExcel.Properties;
@@ -34,10 +35,16 @@ namespace MySQL.ForExcel
   public partial class SchemaSelectionPanel : AutoStyleableBasePanel
   {
     /// <summary>
+    /// String array containing schema names considered system schemas.
+    /// </summary>
+    private static string[] _systemSchemasListValues;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="SchemaSelectionPanel"/> class.
     /// </summary>
     public SchemaSelectionPanel()
     {
+      _systemSchemasListValues = new string[] { "mysql", "information_schema", "performance_schema" };
       InitializeComponent();
 
       InheritFontToControlsExceptionList.Add(SelectSchemaHotLabel.Name);
@@ -186,7 +193,7 @@ namespace MySQL.ForExcel
           }
 
           string lcSchemaName = schemaName.ToLowerInvariant();
-          int index = lcSchemaName == "mysql" || lcSchemaName == "information_schema" ? 1 : 0;
+          int index = _systemSchemasListValues.Contains(lcSchemaName) ? 1 : 0;
           string text = schemaName;
           TreeNode node = SchemasList.AddNode(SchemasList.Nodes[index], text);
           node.Tag = schemaName;

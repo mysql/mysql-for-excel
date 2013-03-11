@@ -1,4 +1,6 @@
 1.1.1
+- Added performance_schema to the list of system schemas, so now it shows along with the mysql and information_schema schemas list.
+  (Bug #16473033 - PERFORMANCE_SCHEMA NOT LISTED UNDER "SYSTEM SCHEMAS" GROUP)
 - Added code that converts numbers to invariant culture strings when building the SQL statements used to push queries to the MySQL Server.
   (Bug #15903921 - USING MYSQL FOR EXCEL IN FRANCE)
 - Refactored code in Panels (AutoStyleableBasePanel.cs, DBObjectSelectionPanel.cs, SchemaSelectionPanel.cs, WelcomePanel.cs), in TaskPanelControl.cs and in 
