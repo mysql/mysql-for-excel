@@ -74,10 +74,7 @@ namespace MySQL.ForExcel
       {
         SetControlTextValue(TableNameInputTextBox, proposedTableName);
       }
-      else
-      {
-        PreviewTableWarningsChanged(PreviewDataTable, new TableWarningsChangedArgs(PreviewDataTable, false));
-      }
+      PreviewTableWarningsChanged(PreviewDataTable, new TableWarningsChangedArgs(PreviewDataTable, false));
 
       TableNameInputTextBox.Focus();
       TableNameInputTextBox.SelectAll();
