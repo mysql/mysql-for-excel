@@ -55,7 +55,7 @@ namespace MySQL.ForExcel
 
       DoubleBuffered = true;
       ManageConnectionsHotLabel.Enabled = MySqlWorkbench.AllowsExternalConnectionsManagement;
-      LoadConnections();
+      LoadConnections(false);
     }
 
     /// <summary>
@@ -148,15 +148,16 @@ namespace MySQL.ForExcel
 
       MySqlWorkbenchConnection connectionToRemove = ConnectionsList.SelectedNode.Tag as MySqlWorkbenchConnection;
       MySQLForExcelConnectionsHelper.RemoveConnection(connectionToRemove.Id);
-      LoadConnections();
+      LoadConnections(false);
     }
 
     /// <summary>
     /// Searches for Workbench connections to load on the Connections list, if Workbench is not installed it loads connections created locally in MySQL for Excel.
+    /// <param name="reloadConnections">Flag indicating if connections are to be re-read from the connections file.</param>
     /// </summary>
-    private void LoadConnections()
+    private void LoadConnections(bool reloadConnections)
     {
-      List<MySqlWorkbenchConnection> connections = MySQLForExcelConnectionsHelper.GetConnections();
+      List<MySqlWorkbenchConnection> connections = MySQLForExcelConnectionsHelper.GetConnections(reloadConnections);
 
       if (connections == null)
       {
@@ -227,7 +228,7 @@ namespace MySQL.ForExcel
       }
 
       MySQLForExcelConnectionsHelper.SaveConnection(dlg.NewConnection);
-      LoadConnections();
+      LoadConnections(false);
     }
     /// <summary>
     /// Event delegate method fired when the <see cref="RefreshToolStripMenuItem"/> context-menu item is clicked.
@@ -236,7 +237,7 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void RefreshItem_Click(object sender, EventArgs e)
     {
-      LoadConnections();
+      LoadConnections(true);
     }
   }
 }

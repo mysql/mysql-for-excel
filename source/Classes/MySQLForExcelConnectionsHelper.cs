@@ -155,14 +155,20 @@ namespace MySQL.ForExcel
     /// Gets a list of connections that MySQL of Excel can use to connect to MySQL Server instances.
     /// </summary>
     /// <param name="useWorkbenchConnectionsFile">Flag indicating if the connections file used is the MySQL Workbench one.</param>
+    /// <param name="reloadConnections">Flag indicating if connections are to be re-read from the connections file.</param>
     /// <returns>A list of <see cref="MySqlWorkbenchConnection"/> objects.</returns>
-    public static List<MySqlWorkbenchConnection> GetConnections(bool useWorkbenchConnectionsFile)
+    public static List<MySqlWorkbenchConnection> GetConnections(bool useWorkbenchConnectionsFile, bool reloadConnections = false)
     {
       if (useWorkbenchConnectionsFile)
       {
         if (!File.Exists(WorkbenchConnectionsFile) && !CreateXMLFile(true))
         {
           return null;
+        }
+
+        if (reloadConnections)
+        {
+          MySqlWorkbench.LoadData();
         }
       }
       else
@@ -210,14 +216,15 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets a list of connections that MySQL of Excel can use to connect to MySQL Server instances.
     /// </summary>
+    /// <param name="reloadConnections">Flag indicating if connections are to be re-read from the connections file.</param>
     /// <returns>A list of <see cref="MySqlWorkbenchConnection"/> objects.</returns>
-    public static List<MySqlWorkbenchConnection> GetConnections()
+    public static List<MySqlWorkbenchConnection> GetConnections(bool reloadConnections = false)
     {
-      return GetConnections(MySqlWorkbench.AllowsExternalConnectionsManagement);
+      return GetConnections(MySqlWorkbench.AllowsExternalConnectionsManagement, reloadConnections);
     }
 
     /// <summary>
-    /// 
+    /// Migrates connections from the MySQL for Excel connections file to the MySQL Workbench connections one.
     /// </summary>
     public static void MigrateConnectionsFromMySQLForExcelToWorkbench()
     {

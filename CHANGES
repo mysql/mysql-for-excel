@@ -1,4 +1,6 @@
 1.1.1
+- Added a parameter to the LoadConnections method that refreshes connections from its corresponding file, set to true when the the Refresh Connections action
+  is performed. (Bug #16493129 - CONNECTION DETAILS NOT REFRESHED)
 - Added code to prevent the connections, schemas and DB objects lists from drawing while they are being filled with items.
   (Bug #16392862 - CONNECTIONS LIST FLICKERS WHEN A CONNECTION IS DELETED OR ADDED)
 - Added performance_schema to the list of system schemas, so now it shows along with the mysql and information_schema schemas list.
