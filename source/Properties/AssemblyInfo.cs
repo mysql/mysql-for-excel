@@ -1,16 +1,16 @@
-﻿// 
-// Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+﻿//
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
@@ -26,11 +26,11 @@ using System.Security;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("MySQL For Excel")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("MySQL for Excel is an application plugin enabling data analysts to very easily access and manipulate MySQL data within Microsoft Excel.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Oracle")]
+[assembly: AssemblyCompany("Oracle Corporation")]
 [assembly: AssemblyProduct("MySQL For Excel")]
-[assembly: AssemblyCopyright("Copyright © Oracle 2012")]
+[assembly: AssemblyCopyright("Copyright © 2012 - 2013, Oracle and/or its affiliates. All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
