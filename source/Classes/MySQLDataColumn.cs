@@ -611,10 +611,12 @@ namespace MySQL.ForExcel
     public MySQLDataColumn CloneSchema()
     {
       MySQLDataColumn clonedColumn = new MySQLDataColumn();
-      clonedColumn.ColumnName = this.ColumnName;
-      clonedColumn.DisplayName = this.DisplayName;
-      clonedColumn.DataType = this.DataType;
-      clonedColumn.MySQLDataType = MySQLDataType;
+      clonedColumn.ColumnName = ColumnName;
+      clonedColumn.SetDisplayName(DisplayName, false);
+      clonedColumn.DataType = DataType;
+      clonedColumn.SetMySQLDataType(MySQLDataType);
+      clonedColumn.RowsFrom1stDataType = RowsFrom1stDataType;
+      clonedColumn.RowsFrom2ndDataType = RowsFrom2ndDataType;
       clonedColumn.AutoPK = AutoPK;
       clonedColumn.AllowNull = AllowNull;
       clonedColumn.PrimaryKey = PrimaryKey;
@@ -622,6 +624,7 @@ namespace MySQL.ForExcel
       clonedColumn.AutoIncrement = AutoIncrement;
       clonedColumn.UniqueKey = UniqueKey;
       clonedColumn.ExcludeColumn = ExcludeColumn;
+      clonedColumn.CreateIndex = CreateIndex;
       return clonedColumn;
     }
 
@@ -741,8 +744,10 @@ namespace MySQL.ForExcel
     /// Checks if a user typed MySQL data type is valid and assigns it to the <see cref="MySQLDataType"/> property.
     /// </summary>
     /// <param name="dataType">A MySQL data type as specified for new columns in a CREATE TABLE statement.</param>
+    /// <param name="validateType">Flag indicating if the data type will be checked if it's a valid MySQL data type.</param>
+    /// <param name="testTypeOnData">Flag indicating if the data type will be tested against the column's data to see if the type is suitable for the data.</param>
     /// <returns>true if the type is a valid MySQL data type, false otherwise.</returns>
-    public bool SetMySQLDataType(string dataType, bool validateType = false)
+    public bool SetMySQLDataType(string dataType, bool validateType = false, bool testTypeOnData = false)
     {
       bool warningsChanged = false;
       IsMySQLDataTypeValid = true;
@@ -757,28 +762,31 @@ namespace MySQL.ForExcel
         return IsMySQLDataTypeValid;
       }
 
-      warningsChanged = warningsChanged || UpdateWarnings(false, Properties.Resources.ColumnDataTypeRequiredWarning);
+      warningsChanged = UpdateWarnings(false, Properties.Resources.ColumnDataTypeRequiredWarning) || warningsChanged;
       if (validateType)
       {
         IsMySQLDataTypeValid = DataTypeUtilities.ValidateUserDataType(dataType);
       }
 
-      warningsChanged = warningsChanged || UpdateWarnings(!IsMySQLDataTypeValid, Properties.Resources.ExportDataTypeNotValidWarning);
-      if (IsMySQLDataTypeValid)
+      warningsChanged = UpdateWarnings(!IsMySQLDataTypeValid, Properties.Resources.ExportDataTypeNotValidWarning) || warningsChanged;
+      if (IsMySQLDataTypeValid && testTypeOnData)
       {
         TestColumnDataTypeAgainstColumnData();
       }
 
       MySQLDataTable parentTable = Table as MySQLDataTable;
-      if (!CreateIndex && IsInteger && parentTable.AutoIndexIntColumns)
+      if (parentTable != null)
       {
-        CreateIndex = true;
-      }
+        if (!CreateIndex && IsInteger && parentTable.AutoIndexIntColumns)
+        {
+          CreateIndex = true;
+        }
 
-      if (!parentTable.DetectDatatype)
-      {
-        RowsFrom1stDataType = MySQLDataType;
-        RowsFrom2ndDataType = MySQLDataType;
+        if (!parentTable.DetectDatatype)
+        {
+          RowsFrom1stDataType = MySQLDataType;
+          RowsFrom2ndDataType = MySQLDataType;
+        }
       }
 
       if (warningsChanged)

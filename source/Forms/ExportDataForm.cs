@@ -294,7 +294,7 @@ namespace MySQL.ForExcel
         return;
       }
 
-      currentCol.SetMySQLDataType(DataTypeComboBox.Text, false);
+      currentCol.SetMySQLDataType(DataTypeComboBox.Text, false, true);
     }
 
     /// <summary>
@@ -322,7 +322,7 @@ namespace MySQL.ForExcel
         return;
       }
 
-      currentCol.SetMySQLDataType(newDataType, true);
+      currentCol.SetMySQLDataType(newDataType, true, true);
     }
 
     /// <summary>
@@ -371,6 +371,7 @@ namespace MySQL.ForExcel
       if (ExportDataTable == null)
       {
         ExportDataTable = PreviewDataTable.CloneSchema();
+        ExportDataTable.DetectDatatype = false;
         ExportDataTable.SetData(ExportDataRange, false, true);
       }
       else

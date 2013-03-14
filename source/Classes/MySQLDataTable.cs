@@ -1717,6 +1717,8 @@ namespace MySQL.ForExcel
         MySQLDataColumn syncFromColumn = syncFromTable.GetColumnAtIndex(colIdx);
         thisColumn.SetDisplayName(syncFromColumn.DisplayName);
         thisColumn.SetMySQLDataType(syncFromColumn.MySQLDataType);
+        thisColumn.RowsFrom1stDataType = syncFromColumn.RowsFrom1stDataType;
+        thisColumn.RowsFrom2ndDataType = syncFromColumn.RowsFrom2ndDataType;
         thisColumn.PrimaryKey = syncFromColumn.PrimaryKey;
         thisColumn.AllowNull = syncFromColumn.AllowNull;
         thisColumn.UniqueKey = syncFromColumn.UniqueKey;
@@ -2043,13 +2045,13 @@ namespace MySQL.ForExcel
 
       //// Update warning stating the table name cannot be empty
       bool emptyTableName = string.IsNullOrWhiteSpace(TableName);
-      warningsChanged = warningsChanged || UpdateWarnings(emptyTableName, Properties.Resources.TableNameRequiredWarning);
+      warningsChanged = UpdateWarnings(emptyTableName, Properties.Resources.TableNameRequiredWarning) || warningsChanged;
       IsTableNameValid = !emptyTableName;
 
       //// Update warning stating a table with the given name already exists in the database
       if (IsTableNameValid && WBConnection != null)
       {
-        warningsChanged = warningsChanged || UpdateWarnings(TableExistsInSchema, Properties.Resources.TableNameExistsWarning);
+        warningsChanged = UpdateWarnings(TableExistsInSchema, Properties.Resources.TableNameExistsWarning) || warningsChanged;
         IsTableNameValid = !TableExistsInSchema;
       }
 
@@ -2057,7 +2059,7 @@ namespace MySQL.ForExcel
       if (IsTableNameValid)
       {
         bool nonStandardTableName = TableName.Contains(" ") || TableName.Any(char.IsUpper);
-        warningsChanged = warningsChanged || UpdateWarnings(nonStandardTableName, Properties.Resources.NamesWarning);
+        warningsChanged = UpdateWarnings(nonStandardTableName, Properties.Resources.NamesWarning) || warningsChanged;
       }
 
       //// Fire the TableWarningsChanged event.
