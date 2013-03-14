@@ -163,6 +163,9 @@ namespace MySQL.ForExcel
         return;
       }
 
+      //// Avoids flickering of connections list while adding the items to it.
+      ConnectionsList.BeginUpdate();
+
       //// Clear currently loaded connections
       foreach (TreeNode node in ConnectionsList.Nodes)
       {
@@ -183,7 +186,11 @@ namespace MySQL.ForExcel
           groupNode.Expand();
         }
       }
+
+      //// Avoids flickering of connections list while adding the items to it.
+      ConnectionsList.EndUpdate();
     }
+
     /// <summary>
     /// Event delegate method fired when the <see cref="ManageConnectionsHotLabel"/> label is clicked.
     /// </summary>

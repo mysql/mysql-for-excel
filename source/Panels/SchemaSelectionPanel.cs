@@ -176,6 +176,9 @@ namespace MySQL.ForExcel
     {
       try
       {
+        //// Avoids flickering of schemas list while adding the items to it.
+        SchemasList.BeginUpdate();
+
         foreach (TreeNode node in SchemasList.Nodes)
         {
           node.Nodes.Clear();
@@ -204,6 +207,9 @@ namespace MySQL.ForExcel
         {
           SchemasList.Nodes[0].Expand();
         }
+
+        //// Avoids flickering of schemas list while adding the items to it.
+        SchemasList.EndUpdate();
 
         return true;
       }

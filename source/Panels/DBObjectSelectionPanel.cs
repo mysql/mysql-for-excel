@@ -498,11 +498,15 @@ namespace MySQL.ForExcel
         node.ImageIndex = (int)dataObjectType;
       }
     }
+
     /// <summary>
     /// Refreshes the DB objects list control with current objects in the connected schema.
     /// </summary>
     private void RefreshDBObjectsList()
     {
+      //// Avoids flickering of DB Objects lists while adding the items to it.
+      DBObjectList.BeginUpdate();
+
       foreach (TreeNode node in DBObjectList.Nodes)
       {
         node.Nodes.Clear();
@@ -516,6 +520,9 @@ namespace MySQL.ForExcel
       {
         DBObjectList.Nodes[0].Expand();
       }
+
+      //// Avoids flickering of DB Objects lists while adding the items to it.
+      DBObjectList.EndUpdate();
     }
 
     /// <summary>
