@@ -664,6 +664,42 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The following connections were migrated to the MySQL Workbench connections file:.
+        /// </summary>
+        internal static string ExcelConnectionsMigratedSuccessfullyDetail {
+            get {
+                return ResourceManager.GetString("ExcelConnectionsMigratedSuccessfullyDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} database connections were migrated successfully..
+        /// </summary>
+        internal static string ExcelConnectionsMigratedSuccessfullyTitle {
+            get {
+                return ResourceManager.GetString("ExcelConnectionsMigratedSuccessfullyTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Database connections were not migrated because the following error ocurred:.
+        /// </summary>
+        internal static string ExcelConnectionsMigrationErrorDetail {
+            get {
+                return ResourceManager.GetString("ExcelConnectionsMigrationErrorDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Local database connections could not be migrated..
+        /// </summary>
+        internal static string ExcelConnectionsMigrationErrorTitle {
+            get {
+                return ResourceManager.GetString("ExcelConnectionsMigrationErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Use &lt;Alt + N&gt; to move to the next column and &lt;Alt + P&gt; to move to the previous one..
         /// </summary>
         internal static string ExportColumnsGridToolTipCaption {

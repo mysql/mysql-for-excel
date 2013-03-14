@@ -621,4 +621,16 @@ To be able to make modifications on cells not related to MySQL data please exit 
   <data name="EditDataErrorTitle" xml:space="preserve">
     <value>Error editing data</value>
   </data>
+  <data name="ExcelConnectionsMigratedSuccessfullyDetail" xml:space="preserve">
+    <value>The following connections were migrated to the MySQL Workbench connections file:</value>
+  </data>
+  <data name="ExcelConnectionsMigratedSuccessfullyTitle" xml:space="preserve">
+    <value>{0} database connections were migrated successfully.</value>
+  </data>
+  <data name="ExcelConnectionsMigrationErrorDetail" xml:space="preserve">
+    <value>Database connections were not migrated because the following error ocurred:</value>
+  </data>
+  <data name="ExcelConnectionsMigrationErrorTitle" xml:space="preserve">
+    <value>Local database connections could not be migrated.</value>
+  </data>
 </root>
