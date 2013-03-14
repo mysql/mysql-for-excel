@@ -682,7 +682,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Entered Data Type is not a MySQL recognized data type..
+        ///   Looks up a localized string similar to Entered Data Type is not a MySQL valid data type..
         /// </summary>
         internal static string ExportDataTypeNotValidWarning {
             get {

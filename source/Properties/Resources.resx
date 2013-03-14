@@ -299,7 +299,7 @@
     <value>..\Resources\MySQLforExcel-Input-64x64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ExportDataTypeNotValidWarning" xml:space="preserve">
-    <value>Entered Data Type is not a MySQL recognized data type.</value>
+    <value>Entered Data Type is not a MySQL valid data type.</value>
   </data>
   <data name="MySQLforExcel_Cursor_Dragging_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySQLforExcel-Cursor-Dragging-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

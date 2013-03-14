@@ -751,6 +751,7 @@ namespace MySQL.ForExcel
     {
       bool warningsChanged = false;
       IsMySQLDataTypeValid = true;
+      dataType = dataType.Trim().Replace(" ", string.Empty);
       MySQLDataType = dataType;
 
       if (MySQLDataType.Length == 0)
@@ -759,6 +760,7 @@ namespace MySQL.ForExcel
         {
           OnColumnWarningsChanged();
         }
+
         return IsMySQLDataTypeValid;
       }
 

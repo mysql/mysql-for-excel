@@ -726,7 +726,20 @@ namespace MySQL.ForExcel
       int lParensIndex = mySQLDataType.IndexOf("(");
       int rParensIndex = mySQLDataType.IndexOf(")");
       int commaPos = mySQLDataType.IndexOf(",");
-      int characterLen = (isCharacter ? (lParensIndex >= 0 ? Int32.Parse(mySQLDataType.Substring(lParensIndex + 1, mySQLDataType.Length - lParensIndex - 2)) : 1) : 0);
+      int characterLen = 0;
+      if (isCharacter)
+      {
+        if (lParensIndex >= 0)
+        {
+          string paramValue = mySQLDataType.Substring(lParensIndex + 1, mySQLDataType.Length - lParensIndex - 2);
+          int.TryParse(paramValue, out characterLen);
+        }
+        else
+        {
+          characterLen = 1;
+        }
+      }
+
       int[] decimalLen = new int[2] { -1, -1 };
       List<string> setOrEnumMembers = null;
       if (mayContainFloatingPoint && lParensIndex >= 0 && rParensIndex >= 0 && lParensIndex < rParensIndex)
@@ -956,40 +969,68 @@ namespace MySQL.ForExcel
     /// <returns>true if the type is a valid MySQL data type, false otherwise.</returns>
     public static bool ValidateUserDataType(string proposedUserType)
     {
-      bool isValid = true;
-
-      if (proposedUserType.Length > 0)
+      //// If the proposed type is blank return true since a blank data type is considered valid.
+      if (proposedUserType.Length == 0)
       {
-        List<int> paramsInParenthesis;
-        List<string> dataTypesList = GetMySQLDataTypes(out paramsInParenthesis);
-        int rightParentFound = proposedUserType.IndexOf(")");
-        int leftParentFound = proposedUserType.IndexOf("(");
-        string pureDataType = string.Empty;
-        int typeParametersNum = 0;
+        return true;
+      }
 
-        proposedUserType = proposedUserType.Trim().Replace(" ", string.Empty);
-        if (rightParentFound >= 0)
+      List<int> validParamsPerDataType;
+      List<string> dataTypesList = GetMySQLDataTypes(out validParamsPerDataType);
+      int rightParenthesisIndex = proposedUserType.IndexOf(")");
+      int leftParenthesisIndex = proposedUserType.IndexOf("(");
+
+      //// Check if we have parenthesis within the proposed data type and if the left and right parentheses are placed properly.
+      //// Also check if there is no text beyond the right parenthesis.
+      if (rightParenthesisIndex >= 0 && (leftParenthesisIndex < 0 || leftParenthesisIndex >= rightParenthesisIndex || proposedUserType.Length > rightParenthesisIndex + 1))
+      {
+        return false;
+      }
+
+      //// Check if the data type stripped of parenthesis is found in the list of valid MySQL types.
+      string pureDataType = rightParenthesisIndex >= 0 ? proposedUserType.Substring(0, leftParenthesisIndex).ToLowerInvariant() : proposedUserType.ToLowerInvariant();
+      int typeFoundAt = dataTypesList.IndexOf(pureDataType);
+      if (typeFoundAt < 0)
+      {
+        return false;
+      }
+
+      //// Parameters checks.
+      if (rightParenthesisIndex >= 0)
+      {
+        //// Check if the number of parameters is valid for the proposed MySQL data type
+        int numOfValidParams = validParamsPerDataType[typeFoundAt];
+        string[] parameterValues = proposedUserType.Substring(leftParenthesisIndex + 1, rightParenthesisIndex - leftParenthesisIndex - 1).Split(new Char[] { ',' });
+        bool parametersQtyIsValid = false;
+        if (pureDataType.StartsWith("var"))
         {
-          if (leftParentFound < 0 || leftParentFound >= rightParentFound)
-          {
-            return false;
-          }
-
-          typeParametersNum = proposedUserType.Substring(leftParentFound + 1, rightParentFound - leftParentFound - 1).Count(c => c == ',') + 1;
-          pureDataType = proposedUserType.Substring(0, leftParentFound).ToLowerInvariant();
+          parametersQtyIsValid = numOfValidParams >= 0 && numOfValidParams == parameterValues.Length;
         }
         else
         {
-          pureDataType = proposedUserType.ToLowerInvariant();
+          parametersQtyIsValid = (numOfValidParams >= 0 && numOfValidParams == parameterValues.Length) || (numOfValidParams < 0 && parameterValues.Length > 0) || parameterValues.Length == 0;
         }
 
-        int typeFoundAt = dataTypesList.IndexOf(pureDataType);
-        int numOfValidParams = typeFoundAt >= 0 ? paramsInParenthesis[typeFoundAt] : -1;
-        bool numParamsMatch = pureDataType.StartsWith("var") ? numOfValidParams >= 0 && numOfValidParams == typeParametersNum : (numOfValidParams >= 0 && numOfValidParams == typeParametersNum) || (numOfValidParams < 0 && typeParametersNum > 0) || typeParametersNum == 0;
-        isValid = typeFoundAt >= 0 && numParamsMatch;
+        if (!parametersQtyIsValid)
+        {
+          return false;
+        }
+
+        //// Check if the paremeter values are valid integers for data types with 1 or 2 parameters (varchar and numeric types).
+        if (numOfValidParams >= 1 && numOfValidParams <= 2)
+        {
+          foreach (string paramValue in parameterValues)
+          {
+            int convertedValue = 0;
+            if (!int.TryParse(paramValue, out convertedValue))
+            {
+              return false;
+            }
+          }
+        }
       }
 
-      return isValid;
+      return true;
     }
 
     public static string GetMySQLExportDataType(object packedValue, out bool valueOverflow)
