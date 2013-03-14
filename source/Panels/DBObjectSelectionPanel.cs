@@ -174,7 +174,7 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog errorDialog = new InfoDialog(false, ex.Message, null);
+        InfoDialog errorDialog = new InfoDialog(false, Resources.AppendDataErrorTitle, ex.Message);
         errorDialog.WordWrapDetails = true;
         errorDialog.ShowDialog();
         MiscUtilities.WriteAppErrorToLog(ex);
@@ -255,10 +255,20 @@ namespace MySQL.ForExcel
         return;
       }
 
-      bool editActivated = (Parent as TaskPaneControl).EditTableData(selDBObject);
-      if (editActivated)
+      try
       {
-        EditDataHotLabel.Enabled = false;
+        bool editActivated = (Parent as TaskPaneControl).EditTableData(selDBObject);
+        if (editActivated)
+        {
+          EditDataHotLabel.Enabled = false;
+        }
+      }
+      catch (Exception ex)
+      {
+        InfoDialog errorDialog = new InfoDialog(false, Resources.EditDataErrorTitle, ex.Message);
+        errorDialog.WordWrapDetails = true;
+        errorDialog.ShowDialog();
+        MiscUtilities.WriteAppErrorToLog(ex);
       }
     }
 
@@ -354,7 +364,7 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog errorDialog = new InfoDialog(false, Properties.Resources.ImportDataErrorTitle, ex.Message);
+        InfoDialog errorDialog = new InfoDialog(false, Resources.ImportDataErrorTitle, ex.Message);
         errorDialog.WordWrapDetails = true;
         errorDialog.ShowDialog();
         MiscUtilities.WriteAppErrorToLog(ex);

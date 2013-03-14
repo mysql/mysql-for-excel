@@ -615,4 +615,10 @@ To be able to make modifications on cells not related to MySQL data please exit 
   <data name="ColumnExistsWarning" xml:space="preserve">
     <value>Another column with this name already exists in the table.</value>
   </data>
+  <data name="AppendDataErrorTitle" xml:space="preserve">
+    <value>Error appending data</value>
+  </data>
+  <data name="EditDataErrorTitle" xml:space="preserve">
+    <value>Error editing data</value>
+  </data>
 </root>

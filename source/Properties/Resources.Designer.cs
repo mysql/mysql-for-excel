@@ -97,6 +97,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error appending data.
+        /// </summary>
+        internal static string AppendDataErrorTitle {
+            get {
+                return ResourceManager.GetString("AppendDataErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Application Exception on {0}.{1} - {2} {3}.
         /// </summary>
         internal static string ApplicationExceptionForLog {
@@ -514,6 +523,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string EditDataDeleteLastRowNotPermittedErrorTitle {
             get {
                 return ResourceManager.GetString("EditDataDeleteLastRowNotPermittedErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error editing data.
+        /// </summary>
+        internal static string EditDataErrorTitle {
+            get {
+                return ResourceManager.GetString("EditDataErrorTitle", resourceCulture);
             }
         }
         
