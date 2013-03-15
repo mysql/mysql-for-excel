@@ -179,15 +179,11 @@ namespace MySQL.ForExcel
         AddConnectionToList(conn);
       }
 
-      //// Expand each Connections group node if it contains connections.
-      //// Traverse the node list from bottom up so the first node is expanded last and the tree scrollbar does not move to the end.
-      for (int topLevelNodeIndex = ConnectionsList.Nodes.Count - 1; topLevelNodeIndex >= 0; topLevelNodeIndex--)
+      //// Expand connection nodes
+      ConnectionsList.ExpandAll();
+      if (ConnectionsList.Nodes.Count > 0)
       {
-        TreeNode groupNode = ConnectionsList.Nodes[topLevelNodeIndex];
-        if (groupNode.GetNodeCount(true) > 0)
-        {
-          groupNode.Expand();
-        }
+        ConnectionsList.Nodes[0].EnsureVisible();
       }
 
       //// Avoids flickering of connections list while adding the items to it.
