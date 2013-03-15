@@ -1,4 +1,6 @@
 1.1.1
+- Fixed logic that detects data types for columns to check for empty columns instead of excluded ones and properly assigning the default generic data type of
+  varchar(255) to empty columns as per design. (Bug #16495493 - EXPORT DATA - DATA TYPE FOR EMPTY COLUMNS IS NOT AUTO-DETECTED)
 - Fixed code that detected data types for columns for the scenario where only 1 row of Excel data is selected for Export or for Append, in which case the data
   type was always being set as a varchar(255) which is used when data types between rows are not consistent. (Bug #16493139 - AUTOMATIC MAPPING NOT WORKING)
 - Added a parameter to the LoadConnections method that refreshes connections from its corresponding file, set to true when the the Refresh Connections action

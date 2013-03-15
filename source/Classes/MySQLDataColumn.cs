@@ -69,6 +69,7 @@ namespace MySQL.ForExcel
       DisplayName = string.Empty;
       InExportMode = false;
       IsDisplayNameDuplicate = false;
+      IsEmpty = true;
       ExcludeColumn = false;
       IsMySQLDataTypeValid = true;
       MappedDataColName = null;
@@ -173,6 +174,11 @@ namespace MySQL.ForExcel
     /// Gets a value indicating if the <see cref="DisplayName"/> property value is not a duplicate of the one in another column.
     /// </summary>
     public bool IsDisplayNameDuplicate { get; private set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the column has no data.
+    /// </summary>
+    public bool IsEmpty { get; set; }
 
     /// <summary>
     /// Gets a value indicating whether the column's data type is a valid MySQL data type.

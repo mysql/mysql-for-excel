@@ -1641,7 +1641,7 @@ namespace MySQL.ForExcel
           Columns.Clear();
         }
 
-        CreateColumns(numCols);
+        CreateColumns(columnsHaveAnyDataList);
       }
 
       //// Create excelData rows and fill them with the Excel data.
@@ -1655,10 +1655,14 @@ namespace MySQL.ForExcel
         {
           int adjColIdx = col - colAdjustIdx;
           MySQLDataColumn column = GetColumnAtIndex(adjColIdx);
-          if (row == 1 && !columnsHaveAnyDataList[col])
+          if (column.IsEmpty)
           {
-            column.ExcludeColumn = true;
-            colsToDelete.Add(column.ColumnName);
+            if (row == 1)
+            {
+              colsToDelete.Add(column.ColumnName);
+            }
+
+            continue;
           }
 
           rowHasAnyData = rowHasAnyData || excelData[row, col] != null;
@@ -1827,18 +1831,32 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Adds a specified number of <see cref="MySQLDataColumn"/> objects to the Columns collection where the first column may be an automatically created one for the table's primary index.
     /// </summary>
-    /// <param name="numCols">Number of columns to add to the table.</param>
+    /// <param name="numCols">Number of columns to add to the table not counting the auto-generated primary key column.</param>
     private void CreateColumns(int numCols)
     {
+      List<bool> columnsHaveAnyDataList = new List<bool>(numCols + 1);
+      columnsHaveAnyDataList[0] = true;
+      CreateColumns(columnsHaveAnyDataList);
+    }
+
+    /// <summary>
+    /// Adds a specified number of <see cref="MySQLDataColumn"/> objects to the Columns collection where the first column may be an automatically created one for the table's primary index.
+    /// </summary>
+    /// <param name="columnsHaveAnyDataList">List of boolean values representing if each column is empty, includes the auto-generated primary key column.</param>
+    private void CreateColumns(List<bool> columnsHaveAnyDataList)
+    {
       MySQLDataColumn column = null;
+      int numCols = columnsHaveAnyDataList.Count;
       int startCol = AddPrimaryKeyColumn ? 0 : 1;
-      for (int colIdx = startCol; colIdx <= numCols; colIdx++)
+      for (int colIdx = startCol; colIdx < numCols; colIdx++)
       {
         column = new MySQLDataColumn(InExportMode);
         column.ColumnName = AddPrimaryKeyColumn && colIdx == 0 ? "AutoPK" : "Column" + colIdx;
         column.SetDisplayName(column.ColumnName);
         column.ColumnWarningsChanged += ColumnWarningsChanged;
         column.PropertyChanged += ColumnPropertyValueChanged;
+        column.IsEmpty = !columnsHaveAnyDataList[colIdx];
+        column.ExcludeColumn = column.IsEmpty;
         Columns.Add(column);
       }
 
@@ -1892,92 +1910,96 @@ namespace MySQL.ForExcel
 
       for (int dataColPos = 1; dataColPos <= colsCount; dataColPos++)
       {
-        MySQLDataColumn col = GetColumnAtIndex(dataColPos - colAdjustIdx);
-        if (col.ExcludeColumn)
-        {
-          continue;
-        }
-
-        object valueFromArray = null;
         string proposedType = string.Empty;
         string strippedType = string.Empty;
-        string valueAsString = string.Empty;
-        bool valueOverflow = false;
+        int leftParensIndex = -1;
         List<string> typesListFor1stAndRest = new List<string>(2);
         List<string> typesListFrom2ndRow = new List<string>(rowsCount - 1);
         int[] varCharMaxLen = new int[2] { 0, 0 };    //// 0 - All rows original datatype varcharmaxlen, 1 - All rows Varchar forced datatype maxlen
         int[] decimalMaxLen = new int[2] { 0, 0 };    //// 0 - Integral part max length, 1 - decimal part max length
-        int leftParensIndex = -1;
-        int varCharValueLength = 0;
 
-        for (int rowPos = 1; rowPos <= rowsCount; rowPos++)
+        MySQLDataColumn col = GetColumnAtIndex(dataColPos - colAdjustIdx);
+        if (!col.IsEmpty)
         {
-          proposedType = strippedType = valueAsString = string.Empty;
-          valueFromArray = excelData[rowPos, dataColPos];
-          if (valueFromArray == null)
-          {
-            continue;
-          }
+          object valueFromArray = null;
+          string valueAsString = string.Empty;
+          bool valueOverflow = false;
+          int varCharValueLength = 0;
 
-          //// Treat always as a Varchar value first in case all rows do not have a consistent datatype just to see the varchar len calculated by GetMySQLExportDataType
-          valueAsString = valueFromArray.ToString();
-          proposedType = DataTypeUtilities.GetMySQLExportDataType(valueAsString, out valueOverflow);
-          if (proposedType == "Bool")
+          for (int rowPos = 1; rowPos <= rowsCount; rowPos++)
           {
-            proposedType = "Varchar(5)";
-          }
-          else if (proposedType.StartsWith("Date"))
-          {
-            proposedType = string.Format("Varchar({0})", valueAsString.Length);
-          }
+            proposedType = strippedType = valueAsString = string.Empty;
+            valueFromArray = excelData[rowPos, dataColPos];
+            if (valueFromArray == null)
+            {
+              continue;
+            }
 
-          leftParensIndex = proposedType.IndexOf("(");
-          varCharValueLength = AddBufferToVarchar ? int.Parse(proposedType.Substring(leftParensIndex + 1, proposedType.Length - leftParensIndex - 2)) : valueAsString.Length;
-          varCharMaxLen[1] = Math.Max(varCharValueLength, varCharMaxLen[1]);
+            //// Treat always as a Varchar value first in case all rows do not have a consistent datatype just to see the varchar len calculated by GetMySQLExportDataType
+            valueAsString = valueFromArray.ToString();
+            proposedType = DataTypeUtilities.GetMySQLExportDataType(valueAsString, out valueOverflow);
+            if (proposedType == "Bool")
+            {
+              proposedType = "Varchar(5)";
+            }
+            else if (proposedType.StartsWith("Date"))
+            {
+              proposedType = string.Format("Varchar({0})", valueAsString.Length);
+            }
 
-          //// Normal datatype detection
-          proposedType = DataTypeUtilities.GetMySQLExportDataType(valueFromArray, out valueOverflow);
-          leftParensIndex = proposedType.IndexOf("(");
-          strippedType = leftParensIndex < 0 ? proposedType : proposedType.Substring(0, leftParensIndex);
-          switch (strippedType)
-          {
-            case "Date":
-            case "Datetime":
-              bool zeroDate = valueAsString.StartsWith("0000-00-00") || valueAsString.StartsWith("00-00-00");
-              if (zeroDate)
-              {
+            leftParensIndex = proposedType.IndexOf("(");
+            varCharValueLength = AddBufferToVarchar ? int.Parse(proposedType.Substring(leftParensIndex + 1, proposedType.Length - leftParensIndex - 2)) : valueAsString.Length;
+            varCharMaxLen[1] = Math.Max(varCharValueLength, varCharMaxLen[1]);
+
+            //// Normal datatype detection
+            proposedType = DataTypeUtilities.GetMySQLExportDataType(valueFromArray, out valueOverflow);
+            leftParensIndex = proposedType.IndexOf("(");
+            strippedType = leftParensIndex < 0 ? proposedType : proposedType.Substring(0, leftParensIndex);
+            switch (strippedType)
+            {
+              case "Date":
+              case "Datetime":
+                bool zeroDate = valueAsString.StartsWith("0000-00-00") || valueAsString.StartsWith("00-00-00");
+                if (zeroDate)
+                {
+                  break;
+                }
+
+                DateTime dtValue = (DateTime)valueFromArray;
+                Rows[rowPos - 1][dataColPos - colAdjustIdx] = dtValue.ToString(DataTypeUtilities.DATE_FORMAT);
                 break;
-              }
+              case "Varchar":
+                varCharValueLength = AddBufferToVarchar ? int.Parse(proposedType.Substring(leftParensIndex + 1, proposedType.Length - leftParensIndex - 2)) : valueAsString.Length;
+                varCharMaxLen[0] = Math.Max(varCharValueLength, varCharMaxLen[0]);
+                break;
+              case "Decimal":
+                int commaPos = proposedType.IndexOf(",");
+                decimalMaxLen[0] = Math.Max(int.Parse(proposedType.Substring(leftParensIndex + 1, commaPos - leftParensIndex - 1)), decimalMaxLen[0]);
+                decimalMaxLen[1] = Math.Max(int.Parse(proposedType.Substring(commaPos + 1, proposedType.Length - commaPos - 2)), decimalMaxLen[1]);
+                break;
+            }
 
-              DateTime dtValue = (DateTime)valueFromArray;
-              Rows[rowPos - 1][dataColPos - colAdjustIdx] = dtValue.ToString(DataTypeUtilities.DATE_FORMAT);
-              break;
-            case "Varchar":
-              varCharValueLength = AddBufferToVarchar ? int.Parse(proposedType.Substring(leftParensIndex + 1, proposedType.Length - leftParensIndex - 2)) : valueAsString.Length;
-              varCharMaxLen[0] = Math.Max(varCharValueLength, varCharMaxLen[0]);
-              break;
-            case "Decimal":
-              int commaPos = proposedType.IndexOf(",");
-              decimalMaxLen[0] = Math.Max(int.Parse(proposedType.Substring(leftParensIndex + 1, commaPos - leftParensIndex - 1)), decimalMaxLen[0]);
-              decimalMaxLen[1] = Math.Max(int.Parse(proposedType.Substring(commaPos + 1, proposedType.Length - commaPos - 2)), decimalMaxLen[1]);
-              break;
+            if (rowPos == 1)
+            {
+              typesListFor1stAndRest.Add(strippedType);
+            }
+            else
+            {
+              typesListFrom2ndRow.Add(strippedType);
+            }
           }
 
-          if (rowPos == 1)
-          {
-            typesListFor1stAndRest.Add(strippedType);
-          }
-          else
-          {
-            typesListFrom2ndRow.Add(strippedType);
-          }
+          //// Get the consistent DataType for all rows except first one.
+          proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListFrom2ndRow, decimalMaxLen, varCharMaxLen);
         }
 
-        //// Get the consistent DataType for all rows except first one.
-        proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListFrom2ndRow, decimalMaxLen, varCharMaxLen);
         if (emptyColumnsToVarchar && string.IsNullOrEmpty(proposedType))
         {
           proposedType = "Varchar(255)";
+          strippedType = "Varchar";
+          typesListFor1stAndRest.Add("Varchar");
+          varCharMaxLen[0] = 255;
+          varCharMaxLen[1] = 255;
         }
 
         col.RowsFrom2ndDataType = proposedType;
