@@ -1612,10 +1612,15 @@ namespace MySQL.ForExcel
       int numCols = excelData.GetUpperBound(1);
       int colAdjustIdx = AddPrimaryKeyColumn ? 0 : 1;
       List<bool> columnsHaveAnyDataList = new List<bool>(numCols + 1);
+      List<bool> columnsContainDatesList = new List<bool>(numCols + 1);
       List<string> colsToDelete = new List<string>(numCols);
 
       //// Create a list of boolean values that state if each column has any data or none.
-      columnsHaveAnyDataList.Add(true);
+      if (AddPrimaryKeyColumn)
+      {
+        columnsHaveAnyDataList.Add(true);
+      }
+
       for (int colIdx = 1; colIdx <= numCols; colIdx++)
       {
         bool colHasAnyData = false;
@@ -1636,12 +1641,23 @@ namespace MySQL.ForExcel
       //// Drop all columns and re-create them or create them if none have been created so far.
       if (recreateColumnsFromData || Columns.Count == 0)
       {
-        if (Columns.Count > 0)
+        CreateColumns(numCols);
+      }
+      
+      //// Set the IsEmpty and Exclude properties of columns based on the filling data
+      for (int colIdx = 0; colIdx < Columns.Count; colIdx++)
+      {
+        MySQLDataColumn column = GetColumnAtIndex(colIdx);
+        columnsContainDatesList.Add(column.IsDate);
+        column.IsEmpty = !columnsHaveAnyDataList[colIdx];
+        if (recreateColumnsFromData)
         {
-          Columns.Clear();
+          column.ExcludeColumn = column.IsEmpty;
+          if (column.IsEmpty)
+          {
+            colsToDelete.Add(column.ColumnName);
+          }
         }
-
-        CreateColumns(columnsHaveAnyDataList);
       }
 
       //// Create excelData rows and fill them with the Excel data.
@@ -1654,19 +1670,13 @@ namespace MySQL.ForExcel
         for (int col = 1; col <= numCols; col++)
         {
           int adjColIdx = col - colAdjustIdx;
-          MySQLDataColumn column = GetColumnAtIndex(adjColIdx);
-          if (column.IsEmpty)
+          if (!columnsHaveAnyDataList[adjColIdx])
           {
-            if (row == 1)
-            {
-              colsToDelete.Add(column.ColumnName);
-            }
-
             continue;
           }
 
           rowHasAnyData = rowHasAnyData || excelData[row, col] != null;
-          dataRow[adjColIdx] = excelData[row, col] != null && excelData[row, col].Equals(0.0) && column.IsDate ? DataTypeUtilities.EMPTY_DATE : dataRow[adjColIdx] = excelData[row, col];
+          dataRow[adjColIdx] = excelData[row, col] != null && excelData[row, col].Equals(0.0) && columnsContainDatesList[adjColIdx] ? DataTypeUtilities.EMPTY_DATE : dataRow[adjColIdx] = excelData[row, col];
         }
 
         if (rowHasAnyData)
@@ -1834,29 +1844,17 @@ namespace MySQL.ForExcel
     /// <param name="numCols">Number of columns to add to the table not counting the auto-generated primary key column.</param>
     private void CreateColumns(int numCols)
     {
-      List<bool> columnsHaveAnyDataList = new List<bool>(numCols + 1);
-      columnsHaveAnyDataList[0] = true;
-      CreateColumns(columnsHaveAnyDataList);
-    }
+      Columns.Clear();
 
-    /// <summary>
-    /// Adds a specified number of <see cref="MySQLDataColumn"/> objects to the Columns collection where the first column may be an automatically created one for the table's primary index.
-    /// </summary>
-    /// <param name="columnsHaveAnyDataList">List of boolean values representing if each column is empty, includes the auto-generated primary key column.</param>
-    private void CreateColumns(List<bool> columnsHaveAnyDataList)
-    {
       MySQLDataColumn column = null;
-      int numCols = columnsHaveAnyDataList.Count;
       int startCol = AddPrimaryKeyColumn ? 0 : 1;
-      for (int colIdx = startCol; colIdx < numCols; colIdx++)
+      for (int colIdx = startCol; colIdx <= numCols; colIdx++)
       {
         column = new MySQLDataColumn(InExportMode);
         column.ColumnName = AddPrimaryKeyColumn && colIdx == 0 ? "AutoPK" : "Column" + colIdx;
         column.SetDisplayName(column.ColumnName);
         column.ColumnWarningsChanged += ColumnWarningsChanged;
         column.PropertyChanged += ColumnPropertyValueChanged;
-        column.IsEmpty = !columnsHaveAnyDataList[colIdx];
-        column.ExcludeColumn = column.IsEmpty;
         Columns.Add(column);
       }
 
