@@ -1993,9 +1993,12 @@ namespace MySQL.ForExcel
         }
 
         //// Get the consistent DataType between first columnInfoRow and the previously computed consistent DataType for the rest of the rows.
-        leftParensIndex = proposedType.IndexOf("(");
-        strippedType = leftParensIndex < 0 ? proposedType : proposedType.Substring(0, leftParensIndex);
-        typesListFor1stAndRest.Add(strippedType);
+        if (typesListFrom2ndRow.Count > 0)
+        {
+          leftParensIndex = proposedType.IndexOf("(");
+          strippedType = leftParensIndex < 0 ? proposedType : proposedType.Substring(0, leftParensIndex);
+          typesListFor1stAndRest.Add(strippedType);
+        }
         proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListFor1stAndRest, decimalMaxLen, varCharMaxLen);
         col.RowsFrom1stDataType = proposedType;
         col.SetMySQLDataType(_firstRowIsHeaders ? col.RowsFrom2ndDataType : col.RowsFrom1stDataType);

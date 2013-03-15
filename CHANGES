@@ -1,4 +1,6 @@
 1.1.1
+- Fixed code that detected data types for columns for the scenario where only 1 row of Excel data is selected for Export or for Append, in which case the data
+  type was always being set as a varchar(255) which is used when data types between rows are not consistent. (Bug #16493139 - AUTOMATIC MAPPING NOT WORKING)
 - Added a parameter to the LoadConnections method that refreshes connections from its corresponding file, set to true when the the Refresh Connections action
   is performed. (Bug #16493129 - CONNECTION DETAILS NOT REFRESHED)
 - Added code to prevent the connections, schemas and DB objects lists from drawing while they are being filled with items.
