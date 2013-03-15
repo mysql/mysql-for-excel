@@ -356,6 +356,7 @@ namespace MySQL.ForExcel
       }
 
       currentCol.ExcludeColumn = ExcludeColumnCheckBox.Checked;
+      RefreshColumnWarnings(currentCol);
       RefreshColumnControlsEnabledStatus(true);
       RefreshPrimaryKeyColumnsCombo(false);
     }
@@ -953,8 +954,7 @@ namespace MySQL.ForExcel
       ExcludeColumnCheckBox.Checked = mysqlCol.ExcludeColumn;
 
       //// Update column warnings
-      bool showWarning = !string.IsNullOrEmpty(mysqlCol.CurrentColumnWarningText);
-      ShowValidationWarning("ColumnOptionsWarning", showWarning, mysqlCol.CurrentColumnWarningText);
+      RefreshColumnWarnings(mysqlCol);
 
       //// Refresh column controls enabled status and related grid column background color
       RefreshColumnControlsEnabledStatus(true);
@@ -991,6 +991,16 @@ namespace MySQL.ForExcel
         DataGridViewColumn gridCol = PreviewDataGrid.SelectedColumns[0];
         gridCol.DefaultCellStyle.BackColor = mysqlCol.ExcludeColumn ? Color.LightGray : (mysqlCol.WarningsQuantity > 0 ? Color.OrangeRed : PreviewDataGrid.DefaultCellStyle.BackColor);
       }
+    }
+
+    /// <summary>
+    /// Refreshes the warnings shown to users related to the given column.
+    /// </summary>
+    /// <param name="column">Column to refresh warnings for.</param>
+    private void RefreshColumnWarnings(MySQLDataColumn column)
+    {
+      bool showWarning = !string.IsNullOrEmpty(column.CurrentColumnWarningText);
+      ShowValidationWarning("ColumnOptionsWarning", showWarning, column.CurrentColumnWarningText);
     }
 
     /// <summary>
