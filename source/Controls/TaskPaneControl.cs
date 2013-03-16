@@ -483,6 +483,7 @@ namespace MySQL.ForExcel
             fillingRowIdx++;
           }
 
+          fillingRange.ClearFormats();
           fillingRange.set_Value(Type.Missing, fillingArray);
           fillingRange.Columns.AutoFit();
           ExcelApplication_SheetSelectionChange(currentSheet, ExcelApplication.ActiveCell);
