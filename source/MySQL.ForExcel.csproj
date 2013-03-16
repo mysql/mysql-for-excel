@@ -228,6 +228,7 @@
     </Compile>
     <Compile Include="Classes\MySQLForExcelConnectionsHelper.cs" />
     <Compile Include="Classes\MySQLForExcelSettings.cs" />
+    <Compile Include="Classes\NativeWindowWrapper.cs" />
     <Compile Include="Classes\Options.cs" />
     <Compile Include="Classes\PushResultsDataTable.cs">
       <SubType>Component</SubType>

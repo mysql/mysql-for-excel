@@ -1,4 +1,7 @@
 1.1.1
+- Added code to check for changes on the contents of the currently selected Excel cells, so if the contents become empty the Export and Append data actions are
+  disabled in the same way as they are disabled when a new cells selection is made and they contain no data.
+  (Bug #16495151 - EXPORT TABLE LINK IS NOT DISABLED WHEN DATA IS DELETED)
 - Added code to clear the format of a target Excel range where MySQL data is to be imported to before copying the values to the Excel range so the format applied
   to the Excel cells from a previous import operation does not corrupt the format of newly imported data.
   (Bug #16495155 - DATA GETS CORRUPTED WHEN CELL FORMAT IS DIFFERENT THAN DATA EXPORTED)

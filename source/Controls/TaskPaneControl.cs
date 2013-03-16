@@ -40,6 +40,7 @@ namespace MySQL.ForExcel
     public TaskPaneControl(Excel.Application app)
     {
       ExcelApplication = app;
+      ExcelApplication.SheetChange += new Excel.AppEvents_SheetChangeEventHandler(ExcelApplication_SheetChange);
       ExcelApplication.SheetSelectionChange += new Excel.AppEvents_SheetSelectionChangeEventHandler(ExcelApplication_SheetSelectionChange);
       ExcelApplication.SheetActivate += new Excel.AppEvents_SheetActivateEventHandler(ExcelApplication_SheetActivate);
       ExcelApplication.SheetDeactivate += new Excel.AppEvents_SheetDeactivateEventHandler(ExcelApplication_SheetDeactivate);
@@ -778,6 +779,16 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Event delegate method fired when the contents of the current selection of Excel cells in a given <see cref="Microsoft.Office.Interop.Excel.Worksheet"/> change.
+    /// </summary>
+    /// <param name="workSheet">A <see cref="Microsoft.Office.Interop.Excel.Worksheet"/> object.</param>
+    /// <param name="targetRange">A selection of Excel cells.</param>
+    private void ExcelApplication_SheetChange(object workSheet, Excel.Range targetRange)
+    {
+      UpdateExcelSelectedDataStatus(targetRange);
+    }
+
+    /// <summary>
     /// Event delegate method fired when an Excel <see cref="Microsoft.Office.Interop.Excel.Worksheet"/> is deactivated.
     /// </summary>
     /// <param name="workSheet">A <see cref="Microsoft.Office.Interop.Excel.Worksheet"/> object.</param>
@@ -797,39 +808,10 @@ namespace MySQL.ForExcel
     /// Event delegate method fired when the selection of Excel cells in a given <see cref="Microsoft.Office.Interop.Excel.Worksheet"/> changes.
     /// </summary>
     /// <param name="workSheet">A <see cref="Microsoft.Office.Interop.Excel.Worksheet"/> object.</param>
-    /// <param name="Target">The new selection of Excel cells.</param>
-    private void ExcelApplication_SheetSelectionChange(object workSheet, Excel.Range Target)
+    /// <param name="targetRange">The new selection of Excel cells.</param>
+    private void ExcelApplication_SheetSelectionChange(object workSheet, Excel.Range targetRange)
     {
-      if (!this.Visible)
-      {
-        return;
-      }
-
-      int selectedCellsCount = Target.Count;
-      bool hasData = false;
-      if (Target.Count == 1)
-      {
-        hasData = Target.Value2 != null;
-      }
-      else if (Target.Count > 1)
-      {
-        object[,] values = Target.Value2;
-        if (values != null)
-        {
-          foreach (object o in values)
-          {
-            if (o == null)
-            {
-              continue;
-            }
-
-            hasData = true;
-            break;
-          }
-        }
-      }
-
-      DBObjectSelectionPanel3.ExcelSelectionContainsData = hasData;
+      UpdateExcelSelectedDataStatus(targetRange);
     }
 
     /// <summary>
@@ -911,25 +893,50 @@ namespace MySQL.ForExcel
         ChangeEditDialogVisibility(wSheet, false);
       }
     }
-  }
 
-  /// <summary>
-  /// A wrapper for an object representing a window form.
-  /// </summary>
-  internal class NativeWindowWrapper : IWin32Window
-  {
     /// <summary>
-    /// Initializes a new instance of the <see cref="NativeWindowWrapper"/> class.
+    /// Checks if the given Excel range contains data in any of its cells.
     /// </summary>
-    /// <param name="hwnd">An integer pointing to an existing window object.</param>
-    public NativeWindowWrapper(int hwnd)
+    /// <param name="range">An excel range.</param>
+    /// <returns><see cref="true"/> if the given range is not empty, <see cref="false"/> otherwise.</returns>
+    private bool ExcelRangeContainsAnyData(Excel.Range range)
     {
-      Handle = new IntPtr(hwnd);
+      bool hasData = false;
+      int selectedCellsCount = range.Count;
+      if (range.Count == 1)
+      {
+        hasData = range.Value2 != null;
+      }
+      else if (range.Count > 1)
+      {
+        object[,] values = range.Value2;
+        if (values != null)
+        {
+          foreach (object o in values)
+          {
+            if (o == null)
+            {
+              continue;
+            }
+
+            hasData = true;
+            break;
+          }
+        }
+      }
+
+      return hasData;
     }
 
-    /// <summary>
-    /// Gets a pointer to an existing window object.
-    /// </summary>
-    public IntPtr Handle { get; private set; }
+    private void UpdateExcelSelectedDataStatus(Excel.Range range)
+    {
+      if (!this.Visible)
+      {
+        return;
+      }
+
+      bool hasData = ExcelRangeContainsAnyData(range);
+      DBObjectSelectionPanel3.ExcelSelectionContainsData = hasData;
+    }
   }
 }
