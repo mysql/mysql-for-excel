@@ -1,4 +1,34 @@
 
+MySQL for Excel 1.1.1 Release Notes
+------------------------------------
+
+Welcome to the release notes for MySQL for Excel 1.1.1
+
+* Added About dialog so users can check the MySQL for Excel version right from the Welcome panel.
+* Fixed formatting of decimal numbers for European users where the decimal separator is a ",".
+* Fixed formatting of data on Excel cells that had data previously imported on them.
+* Other bug fixes (for a complete list refer to the CHANGES file).
+	
+
+MySQL for Excel 1.1.0 Release Notes
+------------------------------------
+
+Welcome to the release notes for MySQL for Excel 1.1.0
+
+* Edit MySQL Data
+	This may be the coolest feature so far; users will be able to edit the data in a
+	MySQL table using MS Excel in a very friendly and intuitive way.  Edit Data supports
+	inserting new rows, deleting existing rows and updating existing data as easy as playing
+	with data in an Excel’s spreadsheet and pushing changes back to the server.
+* Bug fixes (for a complete list refer to the CHANGES file).
+	
+Known Issues
+--------------------
+* The Edit Data does not lock records and does not update data in an optimistic way, so if
+  data has changed by another user in the table being edited after it was pulled for edition
+  it will be overwritten with the latest change.
+
+
 MySQL for Excel 1.0.7 Release Notes
 ------------------------------------
 
