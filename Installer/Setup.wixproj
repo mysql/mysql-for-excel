@@ -40,7 +40,6 @@
   <ItemGroup>
     <Content Include="COPYING" />
     <Content Include="README" />
-    <Content Include="README-Commercial" />
     <Content Include="Release Notes.txt" />
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />

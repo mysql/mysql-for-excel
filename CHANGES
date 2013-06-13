@@ -16,7 +16,7 @@
 - Added performance_schema to the list of system schemas, so now it shows along with the mysql and information_schema schemas list.
   (Bug #16473033 - PERFORMANCE_SCHEMA NOT LISTED UNDER "SYSTEM SCHEMAS" GROUP)
 - Added code that converts numbers to invariant culture strings when building the SQL statements used to push queries to the MySQL Server.
-  (Bug #15903921 - USING MYSQL FOR EXCEL IN FRANCE)
+  (MySql bug #67663, Bug #15903921 - USING MYSQL FOR EXCEL IN FRANCE)
 - Refactored code in Panels (AutoStyleableBasePanel.cs, DBObjectSelectionPanel.cs, SchemaSelectionPanel.cs, WelcomePanel.cs), in TaskPanelControl.cs and in 
   some Forms (ExportForm.cs, ImportTableViewForm.cs) to comply with StyleCop rules.
 - Removed code that always forced the FirstDisplayedScrollingColumnIndex of the preview grid to the currently selected column every time the First Row Contains
@@ -38,7 +38,8 @@
   (Bug #16239011 - EDIT DATA - IMPORT DIALOG'S PREVIEW GRID HAS HORIZONTAL SCROLLBAR DISABLED)
 - Added a link in the Welcome Panel to open an About box displaying the MySQLfor Excel version and copyright text. The About box can be closed by clicking on it or
   pressing the ESC key.(Bug #16238860 - MYSQL FOR EXCEL VERSION NOT VISIBLE UNLESS GOING TO ADD/REMOVE PROGRAMS)
-1.1.0
+
+  1.1.0
 - Added Edit MySQL Data feature: users are now able to edit the data in a MySQL table using MS Excel in a very friendly and intuitive way. Edit Data supports
   inserting new rows, deleting existing rows and updating existing data as easy as playing with data in an Excel’s spreadsheet and pushing changes back to the server.
 - Enabled the following checkboxes in the Append Data's Advanced Options dialog and added code in the Append Data dialog to use the checkboxes as follows:
@@ -70,6 +71,7 @@
 - Fixed code to always set an empty string instead of null to the MySQLDataColumn properties that stores MySQL data types (MySQLDataType, RowsFrom1stDataType and
   RowsFrom2ndDataType). Added code to display a warning and color red a column which Data Type has not been set by the user or has been manually cleared.
 - Added code to output to the application log exception messages consistently in all places where exceptions are catched.
+
 1.0.7
 - Changed code to conditionally detect the datatype of a column with no data in any of its cells as either a Varchar(255) when Exporting data (empty column falls back to a "safe"
   type that user can override) or as a null/empty datatype when Appending data so the empty column can be automatically mapped to any other column regardless of the target's

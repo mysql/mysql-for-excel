@@ -8,7 +8,7 @@
 
     <Upgrade Id="30162E4E-2EED-48D1-BBC0-8D4A517DB004">
       <UpgradeVersion OnlyDetect="yes" Minimum="$(var.Version)" Property="NEWERVERSIONDETECTED" IncludeMinimum="no" />
-      <UpgradeVersion OnlyDetect="no" Maximum="$(var.Version)" Property="OLDERVERSIONBEINGUPGRADED" IncludeMaximum="yes" />
+      <UpgradeVersion OnlyDetect="no" Maximum="$(var.Version)" Property="OLDERVERSIONBEINGUPGRADED" IncludeMaximum="no" />
     </Upgrade>
 
     <!-- Do not install if a newer version is already installed. -->
