@@ -1,4 +1,0 @@
-﻿installer
-=====================
-- make sure all non-VSTO items are installed
-- make appropriate registry settings to regiter addin
