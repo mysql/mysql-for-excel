@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -17,89 +17,189 @@
 // 02110-1301  USA
 //
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using MySQL.Utility;
-using MySql.Data.MySqlClient;
-using System.Windows.Forms;
-using Excel = Microsoft.Office.Interop.Excel;
-using System.Runtime.InteropServices;
-
 namespace MySQL.ForExcel
 {
+  using System;
+  using System.Collections.Generic;
+  using System.ComponentModel;
+  using System.Data;
+  using System.Drawing;
+  using System.Linq;
+  using System.Runtime.InteropServices;
+  using System.Text;
+  using System.Windows.Forms;
+  using MySQL.Utility;
+  using MySQL.Utility.Forms;
+  using Excel = Microsoft.Office.Interop.Excel;
+
+  /// <summary>
+  /// Provides a minimalistic floating interface used for editing sessions against MySQL tables.
+  /// </summary>
   public partial class EditDataDialog : AutoStyleableBaseForm
   {
-    private const int SW_SHOWNOACTIVATE = 4;
-    private const int HWND_TOPMOST = -1;
+    #region Constants
+
+    /// <summary>
+    /// Places the window above all non-topmost windows (that is, behind all topmost windows). This flag has no effect if the window is already a non-topmost window.
+    /// </summary>
     private const int HWND_NOTOPMOST = -2;
-    private const uint SWP_NOACTIVATE = 0x0010;
+
+    /// <summary>
+    /// Places the window above all non-topmost windows. The window maintains its topmost position even when it is deactivated.
+    /// </summary>
+    private const int HWND_TOPMOST = -1;
+
+    /// <summary>
+    /// GUID used as a key to protect the editing Excel worksheet.
+    /// </summary>
     private const string SHEET_PROTECTION_KEY = "84308893-7292-49BE-97C0-3A28E81AA2EF";
 
-    private Point mouseDownPoint = Point.Empty;
-    private MySqlWorkbenchConnection wbConnection;
-    private Excel.Range editDataRange;
-    private string queryString = String.Empty;
-    private MySQLDataTable editMySQLDataTable;
-    private List<RangeAndAddress> rangesAndAddressesList;
-    private int whiteOLEColor = ColorTranslator.ToOle(Color.White);
-    private int commitedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#B8E5F7"));
-    private int uncommitedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#7CC576"));
-    private int erroredCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#FF8282"));
-    private int newRowCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#FFFCC7"));
-    private int lockedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#D7D7D7"));
-    private long editingRowsQuantity = 0;
-    private long editingColsQuantity = 0;
-    private bool undoingChanges = false;
-    private bool uncommitedDataExists
+    /// <summary>
+    /// Displays a window in its most recent size and position. This value is similar to SW_SHOWNORMAL, except that the window is not activated.
+    /// </summary>
+    private const int SW_SHOWNOACTIVATE = 4;
+
+    /// <summary>
+    /// Does not activate the window. If this flag is not set, the window is activated and moved to the top of either the topmost or non-topmost group (depending on the setting of the hWndInsertAfter parameter).
+    /// </summary>
+    private const uint SWP_NOACTIVATE = 0x0010;
+
+    #endregion Constants
+
+    #region Fields
+
+    /// <summary>
+    /// The color used to paint commited Excel cells (blue-ish).
+    /// </summary>
+    private int _commitedCellsOLEColor;
+
+    /// <summary>
+    /// The color used to paint Excel cells that caused commit errors (red-ish).
+    /// </summary>
+    private int _erroredCellsOLEColor;
+
+    /// <summary>
+    /// The color used to paint Excel cells that are locked for users, like the headers containing column names (gray-ish).
+    /// </summary>
+    private int _lockedCellsOLEColor;
+
+    /// <summary>
+    /// A point object used as a placeholder to track where the mouse has been pressed.
+    /// </summary>
+    private Point _mouseDownPoint;
+
+    /// <summary>
+    /// The color used to paint Excel cells accepting data from users to create a new row in the table (yellow-ish).
+    /// </summary>
+    private int _newRowCellsOLEColor;
+
+    /// <summary>
+    /// The query string assembled to perform operations against the MySQL table (UPDATE, INSERT, DELETE).
+    /// </summary>
+    private string _queryString;
+
+    /// <summary>
+    /// The color used to paint Excel cells containing values that have been changed by users but not yet committed (green-ish).
+    /// </summary>
+    private int _uncommitedCellsOLEColor;
+
+    /// <summary>
+    /// Flag indicating whether the editing session is in process of undoing changes done
+    /// </summary>
+    private bool _undoingChanges;
+
+    /// <summary>
+    /// The color used to revert Excel cells to their original background color, for example when reverting the cells value or synchronizing data with the MySQL table (white).
+    /// </summary>
+    private int _whiteOLEColor;
+
+    #endregion Fields
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EditDataDialog"/> class.
+    /// </summary>
+    /// <param name="parentTaskPane">The <see cref="TaskPaneControl"/> from which the <see cref="EditDataDialog"/> is called.</param>
+    /// <param name="parentWindow">The parent window assigned to the <see cref="EditDataDialog"/> to be opened as a dialog.</param>
+    /// <param name="wbConnection">The connection to a MySQL server instance selected by users.</param>
+    /// <param name="originalEditDataRange">The Excel cells range containing the MySQL table's data being edited.</param>
+    /// <param name="importTable">The table containing the data imported from the MySQL table that will be edited.</param>
+    /// <param name="editingWorksheet">The Excel worksheet tied to the current editing session.</param>
+    public EditDataDialog(TaskPaneControl parentTaskPane, IWin32Window parentWindow, MySqlWorkbenchConnection wbConnection, Excel.Range originalEditDataRange, DataTable importTable, Excel.Worksheet editingWorksheet)
     {
-      get { return (rangesAndAddressesList != null ? rangesAndAddressesList.Count > 0 : false); }
+      _commitedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#B8E5F7"));
+      _erroredCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#FF8282"));
+      _lockedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#D7D7D7"));
+      _mouseDownPoint = Point.Empty;
+      _newRowCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#FFFCC7"));
+      _uncommitedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#7CC576"));
+      _undoingChanges = false;
+      _whiteOLEColor = ColorTranslator.ToOle(Color.White);
+
+      InitializeComponent();
+
+      ParentTaskPane = parentTaskPane;
+      ParentWindow = parentWindow;
+      WBConnection = wbConnection;
+      EditDataRange = originalEditDataRange;
+      _queryString = importTable.ExtendedProperties["QueryString"].ToString();
+      string tableName = importTable.TableName;
+      if (importTable.ExtendedProperties.ContainsKey("TableName") && !string.IsNullOrEmpty(importTable.ExtendedProperties["TableName"].ToString()))
+      {
+        tableName = importTable.ExtendedProperties["TableName"].ToString();
+      }
+
+      EditMySQLDataTable = new MySQLDataTable(tableName, importTable, wbConnection);
+      if (importTable.ExtendedProperties.ContainsKey("QueryString") && !string.IsNullOrEmpty(importTable.ExtendedProperties["QueryString"].ToString()))
+      {
+        EditMySQLDataTable.SelectQuery = importTable.ExtendedProperties["QueryString"].ToString();
+      }
+
+      EditingWorksheet = editingWorksheet;
+      EditingWorksheet.SelectionChange += new Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);
+      ResetToolTip();
+      EditingColsQuantity = editingWorksheet.UsedRange.Columns.Count;
+      EditingRowsQuantity = 0;
+      Opacity = 0.60;
+      AddNewRowToEditingRange(false);
+      RangesAndAddressesList = new List<RangeAndAddress>();
     }
 
-    public Excel.Worksheet EditingWorksheet = null;
-    public TaskPaneControl CallerTaskPane;
-    public bool LockByProtectingWorksheet { get; set; }
-    public IWin32Window ParentWindow { get; set; }
-    public string EditingSchema
-    {
-      get { return (wbConnection != null ? wbConnection.Schema : null); }
-    }
+    #region Properties
+
+    /// <summary>
+    /// Gets the Excel cells range containing the MySQL table's data being edited.
+    /// </summary>
+    public Excel.Range EditDataRange { get; private set; }
+
+    /// <summary>
+    /// Gets the number of columns in the current editing session.
+    /// </summary>
+    public long EditingColsQuantity { get; private set; }
+
+    /// <summary>
+    /// Gets the number of rows in the current editing session.
+    /// </summary>
+    public long EditingRowsQuantity { get; private set; }
+
+    /// <summary>
+    /// Gets the name of the MySQL table whose data is being edited.
+    /// </summary>
     public string EditingTableName
     {
-      get { return (editMySQLDataTable != null ? editMySQLDataTable.TableName : null); }
-    }
-    public string WorksheetName
-    {
-      get 
+      get
       {
-        try
-        {
-          return EditingWorksheet.Name;
-        }
-        catch
-        {
-          return null;
-        }
+        return EditMySQLDataTable != null ? EditMySQLDataTable.TableName : null;
       }
     }
-    public string WorkbookName
-    {
-      get 
-      {
-        try
-        {
-          return (EditingWorksheet.Parent as Excel.Workbook).Name;
-        }
-        catch
-        {
-          return null;
-        }
-      }
-    }
+
+    /// <summary>
+    /// Gets the Excel worksheet tied to the current editing session.
+    /// </summary>
+    public Excel.Worksheet EditingWorksheet { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicating whether the Excel worksheet tied to the current editing session still exists.
+    /// </summary>
     public bool EditingWorksheetExists
     {
       get
@@ -117,49 +217,151 @@ namespace MySQL.ForExcel
             exists = false;
           }
         }
+
         return exists;
       }
     }
 
-    public EditDataDialog(MySqlWorkbenchConnection wbConnection, Excel.Range originalEditDataRange, DataTable importTable, Excel.Worksheet editingWorksheet, bool protectWorksheet)
+    /// <summary>
+    /// Gets the <see cref="MySQLDataTable"/> whose data is being edited.
+    /// </summary>
+    public MySQLDataTable EditMySQLDataTable { get; private set; }
+
+    /// <summary>
+    /// Gets the <see cref="TaskPaneControl"/> from which the <see cref="EditDataDialog"/> is called.
+    /// </summary>
+    public TaskPaneControl ParentTaskPane { get; private set; }
+
+    /// <summary>
+    /// Gets the parent window assigned to the <see cref="EditDataDialog"/> to be opened as a dialog.
+    /// </summary>
+    public IWin32Window ParentWindow { get; private set; }
+
+    /// <summary>
+    /// Gets a list of <see cref="RangeAndAddress"/> objects containing information about the Excel cells being edited.
+    /// </summary>
+    public List<RangeAndAddress> RangesAndAddressesList { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicating whether uncommited data exists in the editing session.
+    /// </summary>
+    public bool UncommitedDataExists
     {
-      InitializeComponent();
-
-      this.wbConnection = wbConnection;
-      editDataRange = originalEditDataRange;
-      queryString = importTable.ExtendedProperties["QueryString"].ToString();
-      string tableName = importTable.TableName;
-      if (importTable.ExtendedProperties.ContainsKey("TableName") && !String.IsNullOrEmpty(importTable.ExtendedProperties["TableName"].ToString()))
-        tableName = importTable.ExtendedProperties["TableName"].ToString();
-      editMySQLDataTable = new MySQLDataTable(tableName, importTable, wbConnection);
-      if (importTable.ExtendedProperties.ContainsKey("QueryString") && !String.IsNullOrEmpty(importTable.ExtendedProperties["QueryString"].ToString()))
-        editMySQLDataTable.SelectQuery = importTable.ExtendedProperties["QueryString"].ToString();
-      EditingWorksheet = editingWorksheet;
-      EditingWorksheet.SelectionChange += new Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);
-      ResetToolTip();
-      editingColsQuantity = editingWorksheet.UsedRange.Columns.Count;
-      Opacity = 0.60;
-      LockByProtectingWorksheet = protectWorksheet;
-      addNewRowToEditingRange(false);
-
-      rangesAndAddressesList = new List<RangeAndAddress>();
+      get
+      {
+        return RangesAndAddressesList != null ? RangesAndAddressesList.Count > 0 : false;
+      }
     }
 
-    private void EditDataDialog_Activated(object sender, EventArgs e)
+    /// <summary>
+    /// Gets the connection to a MySQL server instance selected by users.
+    /// </summary>
+    public MySqlWorkbenchConnection WBConnection { get; private set; }
+
+    /// <summary>
+    /// Gets the name of the Excel workbook that contains the worksheet tied to the current editing session.
+    /// </summary>
+    public string WorkbookName
     {
-      ResetToolTip();
+      get
+      {
+        try
+        {
+          return (EditingWorksheet.Parent as Excel.Workbook).Name;
+        }
+        catch
+        {
+          return null;
+        }
+      }
     }
 
-    private void ResetToolTip()
+    /// <summary>
+    /// Gets the name of the Excel worksheet tied to the current editing session.
+    /// </summary>
+    public string WorksheetName
     {
-      toolTip.SetToolTip(this, String.Format(Properties.Resources.EditDataFormTooltipText,
-                                             Environment.NewLine,
-                                             wbConnection.Schema,
-                                             EditingTableName,
-                                             WorkbookName,
-                                             WorksheetName));
+      get
+      {
+        try
+        {
+          return EditingWorksheet.Name;
+        }
+        catch
+        {
+          return null;
+        }
+      }
     }
 
+    #endregion Properties
+
+    /// <summary>
+    /// Shows the dialog as the topmost window without placing the focus on it (i.e. leaving the focus on the parent window).
+    /// </summary>
+    public void ShowInactiveTopmost()
+    {
+      ShowWindow(Handle, SW_SHOWNOACTIVATE);
+      SetWindowPos(Handle.ToInt32(), HWND_NOTOPMOST, Left, Top, Width, Height, SWP_NOACTIVATE);
+    }
+
+    /// <summary>
+    /// Raises the Closing event.
+    /// </summary>
+    /// <param name="e">A <see cref="CancelEventArgs"/> that contains the event data.</param>
+    protected override void OnClosing(CancelEventArgs e)
+    {
+      base.OnClosing(e);
+      ParentTaskPane.RefreshDBObjectPanelActionLabelsEnabledStatus(EditingTableName, false);
+      if (EditingWorksheetExists)
+      {
+        EditingWorksheet.Unprotect(SHEET_PROTECTION_KEY);
+        EditingWorksheet.UsedRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+      }
+
+      ActiveEditDialogContainer editContainer = ParentTaskPane.ActiveEditDialogsList.Find(ac => ac.EditDialog.Equals(this));
+      if (editContainer != null)
+      {
+        ParentTaskPane.ActiveEditDialogsList.Remove(editContainer);
+      }
+
+      Dispose();
+    }
+
+    /// <summary>
+    /// Raises the MouseDown event.
+    /// </summary>
+    /// <param name="e">A <see cref="MouseEventArgs"/> that contains the event data.</param>
+    protected override void OnMouseDown(MouseEventArgs e)
+    {
+      base.OnMouseDown(e);
+      GenericMouseDown(this, e);
+    }
+
+    /// <summary>
+    /// Raises the MouseMove event.
+    /// </summary>
+    /// <param name="e">A <see cref="MouseEventArgs"/> that contains the event data.</param>
+    protected override void OnMouseMove(MouseEventArgs e)
+    {
+      base.OnMouseMove(e);
+      GenericMouseMove(this, e);
+    }
+
+    /// <summary>
+    /// Raises the MouseUp event.
+    /// </summary>
+    /// <param name="e">A <see cref="MouseEventArgs"/> that contains the event data.</param>
+    protected override void OnMouseUp(MouseEventArgs e)
+    {
+      base.OnMouseUp(e);
+      GenericMouseUp(this, e);
+    }
+
+    /// <summary>
+    /// Paints the background of the control.
+    /// </summary>
+    /// <param name="e">A <see cref="PaintEventArgs"/> that contains the event data.</param>
     protected override void OnPaintBackground(PaintEventArgs e)
     {
       base.OnPaintBackground(e);
@@ -170,34 +372,479 @@ namespace MySQL.ForExcel
       pen.Dispose();
     }
 
-    protected override void OnClosing(CancelEventArgs e)
+    /// <summary>
+    /// Changes the size, position, and Z-order of child, pop-up, and top-level windows.
+    /// </summary>
+    /// <param name="hWnd">The window handle.</param>
+    /// <param name="hWndInsertAfter">Identifies the CWnd object that will precede (be higher than) this CWnd object in the Z-order.</param>
+    /// <param name="X">Specifies the new position of the left side of the window.</param>
+    /// <param name="Y">Specifies the new position of the top of the window.</param>
+    /// <param name="cx">Specifies the new width of the window.</param>
+    /// <param name="cy">Specifies the new height of the window.</param>
+    /// <param name="uFlags">Specifies sizing and positioning options.</param>
+    /// <returns><c>true</c> if the function is successful; <c>false</c> otherwise.</returns>
+    [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
+    private static extern bool SetWindowPos(int hWnd, int hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+    /// <summary>
+    /// Sets the specified window's show state.
+    /// </summary>
+    /// <param name="hWnd">A handle to the window.</param>
+    /// <param name="nCmdShow">Controls how the window is to be shown.</param>
+    /// <returns><c>true</c> if the window was previously visible, <c>false</c> if the window was previously hidden.</returns>
+    [DllImport("user32.dll")]
+    private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+    /// <summary>
+    /// Adds a new row at the bottom of the Excel editing range.
+    /// </summary>
+    /// <param name="clearColoringOfOldNewRow">Flag indicating whether the previous row that was placeholder for new rows is cleared of its formatting.</param>
+    /// <returns>An Excel range containing just the newly added row.</returns>
+    private Excel.Range AddNewRowToEditingRange(bool clearColoringOfOldNewRow)
     {
-      base.OnClosing(e);
-      CallerTaskPane.RefreshDBObjectPanelActionLabelsEnabledStatus(EditingTableName, false);
-      if (EditingWorksheetExists)
+      Excel.Range rowRange = null;
+
+      if (EditDataRange != null)
       {
-        EditingWorksheet.Unprotect(SHEET_PROTECTION_KEY);
-        EditingWorksheet.UsedRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+        UnprotectEditingWorksheet();
+        EditDataRange = EditDataRange.get_Resize(EditDataRange.Rows.Count + 1, EditDataRange.Columns.Count);
+        rowRange = EditDataRange.Rows[EditDataRange.Rows.Count] as Excel.Range;
+        rowRange.Interior.Color = _newRowCellsOLEColor;
+        EditingRowsQuantity = EditDataRange.Rows.Count;
+        ProtectEditingWorksheet();
+        if (clearColoringOfOldNewRow && EditDataRange.Rows.Count > 0)
+        {
+          rowRange = EditDataRange.Rows[EditDataRange.Rows.Count - 1] as Excel.Range;
+          rowRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+        }
       }
-      ActiveEditDialogContainer editContainer = CallerTaskPane.ActiveEditDialogsList.Find(ac => ac.EditDialog.Equals(this));
-      if (editContainer != null)
-        CallerTaskPane.ActiveEditDialogsList.Remove(editContainer);
-      Dispose();
+
+      return rowRange;
     }
 
-    private void initializeWorksheetProtection()
+    /// <summary>
+    /// Event delegate method called when the <see cref="AutoCommitCheckBox"/> checked property value changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void AutoCommitCheckBox_CheckedChanged(object sender, EventArgs e)
     {
-      if (editDataRange != null)
+      CommitChangesButton.Enabled = !AutoCommitCheckBox.Checked && UncommitedDataExists;
+    }
+
+    /// <summary>
+    /// Changes the fill color of the given Excel range to the specified color.
+    /// </summary>
+    /// <param name="modifiedRange">Excel range to have their fill color changed.</param>
+    /// <param name="oleColor">The new fill color for the Excel cells.</param>
+    private void ChangeExcelCellsColor(Excel.Range modifiedRange, int oleColor)
+    {
+      if (modifiedRange == null)
       {
-        Excel.Range extendedRange = editDataRange.get_Range(String.Format("A{0}", 2));
-        extendedRange = extendedRange.get_Resize(editDataRange.Rows.Count - 1, EditingWorksheet.Columns.Count);
+        return;
+      }
+
+      if (oleColor > 0)
+      {
+        modifiedRange.Interior.Color = oleColor;
+      }
+      else
+      {
+        modifiedRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+      }
+    }
+
+    /// <summary>
+    /// Changes the fill color of all the Excel ranges within the given list to the specified color.
+    /// </summary>
+    /// <param name="rangesAndAddressesList">The list of Excel ranges to have their fill color changed.</param>
+    /// <param name="oleColor">The new fill color for the Excel cells.</param>
+    private void ChangeExcelCellsColor(List<RangeAndAddress> rangesAndAddressesList, int oleColor)
+    {
+      if (rangesAndAddressesList == null)
+      {
+        return;
+      }
+
+      foreach (RangeAndAddress ra in rangesAndAddressesList)
+      {
+        ChangeExcelCellsColor(ra.Range, oleColor);
+      }
+
+      rangesAndAddressesList.Clear();
+    }
+
+    /// <summary>
+    /// Changes the fill color of all the Excel cells recorded in the editing session to the committed data color (blue-ish), if cells errored out they are set to the error color (red-ish).
+    /// </summary>
+    /// <param name="commitSuccessful">Flag indicating whether the commit of the Excel cells recorded in the editing session was successful.</param>
+    private void ChangeExcelCellsToCommmitedColor(bool commitSuccessful)
+    {
+      if (RangesAndAddressesList == null)
+      {
+        return;
+      }
+
+      for (int idx = 0; idx < RangesAndAddressesList.Count; idx++)
+      {
+        RangeAndAddress ra = RangesAndAddressesList[idx];
+        if (ra.TableRow.HasErrors)
+        {
+          ChangeExcelCellsColor(ra.Range, _erroredCellsOLEColor);
+          continue;
+        }
+
+        if (!commitSuccessful)
+        {
+          continue;
+        }
+
+        if (ra.TableRow.RowState != DataRowState.Detached && ra.TableRow.RowState != DataRowState.Deleted)
+        {
+          ChangeExcelCellsColor(ra.Range, _commitedCellsOLEColor);
+        }
+
+        RangesAndAddressesList.Remove(ra);
+        idx--;
+      }
+    }
+
+    /// <summary>
+    /// Event delegate method called when the <see cref="CommitChangesButton"/> is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void CommitChangesButton_Click(object sender, EventArgs e)
+    {
+      PushDataChanges();
+    }
+
+    /// <summary>
+    /// Event delegate method called when the <see cref="EditDataDialog"/> window is activated.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void EditDataDialog_Activated(object sender, EventArgs e)
+    {
+      ResetToolTip();
+    }
+
+    /// <summary>
+    /// Event delegate method called when the <see cref="EditDataDialog"/> window is shown for the first time.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void EditDataDialog_Shown(object sender, EventArgs e)
+    {
+      //// Need to call the ShowInactiveTopmost method when the form is shown in order to make it topmost and
+      //// to avoid that the controls inside it activate so focus remains on excel cells.
+      ShowInactiveTopmost();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when any value in a cell within the <see cref="EditingWorksheet"/> changes.
+    /// </summary>
+    /// <remarks>
+    /// This method is used to record any changes done by users to the data and prepare corresponding changes within a data table object
+    /// that later will generate queries to commit the data changes to the MySQL server.
+    /// </remarks>
+    /// <param name="Target"></param>
+    private void EditingWorksheet_Change(Excel.Range Target)
+    {
+      if (_undoingChanges)
+      {
+        return;
+      }
+
+      bool rowWasDeleted = EditingWorksheet.UsedRange.Rows.Count < EditingRowsQuantity && Target.Columns.Count == EditingWorksheet.Columns.Count;
+      bool undoChanges = false;
+      string operationSummary = null;
+      string operationDetails = null;
+
+      Excel.Range intersectRange = ParentTaskPane.IntersectRanges(EditDataRange, Target);
+      if (intersectRange == null || intersectRange.Count == 0)
+      {
+        if (rowWasDeleted)
+        {
+          //// The row for insertions is attempted to be deleted, we need to undo
+          undoChanges = true;
+          operationSummary = Properties.Resources.EditDataDeleteLastRowNotPermittedErrorTitle;
+          operationDetails = Properties.Resources.EditDataDeleteLastRowNotPermittedErrorDetail;
+        }
+        else
+        {
+          //// It is a modification and outside the permitted range
+          undoChanges = true;
+          operationSummary = Properties.Resources.EditDataOutsideEditingRangeNotPermittedErrorTitle;
+          operationDetails = Properties.Resources.EditDataOutsideEditingRangeNotPermittedErrorDetail;
+        }
+      }
+
+      if (undoChanges)
+      {
+        MiscUtilities.ShowCustomizedErrorDialog(operationSummary, operationDetails, true);
+        UndoChanges();
+        if (rowWasDeleted)
+        {
+          int changedRangesQty = RefreshAddressesOfStoredRanges();
+          EditDataRange = EditingWorksheet.UsedRange;
+        }
+
+        return;
+      }
+
+      //// Substract from the Excel indexes since they start at 1, ExcelRow is subtracted by 2 if we imported headers.
+      Excel.Range startCell = (intersectRange.Item[1, 1] as Excel.Range);
+      int startDataTableRow = startCell.Row - 2;
+      int startDataTableCol = startCell.Column - 1;
+
+      //// Detect if a row was deleted and if so flag it for deletion
+      if (rowWasDeleted)
+      {
+        List<int> skipDeletedRowsList = new List<int>();
+        foreach (Excel.Range deletedRow in Target.Rows)
+        {
+          startDataTableRow = deletedRow.Row - 2;
+          startDataTableRow = SearchRowIndexNotDeleted(startDataTableRow, skipDeletedRowsList);
+          DataRow dr = EditMySQLDataTable.Rows[startDataTableRow];
+          dr.Delete();
+          skipDeletedRowsList.Add(startDataTableRow);
+          RangeAndAddress addedRA = RangesAndAddressesList.Find(ra => ra.Modification == RangeAndAddress.RangeModification.Added && ra.ExcelRow == deletedRow.Row);
+          if (addedRA != null)
+          {
+            RangesAndAddressesList.Remove(addedRA);
+          }
+          else if (!RangesAndAddressesList.Exists(ra => ra.Modification == RangeAndAddress.RangeModification.Deleted && ra.Address == deletedRow.Address))
+          {
+            RangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Deleted, deletedRow, deletedRow.Address, (int)deletedRow.Interior.Color, deletedRow.Row, dr));
+          }
+        }
+
+        for (int rangeIdx = 0; rangeIdx < RangesAndAddressesList.Count; rangeIdx++)
+        {
+          bool removeFromList = false;
+          RangeAndAddress ra = RangesAndAddressesList[rangeIdx];
+          if (ra.Modification == RangeAndAddress.RangeModification.Deleted)
+          {
+            continue;
+          }
+
+          try
+          {
+            ra.Address = ra.Range.Address;
+          }
+          catch
+          {
+            removeFromList = true;
+          }
+
+          if (removeFromList)
+          {
+            RangesAndAddressesList.Remove(ra);
+            rangeIdx--;
+          }
+        }
+
+        int changedRangesQty = RefreshAddressesOfStoredRanges();
+        EditingRowsQuantity = EditDataRange.Rows.Count;
+      }
+      else
+      {
+        //// The change was a modification of cell values
+        MySQLDataColumn currCol = null;
+        try
+        {
+          for (int rowIdx = 1; rowIdx <= intersectRange.Rows.Count; rowIdx++)
+          {
+            for (int colIdx = 1; colIdx <= intersectRange.Columns.Count; colIdx++)
+            {
+              Excel.Range cell = intersectRange.Cells[rowIdx, colIdx] as Excel.Range;
+
+              //// Detect if a data row has been added by the user and if so flag it for addition
+              if (cell.Row == EditDataRange.Rows.Count)
+              {
+                if (cell.Value == null)
+                {
+                  continue;
+                }
+
+                Excel.Range insertingRowRange = AddNewRowToEditingRange(true);
+                DataRow newRow = EditMySQLDataTable.NewRow();
+                EditMySQLDataTable.Rows.Add(newRow);
+                if (!RangesAndAddressesList.Exists(ra => ra.Modification == RangeAndAddress.RangeModification.Added && ra.Address == insertingRowRange.Address))
+                {
+                  RangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Added, insertingRowRange, insertingRowRange.Address, (int)insertingRowRange.Interior.Color, insertingRowRange.Row, newRow));
+                }
+
+                insertingRowRange.Interior.Color = _uncommitedCellsOLEColor;
+              }
+
+              int absRow = startDataTableRow + rowIdx - 1;
+              absRow = SearchRowIndexNotDeleted(absRow, null);
+              int absCol = startDataTableCol + colIdx - 1;
+
+              currCol = EditMySQLDataTable.GetColumnAtIndex(absCol);
+              object insertingValue = DBNull.Value;
+              if (cell.Value != null)
+              {
+                insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(cell.Value, currCol);
+              }
+
+              if (EditMySQLDataTable.Rows[absRow].RowState != DataRowState.Added)
+              {
+                if (DataTypeUtilities.ExcelValueEqualsDataTableValue(EditMySQLDataTable.Rows[absRow][absCol, DataRowVersion.Original], insertingValue))
+                {
+                  var existingRA = RangesAndAddressesList.Find(ra => ra.Modification == RangeAndAddress.RangeModification.Updated && ra.Address == cell.Address);
+                  if (existingRA != null)
+                  {
+                    ChangeExcelCellsColor(cell, existingRA.RangeColor == _whiteOLEColor ? 0 : existingRA.RangeColor);
+                    RangesAndAddressesList.RemoveAll(ra => ra.Modification == RangeAndAddress.RangeModification.Updated && ra.Address == cell.Address);
+                    EditMySQLDataTable.Rows[absRow][absCol] = insertingValue;
+                    int changedColsQty = EditMySQLDataTable.GetChangedColumns(EditMySQLDataTable.Rows[absRow]).Count;
+                    if (changedColsQty == 0)
+                    {
+                      EditMySQLDataTable.Rows[absRow].RejectChanges();
+                    }
+                  }
+
+                  continue;
+                }
+
+                //// Need to set the value before coloring the cell in case there is an invalid value it does not reach the coloring code
+                DataRow dr = EditMySQLDataTable.Rows[absRow];
+                dr[absCol] = insertingValue;
+                if (!RangesAndAddressesList.Exists(ra => ra.Modification == RangeAndAddress.RangeModification.Updated && ra.Address == cell.Address))
+                {
+                  RangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Updated, cell, cell.Address, (int)cell.Interior.Color, cell.Row, dr));
+                }
+              }
+              else
+              {
+                EditMySQLDataTable.Rows[absRow][absCol] = insertingValue;
+              }
+
+              cell.Interior.Color = _uncommitedCellsOLEColor;
+            }
+          }
+        }
+        catch (ArgumentException argEx)
+        {
+          undoChanges = true;
+          operationSummary = string.Format(Properties.Resources.EditDataInvalidValueError, currCol != null ? currCol.MySQLDataType : "Unknown");
+          operationDetails = argEx.Message;
+        }
+        catch (Exception ex)
+        {
+          undoChanges = true;
+          operationSummary = Properties.Resources.EditDataCellModificationError;
+          operationDetails = ex.Message;
+          MySQLSourceTrace.WriteAppErrorToLog(ex);
+        }
+        finally
+        {
+          if (undoChanges)
+          {
+            MiscUtilities.ShowCustomizedErrorDialog(operationSummary, operationDetails, true);
+            UndoChanges();
+          }
+        }
+      }
+
+      CommitChangesButton.Enabled = !AutoCommitCheckBox.Checked && UncommitedDataExists;
+      if (AutoCommitCheckBox.Checked && UncommitedDataExists)
+      {
+        PushDataChanges();
+      }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the Excel cells selection changes within the <see cref="EditingWorksheet"/>.
+    /// </summary>
+    /// <param name="Target"></param>
+    private void EditingWorksheet_SelectionChange(Excel.Range Target)
+    {
+      Excel.Range intersectRange = ParentTaskPane.IntersectRanges(EditDataRange, Target);
+      if (intersectRange == null || intersectRange.Count == 0)
+      {
+        Hide();
+      }
+      else
+      {
+        ShowInactiveTopmost();
+      }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="ExitEditModeToolStripMenuItem"/> is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ExitEditModeToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      Close();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when a mouse button is pressed down.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void GenericMouseDown(object sender, MouseEventArgs e)
+    {
+      if (e.Button == MouseButtons.Left)
+      {
+        _mouseDownPoint = new Point(e.X, e.Y);
+      }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the mouse is moved.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void GenericMouseMove(object sender, MouseEventArgs e)
+    {
+      if (e.Button == MouseButtons.Left)
+      {
+        if (_mouseDownPoint.IsEmpty)
+        {
+          return;
+        }
+
+        Location = new Point(Location.X + (e.X - _mouseDownPoint.X), Location.Y + (e.Y - _mouseDownPoint.Y));
+      }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when a mouse button is up.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void GenericMouseUp(object sender, MouseEventArgs e)
+    {
+      if (e.Button == MouseButtons.Left)
+      {
+        _mouseDownPoint = Point.Empty;
+      }
+    }
+
+    /// <summary>
+    /// Initializes the Excel worksheet protection for the <see cref="EditingWorksheet"/>.
+    /// </summary>
+    private void InitializeWorksheetProtection()
+    {
+      if (EditDataRange != null)
+      {
+        Excel.Range extendedRange = EditDataRange.get_Range(string.Format("A{0}", 2));
+        extendedRange = extendedRange.get_Resize(EditDataRange.Rows.Count - 1, EditingWorksheet.Columns.Count);
         extendedRange.Locked = false;
 
-        // Column names range code
+        //// Column names range code
         Excel.Range headersRange = EditingWorksheet.get_Range("A1");
-        headersRange = headersRange.get_Resize(1, editDataRange.Columns.Count);
-        lockRange(headersRange, true);
+        headersRange = headersRange.get_Resize(1, EditDataRange.Columns.Count);
+        LockRange(headersRange, true);
       }
+
       EditingWorksheet.Protect(SHEET_PROTECTION_KEY,
                                false,
                                true,
@@ -216,163 +863,88 @@ namespace MySQL.ForExcel
                                false);
     }
 
-    private void lockRange(Excel.Range range, bool lockRange)
+    /// <summary>
+    /// Locks the given Excel range and sets its fill color accordingly.
+    /// </summary>
+    /// <param name="range">The Excel range to lock or unlock.</param>
+    /// <param name="lockRange">Flag indicating whether the Excel range is locked or unlocked.</param>
+    private void LockRange(Excel.Range range, bool lockRange)
     {
       if (lockRange)
-        range.Interior.Color = lockedCellsOLEColor;
+      {
+        range.Interior.Color = _lockedCellsOLEColor;
+      }
       else
+      {
         range.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+      }
+
       range.Locked = lockRange;
     }
 
-    private void changeExcelCellsColor(Excel.Range modifiedRange, int oleColor)
-    {
-      if (modifiedRange == null)
-        return;
-      if (oleColor > 0)
-        modifiedRange.Interior.Color = oleColor;
-      else
-        modifiedRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
-    }
-
-    private void changeExcelCellsColor(List<RangeAndAddress> rangesAndAddressesList, int oleColor)
-    {
-      if (rangesAndAddressesList == null)
-        return;
-      foreach (RangeAndAddress ra in rangesAndAddressesList)
-        changeExcelCellsColor(ra.Range, oleColor);
-      rangesAndAddressesList.Clear();
-    }
-
-    private void changeExcelCellsToCommmitedColor(bool commitSuccessful)
-    {
-      if (rangesAndAddressesList == null)
-        return;
-      for (int idx = 0; idx < rangesAndAddressesList.Count; idx++)
-      {
-        RangeAndAddress ra = rangesAndAddressesList[idx];
-        if (ra.TableRow.HasErrors)
-        {
-          changeExcelCellsColor(ra.Range, erroredCellsOLEColor);
-          continue;
-        }
-        if (!commitSuccessful)
-          continue;
-        if (ra.TableRow.RowState != DataRowState.Detached && ra.TableRow.RowState != DataRowState.Deleted)
-          changeExcelCellsColor(ra.Range, commitedCellsOLEColor);
-        rangesAndAddressesList.Remove(ra);
-        idx--;
-      }
-    }
-
-    private Excel.Range addNewRowToEditingRange(bool clearColoringOfOldNewRow)
-    {
-      Excel.Range rowRange = null;
-
-      if (editDataRange != null)
-      {
-        UnprotectEditingWorksheet();
-        editDataRange = editDataRange.get_Resize(editDataRange.Rows.Count + 1, editDataRange.Columns.Count);
-        rowRange = editDataRange.Rows[editDataRange.Rows.Count] as Excel.Range;
-        rowRange.Interior.Color = newRowCellsOLEColor;
-        editingRowsQuantity = editDataRange.Rows.Count;
-        ProtectEditingWorksheet();
-        if (clearColoringOfOldNewRow && editDataRange.Rows.Count > 0)
-        {
-          rowRange = editDataRange.Rows[editDataRange.Rows.Count - 1] as Excel.Range;
-          rowRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
-        }
-      }
-
-      return rowRange;
-    }
-
-    private void UnprotectEditingWorksheet()
-    {
-      EditingWorksheet.Change -= new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
-      EditingWorksheet.Unprotect(SHEET_PROTECTION_KEY);
-    }
-
+    /// <summary>
+    /// Protects the <see cref="EditingWorksheet"/>.
+    /// </summary>
     private void ProtectEditingWorksheet()
     {
       EditingWorksheet.Change += new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
-      initializeWorksheetProtection();
+      InitializeWorksheetProtection();
     }
 
-    private void revertDataChanges(bool refreshFromDB)
-    {
-      Exception exception = null;
-      editMySQLDataTable.RevertData(refreshFromDB, out exception);
-      if (exception != null)
-      {
-        InfoDialog errorDialog = new InfoDialog(false, String.Format("{0} Data Error", (refreshFromDB ? "Refresh" : "Revert")), exception.Message);
-        errorDialog.ShowDialog();
-      }
-
-      UnprotectEditingWorksheet();
-      editDataRange.Clear();
-      Excel.Range topLeftCell = editDataRange.Cells[1, 1];
-      topLeftCell.Select();
-      editDataRange = CallerTaskPane.ImportDataTableToExcelAtGivenCell(editMySQLDataTable, true, topLeftCell);
-      if (refreshFromDB)
-      {
-        changeExcelCellsColor(editDataRange, 0);
-        rangesAndAddressesList.Clear();
-      }
-      else
-        changeExcelCellsColor(rangesAndAddressesList, 0);
-      btnCommit.Enabled = false;
-      addNewRowToEditingRange(false);
-    }
-
-    private bool pushDataChanges()
+    /// <summary>
+    /// Pushes the data changes currently done in the Excel worksheet to attempt to commit them to the MySQL server.
+    /// </summary>
+    /// <returns><c>true</c> if the transaction was committed successfully to the database, <c>false</c> otherwise.</returns>
+    private bool PushDataChanges()
     {
       bool success = true;
       bool warningsFound = false;
       bool errorsFound = false;
-      bool autoCommitOn = chkAutoCommit.Checked;
+      bool autoCommitOn = AutoCommitCheckBox.Checked;
 
       int warningsCount = 0;
       StringBuilder operationSummary = new StringBuilder();
       operationSummary.AppendFormat(Properties.Resources.EditedDataForTable, EditingTableName);
-      string sqlQuery = String.Empty;
+      string sqlQuery = string.Empty;
       StringBuilder operationDetails = new StringBuilder();
       StringBuilder warningDetails = new StringBuilder();
       this.Cursor = Cursors.WaitCursor;
 
       operationDetails.AppendFormat(Properties.Resources.EditDataCommittingText,
-                                    editMySQLDataTable.DeletingOperations,
-                                    editMySQLDataTable.InsertingOperations,
-                                    editMySQLDataTable.UpdatingOperations);
-      PushResultsDataTable resultsDT = editMySQLDataTable.PushData();
+                                    EditMySQLDataTable.DeletingOperations,
+                                    EditMySQLDataTable.InsertingOperations,
+                                    EditMySQLDataTable.UpdatingOperations);
+      PushResultsDataTable resultsDT = EditMySQLDataTable.PushData();
       operationDetails.Append(Environment.NewLine);
       foreach (DataRow operationRow in resultsDT.Rows)
       {
         sqlQuery = operationRow["QueryText"].ToString();
         if (sqlQuery.Length > 0)
         {
-          operationDetails.AppendFormat("{0}{1:000}: {2}",
-                                        Environment.NewLine,
+          operationDetails.Append(Environment.NewLine);
+          operationDetails.AppendFormat("{0:000}: {1}",
                                         (int)operationRow["OperationIndex"],
                                         sqlQuery);
         }
+
         string operationResult = operationRow["OperationResult"].ToString();
         switch (operationResult)
         {
           case "Warning":
             warningsFound = true;
-            warningDetails.AppendFormat("{0}{1}",
-                                        Environment.NewLine,
-                                        operationRow["ResultText"].ToString());
+            warningDetails.Append(Environment.NewLine);
+            warningDetails.Append(operationRow["ResultText"].ToString());
             warningsCount++;
             break;
+
           case "Error":
             errorsFound = true;
-            operationDetails.AppendFormat("{0}{0}{1}",
-                                        Environment.NewLine,
-                                        operationRow["ResultText"].ToString());
+            operationDetails.Append(Environment.NewLine);
+            operationDetails.Append(Environment.NewLine);
+            operationDetails.Append(operationRow["ResultText"].ToString());
             break;
         }
+
         if (errorsFound)
         {
           success = false;
@@ -384,11 +956,11 @@ namespace MySQL.ForExcel
       {
         operationDetails.Append(Environment.NewLine);
         operationDetails.Append(Environment.NewLine);
-        operationDetails.AppendFormat(Properties.Resources.EditDataCommittedWarningsFound,
-                                      warningsCount);
+        operationDetails.AppendFormat(Properties.Resources.EditDataCommittedWarningsFound, warningsCount);
         operationDetails.Append(Environment.NewLine);
         operationDetails.Append(warningDetails.ToString());
       }
+
       operationDetails.Append(Environment.NewLine);
       operationDetails.Append(Environment.NewLine);
       operationDetails.AppendFormat(Properties.Resources.EditDataCommittedText,
@@ -396,9 +968,9 @@ namespace MySQL.ForExcel
                                     resultsDT.InsertedOperations,
                                     resultsDT.UpdatedOperations);
 
-      changeExcelCellsToCommmitedColor(success);
+      ChangeExcelCellsToCommmitedColor(success);
 
-      foreach (DataRow dr in editMySQLDataTable.Rows)
+      foreach (DataRow dr in EditMySQLDataTable.Rows)
       {
         dr.ClearErrors();
       }
@@ -425,63 +997,32 @@ namespace MySQL.ForExcel
 
       if (!autoCommitOn || warningsFound || errorsFound)
       {
-        InfoDialog infoDialog = new InfoDialog(operationsType, operationSummary.ToString(), operationDetails.ToString());
-        infoDialog.StartPosition = FormStartPosition.CenterScreen;
-        DialogResult dr = infoDialog.ShowDialog();
+        MiscUtilities.ShowCustomizedInfoDialog(operationsType, operationSummary.ToString(), operationDetails.ToString(), false);
       }
 
-      btnCommit.Enabled = uncommitedDataExists && !autoCommitOn;
-      this.Cursor = Cursors.Default;
+      CommitChangesButton.Enabled = UncommitedDataExists && !autoCommitOn;
+      Cursor = Cursors.Default;
 
       return !errorsFound;
     }
 
-    private void UndoChanges()
-    {
-      undoingChanges = true;
-      try
-      {
-        EditingWorksheet.Application.Undo();
-      }
-      catch(Exception ex)
-      {
-        MiscUtilities.WriteAppErrorToLog(ex);
-      }
-      undoingChanges = false;
-    }
-
-    private int SearchRowIndexNotDeleted(int excelRowIdx, List<int> skipIndexesList)
-    {
-      int notDeletedIdx = -1;
-
-      if (editMySQLDataTable != null)
-      {
-        if (editMySQLDataTable.Rows.Count == editDataRange.Rows.Count - 2)
-          return excelRowIdx;
-        for (int tableRowIdx = 0; tableRowIdx < editMySQLDataTable.Rows.Count; tableRowIdx++)
-        {
-          if (editMySQLDataTable.Rows[tableRowIdx].RowState != DataRowState.Deleted)
-            notDeletedIdx++;
-          if (skipIndexesList != null)
-            notDeletedIdx += skipIndexesList.Count(n => n == tableRowIdx);
-          if (notDeletedIdx == excelRowIdx)
-            return tableRowIdx;
-        }
-      }
-
-      return -1;
-    }
-
+    /// <summary>
+    /// Refreshes the Excel range addresses of recorded changes in case rows have been added or deleted.
+    /// </summary>
+    /// <returns>The number of Excel ranges with address changes.</returns>
     private int RefreshAddressesOfStoredRanges()
     {
       int qtyUpdated = 0;
 
-      if (rangesAndAddressesList != null && rangesAndAddressesList.Count > 0)
+      if (RangesAndAddressesList != null && RangesAndAddressesList.Count > 0)
       {
-        foreach (RangeAndAddress ra in rangesAndAddressesList)
+        foreach (RangeAndAddress ra in RangesAndAddressesList)
         {
           if (ra.Modification != RangeAndAddress.RangeModification.Added && ra.Modification != RangeAndAddress.RangeModification.Updated)
+          {
             continue;
+          }
+
           try
           {
             if (ra.Address != ra.Range.Address)
@@ -503,296 +1044,144 @@ namespace MySQL.ForExcel
       return qtyUpdated;
     }
 
-    private void EditingWorksheet_Change(Excel.Range Target)
+    /// <summary>
+    /// Resets the tooltip shown in the <see cref="EditDataDialog"/> to show information on its corresponding editing session.
+    /// </summary>
+    private void ResetToolTip()
     {
-      if (undoingChanges)
-        return;
-
-      InfoDialog errorDialog = null;
-      bool rowWasDeleted = EditingWorksheet.UsedRange.Rows.Count < editingRowsQuantity && Target.Columns.Count == EditingWorksheet.Columns.Count;
-      bool undoChanges = false;
-      string operationSummary = null;
-      string operationDetails = null;
-
-      Excel.Range intersectRange = CallerTaskPane.IntersectRanges(editDataRange, Target);
-      if (intersectRange == null || intersectRange.Count == 0)
-      {
-        if (rowWasDeleted)
-        {
-          // The row for insertions is attempted to be deleted, we need to undo
-          undoChanges = true;
-          operationSummary = Properties.Resources.EditDataDeleteLastRowNotPermittedErrorTitle;
-          operationDetails = Properties.Resources.EditDataDeleteLastRowNotPermittedErrorDetail;
-        }
-        else
-        {
-          // It is a modification and outside the permitted range
-          undoChanges = true;
-          operationSummary = Properties.Resources.EditDataOutsideEditingRangeNotPermittedErrorTitle;
-          operationDetails = Properties.Resources.EditDataOutsideEditingRangeNotPermittedErrorDetail;
-        }
-      }
-      if (undoChanges)
-      {
-        errorDialog = new InfoDialog(false, operationSummary, operationDetails);
-        errorDialog.WordWrapDetails = true;
-        errorDialog.StartPosition = FormStartPosition.CenterScreen;
-        errorDialog.ShowDialog();
-        UndoChanges();
-        if (rowWasDeleted)
-        {
-          int changedRangesQty = RefreshAddressesOfStoredRanges();
-          editDataRange = EditingWorksheet.UsedRange;
-        }
-        return;
-      }
-      
-      // We substract from the Excel indexes since they start at 1, ExcelRow is subtracted by 2 if we imported headers.
-      Excel.Range startCell = (intersectRange.Item[1, 1] as Excel.Range);
-      int startDataTableRow = startCell.Row - 2;
-      int startDataTableCol = startCell.Column - 1;
-
-      // Detect if a row was deleted and if so flag it for deletion
-      if (rowWasDeleted)
-      {
-        List<int> skipDeletedRowsList = new List<int>();
-        foreach (Excel.Range deletedRow in Target.Rows)
-        {
-          startDataTableRow = deletedRow.Row - 2;
-          startDataTableRow = SearchRowIndexNotDeleted(startDataTableRow, skipDeletedRowsList);
-          DataRow dr = editMySQLDataTable.Rows[startDataTableRow];
-          dr.Delete();
-          skipDeletedRowsList.Add(startDataTableRow);
-          RangeAndAddress addedRA = rangesAndAddressesList.Find(ra => ra.Modification == RangeAndAddress.RangeModification.Added && ra.ExcelRow == deletedRow.Row);
-          if (addedRA != null)
-            rangesAndAddressesList.Remove(addedRA);
-          else if (!rangesAndAddressesList.Exists(ra => ra.Modification == RangeAndAddress.RangeModification.Deleted && ra.Address == deletedRow.Address))
-            rangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Deleted, deletedRow, deletedRow.Address, (int)deletedRow.Interior.Color, deletedRow.Row, dr));
-        }
-        for (int rangeIdx = 0; rangeIdx < rangesAndAddressesList.Count; rangeIdx++)
-        {
-          bool removeFromList = false;
-          RangeAndAddress ra = rangesAndAddressesList[rangeIdx];
-          if (ra.Modification == RangeAndAddress.RangeModification.Deleted)
-            continue;
-          try
-          {
-            ra.Address = ra.Range.Address;
-          }
-          catch 
-          {
-            removeFromList = true;
-          }
-          if (removeFromList)
-          {
-            rangesAndAddressesList.Remove(ra);
-            rangeIdx--;
-          }
-        }
-        int changedRangesQty = RefreshAddressesOfStoredRanges();
-        editingRowsQuantity = editDataRange.Rows.Count;
-      }
-      else
-      {
-        // The change was a modification of cell values
-        MySQLDataColumn currCol = null;
-        try
-        {
-          for (int rowIdx = 1; rowIdx <= intersectRange.Rows.Count; rowIdx++)
-            for (int colIdx = 1; colIdx <= intersectRange.Columns.Count; colIdx++)
-            {
-              Excel.Range cell = intersectRange.Cells[rowIdx, colIdx] as Excel.Range;
-
-              // Detect if a data row has been added by the user and if so flag it for addition
-              if (cell.Row == editDataRange.Rows.Count)
-              {
-                if (cell.Value == null)
-                  continue;
-                Excel.Range insertingRowRange = addNewRowToEditingRange(true);
-                DataRow newRow = editMySQLDataTable.NewRow();
-                editMySQLDataTable.Rows.Add(newRow);
-                if (!rangesAndAddressesList.Exists(ra => ra.Modification == RangeAndAddress.RangeModification.Added && ra.Address == insertingRowRange.Address))
-                  rangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Added, insertingRowRange, insertingRowRange.Address, (int)insertingRowRange.Interior.Color, insertingRowRange.Row, newRow));
-                insertingRowRange.Interior.Color = uncommitedCellsOLEColor;
-              }
-
-              int absRow = startDataTableRow + rowIdx - 1;
-              absRow = SearchRowIndexNotDeleted(absRow, null);
-              int absCol = startDataTableCol + colIdx - 1;
-
-              currCol = editMySQLDataTable.GetColumnAtIndex(absCol);
-              object insertingValue = DBNull.Value;
-              if (cell.Value != null)
-                insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(cell.Value, currCol);
-              if (editMySQLDataTable.Rows[absRow].RowState != DataRowState.Added)
-              {
-                if (DataTypeUtilities.ExcelValueEqualsDataTableValue(editMySQLDataTable.Rows[absRow][absCol, DataRowVersion.Original], insertingValue))
-                {
-                  var existingRA = rangesAndAddressesList.Find(ra => ra.Modification == RangeAndAddress.RangeModification.Updated && ra.Address == cell.Address);
-                  if (existingRA != null)
-                  {
-                    changeExcelCellsColor(cell, (existingRA.RangeColor == whiteOLEColor ? 0 : existingRA.RangeColor));
-                    rangesAndAddressesList.RemoveAll(ra => ra.Modification == RangeAndAddress.RangeModification.Updated && ra.Address == cell.Address);
-                    editMySQLDataTable.Rows[absRow][absCol] = insertingValue;
-                    int changedColsQty = editMySQLDataTable.GetChangedColumns(editMySQLDataTable.Rows[absRow]).Count;
-                    if (changedColsQty == 0)
-                      editMySQLDataTable.Rows[absRow].RejectChanges();
-                  }
-                  continue;
-                }
-                // Need to set the value before coloring the cell in case there is an invalid value it does not reach the coloring code
-                DataRow dr = editMySQLDataTable.Rows[absRow];
-                dr[absCol] = insertingValue;
-                if (!rangesAndAddressesList.Exists(ra => ra.Modification == RangeAndAddress.RangeModification.Updated && ra.Address == cell.Address))
-                  rangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Updated, cell, cell.Address, (int)cell.Interior.Color, cell.Row, dr));
-              }
-              else
-                editMySQLDataTable.Rows[absRow][absCol] = insertingValue;
-              cell.Interior.Color = uncommitedCellsOLEColor;
-            }
-        }
-        catch (ArgumentException argEx)
-        {
-          undoChanges = true;
-          operationSummary = String.Format(Properties.Resources.EditDataInvalidValueError, (currCol != null ? currCol.MySQLDataType : "Unknown"));
-          operationDetails = argEx.Message;
-        }
-        catch (Exception ex)
-        {
-          undoChanges = true;
-          operationSummary = Properties.Resources.EditDataCellModificationError;
-          operationDetails = ex.Message;
-          MiscUtilities.WriteAppErrorToLog(ex);
-        }
-        finally
-        {
-          if (undoChanges)
-          {
-            errorDialog = new InfoDialog(false, operationSummary, operationDetails);
-            errorDialog.WordWrapDetails = true;
-            errorDialog.StartPosition = FormStartPosition.CenterScreen;
-            errorDialog.ShowDialog();
-            UndoChanges();
-          }
-        }
-      }
-
-      btnCommit.Enabled = !chkAutoCommit.Checked && uncommitedDataExists;
-      if (chkAutoCommit.Checked && uncommitedDataExists)
-        pushDataChanges();
+      DialogToolTip.SetToolTip(this, string.Format(Properties.Resources.EditDataFormTooltipText, Environment.NewLine, WBConnection.Schema, EditingTableName, WorkbookName, WorksheetName));
     }
 
-    void EditingWorksheet_SelectionChange(Excel.Range Target)
+    /// <summary>
+    /// Event delegate method fired when the <see cref="RevertDataButton"/> is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void RevertDataButton_Click(object sender, EventArgs e)
     {
-      Excel.Range intersectRange = CallerTaskPane.IntersectRanges(editDataRange, Target);
-      if (intersectRange == null || intersectRange.Count == 0)
-        Hide();
-      else
-        ShowInactiveTopmost();
-    }
-
-    private void GenericMouseDown(object sender, MouseEventArgs e)
-    {
-      if (e.Button == MouseButtons.Left)
-        mouseDownPoint = new Point(e.X, e.Y);
-    }
-
-    private void GenericMouseUp(object sender, MouseEventArgs e)
-    {
-      if (e.Button == MouseButtons.Left)
-        mouseDownPoint = Point.Empty;
-    }
-
-    private void GenericMouseMove(object sender, MouseEventArgs e)
-    {
-      if (e.Button == MouseButtons.Left)
-      {
-        if (mouseDownPoint.IsEmpty)
-          return;
-        Location = new Point(Location.X + (e.X - mouseDownPoint.X), Location.Y + (e.Y - mouseDownPoint.Y));
-      }
-    }
-
-    protected override void OnMouseDown(MouseEventArgs e)
-    {
-      base.OnMouseDown(e);
-      GenericMouseDown(this, e);
-    }
-
-    protected override void OnMouseUp(MouseEventArgs e)
-    {
-      base.OnMouseUp(e);
-      GenericMouseUp(this, e);
-    }
-
-    protected override void OnMouseMove(MouseEventArgs e)
-    {
-      base.OnMouseMove(e);
-      GenericMouseMove(this, e);
-    }
-
-    private void exitEditModeToolStripMenuItem_Click(object sender, EventArgs e)
-    {
-      Close();
-    }
-
-    private void btnRevert_Click(object sender, EventArgs e)
-    {
-      EditDataRevertDialog revertDialog = new EditDataRevertDialog(!chkAutoCommit.Checked && uncommitedDataExists);
+      EditDataRevertDialog revertDialog = new EditDataRevertDialog(!AutoCommitCheckBox.Checked && UncommitedDataExists);
       DialogResult dr = revertDialog.ShowDialog();
       if (dr == DialogResult.Cancel)
+      {
         return;
-      revertDataChanges(revertDialog.SelectedAction == EditDataRevertDialog.EditUndoAction.RefreshData);
+      }
+
+      RevertDataChanges(revertDialog.SelectedAction == EditDataRevertDialog.EditUndoAction.RefreshData);
     }
 
-    private void btnCommit_Click(object sender, EventArgs e)
+    /// <summary>
+    /// Reverts the changes done to Excel cell values after the last commit.
+    /// </summary>
+    /// <param name="refreshFromDB">Flag indicating if instead of reverting the data back to the way it was when the editing session started, it is pulled to have the most recent version of it.</param>
+    private void RevertDataChanges(bool refreshFromDB)
     {
-      pushDataChanges();
+      Exception exception = null;
+      EditMySQLDataTable.RevertData(refreshFromDB, out exception);
+      if (exception != null)
+      {
+        MiscUtilities.ShowCustomizedErrorDialog(refreshFromDB ? Properties.Resources.EditDataRefreshErrorText : Properties.Resources.EditDataRevertErrorText, exception.Message);
+      }
+
+      UnprotectEditingWorksheet();
+      EditDataRange.Clear();
+      Excel.Range topLeftCell = EditDataRange.Cells[1, 1];
+      topLeftCell.Select();
+      EditDataRange = ParentTaskPane.ImportDataTableToExcelAtGivenCell(EditMySQLDataTable, true, topLeftCell);
+      if (refreshFromDB)
+      {
+        ChangeExcelCellsColor(EditDataRange, 0);
+        RangesAndAddressesList.Clear();
+      }
+      else
+      {
+        ChangeExcelCellsColor(RangesAndAddressesList, 0);
+      }
+
+      CommitChangesButton.Enabled = false;
+      AddNewRowToEditingRange(false);
     }
 
-    private void chkAutoCommit_CheckedChanged(object sender, EventArgs e)
+    /// <summary>
+    /// Searches for the row index in the <see cref="EditMySQLDataTable"/> corresponding to the given Excel row index skipping deleted rows.
+    /// </summary>
+    /// <param name="excelRowIdx">The Excel row index.</param>
+    /// <param name="skipIndexesList">A list of row indexes to skip since they are flagged for deletion.</param>
+    /// <returns>The corresponding row index in the <see cref="EditMySQLDataTable"/>.</returns>
+    private int SearchRowIndexNotDeleted(int excelRowIdx, List<int> skipIndexesList)
     {
-      btnCommit.Enabled = !chkAutoCommit.Checked && uncommitedDataExists;
+      int notDeletedIdx = -1;
+
+      if (EditMySQLDataTable != null)
+      {
+        if (EditMySQLDataTable.Rows.Count == EditDataRange.Rows.Count - 2)
+        {
+          return excelRowIdx;
+        }
+
+        for (int tableRowIdx = 0; tableRowIdx < EditMySQLDataTable.Rows.Count; tableRowIdx++)
+        {
+          if (EditMySQLDataTable.Rows[tableRowIdx].RowState != DataRowState.Deleted)
+          {
+            notDeletedIdx++;
+          }
+
+          if (skipIndexesList != null)
+          {
+            notDeletedIdx += skipIndexesList.Count(n => n == tableRowIdx);
+          }
+
+          if (notDeletedIdx == excelRowIdx)
+          {
+            return tableRowIdx;
+          }
+        }
+      }
+
+      return -1;
     }
 
-    [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
-    static extern bool SetWindowPos(
-         int hWnd,           // window handle
-         int hWndInsertAfter,    // placement-order handle
-         int X,          // horizontal position
-         int Y,          // vertical position
-         int cx,         // width
-         int cy,         // height
-         uint uFlags);       // window positioning flags
-
-    [DllImport("user32.dll")]
-    static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-    public void ShowInactiveTopmost()
+    /// <summary>
+    /// Undoes changes in the <see cref="EditingWorksheet"/> only.
+    /// </summary>
+    private void UndoChanges()
     {
-      ShowWindow(Handle, SW_SHOWNOACTIVATE);
-      SetWindowPos(Handle.ToInt32(), HWND_NOTOPMOST, Left, Top, Width, Height, SWP_NOACTIVATE);
+      _undoingChanges = true;
+      try
+      {
+        EditingWorksheet.Application.Undo();
+      }
+      catch (Exception ex)
+      {
+        MySQLSourceTrace.WriteAppErrorToLog(ex);
+      }
+
+      _undoingChanges = false;
     }
 
-    private void EditDataDialog_Shown(object sender, EventArgs e)
+    /// <summary>
+    /// Unprotects the <see cref="EditingWorksheet"/>.
+    /// </summary>
+    private void UnprotectEditingWorksheet()
     {
-      // Need to call the ShowInactiveTopmost method when the form is shown in order to make it topmost and
-      // to avoid that the controls inside it activate so focus remains on excel cells.
-      ShowInactiveTopmost();
+      EditingWorksheet.Change -= new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
+      EditingWorksheet.Unprotect(SHEET_PROTECTION_KEY);
     }
-
   }
 
+  /// <summary>
+  /// Records modifications done to an Excel row mapping it to its corresponding data table row.
+  /// </summary>
   public class RangeAndAddress
   {
-    public enum RangeModification { Added, Deleted, Updated };
-    public RangeModification Modification;
-    public Excel.Range Range;
-    public string Address;
-    public int RangeColor;
-    public int ExcelRow;
-    public DataRow TableRow;
-
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RangeAndAddress"/> class.
+    /// </summary>
+    /// <param name="modification">The type of modification done to the Excel range.</param>
+    /// <param name="range">The Excel range being recorded.</param>
+    /// <param name="address">The address of the Excel range.</param>
+    /// <param name="rangeColor">The fill color assigned to the Excel range cells.</param>
+    /// <param name="excelRow">The ordinal index of the Excel row corresponding to the Excel range.</param>
+    /// <param name="tableRow">The <see cref="DataRow"/> mapped to the Excel range being recorded.</param>
     public RangeAndAddress(RangeModification modification, Excel.Range range, string address, int rangeColor, int excelRow, DataRow tableRow)
     {
       Modification = modification;
@@ -802,5 +1191,60 @@ namespace MySQL.ForExcel
       ExcelRow = excelRow;
       TableRow = tableRow;
     }
+
+    /// <summary>
+    /// Specifies identifiers to indicate the type of modification done to Excel ranges.
+    /// </summary>
+    public enum RangeModification
+    {
+      /// <summary>
+      /// A row was added to the editing Excel range.
+      /// </summary>
+      Added,
+
+      /// <summary>
+      /// A row was deleted from the editing Excel range.
+      /// </summary>
+      Deleted,
+
+      /// <summary>
+      /// Cell values were modified in the editing Excel range.
+      /// </summary>
+      Updated
+    }
+
+    #region Properties
+
+    /// <summary>
+    /// Gets or sets the address of the Excel range.
+    /// </summary>
+    public string Address { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ordinal index of the Excel row corresponding to the Excel range.
+    /// </summary>
+    public int ExcelRow { get; set; }
+
+    /// <summary>
+    /// Gets the type of modification done to the Excel range.
+    /// </summary>
+    public RangeModification Modification { get; private set; }
+
+    /// <summary>
+    /// Gets or sets the Excel range being recorded.
+    /// </summary>
+    public Excel.Range Range { get; set; }
+
+    /// <summary>
+    /// Gets the fill color assigned to the Excel range cells.
+    /// </summary>
+    public int RangeColor { get; private set; }
+
+    /// <summary>
+    /// Gets the <see cref="DataRow"/> mapped to the Excel range being recorded.
+    /// </summary>
+    public DataRow TableRow { get; private set; }
+
+    #endregion Properties
   }
 }

@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -47,139 +47,144 @@ namespace MySQL.ForExcel
     /// </summary>
     private void InitializeComponent()
     {
-      this.btnOK = new System.Windows.Forms.Button();
-      this.btnCancel = new System.Windows.Forms.Button();
-      this.txtSchemaName = new System.Windows.Forms.TextBox();
-      this.picLogo = new System.Windows.Forms.PictureBox();
-      this.lblNewSchemaName = new System.Windows.Forms.Label();
-      this.lblInstructions = new System.Windows.Forms.Label();
-      this.lblSchemaName = new System.Windows.Forms.Label();
-      this.contentAreaPanel.SuspendLayout();
-      this.commandAreaPanel.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.picLogo)).BeginInit();
+      this.DialogOKButton = new System.Windows.Forms.Button();
+      this.DialogCancelButton = new System.Windows.Forms.Button();
+      this.SchemaNameTextBox = new System.Windows.Forms.TextBox();
+      this.LogoPictureBox = new System.Windows.Forms.PictureBox();
+      this.NewSchemaNameLabel = new System.Windows.Forms.Label();
+      this.InstructionsLabel = new System.Windows.Forms.Label();
+      this.SchemaNameLabel = new System.Windows.Forms.Label();
+      this.ContentAreaPanel.SuspendLayout();
+      this.CommandAreaPanel.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).BeginInit();
       this.SuspendLayout();
       // 
-      // contentAreaPanel
+      // FootnoteAreaPanel
       // 
-      this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
-      this.contentAreaPanel.Controls.Add(this.lblSchemaName);
-      this.contentAreaPanel.Controls.Add(this.lblInstructions);
-      this.contentAreaPanel.Controls.Add(this.lblNewSchemaName);
-      this.contentAreaPanel.Controls.Add(this.picLogo);
-      this.contentAreaPanel.Controls.Add(this.txtSchemaName);
-      this.contentAreaPanel.Size = new System.Drawing.Size(514, 135);
+      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 102);
+      this.FootnoteAreaPanel.Size = new System.Drawing.Size(514, 0);
       // 
-      // commandAreaPanel
+      // ContentAreaPanel
       // 
-      this.commandAreaPanel.Controls.Add(this.btnOK);
-      this.commandAreaPanel.Controls.Add(this.btnCancel);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 135);
-      this.commandAreaPanel.Size = new System.Drawing.Size(514, 45);
+      this.ContentAreaPanel.Controls.Add(this.SchemaNameLabel);
+      this.ContentAreaPanel.Controls.Add(this.InstructionsLabel);
+      this.ContentAreaPanel.Controls.Add(this.NewSchemaNameLabel);
+      this.ContentAreaPanel.Controls.Add(this.LogoPictureBox);
+      this.ContentAreaPanel.Controls.Add(this.SchemaNameTextBox);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(514, 182);
       // 
-      // btnOK
+      // CommandAreaPanel
       // 
-      this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.btnOK.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnOK.Location = new System.Drawing.Point(346, 11);
-      this.btnOK.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-      this.btnOK.Name = "btnOK";
-      this.btnOK.Size = new System.Drawing.Size(75, 23);
-      this.btnOK.TabIndex = 0;
-      this.btnOK.Text = "OK";
-      this.btnOK.UseVisualStyleBackColor = true;
+      this.CommandAreaPanel.Controls.Add(this.DialogOKButton);
+      this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 137);
+      this.CommandAreaPanel.Size = new System.Drawing.Size(514, 45);
       // 
-      // btnCancel
+      // DialogOKButton
       // 
-      this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnCancel.Location = new System.Drawing.Point(427, 11);
-      this.btnCancel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-      this.btnCancel.Name = "btnCancel";
-      this.btnCancel.Size = new System.Drawing.Size(75, 23);
-      this.btnCancel.TabIndex = 1;
-      this.btnCancel.Text = "Cancel";
-      this.btnCancel.UseVisualStyleBackColor = true;
+      this.DialogOKButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.DialogOKButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+      this.DialogOKButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.DialogOKButton.Location = new System.Drawing.Point(346, 11);
+      this.DialogOKButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.DialogOKButton.Name = "DialogOKButton";
+      this.DialogOKButton.Size = new System.Drawing.Size(75, 23);
+      this.DialogOKButton.TabIndex = 0;
+      this.DialogOKButton.Text = "OK";
+      this.DialogOKButton.UseVisualStyleBackColor = true;
       // 
-      // txtSchemaName
+      // DialogCancelButton
       // 
-      this.txtSchemaName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.txtSchemaName.Location = new System.Drawing.Point(183, 88);
-      this.txtSchemaName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-      this.txtSchemaName.Name = "txtSchemaName";
-      this.txtSchemaName.Size = new System.Drawing.Size(319, 21);
-      this.txtSchemaName.TabIndex = 3;
-      this.txtSchemaName.TextChanged += new System.EventHandler(this.txtSchemaName_TextChanged);
+      this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.DialogCancelButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.DialogCancelButton.Location = new System.Drawing.Point(427, 11);
+      this.DialogCancelButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.DialogCancelButton.Name = "DialogCancelButton";
+      this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
+      this.DialogCancelButton.TabIndex = 1;
+      this.DialogCancelButton.Text = "Cancel";
+      this.DialogCancelButton.UseVisualStyleBackColor = true;
       // 
-      // picLogo
+      // SchemaNameTextBox
       // 
-      this.picLogo.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Input_64x64;
-      this.picLogo.Location = new System.Drawing.Point(14, 14);
-      this.picLogo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-      this.picLogo.Name = "picLogo";
-      this.picLogo.Size = new System.Drawing.Size(64, 64);
-      this.picLogo.TabIndex = 11;
-      this.picLogo.TabStop = false;
+      this.SchemaNameTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.SchemaNameTextBox.Location = new System.Drawing.Point(183, 88);
+      this.SchemaNameTextBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.SchemaNameTextBox.Name = "SchemaNameTextBox";
+      this.SchemaNameTextBox.Size = new System.Drawing.Size(319, 21);
+      this.SchemaNameTextBox.TabIndex = 3;
+      this.SchemaNameTextBox.TextChanged += new System.EventHandler(this.SchemaNameTextBox_TextChanged);
       // 
-      // lblNewSchemaName
+      // LogoPictureBox
       // 
-      this.lblNewSchemaName.AutoSize = true;
-      this.lblNewSchemaName.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblNewSchemaName.ForeColor = System.Drawing.Color.Navy;
-      this.lblNewSchemaName.Location = new System.Drawing.Point(84, 23);
-      this.lblNewSchemaName.Name = "lblNewSchemaName";
-      this.lblNewSchemaName.Size = new System.Drawing.Size(145, 18);
-      this.lblNewSchemaName.TabIndex = 0;
-      this.lblNewSchemaName.Text = "New Schema Name:";
+      this.LogoPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Input_64x64;
+      this.LogoPictureBox.Location = new System.Drawing.Point(14, 14);
+      this.LogoPictureBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.LogoPictureBox.Name = "LogoPictureBox";
+      this.LogoPictureBox.Size = new System.Drawing.Size(64, 64);
+      this.LogoPictureBox.TabIndex = 11;
+      this.LogoPictureBox.TabStop = false;
       // 
-      // lblInstructions
+      // NewSchemaNameLabel
       // 
-      this.lblInstructions.AutoSize = true;
-      this.lblInstructions.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblInstructions.Location = new System.Drawing.Point(84, 45);
-      this.lblInstructions.Name = "lblInstructions";
-      this.lblInstructions.Size = new System.Drawing.Size(234, 15);
-      this.lblInstructions.TabIndex = 1;
-      this.lblInstructions.Text = "Please enter a name for the new schema.";
+      this.NewSchemaNameLabel.AutoSize = true;
+      this.NewSchemaNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.NewSchemaNameLabel.ForeColor = System.Drawing.Color.Navy;
+      this.NewSchemaNameLabel.Location = new System.Drawing.Point(84, 23);
+      this.NewSchemaNameLabel.Name = "NewSchemaNameLabel";
+      this.NewSchemaNameLabel.Size = new System.Drawing.Size(145, 18);
+      this.NewSchemaNameLabel.TabIndex = 0;
+      this.NewSchemaNameLabel.Text = "New Schema Name:";
       // 
-      // lblSchemaName
+      // InstructionsLabel
       // 
-      this.lblSchemaName.AutoSize = true;
-      this.lblSchemaName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblSchemaName.Location = new System.Drawing.Point(84, 91);
-      this.lblSchemaName.Name = "lblSchemaName";
-      this.lblSchemaName.Size = new System.Drawing.Size(93, 15);
-      this.lblSchemaName.TabIndex = 2;
-      this.lblSchemaName.Text = "Schema Name:";
+      this.InstructionsLabel.AutoSize = true;
+      this.InstructionsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.InstructionsLabel.Location = new System.Drawing.Point(84, 45);
+      this.InstructionsLabel.Name = "InstructionsLabel";
+      this.InstructionsLabel.Size = new System.Drawing.Size(234, 15);
+      this.InstructionsLabel.TabIndex = 1;
+      this.InstructionsLabel.Text = "Please enter a name for the new schema.";
+      // 
+      // SchemaNameLabel
+      // 
+      this.SchemaNameLabel.AutoSize = true;
+      this.SchemaNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.SchemaNameLabel.Location = new System.Drawing.Point(84, 91);
+      this.SchemaNameLabel.Name = "SchemaNameLabel";
+      this.SchemaNameLabel.Size = new System.Drawing.Size(93, 15);
+      this.SchemaNameLabel.TabIndex = 2;
+      this.SchemaNameLabel.Text = "Schema Name:";
       // 
       // NewSchemaDialog
       // 
-      this.AcceptButton = this.btnOK;
+      this.AcceptButton = this.DialogOKButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-      this.CancelButton = this.btnCancel;
+      this.CancelButton = this.DialogCancelButton;
       this.ClientSize = new System.Drawing.Size(514, 182);
-      this.CommandAreaHeight = 45;
+      this.CommandAreaVisible = true;
+      this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 13);
       this.MainInstructionLocationOffset = new System.Drawing.Size(-10, 10);
       this.Name = "NewSchemaDialog";
       this.Text = "MySQL for Excel";
-      this.contentAreaPanel.ResumeLayout(false);
-      this.contentAreaPanel.PerformLayout();
-      this.commandAreaPanel.ResumeLayout(false);
-      ((System.ComponentModel.ISupportInitialize)(this.picLogo)).EndInit();
+      this.ContentAreaPanel.ResumeLayout(false);
+      this.ContentAreaPanel.PerformLayout();
+      this.CommandAreaPanel.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).EndInit();
       this.ResumeLayout(false);
 
     }
 
     #endregion
 
-    private System.Windows.Forms.Button btnOK;
-    private System.Windows.Forms.Button btnCancel;
-    private System.Windows.Forms.TextBox txtSchemaName;
-    private System.Windows.Forms.Label lblNewSchemaName;
-    private System.Windows.Forms.PictureBox picLogo;
-    private System.Windows.Forms.Label lblSchemaName;
-    private System.Windows.Forms.Label lblInstructions;
+    private System.Windows.Forms.Button DialogOKButton;
+    private System.Windows.Forms.Button DialogCancelButton;
+    private System.Windows.Forms.TextBox SchemaNameTextBox;
+    private System.Windows.Forms.Label NewSchemaNameLabel;
+    private System.Windows.Forms.PictureBox LogoPictureBox;
+    private System.Windows.Forms.Label SchemaNameLabel;
+    private System.Windows.Forms.Label InstructionsLabel;
   }
 }

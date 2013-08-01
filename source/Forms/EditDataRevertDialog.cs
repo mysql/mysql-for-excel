@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -17,36 +17,65 @@
 // 02110-1301  USA
 //
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-
 namespace MySQL.ForExcel
 {
+  using System;
+  using MySQL.Utility.Forms;
+
+  /// <summary>
+  /// Offers users options to undo changes to data edition by reverting changes or fetching an updated copy of the data from the database.
+  /// </summary>
   public partial class EditDataRevertDialog : AutoStyleableBaseDialog
   {
-    public enum EditUndoAction { RefreshData, RevertData };
-    public EditUndoAction SelectedAction { get; private set; }
-
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EditDataRevertDialog"/> class.
+    /// </summary>
+    /// <param name="enableRevert">Flag indicating whether the revert data checkbox is available for selection.</param>
     public EditDataRevertDialog(bool enableRevert)
     {
       InitializeComponent();
-      btnRevert.Enabled = enableRevert;
+      RevertDataButton.Enabled = enableRevert;
     }
 
-    private void btnRevert_Click(object sender, EventArgs e)
+    /// <summary>
+    /// Indicates the type of action for the undo operation.
+    /// </summary>
+    public enum EditUndoAction
     {
-      SelectedAction = EditUndoAction.RevertData;
+      /// <summary>
+      /// An updated copy of the data is to be fetched from the database after changes are undone.
+      /// </summary>
+      RefreshData,
+
+      /// <summary>
+      /// Existing changes are reverted to the state when the data was retrieved for edition.
+      /// </summary>
+      RevertData
     }
 
-    private void btnRefreshData_Click(object sender, EventArgs e)
+    /// <summary>
+    /// Gets the undo action selected by the user.
+    /// </summary>
+    public EditUndoAction SelectedAction { get; private set; }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="RefreshDataButton"/> button is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void RefreshDataButton_Click(object sender, EventArgs e)
     {
       SelectedAction = EditUndoAction.RefreshData;
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="RevertDataButton"/> button is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void RevertDataButton_Click(object sender, EventArgs e)
+    {
+      SelectedAction = EditUndoAction.RevertData;
     }
   }
 }

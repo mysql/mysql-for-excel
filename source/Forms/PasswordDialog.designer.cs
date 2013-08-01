@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -47,186 +47,189 @@ namespace MySQL.ForExcel
     /// </summary>
     private void InitializeComponent()
     {
-      this.btnOK = new System.Windows.Forms.Button();
-      this.btnCancel = new System.Windows.Forms.Button();
-      this.lblUserValue = new System.Windows.Forms.Label();
-      this.lblConnectionValue = new System.Windows.Forms.Label();
-      this.txtPassword = new System.Windows.Forms.TextBox();
-      this.lblPassword = new System.Windows.Forms.Label();
-      this.lblUser = new System.Windows.Forms.Label();
-      this.lblConnection = new System.Windows.Forms.Label();
-      this.lblEnterPassword = new System.Windows.Forms.Label();
-      this.picLogo = new System.Windows.Forms.PictureBox();
-      this.contentAreaPanel.SuspendLayout();
-      this.commandAreaPanel.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.picLogo)).BeginInit();
+      this.DialogOKButton = new System.Windows.Forms.Button();
+      this.DialogCancelButton = new System.Windows.Forms.Button();
+      this.UserValueLabel = new System.Windows.Forms.Label();
+      this.ConnectionValueLabel = new System.Windows.Forms.Label();
+      this.PasswordTextBox = new System.Windows.Forms.TextBox();
+      this.PasswordLabel = new System.Windows.Forms.Label();
+      this.UserLabel = new System.Windows.Forms.Label();
+      this.ConnectionLabel = new System.Windows.Forms.Label();
+      this.EnterPasswordLabel = new System.Windows.Forms.Label();
+      this.LogoPictureBox = new System.Windows.Forms.PictureBox();
+      this.ContentAreaPanel.SuspendLayout();
+      this.CommandAreaPanel.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).BeginInit();
       this.SuspendLayout();
       // 
-      // contentAreaPanel
+      // FootnoteAreaPanel
       // 
-      this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
-      this.contentAreaPanel.Controls.Add(this.picLogo);
-      this.contentAreaPanel.Controls.Add(this.lblEnterPassword);
-      this.contentAreaPanel.Controls.Add(this.lblUserValue);
-      this.contentAreaPanel.Controls.Add(this.txtPassword);
-      this.contentAreaPanel.Controls.Add(this.lblConnectionValue);
-      this.contentAreaPanel.Controls.Add(this.lblConnection);
-      this.contentAreaPanel.Controls.Add(this.lblUser);
-      this.contentAreaPanel.Controls.Add(this.lblPassword);
-      this.contentAreaPanel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-      this.contentAreaPanel.Size = new System.Drawing.Size(514, 145);
+      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 112);
+      this.FootnoteAreaPanel.Size = new System.Drawing.Size(514, 0);
       // 
-      // commandAreaPanel
+      // ContentAreaPanel
       // 
-      this.commandAreaPanel.Controls.Add(this.btnOK);
-      this.commandAreaPanel.Controls.Add(this.btnCancel);
-      this.commandAreaPanel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 145);
-      this.commandAreaPanel.Size = new System.Drawing.Size(514, 45);
+      this.ContentAreaPanel.Controls.Add(this.LogoPictureBox);
+      this.ContentAreaPanel.Controls.Add(this.EnterPasswordLabel);
+      this.ContentAreaPanel.Controls.Add(this.UserValueLabel);
+      this.ContentAreaPanel.Controls.Add(this.PasswordTextBox);
+      this.ContentAreaPanel.Controls.Add(this.ConnectionValueLabel);
+      this.ContentAreaPanel.Controls.Add(this.ConnectionLabel);
+      this.ContentAreaPanel.Controls.Add(this.UserLabel);
+      this.ContentAreaPanel.Controls.Add(this.PasswordLabel);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(514, 192);
       // 
-      // btnOK
+      // CommandAreaPanel
       // 
-      this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.btnOK.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnOK.Location = new System.Drawing.Point(346, 11);
-      this.btnOK.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-      this.btnOK.Name = "btnOK";
-      this.btnOK.Size = new System.Drawing.Size(75, 23);
-      this.btnOK.TabIndex = 0;
-      this.btnOK.Text = "OK";
-      this.btnOK.UseVisualStyleBackColor = true;
+      this.CommandAreaPanel.Controls.Add(this.DialogOKButton);
+      this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 147);
+      this.CommandAreaPanel.Size = new System.Drawing.Size(514, 45);
       // 
-      // btnCancel
+      // DialogOKButton
       // 
-      this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnCancel.Location = new System.Drawing.Point(427, 11);
-      this.btnCancel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-      this.btnCancel.Name = "btnCancel";
-      this.btnCancel.Size = new System.Drawing.Size(75, 23);
-      this.btnCancel.TabIndex = 1;
-      this.btnCancel.Text = "Cancel";
-      this.btnCancel.UseVisualStyleBackColor = true;
+      this.DialogOKButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.DialogOKButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+      this.DialogOKButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.DialogOKButton.Location = new System.Drawing.Point(346, 11);
+      this.DialogOKButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.DialogOKButton.Name = "DialogOKButton";
+      this.DialogOKButton.Size = new System.Drawing.Size(75, 23);
+      this.DialogOKButton.TabIndex = 0;
+      this.DialogOKButton.Text = "OK";
+      this.DialogOKButton.UseVisualStyleBackColor = true;
       // 
-      // lblUserValue
+      // DialogCancelButton
       // 
-      this.lblUserValue.AutoSize = true;
-      this.lblUserValue.BackColor = System.Drawing.Color.Transparent;
-      this.lblUserValue.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblUserValue.Location = new System.Drawing.Point(187, 87);
-      this.lblUserValue.Name = "lblUserValue";
-      this.lblUserValue.Size = new System.Drawing.Size(17, 15);
-      this.lblUserValue.TabIndex = 4;
-      this.lblUserValue.Text = "??";
+      this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.DialogCancelButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.DialogCancelButton.Location = new System.Drawing.Point(427, 11);
+      this.DialogCancelButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.DialogCancelButton.Name = "DialogCancelButton";
+      this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
+      this.DialogCancelButton.TabIndex = 1;
+      this.DialogCancelButton.Text = "Cancel";
+      this.DialogCancelButton.UseVisualStyleBackColor = true;
       // 
-      // lblConnectionValue
+      // UserValueLabel
       // 
-      this.lblConnectionValue.AutoSize = true;
-      this.lblConnectionValue.BackColor = System.Drawing.Color.Transparent;
-      this.lblConnectionValue.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblConnectionValue.Location = new System.Drawing.Point(187, 64);
-      this.lblConnectionValue.Name = "lblConnectionValue";
-      this.lblConnectionValue.Size = new System.Drawing.Size(17, 15);
-      this.lblConnectionValue.TabIndex = 2;
-      this.lblConnectionValue.Text = "??";
+      this.UserValueLabel.AutoSize = true;
+      this.UserValueLabel.BackColor = System.Drawing.Color.Transparent;
+      this.UserValueLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.UserValueLabel.Location = new System.Drawing.Point(187, 87);
+      this.UserValueLabel.Name = "UserValueLabel";
+      this.UserValueLabel.Size = new System.Drawing.Size(17, 15);
+      this.UserValueLabel.TabIndex = 4;
+      this.UserValueLabel.Text = "??";
       // 
-      // txtPassword
+      // ConnectionValueLabel
       // 
-      this.txtPassword.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.txtPassword.Location = new System.Drawing.Point(187, 108);
-      this.txtPassword.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-      this.txtPassword.Name = "txtPassword";
-      this.txtPassword.Size = new System.Drawing.Size(315, 23);
-      this.txtPassword.TabIndex = 6;
-      this.txtPassword.UseSystemPasswordChar = true;
+      this.ConnectionValueLabel.AutoSize = true;
+      this.ConnectionValueLabel.BackColor = System.Drawing.Color.Transparent;
+      this.ConnectionValueLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ConnectionValueLabel.Location = new System.Drawing.Point(187, 64);
+      this.ConnectionValueLabel.Name = "ConnectionValueLabel";
+      this.ConnectionValueLabel.Size = new System.Drawing.Size(17, 15);
+      this.ConnectionValueLabel.TabIndex = 2;
+      this.ConnectionValueLabel.Text = "??";
       // 
-      // lblPassword
+      // PasswordTextBox
       // 
-      this.lblPassword.AutoSize = true;
-      this.lblPassword.BackColor = System.Drawing.Color.Transparent;
-      this.lblPassword.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblPassword.Location = new System.Drawing.Point(103, 111);
-      this.lblPassword.Name = "lblPassword";
-      this.lblPassword.Size = new System.Drawing.Size(60, 15);
-      this.lblPassword.TabIndex = 5;
-      this.lblPassword.Text = "Password:";
+      this.PasswordTextBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.PasswordTextBox.Location = new System.Drawing.Point(187, 108);
+      this.PasswordTextBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.PasswordTextBox.Name = "PasswordTextBox";
+      this.PasswordTextBox.Size = new System.Drawing.Size(315, 23);
+      this.PasswordTextBox.TabIndex = 6;
+      this.PasswordTextBox.UseSystemPasswordChar = true;
       // 
-      // lblUser
+      // PasswordLabel
       // 
-      this.lblUser.AutoSize = true;
-      this.lblUser.BackColor = System.Drawing.Color.Transparent;
-      this.lblUser.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblUser.Location = new System.Drawing.Point(103, 87);
-      this.lblUser.Name = "lblUser";
-      this.lblUser.Size = new System.Drawing.Size(33, 15);
-      this.lblUser.TabIndex = 3;
-      this.lblUser.Text = "User:";
+      this.PasswordLabel.AutoSize = true;
+      this.PasswordLabel.BackColor = System.Drawing.Color.Transparent;
+      this.PasswordLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.PasswordLabel.Location = new System.Drawing.Point(103, 111);
+      this.PasswordLabel.Name = "PasswordLabel";
+      this.PasswordLabel.Size = new System.Drawing.Size(60, 15);
+      this.PasswordLabel.TabIndex = 5;
+      this.PasswordLabel.Text = "Password:";
       // 
-      // lblConnection
+      // UserLabel
       // 
-      this.lblConnection.AutoSize = true;
-      this.lblConnection.BackColor = System.Drawing.Color.Transparent;
-      this.lblConnection.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblConnection.Location = new System.Drawing.Point(103, 64);
-      this.lblConnection.Name = "lblConnection";
-      this.lblConnection.Size = new System.Drawing.Size(72, 15);
-      this.lblConnection.TabIndex = 1;
-      this.lblConnection.Text = "Connection:";
+      this.UserLabel.AutoSize = true;
+      this.UserLabel.BackColor = System.Drawing.Color.Transparent;
+      this.UserLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.UserLabel.Location = new System.Drawing.Point(103, 87);
+      this.UserLabel.Name = "UserLabel";
+      this.UserLabel.Size = new System.Drawing.Size(33, 15);
+      this.UserLabel.TabIndex = 3;
+      this.UserLabel.Text = "User:";
       // 
-      // lblEnterPassword
+      // ConnectionLabel
       // 
-      this.lblEnterPassword.AutoSize = true;
-      this.lblEnterPassword.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblEnterPassword.ForeColor = System.Drawing.Color.Navy;
-      this.lblEnterPassword.Location = new System.Drawing.Point(90, 27);
-      this.lblEnterPassword.Name = "lblEnterPassword";
-      this.lblEnterPassword.Size = new System.Drawing.Size(309, 20);
-      this.lblEnterPassword.TabIndex = 0;
-      this.lblEnterPassword.Text = "Please enter the password for the connection:";
+      this.ConnectionLabel.AutoSize = true;
+      this.ConnectionLabel.BackColor = System.Drawing.Color.Transparent;
+      this.ConnectionLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ConnectionLabel.Location = new System.Drawing.Point(103, 64);
+      this.ConnectionLabel.Name = "ConnectionLabel";
+      this.ConnectionLabel.Size = new System.Drawing.Size(72, 15);
+      this.ConnectionLabel.TabIndex = 1;
+      this.ConnectionLabel.Text = "Connection:";
       // 
-      // picLogo
+      // EnterPasswordLabel
       // 
-      this.picLogo.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Security;
-      this.picLogo.Location = new System.Drawing.Point(20, 20);
-      this.picLogo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-      this.picLogo.Name = "picLogo";
-      this.picLogo.Size = new System.Drawing.Size(64, 64);
-      this.picLogo.TabIndex = 22;
-      this.picLogo.TabStop = false;
+      this.EnterPasswordLabel.AutoSize = true;
+      this.EnterPasswordLabel.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.EnterPasswordLabel.ForeColor = System.Drawing.Color.Navy;
+      this.EnterPasswordLabel.Location = new System.Drawing.Point(90, 27);
+      this.EnterPasswordLabel.Name = "EnterPasswordLabel";
+      this.EnterPasswordLabel.Size = new System.Drawing.Size(309, 20);
+      this.EnterPasswordLabel.TabIndex = 0;
+      this.EnterPasswordLabel.Text = "Please enter the password for the connection:";
+      // 
+      // LogoPictureBox
+      // 
+      this.LogoPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Security;
+      this.LogoPictureBox.Location = new System.Drawing.Point(20, 20);
+      this.LogoPictureBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.LogoPictureBox.Name = "LogoPictureBox";
+      this.LogoPictureBox.Size = new System.Drawing.Size(64, 64);
+      this.LogoPictureBox.TabIndex = 22;
+      this.LogoPictureBox.TabStop = false;
       // 
       // PasswordDialog
       // 
-      this.AcceptButton = this.btnOK;
+      this.AcceptButton = this.DialogOKButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-      this.CancelButton = this.btnCancel;
+      this.CancelButton = this.DialogCancelButton;
       this.ClientSize = new System.Drawing.Size(514, 192);
-      this.CommandAreaHeight = 45;
+      this.CommandAreaVisible = true;
+      this.FootnoteAreaHeight = 0;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
       this.MainInstructionLocation = new System.Drawing.Point(19, 19);
       this.MainInstructionLocationOffset = new System.Drawing.Size(-20, 5);
       this.Name = "PasswordDialog";
       this.Text = "Connection Password";
-      this.contentAreaPanel.ResumeLayout(false);
-      this.contentAreaPanel.PerformLayout();
-      this.commandAreaPanel.ResumeLayout(false);
-      ((System.ComponentModel.ISupportInitialize)(this.picLogo)).EndInit();
+      this.ContentAreaPanel.ResumeLayout(false);
+      this.ContentAreaPanel.PerformLayout();
+      this.CommandAreaPanel.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).EndInit();
       this.ResumeLayout(false);
 
     }
 
     #endregion
 
-    private System.Windows.Forms.Button btnOK;
-    private System.Windows.Forms.Button btnCancel;
-    private System.Windows.Forms.Label lblUserValue;
-    private System.Windows.Forms.TextBox txtPassword;
-    private System.Windows.Forms.Label lblConnectionValue;
-    private System.Windows.Forms.Label lblConnection;
-    private System.Windows.Forms.Label lblUser;
-    private System.Windows.Forms.Label lblPassword;
-    private System.Windows.Forms.Label lblEnterPassword;
-    private System.Windows.Forms.PictureBox picLogo;
+    private System.Windows.Forms.Button DialogOKButton;
+    private System.Windows.Forms.Button DialogCancelButton;
+    private System.Windows.Forms.Label UserValueLabel;
+    private System.Windows.Forms.TextBox PasswordTextBox;
+    private System.Windows.Forms.Label ConnectionValueLabel;
+    private System.Windows.Forms.Label ConnectionLabel;
+    private System.Windows.Forms.Label UserLabel;
+    private System.Windows.Forms.Label PasswordLabel;
+    private System.Windows.Forms.Label EnterPasswordLabel;
+    private System.Windows.Forms.PictureBox LogoPictureBox;
   }
 }

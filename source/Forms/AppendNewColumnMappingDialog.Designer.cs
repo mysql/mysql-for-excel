@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -47,138 +47,143 @@ namespace MySQL.ForExcel
     /// </summary>
     private void InitializeComponent()
     {
-      this.btnOK = new System.Windows.Forms.Button();
-      this.btnCancel = new System.Windows.Forms.Button();
-      this.txtMappingName = new System.Windows.Forms.TextBox();
-      this.picLogo = new System.Windows.Forms.PictureBox();
-      this.lblColumnMappingName = new System.Windows.Forms.Label();
-      this.lblMappingName = new System.Windows.Forms.Label();
-      this.lblInstructions = new System.Windows.Forms.Label();
-      this.contentAreaPanel.SuspendLayout();
-      this.commandAreaPanel.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.picLogo)).BeginInit();
+      this.OKButton = new System.Windows.Forms.Button();
+      this.DialogCancelButton = new System.Windows.Forms.Button();
+      this.MappingNameTextBox = new System.Windows.Forms.TextBox();
+      this.LogoPictureBox = new System.Windows.Forms.PictureBox();
+      this.ColumnMappingNameLabel = new System.Windows.Forms.Label();
+      this.MappingNameLabel = new System.Windows.Forms.Label();
+      this.InstructionsLabel = new System.Windows.Forms.Label();
+      this.ContentAreaPanel.SuspendLayout();
+      this.CommandAreaPanel.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).BeginInit();
       this.SuspendLayout();
       // 
-      // contentAreaPanel
+      // FootnoteAreaPanel
       // 
-      this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
-      this.contentAreaPanel.Controls.Add(this.lblMappingName);
-      this.contentAreaPanel.Controls.Add(this.lblInstructions);
-      this.contentAreaPanel.Controls.Add(this.lblColumnMappingName);
-      this.contentAreaPanel.Controls.Add(this.picLogo);
-      this.contentAreaPanel.Controls.Add(this.txtMappingName);
-      this.contentAreaPanel.Size = new System.Drawing.Size(514, 135);
+      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 102);
+      this.FootnoteAreaPanel.Size = new System.Drawing.Size(514, 0);
       // 
-      // commandAreaPanel
+      // ContentAreaPanel
       // 
-      this.commandAreaPanel.Controls.Add(this.btnOK);
-      this.commandAreaPanel.Controls.Add(this.btnCancel);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 135);
-      this.commandAreaPanel.Size = new System.Drawing.Size(514, 45);
+      this.ContentAreaPanel.Controls.Add(this.MappingNameLabel);
+      this.ContentAreaPanel.Controls.Add(this.InstructionsLabel);
+      this.ContentAreaPanel.Controls.Add(this.ColumnMappingNameLabel);
+      this.ContentAreaPanel.Controls.Add(this.LogoPictureBox);
+      this.ContentAreaPanel.Controls.Add(this.MappingNameTextBox);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(514, 182);
       // 
-      // btnOK
+      // CommandAreaPanel
       // 
-      this.btnOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.btnOK.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnOK.Location = new System.Drawing.Point(346, 11);
-      this.btnOK.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-      this.btnOK.Name = "btnOK";
-      this.btnOK.Size = new System.Drawing.Size(75, 23);
-      this.btnOK.TabIndex = 0;
-      this.btnOK.Text = "OK";
-      this.btnOK.UseVisualStyleBackColor = true;
+      this.CommandAreaPanel.Controls.Add(this.OKButton);
+      this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 137);
+      this.CommandAreaPanel.Size = new System.Drawing.Size(514, 45);
       // 
-      // btnCancel
+      // OKButton
       // 
-      this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.btnCancel.Location = new System.Drawing.Point(427, 11);
-      this.btnCancel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-      this.btnCancel.Name = "btnCancel";
-      this.btnCancel.Size = new System.Drawing.Size(75, 23);
-      this.btnCancel.TabIndex = 1;
-      this.btnCancel.Text = "Cancel";
-      this.btnCancel.UseVisualStyleBackColor = true;
+      this.OKButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.OKButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+      this.OKButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.OKButton.Location = new System.Drawing.Point(346, 11);
+      this.OKButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.OKButton.Name = "OKButton";
+      this.OKButton.Size = new System.Drawing.Size(75, 23);
+      this.OKButton.TabIndex = 0;
+      this.OKButton.Text = "OK";
+      this.OKButton.UseVisualStyleBackColor = true;
       // 
-      // txtMappingName
+      // DialogCancelButton
       // 
-      this.txtMappingName.Location = new System.Drawing.Point(186, 90);
-      this.txtMappingName.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-      this.txtMappingName.Name = "txtMappingName";
-      this.txtMappingName.Size = new System.Drawing.Size(316, 20);
-      this.txtMappingName.TabIndex = 1;
-      this.txtMappingName.TextChanged += new System.EventHandler(this.txtMappingName_TextChanged);
+      this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.DialogCancelButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.DialogCancelButton.Location = new System.Drawing.Point(427, 11);
+      this.DialogCancelButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.DialogCancelButton.Name = "DialogCancelButton";
+      this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
+      this.DialogCancelButton.TabIndex = 1;
+      this.DialogCancelButton.Text = "Cancel";
+      this.DialogCancelButton.UseVisualStyleBackColor = true;
       // 
-      // picLogo
+      // MappingNameTextBox
       // 
-      this.picLogo.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Input_64x64;
-      this.picLogo.Location = new System.Drawing.Point(14, 14);
-      this.picLogo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-      this.picLogo.Name = "picLogo";
-      this.picLogo.Size = new System.Drawing.Size(64, 64);
-      this.picLogo.TabIndex = 11;
-      this.picLogo.TabStop = false;
+      this.MappingNameTextBox.Location = new System.Drawing.Point(186, 90);
+      this.MappingNameTextBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.MappingNameTextBox.Name = "MappingNameTextBox";
+      this.MappingNameTextBox.Size = new System.Drawing.Size(316, 20);
+      this.MappingNameTextBox.TabIndex = 1;
+      this.MappingNameTextBox.TextChanged += new System.EventHandler(this.MappingNameTextBox_TextChanged);
       // 
-      // lblColumnMappingName
+      // LogoPictureBox
       // 
-      this.lblColumnMappingName.AutoSize = true;
-      this.lblColumnMappingName.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblColumnMappingName.ForeColor = System.Drawing.Color.Navy;
-      this.lblColumnMappingName.Location = new System.Drawing.Point(84, 23);
-      this.lblColumnMappingName.Name = "lblColumnMappingName";
-      this.lblColumnMappingName.Size = new System.Drawing.Size(168, 18);
-      this.lblColumnMappingName.TabIndex = 0;
-      this.lblColumnMappingName.Text = "Column Mapping Name:";
+      this.LogoPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Input_64x64;
+      this.LogoPictureBox.Location = new System.Drawing.Point(14, 14);
+      this.LogoPictureBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.LogoPictureBox.Name = "LogoPictureBox";
+      this.LogoPictureBox.Size = new System.Drawing.Size(64, 64);
+      this.LogoPictureBox.TabIndex = 11;
+      this.LogoPictureBox.TabStop = false;
       // 
-      // lblMappingName
+      // ColumnMappingNameLabel
       // 
-      this.lblMappingName.AutoSize = true;
-      this.lblMappingName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblMappingName.Location = new System.Drawing.Point(84, 91);
-      this.lblMappingName.Name = "lblMappingName";
-      this.lblMappingName.Size = new System.Drawing.Size(96, 15);
-      this.lblMappingName.TabIndex = 13;
-      this.lblMappingName.Text = "Mapping Name:";
+      this.ColumnMappingNameLabel.AutoSize = true;
+      this.ColumnMappingNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ColumnMappingNameLabel.ForeColor = System.Drawing.Color.Navy;
+      this.ColumnMappingNameLabel.Location = new System.Drawing.Point(84, 23);
+      this.ColumnMappingNameLabel.Name = "ColumnMappingNameLabel";
+      this.ColumnMappingNameLabel.Size = new System.Drawing.Size(168, 18);
+      this.ColumnMappingNameLabel.TabIndex = 0;
+      this.ColumnMappingNameLabel.Text = "Column Mapping Name:";
       // 
-      // lblInstructions
+      // MappingNameLabel
       // 
-      this.lblInstructions.AutoSize = true;
-      this.lblInstructions.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblInstructions.Location = new System.Drawing.Point(84, 45);
-      this.lblInstructions.Name = "lblInstructions";
-      this.lblInstructions.Size = new System.Drawing.Size(257, 15);
-      this.lblInstructions.TabIndex = 12;
-      this.lblInstructions.Text = "Please enter a name for the column mapping.";
+      this.MappingNameLabel.AutoSize = true;
+      this.MappingNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.MappingNameLabel.Location = new System.Drawing.Point(84, 91);
+      this.MappingNameLabel.Name = "MappingNameLabel";
+      this.MappingNameLabel.Size = new System.Drawing.Size(96, 15);
+      this.MappingNameLabel.TabIndex = 13;
+      this.MappingNameLabel.Text = "Mapping Name:";
+      // 
+      // InstructionsLabel
+      // 
+      this.InstructionsLabel.AutoSize = true;
+      this.InstructionsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.InstructionsLabel.Location = new System.Drawing.Point(84, 45);
+      this.InstructionsLabel.Name = "InstructionsLabel";
+      this.InstructionsLabel.Size = new System.Drawing.Size(257, 15);
+      this.InstructionsLabel.TabIndex = 12;
+      this.InstructionsLabel.Text = "Please enter a name for the column mapping.";
       // 
       // AppendNewColumnMappingDialog
       // 
-      this.AcceptButton = this.btnOK;
+      this.AcceptButton = this.OKButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-      this.CancelButton = this.btnCancel;
+      this.CancelButton = this.DialogCancelButton;
       this.ClientSize = new System.Drawing.Size(514, 182);
-      this.CommandAreaHeight = 45;
+      this.CommandAreaVisible = true;
+      this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 13);
       this.MainInstructionLocationOffset = new System.Drawing.Size(-10, 10);
       this.Name = "AppendNewColumnMappingDialog";
       this.Text = "MySQL for Excel";
-      this.contentAreaPanel.ResumeLayout(false);
-      this.contentAreaPanel.PerformLayout();
-      this.commandAreaPanel.ResumeLayout(false);
-      ((System.ComponentModel.ISupportInitialize)(this.picLogo)).EndInit();
+      this.ContentAreaPanel.ResumeLayout(false);
+      this.ContentAreaPanel.PerformLayout();
+      this.CommandAreaPanel.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).EndInit();
       this.ResumeLayout(false);
 
     }
 
     #endregion
 
-    private System.Windows.Forms.Button btnOK;
-    private System.Windows.Forms.Button btnCancel;
-    private System.Windows.Forms.TextBox txtMappingName;
-    private System.Windows.Forms.Label lblColumnMappingName;
-    private System.Windows.Forms.PictureBox picLogo;
-    private System.Windows.Forms.Label lblMappingName;
-    private System.Windows.Forms.Label lblInstructions;
+    private System.Windows.Forms.Button OKButton;
+    private System.Windows.Forms.Button DialogCancelButton;
+    private System.Windows.Forms.TextBox MappingNameTextBox;
+    private System.Windows.Forms.Label ColumnMappingNameLabel;
+    private System.Windows.Forms.PictureBox LogoPictureBox;
+    private System.Windows.Forms.Label MappingNameLabel;
+    private System.Windows.Forms.Label InstructionsLabel;
   }
 }

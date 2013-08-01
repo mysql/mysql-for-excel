@@ -61,24 +61,6 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Version {0}.
-        /// </summary>
-        internal static string AboutMySQLForExcelVersion {
-            get {
-                return ResourceManager.GetString("AboutMySQLForExcelVersion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to MySQL Installer 1.2.
-        /// </summary>
-        internal static string AboutMySQLInstallerVersion {
-            get {
-                return ResourceManager.GetString("AboutMySQLInstallerVersion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to All active editing sessions on the current schema will be terminated. Do you wish to continue?.
         /// </summary>
         internal static string ActiveEditingSessionsCloseWarningDetail {
@@ -97,11 +79,65 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Excel data could not be appended to MySQL Table &quot;{0}&quot;..
+        /// </summary>
+        internal static string AppendDataDetailsDoneErrorText {
+            get {
+                return ResourceManager.GetString("AppendDataDetailsDoneErrorText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Excel data was appended successfully to MySQL Table &quot;{0}&quot;..
+        /// </summary>
+        internal static string AppendDataDetailsDoneSuccessText {
+            get {
+                return ResourceManager.GetString("AppendDataDetailsDoneSuccessText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Excel data was appended with warnings to MySQL Table &quot;{0}&quot;..
+        /// </summary>
+        internal static string AppendDataDetailsDoneWarningsText {
+            get {
+                return ResourceManager.GetString("AppendDataDetailsDoneWarningsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error appending data.
         /// </summary>
         internal static string AppendDataErrorTitle {
             get {
                 return ResourceManager.GetString("AppendDataErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} rows were appended successfully..
+        /// </summary>
+        internal static string AppendDataRowsAppendedSuccessfullyText {
+            get {
+                return ResourceManager.GetString("AppendDataRowsAppendedSuccessfullyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} rows were appended with {0} warnings:.
+        /// </summary>
+        internal static string AppendDataRowsAppendedWithWarningsText {
+            get {
+                return ResourceManager.GetString("AppendDataRowsAppendedWithWarningsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error while appending rows....
+        /// </summary>
+        internal static string AppendDataRowsInsertionErrorText {
+            get {
+                return ResourceManager.GetString("AppendDataRowsInsertionErrorText", resourceCulture);
             }
         }
         
@@ -574,6 +610,24 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Refresh Data Error.
+        /// </summary>
+        internal static string EditDataRefreshErrorText {
+            get {
+                return ResourceManager.GetString("EditDataRefreshErrorText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Revert Data Error.
+        /// </summary>
+        internal static string EditDataRevertErrorText {
+            get {
+                return ResourceManager.GetString("EditDataRevertErrorText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to had errors on commit; changes were rolled back..
         /// </summary>
         internal static string EditedDataCommittedError {
@@ -645,11 +699,29 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ADO.NET Error:.
+        /// </summary>
+        internal static string ErrorAdoNetText {
+            get {
+                return ResourceManager.GetString("ErrorAdoNetText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occurred creating a new schema..
         /// </summary>
         internal static string ErrorCreatingNewSchema {
             get {
                 return ResourceManager.GetString("ErrorCreatingNewSchema", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MySQL Error {0}:.
+        /// </summary>
+        internal static string ErrorMySQLText {
+            get {
+                return ResourceManager.GetString("ErrorMySQLText", resourceCulture);
             }
         }
         
@@ -709,6 +781,33 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Creating MySQL Table &quot;{0}&quot; with query....
+        /// </summary>
+        internal static string ExportDataDetailsTextLine1 {
+            get {
+                return ResourceManager.GetString("ExportDataDetailsTextLine1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Attempted to insert {0} rows, but only {1} rows were inserted with no further errors. Please check the MySQL Server log for more information..
+        /// </summary>
+        internal static string ExportDataLessRowsThanExpectedInsertedText {
+            get {
+                return ResourceManager.GetString("ExportDataLessRowsThanExpectedInsertedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;Multiple Items&gt;.
+        /// </summary>
+        internal static string ExportDataMultiPrimaryKeyText {
+            get {
+                return ResourceManager.GetString("ExportDataMultiPrimaryKeyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There is no current data to export to the new table, do you want to proceed just with the table creation?.
         /// </summary>
         internal static string ExportDataNoDataToExportDetailWarning {
@@ -723,6 +822,78 @@ namespace MySQL.ForExcel.Properties {
         internal static string ExportDataNoDataToExportTitleWarning {
             get {
                 return ResourceManager.GetString("ExportDataNoDataToExportTitleWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The MySQL Table &quot;{0}&quot; could not be created..
+        /// </summary>
+        internal static string ExportDataOperationErrorText {
+            get {
+                return ResourceManager.GetString("ExportDataOperationErrorText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The MySQL Table &quot;{0}&quot; has been created with no data..
+        /// </summary>
+        internal static string ExportDataOperationSuccessNoDataText {
+            get {
+                return ResourceManager.GetString("ExportDataOperationSuccessNoDataText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The MySQL Table &quot;{0}&quot; has been created with data..
+        /// </summary>
+        internal static string ExportDataOperationSuccessWithDataText {
+            get {
+                return ResourceManager.GetString("ExportDataOperationSuccessWithDataText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} rows have been inserted successfully..
+        /// </summary>
+        internal static string ExportDataRowsInsertedSuccessfullyText {
+            get {
+                return ResourceManager.GetString("ExportDataRowsInsertedSuccessfullyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} rows have been inserted with {1} warnings:.
+        /// </summary>
+        internal static string ExportDataRowsInsertedWithWarningsText {
+            get {
+                return ResourceManager.GetString("ExportDataRowsInsertedWithWarningsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error while inserting rows....
+        /// </summary>
+        internal static string ExportDataRowsInsertionErrorText {
+            get {
+                return ResourceManager.GetString("ExportDataRowsInsertionErrorText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Table has been created successfully..
+        /// </summary>
+        internal static string ExportDataTableCreatedSuccessfullyText {
+            get {
+                return ResourceManager.GetString("ExportDataTableCreatedSuccessfullyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Table has been created with {0} warnings:.
+        /// </summary>
+        internal static string ExportDataTableCreatedWithWarningsText {
+            get {
+                return ResourceManager.GetString("ExportDataTableCreatedWithWarningsText", resourceCulture);
             }
         }
         
@@ -754,6 +925,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error ocurred when trying to import the data..
+        /// </summary>
+        internal static string ImportDataErrorDetailText {
+            get {
+                return ResourceManager.GetString("ImportDataErrorDetailText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error importing data.
         /// </summary>
         internal static string ImportDataErrorTitle {
@@ -763,11 +943,38 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All Result Sets - Arranged Horizontally.
+        /// </summary>
+        internal static string ImportProcedureAllResultSetsHorizontally {
+            get {
+                return ResourceManager.GetString("ImportProcedureAllResultSetsHorizontally", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All Result Sets - Arranged Vertically.
+        /// </summary>
+        internal static string ImportProcedureAllResultSetsVertically {
+            get {
+                return ResourceManager.GetString("ImportProcedureAllResultSetsVertically", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error importing procedure&apos;s data.
         /// </summary>
         internal static string ImportProcedureErrorTitle {
             get {
                 return ResourceManager.GetString("ImportProcedureErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selected Result Set.
+        /// </summary>
+        internal static string ImportProcedureSelectedResultSet {
+            get {
+                return ResourceManager.GetString("ImportProcedureSelectedResultSet", resourceCulture);
             }
         }
         
@@ -799,11 +1006,29 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0}\Oracle\MySQL For Excel\MySQLForExcel.log.
+        ///   Looks up a localized string similar to Inserting Excel data in MySQL Table &quot;{0}&quot; with query....
         /// </summary>
-        internal static string LogFile {
+        internal static string InsertingExcelDataWithQueryText {
             get {
-                return ResourceManager.GetString("LogFile", resourceCulture);
+                return ResourceManager.GetString("InsertingExcelDataWithQueryText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please try a different name for the columns mapping..
+        /// </summary>
+        internal static string MappingNameAlreadyExistsDetail {
+            get {
+                return ResourceManager.GetString("MappingNameAlreadyExistsDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mapping name is already in use.
+        /// </summary>
+        internal static string MappingNameAlreadyExistsTitle {
+            get {
+                return ResourceManager.GetString("MappingNameAlreadyExistsTitle", resourceCulture);
             }
         }
         
@@ -1276,6 +1501,51 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An Error Ocurred.
+        /// </summary>
+        internal static string OperationErrorTitle {
+            get {
+                return ResourceManager.GetString("OperationErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Information.
+        /// </summary>
+        internal static string OperationInformationTitle {
+            get {
+                return ResourceManager.GetString("OperationInformationTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Press {0} to continue..
+        /// </summary>
+        internal static string OperationSubDetailText {
+            get {
+                return ResourceManager.GetString("OperationSubDetailText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Operation Completed Successfully.
+        /// </summary>
+        internal static string OperationSuccessTitle {
+            get {
+                return ResourceManager.GetString("OperationSuccessTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Operation Completed With Warnings.
+        /// </summary>
+        internal static string OperationWarningTitle {
+            get {
+                return ResourceManager.GetString("OperationWarningTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Primary Key column cannot be created because another column has the same name..
         /// </summary>
         internal static string PrimaryKeyColumnExistsWarning {
@@ -1486,6 +1756,24 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Editing not possible.
+        /// </summary>
+        internal static string TaskPaneEditingNotPossibleTitleText {
+            get {
+                return ResourceManager.GetString("TaskPaneEditingNotPossibleTitleText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error while creating new Excel Worksheet.
+        /// </summary>
+        internal static string TaskPaneErrorCreatingWorksheetText {
+            get {
+                return ResourceManager.GetString("TaskPaneErrorCreatingWorksheetText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Adding new connections is not allowed when MySQL Workbench is running..
         /// </summary>
         internal static string UnableToAddConnectionsWhenWBRunning {
@@ -1577,6 +1865,15 @@ namespace MySQL.ForExcel.Properties {
             get {
                 object obj = ResourceManager.GetObject("Warning", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Code {0} - {1}.
+        /// </summary>
+        internal static string WarningSingleText {
+            get {
+                return ResourceManager.GetString("WarningSingleText", resourceCulture);
             }
         }
         

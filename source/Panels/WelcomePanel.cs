@@ -1,16 +1,16 @@
-﻿//
+﻿// 
 // Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
@@ -20,16 +20,12 @@
 namespace MySQL.ForExcel
 {
   using System;
-  using System.Collections.Generic;
   using System.ComponentModel;
-  using System.Data;
-  using System.Drawing;
-  using System.IO;
   using System.Linq;
-  using System.Text;
   using System.Windows.Forms;
   using MySQL.ForExcel.Properties;
   using MySQL.Utility;
+  using MySQL.Utility.Forms;
 
   /// <summary>
   /// First panel shown to users within the Add-In's <see cref="TaskPaneControl"/> where connections are managed.
@@ -140,15 +136,17 @@ namespace MySQL.ForExcel
         return;
       }
 
-      WarningDialog warningDlg = new WarningDialog(Resources.DeleteConnectionWarningTitle, Resources.DeleteConnectionWarningDetail);
-      if (warningDlg.ShowDialog() == DialogResult.No)
+      DialogResult dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.DeleteConnectionWarningTitle, Resources.DeleteConnectionWarningDetail);
+      if (dr == DialogResult.No)
       {
         return;
       }
 
       MySqlWorkbenchConnection connectionToRemove = ConnectionsList.SelectedNode.Tag as MySqlWorkbenchConnection;
-      MySQLForExcelConnectionsHelper.RemoveConnection(connectionToRemove.Id);
-      LoadConnections(false);
+      if (MySqlWorkbench.Connections.DeleteConnection(connectionToRemove.Id))
+      {
+        LoadConnections(false);
+      }
     }
 
     /// <summary>
@@ -157,11 +155,9 @@ namespace MySQL.ForExcel
     /// </summary>
     private void LoadConnections(bool reloadConnections)
     {
-      List<MySqlWorkbenchConnection> connections = MySQLForExcelConnectionsHelper.GetConnections(reloadConnections);
-
-      if (connections == null)
+      if (reloadConnections)
       {
-        return;
+        MySqlWorkbench.Connections.Load();
       }
 
       //// Avoids flickering of connections list while adding the items to it.
@@ -174,8 +170,9 @@ namespace MySQL.ForExcel
       }
 
       //// Load connections just obtained from Workbench or locally created
-      foreach (MySqlWorkbenchConnection conn in connections)
+      foreach (MySqlWorkbenchConnection conn in MySqlWorkbench.Connections.OrderBy(conn => conn.Name))
       {
+        conn.AllowZeroDateTimeValues = true;
         AddConnectionToList(conn);
       }
 
@@ -210,22 +207,20 @@ namespace MySQL.ForExcel
       if (MySqlWorkbench.IsRunning)
       {
         //// If Workbench is running we can't allow adding new connections
-        InfoDialog id = new InfoDialog(false, Resources.UnableToAddConnectionsWhenWBRunning, string.Empty);
-        id.OperationSummarySubText = Resources.CloseWBAdviceToAdd;
-        id.ShowDialog();
+        InfoDialog.ShowErrorDialog(Resources.OperationErrorTitle, Resources.UnableToAddConnectionsWhenWBRunning, Resources.CloseWBAdviceToAdd);
         return;
       }
 
-      NewConnectionDialog dlg = new NewConnectionDialog();
-      DialogResult result = dlg.ShowDialog();
-      if (result == DialogResult.Cancel)
+      using (MySQLWorkbenchConnectionDialog newConnectionDialog = new MySQLWorkbenchConnectionDialog(null))
       {
-        return;
+        DialogResult result = newConnectionDialog.ShowDialog();
+        if (result == DialogResult.OK)
+        {
+          LoadConnections(false);
+        }
       }
-
-      MySQLForExcelConnectionsHelper.SaveConnection(dlg.NewConnection);
-      LoadConnections(false);
     }
+
     /// <summary>
     /// Event delegate method fired when the <see cref="RefreshToolStripMenuItem"/> context-menu item is clicked.
     /// </summary>

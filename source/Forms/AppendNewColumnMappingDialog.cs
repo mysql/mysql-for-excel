@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -17,39 +17,59 @@
 // 02110-1301  USA
 //
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-
 namespace MySQL.ForExcel
 {
+  using System;
+  using MySQL.Utility.Forms;
+
+  /// <summary>
+  /// Provides an interface to let users input a column mapping name that will be saved to file.
+  /// </summary>
   public partial class AppendNewColumnMappingDialog : AutoStyleableBaseDialog
   {
-    public string ColumnMappingName
-    {
-      get { return txtMappingName.Text.Trim(); }
-      set { txtMappingName.Text = value; }
-    }
-
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AppendNewColumnMappingDialog"/> class.
+    /// </summary>
+    /// <param name="proposedMappingName">The name of the column mapping proposed by the system.</param>
     public AppendNewColumnMappingDialog(string proposedMappingName)
     {
       InitializeComponent();
-      txtMappingName.Text = proposedMappingName;
-      txtMappingName.SelectAll();
+      MappingNameTextBox.Text = proposedMappingName;
+      MappingNameTextBox.SelectAll();
     }
 
-    public AppendNewColumnMappingDialog() : this(String.Empty)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AppendNewColumnMappingDialog"/> class.
+    /// </summary>
+    public AppendNewColumnMappingDialog()
+      : this(string.Empty)
     {
     }
 
-    private void txtMappingName_TextChanged(object sender, EventArgs e)
+    /// <summary>
+    /// Gets or sets the name of the column mapping that will be saved to file.
+    /// </summary>
+    public string ColumnMappingName
     {
-      btnOK.Enabled = ColumnMappingName.Length > 0;
+      get
+      {
+        return MappingNameTextBox.Text.Trim();
+      }
+
+      set
+      {
+        MappingNameTextBox.Text = value;
+      }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the text in the <see cref="MappingNameTextBox"/> changes.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void MappingNameTextBox_TextChanged(object sender, EventArgs e)
+    {
+      OKButton.Enabled = ColumnMappingName.Length > 0;
     }
   }
 }

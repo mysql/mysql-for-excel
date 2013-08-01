@@ -1,19 +1,21 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// 
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
+//
 
 namespace MySQL.ForExcel
 {
@@ -65,7 +67,7 @@ namespace MySQL.ForExcel
     private ulong _mysqlMaxAllowedPacket;
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     private bool? _tableExistsInSchema;
 
@@ -94,7 +96,7 @@ namespace MySQL.ForExcel
     /// <param name="addBufferToVarchar">Flag indicating if columns with an auto-detected varchar type will get a padding buffer for its size.</param>
     /// <param name="autoIndexIntColumns">Flag indicating if columns with an integer-based data-type will have their <see cref="CreateIndex"/> property value set to true.</param>
     /// <param name="autoAllowEmptyNonIndexColumns">Flag indicating if columns that have their <see cref="CreateIndex"/> property value set to false will automatically get their <see cref="AllowNull"/> property value set to true.</param>
-    /// <param name="wbConnection">Connection to a MySQL server instance selected by users.</param>
+    /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     public MySQLDataTable(string schemaName, string proposedTableName, bool addPrimaryKeyCol, bool useFormattedValues, bool removeEmptyColumns, bool detectDataType, bool addBufferToVarchar, bool autoIndexIntColumns, bool autoAllowEmptyNonIndexColumns, MySqlWorkbenchConnection wbConnection)
       : this(schemaName, proposedTableName)
     {
@@ -117,7 +119,7 @@ namespace MySQL.ForExcel
     /// <param name="tableName">Name of the table.</param>
     /// <param name="fetchColumnsSchemaInfo">Flag indicating if the schema information from the corresponding MySQL table is fetched and recreated before any excelData is added to the table.</param>
     /// <param name="datesAsMySQLDates">Flag indicating if the dates are stored in the table as <see cref="System.DateTime"/> or <see cref="MySql.Data.Types.MySqlDateTime"/> objects.</param>
-    /// <param name="wbConnection">Connection to a MySQL server instance selected by users.</param>
+    /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     public MySQLDataTable(string tableName, bool fetchColumnsSchemaInfo, bool datesAsMySQLDates, MySqlWorkbenchConnection wbConnection)
       : this(wbConnection.Schema, tableName)
     {
@@ -136,7 +138,7 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="tableName">Name of the table.</param>
     /// <param name="filledTable"><see cref="DataTable"/> object containing imported excelData from the MySQL table to be edited.</param>
-    /// <param name="wbConnection">Connection to a MySQL server instance selected by users.</param>
+    /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     public MySQLDataTable(string tableName, DataTable filledTable, MySqlWorkbenchConnection wbConnection)
       : this(tableName, true, true, wbConnection)
     {
@@ -547,7 +549,7 @@ namespace MySQL.ForExcel
       MySqlTransaction transaction = null;
       string chunkQuery = sqlQuery = string.Empty;
 
-      string connectionString = MySQLDataUtilities.GetConnectionString(WBConnection);
+      string connectionString = WBConnection.GetConnectionStringBuilder().ConnectionString;
       using (MySqlConnection conn = new MySqlConnection(connectionString))
       {
         try
@@ -580,7 +582,7 @@ namespace MySQL.ForExcel
           }
 
           exception = mysqlEx;
-          MiscUtilities.WriteAppErrorToLog(mysqlEx);
+          MySQLSourceTrace.WriteAppErrorToLog(mysqlEx);
         }
         catch (Exception ex)
         {
@@ -590,7 +592,7 @@ namespace MySQL.ForExcel
           }
 
           exception = ex;
-          MiscUtilities.WriteAppErrorToLog(ex);
+          MySQLSourceTrace.WriteAppErrorToLog(ex);
         }
       }
 
@@ -671,7 +673,7 @@ namespace MySQL.ForExcel
     public DataTable CreateTable(out Exception exception, out string sqlQuery)
     {
       DataSet warningsDS = null;
-      string connectionString = MySQLDataUtilities.GetConnectionString(WBConnection);
+      string connectionString = WBConnection.GetConnectionStringBuilder().ConnectionString;
       exception = null;
       sqlQuery = GetCreateSQL(true);
 
@@ -688,7 +690,7 @@ namespace MySQL.ForExcel
       catch (MySqlException ex)
       {
         exception = ex;
-        MiscUtilities.WriteAppErrorToLog(ex);
+        MySQLSourceTrace.WriteAppErrorToLog(ex);
       }
 
       return warningsDS != null && warningsDS.Tables.Count > 0 ? warningsDS.Tables[0] : null;
@@ -1171,7 +1173,7 @@ namespace MySQL.ForExcel
     /// <returns>Unique column name.</returns>
     public string GetNonDuplicateColumnName(string proposedName, int forColumnIndex = -1)
     {
-      List<string> columnNames =  Columns != null && Columns.Count > 0 ? Columns.OfType<MySQLDataColumn>().Where(col => col.Ordinal != forColumnIndex).Select(col => col.DisplayName).ToList<string>() : null;
+      List<string> columnNames = Columns != null && Columns.Count > 0 ? Columns.OfType<MySQLDataColumn>().Where(col => col.Ordinal != forColumnIndex).Select(col => col.DisplayName).ToList<string>() : null;
       return MiscUtilities.GetNonDuplicateText(columnNames, proposedName);
     }
 
@@ -1219,6 +1221,7 @@ namespace MySQL.ForExcel
           }
 
           break;
+
         case DataRowState.Added:
           int colIdx = 0;
           int startingColNum = AddPrimaryKeyColumn ? (_useFirstColumnAsPK ? 0 : 1) : 0;
@@ -1261,6 +1264,7 @@ namespace MySQL.ForExcel
 
           queryString.Append(")");
           break;
+
         case DataRowState.Modified:
           StringBuilder wClauseString = new StringBuilder(" WHERE ");
           string wClauseColsSeparator = string.Empty;
@@ -1349,7 +1353,7 @@ namespace MySQL.ForExcel
       MySqlTransaction transaction = null;
       string chunkQuery = sqlQuery = string.Empty;
 
-      string connectionString = MySQLDataUtilities.GetConnectionString(WBConnection);
+      string connectionString = WBConnection.GetConnectionStringBuilder().ConnectionString;
       using (MySqlConnection conn = new MySqlConnection(connectionString))
       {
         try
@@ -1384,7 +1388,7 @@ namespace MySQL.ForExcel
           }
 
           exception = mysqlEx;
-          MiscUtilities.WriteAppErrorToLog(mysqlEx);
+          MySQLSourceTrace.WriteAppErrorToLog(mysqlEx);
         }
         catch (Exception ex)
         {
@@ -1394,7 +1398,7 @@ namespace MySQL.ForExcel
           }
 
           exception = ex;
-          MiscUtilities.WriteAppErrorToLog(ex);
+          MySQLSourceTrace.WriteAppErrorToLog(ex);
         }
       }
 
@@ -1415,7 +1419,7 @@ namespace MySQL.ForExcel
       PushResultsDataTable resultsDT = new PushResultsDataTable();
       MySqlTransaction transaction = null;
       DataSet warningsDS = null;
-      string connectionString = MySQLDataUtilities.GetConnectionString(WBConnection);
+      string connectionString = WBConnection.GetConnectionStringBuilder().ConnectionString;
       DataRowState[] pushOperationsArray = new DataRowState[3] { DataRowState.Deleted, DataRowState.Added, DataRowState.Modified };
       PushResultsDataTable.OperationType currentOperationType = PushResultsDataTable.OperationType.Prepare;
       string queryText = string.Empty;
@@ -1519,9 +1523,9 @@ namespace MySQL.ForExcel
             lastRow.RowError = mysqlEx.Message;
           }
 
-          errorText = string.Format("MySQL Error {0}:{1}{2}", mysqlEx.Number, Environment.NewLine, mysqlEx.Message);
+          errorText = string.Format(Properties.Resources.ErrorMySQLText, mysqlEx.Number) + Environment.NewLine + mysqlEx.Message;
           resultsDT.AddResult(operationIndex, currentOperationType, PushResultsDataTable.OperationResult.Error, queryText, errorText, 0);
-          MiscUtilities.WriteAppErrorToLog(mysqlEx);
+          MySQLSourceTrace.WriteAppErrorToLog(mysqlEx);
         }
         catch (Exception ex)
         {
@@ -1535,9 +1539,9 @@ namespace MySQL.ForExcel
             lastRow.RowError = ex.Message;
           }
 
-          errorText = string.Format("ADO.NET Error:{0}{1}", Environment.NewLine, ex.Message);
+          errorText = Properties.Resources.ErrorAdoNetText + Environment.NewLine + ex.Message;
           resultsDT.AddResult(operationIndex, currentOperationType, PushResultsDataTable.OperationResult.Error, queryText, errorText, 0);
-          MiscUtilities.WriteAppErrorToLog(ex);
+          MySQLSourceTrace.WriteAppErrorToLog(ex);
         }
       }
 
@@ -1577,12 +1581,12 @@ namespace MySQL.ForExcel
       catch (MySqlException mysqlEx)
       {
         exception = mysqlEx;
-        MiscUtilities.WriteAppErrorToLog(mysqlEx);
+        MySQLSourceTrace.WriteAppErrorToLog(mysqlEx);
       }
       catch (Exception ex)
       {
         exception = ex;
-        MiscUtilities.WriteAppErrorToLog(ex);
+        MySQLSourceTrace.WriteAppErrorToLog(ex);
       }
     }
 
@@ -1643,7 +1647,7 @@ namespace MySQL.ForExcel
       {
         CreateColumns(numCols);
       }
-      
+
       //// Set the IsEmpty and Exclude properties of columns based on the filling data
       for (int colIdx = 0; colIdx < Columns.Count; colIdx++)
       {
@@ -1676,7 +1680,7 @@ namespace MySQL.ForExcel
           }
 
           rowHasAnyData = rowHasAnyData || excelData[row, col] != null;
-          dataRow[adjColIdx] = excelData[row, col] != null && excelData[row, col].Equals(0.0) && columnsContainDatesList[adjColIdx] ? DataTypeUtilities.EMPTY_DATE : dataRow[adjColIdx] = excelData[row, col];
+          dataRow[adjColIdx] = excelData[row, col] != null && excelData[row, col].Equals(0.0) && columnsContainDatesList[adjColIdx] ? DataTypeUtilities.MYSQL_EMPTY_DATE : dataRow[adjColIdx] = excelData[row, col];
         }
 
         if (rowHasAnyData)
@@ -1831,10 +1835,8 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog errorDialog = new InfoDialog(false, Properties.Resources.TableDataCopyErrorTitle, string.Format("{0}{2}{2}{1}", ex.Message, ex.StackTrace, Environment.NewLine));
-        errorDialog.WordWrapDetails = true;
-        errorDialog.ShowDialog();
-        MiscUtilities.WriteAppErrorToLog(ex);
+        MiscUtilities.ShowCustomizedErrorDialog(Properties.Resources.TableDataCopyErrorTitle, ex.Message + Environment.NewLine + Environment.NewLine + ex.StackTrace, true);
+        MySQLSourceTrace.WriteAppErrorToLog(ex);
       }
     }
 
@@ -1964,12 +1966,14 @@ namespace MySQL.ForExcel
                 }
 
                 DateTime dtValue = (DateTime)valueFromArray;
-                Rows[rowPos - 1][dataColPos - colAdjustIdx] = dtValue.ToString(DataTypeUtilities.DATE_FORMAT);
+                Rows[rowPos - 1][dataColPos - colAdjustIdx] = dtValue.ToString(DataTypeUtilities.MYSQL_DATE_FORMAT);
                 break;
+
               case "Varchar":
                 varCharValueLength = AddBufferToVarchar ? int.Parse(proposedType.Substring(leftParensIndex + 1, proposedType.Length - leftParensIndex - 2)) : valueAsString.Length;
                 varCharMaxLen[0] = Math.Max(varCharValueLength, varCharMaxLen[0]);
                 break;
+
               case "Decimal":
                 int commaPos = proposedType.IndexOf(",");
                 decimalMaxLen[0] = Math.Max(int.Parse(proposedType.Substring(leftParensIndex + 1, commaPos - leftParensIndex - 1)), decimalMaxLen[0]);
@@ -2007,7 +2011,7 @@ namespace MySQL.ForExcel
           {
             if (dr[dataColPos - colAdjustIdx].ToString() == "0")
             {
-              dr[dataColPos - colAdjustIdx] = DataTypeUtilities.EMPTY_DATE;
+              dr[dataColPos - colAdjustIdx] = DataTypeUtilities.MYSQL_EMPTY_DATE;
             }
           }
         }
@@ -2019,6 +2023,7 @@ namespace MySQL.ForExcel
           strippedType = leftParensIndex < 0 ? proposedType : proposedType.Substring(0, leftParensIndex);
           typesListFor1stAndRest.Add(strippedType);
         }
+
         proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListFor1stAndRest, decimalMaxLen, varCharMaxLen);
         col.RowsFrom1stDataType = proposedType;
         col.SetMySQLDataType(_firstRowIsHeaders ? col.RowsFrom2ndDataType : col.RowsFrom1stDataType);

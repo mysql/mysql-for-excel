@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -17,33 +17,41 @@
 // 02110-1301  USA
 //
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Office.Tools.Ribbon;
-using System.Windows.Forms;
 
 namespace MySQL.ForExcel
 {
+  /// <summary>
+  /// Attaches the add-in to a ribbon button.
+  /// </summary>
   public partial class ManageTaskPaneRibbon
   {
+    /// <summary>
+    /// Event delegate method fired when the <see cref="ManageTaskPaneRibbon"/> is loaded.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
     private void ManageTaskPaneRibbon_Load(object sender, RibbonUIEventArgs e)
     {
-
     }
 
-    private void togShowTaskPane_Click(object sender, RibbonControlEventArgs e)
+    /// <summary>
+    /// Event delegate method fired when the <see cref="ShowTaskPaneRibbonToggleButton"/> is clicked
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ShowTaskPaneRibbonToggleButton_Click(object sender, RibbonControlEventArgs e)
     {
-      bool enableAddIn = ((RibbonToggleButton)sender).Checked;
+      bool enableAddIn = (sender as RibbonToggleButton).Checked;
       Globals.ThisAddIn.TaskPane.Visible = enableAddIn;
       if (!enableAddIn)
       {
         TaskPaneControl tpc = Globals.ThisAddIn.TaskPane as TaskPaneControl;
         if (tpc != null)
-          tpc.CloseAddIn();
+        {
+          tpc.CloseAddIn(false);
+        }
       }
     }
-
   }
 }

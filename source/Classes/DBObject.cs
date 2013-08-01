@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -17,38 +17,53 @@
 // 02110-1301  USA
 //
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Data;
-using MySql.Data.MySqlClient;
-using System.Windows.Forms;
-
 namespace MySQL.ForExcel
 {
-  public enum DBObjectType { Table = 0, View = 1, Routine = 2 };
-  public enum RoutineType { None, Procedure, Function };
-
+  /// <summary>
+  /// Represents a MySQL database object that MySQL for Excel can interact with.
+  /// </summary>
   public class DBObject
   {
-    public string Name;
-    public DBObjectType Type;
-    public RoutineType RoutineType;
-
-    public DBObject()
-    {
-    }
-
-    public DBObject(string name, DBObjectType type, RoutineType routineType)
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DBObject"/> class.
+    /// </summary>
+    /// <param name="name">The name of the MySQL database object.</param>
+    /// <param name="type">The MySQL database object type.</param>
+    public DBObject(string name, DBObjectType type)
     {
       Name = name;
       Type = type;
-      RoutineType = routineType;
     }
 
-    public DBObject(string name, DBObjectType type) : this(name, type, RoutineType.None)
-    { }
-  }
+    /// <summary>
+    /// Specifies identifiers to indicate the MySQL database object type.
+    /// </summary>
+    public enum DBObjectType
+    {
+      /// <summary>
+      /// A MySQL table object.
+      /// </summary>
+      Table,
 
+      /// <summary>
+      /// A MySQL view object.
+      /// </summary>
+      View,
+
+      /// <summary>
+      /// A MySQL stored procedure object.
+      /// </summary>
+      Procedure
+    }
+
+    /// <summary>
+    /// Gets the name of the MySQL database object.
+    /// </summary>
+    public string Name { get; private set; }
+
+    /// <summary>
+    /// Gets the MySQL database object type.
+    /// </summary>
+    public DBObjectType Type { get; private set; }
+  }
 }

@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -47,127 +47,132 @@ namespace MySQL.ForExcel
     /// </summary>
     private void InitializeComponent()
     {
-      this.lblOperationSummary = new System.Windows.Forms.Label();
-      this.picLogo = new System.Windows.Forms.PictureBox();
-      this.lblRevertData = new System.Windows.Forms.Label();
-      this.btnCancel = new System.Windows.Forms.Button();
-      this.btnRevert = new System.Windows.Forms.Button();
-      this.btnRefreshData = new System.Windows.Forms.Button();
-      this.contentAreaPanel.SuspendLayout();
-      this.commandAreaPanel.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.picLogo)).BeginInit();
+      this.OperationSummaryLabel = new System.Windows.Forms.Label();
+      this.LogoPictureBox = new System.Windows.Forms.PictureBox();
+      this.RevertDataLabel = new System.Windows.Forms.Label();
+      this.DialogCancelButton = new System.Windows.Forms.Button();
+      this.RevertDataButton = new System.Windows.Forms.Button();
+      this.RefreshDataButton = new System.Windows.Forms.Button();
+      this.ContentAreaPanel.SuspendLayout();
+      this.CommandAreaPanel.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).BeginInit();
       this.SuspendLayout();
       // 
-      // contentAreaPanel
+      // FootnoteAreaPanel
       // 
-      this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
-      this.contentAreaPanel.Controls.Add(this.lblOperationSummary);
-      this.contentAreaPanel.Controls.Add(this.picLogo);
-      this.contentAreaPanel.Controls.Add(this.lblRevertData);
-      this.contentAreaPanel.Size = new System.Drawing.Size(484, 106);
+      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 71);
+      this.FootnoteAreaPanel.Size = new System.Drawing.Size(484, 0);
       // 
-      // commandAreaPanel
+      // ContentAreaPanel
       // 
-      this.commandAreaPanel.Controls.Add(this.btnRefreshData);
-      this.commandAreaPanel.Controls.Add(this.btnRevert);
-      this.commandAreaPanel.Controls.Add(this.btnCancel);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 106);
-      this.commandAreaPanel.Size = new System.Drawing.Size(484, 45);
+      this.ContentAreaPanel.Controls.Add(this.OperationSummaryLabel);
+      this.ContentAreaPanel.Controls.Add(this.LogoPictureBox);
+      this.ContentAreaPanel.Controls.Add(this.RevertDataLabel);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(484, 151);
       // 
-      // lblOperationSummary
+      // CommandAreaPanel
       // 
-      this.lblOperationSummary.AutoSize = true;
-      this.lblOperationSummary.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblOperationSummary.Location = new System.Drawing.Point(92, 56);
-      this.lblOperationSummary.Name = "lblOperationSummary";
-      this.lblOperationSummary.Size = new System.Drawing.Size(341, 30);
-      this.lblOperationSummary.TabIndex = 26;
-      this.lblOperationSummary.Text = "Reverting changes or refreshing data from the DB will cause\r\nyour changes to be l" +
+      this.CommandAreaPanel.Controls.Add(this.RefreshDataButton);
+      this.CommandAreaPanel.Controls.Add(this.RevertDataButton);
+      this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 106);
+      this.CommandAreaPanel.Size = new System.Drawing.Size(484, 45);
+      // 
+      // OperationSummaryLabel
+      // 
+      this.OperationSummaryLabel.AutoSize = true;
+      this.OperationSummaryLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.OperationSummaryLabel.Location = new System.Drawing.Point(92, 56);
+      this.OperationSummaryLabel.Name = "OperationSummaryLabel";
+      this.OperationSummaryLabel.Size = new System.Drawing.Size(341, 30);
+      this.OperationSummaryLabel.TabIndex = 26;
+      this.OperationSummaryLabel.Text = "Reverting changes or refreshing data from the DB will cause\r\nyour changes to be l" +
     "ost. Click on the buttons below to proceed.";
       // 
-      // picLogo
+      // LogoPictureBox
       // 
-      this.picLogo.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Logo_64x64;
-      this.picLogo.Location = new System.Drawing.Point(21, 22);
-      this.picLogo.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-      this.picLogo.Name = "picLogo";
-      this.picLogo.Size = new System.Drawing.Size(64, 64);
-      this.picLogo.TabIndex = 27;
-      this.picLogo.TabStop = false;
+      this.LogoPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Logo_64x64;
+      this.LogoPictureBox.Location = new System.Drawing.Point(21, 22);
+      this.LogoPictureBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.LogoPictureBox.Name = "LogoPictureBox";
+      this.LogoPictureBox.Size = new System.Drawing.Size(64, 64);
+      this.LogoPictureBox.TabIndex = 27;
+      this.LogoPictureBox.TabStop = false;
       // 
-      // lblRevertData
+      // RevertDataLabel
       // 
-      this.lblRevertData.AutoSize = true;
-      this.lblRevertData.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblRevertData.ForeColor = System.Drawing.Color.Navy;
-      this.lblRevertData.Location = new System.Drawing.Point(91, 29);
-      this.lblRevertData.Name = "lblRevertData";
-      this.lblRevertData.Size = new System.Drawing.Size(87, 20);
-      this.lblRevertData.TabIndex = 25;
-      this.lblRevertData.Text = "Revert Data";
+      this.RevertDataLabel.AutoSize = true;
+      this.RevertDataLabel.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.RevertDataLabel.ForeColor = System.Drawing.Color.Navy;
+      this.RevertDataLabel.Location = new System.Drawing.Point(91, 29);
+      this.RevertDataLabel.Name = "RevertDataLabel";
+      this.RevertDataLabel.Size = new System.Drawing.Size(87, 20);
+      this.RevertDataLabel.TabIndex = 25;
+      this.RevertDataLabel.Text = "Revert Data";
       // 
-      // btnCancel
+      // DialogCancelButton
       // 
-      this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnCancel.Location = new System.Drawing.Point(397, 11);
-      this.btnCancel.Name = "btnCancel";
-      this.btnCancel.Size = new System.Drawing.Size(75, 23);
-      this.btnCancel.TabIndex = 0;
-      this.btnCancel.Text = "Cancel";
-      this.btnCancel.UseVisualStyleBackColor = true;
+      this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.DialogCancelButton.Location = new System.Drawing.Point(397, 11);
+      this.DialogCancelButton.Name = "DialogCancelButton";
+      this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
+      this.DialogCancelButton.TabIndex = 0;
+      this.DialogCancelButton.Text = "Cancel";
+      this.DialogCancelButton.UseVisualStyleBackColor = true;
       // 
-      // btnRevert
+      // RevertDataButton
       // 
-      this.btnRevert.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnRevert.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.btnRevert.Location = new System.Drawing.Point(235, 11);
-      this.btnRevert.Name = "btnRevert";
-      this.btnRevert.Size = new System.Drawing.Size(156, 23);
-      this.btnRevert.TabIndex = 1;
-      this.btnRevert.Text = "Revert Changed Data";
-      this.btnRevert.UseVisualStyleBackColor = true;
-      this.btnRevert.Click += new System.EventHandler(this.btnRevert_Click);
+      this.RevertDataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.RevertDataButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+      this.RevertDataButton.Location = new System.Drawing.Point(235, 11);
+      this.RevertDataButton.Name = "RevertDataButton";
+      this.RevertDataButton.Size = new System.Drawing.Size(156, 23);
+      this.RevertDataButton.TabIndex = 1;
+      this.RevertDataButton.Text = "Revert Changed Data";
+      this.RevertDataButton.UseVisualStyleBackColor = true;
+      this.RevertDataButton.Click += new System.EventHandler(this.RevertDataButton_Click);
       // 
-      // btnRefreshData
+      // RefreshDataButton
       // 
-      this.btnRefreshData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnRefreshData.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.btnRefreshData.Location = new System.Drawing.Point(85, 11);
-      this.btnRefreshData.Name = "btnRefreshData";
-      this.btnRefreshData.Size = new System.Drawing.Size(144, 23);
-      this.btnRefreshData.TabIndex = 2;
-      this.btnRefreshData.Text = "Refresh Data from DB";
-      this.btnRefreshData.UseVisualStyleBackColor = true;
-      this.btnRefreshData.Click += new System.EventHandler(this.btnRefreshData_Click);
+      this.RefreshDataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.RefreshDataButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+      this.RefreshDataButton.Location = new System.Drawing.Point(85, 11);
+      this.RefreshDataButton.Name = "RefreshDataButton";
+      this.RefreshDataButton.Size = new System.Drawing.Size(144, 23);
+      this.RefreshDataButton.TabIndex = 2;
+      this.RefreshDataButton.Text = "Refresh Data from DB";
+      this.RefreshDataButton.UseVisualStyleBackColor = true;
+      this.RefreshDataButton.Click += new System.EventHandler(this.RefreshDataButton_Click);
       // 
       // EditDataRevertDialog
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-      this.CancelButton = this.btnCancel;
-      this.ClientSize = new System.Drawing.Size(484, 152);
-      this.CommandAreaHeight = 45;
+      this.CancelButton = this.DialogCancelButton;
+      this.ClientSize = new System.Drawing.Size(484, 151);
+      this.CommandAreaVisible = true;
+      this.FootnoteAreaHeight = 0;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
       this.MaximumSize = new System.Drawing.Size(500, 190);
       this.MinimumSize = new System.Drawing.Size(500, 190);
       this.Name = "EditDataRevertDialog";
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
       this.Text = "MySQL for Excel";
-      this.contentAreaPanel.ResumeLayout(false);
-      this.contentAreaPanel.PerformLayout();
-      this.commandAreaPanel.ResumeLayout(false);
-      ((System.ComponentModel.ISupportInitialize)(this.picLogo)).EndInit();
+      this.ContentAreaPanel.ResumeLayout(false);
+      this.ContentAreaPanel.PerformLayout();
+      this.CommandAreaPanel.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).EndInit();
       this.ResumeLayout(false);
 
     }
 
     #endregion
 
-    private System.Windows.Forms.Label lblOperationSummary;
-    private System.Windows.Forms.PictureBox picLogo;
-    private System.Windows.Forms.Label lblRevertData;
-    private System.Windows.Forms.Button btnCancel;
-    private System.Windows.Forms.Button btnRefreshData;
-    private System.Windows.Forms.Button btnRevert;
+    private System.Windows.Forms.Label OperationSummaryLabel;
+    private System.Windows.Forms.PictureBox LogoPictureBox;
+    private System.Windows.Forms.Label RevertDataLabel;
+    private System.Windows.Forms.Button DialogCancelButton;
+    private System.Windows.Forms.Button RefreshDataButton;
+    private System.Windows.Forms.Button RevertDataButton;
   }
 }

@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -53,130 +53,134 @@ namespace MySQL.ForExcel
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AppendDataForm));
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-      this.btnAppend = new System.Windows.Forms.Button();
-      this.btnCancel = new System.Windows.Forms.Button();
-      this.lblManuallyAdjustMappingMainSub = new System.Windows.Forms.Label();
-      this.chkFirstRowHeaders = new System.Windows.Forms.CheckBox();
-      this.grdFromExcelData = new MySQL.ForExcel.PreviewDataGridView();
-      this.lblChooseColumnMappingMainSub = new System.Windows.Forms.Label();
-      this.lblChooseColumnMappingMain = new System.Windows.Forms.Label();
-      this.picChooseColumnMapping = new System.Windows.Forms.PictureBox();
-      this.lblManuallyAdjustMappingMain = new System.Windows.Forms.Label();
-      this.picManuallyAdjustMapping = new System.Windows.Forms.PictureBox();
-      this.lblExportData = new System.Windows.Forms.Label();
-      this.picColorMapMapped = new System.Windows.Forms.PictureBox();
-      this.lblColorMapMapped = new System.Windows.Forms.Label();
-      this.picColorMapUnmapped = new System.Windows.Forms.PictureBox();
-      this.lblColorMapUnmapped = new System.Windows.Forms.Label();
-      this.pictureBox1 = new System.Windows.Forms.PictureBox();
-      this.lblMappingMethod = new System.Windows.Forms.Label();
-      this.cmbMappingMethod = new System.Windows.Forms.ComboBox();
-      this.btnAdvanced = new System.Windows.Forms.Button();
-      this.btnStoreMapping = new System.Windows.Forms.Button();
-      this.grdToMySQLTable = new MySQL.ForExcel.MultiHeaderDataGridView();
-      this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-      this.removeColumnMappingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.clearAllMappingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.lblSubSetOfData = new System.Windows.Forms.Label();
-      this.contentAreaPanel.SuspendLayout();
-      this.commandAreaPanel.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.grdFromExcelData)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picChooseColumnMapping)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picManuallyAdjustMapping)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picColorMapMapped)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picColorMapUnmapped)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.grdToMySQLTable)).BeginInit();
-      this.contextMenu.SuspendLayout();
+      this.AppendButton = new System.Windows.Forms.Button();
+      this.DialogCancelButton = new System.Windows.Forms.Button();
+      this.ManuallyAdjustMappingMainSubLabel = new System.Windows.Forms.Label();
+      this.FirstRowHeadersCheckBox = new System.Windows.Forms.CheckBox();
+      this.SourceExcelDataDataGridView = new MySQL.ForExcel.PreviewDataGridView();
+      this.ChooseColumnMappingMainSubLabel = new System.Windows.Forms.Label();
+      this.ChooseColumnMappingMainLabel = new System.Windows.Forms.Label();
+      this.ChooseColumnMappingPictureBox = new System.Windows.Forms.PictureBox();
+      this.ManuallyAdjustMappingMainLabel = new System.Windows.Forms.Label();
+      this.ManuallyAdjustMappingPictureBox = new System.Windows.Forms.PictureBox();
+      this.ExportDataLabel = new System.Windows.Forms.Label();
+      this.ColorMapMappedPictureBox = new System.Windows.Forms.PictureBox();
+      this.ColorMapMappedLabel = new System.Windows.Forms.Label();
+      this.ColorMapUnmappedPictureBox = new System.Windows.Forms.PictureBox();
+      this.ColorMapUnmappedLabel = new System.Windows.Forms.Label();
+      this.DownArrowPictureBox = new System.Windows.Forms.PictureBox();
+      this.MappingMethodLabel = new System.Windows.Forms.Label();
+      this.MappingMethodComboBox = new System.Windows.Forms.ComboBox();
+      this.AdvancedOptionsButton = new System.Windows.Forms.Button();
+      this.StoreMappingButton = new System.Windows.Forms.Button();
+      this.TargetMySQLTableDataGridView = new MySQL.ForExcel.MultiHeaderDataGridView();
+      this.AppendContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.RemoveColumnMappingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.ClearAllMappingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.SubSetOfDataLabel = new System.Windows.Forms.Label();
+      this.ContentAreaPanel.SuspendLayout();
+      this.CommandAreaPanel.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.SourceExcelDataDataGridView)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.ChooseColumnMappingPictureBox)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.ManuallyAdjustMappingPictureBox)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.ColorMapMappedPictureBox)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.ColorMapUnmappedPictureBox)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.DownArrowPictureBox)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.TargetMySQLTableDataGridView)).BeginInit();
+      this.AppendContextMenu.SuspendLayout();
       this.SuspendLayout();
       // 
-      // contentAreaPanel
+      // FootnoteAreaPanel
       // 
-      this.contentAreaPanel.AllowDrop = true;
-      this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
-      this.contentAreaPanel.Controls.Add(this.lblSubSetOfData);
-      this.contentAreaPanel.Controls.Add(this.grdToMySQLTable);
-      this.contentAreaPanel.Controls.Add(this.cmbMappingMethod);
-      this.contentAreaPanel.Controls.Add(this.lblMappingMethod);
-      this.contentAreaPanel.Controls.Add(this.pictureBox1);
-      this.contentAreaPanel.Controls.Add(this.picColorMapMapped);
-      this.contentAreaPanel.Controls.Add(this.lblColorMapMapped);
-      this.contentAreaPanel.Controls.Add(this.picColorMapUnmapped);
-      this.contentAreaPanel.Controls.Add(this.lblColorMapUnmapped);
-      this.contentAreaPanel.Controls.Add(this.lblExportData);
-      this.contentAreaPanel.Controls.Add(this.lblManuallyAdjustMappingMainSub);
-      this.contentAreaPanel.Controls.Add(this.chkFirstRowHeaders);
-      this.contentAreaPanel.Controls.Add(this.grdFromExcelData);
-      this.contentAreaPanel.Controls.Add(this.lblChooseColumnMappingMainSub);
-      this.contentAreaPanel.Controls.Add(this.lblChooseColumnMappingMain);
-      this.contentAreaPanel.Controls.Add(this.picChooseColumnMapping);
-      this.contentAreaPanel.Controls.Add(this.lblManuallyAdjustMappingMain);
-      this.contentAreaPanel.Controls.Add(this.picManuallyAdjustMapping);
-      this.contentAreaPanel.Size = new System.Drawing.Size(844, 550);
-      this.contentAreaPanel.DragDrop += new System.Windows.Forms.DragEventHandler(this.contentAreaPanel_DragDrop);
-      this.contentAreaPanel.DragOver += new System.Windows.Forms.DragEventHandler(this.contentAreaPanel_DragOver);
-      this.contentAreaPanel.QueryContinueDrag += new System.Windows.Forms.QueryContinueDragEventHandler(this.contentAreaPanel_QueryContinueDrag);
+      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 292);
+      this.FootnoteAreaPanel.Size = new System.Drawing.Size(634, 0);
       // 
-      // commandAreaPanel
+      // ContentAreaPanel
       // 
-      this.commandAreaPanel.Controls.Add(this.btnStoreMapping);
-      this.commandAreaPanel.Controls.Add(this.btnAdvanced);
-      this.commandAreaPanel.Controls.Add(this.btnAppend);
-      this.commandAreaPanel.Controls.Add(this.btnCancel);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 550);
-      this.commandAreaPanel.Size = new System.Drawing.Size(844, 45);
+      this.ContentAreaPanel.AllowDrop = true;
+      this.ContentAreaPanel.Controls.Add(this.SubSetOfDataLabel);
+      this.ContentAreaPanel.Controls.Add(this.TargetMySQLTableDataGridView);
+      this.ContentAreaPanel.Controls.Add(this.MappingMethodComboBox);
+      this.ContentAreaPanel.Controls.Add(this.MappingMethodLabel);
+      this.ContentAreaPanel.Controls.Add(this.DownArrowPictureBox);
+      this.ContentAreaPanel.Controls.Add(this.ColorMapMappedPictureBox);
+      this.ContentAreaPanel.Controls.Add(this.ColorMapMappedLabel);
+      this.ContentAreaPanel.Controls.Add(this.ColorMapUnmappedPictureBox);
+      this.ContentAreaPanel.Controls.Add(this.ColorMapUnmappedLabel);
+      this.ContentAreaPanel.Controls.Add(this.ExportDataLabel);
+      this.ContentAreaPanel.Controls.Add(this.ManuallyAdjustMappingMainSubLabel);
+      this.ContentAreaPanel.Controls.Add(this.FirstRowHeadersCheckBox);
+      this.ContentAreaPanel.Controls.Add(this.SourceExcelDataDataGridView);
+      this.ContentAreaPanel.Controls.Add(this.ChooseColumnMappingMainSubLabel);
+      this.ContentAreaPanel.Controls.Add(this.ChooseColumnMappingMainLabel);
+      this.ContentAreaPanel.Controls.Add(this.ChooseColumnMappingPictureBox);
+      this.ContentAreaPanel.Controls.Add(this.ManuallyAdjustMappingMainLabel);
+      this.ContentAreaPanel.Controls.Add(this.ManuallyAdjustMappingPictureBox);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(844, 597);
+      this.ContentAreaPanel.DragDrop += new System.Windows.Forms.DragEventHandler(this.ContentAreaPanel_DragDrop);
+      this.ContentAreaPanel.DragOver += new System.Windows.Forms.DragEventHandler(this.ContentAreaPanel_DragOver);
+      this.ContentAreaPanel.QueryContinueDrag += new System.Windows.Forms.QueryContinueDragEventHandler(this.ContentAreaPanel_QueryContinueDrag);
       // 
-      // btnAppend
+      // CommandAreaPanel
       // 
-      this.btnAppend.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnAppend.Location = new System.Drawing.Point(678, 12);
-      this.btnAppend.Name = "btnAppend";
-      this.btnAppend.Size = new System.Drawing.Size(75, 23);
-      this.btnAppend.TabIndex = 2;
-      this.btnAppend.Text = "Append";
-      this.btnAppend.UseVisualStyleBackColor = true;
-      this.btnAppend.Click += new System.EventHandler(this.btnAppend_Click);
+      this.CommandAreaPanel.Controls.Add(this.StoreMappingButton);
+      this.CommandAreaPanel.Controls.Add(this.AdvancedOptionsButton);
+      this.CommandAreaPanel.Controls.Add(this.AppendButton);
+      this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 552);
+      this.CommandAreaPanel.Size = new System.Drawing.Size(844, 45);
       // 
-      // btnCancel
+      // AppendButton
       // 
-      this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.btnCancel.Location = new System.Drawing.Point(759, 12);
-      this.btnCancel.Name = "btnCancel";
-      this.btnCancel.Size = new System.Drawing.Size(75, 23);
-      this.btnCancel.TabIndex = 3;
-      this.btnCancel.Text = "Cancel";
-      this.btnCancel.UseVisualStyleBackColor = true;
+      this.AppendButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.AppendButton.Location = new System.Drawing.Point(678, 12);
+      this.AppendButton.Name = "AppendButton";
+      this.AppendButton.Size = new System.Drawing.Size(75, 23);
+      this.AppendButton.TabIndex = 2;
+      this.AppendButton.Text = "Append";
+      this.AppendButton.UseVisualStyleBackColor = true;
+      this.AppendButton.Click += new System.EventHandler(this.AppendButton_Click);
       // 
-      // lblManuallyAdjustMappingMainSub
+      // DialogCancelButton
       // 
-      this.lblManuallyAdjustMappingMainSub.AutoSize = true;
-      this.lblManuallyAdjustMappingMainSub.BackColor = System.Drawing.Color.Transparent;
-      this.lblManuallyAdjustMappingMainSub.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblManuallyAdjustMappingMainSub.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblManuallyAdjustMappingMainSub.Location = new System.Drawing.Point(470, 73);
-      this.lblManuallyAdjustMappingMainSub.Name = "lblManuallyAdjustMappingMainSub";
-      this.lblManuallyAdjustMappingMainSub.Size = new System.Drawing.Size(298, 45);
-      this.lblManuallyAdjustMappingMainSub.TabIndex = 6;
-      this.lblManuallyAdjustMappingMainSub.Text = "Manually change the column mapping if needed. Click\r\na column in the upper table " +
+      this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.DialogCancelButton.Location = new System.Drawing.Point(759, 12);
+      this.DialogCancelButton.Name = "DialogCancelButton";
+      this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
+      this.DialogCancelButton.TabIndex = 3;
+      this.DialogCancelButton.Text = "Cancel";
+      this.DialogCancelButton.UseVisualStyleBackColor = true;
+      // 
+      // ManuallyAdjustMappingMainSubLabel
+      // 
+      this.ManuallyAdjustMappingMainSubLabel.AutoSize = true;
+      this.ManuallyAdjustMappingMainSubLabel.BackColor = System.Drawing.Color.Transparent;
+      this.ManuallyAdjustMappingMainSubLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ManuallyAdjustMappingMainSubLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.ManuallyAdjustMappingMainSubLabel.Location = new System.Drawing.Point(470, 73);
+      this.ManuallyAdjustMappingMainSubLabel.Name = "ManuallyAdjustMappingMainSubLabel";
+      this.ManuallyAdjustMappingMainSubLabel.Size = new System.Drawing.Size(298, 45);
+      this.ManuallyAdjustMappingMainSubLabel.TabIndex = 6;
+      this.ManuallyAdjustMappingMainSubLabel.Text = "Manually change the column mapping if needed. Click\r\na column in the upper table " +
     "with the mouse and drag it\r\nonto a column in the lower table.";
       // 
-      // chkFirstRowHeaders
+      // FirstRowHeadersCheckBox
       // 
-      this.chkFirstRowHeaders.AutoSize = true;
-      this.chkFirstRowHeaders.BackColor = System.Drawing.Color.Transparent;
-      this.chkFirstRowHeaders.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.chkFirstRowHeaders.Location = new System.Drawing.Point(82, 158);
-      this.chkFirstRowHeaders.Name = "chkFirstRowHeaders";
-      this.chkFirstRowHeaders.Size = new System.Drawing.Size(210, 19);
-      this.chkFirstRowHeaders.TabIndex = 7;
-      this.chkFirstRowHeaders.Text = "First Row Contains Column Names";
-      this.chkFirstRowHeaders.UseVisualStyleBackColor = false;
-      this.chkFirstRowHeaders.CheckedChanged += new System.EventHandler(this.chkFirstRowHeaders_CheckedChanged);
+      this.FirstRowHeadersCheckBox.AutoSize = true;
+      this.FirstRowHeadersCheckBox.BackColor = System.Drawing.Color.Transparent;
+      this.FirstRowHeadersCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.FirstRowHeadersCheckBox.Location = new System.Drawing.Point(82, 158);
+      this.FirstRowHeadersCheckBox.Name = "FirstRowHeadersCheckBox";
+      this.FirstRowHeadersCheckBox.Size = new System.Drawing.Size(210, 19);
+      this.FirstRowHeadersCheckBox.TabIndex = 7;
+      this.FirstRowHeadersCheckBox.Text = "First Row Contains Column Names";
+      this.FirstRowHeadersCheckBox.UseVisualStyleBackColor = false;
+      this.FirstRowHeadersCheckBox.CheckedChanged += new System.EventHandler(this.FirstRowHeadersCheckBox_CheckedChanged);
       // 
-      // grdFromExcelData
+      // SourceExcelDataDataGridView
       // 
-      this.grdFromExcelData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+      this.SourceExcelDataDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
       dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.InactiveCaption;
@@ -185,8 +189,8 @@ namespace MySQL.ForExcel
       dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Control;
       dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.ControlText;
       dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdFromExcelData.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
-      this.grdFromExcelData.ColumnsMaximumWidth = 200;
+      this.SourceExcelDataDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+      this.SourceExcelDataDataGridView.ColumnsMaximumWidth = 200;
       dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
       dataGridViewCellStyle4.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -194,188 +198,188 @@ namespace MySQL.ForExcel
       dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
       dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
       dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdFromExcelData.DefaultCellStyle = dataGridViewCellStyle4;
-      this.grdFromExcelData.Location = new System.Drawing.Point(82, 182);
-      this.grdFromExcelData.Name = "grdFromExcelData";
-      this.grdFromExcelData.Size = new System.Drawing.Size(686, 150);
-      this.grdFromExcelData.TabIndex = 9;
-      this.grdFromExcelData.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.grdFromExcelData_DataBindingComplete);
-      this.grdFromExcelData.GiveFeedback += new System.Windows.Forms.GiveFeedbackEventHandler(this.grdGiveFeedback);
-      this.grdFromExcelData.QueryContinueDrag += new System.Windows.Forms.QueryContinueDragEventHandler(this.grdQueryContinueDrag);
-      this.grdFromExcelData.MouseDown += new System.Windows.Forms.MouseEventHandler(this.grdMouseDown);
-      this.grdFromExcelData.MouseMove += new System.Windows.Forms.MouseEventHandler(this.grdMouseMove);
-      this.grdFromExcelData.MouseUp += new System.Windows.Forms.MouseEventHandler(this.grdMouseUp);
+      this.SourceExcelDataDataGridView.DefaultCellStyle = dataGridViewCellStyle4;
+      this.SourceExcelDataDataGridView.Location = new System.Drawing.Point(82, 182);
+      this.SourceExcelDataDataGridView.Name = "SourceExcelDataDataGridView";
+      this.SourceExcelDataDataGridView.Size = new System.Drawing.Size(686, 150);
+      this.SourceExcelDataDataGridView.TabIndex = 9;
+      this.SourceExcelDataDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.SourceExcelDataDataGridView_DataBindingComplete);
+      this.SourceExcelDataDataGridView.GiveFeedback += new System.Windows.Forms.GiveFeedbackEventHandler(this.DataGridView_GiveFeedback);
+      this.SourceExcelDataDataGridView.QueryContinueDrag += new System.Windows.Forms.QueryContinueDragEventHandler(this.DataGridView_QueryContinueDrag);
+      this.SourceExcelDataDataGridView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.DataGridView_MouseDown);
+      this.SourceExcelDataDataGridView.MouseMove += new System.Windows.Forms.MouseEventHandler(this.DataGridView_MouseMove);
+      this.SourceExcelDataDataGridView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.DataGridView_MouseUp);
       // 
-      // lblChooseColumnMappingMainSub
+      // ChooseColumnMappingMainSubLabel
       // 
-      this.lblChooseColumnMappingMainSub.AutoSize = true;
-      this.lblChooseColumnMappingMainSub.BackColor = System.Drawing.Color.Transparent;
-      this.lblChooseColumnMappingMainSub.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblChooseColumnMappingMainSub.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblChooseColumnMappingMainSub.Location = new System.Drawing.Point(79, 73);
-      this.lblChooseColumnMappingMainSub.Name = "lblChooseColumnMappingMainSub";
-      this.lblChooseColumnMappingMainSub.Size = new System.Drawing.Size(298, 30);
-      this.lblChooseColumnMappingMainSub.TabIndex = 2;
-      this.lblChooseColumnMappingMainSub.Text = "Select how the Excel columns should be mapped to the\r\nMySQL table columns.";
+      this.ChooseColumnMappingMainSubLabel.AutoSize = true;
+      this.ChooseColumnMappingMainSubLabel.BackColor = System.Drawing.Color.Transparent;
+      this.ChooseColumnMappingMainSubLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ChooseColumnMappingMainSubLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.ChooseColumnMappingMainSubLabel.Location = new System.Drawing.Point(79, 73);
+      this.ChooseColumnMappingMainSubLabel.Name = "ChooseColumnMappingMainSubLabel";
+      this.ChooseColumnMappingMainSubLabel.Size = new System.Drawing.Size(298, 30);
+      this.ChooseColumnMappingMainSubLabel.TabIndex = 2;
+      this.ChooseColumnMappingMainSubLabel.Text = "Select how the Excel columns should be mapped to the\r\nMySQL table columns.";
       // 
-      // lblChooseColumnMappingMain
+      // ChooseColumnMappingMainLabel
       // 
-      this.lblChooseColumnMappingMain.AutoSize = true;
-      this.lblChooseColumnMappingMain.BackColor = System.Drawing.Color.Transparent;
-      this.lblChooseColumnMappingMain.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblChooseColumnMappingMain.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblChooseColumnMappingMain.Location = new System.Drawing.Point(79, 53);
-      this.lblChooseColumnMappingMain.Name = "lblChooseColumnMappingMain";
-      this.lblChooseColumnMappingMain.Size = new System.Drawing.Size(221, 17);
-      this.lblChooseColumnMappingMain.TabIndex = 1;
-      this.lblChooseColumnMappingMain.Text = "1. Choose Column Mapping Method";
+      this.ChooseColumnMappingMainLabel.AutoSize = true;
+      this.ChooseColumnMappingMainLabel.BackColor = System.Drawing.Color.Transparent;
+      this.ChooseColumnMappingMainLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ChooseColumnMappingMainLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.ChooseColumnMappingMainLabel.Location = new System.Drawing.Point(79, 53);
+      this.ChooseColumnMappingMainLabel.Name = "ChooseColumnMappingMainLabel";
+      this.ChooseColumnMappingMainLabel.Size = new System.Drawing.Size(221, 17);
+      this.ChooseColumnMappingMainLabel.TabIndex = 1;
+      this.ChooseColumnMappingMainLabel.Text = "1. Choose Column Mapping Method";
       // 
-      // picChooseColumnMapping
+      // ChooseColumnMappingPictureBox
       // 
-      this.picChooseColumnMapping.BackColor = System.Drawing.Color.Transparent;
-      this.picChooseColumnMapping.Image = ((System.Drawing.Image)(resources.GetObject("picChooseColumnMapping.Image")));
-      this.picChooseColumnMapping.Location = new System.Drawing.Point(41, 59);
-      this.picChooseColumnMapping.Name = "picChooseColumnMapping";
-      this.picChooseColumnMapping.Size = new System.Drawing.Size(32, 32);
-      this.picChooseColumnMapping.TabIndex = 36;
-      this.picChooseColumnMapping.TabStop = false;
+      this.ChooseColumnMappingPictureBox.BackColor = System.Drawing.Color.Transparent;
+      this.ChooseColumnMappingPictureBox.Image = ((System.Drawing.Image)(resources.GetObject("ChooseColumnMappingPictureBox.Image")));
+      this.ChooseColumnMappingPictureBox.Location = new System.Drawing.Point(41, 59);
+      this.ChooseColumnMappingPictureBox.Name = "ChooseColumnMappingPictureBox";
+      this.ChooseColumnMappingPictureBox.Size = new System.Drawing.Size(32, 32);
+      this.ChooseColumnMappingPictureBox.TabIndex = 36;
+      this.ChooseColumnMappingPictureBox.TabStop = false;
       // 
-      // lblManuallyAdjustMappingMain
+      // ManuallyAdjustMappingMainLabel
       // 
-      this.lblManuallyAdjustMappingMain.AutoSize = true;
-      this.lblManuallyAdjustMappingMain.BackColor = System.Drawing.Color.Transparent;
-      this.lblManuallyAdjustMappingMain.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblManuallyAdjustMappingMain.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.lblManuallyAdjustMappingMain.Location = new System.Drawing.Point(470, 54);
-      this.lblManuallyAdjustMappingMain.Name = "lblManuallyAdjustMappingMain";
-      this.lblManuallyAdjustMappingMain.Size = new System.Drawing.Size(219, 17);
-      this.lblManuallyAdjustMappingMain.TabIndex = 5;
-      this.lblManuallyAdjustMappingMain.Text = "2. Manually Adjust Column Mapping";
+      this.ManuallyAdjustMappingMainLabel.AutoSize = true;
+      this.ManuallyAdjustMappingMainLabel.BackColor = System.Drawing.Color.Transparent;
+      this.ManuallyAdjustMappingMainLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ManuallyAdjustMappingMainLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.ManuallyAdjustMappingMainLabel.Location = new System.Drawing.Point(470, 54);
+      this.ManuallyAdjustMappingMainLabel.Name = "ManuallyAdjustMappingMainLabel";
+      this.ManuallyAdjustMappingMainLabel.Size = new System.Drawing.Size(219, 17);
+      this.ManuallyAdjustMappingMainLabel.TabIndex = 5;
+      this.ManuallyAdjustMappingMainLabel.Text = "2. Manually Adjust Column Mapping";
       // 
-      // picManuallyAdjustMapping
+      // ManuallyAdjustMappingPictureBox
       // 
-      this.picManuallyAdjustMapping.BackColor = System.Drawing.Color.Transparent;
-      this.picManuallyAdjustMapping.Image = ((System.Drawing.Image)(resources.GetObject("picManuallyAdjustMapping.Image")));
-      this.picManuallyAdjustMapping.Location = new System.Drawing.Point(432, 60);
-      this.picManuallyAdjustMapping.Name = "picManuallyAdjustMapping";
-      this.picManuallyAdjustMapping.Size = new System.Drawing.Size(32, 32);
-      this.picManuallyAdjustMapping.TabIndex = 30;
-      this.picManuallyAdjustMapping.TabStop = false;
+      this.ManuallyAdjustMappingPictureBox.BackColor = System.Drawing.Color.Transparent;
+      this.ManuallyAdjustMappingPictureBox.Image = ((System.Drawing.Image)(resources.GetObject("ManuallyAdjustMappingPictureBox.Image")));
+      this.ManuallyAdjustMappingPictureBox.Location = new System.Drawing.Point(432, 60);
+      this.ManuallyAdjustMappingPictureBox.Name = "ManuallyAdjustMappingPictureBox";
+      this.ManuallyAdjustMappingPictureBox.Size = new System.Drawing.Size(32, 32);
+      this.ManuallyAdjustMappingPictureBox.TabIndex = 30;
+      this.ManuallyAdjustMappingPictureBox.TabStop = false;
       // 
-      // lblExportData
+      // ExportDataLabel
       // 
-      this.lblExportData.AutoSize = true;
-      this.lblExportData.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblExportData.ForeColor = System.Drawing.Color.Navy;
-      this.lblExportData.Location = new System.Drawing.Point(17, 17);
-      this.lblExportData.Name = "lblExportData";
-      this.lblExportData.Size = new System.Drawing.Size(207, 20);
-      this.lblExportData.TabIndex = 0;
-      this.lblExportData.Text = "Append Data to MySQL Table";
+      this.ExportDataLabel.AutoSize = true;
+      this.ExportDataLabel.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ExportDataLabel.ForeColor = System.Drawing.Color.Navy;
+      this.ExportDataLabel.Location = new System.Drawing.Point(17, 17);
+      this.ExportDataLabel.Name = "ExportDataLabel";
+      this.ExportDataLabel.Size = new System.Drawing.Size(207, 20);
+      this.ExportDataLabel.TabIndex = 0;
+      this.ExportDataLabel.Text = "Append Data to MySQL Table";
       // 
-      // picColorMapMapped
+      // ColorMapMappedPictureBox
       // 
-      this.picColorMapMapped.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.picColorMapMapped.BackColor = System.Drawing.Color.LightGreen;
-      this.picColorMapMapped.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-      this.picColorMapMapped.Location = new System.Drawing.Point(229, 516);
-      this.picColorMapMapped.Name = "picColorMapMapped";
-      this.picColorMapMapped.Size = new System.Drawing.Size(15, 15);
-      this.picColorMapMapped.TabIndex = 41;
-      this.picColorMapMapped.TabStop = false;
+      this.ColorMapMappedPictureBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.ColorMapMappedPictureBox.BackColor = System.Drawing.Color.LightGreen;
+      this.ColorMapMappedPictureBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+      this.ColorMapMappedPictureBox.Location = new System.Drawing.Point(229, 516);
+      this.ColorMapMappedPictureBox.Name = "ColorMapMappedPictureBox";
+      this.ColorMapMappedPictureBox.Size = new System.Drawing.Size(15, 15);
+      this.ColorMapMappedPictureBox.TabIndex = 41;
+      this.ColorMapMappedPictureBox.TabStop = false;
       // 
-      // lblColorMapMapped
+      // ColorMapMappedLabel
       // 
-      this.lblColorMapMapped.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.lblColorMapMapped.AutoSize = true;
-      this.lblColorMapMapped.BackColor = System.Drawing.Color.Transparent;
-      this.lblColorMapMapped.Location = new System.Drawing.Point(244, 516);
-      this.lblColorMapMapped.Name = "lblColorMapMapped";
-      this.lblColorMapMapped.Size = new System.Drawing.Size(89, 13);
-      this.lblColorMapMapped.TabIndex = 12;
-      this.lblColorMapMapped.Text = "Mapped Columns";
+      this.ColorMapMappedLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.ColorMapMappedLabel.AutoSize = true;
+      this.ColorMapMappedLabel.BackColor = System.Drawing.Color.Transparent;
+      this.ColorMapMappedLabel.Location = new System.Drawing.Point(244, 516);
+      this.ColorMapMappedLabel.Name = "ColorMapMappedLabel";
+      this.ColorMapMappedLabel.Size = new System.Drawing.Size(89, 13);
+      this.ColorMapMappedLabel.TabIndex = 12;
+      this.ColorMapMappedLabel.Text = "Mapped Columns";
       // 
-      // picColorMapUnmapped
+      // ColorMapUnmappedPictureBox
       // 
-      this.picColorMapUnmapped.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.picColorMapUnmapped.BackColor = System.Drawing.Color.OrangeRed;
-      this.picColorMapUnmapped.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-      this.picColorMapUnmapped.Location = new System.Drawing.Point(82, 516);
-      this.picColorMapUnmapped.Name = "picColorMapUnmapped";
-      this.picColorMapUnmapped.Size = new System.Drawing.Size(15, 15);
-      this.picColorMapUnmapped.TabIndex = 40;
-      this.picColorMapUnmapped.TabStop = false;
+      this.ColorMapUnmappedPictureBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.ColorMapUnmappedPictureBox.BackColor = System.Drawing.Color.OrangeRed;
+      this.ColorMapUnmappedPictureBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+      this.ColorMapUnmappedPictureBox.Location = new System.Drawing.Point(82, 516);
+      this.ColorMapUnmappedPictureBox.Name = "ColorMapUnmappedPictureBox";
+      this.ColorMapUnmappedPictureBox.Size = new System.Drawing.Size(15, 15);
+      this.ColorMapUnmappedPictureBox.TabIndex = 40;
+      this.ColorMapUnmappedPictureBox.TabStop = false;
       // 
-      // lblColorMapUnmapped
+      // ColorMapUnmappedLabel
       // 
-      this.lblColorMapUnmapped.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.lblColorMapUnmapped.AutoSize = true;
-      this.lblColorMapUnmapped.BackColor = System.Drawing.Color.Transparent;
-      this.lblColorMapUnmapped.Location = new System.Drawing.Point(97, 516);
-      this.lblColorMapUnmapped.Name = "lblColorMapUnmapped";
-      this.lblColorMapUnmapped.Size = new System.Drawing.Size(102, 13);
-      this.lblColorMapUnmapped.TabIndex = 11;
-      this.lblColorMapUnmapped.Text = "Unmapped Columns";
+      this.ColorMapUnmappedLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.ColorMapUnmappedLabel.AutoSize = true;
+      this.ColorMapUnmappedLabel.BackColor = System.Drawing.Color.Transparent;
+      this.ColorMapUnmappedLabel.Location = new System.Drawing.Point(97, 516);
+      this.ColorMapUnmappedLabel.Name = "ColorMapUnmappedLabel";
+      this.ColorMapUnmappedLabel.Size = new System.Drawing.Size(102, 13);
+      this.ColorMapUnmappedLabel.TabIndex = 11;
+      this.ColorMapUnmappedLabel.Text = "Unmapped Columns";
       // 
-      // pictureBox1
+      // DownArrowPictureBox
       // 
-      this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-      this.pictureBox1.Location = new System.Drawing.Point(414, 340);
-      this.pictureBox1.Name = "pictureBox1";
-      this.pictureBox1.Size = new System.Drawing.Size(17, 11);
-      this.pictureBox1.TabIndex = 42;
-      this.pictureBox1.TabStop = false;
+      this.DownArrowPictureBox.Image = ((System.Drawing.Image)(resources.GetObject("DownArrowPictureBox.Image")));
+      this.DownArrowPictureBox.Location = new System.Drawing.Point(414, 340);
+      this.DownArrowPictureBox.Name = "DownArrowPictureBox";
+      this.DownArrowPictureBox.Size = new System.Drawing.Size(17, 11);
+      this.DownArrowPictureBox.TabIndex = 42;
+      this.DownArrowPictureBox.TabStop = false;
       // 
-      // lblMappingMethod
+      // MappingMethodLabel
       // 
-      this.lblMappingMethod.AutoSize = true;
-      this.lblMappingMethod.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblMappingMethod.Location = new System.Drawing.Point(79, 115);
-      this.lblMappingMethod.Name = "lblMappingMethod";
-      this.lblMappingMethod.Size = new System.Drawing.Size(103, 15);
-      this.lblMappingMethod.TabIndex = 3;
-      this.lblMappingMethod.Text = "Mapping Method:";
+      this.MappingMethodLabel.AutoSize = true;
+      this.MappingMethodLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.MappingMethodLabel.Location = new System.Drawing.Point(79, 115);
+      this.MappingMethodLabel.Name = "MappingMethodLabel";
+      this.MappingMethodLabel.Size = new System.Drawing.Size(103, 15);
+      this.MappingMethodLabel.TabIndex = 3;
+      this.MappingMethodLabel.Text = "Mapping Method:";
       // 
-      // cmbMappingMethod
+      // MappingMethodComboBox
       // 
-      this.cmbMappingMethod.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-      this.cmbMappingMethod.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-      this.cmbMappingMethod.DropDownWidth = 243;
-      this.cmbMappingMethod.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.cmbMappingMethod.FormattingEnabled = true;
-      this.cmbMappingMethod.Location = new System.Drawing.Point(188, 112);
-      this.cmbMappingMethod.Name = "cmbMappingMethod";
-      this.cmbMappingMethod.Size = new System.Drawing.Size(189, 23);
-      this.cmbMappingMethod.TabIndex = 4;
-      this.cmbMappingMethod.SelectedIndexChanged += new System.EventHandler(this.cmbMappingMethod_SelectedIndexChanged);
+      this.MappingMethodComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+      this.MappingMethodComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+      this.MappingMethodComboBox.DropDownWidth = 243;
+      this.MappingMethodComboBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.MappingMethodComboBox.FormattingEnabled = true;
+      this.MappingMethodComboBox.Location = new System.Drawing.Point(188, 112);
+      this.MappingMethodComboBox.Name = "MappingMethodComboBox";
+      this.MappingMethodComboBox.Size = new System.Drawing.Size(189, 23);
+      this.MappingMethodComboBox.TabIndex = 4;
+      this.MappingMethodComboBox.SelectedIndexChanged += new System.EventHandler(this.MappingMethodComboBox_SelectedIndexChanged);
       // 
-      // btnAdvanced
+      // AdvancedOptionsButton
       // 
-      this.btnAdvanced.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.btnAdvanced.Location = new System.Drawing.Point(12, 12);
-      this.btnAdvanced.Name = "btnAdvanced";
-      this.btnAdvanced.Size = new System.Drawing.Size(131, 23);
-      this.btnAdvanced.TabIndex = 0;
-      this.btnAdvanced.Text = "Advanced Options...";
-      this.btnAdvanced.UseVisualStyleBackColor = true;
-      this.btnAdvanced.Click += new System.EventHandler(this.btnAdvanced_Click);
+      this.AdvancedOptionsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.AdvancedOptionsButton.Location = new System.Drawing.Point(12, 12);
+      this.AdvancedOptionsButton.Name = "AdvancedOptionsButton";
+      this.AdvancedOptionsButton.Size = new System.Drawing.Size(131, 23);
+      this.AdvancedOptionsButton.TabIndex = 0;
+      this.AdvancedOptionsButton.Text = "Advanced Options...";
+      this.AdvancedOptionsButton.UseVisualStyleBackColor = true;
+      this.AdvancedOptionsButton.Click += new System.EventHandler(this.AdvancedOptionsButton_Click);
       // 
-      // btnStoreMapping
+      // StoreMappingButton
       // 
-      this.btnStoreMapping.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.btnStoreMapping.Enabled = false;
-      this.btnStoreMapping.Location = new System.Drawing.Point(572, 12);
-      this.btnStoreMapping.Name = "btnStoreMapping";
-      this.btnStoreMapping.Size = new System.Drawing.Size(100, 23);
-      this.btnStoreMapping.TabIndex = 1;
-      this.btnStoreMapping.Text = "Store Mapping";
-      this.btnStoreMapping.UseVisualStyleBackColor = true;
-      this.btnStoreMapping.Click += new System.EventHandler(this.btnStoreMapping_Click);
+      this.StoreMappingButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.StoreMappingButton.Enabled = false;
+      this.StoreMappingButton.Location = new System.Drawing.Point(572, 12);
+      this.StoreMappingButton.Name = "StoreMappingButton";
+      this.StoreMappingButton.Size = new System.Drawing.Size(100, 23);
+      this.StoreMappingButton.TabIndex = 1;
+      this.StoreMappingButton.Text = "Store Mapping";
+      this.StoreMappingButton.UseVisualStyleBackColor = true;
+      this.StoreMappingButton.Click += new System.EventHandler(this.StoreMappingButton_Click);
       // 
-      // grdToMySQLTable
+      // TargetMySQLTableDataGridView
       // 
-      this.grdToMySQLTable.AllowDrop = true;
-      this.grdToMySQLTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+      this.TargetMySQLTableDataGridView.AllowDrop = true;
+      this.TargetMySQLTableDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomCenter;
@@ -385,10 +389,10 @@ namespace MySQL.ForExcel
       dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
       dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
       dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdToMySQLTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-      this.grdToMySQLTable.ColumnHeadersHeight = 46;
-      this.grdToMySQLTable.ColumnsMaximumWidth = 200;
-      this.grdToMySQLTable.ContextMenuStrip = this.contextMenu;
+      this.TargetMySQLTableDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+      this.TargetMySQLTableDataGridView.ColumnHeadersHeight = 46;
+      this.TargetMySQLTableDataGridView.ColumnsMaximumWidth = 200;
+      this.TargetMySQLTableDataGridView.ContextMenuStrip = this.AppendContextMenu;
       dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
       dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -396,112 +400,114 @@ namespace MySQL.ForExcel
       dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
       dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
       dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.grdToMySQLTable.DefaultCellStyle = dataGridViewCellStyle2;
-      this.grdToMySQLTable.Location = new System.Drawing.Point(82, 360);
-      this.grdToMySQLTable.MultiSelect = false;
-      this.grdToMySQLTable.Name = "grdToMySQLTable";
-      this.grdToMySQLTable.Size = new System.Drawing.Size(686, 150);
-      this.grdToMySQLTable.TabIndex = 10;
-      this.grdToMySQLTable.DragDrop += new System.Windows.Forms.DragEventHandler(this.grdToMySQLTable_DragDrop);
-      this.grdToMySQLTable.DragOver += new System.Windows.Forms.DragEventHandler(this.grdToMySQLTable_DragOver);
-      this.grdToMySQLTable.GiveFeedback += new System.Windows.Forms.GiveFeedbackEventHandler(this.grdGiveFeedback);
-      this.grdToMySQLTable.QueryContinueDrag += new System.Windows.Forms.QueryContinueDragEventHandler(this.grdQueryContinueDrag);
-      this.grdToMySQLTable.MouseDown += new System.Windows.Forms.MouseEventHandler(this.grdMouseDown);
-      this.grdToMySQLTable.MouseMove += new System.Windows.Forms.MouseEventHandler(this.grdMouseMove);
-      this.grdToMySQLTable.MouseUp += new System.Windows.Forms.MouseEventHandler(this.grdMouseUp);
+      this.TargetMySQLTableDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
+      this.TargetMySQLTableDataGridView.Location = new System.Drawing.Point(82, 360);
+      this.TargetMySQLTableDataGridView.MultiSelect = false;
+      this.TargetMySQLTableDataGridView.Name = "TargetMySQLTableDataGridView";
+      this.TargetMySQLTableDataGridView.Size = new System.Drawing.Size(686, 150);
+      this.TargetMySQLTableDataGridView.TabIndex = 10;
+      this.TargetMySQLTableDataGridView.DragDrop += new System.Windows.Forms.DragEventHandler(this.TargetMySQLTableDataGridView_DragDrop);
+      this.TargetMySQLTableDataGridView.DragOver += new System.Windows.Forms.DragEventHandler(this.TargetMySQLTableDataGridView_DragOver);
+      this.TargetMySQLTableDataGridView.GiveFeedback += new System.Windows.Forms.GiveFeedbackEventHandler(this.DataGridView_GiveFeedback);
+      this.TargetMySQLTableDataGridView.QueryContinueDrag += new System.Windows.Forms.QueryContinueDragEventHandler(this.DataGridView_QueryContinueDrag);
+      this.TargetMySQLTableDataGridView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.DataGridView_MouseDown);
+      this.TargetMySQLTableDataGridView.MouseMove += new System.Windows.Forms.MouseEventHandler(this.DataGridView_MouseMove);
+      this.TargetMySQLTableDataGridView.MouseUp += new System.Windows.Forms.MouseEventHandler(this.DataGridView_MouseUp);
       // 
-      // contextMenu
+      // AppendContextMenu
       // 
-      this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.removeColumnMappingToolStripMenuItem,
-            this.clearAllMappingsToolStripMenuItem});
-      this.contextMenu.Name = "contextMenu";
-      this.contextMenu.Size = new System.Drawing.Size(215, 70);
-      this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
+      this.AppendContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.RemoveColumnMappingToolStripMenuItem,
+            this.ClearAllMappingsToolStripMenuItem});
+      this.AppendContextMenu.Name = "contextMenu";
+      this.AppendContextMenu.Size = new System.Drawing.Size(215, 70);
+      this.AppendContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.AppendContextMenu_Opening);
       // 
-      // removeColumnMappingToolStripMenuItem
+      // RemoveColumnMappingToolStripMenuItem
       // 
-      this.removeColumnMappingToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.remove_col_mapping;
-      this.removeColumnMappingToolStripMenuItem.Name = "removeColumnMappingToolStripMenuItem";
-      this.removeColumnMappingToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
-      this.removeColumnMappingToolStripMenuItem.Text = "Remove Column Mapping";
-      this.removeColumnMappingToolStripMenuItem.Click += new System.EventHandler(this.removeColumnMappingToolStripMenuItem_Click);
+      this.RemoveColumnMappingToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.remove_col_mapping;
+      this.RemoveColumnMappingToolStripMenuItem.Name = "RemoveColumnMappingToolStripMenuItem";
+      this.RemoveColumnMappingToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
+      this.RemoveColumnMappingToolStripMenuItem.Text = "Remove Column Mapping";
+      this.RemoveColumnMappingToolStripMenuItem.Click += new System.EventHandler(this.RemoveColumnMappingToolStripMenuItem_Click);
       // 
-      // clearAllMappingsToolStripMenuItem
+      // ClearAllMappingsToolStripMenuItem
       // 
-      this.clearAllMappingsToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.clear_output;
-      this.clearAllMappingsToolStripMenuItem.Name = "clearAllMappingsToolStripMenuItem";
-      this.clearAllMappingsToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
-      this.clearAllMappingsToolStripMenuItem.Text = "Clear All Mappings";
-      this.clearAllMappingsToolStripMenuItem.Click += new System.EventHandler(this.clearAllMappingsToolStripMenuItem_Click);
+      this.ClearAllMappingsToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.clear_output;
+      this.ClearAllMappingsToolStripMenuItem.Name = "ClearAllMappingsToolStripMenuItem";
+      this.ClearAllMappingsToolStripMenuItem.Size = new System.Drawing.Size(214, 22);
+      this.ClearAllMappingsToolStripMenuItem.Text = "Clear All Mappings";
+      this.ClearAllMappingsToolStripMenuItem.Click += new System.EventHandler(this.ClearAllMappingsToolStripMenuItem_Click);
       // 
-      // lblSubSetOfData
+      // SubSetOfDataLabel
       // 
-      this.lblSubSetOfData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.lblSubSetOfData.AutoSize = true;
-      this.lblSubSetOfData.BackColor = System.Drawing.Color.Transparent;
-      this.lblSubSetOfData.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.lblSubSetOfData.ForeColor = System.Drawing.SystemColors.InactiveCaption;
-      this.lblSubSetOfData.Location = new System.Drawing.Point(449, 159);
-      this.lblSubSetOfData.Name = "lblSubSetOfData";
-      this.lblSubSetOfData.Size = new System.Drawing.Size(319, 15);
-      this.lblSubSetOfData.TabIndex = 8;
-      this.lblSubSetOfData.Text = "This is a small subset of the data for preview purposes only.";
+      this.SubSetOfDataLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.SubSetOfDataLabel.AutoSize = true;
+      this.SubSetOfDataLabel.BackColor = System.Drawing.Color.Transparent;
+      this.SubSetOfDataLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.SubSetOfDataLabel.ForeColor = System.Drawing.SystemColors.InactiveCaption;
+      this.SubSetOfDataLabel.Location = new System.Drawing.Point(449, 159);
+      this.SubSetOfDataLabel.Name = "SubSetOfDataLabel";
+      this.SubSetOfDataLabel.Size = new System.Drawing.Size(319, 15);
+      this.SubSetOfDataLabel.TabIndex = 8;
+      this.SubSetOfDataLabel.Text = "This is a small subset of the data for preview purposes only.";
       // 
       // AppendDataForm
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-      this.CancelButton = this.btnCancel;
+      this.CancelButton = this.DialogCancelButton;
       this.ClientSize = new System.Drawing.Size(844, 597);
-      this.CommandAreaHeight = 45;
+      this.CommandAreaVisible = true;
+      this.FootnoteAreaHeight = 0;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
       this.MainInstructionLocation = new System.Drawing.Point(11, 16);
       this.MinimumSize = new System.Drawing.Size(860, 635);
       this.Name = "AppendDataForm";
       this.Text = "Append Data";
-      this.Controls.SetChildIndex(this.contentAreaPanel, 0);
-      this.Controls.SetChildIndex(this.commandAreaPanel, 0);
-      this.contentAreaPanel.ResumeLayout(false);
-      this.contentAreaPanel.PerformLayout();
-      this.commandAreaPanel.ResumeLayout(false);
-      ((System.ComponentModel.ISupportInitialize)(this.grdFromExcelData)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picChooseColumnMapping)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picManuallyAdjustMapping)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picColorMapMapped)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.picColorMapUnmapped)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.grdToMySQLTable)).EndInit();
-      this.contextMenu.ResumeLayout(false);
+      this.Controls.SetChildIndex(this.FootnoteAreaPanel, 0);
+      this.Controls.SetChildIndex(this.ContentAreaPanel, 0);
+      this.Controls.SetChildIndex(this.CommandAreaPanel, 0);
+      this.ContentAreaPanel.ResumeLayout(false);
+      this.ContentAreaPanel.PerformLayout();
+      this.CommandAreaPanel.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.SourceExcelDataDataGridView)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.ChooseColumnMappingPictureBox)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.ManuallyAdjustMappingPictureBox)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.ColorMapMappedPictureBox)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.ColorMapUnmappedPictureBox)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.DownArrowPictureBox)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.TargetMySQLTableDataGridView)).EndInit();
+      this.AppendContextMenu.ResumeLayout(false);
       this.ResumeLayout(false);
 
     }
 
     #endregion
 
-    private System.Windows.Forms.Button btnAppend;
-    private System.Windows.Forms.Button btnCancel;
-    private System.Windows.Forms.Label lblManuallyAdjustMappingMainSub;
-    private System.Windows.Forms.CheckBox chkFirstRowHeaders;
-    private PreviewDataGridView grdFromExcelData;
-    private System.Windows.Forms.Label lblChooseColumnMappingMainSub;
-    private System.Windows.Forms.Label lblChooseColumnMappingMain;
-    private System.Windows.Forms.PictureBox picChooseColumnMapping;
-    private System.Windows.Forms.Label lblManuallyAdjustMappingMain;
-    private System.Windows.Forms.PictureBox picManuallyAdjustMapping;
-    private System.Windows.Forms.Label lblExportData;
-    private System.Windows.Forms.PictureBox picColorMapMapped;
-    private System.Windows.Forms.Label lblColorMapMapped;
-    private System.Windows.Forms.PictureBox picColorMapUnmapped;
-    private System.Windows.Forms.Label lblColorMapUnmapped;
-    private System.Windows.Forms.PictureBox pictureBox1;
-    private System.Windows.Forms.ComboBox cmbMappingMethod;
-    private System.Windows.Forms.Label lblMappingMethod;
-    private System.Windows.Forms.Button btnAdvanced;
-    private System.Windows.Forms.Button btnStoreMapping;
-    private MultiHeaderDataGridView grdToMySQLTable;
-    private System.Windows.Forms.ContextMenuStrip contextMenu;
-    private System.Windows.Forms.ToolStripMenuItem removeColumnMappingToolStripMenuItem;
-    private System.Windows.Forms.ToolStripMenuItem clearAllMappingsToolStripMenuItem;
-    private System.Windows.Forms.Label lblSubSetOfData;
+    private System.Windows.Forms.Button AppendButton;
+    private System.Windows.Forms.Button DialogCancelButton;
+    private System.Windows.Forms.Label ManuallyAdjustMappingMainSubLabel;
+    private System.Windows.Forms.CheckBox FirstRowHeadersCheckBox;
+    private PreviewDataGridView SourceExcelDataDataGridView;
+    private System.Windows.Forms.Label ChooseColumnMappingMainSubLabel;
+    private System.Windows.Forms.Label ChooseColumnMappingMainLabel;
+    private System.Windows.Forms.PictureBox ChooseColumnMappingPictureBox;
+    private System.Windows.Forms.Label ManuallyAdjustMappingMainLabel;
+    private System.Windows.Forms.PictureBox ManuallyAdjustMappingPictureBox;
+    private System.Windows.Forms.Label ExportDataLabel;
+    private System.Windows.Forms.PictureBox ColorMapMappedPictureBox;
+    private System.Windows.Forms.Label ColorMapMappedLabel;
+    private System.Windows.Forms.PictureBox ColorMapUnmappedPictureBox;
+    private System.Windows.Forms.Label ColorMapUnmappedLabel;
+    private System.Windows.Forms.PictureBox DownArrowPictureBox;
+    private System.Windows.Forms.ComboBox MappingMethodComboBox;
+    private System.Windows.Forms.Label MappingMethodLabel;
+    private System.Windows.Forms.Button AdvancedOptionsButton;
+    private System.Windows.Forms.Button StoreMappingButton;
+    private MultiHeaderDataGridView TargetMySQLTableDataGridView;
+    private System.Windows.Forms.ContextMenuStrip AppendContextMenu;
+    private System.Windows.Forms.ToolStripMenuItem RemoveColumnMappingToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem ClearAllMappingsToolStripMenuItem;
+    private System.Windows.Forms.Label SubSetOfDataLabel;
   }
 }

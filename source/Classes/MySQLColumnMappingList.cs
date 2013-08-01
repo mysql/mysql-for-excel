@@ -1,28 +1,29 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// 
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
+//
 
 namespace MySQL.ForExcel
 {
   using System;
   using System.Collections.Generic;
   using System.Linq;
-  using System.Text;
-  using System.Windows.Forms;
   using MySQL.ForExcel.Properties;
+  using MySQL.Utility;
 
   /// <summary>
   /// Represents a collection of column mappings for the current user.
@@ -86,10 +87,8 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog errorDialog = new InfoDialog(false, Properties.Resources.ColumnMappingDeletionErrorTitle, ex.Message);
-        errorDialog.WordWrapDetails = true;
-        errorDialog.ShowDialog();
-        MiscUtilities.WriteAppErrorToLog(ex);
+        MiscUtilities.ShowCustomizedErrorDialog(Resources.ColumnMappingDeletionErrorTitle, ex.Message, true);
+        MySQLSourceTrace.WriteAppErrorToLog(ex);
         return false;
       }
 
@@ -115,10 +114,8 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog errorDialog = new InfoDialog(false, Properties.Resources.ColumnMappingRenameErrorTitle, ex.Message);
-        errorDialog.WordWrapDetails = true;
-        errorDialog.ShowDialog();
-        MiscUtilities.WriteAppErrorToLog(ex);
+        MiscUtilities.ShowCustomizedErrorDialog(Properties.Resources.ColumnMappingRenameErrorTitle, ex.Message, true);
+        MySQLSourceTrace.WriteAppErrorToLog(ex);
         return false;
       }
 
@@ -149,7 +146,7 @@ namespace MySQL.ForExcel
     /// <param name="schema">Schema name where the mapped table resides.</param>
     /// <param name="tableName">Name of the table to map to.</param>
     /// <returns>List of <see cref="MySQLColumnMapping"/> objects.</returns>
-    public List<MySQLColumnMapping> GetMappingsByConnectionSchemaAndTable(string connectionName, int port, string schema, string tableName)
+    public List<MySQLColumnMapping> GetMappingsByConnectionSchemaAndTable(string connectionName, uint port, string schema, string tableName)
     {
       if (UserColumnMappingsList != null && !string.IsNullOrEmpty(connectionName))
       {

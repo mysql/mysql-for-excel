@@ -389,9 +389,6 @@ Please add a primary key to the table.</value>
   <data name="UnableToAddConnectionsWhenWBRunning" xml:space="preserve">
     <value>Adding new connections is not allowed when MySQL Workbench is running.</value>
   </data>
-  <data name="AppName" xml:space="preserve">
-    <value>MySQL For Excel</value>
-  </data>
   <data name="ConnectFailedDetailWarning" xml:space="preserve">
     <value>Connection attempt failed.
 Please re-enter your password to try again.</value>
@@ -552,9 +549,6 @@ To be able to make modifications on cells not related to MySQL data please exit 
   <data name="QueryDidNotMatchRowsWarning" xml:space="preserve">
     <value>Query did not match any rows in the DB, Primary Key values in the row may have changed; please refresh values from the DB.</value>
   </data>
-  <data name="LogFile" xml:space="preserve">
-    <value>{0}\Oracle\MySQL For Excel\MySQLForExcel.log</value>
-  </data>
   <data name="ShutdownMessage" xml:space="preserve">
     <value>MySQL for Excel Shutdown</value>
   </data>
@@ -606,12 +600,6 @@ To be able to make modifications on cells not related to MySQL data please exit 
   <data name="SplashScreenExcel" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\SplashScreenExcel.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="AboutMySQLForExcelVersion" xml:space="preserve">
-    <value>Version {0}</value>
-  </data>
-  <data name="AboutMySQLInstallerVersion" xml:space="preserve">
-    <value>MySQL Installer 1.2</value>
-  </data>
   <data name="ColumnExistsWarning" xml:space="preserve">
     <value>Another column with this name already exists in the table.</value>
   </data>
@@ -632,5 +620,116 @@ To be able to make modifications on cells not related to MySQL data please exit 
   </data>
   <data name="ExcelConnectionsMigrationErrorTitle" xml:space="preserve">
     <value>Local database connections could not be migrated.</value>
+  </data>
+  <data name="AppendDataDetailsDoneErrorText" xml:space="preserve">
+    <value>Excel data could not be appended to MySQL Table "{0}".</value>
+  </data>
+  <data name="AppendDataDetailsDoneSuccessText" xml:space="preserve">
+    <value>Excel data was appended successfully to MySQL Table "{0}".</value>
+  </data>
+  <data name="AppendDataDetailsDoneWarningsText" xml:space="preserve">
+    <value>Excel data was appended with warnings to MySQL Table "{0}".</value>
+  </data>
+  <data name="ErrorAdoNetText" xml:space="preserve">
+    <value>ADO.NET Error:</value>
+  </data>
+  <data name="ErrorMySQLText" xml:space="preserve">
+    <value>MySQL Error {0}:</value>
+  </data>
+  <data name="AppendDataRowsInsertionErrorText" xml:space="preserve">
+    <value>Error while appending rows...</value>
+  </data>
+  <data name="InsertingExcelDataWithQueryText" xml:space="preserve">
+    <value>Inserting Excel data in MySQL Table "{0}" with query...</value>
+  </data>
+  <data name="WarningSingleText" xml:space="preserve">
+    <value>Code {0} - {1}</value>
+  </data>
+  <data name="MappingNameAlreadyExistsDetail" xml:space="preserve">
+    <value>Please try a different name for the columns mapping.</value>
+  </data>
+  <data name="MappingNameAlreadyExistsTitle" xml:space="preserve">
+    <value>Mapping name is already in use</value>
+  </data>
+  <data name="OperationErrorTitle" xml:space="preserve">
+    <value>An Error Ocurred</value>
+  </data>
+  <data name="OperationInformationTitle" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="OperationSubDetailText" xml:space="preserve">
+    <value>Press {0} to continue.</value>
+  </data>
+  <data name="OperationSuccessTitle" xml:space="preserve">
+    <value>Operation Completed Successfully</value>
+  </data>
+  <data name="OperationWarningTitle" xml:space="preserve">
+    <value>Operation Completed With Warnings</value>
+  </data>
+  <data name="AppName" xml:space="preserve">
+    <value>MySQL For Excel</value>
+  </data>
+  <data name="AppendDataRowsAppendedSuccessfullyText" xml:space="preserve">
+    <value>{0} rows were appended successfully.</value>
+  </data>
+  <data name="AppendDataRowsAppendedWithWarningsText" xml:space="preserve">
+    <value>{0} rows were appended with {0} warnings:</value>
+  </data>
+  <data name="ExportDataDetailsTextLine1" xml:space="preserve">
+    <value>Creating MySQL Table "{0}" with query...</value>
+  </data>
+  <data name="ExportDataLessRowsThanExpectedInsertedText" xml:space="preserve">
+    <value>Attempted to insert {0} rows, but only {1} rows were inserted with no further errors. Please check the MySQL Server log for more information.</value>
+  </data>
+  <data name="ExportDataMultiPrimaryKeyText" xml:space="preserve">
+    <value>&lt;Multiple Items&gt;</value>
+  </data>
+  <data name="ExportDataOperationErrorText" xml:space="preserve">
+    <value>The MySQL Table "{0}" could not be created.</value>
+  </data>
+  <data name="ExportDataOperationSuccessNoDataText" xml:space="preserve">
+    <value>The MySQL Table "{0}" has been created with no data.</value>
+  </data>
+  <data name="ExportDataOperationSuccessWithDataText" xml:space="preserve">
+    <value>The MySQL Table "{0}" has been created with data.</value>
+  </data>
+  <data name="ExportDataRowsInsertedSuccessfullyText" xml:space="preserve">
+    <value>{0} rows have been inserted successfully.</value>
+  </data>
+  <data name="ExportDataRowsInsertedWithWarningsText" xml:space="preserve">
+    <value>{0} rows have been inserted with {1} warnings:</value>
+  </data>
+  <data name="ExportDataRowsInsertionErrorText" xml:space="preserve">
+    <value>Error while inserting rows...</value>
+  </data>
+  <data name="ExportDataTableCreatedSuccessfullyText" xml:space="preserve">
+    <value>Table has been created successfully.</value>
+  </data>
+  <data name="ExportDataTableCreatedWithWarningsText" xml:space="preserve">
+    <value>Table has been created with {0} warnings:</value>
+  </data>
+  <data name="ImportProcedureAllResultSetsHorizontally" xml:space="preserve">
+    <value>All Result Sets - Arranged Horizontally</value>
+  </data>
+  <data name="ImportProcedureAllResultSetsVertically" xml:space="preserve">
+    <value>All Result Sets - Arranged Vertically</value>
+  </data>
+  <data name="ImportProcedureSelectedResultSet" xml:space="preserve">
+    <value>Selected Result Set</value>
+  </data>
+  <data name="EditDataRefreshErrorText" xml:space="preserve">
+    <value>Refresh Data Error</value>
+  </data>
+  <data name="EditDataRevertErrorText" xml:space="preserve">
+    <value>Revert Data Error</value>
+  </data>
+  <data name="ImportDataErrorDetailText" xml:space="preserve">
+    <value>An error ocurred when trying to import the data.</value>
+  </data>
+  <data name="TaskPaneEditingNotPossibleTitleText" xml:space="preserve">
+    <value>Editing not possible</value>
+  </data>
+  <data name="TaskPaneErrorCreatingWorksheetText" xml:space="preserve">
+    <value>Error while creating new Excel Worksheet</value>
   </data>
 </root>

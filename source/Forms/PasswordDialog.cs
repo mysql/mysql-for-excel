@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -17,47 +17,73 @@
 // 02110-1301  USA
 //
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using MySQL.Utility;
-
 namespace MySQL.ForExcel
 {
+  using MySQL.Utility.Forms;
+
+  /// <summary>
+  /// Provides an interface to enter the password required by a MySQL connection.
+  /// </summary>
   public partial class PasswordDialog : AutoStyleableBaseDialog
   {
-    public string PasswordText
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PasswordDialog"/> class.
+    /// </summary>
+    /// <param name="hostIdentifier">The complete identifier of the MySQL host of the connection (instance name + host name + port).</param>
+    /// <param name="user">The user name used by the connection.</param>
+    public PasswordDialog(string hostIdentifier, string user)
     {
-      set { txtPassword.Text = value; }
-      get { return txtPassword.Text; }
+      InitializeComponent();
+      HostIdentifier = hostIdentifier;
+      UserName = user;
     }
 
+    /// <summary>
+    /// Gets the complete identifier of the MySQL host of the connection (instance name + host name + port).
+    /// </summary>
     public string HostIdentifier
     {
-      set { lblConnectionValue.Text = value; }
+      get
+      {
+        return ConnectionValueLabel.Text;
+      }
+
+      private set
+      {
+        ConnectionValueLabel.Text = value;
+      }
     }
 
+    /// <summary>
+    /// Gets the password entered by the user for the connection.
+    /// </summary>
+    public string PasswordText
+    {
+      get
+      {
+        return PasswordTextBox.Text;
+      }
+
+      private set
+      {
+        PasswordTextBox.Text = value;
+      }
+    }
+
+    /// <summary>
+    /// Gets the user name used by the connection.
+    /// </summary>
     public string UserName
     {
-      set { lblUserValue.Text = value; }
-    }
+      get
+      {
+        return UserValueLabel.Text;
+      }
 
-    public PasswordDialog()
-    {
-      InitializeComponent();
-    }
-
-    public PasswordDialog(string hostIdentifier, string User)
-    {
-      InitializeComponent();
-      lblConnection.Text = "Service:";
-      HostIdentifier = hostIdentifier;
-      UserName = User;
+      private set
+      {
+        UserValueLabel.Text = value;
+      }
     }
   }
 }

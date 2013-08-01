@@ -1,16 +1,16 @@
-﻿//
+﻿// 
 // Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
@@ -27,6 +27,7 @@ namespace MySQL.ForExcel
   using System.IO;
   using System.Windows.Forms;
   using MySQL.Utility;
+  using MySQL.Utility.Forms;
 
   /// <summary>
   /// Previews a MySQL table's data and lets users select columns and rows to import to an Excel spreadsheet.
@@ -34,14 +35,9 @@ namespace MySQL.ForExcel
   public partial class ImportTableViewForm : AutoStyleableBaseDialog
   {
     /// <summary>
-    /// <see cref="DataTable"/> object containing the data to be imported to the active Excel Worksheet.
-    /// </summary>
-    public DataTable ImportDataTable;
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="ImportTableViewForm"/> class.
     /// </summary>
-    /// <param name="wbConnection">Connection to a MySQL server instance selected by users.</param>
+    /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="importDBObject">MySQL table, view or procedure from which to import data to an Excel spreadsheet.</param>
     /// <param name="importToWorksheetName">Name of the Excel worksheet where the data will be imported to.</param>
     /// <param name="workSheetInCompatibilityMode">Flag indicating if the Excel worksheet where the data will be imported to is in Excel 2003 compatibility mode.</param>
@@ -56,15 +52,15 @@ namespace MySQL.ForExcel
       ImportDataTable = null;
 
       InitializeComponent();
-      PreviewDataGrid.DataError += new DataGridViewDataErrorEventHandler(PreviewDataGrid_DataError);
+      PreviewDataGridView.DataError += new DataGridViewDataErrorEventHandler(PreviewDataGridView_DataError);
 
       IncludeHeadersCheckBox.Checked = true;
       IncludeHeadersCheckBox.Enabled = !importForEditData;
       ImportWithinEditOperation = importForEditData;
-      PreviewDataGrid.DisableColumnsSelection = ImportWithinEditOperation;
+      PreviewDataGridView.DisableColumnsSelection = ImportWithinEditOperation;
       if (importForEditData)
       {
-        PreviewDataGrid.ContextMenuStrip = null;
+        PreviewDataGridView.ContextMenuStrip = null;
       }
 
       LimitRowsCheckBox.Checked = false;
@@ -82,8 +78,16 @@ namespace MySQL.ForExcel
     /// </summary>
     public bool AllColumnsSelected
     {
-      get { return (PreviewDataGrid.SelectedColumns.Count == PreviewDataGrid.Columns.Count); }
+      get
+      {
+        return (PreviewDataGridView.SelectedColumns.Count == PreviewDataGridView.Columns.Count);
+      }
     }
+
+    /// <summary>
+    /// Gets a <see cref="DataTable"/> object containing the data to be imported to the active Excel Worksheet.
+    /// </summary>
+    public DataTable ImportDataTable { get; private set; }
 
     /// <summary>
     /// Gets the type of DB object (MySQL table or view) from which to import data to the active Excel Worksheet.
@@ -95,7 +99,10 @@ namespace MySQL.ForExcel
     /// </summary>
     public bool ImportHeaders
     {
-      get { return IncludeHeadersCheckBox.Checked; }
+      get
+      {
+        return IncludeHeadersCheckBox.Checked;
+      }
     }
 
     /// <summary>
@@ -128,16 +135,6 @@ namespace MySQL.ForExcel
     /// </summary>
     public bool WorkSheetInCompatibilityMode { get; private set; }
 
-    /// <summary>
-    /// Shows or hides the compatibility warning controls to let the users know if the Excel spreadsheet is running in Excel 2003 compatibility mode.
-    /// </summary>
-    /// <param name="show">Flag indicating if the compatibility warning controls should be shown.</param>
-    private void SetCompatibilityWarningControlsVisibility(bool show)
-    {
-      OptionsWarningLabel.Visible = show;
-      OptionsWarningPictureBox.Visible = show;
-    }
-
     #endregion Properties
 
     /// <summary>
@@ -147,8 +144,8 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void ContextMenuForGrid_Opening(object sender, CancelEventArgs e)
     {
-      SelectAllToolStripMenuItem.Visible = PreviewDataGrid.SelectedColumns.Count < PreviewDataGrid.Columns.Count;
-      SelectNoneToolStripMenuItem.Visible = PreviewDataGrid.SelectedColumns.Count > 0;
+      SelectAllToolStripMenuItem.Visible = PreviewDataGridView.SelectedColumns.Count < PreviewDataGridView.Columns.Count;
+      SelectNoneToolStripMenuItem.Visible = PreviewDataGridView.SelectedColumns.Count > 0;
     }
 
     /// <summary>
@@ -159,13 +156,13 @@ namespace MySQL.ForExcel
       PreviewDataTable = MySQLDataUtilities.GetDataFromTableOrView(WBConnection, ImportDBObject, null, 0, 10);
       TotalRowsCount = MySQLDataUtilities.GetRowsCountFromTableOrView(WBConnection, ImportDBObject);
       RowsCountSubLabel.Text = TotalRowsCount.ToString();
-      PreviewDataGrid.DataSource = PreviewDataTable;
-      foreach (DataGridViewColumn gridCol in PreviewDataGrid.Columns)
+      PreviewDataGridView.DataSource = PreviewDataTable;
+      foreach (DataGridViewColumn gridCol in PreviewDataGridView.Columns)
       {
         gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
       }
 
-      PreviewDataGrid.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
+      PreviewDataGridView.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
       bool cappingAtMaxCompatRows = WorkSheetInCompatibilityMode && TotalRowsCount > UInt16.MaxValue;
       SetCompatibilityWarningControlsVisibility(cappingAtMaxCompatRows);
       FromRowNumericUpDown.Maximum = cappingAtMaxCompatRows ? UInt16.MaxValue : TotalRowsCount;
@@ -192,10 +189,10 @@ namespace MySQL.ForExcel
     {
       List<string> importColumns = null;
       List<DataGridViewColumn> selectedColumns = new List<DataGridViewColumn>();
-      if (PreviewDataGrid.SelectedColumns.Count < PreviewDataGrid.Columns.Count)
+      if (PreviewDataGridView.SelectedColumns.Count < PreviewDataGridView.Columns.Count)
       {
-        importColumns = new List<string>(PreviewDataGrid.SelectedColumns.Count);
-        foreach (DataGridViewColumn selCol in PreviewDataGrid.SelectedColumns)
+        importColumns = new List<string>(PreviewDataGridView.SelectedColumns.Count);
+        foreach (DataGridViewColumn selCol in PreviewDataGridView.SelectedColumns)
         {
           selectedColumns.Add(selCol);
         }
@@ -232,11 +229,9 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog errorDialog = new InfoDialog(false, Properties.Resources.ImportTableErrorTitle, ex.Message);
-        errorDialog.WordWrapDetails = true;
-        errorDialog.ShowDialog();
+        MiscUtilities.ShowCustomizedErrorDialog(Properties.Resources.ImportTableErrorTitle, ex.Message, true);
         ImportOperationGeneratedErrors = true;
-        MiscUtilities.WriteAppErrorToLog(ex);
+        MySQLSourceTrace.WriteAppErrorToLog(ex);
       }
 
       this.Cursor = Cursors.Default;
@@ -264,27 +259,27 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="PreviewDataGrid"/> grid is done with its data binding operation.
+    /// Event delegate method fired when the <see cref="PreviewDataGridView"/> grid is done with its data binding operation.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void PreviewDataGrid_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+    private void PreviewDataGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
     {
-      PreviewDataGrid.SelectAll();
+      PreviewDataGridView.SelectAll();
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="PreviewDataGrid"/> detects a data error in one of its cells.
+    /// Event delegate method fired when the <see cref="PreviewDataGridView"/> detects a data error in one of its cells.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void PreviewDataGrid_DataError(object sender, DataGridViewDataErrorEventArgs e)
+    private void PreviewDataGridView_DataError(object sender, DataGridViewDataErrorEventArgs e)
     {
-      if (PreviewDataGrid.Rows[e.RowIndex].Cells[e.ColumnIndex].ValueType == Type.GetType("System.Byte[]"))
+      if (PreviewDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex].ValueType == Type.GetType("System.Byte[]"))
       {
         try
         {
-          var img = (byte[])(PreviewDataGrid.Rows[e.RowIndex].Cells[e.ColumnIndex]).Value;
+          var img = (byte[])(PreviewDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex]).Value;
           using (MemoryStream ms = new MemoryStream(img))
           {
             Image.FromStream(ms);
@@ -292,26 +287,24 @@ namespace MySQL.ForExcel
         }
         catch (ArgumentException argEx)
         {
-          MiscUtilities.WriteAppErrorToLog(argEx);
+          MySQLSourceTrace.WriteAppErrorToLog(argEx);
         }
         catch (Exception ex)
         {
-          InfoDialog errorDialog = new InfoDialog(false, Properties.Resources.DataLoadingError, ex.Message);
-          errorDialog.WordWrapDetails = true;
-          errorDialog.ShowDialog();
-          MiscUtilities.WriteAppErrorToLog(ex);
+          MiscUtilities.ShowCustomizedErrorDialog(Properties.Resources.DataLoadingError, ex.Message);
+          MySQLSourceTrace.WriteAppErrorToLog(ex);
         }
       }
     }
 
     /// <summary>
-    /// Event delegate method fired when the selection of the <see cref="PreviewDataGrid"/> grid changes.
+    /// Event delegate method fired when the selection of the <see cref="PreviewDataGridView"/> grid changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void PreviewDataGrid_SelectionChanged(object sender, EventArgs e)
+    private void PreviewDataGridView_SelectionChanged(object sender, EventArgs e)
     {
-      ImportButton.Enabled = PreviewDataGrid.SelectedColumns.Count > 0;
+      ImportButton.Enabled = PreviewDataGridView.SelectedColumns.Count > 0;
     }
 
     /// <summary>
@@ -321,7 +314,7 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void SelectAllToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      PreviewDataGrid.SelectAll();
+      PreviewDataGridView.SelectAll();
     }
 
     /// <summary>
@@ -331,7 +324,17 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void SelectNoneToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      PreviewDataGrid.ClearSelection();
+      PreviewDataGridView.ClearSelection();
+    }
+
+    /// <summary>
+    /// Shows or hides the compatibility warning controls to let the users know if the Excel spreadsheet is running in Excel 2003 compatibility mode.
+    /// </summary>
+    /// <param name="show">Flag indicating if the compatibility warning controls should be shown.</param>
+    private void SetCompatibilityWarningControlsVisibility(bool show)
+    {
+      OptionsWarningLabel.Visible = show;
+      OptionsWarningPictureBox.Visible = show;
     }
   }
 }

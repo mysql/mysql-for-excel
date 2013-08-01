@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -53,53 +53,53 @@ namespace MySQL.ForExcel
     /// </summary>
     private void InitializeComponent()
     {
-      this.tab1 = this.Factory.CreateRibbonTab();
-      this.grpMySQLExcelAddIn = this.Factory.CreateRibbonGroup();
-      this.togShowTaskPane = this.Factory.CreateRibbonToggleButton();
-      this.tab1.SuspendLayout();
-      this.grpMySQLExcelAddIn.SuspendLayout();
+      this.DataRibbonTab = this.Factory.CreateRibbonTab();
+      this.MySQLExcelAddInRibbonGroup = this.Factory.CreateRibbonGroup();
+      this.ShowTaskPaneRibbonToggleButton = this.Factory.CreateRibbonToggleButton();
+      this.DataRibbonTab.SuspendLayout();
+      this.MySQLExcelAddInRibbonGroup.SuspendLayout();
       // 
-      // tab1
+      // DataRibbonTab
       // 
-      this.tab1.ControlId.ControlIdType = Microsoft.Office.Tools.Ribbon.RibbonControlIdType.Office;
-      this.tab1.ControlId.OfficeId = "TabData";
-      this.tab1.Groups.Add(this.grpMySQLExcelAddIn);
-      this.tab1.Label = "TabData";
-      this.tab1.Name = "tab1";
+      this.DataRibbonTab.ControlId.ControlIdType = Microsoft.Office.Tools.Ribbon.RibbonControlIdType.Office;
+      this.DataRibbonTab.ControlId.OfficeId = "TabData";
+      this.DataRibbonTab.Groups.Add(this.MySQLExcelAddInRibbonGroup);
+      this.DataRibbonTab.Label = "TabData";
+      this.DataRibbonTab.Name = "DataRibbonTab";
       // 
-      // grpMySQLExcelAddIn
+      // MySQLExcelAddInRibbonGroup
       // 
-      this.grpMySQLExcelAddIn.Items.Add(this.togShowTaskPane);
-      this.grpMySQLExcelAddIn.Label = "Database";
-      this.grpMySQLExcelAddIn.Name = "grpMySQLExcelAddIn";
+      this.MySQLExcelAddInRibbonGroup.Items.Add(this.ShowTaskPaneRibbonToggleButton);
+      this.MySQLExcelAddInRibbonGroup.Label = "Database";
+      this.MySQLExcelAddInRibbonGroup.Name = "MySQLExcelAddInRibbonGroup";
       // 
-      // togShowTaskPane
+      // ShowTaskPaneRibbonToggleButton
       // 
-      this.togShowTaskPane.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
-      this.togShowTaskPane.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Logo_48x48;
-      this.togShowTaskPane.Label = "MySQL for Excel";
-      this.togShowTaskPane.Name = "togShowTaskPane";
-      this.togShowTaskPane.ShowImage = true;
-      this.togShowTaskPane.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.togShowTaskPane_Click);
+      this.ShowTaskPaneRibbonToggleButton.ControlSize = Microsoft.Office.Core.RibbonControlSize.RibbonControlSizeLarge;
+      this.ShowTaskPaneRibbonToggleButton.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Logo_48x48;
+      this.ShowTaskPaneRibbonToggleButton.Label = "MySQL for Excel";
+      this.ShowTaskPaneRibbonToggleButton.Name = "ShowTaskPaneRibbonToggleButton";
+      this.ShowTaskPaneRibbonToggleButton.ShowImage = true;
+      this.ShowTaskPaneRibbonToggleButton.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.ShowTaskPaneRibbonToggleButton_Click);
       // 
       // ManageTaskPaneRibbon
       // 
       this.Name = "ManageTaskPaneRibbon";
       this.RibbonType = "Microsoft.Excel.Workbook";
-      this.Tabs.Add(this.tab1);
+      this.Tabs.Add(this.DataRibbonTab);
       this.Load += new Microsoft.Office.Tools.Ribbon.RibbonUIEventHandler(this.ManageTaskPaneRibbon_Load);
-      this.tab1.ResumeLayout(false);
-      this.tab1.PerformLayout();
-      this.grpMySQLExcelAddIn.ResumeLayout(false);
-      this.grpMySQLExcelAddIn.PerformLayout();
+      this.DataRibbonTab.ResumeLayout(false);
+      this.DataRibbonTab.PerformLayout();
+      this.MySQLExcelAddInRibbonGroup.ResumeLayout(false);
+      this.MySQLExcelAddInRibbonGroup.PerformLayout();
 
     }
 
     #endregion
 
-    internal Microsoft.Office.Tools.Ribbon.RibbonTab tab1;
-    internal Microsoft.Office.Tools.Ribbon.RibbonGroup grpMySQLExcelAddIn;
-    internal Microsoft.Office.Tools.Ribbon.RibbonToggleButton togShowTaskPane;
+    internal Microsoft.Office.Tools.Ribbon.RibbonTab DataRibbonTab;
+    internal Microsoft.Office.Tools.Ribbon.RibbonGroup MySQLExcelAddInRibbonGroup;
+    internal Microsoft.Office.Tools.Ribbon.RibbonToggleButton ShowTaskPaneRibbonToggleButton;
   }
 
   partial class ThisRibbonCollection

@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -62,7 +62,7 @@ namespace MySQL.ForExcel
       this.IncludeHeadersCheckBox = new System.Windows.Forms.CheckBox();
       this.OptionsWarningLabel = new System.Windows.Forms.Label();
       this.OptionsWarningPictureBox = new System.Windows.Forms.PictureBox();
-      this.PreviewDataGrid = new MySQL.ForExcel.PreviewDataGridView();
+      this.PreviewDataGridView = new MySQL.ForExcel.PreviewDataGridView();
       this.ContextMenuForGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.SelectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.SelectNoneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -73,43 +73,47 @@ namespace MySQL.ForExcel
       this.TableNameSubLabel = new System.Windows.Forms.Label();
       this.TableNameMainLabel = new System.Windows.Forms.Label();
       this.ImportButton = new System.Windows.Forms.Button();
-      this.ImportCancelButton = new System.Windows.Forms.Button();
+      this.DialogCancelButton = new System.Windows.Forms.Button();
       this.ExportDataLabel = new System.Windows.Forms.Label();
-      this.contentAreaPanel.SuspendLayout();
-      this.commandAreaPanel.SuspendLayout();
+      this.ContentAreaPanel.SuspendLayout();
+      this.CommandAreaPanel.SuspendLayout();
       this.OptionsGroupBox.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.FromRowNumericUpDown)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.RowsToReturnNumericUpDown)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.OptionsWarningPictureBox)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.PreviewDataGrid)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.PreviewDataGridView)).BeginInit();
       this.ContextMenuForGrid.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.ColumnOptionsPictureBox)).BeginInit();
       this.SuspendLayout();
       // 
-      // contentAreaPanel
+      // FootnoteAreaPanel
       // 
-      this.contentAreaPanel.BackColor = System.Drawing.SystemColors.Window;
-      this.contentAreaPanel.Controls.Add(this.OptionsWarningLabel);
-      this.contentAreaPanel.Controls.Add(this.OptionsWarningPictureBox);
-      this.contentAreaPanel.Controls.Add(this.ExportDataLabel);
-      this.contentAreaPanel.Controls.Add(this.SubSetOfDataLabel);
-      this.contentAreaPanel.Controls.Add(this.RowsCountSubLabel);
-      this.contentAreaPanel.Controls.Add(this.OptionsGroupBox);
-      this.contentAreaPanel.Controls.Add(this.PreviewDataGrid);
-      this.contentAreaPanel.Controls.Add(this.PickColumnsSubLabel);
-      this.contentAreaPanel.Controls.Add(this.PickColumnsMainLabel);
-      this.contentAreaPanel.Controls.Add(this.ColumnOptionsPictureBox);
-      this.contentAreaPanel.Controls.Add(this.RowsCountMainLabel);
-      this.contentAreaPanel.Controls.Add(this.TableNameSubLabel);
-      this.contentAreaPanel.Controls.Add(this.TableNameMainLabel);
-      this.contentAreaPanel.Size = new System.Drawing.Size(849, 550);
+      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 517);
+      this.FootnoteAreaPanel.Size = new System.Drawing.Size(849, 0);
       // 
-      // commandAreaPanel
+      // ContentAreaPanel
       // 
-      this.commandAreaPanel.Controls.Add(this.ImportButton);
-      this.commandAreaPanel.Controls.Add(this.ImportCancelButton);
-      this.commandAreaPanel.Location = new System.Drawing.Point(0, 550);
-      this.commandAreaPanel.Size = new System.Drawing.Size(849, 45);
+      this.ContentAreaPanel.Controls.Add(this.OptionsWarningLabel);
+      this.ContentAreaPanel.Controls.Add(this.OptionsWarningPictureBox);
+      this.ContentAreaPanel.Controls.Add(this.ExportDataLabel);
+      this.ContentAreaPanel.Controls.Add(this.SubSetOfDataLabel);
+      this.ContentAreaPanel.Controls.Add(this.RowsCountSubLabel);
+      this.ContentAreaPanel.Controls.Add(this.OptionsGroupBox);
+      this.ContentAreaPanel.Controls.Add(this.PreviewDataGridView);
+      this.ContentAreaPanel.Controls.Add(this.PickColumnsSubLabel);
+      this.ContentAreaPanel.Controls.Add(this.PickColumnsMainLabel);
+      this.ContentAreaPanel.Controls.Add(this.ColumnOptionsPictureBox);
+      this.ContentAreaPanel.Controls.Add(this.RowsCountMainLabel);
+      this.ContentAreaPanel.Controls.Add(this.TableNameSubLabel);
+      this.ContentAreaPanel.Controls.Add(this.TableNameMainLabel);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(849, 596);
+      // 
+      // CommandAreaPanel
+      // 
+      this.CommandAreaPanel.Controls.Add(this.ImportButton);
+      this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 551);
+      this.CommandAreaPanel.Size = new System.Drawing.Size(849, 45);
       // 
       // FromImageList
       // 
@@ -253,9 +257,9 @@ namespace MySQL.ForExcel
       this.OptionsWarningPictureBox.TabStop = false;
       this.OptionsWarningPictureBox.Visible = false;
       // 
-      // PreviewDataGrid
+      // PreviewDataGridView
       // 
-      this.PreviewDataGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+      this.PreviewDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
@@ -265,9 +269,9 @@ namespace MySQL.ForExcel
       dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Control;
       dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.ControlText;
       dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.PreviewDataGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-      this.PreviewDataGrid.ColumnsMaximumWidth = 200;
-      this.PreviewDataGrid.ContextMenuStrip = this.ContextMenuForGrid;
+      this.PreviewDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+      this.PreviewDataGridView.ColumnsMaximumWidth = 200;
+      this.PreviewDataGridView.ContextMenuStrip = this.ContextMenuForGrid;
       dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.InactiveCaption;
       dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -275,13 +279,13 @@ namespace MySQL.ForExcel
       dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Window;
       dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.ControlText;
       dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.PreviewDataGrid.DefaultCellStyle = dataGridViewCellStyle2;
-      this.PreviewDataGrid.Location = new System.Drawing.Point(80, 164);
-      this.PreviewDataGrid.Name = "PreviewDataGrid";
-      this.PreviewDataGrid.Size = new System.Drawing.Size(695, 265);
-      this.PreviewDataGrid.TabIndex = 7;
-      this.PreviewDataGrid.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.PreviewDataGrid_DataBindingComplete);
-      this.PreviewDataGrid.SelectionChanged += new System.EventHandler(this.PreviewDataGrid_SelectionChanged);
+      this.PreviewDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
+      this.PreviewDataGridView.Location = new System.Drawing.Point(80, 164);
+      this.PreviewDataGridView.Name = "PreviewDataGridView";
+      this.PreviewDataGridView.Size = new System.Drawing.Size(695, 265);
+      this.PreviewDataGridView.TabIndex = 7;
+      this.PreviewDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.PreviewDataGridView_DataBindingComplete);
+      this.PreviewDataGridView.SelectionChanged += new System.EventHandler(this.PreviewDataGridView_SelectionChanged);
       // 
       // ContextMenuForGrid
       // 
@@ -289,14 +293,14 @@ namespace MySQL.ForExcel
             this.SelectAllToolStripMenuItem,
             this.SelectNoneToolStripMenuItem});
       this.ContextMenuForGrid.Name = "contextMenuForGrid";
-      this.ContextMenuForGrid.Size = new System.Drawing.Size(138, 48);
+      this.ContextMenuForGrid.Size = new System.Drawing.Size(153, 70);
       this.ContextMenuForGrid.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenuForGrid_Opening);
       // 
       // SelectAllToolStripMenuItem
       // 
       this.SelectAllToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
       this.SelectAllToolStripMenuItem.Name = "SelectAllToolStripMenuItem";
-      this.SelectAllToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+      this.SelectAllToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
       this.SelectAllToolStripMenuItem.Text = "Select All";
       this.SelectAllToolStripMenuItem.Click += new System.EventHandler(this.SelectAllToolStripMenuItem_Click);
       // 
@@ -304,7 +308,7 @@ namespace MySQL.ForExcel
       // 
       this.SelectNoneToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
       this.SelectNoneToolStripMenuItem.Name = "SelectNoneToolStripMenuItem";
-      this.SelectNoneToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+      this.SelectNoneToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
       this.SelectNoneToolStripMenuItem.Text = "Select None";
       this.SelectNoneToolStripMenuItem.Click += new System.EventHandler(this.SelectNoneToolStripMenuItem_Click);
       // 
@@ -392,17 +396,17 @@ namespace MySQL.ForExcel
       this.ImportButton.UseVisualStyleBackColor = true;
       this.ImportButton.Click += new System.EventHandler(this.ImportButton_Click);
       // 
-      // ImportCancelButton
+      // DialogCancelButton
       // 
-      this.ImportCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.ImportCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.ImportCancelButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.ImportCancelButton.Location = new System.Drawing.Point(762, 11);
-      this.ImportCancelButton.Name = "ImportCancelButton";
-      this.ImportCancelButton.Size = new System.Drawing.Size(75, 23);
-      this.ImportCancelButton.TabIndex = 1;
-      this.ImportCancelButton.Text = "Cancel";
-      this.ImportCancelButton.UseVisualStyleBackColor = true;
+      this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.DialogCancelButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.DialogCancelButton.Location = new System.Drawing.Point(762, 11);
+      this.DialogCancelButton.Name = "DialogCancelButton";
+      this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
+      this.DialogCancelButton.TabIndex = 1;
+      this.DialogCancelButton.Text = "Cancel";
+      this.DialogCancelButton.UseVisualStyleBackColor = true;
       // 
       // ExportDataLabel
       // 
@@ -418,25 +422,27 @@ namespace MySQL.ForExcel
       // ImportTableViewForm
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-      this.ClientSize = new System.Drawing.Size(849, 597);
-      this.CommandAreaHeight = 45;
+      this.ClientSize = new System.Drawing.Size(849, 596);
+      this.CommandAreaVisible = true;
+      this.FootnoteAreaHeight = 0;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
       this.MainInstructionLocation = new System.Drawing.Point(10, 14);
       this.MinimumSize = new System.Drawing.Size(865, 635);
       this.Name = "ImportTableViewForm";
       this.Text = "Import Data";
       this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ImportTableViewForm_FormClosing);
-      this.Controls.SetChildIndex(this.contentAreaPanel, 0);
-      this.Controls.SetChildIndex(this.commandAreaPanel, 0);
-      this.contentAreaPanel.ResumeLayout(false);
-      this.contentAreaPanel.PerformLayout();
-      this.commandAreaPanel.ResumeLayout(false);
+      this.Controls.SetChildIndex(this.FootnoteAreaPanel, 0);
+      this.Controls.SetChildIndex(this.ContentAreaPanel, 0);
+      this.Controls.SetChildIndex(this.CommandAreaPanel, 0);
+      this.ContentAreaPanel.ResumeLayout(false);
+      this.ContentAreaPanel.PerformLayout();
+      this.CommandAreaPanel.ResumeLayout(false);
       this.OptionsGroupBox.ResumeLayout(false);
       this.OptionsGroupBox.PerformLayout();
       ((System.ComponentModel.ISupportInitialize)(this.FromRowNumericUpDown)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.RowsToReturnNumericUpDown)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.OptionsWarningPictureBox)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.PreviewDataGrid)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.PreviewDataGridView)).EndInit();
       this.ContextMenuForGrid.ResumeLayout(false);
       ((System.ComponentModel.ISupportInitialize)(this.ColumnOptionsPictureBox)).EndInit();
       this.ResumeLayout(false);
@@ -456,7 +462,7 @@ namespace MySQL.ForExcel
     private System.Windows.Forms.CheckBox IncludeHeadersCheckBox;
     private System.Windows.Forms.Label OptionsWarningLabel;
     private System.Windows.Forms.PictureBox OptionsWarningPictureBox;
-    private PreviewDataGridView PreviewDataGrid;
+    private PreviewDataGridView PreviewDataGridView;
     private System.Windows.Forms.Label PickColumnsSubLabel;
     private System.Windows.Forms.Label PickColumnsMainLabel;
     private System.Windows.Forms.PictureBox ColumnOptionsPictureBox;
@@ -464,7 +470,7 @@ namespace MySQL.ForExcel
     private System.Windows.Forms.Label TableNameSubLabel;
     private System.Windows.Forms.Label TableNameMainLabel;
     private System.Windows.Forms.Button ImportButton;
-    private System.Windows.Forms.Button ImportCancelButton;
+    private System.Windows.Forms.Button DialogCancelButton;
     private System.Windows.Forms.Label ExportDataLabel;
     private System.Windows.Forms.ContextMenuStrip ContextMenuForGrid;
     private System.Windows.Forms.ToolStripMenuItem SelectAllToolStripMenuItem;

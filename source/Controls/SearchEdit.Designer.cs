@@ -1,5 +1,5 @@
 ﻿// 
-// Copyright (c) 2012, Oracle and/or its affiliates. All rights reserved.
+// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -47,21 +47,21 @@ namespace MySQL.ForExcel
     /// </summary>
     private void InitializeComponent()
     {
-      this.innerText = new System.Windows.Forms.TextBox();
+      this.InnerTextBox = new System.Windows.Forms.TextBox();
       this.SuspendLayout();
       // 
-      // innerText
+      // InnerTextBox
       // 
-      this.innerText.Anchor = System.Windows.Forms.AnchorStyles.None;
-      this.innerText.BorderStyle = System.Windows.Forms.BorderStyle.None;
-      this.innerText.Font = new System.Drawing.Font("Arial", 9F);
-      this.innerText.Location = new System.Drawing.Point(38, 0);
-      this.innerText.Name = "innerText";
-      this.innerText.Size = new System.Drawing.Size(311, 14);
-      this.innerText.TabIndex = 1;
-      this.innerText.Enter += new System.EventHandler(this.innerText_Enter);
-      this.innerText.KeyDown += new System.Windows.Forms.KeyEventHandler(this.innerText_KeyDown);
-      this.innerText.Leave += new System.EventHandler(this.innerText_Leave);
+      this.InnerTextBox.Anchor = System.Windows.Forms.AnchorStyles.None;
+      this.InnerTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
+      this.InnerTextBox.Font = new System.Drawing.Font("Arial", 9F);
+      this.InnerTextBox.Location = new System.Drawing.Point(38, 0);
+      this.InnerTextBox.Name = "InnerTextBox";
+      this.InnerTextBox.Size = new System.Drawing.Size(311, 14);
+      this.InnerTextBox.TabIndex = 1;
+      this.InnerTextBox.Enter += new System.EventHandler(this.InnerTextBox_Enter);
+      this.InnerTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.InnerTextBox_KeyDown);
+      this.InnerTextBox.Leave += new System.EventHandler(this.InnerTextBox_Leave);
       // 
       // SearchEdit
       // 
@@ -69,7 +69,7 @@ namespace MySQL.ForExcel
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.BackColor = System.Drawing.SystemColors.Window;
       this.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-      this.Controls.Add(this.innerText);
+      this.Controls.Add(this.InnerTextBox);
       this.Name = "SearchEdit";
       this.Size = new System.Drawing.Size(349, 15);
       this.Resize += new System.EventHandler(this.SearchEdit_Resize);
@@ -80,7 +80,7 @@ namespace MySQL.ForExcel
 
     #endregion
 
-    private System.Windows.Forms.TextBox innerText;
+    private System.Windows.Forms.TextBox InnerTextBox;
 
   }
 }

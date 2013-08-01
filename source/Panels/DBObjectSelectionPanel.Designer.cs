@@ -152,7 +152,7 @@ namespace MySQL.ForExcel
       this.DBObjectsContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.RefreshDatabaseObjectsToolStripMenuItem});
       this.DBObjectsContextMenuStrip.Name = "contextMenuStrip";
-      this.DBObjectsContextMenuStrip.Size = new System.Drawing.Size(208, 48);
+      this.DBObjectsContextMenuStrip.Size = new System.Drawing.Size(208, 26);
       // 
       // RefreshDatabaseObjectsToolStripMenuItem
       // 
@@ -307,6 +307,7 @@ namespace MySQL.ForExcel
       this.DBObjectsFilter.Location = new System.Drawing.Point(9, 171);
       this.DBObjectsFilter.Name = "DBObjectsFilter";
       this.DBObjectsFilter.NoTextLabel = "Filter Schema Objects";
+      this.DBObjectsFilter.SearchImage = global::MySQL.ForExcel.Properties.Resources.ExcelAddinFilter;
       this.DBObjectsFilter.Size = new System.Drawing.Size(242, 21);
       this.DBObjectsFilter.TabIndex = 33;
       this.DBObjectsFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DBObjectsFilter_KeyDown);

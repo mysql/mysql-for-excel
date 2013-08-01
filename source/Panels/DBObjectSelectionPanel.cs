@@ -1,16 +1,16 @@
-﻿//
+﻿// 
 // Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
@@ -100,7 +100,7 @@ namespace MySQL.ForExcel
       {
         _excelSelectionContainsData = value;
         ExportToNewTableHotLabel.Enabled = value;
-        AppendDataHotLabel.Enabled = value && CurrentSelectedDBObject != null && CurrentSelectedDBObject.Type == DBObjectType.Table;
+        AppendDataHotLabel.Enabled = value && CurrentSelectedDBObject != null && CurrentSelectedDBObject.Type == DBObject.DBObjectType.Table;
       }
     }
 
@@ -115,7 +115,7 @@ namespace MySQL.ForExcel
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public MySqlWorkbenchConnection WBConnection
-    { 
+    {
       get
       {
         return _wbConnection;
@@ -125,7 +125,7 @@ namespace MySQL.ForExcel
       {
         _wbConnection = value;
         ConnectionNameLabel.Text = _wbConnection.Name;
-        UserIPLabel.Text = String.Format("User: {0}, IP: {1}", _wbConnection.UserName, _wbConnection.Host);
+        UserIPLabel.Text = string.Format("User: {0}, IP: {1}", _wbConnection.UserName, _wbConnection.Host);
         RefreshDBObjectsList();
         DBObjectList_AfterSelect(null, null);
       }
@@ -141,15 +141,15 @@ namespace MySQL.ForExcel
     public void RefreshActionLabelsEnabledStatus(string tableName, bool editActive)
     {
       DBObject dbObj = CurrentSelectedDBObject;
-      if (dbObj == null || (!string.IsNullOrEmpty(tableName) && dbObj.Name != tableName))
+      if (dbObj == null || Parent == null || (!string.IsNullOrEmpty(tableName) && dbObj.Name != tableName))
       {
         return;
       }
 
-      editActive = dbObj.Type == DBObjectType.Table && (Parent as TaskPaneControl).TableHasEditOnGoing(CurrentSelectedDBObject.Name);
+      editActive = dbObj.Type == DBObject.DBObjectType.Table && (Parent as TaskPaneControl).TableHasEditOnGoing(CurrentSelectedDBObject.Name);
       ImportDataHotLabel.Enabled = true;
-      EditDataHotLabel.Enabled = dbObj.Type == DBObjectType.Table && !editActive;
-      AppendDataHotLabel.Enabled = dbObj.Type == DBObjectType.Table && ExcelSelectionContainsData;
+      EditDataHotLabel.Enabled = dbObj.Type == DBObject.DBObjectType.Table && !editActive;
+      AppendDataHotLabel.Enabled = dbObj.Type == DBObject.DBObjectType.Table && ExcelSelectionContainsData;
     }
 
     /// <summary>
@@ -167,17 +167,15 @@ namespace MySQL.ForExcel
       try
       {
         DBObject selDBObject = (DBObjectList.SelectedNode.Tag as DBObject);
-        if (selDBObject.Type == DBObjectType.Table)
+        if (selDBObject.Type == DBObject.DBObjectType.Table)
         {
           ExportDataToTable(selDBObject);
         }
       }
       catch (Exception ex)
       {
-        InfoDialog errorDialog = new InfoDialog(false, Resources.AppendDataErrorTitle, ex.Message);
-        errorDialog.WordWrapDetails = true;
-        errorDialog.ShowDialog();
-        MiscUtilities.WriteAppErrorToLog(ex);
+        MiscUtilities.ShowCustomizedErrorDialog(Resources.AppendDataErrorTitle, ex.Message, true);
+        MySQLSourceTrace.WriteAppErrorToLog(ex);
       }
       finally
       {
@@ -205,7 +203,7 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void CloseButton_Click(object sender, EventArgs e)
     {
-      (Parent as TaskPaneControl).CloseAddIn();
+      (Parent as TaskPaneControl).CloseAddIn(false);
     }
 
     /// <summary>
@@ -234,10 +232,8 @@ namespace MySQL.ForExcel
         }
         catch (Exception ex)
         {
-          InfoDialog errorDialog = new InfoDialog(false, ex.Message, null);
-          errorDialog.WordWrapDetails = true;
-          errorDialog.ShowDialog();
-          MiscUtilities.WriteAppErrorToLog(ex);
+          MiscUtilities.ShowCustomizedErrorDialog(ex.Message);
+          MySQLSourceTrace.WriteAppErrorToLog(ex);
         }
       }
     }
@@ -250,7 +246,7 @@ namespace MySQL.ForExcel
     private void EditDataHotLabel_Click(object sender, EventArgs e)
     {
       DBObject selDBObject = (DBObjectList.SelectedNode != null ? DBObjectList.SelectedNode.Tag as DBObject : null);
-      if (selDBObject == null || selDBObject.Type != DBObjectType.Table)
+      if (selDBObject == null || selDBObject.Type != DBObject.DBObjectType.Table)
       {
         return;
       }
@@ -265,10 +261,8 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog errorDialog = new InfoDialog(false, Resources.EditDataErrorTitle, ex.Message);
-        errorDialog.WordWrapDetails = true;
-        errorDialog.ShowDialog();
-        MiscUtilities.WriteAppErrorToLog(ex);
+        MiscUtilities.ShowCustomizedErrorDialog(Resources.EditDataErrorTitle, ex.Message, true);
+        MySQLSourceTrace.WriteAppErrorToLog(ex);
       }
     }
 
@@ -293,7 +287,7 @@ namespace MySQL.ForExcel
       if (success)
       {
         DBObjectList.Nodes[0].Nodes.Clear();
-        LoadDataObjects(DBObjectType.Table);
+        LoadDataObjects(DBObject.DBObjectType.Table);
         DBObjectList_AfterSelect(DBObjectList, new TreeViewEventArgs(null));
       }
     }
@@ -334,8 +328,7 @@ namespace MySQL.ForExcel
 
       if (parentTaskPane.ActiveWorksheetInEditMode)
       {
-        WarningDialog wDiag = new WarningDialog(Resources.WorkSheetInEditModeWarningTitle, Resources.WorkSheetInEditModeWarningDetail);
-        DialogResult dr = wDiag.ShowDialog();
+        DialogResult dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.WorkSheetInEditModeWarningTitle, Resources.WorkSheetInEditModeWarningDetail);
         if (dr != DialogResult.Yes)
         {
           return;
@@ -352,22 +345,20 @@ namespace MySQL.ForExcel
       {
         switch (dbo.Type)
         {
-          case DBObjectType.Table:
-          case DBObjectType.View:
+          case DBObject.DBObjectType.Table:
+          case DBObject.DBObjectType.View:
             ImportTableOrView(dbo);
             break;
 
-          case DBObjectType.Routine:
+          case DBObject.DBObjectType.Procedure:
             ImportProcedure(dbo);
             break;
         }
       }
       catch (Exception ex)
       {
-        InfoDialog errorDialog = new InfoDialog(false, Resources.ImportDataErrorTitle, ex.Message);
-        errorDialog.WordWrapDetails = true;
-        errorDialog.ShowDialog();
-        MiscUtilities.WriteAppErrorToLog(ex);
+        MiscUtilities.ShowCustomizedErrorDialog(Resources.ImportDataErrorTitle, ex.Message, true);
+        MySQLSourceTrace.WriteAppErrorToLog(ex);
       }
     }
 
@@ -386,12 +377,11 @@ namespace MySQL.ForExcel
 
       if (importProcedureForm.ImportDataSet == null)
       {
-        InfoDialog errorDialog = new InfoDialog(false, String.Format(Resources.UnableToRetrieveData, dbo.Type.ToString().ToLowerInvariant(), dbo.Name), null);
-        errorDialog.ShowDialog();
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, dbo.Type.ToString().ToLowerInvariant(), dbo.Name));
         return;
       }
 
-      (Parent as TaskPaneControl).ImportDataToExcel(importProcedureForm.ImportDataSet, importProcedureForm.ImportHeaders, importProcedureForm.ImportType, importProcedureForm.SelectedResultSet);
+      (Parent as TaskPaneControl).ImportDataToExcel(importProcedureForm.ImportDataSet, importProcedureForm.ImportHeaders, importProcedureForm.ImportType, importProcedureForm.SelectedResultSetIndex);
     }
 
     /// <summary>
@@ -411,8 +401,7 @@ namespace MySQL.ForExcel
 
       if (importForm.ImportDataTable == null)
       {
-        InfoDialog errorDialog = new InfoDialog(false, String.Format(Resources.UnableToRetrieveData, dbo.Type.ToString().ToLowerInvariant(), dbo.Name), null);
-        errorDialog.ShowDialog();
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, dbo.Type.ToString().ToLowerInvariant(), dbo.Name));
         return;
       }
 
@@ -449,13 +438,13 @@ namespace MySQL.ForExcel
     /// Fetches all DB object names of the given type from the current connection and loads them in the <see cref="DBObjectsList"/> tree.
     /// </summary>
     /// <param name="dataObjectType">Type of DB object to load.</param>
-    private void LoadDataObjects(DBObjectType dataObjectType)
+    private void LoadDataObjects(DBObject.DBObjectType dataObjectType)
     {
       DataTable objs = new DataTable();
       TreeNode parent = new TreeNode();
 
       string objectName;
-      if (dataObjectType == DBObjectType.Routine)
+      if (dataObjectType == DBObject.DBObjectType.Procedure)
       {
         objs = MySQLDataUtilities.GetSchemaCollection(WBConnection, "Procedures", null, WBConnection.Schema, null, "PROCEDURE");
         objectName = "ROUTINE_NAME";
@@ -478,23 +467,14 @@ namespace MySQL.ForExcel
         string dataName = dataRow[objectName].ToString();
 
         //// Check our filter
-        if (!String.IsNullOrEmpty(Filter) && !dataName.ToUpper().Contains(Filter))
+        if (!string.IsNullOrEmpty(Filter) && !dataName.ToUpper().Contains(Filter))
         {
           continue;
         }
 
         string text = dataName;
         TreeNode node = DBObjectList.AddNode(parent, text);
-        if (dataObjectType == DBObjectType.Routine)
-        {
-          node.Tag = new DBObject(dataName, dataObjectType,
-            ((dataRow["ROUTINE_TYPE"].ToString()) == "PROCEDURE" ? RoutineType.Procedure : RoutineType.Function));
-        }
-        else
-        {
-          node.Tag = new DBObject(dataName, dataObjectType);
-        }
-
+        node.Tag = new DBObject(dataName, dataObjectType);
         node.ImageIndex = (int)dataObjectType;
       }
     }
@@ -512,9 +492,9 @@ namespace MySQL.ForExcel
         node.Nodes.Clear();
       }
 
-      LoadDataObjects(DBObjectType.Table);
-      LoadDataObjects(DBObjectType.View);
-      LoadDataObjects(DBObjectType.Routine);
+      LoadDataObjects(DBObject.DBObjectType.Table);
+      LoadDataObjects(DBObject.DBObjectType.View);
+      LoadDataObjects(DBObject.DBObjectType.Procedure);
 
       if (DBObjectList.Nodes[0].GetNodeCount(true) > 0)
       {
@@ -539,10 +519,8 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog errorDialog = new InfoDialog(false, Resources.RefreshDBObjectsErrorTitle, ex.Message);
-        errorDialog.WordWrapDetails = true;
-        errorDialog.ShowDialog();
-        MiscUtilities.WriteAppErrorToLog(ex);
+        MiscUtilities.ShowCustomizedErrorDialog(Resources.RefreshDBObjectsErrorTitle, ex.Message, true);
+        MySQLSourceTrace.WriteAppErrorToLog(ex);
       }
     }
   }

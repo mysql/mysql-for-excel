@@ -1,16 +1,16 @@
-﻿//
+﻿// 
 // Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-//
+// 
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
@@ -26,6 +26,7 @@ namespace MySQL.ForExcel
   using System.Windows.Forms;
   using MySQL.ForExcel.Properties;
   using MySQL.Utility;
+  using MySQL.Utility.Forms;
   using Excel = Microsoft.Office.Interop.Excel;
 
   /// <summary>
@@ -155,8 +156,7 @@ namespace MySQL.ForExcel
 
       if (exportRange.Areas.Count > 1)
       {
-        WarningDialog warningDiag = new WarningDialog(WarningDialog.WarningButtons.OK, Resources.MultipleAreasNotSupportedWarningTitle, Resources.MultipleAreasNotSupportedWarningDetail);
-        warningDiag.ShowDialog();
+        InfoDialog.ShowWarningDialog(Resources.MultipleAreasNotSupportedWarningTitle, Resources.MultipleAreasNotSupportedWarningDetail);
         return false;
       }
 
@@ -181,10 +181,14 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Closes the current connection and hides the add-in's task pane.
     /// </summary>
-    public void CloseAddIn()
+    /// <param name="excelClosing">Flag indicating whether Excel is being closed.</param>
+    public void CloseAddIn(bool excelClosing)
     {
       CloseConnection();
-      Globals.ThisAddIn.TaskPane.Visible = false;
+      if (!excelClosing)
+      {
+        Globals.ThisAddIn.TaskPane.Visible = false;
+      }
     }
 
     /// <summary>
@@ -242,8 +246,7 @@ namespace MySQL.ForExcel
       //// If there are Active Edit sessions warn the users that by closing the schema the sessions will be terminated
       if (ActiveEditDialogsList != null && ActiveEditDialogsList.Count > 0)
       {
-        WarningDialog warningDiag = new WarningDialog(Resources.ActiveEditingSessionsCloseWarningTitle, Resources.ActiveEditingSessionsCloseWarningDetail);
-        DialogResult dr = warningDiag.ShowDialog();
+        DialogResult dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.ActiveEditingSessionsCloseWarningTitle, Resources.ActiveEditingSessionsCloseWarningDetail);
         if (dr == DialogResult.No)
         {
           return;
@@ -273,10 +276,8 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        InfoDialog errorDialog = new InfoDialog(false, "Error while creating new Excel Worksheet", ex.Message);
-        errorDialog.WordWrapDetails = true;
-        errorDialog.ShowDialog();
-        MiscUtilities.WriteAppErrorToLog(ex);
+        MiscUtilities.ShowCustomizedErrorDialog(Resources.TaskPaneErrorCreatingWorksheetText, ex.Message, true);
+        MySQLSourceTrace.WriteAppErrorToLog(ex);
       }
 
       return newWorksheet;
@@ -289,27 +290,20 @@ namespace MySQL.ForExcel
     /// <returns><see cref="true"/> if the export/append action was executed, <see cref="false"/> otherwise.</returns>
     public bool EditTableData(DBObject tableObject)
     {
-      InfoDialog errorDialog = null;
       string schemaAndTableNames = WBConnection.Schema + "." + tableObject.Name;
 
       //// Check if the current dbobject has an edit ongoing
       if (TableHasEditOnGoing(tableObject.Name))
       {
         //// Display an error since there is an ongoing Editing operation and return
-        errorDialog = new InfoDialog(false, string.Format(Properties.Resources.TableWithOperationOngoingError, schemaAndTableNames), null);
-        errorDialog.OperationStatusText = "Editing not possible";
-        errorDialog.ShowDialog();
+        InfoDialog.ShowErrorDialog(Resources.TaskPaneEditingNotPossibleTitleText, string.Format(Properties.Resources.TableWithOperationOngoingError, schemaAndTableNames));
         return false;
       }
 
       //// Check if selected Table has a Primary Key, it it does not we prompt an error and exit since Editing on such table is not permitted
       if (!MySQLDataUtilities.TableHasPrimaryKey(WBConnection, tableObject.Name))
       {
-        errorDialog = new InfoDialog(false, Properties.Resources.EditOpenSummaryError, Properties.Resources.EditOpenDetailsError);
-        errorDialog.OperationStatusText = Properties.Resources.EditOpenSatusError;
-        errorDialog.OperationSummarySubText = string.Empty;
-        errorDialog.WordWrapDetails = true;
-        errorDialog.ShowDialog();
+        InfoDialog.ShowErrorDialog(Resources.EditOpenSatusError, Resources.EditOpenSummaryError, Resources.EditOpenDetailsError);
         return false;
       }
 
@@ -319,13 +313,14 @@ namespace MySQL.ForExcel
       DialogResult dr = importForm.ShowDialog();
       if (dr == DialogResult.Cancel)
       {
+        importForm.Dispose();
         return false;
       }
 
       if (importForm.ImportDataTable == null || importForm.ImportDataTable.Columns == null || importForm.ImportDataTable.Columns.Count == 0)
       {
-        errorDialog = new InfoDialog(false, string.Format(Properties.Resources.UnableToRetrieveData, tableObject.Name), null);
-        errorDialog.ShowDialog();
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Properties.Resources.UnableToRetrieveData, tableObject.Name));
+        importForm.Dispose();
         return false;
       }
 
@@ -343,6 +338,7 @@ namespace MySQL.ForExcel
       Excel.Worksheet currentWorksheet = CreateNewWorksheet(proposedWorksheetName, false);
       if (currentWorksheet == null)
       {
+        importForm.Dispose();
         return false;
       }
 
@@ -350,10 +346,8 @@ namespace MySQL.ForExcel
       Excel.Range editingRange = ImportDataTableToExcelAtGivenCell(importForm.ImportDataTable, importForm.ImportHeaders, atCell);
 
       //// Create and show the Edit Data Dialog
-      MySQLDataUtilities.AddExtendedProperties(ref importForm.ImportDataTable, importForm.ImportDataTable.ExtendedProperties["QueryString"].ToString(), importForm.ImportHeaders, tableObject.Name);
-      ActiveEditDialog = new EditDataDialog(WBConnection, editingRange, importForm.ImportDataTable, currentWorksheet, true);
-      ActiveEditDialog.ParentWindow = new NativeWindowWrapper(ExcelApplication.Hwnd);
-      ActiveEditDialog.CallerTaskPane = this;
+      importForm.ImportDataTable.AddExtendedProperties(importForm.ImportDataTable.ExtendedProperties["QueryString"].ToString(), importForm.ImportHeaders, tableObject.Name);
+      ActiveEditDialog = new EditDataDialog(this, new NativeWindowWrapper(ExcelApplication.Hwnd), WBConnection, editingRange, importForm.ImportDataTable, currentWorksheet);
       ActiveEditDialog.Show(ActiveEditDialog.ParentWindow);
 
       //// Maintain hashtables for open Edit Data Dialogs
@@ -363,6 +357,7 @@ namespace MySQL.ForExcel
       }
 
       ActiveEditDialogsList.Add(new ActiveEditDialogContainer(tableObject.Name, ActiveEditDialog));
+      importForm.Dispose();
       return true;
     }
 
@@ -492,12 +487,8 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        using (var errorDialog = new InfoDialog(false, "An error ocurred when trying to import the data.", ex.Message))
-        {
-          errorDialog.WordWrapDetails = true;
-          errorDialog.ShowDialog();
-          MiscUtilities.WriteAppErrorToLog(ex);
-        }
+        MiscUtilities.ShowCustomizedErrorDialog(Resources.ImportDataErrorDetailText, ex.Message, true);
+        MySQLSourceTrace.WriteAppErrorToLog(ex);
       }
 
       return fillingRange;
@@ -520,7 +511,7 @@ namespace MySQL.ForExcel
     /// <param name="importColumnNames">Flag indicating if column names will be imported as the first row of imported data.</param>
     /// <param name="importType">Indicates how to arrange multiple resultsets in the active Excel <see cref="Microsoft.Office.Interop.Excel.Worksheet"/>.</param>
     /// <param name="selectedResultSet">Number of resultset to import when the <see cref="importType"/> is ImportMultipleType.SelectedResultSet.</param>
-    public void ImportDataToExcel(DataSet ds, bool importColumnNames, ImportMultipleType importType, int selectedResultSet)
+    public void ImportDataToExcel(DataSet ds, bool importColumnNames, ImportProcedureForm.ImportMultipleType importType, int selectedResultSet)
     {
       Excel.Range atCell = ExcelApplication.ActiveCell;
       Excel.Range endCell = null;
@@ -529,7 +520,7 @@ namespace MySQL.ForExcel
       int tableIdx = 0;
       foreach (DataTable dt in ds.Tables)
       {
-        if (importType == ImportMultipleType.SelectedResultSet && selectedResultSet < tableIdx)
+        if (importType == ImportProcedureForm.ImportMultipleType.SelectedResultSet && selectedResultSet < tableIdx)
         {
           continue;
         }
@@ -549,11 +540,11 @@ namespace MySQL.ForExcel
         {
           switch (importType)
           {
-            case ImportMultipleType.AllResultSetsHorizontally:
+            case ImportProcedureForm.ImportMultipleType.AllResultSetsHorizontally:
               atCell = endCell.get_Offset(atCell.Row - endCell.Row, 2);
               break;
 
-            case ImportMultipleType.AllResultSetsVertically:
+            case ImportProcedureForm.ImportMultipleType.AllResultSetsVertically:
               if (ActiveWorkbook.Excel8CompatibilityMode && endCell.Row + 2 > UInt16.MaxValue)
               {
                 return;
@@ -589,17 +580,16 @@ namespace MySQL.ForExcel
       {
         if (connection.Password == null || failed)
         {
-          PasswordDialog dlg = new PasswordDialog();
-          dlg.HostIdentifier = connection.Name + " - " + connection.HostIdentifier;
-          dlg.UserName = connection.UserName;
-          dlg.PasswordText = string.Empty;
-          if (dlg.ShowDialog() == DialogResult.Cancel)
+          using (PasswordDialog passwordDialog = new PasswordDialog(connection.Name + " - " + connection.HostIdentifier, connection.UserName))
           {
-            connection.Password = null;
-            return;
+            DialogResult dr = passwordDialog.ShowDialog();
+            connection.Password = dr == DialogResult.Cancel ? null : passwordDialog.PasswordText;
           }
 
-          connection.Password = dlg.PasswordText;
+          if (connection.Password == null)
+          {
+            return;
+          }
         }
 
         if (connection.TestConnection())
@@ -612,15 +602,8 @@ namespace MySQL.ForExcel
           && string.IsNullOrWhiteSpace(connection.SSLCert)
           && string.IsNullOrWhiteSpace(connection.SSLCipher)
           && string.IsNullOrWhiteSpace(connection.SSLKey));
-        InfoDialog infoDialog = new InfoDialog(InfoDialog.InfoType.Warning, Resources.ConnectFailedDetailWarning, null);
-        infoDialog.OperationStatusText = Resources.ConnectFailedTitleWarning;
-        infoDialog.OperationSummarySubText = string.Empty;
-        if (isSSL)
-        {
-          infoDialog.OperationDetailsText = Resources.ConnectSSLFailedDetailWarning;
-        }
-
-        infoDialog.ShowDialog();
+        string moreInfoText = isSSL ? Resources.ConnectSSLFailedDetailWarning : null;
+        InfoDialog.ShowWarningDialog(Resources.ConnectFailedTitleWarning, Resources.ConnectFailedDetailWarning, null, moreInfoText);
         failed = true;
       }
 
