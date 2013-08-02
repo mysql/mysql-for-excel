@@ -1134,7 +1134,7 @@ namespace MySQL.ForExcel
     private void ShowValidationWarning(string warningControlPrefix, bool show, string text)
     {
       show = show && !string.IsNullOrEmpty(text);
-      string pictureBoxControlName = warningControlPrefix + "Picture";
+      string pictureBoxControlName = warningControlPrefix + "PictureBox";
       string labelControlName = warningControlPrefix + "Label";
 
       if (ContentAreaPanel.Controls.ContainsKey(pictureBoxControlName) && ContentAreaPanel.Controls.ContainsKey(labelControlName))
