@@ -1,3 +1,7 @@
+1.1.2
+- Fixed code in GetInsertingValueForColumnType method to conditionally call the GetStringValueForColumn since that method was being called twice for Edit Data operations.
+  (MySQL Bug #68669, Bug #17271693 - A BACKSLASH IS INSERTED BEFORE AN APOSTROPHE EDITING TABLE WITH MYSQL FOR EXCEL)
+
 1.1.1
 - Added code to check for changes on the contents of the currently selected Excel cells, so if the contents become empty the Export and Append data actions are
   disabled in the same way as they are disabled when a new cells selection is made and they contain no data.
