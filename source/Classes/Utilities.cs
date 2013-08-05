@@ -392,8 +392,9 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="rawValue">The raw value to be inserted in a target column.</param>
     /// <param name="againstTypeColumn">The target column where the value will be inserted.</param>
+    /// <param name="escapeStringForTextTypes">Flag indicating whether text values must have special characters escaped with a back-slash.</param>
     /// <returns>The formatted string representation of the raw value.</returns>
-    public static object GetInsertingValueForColumnType(object rawValue, MySQLDataColumn againstTypeColumn)
+    public static object GetInsertingValueForColumnType(object rawValue, MySQLDataColumn againstTypeColumn, bool escapeStringForTextTypes)
     {
       object retValue = rawValue;
       if (againstTypeColumn == null)
@@ -513,7 +514,7 @@ namespace MySQL.ForExcel
         }
         else if (againstTypeColumn.ColumnsRequireQuotes)
         {
-          retValue = MySQLDataUtilities.EscapeDataValueString(rawValue.ToString());
+          retValue = escapeStringForTextTypes ? MySQLDataUtilities.EscapeDataValueString(rawValue.ToString()) : rawValue.ToString();
         }
       }
 
@@ -854,7 +855,7 @@ namespace MySQL.ForExcel
       valueIsNull = true;
       string valueToDB = @"null";
 
-      object valueObject = dataForInsertion ? DataTypeUtilities.GetInsertingValueForColumnType(rawValue, againstTypeColumn) : rawValue;
+      object valueObject = dataForInsertion ? DataTypeUtilities.GetInsertingValueForColumnType(rawValue, againstTypeColumn, true) : rawValue;
       valueIsNull = valueObject == null || valueObject == DBNull.Value;
       if (!valueIsNull)
       {
@@ -1664,13 +1665,12 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Shows a warning dialog customized for MySQL for Excel showing Yes/No buttons.
     /// </summary>
-    /// <param name="detail">The text describing information details to the users.</param>
-    /// <param name="moreInformation">The extended text users can see in the More Information text box.</param>
-    /// <param name="wordWrapMoreInfo">Indicates if the More Information text box word wraps the text.</param>
+    /// <param name="title">The main short title of the warning.</param>
+    /// <param name="detail">The detail text describing further the warning.</param>
     /// <returns>A dialog result with the user's selection.</returns>
-    public static DialogResult ShowCustomizedWarningDialog(string detail, string moreInformation = null, bool wordWrapMoreInfo = true)
+    public static DialogResult ShowCustomizedWarningDialog(string title, string detail)
     {
-      return InfoDialog.ShowDialog(InfoDialog.DialogType.YesNo, InfoDialog.InfoType.Warning, Properties.Resources.OperationWarningTitle, detail, null, moreInformation, wordWrapMoreInfo);
+      return InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, title, detail);
     }
 
     /// <summary>

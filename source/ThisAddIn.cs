@@ -167,6 +167,8 @@ namespace MySQL.ForExcel
       try
       {
         //// Static initializations.
+        System.Windows.Forms.Application.EnableVisualStyles();
+        System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
         CustomizeInfoDialog();
         InitializeMySQLWorkbenchStaticSettings();
 

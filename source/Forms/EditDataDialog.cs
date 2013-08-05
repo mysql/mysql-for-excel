@@ -687,7 +687,7 @@ namespace MySQL.ForExcel
               object insertingValue = DBNull.Value;
               if (cell.Value != null)
               {
-                insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(cell.Value, currCol);
+                insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(cell.Value, currCol, false);
               }
 
               if (EditMySQLDataTable.Rows[absRow].RowState != DataRowState.Added)
