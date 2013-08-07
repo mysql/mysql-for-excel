@@ -1,4 +1,6 @@
 1.1.2
+- Included the latest MySQL Utility with a code fix for the COM exception thrown when attempting to open Workbench in the Manage Connections window.
+  (Bug #17258966 - MYSQL WORKBENCH NOT OPENED BY CLICKING MANAGE CONNECTIONS HOTLABEL)
 - Fixed code for Append Data operations that was not applying a calculated automatic mapping correctly when the source and target tables had different number of
   columns, some columns with the same name but some of those lying on column indexes beyond the limit of the other source/target table.
   (MySQL Bug #69220, Bug #17278349	 APPEND DOESN'T AUTOMATICALLY DETECT EXCEL COL HEADER WITH SAME NAME AS SQL FIELD)
