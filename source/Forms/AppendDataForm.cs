@@ -338,11 +338,6 @@ namespace MySQL.ForExcel
 
         for (int mappedIdx = 0; mappedIdx < CurrentColumnMapping.MappedSourceIndexes.Length; mappedIdx++)
         {
-          if (mappedIdx >= MaxMappingColumnsQuantity)
-          {
-            break;
-          }
-
           int currentMappedSourceIndex = CurrentColumnMapping.MappedSourceIndexes[mappedIdx];
           string currentMappedColName = currentMappedSourceIndex >= 0 ? CurrentColumnMapping.SourceColumns[currentMappedSourceIndex] : null;
           ApplySingleMapping(currentMappedSourceIndex, mappedIdx, currentMappedColName);
@@ -659,7 +654,7 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void DataGridView_GiveFeedback(object sender, GiveFeedbackEventArgs e)
     {
-      bool feedBackFromGrid = (sender as DataGridView).Name == "grdFromExcelData";
+      bool feedBackFromGrid = (sender as DataGridView).Name == "SourceExcelDataDataGridView";
 
       e.UseDefaultCursors = false;
       switch (e.Effect)
@@ -735,7 +730,7 @@ namespace MySQL.ForExcel
           //// Proceed with the drag-and-drop, passing in the list item.
           switch (gridObject.Name)
           {
-            case "grdFromExcelData":
+            case "SourceExcelDataDataGridView":
               gridObject.DoDragDrop(_gridColumnIndexToDrag, DragDropEffects.Link);
               break;
 

@@ -344,6 +344,7 @@ namespace MySQL.ForExcel
       // 
       this.MappingMethodComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
       this.MappingMethodComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+      this.MappingMethodComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
       this.MappingMethodComboBox.DropDownWidth = 243;
       this.MappingMethodComboBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.MappingMethodComboBox.FormattingEnabled = true;
@@ -420,7 +421,7 @@ namespace MySQL.ForExcel
             this.RemoveColumnMappingToolStripMenuItem,
             this.ClearAllMappingsToolStripMenuItem});
       this.AppendContextMenu.Name = "contextMenu";
-      this.AppendContextMenu.Size = new System.Drawing.Size(215, 70);
+      this.AppendContextMenu.Size = new System.Drawing.Size(215, 48);
       this.AppendContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.AppendContextMenu_Opening);
       // 
       // RemoveColumnMappingToolStripMenuItem

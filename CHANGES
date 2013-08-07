@@ -1,6 +1,11 @@
 1.1.2
-- Fixed code in GetInsertingValueForColumnType method to conditionally call the GetStringValueForColumn since that method was being called twice for Edit Data operations.
+- Fixed code for Append Data operations that was not applying a calculated automatic mapping correctly when the source and target tables had different number of
+  columns, some columns with the same name but some of those lying on column indexes beyond the limit of the other source/target table.
+  (MySQL Bug #69220, Bug #17278349	 APPEND DOESN'T AUTOMATICALLY DETECT EXCEL COL HEADER WITH SAME NAME AS SQL FIELD)
+- Fixed some code for Edit Data operations that was escaping special characters twice (during edition in Excel and then upon sending the query to the MySQL server).
   (MySQL Bug #68669, Bug #17271693 - A BACKSLASH IS INSERTED BEFORE AN APOSTROPHE EDITING TABLE WITH MYSQL FOR EXCEL)
+- Refactored all code to comply with SyleCop rules, upgraded MySQL Utility with latest version that encapsulates dialog base classes and introduces more classes
+  to handle Workbench connections, and removed these from the Excel project.
 
 1.1.1
 - Added code to check for changes on the contents of the currently selected Excel cells, so if the contents become empty the Export and Append data actions are
