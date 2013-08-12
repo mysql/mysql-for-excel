@@ -1,4 +1,7 @@
 1.1.2
+- Added support for Excel 2013 Single Document Interface, now that Excel 2013 creates 1 window per workbook also the Excel Add-In maintains an independent
+  custom task pane in each window. Also changed the way the toggle button works, instead of just showing or hiding the Add-In it actually opens and closes it.
+  (MySQL Bug #68792, Bug #17272087 - MYSQL FOR EXCEL SIDEBAR DOES NOT APPEAR IN EXCEL 2013 (WITH WORKAROUND))
 - Included the latest MySQL Utility with a code fix for the COM exception thrown when attempting to open Workbench in the Manage Connections window.
   (Bug #17258966 - MYSQL WORKBENCH NOT OPENED BY CLICKING MANAGE CONNECTIONS HOTLABEL)
 - Fixed code for Append Data operations that was not applying a calculated automatic mapping correctly when the source and target tables had different number of

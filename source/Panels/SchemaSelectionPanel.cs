@@ -30,7 +30,7 @@ namespace MySQL.ForExcel
   using MySQL.Utility;
 
   /// <summary>
-  /// Second panel shown to users within the Add-In's <see cref="TaskPaneControl"/> where schemas are managed.
+  /// Second panel shown to users within the Add-In's <see cref="ExcelAddInPane"/> where schemas are managed.
   /// </summary>
   public partial class SchemaSelectionPanel : AutoStyleableBasePanel
   {
@@ -98,7 +98,7 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void BackButton_Click(object sender, EventArgs e)
     {
-      (Parent as TaskPaneControl).CloseConnection();
+      (Parent as ExcelAddInPane).CloseConnection();
     }
 
     /// <summary>
@@ -229,7 +229,7 @@ namespace MySQL.ForExcel
       try
       {
         string databaseName = SchemasList.SelectedNode.Tag as string;
-        (Parent as TaskPaneControl).OpenSchema(databaseName);
+        (Parent as ExcelAddInPane).OpenSchema(databaseName);
       }
       catch (Exception ex)
       {

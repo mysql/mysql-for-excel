@@ -32,13 +32,13 @@ namespace MySQL.ForExcel
   /// <summary>
   /// Represents a task pane that can be used in Excel to contain controls for an add-in.
   /// </summary>
-  public partial class TaskPaneControl : UserControl
+  public partial class ExcelAddInPane : UserControl
   {
     /// <summary>
-    /// Initializes a new instance of the <see cref="TaskPaneControl"/> class.
+    /// Initializes a new instance of the <see cref="ExcelAddInPane"/> class.
     /// </summary>
     /// <param name="app">An instance of the Excel application running the add-in.</param>
-    public TaskPaneControl(Excel.Application app)
+    public ExcelAddInPane(Excel.Application app)
     {
       ExcelApplication = app;
       ExcelApplication.SheetChange += new Excel.AppEvents_SheetChangeEventHandler(ExcelApplication_SheetChange);
@@ -176,19 +176,6 @@ namespace MySQL.ForExcel
       }
 
       return dr == DialogResult.OK;
-    }
-
-    /// <summary>
-    /// Closes the current connection and hides the add-in's task pane.
-    /// </summary>
-    /// <param name="excelClosing">Flag indicating whether Excel is being closed.</param>
-    public void CloseAddIn(bool excelClosing)
-    {
-      CloseConnection();
-      if (!excelClosing)
-      {
-        Globals.ThisAddIn.TaskPane.Visible = false;
-      }
     }
 
     /// <summary>

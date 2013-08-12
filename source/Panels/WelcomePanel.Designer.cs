@@ -20,7 +20,7 @@
 namespace MySQL.ForExcel
 {
   /// <summary>
-  /// First panel shown to users within the Add-In's <seealso cref="TaskPaneControl"/>.
+  /// First panel shown to users within the Add-In's <seealso cref="ExcelAddInPane"/>.
   /// </summary>
   partial class WelcomePanel
   {

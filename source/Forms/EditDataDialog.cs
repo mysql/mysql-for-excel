@@ -118,13 +118,13 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Initializes a new instance of the <see cref="EditDataDialog"/> class.
     /// </summary>
-    /// <param name="parentTaskPane">The <see cref="TaskPaneControl"/> from which the <see cref="EditDataDialog"/> is called.</param>
+    /// <param name="parentTaskPane">The <see cref="ExcelAddInPane"/> from which the <see cref="EditDataDialog"/> is called.</param>
     /// <param name="parentWindow">The parent window assigned to the <see cref="EditDataDialog"/> to be opened as a dialog.</param>
     /// <param name="wbConnection">The connection to a MySQL server instance selected by users.</param>
     /// <param name="originalEditDataRange">The Excel cells range containing the MySQL table's data being edited.</param>
     /// <param name="importTable">The table containing the data imported from the MySQL table that will be edited.</param>
     /// <param name="editingWorksheet">The Excel worksheet tied to the current editing session.</param>
-    public EditDataDialog(TaskPaneControl parentTaskPane, IWin32Window parentWindow, MySqlWorkbenchConnection wbConnection, Excel.Range originalEditDataRange, DataTable importTable, Excel.Worksheet editingWorksheet)
+    public EditDataDialog(ExcelAddInPane parentTaskPane, IWin32Window parentWindow, MySqlWorkbenchConnection wbConnection, Excel.Range originalEditDataRange, DataTable importTable, Excel.Worksheet editingWorksheet)
     {
       _commitedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#B8E5F7"));
       _erroredCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#FF8282"));
@@ -228,9 +228,9 @@ namespace MySQL.ForExcel
     public MySQLDataTable EditMySQLDataTable { get; private set; }
 
     /// <summary>
-    /// Gets the <see cref="TaskPaneControl"/> from which the <see cref="EditDataDialog"/> is called.
+    /// Gets the <see cref="ExcelAddInPane"/> from which the <see cref="EditDataDialog"/> is called.
     /// </summary>
-    public TaskPaneControl ParentTaskPane { get; private set; }
+    public ExcelAddInPane ParentTaskPane { get; private set; }
 
     /// <summary>
     /// Gets the parent window assigned to the <see cref="EditDataDialog"/> to be opened as a dialog.

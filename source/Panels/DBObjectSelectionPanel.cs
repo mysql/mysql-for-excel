@@ -29,7 +29,7 @@ namespace MySQL.ForExcel
   using Excel = Microsoft.Office.Interop.Excel;
 
   /// <summary>
-  /// Third panel shown to users within the Add-In's <see cref="TaskPaneControl"/> where DB objects are managed.
+  /// Third panel shown to users within the Add-In's <see cref="ExcelAddInPane"/> where DB objects are managed.
   /// </summary>
   public partial class DBObjectSelectionPanel : AutoStyleableBasePanel
   {
@@ -146,7 +146,7 @@ namespace MySQL.ForExcel
         return;
       }
 
-      editActive = dbObj.Type == DBObject.DBObjectType.Table && (Parent as TaskPaneControl).TableHasEditOnGoing(CurrentSelectedDBObject.Name);
+      editActive = dbObj.Type == DBObject.DBObjectType.Table && (Parent as ExcelAddInPane).TableHasEditOnGoing(CurrentSelectedDBObject.Name);
       ImportDataHotLabel.Enabled = true;
       EditDataHotLabel.Enabled = dbObj.Type == DBObject.DBObjectType.Table && !editActive;
       AppendDataHotLabel.Enabled = dbObj.Type == DBObject.DBObjectType.Table && ExcelSelectionContainsData;
@@ -193,7 +193,7 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void BackButton_Click(object sender, EventArgs e)
     {
-      (Parent as TaskPaneControl).CloseSchema();
+      (Parent as ExcelAddInPane).CloseSchema();
     }
 
     /// <summary>
@@ -203,7 +203,7 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void CloseButton_Click(object sender, EventArgs e)
     {
-      (Parent as TaskPaneControl).CloseAddIn(false);
+      Globals.ThisAddIn.CloseExcelPane(Parent as ExcelAddInPane);
     }
 
     /// <summary>
@@ -253,7 +253,7 @@ namespace MySQL.ForExcel
 
       try
       {
-        bool editActivated = (Parent as TaskPaneControl).EditTableData(selDBObject);
+        bool editActivated = (Parent as ExcelAddInPane).EditTableData(selDBObject);
         if (editActivated)
         {
           EditDataHotLabel.Enabled = false;
@@ -273,7 +273,7 @@ namespace MySQL.ForExcel
     /// <returns><see cref="true"/> if data was exported/appended successfully, <see cref="false"/> otherwise.</returns>
     private bool ExportDataToTable(DBObject appendToTable)
     {
-      return (Parent as TaskPaneControl).AppendDataToTable(appendToTable);
+      return (Parent as ExcelAddInPane).AppendDataToTable(appendToTable);
     }
 
     /// <summary>
@@ -314,7 +314,7 @@ namespace MySQL.ForExcel
         return;
       }
 
-      TaskPaneControl parentTaskPane = (Parent as TaskPaneControl);
+      ExcelAddInPane parentTaskPane = (Parent as ExcelAddInPane);
       if (parentTaskPane == null)
       {
         return;
@@ -368,7 +368,7 @@ namespace MySQL.ForExcel
     /// <param name="dbo">DB object.</param>
     private void ImportProcedure(DBObject dbo)
     {
-      ImportProcedureForm importProcedureForm = new ImportProcedureForm(WBConnection, dbo, (Parent as TaskPaneControl).ActiveWorksheet.Name, (Parent as TaskPaneControl).ActiveWorkbook.Excel8CompatibilityMode);
+      ImportProcedureForm importProcedureForm = new ImportProcedureForm(WBConnection, dbo, (Parent as ExcelAddInPane).ActiveWorksheet.Name, (Parent as ExcelAddInPane).ActiveWorkbook.Excel8CompatibilityMode);
       DialogResult dr = importProcedureForm.ShowDialog();
       if (dr == DialogResult.Cancel)
       {
@@ -381,7 +381,7 @@ namespace MySQL.ForExcel
         return;
       }
 
-      (Parent as TaskPaneControl).ImportDataToExcel(importProcedureForm.ImportDataSet, importProcedureForm.ImportHeaders, importProcedureForm.ImportType, importProcedureForm.SelectedResultSetIndex);
+      (Parent as ExcelAddInPane).ImportDataToExcel(importProcedureForm.ImportDataSet, importProcedureForm.ImportHeaders, importProcedureForm.ImportType, importProcedureForm.SelectedResultSetIndex);
     }
 
     /// <summary>
@@ -390,7 +390,7 @@ namespace MySQL.ForExcel
     /// <param name="dbo">DB object.</param>
     private void ImportTableOrView(DBObject dbo)
     {
-      var taskPaneControl = (TaskPaneControl)Parent;
+      var taskPaneControl = (ExcelAddInPane)Parent;
       ImportTableViewForm importForm = new ImportTableViewForm(WBConnection, dbo, taskPaneControl.ActiveWorkbook.ActiveSheet.Name, taskPaneControl.ActiveWorkbook.Excel8CompatibilityMode, false);
 
       DialogResult dr = importForm.ShowDialog();
@@ -405,7 +405,7 @@ namespace MySQL.ForExcel
         return;
       }
 
-      (Parent as TaskPaneControl).ImportDataToExcel(importForm.ImportDataTable, importForm.ImportHeaders);
+      (Parent as ExcelAddInPane).ImportDataToExcel(importForm.ImportDataTable, importForm.ImportHeaders);
     }
 
     /// <summary>

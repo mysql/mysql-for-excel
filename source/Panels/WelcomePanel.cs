@@ -28,7 +28,7 @@ namespace MySQL.ForExcel
   using MySQL.Utility.Forms;
 
   /// <summary>
-  /// First panel shown to users within the Add-In's <see cref="TaskPaneControl"/> where connections are managed.
+  /// First panel shown to users within the Add-In's <see cref="ExcelAddInPane"/> where connections are managed.
   /// </summary>
   public partial class WelcomePanel : AutoStyleableBasePanel
   {
@@ -111,7 +111,7 @@ namespace MySQL.ForExcel
       }
 
       MySqlWorkbenchConnection c = ConnectionsList.SelectedNode.Tag as MySqlWorkbenchConnection;
-      (Parent as TaskPaneControl).OpenConnection(c);
+      (Parent as ExcelAddInPane).OpenConnection(c);
     }
 
     /// <summary>

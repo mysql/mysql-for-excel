@@ -242,6 +242,12 @@
     <Compile Include="Classes\PushResultsDataTable.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\ExcelAddInPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ExcelAddInPane.Designer.cs">
+      <DependentUpon>ExcelAddInPane.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ManageTaskPaneRibbon.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -269,12 +275,6 @@
     </Compile>
     <Compile Include="Controls\SearchEdit.Designer.cs">
       <DependentUpon>SearchEdit.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\TaskPaneControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\TaskPaneControl.Designer.cs">
-      <DependentUpon>TaskPaneControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\TransparentLabel.cs">
       <SubType>UserControl</SubType>
@@ -381,6 +381,9 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <EmbeddedResource Include="Controls\ExcelAddInPane.resx">
+      <DependentUpon>ExcelAddInPane.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\HotLabel.resx">
       <DependentUpon>HotLabel.cs</DependentUpon>
     </EmbeddedResource>
@@ -389,9 +392,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\SearchEdit.resx">
       <DependentUpon>SearchEdit.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Controls\TaskPaneControl.resx">
-      <DependentUpon>TaskPaneControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\AboutBox.resx">
       <DependentUpon>AboutBox.cs</DependentUpon>

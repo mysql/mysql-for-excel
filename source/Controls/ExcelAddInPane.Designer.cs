@@ -19,7 +19,7 @@
 
 namespace MySQL.ForExcel
 {
-  partial class TaskPaneControl
+  partial class ExcelAddInPane
   {
     /// <summary> 
     /// Required designer variable.
@@ -32,10 +32,16 @@ namespace MySQL.ForExcel
     /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
     protected override void Dispose(bool disposing)
     {
-      if (disposing && (components != null))
+      if (disposing)
       {
-        components.Dispose();
+        CloseConnection();
+
+        if (components != null)
+        {
+          components.Dispose();
+        }
       }
+
       base.Dispose(disposing);
     }
 

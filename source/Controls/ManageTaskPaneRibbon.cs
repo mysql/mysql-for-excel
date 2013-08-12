@@ -17,10 +17,12 @@
 // 02110-1301  USA
 //
 
-using Microsoft.Office.Tools.Ribbon;
-
 namespace MySQL.ForExcel
 {
+  using MySQL.Utility;
+  using Office = Microsoft.Office.Tools;
+  using Microsoft.Office.Tools.Ribbon;
+
   /// <summary>
   /// Attaches the add-in to a ribbon button.
   /// </summary>
@@ -42,15 +44,18 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void ShowTaskPaneRibbonToggleButton_Click(object sender, RibbonControlEventArgs e)
     {
-      bool enableAddIn = (sender as RibbonToggleButton).Checked;
-      Globals.ThisAddIn.TaskPane.Visible = enableAddIn;
-      if (!enableAddIn)
+      bool showAddIn = (sender as RibbonToggleButton).Checked;
+      Office.CustomTaskPane taskPane = Globals.ThisAddIn.GetOrCreateActiveCustomPane();
+      if (taskPane == null)
       {
-        TaskPaneControl tpc = Globals.ThisAddIn.TaskPane as TaskPaneControl;
-        if (tpc != null)
-        {
-          tpc.CloseAddIn(false);
-        }
+        MySQLSourceTrace.WriteToLog(string.Format("Could not get or create a custom task pane for the active Excel window. Using Excel version {0}.", Globals.ThisAddIn.ExcelVersionNumber));
+        return;
+      }
+
+      taskPane.Visible = showAddIn;
+      if (!showAddIn)
+      {
+        Globals.ThisAddIn.CloseExcelPane(taskPane.Control as ExcelAddInPane);
       }
     }
   }
