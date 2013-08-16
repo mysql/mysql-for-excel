@@ -640,8 +640,10 @@ namespace MySQL.ForExcel
             "longtext",
             "enum",
             "set"});
+
+      //// Assemble the list of the number of parameters used with each data type in the list above.
       paramsInParenthesisList = new List<int>(retList.Count);
-      paramsInParenthesisList.AddRange(new int[] { 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1 });
+      paramsInParenthesisList.AddRange(new int[] { 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1 });
       return retList;
     }
 
@@ -1126,10 +1128,16 @@ namespace MySQL.ForExcel
       }
 
       //// Check for integer values
-      if (mySQLDataType.StartsWith("int") || mySQLDataType.StartsWith("mediumint") || mySQLDataType == "year")
+      if (mySQLDataType.StartsWith("int") || mySQLDataType.StartsWith("mediumint"))
       {
         int tryIntValue = 0;
         return Int32.TryParse(strValue, out tryIntValue);
+      }
+
+      if (mySQLDataType.StartsWith("year"))
+      {
+        int tryYearValue = 0;
+        return Int32.TryParse(strValue, out tryYearValue) && (tryYearValue >= 0 && tryYearValue < 100) || (tryYearValue > 1900 && tryYearValue < 2156);
       }
 
       if (mySQLDataType.StartsWith("tinyint"))
@@ -1415,6 +1423,12 @@ namespace MySQL.ForExcel
           {
             int convertedValue = 0;
             if (!int.TryParse(paramValue, out convertedValue))
+            {
+              return false;
+            }
+
+            //// Check for year data type only.
+            if (pureDataType == "year" && convertedValue != 2 && convertedValue != 4)
             {
               return false;
             }

@@ -1,4 +1,6 @@
 1.1.2
+- Added support for the year data type with a length of 2 or 4 and a validation that valid values are integers between 1901-2155 (for 4-digit years) or between
+  0-99 (for 2-digit years). (Bug #17259915 - EXPORT DATA YEAR DATA TYPE NOT RECOGNIZED IF DECLARED WITH A DISPLAY WIDTH)
 - Fixed code for Export Data operations where users overrode the data type for columns typing Text in the data type combobox, which is a valid data type but was
   not recognized as such. (Bug #17259490 - EXPORT DATA TEXT DATA TYPE NOT RECOGNIZED AS A VALID DATA TYPE)
 - Changed the location of the registry where the MySQL for Excel add-in is installed to HKEY_LOCAL_MACHINE instead of HKEY_CURRENT_USER so the add-in is accessible

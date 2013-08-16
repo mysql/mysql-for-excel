@@ -117,27 +117,14 @@ namespace MySQL.ForExcel
       }
 
       Office.CustomTaskPane customPane = CustomTaskPanes.FirstOrDefault(ctp => ctp.Control is ExcelAddInPane && ctp.Control == excelPane);
-      if (customPane != null)
-      {
-        try
-        {
-          customPane.Visible = false;
-        }
-        catch
-        {
-          //// If hiding the panel failed it means it was already disposed as part of a Windows closing, so we set it to null
-          ////  since there will be no need to remove it from the custom task panes collection and dispose of it.
-          customPane = null;
-        }
-      }
-
       ExcelPanesList.Remove(excelPane);
       excelPane.Dispose();
       if (customPane != null)
       {
-        CustomTaskPanes.Remove(customPane);
         customPane.Dispose();
       }
+
+      CustomTaskPanes.Remove(customPane);
     }
 
     /// <summary>
