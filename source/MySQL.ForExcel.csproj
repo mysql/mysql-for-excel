@@ -453,7 +453,6 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
-    <None Include="Properties\DataSources\MySQL.Utility.MySqlWorkbenchConnection.datasource" />
     <None Include="Properties\DataSources\MySQLColumn.datasource" />
     <None Include="Properties\DataSources\MySQLDataColumn.datasource" />
     <None Include="Properties\DataSources\MySQLTable.datasource" />

@@ -33,14 +33,18 @@
     <Condition Message="The Microsoft Visual Studio Tools for Office Runtime must be installed prior to running this installation.">
       <![CDATA[Installed OR VSTOINSTALLED]]>
     </Condition>
-    
-    
+
     <!-- First make sure that .NET is installed -->
     <PropertyRef Id="NETFRAMEWORK40CLIENT"/>
     <PropertyRef Id="NETFRAMEWORK40FULL"/>
     <Condition Message="This application requires .NET Framework 4.0. Please install the .NET Framework then run this installer again.  For more information, please see http://go.microsoft.com/fwlink/?LinkId=181012">
       <![CDATA[Installed OR NETFRAMEWORK40FULL OR NETFRAMEWORK40CLIENT]]>
     </Condition>
+
+    <!-- See if Office 2007 (only 32bit version is available) is installed -->
+    <Property Id="EXCEL_2007_32_INSTALLED">
+      <ComponentSearch Id="Office_2007_32_Search" Guid="{0638C49D-BB8B-4CD1-B191-052E8F325736}" />
+    </Property>
 
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder" Name='PFiles'>
@@ -63,13 +67,12 @@
               <?endif?>
               <RemoveFolder Id="INSTALLDIR" On="uninstall" />
             </Component>
-            <Component Id="RegistryItems" Guid="*">
-              <RegistryKey Id="Addin" Root="HKCU" Action="createAndRemoveOnUninstall"
-                           Key="SOFTWARE\Microsoft\Office\Excel\Addins\MySQL.ForExcel">
-                <RegistryValue Id="IdDescription" Name="Description" Value="MySQL.ForExcel" Type="string"/>
-                <RegistryValue Id="IdFriendlyName" Name="FriendlyName" Value="MySQL.ForExcel" Type="string"/>
-                <RegistryValue Id="IDLoadBehavior" Name="LoadBehavior" Value="3" Type="integer"/>
-                <RegistryValue Id="IdManifest" Name="Manifest" Value="[#VSTOFile]|vstolocal" Type="string"/>
+            <Component Id="RegistryEnableHKCLOffice2007" Guid="E9D77B0E-FD67-4F82-A36E-ACE228F566D6">
+              <Condition>
+                <![CDATA[EXCEL_2007_32_INSTALLED]]>
+              </Condition>
+              <RegistryKey Id="EnableLMKey" Root="HKLM" Action="createAndRemoveOnUninstall" Key="SOFTWARE\Microsoft\Office\12.0\Common\General">
+                <RegistryValue Id="IdEnableLocalMachineVSTO" Name="EnableLocalMachineVSTO" Value="1" Type="integer"/>
               </RegistryKey>
             </Component>
           </Directory>
@@ -79,13 +82,40 @@
 
     <Feature Id="DefaultFeature" Title="MySQL for Excel" ConfigurableDirectory="INSTALLDIR" Level="1" >
       <ComponentRef Id="MainItems" />
-      <ComponentRef Id="RegistryItems"/>
+      <ComponentRef Id="RegistryEnableHKCLOffice2007"/>
     </Feature>
+
+    <Binary Id="ExcelCustomAction" SourceFile="ExcelCustomAction.CA.dll" />
+    <CustomAction Id="InstallAddIn32.SetProperty" Return="check" Property="InstallAddIn32" Value="AddInDllLocation=[#AddIn];VstoFileLocation=[#VSTOFile]"/>
+    <CustomAction Id="InstallAddIn32" BinaryKey="ExcelCustomAction" DllEntry="InstallAddIn32" Execute="deferred" />
+    <CustomAction Id="InstallAddIn64.SetProperty" Return="check" Property="InstallAddIn64" Value="AddInDllLocation=[#AddIn];VstoFileLocation=[#VSTOFile]"/>
+    <CustomAction Id="InstallAddIn64" BinaryKey="ExcelCustomAction" DllEntry="InstallAddIn64" Execute="deferred" />
+    <CustomAction Id="RemoveAddIn32" BinaryKey="ExcelCustomAction" DllEntry="RemoveAddIn32" />
+    <CustomAction Id="RemoveAddIn64" BinaryKey="ExcelCustomAction" DllEntry="RemoveAddIn64" />
 
     <InstallExecuteSequence>
       <RemoveExistingProducts After="InstallInitialize" />
-    </InstallExecuteSequence>
 
+      <Custom Action="InstallAddIn32.SetProperty" Before="InstallAddIn32">
+        <![CDATA[NOT(REMOVE="ALL" AND NOT UPGRADINGPRODUCTCODE)]]>
+      </Custom>
+      <Custom Action="InstallAddIn32" Before="InstallFinalize">
+        <![CDATA[NOT(REMOVE="ALL" AND NOT UPGRADINGPRODUCTCODE)]]>
+      </Custom>
+      <Custom Action="InstallAddIn64.SetProperty" Before="InstallAddIn64">
+        <![CDATA[VersionNT64 AND NOT(REMOVE="ALL" AND NOT UPGRADINGPRODUCTCODE)]]>
+      </Custom>
+      <Custom Action="InstallAddIn64" After="InstallAddIn32">
+        <![CDATA[VersionNT64 AND NOT(REMOVE="ALL" AND NOT UPGRADINGPRODUCTCODE)]]>
+      </Custom>
+
+      <Custom Action="RemoveAddIn32" Before="InstallFinalize">
+        <![CDATA[REMOVE="ALL" AND NOT UPGRADINGPRODUCTCODE]]>
+      </Custom>
+      <Custom Action="RemoveAddIn64" After="RemoveAddIn32">
+        <![CDATA[VersionNT64 AND REMOVE="ALL" AND NOT UPGRADINGPRODUCTCODE]]>
+      </Custom>
+    </InstallExecuteSequence>
 
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
     <UIRef Id="WixUI_MySQL" />

@@ -1,4 +1,7 @@
 1.1.2
+- Changed the location of the registry where the MySQL for Excel add-in is installed to HKEY_LOCAL_MACHINE instead of HKEY_CURRENT_USER so the add-in is accessible
+  by all users and not only to the user that installed it. For this to work with Excel 2007 a hotfix may be required (see http://support.microsoft.com/kb/976477).
+  (MySQL Bug #68746, Bug #16675992 - EXCEL-ADD-IN IS ONLY INSTALLED FOR USER ACCOUNT THAT THE INSTALLATION RUNS UNDER)
 - Added support for Excel 2013 Single Document Interface, now that Excel 2013 creates 1 window per workbook also the Excel Add-In maintains an independent
   custom task pane in each window. Also changed the way the toggle button works, instead of just showing or hiding the Add-In it actually opens and closes it.
   (MySQL Bug #68792, Bug #17272087 - MYSQL FOR EXCEL SIDEBAR DOES NOT APPEAR IN EXCEL 2013 (WITH WORKAROUND))

@@ -1,56 +1,52 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Security;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MySQL For Excel")]
-[assembly: AssemblyDescription("MySQL for Excel is an application plug-in enabling data analysts to very easily access and manipulate MySQL data within Microsoft Excel.")]
-[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyTitle("ExcelCustomAction")]
+[assembly: AssemblyDescription("Custom actions for the MySQL for Excel installer.")]
 [assembly: AssemblyCompany("Oracle Corporation")]
-[assembly: AssemblyProduct("MySQL For Excel")]
-[assembly: AssemblyCopyright("Copyright © 2012 - 2013, Oracle and/or its affiliates. All rights reserved.")]
+[assembly: AssemblyProduct("ExcelCustomAction")]
+[assembly: AssemblyCopyright("Copyright © 2013, Oracle and/or its affiliates. All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-// Setting ComVisible to false makes the types in this assembly not visible 
-// to COM components.  If you need to access a type in this assembly from 
+// Setting ComVisible to false makes the types in this assembly not visible
+// to COM components.  If you need to access a type in this assembly from
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("bca8f7dc-50c5-4a71-b056-52a15d4570cd")]
+[assembly: Guid("55c2bf43-4d84-41b7-a786-ad343d29ee15")]
 
 // Version information for an assembly consists of the following four values:
 //
 //      Major Version
-//      Minor Version 
+//      Minor Version
 //      Build Number
 //      Revision
 //
-// You can specify all the values or you can default the Build and Revision Numbers 
+// You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.1")]
-[assembly: AssemblyFileVersion("1.1.1")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
