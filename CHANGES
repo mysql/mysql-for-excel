@@ -1,4 +1,7 @@
 1.1.2
+- Removed code that was replacing all spaces typed by the user in an overriden data type for a new column in an Export Data operation, also improved the data
+  type detection code to flag as invalid data types with parenthesis but without any text inside or where the contents inside the parenthesis are not valid for
+  the specific data type. (Bug #17260260 - EXPORT DATA SET TYPE NOT WORKING WITH MEMBER VALUES CONTAINING SPACES)
 - Added support for the year data type with a length of 2 or 4 and a validation that valid values are integers between 1901-2155 (for 4-digit years) or between
   0-99 (for 2-digit years). (Bug #17259915 - EXPORT DATA YEAR DATA TYPE NOT RECOGNIZED IF DECLARED WITH A DISPLAY WIDTH)
 - Fixed code for Export Data operations where users overrode the data type for columns typing Text in the data type combobox, which is a valid data type but was

@@ -765,7 +765,7 @@ namespace MySQL.ForExcel
     {
       bool warningsChanged = false;
       IsMySQLDataTypeValid = true;
-      dataType = dataType.Trim().Replace(" ", string.Empty);
+      dataType = dataType.Trim();
       MySQLDataType = dataType;
 
       if (MySQLDataType.Length == 0)

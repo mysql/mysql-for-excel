@@ -1219,33 +1219,35 @@ namespace MySQL.ForExcel
       //// Check if enum or set.
       bool isEnum = mySQLDataType.StartsWith("enum");
       bool isSet = mySQLDataType.StartsWith("set");
-      List<string> setOrEnumMembers = null;
-      if ((isSet || isEnum) && lParensIndex >= 0 && rParensIndex >= 0 && lParensIndex < rParensIndex)
+      if (isSet || isEnum)
       {
-        setOrEnumMembers = new List<string>();
-        string membersString = mySQLDataType.Substring(lParensIndex + 1, rParensIndex - lParensIndex - 1);
-        string[] setMembersArray = membersString.Split(new char[] { ',' });
-        foreach (string s in setMembersArray)
+        List<string> setOrEnumMembers = new List<string>();
+        if (lParensIndex >= 0 && rParensIndex >= 0 && lParensIndex < rParensIndex)
         {
-          setOrEnumMembers.Add(s.Trim(new char[] { '"', '\'' }));
-        }
-      }
-
-      if (isEnum)
-      {
-        return setOrEnumMembers.Contains(strValue.ToLowerInvariant());
-      }
-
-      if (isSet)
-      {
-        string[] valueSet = strValue.Split(new char[] { ',' });
-        bool setMatch = valueSet.Length > 0;
-        foreach (string val in valueSet)
-        {
-          setMatch = setMatch && setOrEnumMembers.Contains(val.ToLowerInvariant());
+          string membersString = mySQLDataType.Substring(lParensIndex + 1, rParensIndex - lParensIndex - 1);
+          string[] setMembersArray = membersString.Split(new char[] { ',' });
+          foreach (string s in setMembersArray)
+          {
+            setOrEnumMembers.Add(s.Trim(new char[] { '"', '\'' }));
+          }
         }
 
-        return setMatch;
+        if (isEnum)
+        {
+          return setOrEnumMembers.Contains(strValue.ToLowerInvariant());
+        }
+
+        if (isSet)
+        {
+          string[] valueSet = strValue.Split(new char[] { ',' });
+          bool setMatch = valueSet.Length > 0;
+          foreach (string val in valueSet)
+          {
+            setMatch = setMatch && setOrEnumMembers.Contains(val.ToLowerInvariant());
+          }
+
+          return setMatch;
+        }
       }
 
       //// Check for decimal values which is the more complex.
@@ -1396,28 +1398,36 @@ namespace MySQL.ForExcel
       }
 
       //// Parameters checks.
-      if (rightParenthesisIndex >= 0)
+      bool enumOrSet = pureDataType == "enum" || pureDataType == "set";
+      int numOfValidParams = validParamsPerDataType[typeFoundAt];
+      if ((numOfValidParams != 0 && rightParenthesisIndex >= 0) || enumOrSet)
       {
-        //// Check if the number of parameters is valid for the proposed MySQL data type
-        int numOfValidParams = validParamsPerDataType[typeFoundAt];
-        string[] parameterValues = proposedUserType.Substring(leftParenthesisIndex + 1, rightParenthesisIndex - leftParenthesisIndex - 1).Split(new Char[] { ',' });
-        bool parametersQtyIsValid = false;
-        if (pureDataType.StartsWith("var"))
+        //// If an enum or set the data type must contain parenthesis along with its list of valid values.
+        if (enumOrSet && rightParenthesisIndex < 0)
         {
-          parametersQtyIsValid = numOfValidParams >= 0 && numOfValidParams == parameterValues.Length;
-        }
-        else
-        {
-          parametersQtyIsValid = (numOfValidParams >= 0 && numOfValidParams == parameterValues.Length) || (numOfValidParams < 0 && parameterValues.Length > 0) || parameterValues.Length == 0;
+          return false;
         }
 
+        //// Check if the number of parameters is valid for the proposed MySQL data type
+        string parametersText = proposedUserType.Substring(leftParenthesisIndex + 1, rightParenthesisIndex - leftParenthesisIndex - 1).Trim();
+        string[] parameterValues = string.IsNullOrEmpty(parametersText) ? null : parametersText.Split(',');
+        int parametersCount = parameterValues == null ? 0 : parameterValues.Length;
+
+        //// If there are no parameters but parenthesis were provided the data type is invalid.
+        if (parametersCount == 0)
+        {
+          return false;
+        }
+
+        //// If the quantity of parameters does not match the data type valid accepted parameters quantity the data type is invalid.
+        bool parametersQtyIsValid = enumOrSet ? parametersCount > 0 : numOfValidParams == parametersCount;
         if (!parametersQtyIsValid)
         {
           return false;
         }
 
         //// Check if the paremeter values are valid integers for data types with 1 or 2 parameters (varchar and numeric types).
-        if (numOfValidParams >= 1 && numOfValidParams <= 2)
+        if (!enumOrSet)
         {
           foreach (string paramValue in parameterValues)
           {
@@ -1427,7 +1437,7 @@ namespace MySQL.ForExcel
               return false;
             }
 
-            //// Check for year data type only.
+            //// Specific check for year data type.
             if (pureDataType == "year" && convertedValue != 2 && convertedValue != 4)
             {
               return false;
