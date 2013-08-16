@@ -1,4 +1,6 @@
 1.1.2
+- Fixed code for Export Data operations where users overrode the data type for columns typing Text in the data type combobox, which is a valid data type but was
+  not recognized as such. (Bug #17259490 - EXPORT DATA TEXT DATA TYPE NOT RECOGNIZED AS A VALID DATA TYPE)
 - Changed the location of the registry where the MySQL for Excel add-in is installed to HKEY_LOCAL_MACHINE instead of HKEY_CURRENT_USER so the add-in is accessible
   by all users and not only to the user that installed it. For this to work with Excel 2007 a hotfix may be required (see http://support.microsoft.com/kb/976477).
   (MySQL Bug #68746, Bug #16675992 - EXCEL-ADD-IN IS ONLY INSTALLED FOR USER ACCOUNT THAT THE INSTALLATION RUNS UNDER)

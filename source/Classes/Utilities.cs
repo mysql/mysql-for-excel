@@ -1111,122 +1111,74 @@ namespace MySQL.ForExcel
     public static bool StringValueCanBeStoredWithMySQLType(string strValue, string mySQLDataType)
     {
       mySQLDataType = mySQLDataType.ToLowerInvariant();
-      bool isCharacter = mySQLDataType.StartsWith("varchar") || mySQLDataType.StartsWith("char") || mySQLDataType.Contains("text");
-      bool isEnum = mySQLDataType.StartsWith("enum");
-      bool isSet = mySQLDataType.StartsWith("set");
-      bool mayContainFloatingPoint = mySQLDataType.StartsWith("decimal") || mySQLDataType.StartsWith("numeric") || mySQLDataType.StartsWith("double") || mySQLDataType.StartsWith("float") || mySQLDataType.StartsWith("real");
-      int lParensIndex = mySQLDataType.IndexOf("(");
-      int rParensIndex = mySQLDataType.IndexOf(")");
-      int commaPos = mySQLDataType.IndexOf(",");
-      int characterLen = 0;
-      if (isCharacter)
+
+      //// Return immediately for big data types.
+      if (mySQLDataType.Contains("text") || mySQLDataType == "blob" || mySQLDataType == "tinyblob" || mySQLDataType == "mediumblob" || mySQLDataType == "longblob" || mySQLDataType == "binary" || mySQLDataType == "varbinary")
       {
-        if (lParensIndex >= 0)
-        {
-          string paramValue = mySQLDataType.Substring(lParensIndex + 1, mySQLDataType.Length - lParensIndex - 2);
-          int.TryParse(paramValue, out characterLen);
-        }
-        else
-        {
-          characterLen = 1;
-        }
+        return true;
       }
 
-      int[] decimalLen = new int[2] { -1, -1 };
-      List<string> setOrEnumMembers = null;
-      if (mayContainFloatingPoint && lParensIndex >= 0 && rParensIndex >= 0 && lParensIndex < rParensIndex)
-      {
-        decimalLen[0] = Int32.Parse(mySQLDataType.Substring(lParensIndex + 1, (commaPos >= 0 ? commaPos : rParensIndex) - lParensIndex - 1));
-        if (commaPos >= 0)
-        {
-          decimalLen[1] = Int32.Parse(mySQLDataType.Substring(commaPos + 1, rParensIndex - commaPos - 1));
-        }
-      }
-
-      if ((isSet || isEnum) && lParensIndex >= 0 && rParensIndex >= 0 && lParensIndex < rParensIndex)
-      {
-        setOrEnumMembers = new List<string>();
-        string membersString = mySQLDataType.Substring(lParensIndex + 1, rParensIndex - lParensIndex - 1);
-        string[] setMembersArray = membersString.Split(new char[] { ',' });
-        foreach (string s in setMembersArray)
-        {
-          setOrEnumMembers.Add(s.Trim(new char[] { '"', '\'' }));
-        }
-      }
-
-      ulong tryBitValue = 0;
-      byte tryByteValue = 0;
-      int tryIntValue = 0;
-      short trySmallIntValue = 0;
-      long tryBigIntValue = 0;
-      decimal tryDecimalValue = 0;
-      double tryDoubleValue = 0;
-      float tryFloatValue = 0;
-      DateTime tryDateTimeValue = DateTime.Now;
-      TimeSpan tryTimeSpanValue = TimeSpan.Zero;
-
-      int floatingPointPos = strValue.IndexOf(".");
-      bool floatingPointCompliant = true;
-      if (floatingPointPos >= 0)
-      {
-        bool lengthCompliant = strValue.Substring(0, floatingPointPos).Length <= decimalLen[0];
-        bool decimalPlacesCompliant = decimalLen[1] >= 0 ? strValue.Substring(floatingPointPos + 1, strValue.Length - floatingPointPos - 1).Length <= decimalLen[1] : true;
-        floatingPointCompliant = lengthCompliant && decimalPlacesCompliant;
-      }
-
-      if (isCharacter)
-      {
-        return strValue.Length <= characterLen;
-      }
-
-      if (mySQLDataType.StartsWith("decimal") || mySQLDataType.StartsWith("numeric"))
-      {
-        return Decimal.TryParse(strValue, out tryDecimalValue) && floatingPointCompliant;
-      }
-
-      if (mySQLDataType.StartsWith("int") || mySQLDataType.StartsWith("mediumint") || mySQLDataType == "year")
-      {
-        return Int32.TryParse(strValue, out tryIntValue);
-      }
-
-      if (mySQLDataType.StartsWith("tinyint"))
-      {
-        return Byte.TryParse(strValue, out tryByteValue);
-      }
-
-      if (mySQLDataType.StartsWith("smallint"))
-      {
-        return Int16.TryParse(strValue, out trySmallIntValue);
-      }
-
-      if (mySQLDataType.StartsWith("bigint"))
-      {
-        return Int64.TryParse(strValue, out tryBigIntValue);
-      }
-
+      //// Check for boolean
       if (mySQLDataType.StartsWith("bool") || mySQLDataType == "bit" || mySQLDataType == "bit(1)")
       {
         strValue = strValue.ToLowerInvariant();
         return (strValue == "true" || strValue == "false" || strValue == "0" || strValue == "1" || strValue == "yes" || strValue == "no" || strValue == "ja" || strValue == "nein");
       }
 
+      //// Check for integer values
+      if (mySQLDataType.StartsWith("int") || mySQLDataType.StartsWith("mediumint") || mySQLDataType == "year")
+      {
+        int tryIntValue = 0;
+        return Int32.TryParse(strValue, out tryIntValue);
+      }
+
+      if (mySQLDataType.StartsWith("tinyint"))
+      {
+        byte tryByteValue = 0;
+        return Byte.TryParse(strValue, out tryByteValue);
+      }
+
+      if (mySQLDataType.StartsWith("smallint"))
+      {
+        short trySmallIntValue = 0;
+        return Int16.TryParse(strValue, out trySmallIntValue);
+      }
+
+      if (mySQLDataType.StartsWith("bigint"))
+      {
+        long tryBigIntValue = 0;
+        return Int64.TryParse(strValue, out tryBigIntValue);
+      }
+
       if (mySQLDataType.StartsWith("bit"))
       {
+        ulong tryBitValue = 0;
         return UInt64.TryParse(strValue, out tryBitValue);
       }
 
+      //// Check for big numeric values
       if (mySQLDataType.StartsWith("float"))
       {
+        float tryFloatValue = 0;
         return Single.TryParse(strValue, out tryFloatValue);
       }
 
       if (mySQLDataType.StartsWith("double") || mySQLDataType.StartsWith("real"))
       {
+        double tryDoubleValue = 0;
         return Double.TryParse(strValue, out tryDoubleValue);
+      }
+
+      //// Check for date and time values.
+      if (mySQLDataType == "time")
+      {
+        TimeSpan tryTimeSpanValue = TimeSpan.Zero;
+        return TimeSpan.TryParse(strValue, out tryTimeSpanValue);
       }
 
       if (mySQLDataType == "date" || mySQLDataType == "datetime" || mySQLDataType == "timestamp")
       {
+        DateTime tryDateTimeValue = DateTime.Now;
         if (strValue.StartsWith("0000-00-00") || strValue.StartsWith("00-00-00"))
         {
           return true;
@@ -1237,14 +1189,38 @@ namespace MySQL.ForExcel
         }
       }
 
-      if (mySQLDataType == "time")
+      //// Check of char or varchar.
+      int lParensIndex = mySQLDataType.IndexOf("(");
+      int rParensIndex = mySQLDataType.IndexOf(")");
+      if (mySQLDataType.StartsWith("varchar") || mySQLDataType.StartsWith("char"))
       {
-        return TimeSpan.TryParse(strValue, out tryTimeSpanValue);
+        int characterLen = 0;
+        if (lParensIndex >= 0)
+        {
+          string paramValue = mySQLDataType.Substring(lParensIndex + 1, mySQLDataType.Length - lParensIndex - 2);
+          int.TryParse(paramValue, out characterLen);
+        }
+        else
+        {
+          characterLen = 1;
+        }
+
+        return strValue.Length <= characterLen;
       }
 
-      if (mySQLDataType == "blob" || mySQLDataType == "tinyblob" || mySQLDataType == "mediumblob" || mySQLDataType == "longblob" || mySQLDataType == "binary" || mySQLDataType == "varbinary")
+      //// Check if enum or set.
+      bool isEnum = mySQLDataType.StartsWith("enum");
+      bool isSet = mySQLDataType.StartsWith("set");
+      List<string> setOrEnumMembers = null;
+      if ((isSet || isEnum) && lParensIndex >= 0 && rParensIndex >= 0 && lParensIndex < rParensIndex)
       {
-        return true;
+        setOrEnumMembers = new List<string>();
+        string membersString = mySQLDataType.Substring(lParensIndex + 1, rParensIndex - lParensIndex - 1);
+        string[] setMembersArray = membersString.Split(new char[] { ',' });
+        foreach (string s in setMembersArray)
+        {
+          setOrEnumMembers.Add(s.Trim(new char[] { '"', '\'' }));
+        }
       }
 
       if (isEnum)
@@ -1262,6 +1238,34 @@ namespace MySQL.ForExcel
         }
 
         return setMatch;
+      }
+
+      //// Check for decimal values which is the more complex.
+      bool mayContainFloatingPoint = mySQLDataType.StartsWith("decimal") || mySQLDataType.StartsWith("numeric") || mySQLDataType.StartsWith("double") || mySQLDataType.StartsWith("float") || mySQLDataType.StartsWith("real");
+      int commaPos = mySQLDataType.IndexOf(",");
+      int[] decimalLen = new int[2] { -1, -1 };
+      if (mayContainFloatingPoint && lParensIndex >= 0 && rParensIndex >= 0 && lParensIndex < rParensIndex)
+      {
+        decimalLen[0] = Int32.Parse(mySQLDataType.Substring(lParensIndex + 1, (commaPos >= 0 ? commaPos : rParensIndex) - lParensIndex - 1));
+        if (commaPos >= 0)
+        {
+          decimalLen[1] = Int32.Parse(mySQLDataType.Substring(commaPos + 1, rParensIndex - commaPos - 1));
+        }
+      }
+
+      int floatingPointPos = strValue.IndexOf(".");
+      bool floatingPointCompliant = true;
+      if (floatingPointPos >= 0)
+      {
+        bool lengthCompliant = strValue.Substring(0, floatingPointPos).Length <= decimalLen[0];
+        bool decimalPlacesCompliant = decimalLen[1] >= 0 ? strValue.Substring(floatingPointPos + 1, strValue.Length - floatingPointPos - 1).Length <= decimalLen[1] : true;
+        floatingPointCompliant = lengthCompliant && decimalPlacesCompliant;
+      }
+
+      if (mySQLDataType.StartsWith("decimal") || mySQLDataType.StartsWith("numeric"))
+      {
+        decimal tryDecimalValue = 0;
+        return Decimal.TryParse(strValue, out tryDecimalValue) && floatingPointCompliant;
       }
 
       return false;

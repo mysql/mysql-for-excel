@@ -607,6 +607,12 @@ namespace MySQL.ForExcel
         }
 
         result = result && DataTypeUtilities.StringValueCanBeStoredWithMySQLType(strValueFromArray, mySQLDataType);
+
+        //// If found a value where the data type is not good for it break since there is no need testing more values.
+        if (!result)
+        {
+          break;
+        }
       }
 
       return result;
