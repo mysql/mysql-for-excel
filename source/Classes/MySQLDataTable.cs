@@ -129,7 +129,7 @@ namespace MySQL.ForExcel
         CreateTableSchema(tableName, datesAsMySQLDates);
       }
 
-      _mysqlMaxAllowedPacket = MySQLDataUtilities.GetMySQLServerMaxAllowedPacket(WBConnection);
+      _mysqlMaxAllowedPacket = WBConnection.GetMySQLServerMaxAllowedPacket();
     }
 
     /// <summary>
@@ -416,7 +416,7 @@ namespace MySQL.ForExcel
         if (_tableExistsInSchema == null)
         {
           string cleanTableName = TableName.ToLowerInvariant().Replace(" ", "_");
-          _tableExistsInSchema = WBConnection != null ? MySQLDataUtilities.TableExistsInSchema(WBConnection, WBConnection.Schema, cleanTableName) : false;
+          _tableExistsInSchema = WBConnection != null ? WBConnection.TableExistsInSchema(WBConnection.Schema, cleanTableName) : false;
         }
 
         return (bool)_tableExistsInSchema;
@@ -557,7 +557,7 @@ namespace MySQL.ForExcel
           conn.Open();
           if (_mysqlMaxAllowedPacket == 0)
           {
-            _mysqlMaxAllowedPacket = MySQLDataUtilities.GetMySQLServerMaxAllowedPacket(conn);
+            _mysqlMaxAllowedPacket = conn.GetMySQLServerMaxAllowedPacket();
           }
 
           transaction = conn.BeginTransaction();
@@ -1361,7 +1361,7 @@ namespace MySQL.ForExcel
           conn.Open();
           if (_mysqlMaxAllowedPacket == 0)
           {
-            _mysqlMaxAllowedPacket = MySQLDataUtilities.GetMySQLServerMaxAllowedPacket(conn);
+            _mysqlMaxAllowedPacket = conn.GetMySQLServerMaxAllowedPacket();
           }
 
           transaction = conn.BeginTransaction();
@@ -1436,7 +1436,7 @@ namespace MySQL.ForExcel
           conn.Open();
           if (_mysqlMaxAllowedPacket == 0)
           {
-            _mysqlMaxAllowedPacket = MySQLDataUtilities.GetMySQLServerMaxAllowedPacket(conn);
+            _mysqlMaxAllowedPacket = conn.GetMySQLServerMaxAllowedPacket();
           }
 
           transaction = conn.BeginTransaction();
@@ -1574,7 +1574,7 @@ namespace MySQL.ForExcel
       try
       {
         Clear();
-        DataTable filledTable = MySQLDataUtilities.GetDataFromTableOrView(WBConnection, SelectQuery);
+        DataTable filledTable = WBConnection.GetDataFromTableOrView(SelectQuery);
         CreateTableSchema(TableName, true);
         CopyTableData(filledTable);
       }
@@ -1871,7 +1871,7 @@ namespace MySQL.ForExcel
     private void CreateTableSchema(string tableName, bool datesAsMySQLDates)
     {
       Columns.Clear();
-      DataTable columnsInfoTable = MySQLDataUtilities.GetSchemaCollection(WBConnection, "Columns Short", null, WBConnection.Schema, tableName);
+      DataTable columnsInfoTable = WBConnection.GetSchemaCollection("Columns Short", null, WBConnection.Schema, tableName);
       if (columnsInfoTable != null)
       {
         foreach (DataRow columnInfoRow in columnsInfoTable.Rows)

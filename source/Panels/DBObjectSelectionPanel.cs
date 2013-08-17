@@ -436,13 +436,13 @@ namespace MySQL.ForExcel
       string objectName;
       if (dataObjectType == DBObject.DBObjectType.Procedure)
       {
-        objs = MySQLDataUtilities.GetSchemaCollection(WBConnection, "Procedures", null, WBConnection.Schema, null, "PROCEDURE");
+        objs = WBConnection.GetSchemaCollection("Procedures", null, WBConnection.Schema, null, "PROCEDURE");
         objectName = "ROUTINE_NAME";
         parent = DBObjectList.Nodes[2];
       }
       else
       {
-        objs = MySQLDataUtilities.GetSchemaCollection(WBConnection, dataObjectType.ToString() + "s", null, WBConnection.Schema);
+        objs = WBConnection.GetSchemaCollection(dataObjectType.ToString() + "s", null, WBConnection.Schema);
         objectName = "TABLE_NAME";
         parent = DBObjectList.Nodes[(int)dataObjectType];
       }

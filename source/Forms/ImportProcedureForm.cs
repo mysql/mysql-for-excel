@@ -197,7 +197,7 @@ namespace MySQL.ForExcel
           }
         }
 
-        ImportDataSet = MySQLDataUtilities.GetDataSetFromProcedure(WBConnection, ImportDBObject, _mysqlParameters);
+        ImportDataSet = WBConnection.GetDataSetFromProcedure(ImportDBObject, _mysqlParameters);
         if (ImportDataSet == null || ImportDataSet.Tables.Count == 0)
         {
           ImportButton.Enabled = false;
@@ -310,7 +310,7 @@ namespace MySQL.ForExcel
     private void PrepareParameters()
     {
       CustomProperty parameter = null;
-      DataTable parametersTable = MySQLDataUtilities.GetSchemaCollection(WBConnection, "Procedure Parameters", null, WBConnection.Schema, ImportDBObject.Name);
+      DataTable parametersTable = WBConnection.GetSchemaCollection("Procedure Parameters", null, WBConnection.Schema, ImportDBObject.Name);
       _mysqlParameters = new MySqlParameter[parametersTable.Rows.Count];
       int paramIdx = 0;
       MySqlDbType dbType = MySqlDbType.Guid;

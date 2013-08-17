@@ -19,6 +19,8 @@
 
 namespace MySQL.ForExcel
 {
+  using System;
+  using MySQL.Utility;
   using MySQL.Utility.Forms;
 
   /// <summary>
@@ -27,63 +29,94 @@ namespace MySQL.ForExcel
   public partial class PasswordDialog : AutoStyleableBaseDialog
   {
     /// <summary>
+    /// Flag indicating whether the connection is tested after setting the password.
+    /// </summary>
+    private bool _testConnection;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="PasswordDialog"/> class.
     /// </summary>
-    /// <param name="hostIdentifier">The complete identifier of the MySQL host of the connection (instance name + host name + port).</param>
-    /// <param name="user">The user name used by the connection.</param>
-    public PasswordDialog(string hostIdentifier, string user)
+    /// <param name="wbConnection">A <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.</param>
+    /// <param name="testConnection">Flag indicating whether the connection is tested after setting the password.</param>
+    public PasswordDialog(MySqlWorkbenchConnection wbConnection, bool testConnection)
     {
+      _testConnection = testConnection;
       InitializeComponent();
-      HostIdentifier = hostIdentifier;
-      UserName = user;
+      WBConnection = wbConnection;
+      UserValueLabel.Text = WBConnection.UserName;
+      ConnectionValueLabel.Text = WBConnection.Name + " - " + WBConnection.HostIdentifier;
+      PasswordTextBox.Text = WBConnection.Password;
+      DialogOKButton.Enabled = PasswordTextBox.Text.Trim().Length > 0;
     }
 
     /// <summary>
-    /// Gets the complete identifier of the MySQL host of the connection (instance name + host name + port).
+    /// Gets a value indicating whether the password is saved in the password vault.
     /// </summary>
-    public string HostIdentifier
+    public bool StorePasswordSecurely
     {
       get
       {
-        return ConnectionValueLabel.Text;
+        return StorePasswordSecurelyCheckBox.Checked;
       }
 
       private set
       {
-        ConnectionValueLabel.Text = value;
+        StorePasswordSecurelyCheckBox.Checked = value;
       }
     }
 
     /// <summary>
-    /// Gets the password entered by the user for the connection.
+    /// Gets the connection to a MySQL server instance selected by users
     /// </summary>
-    public string PasswordText
+    public MySqlWorkbenchConnection WBConnection { get; private set; }
+
+    private void DialogOKButton_Click(object sender, System.EventArgs e)
     {
-      get
+      WBConnection.Password = PasswordTextBox.Text;
+      bool connectionSuccessful = true;
+      if (_testConnection)
       {
-        return PasswordTextBox.Text;
+        bool wrongPassword = false;
+        connectionSuccessful = WBConnection.TestConnectionAndShowError(out wrongPassword);
       }
 
-      private set
+      if (StorePasswordSecurely && !string.IsNullOrEmpty(WBConnection.Password) && connectionSuccessful)
       {
-        PasswordTextBox.Text = value;
+        MySqlWorkbenchPasswordVault.StorePassword(WBConnection.HostIdentifier, WBConnection.UserName, WBConnection.Password);
       }
     }
 
     /// <summary>
-    /// Gets the user name used by the connection.
+    /// Event delegate method fired when the <see cref="PasswordChangedTimer"/> timer elapses.
     /// </summary>
-    public string UserName
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void PasswordChangedTimer_Tick(object sender, EventArgs e)
     {
-      get
-      {
-        return UserValueLabel.Text;
-      }
+      PasswordTextBox_Validated(PasswordTextBox, EventArgs.Empty);
+    }
 
-      private set
-      {
-        UserValueLabel.Text = value;
-      }
+    /// <summary>
+    /// Event delegate method fired when the <see cref="PasswordTextBox"/> text changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void PasswordTextBox_TextChanged(object sender, EventArgs e)
+    {
+      PasswordChangedTimer.Stop();
+      PasswordChangedTimer.Start();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="PasswordTextBox"/> is validated.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void PasswordTextBox_Validated(object sender, EventArgs e)
+    {
+      PasswordChangedTimer.Stop();
+      PasswordTextBox.Text = PasswordTextBox.Text.Trim();
+      DialogOKButton.Enabled = PasswordTextBox.TextLength > 0;
     }
   }
 }

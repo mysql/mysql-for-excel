@@ -389,8 +389,8 @@ Please add a primary key to the table.</value>
   <data name="UnableToAddConnectionsWhenWBRunning" xml:space="preserve">
     <value>Adding new connections is not allowed when MySQL Workbench is running.</value>
   </data>
-  <data name="ConnectFailedDetailWarning" xml:space="preserve">
-    <value>Connection attempt failed.
+  <data name="PasswordFailedText" xml:space="preserve">
+    <value>Connection failed with current password.
 Please re-enter your password to try again.</value>
   </data>
   <data name="ColumnMappedExchangeDetailWarning" xml:space="preserve">
@@ -408,8 +408,8 @@ Please re-enter your password to try again.</value>
   <data name="refresh_sidebar" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\refresh_sidebar.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ConnectFailedTitleWarning" xml:space="preserve">
-    <value>Wrong Password</value>
+  <data name="ConnectFailedWarningTitle" xml:space="preserve">
+    <value>Connection attempt failed.</value>
   </data>
   <data name="DeleteHS" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\DeleteHS.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -424,9 +424,9 @@ Please re-enter your password to try again.</value>
     <value>Excel WorkSheet is in Compatibility Mode which has a row limit of 65,535 rows.</value>
   </data>
   <data name="ConnectSSLFailedDetailWarning" xml:space="preserve">
-    <value>A possible fail reason could be that your user requires a SSL connection that is not supported by MySQL for Excel.
+    <value>A possible fail reason could be that your user requires a SSL connection that is not currently supported by MySQL for Excel.
 
-Please check with the Administrator if you require a SSL Connection or if he can authorize your user to login without a SSL connection.</value>
+Please check with the Administrator if you require a SSL Connection and if he can authorize your user to login without a SSL connection.</value>
   </data>
   <data name="ImportVerticallyExceedsMaxRowsDetailWarning" xml:space="preserve">
     <value>Rows in all result sets exceed the limit of 65,535 rows in Compatibility Mode, one or more Result Sets will be truncated.</value>

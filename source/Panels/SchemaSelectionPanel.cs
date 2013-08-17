@@ -172,7 +172,7 @@ namespace MySQL.ForExcel
           node.Nodes.Clear();
         }
 
-        DataTable databases = MySQLDataUtilities.GetSchemaCollection(WBConnection, "Databases", null);
+        DataTable databases = WBConnection.GetSchemaCollection("Databases", null);
         foreach (DataRow row in databases.Rows)
         {
           string schemaName = row["DATABASE_NAME"].ToString();

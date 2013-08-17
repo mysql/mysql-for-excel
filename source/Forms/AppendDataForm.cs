@@ -869,7 +869,7 @@ namespace MySQL.ForExcel
     private void InitializeToTableGrid(DBObject importDBObject)
     {
       TargetMySQLDataTable = new MySQLDataTable(importDBObject.Name, true, false, WBConnection);
-      DataTable dt = MySQLDataUtilities.GetDataFromTableOrView(WBConnection, importDBObject, null, 0, 10);
+      DataTable dt = WBConnection.GetDataFromTableOrView(importDBObject, null, 0, 10);
       foreach (DataRow dr in dt.Rows)
       {
         object[] rowValues = dr.ItemArray;
@@ -881,7 +881,7 @@ namespace MySQL.ForExcel
         TargetMySQLDataTable.LoadDataRow(rowValues, true);
       }
 
-      long totalRowsCount = MySQLDataUtilities.GetRowsCountFromTableOrView(WBConnection, importDBObject);
+      long totalRowsCount = WBConnection.GetRowsCountFromTableOrView(importDBObject);
       TargetMySQLTableDataGridView.DataSource = TargetMySQLDataTable;
       foreach (DataGridViewColumn gridCol in TargetMySQLTableDataGridView.Columns)
       {

@@ -153,8 +153,8 @@ namespace MySQL.ForExcel
     /// </summary>
     private void FillPreviewGrid()
     {
-      PreviewDataTable = MySQLDataUtilities.GetDataFromTableOrView(WBConnection, ImportDBObject, null, 0, 10);
-      TotalRowsCount = MySQLDataUtilities.GetRowsCountFromTableOrView(WBConnection, ImportDBObject);
+      PreviewDataTable = WBConnection.GetDataFromTableOrView(ImportDBObject, null, 0, 10);
+      TotalRowsCount = WBConnection.GetRowsCountFromTableOrView(ImportDBObject);
       RowsCountSubLabel.Text = TotalRowsCount.ToString();
       PreviewDataGridView.DataSource = PreviewDataTable;
       foreach (DataGridViewColumn gridCol in PreviewDataGridView.Columns)
@@ -216,15 +216,15 @@ namespace MySQL.ForExcel
         this.Cursor = Cursors.WaitCursor;
         if (LimitRowsCheckBox.Checked)
         {
-          ImportDataTable = MySQLDataUtilities.GetDataFromTableOrView(WBConnection, ImportDBObject, importColumns, Convert.ToInt32(FromRowNumericUpDown.Value) - 1, Convert.ToInt32(RowsToReturnNumericUpDown.Value));
+          ImportDataTable = WBConnection.GetDataFromTableOrView(ImportDBObject, importColumns, Convert.ToInt32(FromRowNumericUpDown.Value) - 1, Convert.ToInt32(RowsToReturnNumericUpDown.Value));
         }
         else if (WorkSheetInCompatibilityMode)
         {
-          ImportDataTable = MySQLDataUtilities.GetDataFromTableOrView(WBConnection, ImportDBObject, importColumns, 0, UInt16.MaxValue);
+          ImportDataTable = WBConnection.GetDataFromTableOrView(ImportDBObject, importColumns, 0, UInt16.MaxValue);
         }
         else
         {
-          ImportDataTable = MySQLDataUtilities.GetDataFromTableOrView(WBConnection, ImportDBObject, importColumns);
+          ImportDataTable = WBConnection.GetDataFromTableOrView(ImportDBObject, importColumns);
         }
       }
       catch (Exception ex)

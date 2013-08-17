@@ -530,7 +530,7 @@ namespace MySQL.ForExcel
         }
         else if (againstTypeColumn.ColumnsRequireQuotes)
         {
-          retValue = escapeStringForTextTypes ? MySQLDataUtilities.EscapeDataValueString(rawValue.ToString()) : rawValue.ToString();
+          retValue = escapeStringForTextTypes ? rawValue.ToString().EscapeDataValueString() : rawValue.ToString();
         }
       }
 
@@ -2170,6 +2170,20 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Checks if the given connection may be using SSL.
+    /// </summary>
+    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
+    /// <returns><c>true</c> if the connection uses SSL, <c>false</c> otherwise.</returns>
+    public static bool IsSSL(this MySqlWorkbenchConnection connection)
+    {
+      return connection.UseSSL == 1
+        || !(string.IsNullOrWhiteSpace(connection.SSLCA)
+        && string.IsNullOrWhiteSpace(connection.SSLCert)
+        && string.IsNullOrWhiteSpace(connection.SSLCipher)
+        && string.IsNullOrWhiteSpace(connection.SSLKey));
+    }
+
+    /// <summary>
     /// Checks if a table with the given name exists in the given schema.
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
@@ -2205,6 +2219,40 @@ namespace MySQL.ForExcel
       string sql = string.Format("SHOW KEYS FROM `{0}` IN `{1}` WHERE Key_name = 'PRIMARY';", tableName, connection.Schema);
       DataTable dt = GetDataFromTableOrView(connection, sql);
       return dt != null ? dt.Rows.Count > 0 : false;
+    }
+
+    /// <summary>
+    /// Tests the given connection to check if it can successfully connect to the corresponding MySQL instance.
+    /// </summary>
+    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
+    /// <param name="wrongPassword">Flag indicating if the reason for an unsuccessful connection is because of a bad password.</param>
+    /// <returns><c>true</c> if successfully connects, <c>false</c> otherwise.</returns>
+    public static bool TestConnectionAndShowError(this MySqlWorkbenchConnection connection, out bool wrongPassword)
+    {
+      wrongPassword = false;
+      Exception connectionException = null;
+      if (connection.TestConnection(out connectionException))
+      {
+        return true;
+      }
+
+      //// If the error returned is about the connection failing the password check, it may be because either the stored password is wrong or no password.
+      if (connectionException is MySqlException && (connectionException as MySqlException).Number == 0)
+      {
+        if (!string.IsNullOrEmpty(connection.Password))
+        {
+          string moreInfoText = connection.IsSSL() ? Properties.Resources.ConnectSSLFailedDetailWarning : null;
+          InfoDialog.ShowWarningDialog(Properties.Resources.ConnectFailedWarningTitle, connectionException.Message, null, moreInfoText);
+        }
+
+        wrongPassword = true;
+      }
+      else
+      {
+        InfoDialog.ShowErrorDialog(Properties.Resources.ConnectFailedWarningTitle, connectionException.Message, null, connectionException.InnerException != null ? connectionException.InnerException.Message : null);
+      }
+
+      return false;
     }
 
     /// <summary>

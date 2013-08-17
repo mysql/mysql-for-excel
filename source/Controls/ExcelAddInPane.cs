@@ -24,6 +24,7 @@ namespace MySQL.ForExcel
   using System.ComponentModel;
   using System.Data;
   using System.Windows.Forms;
+  using MySql.Data.MySqlClient;
   using MySQL.ForExcel.Properties;
   using MySQL.Utility;
   using MySQL.Utility.Forms;
@@ -288,7 +289,7 @@ namespace MySQL.ForExcel
       }
 
       //// Check if selected Table has a Primary Key, it it does not we prompt an error and exit since Editing on such table is not permitted
-      if (!MySQLDataUtilities.TableHasPrimaryKey(WBConnection, tableObject.Name))
+      if (!WBConnection.TableHasPrimaryKey(tableObject.Name))
       {
         InfoDialog.ShowErrorDialog(Resources.EditOpenSatusError, Resources.EditOpenSummaryError, Resources.EditOpenDetailsError);
         return false;
@@ -563,39 +564,45 @@ namespace MySQL.ForExcel
     {
       WBConnection = connection;
       RefreshWbConnectionTimeouts();
-      bool failed = false;
+      bool isSSL = WBConnection.UseSSL == 1
+        || !(string.IsNullOrWhiteSpace(WBConnection.SSLCA)
+        && string.IsNullOrWhiteSpace(WBConnection.SSLCert)
+        && string.IsNullOrWhiteSpace(WBConnection.SSLCipher)
+        && string.IsNullOrWhiteSpace(WBConnection.SSLKey));
       while (true)
       {
-        if (connection.Password == null || failed)
-        {
-          using (PasswordDialog passwordDialog = new PasswordDialog(connection.Name + " - " + connection.HostIdentifier, connection.UserName))
-          {
-            DialogResult dr = passwordDialog.ShowDialog();
-            connection.Password = dr == DialogResult.Cancel ? null : passwordDialog.PasswordText;
-          }
+        bool noPassword = string.IsNullOrEmpty(WBConnection.Password);
+        bool wrongPassword = false;
 
-          if (connection.Password == null)
-          {
-            return;
-          }
-        }
-
-        if (connection.TestConnection())
+        //// Try to connect with the connection exactly as loaded (maybe without a password).
+        if (WBConnection.TestConnectionAndShowError(out wrongPassword))
         {
+          //// Connection successful so exit loop and continue.
           break;
         }
 
-        bool isSSL = connection.UseSSL == 1
-          || !(string.IsNullOrWhiteSpace(connection.SSLCA)
-          && string.IsNullOrWhiteSpace(connection.SSLCert)
-          && string.IsNullOrWhiteSpace(connection.SSLCipher)
-          && string.IsNullOrWhiteSpace(connection.SSLKey));
-        string moreInfoText = isSSL ? Resources.ConnectSSLFailedDetailWarning : null;
-        InfoDialog.ShowWarningDialog(Resources.ConnectFailedTitleWarning, Resources.ConnectFailedDetailWarning, null, moreInfoText);
-        failed = true;
+        if (!wrongPassword)
+        {
+          return;
+        }
+
+        //// If the connection does not have a stored password or the stored password failed then ask for one and retry. 
+        if (noPassword || wrongPassword)
+        {
+          using (PasswordDialog passwordDialog = new PasswordDialog(WBConnection, true))
+          {
+            DialogResult dr = passwordDialog.ShowDialog();
+            if (dr == DialogResult.Cancel)
+            {
+              return;
+            }
+
+            WBConnection.Password = passwordDialog.WBConnection.Password;
+          }
+        }
       }
 
-      bool schemasLoaded = SchemaSelectionPanel2.SetConnection(connection);
+      bool schemasLoaded = SchemaSelectionPanel2.SetConnection(WBConnection);
       if (schemasLoaded)
       {
         SchemaSelectionPanel2.BringToFront();

@@ -1,4 +1,8 @@
 1.1.2
+- Added code to properly check the reason for a failing connection, if it's a failing password the user gets a dialog to retry the connection with a different
+  password until the connection succeeds, a connection error not related to the password is thrown or the user cancels. If the failing connection is not related
+  to a bad password an error message is shown to the users indicating the reason of the failure.
+  (Bug #16239007 - CONNECTIONS TO MYSQL SERVICES NOT RUNNING DISPLAY A WRONG PASSWORD ERROR MESSAGE)
 - Added global options dialog that can be accessed from the Schema Selection and DB Object Selection panels where the timeouts for the connection to the DB
   Server and for the query commands can be changed from their default values (15 seconds for the connection timeout and 30 seconds for the query timeout).
   (MySQL Bug #68732, Bug #17191646 - QUERY TIMEOUT CANNOT BE ADJUSTED IN MYSQL FOR EXCEL)

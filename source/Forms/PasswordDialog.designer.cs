@@ -47,6 +47,7 @@ namespace MySQL.ForExcel
     /// </summary>
     private void InitializeComponent()
     {
+      this.components = new System.ComponentModel.Container();
       this.DialogOKButton = new System.Windows.Forms.Button();
       this.DialogCancelButton = new System.Windows.Forms.Button();
       this.UserValueLabel = new System.Windows.Forms.Label();
@@ -57,6 +58,8 @@ namespace MySQL.ForExcel
       this.ConnectionLabel = new System.Windows.Forms.Label();
       this.EnterPasswordLabel = new System.Windows.Forms.Label();
       this.LogoPictureBox = new System.Windows.Forms.PictureBox();
+      this.StorePasswordSecurelyCheckBox = new System.Windows.Forms.CheckBox();
+      this.PasswordChangedTimer = new System.Windows.Forms.Timer(this.components);
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).BeginInit();
@@ -64,11 +67,12 @@ namespace MySQL.ForExcel
       // 
       // FootnoteAreaPanel
       // 
-      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 112);
-      this.FootnoteAreaPanel.Size = new System.Drawing.Size(514, 0);
+      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 292);
+      this.FootnoteAreaPanel.Size = new System.Drawing.Size(634, 0);
       // 
       // ContentAreaPanel
       // 
+      this.ContentAreaPanel.Controls.Add(this.StorePasswordSecurelyCheckBox);
       this.ContentAreaPanel.Controls.Add(this.LogoPictureBox);
       this.ContentAreaPanel.Controls.Add(this.EnterPasswordLabel);
       this.ContentAreaPanel.Controls.Add(this.UserValueLabel);
@@ -77,19 +81,20 @@ namespace MySQL.ForExcel
       this.ContentAreaPanel.Controls.Add(this.ConnectionLabel);
       this.ContentAreaPanel.Controls.Add(this.UserLabel);
       this.ContentAreaPanel.Controls.Add(this.PasswordLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(514, 192);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(514, 226);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.DialogOKButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 147);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 181);
       this.CommandAreaPanel.Size = new System.Drawing.Size(514, 45);
       // 
       // DialogOKButton
       // 
       this.DialogOKButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.DialogOKButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+      this.DialogOKButton.Enabled = false;
       this.DialogOKButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.DialogOKButton.Location = new System.Drawing.Point(346, 11);
       this.DialogOKButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
@@ -98,6 +103,7 @@ namespace MySQL.ForExcel
       this.DialogOKButton.TabIndex = 0;
       this.DialogOKButton.Text = "OK";
       this.DialogOKButton.UseVisualStyleBackColor = true;
+      this.DialogOKButton.Click += new System.EventHandler(this.DialogOKButton_Click);
       // 
       // DialogCancelButton
       // 
@@ -143,6 +149,8 @@ namespace MySQL.ForExcel
       this.PasswordTextBox.Size = new System.Drawing.Size(315, 23);
       this.PasswordTextBox.TabIndex = 6;
       this.PasswordTextBox.UseSystemPasswordChar = true;
+      this.PasswordTextBox.TextChanged += new System.EventHandler(this.PasswordTextBox_TextChanged);
+      this.PasswordTextBox.Validated += new System.EventHandler(this.PasswordTextBox_Validated);
       // 
       // PasswordLabel
       // 
@@ -198,12 +206,27 @@ namespace MySQL.ForExcel
       this.LogoPictureBox.TabIndex = 22;
       this.LogoPictureBox.TabStop = false;
       // 
+      // StorePasswordSecurelyCheckBox
+      // 
+      this.StorePasswordSecurelyCheckBox.AutoSize = true;
+      this.StorePasswordSecurelyCheckBox.Location = new System.Drawing.Point(190, 138);
+      this.StorePasswordSecurelyCheckBox.Name = "StorePasswordSecurelyCheckBox";
+      this.StorePasswordSecurelyCheckBox.Size = new System.Drawing.Size(147, 17);
+      this.StorePasswordSecurelyCheckBox.TabIndex = 7;
+      this.StorePasswordSecurelyCheckBox.Text = "Store password securely?";
+      this.StorePasswordSecurelyCheckBox.UseVisualStyleBackColor = true;
+      // 
+      // PasswordChangedTimer
+      // 
+      this.PasswordChangedTimer.Interval = 800;
+      this.PasswordChangedTimer.Tick += new System.EventHandler(this.PasswordChangedTimer_Tick);
+      // 
       // PasswordDialog
       // 
       this.AcceptButton = this.DialogOKButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(514, 192);
+      this.ClientSize = new System.Drawing.Size(514, 226);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -231,5 +254,7 @@ namespace MySQL.ForExcel
     private System.Windows.Forms.Label PasswordLabel;
     private System.Windows.Forms.Label EnterPasswordLabel;
     private System.Windows.Forms.PictureBox LogoPictureBox;
+    private System.Windows.Forms.CheckBox StorePasswordSecurelyCheckBox;
+    private System.Windows.Forms.Timer PasswordChangedTimer;
   }
 }
