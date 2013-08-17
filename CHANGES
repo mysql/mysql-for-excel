@@ -23,7 +23,7 @@
 - Fixed some code for Edit Data operations that was escaping special characters twice (during edition in Excel and then upon sending the query to the MySQL server).
   (MySQL Bug #68669, Bug #17271693 - A BACKSLASH IS INSERTED BEFORE AN APOSTROPHE EDITING TABLE WITH MYSQL FOR EXCEL)
 - Refactored all code to comply with SyleCop rules, upgraded MySQL Utility with latest version that encapsulates dialog base classes and introduces more classes
-  to handle Workbench connections, and removed these from the Excel project.
+  to handle Workbench connections, and removed these from the Excel project. (Bug #16500331 - CAN'T DELETE CONNECTIONS CREATED WITHIN ADDIN)
 
 1.1.1
 - Added code to check for changes on the contents of the currently selected Excel cells, so if the contents become empty the Export and Append data actions are
