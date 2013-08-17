@@ -1,3 +1,21 @@
+MySQL for Excel 1.1.2 Release Notes
+------------------------------------
+
+Welcome to the release notes for MySQL for Excel 1.1.2
+
+* Added global options to override the default connection and query execution timeouts.
+* Connection passwords can be stored securely just like MySQL Workbench does and these
+  secured passwords are shared with Workbench in the same way connections are.
+* Fixed bug where a backslash was inserted before apostrophes when editing a MySQL table.
+* Fixed problem specific to Excel 2013 where the add-in side bar was not visible on Excel
+  windows different than the first window opened.
+* Fixed problem where users different to the one that installed MySQL for Excel could not
+  see and use the add-in (i.e. the add-in was only installed for the current user and not
+  for all users).
+* Fixed problem where a failed connection was always stating that the connection password
+  was wrong, now the actual failing reason for the connection failure is shown.
+* Other bug fixes (for a complete list refer to the CHANGES file).
+
 
 MySQL for Excel 1.1.1 Release Notes
 ------------------------------------
