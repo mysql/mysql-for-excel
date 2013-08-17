@@ -131,16 +131,6 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Event delegate method fired when <see cref="HelpButton"/> is clicked.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void HelpButton_Click(object sender, EventArgs e)
-    {
-      MessageBox.Show("Showing Help...");
-    }
-
-    /// <summary>
     /// Event delegate method fired when a <see cref="Label"/> control is being painted.
     /// </summary>
     /// <param name="sender">A <see cref="Label"/> control object.</param>
@@ -235,6 +225,23 @@ namespace MySQL.ForExcel
       {
         MiscUtilities.ShowCustomizedErrorDialog(Resources.SchemaOpeningErrorTitle, ex.Message, true);
         MySQLSourceTrace.WriteAppErrorToLog(ex);
+      }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when <see cref="OptionsButton"/> is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void OptionsButton_Click(object sender, EventArgs e)
+    {
+      using (GlobalOptionsDialog optionsDialog = new GlobalOptionsDialog())
+      {
+        DialogResult dr = optionsDialog.ShowDialog();
+        if (dr == DialogResult.OK)
+        {
+          (Parent as ExcelAddInPane).RefreshWbConnectionTimeouts();
+        }
       }
     }
 

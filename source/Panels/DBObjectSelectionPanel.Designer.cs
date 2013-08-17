@@ -52,7 +52,7 @@ namespace MySQL.ForExcel
       this.LargeImagesList = new System.Windows.Forms.ImageList(this.components);
       this.CloseButton = new System.Windows.Forms.Button();
       this.BackButton = new System.Windows.Forms.Button();
-      this.HelpButton = new System.Windows.Forms.Button();
+      this.OptionsButton = new System.Windows.Forms.Button();
       this.DBObjectList = new MySQL.ForExcel.MyTreeView();
       this.DBObjectsContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.RefreshDatabaseObjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -105,18 +105,17 @@ namespace MySQL.ForExcel
       this.BackButton.UseVisualStyleBackColor = true;
       this.BackButton.Click += new System.EventHandler(this.BackButton_Click);
       // 
-      // HelpButton
+      // OptionsButton
       // 
-      this.HelpButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-      this.HelpButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.HelpButton.Location = new System.Drawing.Point(14, 597);
-      this.HelpButton.Name = "HelpButton";
-      this.HelpButton.Size = new System.Drawing.Size(75, 23);
-      this.HelpButton.TabIndex = 9;
-      this.HelpButton.Text = "Help";
-      this.HelpButton.UseVisualStyleBackColor = true;
-      this.HelpButton.Visible = false;
-      this.HelpButton.Click += new System.EventHandler(this.HelpButton_Click);
+      this.OptionsButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+      this.OptionsButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.OptionsButton.Location = new System.Drawing.Point(9, 597);
+      this.OptionsButton.Name = "OptionsButton";
+      this.OptionsButton.Size = new System.Drawing.Size(75, 23);
+      this.OptionsButton.TabIndex = 9;
+      this.OptionsButton.Text = "Options";
+      this.OptionsButton.UseVisualStyleBackColor = true;
+      this.OptionsButton.Click += new System.EventHandler(this.OptionsButton_Click);
       // 
       // DBObjectList
       // 
@@ -402,7 +401,7 @@ namespace MySQL.ForExcel
       this.Controls.Add(this.AppendDataHotLabel);
       this.Controls.Add(this.DBObjectList);
       this.Controls.Add(this.ImportDataHotLabel);
-      this.Controls.Add(this.HelpButton);
+      this.Controls.Add(this.OptionsButton);
       this.Controls.Add(this.EditDataHotLabel);
       this.Controls.Add(this.CloseButton);
       this.Controls.Add(this.BackButton);
@@ -421,7 +420,7 @@ namespace MySQL.ForExcel
     public System.Windows.Forms.Button CloseButton;
     public System.Windows.Forms.Button BackButton;
     private System.Windows.Forms.ImageList LargeImagesList;
-    public System.Windows.Forms.Button HelpButton;
+    public System.Windows.Forms.Button OptionsButton;
     private HotLabel ImportDataHotLabel;
     private HotLabel EditDataHotLabel;
     private HotLabel AppendDataHotLabel;

@@ -1,4 +1,7 @@
 1.1.2
+- Added global options dialog that can be accessed from the Schema Selection and DB Object Selection panels where the timeouts for the connection to the DB
+  Server and for the query commands can be changed from their default values (15 seconds for the connection timeout and 30 seconds for the query timeout).
+  (MySQL Bug #68732, Bug #17191646 - QUERY TIMEOUT CANNOT BE ADJUSTED IN MYSQL FOR EXCEL)
 - Changed the Varchar(65,535) data type shown in the Export Data data type combo box to Text since the maximum row size is 65,535 bytes and any autodetected
   column data type with a length greater than 4,000 should be set to Text actually for the table to be created successfully.
   (MySQL Bug #69779, Bug #17191633 - EXPORT FAILS FOR EXCEL FILES CONTAINING > 4000 CHARACTERS OF TEXT PER CELL)

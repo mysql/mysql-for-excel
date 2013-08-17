@@ -303,6 +303,12 @@
     <Compile Include="Forms\AppendNewColumnMappingDialog.Designer.cs">
       <DependentUpon>AppendNewColumnMappingDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\GlobalOptionsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\GlobalOptionsDialog.Designer.cs">
+      <DependentUpon>GlobalOptionsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\EditDataRevertDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -404,6 +410,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\AppendNewColumnMappingDialog.resx">
       <DependentUpon>AppendNewColumnMappingDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\GlobalOptionsDialog.resx">
+      <DependentUpon>GlobalOptionsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\EditDataRevertDialog.resx">
       <DependentUpon>EditDataRevertDialog.cs</DependentUpon>

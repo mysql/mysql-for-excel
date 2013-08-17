@@ -52,7 +52,7 @@ namespace MySQL.ForExcel
       this.LargeImagesList = new System.Windows.Forms.ImageList(this.components);
       this.BackButton = new System.Windows.Forms.Button();
       this.NextButton = new System.Windows.Forms.Button();
-      this.HelpButton = new System.Windows.Forms.Button();
+      this.OptionsButton = new System.Windows.Forms.Button();
       this.SchemasList = new MySQL.ForExcel.MyTreeView();
       this.SchemasContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.RefreshSchemasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -102,18 +102,17 @@ namespace MySQL.ForExcel
       this.NextButton.UseVisualStyleBackColor = true;
       this.NextButton.Click += new System.EventHandler(this.NextButton_Click);
       // 
-      // HelpButton
+      // OptionsButton
       // 
-      this.HelpButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-      this.HelpButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.HelpButton.Location = new System.Drawing.Point(14, 599);
-      this.HelpButton.Name = "HelpButton";
-      this.HelpButton.Size = new System.Drawing.Size(75, 23);
-      this.HelpButton.TabIndex = 6;
-      this.HelpButton.Text = "Help";
-      this.HelpButton.UseVisualStyleBackColor = true;
-      this.HelpButton.Visible = false;
-      this.HelpButton.Click += new System.EventHandler(this.HelpButton_Click);
+      this.OptionsButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+      this.OptionsButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.OptionsButton.Location = new System.Drawing.Point(9, 599);
+      this.OptionsButton.Name = "OptionsButton";
+      this.OptionsButton.Size = new System.Drawing.Size(75, 23);
+      this.OptionsButton.TabIndex = 6;
+      this.OptionsButton.Text = "Options";
+      this.OptionsButton.UseVisualStyleBackColor = true;
+      this.OptionsButton.Click += new System.EventHandler(this.OptionsButton_Click);
       // 
       // SchemasList
       // 
@@ -314,7 +313,7 @@ namespace MySQL.ForExcel
       this.Controls.Add(this.UpperPanel);
       this.Controls.Add(this.SchemasList);
       this.Controls.Add(this.CreateNewSchemaHotLabel);
-      this.Controls.Add(this.HelpButton);
+      this.Controls.Add(this.OptionsButton);
       this.Controls.Add(this.NextButton);
       this.Controls.Add(this.BackButton);
       this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -332,7 +331,7 @@ namespace MySQL.ForExcel
     public System.Windows.Forms.Button BackButton;
     public System.Windows.Forms.Button NextButton;
     private System.Windows.Forms.ImageList LargeImagesList;
-    public System.Windows.Forms.Button HelpButton;
+    public System.Windows.Forms.Button OptionsButton;
     private HotLabel CreateNewSchemaHotLabel;
     private MyTreeView SchemasList;
     private System.Windows.Forms.ToolTip LabelsToolTip;

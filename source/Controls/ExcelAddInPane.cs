@@ -562,6 +562,7 @@ namespace MySQL.ForExcel
     public void OpenConnection(MySqlWorkbenchConnection connection)
     {
       WBConnection = connection;
+      RefreshWbConnectionTimeouts();
       bool failed = false;
       while (true)
       {
@@ -630,6 +631,18 @@ namespace MySQL.ForExcel
     {
       bool editActive = TableHasEditOnGoing(tableName);
       DBObjectSelectionPanel3.RefreshActionLabelsEnabledStatus(tableName, editActive);
+    }
+
+    /// <summary>
+    /// Refreshes the connection timeout values from the settings file.
+    /// </summary>
+    public void RefreshWbConnectionTimeouts()
+    {
+      if (WBConnection != null)
+      {
+        WBConnection.ConnectionTimeout = Settings.Default.GlobalConnectionConnectionTimeout;
+        WBConnection.DefaultCommandTimeout = Settings.Default.GlobalConnectionCommandTimeout;
+      }
     }
 
     /// <summary>

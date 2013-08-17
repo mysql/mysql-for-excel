@@ -170,10 +170,10 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void AdvancedOptionsButton_Click(object sender, EventArgs e)
     {
-      ExportAdvancedOptionsDialog optionsDialog = new ExportAdvancedOptionsDialog();
-      DialogResult dr = optionsDialog.ShowDialog();
-      ////if (dr == DialogResult.OK)
-      ////  btnCopySQL.Visible = Settings.Default.ExportShowCopySQLButton;
+      using (ExportAdvancedOptionsDialog optionsDialog = new ExportAdvancedOptionsDialog())
+      {
+        optionsDialog.ShowDialog();
+      }
     }
 
     /// <summary>

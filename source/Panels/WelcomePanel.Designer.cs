@@ -217,7 +217,6 @@ namespace MySQL.ForExcel
       // 
       this.UpperPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.UpperPanel.BackColor = System.Drawing.SystemColors.Control;
       this.UpperPanel.Controls.Add(this.SeparatorImage);
       this.UpperPanel.Controls.Add(this.WelcomeTextPictureBox);
       this.UpperPanel.Controls.Add(this.InstructionsLabel);
