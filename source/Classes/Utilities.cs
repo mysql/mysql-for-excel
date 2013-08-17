@@ -50,9 +50,9 @@ namespace MySQL.ForExcel
     public const string MYSQL_EMPTY_DATE = "0000-00-00 00:00:00";
 
     /// <summary>
-    /// The maximum length of the MySQL varchar data type.
+    /// The maximum proposed length of the MySQL varchar data type.
     /// </summary>
-    public const int MYSQL_VARCHAR_MAX_LEN = ushort.MaxValue;
+    public const int MYSQL_VARCHAR_MAX_PROPOSED_LEN = 4000;
 
     /// <summary>
     /// Compares the values in a data table row-column and its corresponding Excel cell value.
@@ -282,27 +282,35 @@ namespace MySQL.ForExcel
       bool typesConsistent = rowsDataTypesList.All(str => str == proposedStrippedDataType);
       if (!typesConsistent)
       {
-        if (rowsDataTypesList.Count(str => str == "Integer") + rowsDataTypesList.Count(str => str == "Bool") == rowsDataTypesList.Count)
+        int integerCount = 0;
+        int decimalCount = 0;
+        if (rowsDataTypesList.Count(str => str == "Varchar") + rowsDataTypesList.Count(str => str == "Text") == rowsDataTypesList.Count)
+        {
+          typesConsistent = true;
+          fullDataType = "Text";
+          proposedStrippedDataType = fullDataType;
+        }
+        else if ((integerCount = rowsDataTypesList.Count(str => str == "Integer")) + rowsDataTypesList.Count(str => str == "Bool") == rowsDataTypesList.Count)
         {
           typesConsistent = true;
           fullDataType = "Integer";
         }
-        else if (rowsDataTypesList.Count(str => str == "Integer") + rowsDataTypesList.Count(str => str == "BigInt") == rowsDataTypesList.Count)
+        else if (integerCount + rowsDataTypesList.Count(str => str == "BigInt") == rowsDataTypesList.Count)
         {
           typesConsistent = true;
           fullDataType = "BigInt";
         }
-        else if (rowsDataTypesList.Count(str => str == "Integer") + rowsDataTypesList.Count(str => str == "Decimal") == rowsDataTypesList.Count)
+        else if (integerCount + (decimalCount = rowsDataTypesList.Count(str => str == "Decimal")) == rowsDataTypesList.Count)
         {
           typesConsistent = true;
           proposedStrippedDataType = "Decimal";
         }
-        else if (rowsDataTypesList.Count(str => str == "Integer") + rowsDataTypesList.Count(str => str == "Decimal") + rowsDataTypesList.Count(str => str == "Double") == rowsDataTypesList.Count)
+        else if (integerCount + decimalCount + rowsDataTypesList.Count(str => str == "Double") == rowsDataTypesList.Count)
         {
           typesConsistent = true;
           fullDataType = "Double";
         }
-        else if (rowsDataTypesList.Count(str => str == "Datetime") + rowsDataTypesList.Count(str => str == "Date") + rowsDataTypesList.Count(str => str == "Integer") == rowsDataTypesList.Count)
+        else if (rowsDataTypesList.Count(str => str == "Datetime") + rowsDataTypesList.Count(str => str == "Date") + integerCount == rowsDataTypesList.Count)
         {
           typesConsistent = true;
           fullDataType = "Datetime";
@@ -341,8 +349,16 @@ namespace MySQL.ForExcel
       }
       else
       {
-        consistentStrippedDataType = "Varchar";
-        fullDataType = string.Format("Varchar({0})", varCharMaxLen[1]);
+        if (varCharMaxLen[1] <= MYSQL_VARCHAR_MAX_PROPOSED_LEN)
+        {
+          consistentStrippedDataType = "Varchar";
+          fullDataType = string.Format("Varchar({0})", varCharMaxLen[1]);
+        }
+        else
+        {
+          consistentStrippedDataType = "Text";
+          fullDataType = consistentStrippedDataType;
+        }
       }
 
       return fullDataType;
@@ -543,7 +559,7 @@ namespace MySQL.ForExcel
       switch (strType)
       {
         case "System.String":
-          retType = strLength > MYSQL_VARCHAR_MAX_LEN ? "text" : "varchar";
+          retType = strLength > MYSQL_VARCHAR_MAX_PROPOSED_LEN ? "text" : "varchar";
           break;
 
         case "System.Byte":
@@ -676,7 +692,7 @@ namespace MySQL.ForExcel
       string strValue = packedValue.ToString();
       int strLength = strValue.Length;
       int decimalPointPos = strValue.IndexOf(".");
-      int[] varCharApproxLen = new int[7] { 5, 12, 25, 45, 255, 4000, MYSQL_VARCHAR_MAX_LEN };
+      int[] varCharApproxLen = new int[6] { 5, 12, 25, 45, 255, MYSQL_VARCHAR_MAX_PROPOSED_LEN };
       int[,] decimalApproxLen = new int[2, 2] { { 12, 2 }, { 65, 30 } };
       int intResult = 0;
       long longResult = 0;
@@ -726,8 +742,7 @@ namespace MySQL.ForExcel
             }
           }
 
-          valueOverflow = true;
-          return string.Format("Varchar({0})", MYSQL_VARCHAR_MAX_LEN);
+          return "Text";
 
         case "System.Double":
           return "Double";

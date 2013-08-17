@@ -1915,8 +1915,10 @@ namespace MySQL.ForExcel
         int leftParensIndex = -1;
         List<string> typesListFor1stAndRest = new List<string>(2);
         List<string> typesListFrom2ndRow = new List<string>(rowsCount - 1);
-        int[] varCharMaxLen = new int[2] { 0, 0 };    //// 0 - All rows original datatype varcharmaxlen, 1 - All rows Varchar forced datatype maxlen
-        int[] decimalMaxLen = new int[2] { 0, 0 };    //// 0 - Integral part max length, 1 - decimal part max length
+        int[] varCharLengths1stRow = new int[2] { 0, 0 }; //// 0 - All rows original datatype varcharmaxlen, 1 - All rows Varchar forced datatype maxlen
+        int[] varCharMaxLen = new int[2] { 0, 0 };        //// 0 - All rows original datatype varcharmaxlen, 1 - All rows Varchar forced datatype maxlen
+        int[] decimalMaxLen1stRow = new int[2] { 0, 0 };  //// 0 - Integral part max length, 1 - decimal part max length
+        int[] decimalMaxLen = new int[2] { 0, 0 };        //// 0 - Integral part max length, 1 - decimal part max length
 
         MySQLDataColumn col = GetColumnAtIndex(dataColPos - colAdjustIdx);
         if (!col.IsEmpty)
@@ -1947,9 +1949,12 @@ namespace MySQL.ForExcel
               proposedType = string.Format("Varchar({0})", valueAsString.Length);
             }
 
-            leftParensIndex = proposedType.IndexOf("(");
-            varCharValueLength = AddBufferToVarchar ? int.Parse(proposedType.Substring(leftParensIndex + 1, proposedType.Length - leftParensIndex - 2)) : valueAsString.Length;
-            varCharMaxLen[1] = Math.Max(varCharValueLength, varCharMaxLen[1]);
+            if (proposedType != "Text")
+            {
+              leftParensIndex = proposedType.IndexOf("(");
+              varCharValueLength = AddBufferToVarchar ? int.Parse(proposedType.Substring(leftParensIndex + 1, proposedType.Length - leftParensIndex - 2)) : valueAsString.Length;
+              varCharMaxLen[1] = Math.Max(varCharValueLength, varCharMaxLen[1]);
+            }
 
             //// Normal datatype detection
             proposedType = DataTypeUtilities.GetMySQLExportDataType(valueFromArray, out valueOverflow);
@@ -1984,6 +1989,14 @@ namespace MySQL.ForExcel
             if (rowPos == 1)
             {
               typesListFor1stAndRest.Add(strippedType);
+              varCharLengths1stRow[0] = varCharMaxLen[0];
+              varCharMaxLen[0] = 0;
+              varCharLengths1stRow[1] = varCharMaxLen[1];
+              varCharMaxLen[1] = 0;
+              decimalMaxLen1stRow[0] = decimalMaxLen[0];
+              decimalMaxLen[0] = 0;
+              decimalMaxLen1stRow[1] = decimalMaxLen[1];
+              decimalMaxLen[1] = 0;
             }
             else
             {
@@ -2024,6 +2037,10 @@ namespace MySQL.ForExcel
           typesListFor1stAndRest.Add(strippedType);
         }
 
+        varCharMaxLen[0] = Math.Max(varCharMaxLen[0], varCharLengths1stRow[0]);
+        varCharMaxLen[1] = Math.Max(varCharMaxLen[1], varCharLengths1stRow[1]);
+        decimalMaxLen[0] = Math.Max(decimalMaxLen[0], decimalMaxLen1stRow[0]);
+        decimalMaxLen[1] = Math.Max(decimalMaxLen[1], decimalMaxLen1stRow[1]);
         proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListFor1stAndRest, decimalMaxLen, varCharMaxLen);
         col.RowsFrom1stDataType = proposedType;
         col.SetMySQLDataType(_firstRowIsHeaders ? col.RowsFrom2ndDataType : col.RowsFrom1stDataType);

@@ -1,4 +1,7 @@
 1.1.2
+- Changed the Varchar(65,535) data type shown in the Export Data data type combo box to Text since the maximum row size is 65,535 bytes and any autodetected
+  column data type with a length greater than 4,000 should be set to Text actually for the table to be created successfully.
+  (MySQL Bug #69779, Bug #17191633 - EXPORT FAILS FOR EXCEL FILES CONTAINING > 4000 CHARACTERS OF TEXT PER CELL)
 - Removed code that was replacing all spaces typed by the user in an overriden data type for a new column in an Export Data operation, also improved the data
   type detection code to flag as invalid data types with parenthesis but without any text inside or where the contents inside the parenthesis are not valid for
   the specific data type. (Bug #17260260 - EXPORT DATA SET TYPE NOT WORKING WITH MEMBER VALUES CONTAINING SPACES)

@@ -625,7 +625,7 @@ namespace MySQL.ForExcel
       dataTypesTable.Rows.Add(new string[] { "Varchar(45)", "Varchar(45) - Standard string up to 45 characters" });
       dataTypesTable.Rows.Add(new string[] { "Varchar(255)", "Varchar(255) - Standard string up to 255 characters" });
       dataTypesTable.Rows.Add(new string[] { "Varchar(4000)", "Varchar(4000) - Large string up to 4k characters" });
-      dataTypesTable.Rows.Add(new string[] { "Varchar(65535)", "Varchar(65535) - Maximum string up to 65k characters" });
+      dataTypesTable.Rows.Add(new string[] { "Text", "Text - Maximum string up to 65k characters" });
       dataTypesTable.Rows.Add(new string[] { "Datetime", "Datetime - For columns that store both, date and time" });
       dataTypesTable.Rows.Add(new string[] { "Date", "Date - For columns that only store a date" });
       dataTypesTable.Rows.Add(new string[] { "Time", "Time - For columns that only store a time" });
