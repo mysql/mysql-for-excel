@@ -478,8 +478,7 @@ namespace MySQL.ForExcel
     {
       using (GlobalOptionsDialog optionsDialog = new GlobalOptionsDialog())
       {
-        DialogResult dr = optionsDialog.ShowDialog();
-        if (dr == DialogResult.OK)
+        if (optionsDialog.ShowDialog() == DialogResult.OK)
         {
           (Parent as ExcelAddInPane).RefreshWbConnectionTimeouts();
         }
