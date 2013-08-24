@@ -110,8 +110,8 @@ namespace MySQL.ForExcel
 
       SourceExcelDataDataGridView.EnableHeadersVisualStyles = false;
 
-      InitializeFromTableGrid(wbConnection.Schema, importDBObject.Name);
-      InitializeToTableGrid(importDBObject);
+      InitializeSourceTableGrid(wbConnection.Schema, importDBObject.Name);
+      InitializeTargetTableGrid(importDBObject);
 
       string excelRangeAddress = appendDataRange.Address.Replace("$", string.Empty);
       Text = string.Format("Append Data - {0} [{1}]", appendingWorksheetName, excelRangeAddress);
@@ -835,7 +835,7 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="schemaName">The name of the schema containing the From table.</param>
     /// <param name="fromTableName">The name of the source DB object in Excel.</param>
-    private void InitializeFromTableGrid(string schemaName, string fromTableName)
+    private void InitializeSourceTableGrid(string schemaName, string fromTableName)
     {
       SourceMySQLPreviewDataTable = new MySQLDataTable(
         schemaName,
@@ -866,7 +866,7 @@ namespace MySQL.ForExcel
     /// Initilizes the grid containing preview data contained in the target table.
     /// </summary>
     /// <param name="importDBObject">The name of the target DB object in Excel.</param>
-    private void InitializeToTableGrid(DBObject importDBObject)
+    private void InitializeTargetTableGrid(DBObject importDBObject)
     {
       TargetMySQLDataTable = new MySQLDataTable(importDBObject.Name, true, false, WBConnection);
       DataTable dt = WBConnection.GetDataFromTableOrView(importDBObject, null, 0, 10);

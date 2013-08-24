@@ -56,6 +56,26 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Event delegate method fired when the <see cref="ImportAdvancedOptionsDialog"/> is being closed.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void AppendAdvancedOptionsDialog_FormClosing(object sender, FormClosingEventArgs e)
+    {
+      if (DialogResult == DialogResult.Cancel)
+      {
+        return;
+      }
+
+      Properties.Settings.Default.AppendPerformAutoMap = DoNotPerformAutoMapCheckBox.Checked;
+      Properties.Settings.Default.AppendAutoStoreColumnMapping = AutoStoreColumnMappingCheckBox.Checked;
+      Properties.Settings.Default.AppendReloadColumnMapping = ReloadColumnMappingCheckBox.Checked;
+      Properties.Settings.Default.AppendUseFormattedValues = UseFormattedValuesCheckBox.Checked;
+      Properties.Settings.Default.AppendLimitPreviewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
+      MiscUtilities.SaveSettings();
+    }
+
+    /// <summary>
     /// Event delegate method fired when the <see cref="DeleteMappingButton"/> button is clicked.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -69,23 +89,6 @@ namespace MySQL.ForExcel
 
       _mappings.Remove(_selectedMapping);
       RefreshMappingList();
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="DialogAcceptButton"/> button is clicked.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void DialogAcceptButton_Click(object sender, EventArgs e)
-    {
-      Properties.Settings.Default.AppendPerformAutoMap = DoNotPerformAutoMapCheckBox.Checked;
-      Properties.Settings.Default.AppendAutoStoreColumnMapping = AutoStoreColumnMappingCheckBox.Checked;
-      Properties.Settings.Default.AppendReloadColumnMapping = ReloadColumnMappingCheckBox.Checked;
-      Properties.Settings.Default.AppendUseFormattedValues = UseFormattedValuesCheckBox.Checked;
-      Properties.Settings.Default.AppendLimitPreviewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
-      MiscUtilities.SaveSettings();
-      DialogResult = DialogResult.OK;
-      Close();
     }
 
     /// <summary>

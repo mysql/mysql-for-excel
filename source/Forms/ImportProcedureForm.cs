@@ -177,6 +177,19 @@ namespace MySQL.ForExcel
     #endregion Properties
 
     /// <summary>
+    /// Event delegate method fired when the <see cref="AdvancedOptionsButton"/> button is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void AdvancedOptionsButton_Click(object sender, EventArgs e)
+    {
+      using (ImportAdvancedOptionsDialog optionsDialog = new ImportAdvancedOptionsDialog())
+      {
+        optionsDialog.ShowDialog();
+      }
+    }
+
+    /// <summary>
     /// Event delegate method fired when the <see cref="CallButton"/> button is clicked.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -235,7 +248,7 @@ namespace MySQL.ForExcel
             SumOfResultSetsExceedsMaxCompatibilityRows = SumOfResultSetsExceedsMaxCompatibilityRows || resultSetsRowSum > UInt16.MaxValue;
           }
 
-          int limitRows = Math.Min(ImportDataSet.Tables[tableIdx].Rows.Count, 10);
+          int limitRows = Math.Min(ImportDataSet.Tables[tableIdx].Rows.Count, Properties.Settings.Default.ImportPreviewRowsQuantity);
           for (int rowIdx = 0; rowIdx < limitRows; rowIdx++)
           {
             PreviewDataSet.Tables[tableIdx].ImportRow(ImportDataSet.Tables[tableIdx].Rows[rowIdx]);

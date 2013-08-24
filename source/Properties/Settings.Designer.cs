@@ -229,5 +229,31 @@ namespace MySQL.ForExcel.Properties {
                 this["GlobalConnectionCommandTimeout"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.MySQLForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int ImportPreviewRowsQuantity {
+            get {
+                return ((int)(this["ImportPreviewRowsQuantity"]));
+            }
+            set {
+                this["ImportPreviewRowsQuantity"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.MySQLForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ImportEscapeFormulaTextValues {
+            get {
+                return ((bool)(this["ImportEscapeFormulaTextValues"]));
+            }
+            set {
+                this["ImportEscapeFormulaTextValues"] = value;
+            }
+        }
     }
 }

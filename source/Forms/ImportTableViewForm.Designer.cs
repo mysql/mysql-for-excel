@@ -75,6 +75,7 @@ namespace MySQL.ForExcel
       this.ImportButton = new System.Windows.Forms.Button();
       this.DialogCancelButton = new System.Windows.Forms.Button();
       this.ExportDataLabel = new System.Windows.Forms.Label();
+      this.AdvancedOptionsButton = new System.Windows.Forms.Button();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       this.OptionsGroupBox.SuspendLayout();
@@ -110,6 +111,7 @@ namespace MySQL.ForExcel
       // 
       // CommandAreaPanel
       // 
+      this.CommandAreaPanel.Controls.Add(this.AdvancedOptionsButton);
       this.CommandAreaPanel.Controls.Add(this.ImportButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
       this.CommandAreaPanel.Location = new System.Drawing.Point(0, 551);
@@ -391,7 +393,7 @@ namespace MySQL.ForExcel
       this.ImportButton.Location = new System.Drawing.Point(681, 11);
       this.ImportButton.Name = "ImportButton";
       this.ImportButton.Size = new System.Drawing.Size(75, 23);
-      this.ImportButton.TabIndex = 0;
+      this.ImportButton.TabIndex = 1;
       this.ImportButton.Text = "Import";
       this.ImportButton.UseVisualStyleBackColor = true;
       this.ImportButton.Click += new System.EventHandler(this.ImportButton_Click);
@@ -404,7 +406,7 @@ namespace MySQL.ForExcel
       this.DialogCancelButton.Location = new System.Drawing.Point(762, 11);
       this.DialogCancelButton.Name = "DialogCancelButton";
       this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
-      this.DialogCancelButton.TabIndex = 1;
+      this.DialogCancelButton.TabIndex = 2;
       this.DialogCancelButton.Text = "Cancel";
       this.DialogCancelButton.UseVisualStyleBackColor = true;
       // 
@@ -418,6 +420,17 @@ namespace MySQL.ForExcel
       this.ExportDataLabel.Size = new System.Drawing.Size(176, 20);
       this.ExportDataLabel.TabIndex = 30;
       this.ExportDataLabel.Text = "Import Data from MySQL";
+      // 
+      // AdvancedOptionsButton
+      // 
+      this.AdvancedOptionsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.AdvancedOptionsButton.Location = new System.Drawing.Point(12, 11);
+      this.AdvancedOptionsButton.Name = "AdvancedOptionsButton";
+      this.AdvancedOptionsButton.Size = new System.Drawing.Size(131, 23);
+      this.AdvancedOptionsButton.TabIndex = 0;
+      this.AdvancedOptionsButton.Text = "Advanced Options...";
+      this.AdvancedOptionsButton.UseVisualStyleBackColor = true;
+      this.AdvancedOptionsButton.Click += new System.EventHandler(this.AdvancedOptionsButton_Click);
       // 
       // ImportTableViewForm
       // 
@@ -475,6 +488,7 @@ namespace MySQL.ForExcel
     private System.Windows.Forms.ContextMenuStrip ContextMenuForGrid;
     private System.Windows.Forms.ToolStripMenuItem SelectAllToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem SelectNoneToolStripMenuItem;
+    private System.Windows.Forms.Button AdvancedOptionsButton;
 
   }
 }

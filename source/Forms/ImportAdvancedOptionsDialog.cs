@@ -24,18 +24,17 @@ namespace MySQL.ForExcel
   /// <summary>
   /// Advanced options dialog for the operations performed by the <see cref="ExportDataForm"/>.
   /// </summary>
-  public partial class GlobalOptionsDialog : AutoStyleableBaseDialog
+  public partial class ImportAdvancedOptionsDialog : AutoStyleableBaseDialog
   {
     /// <summary>
-    /// Initializes a new instance of the <see cref="GlobalOptionsDialog"/> class.
+    /// Initializes a new instance of the <see cref="ImportAdvancedOptionsDialog"/> class.
     /// </summary>
-    public GlobalOptionsDialog()
+    public ImportAdvancedOptionsDialog()
     {
       InitializeComponent();
 
-      ConnectionTimeoutNumericUpDown.Maximum = Int32.MaxValue / 1000;
-      ConnectionTimeoutNumericUpDown.Value = Math.Min(ConnectionTimeoutNumericUpDown.Maximum, Properties.Settings.Default.GlobalConnectionConnectionTimeout);
-      QueryTimeoutNumericUpDown.Value = Properties.Settings.Default.GlobalConnectionCommandTimeout;
+      PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Properties.Settings.Default.ImportPreviewRowsQuantity);
+      EscapeFormulaValuesCheckBox.Checked = Properties.Settings.Default.ImportEscapeFormulaTextValues;
     }
 
     /// <summary>
@@ -43,15 +42,15 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void GlobalOptionsDialog_FormClosing(object sender, FormClosingEventArgs e)
+    private void ImportAdvancedOptionsDialog_FormClosing(object sender, FormClosingEventArgs e)
     {
       if (DialogResult == DialogResult.Cancel)
       {
         return;
       }
 
-      Properties.Settings.Default.GlobalConnectionConnectionTimeout = (uint)ConnectionTimeoutNumericUpDown.Value;
-      Properties.Settings.Default.GlobalConnectionCommandTimeout = (uint)QueryTimeoutNumericUpDown.Value;
+      Properties.Settings.Default.ImportPreviewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
+      Properties.Settings.Default.ImportEscapeFormulaTextValues = EscapeFormulaValuesCheckBox.Checked;
       MiscUtilities.SaveSettings();
     }
   }

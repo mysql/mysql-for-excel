@@ -108,7 +108,6 @@ namespace MySQL.ForExcel
       this.DialogAcceptButton.TabIndex = 0;
       this.DialogAcceptButton.Text = "Accept";
       this.DialogAcceptButton.UseVisualStyleBackColor = true;
-      this.DialogAcceptButton.Click += new System.EventHandler(this.DialogAcceptButton_Click);
       // 
       // DialogCancelButton
       // 
@@ -299,6 +298,7 @@ namespace MySQL.ForExcel
       // 
       // ExportAdvancedOptionsDialog
       // 
+      this.AcceptButton = this.DialogAcceptButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
       this.ClientSize = new System.Drawing.Size(544, 399);
@@ -307,6 +307,7 @@ namespace MySQL.ForExcel
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
       this.Name = "ExportAdvancedOptionsDialog";
       this.Text = "Advanced Options";
+      this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ExportAdvancedOptionsDialog_FormClosing);
       this.ContentAreaPanel.ResumeLayout(false);
       this.ContentAreaPanel.PerformLayout();
       this.CommandAreaPanel.ResumeLayout(false);

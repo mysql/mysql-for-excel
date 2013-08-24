@@ -1,4 +1,7 @@
 1.1.2
+- Added code to escape text values to be imported to an Excel worksheet that start with an equals sign so Excel does not treat those values as formulas that will
+  fail evaluation. This is an option turned on by default that can be turned off by users if they wish to import values to be treated as Excel formulas.
+  (Bug #17354102 - ERROR IMPORTING TEXT VALUES TO EXCEL STARTING WITH AN EQUALS SIGN)
 - Added code to properly check the reason for a failing connection, if it's a failing password the user gets a dialog to retry the connection with a different
   password until the connection succeeds, a connection error not related to the password is thrown or the user cancels. If the failing connection is not related
   to a bad password an error message is shown to the users indicating the reason of the failure.

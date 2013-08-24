@@ -442,6 +442,7 @@ namespace MySQL.ForExcel
           int colsCount = dt.Columns.Count;
           int startingRow = importColumnNames ? 1 : 0;
           int cappedNumRows = ActiveWorkbook.Excel8CompatibilityMode ? Math.Min(rowsCount + startingRow, UInt16.MaxValue - currentRow) : rowsCount + startingRow;
+          bool escapeFormulaTexts = Properties.Settings.Default.ImportEscapeFormulaTextValues;
 
           Excel.Worksheet currentSheet = ActiveWorksheet;
           fillingRange = atCell.get_Resize(cappedNumRows, colsCount);
@@ -461,7 +462,20 @@ namespace MySQL.ForExcel
           {
             for (int currCol = 0; currCol < colsCount; currCol++)
             {
-              fillingArray[fillingRowIdx, currCol] = DataTypeUtilities.GetImportingValueForDateType(dt.Rows[currRow][currCol]);
+              object importingValue = DataTypeUtilities.GetImportingValueForDateType(dt.Rows[currRow][currCol]);
+              if (importingValue is string)
+              {
+                string importingValueText = importingValue as string;
+
+                //// If the imported value is a text that starts with an equal sign Excel will treat it as a formula
+                ////  so it needs to be escaped prepending an apostrophe to it for Excel to treat it as standard text.
+                if (escapeFormulaTexts && importingValueText.StartsWith("="))
+                {
+                  importingValue = "'" + importingValueText;
+                }
+              }
+
+              fillingArray[fillingRowIdx, currCol] = importingValue;
             }
 
             fillingRowIdx++;
@@ -470,6 +484,7 @@ namespace MySQL.ForExcel
           fillingRange.ClearFormats();
           fillingRange.set_Value(Type.Missing, fillingArray);
           fillingRange.Columns.AutoFit();
+          fillingRange.Rows.AutoFit();
           ExcelApplication_SheetSelectionChange(currentSheet, ExcelApplication.ActiveCell);
         }
       }

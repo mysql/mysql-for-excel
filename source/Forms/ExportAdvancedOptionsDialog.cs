@@ -61,12 +61,17 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="DialogAcceptButton"/> button is clicked.
+    /// Event delegate method fired when the <see cref="ImportAdvancedOptionsDialog"/> is being closed.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void DialogAcceptButton_Click(object sender, EventArgs e)
+    private void ExportAdvancedOptionsDialog_FormClosing(object sender, FormClosingEventArgs e)
     {
+      if (DialogResult == DialogResult.Cancel)
+      {
+        return;
+      }
+
       Properties.Settings.Default.ExportLimitPreviewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
       Properties.Settings.Default.ExportDetectDatatype = DetectDatatypeCheckBox.Checked;
       Properties.Settings.Default.ExportAddBufferToVarchar = AddBufferToVarcharCheckBox.Checked;
@@ -76,8 +81,6 @@ namespace MySQL.ForExcel
       Properties.Settings.Default.ExportRemoveEmptyColumns = RemoveEmptyColumnsCheckBox.Checked;
       //Properties.Settings.Default.ExportShowCopySQLButton = chkShowCopySQLButton.Checked;
       MiscUtilities.SaveSettings();
-      DialogResult = DialogResult.OK;
-      Close();
     }
   }
 }

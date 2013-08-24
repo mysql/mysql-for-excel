@@ -138,6 +138,19 @@ namespace MySQL.ForExcel
     #endregion Properties
 
     /// <summary>
+    /// Event delegate method fired when the <see cref="AdvancedOptionsButton"/> button is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void AdvancedOptionsButton_Click(object sender, EventArgs e)
+    {
+      using (ImportAdvancedOptionsDialog optionsDialog = new ImportAdvancedOptionsDialog())
+      {
+        optionsDialog.ShowDialog();
+      }
+    }
+
+    /// <summary>
     /// Event delegate method fired when the <see cref="ContextMenuForGrid"/> context menu strip is opening.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -153,7 +166,7 @@ namespace MySQL.ForExcel
     /// </summary>
     private void FillPreviewGrid()
     {
-      PreviewDataTable = WBConnection.GetDataFromTableOrView(ImportDBObject, null, 0, 10);
+      PreviewDataTable = WBConnection.GetDataFromTableOrView(ImportDBObject, null, 0, Properties.Settings.Default.ImportPreviewRowsQuantity);
       TotalRowsCount = WBConnection.GetRowsCountFromTableOrView(ImportDBObject);
       RowsCountSubLabel.Text = TotalRowsCount.ToString();
       PreviewDataGridView.DataSource = PreviewDataTable;

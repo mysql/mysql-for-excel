@@ -315,6 +315,12 @@
     <Compile Include="Forms\EditDataRevertDialog.Designer.cs">
       <DependentUpon>EditDataRevertDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\ImportAdvancedOptionsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ImportAdvancedOptionsDialog.Designer.cs">
+      <DependentUpon>ImportAdvancedOptionsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\ImportProcedureForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -416,6 +422,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\EditDataRevertDialog.resx">
       <DependentUpon>EditDataRevertDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ImportAdvancedOptionsDialog.resx">
+      <DependentUpon>ImportAdvancedOptionsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportProcedureForm.resx">
       <DependentUpon>ImportProcedureForm.cs</DependentUpon>
