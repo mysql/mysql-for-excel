@@ -114,6 +114,12 @@ namespace MySQL.ForExcel
         return;
       }
 
+      PasswordDialogFlags passwordFlags = WBConnection.TestConnectionAndRetryOnWrongPassword();
+      if (!passwordFlags.ConnectionSuccess)
+      {
+        return;
+      }
+
       string connectionString = WBConnection.GetConnectionStringBuilder().ConnectionString;
       string sql = string.Format("CREATE DATABASE `{0}`", dlg.SchemaName);
       try
@@ -216,6 +222,12 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void NextButton_Click(object sender, EventArgs e)
     {
+      PasswordDialogFlags passwordFlags = WBConnection.TestConnectionAndRetryOnWrongPassword();
+      if (!passwordFlags.ConnectionSuccess)
+      {
+        return;
+      }
+
       try
       {
         string databaseName = SchemasList.SelectedNode.Tag as string;

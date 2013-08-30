@@ -60,6 +60,10 @@ namespace MySQL.ForExcel
       this.LogoPictureBox = new System.Windows.Forms.PictureBox();
       this.StorePasswordSecurelyCheckBox = new System.Windows.Forms.CheckBox();
       this.PasswordChangedTimer = new System.Windows.Forms.Timer(this.components);
+      this.NewPasswordTextBox = new System.Windows.Forms.TextBox();
+      this.NewPasswordLabel = new System.Windows.Forms.Label();
+      this.ConfirmTextBox = new System.Windows.Forms.TextBox();
+      this.ConfirmLabel = new System.Windows.Forms.Label();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).BeginInit();
@@ -72,6 +76,10 @@ namespace MySQL.ForExcel
       // 
       // ContentAreaPanel
       // 
+      this.ContentAreaPanel.Controls.Add(this.ConfirmTextBox);
+      this.ContentAreaPanel.Controls.Add(this.ConfirmLabel);
+      this.ContentAreaPanel.Controls.Add(this.NewPasswordTextBox);
+      this.ContentAreaPanel.Controls.Add(this.NewPasswordLabel);
       this.ContentAreaPanel.Controls.Add(this.StorePasswordSecurelyCheckBox);
       this.ContentAreaPanel.Controls.Add(this.LogoPictureBox);
       this.ContentAreaPanel.Controls.Add(this.EnterPasswordLabel);
@@ -81,13 +89,13 @@ namespace MySQL.ForExcel
       this.ContentAreaPanel.Controls.Add(this.ConnectionLabel);
       this.ContentAreaPanel.Controls.Add(this.UserLabel);
       this.ContentAreaPanel.Controls.Add(this.PasswordLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(514, 226);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(514, 286);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.DialogOKButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 181);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 241);
       this.CommandAreaPanel.Size = new System.Drawing.Size(514, 45);
       // 
       // DialogOKButton
@@ -103,7 +111,6 @@ namespace MySQL.ForExcel
       this.DialogOKButton.TabIndex = 0;
       this.DialogOKButton.Text = "OK";
       this.DialogOKButton.UseVisualStyleBackColor = true;
-      this.DialogOKButton.Click += new System.EventHandler(this.DialogOKButton_Click);
       // 
       // DialogCancelButton
       // 
@@ -123,7 +130,7 @@ namespace MySQL.ForExcel
       this.UserValueLabel.AutoSize = true;
       this.UserValueLabel.BackColor = System.Drawing.Color.Transparent;
       this.UserValueLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.UserValueLabel.Location = new System.Drawing.Point(187, 87);
+      this.UserValueLabel.Location = new System.Drawing.Point(193, 87);
       this.UserValueLabel.Name = "UserValueLabel";
       this.UserValueLabel.Size = new System.Drawing.Size(17, 15);
       this.UserValueLabel.TabIndex = 4;
@@ -134,7 +141,7 @@ namespace MySQL.ForExcel
       this.ConnectionValueLabel.AutoSize = true;
       this.ConnectionValueLabel.BackColor = System.Drawing.Color.Transparent;
       this.ConnectionValueLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.ConnectionValueLabel.Location = new System.Drawing.Point(187, 64);
+      this.ConnectionValueLabel.Location = new System.Drawing.Point(193, 64);
       this.ConnectionValueLabel.Name = "ConnectionValueLabel";
       this.ConnectionValueLabel.Size = new System.Drawing.Size(17, 15);
       this.ConnectionValueLabel.TabIndex = 2;
@@ -142,33 +149,35 @@ namespace MySQL.ForExcel
       // 
       // PasswordTextBox
       // 
+      this.PasswordTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.PasswordTextBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.PasswordTextBox.Location = new System.Drawing.Point(187, 108);
+      this.PasswordTextBox.Location = new System.Drawing.Point(196, 110);
       this.PasswordTextBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.PasswordTextBox.Name = "PasswordTextBox";
-      this.PasswordTextBox.Size = new System.Drawing.Size(315, 23);
+      this.PasswordTextBox.Size = new System.Drawing.Size(306, 23);
       this.PasswordTextBox.TabIndex = 6;
       this.PasswordTextBox.UseSystemPasswordChar = true;
-      this.PasswordTextBox.TextChanged += new System.EventHandler(this.PasswordTextBox_TextChanged);
-      this.PasswordTextBox.Validated += new System.EventHandler(this.PasswordTextBox_Validated);
+      this.PasswordTextBox.TextChanged += new System.EventHandler(this.PasswordTextBoxTextChanged);
+      this.PasswordTextBox.Validated += new System.EventHandler(this.PasswordTextBoxValidated);
       // 
       // PasswordLabel
       // 
-      this.PasswordLabel.AutoSize = true;
       this.PasswordLabel.BackColor = System.Drawing.Color.Transparent;
       this.PasswordLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.PasswordLabel.Location = new System.Drawing.Point(103, 111);
+      this.PasswordLabel.Location = new System.Drawing.Point(108, 113);
       this.PasswordLabel.Name = "PasswordLabel";
-      this.PasswordLabel.Size = new System.Drawing.Size(60, 15);
+      this.PasswordLabel.Size = new System.Drawing.Size(82, 15);
       this.PasswordLabel.TabIndex = 5;
-      this.PasswordLabel.Text = "Password:";
+      this.PasswordLabel.Text = "Old Password:";
+      this.PasswordLabel.TextAlign = System.Drawing.ContentAlignment.TopRight;
       // 
       // UserLabel
       // 
       this.UserLabel.AutoSize = true;
       this.UserLabel.BackColor = System.Drawing.Color.Transparent;
       this.UserLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.UserLabel.Location = new System.Drawing.Point(103, 87);
+      this.UserLabel.Location = new System.Drawing.Point(154, 87);
       this.UserLabel.Name = "UserLabel";
       this.UserLabel.Size = new System.Drawing.Size(33, 15);
       this.UserLabel.TabIndex = 3;
@@ -179,7 +188,7 @@ namespace MySQL.ForExcel
       this.ConnectionLabel.AutoSize = true;
       this.ConnectionLabel.BackColor = System.Drawing.Color.Transparent;
       this.ConnectionLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.ConnectionLabel.Location = new System.Drawing.Point(103, 64);
+      this.ConnectionLabel.Location = new System.Drawing.Point(115, 64);
       this.ConnectionLabel.Name = "ConnectionLabel";
       this.ConnectionLabel.Size = new System.Drawing.Size(72, 15);
       this.ConnectionLabel.TabIndex = 1;
@@ -187,14 +196,15 @@ namespace MySQL.ForExcel
       // 
       // EnterPasswordLabel
       // 
-      this.EnterPasswordLabel.AutoSize = true;
+      this.EnterPasswordLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.EnterPasswordLabel.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.EnterPasswordLabel.ForeColor = System.Drawing.Color.Navy;
-      this.EnterPasswordLabel.Location = new System.Drawing.Point(90, 27);
+      this.EnterPasswordLabel.Location = new System.Drawing.Point(90, 20);
       this.EnterPasswordLabel.Name = "EnterPasswordLabel";
-      this.EnterPasswordLabel.Size = new System.Drawing.Size(309, 20);
+      this.EnterPasswordLabel.Size = new System.Drawing.Size(412, 44);
       this.EnterPasswordLabel.TabIndex = 0;
-      this.EnterPasswordLabel.Text = "Please enter the password for the connection:";
+      this.EnterPasswordLabel.Text = "Connection password...";
       // 
       // LogoPictureBox
       // 
@@ -209,24 +219,74 @@ namespace MySQL.ForExcel
       // StorePasswordSecurelyCheckBox
       // 
       this.StorePasswordSecurelyCheckBox.AutoSize = true;
-      this.StorePasswordSecurelyCheckBox.Location = new System.Drawing.Point(190, 138);
+      this.StorePasswordSecurelyCheckBox.Location = new System.Drawing.Point(196, 202);
       this.StorePasswordSecurelyCheckBox.Name = "StorePasswordSecurelyCheckBox";
       this.StorePasswordSecurelyCheckBox.Size = new System.Drawing.Size(147, 17);
-      this.StorePasswordSecurelyCheckBox.TabIndex = 7;
+      this.StorePasswordSecurelyCheckBox.TabIndex = 11;
       this.StorePasswordSecurelyCheckBox.Text = "Store password securely?";
       this.StorePasswordSecurelyCheckBox.UseVisualStyleBackColor = true;
       // 
       // PasswordChangedTimer
       // 
-      this.PasswordChangedTimer.Interval = 800;
+      this.PasswordChangedTimer.Interval = 500;
       this.PasswordChangedTimer.Tick += new System.EventHandler(this.PasswordChangedTimer_Tick);
+      // 
+      // NewPasswordTextBox
+      // 
+      this.NewPasswordTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.NewPasswordTextBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.NewPasswordTextBox.Location = new System.Drawing.Point(196, 141);
+      this.NewPasswordTextBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.NewPasswordTextBox.Name = "NewPasswordTextBox";
+      this.NewPasswordTextBox.Size = new System.Drawing.Size(306, 23);
+      this.NewPasswordTextBox.TabIndex = 8;
+      this.NewPasswordTextBox.UseSystemPasswordChar = true;
+      this.NewPasswordTextBox.TextChanged += new System.EventHandler(this.PasswordTextBoxTextChanged);
+      this.NewPasswordTextBox.Validated += new System.EventHandler(this.PasswordTextBoxValidated);
+      // 
+      // NewPasswordLabel
+      // 
+      this.NewPasswordLabel.AutoSize = true;
+      this.NewPasswordLabel.BackColor = System.Drawing.Color.Transparent;
+      this.NewPasswordLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.NewPasswordLabel.Location = new System.Drawing.Point(103, 144);
+      this.NewPasswordLabel.Name = "NewPasswordLabel";
+      this.NewPasswordLabel.Size = new System.Drawing.Size(87, 15);
+      this.NewPasswordLabel.TabIndex = 7;
+      this.NewPasswordLabel.Text = "New Password:";
+      // 
+      // ConfirmTextBox
+      // 
+      this.ConfirmTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.ConfirmTextBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ConfirmTextBox.Location = new System.Drawing.Point(196, 172);
+      this.ConfirmTextBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.ConfirmTextBox.Name = "ConfirmTextBox";
+      this.ConfirmTextBox.Size = new System.Drawing.Size(306, 23);
+      this.ConfirmTextBox.TabIndex = 10;
+      this.ConfirmTextBox.UseSystemPasswordChar = true;
+      this.ConfirmTextBox.TextChanged += new System.EventHandler(this.PasswordTextBoxTextChanged);
+      this.ConfirmTextBox.Validated += new System.EventHandler(this.PasswordTextBoxValidated);
+      // 
+      // ConfirmLabel
+      // 
+      this.ConfirmLabel.AutoSize = true;
+      this.ConfirmLabel.BackColor = System.Drawing.Color.Transparent;
+      this.ConfirmLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ConfirmLabel.Location = new System.Drawing.Point(133, 175);
+      this.ConfirmLabel.Name = "ConfirmLabel";
+      this.ConfirmLabel.Size = new System.Drawing.Size(54, 15);
+      this.ConfirmLabel.TabIndex = 9;
+      this.ConfirmLabel.Text = "Confirm:";
       // 
       // PasswordDialog
       // 
       this.AcceptButton = this.DialogOKButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(514, 226);
+      this.ClientSize = new System.Drawing.Size(514, 286);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -234,6 +294,7 @@ namespace MySQL.ForExcel
       this.MainInstructionLocationOffset = new System.Drawing.Size(-20, 5);
       this.Name = "PasswordDialog";
       this.Text = "Connection Password";
+      this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.PasswordDialog_FormClosing);
       this.ContentAreaPanel.ResumeLayout(false);
       this.ContentAreaPanel.PerformLayout();
       this.CommandAreaPanel.ResumeLayout(false);
@@ -256,5 +317,9 @@ namespace MySQL.ForExcel
     private System.Windows.Forms.PictureBox LogoPictureBox;
     private System.Windows.Forms.CheckBox StorePasswordSecurelyCheckBox;
     private System.Windows.Forms.Timer PasswordChangedTimer;
+    private System.Windows.Forms.TextBox ConfirmTextBox;
+    private System.Windows.Forms.Label ConfirmLabel;
+    private System.Windows.Forms.TextBox NewPasswordTextBox;
+    private System.Windows.Forms.Label NewPasswordLabel;
   }
 }

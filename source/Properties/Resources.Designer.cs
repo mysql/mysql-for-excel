@@ -361,6 +361,24 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please enter the password for the connection:.
+        /// </summary>
+        internal static string ConnectionPasswordLabelText {
+            get {
+                return ResourceManager.GetString("ConnectionPasswordLabelText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connection Password.
+        /// </summary>
+        internal static string ConnectionPasswordWindowTitleText {
+            get {
+                return ResourceManager.GetString("ConnectionPasswordWindowTitleText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Workbench connections.xml file not found.
         /// </summary>
         internal static string ConnectionsFileNotFound {
@@ -762,6 +780,25 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The password for the MySQL account has expired.
+        ///Please enter a new password:.
+        /// </summary>
+        internal static string ExpiredPasswordLabelText {
+            get {
+                return ResourceManager.GetString("ExpiredPasswordLabelText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password Expired.
+        /// </summary>
+        internal static string ExpiredPasswordWindowTitleText {
+            get {
+                return ResourceManager.GetString("ExpiredPasswordWindowTitleText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Use &lt;Alt + N&gt; to move to the next column and &lt;Alt + P&gt; to move to the previous one..
         /// </summary>
         internal static string ExportColumnsGridToolTipCaption {
@@ -902,6 +939,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string ExportDataTypeNotValidWarning {
             get {
                 return ResourceManager.GetString("ExportDataTypeNotValidWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MySQL Error {0}: {1}.
+        /// </summary>
+        internal static string GenericConnectionErrorText {
+            get {
+                return ResourceManager.GetString("GenericConnectionErrorText", resourceCulture);
             }
         }
         
@@ -1491,6 +1537,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Old Password:.
+        /// </summary>
+        internal static string OldPasswordLabelText {
+            get {
+                return ResourceManager.GetString("OldPasswordLabelText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An Error Ocurred.
         /// </summary>
         internal static string OperationErrorTitle {
@@ -1542,6 +1597,43 @@ namespace MySQL.ForExcel.Properties {
         internal static string PasswordFailedText {
             get {
                 return ResourceManager.GetString("PasswordFailedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password:.
+        /// </summary>
+        internal static string PasswordLabelText {
+            get {
+                return ResourceManager.GetString("PasswordLabelText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error ocurred trying to reset the password for the current user.
+        ///Please select your MySQL connection again to retry..
+        /// </summary>
+        internal static string PasswordResetErrorDetailText {
+            get {
+                return ResourceManager.GetString("PasswordResetErrorDetailText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password Reset Error.
+        /// </summary>
+        internal static string PasswordResetErrorTitleText {
+            get {
+                return ResourceManager.GetString("PasswordResetErrorTitleText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The new password and its confirmation do not match. Please enter them again and make sure they match..
+        /// </summary>
+        internal static string PasswordsMismatchErrorText {
+            get {
+                return ResourceManager.GetString("PasswordsMismatchErrorText", resourceCulture);
             }
         }
         

@@ -164,6 +164,12 @@ namespace MySQL.ForExcel
         return;
       }
 
+      PasswordDialogFlags passwordFlags = WBConnection.TestConnectionAndRetryOnWrongPassword();
+      if (!passwordFlags.ConnectionSuccess)
+      {
+        return;
+      }
+
       try
       {
         DBObject selDBObject = (DBObjectList.SelectedNode.Tag as DBObject);
@@ -251,6 +257,12 @@ namespace MySQL.ForExcel
         return;
       }
 
+      PasswordDialogFlags passwordFlags = WBConnection.TestConnectionAndRetryOnWrongPassword();
+      if (!passwordFlags.ConnectionSuccess)
+      {
+        return;
+      }
+
       try
       {
         bool editActivated = (Parent as ExcelAddInPane).EditTableData(selDBObject);
@@ -283,6 +295,12 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void ExportToNewTableHotLabel_Click(object sender, EventArgs e)
     {
+      PasswordDialogFlags passwordFlags = WBConnection.TestConnectionAndRetryOnWrongPassword();
+      if (!passwordFlags.ConnectionSuccess)
+      {
+        return;
+      }
+
       bool success = ExportDataToTable(null);
       if (success)
       {
@@ -312,6 +330,12 @@ namespace MySQL.ForExcel
 
       DBObject dbo = DBObjectList.SelectedNode.Tag as DBObject;
       if (dbo == null)
+      {
+        return;
+      }
+
+      PasswordDialogFlags passwordFlags = WBConnection.TestConnectionAndRetryOnWrongPassword();
+      if (!passwordFlags.ConnectionSuccess)
       {
         return;
       }

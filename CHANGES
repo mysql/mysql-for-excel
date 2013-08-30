@@ -1,4 +1,7 @@
 1.1.2
+- Added a check on every connection test for an expired password, if the password has been expired a dialog is now shown to the user to reset the password. Also
+  added a connection test before any operation against the database (schema creation, data import, append, export or edition).
+  (Bug #17354118 - DON'T HANDLE EXPIRED PASSWORDS)
 - Added code to escape text values to be imported to an Excel worksheet that start with an equals sign so Excel does not treat those values as formulas that will
   fail evaluation. This is an option turned on by default that can be turned off by users if they wish to import values to be treated as Excel formulas.
   (Bug #17354102 - ERROR IMPORTING TEXT VALUES TO EXCEL STARTING WITH AN EQUALS SIGN)

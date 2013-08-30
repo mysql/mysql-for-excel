@@ -290,9 +290,12 @@ namespace MySQL.ForExcel
       MySQLSourceTrace.WriteToLog(Properties.Resources.ShutdownMessage, SourceLevels.Information);
 
       //// Close all Excel panes created
-      foreach (ExcelAddInPane excelPane in ExcelPanesList)
+      if (ExcelPanesList != null)
       {
-        excelPane.Dispose();
+        foreach (ExcelAddInPane excelPane in ExcelPanesList)
+        {
+          excelPane.Dispose();
+        }
       }
     }
 

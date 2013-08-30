@@ -1,25 +1,25 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
 namespace MySQL.ForExcel
 {
   using System;
+  using System.Drawing;
+  using System.Windows.Forms;
   using MySQL.Utility;
   using MySQL.Utility.Forms;
 
@@ -28,25 +28,74 @@ namespace MySQL.ForExcel
   /// </summary>
   public partial class PasswordDialog : AutoStyleableBaseDialog
   {
+    #region Constants
+
+    /// <summary>
+    /// The height in pixels of the dialog when used to enter a new password after an old one expired.
+    /// </summary>
+    public const int EXPANDED_DIALOG_HEIGHT = 325;
+
+    /// <summary>
+    /// The height in pixels of the dialog when used to ask for a connection's password.
+    /// </summary>
+    public const int REGULAR_DIALOG_HEIGHT = 255;
+
+    /// <summary>
+    /// The vertical space in pixels the top password label is shifted if the regular dialog is used.
+    /// </summary>
+    public const int TOP_LABEL_VERTICAL_DELTA = 5;
+
+    #endregion Constants
+
+    #region Fields
+
+    /// <summary>
+    /// Containins data about the password operation.
+    /// </summary>
+    private PasswordDialogFlags _passwordFlags;
+
     /// <summary>
     /// Flag indicating whether the connection is tested after setting the password.
     /// </summary>
     private bool _testConnection;
+
+    #endregion Fields
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PasswordDialog"/> class.
     /// </summary>
     /// <param name="wbConnection">A <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.</param>
     /// <param name="testConnection">Flag indicating whether the connection is tested after setting the password.</param>
-    public PasswordDialog(MySqlWorkbenchConnection wbConnection, bool testConnection)
+    /// <param name="passwordExpired">Flag indicating if the dialog will be used to set a new password when an old one expired.</param>
+    public PasswordDialog(MySqlWorkbenchConnection wbConnection, bool testConnection, bool passwordExpired)
     {
       _testConnection = testConnection;
+      _passwordFlags = new PasswordDialogFlags(wbConnection);
       InitializeComponent();
+      PasswordExpiredDialog = passwordExpired;
       WBConnection = wbConnection;
       UserValueLabel.Text = WBConnection.UserName;
       ConnectionValueLabel.Text = WBConnection.Name + " - " + WBConnection.HostIdentifier;
       PasswordTextBox.Text = WBConnection.Password;
-      DialogOKButton.Enabled = PasswordTextBox.Text.Trim().Length > 0;
+      SetDialogInterface();
+    }
+
+    #region Properties
+
+    /// <summary>
+    /// Gets a value indicating whether the dialog will be used to set a new password when an old one expired.
+    /// </summary>
+    public bool PasswordExpiredDialog { get; private set; }
+
+    /// <summary>
+    /// Gets a structure with data about the password operation.
+    /// </summary>
+    public PasswordDialogFlags PasswordFlags
+    {
+      get
+      {
+        return _passwordFlags;
+      }
     }
 
     /// <summary>
@@ -70,20 +119,42 @@ namespace MySQL.ForExcel
     /// </summary>
     public MySqlWorkbenchConnection WBConnection { get; private set; }
 
-    private void DialogOKButton_Click(object sender, System.EventArgs e)
+    #endregion Properties
+
+    /// <summary>
+    /// Shows the connection password dialog to users and returns the entered password.
+    /// </summary>
+    /// <param name="wbConnection">A <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.</param>
+    /// <param name="testConnection">Flag indicating whether the connection is tested after setting the password.</param>
+    /// <returns>A <see cref="PasswordDialogFlags"/> containing data about the operation.</returns>
+    public static PasswordDialogFlags ShowConnectionPasswordDialog(MySqlWorkbenchConnection wbConnection, bool testConnection)
     {
-      WBConnection.Password = PasswordTextBox.Text;
-      bool connectionSuccessful = true;
-      if (_testConnection)
+      PasswordDialogFlags flags;
+      using (PasswordDialog connectionPasswordDialog = new PasswordDialog(wbConnection, testConnection, false))
       {
-        bool wrongPassword = false;
-        connectionSuccessful = WBConnection.TestConnectionAndShowError(out wrongPassword);
+        connectionPasswordDialog.ShowDialog();
+        flags = connectionPasswordDialog.PasswordFlags;
       }
 
-      if (StorePasswordSecurely && !string.IsNullOrEmpty(WBConnection.Password) && connectionSuccessful)
+      return flags;
+    }
+
+    /// <summary>
+    /// Shows the connection password dialog to users and returns the entered password.
+    /// </summary>
+    /// <param name="wbConnection">A <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.</param>
+    /// <param name="testConnection">Flag indicating whether the connection is tested after setting the password.</param>
+    /// <returns>A <see cref="PasswordDialogFlags"/> containing data about the operation.</returns>
+    public static PasswordDialogFlags ShowExpiredPasswordDialog(MySqlWorkbenchConnection wbConnection, bool testConnection)
+    {
+      PasswordDialogFlags flags;
+      using (PasswordDialog connectionPasswordDialog = new PasswordDialog(wbConnection, testConnection, true))
       {
-        MySqlWorkbenchPasswordVault.StorePassword(WBConnection.HostIdentifier, WBConnection.UserName, WBConnection.Password);
+        connectionPasswordDialog.ShowDialog();
+        flags = connectionPasswordDialog.PasswordFlags;
       }
+
+      return flags;
     }
 
     /// <summary>
@@ -93,7 +164,103 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void PasswordChangedTimer_Tick(object sender, EventArgs e)
     {
-      PasswordTextBox_Validated(PasswordTextBox, EventArgs.Empty);
+      TextBox passwordTextBox = null;
+      if (PasswordTextBox.Focused)
+      {
+        passwordTextBox = PasswordTextBox;
+      }
+      else if (NewPasswordTextBox.Focused)
+      {
+        passwordTextBox = NewPasswordTextBox;
+      }
+      else if (ConfirmTextBox.Focused)
+      {
+        passwordTextBox = ConfirmTextBox;
+      }
+
+      PasswordTextBoxValidated(passwordTextBox, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="PasswordDialog"/> form is closing.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void PasswordDialog_FormClosing(object sender, FormClosingEventArgs e)
+    {
+      if (DialogResult == DialogResult.Cancel)
+      {
+        _passwordFlags.Cancelled = true;
+        return;
+      }
+
+      if (PasswordExpiredDialog)
+      {
+        //// Check if the new password and its confirmation match, otherwise notify the user and exit.
+        if (NewPasswordTextBox.Text != ConfirmTextBox.Text)
+        {
+          InfoDialog.ShowErrorDialog(Properties.Resources.PasswordResetErrorTitleText, Properties.Resources.PasswordsMismatchErrorText);
+          e.Cancel = true;
+          return;
+        }
+
+        //// Reset the password and if the reset is successful assign the new password to the local connection.
+        WBConnection.Password = PasswordTextBox.Text;
+        try
+        {
+          WBConnection.ResetPassword(ConfirmTextBox.Text);
+        }
+        catch (Exception ex)
+        {
+          MySQLSourceTrace.WriteAppErrorToLog(ex);
+          InfoDialog.ShowErrorDialog(Properties.Resources.PasswordResetErrorTitleText, Properties.Resources.PasswordResetErrorDetailText);
+          _passwordFlags.Cancelled = true;
+          return;
+        }
+
+        WBConnection.Password = ConfirmTextBox.Text;
+      }
+      else
+      {
+        WBConnection.Password = PasswordTextBox.Text;
+      }
+
+      _passwordFlags.NewPassword = WBConnection.Password;
+      bool connectionSuccessful = false;
+      if (_testConnection)
+      {
+        //// Test the connection and if not successful revert the password to the one before the dialog was shown to the user.
+        TestConnectionResult connectionResult = WBConnection.TestConnectionAndReturnResult(false);
+        _passwordFlags.ConnectionResult = connectionResult;
+        switch(connectionResult)
+        {
+          case TestConnectionResult.ConnectionSuccess:
+          case TestConnectionResult.PasswordReset:
+            connectionSuccessful = true;
+
+            //// If the pasword was reset within the connection test, then set it again in the new password flag.
+            if (connectionResult == TestConnectionResult.PasswordReset)
+            {
+              _passwordFlags.NewPassword = WBConnection.Password;
+            }
+
+            break;
+
+          case TestConnectionResult.PasswordExpired:
+            //// This status is set if the password was expired, and the dialog shown to the user to reset the password was cancelled, so exit.
+            return;
+        }
+      }
+
+      //// If the connection was successful and the user chose to store the password, save it in the password vault.
+      if (StorePasswordSecurely && connectionSuccessful && !string.IsNullOrEmpty(WBConnection.Password))
+      {
+        string storedPassword = MySqlWorkbenchPasswordVault.FindPassword(WBConnection.HostIdentifier, WBConnection.UserName);
+        if (storedPassword == null || storedPassword != WBConnection.Password)
+        {
+          MySqlWorkbenchPasswordVault.StorePassword(WBConnection.HostIdentifier, WBConnection.UserName, WBConnection.Password);
+        }
+      }
     }
 
     /// <summary>
@@ -101,7 +268,7 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void PasswordTextBox_TextChanged(object sender, EventArgs e)
+    private void PasswordTextBoxTextChanged(object sender, EventArgs e)
     {
       PasswordChangedTimer.Stop();
       PasswordChangedTimer.Start();
@@ -112,11 +279,97 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void PasswordTextBox_Validated(object sender, EventArgs e)
+    private void PasswordTextBoxValidated(object sender, EventArgs e)
     {
+      if (sender == null)
+      {
+        return;
+      }
+
+      TextBox passwordTextBox = sender as TextBox;
       PasswordChangedTimer.Stop();
-      PasswordTextBox.Text = PasswordTextBox.Text.Trim();
-      DialogOKButton.Enabled = PasswordTextBox.TextLength > 0;
+      passwordTextBox.Text = passwordTextBox.Text.Trim();
+      DialogOKButton.Enabled = PasswordTextBox.TextLength > 0 && (PasswordExpiredDialog ? NewPasswordTextBox.TextLength > 0 && ConfirmTextBox.TextLength > 0 : true);
+    }
+
+    /// <summary>
+    /// Sets the dialog interface to use it to enter connection passwords or to enter a new password after an old one expired.
+    /// </summary>
+    private void SetDialogInterface()
+    {
+      Text = PasswordExpiredDialog ? Properties.Resources.ExpiredPasswordWindowTitleText : Properties.Resources.ConnectionPasswordWindowTitleText;
+      EnterPasswordLabel.Text = PasswordExpiredDialog ? Properties.Resources.ExpiredPasswordLabelText : Properties.Resources.ConnectionPasswordLabelText;
+      Height = PasswordExpiredDialog ? EXPANDED_DIALOG_HEIGHT : REGULAR_DIALOG_HEIGHT;
+      EnterPasswordLabel.Height = PasswordExpiredDialog ? EnterPasswordLabel.Height : EnterPasswordLabel.Height / 2;
+      EnterPasswordLabel.Location = new Point(EnterPasswordLabel.Location.X, EnterPasswordLabel.Location.Y + (PasswordExpiredDialog ? 0 : TOP_LABEL_VERTICAL_DELTA));
+      PasswordTextBox.ReadOnly = PasswordExpiredDialog;
+      NewPasswordLabel.Visible = PasswordExpiredDialog;
+      NewPasswordTextBox.Visible = PasswordExpiredDialog;
+      ConfirmLabel.Visible = PasswordExpiredDialog;
+      ConfirmTextBox.Visible = PasswordExpiredDialog;
+      PasswordLabel.Text = PasswordExpiredDialog ? Properties.Resources.OldPasswordLabelText : Properties.Resources.PasswordLabelText;
+      StorePasswordSecurelyCheckBox.Location = PasswordExpiredDialog ?  StorePasswordSecurelyCheckBox.Location : NewPasswordTextBox.Location;
+      DialogOKButton.Enabled = PasswordTextBox.Text.Trim().Length > 0;
+    }
+  }
+
+  /// <summary>
+  /// Specifies flags about password-related operations.
+  /// </summary>
+  public struct PasswordDialogFlags
+  {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PasswordDialogFlags"/> struct.
+    /// </summary>
+    /// <param name="wbConnection"></param>
+    public PasswordDialogFlags(MySqlWorkbenchConnection wbConnection)
+    {
+      Cancelled = false;
+      ConnectionResult = TestConnectionResult.None;
+      NewPassword = null;
+      OldPassword = wbConnection.Password;
+    }
+
+    /// <summary>
+    /// Flag indicating whether the operation (password connection or reset password) was cancelled by the user.
+    /// </summary>
+    public bool Cancelled;
+
+    /// <summary>
+    /// Indicates the result of a connection test.
+    /// </summary>
+    public TestConnectionResult ConnectionResult;
+
+    /// <summary>
+    /// Gets a value indicating whether the connection was made sucessfully or if the password was just reset by the user.
+    /// </summary>
+    public bool ConnectionSuccess
+    {
+      get
+      {
+        return ConnectionResult == TestConnectionResult.ConnectionSuccess || ConnectionResult == TestConnectionResult.PasswordReset;
+      }
+    }
+
+    /// <summary>
+    /// The new password entered by the user.
+    /// </summary>
+    public string NewPassword;
+
+    /// <summary>
+    /// The original password provided to the <see cref="PasswordDialog"/> .
+    /// </summary>
+    public string OldPassword;
+
+    /// <summary>
+    /// Gets a value indicating whether the connection could not be made because of a wrong password.
+    /// </summary>
+    public bool WrongPassword
+    {
+      get
+      {
+        return ConnectionResult == TestConnectionResult.WrongPassword;
+      }
     }
   }
 }

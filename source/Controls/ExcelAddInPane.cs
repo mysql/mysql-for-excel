@@ -579,46 +579,13 @@ namespace MySQL.ForExcel
     {
       WBConnection = connection;
       RefreshWbConnectionTimeouts();
-      bool isSSL = WBConnection.UseSSL == 1
-        || !(string.IsNullOrWhiteSpace(WBConnection.SSLCA)
-        && string.IsNullOrWhiteSpace(WBConnection.SSLCert)
-        && string.IsNullOrWhiteSpace(WBConnection.SSLCipher)
-        && string.IsNullOrWhiteSpace(WBConnection.SSLKey));
-      while (true)
+      PasswordDialogFlags passwordFlags = WBConnection.TestConnectionAndRetryOnWrongPassword();
+      if (!passwordFlags.ConnectionSuccess)
       {
-        bool noPassword = string.IsNullOrEmpty(WBConnection.Password);
-        bool wrongPassword = false;
-
-        //// Try to connect with the connection exactly as loaded (maybe without a password).
-        if (WBConnection.TestConnectionAndShowError(out wrongPassword))
-        {
-          //// Connection successful so exit loop and continue.
-          break;
-        }
-
-        if (!wrongPassword)
-        {
-          return;
-        }
-
-        //// If the connection does not have a stored password or the stored password failed then ask for one and retry. 
-        if (noPassword || wrongPassword)
-        {
-          using (PasswordDialog passwordDialog = new PasswordDialog(WBConnection, true))
-          {
-            DialogResult dr = passwordDialog.ShowDialog();
-            if (dr == DialogResult.Cancel)
-            {
-              return;
-            }
-
-            WBConnection.Password = passwordDialog.WBConnection.Password;
-          }
-        }
+        return;
       }
 
-      bool schemasLoaded = SchemaSelectionPanel2.SetConnection(WBConnection);
-      if (schemasLoaded)
+      if (SchemaSelectionPanel2.SetConnection(WBConnection))
       {
         SchemaSelectionPanel2.BringToFront();
       }
