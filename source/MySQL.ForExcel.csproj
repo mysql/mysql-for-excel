@@ -228,7 +228,9 @@
   -->
   <ItemGroup>
     <Compile Include="Classes\ActiveEditDialogContainer.cs" />
+    <Compile Include="Classes\DataTypeUtilities.cs" />
     <Compile Include="Classes\DBObject.cs" />
+    <Compile Include="Classes\MiscUtilities.cs" />
     <Compile Include="Classes\MySQLColumnMapping.cs" />
     <Compile Include="Classes\MySQLColumnMappingList.cs" />
     <Compile Include="Classes\MySQLDataColumn.cs">
@@ -237,6 +239,7 @@
     <Compile Include="Classes\MySQLDataTable.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Classes\MySQLDataUtilities.cs" />
     <Compile Include="Classes\MySQLForExcelSettings.cs" />
     <Compile Include="Classes\NativeWindowWrapper.cs" />
     <Compile Include="Classes\PushResultsDataTable.cs">
@@ -257,7 +260,6 @@
     <Compile Include="Controls\PreviewDataGridView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Classes\Utilities.cs" />
     <Compile Include="Controls\HotLabel.cs">
       <SubType>UserControl</SubType>
     </Compile>

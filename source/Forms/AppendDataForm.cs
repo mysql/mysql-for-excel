@@ -99,12 +99,12 @@ namespace MySQL.ForExcel
       WBConnection = wbConnection;
 
       _dragBoxFromMouseDown = Rectangle.Empty;
-      _draggingCursor = MiscUtilities.CreateCursor(new Bitmap(Properties.Resources.MySQLforExcel_Cursor_Dragging_32x32), 3, 3);
-      _droppableCursor = MiscUtilities.CreateCursor(new Bitmap(Properties.Resources.MySQLforExcel_Cursor_Dropable_32x32), 3, 3);
+      _draggingCursor = new Bitmap(Properties.Resources.MySQLforExcel_Cursor_Dragging_32x32).CreateCursor(3, 3);
+      _droppableCursor = new Bitmap(Properties.Resources.MySQLforExcel_Cursor_Dropable_32x32).CreateCursor(3, 3);
       _gridColumnClicked = -1;
       _gridColumnIndexToDrag = -1;
       _gridTargetTableColumnIndexToDrop = -1;
-      _trashCursor = MiscUtilities.CreateCursor(new Bitmap(Properties.Resources.MySQLforExcel_Cursor_Trash_32x32), 3, 3);
+      _trashCursor = new Bitmap(Properties.Resources.MySQLforExcel_Cursor_Trash_32x32).CreateCursor(3, 3);
 
       InitializeComponent();
 

@@ -23,6 +23,7 @@ namespace MySQL.ForExcel
   using System.Drawing;
   using System.Runtime.InteropServices;
   using System.Windows.Forms;
+  using MySQL.Utility;
 
   /// <summary>
   /// 
@@ -674,7 +675,7 @@ namespace MySQL.ForExcel
       {
         if (maxWidth > 0)
         {
-          _truncatedSubtitle = MiscUtilities.TruncateString(Subtitle, maxWidth, graphics, font);
+          _truncatedSubtitle = Subtitle.TruncateString(graphics, maxWidth, font);
         }
 
         UpdateTruncatedSubtitle = false;
@@ -696,7 +697,7 @@ namespace MySQL.ForExcel
       {
         if (maxWidth > 0)
         {
-          _truncatedTitle = MiscUtilities.TruncateString(Title, maxWidth, graphics, font);
+          _truncatedTitle = Title.TruncateString(graphics, maxWidth, font);
         }
 
         UpdateTruncatedTitle = false;

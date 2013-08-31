@@ -25,6 +25,7 @@ namespace MySQL.ForExcel
   using System.Drawing;
   using System.Drawing.Drawing2D;
   using System.Windows.Forms;
+  using MySQL.Utility;
 
   /// <summary>
   /// Provides a label control with a variable text color opacity.
@@ -264,7 +265,8 @@ namespace MySQL.ForExcel
 
       if (_wordWrapRecalculationNeeded)
       {
-        WordWrapText(e.Graphics);
+        _wordWrapLines = this.WordWrapText(_transparentText);
+        _wordWrapRecalculationNeeded = false;
       }
 
       if (_wordWrapLines == null || _wordWrapLines.Count == 0)
@@ -374,67 +376,6 @@ namespace MySQL.ForExcel
           _customFormatter.LineAlignment = StringAlignment.Near;
           break;
       }
-    }
-
-    /// <summary>
-    /// Implements word wrapping for the label text.
-    /// </summary>
-    /// <param name="graphics">Graphics used to draw the text.</param>
-    private void WordWrapText(Graphics graphics)
-    {
-      if (_wordWrapLines == null)
-      {
-        _wordWrapLines = new List<string>();
-      }
-
-      _wordWrapLines.Clear();
-      if (AutoSize)
-      {
-        _wordWrapLines.Add(_transparentText);
-        return;
-      }
-
-      string remainingText = _transparentText.Trim();
-      string textToDraw = string.Empty;
-      SizeF stringSize = SizeF.Empty;
-      int lengthToCut = 0;
-      double trimPercentage = 0;
-      int spaceAfterPos = -1;
-      int spaceBeforePos = -1;
-
-      do
-      {
-        stringSize = graphics.MeasureString(remainingText, Font);
-        trimPercentage = Width / stringSize.Width;
-        if (trimPercentage < 1)
-        {
-          lengthToCut = Convert.ToInt32(remainingText.Length * trimPercentage);
-          lengthToCut = lengthToCut > 0 ? lengthToCut - 1 : 0;
-          spaceBeforePos = lengthToCut;
-          spaceAfterPos = remainingText.IndexOf(" ", lengthToCut);
-          textToDraw = spaceAfterPos >= 0 ? remainingText.Substring(0, spaceAfterPos) : remainingText;
-          while (spaceBeforePos > -1 && graphics.MeasureString(textToDraw, Font).Width > Width)
-          {
-            spaceBeforePos = remainingText.LastIndexOf(" ", spaceBeforePos);
-            textToDraw = spaceBeforePos >= 0 ? remainingText.Substring(0, spaceBeforePos) : textToDraw;
-            spaceBeforePos--;
-          }
-        }
-        else
-        {
-          textToDraw = remainingText;
-        }
-
-        textToDraw = textToDraw.Trim();
-        if (textToDraw.Length > 0)
-        {
-          _wordWrapLines.Add(textToDraw);
-        }
-
-        remainingText = textToDraw.Length < remainingText.Length ? remainingText.Substring(textToDraw.Length).Trim() : string.Empty;
-      }
-      while (remainingText.Length > 0);
-      _wordWrapRecalculationNeeded = false;
     }
   }
 }

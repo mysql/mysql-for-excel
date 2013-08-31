@@ -1174,7 +1174,7 @@ namespace MySQL.ForExcel
     public string GetNonDuplicateColumnName(string proposedName, int forColumnIndex = -1)
     {
       List<string> columnNames = Columns != null && Columns.Count > 0 ? Columns.OfType<MySQLDataColumn>().Where(col => col.Ordinal != forColumnIndex).Select(col => col.DisplayName).ToList<string>() : null;
-      return MiscUtilities.GetNonDuplicateText(columnNames, proposedName);
+      return columnNames.GetNonDuplicateText(proposedName);
     }
 
     /// <summary>
@@ -2163,7 +2163,7 @@ namespace MySQL.ForExcel
       {
         MySQLDataColumn autoPKCol = GetColumnAtIndex(0);
         string autoPKName = autoPKCol.DisplayName;
-        autoPKName = MiscUtilities.GetNonDuplicateText(row.ItemArray.Skip(1).Select(obj => obj.ToString()).ToList<string>(), autoPKName);
+        autoPKName = row.ItemArray.Skip(1).Select(obj => obj.ToString()).ToList<string>().GetNonDuplicateText(autoPKName);
         autoPKCol.SetDisplayName(autoPKName);
       }
 

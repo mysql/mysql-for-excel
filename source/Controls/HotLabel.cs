@@ -23,6 +23,7 @@ namespace MySQL.ForExcel
   using System.ComponentModel;
   using System.Drawing;
   using System.Windows.Forms;
+  using MySQL.Utility;
 
   /// <summary>
   /// Provides a text label that can be clicked to perform an action.
@@ -249,7 +250,7 @@ namespace MySQL.ForExcel
     {
       base.OnPaint(e);
 
-      Image i = Enabled ? Image : (DisabledImage == null && Image != null ? MiscUtilities.MakeGrayscale(new Bitmap(Image)) : DisabledImage);
+      Image i = Enabled ? Image : (DisabledImage == null && Image != null ? new Bitmap(Image).MakeGrayscale() : DisabledImage);
       Size imageSize = Size.Empty;
       if (i != null)
       {
