@@ -483,7 +483,13 @@ namespace MySQL.ForExcel
 
           fillingRange.ClearFormats();
           fillingRange.set_Value(Type.Missing, fillingArray);
-          fillingRange.Columns.AutoFit();
+          if (importColumnNames)
+          {
+            Excel.Range headerRange = fillingRange.GetColumnNamesRange();
+            headerRange.SetInteriorColor(ExcelUtilities.LockedCellsOLEColor);
+          }
+
+          currentSheet.Columns.AutoFit();
           fillingRange.Rows.AutoFit();
           ExcelApplication_SheetSelectionChange(currentSheet, ExcelApplication.ActiveCell);
         }
@@ -558,17 +564,6 @@ namespace MySQL.ForExcel
           }
         }
       }
-    }
-
-    /// <summary>
-    /// Gets a new Excel range containing the intersection of the given 2 ranges.
-    /// </summary>
-    /// <param name="r1">First <see cref="Microsoft.Office.Interop.Excel.Range"/>.</param>
-    /// <param name="r2">Second <see cref="Microsoft.Office.Interop.Excel.Range"/>.</param>
-    /// <returns>The resulting Excel range containing the intersecting cells.</returns>
-    public Excel.Range IntersectRanges(Excel.Range r1, Excel.Range r2)
-    {
-      return ExcelApplication.Intersect(r1, r2);
     }
 
     /// <summary>

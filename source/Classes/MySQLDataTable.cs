@@ -1,21 +1,19 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
 namespace MySQL.ForExcel
 {
@@ -1588,6 +1586,43 @@ namespace MySQL.ForExcel
         exception = ex;
         MySQLSourceTrace.WriteAppErrorToLog(ex);
       }
+    }
+
+    /// <summary>
+    /// Searches for the row index in this table corresponding to the given Excel row index skipping deleted rows.
+    /// </summary>
+    /// <param name="excelRowIdx">The Excel row index.</param>
+    /// <param name="skipIndexesList">A list of row indexes to skip since they are flagged for deletion.</param>
+    /// <param name="editingRangeRowsCount">The number of Excel rows in the editing Excel range.</param>
+    /// <returns>The corresponding row index in the <see cref="EditMySQLDataTable"/>.</returns>
+    public int SearchRowIndexNotDeleted(int excelRowIdx, IList<int> skipIndexesList, int editingRangeRowsCount)
+    {
+      int notDeletedIdx = -1;
+
+      if (Rows.Count == editingRangeRowsCount - 2)
+      {
+        return excelRowIdx;
+      }
+
+      for (int tableRowIdx = 0; tableRowIdx < Rows.Count; tableRowIdx++)
+      {
+        if (Rows[tableRowIdx].RowState != DataRowState.Deleted)
+        {
+          notDeletedIdx++;
+        }
+
+        if (skipIndexesList != null)
+        {
+          notDeletedIdx += skipIndexesList.Count(n => n == tableRowIdx);
+        }
+
+        if (notDeletedIdx == excelRowIdx)
+        {
+          return tableRowIdx;
+        }
+      }
+
+      return -1;
     }
 
     /// <summary>

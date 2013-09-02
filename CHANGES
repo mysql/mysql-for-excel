@@ -1,4 +1,5 @@
 1.1.2
+- Set the color of the Excel cells containing column names from an Import Data operation to the same color used in Edit Data operations for consistency.
 - Added a check on every connection test for an expired password, if the password has been expired a dialog is now shown to the user to reset the password. Also
   added a connection test before any operation against the database (schema creation, data import, append, export or edition).
   (Bug #17354118 - DON'T HANDLE EXPIRED PASSWORDS)

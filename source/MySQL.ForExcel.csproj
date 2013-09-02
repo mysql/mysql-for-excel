@@ -230,6 +230,7 @@
     <Compile Include="Classes\ActiveEditDialogContainer.cs" />
     <Compile Include="Classes\DataTypeUtilities.cs" />
     <Compile Include="Classes\DBObject.cs" />
+    <Compile Include="Classes\ExcelUtilities.cs" />
     <Compile Include="Classes\MiscUtilities.cs" />
     <Compile Include="Classes\MySQLColumnMapping.cs" />
     <Compile Include="Classes\MySQLColumnMappingList.cs" />
@@ -245,6 +246,7 @@
     <Compile Include="Classes\PushResultsDataTable.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Classes\RangeAndAddress.cs" />
     <Compile Include="Controls\ExcelAddInPane.cs">
       <SubType>UserControl</SubType>
     </Compile>

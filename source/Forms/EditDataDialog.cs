@@ -1,21 +1,19 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
 namespace MySQL.ForExcel
 {
@@ -24,7 +22,6 @@ namespace MySQL.ForExcel
   using System.ComponentModel;
   using System.Data;
   using System.Drawing;
-  using System.Linq;
   using System.Runtime.InteropServices;
   using System.Text;
   using System.Windows.Forms;
@@ -69,29 +66,9 @@ namespace MySQL.ForExcel
     #region Fields
 
     /// <summary>
-    /// The color used to paint commited Excel cells (blue-ish).
-    /// </summary>
-    private int _commitedCellsOLEColor;
-
-    /// <summary>
-    /// The color used to paint Excel cells that caused commit errors (red-ish).
-    /// </summary>
-    private int _erroredCellsOLEColor;
-
-    /// <summary>
-    /// The color used to paint Excel cells that are locked for users, like the headers containing column names (gray-ish).
-    /// </summary>
-    private int _lockedCellsOLEColor;
-
-    /// <summary>
     /// A point object used as a placeholder to track where the mouse has been pressed.
     /// </summary>
     private Point _mouseDownPoint;
-
-    /// <summary>
-    /// The color used to paint Excel cells accepting data from users to create a new row in the table (yellow-ish).
-    /// </summary>
-    private int _newRowCellsOLEColor;
 
     /// <summary>
     /// The query string assembled to perform operations against the MySQL table (UPDATE, INSERT, DELETE).
@@ -99,19 +76,9 @@ namespace MySQL.ForExcel
     private string _queryString;
 
     /// <summary>
-    /// The color used to paint Excel cells containing values that have been changed by users but not yet committed (green-ish).
-    /// </summary>
-    private int _uncommitedCellsOLEColor;
-
-    /// <summary>
     /// Flag indicating whether the editing session is in process of undoing changes done
     /// </summary>
     private bool _undoingChanges;
-
-    /// <summary>
-    /// The color used to revert Excel cells to their original background color, for example when reverting the cells value or synchronizing data with the MySQL table (white).
-    /// </summary>
-    private int _whiteOLEColor;
 
     #endregion Fields
 
@@ -126,14 +93,8 @@ namespace MySQL.ForExcel
     /// <param name="editingWorksheet">The Excel worksheet tied to the current editing session.</param>
     public EditDataDialog(ExcelAddInPane parentTaskPane, IWin32Window parentWindow, MySqlWorkbenchConnection wbConnection, Excel.Range originalEditDataRange, DataTable importTable, Excel.Worksheet editingWorksheet)
     {
-      _commitedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#B8E5F7"));
-      _erroredCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#FF8282"));
-      _lockedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#D7D7D7"));
       _mouseDownPoint = Point.Empty;
-      _newRowCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#FFFCC7"));
-      _uncommitedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml("#7CC576"));
       _undoingChanges = false;
-      _whiteOLEColor = ColorTranslator.ToOle(Color.White);
 
       InitializeComponent();
 
@@ -402,23 +363,9 @@ namespace MySQL.ForExcel
     /// <returns>An Excel range containing just the newly added row.</returns>
     private Excel.Range AddNewRowToEditingRange(bool clearColoringOfOldNewRow)
     {
-      Excel.Range rowRange = null;
-
-      if (EditDataRange != null)
-      {
-        UnprotectEditingWorksheet();
-        EditDataRange = EditDataRange.get_Resize(EditDataRange.Rows.Count + 1, EditDataRange.Columns.Count);
-        rowRange = EditDataRange.Rows[EditDataRange.Rows.Count] as Excel.Range;
-        rowRange.Interior.Color = _newRowCellsOLEColor;
-        EditingRowsQuantity = EditDataRange.Rows.Count;
-        ProtectEditingWorksheet();
-        if (clearColoringOfOldNewRow && EditDataRange.Rows.Count > 0)
-        {
-          rowRange = EditDataRange.Rows[EditDataRange.Rows.Count - 1] as Excel.Range;
-          rowRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
-        }
-      }
-
+      EditingWorksheet.UnprotectEditingWorksheet(EditingWorksheet_Change, SHEET_PROTECTION_KEY);
+      Excel.Range rowRange = EditDataRange.AddNewRow(clearColoringOfOldNewRow);
+      EditingWorksheet.ProtectEditingWorksheet(EditingWorksheet_Change, SHEET_PROTECTION_KEY, EditDataRange);
       return rowRange;
     }
 
@@ -430,83 +377,6 @@ namespace MySQL.ForExcel
     private void AutoCommitCheckBox_CheckedChanged(object sender, EventArgs e)
     {
       CommitChangesButton.Enabled = !AutoCommitCheckBox.Checked && UncommitedDataExists;
-    }
-
-    /// <summary>
-    /// Changes the fill color of the given Excel range to the specified color.
-    /// </summary>
-    /// <param name="modifiedRange">Excel range to have their fill color changed.</param>
-    /// <param name="oleColor">The new fill color for the Excel cells.</param>
-    private void ChangeExcelCellsColor(Excel.Range modifiedRange, int oleColor)
-    {
-      if (modifiedRange == null)
-      {
-        return;
-      }
-
-      if (oleColor > 0)
-      {
-        modifiedRange.Interior.Color = oleColor;
-      }
-      else
-      {
-        modifiedRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
-      }
-    }
-
-    /// <summary>
-    /// Changes the fill color of all the Excel ranges within the given list to the specified color.
-    /// </summary>
-    /// <param name="rangesAndAddressesList">The list of Excel ranges to have their fill color changed.</param>
-    /// <param name="oleColor">The new fill color for the Excel cells.</param>
-    private void ChangeExcelCellsColor(List<RangeAndAddress> rangesAndAddressesList, int oleColor)
-    {
-      if (rangesAndAddressesList == null)
-      {
-        return;
-      }
-
-      foreach (RangeAndAddress ra in rangesAndAddressesList)
-      {
-        ChangeExcelCellsColor(ra.Range, oleColor);
-      }
-
-      rangesAndAddressesList.Clear();
-    }
-
-    /// <summary>
-    /// Changes the fill color of all the Excel cells recorded in the editing session to the committed data color (blue-ish), if cells errored out they are set to the error color (red-ish).
-    /// </summary>
-    /// <param name="commitSuccessful">Flag indicating whether the commit of the Excel cells recorded in the editing session was successful.</param>
-    private void ChangeExcelCellsToCommmitedColor(bool commitSuccessful)
-    {
-      if (RangesAndAddressesList == null)
-      {
-        return;
-      }
-
-      for (int idx = 0; idx < RangesAndAddressesList.Count; idx++)
-      {
-        RangeAndAddress ra = RangesAndAddressesList[idx];
-        if (ra.TableRow.HasErrors)
-        {
-          ChangeExcelCellsColor(ra.Range, _erroredCellsOLEColor);
-          continue;
-        }
-
-        if (!commitSuccessful)
-        {
-          continue;
-        }
-
-        if (ra.TableRow.RowState != DataRowState.Detached && ra.TableRow.RowState != DataRowState.Deleted)
-        {
-          ChangeExcelCellsColor(ra.Range, _commitedCellsOLEColor);
-        }
-
-        RangesAndAddressesList.Remove(ra);
-        idx--;
-      }
     }
 
     /// <summary>
@@ -561,7 +431,7 @@ namespace MySQL.ForExcel
       string operationSummary = null;
       string operationDetails = null;
 
-      Excel.Range intersectRange = ParentTaskPane.IntersectRanges(EditDataRange, Target);
+      Excel.Range intersectRange = EditDataRange.IntersectWith(Target);
       if (intersectRange == null || intersectRange.Count == 0)
       {
         if (rowWasDeleted)
@@ -586,7 +456,7 @@ namespace MySQL.ForExcel
         UndoChanges();
         if (rowWasDeleted)
         {
-          int changedRangesQty = RefreshAddressesOfStoredRanges();
+          int changedRangesQty = RangesAndAddressesList.RefreshAddressesOfStoredRanges();
           EditDataRange = EditingWorksheet.UsedRange;
         }
 
@@ -605,7 +475,7 @@ namespace MySQL.ForExcel
         foreach (Excel.Range deletedRow in Target.Rows)
         {
           startDataTableRow = deletedRow.Row - 2;
-          startDataTableRow = SearchRowIndexNotDeleted(startDataTableRow, skipDeletedRowsList);
+          startDataTableRow = EditMySQLDataTable.SearchRowIndexNotDeleted(startDataTableRow, skipDeletedRowsList, EditDataRange.Rows.Count);
           DataRow dr = EditMySQLDataTable.Rows[startDataTableRow];
           dr.Delete();
           skipDeletedRowsList.Add(startDataTableRow);
@@ -645,7 +515,7 @@ namespace MySQL.ForExcel
           }
         }
 
-        int changedRangesQty = RefreshAddressesOfStoredRanges();
+        int changedRangesQty = RangesAndAddressesList.RefreshAddressesOfStoredRanges();
         EditingRowsQuantity = EditDataRange.Rows.Count;
       }
       else
@@ -676,11 +546,11 @@ namespace MySQL.ForExcel
                   RangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Added, insertingRowRange, insertingRowRange.Address, (int)insertingRowRange.Interior.Color, insertingRowRange.Row, newRow));
                 }
 
-                insertingRowRange.Interior.Color = _uncommitedCellsOLEColor;
+                insertingRowRange.Interior.Color = ExcelUtilities.UncommittedCellsOLEColor;
               }
 
               int absRow = startDataTableRow + rowIdx - 1;
-              absRow = SearchRowIndexNotDeleted(absRow, null);
+              absRow = EditMySQLDataTable.SearchRowIndexNotDeleted(absRow, null, EditDataRange.Rows.Count);
               int absCol = startDataTableCol + colIdx - 1;
 
               currCol = EditMySQLDataTable.GetColumnAtIndex(absCol);
@@ -697,7 +567,7 @@ namespace MySQL.ForExcel
                   var existingRA = RangesAndAddressesList.Find(ra => ra.Modification == RangeAndAddress.RangeModification.Updated && ra.Address == cell.Address);
                   if (existingRA != null)
                   {
-                    ChangeExcelCellsColor(cell, existingRA.RangeColor == _whiteOLEColor ? 0 : existingRA.RangeColor);
+                    cell.SetInteriorColor(existingRA.RangeColor == ExcelUtilities.EmptyCellsOLEColor ? 0 : existingRA.RangeColor);
                     RangesAndAddressesList.RemoveAll(ra => ra.Modification == RangeAndAddress.RangeModification.Updated && ra.Address == cell.Address);
                     EditMySQLDataTable.Rows[absRow][absCol] = insertingValue;
                     int changedColsQty = EditMySQLDataTable.GetChangedColumns(EditMySQLDataTable.Rows[absRow]).Count;
@@ -723,7 +593,7 @@ namespace MySQL.ForExcel
                 EditMySQLDataTable.Rows[absRow][absCol] = insertingValue;
               }
 
-              cell.Interior.Color = _uncommitedCellsOLEColor;
+              cell.Interior.Color = ExcelUtilities.UncommittedCellsOLEColor;
             }
           }
         }
@@ -763,7 +633,7 @@ namespace MySQL.ForExcel
     /// <param name="Target"></param>
     private void EditingWorksheet_SelectionChange(Excel.Range Target)
     {
-      Excel.Range intersectRange = ParentTaskPane.IntersectRanges(EditDataRange, Target);
+      Excel.Range intersectRange = EditDataRange.IntersectWith(Target);
       if (intersectRange == null || intersectRange.Count == 0)
       {
         Hide();
@@ -826,69 +696,6 @@ namespace MySQL.ForExcel
       {
         _mouseDownPoint = Point.Empty;
       }
-    }
-
-    /// <summary>
-    /// Initializes the Excel worksheet protection for the <see cref="EditingWorksheet"/>.
-    /// </summary>
-    private void InitializeWorksheetProtection()
-    {
-      if (EditDataRange != null)
-      {
-        Excel.Range extendedRange = EditDataRange.get_Range(string.Format("A{0}", 2));
-        extendedRange = extendedRange.get_Resize(EditDataRange.Rows.Count - 1, EditingWorksheet.Columns.Count);
-        extendedRange.Locked = false;
-
-        //// Column names range code
-        Excel.Range headersRange = EditingWorksheet.get_Range("A1");
-        headersRange = headersRange.get_Resize(1, EditDataRange.Columns.Count);
-        LockRange(headersRange, true);
-      }
-
-      EditingWorksheet.Protect(SHEET_PROTECTION_KEY,
-                               false,
-                               true,
-                               true,
-                               true,
-                               true,
-                               true,
-                               false,
-                               false,
-                               false,
-                               false,
-                               false,
-                               true,
-                               false,
-                               false,
-                               false);
-    }
-
-    /// <summary>
-    /// Locks the given Excel range and sets its fill color accordingly.
-    /// </summary>
-    /// <param name="range">The Excel range to lock or unlock.</param>
-    /// <param name="lockRange">Flag indicating whether the Excel range is locked or unlocked.</param>
-    private void LockRange(Excel.Range range, bool lockRange)
-    {
-      if (lockRange)
-      {
-        range.Interior.Color = _lockedCellsOLEColor;
-      }
-      else
-      {
-        range.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
-      }
-
-      range.Locked = lockRange;
-    }
-
-    /// <summary>
-    /// Protects the <see cref="EditingWorksheet"/>.
-    /// </summary>
-    private void ProtectEditingWorksheet()
-    {
-      EditingWorksheet.Change += new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
-      InitializeWorksheetProtection();
     }
 
     /// <summary>
@@ -967,8 +774,7 @@ namespace MySQL.ForExcel
                                     resultsDT.DeletedOperations,
                                     resultsDT.InsertedOperations,
                                     resultsDT.UpdatedOperations);
-
-      ChangeExcelCellsToCommmitedColor(success);
+      RangesAndAddressesList.SetInteriorColorToCommmited(success);
 
       foreach (DataRow dr in EditMySQLDataTable.Rows)
       {
@@ -1004,44 +810,6 @@ namespace MySQL.ForExcel
       Cursor = Cursors.Default;
 
       return !errorsFound;
-    }
-
-    /// <summary>
-    /// Refreshes the Excel range addresses of recorded changes in case rows have been added or deleted.
-    /// </summary>
-    /// <returns>The number of Excel ranges with address changes.</returns>
-    private int RefreshAddressesOfStoredRanges()
-    {
-      int qtyUpdated = 0;
-
-      if (RangesAndAddressesList != null && RangesAndAddressesList.Count > 0)
-      {
-        foreach (RangeAndAddress ra in RangesAndAddressesList)
-        {
-          if (ra.Modification != RangeAndAddress.RangeModification.Added && ra.Modification != RangeAndAddress.RangeModification.Updated)
-          {
-            continue;
-          }
-
-          try
-          {
-            if (ra.Address != ra.Range.Address)
-            {
-              ra.Address = ra.Range.Address;
-              ra.ExcelRow = ra.Range.Row;
-              qtyUpdated++;
-            }
-          }
-          catch
-          {
-            ra.Range = EditingWorksheet.get_Range(ra.Address);
-            ra.ExcelRow = ra.Range.Row;
-            qtyUpdated++;
-          }
-        }
-      }
-
-      return qtyUpdated;
     }
 
     /// <summary>
@@ -1082,62 +850,23 @@ namespace MySQL.ForExcel
         MiscUtilities.ShowCustomizedErrorDialog(refreshFromDB ? Properties.Resources.EditDataRefreshErrorText : Properties.Resources.EditDataRevertErrorText, exception.Message);
       }
 
-      UnprotectEditingWorksheet();
+      EditingWorksheet.UnprotectEditingWorksheet(EditingWorksheet_Change, SHEET_PROTECTION_KEY);
       EditDataRange.Clear();
       Excel.Range topLeftCell = EditDataRange.Cells[1, 1];
       topLeftCell.Select();
       EditDataRange = ParentTaskPane.ImportDataTableToExcelAtGivenCell(EditMySQLDataTable, true, topLeftCell);
       if (refreshFromDB)
       {
-        ChangeExcelCellsColor(EditDataRange, 0);
+        EditDataRange.SetInteriorColor(0);
         RangesAndAddressesList.Clear();
       }
       else
       {
-        ChangeExcelCellsColor(RangesAndAddressesList, 0);
+        RangesAndAddressesList.SetInteriorColor(0);
       }
 
       CommitChangesButton.Enabled = false;
       AddNewRowToEditingRange(false);
-    }
-
-    /// <summary>
-    /// Searches for the row index in the <see cref="EditMySQLDataTable"/> corresponding to the given Excel row index skipping deleted rows.
-    /// </summary>
-    /// <param name="excelRowIdx">The Excel row index.</param>
-    /// <param name="skipIndexesList">A list of row indexes to skip since they are flagged for deletion.</param>
-    /// <returns>The corresponding row index in the <see cref="EditMySQLDataTable"/>.</returns>
-    private int SearchRowIndexNotDeleted(int excelRowIdx, List<int> skipIndexesList)
-    {
-      int notDeletedIdx = -1;
-
-      if (EditMySQLDataTable != null)
-      {
-        if (EditMySQLDataTable.Rows.Count == EditDataRange.Rows.Count - 2)
-        {
-          return excelRowIdx;
-        }
-
-        for (int tableRowIdx = 0; tableRowIdx < EditMySQLDataTable.Rows.Count; tableRowIdx++)
-        {
-          if (EditMySQLDataTable.Rows[tableRowIdx].RowState != DataRowState.Deleted)
-          {
-            notDeletedIdx++;
-          }
-
-          if (skipIndexesList != null)
-          {
-            notDeletedIdx += skipIndexesList.Count(n => n == tableRowIdx);
-          }
-
-          if (notDeletedIdx == excelRowIdx)
-          {
-            return tableRowIdx;
-          }
-        }
-      }
-
-      return -1;
     }
 
     /// <summary>
@@ -1157,94 +886,5 @@ namespace MySQL.ForExcel
 
       _undoingChanges = false;
     }
-
-    /// <summary>
-    /// Unprotects the <see cref="EditingWorksheet"/>.
-    /// </summary>
-    private void UnprotectEditingWorksheet()
-    {
-      EditingWorksheet.Change -= new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
-      EditingWorksheet.Unprotect(SHEET_PROTECTION_KEY);
-    }
-  }
-
-  /// <summary>
-  /// Records modifications done to an Excel row mapping it to its corresponding data table row.
-  /// </summary>
-  public class RangeAndAddress
-  {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="RangeAndAddress"/> class.
-    /// </summary>
-    /// <param name="modification">The type of modification done to the Excel range.</param>
-    /// <param name="range">The Excel range being recorded.</param>
-    /// <param name="address">The address of the Excel range.</param>
-    /// <param name="rangeColor">The fill color assigned to the Excel range cells.</param>
-    /// <param name="excelRow">The ordinal index of the Excel row corresponding to the Excel range.</param>
-    /// <param name="tableRow">The <see cref="DataRow"/> mapped to the Excel range being recorded.</param>
-    public RangeAndAddress(RangeModification modification, Excel.Range range, string address, int rangeColor, int excelRow, DataRow tableRow)
-    {
-      Modification = modification;
-      Range = range;
-      Address = address;
-      RangeColor = rangeColor;
-      ExcelRow = excelRow;
-      TableRow = tableRow;
-    }
-
-    /// <summary>
-    /// Specifies identifiers to indicate the type of modification done to Excel ranges.
-    /// </summary>
-    public enum RangeModification
-    {
-      /// <summary>
-      /// A row was added to the editing Excel range.
-      /// </summary>
-      Added,
-
-      /// <summary>
-      /// A row was deleted from the editing Excel range.
-      /// </summary>
-      Deleted,
-
-      /// <summary>
-      /// Cell values were modified in the editing Excel range.
-      /// </summary>
-      Updated
-    }
-
-    #region Properties
-
-    /// <summary>
-    /// Gets or sets the address of the Excel range.
-    /// </summary>
-    public string Address { get; set; }
-
-    /// <summary>
-    /// Gets or sets the ordinal index of the Excel row corresponding to the Excel range.
-    /// </summary>
-    public int ExcelRow { get; set; }
-
-    /// <summary>
-    /// Gets the type of modification done to the Excel range.
-    /// </summary>
-    public RangeModification Modification { get; private set; }
-
-    /// <summary>
-    /// Gets or sets the Excel range being recorded.
-    /// </summary>
-    public Excel.Range Range { get; set; }
-
-    /// <summary>
-    /// Gets the fill color assigned to the Excel range cells.
-    /// </summary>
-    public int RangeColor { get; private set; }
-
-    /// <summary>
-    /// Gets the <see cref="DataRow"/> mapped to the Excel range being recorded.
-    /// </summary>
-    public DataRow TableRow { get; private set; }
-
-    #endregion Properties
   }
 }
