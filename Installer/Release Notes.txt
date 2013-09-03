@@ -3,6 +3,17 @@ MySQL for Excel 1.1.2 Release Notes
 
 Welcome to the release notes for MySQL for Excel 1.1.2
 
+* Upon saving a Workbook containing Worksheets in Edit Mode, the user is asked if he
+  wants to exit the Edit Mode on all Worksheets before their parent Workbook is saved
+  so the Worksheets are saved unprotected, otherwise the Worksheets will remain protected
+  and the users will be able to unprotect them later retrieving the passkeys from the
+  application log after closing MySQL for Excel.
+* Added background coloring to the column names header row of an Import Data operation
+  to have the same look as the one in an Edit Data operation (i.e. gray-ish background).
+* Expired passwords are checked upon connection and can be reset by the users right at
+  connection time within the add-in.
+* A connection test is done before doing any operation against the MySQL Server (schema
+  creation, data export, append, import and edition).
 * Added global options to override the default connection and query execution timeouts.
 * Connection passwords can be stored securely just like MySQL Workbench does and these
   secured passwords are shared with Workbench in the same way connections are.
