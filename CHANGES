@@ -1,4 +1,7 @@
 1.1.2
+- Generate a password dynamically to protect Excel Worksheets during Edit Data operations instead of using a hardcoded GUID. If the user saves the Workbook while
+  any of its Worksheets is in Edit mode, MySQL for Excel will ask the user if he wants to exit the Edit Mode before saving. If the user chooses not to close Edit
+  Mode the passkeys used to protect those Worksheets will be output to the application log after closing MySQL for Excel.
 - Set the color of the Excel cells containing column names from an Import Data operation to the same color used in Edit Data operations for consistency.
 - Added a check on every connection test for an expired password, if the password has been expired a dialog is now shown to the user to reset the password. Also
   added a connection test before any operation against the database (schema creation, data import, append, export or edition).

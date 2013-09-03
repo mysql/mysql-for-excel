@@ -47,11 +47,6 @@ namespace MySQL.ForExcel
     private const int HWND_TOPMOST = -1;
 
     /// <summary>
-    /// GUID used as a key to protect the editing Excel worksheet.
-    /// </summary>
-    private const string SHEET_PROTECTION_KEY = "84308893-7292-49BE-97C0-3A28E81AA2EF";
-
-    /// <summary>
     /// Displays a window in its most recent size and position. This value is similar to SW_SHOWNORMAL, except that the window is not activated.
     /// </summary>
     private const int SW_SHOWNOACTIVATE = 4;
@@ -98,6 +93,7 @@ namespace MySQL.ForExcel
 
       InitializeComponent();
 
+      WorksheetProtectionKey = Guid.NewGuid().ToString();
       ParentTaskPane = parentTaskPane;
       ParentWindow = parentWindow;
       WBConnection = wbConnection;
@@ -255,6 +251,11 @@ namespace MySQL.ForExcel
       }
     }
 
+    /// <summary>
+    /// Gets the GUID used as a key to protect the editing Excel worksheet.
+    /// </summary>
+    public string WorksheetProtectionKey { get; private set; }
+
     #endregion Properties
 
     /// <summary>
@@ -276,7 +277,7 @@ namespace MySQL.ForExcel
       ParentTaskPane.RefreshDBObjectPanelActionLabelsEnabledStatus(EditingTableName, false);
       if (EditingWorksheetExists)
       {
-        EditingWorksheet.Unprotect(SHEET_PROTECTION_KEY);
+        EditingWorksheet.Unprotect(WorksheetProtectionKey);
         EditingWorksheet.UsedRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
       }
 
@@ -363,9 +364,9 @@ namespace MySQL.ForExcel
     /// <returns>An Excel range containing just the newly added row.</returns>
     private Excel.Range AddNewRowToEditingRange(bool clearColoringOfOldNewRow)
     {
-      EditingWorksheet.UnprotectEditingWorksheet(EditingWorksheet_Change, SHEET_PROTECTION_KEY);
+      EditingWorksheet.UnprotectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey);
       Excel.Range rowRange = EditDataRange.AddNewRow(clearColoringOfOldNewRow);
-      EditingWorksheet.ProtectEditingWorksheet(EditingWorksheet_Change, SHEET_PROTECTION_KEY, EditDataRange);
+      EditingWorksheet.ProtectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey, EditDataRange);
       return rowRange;
     }
 
@@ -850,7 +851,7 @@ namespace MySQL.ForExcel
         MiscUtilities.ShowCustomizedErrorDialog(refreshFromDB ? Properties.Resources.EditDataRefreshErrorText : Properties.Resources.EditDataRevertErrorText, exception.Message);
       }
 
-      EditingWorksheet.UnprotectEditingWorksheet(EditingWorksheet_Change, SHEET_PROTECTION_KEY);
+      EditingWorksheet.UnprotectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey);
       EditDataRange.Clear();
       Excel.Range topLeftCell = EditDataRange.Cells[1, 1];
       topLeftCell.Select();

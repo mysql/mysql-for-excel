@@ -1,21 +1,19 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
 namespace MySQL.ForExcel
 {
@@ -23,6 +21,7 @@ namespace MySQL.ForExcel
   using System.Collections.Generic;
   using System.ComponentModel;
   using System.Data;
+  using System.Linq;
   using System.Windows.Forms;
   using MySql.Data.MySqlClient;
   using MySQL.ForExcel.Properties;
@@ -42,12 +41,13 @@ namespace MySQL.ForExcel
     public ExcelAddInPane(Excel.Application app)
     {
       ExcelApplication = app;
-      ExcelApplication.SheetChange += new Excel.AppEvents_SheetChangeEventHandler(ExcelApplication_SheetChange);
-      ExcelApplication.SheetSelectionChange += new Excel.AppEvents_SheetSelectionChangeEventHandler(ExcelApplication_SheetSelectionChange);
-      ExcelApplication.SheetActivate += new Excel.AppEvents_SheetActivateEventHandler(ExcelApplication_SheetActivate);
-      ExcelApplication.SheetDeactivate += new Excel.AppEvents_SheetDeactivateEventHandler(ExcelApplication_SheetDeactivate);
-      ExcelApplication.WorkbookDeactivate += new Excel.AppEvents_WorkbookDeactivateEventHandler(ExcelApplication_WorkbookDeactivate);
-      ExcelApplication.WorkbookActivate += new Excel.AppEvents_WorkbookActivateEventHandler(ExcelApplication_WorkbookActivate);
+      ExcelApplication.SheetChange += ExcelApplication_SheetChange;
+      ExcelApplication.SheetSelectionChange += ExcelApplication_SheetSelectionChange;
+      ExcelApplication.SheetActivate += ExcelApplication_SheetActivate;
+      ExcelApplication.SheetDeactivate += ExcelApplication_SheetDeactivate;
+      ExcelApplication.WorkbookDeactivate += ExcelApplication_WorkbookDeactivate;
+      ExcelApplication.WorkbookActivate += ExcelApplication_WorkbookActivate;
+      ExcelApplication.WorkbookBeforeSave += ExcelApplication_WorkbookBeforeSave;
 
       InitializeComponent();
 
@@ -56,6 +56,7 @@ namespace MySQL.ForExcel
       ActiveEditDialogsList = null;
       LastDeactivatedSheetName = string.Empty;
       LastDeactivatedWorkbookName = string.Empty;
+      ProtectedWorksheetPasskeys = new Dictionary<string, string>();
       WBConnection = null;
     }
 
@@ -136,6 +137,12 @@ namespace MySQL.ForExcel
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string LastDeactivatedWorkbookName { get; private set; }
+
+    /// <summary>
+    /// Gets a dictionary with the names and passkeys of Worksheets that were protected in Edit Data operations and saved to disk.
+    /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public Dictionary<string, string> ProtectedWorksheetPasskeys { get; private set; }
 
     /// <summary>
     /// Gets a <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.
@@ -837,6 +844,47 @@ namespace MySQL.ForExcel
       if (ActiveEditDialogsList.Count == 0)
       {
         ActiveEditDialogsList = null;
+      }
+    }
+
+    /// <summary>
+    /// Event delegate method fired before an Excel <see cref="Microsoft.Office.Interop.Excel.Workbook"/> is saved to disk.
+    /// </summary>
+    /// <param name="Wb">A <see cref="Microsoft.Office.Interop.Excel.Workbook"/> object.</param>
+    /// <param name="SaveAsUI">Flag indicating whether the Save As dialog was displayed.</param>
+    /// <param name="Cancel">Flag indicating whether the event is cancelled.</param>
+    private void ExcelApplication_WorkbookBeforeSave(Excel.Workbook Wb, bool SaveAsUI, ref bool Cancel)
+    {
+      if (ActiveEditDialogsList.Exists(editContainer => editContainer.EditDialog.WorkbookName == Wb.Name))
+      {
+        bool closeEditingWorksheets = InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.WorkSheetInEditModeSavingWarningTitle, Resources.WorkSheetInEditModeSavingWarningDetail, null, Resources.WorkSheetInEditModeSavingWarningMoreInfo) == DialogResult.Yes;
+        foreach (Excel.Worksheet worksheet in Wb.Worksheets)
+        {
+          ActiveEditDialogContainer editContainer = ActiveEditDialogsList.FirstOrDefault(editDialogContainer => editDialogContainer.EditDialog.EditingWorksheet == worksheet);
+          if (editContainer == null)
+          {
+            continue;
+          }
+
+          if (closeEditingWorksheets)
+          {
+            if (editContainer.EditDialog != null)
+            {
+              editContainer.EditDialog.Close();
+            }
+
+            if (ActiveEditDialogsList.Contains(editContainer))
+            {
+              ActiveEditDialogsList.Remove(editContainer);
+            }
+
+            ProtectedWorksheetPasskeys.Remove(worksheet.Name);
+          }
+          else
+          {
+            ProtectedWorksheetPasskeys.Add(worksheet.Name, editContainer.EditDialog.WorksheetProtectionKey);
+          }
+        }
       }
     }
 

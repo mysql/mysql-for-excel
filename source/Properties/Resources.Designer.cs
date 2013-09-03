@@ -1970,11 +1970,51 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Excel WorkSheet is in Compatibility Mode which has a row limit of 65,535 rows..
+        ///   Looks up a localized string similar to Excel Worksheet is in Compatibility Mode which has a row limit of 65,535 rows..
         /// </summary>
         internal static string WorkSheetInCompatibilityModeWarning {
             get {
                 return ResourceManager.GetString("WorkSheetInCompatibilityModeWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warning: Excel Worksheet {0} was saved password-protected because it was used within an Edit Data operation. To unprotect it use the password: {1}.
+        /// </summary>
+        internal static string WorkSheetInEditModeSavedLogWarning {
+            get {
+                return ResourceManager.GetString("WorkSheetInEditModeSavedLogWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Excel Workbook being saved contains Worksheets that are password-protected to be used by MySQL for Excel in Edit Mode.
+        ///Do you want to exit Edit Mode on all Worksheets within the Workbook before saving?.
+        /// </summary>
+        internal static string WorkSheetInEditModeSavingWarningDetail {
+            get {
+                return ResourceManager.GetString("WorkSheetInEditModeSavingWarningDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MySQL for Excel password-protects Excel Worksheets in Edit Mode. The next time the saved Workbook is opened those Worksheets will remain protected, so in order to save the Workbook the following is recommended:
+        ///
+        ///* Exit Edit Mode in all Excel Worksheets before saving so this warning is not shown.
+        ///* If you choose not to exit Edit Mode and save anyway, you will be able to unprotect the Worksheets after MySQL for Excel is closed using the protection passwords output to the application log..
+        /// </summary>
+        internal static string WorkSheetInEditModeSavingWarningMoreInfo {
+            get {
+                return ResourceManager.GetString("WorkSheetInEditModeSavingWarningMoreInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Workbook contains password protected Worksheets..
+        /// </summary>
+        internal static string WorkSheetInEditModeSavingWarningTitle {
+            get {
+                return ResourceManager.GetString("WorkSheetInEditModeSavingWarningTitle", resourceCulture);
             }
         }
         
@@ -1988,7 +2028,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Active Workhsheet in Edit Mode.
+        ///   Looks up a localized string similar to Active Worksheet in Edit Mode.
         /// </summary>
         internal static string WorkSheetInEditModeWarningTitle {
             get {

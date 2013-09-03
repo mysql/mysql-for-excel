@@ -421,7 +421,7 @@ Please re-enter your password to try again.</value>
     <value>..\Resources\remove_col_mapping.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="WorkSheetInCompatibilityModeWarning" xml:space="preserve">
-    <value>Excel WorkSheet is in Compatibility Mode which has a row limit of 65,535 rows.</value>
+    <value>Excel Worksheet is in Compatibility Mode which has a row limit of 65,535 rows.</value>
   </data>
   <data name="ConnectSSLFailedDetailWarning" xml:space="preserve">
     <value>A possible fail reason could be that your user requires a SSL connection that is not currently supported by MySQL for Excel.
@@ -490,7 +490,7 @@ To be able to make modifications on cells not related to MySQL data please exit 
     <value>Data Imports cannot be done into a Worksheet in Edit Mode, do you want to import the data into a new Worksheet?</value>
   </data>
   <data name="WorkSheetInEditModeWarningTitle" xml:space="preserve">
-    <value>Active Workhsheet in Edit Mode</value>
+    <value>Active Worksheet in Edit Mode</value>
   </data>
   <data name="ColumnDataTypeRequiredWarning" xml:space="preserve">
     <value>Column DataType is required.</value>
@@ -763,5 +763,21 @@ Please select your MySQL connection again to retry.</value>
   </data>
   <data name="GenericConnectionErrorText" xml:space="preserve">
     <value>MySQL Error {0}: {1}</value>
+  </data>
+  <data name="WorkSheetInEditModeSavedLogWarning" xml:space="preserve">
+    <value>Warning: Excel Worksheet {0} was saved password-protected because it was used within an Edit Data operation. To unprotect it use the password: {1}</value>
+  </data>
+  <data name="WorkSheetInEditModeSavingWarningDetail" xml:space="preserve">
+    <value>The Excel Workbook being saved contains Worksheets that are password-protected to be used by MySQL for Excel in Edit Mode.
+Do you want to exit Edit Mode on all Worksheets within the Workbook before saving?</value>
+  </data>
+  <data name="WorkSheetInEditModeSavingWarningMoreInfo" xml:space="preserve">
+    <value>MySQL for Excel password-protects Excel Worksheets in Edit Mode. The next time the saved Workbook is opened those Worksheets will remain protected, so in order to save the Workbook the following is recommended:
+
+* Exit Edit Mode in all Excel Worksheets before saving so this warning is not shown.
+* If you choose not to exit Edit Mode and save anyway, you will be able to unprotect the Worksheets after MySQL for Excel is closed using the protection passwords output to the application log.</value>
+  </data>
+  <data name="WorkSheetInEditModeSavingWarningTitle" xml:space="preserve">
+    <value>Workbook contains password protected Worksheets.</value>
   </data>
 </root>
