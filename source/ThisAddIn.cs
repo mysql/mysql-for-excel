@@ -66,12 +66,23 @@ namespace MySQL.ForExcel
       get
       {
         Office.CustomTaskPane addInPane = CustomTaskPanes.FirstOrDefault(ctp =>
+        {
+          bool isParentWindowActiveExcelWindow = false;
+          if (ExcelVersionNumber >= EXCEL_2013_VERSION_NUMBER)
           {
+            // If running on Excel 2013 or later a MDI is used for the windows so the active custom pane is matched with its
+            // window and the application active window.
             Excel.Window paneWindow = ctp.Window as Excel.Window;
-            bool isPanWindow = paneWindow.Hwnd == Application.ActiveWindow.Hwnd;
-            bool isExcelAddin = ctp.Control is ExcelAddInPane;
-            return isPanWindow && isExcelAddin;
-          });
+            isParentWindowActiveExcelWindow = paneWindow != null && paneWindow.Hwnd == Application.ActiveWindow.Hwnd;
+          }
+          else
+          {
+            // If running on Excel 2007 or 2010 a SDI is used so the active custom pane is the first one of an Excel Add-In.
+            isParentWindowActiveExcelWindow = true;
+          }
+
+          return isParentWindowActiveExcelWindow && ctp.Control is ExcelAddInPane;
+        });
 
         return addInPane;
       }
