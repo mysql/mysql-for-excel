@@ -90,8 +90,8 @@
     <CustomAction Id="InstallAddIn32" BinaryKey="ExcelCustomAction" DllEntry="InstallAddIn32" Execute="deferred" Impersonate="no" />
     <CustomAction Id="InstallAddIn64.SetProperty" Return="check" Property="InstallAddIn64" Value="AddInDllLocation=[#AddIn];VstoFileLocation=[#VSTOFile]"/>
     <CustomAction Id="InstallAddIn64" BinaryKey="ExcelCustomAction" DllEntry="InstallAddIn64" Execute="deferred" Impersonate="no" />
-    <CustomAction Id="RemoveAddIn32" BinaryKey="ExcelCustomAction" DllEntry="RemoveAddIn32" Impersonate="no" />
-    <CustomAction Id="RemoveAddIn64" BinaryKey="ExcelCustomAction" DllEntry="RemoveAddIn64" Impersonate="no" />
+    <CustomAction Id="RemoveAddIn32" BinaryKey="ExcelCustomAction" DllEntry="RemoveAddIn32" Execute="deferred" Impersonate="no" />
+    <CustomAction Id="RemoveAddIn64" BinaryKey="ExcelCustomAction" DllEntry="RemoveAddIn64" Execute="deferred" Impersonate="no" />
 
     <InstallExecuteSequence>
       <RemoveExistingProducts After="InstallInitialize" />
