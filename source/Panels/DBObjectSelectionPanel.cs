@@ -146,7 +146,6 @@ namespace MySQL.ForExcel
         return;
       }
 
-      editActive = dbObj.Type == DBObject.DBObjectType.Table && (Parent as ExcelAddInPane).TableHasEditOnGoing(CurrentSelectedDBObject.Name);
       ImportDataHotLabel.Enabled = true;
       EditDataHotLabel.Enabled = dbObj.Type == DBObject.DBObjectType.Table && !editActive;
       AppendDataHotLabel.Enabled = dbObj.Type == DBObject.DBObjectType.Table && ExcelSelectionContainsData;

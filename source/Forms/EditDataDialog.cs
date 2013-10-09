@@ -274,7 +274,7 @@ namespace MySQL.ForExcel
     protected override void OnClosing(CancelEventArgs e)
     {
       base.OnClosing(e);
-      ParentTaskPane.RefreshDBObjectPanelActionLabelsEnabledStatus(EditingTableName, false);
+      ParentTaskPane.RefreshDbObjectPanelActionLabelsEnabledStatus(EditingTableName, false);
       if (EditingWorksheetExists)
       {
         EditingWorksheet.Unprotect(WorksheetProtectionKey);

@@ -609,7 +609,7 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="tableName">Name of the table with status update.</param>
     /// <param name="editActive">Flag indicating if the Edit Data action is enabled for a table with the given name.</param>
-    public void RefreshDBObjectPanelActionLabelsEnabledStatus(string tableName, bool editActive)
+    public void RefreshDbObjectPanelActionLabelsEnabledStatus(string tableName, bool editActive)
     {
       DBObjectSelectionPanel3.RefreshActionLabelsEnabledStatus(tableName, editActive);
     }
@@ -618,7 +618,7 @@ namespace MySQL.ForExcel
     /// Refreshes the availability of action labels linked to a table with the given name.
     /// </summary>
     /// <param name="tableName">Name of the table with status update.</param>
-    public void RefreshDBObjectPanelActionLabelsEnabledStatus(string tableName)
+    public void RefreshDbObjectPanelActionLabelsEnabledStatus(string tableName)
     {
       bool editActive = TableHasEditOnGoing(tableName);
       DBObjectSelectionPanel3.RefreshActionLabelsEnabledStatus(tableName, editActive);
