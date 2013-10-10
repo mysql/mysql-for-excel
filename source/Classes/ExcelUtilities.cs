@@ -194,26 +194,35 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Adds a new row at the bottom of the given Excel range.
     /// </summary>
-    /// <param name="clearColoringOfOldNewRow">Flag indicating whether the previous row that was placeholder for new rows is cleared of its formatting.</param>
-    /// <returns>An Excel range containing just the newly added row.</returns>
-    public static Excel.Range AddNewRow(this Excel.Range range, bool clearLastRowColoring = false)
+    /// <param name="range">The Excel range to add a new row to the end of it.</param>
+    /// <param name="clearLastRowColoring">Flag indicating whether the previous row that was placeholder for new rows is cleared of its formatting.</param>
+    /// <param name="newRowRange">An Excel range containing just the newly added row if <see cref="clearLastRowColoring"/> is <c>true</c>, or containing the row above the newly added one otherwise.</param>
+    /// <returns>The original Excel range with the newly added row at the end of it.</returns>
+    public static Excel.Range AddNewRow(this Excel.Range range, bool clearLastRowColoring, out Excel.Range newRowRange)
     {
-      Excel.Range newRowRange = null;
+      newRowRange = null;
       if (range == null)
       {
-        return newRowRange;
+        return null;
       }
 
       range = range.get_Resize(range.Rows.Count + 1, range.Columns.Count);
       newRowRange = range.Rows[range.Rows.Count] as Excel.Range;
-      newRowRange.Interior.Color = NewRowCellsOLEColor;
+      if (newRowRange != null)
+      {
+        newRowRange.Interior.Color = NewRowCellsOLEColor;
+      }
+
       if (clearLastRowColoring && range.Rows.Count > 0)
       {
         newRowRange = range.Rows[range.Rows.Count - 1] as Excel.Range;
-        newRowRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+        if (newRowRange != null)
+        {
+          newRowRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+        }
       }
 
-      return newRowRange;
+      return range;
     }
 
     /// <summary>

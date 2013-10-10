@@ -364,10 +364,11 @@ namespace MySQL.ForExcel
     /// <returns>An Excel range containing just the newly added row.</returns>
     private Excel.Range AddNewRowToEditingRange(bool clearColoringOfOldNewRow)
     {
+      Excel.Range newRowRange = null;
       EditingWorksheet.UnprotectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey);
-      Excel.Range rowRange = EditDataRange.AddNewRow(clearColoringOfOldNewRow);
+      EditDataRange = EditDataRange.AddNewRow(clearColoringOfOldNewRow, out newRowRange);
       EditingWorksheet.ProtectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey, EditDataRange);
-      return rowRange;
+      return newRowRange;
     }
 
     /// <summary>
