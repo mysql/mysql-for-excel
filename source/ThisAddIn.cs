@@ -1,37 +1,40 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using MySQL.ForExcel.Classes;
+using MySQL.ForExcel.Controls;
+using MySQL.ForExcel.Properties;
+using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQLWorkbench;
+using MySQL.Utility.Forms;
+using Excel = Microsoft.Office.Interop.Excel;
+using Office = Microsoft.Office.Tools;
+using OfficeCore = Microsoft.Office.Core;
 
 namespace MySQL.ForExcel
 {
-  using System;
-  using System.Collections.Generic;
-  using System.Diagnostics;
-  using System.Globalization;
-  using System.IO;
-  using System.Linq;
-  using System.Windows.Forms;
-  using MySQL.Utility;
-  using MySQL.Utility.Forms;
-  using Excel = Microsoft.Office.Interop.Excel;
-  using Office = Microsoft.Office.Tools;
-  using OfficeCore = Microsoft.Office.Core;
-
   /// <summary>
   /// Represents the main MySQL for Excel Office add-in.
   /// </summary>
@@ -67,7 +70,7 @@ namespace MySQL.ForExcel
       {
         Office.CustomTaskPane addInPane = CustomTaskPanes.FirstOrDefault(ctp =>
         {
-          bool isParentWindowActiveExcelWindow = false;
+          bool isParentWindowActiveExcelWindow;
           if (ExcelVersionNumber >= EXCEL_2013_VERSION_NUMBER)
           {
             // If running on Excel 2013 or later a MDI is used for the windows so the active custom pane is matched with its
@@ -147,31 +150,32 @@ namespace MySQL.ForExcel
       Office.CustomTaskPane activeCustomPane = ActiveCustomPane;
 
       //// If there is no custom pane associated to the Excel Add-In in the active window, create one.
-      if (activeCustomPane == null)
+      if (activeCustomPane != null)
       {
-        Application.Cursor = Excel.XlMousePointer.xlWait;
-        if (ExcelPanesList == null)
-        {
-          ExcelPanesList = new List<ExcelAddInPane>();
-        }
-
-        //// Instantiate the Excel Add-In pane to attach it to the Excel's custom task pane.
-        //// Note that in Excel 2007 and 2010 a MDI model is used so only a single Excel pane is instantiated, whereas in Excel 2013 and greater
-        ////  a SDI model is used instead, so an Excel pane is instantiated for each custom task pane appearing in each Excel window.
-        ExcelAddInPane excelPane = new ExcelAddInPane(Application);
-        excelPane.Dock = DockStyle.Fill;
-        excelPane.SizeChanged += new EventHandler(ExcelPane_SizeChanged);
-        ExcelPanesList.Add(excelPane);
-
-        //// Create a new custom task pane and initialize it.
-        activeCustomPane = CustomTaskPanes.Add(excelPane, AssemblyTitle);
-        activeCustomPane.VisibleChanged += CustomTaskPaneVisibleChanged;
-        activeCustomPane.DockPosition = OfficeCore.MsoCTPDockPosition.msoCTPDockPositionRight;
-        activeCustomPane.DockPositionRestrict = OfficeCore.MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoHorizontal;
-        activeCustomPane.Width = ADD_IN_PANE_WIDTH;
-
-        Application.Cursor = Excel.XlMousePointer.xlDefault;
+        return activeCustomPane;
       }
+
+      Application.Cursor = Excel.XlMousePointer.xlWait;
+      if (ExcelPanesList == null)
+      {
+        ExcelPanesList = new List<ExcelAddInPane>();
+      }
+
+      // Instantiate the Excel Add-In pane to attach it to the Excel's custom task pane.
+      // Note that in Excel 2007 and 2010 a MDI model is used so only a single Excel pane is instantiated, whereas in Excel 2013 and greater
+      //  a SDI model is used instead, so an Excel pane is instantiated for each custom task pane appearing in each Excel window.
+      ExcelAddInPane excelPane = new ExcelAddInPane(Application) { Dock = DockStyle.Fill };
+      excelPane.SizeChanged += ExcelPane_SizeChanged;
+      ExcelPanesList.Add(excelPane);
+
+      // Create a new custom task pane and initialize it.
+      activeCustomPane = CustomTaskPanes.Add(excelPane, AssemblyTitle);
+      activeCustomPane.VisibleChanged += CustomTaskPaneVisibleChanged;
+      activeCustomPane.DockPosition = OfficeCore.MsoCTPDockPosition.msoCTPDockPositionRight;
+      activeCustomPane.DockPositionRestrict = OfficeCore.MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoHorizontal;
+      activeCustomPane.Width = ADD_IN_PANE_WIDTH;
+
+      Application.Cursor = Excel.XlMousePointer.xlDefault;
 
       return activeCustomPane;
     }
@@ -179,46 +183,86 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Event delegate method fired when an Excel window is activated.
     /// </summary>
-    /// <param name="Wb">The Excel workbook tied to the activated window.</param>
-    /// <param name="Wn">The activated Excel window.</param>
-    private void Application_WindowActivate(Excel.Workbook Wb, Excel.Window Wn)
+    /// <param name="wb">The Excel workbook tied to the activated window.</param>
+    /// <param name="wn">The activated Excel window.</param>
+    private void Application_WindowActivate(Excel.Workbook wb, Excel.Window wn)
     {
-      //// Verify the collection of custom task panes to dispose of custom task panes pointing to closed (invalid) windows.
+      // Verify the collection of custom task panes to dispose of custom task panes pointing to closed (invalid) windows.
       bool disposePane = false;
-      foreach (Office.CustomTaskPane customPane in CustomTaskPanes)
+      foreach (Office.CustomTaskPane customPane in CustomTaskPanes.Where(customPane => customPane.Control is ExcelAddInPane))
       {
-        if (!(customPane.Control is ExcelAddInPane))
-        {
-          //// If a custom task pane has been created for a different Add-In then skip it.
-          continue;
-        }
-
         try
         {
+          // Do NOT remove the following line although the customPaneWindow variable is not used in the method the casting
+          // of the customPane.Window is needed to determine if the window is still valid and has not been disposed of.
           Excel.Window customPaneWindow = customPane.Window as Excel.Window;
         }
         catch
         {
-          //// If an error ocurred trying to access the custom task pane window, it means its window is no longer valid
-          ////  or in other words, it has been closed. There is no other way to find out if a windows was closed
-          ////  (similar to the way we find out if a Worksheet has been closed as there are no events for that).
+          // If an error ocurred trying to access the custom task pane window, it means its window is no longer valid
+          //  or in other words, it has been closed. There is no other way to find out if a windows was closed
+          //  (similar to the way we find out if a Worksheet has been closed as there are no events for that).
           disposePane = true;
         }
 
-        if (disposePane)
+        if (!disposePane)
         {
-          ExcelAddInPane excelPane = customPane.Control as ExcelAddInPane;
-          CloseExcelPane(excelPane);
-          break;
+          continue;
         }
+
+        ExcelAddInPane excelPane = customPane.Control as ExcelAddInPane;
+        CloseExcelPane(excelPane);
+        break;
       }
 
-      //// Synchronize the MySQL for Excel toggle button state of the currently activated window.
+      // Synchronize the MySQL for Excel toggle button state of the currently activated window.
       Office.Ribbon.RibbonControl ribbonControl = Globals.Ribbons.ManageTaskPaneRibbon.MySQLExcelAddInRibbonGroup.Items.FirstOrDefault(rc => rc.Name == "ShowTaskPaneRibbonToggleButton");
-      if (ribbonControl != null && ribbonControl is Office.Ribbon.RibbonToggleButton)
+      if (!(ribbonControl is Office.Ribbon.RibbonToggleButton))
       {
-        Office.Ribbon.RibbonToggleButton toggleButton = ribbonControl as Office.Ribbon.RibbonToggleButton;
-        toggleButton.Checked = ActiveCustomPane != null && ActiveCustomPane.Visible;
+        return;
+      }
+
+      Office.Ribbon.RibbonToggleButton toggleButton = ribbonControl as Office.Ribbon.RibbonToggleButton;
+      toggleButton.Checked = ActiveCustomPane != null && ActiveCustomPane.Visible;
+    }
+
+    /// <summary>
+    /// Converts the settings stored mappings property to the renamed MySqlColumnMapping class.
+    /// </summary>
+    private static void ConvertSettingsStoredMappingsCasing()
+    {
+      // Check if settings file exists, if it does not flag the conversion as done since it was not needed.
+      MySqlForExcelSettings settings = new MySqlForExcelSettings();
+      if (!File.Exists(settings.SettingsPath))
+      {
+        Settings.Default.ConvertedSettingsStoredMappingsCasing = true;
+        return;
+      }
+
+      // Open the settings.config file for writing and convert the MySQLColumnMapping class to MySqlColumnMapping.
+      try
+      {
+        bool converted = false;
+        string settingsConfigText = File.ReadAllText(settings.SettingsPath, Encoding.Unicode);
+        if (settingsConfigText.Contains("MySQLColumnMapping"))
+        {
+          settingsConfigText = settingsConfigText.Replace("MySQLColumnMapping", "MySqlColumnMapping");
+          converted = true;
+        }
+
+        if (!converted)
+        {
+          return;
+        }
+
+        File.WriteAllText(settings.SettingsPath, settingsConfigText, Encoding.Unicode);
+        Settings.Default.Reload();
+        Settings.Default.ConvertedSettingsStoredMappingsCasing = true;
+        Settings.Default.Save();
+      }
+      catch (Exception ex)
+      {
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
     }
 
@@ -228,25 +272,25 @@ namespace MySQL.ForExcel
     private void CustomizeInfoDialog()
     {
       InfoDialog.ApplicationName = AssemblyTitle;
-      InfoDialog.SuccessLogo = Properties.Resources.MySQLforExcel_InfoDlg_Success_64x64;
-      InfoDialog.ErrorLogo = Properties.Resources.MySQLforExcel_InfoDlg_Error_64x64;
-      InfoDialog.WarningLogo = Properties.Resources.MySQLforExcel_InfoDlg_Warning_64x64;
-      InfoDialog.InformationLogo = Properties.Resources.MySQLforExcel_Logo_64x64;
+      InfoDialog.SuccessLogo = Resources.MySQLforExcel_InfoDlg_Success_64x64;
+      InfoDialog.ErrorLogo = Resources.MySQLforExcel_InfoDlg_Error_64x64;
+      InfoDialog.WarningLogo = Resources.MySQLforExcel_InfoDlg_Warning_64x64;
+      InfoDialog.InformationLogo = Resources.MySQLforExcel_Logo_64x64;
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="taskPaneValue"/> visible property value changes.
+    /// Event delegate method fired when the <see cref="Office.CustomTaskPane"/> visible property value changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Sender object.</param>
-    private void CustomTaskPaneVisibleChanged(object sender, EventArgs e)
+    private static void CustomTaskPaneVisibleChanged(object sender, EventArgs e)
     {
       Office.CustomTaskPane customTaskPane = sender as Office.CustomTaskPane;
-      Globals.Ribbons.ManageTaskPaneRibbon.ShowTaskPaneRibbonToggleButton.Checked = customTaskPane.Visible;
+      Globals.Ribbons.ManageTaskPaneRibbon.ShowTaskPaneRibbonToggleButton.Checked = customTaskPane != null && customTaskPane.Visible;
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="ExcelPane"/> size changes.
+    /// Event delegate method fired when the <see cref="ExcelAddInPane"/> size changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
@@ -254,41 +298,43 @@ namespace MySQL.ForExcel
     {
       ExcelAddInPane excelPane = sender as ExcelAddInPane;
 
-      //// Find the parent Custom Task Pane
+      // Find the parent Custom Task Pane
       Office.CustomTaskPane customTaskPane = CustomTaskPanes.FirstOrDefault(ctp => ctp.Control == excelPane);
       if (customTaskPane == null || !customTaskPane.Visible)
       {
         return;
       }
 
-      //// Since there is no way to restrict the resizing of a custom task pane, cancel the resizing as soon as a
-      ////  user attempts to resize the pane.
+      // Since there is no way to restrict the resizing of a custom task pane, cancel the resizing as soon as a
+      //  user attempts to resize the pane.
       bool shouldResetWidth = customTaskPane.Width != ADD_IN_PANE_WIDTH && Application.Width >= ADD_IN_PANE_WIDTH;
-      if (shouldResetWidth)
+      if (!shouldResetWidth)
       {
-        try
-        {
-          SendKeys.Send(ESCAPE_KEY);
-          customTaskPane.Width = ADD_IN_PANE_WIDTH;
-        }
-        catch (Exception ex)
-        {
-          MySQLSourceTrace.WriteAppErrorToLog(ex);
-        }
+        return;
+      }
+
+      try
+      {
+        SendKeys.Send(ESCAPE_KEY);
+        customTaskPane.Width = ADD_IN_PANE_WIDTH;
+      }
+      catch (Exception ex)
+      {
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
     }
 
     /// <summary>
-    /// Initializes settings for the <see cref="MySqlWorkbenchConnectionsHelper"/> and <see cref="MySqlWorkbenchPasswordVault"/> classes.
+    /// Initializes settings for the <see cref="MySqlWorkbench"/> and <see cref="MySqlWorkbenchPasswordVault"/> classes.
     /// </summary>
-    private void InitializeMySQLWorkbenchStaticSettings()
+    private void InitializeMySqlWorkbenchStaticSettings()
     {
       string applicationDataFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
       MySqlWorkbench.ExternalApplicationName = AssemblyTitle;
       MySqlWorkbenchPasswordVault.ApplicationPasswordVaultFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\user_data.dat";
       MySqlWorkbench.ExternalApplicationConnectionsFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\connections.xml";
-      MySQLSourceTrace.LogFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\MySQLForExcel.log";
-      MySQLSourceTrace.SourceTraceClass = "MySQLForExcel";
+      MySqlSourceTrace.LogFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\MySQLForExcel.log";
+      MySqlSourceTrace.SourceTraceClass = "MySQLForExcel";
     }
 
     /// <summary>
@@ -296,17 +342,19 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
+    private void ThisAddIn_Shutdown(object sender, EventArgs e)
     {
-      MySQLSourceTrace.WriteToLog(Properties.Resources.ShutdownMessage, SourceLevels.Information);
+      MySqlSourceTrace.WriteToLog(Resources.ShutdownMessage, SourceLevels.Information);
 
-      //// Close all Excel panes created
-      if (ExcelPanesList != null)
+      // Close all Excel panes created
+      if (ExcelPanesList == null)
       {
-        foreach (ExcelAddInPane excelPane in ExcelPanesList)
-        {
-          excelPane.Dispose();
-        }
+        return;
+      }
+
+      foreach (ExcelAddInPane excelPane in ExcelPanesList)
+      {
+        excelPane.Dispose();
       }
     }
 
@@ -315,33 +363,39 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void ThisAddIn_Startup(object sender, System.EventArgs e)
+    private void ThisAddIn_Startup(object sender, EventArgs e)
     {
       try
       {
-        //// Make sure the settings directory exists
+        // Make sure the settings directory exists
         Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Oracle\MySQL for Excel");
 
-        //// Static initializations.
+        // Static initializations.
         System.Windows.Forms.Application.EnableVisualStyles();
         System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
         CustomizeInfoDialog();
-        InitializeMySQLWorkbenchStaticSettings();
+        InitializeMySqlWorkbenchStaticSettings();
         AssemblyTitle = AssemblyInfo.AssemblyTitle;
 
-        //// Log the Add-In's Startup
-        MySQLSourceTrace.WriteToLog(Properties.Resources.StartupMessage, SourceLevels.Information);
+        // Log the Add-In's Startup
+        MySqlSourceTrace.WriteToLog(Resources.StartupMessage, SourceLevels.Information);
 
-        //// Detect Excel version.
+        // Detect Excel version.
         int pointPos = Application.Version.IndexOf('.');
         string majorVersionText = pointPos >= 0 ? Application.Version.Substring(0, pointPos) : Application.Version;
         ExcelVersionNumber = Int32.Parse(majorVersionText, CultureInfo.InvariantCulture);
 
-        //// This method is used to migrate all connections created with 1.0.6 (in a local connections file) to the Workbench connections file.
+        // Convert the StoredDataMappings setting's data type to MySql
+        if (!Settings.Default.ConvertedSettingsStoredMappingsCasing)
+        {
+          ConvertSettingsStoredMappingsCasing();
+        }
+
+        // This method is used to migrate all connections created with 1.0.6 (in a local connections file) to the Workbench connections file.
         MySqlWorkbench.MigrateExternalConnectionsToWorkbench();
 
-        //// If the Excel version corresponds to Excel 2013 or greater we need to monitoring the Excel windows activation and deactivation
-        ////  in order to synchronize the Add-In's toggle button state and dispose custom task panes when its parent window closes.
+        // If the Excel version corresponds to Excel 2013 or greater we need to monitoring the Excel windows activation and deactivation
+        //  in order to synchronize the Add-In's toggle button state and dispose custom task panes when its parent window closes.
         if (ExcelVersionNumber >= EXCEL_2013_VERSION_NUMBER)
         {
           Application.WindowActivate += Application_WindowActivate;
@@ -349,7 +403,7 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        MySQLSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
     }
 
@@ -361,8 +415,8 @@ namespace MySQL.ForExcel
     /// </summary>
     private void InternalStartup()
     {
-      this.Startup += new System.EventHandler(ThisAddIn_Startup);
-      this.Shutdown += new System.EventHandler(ThisAddIn_Shutdown);
+      Startup += ThisAddIn_Startup;
+      Shutdown += ThisAddIn_Shutdown;
     }
 
     #endregion VSTO generated code

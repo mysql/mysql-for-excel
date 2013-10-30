@@ -15,14 +15,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
-namespace MySQL.ForExcel
-{
-  using System;
-  using System.Collections.Generic;
-  using System.Globalization;
-  using System.Linq;
-  using MySql.Data.MySqlClient;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using MySql.Data.MySqlClient;
 
+namespace MySQL.ForExcel.Classes
+{
   /// <summary>
   /// Provides extension methods and other static methods to leverage the work with MySQL and native ADO.NET data types.
   /// </summary>
@@ -50,204 +50,206 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Compares the values in a data table row-column and its corresponding Excel cell value.
     /// </summary>
-    /// <param name="dataTableValue">The value stored in a <see cref="DataTable"/> row and column.</param>
+    /// <param name="dataTableValue">The value stored in a <see cref="System.Data.DataTable"/> row and column.</param>
     /// <param name="excelValue">The value contained in an Excel's cell.</param>
     /// <returns><c>true</c> if the values are considered equal, <c>false</c> otherwise.</returns>
     public static bool ExcelValueEqualsDataTableValue(object dataTableValue, object excelValue)
     {
       bool areEqual = dataTableValue.Equals(excelValue);
 
-      if (!areEqual && dataTableValue != null)
+      if (areEqual)
       {
-        string strExcelValue = excelValue.ToString();
-        string strExcelValueIfBool = excelValue.GetType().ToString() == "System.Boolean" ? ((bool)excelValue ? "1" : "0") : null;
-        string nativeDataTableType = dataTableValue.GetType().ToString();
-        switch (nativeDataTableType)
-        {
-          case "System.String":
-            areEqual = string.Compare(dataTableValue.ToString(), strExcelValue, false) == 0;
+        return true;
+      }
+
+      string strExcelValue = excelValue.ToString();
+      string strExcelValueIfBool = excelValue.GetType().ToString() == "System.Boolean" ? ((bool)excelValue ? "1" : "0") : null;
+      string nativeDataTableType = dataTableValue.GetType().ToString();
+      switch (nativeDataTableType)
+      {
+        case "System.String":
+          areEqual = string.CompareOrdinal(dataTableValue.ToString(), strExcelValue) == 0;
+          break;
+
+        case "System.Byte":
+          byte byteTableValue = (byte)dataTableValue;
+          byte byteExcelValue;
+          if (strExcelValueIfBool != null)
+          {
+            strExcelValue = strExcelValueIfBool;
+          }
+
+          if (Byte.TryParse(strExcelValue, out byteExcelValue))
+          {
+            areEqual = byteTableValue == byteExcelValue;
+          }
+
+          break;
+
+        case "System.UInt16":
+          ushort ushortTableValue = (ushort)dataTableValue;
+          ushort ushortExcelValue;
+          if (strExcelValueIfBool != null)
+          {
+            strExcelValue = strExcelValueIfBool;
+          }
+
+          if (UInt16.TryParse(strExcelValue, out ushortExcelValue))
+          {
+            areEqual = ushortTableValue == ushortExcelValue;
+          }
+
+          break;
+
+        case "System.Int16":
+          short shortTableValue = (short)dataTableValue;
+          short shortExcelValue;
+          if (strExcelValueIfBool != null)
+          {
+            strExcelValue = strExcelValueIfBool;
+          }
+
+          if (Int16.TryParse(strExcelValue, out shortExcelValue))
+          {
+            areEqual = shortTableValue == shortExcelValue;
+          }
+
+          break;
+
+        case "System.UInt32":
+          uint uintTableValue = (uint)dataTableValue;
+          uint uintExcelValue;
+          if (strExcelValueIfBool != null)
+          {
+            strExcelValue = strExcelValueIfBool;
+          }
+
+          if (UInt32.TryParse(strExcelValue, out uintExcelValue))
+          {
+            areEqual = uintTableValue == uintExcelValue;
+          }
+
+          break;
+
+        case "System.Int32":
+          int intTableValue = (int)dataTableValue;
+          int intExcelValue;
+          if (strExcelValueIfBool != null)
+          {
+            strExcelValue = strExcelValueIfBool;
+          }
+
+          if (Int32.TryParse(strExcelValue, out intExcelValue))
+          {
+            areEqual = intTableValue == intExcelValue;
+          }
+
+          break;
+
+        case "System.UInt64":
+          ulong ulongTableValue = (ulong)dataTableValue;
+          ulong ulongExcelValue;
+          if (strExcelValueIfBool != null)
+          {
+            strExcelValue = strExcelValueIfBool;
+          }
+
+          if (UInt64.TryParse(strExcelValue, out ulongExcelValue))
+          {
+            areEqual = ulongTableValue == ulongExcelValue;
+          }
+
+          break;
+
+        case "System.Int64":
+          long longTableValue = (long)dataTableValue;
+          long longExcelValue;
+          if (strExcelValueIfBool != null)
+          {
+            strExcelValue = strExcelValueIfBool;
+          }
+
+          if (Int64.TryParse(strExcelValue, out longExcelValue))
+          {
+            areEqual = longTableValue == longExcelValue;
+          }
+
+          break;
+
+        case "System.Decimal":
+          decimal decimalTableValue = (decimal)dataTableValue;
+          decimal decimalExcelValue;
+          if (Decimal.TryParse(strExcelValue, out decimalExcelValue))
+          {
+            areEqual = decimalTableValue == decimalExcelValue;
+          }
+
+          break;
+
+        case "System.Single":
+          float floatTableValue = (float)dataTableValue;
+          float floatExcelValue;
+          if (Single.TryParse(strExcelValue, out floatExcelValue))
+          {
+            areEqual = floatTableValue.CompareTo(floatExcelValue) == 0;
+          }
+
+          break;
+
+        case "System.Double":
+          double doubleTableValue = (double)dataTableValue;
+          double doubleExcelValue;
+          if (Double.TryParse(strExcelValue, out doubleExcelValue))
+          {
+            areEqual = doubleTableValue.CompareTo(doubleExcelValue) == 0;
+          }
+
+          break;
+
+        case "System.Boolean":
+          bool boolTableValue = (bool)dataTableValue;
+          bool boolExcelValue;
+          if (Boolean.TryParse(strExcelValue, out boolExcelValue))
+          {
+            areEqual = boolTableValue == boolExcelValue;
+          }
+
+          break;
+
+        case "System.DateTime":
+          DateTime dateTableValue = (DateTime)dataTableValue;
+          DateTime dateExcelValue;
+          if (DateTime.TryParse(strExcelValue, out dateExcelValue))
+          {
+            areEqual = dateTableValue == dateExcelValue;
+          }
+
+          break;
+
+        case "MySql.Data.Types.MySqlDateTime":
+          MySql.Data.Types.MySqlDateTime mySqlDateTableValue = (MySql.Data.Types.MySqlDateTime)dataTableValue;
+          MySql.Data.Types.MySqlDateTime mySqlDateExcelValue;
+          try
+          {
+            mySqlDateExcelValue = new MySql.Data.Types.MySqlDateTime(strExcelValue);
+          }
+          catch
+          {
             break;
+          }
 
-          case "System.Byte":
-            byte byteTableValue = (byte)dataTableValue;
-            byte byteExcelValue = 0;
-            if (strExcelValueIfBool != null)
-            {
-              strExcelValue = strExcelValueIfBool;
-            }
+          areEqual = mySqlDateTableValue.Equals(mySqlDateExcelValue);
+          break;
 
-            if (Byte.TryParse(strExcelValue, out byteExcelValue))
-            {
-              areEqual = byteTableValue == byteExcelValue;
-            }
+        case "System.TimeSpan":
+          TimeSpan timeTableValue = (TimeSpan)dataTableValue;
+          TimeSpan timeExcelValue;
+          if (TimeSpan.TryParse(strExcelValue, out timeExcelValue))
+          {
+            areEqual = timeTableValue == timeExcelValue;
+          }
 
-            break;
-
-          case "System.UInt16":
-            ushort ushortTableValue = (ushort)dataTableValue;
-            ushort ushortExcelValue = 0;
-            if (strExcelValueIfBool != null)
-            {
-              strExcelValue = strExcelValueIfBool;
-            }
-
-            if (UInt16.TryParse(strExcelValue, out ushortExcelValue))
-            {
-              areEqual = ushortTableValue == ushortExcelValue;
-            }
-
-            break;
-
-          case "System.Int16":
-            short shortTableValue = (short)dataTableValue;
-            short shortExcelValue = 0;
-            if (strExcelValueIfBool != null)
-            {
-              strExcelValue = strExcelValueIfBool;
-            }
-
-            if (Int16.TryParse(strExcelValue, out shortExcelValue))
-            {
-              areEqual = shortTableValue == shortExcelValue;
-            }
-
-            break;
-
-          case "System.UInt32":
-            uint uintTableValue = (uint)dataTableValue;
-            uint uintExcelValue = 0;
-            if (strExcelValueIfBool != null)
-            {
-              strExcelValue = strExcelValueIfBool;
-            }
-
-            if (UInt32.TryParse(strExcelValue, out uintExcelValue))
-            {
-              areEqual = uintTableValue == uintExcelValue;
-            }
-
-            break;
-
-          case "System.Int32":
-            int intTableValue = (int)dataTableValue;
-            int intExcelValue = 0;
-            if (strExcelValueIfBool != null)
-            {
-              strExcelValue = strExcelValueIfBool;
-            }
-
-            if (Int32.TryParse(strExcelValue, out intExcelValue))
-            {
-              areEqual = intTableValue == intExcelValue;
-            }
-
-            break;
-
-          case "System.UInt64":
-            ulong ulongTableValue = (ulong)dataTableValue;
-            ulong ulongExcelValue = 0;
-            if (strExcelValueIfBool != null)
-            {
-              strExcelValue = strExcelValueIfBool;
-            }
-
-            if (UInt64.TryParse(strExcelValue, out ulongExcelValue))
-            {
-              areEqual = ulongTableValue == ulongExcelValue;
-            }
-
-            break;
-
-          case "System.Int64":
-            long longTableValue = (long)dataTableValue;
-            long longExcelValue = 0;
-            if (strExcelValueIfBool != null)
-            {
-              strExcelValue = strExcelValueIfBool;
-            }
-
-            if (Int64.TryParse(strExcelValue, out longExcelValue))
-            {
-              areEqual = longTableValue == longExcelValue;
-            }
-
-            break;
-
-          case "System.Decimal":
-            decimal decimalTableValue = (decimal)dataTableValue;
-            decimal decimalExcelValue = 0;
-            if (Decimal.TryParse(strExcelValue, out decimalExcelValue))
-            {
-              areEqual = decimalTableValue == decimalExcelValue;
-            }
-
-            break;
-
-          case "System.Single":
-            float floatTableValue = (float)dataTableValue;
-            float floatExcelValue = 0;
-            if (Single.TryParse(strExcelValue, out floatExcelValue))
-            {
-              areEqual = floatTableValue == floatExcelValue;
-            }
-
-            break;
-
-          case "System.Double":
-            double doubleTableValue = (double)dataTableValue;
-            double doubleExcelValue = 0;
-            if (Double.TryParse(strExcelValue, out doubleExcelValue))
-            {
-              areEqual = doubleTableValue == doubleExcelValue;
-            }
-
-            break;
-
-          case "System.Boolean":
-            bool boolTableValue = (bool)dataTableValue;
-            bool boolExcelValue = false;
-            if (Boolean.TryParse(strExcelValue, out boolExcelValue))
-            {
-              areEqual = boolTableValue == boolExcelValue;
-            }
-
-            break;
-
-          case "System.DateTime":
-            DateTime dateTableValue = (DateTime)dataTableValue;
-            DateTime dateExcelValue;
-            if (DateTime.TryParse(strExcelValue, out dateExcelValue))
-            {
-              areEqual = dateTableValue == dateExcelValue;
-            }
-
-            break;
-
-          case "MySql.Data.Types.MySqlDateTime":
-            MySql.Data.Types.MySqlDateTime mySQLDateTableValue = (MySql.Data.Types.MySqlDateTime)dataTableValue;
-            MySql.Data.Types.MySqlDateTime mySQLDateExcelValue;
-            try
-            {
-              mySQLDateExcelValue = new MySql.Data.Types.MySqlDateTime(strExcelValue);
-            }
-            catch
-            {
-              break;
-            }
-
-            areEqual = mySQLDateTableValue.Equals(mySQLDateExcelValue);
-            break;
-
-          case "System.TimeSpan":
-            TimeSpan timeTableValue = (TimeSpan)dataTableValue;
-            TimeSpan timeExcelValue;
-            if (TimeSpan.TryParse(strExcelValue, out timeExcelValue))
-            {
-              areEqual = timeTableValue == timeExcelValue;
-            }
-
-            break;
-        }
+          break;
       }
 
       return areEqual;
@@ -275,8 +277,8 @@ namespace MySQL.ForExcel
       bool typesConsistent = rowsDataTypesList.All(str => str == proposedStrippedDataType);
       if (!typesConsistent)
       {
-        int integerCount = 0;
-        int decimalCount = 0;
+        int integerCount;
+        int decimalCount;
         if (rowsDataTypesList.Count(str => str == "Varchar") + rowsDataTypesList.Count(str => str == "Text") == rowsDataTypesList.Count)
         {
           typesConsistent = true;
@@ -380,19 +382,13 @@ namespace MySQL.ForExcel
     {
       object importingValue = rawValue;
 
-      if (rawValue != null && rawValue is MySql.Data.Types.MySqlDateTime)
+      if (!(rawValue is MySql.Data.Types.MySqlDateTime))
       {
-        MySql.Data.Types.MySqlDateTime mysqlDate = (MySql.Data.Types.MySqlDateTime)rawValue;
-        if (mysqlDate.IsValidDateTime)
-        {
-          importingValue = new DateTime(mysqlDate.Year, mysqlDate.Month, mysqlDate.Day, mysqlDate.Hour, mysqlDate.Minute, mysqlDate.Second);
-        }
-        else
-        {
-          importingValue = DateTime.MinValue;
-        }
+        return importingValue;
       }
 
+      MySql.Data.Types.MySqlDateTime mysqlDate = (MySql.Data.Types.MySqlDateTime)rawValue;
+      importingValue = mysqlDate.IsValidDateTime ? new DateTime(mysqlDate.Year, mysqlDate.Month, mysqlDate.Day, mysqlDate.Hour, mysqlDate.Minute, mysqlDate.Second) : DateTime.MinValue;
       return importingValue;
     }
 
@@ -403,7 +399,7 @@ namespace MySQL.ForExcel
     /// <param name="againstTypeColumn">The target column where the value will be inserted.</param>
     /// <param name="escapeStringForTextTypes">Flag indicating whether text values must have special characters escaped with a back-slash.</param>
     /// <returns>The formatted string representation of the raw value.</returns>
-    public static object GetInsertingValueForColumnType(object rawValue, MySQLDataColumn againstTypeColumn, bool escapeStringForTextTypes)
+    public static object GetInsertingValueForColumnType(object rawValue, MySqlDataColumn againstTypeColumn, bool escapeStringForTextTypes)
     {
       object retValue = rawValue;
       if (againstTypeColumn == null)
@@ -476,7 +472,6 @@ namespace MySQL.ForExcel
           }
           else
           {
-            DateTime dtValue;
             string rawValueAsString = rawValue.ToString();
             if (rawValueAsString.StartsWith("0000-00-00") || rawValueAsString.StartsWith("00-00-00") || rawValueAsString.Equals("0"))
             {
@@ -491,6 +486,7 @@ namespace MySQL.ForExcel
             }
             else
             {
+              DateTime dtValue;
               if (DateTime.TryParse(rawValueAsString, out dtValue))
               {
                 if (againstTypeColumn.DataType.Name == "DateTime")
@@ -512,13 +508,20 @@ namespace MySQL.ForExcel
         else if (againstTypeColumn.IsBool)
         {
           string rawValueAsString = rawValue.ToString().ToLowerInvariant();
-          if (rawValueAsString == "ja" || rawValueAsString == "yes" || rawValueAsString == "true" || rawValueAsString == "1")
+          switch (rawValueAsString)
           {
-            retValue = true;
-          }
-          else if (rawValueAsString == "nein" || rawValueAsString == "no" || rawValueAsString == "false" || rawValueAsString == "0")
-          {
-            retValue = false;
+            case "1":
+            case "true":
+            case "yes":
+            case "ja":
+              retValue = true;
+              break;
+            case "0":
+            case "false":
+            case "no":
+            case "nein":
+              retValue = false;
+              break;
           }
         }
         else if (againstTypeColumn.ColumnsRequireQuotes)
@@ -535,7 +538,7 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="packedValue">The packed value.</param>
     /// <returns>The matching MySQL data type.</returns>
-    public static string GetMySQLDataType(object packedValue)
+    public static string GetMySqlDataType(object packedValue)
     {
       string retType = string.Empty;
       if (packedValue == null)
@@ -612,10 +615,10 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="paramsInParenthesisList">Output list of the number of parameters used with the data types declaration.</param>
     /// <returns>The list of all the MySQL data types</returns>
-    public static List<string> GetMySQLDataTypes(out List<int> paramsInParenthesisList)
+    public static List<string> GetMySqlDataTypes(out List<int> paramsInParenthesisList)
     {
       List<string> retList = new List<string>();
-      retList.AddRange(new string[] {
+      retList.AddRange(new[] {
             "bit",
             "tinyint",
             "smallint",
@@ -650,9 +653,9 @@ namespace MySQL.ForExcel
             "enum",
             "set"});
 
-      //// Assemble the list of the number of parameters used with each data type in the list above.
+      // Assemble the list of the number of parameters used with each data type in the list above.
       paramsInParenthesisList = new List<int>(retList.Count);
-      paramsInParenthesisList.AddRange(new int[] { 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1 });
+      paramsInParenthesisList.AddRange(new[] { 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1 });
       return retList;
     }
 
@@ -660,10 +663,10 @@ namespace MySQL.ForExcel
     /// Gets a list of all the MySQL data types.
     /// </summary>
     /// <returns>The list of all the MySQL data types</returns>
-    public static List<string> GetMySQLDataTypes()
+    public static List<string> GetMySqlDataTypes()
     {
       List<int> unused;
-      return GetMySQLDataTypes(out unused);
+      return GetMySqlDataTypes(out unused);
     }
 
     /// <summary>
@@ -672,7 +675,7 @@ namespace MySQL.ForExcel
     /// <param name="packedValue">Raw value to export</param>
     /// <param name="valueOverflow">Output flag indicating whether the value would still overflow the proposed data type.</param>
     /// <returns>The best match for the MySQL data type to be used for the given raw value.</returns>
-    public static string GetMySQLExportDataType(object packedValue, out bool valueOverflow)
+    public static string GetMySqlExportDataType(object packedValue, out bool valueOverflow)
     {
       valueOverflow = false;
       if (packedValue == null)
@@ -684,25 +687,26 @@ namespace MySQL.ForExcel
       string strType = objUnpackedType.FullName;
       string strValue = packedValue.ToString();
       int strLength = strValue.Length;
-      int decimalPointPos = strValue.IndexOf(".");
-      int[] varCharApproxLen = new int[6] { 5, 12, 25, 45, 255, MYSQL_VARCHAR_MAX_PROPOSED_LEN };
-      int[,] decimalApproxLen = new int[2, 2] { { 12, 2 }, { 65, 30 } };
-      int intResult = 0;
-      long longResult = 0;
-      int intLen = 0;
-      int fractLen = 0;
+      int decimalPointPos = strValue.IndexOf(".", StringComparison.Ordinal);
+      int[] varCharApproxLen = { 5, 12, 25, 45, 255, MYSQL_VARCHAR_MAX_PROPOSED_LEN };
+      int[,] decimalApproxLen = { { 12, 2 }, { 65, 30 } };
 
       if (strType == "System.Double")
       {
         if (decimalPointPos < 0)
         {
+          int intResult;
           if (Int32.TryParse(strValue, out intResult))
           {
             strType = "System.Int32";
           }
-          else if (Int64.TryParse(strValue, out longResult))
+          else
           {
-            strType = "System.Int64";
+            long longResult;
+            if (Int64.TryParse(strValue, out longResult))
+            {
+              strType = "System.Int64";
+            }
           }
         }
         else
@@ -727,12 +731,9 @@ namespace MySQL.ForExcel
       switch (strType)
       {
         case "System.String":
-          for (int i = 0; i < varCharApproxLen.Length; i++)
+          foreach (int t in varCharApproxLen.Where(t => strLength <= t))
           {
-            if (strLength <= varCharApproxLen[i])
-            {
-              return string.Format("Varchar({0})", varCharApproxLen[i]);
-            }
+            return string.Format("Varchar({0})", t);
           }
 
           return "Text";
@@ -742,13 +743,14 @@ namespace MySQL.ForExcel
 
         case "System.Decimal":
         case "System.Single":
-          intLen = decimalPointPos;
-          fractLen = strLength - intLen - 1;
+          int intLen = decimalPointPos;
+          int fractLen = strLength - intLen - 1;
           if (intLen <= decimalApproxLen[0, 0] && fractLen <= decimalApproxLen[0, 1])
           {
             return "Decimal(12,2)";
           }
-          else if (intLen <= decimalApproxLen[1, 0] && fractLen <= decimalApproxLen[1, 1])
+
+          if (intLen <= decimalApproxLen[1, 0] && fractLen <= decimalApproxLen[1, 1])
           {
             return "Decimal(65,30)";
           }
@@ -808,43 +810,53 @@ namespace MySQL.ForExcel
       {
         return ((sbyte)boxedValue).ToString("G", CultureInfo.InvariantCulture);
       }
-      else if (boxedValue is byte)
+      
+      if (boxedValue is byte)
       {
         return ((byte)boxedValue).ToString("G", CultureInfo.InvariantCulture);
       }
-      else if (boxedValue is short)
+
+      if (boxedValue is short)
       {
         return ((short)boxedValue).ToString("G", CultureInfo.InvariantCulture);
       }
-      else if (boxedValue is ushort)
+
+      if (boxedValue is ushort)
       {
         return ((ushort)boxedValue).ToString("G", CultureInfo.InvariantCulture);
       }
-      else if (boxedValue is int)
+
+      if (boxedValue is int)
       {
         return ((int)boxedValue).ToString("G", CultureInfo.InvariantCulture);
       }
-      else if (boxedValue is uint)
+
+      if (boxedValue is uint)
       {
         return ((uint)boxedValue).ToString("G", CultureInfo.InvariantCulture);
       }
-      else if (boxedValue is long)
+
+      if (boxedValue is long)
       {
         return ((long)boxedValue).ToString("G", CultureInfo.InvariantCulture);
       }
-      else if (boxedValue is ulong)
+
+      if (boxedValue is ulong)
       {
         return ((ulong)boxedValue).ToString("G", CultureInfo.InvariantCulture);
       }
-      else if (boxedValue is float)
+
+      if (boxedValue is float)
       {
         return ((float)boxedValue).ToString("G", CultureInfo.InvariantCulture);
       }
-      else if (boxedValue is double)
+
+      if (boxedValue is double)
       {
         return ((double)boxedValue).ToString("G", CultureInfo.InvariantCulture);
       }
-      else if (boxedValue is decimal)
+
+      if (boxedValue is decimal)
       {
         return ((decimal)boxedValue).ToString("G", CultureInfo.InvariantCulture);
       }
@@ -860,48 +872,48 @@ namespace MySQL.ForExcel
     /// <param name="dataForInsertion">Flag indicating whether the data is meant to be inserted or read from the column.</param>
     /// <param name="valueIsNull">Output flag indicating whether the raw value is a null one.</param>
     /// <returns>The text representation of the raw value.</returns>
-    public static string GetStringValueForColumn(object rawValue, MySQLDataColumn againstTypeColumn, bool dataForInsertion, out bool valueIsNull)
+    public static string GetStringValueForColumn(object rawValue, MySqlDataColumn againstTypeColumn, bool dataForInsertion, out bool valueIsNull)
     {
-      valueIsNull = true;
-      string valueToDB = @"null";
-
-      object valueObject = dataForInsertion ? DataTypeUtilities.GetInsertingValueForColumnType(rawValue, againstTypeColumn, true) : rawValue;
+      string valueToDb = @"null";
+      object valueObject = dataForInsertion ? GetInsertingValueForColumnType(rawValue, againstTypeColumn, true) : rawValue;
       valueIsNull = valueObject == null || valueObject == DBNull.Value;
-      if (!valueIsNull)
+      if (valueIsNull)
       {
-        if (valueObject is DateTime)
+        return valueToDb;
+      }
+
+      if (valueObject is DateTime)
+      {
+        DateTime dtValue = (DateTime)valueObject;
+        if (dtValue.Equals(DateTime.MinValue))
         {
-          DateTime dtValue = (DateTime)valueObject;
-          if (dtValue.Equals(DateTime.MinValue))
-          {
-            valueIsNull = againstTypeColumn.AllowNull;
-            valueToDB = valueIsNull ? @"null" : MYSQL_EMPTY_DATE;
-          }
-          else
-          {
-            valueToDB = dtValue.ToString(MYSQL_DATE_FORMAT);
-          }
-        }
-        else if (valueObject is MySql.Data.Types.MySqlDateTime)
-        {
-          MySql.Data.Types.MySqlDateTime dtValue = (MySql.Data.Types.MySqlDateTime)valueObject;
-          if (!dtValue.IsValidDateTime || dtValue.GetDateTime().Equals(DateTime.MinValue))
-          {
-            valueIsNull = againstTypeColumn.AllowNull;
-            valueToDB = valueIsNull ? @"null" : MYSQL_EMPTY_DATE;
-          }
-          else
-          {
-            valueToDB = dtValue.GetDateTime().ToString(MYSQL_DATE_FORMAT);
-          }
+          valueIsNull = againstTypeColumn.AllowNull;
+          valueToDb = valueIsNull ? @"null" : MYSQL_EMPTY_DATE;
         }
         else
         {
-          valueToDB = GetStringRepresentationForNumericObject(valueObject);
+          valueToDb = dtValue.ToString(MYSQL_DATE_FORMAT);
         }
       }
+      else if (valueObject is MySql.Data.Types.MySqlDateTime)
+      {
+        MySql.Data.Types.MySqlDateTime dtValue = (MySql.Data.Types.MySqlDateTime)valueObject;
+        if (!dtValue.IsValidDateTime || dtValue.GetDateTime().Equals(DateTime.MinValue))
+        {
+          valueIsNull = againstTypeColumn.AllowNull;
+          valueToDb = valueIsNull ? @"null" : MYSQL_EMPTY_DATE;
+        }
+        else
+        {
+          valueToDb = dtValue.GetDateTime().ToString(MYSQL_DATE_FORMAT);
+        }
+      }
+      else
+      {
+        valueToDb = GetStringRepresentationForNumericObject(valueObject);
+      }
 
-      return valueToDB;
+      return valueToDb;
     }
 
     /// <summary>
@@ -911,9 +923,9 @@ namespace MySQL.ForExcel
     /// <param name="againstTypeColumn">The MySQL data column where the raw value would be stored.</param>
     /// <param name="dataForInsertion">Flag indicating whether the data is meant to be inserted or read from the column.</param>
     /// <returns>The text representation of the raw value.</returns>
-    public static string GetStringValueForColumn(object rawValue, MySQLDataColumn againstTypeColumn, bool dataForInsertion)
+    public static string GetStringValueForColumn(object rawValue, MySqlDataColumn againstTypeColumn, bool dataForInsertion)
     {
-      bool valueIsNull = false;
+      bool valueIsNull;
       return GetStringValueForColumn(rawValue, againstTypeColumn, dataForInsertion, out valueIsNull);
     }
 
@@ -924,7 +936,7 @@ namespace MySQL.ForExcel
     /// <param name="unsigned">Flag indicating whether integer data types are unsigned.</param>
     /// <param name="realAsFloat">Flag indicating if real is translated to float or to double.</param>
     /// <returns>The Connector.NET data type object corresponding to the given MySQL data type.</returns>
-    public static MySqlDbType NameToMySQLType(string mySqlDataType, bool unsigned, bool realAsFloat)
+    public static MySqlDbType NameToMySqlType(string mySqlDataType, bool unsigned, bool realAsFloat)
     {
       switch (mySqlDataType.ToUpper(CultureInfo.InvariantCulture))
       {
@@ -1038,9 +1050,9 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="mySqlDataType">The MySQL data type name.</param>
     /// <param name="unsigned">Flag indicating whether integer data types are unsigned.</param>
-    /// <param name="datesAsMySQLDates">Flag indicating if a date data type will use a Connector.NET MySQLDateTime type or the native DateTime type.</param>
+    /// <param name="datesAsMySqlDates">Flag indicating if a date data type will use a Connector.NET MySQLDateTime type or the native DateTime type.</param>
     /// <returns>The .NET type corresponding to the given MySQL data type.</returns>
-    public static Type NameToType(string mySqlDataType, bool unsigned, bool datesAsMySQLDates)
+    public static Type NameToType(string mySqlDataType, bool unsigned, bool datesAsMySqlDates)
     {
       string upperType = mySqlDataType.ToUpper(CultureInfo.InvariantCulture);
       switch (upperType)
@@ -1095,7 +1107,7 @@ namespace MySQL.ForExcel
         case "DATE":
         case "DATETIME":
         case "TIMESTAMP":
-          return datesAsMySQLDates ? typeof(MySql.Data.Types.MySqlDateTime) : Type.GetType("System.DateTime");
+          return datesAsMySqlDates ? typeof(MySql.Data.Types.MySqlDateTime) : Type.GetType("System.DateTime");
 
         case "TIME":
           return Type.GetType("System.TimeSpan");
@@ -1116,104 +1128,102 @@ namespace MySQL.ForExcel
     /// Checks whether a given string value can be converted and stored in a column with the given MySQL data type.
     /// </summary>
     /// <param name="strValue">String value to convert and store.</param>
-    /// <param name="mySQLDataType">MySQL data type of the column where the value would be saved.</param>
+    /// <param name="mySqlDataType">MySQL data type of the column where the value would be saved.</param>
     /// <returns><c>true</c> if the string value can be stored using the given MySQL data type, <c>false</c> otherwise.</returns>
-    public static bool StringValueCanBeStoredWithMySQLType(string strValue, string mySQLDataType)
+    public static bool StringValueCanBeStoredWithMySqlType(string strValue, string mySqlDataType)
     {
-      mySQLDataType = mySQLDataType.ToLowerInvariant();
+      mySqlDataType = mySqlDataType.ToLowerInvariant();
 
-      //// Return immediately for big data types.
-      if (mySQLDataType.Contains("text") || mySQLDataType == "blob" || mySQLDataType == "tinyblob" || mySQLDataType == "mediumblob" || mySQLDataType == "longblob" || mySQLDataType == "binary" || mySQLDataType == "varbinary")
+      // Return immediately for big data types.
+      if (mySqlDataType.Contains("text") || mySqlDataType == "blob" || mySqlDataType == "tinyblob" || mySqlDataType == "mediumblob" || mySqlDataType == "longblob" || mySqlDataType == "binary" || mySqlDataType == "varbinary")
       {
         return true;
       }
 
-      //// Check for boolean
-      if (mySQLDataType.StartsWith("bool") || mySQLDataType == "bit" || mySQLDataType == "bit(1)")
+      // Check for boolean
+      if (mySqlDataType.StartsWith("bool") || mySqlDataType == "bit" || mySqlDataType == "bit(1)")
       {
         strValue = strValue.ToLowerInvariant();
         return (strValue == "true" || strValue == "false" || strValue == "0" || strValue == "1" || strValue == "yes" || strValue == "no" || strValue == "ja" || strValue == "nein");
       }
 
-      //// Check for integer values
-      if (mySQLDataType.StartsWith("int") || mySQLDataType.StartsWith("mediumint"))
+      // Check for integer values
+      if (mySqlDataType.StartsWith("int") || mySqlDataType.StartsWith("mediumint"))
       {
-        int tryIntValue = 0;
+        int tryIntValue;
         return Int32.TryParse(strValue, out tryIntValue);
       }
 
-      if (mySQLDataType.StartsWith("year"))
+      if (mySqlDataType.StartsWith("year"))
       {
-        int tryYearValue = 0;
+        int tryYearValue;
         return Int32.TryParse(strValue, out tryYearValue) && (tryYearValue >= 0 && tryYearValue < 100) || (tryYearValue > 1900 && tryYearValue < 2156);
       }
 
-      if (mySQLDataType.StartsWith("tinyint"))
+      if (mySqlDataType.StartsWith("tinyint"))
       {
-        byte tryByteValue = 0;
+        byte tryByteValue;
         return Byte.TryParse(strValue, out tryByteValue);
       }
 
-      if (mySQLDataType.StartsWith("smallint"))
+      if (mySqlDataType.StartsWith("smallint"))
       {
-        short trySmallIntValue = 0;
+        short trySmallIntValue;
         return Int16.TryParse(strValue, out trySmallIntValue);
       }
 
-      if (mySQLDataType.StartsWith("bigint"))
+      if (mySqlDataType.StartsWith("bigint"))
       {
-        long tryBigIntValue = 0;
+        long tryBigIntValue;
         return Int64.TryParse(strValue, out tryBigIntValue);
       }
 
-      if (mySQLDataType.StartsWith("bit"))
+      if (mySqlDataType.StartsWith("bit"))
       {
-        ulong tryBitValue = 0;
+        ulong tryBitValue;
         return UInt64.TryParse(strValue, out tryBitValue);
       }
 
-      //// Check for big numeric values
-      if (mySQLDataType.StartsWith("float"))
+      // Check for big numeric values
+      if (mySqlDataType.StartsWith("float"))
       {
-        float tryFloatValue = 0;
+        float tryFloatValue;
         return Single.TryParse(strValue, out tryFloatValue);
       }
 
-      if (mySQLDataType.StartsWith("double") || mySQLDataType.StartsWith("real"))
+      if (mySqlDataType.StartsWith("double") || mySqlDataType.StartsWith("real"))
       {
-        double tryDoubleValue = 0;
+        double tryDoubleValue;
         return Double.TryParse(strValue, out tryDoubleValue);
       }
 
-      //// Check for date and time values.
-      if (mySQLDataType == "time")
+      // Check for date and time values.
+      if (mySqlDataType == "time")
       {
-        TimeSpan tryTimeSpanValue = TimeSpan.Zero;
+        TimeSpan tryTimeSpanValue;
         return TimeSpan.TryParse(strValue, out tryTimeSpanValue);
       }
 
-      if (mySQLDataType == "date" || mySQLDataType == "datetime" || mySQLDataType == "timestamp")
+      if (mySqlDataType == "date" || mySqlDataType == "datetime" || mySqlDataType == "timestamp")
       {
-        DateTime tryDateTimeValue = DateTime.Now;
         if (strValue.StartsWith("0000-00-00") || strValue.StartsWith("00-00-00"))
         {
           return true;
         }
-        else
-        {
-          return DateTime.TryParse(strValue, out tryDateTimeValue);
-        }
+
+        DateTime tryDateTimeValue;
+        return DateTime.TryParse(strValue, out tryDateTimeValue);
       }
 
-      //// Check of char or varchar.
-      int lParensIndex = mySQLDataType.IndexOf("(");
-      int rParensIndex = mySQLDataType.IndexOf(")");
-      if (mySQLDataType.StartsWith("varchar") || mySQLDataType.StartsWith("char"))
+      // Check of char or varchar.
+      int lParensIndex = mySqlDataType.IndexOf("(", StringComparison.Ordinal);
+      int rParensIndex = mySqlDataType.IndexOf(")", StringComparison.Ordinal);
+      if (mySqlDataType.StartsWith("varchar") || mySqlDataType.StartsWith("char"))
       {
-        int characterLen = 0;
+        int characterLen;
         if (lParensIndex >= 0)
         {
-          string paramValue = mySQLDataType.Substring(lParensIndex + 1, mySQLDataType.Length - lParensIndex - 2);
+          string paramValue = mySqlDataType.Substring(lParensIndex + 1, mySqlDataType.Length - lParensIndex - 2);
           int.TryParse(paramValue, out characterLen);
         }
         else
@@ -1224,20 +1234,17 @@ namespace MySQL.ForExcel
         return strValue.Length <= characterLen;
       }
 
-      //// Check if enum or set.
-      bool isEnum = mySQLDataType.StartsWith("enum");
-      bool isSet = mySQLDataType.StartsWith("set");
+      // Check if enum or set.
+      bool isEnum = mySqlDataType.StartsWith("enum");
+      bool isSet = mySqlDataType.StartsWith("set");
       if (isSet || isEnum)
       {
         List<string> setOrEnumMembers = new List<string>();
         if (lParensIndex >= 0 && rParensIndex >= 0 && lParensIndex < rParensIndex)
         {
-          string membersString = mySQLDataType.Substring(lParensIndex + 1, rParensIndex - lParensIndex - 1);
-          string[] setMembersArray = membersString.Split(new char[] { ',' });
-          foreach (string s in setMembersArray)
-          {
-            setOrEnumMembers.Add(s.Trim(new char[] { '"', '\'' }));
-          }
+          string membersString = mySqlDataType.Substring(lParensIndex + 1, rParensIndex - lParensIndex - 1);
+          string[] setMembersArray = membersString.Split(new[] { ',' });
+          setOrEnumMembers.AddRange(setMembersArray.Select(s => s.Trim(new[] {'"', '\''})));
         }
 
         if (isEnum)
@@ -1245,48 +1252,40 @@ namespace MySQL.ForExcel
           return setOrEnumMembers.Contains(strValue.ToLowerInvariant());
         }
 
-        if (isSet)
-        {
-          string[] valueSet = strValue.Split(new char[] { ',' });
-          bool setMatch = valueSet.Length > 0;
-          foreach (string val in valueSet)
-          {
-            setMatch = setMatch && setOrEnumMembers.Contains(val.ToLowerInvariant());
-          }
-
-          return setMatch;
-        }
+        string[] valueSet = strValue.Split(new[] { ',' });
+        bool setMatch = valueSet.Length > 0;
+        return valueSet.Aggregate(setMatch, (current, val) => current && setOrEnumMembers.Contains(val.ToLowerInvariant()));
       }
 
-      //// Check for decimal values which is the more complex.
-      bool mayContainFloatingPoint = mySQLDataType.StartsWith("decimal") || mySQLDataType.StartsWith("numeric") || mySQLDataType.StartsWith("double") || mySQLDataType.StartsWith("float") || mySQLDataType.StartsWith("real");
-      int commaPos = mySQLDataType.IndexOf(",");
-      int[] decimalLen = new int[2] { -1, -1 };
+      // Check for decimal values which is the more complex.
+      bool mayContainFloatingPoint = mySqlDataType.StartsWith("decimal") || mySqlDataType.StartsWith("numeric") || mySqlDataType.StartsWith("double") || mySqlDataType.StartsWith("float") || mySqlDataType.StartsWith("real");
+      int commaPos = mySqlDataType.IndexOf(",", StringComparison.Ordinal);
+      int[] decimalLen = { -1, -1 };
       if (mayContainFloatingPoint && lParensIndex >= 0 && rParensIndex >= 0 && lParensIndex < rParensIndex)
       {
-        decimalLen[0] = Int32.Parse(mySQLDataType.Substring(lParensIndex + 1, (commaPos >= 0 ? commaPos : rParensIndex) - lParensIndex - 1));
+        decimalLen[0] = Int32.Parse(mySqlDataType.Substring(lParensIndex + 1, (commaPos >= 0 ? commaPos : rParensIndex) - lParensIndex - 1));
         if (commaPos >= 0)
         {
-          decimalLen[1] = Int32.Parse(mySQLDataType.Substring(commaPos + 1, rParensIndex - commaPos - 1));
+          decimalLen[1] = Int32.Parse(mySqlDataType.Substring(commaPos + 1, rParensIndex - commaPos - 1));
         }
       }
 
-      int floatingPointPos = strValue.IndexOf(".");
+      int floatingPointPos = strValue.IndexOf(".", StringComparison.Ordinal);
       bool floatingPointCompliant = true;
       if (floatingPointPos >= 0)
       {
         bool lengthCompliant = strValue.Substring(0, floatingPointPos).Length <= decimalLen[0];
-        bool decimalPlacesCompliant = decimalLen[1] >= 0 ? strValue.Substring(floatingPointPos + 1, strValue.Length - floatingPointPos - 1).Length <= decimalLen[1] : true;
+        bool decimalPlacesCompliant = decimalLen[1] < 0 || strValue.Substring(floatingPointPos + 1, strValue.Length - floatingPointPos - 1).Length <= decimalLen[1];
         floatingPointCompliant = lengthCompliant && decimalPlacesCompliant;
       }
 
-      if (mySQLDataType.StartsWith("decimal") || mySQLDataType.StartsWith("numeric"))
+      if (!mySqlDataType.StartsWith("decimal") && !mySqlDataType.StartsWith("numeric"))
       {
-        decimal tryDecimalValue = 0;
-        return Decimal.TryParse(strValue, out tryDecimalValue) && floatingPointCompliant;
+        return false;
       }
 
-      return false;
+      decimal tryDecimalValue;
+      return Decimal.TryParse(strValue, out tryDecimalValue) && floatingPointCompliant;
     }
 
     /// <summary>
@@ -1309,7 +1308,7 @@ namespace MySQL.ForExcel
 
       strippedType1 = strippedType1.ToLowerInvariant();
       strippedType2 = strippedType2.ToLowerInvariant();
-      List<string> dataTypesList = GetMySQLDataTypes();
+      List<string> dataTypesList = GetMySqlDataTypes();
       if (!dataTypesList.Contains(strippedType1) || !dataTypesList.Contains(strippedType2))
       {
         System.Diagnostics.Debug.WriteLine("Type1FitsIntoType2: One of the 2 types is Invalid.");
@@ -1326,7 +1325,6 @@ namespace MySQL.ForExcel
         return true;
       }
 
-      bool type1IsChar = strippedType1.Contains("char");
       bool type1IsInt = strippedType1.Contains("int");
       bool type2IsInt = strippedType2.Contains("int");
       bool type1IsDecimal = strippedType1 == "float" || strippedType1 == "numeric" || strippedType1 == "decimal" || strippedType1 == "real" || strippedType1 == "double";
@@ -1363,41 +1361,36 @@ namespace MySQL.ForExcel
         return true;
       }
 
-      if (strippedType1.Contains("binary") && strippedType2.Contains("binary"))
-      {
-        return true;
-      }
-
-      return false;
+      return strippedType1.Contains("binary") && strippedType2.Contains("binary");
     }
 
     /// <summary>
     /// Validates that a user typed data type is a valid MySQL data type.
     /// A blank data type is considered valid.
     /// </summary>
-    /// <param name="dataType">A MySQL data type as specified for new columns in a CREATE TABLE statement.</param>
-    /// <returns>true if the type is a valid MySQL data type, false otherwise.</returns>
+    /// <param name="proposedUserType">A MySQL data type as specified for new columns in a CREATE TABLE statement.</param>
+    /// <returns><c>true</c> if the type is a valid MySQL data type, <c>false</c> otherwise.</returns>
     public static bool ValidateUserDataType(string proposedUserType)
     {
-      //// If the proposed type is blank return true since a blank data type is considered valid.
+      // If the proposed type is blank return true since a blank data type is considered valid.
       if (proposedUserType.Length == 0)
       {
         return true;
       }
 
       List<int> validParamsPerDataType;
-      List<string> dataTypesList = GetMySQLDataTypes(out validParamsPerDataType);
-      int rightParenthesisIndex = proposedUserType.IndexOf(")");
-      int leftParenthesisIndex = proposedUserType.IndexOf("(");
+      List<string> dataTypesList = GetMySqlDataTypes(out validParamsPerDataType);
+      int rightParenthesisIndex = proposedUserType.IndexOf(")", StringComparison.Ordinal);
+      int leftParenthesisIndex = proposedUserType.IndexOf("(", StringComparison.Ordinal);
 
-      //// Check if we have parenthesis within the proposed data type and if the left and right parentheses are placed properly.
-      //// Also check if there is no text beyond the right parenthesis.
+      // Check if we have parenthesis within the proposed data type and if the left and right parentheses are placed properly.
+      // Also check if there is no text beyond the right parenthesis.
       if (rightParenthesisIndex >= 0 && (leftParenthesisIndex < 0 || leftParenthesisIndex >= rightParenthesisIndex || proposedUserType.Length > rightParenthesisIndex + 1))
       {
         return false;
       }
 
-      //// Check if the data type stripped of parenthesis is found in the list of valid MySQL types.
+      // Check if the data type stripped of parenthesis is found in the list of valid MySQL types.
       string pureDataType = rightParenthesisIndex >= 0 ? proposedUserType.Substring(0, leftParenthesisIndex).ToLowerInvariant() : proposedUserType.ToLowerInvariant();
       int typeFoundAt = dataTypesList.IndexOf(pureDataType);
       if (typeFoundAt < 0)
@@ -1405,52 +1398,61 @@ namespace MySQL.ForExcel
         return false;
       }
 
-      //// Parameters checks.
+      // Parameters checks.
       bool enumOrSet = pureDataType == "enum" || pureDataType == "set";
       int numOfValidParams = validParamsPerDataType[typeFoundAt];
-      if ((numOfValidParams != 0 && rightParenthesisIndex >= 0) || enumOrSet)
+      if ((numOfValidParams == 0 || rightParenthesisIndex < 0) && !enumOrSet)
       {
-        //// If an enum or set the data type must contain parenthesis along with its list of valid values.
-        if (enumOrSet && rightParenthesisIndex < 0)
+        return true;
+      }
+
+      // If an enum or set the data type must contain parenthesis along with its list of valid values.
+      if (enumOrSet && rightParenthesisIndex < 0)
+      {
+        return false;
+      }
+
+      // Check if the number of parameters is valid for the proposed MySQL data type
+      string parametersText = proposedUserType.Substring(leftParenthesisIndex + 1, rightParenthesisIndex - leftParenthesisIndex - 1).Trim();
+      string[] parameterValues = string.IsNullOrEmpty(parametersText) ? null : parametersText.Split(',');
+      int parametersCount = parameterValues == null ? 0 : parameterValues.Length;
+
+      // If there are no parameters but parenthesis were provided the data type is invalid.
+      if (parametersCount == 0)
+      {
+        return false;
+      }
+
+      // If the quantity of parameters does not match the data type valid accepted parameters quantity the data type is invalid.
+      bool parametersQtyIsValid = enumOrSet ? parametersCount > 0 : numOfValidParams == parametersCount;
+      if (!parametersQtyIsValid)
+      {
+        return false;
+      }
+
+      // Check if the paremeter values are valid integers for data types with 1 or 2 parameters (varchar and numeric types).
+      if (enumOrSet)
+      {
+        return true;
+      }
+
+      if (parameterValues == null)
+      {
+        return true;
+      }
+
+      foreach (string paramValue in parameterValues)
+      {
+        int convertedValue;
+        if (!int.TryParse(paramValue, out convertedValue))
         {
           return false;
         }
 
-        //// Check if the number of parameters is valid for the proposed MySQL data type
-        string parametersText = proposedUserType.Substring(leftParenthesisIndex + 1, rightParenthesisIndex - leftParenthesisIndex - 1).Trim();
-        string[] parameterValues = string.IsNullOrEmpty(parametersText) ? null : parametersText.Split(',');
-        int parametersCount = parameterValues == null ? 0 : parameterValues.Length;
-
-        //// If there are no parameters but parenthesis were provided the data type is invalid.
-        if (parametersCount == 0)
+        // Specific check for year data type.
+        if (pureDataType == "year" && convertedValue != 2 && convertedValue != 4)
         {
           return false;
-        }
-
-        //// If the quantity of parameters does not match the data type valid accepted parameters quantity the data type is invalid.
-        bool parametersQtyIsValid = enumOrSet ? parametersCount > 0 : numOfValidParams == parametersCount;
-        if (!parametersQtyIsValid)
-        {
-          return false;
-        }
-
-        //// Check if the paremeter values are valid integers for data types with 1 or 2 parameters (varchar and numeric types).
-        if (!enumOrSet)
-        {
-          foreach (string paramValue in parameterValues)
-          {
-            int convertedValue = 0;
-            if (!int.TryParse(paramValue, out convertedValue))
-            {
-              return false;
-            }
-
-            //// Specific check for year data type.
-            if (pureDataType == "year" && convertedValue != 2 && convertedValue != 4)
-            {
-              return false;
-            }
-          }
         }
       }
 

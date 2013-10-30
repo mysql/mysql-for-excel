@@ -15,13 +15,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
-namespace MySQL.ForExcel
-{
-  using System;
-  using System.Windows.Forms;
-  using MySQL.Utility;
-  using MySQL.Utility.Forms;
+using System;
+using System.Windows.Forms;
+using MySQL.ForExcel.Properties;
+using MySQL.Utility.Classes;
+using MySQL.Utility.Forms;
 
+namespace MySQL.ForExcel.Classes
+{
   /// <summary>
   /// Provides extension methods and other static methods to leverage miscelaneous tasks.
   /// </summary>
@@ -35,18 +36,21 @@ namespace MySQL.ForExcel
     /// <returns>The ordinal position of the given number within the list, or <c>-1</c> if not found.</returns>
     public static int IndexOfIntInArray(int[] intArray, int intElement)
     {
-      int index = -1;
-
-      if (intArray != null)
+      if (intArray == null)
       {
-        for (int i = 0; i < intArray.Length; i++)
+        return -1;
+      }
+
+      int index = -1;
+      for (int i = 0; i < intArray.Length; i++)
+      {
+        if (intArray[i] != intElement)
         {
-          if (intArray[i] == intElement)
-          {
-            index = i;
-            break;
-          }
+          continue;
         }
+
+        index = i;
+        break;
       }
 
       return index;
@@ -61,23 +65,27 @@ namespace MySQL.ForExcel
     /// <returns>The ordinal position of the given string within the list, or <c>-1</c> if not found.</returns>
     public static int IndexOfStringInArray(string[] stringArray, string stringElement, bool caseSensitive)
     {
-      int index = -1;
+      
+      if (stringArray == null)
+      {
+        return -1;
+      }
+
       if (!caseSensitive)
       {
         stringElement = stringElement.ToLowerInvariant();
       }
 
-      if (stringArray != null)
+      int index = -1;
+      for (int i = 0; i < stringArray.Length; i++)
       {
-        for (int i = 0; i < stringArray.Length; i++)
+        if (stringElement != (caseSensitive ? stringArray[i] : stringArray[i].ToLowerInvariant()))
         {
-          bool areEqual = stringElement == (caseSensitive ? stringArray[i] : stringArray[i].ToLowerInvariant());
-          if (areEqual)
-          {
-            index = i;
-            break;
-          }
+          continue;
         }
+
+        index = i;
+        break;
       }
 
       return index;
@@ -91,24 +99,24 @@ namespace MySQL.ForExcel
     {
       string errorMessage = null;
 
-      //// Attempt to save the settings file up to 3 times, if not successful show an error message to users.
+      // Attempt to save the settings file up to 3 times, if not successful show an error message to users.
       for (int i = 0; i < 3; i++)
       {
         try
         {
-          Properties.Settings.Default.Save();
+          Settings.Default.Save();
           errorMessage = null;
         }
         catch (Exception ex)
         {
-          MySQLSourceTrace.WriteAppErrorToLog(ex);
+          MySqlSourceTrace.WriteAppErrorToLog(ex);
           errorMessage = ex.Message;
         }
       }
 
       if (!string.IsNullOrEmpty(errorMessage))
       {
-        MiscUtilities.ShowCustomizedErrorDialog(Properties.Resources.SettingsFileSaveErrorTitle, errorMessage);
+        ShowCustomizedErrorDialog(Resources.SettingsFileSaveErrorTitle, errorMessage);
       }
 
       return errorMessage == null;
@@ -141,24 +149,24 @@ namespace MySQL.ForExcel
       switch (infoType)
       {
         case InfoDialog.InfoType.Success:
-          title = Properties.Resources.OperationSuccessTitle;
+          title = Resources.OperationSuccessTitle;
           break;
 
         case InfoDialog.InfoType.Warning:
-          title = Properties.Resources.OperationWarningTitle;
+          title = Resources.OperationWarningTitle;
           break;
 
         case InfoDialog.InfoType.Error:
-          title = Properties.Resources.OperationErrorTitle;
+          title = Resources.OperationErrorTitle;
           dialogType = InfoDialog.DialogType.BackOnly;
           break;
 
         case InfoDialog.InfoType.Info:
-          title = Properties.Resources.OperationInformationTitle;
+          title = Resources.OperationInformationTitle;
           break;
       }
 
-      string subDetailText = string.Format(Properties.Resources.OperationSubDetailText, infoType == InfoDialog.InfoType.Error ? "Back" : "OK");
+      string subDetailText = string.Format(Resources.OperationSubDetailText, infoType == InfoDialog.InfoType.Error ? "Back" : "OK");
       return InfoDialog.ShowDialog(dialogType, infoType, title, detail, subDetailText, moreInformation, wordWrapMoreInfo);
     }
 

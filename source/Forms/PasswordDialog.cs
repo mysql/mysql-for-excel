@@ -15,14 +15,16 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
-namespace MySQL.ForExcel
-{
-  using System;
-  using System.Drawing;
-  using System.Windows.Forms;
-  using MySQL.Utility;
-  using MySQL.Utility.Forms;
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+using MySQL.ForExcel.Classes;
+using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQLWorkbench;
+using MySQL.Utility.Forms;
 
+namespace MySQL.ForExcel.Forms
+{
   /// <summary>
   /// Provides an interface to enter the password required by a MySQL connection.
   /// </summary>
@@ -73,10 +75,10 @@ namespace MySQL.ForExcel
       _passwordFlags = new PasswordDialogFlags(wbConnection);
       InitializeComponent();
       PasswordExpiredDialog = passwordExpired;
-      WBConnection = wbConnection;
-      UserValueLabel.Text = WBConnection.UserName;
-      ConnectionValueLabel.Text = WBConnection.Name + " - " + WBConnection.HostIdentifier;
-      PasswordTextBox.Text = WBConnection.Password;
+      WbConnection = wbConnection;
+      UserValueLabel.Text = WbConnection.UserName;
+      ConnectionValueLabel.Text = WbConnection.Name + @" - " + WbConnection.HostIdentifier;
+      PasswordTextBox.Text = WbConnection.Password;
       SetDialogInterface();
     }
 
@@ -107,17 +109,12 @@ namespace MySQL.ForExcel
       {
         return StorePasswordSecurelyCheckBox.Checked;
       }
-
-      private set
-      {
-        StorePasswordSecurelyCheckBox.Checked = value;
-      }
     }
 
     /// <summary>
     /// Gets the connection to a MySQL server instance selected by users
     /// </summary>
-    public MySqlWorkbenchConnection WBConnection { get; private set; }
+    public MySqlWorkbenchConnection WbConnection { get; private set; }
 
     #endregion Properties
 
@@ -196,7 +193,7 @@ namespace MySQL.ForExcel
 
       if (PasswordExpiredDialog)
       {
-        //// Check if the new password and its confirmation match, otherwise notify the user and exit.
+        // Check if the new password and its confirmation match, otherwise notify the user and exit.
         if (NewPasswordTextBox.Text != ConfirmTextBox.Text)
         {
           InfoDialog.ShowErrorDialog(Properties.Resources.PasswordResetErrorTitleText, Properties.Resources.PasswordsMismatchErrorText);
@@ -204,33 +201,33 @@ namespace MySQL.ForExcel
           return;
         }
 
-        //// Reset the password and if the reset is successful assign the new password to the local connection.
-        WBConnection.Password = PasswordTextBox.Text;
+        // Reset the password and if the reset is successful assign the new password to the local connection.
+        WbConnection.Password = PasswordTextBox.Text;
         try
         {
-          WBConnection.ResetPassword(ConfirmTextBox.Text);
+          WbConnection.ResetPassword(ConfirmTextBox.Text);
         }
         catch (Exception ex)
         {
-          MySQLSourceTrace.WriteAppErrorToLog(ex);
+          MySqlSourceTrace.WriteAppErrorToLog(ex);
           InfoDialog.ShowErrorDialog(Properties.Resources.PasswordResetErrorTitleText, Properties.Resources.PasswordResetErrorDetailText);
           _passwordFlags.Cancelled = true;
           return;
         }
 
-        WBConnection.Password = ConfirmTextBox.Text;
+        WbConnection.Password = ConfirmTextBox.Text;
       }
       else
       {
-        WBConnection.Password = PasswordTextBox.Text;
+        WbConnection.Password = PasswordTextBox.Text;
       }
 
-      _passwordFlags.NewPassword = WBConnection.Password;
+      _passwordFlags.NewPassword = WbConnection.Password;
       bool connectionSuccessful = false;
       if (_testConnection)
       {
-        //// Test the connection and if not successful revert the password to the one before the dialog was shown to the user.
-        TestConnectionResult connectionResult = WBConnection.TestConnectionAndReturnResult(false);
+        // Test the connection and if not successful revert the password to the one before the dialog was shown to the user.
+        TestConnectionResult connectionResult = WbConnection.TestConnectionAndReturnResult(false);
         _passwordFlags.ConnectionResult = connectionResult;
         switch(connectionResult)
         {
@@ -238,28 +235,30 @@ namespace MySQL.ForExcel
           case TestConnectionResult.PasswordReset:
             connectionSuccessful = true;
 
-            //// If the pasword was reset within the connection test, then set it again in the new password flag.
+            // If the pasword was reset within the connection test, then set it again in the new password flag.
             if (connectionResult == TestConnectionResult.PasswordReset)
             {
-              _passwordFlags.NewPassword = WBConnection.Password;
+              _passwordFlags.NewPassword = WbConnection.Password;
             }
 
             break;
 
           case TestConnectionResult.PasswordExpired:
-            //// This status is set if the password was expired, and the dialog shown to the user to reset the password was cancelled, so exit.
+            // This status is set if the password was expired, and the dialog shown to the user to reset the password was cancelled, so exit.
             return;
         }
       }
 
-      //// If the connection was successful and the user chose to store the password, save it in the password vault.
-      if (StorePasswordSecurely && connectionSuccessful && !string.IsNullOrEmpty(WBConnection.Password))
+      // If the connection was successful and the user chose to store the password, save it in the password vault.
+      if (!StorePasswordSecurely || !connectionSuccessful || string.IsNullOrEmpty(WbConnection.Password))
       {
-        string storedPassword = MySqlWorkbenchPasswordVault.FindPassword(WBConnection.HostIdentifier, WBConnection.UserName);
-        if (storedPassword == null || storedPassword != WBConnection.Password)
-        {
-          MySqlWorkbenchPasswordVault.StorePassword(WBConnection.HostIdentifier, WBConnection.UserName, WBConnection.Password);
-        }
+        return;
+      }
+
+      string storedPassword = MySqlWorkbenchPasswordVault.FindPassword(WbConnection.HostIdentifier, WbConnection.UserName);
+      if (storedPassword == null || storedPassword != WbConnection.Password)
+      {
+        MySqlWorkbenchPasswordVault.StorePassword(WbConnection.HostIdentifier, WbConnection.UserName, WbConnection.Password);
       }
     }
 
@@ -287,9 +286,14 @@ namespace MySQL.ForExcel
       }
 
       TextBox passwordTextBox = sender as TextBox;
+      if (passwordTextBox == null)
+      {
+        return;
+      }
+
       PasswordChangedTimer.Stop();
       passwordTextBox.Text = passwordTextBox.Text.Trim();
-      DialogOKButton.Enabled = PasswordTextBox.TextLength > 0 && (PasswordExpiredDialog ? NewPasswordTextBox.TextLength > 0 && ConfirmTextBox.TextLength > 0 : true);
+      DialogOKButton.Enabled = PasswordTextBox.TextLength > 0 && (!PasswordExpiredDialog || NewPasswordTextBox.TextLength > 0 && ConfirmTextBox.TextLength > 0);
     }
 
     /// <summary>

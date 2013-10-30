@@ -1,5 +1,4 @@
-﻿//
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -15,11 +14,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using MySQL.ForExcel.Controls;
+
+namespace MySQL.ForExcel.Panels
 {
-  partial class DBObjectSelectionPanel
+  partial class DbObjectSelectionPanel
   {
     /// <summary> 
     /// Required designer variable.
@@ -29,7 +29,7 @@ namespace MySQL.ForExcel
     /// <summary> 
     /// Clean up any resources being used.
     /// </summary>
-    /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+    /// <param name="disposing"><c>true</c> if managed resources should be disposed; otherwise, <c>false</c>.</param>
     protected override void Dispose(bool disposing)
     {
       if (disposing && (components != null))
@@ -48,25 +48,24 @@ namespace MySQL.ForExcel
     private void InitializeComponent()
     {
       this.components = new System.ComponentModel.Container();
-      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DBObjectSelectionPanel));
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DbObjectSelectionPanel));
       this.LargeImagesList = new System.Windows.Forms.ImageList(this.components);
       this.CloseButton = new System.Windows.Forms.Button();
       this.BackButton = new System.Windows.Forms.Button();
       this.OptionsButton = new System.Windows.Forms.Button();
-      this.DBObjectList = new MySQL.ForExcel.MyTreeView();
+      this.DBObjectList = new MySQL.ForExcel.Controls.MyTreeView();
       this.DBObjectsContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.RefreshDatabaseObjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.AppendDataHotLabel = new MySQL.ForExcel.HotLabel();
-      this.EditDataHotLabel = new MySQL.ForExcel.HotLabel();
-      this.ImportDataHotLabel = new MySQL.ForExcel.HotLabel();
-      this.LabelsToolTip = new System.Windows.Forms.ToolTip(this.components);
+      this.AppendDataHotLabel = new MySQL.ForExcel.Controls.HotLabel();
+      this.EditDataHotLabel = new MySQL.ForExcel.Controls.HotLabel();
+      this.ImportDataHotLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.UpperPanel = new System.Windows.Forms.Panel();
-      this.SeparatorImage = new MySQL.ForExcel.TransparentPictureBox();
+      this.SeparatorImage = new TransparentPictureBox();
       this.UserIPLabel = new System.Windows.Forms.Label();
-      this.DBObjectsFilter = new MySQL.ForExcel.SearchEdit();
-      this.SelectDatabaseObjectHotLabel = new MySQL.ForExcel.HotLabel();
+      this.DBObjectsFilter = new SearchEdit();
+      this.SelectDatabaseObjectHotLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.ConnectionNameLabel = new System.Windows.Forms.Label();
-      this.ExportToNewTableHotLabel = new MySQL.ForExcel.HotLabel();
+      this.ExportToNewTableHotLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.MainLogoPictureBox = new System.Windows.Forms.PictureBox();
       this.DBObjectsContextMenuStrip.SuspendLayout();
       this.UpperPanel.SuspendLayout();
@@ -394,7 +393,7 @@ namespace MySQL.ForExcel
       this.MainLogoPictureBox.TabIndex = 30;
       this.MainLogoPictureBox.TabStop = false;
       // 
-      // DBObjectSelectionPanel
+      // DbObjectSelectionPanel
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.Controls.Add(this.UpperPanel);
@@ -406,7 +405,7 @@ namespace MySQL.ForExcel
       this.Controls.Add(this.CloseButton);
       this.Controls.Add(this.BackButton);
       this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.Name = "DBObjectSelectionPanel";
+      this.Name = "DbObjectSelectionPanel";
       this.Size = new System.Drawing.Size(260, 625);
       this.DBObjectsContextMenuStrip.ResumeLayout(false);
       this.UpperPanel.ResumeLayout(false);
@@ -425,7 +424,6 @@ namespace MySQL.ForExcel
     private HotLabel EditDataHotLabel;
     private HotLabel AppendDataHotLabel;
     private MyTreeView DBObjectList;
-    private System.Windows.Forms.ToolTip LabelsToolTip;
     private System.Windows.Forms.ContextMenuStrip DBObjectsContextMenuStrip;
     private System.Windows.Forms.ToolStripMenuItem RefreshDatabaseObjectsToolStripMenuItem;
     private System.Windows.Forms.Panel UpperPanel;

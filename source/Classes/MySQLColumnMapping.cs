@@ -1,54 +1,52 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using System;
+using System.Data;
+using System.Linq;
+using System.Xml.Serialization;
+
+namespace MySQL.ForExcel.Classes
 {
-  using System;
-  using System.Data;
-  using System.Linq;
-  using System.Xml.Serialization;
-
   /// <summary>
   /// Represents a structure with mappings between source Excel columns and a target MySQL table columns in a specific Schema.
   /// </summary>
   [Serializable]
-  public class MySQLColumnMapping
+  public class MySqlColumnMapping
   {
     /// <summary>
-    /// Initializes a new instance of the <see cref="MySQLColumnMapping"/> class.
+    /// Initializes a new instance of the <see cref="MySqlColumnMapping"/> class.
     /// </summary>
-    public MySQLColumnMapping()
+    public MySqlColumnMapping()
     {
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MySQLColumnMapping"/> class.
+    /// Initializes a new instance of the <see cref="MySqlColumnMapping"/> class.
     /// </summary>
     /// <param name="mappingName">Name for this columns mapping structure.</param>
     /// <param name="sourceColNames">An array of column names in the source Excel data range.</param>
     /// <param name="targetColNames">An array of column names in the target MySQL table.</param>
-    public MySQLColumnMapping(string mappingName, string[] sourceColNames, string[] targetColNames)
+    public MySqlColumnMapping(string mappingName, string[] sourceColNames, string[] targetColNames)
       : this()
     {
       Name = mappingName;
 
-      //// Initialization of these values occurs in the AppendDataForm dialog
+      // Initialization of these values occurs in the AppendDataForm dialog
       SchemaName = string.Empty;
       TableName = string.Empty;
       ConnectionName = string.Empty;
@@ -71,22 +69,22 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MySQLColumnMapping"/> class.
+    /// Initializes a new instance of the <see cref="MySqlColumnMapping"/> class.
     /// </summary>
     /// <param name="sourceColNames">An array of column names in the source Excel data range.</param>
     /// <param name="targetColNames">An array of column names in the target MySQL table.</param>
-    public MySQLColumnMapping(string[] sourceColNames, string[] targetColNames)
+    public MySqlColumnMapping(string[] sourceColNames, string[] targetColNames)
       : this(string.Empty, sourceColNames, targetColNames)
     {
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MySQLColumnMapping"/> class.
+    /// Initializes a new instance of the <see cref="MySqlColumnMapping"/> class.
     /// </summary>
-    /// <param name="likeMapping">A <see cref="MySQLColumnMapping"/> object from which to clone the mapping structure data.</param>
+    /// <param name="likeMapping">A <see cref="MySqlColumnMapping"/> object from which to clone the mapping structure data.</param>
     /// <param name="newSourceColNames">An array of column names in the source Excel data range.</param>
     /// <param name="newTargetColNames">An array of column names in the target MySQL table.</param>
-    public MySQLColumnMapping(MySQLColumnMapping likeMapping, string[] newSourceColNames, string[] newTargetColNames)
+    public MySqlColumnMapping(MySqlColumnMapping likeMapping, string[] newSourceColNames, string[] newTargetColNames)
       : this(likeMapping.Name, newSourceColNames, newTargetColNames)
     {
       SchemaName = likeMapping.SchemaName;
@@ -96,10 +94,10 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MySQLColumnMapping"/> class.
+    /// Initializes a new instance of the <see cref="MySqlColumnMapping"/> class.
     /// </summary>
-    /// <param name="likeMapping">A <see cref="MySQLColumnMapping"/> object from which to clone the mapping structure data.</param>
-    public MySQLColumnMapping(MySQLColumnMapping likeMapping)
+    /// <param name="likeMapping">A <see cref="MySqlColumnMapping"/> object from which to clone the mapping structure data.</param>
+    public MySqlColumnMapping(MySqlColumnMapping likeMapping)
       : this(likeMapping, likeMapping.SourceColumns, likeMapping.TargetColumns)
     {
       for (int idx = 0; idx < likeMapping.MappedSourceIndexes.Length; idx++)
@@ -189,10 +187,10 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="dataTable"><see cref="DataTable"/> object representing a possible new target table.</param>
     /// <param name="sameOrdinals">Flag indicating if the check must consider matching column positions besides matching the column names.</param>
-    /// <returns><see cref="true"/> if all columns in the mapping match the possible new target table columns, <see cref="false"/> otherwise.</returns>
+    /// <returns><c>true</c> if all columns in the mapping match the possible new target table columns, <c>false</c> otherwise.</returns>
     public bool AllColumnsMatch(DataTable dataTable, bool sameOrdinals)
     {
-      return TargetColumns != null ? GetMatchingColumnsQuantity(dataTable, sameOrdinals) == TargetColumns.Length : false;
+      return TargetColumns != null && GetMatchingColumnsQuantity(dataTable, sameOrdinals) == TargetColumns.Length;
     }
 
     /// <summary>
@@ -200,12 +198,14 @@ namespace MySQL.ForExcel
     /// </summary>
     public void ClearMappings()
     {
-      if (MappedSourceIndexes != null && TargetColumns != null)
+      if (MappedSourceIndexes == null || TargetColumns == null)
       {
-        for (int i = 0; i < TargetColumns.Length; i++)
-        {
-          MappedSourceIndexes[i] = -1;
-        }
+        return;
+      }
+
+      for (int i = 0; i < TargetColumns.Length; i++)
+      {
+        MappedSourceIndexes[i] = -1;
       }
     }
 
@@ -218,24 +218,26 @@ namespace MySQL.ForExcel
     public int GetMatchingColumnsQuantity(DataTable dataTable, bool sameOrdinals)
     {
       int matchingColumnsQty = 0;
-      if (dataTable != null && TargetColumns != null)
+      if (dataTable == null || TargetColumns == null)
       {
-        for (int colIdx = 0; colIdx < TargetColumns.Length; colIdx++)
+        return matchingColumnsQty;
+      }
+
+      for (int colIdx = 0; colIdx < TargetColumns.Length; colIdx++)
+      {
+        string colName = TargetColumns[colIdx];
+        if (sameOrdinals)
         {
-          string colName = TargetColumns[colIdx];
-          if (sameOrdinals)
+          if (string.Equals(dataTable.Columns[colIdx].ColumnName, colName, StringComparison.InvariantCultureIgnoreCase))
           {
-            if (dataTable.Columns[colIdx].ColumnName.ToLowerInvariant() == colName.ToLowerInvariant())
-            {
-              matchingColumnsQty++;
-            }
+            matchingColumnsQty++;
           }
-          else
+        }
+        else
+        {
+          if (dataTable.Columns.Contains(colName))
           {
-            if (dataTable.Columns.Contains(colName))
-            {
-              matchingColumnsQty++;
-            }
+            matchingColumnsQty++;
           }
         }
       }

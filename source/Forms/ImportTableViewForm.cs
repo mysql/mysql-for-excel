@@ -1,34 +1,37 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
+using MySQL.ForExcel.Classes;
+using MySQL.ForExcel.Properties;
+using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQLWorkbench;
+using MySQL.Utility.Forms;
+
+namespace MySQL.ForExcel.Forms
 {
-  using System;
-  using System.Collections.Generic;
-  using System.ComponentModel;
-  using System.Data;
-  using System.Drawing;
-  using System.IO;
-  using System.Windows.Forms;
-  using MySQL.Utility;
-  using MySQL.Utility.Forms;
-
   /// <summary>
   /// Previews a MySQL table's data and lets users select columns and rows to import to an Excel spreadsheet.
   /// </summary>
@@ -38,21 +41,21 @@ namespace MySQL.ForExcel
     /// Initializes a new instance of the <see cref="ImportTableViewForm"/> class.
     /// </summary>
     /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <param name="importDBObject">MySQL table, view or procedure from which to import data to an Excel spreadsheet.</param>
+    /// <param name="importDbObject">MySQL table, view or procedure from which to import data to an Excel spreadsheet.</param>
     /// <param name="importToWorksheetName">Name of the Excel worksheet where the data will be imported to.</param>
     /// <param name="workSheetInCompatibilityMode">Flag indicating if the Excel worksheet where the data will be imported to is in Excel 2003 compatibility mode.</param>
-    /// <param name="importForEditData">true if the import is part of an Edit operation, false otherwise.</param>
-    public ImportTableViewForm(MySqlWorkbenchConnection wbConnection, DBObject importDBObject, string importToWorksheetName, bool workSheetInCompatibilityMode, bool importForEditData)
+    /// <param name="importForEditData"><c>true</c> if the import is part of an Edit operation, <c>false</c> otherwise.</param>
+    public ImportTableViewForm(MySqlWorkbenchConnection wbConnection, DbObject importDbObject, string importToWorksheetName, bool workSheetInCompatibilityMode, bool importForEditData)
     {
       PreviewDataTable = null;
       ImportOperationGeneratedErrors = false;
-      WBConnection = wbConnection;
-      ImportDBObject = importDBObject;
+      WbConnection = wbConnection;
+      ImportDbObject = importDbObject;
       WorkSheetInCompatibilityMode = workSheetInCompatibilityMode;
       ImportDataTable = null;
 
       InitializeComponent();
-      PreviewDataGridView.DataError += new DataGridViewDataErrorEventHandler(PreviewDataGridView_DataError);
+      PreviewDataGridView.DataError += PreviewDataGridView_DataError;
 
       IncludeHeadersCheckBox.Checked = true;
       IncludeHeadersCheckBox.Enabled = !importForEditData;
@@ -64,10 +67,10 @@ namespace MySQL.ForExcel
       }
 
       LimitRowsCheckBox.Checked = false;
-      TableNameMainLabel.Text = importDBObject.Type.ToString() + " Name:";
-      OptionsWarningLabel.Text = Properties.Resources.WorkSheetInCompatibilityModeWarning;
-      Text = "Import Data - " + importToWorksheetName;
-      TableNameSubLabel.Text = importDBObject.Name;
+      TableNameMainLabel.Text = importDbObject.Type.ToString() + @" Name:";
+      OptionsWarningLabel.Text = Resources.WorkSheetInCompatibilityModeWarning;
+      Text = @"Import Data - " + importToWorksheetName;
+      TableNameSubLabel.Text = importDbObject.Name;
       FillPreviewGrid();
     }
 
@@ -92,7 +95,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets the type of DB object (MySQL table or view) from which to import data to the active Excel Worksheet.
     /// </summary>
-    public DBObject ImportDBObject { get; private set; }
+    public DbObject ImportDbObject { get; private set; }
 
     /// <summary>
     /// Gets a value indicating whether the column names will be imported as data headers in the first row of the Excel spreadsheet.
@@ -121,6 +124,22 @@ namespace MySQL.ForExcel
     public DataTable PreviewDataTable { get; private set; }
 
     /// <summary>
+    /// Gets or sets the text associated with this control.
+    /// </summary>
+    public override sealed string Text
+    {
+      get
+      {
+        return base.Text;
+      }
+
+      set
+      {
+        base.Text = value;
+      }
+    }
+
+    /// <summary>
     /// Gets the total rows contained in the MySQL table or view selected for import.
     /// </summary>
     public long TotalRowsCount { get; private set; }
@@ -128,7 +147,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets the connection to a MySQL server instance selected by users.
     /// </summary>
-    public MySqlWorkbenchConnection WBConnection { get; private set; }
+    public MySqlWorkbenchConnection WbConnection { get; private set; }
 
     /// <summary>
     /// Gets a value indicating whether the Excel Worksheet where the data will be imported to is in Excel 2003 compatibility mode.
@@ -166,9 +185,9 @@ namespace MySQL.ForExcel
     /// </summary>
     private void FillPreviewGrid()
     {
-      PreviewDataTable = WBConnection.GetDataFromTableOrView(ImportDBObject, null, 0, Properties.Settings.Default.ImportPreviewRowsQuantity);
-      TotalRowsCount = WBConnection.GetRowsCountFromTableOrView(ImportDBObject);
-      RowsCountSubLabel.Text = TotalRowsCount.ToString();
+      PreviewDataTable = WbConnection.GetDataFromTableOrView(ImportDbObject, null, 0, Settings.Default.ImportPreviewRowsQuantity);
+      TotalRowsCount = WbConnection.GetRowsCountFromTableOrView(ImportDbObject);
+      RowsCountSubLabel.Text = TotalRowsCount.ToString(CultureInfo.InvariantCulture);
       PreviewDataGridView.DataSource = PreviewDataTable;
       foreach (DataGridViewColumn gridCol in PreviewDataGridView.Columns)
       {
@@ -189,7 +208,6 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments</param>
     private void FromRowNumericUpDown_ValueChanged(object sender, EventArgs e)
     {
-      bool cappingAtMaxCompatRows = WorkSheetInCompatibilityMode && TotalRowsCount > UInt16.MaxValue;
       RowsToReturnNumericUpDown.Maximum = FromRowNumericUpDown.Maximum - FromRowNumericUpDown.Value + 1;
     }
 
@@ -205,49 +223,40 @@ namespace MySQL.ForExcel
       if (PreviewDataGridView.SelectedColumns.Count < PreviewDataGridView.Columns.Count)
       {
         importColumns = new List<string>(PreviewDataGridView.SelectedColumns.Count);
-        foreach (DataGridViewColumn selCol in PreviewDataGridView.SelectedColumns)
-        {
-          selectedColumns.Add(selCol);
-        }
+        selectedColumns.AddRange(PreviewDataGridView.SelectedColumns.Cast<DataGridViewColumn>());
 
         if (selectedColumns.Count > 1)
         {
-          selectedColumns.Sort(delegate(DataGridViewColumn c1, DataGridViewColumn c2)
-          {
-            return c1.Index.CompareTo(c2.Index);
-          });
+          selectedColumns.Sort((c1, c2) => c1.Index.CompareTo(c2.Index));
         }
 
-        foreach (DataGridViewColumn selCol in selectedColumns)
-        {
-          importColumns.Add(selCol.HeaderText);
-        }
+        importColumns.AddRange(selectedColumns.Select(selCol => selCol.HeaderText));
       }
 
       try
       {
-        this.Cursor = Cursors.WaitCursor;
+        Cursor = Cursors.WaitCursor;
         if (LimitRowsCheckBox.Checked)
         {
-          ImportDataTable = WBConnection.GetDataFromTableOrView(ImportDBObject, importColumns, Convert.ToInt32(FromRowNumericUpDown.Value) - 1, Convert.ToInt32(RowsToReturnNumericUpDown.Value));
+          ImportDataTable = WbConnection.GetDataFromTableOrView(ImportDbObject, importColumns, Convert.ToInt32(FromRowNumericUpDown.Value) - 1, Convert.ToInt32(RowsToReturnNumericUpDown.Value));
         }
         else if (WorkSheetInCompatibilityMode)
         {
-          ImportDataTable = WBConnection.GetDataFromTableOrView(ImportDBObject, importColumns, 0, UInt16.MaxValue);
+          ImportDataTable = WbConnection.GetDataFromTableOrView(ImportDbObject, importColumns, 0, UInt16.MaxValue);
         }
         else
         {
-          ImportDataTable = WBConnection.GetDataFromTableOrView(ImportDBObject, importColumns);
+          ImportDataTable = WbConnection.GetDataFromTableOrView(ImportDbObject, importColumns);
         }
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(Properties.Resources.ImportTableErrorTitle, ex.Message, true);
+        MiscUtilities.ShowCustomizedErrorDialog(Resources.ImportTableErrorTitle, ex.Message, true);
         ImportOperationGeneratedErrors = true;
-        MySQLSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
 
-      this.Cursor = Cursors.Default;
+      Cursor = Cursors.Default;
     }
 
     /// <summary>
@@ -288,25 +297,27 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void PreviewDataGridView_DataError(object sender, DataGridViewDataErrorEventArgs e)
     {
-      if (PreviewDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex].ValueType == Type.GetType("System.Byte[]"))
+      if (PreviewDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex].ValueType != Type.GetType("System.Byte[]"))
       {
-        try
+        return;
+      }
+
+      try
+      {
+        var img = (byte[])(PreviewDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex]).Value;
+        using (MemoryStream ms = new MemoryStream(img))
         {
-          var img = (byte[])(PreviewDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex]).Value;
-          using (MemoryStream ms = new MemoryStream(img))
-          {
-            Image.FromStream(ms);
-          }
+          Image.FromStream(ms);
         }
-        catch (ArgumentException argEx)
-        {
-          MySQLSourceTrace.WriteAppErrorToLog(argEx);
-        }
-        catch (Exception ex)
-        {
-          MiscUtilities.ShowCustomizedErrorDialog(Properties.Resources.DataLoadingError, ex.Message);
-          MySQLSourceTrace.WriteAppErrorToLog(ex);
-        }
+      }
+      catch (ArgumentException argEx)
+      {
+        MySqlSourceTrace.WriteAppErrorToLog(argEx);
+      }
+      catch (Exception ex)
+      {
+        MiscUtilities.ShowCustomizedErrorDialog(Resources.DataLoadingError, ex.Message);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
     }
 

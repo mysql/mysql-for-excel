@@ -1,5 +1,4 @@
-﻿//
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -15,9 +14,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using MySQL.ForExcel.Controls;
+
+namespace MySQL.ForExcel.Panels
 {
   partial class SchemaSelectionPanel
   {
@@ -29,7 +29,7 @@ namespace MySQL.ForExcel
     /// <summary> 
     /// Clean up any resources being used.
     /// </summary>
-    /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+    /// <param name="disposing"><c>true</c> if managed resources should be disposed; otherwise, <c>false</c>.</param>
     protected override void Dispose(bool disposing)
     {
       if (disposing && (components != null))
@@ -53,17 +53,16 @@ namespace MySQL.ForExcel
       this.BackButton = new System.Windows.Forms.Button();
       this.NextButton = new System.Windows.Forms.Button();
       this.OptionsButton = new System.Windows.Forms.Button();
-      this.SchemasList = new MySQL.ForExcel.MyTreeView();
+      this.SchemasList = new MySQL.ForExcel.Controls.MyTreeView();
       this.SchemasContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.RefreshSchemasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.CreateNewSchemaHotLabel = new MySQL.ForExcel.HotLabel();
-      this.LabelsToolTip = new System.Windows.Forms.ToolTip(this.components);
+      this.CreateNewSchemaHotLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.UpperPanel = new System.Windows.Forms.Panel();
-      this.SeparatorImage = new MySQL.ForExcel.TransparentPictureBox();
+      this.SeparatorImage = new TransparentPictureBox();
       this.UserIPLabel = new System.Windows.Forms.Label();
-      this.SchemaFilter = new MySQL.ForExcel.SearchEdit();
-      this.SelectSchemaHotLabel = new MySQL.ForExcel.HotLabel();
-      this.InstructionsLabel = new MySQL.ForExcel.TransparentLabel();
+      this.SchemaFilter = new SearchEdit();
+      this.SelectSchemaHotLabel = new MySQL.ForExcel.Controls.HotLabel();
+      this.InstructionsLabel = new MySQL.ForExcel.Controls.TransparentLabel();
       this.ConnectionNameLabel = new System.Windows.Forms.Label();
       this.MainLogoPictureBox = new System.Windows.Forms.PictureBox();
       this.SchemasContextMenuStrip.SuspendLayout();
@@ -334,7 +333,6 @@ namespace MySQL.ForExcel
     public System.Windows.Forms.Button OptionsButton;
     private HotLabel CreateNewSchemaHotLabel;
     private MyTreeView SchemasList;
-    private System.Windows.Forms.ToolTip LabelsToolTip;
     private System.Windows.Forms.ContextMenuStrip SchemasContextMenuStrip;
     private System.Windows.Forms.ToolStripMenuItem RefreshSchemasToolStripMenuItem;
     private System.Windows.Forms.Panel UpperPanel;

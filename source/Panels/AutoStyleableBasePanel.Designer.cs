@@ -1,5 +1,4 @@
-﻿//
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -15,9 +14,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+namespace MySQL.ForExcel.Panels
 {
   partial class AutoStyleableBasePanel
   {
@@ -29,7 +27,7 @@ namespace MySQL.ForExcel
     /// <summary> 
     /// Clean up any resources being used.
     /// </summary>
-    /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+    /// <param name="disposing"><c>true</c> if managed resources should be disposed; otherwise, <c>false</c>.</param>
     protected override void Dispose(bool disposing)
     {
       if (disposing)
@@ -49,6 +47,8 @@ namespace MySQL.ForExcel
     /// </summary>
     private void InitializeComponent()
     {
+      this.components = new System.ComponentModel.Container();
+      this.LabelsToolTip = new System.Windows.Forms.ToolTip(this.components);
       this.SuspendLayout();
       // 
       // AutoStyleableBasePanel
@@ -60,5 +60,7 @@ namespace MySQL.ForExcel
     }
 
     #endregion
+
+    private System.Windows.Forms.ToolTip LabelsToolTip;
   }
 }

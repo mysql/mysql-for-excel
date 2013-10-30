@@ -1,36 +1,37 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using System;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows.Forms;
+using MySQL.ForExcel.Classes;
+using MySQL.ForExcel.Controls;
+using MySQL.ForExcel.Forms;
+using MySQL.ForExcel.Properties;
+using MySQL.Utility.Classes.MySQLWorkbench;
+using MySQL.Utility.Forms;
+
+namespace MySQL.ForExcel.Panels
 {
-  using System;
-  using System.ComponentModel;
-  using System.Linq;
-  using System.Windows.Forms;
-  using MySQL.ForExcel.Properties;
-  using MySQL.Utility;
-  using MySQL.Utility.Forms;
-
   /// <summary>
   /// First panel shown to users within the Add-In's <see cref="ExcelAddInPane"/> where connections are managed.
   /// </summary>
-  public partial class WelcomePanel : AutoStyleableBasePanel
+  public sealed partial class WelcomePanel : AutoStyleableBasePanel
   {
     /// <summary>
     /// String array containing valid values for localhost
@@ -42,7 +43,7 @@ namespace MySQL.ForExcel
     /// </summary>
     public WelcomePanel()
     {
-      _localHostValues = new string[] { string.Empty, "127.0.0.1", "localhost", "local" };
+      _localHostValues = new[] { string.Empty, "127.0.0.1", "localhost", "local" };
       InitializeComponent();
 
       InheritFontToControlsExceptionList.Add(OpenConnectionHotLabel.Name);
@@ -72,10 +73,10 @@ namespace MySQL.ForExcel
     private void AddConnectionToList(MySqlWorkbenchConnection conn)
     {
       int nodeIdx = 1;
-      bool isSSH = conn.DriverType == MySqlWorkbenchConnectionType.Ssh;
+      bool isSsh = conn.DriverType == MySqlWorkbenchConnectionType.Ssh;
       string hostName = (conn.Host ?? string.Empty).Trim();
 
-      if (isSSH)
+      if (isSsh)
       {
         string[] sshConnection = conn.HostIdentifier.Split('@');
         string dbHost = sshConnection[1].Split(':')[0].Trim();
@@ -93,8 +94,8 @@ namespace MySQL.ForExcel
 
       string subtitle = string.Format("User: {0}, Host: {1}", conn.UserName, hostName);
       MyTreeNode node = ConnectionsList.AddNode(ConnectionsList.Nodes[nodeIdx], conn.Name, subtitle);
-      node.ImageIndex = isSSH ? 1 : 0;
-      node.Enable = !isSSH;
+      node.ImageIndex = isSsh ? 1 : 0;
+      node.Enable = !isSsh;
       node.Tag = conn;
     }
 
@@ -111,7 +112,11 @@ namespace MySQL.ForExcel
       }
 
       MySqlWorkbenchConnection c = ConnectionsList.SelectedNode.Tag as MySqlWorkbenchConnection;
-      (Parent as ExcelAddInPane).OpenConnection(c);
+      var excelAddInPane = Parent as ExcelAddInPane;
+      if (excelAddInPane != null)
+      {
+        excelAddInPane.OpenConnection(c);
+      }
     }
 
     /// <summary>
@@ -121,7 +126,7 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void ConnectionsContextMenuStrip_Opening(object sender, CancelEventArgs e)
     {
-      DeleteToolStripMenuItem.Visible = MySqlWorkbench.Connections.Count <= 0 || ConnectionsList.SelectedNode == null || ConnectionsList.SelectedNode.Level == 0 ? false : true;
+      DeleteToolStripMenuItem.Visible = MySqlWorkbench.Connections.Count > 0 && ConnectionsList.SelectedNode != null && ConnectionsList.SelectedNode.Level != 0;
     }
 
     /// <summary>
@@ -143,7 +148,7 @@ namespace MySQL.ForExcel
       }
 
       MySqlWorkbenchConnection connectionToRemove = ConnectionsList.SelectedNode.Tag as MySqlWorkbenchConnection;
-      if (MySqlWorkbench.Connections.DeleteConnection(connectionToRemove.Id))
+      if (connectionToRemove != null && MySqlWorkbench.Connections.DeleteConnection(connectionToRemove.Id))
       {
         LoadConnections(false);
       }
@@ -160,30 +165,30 @@ namespace MySQL.ForExcel
         MySqlWorkbench.Connections.Load();
       }
 
-      //// Avoids flickering of connections list while adding the items to it.
+      // Avoids flickering of connections list while adding the items to it.
       ConnectionsList.BeginUpdate();
 
-      //// Clear currently loaded connections
+      // Clear currently loaded connections
       foreach (TreeNode node in ConnectionsList.Nodes)
       {
         node.Nodes.Clear();
       }
 
-      //// Load connections just obtained from Workbench or locally created
+      // Load connections just obtained from Workbench or locally created
       foreach (MySqlWorkbenchConnection conn in MySqlWorkbench.Connections.OrderBy(conn => conn.Name))
       {
         conn.AllowZeroDateTimeValues = true;
         AddConnectionToList(conn);
       }
 
-      //// Expand connection nodes
+      // Expand connection nodes
       ConnectionsList.ExpandAll();
       if (ConnectionsList.Nodes.Count > 0)
       {
         ConnectionsList.Nodes[0].EnsureVisible();
       }
 
-      //// Avoids flickering of connections list while adding the items to it.
+      // Avoids flickering of connections list while adding the items to it.
       ConnectionsList.EndUpdate();
     }
 
@@ -206,12 +211,12 @@ namespace MySQL.ForExcel
     {
       if (MySqlWorkbench.IsRunning)
       {
-        //// If Workbench is running we can't allow adding new connections
+        // If Workbench is running we can't allow adding new connections
         InfoDialog.ShowErrorDialog(Resources.OperationErrorTitle, Resources.UnableToAddConnectionsWhenWBRunning, Resources.CloseWBAdviceToAdd);
         return;
       }
 
-      using (MySQLWorkbenchConnectionDialog newConnectionDialog = new MySQLWorkbenchConnectionDialog(null))
+      using (MySqlWorkbenchConnectionDialog newConnectionDialog = new MySqlWorkbenchConnectionDialog(null))
       {
         DialogResult result = newConnectionDialog.ShowDialog();
         if (result == DialogResult.OK)

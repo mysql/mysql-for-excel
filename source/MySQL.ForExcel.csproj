@@ -229,19 +229,19 @@
   <ItemGroup>
     <Compile Include="Classes\ActiveEditDialogContainer.cs" />
     <Compile Include="Classes\DataTypeUtilities.cs" />
-    <Compile Include="Classes\DBObject.cs" />
+    <Compile Include="Classes\DbObject.cs" />
     <Compile Include="Classes\ExcelUtilities.cs" />
     <Compile Include="Classes\MiscUtilities.cs" />
-    <Compile Include="Classes\MySQLColumnMapping.cs" />
-    <Compile Include="Classes\MySQLColumnMappingList.cs" />
-    <Compile Include="Classes\MySQLDataColumn.cs">
+    <Compile Include="Classes\MySqlColumnMapping.cs" />
+    <Compile Include="Classes\MySqlColumnMappingList.cs" />
+    <Compile Include="Classes\MySqlDataColumn.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Classes\MySQLDataTable.cs">
+    <Compile Include="Classes\MySqlDataTable.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Classes\MySQLDataUtilities.cs" />
-    <Compile Include="Classes\MySQLForExcelSettings.cs" />
+    <Compile Include="Classes\MySqlDataUtilities.cs" />
+    <Compile Include="Classes\MySqlForExcelSettings.cs" />
     <Compile Include="Classes\NativeWindowWrapper.cs" />
     <Compile Include="Classes\PushResultsDataTable.cs">
       <SubType>Component</SubType>
@@ -376,11 +376,11 @@
     <Compile Include="Panels\AutoStyleableBasePanel.Designer.cs">
       <DependentUpon>AutoStyleableBasePanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Panels\DBObjectSelectionPanel.cs">
+    <Compile Include="Panels\DbObjectSelectionPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Panels\DBObjectSelectionPanel.Designer.cs">
-      <DependentUpon>DBObjectSelectionPanel.cs</DependentUpon>
+    <Compile Include="Panels\DbObjectSelectionPanel.Designer.cs">
+      <DependentUpon>DbObjectSelectionPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="Panels\SchemaSelectionPanel.cs">
       <SubType>UserControl</SubType>
@@ -454,8 +454,8 @@
     <EmbeddedResource Include="Panels\AutoStyleableBasePanel.resx">
       <DependentUpon>AutoStyleableBasePanel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Panels\DBObjectSelectionPanel.resx">
-      <DependentUpon>DBObjectSelectionPanel.cs</DependentUpon>
+    <EmbeddedResource Include="Panels\DbObjectSelectionPanel.resx">
+      <DependentUpon>DbObjectSelectionPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Panels\SchemaSelectionPanel.resx">
       <DependentUpon>SchemaSelectionPanel.cs</DependentUpon>
@@ -475,9 +475,9 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
-    <None Include="Properties\DataSources\MySQLColumn.datasource" />
-    <None Include="Properties\DataSources\MySQLDataColumn.datasource" />
-    <None Include="Properties\DataSources\MySQLTable.datasource" />
+    <None Include="Properties\DataSources\MySqlColumn.datasource" />
+    <None Include="Properties\DataSources\MySqlDataColumn.datasource" />
+    <None Include="Properties\DataSources\MySqlTable.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

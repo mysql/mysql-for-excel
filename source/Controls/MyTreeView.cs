@@ -1,32 +1,31 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using System;
+using System.Collections;
+using System.Drawing;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+using MySQL.Utility.Classes;
+
+namespace MySQL.ForExcel.Controls
 {
-  using System;
-  using System.Drawing;
-  using System.Runtime.InteropServices;
-  using System.Windows.Forms;
-  using MySQL.Utility;
-
   /// <summary>
-  /// 
+  /// Custom <see cref="TreeView"/> that lists MySQL related objects.
   /// </summary>
   public class MyTreeView : TreeView
   {
@@ -67,8 +66,8 @@ namespace MySQL.ForExcel
     public MyTreeView()
     {
       NodeHeightMultiple = 2;
-      DrawMode = TreeViewDrawMode.OwnerDrawAll;
       DoubleBuffered = true;
+      DrawMode = TreeViewDrawMode.OwnerDrawAll;
       ImageHorizontalPixelsOffset = 5;
       ImageToTextHorizontalPixelsOffset = 5;
       TitleColorOpacity = 0.8;
@@ -107,6 +106,15 @@ namespace MySQL.ForExcel
     public int DescriptionTextVerticalPixelsOffset { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the control should redraw its surface using a secondary buffer.
+    /// </summary>
+    protected override sealed bool DoubleBuffered
+    {
+      get { return base.DoubleBuffered; }
+      set { base.DoubleBuffered = value; }
+    }
+
+    /// <summary>
     /// Gets or sets the image to be used for expanded tree nodes.
     /// </summary>
     public Image ExpandedIcon { get; set; }
@@ -135,7 +143,7 @@ namespace MySQL.ForExcel
       {
         if (value < 1)
         {
-          throw new ArgumentOutOfRangeException("NodeHeightMultiple", "Value must be at least 1");
+          throw new IndexOutOfRangeException("Value must be at least 1");
         }
 
         _nodeHeightMultiple = value;
@@ -167,7 +175,7 @@ namespace MySQL.ForExcel
     /// <param name="bShow">Specifies whether the scroll bar is shown or hidden.</param>
     /// <returns></returns>
     [DllImport("user32.dll")]
-    public static extern bool ShowScrollBar(System.IntPtr hWnd, int wBar, bool bShow);
+    public static extern bool ShowScrollBar(IntPtr hWnd, int wBar, bool bShow);
 
     /// <summary>
     /// Creates a new <see cref="MyTreeNode"/> object and adds it to the specified parent node.
@@ -178,12 +186,15 @@ namespace MySQL.ForExcel
     /// <returns>The newly created <see cref="MyTreeNode"/> object.</returns>
     public MyTreeNode AddNode(TreeNode parent, string title, string subtitle = null)
     {
-      MyTreeNode node = null;
+      MyTreeNode node;
       if (parent == null)
       {
         node = Nodes[Nodes.Add(new MyTreeNode(title, subtitle))] as MyTreeNode;
-        node.ForeColor = SystemColors.ControlText;
-        node.BackColor = SystemColors.ControlLight;
+        if (node != null)
+        {
+          node.ForeColor = SystemColors.ControlText;
+          node.BackColor = SystemColors.ControlLight;
+        }
       }
       else
       {
@@ -195,7 +206,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="DrawNode"/> event.
+    /// Raises the <see cref="TreeView.DrawNode"/> event.
     /// </summary>
     /// <param name="e">A <see cref="DrawTreeNodeEventArgs"/> that contains the event data.</param>
     protected override void OnDrawNode(DrawTreeNodeEventArgs e)
@@ -213,7 +224,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="FontChanged"/> event.
+    /// Raises the <see cref="Control.FontChanged"/> event.
     /// </summary>
     /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
     protected override void OnFontChanged(EventArgs e)
@@ -235,7 +246,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="HandleCreated"/> event.
+    /// Raises the <see cref="Control.HandleCreated"/> event.
     /// </summary>
     /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
     protected override void OnHandleCreated(EventArgs e)
@@ -245,7 +256,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="MouseClick"/> event.
+    /// Raises the <see cref="Control.MouseClick"/> event.
     /// </summary>
     /// <param name="e">An <see cref="MouseEventArgs"/> that contains the event data.</param>
     protected override void OnMouseClick(MouseEventArgs e)
@@ -260,7 +271,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="Resize"/> event.
+    /// Raises the <see cref="Control.Resize"/> event.
     /// </summary>
     /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
     protected override void OnResize(EventArgs e)
@@ -276,12 +287,12 @@ namespace MySQL.ForExcel
     /// <param name="hWnd">A handle to the window whose window procedure will receive the message.
     /// If this parameter is HWND_BROADCAST ((HWND)0xffff), the message is sent to all top-level windows in the system,
     /// including disabled or invisible unowned windows, overlapped windows, and pop-up windows; but the message is not sent to child windows.</param>
-    /// <param name="Msg">The message to be sent.</param>
+    /// <param name="msg">The message to be sent.</param>
     /// <param name="wParam">Additional message-specific information.</param>
     /// <param name="lParam">Additional message-specific information.</param>
     /// <returns>Specifies the result of the message processing; it depends on the message sent.</returns>
     [DllImport("user32.dll")]
-    private static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+    private static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
     /// <summary>
     /// Draws each child node.
@@ -301,11 +312,11 @@ namespace MySQL.ForExcel
         int textInitialY = myNode.Subtitle == null ? ((e.Bounds.Height - Convert.ToInt32(titleStringSize.Height) + Convert.ToInt32(descriptionStringSize.Height)) / 2) : 0;
         myNode.ToolTipText = string.Empty;
 
-        //// Paint background
+        // Paint background
         SolidBrush bkBrush = new SolidBrush(myNode.IsSelected ? SystemColors.MenuHighlight : SystemColors.Window);
         e.Graphics.FillRectangle(bkBrush, e.Bounds);
 
-        //// Paint node Image
+        // Paint node Image
         if (img != null)
         {
           pt.X += ImageHorizontalPixelsOffset;
@@ -317,19 +328,11 @@ namespace MySQL.ForExcel
         pt.X += ImageToTextHorizontalPixelsOffset;
         pt.Y += textInitialY + TitleTextVerticalPixelsOffset;
 
-        //// Draw the title if we have one
-        string truncatedText = null;
-        SolidBrush titleBrush = null;
-        if (disabled)
-        {
-          titleBrush = new SolidBrush(Color.FromArgb(80, 0, 0, 0));
-        }
-        else
-        {
-          titleBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), ForeColor));
-        }
+        // Draw the title if we have one
+        string truncatedText;
+        SolidBrush titleBrush = disabled ? new SolidBrush(Color.FromArgb(80, 0, 0, 0)) : new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), ForeColor));
 
-        //// Draw the title
+        // Draw the title
         if (myNode.Title != null)
         {
           SizeF stringSize = e.Graphics.MeasureString(myNode.Title, Font);
@@ -342,17 +345,8 @@ namespace MySQL.ForExcel
           }
         }
 
-        //// Draw the description if there is one
-        SolidBrush descBrush = null;
-        if (disabled)
-        {
-          descBrush = new SolidBrush(Color.FromArgb(80, 0, 0, 0));
-        }
-        else
-        {
-          descBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionColorOpacity * 255), DescriptionColor));
-        }
-
+        // Draw the description if there is one
+        SolidBrush descBrush = disabled ? new SolidBrush(Color.FromArgb(80, 0, 0, 0)) : new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionColorOpacity * 255), DescriptionColor));
         if (myNode.Subtitle != null)
         {
           truncatedText = myNode.GetTruncatedSubtitle(e.Node.TreeView.ClientRectangle.Width - pt.X, e.Graphics, DescriptionFont);
@@ -388,13 +382,13 @@ namespace MySQL.ForExcel
 
       Point pt = e.Bounds.Location;
 
-      //// Draw icon centered
+      // Draw icon centered
       Image i = e.Node.IsExpanded ? ExpandedIcon : CollapsedIcon;
       pt.Y += (e.Bounds.Height - i.Height) / 2;
       e.Graphics.DrawImageUnscaled(i, pt.X, pt.Y, i.Width, i.Height);
 
       SolidBrush textBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), e.Node.ForeColor));
-      Font f = e.Node.NodeFont != null ? e.Node.NodeFont : Font;
+      Font f = e.Node.NodeFont ?? Font;
       if (!f.Bold)
       {
         f = new Font(f.FontFamily, f.Size, FontStyle.Bold);
@@ -413,7 +407,7 @@ namespace MySQL.ForExcel
     /// Truncates the text on child tree nodes.
     /// </summary>
     /// <param name="nodes">Nodes collection to flag their text for truncation.</param>
-    private void MarkTruncate(TreeNodeCollection nodes)
+    private void MarkTruncate(IEnumerable nodes)
     {
       foreach (TreeNode child in nodes)
       {
@@ -435,10 +429,12 @@ namespace MySQL.ForExcel
     /// <param name="integral">The multiple number for the height of tree nodes.</param>
     private void SetNodeHeight(TreeNode node, int integral)
     {
-      TVITEMEX tex = new TVITEMEX();
-      tex.mask = TVIF_HANDLE | TVIF_INTEGRAL;
-      tex.hItem = node.Handle;
-      tex.iIntegral = integral;
+      TVITEMEX tex = new TVITEMEX
+      {
+        mask = TVIF_HANDLE | TVIF_INTEGRAL,
+        hItem = node.Handle,
+        iIntegral = integral
+      };
 
       IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(tex));
       Marshal.StructureToPtr(tex, ptr, false);
@@ -452,16 +448,15 @@ namespace MySQL.ForExcel
     /// </summary>
     private void UpdateExtendedStyles()
     {
-      int Style = 0;
-
+      int style = 0;
       if (DoubleBuffered)
       {
-        Style |= TVS_EX_DOUBLEBUFFER;
+        style |= TVS_EX_DOUBLEBUFFER;
       }
 
-      if (Style != 0)
+      if (style != 0)
       {
-        SendMessage(Handle, TVM_SETEXTENDEDSTYLE, (IntPtr)TVS_EX_DOUBLEBUFFER, (IntPtr)Style);
+        SendMessage(Handle, TVM_SETEXTENDEDSTYLE, (IntPtr)TVS_EX_DOUBLEBUFFER, (IntPtr)style);
       }
     }
   }
@@ -583,7 +578,6 @@ namespace MySQL.ForExcel
     /// Initializes a new instance of the <see cref="MyTreeNode"/> class.
     /// </summary>
     public MyTreeNode()
-      : base()
     {
     }
 
@@ -671,15 +665,17 @@ namespace MySQL.ForExcel
     /// <returns>A new string with the truncated text.</returns>
     public string GetTruncatedSubtitle(float maxWidth, Graphics graphics, Font font)
     {
-      if (UpdateTruncatedSubtitle)
+      if (!UpdateTruncatedSubtitle)
       {
-        if (maxWidth > 0)
-        {
-          _truncatedSubtitle = Subtitle.TruncateString(graphics, maxWidth, font);
-        }
-
-        UpdateTruncatedSubtitle = false;
+        return _truncatedSubtitle;
       }
+
+      if (maxWidth > 0)
+      {
+        _truncatedSubtitle = Subtitle.TruncateString(graphics, maxWidth, font);
+      }
+
+      UpdateTruncatedSubtitle = false;
 
       return _truncatedSubtitle;
     }
@@ -693,15 +689,17 @@ namespace MySQL.ForExcel
     /// <returns>A new string with the truncated text.</returns>
     public string GetTruncatedTitle(float maxWidth, Graphics graphics, Font font)
     {
-      if (UpdateTruncatedTitle)
+      if (!UpdateTruncatedTitle)
       {
-        if (maxWidth > 0)
-        {
-          _truncatedTitle = Title.TruncateString(graphics, maxWidth, font);
-        }
-
-        UpdateTruncatedTitle = false;
+        return _truncatedTitle;
       }
+
+      if (maxWidth > 0)
+      {
+        _truncatedTitle = Title.TruncateString(graphics, maxWidth, font);
+      }
+
+      UpdateTruncatedTitle = false;
 
       return _truncatedTitle;
     }

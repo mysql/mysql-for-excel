@@ -15,21 +15,25 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
-namespace MySQL.ForExcel
-{
-  using System;
-  using System.Collections.Generic;
-  using System.Data;
-  using System.Linq;
-  using System.Text;
-  using MySql.Data.MySqlClient;
-  using MySQL.Utility;
-  using MySQL.Utility.Forms;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
+using System.Text;
+using MySql.Data.MySqlClient;
+using MySQL.ForExcel.Forms;
+using MySQL.ForExcel.Properties;
+using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQLWorkbench;
+using MySQL.Utility.Forms;
+using Excel = Microsoft.Office.Interop.Excel;
 
+namespace MySQL.ForExcel.Classes
+{
   /// <summary>
   /// Provides extension methods and other static methods to leverage the work with MySQL data.
   /// </summary>
-  public static class MySQLDataUtilities
+  public static class MySqlDataUtilities
   {
     /// <summary>
     /// Adds or sets the values on extended properties within the <see cref="DataTable"/> object.
@@ -143,11 +147,13 @@ namespace MySQL.ForExcel
       {
         baseConnection.Open();
 
-        //// Create a command and prepare it for execution
-        MySqlCommand cmd = new MySqlCommand();
-        cmd.Connection = baseConnection;
-        cmd.CommandText = routineName;
-        cmd.CommandType = CommandType.StoredProcedure;
+        // Create a command and prepare it for execution
+        MySqlCommand cmd = new MySqlCommand
+        {
+          Connection = baseConnection,
+          CommandText = routineName,
+          CommandType = CommandType.StoredProcedure
+        };
 
         if (routineParameters != null)
         {
@@ -157,17 +163,17 @@ namespace MySQL.ForExcel
           }
         }
 
-        //// Create the DataAdapter & DataSet
+        // Create the DataAdapter & DataSet
         MySqlDataAdapter da = new MySqlDataAdapter(cmd);
         DataSet ds = new DataSet();
 
-        //// Fill the DataSet using default values for DataTable names, etc.
+        // Fill the DataSet using default values for DataTable names, etc.
         da.Fill(ds);
 
-        //// Detach the MySqlParameters from the command object, so they can be used again.
+        // Detach the MySqlParameters from the command object, so they can be used again.
         cmd.Parameters.Clear();
 
-        //// Return the dataset
+        // Return the dataset
         return ds;
       }
     }
@@ -180,14 +186,14 @@ namespace MySQL.ForExcel
     /// <returns>Table containing the results of the query.</returns>
     public static DataTable GetDataFromTableOrView(this MySqlWorkbenchConnection connection, string query)
     {
-      DataTable retTable = null;
       DataSet ds = MySqlHelper.ExecuteDataset(connection.GetConnectionStringBuilder().ConnectionString, query);
-      if (ds.Tables.Count > 0)
+      if (ds.Tables.Count <= 0)
       {
-        retTable = ds.Tables[0];
-        retTable.AddExtendedProperties(query, true, string.Empty);
+        return null;
       }
 
+      DataTable retTable = ds.Tables[0];
+      retTable.AddExtendedProperties(query, true, string.Empty);
       return retTable;
     }
 
@@ -201,7 +207,7 @@ namespace MySQL.ForExcel
     /// <param name="firstRowIdx">Row number from which to start returning results.</param>
     /// <param name="rowCount">Number of rows to return</param>
     /// <returns>Table containing the results of the query.</returns>
-    public static DataTable GetDataFromTableOrView(this MySqlWorkbenchConnection connection, DBObject dbo, List<string> columnsList, int firstRowIdx, int rowCount)
+    public static DataTable GetDataFromTableOrView(this MySqlWorkbenchConnection connection, DbObject dbo, List<string> columnsList, int firstRowIdx, int rowCount)
     {
       string queryString = AssembleSelectQuery(connection.Schema, dbo, columnsList, firstRowIdx, rowCount);
       return string.IsNullOrEmpty(queryString) ? null : connection.GetDataFromTableOrView(queryString);
@@ -215,7 +221,7 @@ namespace MySQL.ForExcel
     /// <param name="dbo">Type of database object to query (Table, View or Procedure).</param>
     /// <param name="columnsList">List of queries column names.</param>
     /// <returns>Table containing the results of the query.</returns>
-    public static DataTable GetDataFromTableOrView(this MySqlWorkbenchConnection connection, DBObject dbo, List<string> columnsList)
+    public static DataTable GetDataFromTableOrView(this MySqlWorkbenchConnection connection, DbObject dbo, List<string> columnsList)
     {
       return GetDataFromTableOrView(connection, dbo, columnsList, -1, -1);
     }
@@ -228,17 +234,16 @@ namespace MySQL.ForExcel
     /// <param name="dbo">Type of database object to query (Table, View or Procedure)</param>
     /// <param name="parameters">Array of arguments passed to the stored procedure parameters.</param>
     /// <returns><see cref="DataSet"/> where each table within it represents each of the result sets returned by the stored procedure.</returns>
-    public static DataSet GetDataSetFromProcedure(this MySqlWorkbenchConnection connection, DBObject dbo, params MySqlParameter[] parameters)
+    public static DataSet GetDataSetFromProcedure(this MySqlWorkbenchConnection connection, DbObject dbo, params MySqlParameter[] parameters)
     {
-      DataSet retDS = null;
-
-      if (dbo.Type == DBObject.DBObjectType.Procedure)
+      if (dbo.Type != DbObject.DbObjectType.Procedure)
       {
-        string sql = string.Format("`{0}`.`{1}`", connection.Schema, dbo.Name);
-        retDS = connection.ExecuteRoutine(sql, parameters);
+        return null;
       }
 
-      return retDS;
+      string sql = string.Format("`{0}`.`{1}`", connection.Schema, dbo.Name);
+      DataSet retDs = connection.ExecuteRoutine(sql, parameters);
+      return retDs;
     }
 
     /// <summary>
@@ -246,9 +251,9 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <returns>The max size in bytes of the packet returned by a single query.</returns>
-    public static ulong GetMySQLServerMaxAllowedPacket(this MySqlWorkbenchConnection connection)
+    public static ulong GetMySqlServerMaxAllowedPacket(this MySqlWorkbenchConnection connection)
     {
-      string sql = "SELECT @@max_allowed_packet";
+      const string sql = "SELECT @@max_allowed_packet";
       object objCount = MySqlHelper.ExecuteScalar(connection.GetConnectionStringBuilder().ConnectionString, sql);
       return objCount != null ? (ulong)objCount : 0;
     }
@@ -258,9 +263,9 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="connection">A MySQL connection.</param>
     /// <returns>The max size in bytes of the packet returned by a single query.</returns>
-    public static ulong GetMySQLServerMaxAllowedPacket(this MySqlConnection connection)
+    public static ulong GetMySqlServerMaxAllowedPacket(this MySqlConnection connection)
     {
-      string sql = "SELECT @@max_allowed_packet";
+      const string sql = "SELECT @@max_allowed_packet";
       object objCount = MySqlHelper.ExecuteScalar(connection, sql);
       return objCount != null ? (ulong)objCount : 0;
     }
@@ -272,9 +277,9 @@ namespace MySQL.ForExcel
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="dbo">Type of database object to query (Table, View or Procedure).</param>
     /// <returns>The number of rows in a given table or view.</returns>
-    public static long GetRowsCountFromTableOrView(this MySqlWorkbenchConnection connection, DBObject dbo)
+    public static long GetRowsCountFromTableOrView(this MySqlWorkbenchConnection connection, DbObject dbo)
     {
-      if (dbo.Type == DBObject.DBObjectType.Procedure)
+      if (dbo.Type == DbObject.DbObjectType.Procedure)
       {
         return 0;
       }
@@ -294,8 +299,7 @@ namespace MySQL.ForExcel
     public static DataTable GetSchemaCollection(this MySqlWorkbenchConnection connection, string collection, params string[] restrictions)
     {
       string connectionString = connection.GetConnectionStringBuilder().ConnectionString;
-      DataTable dt = null;
-      MySqlDataAdapter mysqlAdapter = null;
+      DataTable dt;
 
       try
       {
@@ -303,6 +307,7 @@ namespace MySQL.ForExcel
         {
           baseConnection.Open();
 
+          MySqlDataAdapter mysqlAdapter;
           switch (collection.ToUpperInvariant())
           {
             case "COLUMNS SHORT":
@@ -347,7 +352,7 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        MySQLSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
         throw;
       }
 
@@ -378,13 +383,13 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <returns><c>true</c> if the connection uses SSL, <c>false</c> otherwise.</returns>
-    public static bool IsSSL(this MySqlWorkbenchConnection connection)
+    public static bool IsSsl(this MySqlWorkbenchConnection connection)
     {
-      return connection.UseSSL == 1
-        || !(string.IsNullOrWhiteSpace(connection.SSLCA)
-        && string.IsNullOrWhiteSpace(connection.SSLCert)
-        && string.IsNullOrWhiteSpace(connection.SSLCipher)
-        && string.IsNullOrWhiteSpace(connection.SSLKey));
+      return connection.UseSsl == 1
+        || !(string.IsNullOrWhiteSpace(connection.SslCa)
+        && string.IsNullOrWhiteSpace(connection.SslCert)
+        && string.IsNullOrWhiteSpace(connection.SslCipher)
+        && string.IsNullOrWhiteSpace(connection.SslKey));
     }
 
     /// <summary>
@@ -422,7 +427,7 @@ namespace MySQL.ForExcel
 
       string sql = string.Format("SHOW KEYS FROM `{0}` IN `{1}` WHERE Key_name = 'PRIMARY';", tableName, connection.Schema);
       DataTable dt = GetDataFromTableOrView(connection, sql);
-      return dt != null ? dt.Rows.Count > 0 : false;
+      return dt != null && dt.Rows.Count > 0;
     }
 
     /// <summary>
@@ -433,25 +438,26 @@ namespace MySQL.ForExcel
     /// <returns>A <see cref="PasswordDialogFlags"/> containing data about the operation.</returns>
     public static PasswordDialogFlags TestConnectionAndRetryOnWrongPassword(this MySqlWorkbenchConnection wbConnection, bool tryConnectionBeforeAskingForPassword = true)
     {
-      PasswordDialogFlags passwordFlags = new PasswordDialogFlags(wbConnection);
+      PasswordDialogFlags passwordFlags = new PasswordDialogFlags(wbConnection)
+      {
+        // Assume a wrong password at first so if the connection is not tested without a password we ensure to ask for one.
+        ConnectionResult = TestConnectionResult.WrongPassword
+      };
 
-      //// Assume a wrong password at first so if the connection is not tested without a password we ensure to ask for one.
-      passwordFlags.ConnectionResult = TestConnectionResult.WrongPassword;
-
-      //// First connection attempt with the connection exactly as loaded (maybe without a password).
+      // First connection attempt with the connection exactly as loaded (maybe without a password).
       if (tryConnectionBeforeAskingForPassword)
       {
         passwordFlags.ConnectionResult = wbConnection.TestConnectionAndReturnResult(false);
         passwordFlags.Cancelled = passwordFlags.ConnectionResult == TestConnectionResult.PasswordExpired;
 
-        ///// If on the first attempt a connection could not be made and not because of a bad password, exit.
+        // If on the first attempt a connection could not be made and not because of a bad password, exit.
         if (!passwordFlags.ConnectionSuccess && !passwordFlags.WrongPassword)
         {
           return passwordFlags;
         }
       }
 
-      //// If the connection does not have a stored password or the stored password failed then ask for one and retry.
+      // If the connection does not have a stored password or the stored password failed then ask for one and retry.
       while (!passwordFlags.ConnectionSuccess && passwordFlags.WrongPassword)
       {
         passwordFlags = PasswordDialog.ShowConnectionPasswordDialog(wbConnection, true);
@@ -474,40 +480,40 @@ namespace MySQL.ForExcel
     /// <returns>Enumeration indicating the result of the connection test.</returns>
     public static TestConnectionResult TestConnectionAndReturnResult(this MySqlWorkbenchConnection connection, bool displayErrorOnEmptyPassword)
     {
-      Globals.ThisAddIn.Application.Cursor = Microsoft.Office.Interop.Excel.XlMousePointer.xlWait;
-      TestConnectionResult connectionResult = TestConnectionResult.None;
-      Exception connectionException = null;
+      Globals.ThisAddIn.Application.Cursor = Excel.XlMousePointer.xlWait;
+      TestConnectionResult connectionResult;
+      Exception connectionException;
       if (connection.TestConnection(out connectionException))
       {
         connectionResult = TestConnectionResult.ConnectionSuccess;
-        Globals.ThisAddIn.Application.Cursor = Microsoft.Office.Interop.Excel.XlMousePointer.xlDefault;
+        Globals.ThisAddIn.Application.Cursor = Excel.XlMousePointer.xlDefault;
         return connectionResult;
       }
 
-      //// If the error returned is about the connection failing the password check, it may be because either the stored password is wrong or no password.
+      // If the error returned is about the connection failing the password check, it may be because either the stored password is wrong or no password.
       connectionResult = TestConnectionResult.ConnectionError;
       if (connectionException is MySqlException)
       {
         MySqlException mySqlException = connectionException as MySqlException;
         switch (mySqlException.Number)
         {
-          //// Connection could not be made.
+          // Connection could not be made.
           case MySqlWorkbenchConnection.MYSQL_EXCEPTION_NUMBER_SERVER_UNREACHABLE:
             connectionResult = TestConnectionResult.HostUnreachable;
-            InfoDialog.ShowErrorDialog(Properties.Resources.ConnectFailedWarningTitle, mySqlException.Message, null, mySqlException.InnerException != null ? mySqlException.InnerException.Message : null);
+            InfoDialog.ShowErrorDialog(Resources.ConnectFailedWarningTitle, mySqlException.Message, null, mySqlException.InnerException != null ? mySqlException.InnerException.Message : null);
             break;
 
-          //// Wrong password.
+          // Wrong password.
           case MySqlWorkbenchConnection.MYSQL_EXCEPTION_NUMBER_WRONG_PASSWORD:
             connectionResult = TestConnectionResult.WrongPassword;
             if (!string.IsNullOrEmpty(connection.Password) || displayErrorOnEmptyPassword)
             {
-              string moreInfoText = connection.IsSSL() ? Properties.Resources.ConnectSSLFailedDetailWarning : null;
-              InfoDialog.ShowWarningDialog(Properties.Resources.ConnectFailedWarningTitle, mySqlException.Message, null, moreInfoText);
+              string moreInfoText = connection.IsSsl() ? Resources.ConnectSSLFailedDetailWarning : null;
+              InfoDialog.ShowWarningDialog(Resources.ConnectFailedWarningTitle, mySqlException.Message, null, moreInfoText);
             }
             break;
 
-          //// Password has expired so any statement can't be run before resetting the expired password.
+          // Password has expired so any statement can't be run before resetting the expired password.
           case MySqlWorkbenchConnection.MYSQL_EXCEPTION_NUMBER_EXPIRED_PASSWORD:
             PasswordDialogFlags passwordFlags = PasswordDialog.ShowExpiredPasswordDialog(connection, false);
             if (!passwordFlags.Cancelled)
@@ -518,18 +524,18 @@ namespace MySQL.ForExcel
             connectionResult = passwordFlags.Cancelled ? TestConnectionResult.PasswordExpired : TestConnectionResult.PasswordReset;
             break;
 
-          //// Any other exception.
+          // Any other exception.
           default:
-            InfoDialog.ShowErrorDialog(Properties.Resources.ConnectFailedWarningTitle, string.Format(Properties.Resources.GenericConnectionErrorText, mySqlException.Number, mySqlException.Message), null, mySqlException.InnerException != null ? mySqlException.InnerException.Message : null);
+            InfoDialog.ShowErrorDialog(Resources.ConnectFailedWarningTitle, string.Format(Resources.GenericConnectionErrorText, mySqlException.Number, mySqlException.Message), null, mySqlException.InnerException != null ? mySqlException.InnerException.Message : null);
             break;
         }
       }
       else
       {
-        InfoDialog.ShowErrorDialog(Properties.Resources.ConnectFailedWarningTitle, connectionException.Message, null, connectionException.InnerException != null ? connectionException.InnerException.Message : null);
+        InfoDialog.ShowErrorDialog(Resources.ConnectFailedWarningTitle, connectionException.Message, null, connectionException.InnerException != null ? connectionException.InnerException.Message : null);
       }
 
-      Globals.ThisAddIn.Application.Cursor = Microsoft.Office.Interop.Excel.XlMousePointer.xlDefault;
+      Globals.ThisAddIn.Application.Cursor = Excel.XlMousePointer.xlDefault;
       return connectionResult;
     }
 
@@ -543,13 +549,14 @@ namespace MySQL.ForExcel
     /// <param name="firstRowIdx">Row number from which to start returning results.</param>
     /// <param name="rowCount">Number of rows to return</param>
     /// <returns>The SELECT query text.</returns>
-    private static string AssembleSelectQuery(string schemaName, DBObject dbo, List<string> columnsList, int firstRowIdx, int rowCount)
+    private static string AssembleSelectQuery(string schemaName, DbObject dbo, ICollection<string> columnsList, int firstRowIdx, int rowCount)
     {
-      if (dbo.Type == DBObject.DBObjectType.Procedure)
+      if (dbo.Type == DbObject.DbObjectType.Procedure)
       {
         return null;
       }
 
+      const string bigRowCountLimit = "18446744073709551615";
       StringBuilder queryStringBuilder = new StringBuilder("SELECT ");
       if (columnsList == null || columnsList.Count == 0)
       {
@@ -568,7 +575,7 @@ namespace MySQL.ForExcel
       queryStringBuilder.AppendFormat(" FROM `{0}`.`{1}`", schemaName, dbo.Name);
       if (firstRowIdx > 0)
       {
-        string strCount = rowCount >= 0 ? rowCount.ToString() : "18446744073709551615";
+        string strCount = rowCount >= 0 ? rowCount.ToString(CultureInfo.InvariantCulture) : bigRowCountLimit;
         queryStringBuilder.AppendFormat(" LIMIT {0},{1}", firstRowIdx, strCount);
       }
       else if (rowCount >= 0)

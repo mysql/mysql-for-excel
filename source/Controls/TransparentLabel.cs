@@ -1,36 +1,34 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Windows.Forms;
+using MySQL.Utility.Classes;
+
+namespace MySQL.ForExcel.Controls
 {
-  using System;
-  using System.Collections.Generic;
-  using System.ComponentModel;
-  using System.Drawing;
-  using System.Drawing.Drawing2D;
-  using System.Windows.Forms;
-  using MySQL.Utility;
-
   /// <summary>
   /// Provides a label control with a variable text color opacity.
   /// </summary>
-  internal class TransparentLabel : UserControl
+  internal sealed class TransparentLabel : UserControl
   {
     #region Fields
 
@@ -190,11 +188,13 @@ namespace MySQL.ForExcel
       {
         bool valueChanged = _transparentText != value;
         _transparentText = value;
-        if (valueChanged)
+        if (!valueChanged)
         {
-          _wordWrapRecalculationNeeded = true;
-          _textSizeRecalculationNeeded = true;
+          return;
         }
+
+        _wordWrapRecalculationNeeded = true;
+        _textSizeRecalculationNeeded = true;
       }
     }
 
@@ -218,7 +218,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="AutoSizeChanged"/> event.
+    /// Raises the <see cref="Control.AutoSizeChanged"/> event.
     /// </summary>
     /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
     protected override void OnAutoSizeChanged(EventArgs e)
@@ -228,7 +228,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="FontChanged"/> event.
+    /// Raises the <see cref="Control.FontChanged"/> event.
     /// </summary>
     /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
     protected override void OnFontChanged(EventArgs e)
@@ -238,7 +238,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="Load"/> event.
+    /// Raises the <see cref="UserControl.Load"/> event.
     /// </summary>
     /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
     protected override void OnLoad(EventArgs e)
@@ -249,7 +249,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="Paint"/> event.
+    /// Raises the <see cref="Control.Paint"/> event.
     /// </summary>
     /// <param name="e">A <see cref="PaintEventArgs"/> that contains the event data.</param>
     protected override void OnPaint(PaintEventArgs e)
@@ -305,7 +305,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="Resize"/> event.
+    /// Raises the <see cref="Control.Resize"/> event.
     /// </summary>
     /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
     protected override void OnResize(EventArgs e)

@@ -15,12 +15,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
-namespace MySQL.ForExcel
-{
-  using System;
-  using System.Windows.Forms;
-  using MySQL.Utility.Forms;
+using System;
+using System.Windows.Forms;
+using MySQL.ForExcel.Classes;
+using MySQL.ForExcel.Properties;
+using MySQL.Utility.Forms;
 
+namespace MySQL.ForExcel.Forms
+{
   /// <summary>
   /// Advanced options dialog for the operations performed by the <see cref="ExportDataForm"/>.
   /// </summary>
@@ -34,8 +36,8 @@ namespace MySQL.ForExcel
       InitializeComponent();
 
       ConnectionTimeoutNumericUpDown.Maximum = Int32.MaxValue / 1000;
-      ConnectionTimeoutNumericUpDown.Value = Math.Min(ConnectionTimeoutNumericUpDown.Maximum, Properties.Settings.Default.GlobalConnectionConnectionTimeout);
-      QueryTimeoutNumericUpDown.Value = Properties.Settings.Default.GlobalConnectionCommandTimeout;
+      ConnectionTimeoutNumericUpDown.Value = Math.Min(ConnectionTimeoutNumericUpDown.Maximum, Settings.Default.GlobalConnectionConnectionTimeout);
+      QueryTimeoutNumericUpDown.Value = Settings.Default.GlobalConnectionCommandTimeout;
     }
 
     /// <summary>
@@ -50,8 +52,8 @@ namespace MySQL.ForExcel
         return;
       }
 
-      Properties.Settings.Default.GlobalConnectionConnectionTimeout = (uint)ConnectionTimeoutNumericUpDown.Value;
-      Properties.Settings.Default.GlobalConnectionCommandTimeout = (uint)QueryTimeoutNumericUpDown.Value;
+      Settings.Default.GlobalConnectionConnectionTimeout = (uint)ConnectionTimeoutNumericUpDown.Value;
+      Settings.Default.GlobalConnectionCommandTimeout = (uint)QueryTimeoutNumericUpDown.Value;
       MiscUtilities.SaveSettings();
     }
   }

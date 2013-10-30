@@ -15,12 +15,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
-namespace MySQL.ForExcel
-{
-  using System;
-  using System.Windows.Forms;
-  using MySQL.Utility.Forms;
+using System;
+using System.Windows.Forms;
+using MySQL.ForExcel.Classes;
+using MySQL.ForExcel.Properties;
+using MySQL.Utility.Forms;
 
+namespace MySQL.ForExcel.Forms
+{
   /// <summary>
   /// Advanced options dialog for the operations performed by the <see cref="ExportDataForm"/>.
   /// </summary>
@@ -33,8 +35,8 @@ namespace MySQL.ForExcel
     {
       InitializeComponent();
 
-      PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Properties.Settings.Default.ImportPreviewRowsQuantity);
-      EscapeFormulaValuesCheckBox.Checked = Properties.Settings.Default.ImportEscapeFormulaTextValues;
+      PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.ImportPreviewRowsQuantity);
+      EscapeFormulaValuesCheckBox.Checked = Settings.Default.ImportEscapeFormulaTextValues;
     }
 
     /// <summary>
@@ -49,8 +51,8 @@ namespace MySQL.ForExcel
         return;
       }
 
-      Properties.Settings.Default.ImportPreviewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
-      Properties.Settings.Default.ImportEscapeFormulaTextValues = EscapeFormulaValuesCheckBox.Checked;
+      Settings.Default.ImportPreviewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
+      Settings.Default.ImportEscapeFormulaTextValues = EscapeFormulaValuesCheckBox.Checked;
       MiscUtilities.SaveSettings();
     }
   }

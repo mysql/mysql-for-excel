@@ -15,20 +15,24 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
-namespace MySQL.ForExcel
-{
-  using System;
-  using System.Collections.Generic;
-  using System.ComponentModel;
-  using System.Data;
-  using System.Drawing;
-  using System.Runtime.InteropServices;
-  using System.Text;
-  using System.Windows.Forms;
-  using MySQL.Utility;
-  using MySQL.Utility.Forms;
-  using Excel = Microsoft.Office.Interop.Excel;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Windows.Forms;
+using MySQL.ForExcel.Classes;
+using MySQL.ForExcel.Controls;
+using MySQL.ForExcel.Properties;
+using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQLWorkbench;
+using MySQL.Utility.Forms;
+using Excel = Microsoft.Office.Interop.Excel;
 
+namespace MySQL.ForExcel.Forms
+{
   /// <summary>
   /// Provides a minimalistic floating interface used for editing sessions against MySQL tables.
   /// </summary>
@@ -40,11 +44,6 @@ namespace MySQL.ForExcel
     /// Places the window above all non-topmost windows (that is, behind all topmost windows). This flag has no effect if the window is already a non-topmost window.
     /// </summary>
     private const int HWND_NOTOPMOST = -2;
-
-    /// <summary>
-    /// Places the window above all non-topmost windows. The window maintains its topmost position even when it is deactivated.
-    /// </summary>
-    private const int HWND_TOPMOST = -1;
 
     /// <summary>
     /// Displays a window in its most recent size and position. This value is similar to SW_SHOWNORMAL, except that the window is not activated.
@@ -64,11 +63,6 @@ namespace MySQL.ForExcel
     /// A point object used as a placeholder to track where the mouse has been pressed.
     /// </summary>
     private Point _mouseDownPoint;
-
-    /// <summary>
-    /// The query string assembled to perform operations against the MySQL table (UPDATE, INSERT, DELETE).
-    /// </summary>
-    private string _queryString;
 
     /// <summary>
     /// Flag indicating whether the editing session is in process of undoing changes done
@@ -96,23 +90,22 @@ namespace MySQL.ForExcel
       WorksheetProtectionKey = Guid.NewGuid().ToString();
       ParentTaskPane = parentTaskPane;
       ParentWindow = parentWindow;
-      WBConnection = wbConnection;
+      WbConnection = wbConnection;
       EditDataRange = originalEditDataRange;
-      _queryString = importTable.ExtendedProperties["QueryString"].ToString();
       string tableName = importTable.TableName;
       if (importTable.ExtendedProperties.ContainsKey("TableName") && !string.IsNullOrEmpty(importTable.ExtendedProperties["TableName"].ToString()))
       {
         tableName = importTable.ExtendedProperties["TableName"].ToString();
       }
 
-      EditMySQLDataTable = new MySQLDataTable(tableName, importTable, wbConnection);
+      EditMySqlDataTable = new MySqlDataTable(tableName, importTable, wbConnection);
       if (importTable.ExtendedProperties.ContainsKey("QueryString") && !string.IsNullOrEmpty(importTable.ExtendedProperties["QueryString"].ToString()))
       {
-        EditMySQLDataTable.SelectQuery = importTable.ExtendedProperties["QueryString"].ToString();
+        EditMySqlDataTable.SelectQuery = importTable.ExtendedProperties["QueryString"].ToString();
       }
 
       EditingWorksheet = editingWorksheet;
-      EditingWorksheet.SelectionChange += new Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);
+      EditingWorksheet.SelectionChange += EditingWorksheet_SelectionChange;
       ResetToolTip();
       EditingColsQuantity = editingWorksheet.UsedRange.Columns.Count;
       EditingRowsQuantity = 0;
@@ -145,7 +138,7 @@ namespace MySQL.ForExcel
     {
       get
       {
-        return EditMySQLDataTable != null ? EditMySQLDataTable.TableName : null;
+        return EditMySqlDataTable != null ? EditMySqlDataTable.TableName : null;
       }
     }
 
@@ -161,18 +154,20 @@ namespace MySQL.ForExcel
     {
       get
       {
-        bool exists = false;
-        if (EditingWorksheet != null)
+        bool exists;
+        if (EditingWorksheet == null)
         {
-          try
-          {
-            Excel.Workbook wb = EditingWorksheet.Parent as Excel.Workbook;
-            exists = true;
-          }
-          catch
-          {
-            exists = false;
-          }
+          return false;
+        }
+
+        try
+        {
+          Excel.Workbook wb = EditingWorksheet.Parent as Excel.Workbook;
+          exists = true;
+        }
+        catch
+        {
+          exists = false;
         }
 
         return exists;
@@ -180,9 +175,9 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Gets the <see cref="MySQLDataTable"/> whose data is being edited.
+    /// Gets the <see cref="MySqlDataTable"/> whose data is being edited.
     /// </summary>
-    public MySQLDataTable EditMySQLDataTable { get; private set; }
+    public MySqlDataTable EditMySqlDataTable { get; private set; }
 
     /// <summary>
     /// Gets the <see cref="ExcelAddInPane"/> from which the <see cref="EditDataDialog"/> is called.
@@ -206,14 +201,14 @@ namespace MySQL.ForExcel
     {
       get
       {
-        return RangesAndAddressesList != null ? RangesAndAddressesList.Count > 0 : false;
+        return RangesAndAddressesList != null && RangesAndAddressesList.Count > 0;
       }
     }
 
     /// <summary>
     /// Gets the connection to a MySQL server instance selected by users.
     /// </summary>
-    public MySqlWorkbenchConnection WBConnection { get; private set; }
+    public MySqlWorkbenchConnection WbConnection { get; private set; }
 
     /// <summary>
     /// Gets the name of the Excel workbook that contains the worksheet tied to the current editing session.
@@ -224,12 +219,18 @@ namespace MySQL.ForExcel
       {
         try
         {
-          return (EditingWorksheet.Parent as Excel.Workbook).Name;
+          var workbook = EditingWorksheet.Parent as Excel.Workbook;
+          if (workbook != null)
+          {
+            return workbook.Name;
+          }
         }
         catch
         {
           return null;
         }
+
+        return null;
       }
     }
 
@@ -328,9 +329,9 @@ namespace MySQL.ForExcel
     {
       base.OnPaintBackground(e);
       Pen pen = new Pen(Color.White, 3f);
-      e.Graphics.DrawRectangle(pen, 0, 0, this.Width - 2, this.Height - 2);
+      e.Graphics.DrawRectangle(pen, 0, 0, Width - 2, Height - 2);
       pen.Width = 1f;
-      e.Graphics.DrawLine(pen, 0, 25, this.Width, 25);
+      e.Graphics.DrawLine(pen, 0, 25, Width, 25);
       pen.Dispose();
     }
 
@@ -339,14 +340,14 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="hWnd">The window handle.</param>
     /// <param name="hWndInsertAfter">Identifies the CWnd object that will precede (be higher than) this CWnd object in the Z-order.</param>
-    /// <param name="X">Specifies the new position of the left side of the window.</param>
-    /// <param name="Y">Specifies the new position of the top of the window.</param>
+    /// <param name="x">Specifies the new position of the left side of the window.</param>
+    /// <param name="y">Specifies the new position of the top of the window.</param>
     /// <param name="cx">Specifies the new width of the window.</param>
     /// <param name="cy">Specifies the new height of the window.</param>
     /// <param name="uFlags">Specifies sizing and positioning options.</param>
     /// <returns><c>true</c> if the function is successful; <c>false</c> otherwise.</returns>
     [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
-    private static extern bool SetWindowPos(int hWnd, int hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+    private static extern bool SetWindowPos(int hWnd, int hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
 
     /// <summary>
     /// Sets the specified window's show state.
@@ -364,7 +365,7 @@ namespace MySQL.ForExcel
     /// <returns>An Excel range containing just the newly added row.</returns>
     private Excel.Range AddNewRowToEditingRange(bool clearColoringOfOldNewRow)
     {
-      Excel.Range newRowRange = null;
+      Excel.Range newRowRange;
       EditingWorksheet.UnprotectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey);
       EditDataRange = EditDataRange.AddNewRow(clearColoringOfOldNewRow, out newRowRange);
       EditingWorksheet.ProtectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey, EditDataRange);
@@ -408,8 +409,8 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void EditDataDialog_Shown(object sender, EventArgs e)
     {
-      //// Need to call the ShowInactiveTopmost method when the form is shown in order to make it topmost and
-      //// to avoid that the controls inside it activate so focus remains on excel cells.
+      // Need to call the ShowInactiveTopmost method when the form is shown in order to make it topmost and
+      // to avoid that the controls inside it activate so focus remains on excel cells.
       ShowInactiveTopmost();
     }
 
@@ -420,35 +421,35 @@ namespace MySQL.ForExcel
     /// This method is used to record any changes done by users to the data and prepare corresponding changes within a data table object
     /// that later will generate queries to commit the data changes to the MySQL server.
     /// </remarks>
-    /// <param name="Target"></param>
-    private void EditingWorksheet_Change(Excel.Range Target)
+    /// <param name="target"></param>
+    private void EditingWorksheet_Change(Excel.Range target)
     {
       if (_undoingChanges)
       {
         return;
       }
 
-      bool rowWasDeleted = EditingWorksheet.UsedRange.Rows.Count < EditingRowsQuantity && Target.Columns.Count == EditingWorksheet.Columns.Count;
+      bool rowWasDeleted = EditingWorksheet.UsedRange.Rows.Count < EditingRowsQuantity && target.Columns.Count == EditingWorksheet.Columns.Count;
       bool undoChanges = false;
       string operationSummary = null;
       string operationDetails = null;
 
-      Excel.Range intersectRange = EditDataRange.IntersectWith(Target);
+      Excel.Range intersectRange = EditDataRange.IntersectWith(target);
       if (intersectRange == null || intersectRange.Count == 0)
       {
         if (rowWasDeleted)
         {
-          //// The row for insertions is attempted to be deleted, we need to undo
+          // The row for insertions is attempted to be deleted, we need to undo
           undoChanges = true;
-          operationSummary = Properties.Resources.EditDataDeleteLastRowNotPermittedErrorTitle;
-          operationDetails = Properties.Resources.EditDataDeleteLastRowNotPermittedErrorDetail;
+          operationSummary = Resources.EditDataDeleteLastRowNotPermittedErrorTitle;
+          operationDetails = Resources.EditDataDeleteLastRowNotPermittedErrorDetail;
         }
         else
         {
-          //// It is a modification and outside the permitted range
+          // It is a modification and outside the permitted range
           undoChanges = true;
-          operationSummary = Properties.Resources.EditDataOutsideEditingRangeNotPermittedErrorTitle;
-          operationDetails = Properties.Resources.EditDataOutsideEditingRangeNotPermittedErrorDetail;
+          operationSummary = Resources.EditDataOutsideEditingRangeNotPermittedErrorTitle;
+          operationDetails = Resources.EditDataOutsideEditingRangeNotPermittedErrorDetail;
         }
       }
 
@@ -456,168 +457,178 @@ namespace MySQL.ForExcel
       {
         MiscUtilities.ShowCustomizedErrorDialog(operationSummary, operationDetails, true);
         UndoChanges();
-        if (rowWasDeleted)
+        if (!rowWasDeleted)
         {
-          int changedRangesQty = RangesAndAddressesList.RefreshAddressesOfStoredRanges();
-          EditDataRange = EditingWorksheet.UsedRange;
+          return;
         }
 
+        RangesAndAddressesList.RefreshAddressesOfStoredRanges();
+        EditDataRange = EditingWorksheet.UsedRange;
         return;
       }
 
-      //// Substract from the Excel indexes since they start at 1, ExcelRow is subtracted by 2 if we imported headers.
-      Excel.Range startCell = (intersectRange.Item[1, 1] as Excel.Range);
-      int startDataTableRow = startCell.Row - 2;
-      int startDataTableCol = startCell.Column - 1;
-
-      //// Detect if a row was deleted and if so flag it for deletion
-      if (rowWasDeleted)
+      // Substract from the Excel indexes since they start at 1, ExcelRow is subtracted by 2 if we imported headers.
+      Excel.Range startCell = intersectRange.Item[1, 1] as Excel.Range;
+      if (startCell != null)
       {
-        List<int> skipDeletedRowsList = new List<int>();
-        foreach (Excel.Range deletedRow in Target.Rows)
+        int startDataTableRow = startCell.Row - 2;
+        int startDataTableCol = startCell.Column - 1;
+
+        // Detect if a row was deleted and if so flag it for deletion
+        if (rowWasDeleted)
         {
-          startDataTableRow = deletedRow.Row - 2;
-          startDataTableRow = EditMySQLDataTable.SearchRowIndexNotDeleted(startDataTableRow, skipDeletedRowsList, EditDataRange.Rows.Count);
-          DataRow dr = EditMySQLDataTable.Rows[startDataTableRow];
-          dr.Delete();
-          skipDeletedRowsList.Add(startDataTableRow);
-          RangeAndAddress addedRA = RangesAndAddressesList.Find(ra => ra.Modification == RangeAndAddress.RangeModification.Added && ra.ExcelRow == deletedRow.Row);
-          if (addedRA != null)
+          List<int> skipDeletedRowsList = new List<int>();
+          foreach (Excel.Range deletedRow in target.Rows)
           {
-            RangesAndAddressesList.Remove(addedRA);
-          }
-          else if (!RangesAndAddressesList.Exists(ra => ra.Modification == RangeAndAddress.RangeModification.Deleted && ra.Address == deletedRow.Address))
-          {
-            RangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Deleted, deletedRow, deletedRow.Address, (int)deletedRow.Interior.Color, deletedRow.Row, dr));
-          }
-        }
-
-        for (int rangeIdx = 0; rangeIdx < RangesAndAddressesList.Count; rangeIdx++)
-        {
-          bool removeFromList = false;
-          RangeAndAddress ra = RangesAndAddressesList[rangeIdx];
-          if (ra.Modification == RangeAndAddress.RangeModification.Deleted)
-          {
-            continue;
+            startDataTableRow = deletedRow.Row - 2;
+            startDataTableRow = EditMySqlDataTable.SearchRowIndexNotDeleted(startDataTableRow, skipDeletedRowsList, EditDataRange.Rows.Count);
+            DataRow dr = EditMySqlDataTable.Rows[startDataTableRow];
+            dr.Delete();
+            skipDeletedRowsList.Add(startDataTableRow);
+            RangeAndAddress addedRa = RangesAndAddressesList.Find(ra => ra.Modification == RangeAndAddress.RangeModification.Added && ra.ExcelRow == deletedRow.Row);
+            if (addedRa != null)
+            {
+              RangesAndAddressesList.Remove(addedRa);
+            }
+            else if (!RangesAndAddressesList.Exists(ra => ra.Modification == RangeAndAddress.RangeModification.Deleted && ra.Address == deletedRow.Address))
+            {
+              RangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Deleted, deletedRow, deletedRow.Address, (int)deletedRow.Interior.Color, deletedRow.Row, dr));
+            }
           }
 
-          try
+          for (int rangeIdx = 0; rangeIdx < RangesAndAddressesList.Count; rangeIdx++)
           {
-            ra.Address = ra.Range.Address;
-          }
-          catch
-          {
-            removeFromList = true;
-          }
+            bool removeFromList = false;
+            RangeAndAddress ra = RangesAndAddressesList[rangeIdx];
+            if (ra.Modification == RangeAndAddress.RangeModification.Deleted)
+            {
+              continue;
+            }
 
-          if (removeFromList)
-          {
+            try
+            {
+              ra.Address = ra.Range.Address;
+            }
+            catch
+            {
+              removeFromList = true;
+            }
+
+            if (!removeFromList)
+            {
+              continue;
+            }
+
             RangesAndAddressesList.Remove(ra);
             rangeIdx--;
           }
+
+          RangesAndAddressesList.RefreshAddressesOfStoredRanges();
+          EditingRowsQuantity = EditDataRange.Rows.Count;
         }
-
-        int changedRangesQty = RangesAndAddressesList.RefreshAddressesOfStoredRanges();
-        EditingRowsQuantity = EditDataRange.Rows.Count;
-      }
-      else
-      {
-        //// The change was a modification of cell values
-        MySQLDataColumn currCol = null;
-        try
+        else
         {
-          for (int rowIdx = 1; rowIdx <= intersectRange.Rows.Count; rowIdx++)
+          // The change was a modification of cell values
+          MySqlDataColumn currCol = null;
+          try
           {
-            for (int colIdx = 1; colIdx <= intersectRange.Columns.Count; colIdx++)
+            for (int rowIdx = 1; rowIdx <= intersectRange.Rows.Count; rowIdx++)
             {
-              Excel.Range cell = intersectRange.Cells[rowIdx, colIdx] as Excel.Range;
-
-              //// Detect if a data row has been added by the user and if so flag it for addition
-              if (cell.Row == EditDataRange.Rows.Count)
+              for (int colIdx = 1; colIdx <= intersectRange.Columns.Count; colIdx++)
               {
-                if (cell.Value == null)
+                Excel.Range cell = intersectRange.Cells[rowIdx, colIdx] as Excel.Range;
+                if (cell == null)
                 {
                   continue;
                 }
 
-                Excel.Range insertingRowRange = AddNewRowToEditingRange(true);
-                DataRow newRow = EditMySQLDataTable.NewRow();
-                EditMySQLDataTable.Rows.Add(newRow);
-                if (!RangesAndAddressesList.Exists(ra => ra.Modification == RangeAndAddress.RangeModification.Added && ra.Address == insertingRowRange.Address))
+                // Detect if a data row has been added by the user and if so flag it for addition
+                if (cell.Row == EditDataRange.Rows.Count)
                 {
-                  RangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Added, insertingRowRange, insertingRowRange.Address, (int)insertingRowRange.Interior.Color, insertingRowRange.Row, newRow));
-                }
-
-                insertingRowRange.Interior.Color = ExcelUtilities.UncommittedCellsOLEColor;
-              }
-
-              int absRow = startDataTableRow + rowIdx - 1;
-              absRow = EditMySQLDataTable.SearchRowIndexNotDeleted(absRow, null, EditDataRange.Rows.Count);
-              int absCol = startDataTableCol + colIdx - 1;
-
-              currCol = EditMySQLDataTable.GetColumnAtIndex(absCol);
-              object insertingValue = DBNull.Value;
-              if (cell.Value != null)
-              {
-                insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(cell.Value, currCol, false);
-              }
-
-              if (EditMySQLDataTable.Rows[absRow].RowState != DataRowState.Added)
-              {
-                if (DataTypeUtilities.ExcelValueEqualsDataTableValue(EditMySQLDataTable.Rows[absRow][absCol, DataRowVersion.Original], insertingValue))
-                {
-                  var existingRA = RangesAndAddressesList.Find(ra => ra.Modification == RangeAndAddress.RangeModification.Updated && ra.Address == cell.Address);
-                  if (existingRA != null)
+                  if (cell.Value == null)
                   {
-                    cell.SetInteriorColor(existingRA.RangeColor == ExcelUtilities.EmptyCellsOLEColor ? 0 : existingRA.RangeColor);
-                    RangesAndAddressesList.RemoveAll(ra => ra.Modification == RangeAndAddress.RangeModification.Updated && ra.Address == cell.Address);
-                    EditMySQLDataTable.Rows[absRow][absCol] = insertingValue;
-                    int changedColsQty = EditMySQLDataTable.GetChangedColumns(EditMySQLDataTable.Rows[absRow]).Count;
-                    if (changedColsQty == 0)
-                    {
-                      EditMySQLDataTable.Rows[absRow].RejectChanges();
-                    }
+                    continue;
                   }
 
-                  continue;
+                  Excel.Range insertingRowRange = AddNewRowToEditingRange(true);
+                  DataRow newRow = EditMySqlDataTable.NewRow();
+                  EditMySqlDataTable.Rows.Add(newRow);
+                  if (!RangesAndAddressesList.Exists(ra => ra.Modification == RangeAndAddress.RangeModification.Added && ra.Address == insertingRowRange.Address))
+                  {
+                    RangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Added, insertingRowRange, insertingRowRange.Address, (int)insertingRowRange.Interior.Color, insertingRowRange.Row, newRow));
+                  }
+
+                  insertingRowRange.Interior.Color = ExcelUtilities.UncommittedCellsOleColor;
                 }
 
-                //// Need to set the value before coloring the cell in case there is an invalid value it does not reach the coloring code
-                DataRow dr = EditMySQLDataTable.Rows[absRow];
-                dr[absCol] = insertingValue;
-                if (!RangesAndAddressesList.Exists(ra => ra.Modification == RangeAndAddress.RangeModification.Updated && ra.Address == cell.Address))
+                int absRow = startDataTableRow + rowIdx - 1;
+                absRow = EditMySqlDataTable.SearchRowIndexNotDeleted(absRow, null, EditDataRange.Rows.Count);
+                int absCol = startDataTableCol + colIdx - 1;
+
+                currCol = EditMySqlDataTable.GetColumnAtIndex(absCol);
+                object insertingValue = DBNull.Value;
+                if (cell.Value != null)
                 {
-                  RangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Updated, cell, cell.Address, (int)cell.Interior.Color, cell.Row, dr));
+                  insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(cell.Value, currCol, false);
                 }
-              }
-              else
-              {
-                EditMySQLDataTable.Rows[absRow][absCol] = insertingValue;
-              }
 
-              cell.Interior.Color = ExcelUtilities.UncommittedCellsOLEColor;
+                if (EditMySqlDataTable.Rows[absRow].RowState != DataRowState.Added)
+                {
+                  if (DataTypeUtilities.ExcelValueEqualsDataTableValue(EditMySqlDataTable.Rows[absRow][absCol, DataRowVersion.Original], insertingValue))
+                  {
+                    var existingRa = RangesAndAddressesList.Find(ra => ra.Modification == RangeAndAddress.RangeModification.Updated && ra.Address == cell.Address);
+                    if (existingRa != null)
+                    {
+                      cell.SetInteriorColor(existingRa.RangeColor == ExcelUtilities.EmptyCellsOleColor ? 0 : existingRa.RangeColor);
+                      RangesAndAddressesList.RemoveAll(ra => ra.Modification == RangeAndAddress.RangeModification.Updated && ra.Address == cell.Address);
+                      EditMySqlDataTable.Rows[absRow][absCol] = insertingValue;
+                      int changedColsQty = EditMySqlDataTable.GetChangedColumns(EditMySqlDataTable.Rows[absRow]).Count;
+                      if (changedColsQty == 0)
+                      {
+                        EditMySqlDataTable.Rows[absRow].RejectChanges();
+                      }
+                    }
+
+                    continue;
+                  }
+
+                  // Need to set the value before coloring the cell in case there is an invalid value it does not reach the coloring code
+                  DataRow dr = EditMySqlDataTable.Rows[absRow];
+                  dr[absCol] = insertingValue;
+                  if (!RangesAndAddressesList.Exists(ra => ra.Modification == RangeAndAddress.RangeModification.Updated && ra.Address == cell.Address))
+                  {
+                    RangesAndAddressesList.Add(new RangeAndAddress(RangeAndAddress.RangeModification.Updated, cell, cell.Address, (int)cell.Interior.Color, cell.Row, dr));
+                  }
+                }
+                else
+                {
+                  EditMySqlDataTable.Rows[absRow][absCol] = insertingValue;
+                }
+
+                cell.Interior.Color = ExcelUtilities.UncommittedCellsOleColor;
+              }
             }
           }
-        }
-        catch (ArgumentException argEx)
-        {
-          undoChanges = true;
-          operationSummary = string.Format(Properties.Resources.EditDataInvalidValueError, currCol != null ? currCol.MySQLDataType : "Unknown");
-          operationDetails = argEx.Message;
-        }
-        catch (Exception ex)
-        {
-          undoChanges = true;
-          operationSummary = Properties.Resources.EditDataCellModificationError;
-          operationDetails = ex.Message;
-          MySQLSourceTrace.WriteAppErrorToLog(ex);
-        }
-        finally
-        {
-          if (undoChanges)
+          catch (ArgumentException argEx)
           {
-            MiscUtilities.ShowCustomizedErrorDialog(operationSummary, operationDetails, true);
-            UndoChanges();
+            undoChanges = true;
+            operationSummary = string.Format(Resources.EditDataInvalidValueError, currCol != null ? currCol.MySqlDataType : "Unknown");
+            operationDetails = argEx.Message;
+          }
+          catch (Exception ex)
+          {
+            undoChanges = true;
+            operationSummary = Resources.EditDataCellModificationError;
+            operationDetails = ex.Message;
+            MySqlSourceTrace.WriteAppErrorToLog(ex);
+          }
+          finally
+          {
+            if (undoChanges)
+            {
+              MiscUtilities.ShowCustomizedErrorDialog(operationSummary, operationDetails, true);
+              UndoChanges();
+            }
           }
         }
       }
@@ -632,10 +643,10 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Event delegate method fired when the Excel cells selection changes within the <see cref="EditingWorksheet"/>.
     /// </summary>
-    /// <param name="Target"></param>
-    private void EditingWorksheet_SelectionChange(Excel.Range Target)
+    /// <param name="target"></param>
+    private void EditingWorksheet_SelectionChange(Excel.Range target)
     {
-      Excel.Range intersectRange = EditDataRange.IntersectWith(Target);
+      Excel.Range intersectRange = EditDataRange.IntersectWith(target);
       if (intersectRange == null || intersectRange.Count == 0)
       {
         Hide();
@@ -676,15 +687,17 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void GenericMouseMove(object sender, MouseEventArgs e)
     {
-      if (e.Button == MouseButtons.Left)
+      if (e.Button != MouseButtons.Left)
       {
-        if (_mouseDownPoint.IsEmpty)
-        {
-          return;
-        }
-
-        Location = new Point(Location.X + (e.X - _mouseDownPoint.X), Location.Y + (e.Y - _mouseDownPoint.Y));
+        return;
       }
+
+      if (_mouseDownPoint.IsEmpty)
+      {
+        return;
+      }
+
+      Location = new Point(Location.X + (e.X - _mouseDownPoint.X), Location.Y + (e.Y - _mouseDownPoint.Y));
     }
 
     /// <summary>
@@ -713,21 +726,20 @@ namespace MySQL.ForExcel
 
       int warningsCount = 0;
       StringBuilder operationSummary = new StringBuilder();
-      operationSummary.AppendFormat(Properties.Resources.EditedDataForTable, EditingTableName);
-      string sqlQuery = string.Empty;
+      operationSummary.AppendFormat(Resources.EditedDataForTable, EditingTableName);
       StringBuilder operationDetails = new StringBuilder();
       StringBuilder warningDetails = new StringBuilder();
-      this.Cursor = Cursors.WaitCursor;
+      Cursor = Cursors.WaitCursor;
 
-      operationDetails.AppendFormat(Properties.Resources.EditDataCommittingText,
-                                    EditMySQLDataTable.DeletingOperations,
-                                    EditMySQLDataTable.InsertingOperations,
-                                    EditMySQLDataTable.UpdatingOperations);
-      PushResultsDataTable resultsDT = EditMySQLDataTable.PushData();
+      operationDetails.AppendFormat(Resources.EditDataCommittingText,
+                                    EditMySqlDataTable.DeletingOperations,
+                                    EditMySqlDataTable.InsertingOperations,
+                                    EditMySqlDataTable.UpdatingOperations);
+      PushResultsDataTable resultsDt = EditMySqlDataTable.PushData();
       operationDetails.Append(Environment.NewLine);
-      foreach (DataRow operationRow in resultsDT.Rows)
+      foreach (DataRow operationRow in resultsDt.Rows)
       {
-        sqlQuery = operationRow["QueryText"].ToString();
+        string sqlQuery = operationRow["QueryText"].ToString();
         if (sqlQuery.Length > 0)
         {
           operationDetails.Append(Environment.NewLine);
@@ -742,7 +754,7 @@ namespace MySQL.ForExcel
           case "Warning":
             warningsFound = true;
             warningDetails.Append(Environment.NewLine);
-            warningDetails.Append(operationRow["ResultText"].ToString());
+            warningDetails.Append(operationRow["ResultText"]);
             warningsCount++;
             break;
 
@@ -750,35 +762,37 @@ namespace MySQL.ForExcel
             errorsFound = true;
             operationDetails.Append(Environment.NewLine);
             operationDetails.Append(Environment.NewLine);
-            operationDetails.Append(operationRow["ResultText"].ToString());
+            operationDetails.Append(operationRow["ResultText"]);
             break;
         }
 
-        if (errorsFound)
+        if (!errorsFound)
         {
-          success = false;
-          break;
+          continue;
         }
+
+        success = false;
+        break;
       }
 
       if (warningsFound)
       {
         operationDetails.Append(Environment.NewLine);
         operationDetails.Append(Environment.NewLine);
-        operationDetails.AppendFormat(Properties.Resources.EditDataCommittedWarningsFound, warningsCount);
+        operationDetails.AppendFormat(Resources.EditDataCommittedWarningsFound, warningsCount);
         operationDetails.Append(Environment.NewLine);
-        operationDetails.Append(warningDetails.ToString());
+        operationDetails.Append(warningDetails);
       }
 
       operationDetails.Append(Environment.NewLine);
       operationDetails.Append(Environment.NewLine);
-      operationDetails.AppendFormat(Properties.Resources.EditDataCommittedText,
-                                    resultsDT.DeletedOperations,
-                                    resultsDT.InsertedOperations,
-                                    resultsDT.UpdatedOperations);
+      operationDetails.AppendFormat(Resources.EditDataCommittedText,
+                                    resultsDt.DeletedOperations,
+                                    resultsDt.InsertedOperations,
+                                    resultsDt.UpdatedOperations);
       RangesAndAddressesList.SetInteriorColorToCommmited(success);
 
-      foreach (DataRow dr in EditMySQLDataTable.Rows)
+      foreach (DataRow dr in EditMySqlDataTable.Rows)
       {
         dr.ClearErrors();
       }
@@ -788,18 +802,18 @@ namespace MySQL.ForExcel
       {
         if (warningsFound)
         {
-          operationSummary.Append(Properties.Resources.EditedDataCommittedWarning);
+          operationSummary.Append(Resources.EditedDataCommittedWarning);
           operationsType = InfoDialog.InfoType.Warning;
         }
         else
         {
-          operationSummary.Append(Properties.Resources.EditedDataCommittedSucess);
+          operationSummary.Append(Resources.EditedDataCommittedSucess);
           operationsType = InfoDialog.InfoType.Success;
         }
       }
       else
       {
-        operationSummary.AppendFormat(Properties.Resources.EditedDataCommittedError);
+        operationSummary.AppendFormat(Resources.EditedDataCommittedError);
         operationsType = InfoDialog.InfoType.Error;
       }
 
@@ -819,7 +833,7 @@ namespace MySQL.ForExcel
     /// </summary>
     private void ResetToolTip()
     {
-      DialogToolTip.SetToolTip(this, string.Format(Properties.Resources.EditDataFormTooltipText, Environment.NewLine, WBConnection.Schema, EditingTableName, WorkbookName, WorksheetName));
+      DialogToolTip.SetToolTip(this, string.Format(Resources.EditDataFormTooltipText, Environment.NewLine, WbConnection.Schema, EditingTableName, WorkbookName, WorksheetName));
     }
 
     /// <summary>
@@ -842,22 +856,22 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Reverts the changes done to Excel cell values after the last commit.
     /// </summary>
-    /// <param name="refreshFromDB">Flag indicating if instead of reverting the data back to the way it was when the editing session started, it is pulled to have the most recent version of it.</param>
-    private void RevertDataChanges(bool refreshFromDB)
+    /// <param name="refreshFromDb">Flag indicating if instead of reverting the data back to the way it was when the editing session started, it is pulled to have the most recent version of it.</param>
+    private void RevertDataChanges(bool refreshFromDb)
     {
-      Exception exception = null;
-      EditMySQLDataTable.RevertData(refreshFromDB, out exception);
+      Exception exception;
+      EditMySqlDataTable.RevertData(refreshFromDb, out exception);
       if (exception != null)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(refreshFromDB ? Properties.Resources.EditDataRefreshErrorText : Properties.Resources.EditDataRevertErrorText, exception.Message);
+        MiscUtilities.ShowCustomizedErrorDialog(refreshFromDb ? Resources.EditDataRefreshErrorText : Resources.EditDataRevertErrorText, exception.Message);
       }
 
       EditingWorksheet.UnprotectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey);
       EditDataRange.Clear();
       Excel.Range topLeftCell = EditDataRange.Cells[1, 1];
       topLeftCell.Select();
-      EditDataRange = ParentTaskPane.ImportDataTableToExcelAtGivenCell(EditMySQLDataTable, true, topLeftCell);
-      if (refreshFromDB)
+      EditDataRange = ParentTaskPane.ImportDataTableToExcelAtGivenCell(EditMySqlDataTable, true, topLeftCell);
+      if (refreshFromDb)
       {
         EditDataRange.SetInteriorColor(0);
         RangesAndAddressesList.Clear();
@@ -883,7 +897,7 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        MySQLSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
 
       _undoingChanges = false;

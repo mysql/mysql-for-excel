@@ -1,34 +1,32 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace MySQL.ForExcel.Controls
 {
-  using System;
-  using System.Collections.Generic;
-  using System.ComponentModel;
-  using System.Drawing;
-  using System.Windows.Forms;
-
   /// <summary>
-  /// 
+  /// Displays data in a read-only grid that supports a two-row header for preview purposes only.
   /// </summary>
-  internal class MultiHeaderDataGridView : PreviewDataGridView
+  internal sealed class MultiHeaderDataGridView : PreviewDataGridView
   {
     /// <summary>
     /// Default height in pixels of the top column headers.
@@ -53,7 +51,7 @@ namespace MySQL.ForExcel
     public List<MultiHeaderColumn> MultiHeaderColumnList { get; set; }
 
     /// <summary>
-    /// Raises the <see cref="ColumnWidthChanged"/> event.
+    /// Raises the <see cref="DataGridView.ColumnWidthChanged"/> event.
     /// </summary>
     /// <param name="e">A <see cref="DataGridViewColumnEventArgs"/> that contains the event data.</param>
     protected override void OnColumnWidthChanged(DataGridViewColumnEventArgs e)
@@ -65,7 +63,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="DataBindingComplete"/> event.
+    /// Raises the <see cref="DataGridView.DataBindingComplete"/> event.
     /// </summary>
     /// <param name="e">A <see cref="DataGridViewBindingCompleteEventArgs"/> that contains the event data.</param>
     protected override void OnDataBindingComplete(DataGridViewBindingCompleteEventArgs e)
@@ -75,7 +73,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="Paint"/> event.
+    /// Raises the <see cref="Control.Paint"/> event.
     /// </summary>
     /// <param name="e">A <see cref="PaintEventArgs"/> that contains the event data.</param>
     protected override void OnPaint(PaintEventArgs e)
@@ -87,9 +85,11 @@ namespace MySQL.ForExcel
       SolidBrush foregroundBrush = new SolidBrush(ColumnHeadersDefaultCellStyle.ForeColor);
       Color backColor = ColumnHeadersDefaultCellStyle.BackColor;
       SolidBrush backgroundBrush = new SolidBrush(backColor);
-      StringFormat format = new StringFormat();
-      format.Alignment = StringAlignment.Center;
-      format.LineAlignment = StringAlignment.Center;
+      StringFormat format = new StringFormat
+      {
+        Alignment = StringAlignment.Center,
+        LineAlignment = StringAlignment.Center
+      };
       foreach (MultiHeaderColumn mHeader in MultiHeaderColumnList)
       {
         int lastDivWidth = Columns[mHeader.LastColumnIndex].DividerWidth;
@@ -117,18 +117,20 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="Scroll"/> event.
+    /// Raises the <see cref="DataGridView.Scroll"/> event.
     /// </summary>
     /// <param name="e">A <see cref="ScrollEventArgs"/> that contains the event data.</param>
     protected override void OnScroll(ScrollEventArgs e)
     {
       base.OnScroll(e);
-      if (e.ScrollOrientation == ScrollOrientation.HorizontalScroll)
+      if (e.ScrollOrientation != ScrollOrientation.HorizontalScroll)
       {
-        Rectangle rtHeader = DisplayRectangle;
-        rtHeader.Height = ColumnHeadersHeight / 2;
-        Invalidate(rtHeader);
+        return;
       }
+
+      Rectangle rtHeader = DisplayRectangle;
+      rtHeader.Height = ColumnHeadersHeight / 2;
+      Invalidate(rtHeader);
     }
   }
 

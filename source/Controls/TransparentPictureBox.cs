@@ -1,33 +1,31 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using System;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Windows.Forms;
+
+namespace MySQL.ForExcel.Controls
 {
-  using System;
-  using System.Drawing;
-  using System.Drawing.Imaging;
-  using System.Windows.Forms;
-
   /// <summary>
   /// Provides a Windows picture box control for displaying an image controlling its opacity making it transparent.
   /// </summary>
-  public class TransparentPictureBox : UserControl
+  public sealed class TransparentPictureBox : UserControl
   {
     #region Fields
 
@@ -39,7 +37,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// The attributes used to manipulate the bitmap on rendering. 
     /// </summary>
-    private ImageAttributes _imageAttributes = null;
+    private ImageAttributes _imageAttributes;
 
     #endregion Fields
 
@@ -74,7 +72,7 @@ namespace MySQL.ForExcel
       {
         if (!(value <= 1 && value >= 0))
         {
-          throw new ArgumentOutOfRangeException("Value is out of range");
+          throw new IndexOutOfRangeException("Value is out of range");
         }
 
         _opacity = value;
@@ -119,7 +117,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="Paint"/> event.
+    /// Raises the <see cref="Control.Paint"/> event.
     /// </summary>
     /// <param name="e">A <see cref="PaintEventArgs"/> that contains the event data.</param>
     protected override void OnPaint(PaintEventArgs e)

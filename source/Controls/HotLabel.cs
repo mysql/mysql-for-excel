@@ -1,34 +1,31 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using System;
+using System.Drawing;
+using System.Windows.Forms;
+using MySQL.Utility.Classes;
+
+namespace MySQL.ForExcel.Controls
 {
-  using System;
-  using System.ComponentModel;
-  using System.Drawing;
-  using System.Windows.Forms;
-  using MySQL.Utility;
-
   /// <summary>
   /// Provides a text label that can be clicked to perform an action.
   /// </summary>
-  public partial class HotLabel : UserControl
+  public sealed partial class HotLabel : UserControl
   {
     /// <summary>
     /// The mouse button pressed by the user wheb clicking on the label.
@@ -66,8 +63,8 @@ namespace MySQL.ForExcel
       TitlePixelsXOffset = 0;
       TitlePixelsYOffset = 3;
 
-      FontFamily family = Parent != null && Parent.Font != null ? Parent.Font.FontFamily : FontFamily.GenericSansSerif;
-      float size = Parent != null && Parent.Font != null ? Parent.Font.Size : 8.25f;
+      FontFamily family = Parent != null ? Parent.Font.FontFamily : FontFamily.GenericSansSerif;
+      float size = Parent != null ? Parent.Font.Size : 8.25f;
       Font = new Font(family, size * 1.25f, FontStyle.Bold);
       DescriptionFont = new Font(Font.FontFamily, Font.Size * 0.5f, FontStyle.Regular);
     }
@@ -76,7 +73,7 @@ namespace MySQL.ForExcel
 
     /// <summary>
     /// Gets or sets the description text appearing below the title.
-    /// </summary
+    /// </summary>
     public string Description { get; set; }
 
     /// <summary>
@@ -187,7 +184,7 @@ namespace MySQL.ForExcel
     #endregion Properties
 
     /// <summary>
-    /// Raises the <see cref="Click"/> event.
+    /// Raises the <see cref="Control.Click"/> event.
     /// </summary>
     /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
     protected override void OnClick(EventArgs e)
@@ -201,7 +198,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="MouseDown"/> event.
+    /// Raises the <see cref="Control.MouseDown"/> event.
     /// </summary>
     /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
     protected override void OnMouseDown(MouseEventArgs e)
@@ -211,7 +208,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="MouseEnter"/> event.
+    /// Raises the <see cref="Control.MouseEnter"/> event.
     /// </summary>
     /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
     protected override void OnMouseEnter(EventArgs e)
@@ -227,7 +224,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="MouseLeave"/> event.
+    /// Raises the <see cref="Control.MouseLeave"/> event.
     /// </summary>
     /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
     protected override void OnMouseLeave(EventArgs e)
@@ -243,7 +240,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="Paint"/> event.
+    /// Raises the <see cref="Control.Paint"/> event.
     /// </summary>
     /// <param name="e">A <see cref="PaintEventArgs"/> that contains the event data.</param>
     protected override void OnPaint(PaintEventArgs e)
@@ -262,7 +259,6 @@ namespace MySQL.ForExcel
       Point pt = new Point(imageSize.Width + TitlePixelsXOffset, TitlePixelsYOffset);
       if (!string.IsNullOrEmpty(Title))
       {
-        SolidBrush titleBrush = null;
         Color currentTitleColor = _tracking ? SystemColors.HotTrack : TitleColor;
         if (DrawShadow && Enabled)
         {
@@ -271,40 +267,28 @@ namespace MySQL.ForExcel
           titleShadowBrush.Dispose();
         }
 
-        if (Enabled)
-        {
-          titleBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), currentTitleColor));
-        }
-        else
-        {
-          titleBrush = new SolidBrush(Color.FromArgb(80, 0, 0, 0));
-        }
-
+        SolidBrush titleBrush = Enabled ? new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), currentTitleColor)) : new SolidBrush(Color.FromArgb(80, 0, 0, 0));
         e.Graphics.DrawString(Title, Font, titleBrush, pt.X, pt.Y);
         titleBrush.Dispose();
         SizeF stringSize = e.Graphics.MeasureString(Title, Font);
         pt.Y += (int)(stringSize.Height + TitleDescriptionPixelsSpacing);
       }
 
-      if (!string.IsNullOrEmpty(Description))
+      if (string.IsNullOrEmpty(Description))
       {
-        SolidBrush descriptionBrush = null;
-        if (DrawShadow && Enabled)
-        {
-          SolidBrush descriptionShadowBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionShadowOpacity * 255), Color.White));
-          e.Graphics.DrawString(Description, DescriptionFont, descriptionShadowBrush, pt.X + DescriptionShadowPixelsXOffset, pt.Y + DescriptionShadowPixelsYOffset);
-          descriptionShadowBrush.Dispose();
-          descriptionBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionColorOpacity * 255), DescriptionColor));
-        }
-
-        if (!Enabled)
-        {
-          descriptionBrush = new SolidBrush(Color.FromArgb(80, 0, 0, 0));
-        }
-
-        e.Graphics.DrawString(Description, DescriptionFont, descriptionBrush, pt.X, pt.Y);
-        descriptionBrush.Dispose();
+        return;
       }
+
+      if (DrawShadow && Enabled)
+      {
+        SolidBrush descriptionShadowBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionShadowOpacity * 255), Color.White));
+        e.Graphics.DrawString(Description, DescriptionFont, descriptionShadowBrush, pt.X + DescriptionShadowPixelsXOffset, pt.Y + DescriptionShadowPixelsYOffset);
+        descriptionShadowBrush.Dispose();
+      }
+
+      SolidBrush descriptionBrush = Enabled ? new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionColorOpacity * 255), DescriptionColor)) : new SolidBrush(Color.FromArgb(80, 0, 0, 0));
+      e.Graphics.DrawString(Description, DescriptionFont, descriptionBrush, pt.X, pt.Y);
+      descriptionBrush.Dispose();
     }
   }
 }

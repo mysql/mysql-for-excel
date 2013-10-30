@@ -1,24 +1,21 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
-using Excel = Microsoft.Office.Interop.Excel;
 
-namespace MySQL.ForExcel
+namespace MySQL.ForExcel.Forms
 {
   partial class EditDataDialog
   {
@@ -30,15 +27,15 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Clean up any resources being used.
     /// </summary>
-    /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+    /// <param name="disposing"><c>true</c> if managed resources should be disposed; otherwise, <c>false</c>.</param>
     protected override void Dispose(bool disposing)
     {
       if (disposing)
       {
         if (EditingWorksheet != null)
         {
-          EditingWorksheet.Change -= new Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
-          EditingWorksheet.SelectionChange -= new Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);
+          EditingWorksheet.Change -= new Microsoft.Office.Interop.Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
+          EditingWorksheet.SelectionChange -= new Microsoft.Office.Interop.Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);
         }
         if (components != null)
         components.Dispose();
@@ -60,7 +57,7 @@ namespace MySQL.ForExcel
       this.SakilaLogoPictureBox = new System.Windows.Forms.PictureBox();
       this.MySQLforExcelLabel = new System.Windows.Forms.Label();
       this.EditContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-      this.exitEditModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.ExitEditModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.AutoCommitCheckBox = new System.Windows.Forms.CheckBox();
       this.DialogToolTip = new System.Windows.Forms.ToolTip(this.components);
       ((System.ComponentModel.ISupportInitialize)(this.SakilaLogoPictureBox)).BeginInit();
@@ -123,16 +120,16 @@ namespace MySQL.ForExcel
       // EditContextMenu
       // 
       this.EditContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exitEditModeToolStripMenuItem});
+            this.ExitEditModeToolStripMenuItem});
       this.EditContextMenu.Name = "contextMenu";
       this.EditContextMenu.Size = new System.Drawing.Size(153, 48);
       // 
-      // exitEditModeToolStripMenuItem
+      // ExitEditModeToolStripMenuItem
       // 
-      this.exitEditModeToolStripMenuItem.Name = "exitEditModeToolStripMenuItem";
-      this.exitEditModeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-      this.exitEditModeToolStripMenuItem.Text = "Exit Edit Mode";
-      this.exitEditModeToolStripMenuItem.Click += new System.EventHandler(this.ExitEditModeToolStripMenuItem_Click);
+      this.ExitEditModeToolStripMenuItem.Name = "ExitEditModeToolStripMenuItem";
+      this.ExitEditModeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.ExitEditModeToolStripMenuItem.Text = "Exit Edit Mode";
+      this.ExitEditModeToolStripMenuItem.Click += new System.EventHandler(this.ExitEditModeToolStripMenuItem_Click);
       // 
       // AutoCommitCheckBox
       // 
@@ -186,7 +183,7 @@ namespace MySQL.ForExcel
     private System.Windows.Forms.Label MySQLforExcelLabel;
     private System.Windows.Forms.CheckBox AutoCommitCheckBox;
     private System.Windows.Forms.ContextMenuStrip EditContextMenu;
-    private System.Windows.Forms.ToolStripMenuItem exitEditModeToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem ExitEditModeToolStripMenuItem;
     private System.Windows.Forms.ToolTip DialogToolTip;
   }
 }

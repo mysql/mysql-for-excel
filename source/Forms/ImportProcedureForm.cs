@@ -1,36 +1,38 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using System;
+using System.Collections;
+using System.ComponentModel;
+using System.Data;
+using System.Linq;
+using System.Reflection;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+using MySQL.ForExcel.Classes;
+using MySQL.ForExcel.Properties;
+using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQLWorkbench;
+using MySQL.Utility.Forms;
+
+namespace MySQL.ForExcel.Forms
 {
-  using System;
-  using System.Collections;
-  using System.ComponentModel;
-  using System.Data;
-  using System.Reflection;
-  using System.Windows.Forms;
-  using MySql.Data.MySqlClient;
-  using MySQL.Utility;
-  using MySQL.Utility.Forms;
-
   /// <summary>
-  ///
+  /// Previews the results of a procedure and lets users select rows to import to an Excel spreadsheet.
   /// </summary>
   public partial class ImportProcedureForm : AutoStyleableBaseDialog
   {
@@ -44,7 +46,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Collection of properties of the MySQL procedure's parameters.
     /// </summary>
-    private PropertiesCollection _procedureParamsProperties;
+    private readonly PropertiesCollection _procedureParamsProperties;
 
     #endregion Fields
 
@@ -52,24 +54,24 @@ namespace MySQL.ForExcel
     /// Initializes a new instance of the <see cref="ImportProcedureForm"/> class.
     /// </summary>
     /// <param name="wbConnection">The connection to a MySQL server instance selected by users.</param>
-    /// <param name="importDBObject">The Procedure DB object selected by the users to import data from.</param>
+    /// <param name="importDbObject">The Procedure DB object selected by the users to import data from.</param>
     /// <param name="importToWorksheetName">The name of the Excel worksheet where data will be imported.</param>
     /// <param name="workSheetInCompatibilityMode">Flag indicating whether the Excel worksheet where data will be imported is open in compatibility mode.</param>
-    public ImportProcedureForm(MySqlWorkbenchConnection wbConnection, DBObject importDBObject, string importToWorksheetName, bool workSheetInCompatibilityMode)
+    public ImportProcedureForm(MySqlWorkbenchConnection wbConnection, DbObject importDbObject, string importToWorksheetName, bool workSheetInCompatibilityMode)
     {
-      ImportDBObject = importDBObject;
+      ImportDbObject = importDbObject;
       PreviewDataSet = null;
       SumOfResultSetsExceedsMaxCompatibilityRows = false;
-      WBConnection = wbConnection;
+      WbConnection = wbConnection;
       WorkSheetInCompatibilityMode = workSheetInCompatibilityMode;
 
       InitializeComponent();
 
       SelectedResultSetIndex = -1;
-      Text = string.Format("Import Data - {0}", importToWorksheetName);
+      Text = @"Import Data - " + importToWorksheetName;
       _procedureParamsProperties = new PropertiesCollection();
-      ProcedureNameLabel.Text = importDBObject.Name;
-      OptionsWarningLabel.Text = Properties.Resources.WorkSheetInCompatibilityModeWarning;
+      ProcedureNameLabel.Text = importDbObject.Name;
+      OptionsWarningLabel.Text = Resources.WorkSheetInCompatibilityModeWarning;
       ParametersPropertyGrid.SelectedObject = _procedureParamsProperties;
 
       InitializeMultipleResultSetsCombo();
@@ -119,7 +121,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets the Procedure DB object selected by the users to import data from.
     /// </summary>
-    public DBObject ImportDBObject { get; private set; }
+    public DbObject ImportDbObject { get; private set; }
 
     /// <summary>
     /// Gets the import type selected by users.
@@ -165,9 +167,25 @@ namespace MySQL.ForExcel
     public bool SumOfResultSetsExceedsMaxCompatibilityRows { get; private set; }
 
     /// <summary>
+    /// Gets or sets the text associated with this control.
+    /// </summary>
+    public override sealed string Text
+    {
+      get
+      {
+        return base.Text;
+      }
+
+      set
+      {
+        base.Text = value;
+      }
+    }
+
+    /// <summary>
     /// Gets the connection to a MySQL server instance selected by users.
     /// </summary>
-    public MySqlWorkbenchConnection WBConnection { get; private set; }
+    public MySqlWorkbenchConnection WbConnection { get; private set; }
 
     /// <summary>
     /// Gets a value indicating whether the Excel worksheet where data will be imported is open in compatibility mode.
@@ -199,7 +217,7 @@ namespace MySQL.ForExcel
       Cursor = Cursors.WaitCursor;
       try
       {
-        //// Prepare parameters and execute the procedure and create OutAndReturnValues table
+        // Prepare parameters and execute the procedure and create OutAndReturnValues table
         DataTable outParamsTable = new DataTable("OutAndReturnValues");
         for (int paramIdx = 0; paramIdx < _procedureParamsProperties.Count; paramIdx++)
         {
@@ -210,7 +228,7 @@ namespace MySQL.ForExcel
           }
         }
 
-        ImportDataSet = WBConnection.GetDataSetFromProcedure(ImportDBObject, _mysqlParameters);
+        ImportDataSet = WbConnection.GetDataSetFromProcedure(ImportDbObject, _mysqlParameters);
         if (ImportDataSet == null || ImportDataSet.Tables.Count == 0)
         {
           ImportButton.Enabled = false;
@@ -219,17 +237,19 @@ namespace MySQL.ForExcel
 
         ImportButton.Enabled = true;
 
-        //// Refresh output/return parameter values in PropertyGrid and add them to OutAndReturnValues table
-        if (outParamsTable != null && outParamsTable.Columns.Count > 0)
+        // Refresh output/return parameter values in PropertyGrid and add them to OutAndReturnValues table
+        if (outParamsTable.Columns.Count > 0)
         {
           DataRow valuesRow = outParamsTable.NewRow();
           for (int paramIdx = 0; paramIdx < _procedureParamsProperties.Count; paramIdx++)
           {
-            if (_mysqlParameters[paramIdx].Direction == ParameterDirection.Output || _mysqlParameters[paramIdx].Direction == ParameterDirection.ReturnValue)
+            if (_mysqlParameters[paramIdx].Direction != ParameterDirection.Output && _mysqlParameters[paramIdx].Direction != ParameterDirection.ReturnValue)
             {
-              _procedureParamsProperties[paramIdx].Value = _mysqlParameters[paramIdx].Value;
-              valuesRow[_mysqlParameters[paramIdx].ParameterName] = _mysqlParameters[paramIdx].Value;
+              continue;
             }
+
+            _procedureParamsProperties[paramIdx].Value = _mysqlParameters[paramIdx].Value;
+            valuesRow[_mysqlParameters[paramIdx].ParameterName] = _mysqlParameters[paramIdx].Value;
           }
 
           outParamsTable.Rows.Add(valuesRow);
@@ -237,7 +257,7 @@ namespace MySQL.ForExcel
           ParametersPropertyGrid.Refresh();
         }
 
-        //// Prepare Preview DataSet to show it on Grids
+        // Prepare Preview DataSet to show it on Grids
         PreviewDataSet = ImportDataSet.Clone();
         int resultSetsRowSum = 0;
         for (int tableIdx = 0; tableIdx < ImportDataSet.Tables.Count; tableIdx++)
@@ -248,14 +268,14 @@ namespace MySQL.ForExcel
             SumOfResultSetsExceedsMaxCompatibilityRows = SumOfResultSetsExceedsMaxCompatibilityRows || resultSetsRowSum > UInt16.MaxValue;
           }
 
-          int limitRows = Math.Min(ImportDataSet.Tables[tableIdx].Rows.Count, Properties.Settings.Default.ImportPreviewRowsQuantity);
+          int limitRows = Math.Min(ImportDataSet.Tables[tableIdx].Rows.Count, Settings.Default.ImportPreviewRowsQuantity);
           for (int rowIdx = 0; rowIdx < limitRows; rowIdx++)
           {
             PreviewDataSet.Tables[tableIdx].ImportRow(ImportDataSet.Tables[tableIdx].Rows[rowIdx]);
           }
         }
 
-        //// Refresh ResultSets in Tab Control
+        // Refresh ResultSets in Tab Control
         ResultSetsDataGridView.DataSource = null;
         ResultSetsTabControl.TabPages.Clear();
         for (int dtIdx = 0; dtIdx < ImportDataSet.Tables.Count; dtIdx++)
@@ -274,8 +294,8 @@ namespace MySQL.ForExcel
       catch (Exception ex)
       {
         Cursor = Cursors.Default;
-        MiscUtilities.ShowCustomizedErrorDialog(Properties.Resources.ImportProcedureErrorTitle, ex.Message, true);
-        MySQLSourceTrace.WriteAppErrorToLog(ex);
+        MiscUtilities.ShowCustomizedErrorDialog(Resources.ImportProcedureErrorTitle, ex.Message, true);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
     }
 
@@ -288,7 +308,7 @@ namespace MySQL.ForExcel
     {
       if (SumOfResultSetsExceedsMaxCompatibilityRows && ImportType == ImportMultipleType.AllResultSetsVertically && ImportDataSet.Tables.Count > 1)
       {
-        InfoDialog.ShowWarningDialog(Properties.Resources.ImportVerticallyExceedsMaxRowsTitleWarning, Properties.Resources.ImportVerticallyExceedsMaxRowsDetailWarning);
+        InfoDialog.ShowWarningDialog(Resources.ImportVerticallyExceedsMaxRowsTitleWarning, Resources.ImportVerticallyExceedsMaxRowsDetailWarning);
       }
     }
 
@@ -302,15 +322,15 @@ namespace MySQL.ForExcel
       dt.Columns.Add("description", Type.GetType("System.String"));
       DataRow dr = dt.NewRow();
       dr["value"] = ImportMultipleType.SelectedResultSet;
-      dr["description"] = Properties.Resources.ImportProcedureSelectedResultSet;
+      dr["description"] = Resources.ImportProcedureSelectedResultSet;
       dt.Rows.Add(dr);
       dr = dt.NewRow();
       dr["value"] = ImportMultipleType.AllResultSetsHorizontally;
-      dr["description"] = Properties.Resources.ImportProcedureAllResultSetsHorizontally;
+      dr["description"] = Resources.ImportProcedureAllResultSetsHorizontally;
       dt.Rows.Add(dr);
       dr = dt.NewRow();
       dr["value"] = ImportMultipleType.AllResultSetsVertically;
-      dr["description"] = Properties.Resources.ImportProcedureAllResultSetsVertically;
+      dr["description"] = Resources.ImportProcedureAllResultSetsVertically;
       dt.Rows.Add(dr);
       ImportResultsetsComboBox.DataSource = dt;
       ImportResultsetsComboBox.DisplayMember = "description";
@@ -322,8 +342,7 @@ namespace MySQL.ForExcel
     /// </summary>
     private void PrepareParameters()
     {
-      CustomProperty parameter = null;
-      DataTable parametersTable = WBConnection.GetSchemaCollection("Procedure Parameters", null, WBConnection.Schema, ImportDBObject.Name);
+      DataTable parametersTable = WbConnection.GetSchemaCollection("Procedure Parameters", null, WbConnection.Schema, ImportDbObject.Name);
       _mysqlParameters = new MySqlParameter[parametersTable.Rows.Count];
       int paramIdx = 0;
       MySqlDbType dbType = MySqlDbType.Guid;
@@ -381,7 +400,7 @@ namespace MySQL.ForExcel
           case "int":
           case "integer":
             dbType = MySqlDbType.Int32;
-            objValue = (Int32)0;
+            objValue = 0;
             break;
 
           case "tinyint":
@@ -396,7 +415,7 @@ namespace MySQL.ForExcel
 
           case "mediumint":
             dbType = paramUnsigned ? MySqlDbType.UInt24 : MySqlDbType.Int24;
-            objValue = (Int32)0;
+            objValue = 0;
             break;
 
           case "bigint":
@@ -451,8 +470,10 @@ namespace MySQL.ForExcel
             break;
         }
 
-        parameter = new CustomProperty(paramName, objValue, paramIsReadOnly, true);
-        parameter.Description = string.Format("Direction: {0}, Data Type: {1}", paramDirection.ToString(), dataType);
+        CustomProperty parameter = new CustomProperty(paramName, objValue, paramIsReadOnly, true)
+        {
+          Description = string.Format("Direction: {0}, Data Type: {1}", paramDirection.ToString(), dataType)
+        };
         _mysqlParameters[paramIdx] = new MySqlParameter(paramName, dbType, paramSize, paramDirection, false, paramPrecision, paramScale, null, DataRowVersion.Current, objValue);
         _procedureParamsProperties.Add(parameter);
         paramIdx++;
@@ -524,12 +545,12 @@ namespace MySQL.ForExcel
     {
       get
       {
-        return (CustomProperty)base.List[index];
+        return (CustomProperty)List[index];
       }
 
       set
       {
-        base.List[index] = (CustomProperty)value;
+        List[index] = value;
       }
     }
 
@@ -539,7 +560,7 @@ namespace MySQL.ForExcel
     /// <param name="value">The custom property object to add.</param>
     public void Add(CustomProperty value)
     {
-      base.List.Add(value);
+      List.Add(value);
     }
 
     /// <summary>
@@ -548,13 +569,10 @@ namespace MySQL.ForExcel
     /// <param name="name">The name of the custom property to remove.</param>
     public void Remove(string name)
     {
-      foreach (CustomProperty prop in base.List)
+      foreach (CustomProperty prop in List.Cast<CustomProperty>().Where(prop => prop.Name == name))
       {
-        if (prop.Name == name)
-        {
-          base.List.Remove(prop);
-          return;
-        }
+        List.Remove(prop);
+        return;
       }
     }
 
@@ -650,10 +668,10 @@ namespace MySQL.ForExcel
     /// <returns>A <see cref="PropertyDescriptorCollection"/> with properties corresponding to thegiven attributes.</returns>
     public PropertyDescriptorCollection GetProperties(Attribute[] attributes)
     {
-      PropertyDescriptor[] newProps = new PropertyDescriptor[this.Count];
-      for (int i = 0; i < this.Count; i++)
+      PropertyDescriptor[] newProps = new PropertyDescriptor[Count];
+      for (int i = 0; i < Count; i++)
       {
-        CustomProperty prop = (CustomProperty)this[i];
+        CustomProperty prop = this[i];
         newProps[i] = new CustomPropertyDescriptor(ref prop, attributes);
       }
 
@@ -736,7 +754,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// A single property that can be displayed in a property editor.
     /// </summary>
-    private CustomProperty _property;
+    private readonly CustomProperty _property;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CustomPropertyDescriptor"/> class.

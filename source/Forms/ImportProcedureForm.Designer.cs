@@ -1,23 +1,23 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using MySQL.ForExcel.Controls;
+
+namespace MySQL.ForExcel.Forms
 {
   partial class ImportProcedureForm
   {
@@ -29,7 +29,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Clean up any resources being used.
     /// </summary>
-    /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+    /// <param name="disposing"><c>true</c> if managed resources should be disposed; otherwise, <c>false</c>.</param>
     protected override void Dispose(bool disposing)
     {
       if (disposing && (components != null))
@@ -65,7 +65,7 @@ namespace MySQL.ForExcel
       this.ProcedureParametersPictureBox = new System.Windows.Forms.PictureBox();
       this.ImportDataLabel = new System.Windows.Forms.Label();
       this.ResultSetsTabControl = new System.Windows.Forms.TabControl();
-      this.ResultSetsDataGridView = new MySQL.ForExcel.PreviewDataGridView();
+      this.ResultSetsDataGridView = new PreviewDataGridView();
       this.OptionsWarningLabel = new System.Windows.Forms.Label();
       this.OptionsWarningPictureBox = new System.Windows.Forms.PictureBox();
       this.SubSetOfDataLabel = new System.Windows.Forms.Label();

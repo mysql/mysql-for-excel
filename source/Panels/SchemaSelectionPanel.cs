@@ -1,34 +1,35 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using System;
+using System.ComponentModel;
+using System.Data;
+using System.Linq;
+using System.Windows.Forms;
+using MySql.Data.MySqlClient;
+using MySQL.ForExcel.Classes;
+using MySQL.ForExcel.Controls;
+using MySQL.ForExcel.Forms;
+using MySQL.ForExcel.Properties;
+using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQLWorkbench;
+
+namespace MySQL.ForExcel.Panels
 {
-  using System;
-  using System.ComponentModel;
-  using System.Data;
-  using System.Drawing;
-  using System.Linq;
-  using System.Windows.Forms;
-  using MySql.Data.MySqlClient;
-  using MySQL.ForExcel.Properties;
-  using MySQL.Utility;
-
   /// <summary>
   /// Second panel shown to users within the Add-In's <see cref="ExcelAddInPane"/> where schemas are managed.
   /// </summary>
@@ -44,12 +45,13 @@ namespace MySQL.ForExcel
     /// </summary>
     public SchemaSelectionPanel()
     {
-      _systemSchemasListValues = new string[] { "mysql", "information_schema", "performance_schema" };
+      _systemSchemasListValues = new[] { "mysql", "information_schema", "performance_schema" };
       InitializeComponent();
 
+      ConnectionNameLabel.Paint += Label_Paint;
+      UserIPLabel.Paint += Label_Paint;
       InheritFontToControlsExceptionList.Add(SelectSchemaHotLabel.Name);
       InheritFontToControlsExceptionList.Add(CreateNewSchemaHotLabel.Name);
-
       SchemasList.AddNode(null, "Schemas");
       SchemasList.AddNode(null, "System Schemas");
     }
@@ -66,7 +68,7 @@ namespace MySQL.ForExcel
     /// Gets a <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public MySqlWorkbenchConnection WBConnection { get; private set; }
+    public MySqlWorkbenchConnection WbConnection { get; private set; }
 
     #endregion Properties
 
@@ -74,15 +76,14 @@ namespace MySQL.ForExcel
     /// Sets the current active connection used to query the database.
     /// </summary>
     /// <param name="connection">A <see cref="MySqlWorkbenchConnection"/> object representing the current connection to a MySQL server.</param>
-    /// <returns><see cref="true"/> if schemas were loaded into the schemas list, <see cref="false"/> otherwise.</returns>
+    /// <returns><c>true</c> if schemas were loaded into the schemas list, <c>false</c> otherwise.</returns>
     public bool SetConnection(MySqlWorkbenchConnection connection)
     {
-      bool schemasLoaded = false;
       Filter = string.Empty;
-      WBConnection = connection;
+      WbConnection = connection;
       ConnectionNameLabel.Text = connection.Name;
       UserIPLabel.Text = string.Format("User: {0}, IP: {1}", connection.UserName, connection.Host);
-      schemasLoaded = LoadSchemas();
+      bool schemasLoaded = LoadSchemas();
       if (schemasLoaded)
       {
         SchemasList_AfterSelect(null, null);
@@ -98,7 +99,11 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void BackButton_Click(object sender, EventArgs e)
     {
-      (Parent as ExcelAddInPane).CloseConnection();
+      var excelAddInPane = Parent as ExcelAddInPane;
+      if (excelAddInPane != null)
+      {
+        excelAddInPane.CloseConnection();
+      }
     }
 
     /// <summary>
@@ -114,13 +119,13 @@ namespace MySQL.ForExcel
         return;
       }
 
-      PasswordDialogFlags passwordFlags = WBConnection.TestConnectionAndRetryOnWrongPassword();
+      PasswordDialogFlags passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
       if (!passwordFlags.ConnectionSuccess)
       {
         return;
       }
 
-      string connectionString = WBConnection.GetConnectionStringBuilder().ConnectionString;
+      string connectionString = WbConnection.GetConnectionStringBuilder().ConnectionString;
       string sql = string.Format("CREATE DATABASE `{0}`", dlg.SchemaName);
       try
       {
@@ -129,7 +134,7 @@ namespace MySQL.ForExcel
       catch (Exception ex)
       {
         MiscUtilities.ShowCustomizedErrorDialog(Resources.ErrorCreatingNewSchema, ex.Message, true);
-        MySQLSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
         return;
       }
 
@@ -137,40 +142,14 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Event delegate method fired when a <see cref="Label"/> control is being painted.
-    /// </summary>
-    /// <param name="sender">A <see cref="Label"/> control object.</param>
-    /// <param name="e">Event aruments.</param>
-    private void Label_Paint(object sender, PaintEventArgs e)
-    {
-      Label label = sender as Label;
-
-      //// Set a rectangle size with same width and larger height than label's
-      SizeF layoutSize = new SizeF(label.Width, label.Height + 1);
-
-      //// Get the actual size of rectangle needed for all of text.
-      SizeF fullSize = e.Graphics.MeasureString(label.Text, label.Font);
-
-      //// Set a tooltip if not all text fits in label's size.
-      if (fullSize.Width > label.Width || fullSize.Height > label.Height)
-      {
-        LabelsToolTip.SetToolTip(label, label.Text);
-      }
-      else
-      {
-        LabelsToolTip.SetToolTip(label, null);
-      }
-    }
-
-    /// <summary>
     /// Fetches all schema names from the current connection and loads them in the <see cref="SchemasList"/> tree.
     /// </summary>
-    /// <returns><see cref="true"/> if schemas were loaded successfully, <see cref="false"/> otherwise.</returns>
+    /// <returns><c>true</c> if schemas were loaded successfully, <c>false</c> otherwise.</returns>
     private bool LoadSchemas()
     {
       try
       {
-        //// Avoids flickering of schemas list while adding the items to it.
+        // Avoids flickering of schemas list while adding the items to it.
         SchemasList.BeginUpdate();
 
         foreach (TreeNode node in SchemasList.Nodes)
@@ -178,13 +157,13 @@ namespace MySQL.ForExcel
           node.Nodes.Clear();
         }
 
-        DataTable databases = WBConnection.GetSchemaCollection("Databases", null);
+        DataTable databases = WbConnection.GetSchemaCollection("Databases", null);
         foreach (DataRow row in databases.Rows)
         {
           string schemaName = row["DATABASE_NAME"].ToString();
 
-          //// If the user has specified a filter then check it
-          if (!String.IsNullOrEmpty(Filter) && !schemaName.ToUpper().Contains(Filter))
+          // If the user has specified a filter then check it
+          if (!string.IsNullOrEmpty(Filter) && !schemaName.ToUpper().Contains(Filter))
           {
             continue;
           }
@@ -202,7 +181,7 @@ namespace MySQL.ForExcel
           SchemasList.Nodes[0].Expand();
         }
 
-        //// Avoids flickering of schemas list while adding the items to it.
+        // Avoids flickering of schemas list while adding the items to it.
         SchemasList.EndUpdate();
 
         return true;
@@ -210,7 +189,7 @@ namespace MySQL.ForExcel
       catch (Exception ex)
       {
         MiscUtilities.ShowCustomizedErrorDialog(Resources.SchemasLoadingErrorTitle, ex.Message, true);
-        MySQLSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
         return false;
       }
     }
@@ -222,7 +201,7 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void NextButton_Click(object sender, EventArgs e)
     {
-      PasswordDialogFlags passwordFlags = WBConnection.TestConnectionAndRetryOnWrongPassword();
+      PasswordDialogFlags passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
       if (!passwordFlags.ConnectionSuccess)
       {
         return;
@@ -231,12 +210,16 @@ namespace MySQL.ForExcel
       try
       {
         string databaseName = SchemasList.SelectedNode.Tag as string;
-        (Parent as ExcelAddInPane).OpenSchema(databaseName);
+        var excelAddInPane = Parent as ExcelAddInPane;
+        if (excelAddInPane != null)
+        {
+          excelAddInPane.OpenSchema(databaseName);
+        }
       }
       catch (Exception ex)
       {
         MiscUtilities.ShowCustomizedErrorDialog(Resources.SchemaOpeningErrorTitle, ex.Message, true);
-        MySQLSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
     }
 
@@ -249,9 +232,15 @@ namespace MySQL.ForExcel
     {
       using (GlobalOptionsDialog optionsDialog = new GlobalOptionsDialog())
       {
-        if (optionsDialog.ShowDialog() == DialogResult.OK)
+        if (optionsDialog.ShowDialog() != DialogResult.OK)
         {
-          (Parent as ExcelAddInPane).RefreshWbConnectionTimeouts();
+          return;
+        }
+
+        var excelAddInPane = Parent as ExcelAddInPane;
+        if (excelAddInPane != null)
+        {
+          excelAddInPane.RefreshWbConnectionTimeouts();
         }
       }
     }
@@ -276,11 +265,13 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void SchemaFilter_KeyDown(object sender, KeyEventArgs e)
     {
-      if (e.KeyCode == Keys.Enter)
+      if (e.KeyCode != Keys.Enter)
       {
-        Filter = SchemaFilter.Text.Trim().ToUpper();
-        LoadSchemas();
+        return;
       }
+
+      Filter = SchemaFilter.Text.Trim().ToUpper();
+      LoadSchemas();
     }
 
     /// <summary>

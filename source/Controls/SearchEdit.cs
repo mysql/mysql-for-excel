@@ -1,33 +1,30 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using MySQL.ForExcel.Properties;
 
-namespace MySQL.ForExcel
+namespace MySQL.ForExcel.Controls
 {
   /// <summary>
   /// 
   /// </summary>
-  public partial class SearchEdit : UserControl
+  public sealed partial class SearchEdit : UserControl
   {
     /// <summary>
     /// Flag indicating whether it's the first time the control will be painted.
@@ -37,7 +34,6 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Initializes a new instance of the <see cref="SearchEdit"/> class.
     /// </summary>
-    /// <param name="searchImage">The image displayed inside the search edit box.</param>
     public SearchEdit()
     {
       InitializeComponent();
@@ -80,7 +76,7 @@ namespace MySQL.ForExcel
     #endregion Properties
 
     /// <summary>
-    /// Raises the <see cref="Paint"/> event.
+    /// Raises the <see cref="Control.Paint"/> event.
     /// </summary>
     /// <param name="e">A <see cref="PaintEventArgs"/> that contains the event data.</param>
     protected override void OnPaint(PaintEventArgs e)
@@ -92,11 +88,13 @@ namespace MySQL.ForExcel
       }
 
       base.OnPaint(e);
-      if (SearchImage != null)
+      if (SearchImage == null)
       {
-        int space = SearchImage.Width * 3 / 2;
-        e.Graphics.DrawImage(SearchImage, (space - SearchImage.Width) / 2, (Height - SearchImage.Height) / 2);
+        return;
       }
+
+      int space = SearchImage.Width * 3 / 2;
+      e.Graphics.DrawImage(SearchImage, (space - SearchImage.Width) / 2, (Height - SearchImage.Height) / 2);
     }
 
     /// <summary>
@@ -106,12 +104,14 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void InnerTextBox_Enter(object sender, EventArgs e)
     {
-      if (IsEmpty)
+      if (!IsEmpty)
       {
-        InnerTextBox.Text = string.Empty;
-        IsEmpty = false;
-        InnerTextBox.ForeColor = SystemColors.WindowText;
+        return;
       }
+
+      InnerTextBox.Text = string.Empty;
+      IsEmpty = false;
+      InnerTextBox.ForeColor = SystemColors.WindowText;
     }
 
     /// <summary>
@@ -131,12 +131,14 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void InnerTextBox_Leave(object sender, EventArgs e)
     {
-      if (InnerTextBox.Text.Trim().Length == 0)
+      if (InnerTextBox.Text.Trim().Length != 0)
       {
-        InnerTextBox.Text = NoTextLabel;
-        InnerTextBox.ForeColor = Color.Silver;
-        IsEmpty = true;
+        return;
       }
+
+      InnerTextBox.Text = NoTextLabel;
+      InnerTextBox.ForeColor = Color.Silver;
+      IsEmpty = true;
     }
 
     /// <summary>

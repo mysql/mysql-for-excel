@@ -2,59 +2,62 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="MySQL.ForExcel.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="ExportDetectDatatype" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
+    <Setting Name="ExportDetectDatatype" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ExportAddBufferToVarchar" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
+    <Setting Name="ExportAddBufferToVarchar" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ExportAutoIndexIntColumns" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
+    <Setting Name="ExportAutoIndexIntColumns" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ExportAutoAllowEmptyNonIndexColumns" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
+    <Setting Name="ExportAutoAllowEmptyNonIndexColumns" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ExportUseFormattedValues" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
+    <Setting Name="ExportUseFormattedValues" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ExportShowCopySQLButton" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
+    <Setting Name="ExportShowCopySQLButton" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="AppendPerformAutoMap" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
+    <Setting Name="AppendPerformAutoMap" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="AppendAutoStoreColumnMapping" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
+    <Setting Name="AppendAutoStoreColumnMapping" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="AppendReloadColumnMapping" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
+    <Setting Name="AppendReloadColumnMapping" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="AppendUseFormattedValues" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
+    <Setting Name="AppendUseFormattedValues" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="StoredDataMappings" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Collections.Generic.List&lt;MySQLColumnMapping&gt;" Scope="User">
+    <Setting Name="StoredDataMappings" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Collections.Generic.List&lt;MySQL.ForExcel.Classes.MySqlColumnMapping&gt;" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="ExportLimitPreviewRowsQuantity" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Int32" Scope="User">
+    <Setting Name="ExportLimitPreviewRowsQuantity" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">100</Value>
     </Setting>
-    <Setting Name="AppendLimitPreviewRowsQuantity" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Int32" Scope="User">
+    <Setting Name="AppendLimitPreviewRowsQuantity" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">100</Value>
     </Setting>
-    <Setting Name="ExportRemoveEmptyColumns" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
+    <Setting Name="ExportRemoveEmptyColumns" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
-    <Setting Name="GlobalConnectionConnectionTimeout" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.UInt32" Scope="User">
+    <Setting Name="GlobalConnectionConnectionTimeout" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.UInt32" Scope="User">
       <Value Profile="(Default)">15</Value>
     </Setting>
-    <Setting Name="GlobalConnectionCommandTimeout" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.UInt32" Scope="User">
+    <Setting Name="GlobalConnectionCommandTimeout" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.UInt32" Scope="User">
       <Value Profile="(Default)">30</Value>
     </Setting>
-    <Setting Name="ImportPreviewRowsQuantity" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Int32" Scope="User">
+    <Setting Name="ImportPreviewRowsQuantity" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">10</Value>
     </Setting>
-    <Setting Name="ImportEscapeFormulaTextValues" Provider="MySQL.ForExcel.MySQLForExcelSettings" Type="System.Boolean" Scope="User">
+    <Setting Name="ImportEscapeFormulaTextValues" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ConvertedSettingsStoredMappingsCasing" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

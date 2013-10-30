@@ -1,5 +1,4 @@
-﻿//
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -15,13 +14,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using System.Diagnostics;
+using MySQL.ForExcel.Panels;
+using MySQL.Utility.Classes;
+
+namespace MySQL.ForExcel.Controls
 {
-  using System.Diagnostics;
-  using MySQL.Utility;
-
   partial class ExcelAddInPane
   {
     /// <summary> 
@@ -49,7 +48,7 @@ namespace MySQL.ForExcel
         {
           foreach (var dictEntry in ProtectedWorksheetPasskeys)
           {
-            MySQLSourceTrace.WriteToLog(string.Format(Properties.Resources.WorkSheetInEditModeSavedLogWarning, dictEntry.Key, dictEntry.Value), SourceLevels.Warning);
+            MySqlSourceTrace.WriteToLog(string.Format(Properties.Resources.WorkSheetInEditModeSavedLogWarning, dictEntry.Key, dictEntry.Value), SourceLevels.Warning);
           }
 
           ProtectedWorksheetPasskeys.Clear();
@@ -72,9 +71,9 @@ namespace MySQL.ForExcel
     /// </summary>
     private void InitializeComponent()
     {
-      this.WelcomePanel1 = new MySQL.ForExcel.WelcomePanel();
-      this.DBObjectSelectionPanel3 = new MySQL.ForExcel.DBObjectSelectionPanel();
-      this.SchemaSelectionPanel2 = new MySQL.ForExcel.SchemaSelectionPanel();
+      this.WelcomePanel1 = new WelcomePanel();
+      this.DBObjectSelectionPanel3 = new DbObjectSelectionPanel();
+      this.SchemaSelectionPanel2 = new SchemaSelectionPanel();
       this.SuspendLayout();
       // 
       // WelcomePanel1
@@ -121,7 +120,7 @@ namespace MySQL.ForExcel
 
     private WelcomePanel WelcomePanel1;
     private SchemaSelectionPanel SchemaSelectionPanel2;
-    private DBObjectSelectionPanel DBObjectSelectionPanel3;
+    private DbObjectSelectionPanel DBObjectSelectionPanel3;
 
   }
 }

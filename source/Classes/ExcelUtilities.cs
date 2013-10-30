@@ -15,13 +15,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
-namespace MySQL.ForExcel
-{
-  using System.Collections.Generic;
-  using System.Data;
-  using System.Drawing;
-  using Excel = Microsoft.Office.Interop.Excel;
+using System.Collections.Generic;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using Excel = Microsoft.Office.Interop.Excel;
 
+namespace MySQL.ForExcel.Classes
+{
   /// <summary>
   /// Provides extension methods and other static methods to leverage the work with Excel objects.
   /// </summary>
@@ -75,7 +76,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets the interior color for Excel cells committed to the MySQL server during an Edit Data operation.
     /// </summary>
-    public static int CommitedCellsOLEColor { get; private set; }
+    public static int CommitedCellsOleColor { get; private set; }
 
     /// <summary>
     /// Gets or sets the interior color for Excel cells committed to the MySQL server during an Edit Data operation.
@@ -84,19 +85,19 @@ namespace MySQL.ForExcel
     {
       get
       {
-        return ColorTranslator.ToHtml(ColorTranslator.FromOle(CommitedCellsOLEColor));
+        return ColorTranslator.ToHtml(ColorTranslator.FromOle(CommitedCellsOleColor));
       }
 
       set
       {
-        CommitedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
+        CommitedCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
       }
     }
 
     /// <summary>
     /// Gets the interior color for Excel cells that caused errors during a commit of an Edit Data operation.
     /// </summary>
-    public static int ErroredCellsOLEColor { get; private set; }
+    public static int ErroredCellsOleColor { get; private set; }
 
     /// <summary>
     /// Gets or sets the interior color for Excel cells that caused errors during a commit of an Edit Data operation.
@@ -105,19 +106,19 @@ namespace MySQL.ForExcel
     {
       get
       {
-        return ColorTranslator.ToHtml(ColorTranslator.FromOle(ErroredCellsOLEColor));
+        return ColorTranslator.ToHtml(ColorTranslator.FromOle(ErroredCellsOleColor));
       }
 
       set
       {
-        ErroredCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
+        ErroredCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
       }
     }
 
     /// <summary>
     /// Gets the default interior color for Excel cells locked during an Edit Data operation (like the headers containing column names).
     /// </summary>
-    public static int LockedCellsOLEColor { get; private set; }
+    public static int LockedCellsOleColor { get; private set; }
 
     /// <summary>
     /// Gets or sets the interior color for Excel cells locked during an Edit Data operation (like the headers containing column names).
@@ -126,19 +127,19 @@ namespace MySQL.ForExcel
     {
       get
       {
-        return ColorTranslator.ToHtml(ColorTranslator.FromOle(LockedCellsOLEColor));
+        return ColorTranslator.ToHtml(ColorTranslator.FromOle(LockedCellsOleColor));
       }
 
       set
       {
-        LockedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
+        LockedCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
       }
     }
 
     /// <summary>
     /// Gets the interior color for Excel cells accepting data from users to create a new row in the table during an Edit Data operation.
     /// </summary>
-    public static int NewRowCellsOLEColor { get; private set; }
+    public static int NewRowCellsOleColor { get; private set; }
 
     /// <summary>
     /// Gets or sets the interior color for Excel cells accepting data from users to create a new row in the table during an Edit Data operation.
@@ -147,19 +148,19 @@ namespace MySQL.ForExcel
     {
       get
       {
-        return ColorTranslator.ToHtml(ColorTranslator.FromOle(NewRowCellsOLEColor));
+        return ColorTranslator.ToHtml(ColorTranslator.FromOle(NewRowCellsOleColor));
       }
 
       set
       {
-        NewRowCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
+        NewRowCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
       }
     }
 
     /// <summary>
     /// Gets the interior color for Excel cells containing values that have been changed by the user but not yet committed during an Edit Data operation.
     /// </summary>
-    public static int UncommittedCellsOLEColor { get; private set; }
+    public static int UncommittedCellsOleColor { get; private set; }
 
     /// <summary>
     /// Gets or sets the interior color for Excel cells containing values that have been changed by the user but not yet committed during an Edit Data operation.
@@ -168,12 +169,12 @@ namespace MySQL.ForExcel
     {
       get
       {
-        return ColorTranslator.ToHtml(ColorTranslator.FromOle(UncommittedCellsOLEColor));
+        return ColorTranslator.ToHtml(ColorTranslator.FromOle(UncommittedCellsOleColor));
       }
 
       set
       {
-        UncommittedCellsOLEColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
+        UncommittedCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
       }
     }
 
@@ -181,7 +182,7 @@ namespace MySQL.ForExcel
     /// Gets the interior color used to revert Excel cells to their original background color.
     /// </summary>
     /// <remarks>White.</remarks>
-    public static int EmptyCellsOLEColor
+    public static int EmptyCellsOleColor
     {
       get
       {
@@ -206,20 +207,22 @@ namespace MySQL.ForExcel
         return null;
       }
 
-      range = range.get_Resize(range.Rows.Count + 1, range.Columns.Count);
+      range = range.Resize[range.Rows.Count + 1, range.Columns.Count];
       newRowRange = range.Rows[range.Rows.Count] as Excel.Range;
       if (newRowRange != null)
       {
-        newRowRange.Interior.Color = NewRowCellsOLEColor;
+        newRowRange.Interior.Color = NewRowCellsOleColor;
       }
 
-      if (clearLastRowColoring && range.Rows.Count > 0)
+      if (!clearLastRowColoring || range.Rows.Count <= 0)
       {
-        newRowRange = range.Rows[range.Rows.Count - 1] as Excel.Range;
-        if (newRowRange != null)
-        {
-          newRowRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
-        }
+        return range;
+      }
+
+      newRowRange = range.Rows[range.Rows.Count - 1] as Excel.Range;
+      if (newRowRange != null)
+      {
+        newRowRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
       }
 
       return range;
@@ -232,12 +235,7 @@ namespace MySQL.ForExcel
     /// <returns>The Excel range with the first row cells corresponding to the column names</returns>
     public static Excel.Range GetColumnNamesRange(this Excel.Range mysqlDataRange)
     {
-      if (mysqlDataRange == null)
-      {
-        return null;
-      }
-
-      return mysqlDataRange.get_Resize(1, mysqlDataRange.Columns.Count);
+      return mysqlDataRange == null ? null : mysqlDataRange.Resize[1, mysqlDataRange.Columns.Count];
     }
 
     /// <summary>
@@ -260,7 +258,7 @@ namespace MySQL.ForExcel
     {
       if (lockRange)
       {
-        range.Interior.Color = LockedCellsOLEColor;
+        range.Interior.Color = LockedCellsOleColor;
       }
       else
       {
@@ -291,11 +289,11 @@ namespace MySQL.ForExcel
 
       if (mysqlDataRange != null)
       {
-        Excel.Range extendedRange = mysqlDataRange.get_Range("A2");
-        extendedRange = extendedRange.get_Resize(mysqlDataRange.Rows.Count - 1, worksheet.Columns.Count);
+        Excel.Range extendedRange = mysqlDataRange.Range["A2"];
+        extendedRange = extendedRange.Resize[mysqlDataRange.Rows.Count - 1, worksheet.Columns.Count];
         extendedRange.Locked = false;
 
-        //// Column names range code
+        // Column names range code
         Excel.Range headersRange = mysqlDataRange.GetColumnNamesRange();
         headersRange.LockRange(true);
       }
@@ -327,30 +325,29 @@ namespace MySQL.ForExcel
     {
       int qtyUpdated = 0;
 
-      if (rangesAndAddressesList != null && rangesAndAddressesList.Count > 0)
+      if (rangesAndAddressesList == null || rangesAndAddressesList.Count <= 0)
       {
-        foreach (RangeAndAddress ra in rangesAndAddressesList)
+        return qtyUpdated;
+      }
+
+      foreach (RangeAndAddress ra in rangesAndAddressesList.Where(ra => ra.Modification == RangeAndAddress.RangeModification.Added || ra.Modification == RangeAndAddress.RangeModification.Updated))
+      {
+        try
         {
-          if (ra.Modification != RangeAndAddress.RangeModification.Added && ra.Modification != RangeAndAddress.RangeModification.Updated)
+          if (ra.Address == ra.Range.Address)
           {
             continue;
           }
 
-          try
-          {
-            if (ra.Address != ra.Range.Address)
-            {
-              ra.Address = ra.Range.Address;
-              ra.ExcelRow = ra.Range.Row;
-              qtyUpdated++;
-            }
-          }
-          catch
-          {
-            ra.Range = ra.Range.Worksheet.get_Range(ra.Address);
-            ra.ExcelRow = ra.Range.Row;
-            qtyUpdated++;
-          }
+          ra.Address = ra.Range.Address;
+          ra.ExcelRow = ra.Range.Row;
+          qtyUpdated++;
+        }
+        catch
+        {
+          ra.Range = ra.Range.Worksheet.Range[ra.Address];
+          ra.ExcelRow = ra.Range.Row;
+          qtyUpdated++;
         }
       }
 
@@ -416,7 +413,7 @@ namespace MySQL.ForExcel
         RangeAndAddress ra = rangesAndAddressesList[idx];
         if (ra.TableRow.HasErrors)
         {
-          ra.Range.SetInteriorColor(ErroredCellsOLEColor);
+          ra.Range.SetInteriorColor(ErroredCellsOleColor);
           continue;
         }
 
@@ -427,7 +424,7 @@ namespace MySQL.ForExcel
 
         if (ra.TableRow.RowState != DataRowState.Detached && ra.TableRow.RowState != DataRowState.Deleted)
         {
-          ra.Range.SetInteriorColor(CommitedCellsOLEColor);
+          ra.Range.SetInteriorColor(CommitedCellsOleColor);
         }
 
         rangesAndAddressesList.Remove(ra);

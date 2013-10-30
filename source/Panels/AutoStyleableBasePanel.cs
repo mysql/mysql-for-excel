@@ -1,30 +1,28 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace MySQL.ForExcel.Panels
 {
-  using System;
-  using System.Collections.Generic;
-  using System.ComponentModel;
-  using System.Drawing;
-  using System.Windows.Forms;
-
   /// <summary>
   /// The base class for all MySQL for Excel panels, it provides a template where its child controls Font can be easily changed.
   /// </summary>
@@ -72,7 +70,7 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="controls">A collection of controls to inherit a font to.</param>
     /// <param name="inheritingFont">A <see cref="Font"/> object to set it in each control of the given collection.</param>
-    protected virtual void InheritFontToControls(Control.ControlCollection controls, Font inheritingFont)
+    protected virtual void InheritFontToControls(ControlCollection controls, Font inheritingFont)
     {
       if (controls == null || controls.Count == 0)
       {
@@ -95,25 +93,54 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Event delegate method fired when a <see cref="Label"/> control is being painted.
+    /// </summary>
+    /// <param name="sender">A <see cref="Label"/> control object.</param>
+    /// <param name="e">Event aruments.</param>
+    protected void Label_Paint(object sender, PaintEventArgs e)
+    {
+      Label label = sender as Label;
+      if (label == null)
+      {
+        return;
+      }
+
+      // Get the actual size of rectangle needed for all of text.
+      SizeF fullSize = e.Graphics.MeasureString(label.Text, label.Font);
+
+      // Set a tooltip if not all text fits in label's size.
+      if (fullSize.Width > label.Width || fullSize.Height > label.Height)
+      {
+        LabelsToolTip.SetToolTip(label, label.Text);
+      }
+      else
+      {
+        LabelsToolTip.SetToolTip(label, null);
+      }
+    }
+
+    /// <summary>
     /// Raises the <see cref="System.Windows.Forms.UserControl.Load"/> event.
     /// </summary>
     /// <param name="e">Event arguments.</param>
     protected override void OnLoad(EventArgs e)
     {
       base.OnLoad(e);
-      if (!DesignMode && UseSystemFont)
+      if (DesignMode || !UseSystemFont)
       {
-        Font inheritingFont = Font;
-        if (Font.Name != System.Drawing.SystemFonts.IconTitleFont.Name)
-        {
-          inheritingFont = new Font(System.Drawing.SystemFonts.IconTitleFont.FontFamily, Font.Size, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
-        }
+        return;
+      }
 
-        Microsoft.Win32.SystemEvents.UserPreferenceChanged += new Microsoft.Win32.UserPreferenceChangedEventHandler(SystemEvents_UserPreferenceChanged);
-        if (InheritSystemFontToControls)
-        {
-          InheritFontToControls(Controls, inheritingFont);
-        }
+      Font inheritingFont = Font;
+      if (Font.Name != SystemFonts.IconTitleFont.Name)
+      {
+        inheritingFont = new Font(SystemFonts.IconTitleFont.FontFamily, Font.Size, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
+      }
+
+      Microsoft.Win32.SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
+      if (InheritSystemFontToControls)
+      {
+        InheritFontToControls(Controls, inheritingFont);
       }
     }
 
@@ -126,7 +153,7 @@ namespace MySQL.ForExcel
     {
       if (e.Category == Microsoft.Win32.UserPreferenceCategory.Window && UseSystemFont)
       {
-        Font = new Font(System.Drawing.SystemFonts.IconTitleFont.FontFamily, Font.Size, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
+        Font = new Font(SystemFonts.IconTitleFont.FontFamily, Font.Size, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);
       }
     }
   }

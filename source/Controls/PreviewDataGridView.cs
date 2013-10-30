@@ -1,27 +1,25 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using System.ComponentModel;
+using System.Windows.Forms;
+
+namespace MySQL.ForExcel.Controls
 {
-  using System.ComponentModel;
-  using System.Windows.Forms;
-
   /// <summary>
   /// Displays data in a read-only grid for preview purposes only.
   /// </summary>
@@ -30,7 +28,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Flag indicating if recalculation of column width is not necessary so it must be skipped.
     /// </summary>
-    private bool _skipWidthRecalculation = false;
+    private bool _skipWidthRecalculation;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PreviewDataGridView"/> class.
@@ -292,7 +290,7 @@ namespace MySQL.ForExcel
     #endregion Properties
 
     /// <summary>
-    /// Raises the <see cref="CellMouseDown"/> event.
+    /// Raises the <see cref="DataGridView.CellMouseDown"/> event.
     /// </summary>
     /// <param name="e">A DataGridViewCellMouseEventArgs that contains the event data.</param>
     protected override void OnCellMouseDown(DataGridViewCellMouseEventArgs e)
@@ -306,7 +304,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="CellValueChanged"/> event.
+    /// Raises the <see cref="DataGridView.CellValueChanged"/> event.
     /// </summary>
     /// <param name="e">A DataGridViewCellEventArgs that contains the event data.</param>
     protected override void OnCellValueChanged(DataGridViewCellEventArgs e)
@@ -319,15 +317,12 @@ namespace MySQL.ForExcel
       base.OnCellValueChanged(e);
       if (e.RowIndex < 0)
       {
-        if (this.Columns[e.ColumnIndex].AutoSizeMode != DataGridViewAutoSizeColumnMode.AllCells)
-        {
-          this.Columns[e.ColumnIndex].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-        }
+        Columns[e.ColumnIndex].AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
       }
     }
 
     /// <summary>
-    /// Raises the <see cref="ColumnWidthChanged"/> event.
+    /// Raises the <see cref="DataGridView.ColumnWidthChanged"/> event.
     /// </summary>
     /// <param name="e">A DataGridViewColumnEventArgs that contains the event data.</param>
     protected override void OnColumnWidthChanged(DataGridViewColumnEventArgs e)

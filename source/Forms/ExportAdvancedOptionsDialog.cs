@@ -1,28 +1,28 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using System;
+using System.Windows.Forms;
+using MySQL.ForExcel.Classes;
+using MySQL.ForExcel.Properties;
+using MySQL.Utility.Forms;
+
+namespace MySQL.ForExcel.Forms
 {
-  using System;
-  using System.Windows.Forms;
-  using MySQL.Utility.Forms;
-
   /// <summary>
   /// Advanced options dialog for the operations performed by the <see cref="ExportDataForm"/>.
   /// </summary>
@@ -35,14 +35,14 @@ namespace MySQL.ForExcel
     {
       InitializeComponent();
 
-      PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Properties.Settings.Default.ExportLimitPreviewRowsQuantity);
-      DetectDatatypeCheckBox.Checked = Properties.Settings.Default.ExportDetectDatatype;
-      AddBufferToVarcharCheckBox.Checked = Properties.Settings.Default.ExportAddBufferToVarchar;
-      AutoIndexIntColumnsCheckBox.Checked = Properties.Settings.Default.ExportAutoIndexIntColumns;
-      AutoAllowEmptyNonIndexColumnsCheckBox.Checked = Properties.Settings.Default.ExportAutoAllowEmptyNonIndexColumns;
-      UseFormattedValuesCheckBox.Checked = Properties.Settings.Default.ExportUseFormattedValues;
-      RemoveEmptyColumnsCheckBox.Checked = Properties.Settings.Default.ExportRemoveEmptyColumns;
-      //chkShowCopySQLButton.Checked = Properties.Settings.Default.ExportShowCopySQLButton;
+      PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.ExportLimitPreviewRowsQuantity);
+      DetectDatatypeCheckBox.Checked = Settings.Default.ExportDetectDatatype;
+      AddBufferToVarcharCheckBox.Checked = Settings.Default.ExportAddBufferToVarchar;
+      AutoIndexIntColumnsCheckBox.Checked = Settings.Default.ExportAutoIndexIntColumns;
+      AutoAllowEmptyNonIndexColumnsCheckBox.Checked = Settings.Default.ExportAutoAllowEmptyNonIndexColumns;
+      UseFormattedValuesCheckBox.Checked = Settings.Default.ExportUseFormattedValues;
+      RemoveEmptyColumnsCheckBox.Checked = Settings.Default.ExportRemoveEmptyColumns;
+      //chkShowCopySQLButton.Checked = Settings.Default.ExportShowCopySQLButton;
       AddBufferToVarcharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
     }
 
@@ -72,14 +72,14 @@ namespace MySQL.ForExcel
         return;
       }
 
-      Properties.Settings.Default.ExportLimitPreviewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
-      Properties.Settings.Default.ExportDetectDatatype = DetectDatatypeCheckBox.Checked;
-      Properties.Settings.Default.ExportAddBufferToVarchar = AddBufferToVarcharCheckBox.Checked;
-      Properties.Settings.Default.ExportAutoIndexIntColumns = AutoIndexIntColumnsCheckBox.Checked;
-      Properties.Settings.Default.ExportAutoAllowEmptyNonIndexColumns = AutoAllowEmptyNonIndexColumnsCheckBox.Checked;
-      Properties.Settings.Default.ExportUseFormattedValues = UseFormattedValuesCheckBox.Checked;
-      Properties.Settings.Default.ExportRemoveEmptyColumns = RemoveEmptyColumnsCheckBox.Checked;
-      //Properties.Settings.Default.ExportShowCopySQLButton = chkShowCopySQLButton.Checked;
+      Settings.Default.ExportLimitPreviewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
+      Settings.Default.ExportDetectDatatype = DetectDatatypeCheckBox.Checked;
+      Settings.Default.ExportAddBufferToVarchar = AddBufferToVarcharCheckBox.Checked;
+      Settings.Default.ExportAutoIndexIntColumns = AutoIndexIntColumnsCheckBox.Checked;
+      Settings.Default.ExportAutoAllowEmptyNonIndexColumns = AutoAllowEmptyNonIndexColumnsCheckBox.Checked;
+      Settings.Default.ExportUseFormattedValues = UseFormattedValuesCheckBox.Checked;
+      Settings.Default.ExportRemoveEmptyColumns = RemoveEmptyColumnsCheckBox.Checked;
+      //Settings.Default.ExportShowCopySQLButton = chkShowCopySQLButton.Checked;
       MiscUtilities.SaveSettings();
     }
   }

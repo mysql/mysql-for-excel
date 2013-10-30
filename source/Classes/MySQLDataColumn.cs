@@ -1,36 +1,35 @@
-﻿// 
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
 // published by the Free Software Foundation; version 2 of the
 // License.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Linq;
+using System.Text;
+using MySql.Data.MySqlClient;
+using MySQL.ForExcel.Properties;
+
+namespace MySQL.ForExcel.Classes
 {
-  using System;
-  using System.Collections.Generic;
-  using System.ComponentModel;
-  using System.Data;
-  using System.Linq;
-  using System.Text;
-  using MySql.Data.MySqlClient;
-
   /// <summary>
   /// Represents the schema of a MySQL table's column.
   /// </summary>
-  public class MySQLDataColumn : DataColumn, INotifyPropertyChanged
+  public class MySqlDataColumn : DataColumn, INotifyPropertyChanged
   {
     #region Fields
 
@@ -57,14 +56,14 @@ namespace MySQL.ForExcel
     /// <summary>
     /// List of text strings containing warnings for users about the column properties that could cause errors when creating this column in a database table.
     /// </summary>
-    private List<string> _columnWarningTextsList;
+    private readonly List<string> _columnWarningTextsList;
 
     #endregion Fields
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MySQLDataColumn"/> class.
+    /// Initializes a new instance of the <see cref="MySqlDataColumn"/> class.
     /// </summary>
-    public MySQLDataColumn()
+    public MySqlDataColumn()
     {
       _columnWarningTextsList = new List<string>(3);
       AutoIncrement = false;
@@ -73,9 +72,9 @@ namespace MySQL.ForExcel
       IsDisplayNameDuplicate = false;
       IsEmpty = true;
       ExcludeColumn = false;
-      IsMySQLDataTypeValid = true;
+      IsMySqlDataTypeValid = true;
       MappedDataColName = null;
-      MySQLDataType = string.Empty;
+      MySqlDataType = string.Empty;
       PrimaryKey = false;
       RowsFrom1stDataType = string.Empty;
       RowsFrom2ndDataType = string.Empty;
@@ -83,48 +82,50 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MySQLDataColumn"/> class.
+    /// Initializes a new instance of the <see cref="MySqlDataColumn"/> class.
     /// </summary>
     /// <param name="inExportMode">Flag indicating if the column is being constructed for exporting it to a new MySQL table.</param>
-    public MySQLDataColumn(bool inExportMode)
+    public MySqlDataColumn(bool inExportMode)
       : this()
     {
       InExportMode = inExportMode;
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MySQLDataColumn"/> class.
+    /// Initializes a new instance of the <see cref="MySqlDataColumn"/> class.
     /// </summary>
     /// <param name="columnName">Name of the column.</param>
-    /// <param name="mySQLFullDataType">Data type for a table column supported by MySQL Server.</param>
-    /// <param name="datesAsMySQLDates">Flag indicating if the data type for dates will be stored as <see cref="MySql.Data.Types.MySqlDateTime"/> or <see cref="System.DateTime"/>.</param>
+    /// <param name="mySqlFullDataType">Data type for a table column supported by MySQL Server.</param>
+    /// <param name="datesAsMySqlDates">Flag indicating if the data type for dates will be stored as <see cref="MySql.Data.Types.MySqlDateTime"/>
+    /// or <see cref="System.DateTime"/>.</param>
     /// <param name="allowNulls">Flag indicating if the column will accept null values.</param>
     /// <param name="isPrimaryKey">Flag indicating if the column is part of the primary key.</param>
     /// <param name="extraInfo">Extra information related to the column's data type as stored by the MySQL server.</param>
-    public MySQLDataColumn(string columnName, string mySQLFullDataType, bool datesAsMySQLDates, bool allowNulls, bool isPrimaryKey, string extraInfo)
+    public MySqlDataColumn(string columnName, string mySqlFullDataType, bool datesAsMySqlDates, bool allowNulls, bool isPrimaryKey, string extraInfo)
       : this()
     {
       DisplayName = ColumnName = columnName;
       AllowNull = allowNulls;
-      Unsigned = mySQLFullDataType.Contains("unsigned");
+      Unsigned = mySqlFullDataType.Contains("unsigned");
       if (!string.IsNullOrEmpty(extraInfo))
       {
         AutoIncrement = extraInfo.Contains("auto_increment");
       }
 
-      MySQLDataType = mySQLFullDataType;
-      DataType = DataTypeUtilities.NameToType(StrippedMySQLDataType, Unsigned, datesAsMySQLDates);
+      MySqlDataType = mySqlFullDataType;
+      DataType = DataTypeUtilities.NameToType(StrippedMySqlDataType, Unsigned, datesAsMySqlDates);
       PrimaryKey = isPrimaryKey;
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MySQLDataColumn"/> class.
+    /// Initializes a new instance of the <see cref="MySqlDataColumn"/> class.
     /// </summary>
     /// <param name="columnName">Name of the column.</param>
-    /// <param name="mySQLFullDataType">Data type for a table column supported by MySQL Server.</param>
-    /// <param name="datesAsMySQLDates">Flag indicating if the data type for dates will be stored as <see cref="MySql.Data.Types.MySqlDateTime"/> or <see cref="System.DateTime"/>.</param>
-    public MySQLDataColumn(string columnName, string mySQLFullDataType, bool datesAsMySQLDates)
-      : this(columnName, mySQLFullDataType, datesAsMySQLDates, false, false, string.Empty)
+    /// <param name="mySqlFullDataType">Data type for a table column supported by MySQL Server.</param>
+    /// <param name="datesAsMySqlDates">Flag indicating if the data type for dates will be stored as <see cref="MySql.Data.Types.MySqlDateTime"/>
+    /// or <see cref="System.DateTime"/>.</param>
+    public MySqlDataColumn(string columnName, string mySqlFullDataType, bool datesAsMySqlDates)
+      : this(columnName, mySqlFullDataType, datesAsMySqlDates, false, false, string.Empty)
     {
     }
 
@@ -138,10 +139,10 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets or sets a value indicating whether the column is used in an auto-generated primary key.
     /// </summary>
-    public bool AutoPK { get; set; }
+    public bool AutoPk { get; set; }
 
     /// <summary>
-    /// Gets the <see cref="ColumnName"/> escaping the back-tick character.
+    /// Gets the <see cref="DataColumn.ColumnName"/> escaping the back-tick character.
     /// </summary>
     public string ColumnNameForSqlQueries
     {
@@ -152,7 +153,8 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Gets the name for this column, when its value is different than the one in <see cref="ColumnName"/> it means the latter represents an internal name and this property holds the real column name.
+    /// Gets the name for this column, when its value is different than the one in <see cref="DataColumn.ColumnName"/>
+    /// it means the latter represents an internal name and this property holds the real column name.
     /// </summary>
     public string DisplayName { get; private set; }
 
@@ -185,17 +187,17 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets a value indicating whether the column's data type is a valid MySQL data type.
     /// </summary>
-    public bool IsMySQLDataTypeValid { get; private set; }
+    public bool IsMySqlDataTypeValid { get; private set; }
 
     /// <summary>
-    /// Gets or sets the name of the column in a source <see cref="MySQLDataTable"/> from which data will be appended from.
+    /// Gets or sets the name of the column in a source <see cref="MySqlDataTable"/> from which data will be appended from.
     /// </summary>
     public string MappedDataColName { get; set; }
 
     /// <summary>
     /// Gets or sets the corresponding data type supported by MySQL Server for this column.
     /// </summary>
-    public string MySQLDataType { get; private set; }
+    public string MySqlDataType { get; private set; }
 
     /// <summary>
     /// Gets the consistent data type that can hold the data for all rows starting from the first row.
@@ -230,7 +232,8 @@ namespace MySQL.ForExcel
           return;
         }
 
-        if (!_createIndex && (Table as MySQLDataTable).AutoAllowEmptyNonIndexColumns)
+        var mySqlDataTable = Table as MySqlDataTable;
+        if (mySqlDataTable != null && (!_createIndex && mySqlDataTable.AutoAllowEmptyNonIndexColumns))
         {
           AllowNull = true;
         }
@@ -334,7 +337,7 @@ namespace MySQL.ForExcel
           columnValuesAreUnique = false;
         }
 
-        if (UpdateWarnings(!columnValuesAreUnique, Properties.Resources.ColumnDataNotUniqueWarning))
+        if (UpdateWarnings(!columnValuesAreUnique, Resources.ColumnDataNotUniqueWarning))
         {
           OnColumnWarningsChanged();
         }
@@ -372,12 +375,12 @@ namespace MySQL.ForExcel
     {
       get
       {
-        if (string.IsNullOrEmpty(StrippedMySQLDataType))
+        if (string.IsNullOrEmpty(StrippedMySqlDataType))
         {
           return false;
         }
 
-        string toLowerDataType = StrippedMySQLDataType.ToLowerInvariant();
+        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
         return toLowerDataType == "real" || toLowerDataType == "double" || toLowerDataType == "float" || toLowerDataType == "decimal" || toLowerDataType == "numeric";
       }
     }
@@ -400,12 +403,12 @@ namespace MySQL.ForExcel
     {
       get
       {
-        if (string.IsNullOrEmpty(StrippedMySQLDataType))
+        if (string.IsNullOrEmpty(StrippedMySqlDataType))
         {
           return false;
         }
 
-        string toLowerDataType = StrippedMySQLDataType.ToLowerInvariant();
+        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
         return toLowerDataType.Contains("int");
       }
     }
@@ -417,12 +420,12 @@ namespace MySQL.ForExcel
     {
       get
       {
-        if (string.IsNullOrEmpty(StrippedMySQLDataType))
+        if (string.IsNullOrEmpty(StrippedMySqlDataType))
         {
           return false;
         }
 
-        string toLowerDataType = StrippedMySQLDataType.ToLowerInvariant();
+        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
         return toLowerDataType.Contains("char");
       }
     }
@@ -434,12 +437,12 @@ namespace MySQL.ForExcel
     {
       get
       {
-        if (string.IsNullOrEmpty(StrippedMySQLDataType))
+        if (string.IsNullOrEmpty(StrippedMySqlDataType))
         {
           return false;
         }
 
-        string toLowerDataType = StrippedMySQLDataType.ToLowerInvariant();
+        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
         return toLowerDataType.Contains("char") || toLowerDataType.Contains("text");
       }
     }
@@ -451,12 +454,12 @@ namespace MySQL.ForExcel
     {
       get
       {
-        if (string.IsNullOrEmpty(StrippedMySQLDataType))
+        if (string.IsNullOrEmpty(StrippedMySqlDataType))
         {
           return false;
         }
 
-        string toLowerDataType = StrippedMySQLDataType.ToLowerInvariant();
+        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
         return toLowerDataType.StartsWith("set") || toLowerDataType.StartsWith("enum");
       }
     }
@@ -468,12 +471,12 @@ namespace MySQL.ForExcel
     {
       get
       {
-        if (string.IsNullOrEmpty(StrippedMySQLDataType))
+        if (string.IsNullOrEmpty(StrippedMySqlDataType))
         {
           return false;
         }
 
-        string toLowerDataType = MySQLDataType.ToLowerInvariant();
+        string toLowerDataType = MySqlDataType.ToLowerInvariant();
         return toLowerDataType.StartsWith("bool") || toLowerDataType == "tinyint(1)" || toLowerDataType == "bit(1)";
       }
     }
@@ -485,12 +488,12 @@ namespace MySQL.ForExcel
     {
       get
       {
-        if (string.IsNullOrEmpty(StrippedMySQLDataType))
+        if (string.IsNullOrEmpty(StrippedMySqlDataType))
         {
           return false;
         }
 
-        string toLowerDataType = StrippedMySQLDataType.ToLowerInvariant();
+        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
         return toLowerDataType.Contains("binary");
       }
     }
@@ -502,53 +505,53 @@ namespace MySQL.ForExcel
     {
       get
       {
-        if (string.IsNullOrEmpty(StrippedMySQLDataType))
+        if (string.IsNullOrEmpty(StrippedMySqlDataType))
         {
           return false;
         }
 
-        string toLowerDataType = StrippedMySQLDataType.ToLowerInvariant();
+        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
         return toLowerDataType.Contains("date") || toLowerDataType == "timestamp";
       }
     }
 
     /// <summary>
-    /// Gets a <see cref="MySql.Data.MySQLClient.MySqlDbType"/> object corresponding to this column's data type.
+    /// Gets a <see cref="MySql.Data.MySqlClient.MySqlDbType"/> object corresponding to this column's data type.
     /// </summary>
-    public MySqlDbType MySQLDBType
+    public MySqlDbType MySqlDbType
     {
       get
       {
-        string strippedType = StrippedMySQLDataType;
-        return !string.IsNullOrEmpty(strippedType) ? DataTypeUtilities.NameToMySQLType(strippedType, Unsigned, false) : MySqlDbType.VarChar;
+        string strippedType = StrippedMySqlDataType;
+        return !string.IsNullOrEmpty(strippedType) ? DataTypeUtilities.NameToMySqlType(strippedType, Unsigned, false) : MySqlDbType.VarChar;
       }
     }
 
     /// <summary>
-    /// Gets the parent table of this column as a <see cref="MySQLDataTable"/> object.
+    /// Gets the parent table of this column as a <see cref="MySqlDataTable"/> object.
     /// </summary>
-    public MySQLDataTable ParentTable
+    public MySqlDataTable ParentTable
     {
       get
       {
-        return Table as MySQLDataTable;
+        return Table as MySqlDataTable;
       }
     }
 
     /// <summary>
     /// Gets the MySQL data type descriptor without any options wrapped by parenthesis.
     /// </summary>
-    public string StrippedMySQLDataType
+    public string StrippedMySqlDataType
     {
       get
       {
-        if (string.IsNullOrEmpty(MySQLDataType))
+        if (string.IsNullOrEmpty(MySqlDataType))
         {
-          return MySQLDataType;
+          return MySqlDataType;
         }
 
-        int lParensIndex = MySQLDataType.IndexOf("(");
-        return lParensIndex < 0 ? MySQLDataType : MySQLDataType.Substring(0, lParensIndex);
+        int lParensIndex = MySqlDataType.IndexOf("(", StringComparison.Ordinal);
+        return lParensIndex < 0 ? MySqlDataType : MySqlDataType.Substring(0, lParensIndex);
       }
     }
 
@@ -585,30 +588,24 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Checks if the data stored in this column would fit within the given data type.
     /// </summary>
-    /// <param name="mySQLDataType">Data type for a table column supported by MySQL Server.</param>
-    /// <returns><see cref="true"/> if the data stored in this column would fit, <see cref="false"/> otherwise.</returns>
-    public bool CanBeOfMySQLDataType(string mySQLDataType)
+    /// <param name="mySqlDataType">Data type for a table column supported by MySQL Server.</param>
+    /// <returns><c>true</c> if the data stored in this column would fit, <c>false</c> otherwise.</returns>
+    public bool CanBeOfMySqlDataType(string mySqlDataType)
     {
       bool result = true;
 
-      MySQLDataTable parentTable = Table as MySQLDataTable;
+      MySqlDataTable parentTable = Table as MySqlDataTable;
       int rowIdx = 0;
-      foreach (DataRow dr in parentTable.Rows)
+      if (parentTable == null)
       {
-        if (parentTable.FirstRowIsHeaders && rowIdx++ == 0)
-        {
-          continue;
-        }
+        return true;
+      }
 
-        string strValueFromArray = dr[Ordinal].ToString();
-        if (strValueFromArray.Length == 0)
-        {
-          continue;
-        }
+      foreach (string strValueFromArray in parentTable.Rows.Cast<DataRow>().Where(dr => !parentTable.FirstRowIsHeaders || rowIdx++ != 0).Select(dr => dr[Ordinal].ToString()).Where(strValueFromArray => strValueFromArray.Length != 0))
+      {
+        result = DataTypeUtilities.StringValueCanBeStoredWithMySqlType(strValueFromArray, mySqlDataType);
 
-        result = result && DataTypeUtilities.StringValueCanBeStoredWithMySQLType(strValueFromArray, mySQLDataType);
-
-        //// If found a value where the data type is not good for it break since there is no need testing more values.
+        // If found a value where the data type is not good for it break since there is no need testing more values.
         if (!result)
         {
           break;
@@ -619,19 +616,18 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Creates a new <see cref="MySQLDataColumn"/> object with a schema identical to this column's schema.
+    /// Creates a new <see cref="MySqlDataColumn"/> object with a schema identical to this column's schema.
     /// </summary>
-    /// <returns>A new <see cref="MySQLDataColumn"/> object with a schema cloned from this column.</returns>
-    public MySQLDataColumn CloneSchema()
+    /// <returns>A new <see cref="MySqlDataColumn"/> object with a schema cloned from this column.</returns>
+    public MySqlDataColumn CloneSchema()
     {
-      MySQLDataColumn clonedColumn = new MySQLDataColumn();
-      clonedColumn.ColumnName = ColumnName;
-      clonedColumn.SetDisplayName(DisplayName, false);
+      MySqlDataColumn clonedColumn = new MySqlDataColumn { ColumnName = ColumnName };
+      clonedColumn.SetDisplayName(DisplayName);
       clonedColumn.DataType = DataType;
-      clonedColumn.SetMySQLDataType(MySQLDataType);
+      clonedColumn.SetMySqlDataType(MySqlDataType);
       clonedColumn.RowsFrom1stDataType = RowsFrom1stDataType;
       clonedColumn.RowsFrom2ndDataType = RowsFrom2ndDataType;
-      clonedColumn.AutoPK = AutoPK;
+      clonedColumn.AutoPk = AutoPk;
       clonedColumn.AllowNull = AllowNull;
       clonedColumn.PrimaryKey = PrimaryKey;
       clonedColumn.Unsigned = Unsigned;
@@ -646,16 +642,22 @@ namespace MySQL.ForExcel
     /// Creates a SQL query fragment meant to be used within a CREATE TABLE statement to create a column with this column's schema.
     /// </summary>
     /// <returns>A SQL query fragment describing this column's schema.</returns>
-    public string GetSQL()
+    public string GetSql()
     {
       if (string.IsNullOrEmpty(DisplayName))
       {
         return null;
       }
 
+      var mySqlDataTable = Table as MySqlDataTable;
+      if (mySqlDataTable == null)
+      {
+        return null;
+      }
+
       StringBuilder colDefinition = new StringBuilder();
-      colDefinition.AppendFormat("`{0}` {1}", DisplayName.Replace("`", "``"), MySQLDataType);
-      if (AutoPK || (PrimaryKey && (Table as MySQLDataTable).NumberOfPK == 1))
+      colDefinition.AppendFormat("`{0}` {1}", DisplayName.Replace("`", "``"), MySqlDataType);
+      if (AutoPk || (PrimaryKey && mySqlDataTable.NumberOfPk == 1))
       {
         if (AutoIncrement)
         {
@@ -693,20 +695,19 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Raises the <see cref="PrimaryKeyValueChanged"/> event.
+    /// Raises the <see cref="PropertyChanged"/> event.
     /// </summary>
     /// <param name="args">Event arguments.</param>
     protected void OnPropertyChanged(PropertyChangedEventArgs args)
     {
-      PropertyChangedEventHandler handler = PropertyChanged;
-      if (handler != null)
+      if (PropertyChanged != null)
       {
-        handler(this, args);
+        PropertyChanged(this, args);
       }
     }
 
     /// <summary>
-    /// Raises the <see cref="PrimaryKeyValueChanged"/> event.
+    /// Raises the <see cref="PropertyChanged"/> event.
     /// </summary>
     /// <param name="propertyName">Name of the property whose value changed.</param>
     protected void OnPropertyChanged(string propertyName)
@@ -728,24 +729,24 @@ namespace MySQL.ForExcel
 
       bool colNameEmpty = displayName.Length == 0;
       string nonDuplicateDisplayName = displayName;
-      if (UpdateWarnings(colNameEmpty, Properties.Resources.ColumnNameRequiredWarning))
+      if (UpdateWarnings(colNameEmpty, Resources.ColumnNameRequiredWarning))
       {
         OnColumnWarningsChanged();
       }
 
-      if (!colNameEmpty && Table != null && Table is MySQLDataTable)
+      if (!colNameEmpty && Table is MySqlDataTable)
       {
         nonDuplicateDisplayName = ParentTable.GetNonDuplicateColumnName(displayName, Ordinal);
       }
 
       IsDisplayNameDuplicate = !addSuffixIfDuplicate && displayName != nonDuplicateDisplayName;
-      if (AutoPK)
+      if (AutoPk)
       {
-        ParentTable.UpdateAutoPKWarnings(IsDisplayNameDuplicate, Properties.Resources.PrimaryKeyColumnExistsWarning);
+        ParentTable.UpdateAutoPkWarnings(IsDisplayNameDuplicate, Resources.PrimaryKeyColumnExistsWarning);
       }
       else
       {
-        if (UpdateWarnings(IsDisplayNameDuplicate, Properties.Resources.ColumnExistsWarning))
+        if (UpdateWarnings(IsDisplayNameDuplicate, Resources.ColumnExistsWarning))
         {
           OnColumnWarningsChanged();
         }
@@ -755,42 +756,42 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Checks if a user typed MySQL data type is valid and assigns it to the <see cref="MySQLDataType"/> property.
+    /// Checks if a user typed MySQL data type is valid and assigns it to the <see cref="MySqlDataType"/> property.
     /// </summary>
     /// <param name="dataType">A MySQL data type as specified for new columns in a CREATE TABLE statement.</param>
     /// <param name="validateType">Flag indicating if the data type will be checked if it's a valid MySQL data type.</param>
     /// <param name="testTypeOnData">Flag indicating if the data type will be tested against the column's data to see if the type is suitable for the data.</param>
-    /// <returns>true if the type is a valid MySQL data type, false otherwise.</returns>
-    public bool SetMySQLDataType(string dataType, bool validateType = false, bool testTypeOnData = false)
+    /// <returns><c>true</c> if the type is a valid MySQL data type, <c>false</c> otherwise.</returns>
+    public bool SetMySqlDataType(string dataType, bool validateType = false, bool testTypeOnData = false)
     {
-      bool warningsChanged = false;
-      IsMySQLDataTypeValid = true;
+      bool warningsChanged;
+      IsMySqlDataTypeValid = true;
       dataType = dataType.Trim();
-      MySQLDataType = dataType;
+      MySqlDataType = dataType;
 
-      if (MySQLDataType.Length == 0)
+      if (MySqlDataType.Length == 0)
       {
-        if (UpdateWarnings(true, Properties.Resources.ColumnDataTypeRequiredWarning))
+        if (UpdateWarnings(true, Resources.ColumnDataTypeRequiredWarning))
         {
           OnColumnWarningsChanged();
         }
 
-        return IsMySQLDataTypeValid;
+        return IsMySqlDataTypeValid;
       }
 
-      warningsChanged = UpdateWarnings(false, Properties.Resources.ColumnDataTypeRequiredWarning) || warningsChanged;
+      warningsChanged = UpdateWarnings(false, Resources.ColumnDataTypeRequiredWarning);
       if (validateType)
       {
-        IsMySQLDataTypeValid = DataTypeUtilities.ValidateUserDataType(dataType);
+        IsMySqlDataTypeValid = DataTypeUtilities.ValidateUserDataType(dataType);
       }
 
-      warningsChanged = UpdateWarnings(!IsMySQLDataTypeValid, Properties.Resources.ExportDataTypeNotValidWarning) || warningsChanged;
-      if (IsMySQLDataTypeValid && testTypeOnData)
+      warningsChanged = UpdateWarnings(!IsMySqlDataTypeValid, Resources.ExportDataTypeNotValidWarning) || warningsChanged;
+      if (IsMySqlDataTypeValid && testTypeOnData)
       {
         TestColumnDataTypeAgainstColumnData();
       }
 
-      MySQLDataTable parentTable = Table as MySQLDataTable;
+      MySqlDataTable parentTable = Table as MySqlDataTable;
       if (parentTable != null)
       {
         if (!CreateIndex && IsInteger && parentTable.AutoIndexIntColumns)
@@ -800,8 +801,8 @@ namespace MySQL.ForExcel
 
         if (!parentTable.DetectDatatype)
         {
-          RowsFrom1stDataType = MySQLDataType;
-          RowsFrom2ndDataType = MySQLDataType;
+          RowsFrom1stDataType = MySqlDataType;
+          RowsFrom2ndDataType = MySqlDataType;
         }
       }
 
@@ -810,17 +811,17 @@ namespace MySQL.ForExcel
         OnColumnWarningsChanged();
       }
 
-      return IsMySQLDataTypeValid;
+      return IsMySqlDataTypeValid;
     }
 
     /// <summary>
     /// Checks if this column's data type is right for the data currently stored in the column.
     /// </summary>
-    /// <returns>true if the column's data fits the data type, false otherwise.</returns>
+    /// <returns><c>true</c> if the column's data fits the data type, <c>false</c> otherwise.</returns>
     private bool TestColumnDataTypeAgainstColumnData()
     {
-      bool dataFitsIntoType = MySQLDataType.Length > 0 && CanBeOfMySQLDataType(MySQLDataType);
-      if (UpdateWarnings(!dataFitsIntoType, Properties.Resources.ExportDataTypeNotSuitableWarning))
+      bool dataFitsIntoType = MySqlDataType.Length > 0 && CanBeOfMySqlDataType(MySqlDataType);
+      if (UpdateWarnings(!dataFitsIntoType, Resources.ExportDataTypeNotSuitableWarning))
       {
         OnColumnWarningsChanged();
       }
@@ -833,26 +834,28 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="addWarning">true to add a new warning to the column's warnings collection, false to remove the given warning and display another existing warning.</param>
     /// <param name="warningResourceText">Warning text to display to users.</param>
-    /// <returns><see cref="true"/> if a warning was added or removed, <see cref="false"/> otherwise.</returns>
+    /// <returns><c>true</c> if a warning was added or removed, <c>false</c> otherwise.</returns>
     private bool UpdateWarnings(bool addWarning, string warningResourceText)
     {
       bool warningsChanged = false;
 
       if (addWarning)
       {
-        //// Only add the warning text if it is not empty and not already added to the warnings list
-        if (!string.IsNullOrEmpty(warningResourceText) && !_columnWarningTextsList.Contains(warningResourceText))
+        // Only add the warning text if it is not empty and not already added to the warnings list
+        if (string.IsNullOrEmpty(warningResourceText) || _columnWarningTextsList.Contains(warningResourceText))
         {
-          _columnWarningTextsList.Add(warningResourceText);
-          warningsChanged = true;
+          return false;
         }
+
+        _columnWarningTextsList.Add(warningResourceText);
+        warningsChanged = true;
       }
       else
       {
-        //// We do not want to show a warning or we want to remove a warning if warningResourceText != null
+        // We do not want to show a warning or we want to remove a warning if warningResourceText != null
         if (!string.IsNullOrEmpty(warningResourceText))
         {
-          //// Remove the warning and check if there is an stored warning, if so we want to pull it and show it
+          // Remove the warning and check if there is an stored warning, if so we want to pull it and show it
           warningsChanged = _columnWarningTextsList.Remove(warningResourceText);
         }
       }
@@ -862,16 +865,15 @@ namespace MySQL.ForExcel
   }
 
   /// <summary>
-  /// Event arguments for the <see cref="ColumnWarningsChanged"/> event.
+  /// Event arguments for the ColumnWarningsChanged event.
   /// </summary>
   public class ColumnWarningsChangedArgs : EventArgs
   {
     /// <summary>
     /// Initializes a new instance of the <see cref="ColumnWarningsChangedArgs"/> class.
     /// </summary>
-    /// <param name="currentWarning">The last warning text associated to this column.</param>
-    /// <param name="warningsQuantity">The number of warnings associated to this column.</param>
-    public ColumnWarningsChangedArgs(MySQLDataColumn column)
+    /// <param name="column">The column that warnings are related to.</param>
+    public ColumnWarningsChangedArgs(MySqlDataColumn column)
     {
       CurrentWarningText = column.CurrentColumnWarningText;
       WarningsQuantity = column.WarningsQuantity;

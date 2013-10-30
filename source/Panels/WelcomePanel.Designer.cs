@@ -1,5 +1,4 @@
-﻿//
-// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -15,14 +14,15 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
-//
 
-namespace MySQL.ForExcel
+using MySQL.ForExcel.Controls;
+
+namespace MySQL.ForExcel.Panels
 {
   /// <summary>
   /// First panel shown to users within the Add-In's <seealso cref="ExcelAddInPane"/>.
   /// </summary>
-  partial class WelcomePanel
+  sealed partial class WelcomePanel
   {
     /// <summary> 
     /// Required designer variable.
@@ -32,7 +32,7 @@ namespace MySQL.ForExcel
     /// <summary> 
     /// Clean up any resources being used.
     /// </summary>
-    /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+    /// <param name="disposing"><c>true</c> if managed resources should be disposed; otherwise, <c>false</c>.</param>
     protected override void Dispose(bool disposing)
     {
       if (disposing && (components != null))
@@ -55,19 +55,19 @@ namespace MySQL.ForExcel
       System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Local Connections");
       System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Remote Connections");
       this.LargeImagesList = new System.Windows.Forms.ImageList(this.components);
-      this.ManageConnectionsHotLabel = new MySQL.ForExcel.HotLabel();
-      this.ConnectionsList = new MySQL.ForExcel.MyTreeView();
+      this.ManageConnectionsHotLabel = new HotLabel();
+      this.ConnectionsList = new MyTreeView();
       this.ConnectionsContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.DeleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.RefreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.NewConnectionHotLabel = new MySQL.ForExcel.HotLabel();
+      this.NewConnectionHotLabel = new HotLabel();
       this.UpperPanel = new System.Windows.Forms.Panel();
-      this.SeparatorImage = new MySQL.ForExcel.TransparentPictureBox();
+      this.SeparatorImage = new TransparentPictureBox();
       this.WelcomeTextPictureBox = new System.Windows.Forms.PictureBox();
-      this.InstructionsLabel = new MySQL.ForExcel.TransparentLabel();
+      this.InstructionsLabel = new TransparentLabel();
       this.MainLogoPictureBox = new System.Windows.Forms.PictureBox();
-      this.OpenConnectionHotLabel = new MySQL.ForExcel.HotLabel();
-      this.AboutHotLabel = new MySQL.ForExcel.HotLabel();
+      this.OpenConnectionHotLabel = new HotLabel();
+      this.AboutHotLabel = new HotLabel();
       this.ConnectionsContextMenuStrip.SuspendLayout();
       this.UpperPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.WelcomeTextPictureBox)).BeginInit();
