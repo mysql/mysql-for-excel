@@ -512,6 +512,7 @@
     <Content Include="Resources\ArrowRight.png" />
     <None Include="Resources\DeleteHS.png" />
     <None Include="Resources\clear_output.png" />
+    <None Include="Resources\edit.png" />
     <Content Include="Resources\mysql-for-excel.ico" />
     <None Include="Resources\MySQLforExcel-ObjectPanel-EditData-24x24.png" />
     <None Include="Resources\MySQLforExcel-ObjectPanel-EditData-Disabled-24x24.png" />

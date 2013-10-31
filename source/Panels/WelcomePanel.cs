@@ -92,7 +92,7 @@ namespace MySQL.ForExcel.Panels
         nodeIdx = 0;
       }
 
-      string subtitle = string.Format("User: {0}, Host: {1}", conn.UserName, hostName);
+      string subtitle = string.Format("User: {0}, Host: {1}:{2}", conn.UserName, hostName, conn.Port);
       MyTreeNode node = ConnectionsList.AddNode(ConnectionsList.Nodes[nodeIdx], conn.Name, subtitle);
       node.ImageIndex = isSsh ? 1 : 0;
       node.Enable = !isSsh;
@@ -149,6 +149,31 @@ namespace MySQL.ForExcel.Panels
 
       MySqlWorkbenchConnection connectionToRemove = ConnectionsList.SelectedNode.Tag as MySqlWorkbenchConnection;
       if (connectionToRemove != null && MySqlWorkbench.Connections.DeleteConnection(connectionToRemove.Id))
+      {
+        LoadConnections(false);
+      }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="EditConnectionToolStripMenuItem"/> context-menu item is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void EditConnectionToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      if (ConnectionsList.SelectedNode == null || ConnectionsList.SelectedNode.Level == 0)
+      {
+        return;
+      }
+
+      MySqlWorkbenchConnection connectionToEdit = ConnectionsList.SelectedNode.Tag as MySqlWorkbenchConnection;
+      bool editedConnection;
+      using (var instanceConnectionDialog = new MySqlWorkbenchConnectionDialog(connectionToEdit))
+      {
+        editedConnection = instanceConnectionDialog.ShowIfWorkbenchNotRunning() == DialogResult.OK;
+      }
+
+      if (editedConnection)
       {
         LoadConnections(false);
       }
