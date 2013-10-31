@@ -43,6 +43,11 @@ namespace MySQL.ForExcel.Forms
     #region Fields
 
     /// <summary>
+    /// The _import database object.
+    /// </summary>
+    private DbObject _importDbObject;
+
+    /// <summary>
     /// Rectangle used to measure drag and drop operations.
     /// </summary>
     private Rectangle _dragBoxFromMouseDown;
@@ -111,9 +116,10 @@ namespace MySQL.ForExcel.Forms
       InitializeComponent();
 
       SourceExcelDataDataGridView.EnableHeadersVisualStyles = false;
+      _importDbObject = importDbObject;
 
-      InitializeSourceTableGrid(wbConnection.Schema, importDbObject.Name);
-      InitializeTargetTableGrid(importDbObject);
+      InitializeSourceTableGrid();
+      InitializeTargetTableGrid();
 
       string excelRangeAddress = appendDataRange.Address.Replace("$", string.Empty);
       Text = string.Format("Append Data - {0} [{1}]", appendingWorksheetName, excelRangeAddress);
@@ -207,6 +213,10 @@ namespace MySQL.ForExcel.Forms
       using (AppendAdvancedOptionsDialog optionsDialog = new AppendAdvancedOptionsDialog())
       {
         optionsDialog.ShowDialog();
+        if (optionsDialog.ParentFormRequiresRefresh)
+        {
+          InitializeSourceTableGrid();
+        }
       }
     }
 
@@ -899,11 +909,11 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     /// <param name="schemaName">The name of the schema containing the From table.</param>
     /// <param name="fromTableName">The name of the source DB object in Excel.</param>
-    private void InitializeSourceTableGrid(string schemaName, string fromTableName)
+    private void InitializeSourceTableGrid()
     {
       SourceMySqlPreviewDataTable = new MySqlDataTable(
-        schemaName,
-        fromTableName,
+        WbConnection.Schema,
+        _importDbObject.Name,
         false,
         Settings.Default.AppendUseFormattedValues,
         false,
@@ -930,10 +940,10 @@ namespace MySQL.ForExcel.Forms
     /// Initilizes the grid containing preview data contained in the target table.
     /// </summary>
     /// <param name="importDbObject">The name of the target DB object in Excel.</param>
-    private void InitializeTargetTableGrid(DbObject importDbObject)
+    private void InitializeTargetTableGrid()
     {
-      TargetMySqlDataTable = new MySqlDataTable(importDbObject.Name, true, false, WbConnection);
-      DataTable dt = WbConnection.GetDataFromTableOrView(importDbObject, null, 0, 10);
+      TargetMySqlDataTable = new MySqlDataTable(_importDbObject.Name, true, false, WbConnection);
+      DataTable dt = WbConnection.GetDataFromTableOrView(_importDbObject, null, 0, 10);
       foreach (object[] rowValues in from DataRow dr in dt.Rows select dr.ItemArray)
       {
         for (int colIdx = 0; colIdx < dt.Columns.Count; colIdx++)
@@ -944,7 +954,7 @@ namespace MySQL.ForExcel.Forms
         TargetMySqlDataTable.LoadDataRow(rowValues, true);
       }
 
-      WbConnection.GetRowsCountFromTableOrView(importDbObject);
+      WbConnection.GetRowsCountFromTableOrView(_importDbObject);
       TargetMySQLTableDataGridView.DataSource = TargetMySqlDataTable;
       foreach (DataGridViewColumn gridCol in TargetMySQLTableDataGridView.Columns)
       {

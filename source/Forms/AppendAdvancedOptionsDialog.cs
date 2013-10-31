@@ -41,10 +41,19 @@ namespace MySQL.ForExcel.Forms
     private MySqlColumnMapping _selectedMapping;
 
     /// <summary>
+    /// Gets or sets a value indicating whether the data in the parent form needs to be reloaded on the grids.
+    /// </summary>
+    /// <value>
+    ///   <c>true</c> if requires refreshing; otherwise, <c>false</c>.
+    /// </value>
+    public bool ParentFormRequiresRefresh { get; private set; }
+
+    /// <summary>
     /// Creates a new instance of the <see cref="AppendAdvancedOptionsDialog"/> class.
     /// </summary>
     public AppendAdvancedOptionsDialog()
     {
+      ParentFormRequiresRefresh = false;
       InitializeComponent();
 
       DoNotPerformAutoMapCheckBox.Checked = Settings.Default.AppendPerformAutoMap;
@@ -68,11 +77,15 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
+      var previewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
+      ParentFormRequiresRefresh = Settings.Default.AppendUseFormattedValues != UseFormattedValuesCheckBox.Checked ||
+                                  Settings.Default.AppendLimitPreviewRowsQuantity != previewRowsQuantity;
+
       Settings.Default.AppendPerformAutoMap = DoNotPerformAutoMapCheckBox.Checked;
       Settings.Default.AppendAutoStoreColumnMapping = AutoStoreColumnMappingCheckBox.Checked;
       Settings.Default.AppendReloadColumnMapping = ReloadColumnMappingCheckBox.Checked;
       Settings.Default.AppendUseFormattedValues = UseFormattedValuesCheckBox.Checked;
-      Settings.Default.AppendLimitPreviewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
+      Settings.Default.AppendLimitPreviewRowsQuantity = previewRowsQuantity;
       MiscUtilities.SaveSettings();
     }
 
