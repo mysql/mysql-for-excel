@@ -29,10 +29,19 @@ namespace MySQL.ForExcel.Forms
   public partial class ImportAdvancedOptionsDialog : AutoStyleableBaseDialog
   {
     /// <summary>
+    /// Gets or sets a value indicating whether the data in the parent form needs to be reloaded on the grids.
+    /// </summary>
+    /// <value>
+    ///   <c>true</c> if requires refreshing; otherwise, <c>false</c>.
+    /// </value>
+    public bool ParentFormRequiresRefresh { get; private set; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="ImportAdvancedOptionsDialog"/> class.
     /// </summary>
     public ImportAdvancedOptionsDialog()
     {
+      ParentFormRequiresRefresh = false;
       InitializeComponent();
 
       PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.ImportPreviewRowsQuantity);
@@ -51,7 +60,10 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      Settings.Default.ImportPreviewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
+      var previewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
+      ParentFormRequiresRefresh = Settings.Default.ImportPreviewRowsQuantity != previewRowsQuantity;
+
+      Settings.Default.ImportPreviewRowsQuantity = previewRowsQuantity;
       Settings.Default.ImportEscapeFormulaTextValues = EscapeFormulaValuesCheckBox.Checked;
       MiscUtilities.SaveSettings();
     }

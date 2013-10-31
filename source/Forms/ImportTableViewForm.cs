@@ -166,6 +166,10 @@ namespace MySQL.ForExcel.Forms
       using (ImportAdvancedOptionsDialog optionsDialog = new ImportAdvancedOptionsDialog())
       {
         optionsDialog.ShowDialog();
+        if (optionsDialog.ParentFormRequiresRefresh)
+        {
+          FillPreviewGrid();
+        }
       }
     }
 
