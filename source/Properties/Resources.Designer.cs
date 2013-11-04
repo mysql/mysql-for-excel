@@ -790,6 +790,16 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap exit {
+            get {
+                object obj = ResourceManager.GetObject("exit", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The password for the MySQL account has expired.
         ///Please enter a new password:.
         /// </summary>
@@ -1601,6 +1611,16 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap optimistic_update {
+            get {
+                object obj = ResourceManager.GetObject("optimistic_update", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Connection failed with current password.
         ///Please re-enter your password to try again..
         /// </summary>
@@ -1957,6 +1977,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string UnableToSaveConnectionsFileError {
             get {
                 return ResourceManager.GetString("UnableToSaveConnectionsFileError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unhandled MySQL type encountered..
+        /// </summary>
+        internal static string UnhandledMySqlTypeEncounteredError {
+            get {
+                return ResourceManager.GetString("UnhandledMySqlTypeEncounteredError", resourceCulture);
             }
         }
         

@@ -231,6 +231,8 @@
     <Compile Include="Classes\DataTypeUtilities.cs" />
     <Compile Include="Classes\DbObject.cs" />
     <Compile Include="Classes\ExcelUtilities.cs" />
+    <Compile Include="Classes\Exceptions\QueryExceedsMaxAllowedPacketException.cs" />
+    <Compile Include="Classes\Exceptions\UnhandledMySqlTypeException.cs" />
     <Compile Include="Classes\MiscUtilities.cs" />
     <Compile Include="Classes\MySqlColumnMapping.cs" />
     <Compile Include="Classes\MySqlColumnMappingList.cs" />
@@ -513,6 +515,7 @@
     <None Include="Resources\DeleteHS.png" />
     <None Include="Resources\clear_output.png" />
     <None Include="Resources\edit.png" />
+    <None Include="Resources\exit.png" />
     <Content Include="Resources\mysql-for-excel.ico" />
     <None Include="Resources\MySQLforExcel-ObjectPanel-EditData-24x24.png" />
     <None Include="Resources\MySQLforExcel-ObjectPanel-EditData-Disabled-24x24.png" />
@@ -549,6 +552,7 @@
     <None Include="Resources\MySQLforExcel-WelcomePanel-Connection-Disabled-24x24.png" />
     <None Include="Resources\MySQLforExcel-Cursor-Dragging-32x32.png" />
     <None Include="Resources\MySQLforExcel-InfoDlg-Warning-64x64.png" />
+    <None Include="Resources\optimistic_update.png" />
     <Content Include="Resources\refresh_sidebar.png" />
     <None Include="Resources\remove_col_mapping.png" />
     <None Include="Resources\SplashScreenExcel.png" />

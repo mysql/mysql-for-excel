@@ -36,6 +36,7 @@ namespace MySQL.ForExcel.Forms
         {
           EditingWorksheet.Change -= new Microsoft.Office.Interop.Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
           EditingWorksheet.SelectionChange -= new Microsoft.Office.Interop.Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);
+          Properties.Settings.Default.PropertyChanged -= SettingsPropertyValueChanged;
         }
         if (components != null)
         components.Dispose();
@@ -58,8 +59,11 @@ namespace MySQL.ForExcel.Forms
       this.MySQLforExcelLabel = new System.Windows.Forms.Label();
       this.EditContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.ExitEditModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.UseOptimisticUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.AutoCommitCheckBox = new System.Windows.Forms.CheckBox();
       this.DialogToolTip = new System.Windows.Forms.ToolTip(this.components);
+      this.ForThisSessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.ForAllSessionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       ((System.ComponentModel.ISupportInitialize)(this.SakilaLogoPictureBox)).BeginInit();
       this.EditContextMenu.SuspendLayout();
       this.SuspendLayout();
@@ -120,16 +124,28 @@ namespace MySQL.ForExcel.Forms
       // EditContextMenu
       // 
       this.EditContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ExitEditModeToolStripMenuItem});
+            this.ExitEditModeToolStripMenuItem,
+            this.UseOptimisticUpdateToolStripMenuItem});
       this.EditContextMenu.Name = "contextMenu";
-      this.EditContextMenu.Size = new System.Drawing.Size(153, 48);
+      this.EditContextMenu.Size = new System.Drawing.Size(193, 70);
       // 
       // ExitEditModeToolStripMenuItem
       // 
+      this.ExitEditModeToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.exit;
       this.ExitEditModeToolStripMenuItem.Name = "ExitEditModeToolStripMenuItem";
-      this.ExitEditModeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.ExitEditModeToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
       this.ExitEditModeToolStripMenuItem.Text = "Exit Edit Mode";
       this.ExitEditModeToolStripMenuItem.Click += new System.EventHandler(this.ExitEditModeToolStripMenuItem_Click);
+      // 
+      // UseOptimisticUpdateToolStripMenuItem
+      // 
+      this.UseOptimisticUpdateToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ForThisSessionToolStripMenuItem,
+            this.ForAllSessionsToolStripMenuItem});
+      this.UseOptimisticUpdateToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.optimistic_update;
+      this.UseOptimisticUpdateToolStripMenuItem.Name = "UseOptimisticUpdateToolStripMenuItem";
+      this.UseOptimisticUpdateToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
+      this.UseOptimisticUpdateToolStripMenuItem.Text = "Use Optimistic Update";
       // 
       // AutoCommitCheckBox
       // 
@@ -145,6 +161,20 @@ namespace MySQL.ForExcel.Forms
       this.AutoCommitCheckBox.Text = "Auto-Commit";
       this.AutoCommitCheckBox.UseVisualStyleBackColor = false;
       this.AutoCommitCheckBox.CheckedChanged += new System.EventHandler(this.AutoCommitCheckBox_CheckedChanged);
+      // 
+      // ForThisSessionToolStripMenuItem
+      // 
+      this.ForThisSessionToolStripMenuItem.Name = "ForThisSessionToolStripMenuItem";
+      this.ForThisSessionToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+      this.ForThisSessionToolStripMenuItem.Text = "For this session";
+      this.ForThisSessionToolStripMenuItem.Click += new System.EventHandler(this.ForThisSessionToolStripMenuItem_Click);
+      // 
+      // ForAllSessionsToolStripMenuItem
+      // 
+      this.ForAllSessionsToolStripMenuItem.Name = "ForAllSessionsToolStripMenuItem";
+      this.ForAllSessionsToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+      this.ForAllSessionsToolStripMenuItem.Text = "For all sessions";
+      this.ForAllSessionsToolStripMenuItem.Click += new System.EventHandler(this.ForAllSessionsToolStripMenuItem_Click);
       // 
       // EditDataDialog
       // 
@@ -185,5 +215,8 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.ContextMenuStrip EditContextMenu;
     private System.Windows.Forms.ToolStripMenuItem ExitEditModeToolStripMenuItem;
     private System.Windows.Forms.ToolTip DialogToolTip;
+    private System.Windows.Forms.ToolStripMenuItem UseOptimisticUpdateToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem ForThisSessionToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem ForAllSessionsToolStripMenuItem;
   }
 }

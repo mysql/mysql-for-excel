@@ -22,7 +22,9 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using MySql.Data.MySqlClient;
+using MySQL.ForExcel.Classes.Exceptions;
 using MySQL.ForExcel.Forms;
+using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -42,7 +44,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Bytes to subtract from the maximum allowed packet size to build a query that is safely processed by the database server.
     /// </summary>
-    private const int SAFE_BYTES_BEFORE_REACHING_MAX_ALLOWED_PACKET = 10;
+    public const int SAFE_BYTES_BEFORE_REACHING_MAX_ALLOWED_PACKET = 10;
 
     #region Fields
 
@@ -1173,129 +1175,34 @@ namespace MySQL.ForExcel.Classes
     /// Creates a SQL query meant to push changes in the given <see cref="DataRow"/> object to the database server.
     /// </summary>
     /// <param name="row"><see cref="DataRow"/> object with changes to push to the database server.</param>
+    /// <param name="useOptimisticUpdate">Flag indicating whether optimistic update is used for the update.</param>
     /// <returns>A SQL query containing the data changes.</returns>
-    public string GetSql(DataRow row)
+    public string GetSql(DataRow row, bool useOptimisticUpdate)
     {
       if (row == null || row.RowState == DataRowState.Unchanged)
       {
         return string.Empty;
       }
 
-      string valueToDb;
       ulong maxByteCount = _mysqlMaxAllowedPacket > 0 ? _mysqlMaxAllowedPacket - SAFE_BYTES_BEFORE_REACHING_MAX_ALLOWED_PACKET : 0;
-      StringBuilder queryString = new StringBuilder();
-      string colsSeparator = string.Empty;
+      string retQuery = string.Empty;
 
       switch (row.RowState)
       {
-        case DataRowState.Deleted:
-          queryString.AppendFormat(
-            "DELETE FROM `{0}`.`{1}` WHERE ",
-            SchemaName,
-            TableNameForSqlQueries);
-          foreach (MySqlDataColumn pkCol in Columns.Cast<MySqlDataColumn>().Where(pkCol => pkCol.PrimaryKey))
-          {
-            bool pkValueIsNull;
-            valueToDb = DataTypeUtilities.GetStringValueForColumn(row[pkCol.ColumnName, DataRowVersion.Original], pkCol, false, out pkValueIsNull);
-            queryString.AppendFormat(
-              "{0}`{1}`={2}{3}{2}",
-              colsSeparator,
-              pkCol.ColumnNameForSqlQueries,
-              pkCol.ColumnsRequireQuotes && !pkValueIsNull ? "'" : string.Empty,
-              valueToDb);
-            colsSeparator = " AND ";
-          }
-
+        case DataRowState.Added:
+          retQuery = GetSqlForAddedRow(row);
           break;
 
-        case DataRowState.Added:
-          int colIdx;
-          int startingColNum = AddPrimaryKeyColumn ? (_useFirstColumnAsPk ? 0 : 1) : 0;
-          List<string> insertColumnNames = new List<string>(Columns.Count);
-          queryString.AppendFormat(
-            "INSERT INTO `{0}`.`{1}` (",
-            SchemaName,
-            TableNameForSqlQueries);
-          for (colIdx = startingColNum; colIdx < Columns.Count; colIdx++)
-          {
-            MySqlDataColumn column = GetColumnAtIndex(colIdx);
-            if (column.ExcludeColumn)
-            {
-              continue;
-            }
-
-            queryString.AppendFormat(
-              "{0}`{1}`",
-              colsSeparator,
-              column.DisplayNameForSqlQueries);
-            colsSeparator = ",";
-            insertColumnNames.Add(column.ColumnName);
-          }
-
-          queryString.Append(") VALUES (");
-          colsSeparator = string.Empty;
-          foreach (string insertingColName in insertColumnNames)
-          {
-            MySqlDataColumn column = Columns[insertingColName] as MySqlDataColumn;
-            bool insertingValueIsNull;
-            valueToDb = DataTypeUtilities.GetStringValueForColumn(row[insertingColName], column, true, out insertingValueIsNull);
-            queryString.AppendFormat(
-              "{0}{1}{2}{1}",
-              colsSeparator,
-              column != null && column.ColumnsRequireQuotes && !insertingValueIsNull ? "'" : string.Empty,
-              valueToDb);
-            colsSeparator = ",";
-          }
-
-          queryString.Append(")");
+        case DataRowState.Deleted:
+          retQuery = GetSqlForDeletedRow(row);
           break;
 
         case DataRowState.Modified:
-          StringBuilder wClauseString = new StringBuilder(" WHERE ");
-          string wClauseColsSeparator = string.Empty;
-          List<string> changedColNamesList = GetChangedColumns(row);
-          queryString.AppendFormat(
-            "UPDATE `{0}`.`{1}` SET ",
-            SchemaName,
-            TableNameForSqlQueries);
-          foreach (MySqlDataColumn column in Columns)
-          {
-            bool updatingValueIsNull;
-            string finalColName = column.ColumnNameForSqlQueries;
-            if (column.PrimaryKey)
-            {
-              valueToDb = DataTypeUtilities.GetStringValueForColumn(row[column.ColumnName, DataRowVersion.Original], column, false, out updatingValueIsNull);
-              wClauseString.AppendFormat(
-                "{0}`{1}`={2}{3}{2}",
-                wClauseColsSeparator,
-                finalColName,
-                column.ColumnsRequireQuotes && !updatingValueIsNull ? "'" : string.Empty,
-                valueToDb);
-              wClauseColsSeparator = " AND ";
-            }
-
-            if (!changedColNamesList.Contains(column.ColumnName))
-            {
-              continue;
-            }
-
-            valueToDb = DataTypeUtilities.GetStringValueForColumn(row[column.ColumnName], column, true, out updatingValueIsNull);
-            queryString.AppendFormat(
-              "{0}`{1}`={2}{3}{2}",
-              colsSeparator,
-              finalColName,
-              column.ColumnsRequireQuotes && !updatingValueIsNull ? "'" : string.Empty,
-              valueToDb);
-            colsSeparator = ",";
-          }
-
-          wClauseString.Append(";");
-          queryString.Append(wClauseString);
+          retQuery = GetSqlForModifiedRow(row, useOptimisticUpdate);
           break;
       }
 
       // Verify we have not exceeded the maximum packet size allowed by the server, otherwise throw an Exception.
-      string retQuery = queryString.ToString();
       if (maxByteCount <= 0)
       {
         return retQuery;
@@ -1304,7 +1211,7 @@ namespace MySQL.ForExcel.Classes
       ulong queryStringByteCount = (ulong)Encoding.ASCII.GetByteCount(retQuery);
       if (queryStringByteCount > maxByteCount)
       {
-        throw new Exception(Properties.Resources.QueryExceedsMaxAllowedPacketError);
+        throw new QueryExceedsMaxAllowedPacketException();
       }
 
       return retQuery;
@@ -1314,15 +1221,16 @@ namespace MySQL.ForExcel.Classes
     /// Creates a SQL query meant to push changes in the <see cref="DataRow"/> object found at the given row index.
     /// </summary>
     /// <param name="rowIndex">Row index of the <see cref="DataRow"/> object containing the changes.</param>
+    /// <param name="useOptimisticUpdate">Flag indicating whether optimistic update is used for the update.</param>
     /// <returns>A SQL query containing the data changes.</returns>
-    public string GetSql(int rowIndex)
+    public string GetSql(int rowIndex, bool useOptimisticUpdate)
     {
       if (rowIndex < 0 || rowIndex >= Rows.Count)
       {
         return string.Empty;
       }
 
-      return GetSql(Rows[rowIndex]);
+      return GetSql(Rows[rowIndex], useOptimisticUpdate);
     }
 
     /// <summary>
@@ -1397,8 +1305,9 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Pushes all changes in this table's data to its corresponding database table.
     /// </summary>
+    /// <param name="useOptimisticUpdate">Flag indicating whether optimistic update is used for the update.</param>
     /// <returns>A <see cref="PushResultsDataTable"/> object containing a log of the results of each query executed against the database server.</returns>
-    public PushResultsDataTable PushData()
+    public PushResultsDataTable PushData(bool useOptimisticUpdate)
     {
       var dataTable = GetChanges();
       if (dataTable != null && dataTable.Rows.Count == 0)
@@ -1438,7 +1347,7 @@ namespace MySQL.ForExcel.Classes
               warningText.Clear();
               operationIndex++;
               lastRow = dr;
-              queryText = GetSql(dr);
+              queryText = GetSql(dr, useOptimisticUpdate);
               cmd.CommandText = queryText;
               int executedCount = cmd.ExecuteNonQuery();
               DataSet warningsDs = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");
@@ -1452,7 +1361,7 @@ namespace MySQL.ForExcel.Classes
                   warningText.AppendFormat(
                     "{2}{0:000}: {1}",
                     operationIndex,
-                    Properties.Resources.QueryDidNotMatchRowsWarning,
+                    Resources.QueryDidNotMatchRowsWarning,
                     nl);
                   nl = Environment.NewLine;
                 }
@@ -1509,7 +1418,7 @@ namespace MySQL.ForExcel.Classes
             lastRow.RowError = mysqlEx.Message;
           }
 
-          errorText = string.Format(Properties.Resources.ErrorMySQLText, mysqlEx.Number) + Environment.NewLine + mysqlEx.Message;
+          errorText = string.Format(Resources.ErrorMySQLText, mysqlEx.Number) + Environment.NewLine + mysqlEx.Message;
           resultsDt.AddResult(operationIndex, currentOperationType, PushResultsDataTable.OperationResult.Error, queryText, errorText, 0);
           MySqlSourceTrace.WriteAppErrorToLog(mysqlEx);
         }
@@ -1525,7 +1434,7 @@ namespace MySQL.ForExcel.Classes
             lastRow.RowError = ex.Message;
           }
 
-          errorText = Properties.Resources.ErrorAdoNetText + Environment.NewLine + ex.Message;
+          errorText = Resources.ErrorAdoNetText + Environment.NewLine + ex.Message;
           resultsDt.AddResult(operationIndex, currentOperationType, PushResultsDataTable.OperationResult.Error, queryText, errorText, 0);
           MySqlSourceTrace.WriteAppErrorToLog(ex);
         }
@@ -1864,7 +1773,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(Properties.Resources.TableDataCopyErrorTitle, ex.Message + Environment.NewLine + Environment.NewLine + ex.StackTrace, true);
+        MiscUtilities.ShowCustomizedErrorDialog(Resources.TableDataCopyErrorTitle, ex.Message + Environment.NewLine + Environment.NewLine + ex.StackTrace, true);
         MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
     }
@@ -1993,8 +1902,7 @@ namespace MySQL.ForExcel.Classes
             {
               case "Date":
               case "Datetime":
-                bool zeroDate = valueAsString.StartsWith("0000-00-00") || valueAsString.StartsWith("00-00-00");
-                if (zeroDate)
+                if (valueAsString.IsMySqlZeroDateValue())
                 {
                   break;
                 }
@@ -2076,6 +1984,156 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Creates an INSERT statement SQL query for a row being added.
+    /// </summary>
+    /// <param name="addedRow">An added <see cref="DataRow"/> object.</param>
+    /// <returns>The INSERT SQL query.</returns>
+    private string GetSqlForAddedRow(DataRow addedRow)
+    {
+      if (addedRow == null || addedRow.RowState != DataRowState.Added)
+      {
+        return string.Empty;
+      }
+
+      StringBuilder queryString = new StringBuilder();
+      string colsSeparator = string.Empty;
+      int colIdx;
+      int startingColNum = AddPrimaryKeyColumn ? (_useFirstColumnAsPk ? 0 : 1) : 0;
+      List<string> insertColumnNames = new List<string>(Columns.Count);
+      queryString.AppendFormat("INSERT INTO `{0}`.`{1}` (", SchemaName, TableNameForSqlQueries);
+      for (colIdx = startingColNum; colIdx < Columns.Count; colIdx++)
+      {
+        MySqlDataColumn column = GetColumnAtIndex(colIdx);
+        if (column.ExcludeColumn)
+        {
+          continue;
+        }
+
+        queryString.AppendFormat("{0}`{1}`", colsSeparator, column.DisplayNameForSqlQueries);
+        colsSeparator = ",";
+        insertColumnNames.Add(column.ColumnName);
+      }
+
+      queryString.Append(") VALUES (");
+      colsSeparator = string.Empty;
+      foreach (string insertingColName in insertColumnNames)
+      {
+        MySqlDataColumn column = Columns[insertingColName] as MySqlDataColumn;
+        bool insertingValueIsNull;
+        string valueToDb = DataTypeUtilities.GetStringValueForColumn(addedRow[insertingColName], column, true, out insertingValueIsNull);
+        queryString.AppendFormat(
+          "{0}{1}{2}{1}",
+          colsSeparator,
+          column != null && column.ColumnsRequireQuotes && !insertingValueIsNull ? "'" : string.Empty,
+          valueToDb);
+        colsSeparator = ",";
+      }
+
+      queryString.Append(")");
+      return queryString.ToString();
+    }
+
+    /// <summary>
+    /// Creates a DELETE statement SQL query for a row being deleted.
+    /// </summary>
+    /// <param name="deletedRow">A deleted <see cref="DataRow"/> object.</param>
+    /// <returns>The DELETE SQL query.</returns>
+    private string GetSqlForDeletedRow(DataRow deletedRow)
+    {
+      if (deletedRow == null || deletedRow.RowState != DataRowState.Deleted)
+      {
+        return string.Empty;
+      }
+
+      StringBuilder queryString = new StringBuilder();
+      string colsSeparator = string.Empty;
+      queryString.AppendFormat("DELETE FROM `{0}`.`{1}` WHERE ", SchemaName, TableNameForSqlQueries);
+      foreach (MySqlDataColumn pkCol in Columns.Cast<MySqlDataColumn>().Where(pkCol => pkCol.PrimaryKey))
+      {
+        bool pkValueIsNull;
+        string valueToDb = DataTypeUtilities.GetStringValueForColumn(deletedRow[pkCol.ColumnName, DataRowVersion.Original], pkCol, false, out pkValueIsNull);
+        queryString.AppendFormat(
+          "{0}`{1}`={2}{3}{2}",
+          colsSeparator,
+          pkCol.ColumnNameForSqlQueries,
+          pkCol.ColumnsRequireQuotes && !pkValueIsNull ? "'" : string.Empty,
+          valueToDb);
+        colsSeparator = " AND ";
+      }
+
+      return queryString.ToString();
+    }
+
+    /// <summary>
+    /// Creates an UPDATE statement SQL query for a row being modified.
+    /// </summary>
+    /// <param name="modifiedRow">A modified <see cref="DataRow"/> object.</param>
+    /// <param name="useOptimisticUpdate">Flag indicating whether optimistic update is used for the update.</param>
+    /// <returns>The UPDATE SQL query.</returns>
+    private string GetSqlForModifiedRow(DataRow modifiedRow, bool useOptimisticUpdate)
+    {
+      if (modifiedRow == null || modifiedRow.RowState != DataRowState.Modified)
+      {
+        return string.Empty;
+      }
+
+      StringBuilder queryString = new StringBuilder();
+      string colsSeparator = string.Empty;
+      StringBuilder wClauseString = new StringBuilder(" WHERE ");
+      string wClauseColsSeparator = string.Empty;
+      List<string> changedColNamesList = GetChangedColumns(modifiedRow);
+      queryString.AppendFormat("UPDATE `{0}`.`{1}` SET ", SchemaName, TableNameForSqlQueries);
+      foreach (MySqlDataColumn column in Columns)
+      {
+        bool updatingValueIsNull;
+        string finalColName = column.ColumnNameForSqlQueries;
+        string valueToDb;
+        if (column.PrimaryKey || useOptimisticUpdate)
+        {
+          valueToDb = DataTypeUtilities.GetStringValueForColumn(modifiedRow[column.ColumnName, DataRowVersion.Original], column, false, out updatingValueIsNull);
+          if (useOptimisticUpdate && column.AllowNull)
+          {
+            wClauseString.AppendFormat(
+              "{0}(({2}{3}{2} IS NULL AND `{1}` IS NULL) OR `{1}`={2}{3}{2})",
+              wClauseColsSeparator,
+              finalColName,
+              column.ColumnsRequireQuotes && !updatingValueIsNull ? "'" : string.Empty,
+              valueToDb);
+            wClauseColsSeparator = " AND ";
+          }
+          else
+          {
+            wClauseString.AppendFormat(
+              "{0}`{1}`={2}{3}{2}",
+              wClauseColsSeparator,
+              finalColName,
+              column.ColumnsRequireQuotes && !updatingValueIsNull ? "'" : string.Empty,
+              valueToDb);
+            wClauseColsSeparator = " AND ";
+          }
+        }
+
+        if (!changedColNamesList.Contains(column.ColumnName))
+        {
+          continue;
+        }
+
+        valueToDb = DataTypeUtilities.GetStringValueForColumn(modifiedRow[column.ColumnName], column, true, out updatingValueIsNull);
+        queryString.AppendFormat(
+          "{0}`{1}`={2}{3}{2}",
+          colsSeparator,
+          finalColName,
+          column.ColumnsRequireQuotes && !updatingValueIsNull ? "'" : string.Empty,
+          valueToDb);
+        colsSeparator = ",";
+      }
+
+      wClauseString.Append(";");
+      queryString.Append(wClauseString);
+      return queryString.ToString();
+    }
+
+    /// <summary>
     /// Updates the table's automatically generated primary key's name based on the current table name.
     /// </summary>
     /// <param name="firstSet">Flag indicating if the AutoPK column is a new column and all of its properties must be set.</param>
@@ -2118,13 +2176,13 @@ namespace MySQL.ForExcel.Classes
     {
       // Update warning stating the table name cannot be empty
       bool emptyTableName = string.IsNullOrWhiteSpace(TableName);
-      bool warningsChanged = UpdateWarnings(emptyTableName, Properties.Resources.TableNameRequiredWarning);
+      bool warningsChanged = UpdateWarnings(emptyTableName, Resources.TableNameRequiredWarning);
       IsTableNameValid = !emptyTableName;
 
       // Update warning stating a table with the given name already exists in the database
       if (IsTableNameValid && WbConnection != null)
       {
-        warningsChanged = UpdateWarnings(TableExistsInSchema, Properties.Resources.TableNameExistsWarning) || warningsChanged;
+        warningsChanged = UpdateWarnings(TableExistsInSchema, Resources.TableNameExistsWarning) || warningsChanged;
         IsTableNameValid = !TableExistsInSchema;
       }
 
@@ -2132,7 +2190,7 @@ namespace MySQL.ForExcel.Classes
       if (IsTableNameValid)
       {
         bool nonStandardTableName = TableName.Contains(" ") || TableName.Any(char.IsUpper);
-        warningsChanged = UpdateWarnings(nonStandardTableName, Properties.Resources.NamesWarning) || warningsChanged;
+        warningsChanged = UpdateWarnings(nonStandardTableName, Resources.NamesWarning) || warningsChanged;
       }
 
       // Fire the TableWarningsChanged event.

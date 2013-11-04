@@ -783,4 +783,13 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
   <data name="edit" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\edit.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="exit" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\exit.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="optimistic_update" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\optimistic_update.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UnhandledMySqlTypeEncounteredError" xml:space="preserve">
+    <value>Unhandled MySQL type encountered.</value>
+  </data>
 </root>

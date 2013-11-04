@@ -268,5 +268,18 @@ namespace MySQL.ForExcel.Properties {
                 this["ConvertedSettingsStoredMappingsCasing"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool EditUseOptimisticUpdate {
+            get {
+                return ((bool)(this["EditUseOptimisticUpdate"]));
+            }
+            set {
+                this["EditUseOptimisticUpdate"] = value;
+            }
+        }
     }
 }

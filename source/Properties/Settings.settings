@@ -59,5 +59,8 @@
     <Setting Name="ConvertedSettingsStoredMappingsCasing" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="EditUseOptimisticUpdate" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

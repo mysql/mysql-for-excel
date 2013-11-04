@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using MySql.Data.MySqlClient;
+using MySQL.ForExcel.Classes.Exceptions;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -473,7 +474,7 @@ namespace MySQL.ForExcel.Classes
           else
           {
             string rawValueAsString = rawValue.ToString();
-            if (rawValueAsString.StartsWith("0000-00-00") || rawValueAsString.StartsWith("00-00-00") || rawValueAsString.Equals("0"))
+            if (rawValueAsString.IsMySqlZeroDateValue(true))
             {
               if (againstTypeColumn.DataType.Name == "DateTime")
               {
@@ -722,7 +723,7 @@ namespace MySQL.ForExcel.Classes
         {
           strType = "System.Boolean";
         }
-        else if (strValue.StartsWith("0000-00-00") || strValue.StartsWith("00-00-00"))
+        else if (strValue.IsMySqlZeroDateValue())
         {
           strType = "MySql.Data.Types.MySqlDateTime";
         }
@@ -930,6 +931,23 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Checks if the string value representing a date is a MySQL zero date.
+    /// </summary>
+    /// <param name="dateValueAsString">The string value representing a date.</param>
+    /// <param name="checkIfIntZero">Flag indicating whether a value of 0 should also be treated as a zero date.</param>
+    /// <returns><c>true</c> if the passed string value is a MySQL zero date, <c>false</c> otherwise.</returns>
+    public static bool IsMySqlZeroDateValue(this string dateValueAsString, bool checkIfIntZero = false)
+    {
+      bool isZeroDate = dateValueAsString.StartsWith("0000-00-00") || dateValueAsString.StartsWith("00-00-00");
+      if (checkIfIntZero)
+      {
+        isZeroDate = isZeroDate || dateValueAsString.Equals("0");
+      }
+
+      return isZeroDate;
+    }
+
+    /// <summary>
     /// Gets the Connector.NET data type object corresponding to a given MySQL data type.
     /// </summary>
     /// <param name="mySqlDataType">The MySQL data type name.</param>
@@ -1042,7 +1060,7 @@ namespace MySQL.ForExcel.Classes
           return MySqlDbType.VarBinary;
       }
 
-      throw new Exception("Unhandled type encountered");
+      throw new UnhandledMySqlTypeException();
     }
 
     /// <summary>
@@ -1121,7 +1139,7 @@ namespace MySQL.ForExcel.Classes
           return Type.GetType("System.Object");
       }
 
-      throw new Exception("Unhandled type encountered");
+      throw new UnhandledMySqlTypeException();
     }
 
     /// <summary>
@@ -1206,7 +1224,7 @@ namespace MySQL.ForExcel.Classes
 
       if (mySqlDataType == "date" || mySqlDataType == "datetime" || mySqlDataType == "timestamp")
       {
-        if (strValue.StartsWith("0000-00-00") || strValue.StartsWith("00-00-00"))
+        if (strValue.IsMySqlZeroDateValue())
         {
           return true;
         }

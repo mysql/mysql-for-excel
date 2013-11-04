@@ -686,6 +686,8 @@ namespace MySQL.ForExcel.Controls
       // Maybe the last deactivated sheet has been deleted?
       try
       {
+        // Do NOT remove the following lines although the wSheet variable is not used in the method the casting of the
+        // wBook.Worksheets[workSheetName] is needed to determine if the Worksheet is still valid and has not been disposed of.
         Excel.Workbook wBook = ExcelApplication.Workbooks[workBookName];
         Excel.Worksheet wSheet = wBook.Worksheets[workSheetName] as Excel.Worksheet;
         exists = true;

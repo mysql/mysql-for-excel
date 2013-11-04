@@ -69,6 +69,11 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private bool _undoingChanges;
 
+    /// <summary>
+    /// Flag indicating whether this editing session is changing the value of the global Use Optimistic Update setting.
+    /// </summary>
+    private bool _updatingUSeOptimisticUpdateSetting;
+
     #endregion Fields
 
     /// <summary>
@@ -84,6 +89,7 @@ namespace MySQL.ForExcel.Forms
     {
       _mouseDownPoint = Point.Empty;
       _undoingChanges = false;
+      _updatingUSeOptimisticUpdateSetting = false;
 
       InitializeComponent();
 
@@ -112,6 +118,11 @@ namespace MySQL.ForExcel.Forms
       Opacity = 0.60;
       AddNewRowToEditingRange(false);
       RangesAndAddressesList = new List<RangeAndAddress>();
+      UseOptimisticUpdateForThisSession = Settings.Default.EditUseOptimisticUpdate;
+      ForThisSessionToolStripMenuItem.Checked = UseOptimisticUpdateForThisSession;
+      ForAllSessionsToolStripMenuItem.Checked = UseOptimisticUpdateForThisSession;
+      UseOptimisticUpdateToolStripMenuItem.Checked = UseOptimisticUpdateForThisSession;
+      Settings.Default.PropertyChanged += SettingsPropertyValueChanged;
     }
 
     #region Properties
@@ -162,6 +173,8 @@ namespace MySQL.ForExcel.Forms
 
         try
         {
+          // Do NOT remove the following line although the wb variable is not used in the method the casting of the
+          // EditingWorksheet.Parent is needed to determine if the parent Workbook is valid and has not been disposed of.
           Excel.Workbook wb = EditingWorksheet.Parent as Excel.Workbook;
           exists = true;
         }
@@ -204,6 +217,11 @@ namespace MySQL.ForExcel.Forms
         return RangesAndAddressesList != null && RangesAndAddressesList.Count > 0;
       }
     }
+
+    /// <summary>
+    /// Gets a value indicating whether optimistic update is used for the current editing session.
+    /// </summary>
+    public bool UseOptimisticUpdateForThisSession { get; private set; }
 
     /// <summary>
     /// Gets the connection to a MySQL server instance selected by users.
@@ -668,6 +686,28 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
+    /// Event delegate method fired when the <see cref="ForAllSessionsToolStripMenuItem"/> is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ForAllSessionsToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      SetUseOptimisticUpdateForAllSessions(!UseOptimisticUpdateToolStripMenuItem.Checked, true);
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="ForThisSessionToolStripMenuItem"/> is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ForThisSessionToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      UseOptimisticUpdateForThisSession = !UseOptimisticUpdateForThisSession;
+      ForThisSessionToolStripMenuItem.Checked = UseOptimisticUpdateForThisSession;
+      UseOptimisticUpdateToolStripMenuItem.Checked = UseOptimisticUpdateForThisSession || ForAllSessionsToolStripMenuItem.Checked;
+    }
+
+    /// <summary>
     /// Event delegate method fired when a mouse button is pressed down.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -735,7 +775,7 @@ namespace MySQL.ForExcel.Forms
                                     EditMySqlDataTable.DeletingOperations,
                                     EditMySqlDataTable.InsertingOperations,
                                     EditMySqlDataTable.UpdatingOperations);
-      PushResultsDataTable resultsDt = EditMySqlDataTable.PushData();
+      PushResultsDataTable resultsDt = EditMySqlDataTable.PushData(UseOptimisticUpdateForThisSession);
       operationDetails.Append(Environment.NewLine);
       foreach (DataRow operationRow in resultsDt.Rows)
       {
@@ -883,6 +923,46 @@ namespace MySQL.ForExcel.Forms
 
       CommitChangesButton.Enabled = false;
       AddNewRowToEditingRange(false);
+    }
+
+    /// <summary>
+    /// Sets the value of the global optimistic update for all sessions property and updates the context menu options accordingly.
+    /// </summary>
+    /// <param name="value">The new value of the property.</param>
+    /// <param name="saveInSettings">Flag indicating whether the new value must be saved in the settings file.</param>
+    private void SetUseOptimisticUpdateForAllSessions(bool value, bool saveInSettings)
+    {
+      _updatingUSeOptimisticUpdateSetting = true;
+      if (saveInSettings)
+      {
+        Settings.Default.EditUseOptimisticUpdate = value;
+        MiscUtilities.SaveSettings();
+      }
+
+      ForAllSessionsToolStripMenuItem.Checked = value;
+      if (value)
+      {
+        UseOptimisticUpdateForThisSession = true;
+        ForThisSessionToolStripMenuItem.Checked = true;
+        UseOptimisticUpdateToolStripMenuItem.Checked = true;
+      }
+
+      _updatingUSeOptimisticUpdateSetting = false;
+    }
+
+    /// <summary>
+    /// Event delegate method fired when a settings property value changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void SettingsPropertyValueChanged(object sender, PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName != "EditUseOptimisticUpdate" || _updatingUSeOptimisticUpdateSetting)
+      {
+        return;
+      }
+
+      SetUseOptimisticUpdateForAllSessions(Settings.Default.EditUseOptimisticUpdate, false);
     }
 
     /// <summary>
