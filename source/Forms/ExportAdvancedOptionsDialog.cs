@@ -29,10 +29,29 @@ namespace MySQL.ForExcel.Forms
   public partial class ExportAdvancedOptionsDialog : AutoStyleableBaseDialog
   {
     /// <summary>
+    /// Gets a value indicating whether the parent form requires to refresh its data grid view control.
+    /// </summary>
+    public bool ParentFormRequiresRefresh { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicating whether the auto-detect datatypes setting was changed by the user.
+    /// </summary>
+    public bool ExportDetectDatatypeChanged { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicating whether the auto-remove empty columns setting changed by the user.
+    /// </summary>
+    public bool ExportRemoveEmptyColumnsChanged { get; private set; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="ExportAdvancedOptionsDialog"/> class.
     /// </summary>
     public ExportAdvancedOptionsDialog()
     {
+      ParentFormRequiresRefresh = false;
+      ExportDetectDatatypeChanged = false;
+      ExportRemoveEmptyColumnsChanged = false;
+
       InitializeComponent();
 
       PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.ExportLimitPreviewRowsQuantity);
@@ -72,7 +91,19 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      Settings.Default.ExportLimitPreviewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
+      var previewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
+
+      ExportDetectDatatypeChanged = Settings.Default.ExportDetectDatatype != DetectDatatypeCheckBox.Checked;
+      ExportRemoveEmptyColumnsChanged = Settings.Default.ExportRemoveEmptyColumns != RemoveEmptyColumnsCheckBox.Checked;
+      ParentFormRequiresRefresh = ExportDetectDatatypeChanged ||
+                                  ExportRemoveEmptyColumnsChanged ||
+                                  Settings.Default.ExportLimitPreviewRowsQuantity != previewRowsQuantity ||
+                                  Settings.Default.ExportAutoIndexIntColumns != AutoIndexIntColumnsCheckBox.Checked ||
+                                  Settings.Default.ExportAutoAllowEmptyNonIndexColumns != AutoAllowEmptyNonIndexColumnsCheckBox.Checked ||
+                                  Settings.Default.ExportUseFormattedValues != UseFormattedValuesCheckBox.Checked;
+
+
+      Settings.Default.ExportLimitPreviewRowsQuantity = previewRowsQuantity;
       Settings.Default.ExportDetectDatatype = DetectDatatypeCheckBox.Checked;
       Settings.Default.ExportAddBufferToVarchar = AddBufferToVarcharCheckBox.Checked;
       Settings.Default.ExportAutoIndexIntColumns = AutoIndexIntColumnsCheckBox.Checked;

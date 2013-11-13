@@ -7,6 +7,7 @@
   can be right-clicked and a new "Edit Connection" context menu is available for users to edit the Workbench connection properties.  This feature shines brighter
   when MySQL Workbench is not installed since users only relied on MySQL Workbench to edit a connection, without Workbench users had to delete a connection and
   create it again with updated values.
+- Changes done to the Advanced Options dialogues for Import, Export and Append Data forms are immediately reflected without requiring to close and reopen those forms again.
 
 1.1.2
 - Generate a password dynamically to protect Excel Worksheets during Edit Data operations instead of using a hardcoded GUID. If the user saves the Workbook while

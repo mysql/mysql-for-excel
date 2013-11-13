@@ -44,6 +44,11 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private bool _isUserInput;
 
+    /// <summary>
+    /// The proposed table name
+    /// </summary>
+    private string _proposedTableName;
+
     #endregion Fields
 
     /// <summary>
@@ -57,26 +62,26 @@ namespace MySQL.ForExcel.Forms
       _isUserInput = true;
       WbConnection = wbConnection;
       ExportDataRange = exportDataRange;
-      string proposedTableName = string.Empty;
 
       InitializeComponent();
 
       if (!exportingWorksheetName.ToLowerInvariant().StartsWith("sheet"))
       {
-        proposedTableName = exportingWorksheetName.ToLower().Replace(' ', '_');
+        _proposedTableName = exportingWorksheetName.ToLower().Replace(' ', '_');
       }
 
-      Text = string.Format("Export Data - {0} [{1}]", exportingWorksheetName, exportDataRange.Address.Replace("$", string.Empty));
-      LoadPreviewData(wbConnection.Schema, proposedTableName);
+      Text = string.Format("Export Data - {0} [{1}]", exportingWorksheetName, ExportDataRange.Address.Replace("$", string.Empty));
+      LoadPreviewData();
       InitializeDataTypeCombo();
       CopySQLButton.Visible = Settings.Default.ExportShowCopySQLButton;
       FirstRowHeadersCheckBox_CheckedChanged(FirstRowHeadersCheckBox, EventArgs.Empty);
       SetDefaultPrimaryKey();
 
-      if (!string.IsNullOrEmpty(proposedTableName))
+      if (!string.IsNullOrEmpty(_proposedTableName))
       {
-        SetControlTextValue(TableNameInputTextBox, proposedTableName);
+        SetControlTextValue(TableNameInputTextBox, _proposedTableName);
       }
+
       PreviewTableWarningsChanged(PreviewDataTable, new TableWarningsChangedArgs(PreviewDataTable, false));
 
       TableNameInputTextBox.Focus();
@@ -189,6 +194,37 @@ namespace MySQL.ForExcel.Forms
       using (ExportAdvancedOptionsDialog optionsDialog = new ExportAdvancedOptionsDialog())
       {
         optionsDialog.ShowDialog();
+
+        if (optionsDialog.ParentFormRequiresRefresh)
+        {
+          if (optionsDialog.ExportRemoveEmptyColumnsChanged && !Settings.Default.ExportRemoveEmptyColumns)
+          {
+            // Prevent InvalidOperationException from being thrown at LoadPreviewData() when overwritting the Datasource property,
+            // Somehow the PreviewDataGridView.SelectionMode its set to FullColumnSelect and the overwrite of that property cannot be done.
+            PreviewDataGridView.SelectionMode = DataGridViewSelectionMode.CellSelect;
+          }
+
+          LoadPreviewData();
+
+          if (optionsDialog.ExportDetectDatatypeChanged && Settings.Default.ExportDetectDatatype)
+          {
+            // Reset background colors to default since those aren't reset when the condition above is fullfilled.
+            foreach (MySqlDataColumn mysqldc in PreviewDataTable.Columns.Cast<MySqlDataColumn>().Where(mysqldc => mysqldc != null))
+            {
+              PreviewTableWarningsChanged(mysqldc, new TableWarningsChangedArgs(mysqldc));
+            }
+          }
+
+          // Trigger Warning Refresh
+          PreviewDataTable.FirstRowIsHeaders = FirstRowHeadersCheckBox.Checked;
+
+          // Force Empty columns with emtpy column names from being stated defaulty when this is not desired.
+          RecreateColumns();
+
+          // Refresh first row headers accordingly
+          PreviewDataGridView.CurrentCell = null;
+          PreviewDataGridView.Rows[0].Visible = !FirstRowHeadersCheckBox.Checked;
+        }
       }
     }
 
@@ -671,7 +707,7 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     /// <param name="schemaName">Name of the schema where the MySQL table will be created.</param>
     /// <param name="proposedTableName">Name of the new MySQL table that will be created.</param>
-    private void LoadPreviewData(string schemaName, string proposedTableName)
+    private void LoadPreviewData()
     {
       if (ExportDataRange == null)
       {
@@ -679,8 +715,8 @@ namespace MySQL.ForExcel.Forms
       }
 
       PreviewDataTable = new MySqlDataTable(
-        schemaName,
-        proposedTableName,
+        WbConnection.Schema,
+        _proposedTableName,
         true,
         Settings.Default.ExportUseFormattedValues,
         Settings.Default.ExportRemoveEmptyColumns,
