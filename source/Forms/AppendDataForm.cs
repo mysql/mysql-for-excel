@@ -907,8 +907,6 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Initilizes the grid containing the source data contained in the From table.
     /// </summary>
-    /// <param name="schemaName">The name of the schema containing the From table.</param>
-    /// <param name="fromTableName">The name of the source DB object in Excel.</param>
     private void InitializeSourceTableGrid()
     {
       SourceMySqlPreviewDataTable = new MySqlDataTable(
@@ -939,7 +937,6 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Initilizes the grid containing preview data contained in the target table.
     /// </summary>
-    /// <param name="importDbObject">The name of the target DB object in Excel.</param>
     private void InitializeTargetTableGrid()
     {
       TargetMySqlDataTable = new MySqlDataTable(_importDbObject.Name, true, false, WbConnection);

@@ -17,6 +17,8 @@
 // 02110-1301  USA
 //
 
+using System.Net.Sockets;
+
 namespace MySQL.ForExcel
 {
   using System;
@@ -171,6 +173,20 @@ namespace MySQL.ForExcel
       newRow["ResultText"] = resultText;
       newRow["AffectedRows"] = affectedRows;
       Rows.Add(newRow);
+    }
+
+    /// <summary>
+    /// Adds a new database operation along with its type and result to the log table.
+    /// </summary>
+    /// <param name="operationType">Type of operation done against the database server.</param>
+    /// <param name="operationResult">Result of the database operation.</param>
+    /// <param name="queryText">Query text of the database operation.</param>
+    /// <param name="resultText">Result text returned by the database server for the database operation.</param>
+    /// <param name="affectedRows">Number of rows affected by the database operation.</param>
+    public void AddResult(OperationType operationType, OperationResult operationResult, string queryText, string resultText, int affectedRows)
+    {
+      int operationIndex = Rows.Count + 1;
+      AddResult(operationIndex, operationType, operationResult, queryText, resultText, affectedRows);
     }
 
     /// <summary>

@@ -88,9 +88,9 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Gets a <see cref="DataTable"/> object containing the data to be imported to the active Excel Worksheet.
+    /// Gets a <see cref="MySqlDataTable"/> object containing the data to be imported to the active Excel Worksheet.
     /// </summary>
-    public DataTable ImportDataTable { get; private set; }
+    public MySqlDataTable ImportDataTable { get; private set; }
 
     /// <summary>
     /// Gets the type of DB object (MySQL table or view) from which to import data to the active Excel Worksheet.
@@ -240,17 +240,24 @@ namespace MySQL.ForExcel.Forms
       try
       {
         Cursor = Cursors.WaitCursor;
+        DataTable dt;
         if (LimitRowsCheckBox.Checked)
         {
-          ImportDataTable = WbConnection.GetDataFromTableOrView(ImportDbObject, importColumns, Convert.ToInt32(FromRowNumericUpDown.Value) - 1, Convert.ToInt32(RowsToReturnNumericUpDown.Value));
+          dt = WbConnection.GetDataFromTableOrView(ImportDbObject, importColumns, Convert.ToInt32(FromRowNumericUpDown.Value) - 1, Convert.ToInt32(RowsToReturnNumericUpDown.Value));
         }
         else if (WorkSheetInCompatibilityMode)
         {
-          ImportDataTable = WbConnection.GetDataFromTableOrView(ImportDbObject, importColumns, 0, UInt16.MaxValue);
+          dt = WbConnection.GetDataFromTableOrView(ImportDbObject, importColumns, 0, UInt16.MaxValue);
         }
         else
         {
-          ImportDataTable = WbConnection.GetDataFromTableOrView(ImportDbObject, importColumns);
+          dt = WbConnection.GetDataFromTableOrView(ImportDbObject, importColumns);
+        }
+
+        if (dt != null)
+        {
+          ImportDataTable = new MySqlDataTable(ImportDbObject.Name, dt, WbConnection);
+          ImportDataTable.AddExtendedProperties(dt.ExtendedProperties["QueryString"].ToString(), ImportHeaders, ImportDbObject.Name);
         }
       }
       catch (Exception ex)

@@ -1138,6 +1138,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A MySqlDataTable object was expected and not found..
+        /// </summary>
+        internal static string MySqlDataTableExpectedError {
+            get {
+                return ResourceManager.GetString("MySqlDataTableExpectedError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap MySQLforExcel_AppendDlg_Arrow_Down {
@@ -1673,6 +1682,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string PrimaryKeyColumnExistsWarning {
             get {
                 return ResourceManager.GetString("PrimaryKeyColumnExistsWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Primary Key .
+        /// </summary>
+        internal static string PrimaryKeyText {
+            get {
+                return ResourceManager.GetString("PrimaryKeyText", resourceCulture);
             }
         }
         

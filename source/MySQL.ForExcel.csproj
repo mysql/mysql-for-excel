@@ -239,6 +239,7 @@
     <Compile Include="Classes\MySqlDataColumn.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Classes\MySqlDataRow.cs" />
     <Compile Include="Classes\MySqlDataTable.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -248,7 +249,6 @@
     <Compile Include="Classes\PushResultsDataTable.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Classes\RangeAndAddress.cs" />
     <Compile Include="Controls\ExcelAddInPane.cs">
       <SubType>UserControl</SubType>
     </Compile>

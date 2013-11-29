@@ -540,6 +540,16 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Converts a data string to a valid column name.
+    /// </summary>
+    /// <param name="proposedName">String intended to be used as a MySQL column name.</param>
+    /// <returns>A string formatted as a valid column name.</returns>
+    public static string ToValidMySqlColumnName(this string proposedName)
+    {
+      return proposedName != null ? proposedName.Replace(" ", "_").Replace("(", string.Empty).Replace(")", string.Empty) : string.Empty;
+    }
+
+    /// <summary>
     /// Creates a SELECT query against a Table or View database object.
     /// </summary>
     /// <remarks>Only works against Tables or Views, but not with Procedures.</remarks>

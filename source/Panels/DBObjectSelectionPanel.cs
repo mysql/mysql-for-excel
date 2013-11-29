@@ -436,11 +436,7 @@ namespace MySQL.ForExcel.Panels
         return;
       }
 
-      var excelAddInPane = Parent as ExcelAddInPane;
-      if (excelAddInPane != null)
-      {
-        excelAddInPane.ImportDataToExcel(importForm.ImportDataTable, importForm.ImportHeaders);
-      }
+      importForm.ImportDataTable.ImportDataAtActiveExcelCell(importForm.ImportHeaders);
     }
 
     /// <summary>

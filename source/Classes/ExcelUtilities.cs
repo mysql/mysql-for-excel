@@ -16,7 +16,6 @@
 // 02110-1301  USA
 
 using System.Collections.Generic;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -59,6 +58,11 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <remarks>Green-ish.</remarks>
     public const string DEFAULT_UNCOMMITTED_CELLS_HTML_COLOR = "#7CC576";
+
+    /// <summary>
+    /// The interior color used to revert Excel cells to their original background color.
+    /// </summary>
+    public const int EMPTY_CELLS_OLE_COLOR = 0;
 
     #endregion Constants
 
@@ -178,18 +182,6 @@ namespace MySQL.ForExcel.Classes
       }
     }
 
-    /// <summary>
-    /// Gets the interior color used to revert Excel cells to their original background color.
-    /// </summary>
-    /// <remarks>White.</remarks>
-    public static int EmptyCellsOleColor
-    {
-      get
-      {
-        return ColorTranslator.ToOle(Color.White);
-      }
-    }
-
     #endregion Properties
 
     /// <summary>
@@ -229,6 +221,46 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Checks if the given <see cref="Excel.Range"/> contains data in any of its cells.
+    /// </summary>
+    /// <param name="range">An excel range.</param>
+    /// <returns><c>true</c> if the given range is not empty, <c>false</c> otherwise.</returns>
+    public static bool ContainsAnyData(this Excel.Range range)
+    {
+      if (range == null || range.Count < 1)
+      {
+        return false;
+      }
+
+      bool hasData = false;
+      if (range.Count == 1)
+      {
+        hasData = range.Value2 != null;
+      }
+      else if (range.Count > 1)
+      {
+        object[,] values = range.Value2;
+        if (values == null)
+        {
+          return false;
+        }
+
+        foreach (object o in values)
+        {
+          if (o == null)
+          {
+            continue;
+          }
+
+          hasData = true;
+          break;
+        }
+      }
+
+      return hasData;
+    }
+
+    /// <summary>
     /// Returns an Excel range with the first row cells corresponding to the column names.
     /// </summary>
     /// <param name="mysqlDataRange">If <c>null</c> the whole first row is returned, otherwise only the column cells within the editing range.</param>
@@ -236,6 +268,16 @@ namespace MySQL.ForExcel.Classes
     public static Excel.Range GetColumnNamesRange(this Excel.Range mysqlDataRange)
     {
       return mysqlDataRange == null ? null : mysqlDataRange.Resize[1, mysqlDataRange.Columns.Count];
+    }
+
+    /// <summary>
+    /// Gets a valid name for a new <see cref="Excel.Worksheet"/> that avoids duplicates with existing ones in the current <see cref="Excel.Workbook"/>.
+    /// </summary>
+    /// <param name="worksheetName">The proposed name for a <see cref="Excel.Worksheet"/>.</param>
+    /// <returns>A <see cref="Excel.Worksheet"/> valid name.</returns>
+    public static string GetWorksheetNameAvoidingDuplicates(this string worksheetName)
+    {
+      return worksheetName.GetWorksheetNameAvoidingDuplicates(0);
     }
 
     /// <summary>
@@ -317,44 +359,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Refreshes the Excel range addresses of recorded changes in case rows have been added or deleted.
-    /// </summary>
-    /// <param name="rangesAndAddressesList">The list of Excel ranges to have their data refreshed.</param>
-    /// <returns>The number of Excel ranges with address changes.</returns>
-    public static int RefreshAddressesOfStoredRanges(this IList<RangeAndAddress> rangesAndAddressesList)
-    {
-      int qtyUpdated = 0;
-
-      if (rangesAndAddressesList == null || rangesAndAddressesList.Count <= 0)
-      {
-        return qtyUpdated;
-      }
-
-      foreach (RangeAndAddress ra in rangesAndAddressesList.Where(ra => ra.Modification == RangeAndAddress.RangeModification.Added || ra.Modification == RangeAndAddress.RangeModification.Updated))
-      {
-        try
-        {
-          if (ra.Address == ra.Range.Address)
-          {
-            continue;
-          }
-
-          ra.Address = ra.Range.Address;
-          ra.ExcelRow = ra.Range.Row;
-          qtyUpdated++;
-        }
-        catch
-        {
-          ra.Range = ra.Range.Worksheet.Range[ra.Address];
-          ra.ExcelRow = ra.Range.Row;
-          qtyUpdated++;
-        }
-      }
-
-      return qtyUpdated;
-    }
-
-    /// <summary>
     /// Sets the range cells interior color to the specified OLE color.
     /// </summary>
     /// <param name="range">Excel range to have their interior color changed.</param>
@@ -379,57 +383,21 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Sets the interior color of all the Excel ranges within the given list to the specified color.
     /// </summary>
-    /// <param name="rangesAndAddressesList">The list of Excel ranges to have their fill color changed.</param>
+    /// <param name="rangesList">The list of Excel ranges to have their fill color changed.</param>
     /// <param name="oleColor">The new fill color for the Excel cells.</param>
-    public static void SetInteriorColor(this IList<RangeAndAddress> rangesAndAddressesList, int oleColor)
+    public static void SetInteriorColor(this IList<Excel.Range> rangesList, int oleColor)
     {
-      if (rangesAndAddressesList == null)
+      if (rangesList == null)
       {
         return;
       }
 
-      foreach (RangeAndAddress ra in rangesAndAddressesList)
+      foreach (var range in rangesList)
       {
-        ra.Range.SetInteriorColor(oleColor);
+        range.SetInteriorColor(oleColor);
       }
 
-      rangesAndAddressesList.Clear();
-    }
-
-    /// <summary>
-    /// Sets the interior color of all the Excel cells recorded in the editing session to the committed data color, if cells errored out they are set to the errored color.
-    /// </summary>
-    /// <param name="rangesAndAddressesList">The list of Excel ranges to have their fill color changed.</param>
-    /// <param name="commitSuccessful">Flag indicating whether the commit of the Excel cells recorded in the editing session was successful.</param>
-    public static void SetInteriorColorToCommmited(this IList<RangeAndAddress> rangesAndAddressesList, bool commitSuccessful)
-    {
-      if (rangesAndAddressesList == null)
-      {
-        return;
-      }
-
-      for (int idx = 0; idx < rangesAndAddressesList.Count; idx++)
-      {
-        RangeAndAddress ra = rangesAndAddressesList[idx];
-        if (ra.TableRow.HasErrors)
-        {
-          ra.Range.SetInteriorColor(ErroredCellsOleColor);
-          continue;
-        }
-
-        if (!commitSuccessful)
-        {
-          continue;
-        }
-
-        if (ra.TableRow.RowState != DataRowState.Detached && ra.TableRow.RowState != DataRowState.Deleted)
-        {
-          ra.Range.SetInteriorColor(CommitedCellsOleColor);
-        }
-
-        rangesAndAddressesList.Remove(ra);
-        idx--;
-      }
+      rangesList.Clear();
     }
 
     /// <summary>
@@ -451,6 +419,29 @@ namespace MySQL.ForExcel.Classes
       }
 
       worksheet.Unprotect(protectionKey);
+    }
+
+    /// <summary>
+    /// Gets a valid name for a new <see cref="Excel.Worksheet"/> that avoids duplicates with existing ones in the current <see cref="Excel.Workbook"/>.
+    /// </summary>
+    /// <param name="worksheetName">The proposed name for a <see cref="Excel.Worksheet"/>.</param>
+    /// <param name="copyIndex">Number of the copy of a <see cref="Excel.Worksheet"/> within its name.</param>
+    /// <returns>A <see cref="Excel.Worksheet"/> valid name.</returns>
+    private static string GetWorksheetNameAvoidingDuplicates(this string worksheetName, int copyIndex)
+    {
+      if (Globals.ThisAddIn.Application.ActiveWorkbook == null)
+      {
+        return worksheetName;
+      }
+
+      string retName;
+      do
+      {
+        retName = copyIndex > 0 ? string.Format("Copy {0} of {1}", copyIndex, worksheetName) : worksheetName;
+        copyIndex++;
+      } while (Globals.ThisAddIn.Application.Worksheets.Cast<Excel.Worksheet>().Any(ws => ws.Name == retName));
+
+      return retName;
     }
   }
 }

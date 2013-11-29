@@ -1,4 +1,7 @@
 1.2.0
+- Fixed code that was not detecting an Excel row deletion but instead was detecting an Excel row change during an Edit Data operation.
+  (Bug #17852774 - EDIT DATA - DELETING A ROW TRIGGERS A DATA CHANGE IN THE FOLLOWING ROW)
+- Changes done to the Advanced Options dialogues for Import, Export and Append Data forms are immediately reflected without requiring to close and reopen those forms.
 - Added support for optimistic updates to Edit Data operations via a configurable option, using optimistic updates will ensure that pushing changes in the current
   editing session does not overwrite changes done by another person to the set of data retrieved initially. This option can be set globally for all editing sessions
   open by the current user which is persisted in the settings file, or for a specific editing session so when the session is over the optimistic update value is
@@ -7,7 +10,6 @@
   can be right-clicked and a new "Edit Connection" context menu is available for users to edit the Workbench connection properties.  This feature shines brighter
   when MySQL Workbench is not installed since users only relied on MySQL Workbench to edit a connection, without Workbench users had to delete a connection and
   create it again with updated values.
-- Changes done to the Advanced Options dialogues for Import, Export and Append Data forms are immediately reflected without requiring to close and reopen those forms again.
 
 1.1.2
 - Generate a password dynamically to protect Excel Worksheets during Edit Data operations instead of using a hardcoded GUID. If the user saves the Workbook while

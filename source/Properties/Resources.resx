@@ -792,4 +792,10 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
   <data name="UnhandledMySqlTypeEncounteredError" xml:space="preserve">
     <value>Unhandled MySQL type encountered.</value>
   </data>
+  <data name="MySqlDataTableExpectedError" xml:space="preserve">
+    <value>A MySqlDataTable object was expected and not found.</value>
+  </data>
+  <data name="PrimaryKeyText" xml:space="preserve">
+    <value>Primary Key </value>
+  </data>
 </root>

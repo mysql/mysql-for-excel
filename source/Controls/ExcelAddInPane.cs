@@ -304,7 +304,7 @@ namespace MySQL.ForExcel.Controls
       }
 
       // Attempt to Import Data unless the user cancels the import operation
-      string proposedWorksheetName = GetWorksheetNameAvoidingDuplicates(tableObject.Name);
+      string proposedWorksheetName = tableObject.Name.GetWorksheetNameAvoidingDuplicates();
       ImportTableViewForm importForm = new ImportTableViewForm(WbConnection, tableObject, proposedWorksheetName, ActiveWorkbook.Excel8CompatibilityMode, true);
       DialogResult dr = importForm.ShowDialog();
       if (dr == DialogResult.Cancel)
@@ -339,10 +339,9 @@ namespace MySQL.ForExcel.Controls
       }
 
       Excel.Range atCell = currentWorksheet.Cells[1, 1];
-      Excel.Range editingRange = ImportDataTableToExcelAtGivenCell(importForm.ImportDataTable, importForm.ImportHeaders, atCell);
+      Excel.Range editingRange = importForm.ImportDataTable.ImportDataAtGivenExcelCell(importForm.ImportHeaders, atCell);
 
       // Create and show the Edit Data Dialog
-      importForm.ImportDataTable.AddExtendedProperties(importForm.ImportDataTable.ExtendedProperties["QueryString"].ToString(), importForm.ImportHeaders, tableObject.Name);
       ActiveEditDialog = new EditDataDialog(this, new NativeWindowWrapper(ExcelApplication.Hwnd), WbConnection, editingRange, importForm.ImportDataTable, currentWorksheet);
       ActiveEditDialog.Show(ActiveEditDialog.ParentWindow);
 
@@ -372,7 +371,7 @@ namespace MySQL.ForExcel.Controls
         return currentWorksheet;
       }
 
-      proposedName = checkForDuplicates ? GetWorksheetNameAvoidingDuplicates(proposedName) : proposedName;
+      proposedName = checkForDuplicates ? proposedName.GetWorksheetNameAvoidingDuplicates() : proposedName;
       if (ExcelApplication.ActiveWorkbook != null)
       {
         Excel.Worksheet currentActiveSheet = ActiveWorksheet;
@@ -401,123 +400,6 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Gets a valid name for a new <see cref="Excel.Worksheet"/> that avoids duplicates with existing ones in the current <see cref="Excel.Workbook"/>.
-    /// </summary>
-    /// <param name="proposedName">The proposed name for a <see cref="Excel.Worksheet"/>.</param>
-    /// <param name="copyIndex">Number of the copy of a <see cref="Excel.Worksheet"/> within its name.</param>
-    /// <returns>A <see cref="Excel.Worksheet"/> valid name.</returns>
-    public string GetWorksheetNameAvoidingDuplicates(string proposedName, int copyIndex)
-    {
-      string retName = copyIndex > 0 ? string.Format("Copy {0} of {1}", copyIndex, proposedName) : proposedName;
-      if (ExcelApplication.ActiveWorkbook == null)
-      {
-        return retName;
-      }
-
-      return ExcelApplication.Worksheets.Cast<Excel.Worksheet>().Any(ws => ws.Name == retName) ? GetWorksheetNameAvoidingDuplicates(proposedName, copyIndex + 1) : retName;
-    }
-
-    /// <summary>
-    /// Gets a valid name for a new <see cref="Excel.Worksheet"/> that avoids duplicates with existing ones in the current <see cref="Excel.Workbook"/>.
-    /// </summary>
-    /// <param name="proposedName">The proposed name for a <see cref="Excel.Worksheet"/>.</param>
-    /// <returns>A <see cref="Excel.Worksheet"/> valid name.</returns>
-    public string GetWorksheetNameAvoidingDuplicates(string proposedName)
-    {
-      return GetWorksheetNameAvoidingDuplicates(proposedName, 0);
-    }
-
-    /// <summary>
-    /// Imports data contained in the given <see cref="DataTable"/> object to the active Excel <see cref="Excel.Worksheet"/>.
-    /// </summary>
-    /// <param name="dt">The table containing the data to import to Excel.</param>
-    /// <param name="importColumnNames">Flag indicating if column names will be imported as the first row of imported data.</param>
-    /// <param name="atCell">The starting Excel (left-most and top-most) cell where the imported data is placed.</param>
-    /// <returns>The Excel range containing the cells with the imported data.</returns>
-    public Excel.Range ImportDataTableToExcelAtGivenCell(DataTable dt, bool importColumnNames, Excel.Range atCell)
-    {
-      Excel.Range fillingRange = null;
-      try
-      {
-        if (dt != null && (dt.Rows.Count > 0 || importColumnNames))
-        {
-          int currentRow = atCell.Row - 1;
-          int rowsCount = dt.Rows.Count;
-          int colsCount = dt.Columns.Count;
-          int startingRow = importColumnNames ? 1 : 0;
-          int cappedNumRows = ActiveWorkbook.Excel8CompatibilityMode ? Math.Min(rowsCount + startingRow, UInt16.MaxValue - currentRow) : rowsCount + startingRow;
-          bool escapeFormulaTexts = Settings.Default.ImportEscapeFormulaTextValues;
-
-          Excel.Worksheet currentSheet = ActiveWorksheet;
-          fillingRange = atCell.Resize[cappedNumRows, colsCount];
-          object[,] fillingArray = new object[cappedNumRows, colsCount];
-
-          if (importColumnNames)
-          {
-            for (int currCol = 0; currCol < colsCount; currCol++)
-            {
-              fillingArray[0, currCol] = dt.Columns[currCol].ColumnName;
-            }
-          }
-
-          int fillingRowIdx = startingRow;
-          cappedNumRows -= startingRow;
-          for (int currRow = 0; currRow < cappedNumRows; currRow++)
-          {
-            for (int currCol = 0; currCol < colsCount; currCol++)
-            {
-              object importingValue = DataTypeUtilities.GetImportingValueForDateType(dt.Rows[currRow][currCol]);
-              if (importingValue is string)
-              {
-                string importingValueText = importingValue as string;
-
-                // If the imported value is a text that starts with an equal sign Excel will treat it as a formula
-                //  so it needs to be escaped prepending an apostrophe to it for Excel to treat it as standard text.
-                if (escapeFormulaTexts && importingValueText.StartsWith("="))
-                {
-                  importingValue = "'" + importingValueText;
-                }
-              }
-
-              fillingArray[fillingRowIdx, currCol] = importingValue;
-            }
-
-            fillingRowIdx++;
-          }
-
-          fillingRange.ClearFormats();
-          fillingRange.Value = fillingArray;
-          if (importColumnNames)
-          {
-            Excel.Range headerRange = fillingRange.GetColumnNamesRange();
-            headerRange.SetInteriorColor(ExcelUtilities.LockedCellsOleColor);
-          }
-
-          currentSheet.Columns.AutoFit();
-          fillingRange.Rows.AutoFit();
-          ExcelApplication_SheetSelectionChange(currentSheet, ExcelApplication.ActiveCell);
-        }
-      }
-      catch (Exception ex)
-      {
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.ImportDataErrorDetailText, ex.Message, true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
-      }
-
-      return fillingRange;
-    }
-
-    /// <summary>
-    /// Imports data contained in the given <see cref="DataTable"/> object to the active Excel <see cref="Excel.Worksheet"/>.
-    /// </summary>
-    /// <param name="dt">The table containing the data to import to Excel.</param>
-    /// <param name="importColumnNames">Flag indicating if column names will be imported as the first row of imported data.</param>
-    public void ImportDataToExcel(DataTable dt, bool importColumnNames)
-    {
-      ImportDataTableToExcelAtGivenCell(dt, importColumnNames, ExcelApplication.ActiveCell);
-    }
-
-    /// <summary>
     /// Imports data contained in the given <see cref="DataSet"/> object to the active Excel <see cref="Excel.Worksheet"/>.
     /// </summary>
     /// <param name="ds">The dataset containing the data to import to Excel.</param>
@@ -529,7 +411,7 @@ namespace MySQL.ForExcel.Controls
       Excel.Range atCell = ExcelApplication.ActiveCell;
 
       int tableIdx = 0;
-      foreach (DataTable dt in ds.Tables)
+      foreach (MySqlDataTable mySqlTable in ds.Tables)
       {
         if (importType == ImportProcedureForm.ImportMultipleType.SelectedResultSet && selectedResultSet < tableIdx)
         {
@@ -537,7 +419,7 @@ namespace MySQL.ForExcel.Controls
         }
 
         tableIdx++;
-        Excel.Range fillingRange = ImportDataTableToExcelAtGivenCell(dt, importColumnNames, atCell);
+        Excel.Range fillingRange = mySqlTable.ImportDataAtGivenExcelCell(importColumnNames, atCell);
         Excel.Range endCell;
         if (fillingRange != null)
         {
@@ -927,41 +809,6 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Checks if the given <see cref="Excel.Range"/> contains data in any of its cells.
-    /// </summary>
-    /// <param name="range">An excel range.</param>
-    /// <returns><c>true</c> if the given range is not empty, <c>false</c> otherwise.</returns>
-    private bool ExcelRangeContainsAnyData(Excel.Range range)
-    {
-      bool hasData = false;
-      if (range.Count == 1)
-      {
-        hasData = range.Value2 != null;
-      }
-      else if (range.Count > 1)
-      {
-        object[,] values = range.Value2;
-        if (values == null)
-        {
-          return false;
-        }
-
-        foreach (object o in values)
-        {
-          if (o == null)
-          {
-            continue;
-          }
-
-          hasData = true;
-          break;
-        }
-      }
-
-      return hasData;
-    }
-
-    /// <summary>
     /// Checks if the selected <see cref="Excel.Range"/> contains any data in it and updates that status in the corresponidng panel.
     /// </summary>
     /// <param name="range">The <see cref="Excel.Range"/> where the selection is.</param>
@@ -972,8 +819,7 @@ namespace MySQL.ForExcel.Controls
         return;
       }
 
-      bool hasData = ExcelRangeContainsAnyData(range);
-      DBObjectSelectionPanel3.ExcelSelectionContainsData = hasData;
+      DBObjectSelectionPanel3.ExcelSelectionContainsData = range.ContainsAnyData();
     }
   }
 }
