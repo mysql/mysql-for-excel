@@ -1,0 +1,81 @@
+﻿// Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as
+// published by the Free Software Foundation; version 2 of the
+// License.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+// 02110-1301  USA
+
+using MySQL.ForExcel.Interfaces;
+
+namespace MySQL.ForExcel.Classes
+{
+  /// <summary>
+  /// Represents a dummy MySQL row only to hold an arbitrary SQL statement.
+  /// </summary>
+  public class MySqlDummyRow : IMySqlDataRow
+  {
+    #region Fields
+
+    /// <summary>
+    /// The SQL query needed to commit changes contained in this row to the SQL server.
+    /// </summary>
+    private string _sqlQuery;
+
+    #endregion Fields
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MySqlDummyRow"/> class.
+    /// </summary>
+    /// <param name="sqlQuery">The SQL query needed to commit changes contained in this row to the SQL server.</param>
+    public MySqlDummyRow(string sqlQuery)
+    {
+      _sqlQuery = sqlQuery;
+      RowError = string.Empty;
+      Statement = new MySqlStatement(this);
+    }
+
+    /// <summary>
+    /// Gets or sets the custom error description for a row.
+    /// </summary>
+    public string RowError { get; set; }
+
+    /// <summary>
+    /// Gets the <see cref="MySqlStatement"/> object containing a SQL query to push changes to the database.
+    /// </summary>
+    public MySqlStatement Statement { get; private set; }
+
+    /// <summary>
+    /// Commits all the changes made to this row since the last time AcceptChanges was called.
+    /// </summary>
+    public void AcceptChanges()
+    {
+    }
+
+    /// <summary>
+    /// Clears the errors for the row set in <see cref="RowError"/>.
+    /// </summary>
+    public void ClearErrors()
+    {
+      RowError = string.Empty;
+    }
+
+    /// <summary>
+    /// Returns a SQL query meant to push changes in this row to the database server.
+    /// </summary>
+    /// <returns>A SQL query containing the data changes.</returns>
+    public string GetSql()
+    {
+      return _sqlQuery;
+    }
+  }
+}

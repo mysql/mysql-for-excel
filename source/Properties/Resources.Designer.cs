@@ -426,6 +426,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Create Table  .
+        /// </summary>
+        internal static string CreateTableText {
+            get {
+                return ResourceManager.GetString("CreateTableText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Current changes will be lost, do you want to continue?.
         /// </summary>
         internal static string CurrentChangesLostConfirmation {
@@ -554,11 +563,11 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Deleting {0}, Inserting {1}, Updating {2} row(s) with the following SQL statement(s):.
+        ///   Looks up a localized string similar to Deleted {0}, Inserted {1}, Updated {2} row(s) with the following SQL statement(s):.
         /// </summary>
-        internal static string EditDataCommittingText {
+        internal static string EditDataCommittedWithQueryText {
             get {
-                return ResourceManager.GetString("EditDataCommittingText", resourceCulture);
+                return ResourceManager.GetString("EditDataCommittedWithQueryText", resourceCulture);
             }
         }
         
@@ -828,15 +837,6 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Creating MySQL Table &quot;{0}&quot; with query....
-        /// </summary>
-        internal static string ExportDataDetailsTextLine1 {
-            get {
-                return ResourceManager.GetString("ExportDataDetailsTextLine1", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Attempted to insert {0} rows, but only {1} rows were inserted with no further errors. Please check the MySQL Server log for more information..
         /// </summary>
         internal static string ExportDataLessRowsThanExpectedInsertedText {
@@ -927,7 +927,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Table has been created successfully..
+        ///   Looks up a localized string similar to MySQL Table &quot;{0}&quot; has been created successfully..
         /// </summary>
         internal static string ExportDataTableCreatedSuccessfullyText {
             get {
@@ -936,11 +936,29 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Table has been created with {0} warnings:.
+        ///   Looks up a localized string similar to MySQL Table &quot;{0}&quot; has been created with {1} warnings:.
         /// </summary>
         internal static string ExportDataTableCreatedWithWarningsText {
             get {
                 return ResourceManager.GetString("ExportDataTableCreatedWithWarningsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Executed the following statement to create MySQL Table &quot;{0}&quot;:.
+        /// </summary>
+        internal static string ExportDataTableExecutedQuery {
+            get {
+                return ResourceManager.GetString("ExportDataTableExecutedQuery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export Data  .
+        /// </summary>
+        internal static string ExportDataText {
+            get {
+                return ResourceManager.GetString("ExportDataText", resourceCulture);
             }
         }
         
@@ -1062,11 +1080,11 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Inserting Excel data in MySQL Table &quot;{0}&quot; with query....
+        ///   Looks up a localized string similar to Inserted Excel data in MySQL Table &quot;{0}&quot; with the following statements:.
         /// </summary>
-        internal static string InsertingExcelDataWithQueryText {
+        internal static string InsertedExcelDataWithQueryText {
             get {
-                return ResourceManager.GetString("InsertingExcelDataWithQueryText", resourceCulture);
+                return ResourceManager.GetString("InsertedExcelDataWithQueryText", resourceCulture);
             }
         }
         
@@ -1695,7 +1713,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Query did not match any rows in the DB, Primary Key values in the row may have changed; please refresh values from the DB..
+        ///   Looks up a localized string similar to Query did not match any rows in the DB, {0}values in the row may have changed; please refresh values from the DB..
         /// </summary>
         internal static string QueryDidNotMatchRowsWarning {
             get {
@@ -1760,6 +1778,24 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You will lose the changes done to the SQL query. Are you sure you want to revert to the original SQL query?.
+        /// </summary>
+        internal static string ReviewSqlQueryRevertDetail {
+            get {
+                return ResourceManager.GetString("ReviewSqlQueryRevertDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Revert SQLQuery to original.
+        /// </summary>
+        internal static string ReviewSqlQueryRevertTitle {
+            get {
+                return ResourceManager.GetString("ReviewSqlQueryRevertTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error opening schema.
         /// </summary>
         internal static string SchemaOpeningErrorTitle {
@@ -1774,6 +1810,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string SchemasLoadingErrorTitle {
             get {
                 return ResourceManager.GetString("SchemasLoadingErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Errors found while executing the SQL script, no changes were applied..
+        /// </summary>
+        internal static string ScriptErrorThrownSummary {
+            get {
+                return ResourceManager.GetString("ScriptErrorThrownSummary", resourceCulture);
             }
         }
         
@@ -1838,6 +1883,15 @@ namespace MySQL.ForExcel.Properties {
             get {
                 object obj = ResourceManager.GetObject("SplashScreenExcel", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following SQL statements produced warnings:.
+        /// </summary>
+        internal static string SqlStatementsProducingWarningsText {
+            get {
+                return ResourceManager.GetString("SqlStatementsProducingWarningsText", resourceCulture);
             }
         }
         
@@ -2090,6 +2144,36 @@ namespace MySQL.ForExcel.Properties {
         internal static string WorkSheetInEditModeWarningTitle {
             get {
                 return ResourceManager.GetString("WorkSheetInEditModeWarningTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap zoom_in {
+            get {
+                object obj = ResourceManager.GetObject("zoom_in", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap zoom_out {
+            get {
+                object obj = ResourceManager.GetObject("zoom_out", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap zoom_reset {
+            get {
+                object obj = ResourceManager.GetObject("zoom_reset", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }

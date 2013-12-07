@@ -91,19 +91,6 @@ namespace MySQL.ForExcel.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool ExportShowCopySQLButton {
-            get {
-                return ((bool)(this["ExportShowCopySQLButton"]));
-            }
-            set {
-                this["ExportShowCopySQLButton"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool AppendPerformAutoMap {
             get {
@@ -272,13 +259,39 @@ namespace MySQL.ForExcel.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool EditUseOptimisticUpdate {
             get {
                 return ((bool)(this["EditUseOptimisticUpdate"]));
             }
             set {
                 this["EditUseOptimisticUpdate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool GlobalSqlQueriesPreviewQueries {
+            get {
+                return ((bool)(this["GlobalSqlQueriesPreviewQueries"]));
+            }
+            set {
+                this["GlobalSqlQueriesPreviewQueries"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool GlobalSqlQueriesShowQueriesWithResults {
+            get {
+                return ((bool)(this["GlobalSqlQueriesShowQueriesWithResults"]));
+            }
+            set {
+                this["GlobalSqlQueriesShowQueriesWithResults"] = value;
             }
         }
     }

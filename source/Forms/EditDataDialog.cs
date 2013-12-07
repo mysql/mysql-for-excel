@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
@@ -672,42 +673,64 @@ namespace MySQL.ForExcel.Forms
       bool warningsFound = false;
       bool errorsFound = false;
       bool autoCommitOn = AutoCommitCheckBox.Checked;
-
       int warningsCount = 0;
-      StringBuilder operationSummary = new StringBuilder();
-      operationSummary.AppendFormat(Resources.EditedDataForTable, EditingTableName);
-      StringBuilder operationDetails = new StringBuilder();
-      StringBuilder warningDetails = new StringBuilder();
-      Cursor = Cursors.WaitCursor;
 
-      operationDetails.AppendFormat(Resources.EditDataCommittingText, EditMySqlDataTable.DeletingOperations, EditMySqlDataTable.InsertingOperations, EditMySqlDataTable.UpdatingOperations);
+      Cursor = Cursors.WaitCursor;
       EditMySqlDataTable.UseOptimisticUpdate = UseOptimisticUpdateForThisSession;
-      EditMySqlDataTable.PushData();
-      operationDetails.Append(Environment.NewLine);
-      foreach (DataRow operationRow in EditMySqlDataTable.PushResultsTable.Rows)
+      var modifiedRowsList = EditMySqlDataTable.PushData(Settings.Default.GlobalSqlQueriesPreviewQueries);
+      if (modifiedRowsList == null)
       {
-        string sqlQuery = operationRow["QueryText"].ToString();
-        if (sqlQuery.Length > 0)
+        Cursor = Cursors.Default;
+        return false;
+      }
+
+      StringBuilder operationSummary = new StringBuilder();
+      StringBuilder operationDetails = new StringBuilder();
+      string warningDetails = string.Empty;
+      operationSummary.AppendFormat(Resources.EditedDataForTable, EditingTableName);
+      if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults)
+      {
+        operationDetails.AppendFormat(Resources.EditDataCommittedWithQueryText, EditMySqlDataTable.DeletingOperations, EditMySqlDataTable.InsertingOperations, EditMySqlDataTable.UpdatingOperations);
+        operationDetails.AddNewLine();
+      }
+
+      bool warningDetailHeaderAppended = false;
+      foreach (var statement in modifiedRowsList.Select(statementRow => statementRow.Statement))
+      {
+        if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults && statement.SqlQuery.Length > 0)
         {
-          operationDetails.Append(Environment.NewLine);
-          operationDetails.AppendFormat("{0:000}: {1}", (int)operationRow["OperationIndex"], sqlQuery);
+          operationDetails.AddNewLine();
+          operationDetails.AppendFormat("{0:000}: {1}", statement.ExecutionOrder, statement.SqlQuery);
         }
 
-        string operationResult = operationRow["OperationResult"].ToString();
-        switch (operationResult)
+        switch (statement.StatementResult)
         {
-          case "Warning":
+          case MySqlStatement.StatementResultType.WarningsFound:
+            if (Settings.Default.GlobalSqlQueriesPreviewQueries)
+            {
+              if (!warningDetailHeaderAppended)
+              {
+                warningDetailHeaderAppended = true;
+                operationDetails.AddNewLine(1, true);
+                operationDetails.Append(Resources.SqlStatementsProducingWarningsText);
+              }
+
+              if (statement.SqlQuery.Length > 0)
+              {
+                operationDetails.AddNewLine(1, true);
+                operationDetails.AppendFormat("{0:000}: {1}", statement.ExecutionOrder, statement.SqlQuery);
+              }
+            }
+
             warningsFound = true;
-            warningDetails.Append(Environment.NewLine);
-            warningDetails.Append(operationRow["ResultText"]);
-            warningsCount++;
+            warningDetails = statement.ResultText;
+            warningsCount += statement.WarningsQuantity;
             break;
 
-          case "Error":
+          case MySqlStatement.StatementResultType.ErrorThrown:
             errorsFound = true;
-            operationDetails.Append(Environment.NewLine);
-            operationDetails.Append(Environment.NewLine);
-            operationDetails.Append(operationRow["ResultText"]);
+            operationDetails.AddNewLine(2, true);
+            operationDetails.Append(statement.ResultText);
             break;
         }
 
@@ -721,16 +744,22 @@ namespace MySQL.ForExcel.Forms
 
       if (warningsFound)
       {
-        operationDetails.Append(Environment.NewLine);
-        operationDetails.Append(Environment.NewLine);
+        operationDetails.AddNewLine(2, true);
         operationDetails.AppendFormat(Resources.EditDataCommittedWarningsFound, warningsCount);
-        operationDetails.Append(Environment.NewLine);
+        operationDetails.AddNewLine();
         operationDetails.Append(warningDetails);
       }
 
-      operationDetails.Append(Environment.NewLine);
-      operationDetails.Append(Environment.NewLine);
-      operationDetails.AppendFormat(Resources.EditDataCommittedText, EditMySqlDataTable.PushResultsTable.DeletedOperations, EditMySqlDataTable.PushResultsTable.InsertedOperations, EditMySqlDataTable.PushResultsTable.UpdatedOperations);
+      if (Settings.Default.GlobalSqlQueriesPreviewQueries)
+      {
+        operationDetails.AddNewLine(2, true);
+        operationDetails.AppendFormat(
+          Resources.EditDataCommittedText,
+          modifiedRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Delete),
+          modifiedRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Insert),
+          modifiedRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Update));
+      }
+
       InfoDialog.InfoType operationsType;
       if (!errorsFound)
       {
@@ -747,7 +776,7 @@ namespace MySQL.ForExcel.Forms
       }
       else
       {
-        operationSummary.AppendFormat(Resources.EditedDataCommittedError);
+        operationSummary.Append(Resources.EditedDataCommittedError);
         operationsType = InfoDialog.InfoType.Error;
       }
 
@@ -758,7 +787,6 @@ namespace MySQL.ForExcel.Forms
 
       CommitChangesButton.Enabled = UncommitedDataExists && !autoCommitOn;
       Cursor = Cursors.Default;
-
       return !errorsFound;
     }
 

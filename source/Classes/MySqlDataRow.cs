@@ -15,14 +15,13 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using MySql.Data.MySqlClient;
 using MySQL.ForExcel.Classes.Exceptions;
+using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -32,13 +31,8 @@ namespace MySQL.ForExcel.Classes
   /// <summary>
   /// Represents a table row holding MySQL data mapped to Excel cells.
   /// </summary>
-  public class MySqlDataRow : DataRow
+  public class MySqlDataRow : DataRow, IMySqlDataRow
   {
-    /// <summary>
-    /// String to identify the error code in a <see cref="DataRow"/> as to be related to a row with the given primary key not being found in the MySQL table.
-    /// </summary>
-    public const string NO_MATCH = "NO_MATCH";
-
     #region Fields
 
     /// <summary>
@@ -52,13 +46,15 @@ namespace MySQL.ForExcel.Classes
     /// Initializes a new instance of the DataRow. Constructs a row from the builder.
     /// </summary>
     /// <remarks>Only for internal usage.</remarks>
-    /// <param name="builder"></param>
+    /// <param name="builder">A <see cref="DataRowBuilder"/> to construct the row.</param>
     protected internal MySqlDataRow(DataRowBuilder builder) : base(builder)
     {
       _sqlQuery = null;
       ChangedColumnNames = new List<string>(Table.Columns.Count);
       IsBeingDeleted = false;
+      IsHeadersRow = false;
       ExcelModifiedRangesList = new List<Excel.Range>(Table.Columns.Count);
+      Statement = new MySqlStatement(this);
     }
 
     #region Properties
@@ -84,6 +80,11 @@ namespace MySQL.ForExcel.Classes
     public bool IsBeingDeleted { get; private set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the row represents the row containing column names.
+    /// </summary>
+    public bool IsHeadersRow { get; set; }
+
+    /// <summary>
     /// Gets the parent <see cref="MySqlDataTable"/> for this row.
     /// </summary>
     public MySqlDataTable MySqlTable
@@ -95,85 +96,72 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the related operation type of this row.
+    /// Gets the <see cref="MySqlStatement"/> object containing a SQL query to push changes to the database.
     /// </summary>
-    public PushResultsDataTable.OperationType OperationType
-    {
-      get
-      {
-        return PushResultsDataTable.GetRelatedOperationType(RowState);
-      }
-    }
-
-    /// <summary>
-    /// Gets the SQL query needed to commit changes contained in this row to the SQL server.
-    /// </summary>
-    public string SqlQuery
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(_sqlQuery))
-        {
-          _sqlQuery = GetSql();
-        }
-
-        return _sqlQuery;
-      }
-    }
+    public MySqlStatement Statement { get; private set; }
 
     #endregion Properties
 
     /// <summary>
-    /// Pushes data changes in the row to the MySQL server connected in the given <see cref="MySqlCommand"/>.
+    /// Returns a SQL query meant to push changes in this row to the database server.
     /// </summary>
-    /// <param name="mySqlCommand">The <see cref="MySqlCommand"/> connected to a MySQL server where queries are executed.</param>
-    public void PushData(MySqlCommand mySqlCommand)
+    /// <returns>A SQL query containing the data changes.</returns>
+    public string GetSql()
     {
+      if (_sqlQuery != null)
+      {
+        return _sqlQuery;
+      }
+
+      if (RowState == DataRowState.Unchanged)
+      {
+        _sqlQuery = string.Empty;
+        return _sqlQuery;
+      }
+
       if (MySqlTable == null)
       {
         MySqlSourceTrace.WriteToLog(Resources.MySqlDataTableExpectedError, SourceLevels.Critical);
-        return;
+        _sqlQuery = null;
+        return _sqlQuery;
       }
 
-      StringBuilder warningText = new StringBuilder();
-      int operationIndex = MySqlTable.PushResultsTable.Rows.Count + 1;
-      mySqlCommand.CommandText = SqlQuery;
-      int executedCount = mySqlCommand.ExecuteNonQuery();
-      DataSet warningsDs = MySqlHelper.ExecuteDataset(mySqlCommand.Connection, "SHOW WARNINGS");
-      if ((warningsDs != null && warningsDs.Tables.Count > 0 && warningsDs.Tables[0].Rows.Count > 0) || executedCount == 0)
+      MySqlDataTable mySqlTable = Table as MySqlDataTable;
+      ulong mysqlMaxAllowedPacket = mySqlTable != null ? mySqlTable.MySqlMaxAllowedPacket : 0;
+      ulong maxByteCount = mysqlMaxAllowedPacket > 0 ? mysqlMaxAllowedPacket - MySqlDataTable.SAFE_BYTES_BEFORE_REACHING_MAX_ALLOWED_PACKET : 0;
+      _sqlQuery = string.Empty;
+      switch (RowState)
       {
-        string nl = string.Empty;
-        if (executedCount == 0)
-        {
-          RowError = NO_MATCH;
-          warningText.AppendFormat(
-            "{2}{0:000}: {1}",
-            operationIndex,
-            string.Format(Resources.QueryDidNotMatchRowsWarning, MySqlTable.UseOptimisticUpdate ? string.Empty : Resources.PrimaryKeyText),
-            nl);
-          nl = Environment.NewLine;
-        }
+        case DataRowState.Added:
+          _sqlQuery = GetSqlForAddedRow();
+          break;
 
-        if (warningsDs != null)
-        {
-          foreach (DataRow warningRow in warningsDs.Tables[0].Rows)
-          {
-            warningText.AppendFormat(
-              "{3}{0:000}: {1} - {2}",
-              operationIndex,
-              warningRow[1],
-              warningRow[2],
-              nl);
-            nl = Environment.NewLine;
-          }
-        }
+        case DataRowState.Deleted:
+          _sqlQuery = GetSqlForDeletedRow();
+          break;
 
-        MySqlTable.PushResultsTable.AddResult(operationIndex, OperationType, PushResultsDataTable.OperationResult.Warning, SqlQuery, warningText.ToString(), executedCount);
+        case DataRowState.Modified:
+          _sqlQuery = GetSqlForModifiedRow();
+          break;
+
+        case DataRowState.Unchanged:
+          _sqlQuery = string.Empty;
+          break;
       }
-      else
+
+      // Verify we have not exceeded the maximum packet size allowed by the server, otherwise throw an Exception.
+      if (maxByteCount <= 0)
       {
-        MySqlTable.PushResultsTable.AddResult(operationIndex, OperationType, PushResultsDataTable.OperationResult.Success, SqlQuery, "OK", executedCount);
+        return _sqlQuery;
       }
+
+      ulong queryStringByteCount = (ulong)Encoding.ASCII.GetByteCount(_sqlQuery);
+      if (queryStringByteCount > maxByteCount)
+      {
+        throw new QueryExceedsMaxAllowedPacketException();
+      }
+
+      return _sqlQuery;
     }
 
     /// <summary>
@@ -206,62 +194,6 @@ namespace MySQL.ForExcel.Classes
           ReflectChangesForRolledbackRow();
           break;
       }
-    }
-
-    /// <summary>
-    /// Creates a SQL query meant to push changes in this row to the database server.
-    /// </summary>
-    /// <returns>A SQL query containing the data changes.</returns>
-    private string GetSql()
-    {
-      if (RowState == DataRowState.Unchanged)
-      {
-        return string.Empty;
-      }
-
-      if (MySqlTable == null)
-      {
-        MySqlSourceTrace.WriteToLog(Resources.MySqlDataTableExpectedError, SourceLevels.Critical);
-        return null;
-      }
-
-      MySqlDataTable mySqlTable = Table as MySqlDataTable;
-      ulong mysqlMaxAllowedPacket = mySqlTable != null ? mySqlTable.MySqlMaxAllowedPacket : 0;
-      ulong maxByteCount = mysqlMaxAllowedPacket > 0 ? mysqlMaxAllowedPacket - MySqlDataTable.SAFE_BYTES_BEFORE_REACHING_MAX_ALLOWED_PACKET : 0;
-      string retQuery = string.Empty;
-
-      switch (RowState)
-      {
-        case DataRowState.Added:
-          retQuery = GetSqlForAddedRow();
-          break;
-
-        case DataRowState.Deleted:
-          retQuery = GetSqlForDeletedRow();
-          break;
-
-        case DataRowState.Modified:
-          retQuery = GetSqlForModifiedRow();
-          break;
-
-        case DataRowState.Unchanged:
-          retQuery = string.Empty;
-          break;
-      }
-
-      // Verify we have not exceeded the maximum packet size allowed by the server, otherwise throw an Exception.
-      if (maxByteCount <= 0)
-      {
-        return retQuery;
-      }
-
-      ulong queryStringByteCount = (ulong)Encoding.ASCII.GetByteCount(retQuery);
-      if (queryStringByteCount > maxByteCount)
-      {
-        throw new QueryExceedsMaxAllowedPacketException();
-      }
-
-      return retQuery;
     }
 
     /// <summary>
@@ -404,7 +336,6 @@ namespace MySQL.ForExcel.Classes
         colsSeparator = ",";
       }
 
-      wClauseString.Append(";");
       queryString.Append(wClauseString);
       return queryString.ToString();
     }

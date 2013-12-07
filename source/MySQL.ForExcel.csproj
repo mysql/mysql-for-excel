@@ -244,11 +244,10 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Classes\MySqlDataUtilities.cs" />
+    <Compile Include="Classes\MySqlDummyRow.cs" />
     <Compile Include="Classes\MySqlForExcelSettings.cs" />
+    <Compile Include="Classes\MySqlStatement.cs" />
     <Compile Include="Classes\NativeWindowWrapper.cs" />
-    <Compile Include="Classes\PushResultsDataTable.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Controls\ExcelAddInPane.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -357,6 +356,12 @@
     <Compile Include="Forms\ExportDataForm.Designer.cs">
       <DependentUpon>ExportDataForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\MySqlScriptDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MySqlScriptDialog.Designer.cs">
+      <DependentUpon>MySqlScriptDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\NewSchemaDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -372,6 +377,7 @@
     <Compile Include="Controls\TransparentPictureBox.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Interfaces\IMySqlDataRow.cs" />
     <Compile Include="Panels\AutoStyleableBasePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -447,6 +453,9 @@
     <EmbeddedResource Include="Forms\ExportDataForm.resx">
       <DependentUpon>ExportDataForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\MySqlScriptDialog.resx">
+      <DependentUpon>MySqlScriptDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\NewSchemaDialog.resx">
       <DependentUpon>NewSchemaDialog.cs</DependentUpon>
     </EmbeddedResource>
@@ -509,6 +518,9 @@
     <None Include="Resources\MySQLforExcel-ExportDlg-TableName-32x32.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\zoom_reset.png" />
+    <None Include="Resources\zoom_out.png" />
+    <None Include="Resources\zoom_in.png" />
     <None Include="Resources\ExcelAddinFilter.png" />
     <Content Include="Resources\ArrowDown.png" />
     <Content Include="Resources\ArrowRight.png" />

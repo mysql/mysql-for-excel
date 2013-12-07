@@ -1,4 +1,7 @@
 1.2.0
+- Added "Preview SQL statements before they are sent to the server" and "Show executed SQL statements along with their results" global options. The first option
+  lets users preview the SQL statements used in an Export, Append or Edit data operation before they are sent to the MySQL server and edit them if needed. The
+  second option lets users apply the statements directly and show the executed SQL statements after they were applied along with the results of the operations.
 - Fixed code that was not detecting an Excel row deletion but instead was detecting an Excel row change during an Edit Data operation.
   (Bug #17852774 - EDIT DATA - DELETING A ROW TRIGGERS A DATA CHANGE IN THE FOLLOWING ROW)
 - Changes done to the Advanced Options dialogues for Import, Export and Append Data forms are immediately reflected without requiring to close and reopen those forms.

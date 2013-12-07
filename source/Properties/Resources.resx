@@ -525,8 +525,8 @@ To be able to make modifications on cells not related to MySQL data please exit 
   <data name="EditDataCommittedWarningsFound" xml:space="preserve">
     <value>The following {0} warning(s) were generated:</value>
   </data>
-  <data name="EditDataCommittingText" xml:space="preserve">
-    <value>Deleting {0}, Inserting {1}, Updating {2} row(s) with the following SQL statement(s):</value>
+  <data name="EditDataCommittedWithQueryText" xml:space="preserve">
+    <value>Deleted {0}, Inserted {1}, Updated {2} row(s) with the following SQL statement(s):</value>
   </data>
   <data name="EditDataFormTooltipText" xml:space="preserve">
     <value>Editing data for:{0}Schema: {1}{0}Table: {2}{0}WorkBook: {3}{0}WorkSheet: {4}</value>
@@ -547,7 +547,7 @@ To be able to make modifications on cells not related to MySQL data please exit 
     <value>Edited data for Table {0} </value>
   </data>
   <data name="QueryDidNotMatchRowsWarning" xml:space="preserve">
-    <value>Query did not match any rows in the DB, Primary Key values in the row may have changed; please refresh values from the DB.</value>
+    <value>Query did not match any rows in the DB, {0}values in the row may have changed; please refresh values from the DB.</value>
   </data>
   <data name="ShutdownMessage" xml:space="preserve">
     <value>MySQL for Excel Shutdown</value>
@@ -639,8 +639,8 @@ To be able to make modifications on cells not related to MySQL data please exit 
   <data name="AppendDataRowsInsertionErrorText" xml:space="preserve">
     <value>Error while appending rows...</value>
   </data>
-  <data name="InsertingExcelDataWithQueryText" xml:space="preserve">
-    <value>Inserting Excel data in MySQL Table "{0}" with query...</value>
+  <data name="InsertedExcelDataWithQueryText" xml:space="preserve">
+    <value>Inserted Excel data in MySQL Table "{0}" with the following statements:</value>
   </data>
   <data name="WarningSingleText" xml:space="preserve">
     <value>Code {0} - {1}</value>
@@ -675,8 +675,8 @@ To be able to make modifications on cells not related to MySQL data please exit 
   <data name="AppendDataRowsAppendedWithWarningsText" xml:space="preserve">
     <value>{0} rows were appended with {0} warnings:</value>
   </data>
-  <data name="ExportDataDetailsTextLine1" xml:space="preserve">
-    <value>Creating MySQL Table "{0}" with query...</value>
+  <data name="ExportDataTableExecutedQuery" xml:space="preserve">
+    <value>Executed the following statement to create MySQL Table "{0}":</value>
   </data>
   <data name="ExportDataLessRowsThanExpectedInsertedText" xml:space="preserve">
     <value>Attempted to insert {0} rows, but only {1} rows were inserted with no further errors. Please check the MySQL Server log for more information.</value>
@@ -703,10 +703,10 @@ To be able to make modifications on cells not related to MySQL data please exit 
     <value>Error while inserting rows...</value>
   </data>
   <data name="ExportDataTableCreatedSuccessfullyText" xml:space="preserve">
-    <value>Table has been created successfully.</value>
+    <value>MySQL Table "{0}" has been created successfully.</value>
   </data>
   <data name="ExportDataTableCreatedWithWarningsText" xml:space="preserve">
-    <value>Table has been created with {0} warnings:</value>
+    <value>MySQL Table "{0}" has been created with {1} warnings:</value>
   </data>
   <data name="ImportProcedureAllResultSetsHorizontally" xml:space="preserve">
     <value>All Result Sets - Arranged Horizontally</value>
@@ -792,10 +792,37 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
   <data name="UnhandledMySqlTypeEncounteredError" xml:space="preserve">
     <value>Unhandled MySQL type encountered.</value>
   </data>
-  <data name="MySqlDataTableExpectedError" xml:space="preserve">
-    <value>A MySqlDataTable object was expected and not found.</value>
+  <data name="zoom_in" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\zoom_in.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="zoom_out" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\zoom_out.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="zoom_reset" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\zoom_reset.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ReviewSqlQueryRevertDetail" xml:space="preserve">
+    <value>You will lose the changes done to the SQL query. Are you sure you want to revert to the original SQL query?</value>
+  </data>
+  <data name="ReviewSqlQueryRevertTitle" xml:space="preserve">
+    <value>Revert SQLQuery to original</value>
   </data>
   <data name="PrimaryKeyText" xml:space="preserve">
     <value>Primary Key </value>
+  </data>
+  <data name="MySqlDataTableExpectedError" xml:space="preserve">
+    <value>A MySqlDataTable object was expected and not found.</value>
+  </data>
+  <data name="CreateTableText" xml:space="preserve">
+    <value>Create Table  </value>
+  </data>
+  <data name="ExportDataText" xml:space="preserve">
+    <value>Export Data  </value>
+  </data>
+  <data name="ScriptErrorThrownSummary" xml:space="preserve">
+    <value>Errors found while executing the SQL script, no changes were applied.</value>
+  </data>
+  <data name="SqlStatementsProducingWarningsText" xml:space="preserve">
+    <value>The following SQL statements produced warnings:</value>
   </data>
 </root>

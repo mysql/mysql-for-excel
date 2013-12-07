@@ -74,6 +74,7 @@ namespace MySQL.ForExcel.Classes
       ExcludeColumn = false;
       IsMySqlDataTypeValid = true;
       MappedDataColName = null;
+      MappedDataColOrdinal = -1;
       MySqlDataType = string.Empty;
       PrimaryKey = false;
       RowsFrom1stDataType = string.Empty;
@@ -193,6 +194,11 @@ namespace MySQL.ForExcel.Classes
     /// Gets or sets the name of the column in a source <see cref="MySqlDataTable"/> from which data will be appended from.
     /// </summary>
     public string MappedDataColName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ordinal index of the column in a source <see cref="MySqlDataTable"/> from which data will be appended from.
+    /// </summary>
+    public int MappedDataColOrdinal { get; set; }
 
     /// <summary>
     /// Gets or sets the corresponding data type supported by MySQL Server for this column.
@@ -635,6 +641,8 @@ namespace MySQL.ForExcel.Classes
       clonedColumn.UniqueKey = UniqueKey;
       clonedColumn.ExcludeColumn = ExcludeColumn;
       clonedColumn.CreateIndex = CreateIndex;
+      clonedColumn.MappedDataColName = MappedDataColName;
+      clonedColumn.MappedDataColOrdinal = MappedDataColOrdinal;
       return clonedColumn;
     }
 

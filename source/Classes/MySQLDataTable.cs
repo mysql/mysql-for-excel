@@ -21,8 +21,8 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Text;
-using MySql.Data.MySqlClient;
 using MySQL.ForExcel.Forms;
+using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
@@ -93,7 +93,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="addPrimaryKeyCol">Flag indicating if an auto-generated primary key column will be added as the first column in the table.</param>
     /// <param name="useFormattedValues">Flag indicating if the Excel excelData used to populate this table is formatted (numbers, dates, text) or not (numbers and text).</param>
     /// <param name="removeEmptyColumns">Flag indicating if columns with no excelData will be skipped for export to a new table so they are not created.</param>
-    /// <param name="detectDataType">Flag indicating if the data type for each column is automatically detected when data is loaded by the <see cref="SetData"/> method.</param>
+    /// <param name="detectDataType">Flag indicating if the data type for each column is automatically detected when data is loaded by the <see cref="SetupColumnsWithData"/> method.</param>
     /// <param name="addBufferToVarchar">Flag indicating if columns with an auto-detected varchar type will get a padding buffer for its size.</param>
     /// <param name="autoIndexIntColumns">Flag indicating if columns with an integer-based data-type will have their <see cref="MySqlDataColumn.CreateIndex"/> property value set to true.</param>
     /// <param name="autoAllowEmptyNonIndexColumns">Flag indicating if columns that have their <see cref="MySqlDataColumn.CreateIndex"/> property value
@@ -121,10 +121,12 @@ namespace MySQL.ForExcel.Classes
     /// <param name="tableName">Name of the table.</param>
     /// <param name="fetchColumnsSchemaInfo">Flag indicating if the schema information from the corresponding MySQL table is fetched and recreated before any excelData is added to the table.</param>
     /// <param name="datesAsMySqlDates">Flag indicating if the dates are stored in the table as <see cref="System.DateTime"/> or <see cref="MySql.Data.Types.MySqlDateTime"/> objects.</param>
+    /// <param name="useFormattedValues">Flag indicating if the Excel excelData used to populate this table is formatted (numbers, dates, text) or not (numbers and text).</param>
     /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    public MySqlDataTable(string tableName, bool fetchColumnsSchemaInfo, bool datesAsMySqlDates, MySqlWorkbenchConnection wbConnection)
+    public MySqlDataTable(string tableName, bool fetchColumnsSchemaInfo, bool datesAsMySqlDates, bool useFormattedValues, MySqlWorkbenchConnection wbConnection)
       : this(wbConnection.Schema, tableName)
     {
+      IsFormatted = useFormattedValues;
       OperationType = DataOperationType.Append;
       WbConnection = wbConnection;
       if (fetchColumnsSchemaInfo)
@@ -143,7 +145,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="filledTable"><see cref="DataTable"/> object containing imported excelData from the MySQL table to be edited.</param>
     /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     public MySqlDataTable(string tableName, DataTable filledTable, MySqlWorkbenchConnection wbConnection)
-      : this(tableName, true, true, wbConnection)
+      : this(tableName, true, true, false, wbConnection)
     {
       CopyTableData(filledTable);
       OperationType = DataOperationType.Edit;
@@ -185,12 +187,12 @@ namespace MySQL.ForExcel.Classes
       AddPrimaryKeyColumn = false;
       AutoAllowEmptyNonIndexColumns = false;
       AutoIndexIntColumns = false;
+      CreateTableWithoutData = false;
       DetectDatatype = false;
       FirstRowIsHeaders = false;
       IsTableNameValid = !string.IsNullOrEmpty(TableName);
       IsFormatted = false;
       OperationType = DataOperationType.Import;
-      PushResultsTable = null;
       RemoveEmptyColumns = false;
       SchemaName = string.Empty;
       SelectQuery = string.Format("SELECT * FROM `{0}`", TableNameForSqlQueries);
@@ -271,6 +273,11 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets or sets a value indicating whether during an Export operation only the table will be created without any data.
+    /// </summary>
+    public bool CreateTableWithoutData { get; set; }
+
+    /// <summary>
     /// Gets the last warning text associated to the auto-generated primary key.
     /// </summary>
     public string CurrentAutoPkWarningText
@@ -305,7 +312,7 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a value indicating whether data type for each column is automatically detected when data is loaded by the <see cref="SetData"/> method.
+    /// Gets a value indicating whether data type for each column is automatically detected when data is loaded by the <see cref="SetupColumnsWithData"/> method.
     /// </summary>
     public bool DetectDatatype { get; set; }
 
@@ -442,11 +449,6 @@ namespace MySQL.ForExcel.Classes
     /// Gets the data operation the table is used for.
     /// </summary>
     public DataOperationType OperationType { get; private set; }
-
-    /// <summary>
-    /// Gets a <see cref="PushResultsDataTable"/> object containing results of changes in this table pushed to the server.
-    /// </summary>
-    public PushResultsDataTable PushResultsTable { get; private set; }
 
     /// <summary>
     /// Gets a value indicating whether columns with no excelData will be skipped for export to a new table so they are not created.
@@ -598,72 +600,6 @@ namespace MySQL.ForExcel.Classes
     public event TableWarningsChangedEventHandler TableWarningsChanged;
 
     /// <summary>
-    /// Inserts data taken from the given <see cref="MySqlDataTable"/> source table into the corresponding database table with the same name given the column mappings defined on this table.
-    /// </summary>
-    /// <param name="mappingFromTable"><see cref="MySqlDataTable"/> source table containing the data to insert.</param>
-    /// <param name="exception">Exception thrown back (if any) when trying to insert data into the database table.</param>
-    /// <param name="sqlQuery">The SQL query to insert data in the given <see cref="MySqlDataTable"/> source table into the database table.</param>
-    /// <param name="insertedCount">Number of rows actually inserted into the database.</param>
-    /// <returns><see cref="DataTable"/> object containing warnings thrown by the data append operation, null if no warnings were generated.</returns>
-    public DataTable AppendDataWithManualQuery(MySqlDataTable mappingFromTable, out Exception exception, out string sqlQuery, out int insertedCount)
-    {
-      DataSet warningsDs = null;
-      insertedCount = 0;
-      exception = null;
-      MySqlTransaction transaction = null;
-      sqlQuery = string.Empty;
-
-      string connectionString = WbConnection.GetConnectionStringBuilder().ConnectionString;
-      using (MySqlConnection conn = new MySqlConnection(connectionString))
-      {
-        try
-        {
-          conn.Open();
-          if (_mysqlMaxAllowedPacket == 0)
-          {
-            _mysqlMaxAllowedPacket = conn.GetMySqlServerMaxAllowedPacket();
-          }
-
-          transaction = conn.BeginTransaction();
-          MySqlCommand cmd = new MySqlCommand(string.Empty, conn, transaction);
-          int nextRow = 0;
-          while (nextRow >= 0)
-          {
-            string chunkQuery = GetAppendSql(nextRow, -1, true, mappingFromTable, out nextRow);
-            cmd.CommandText = chunkQuery;
-            sqlQuery += chunkQuery;
-            insertedCount += cmd.ExecuteNonQuery();
-          }
-
-          transaction.Commit();
-          warningsDs = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");
-        }
-        catch (MySqlException mysqlEx)
-        {
-          if (transaction != null)
-          {
-            transaction.Rollback();
-          }
-
-          exception = mysqlEx;
-          MySqlSourceTrace.WriteAppErrorToLog(mysqlEx);
-        }
-        catch (Exception ex)
-        {
-          if (transaction != null)
-          {
-            transaction.Rollback();
-          }
-
-          exception = ex;
-          MySqlSourceTrace.WriteAppErrorToLog(ex);
-        }
-      }
-
-      return warningsDs != null && warningsDs.Tables.Count > 0 ? warningsDs.Tables[0] : null;
-    }
-
-    /// <summary>
     /// Creates a new <see cref="MySqlDataTable"/> object with its schema cloned from this table but no data.
     /// </summary>
     /// <returns>Cloned <see cref="MySqlDataTable"/> object.</returns>
@@ -723,186 +659,6 @@ namespace MySQL.ForExcel.Classes
     public bool ColumnIsPrimaryKey(string columnName)
     {
       return ColumnIsPrimaryKey(columnName, true);
-    }
-
-    /// <summary>
-    /// Creates a new table in the database based on this table's schema information.
-    /// </summary>
-    /// <param name="exception">Exception thrown back (if any) when trying to create the table in the database.</param>
-    /// <param name="sqlQuery">The SQL query to create a new table in the database based on this table's schema information.</param>
-    /// <returns><see cref="DataTable"/> object containing warnings thrown by the table's creation, null if no warnings were generated.</returns>
-    public DataTable CreateTable(out Exception exception, out string sqlQuery)
-    {
-      DataSet warningsDs = null;
-      string connectionString = WbConnection.GetConnectionStringBuilder().ConnectionString;
-      exception = null;
-      sqlQuery = GetCreateSql(true);
-
-      try
-      {
-        using (MySqlConnection conn = new MySqlConnection(connectionString))
-        {
-          conn.Open();
-          MySqlCommand cmd = new MySqlCommand(sqlQuery, conn);
-          cmd.ExecuteNonQuery();
-          warningsDs = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");
-        }
-      }
-      catch (MySqlException ex)
-      {
-        exception = ex;
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
-      }
-
-      return warningsDs != null && warningsDs.Tables.Count > 0 ? warningsDs.Tables[0] : null;
-    }
-
-    /// <summary>
-    /// Creates a SQL query to insert rows taken from the given <see cref="MySqlDataTable"/> source table into mapped columns in this table.
-    /// </summary>
-    /// <param name="startRow">Values to be inserted are taken from this row number forward.</param>
-    /// <param name="limit">Maximum number of rows in the table to be inserted with this query, if -1 all rows are included.</param>
-    /// <param name="formatNewLinesAndTabs">Flag indicating if the SQL statement must be formatted to insert new line and tab characters for display purposes.</param>
-    /// <param name="mappingFromTable"><see cref="MySqlDataTable"/> source table containing the data to insert.</param>
-    /// <param name="nextRow">Last row processed if the query needs to be split, -1 if all rows were processed.</param>
-    /// <returns>INSERT INTO SQL query.</returns>
-    public string GetAppendSql(int startRow, int limit, bool formatNewLinesAndTabs, MySqlDataTable mappingFromTable, out int nextRow)
-    {
-      nextRow = -1;
-      ulong maxByteCount = _mysqlMaxAllowedPacket > 0 ? _mysqlMaxAllowedPacket - SAFE_BYTES_BEFORE_REACHING_MAX_ALLOWED_PACKET : 0;
-      int colsCount = Columns.Count;
-      int rowsCount = mappingFromTable.Rows.Count;
-
-      if (startRow < 0)
-      {
-        startRow = 0;
-      }
-
-      if (mappingFromTable.FirstRowIsHeaders && startRow == 0)
-      {
-        startRow++;
-      }
-
-      if (mappingFromTable.Rows.Count - (mappingFromTable.FirstRowIsHeaders ? 1 : 0) < 1)
-      {
-        return null;
-      }
-
-      if (startRow > rowsCount)
-      {
-        return null;
-      }
-
-      ulong queryStringByteCount = 0;
-      StringBuilder queryString = new StringBuilder();
-      string nl = formatNewLinesAndTabs ? Environment.NewLine : " ";
-      int rowIdx;
-      int colIdx;
-      int startingColNum = AddPrimaryKeyColumn ? (_useFirstColumnAsPk ? 0 : 1) : 0;
-      List<string> fromColumnNames = new List<string>(colsCount);
-      List<string> toColumnNames = new List<string>(colsCount);
-
-      string rowsSeparator = string.Empty;
-      string colsSeparator = string.Empty;
-      queryString.AppendFormat(
-        "INSERT INTO `{0}`.`{1}`{2}(",
-        SchemaName,
-        TableNameForSqlQueries,
-        nl);
-
-      // Loop columns to assemble the piece of the query that includes the column names that we will insert data into.
-      for (colIdx = startingColNum; colIdx < colsCount; colIdx++)
-      {
-        MySqlDataColumn toColumn = GetColumnAtIndex(colIdx);
-        string fromColumnName = toColumn.MappedDataColName;
-        if (toColumn.ExcludeColumn || string.IsNullOrEmpty(fromColumnName))
-        {
-          continue;
-        }
-
-        queryString.AppendFormat(
-          "{0}`{1}`",
-          colsSeparator,
-          toColumn.ColumnNameForSqlQueries);
-        colsSeparator = ",";
-        fromColumnNames.Add(fromColumnName);
-        toColumnNames.Add(toColumn.ColumnName);
-      }
-
-      queryString.AppendFormat("){0}VALUES{0}", nl);
-      int absRowIdx = 0;
-      StringBuilder singleRowValuesBuilder = new StringBuilder();
-      if (maxByteCount > 0)
-      {
-        queryStringByteCount = (ulong)Encoding.ASCII.GetByteCount(queryString.ToString());
-      }
-
-      // Loop all rows in this table to include the values for insertion in the query.
-      for (rowIdx = startRow; rowIdx < rowsCount; rowIdx++)
-      {
-        DataRow dr = mappingFromTable.Rows[rowIdx];
-        if (limit > 0 && absRowIdx > limit)
-        {
-          if (rowIdx < rowsCount)
-          {
-            nextRow = rowIdx;
-          }
-
-          break;
-        }
-
-        absRowIdx++;
-
-        // Within the current row, loop all columns to extract each value and append it to the query string.
-        singleRowValuesBuilder.Clear();
-        singleRowValuesBuilder.AppendFormat("{0}(", rowsSeparator);
-        colsSeparator = string.Empty;
-        for (colIdx = 0; colIdx < toColumnNames.Count; colIdx++)
-        {
-          string fromColumnName = fromColumnNames[colIdx];
-          string toColumnName = toColumnNames[colIdx];
-          MySqlDataColumn toColumn = Columns[toColumnName] as MySqlDataColumn;
-          bool insertingValueIsNull;
-          string valueToDb = DataTypeUtilities.GetStringValueForColumn(dr[fromColumnName], toColumn, true, out insertingValueIsNull);
-          singleRowValuesBuilder.AppendFormat(
-            "{0}{1}{2}{1}",
-            colsSeparator,
-            toColumn != null && toColumn.ColumnsRequireQuotes && !insertingValueIsNull ? "'" : string.Empty,
-            valueToDb);
-          colsSeparator = ",";
-        }
-
-        // Close the current row values piece of the query and check if we have not exceeded the maximum packet size allowed by the server,
-        //  otherwise we return the query string as is and return the last row number that was processed so another INSERT INTO query is
-        //  assembled starting from the row we left on.
-        singleRowValuesBuilder.Append(")");
-        string singleRowValuesString = singleRowValuesBuilder.ToString();
-        if (maxByteCount > 0)
-        {
-          ulong singleValueRowQueryByteCount = (ulong)Encoding.ASCII.GetByteCount(singleRowValuesString);
-          if (queryStringByteCount + singleValueRowQueryByteCount > maxByteCount)
-          {
-            nextRow = rowIdx;
-            break;
-          }
-
-          queryStringByteCount += singleValueRowQueryByteCount;
-        }
-
-        // Add a , separator for the collection of values in the INSERT QUERY.
-        queryString.Append(singleRowValuesString);
-        if (rowsSeparator.Length == 0)
-        {
-          rowsSeparator = "," + nl;
-        }
-      }
-
-      if (nextRow >= 0)
-      {
-        queryString.AppendFormat(";{0}", nl);
-      }
-
-      return queryString.ToString();
     }
 
     /// <summary>
@@ -1009,7 +765,7 @@ namespace MySQL.ForExcel.Classes
     {
       StringBuilder sql = new StringBuilder();
       string nl = formatNewLinesAndTabs ? Environment.NewLine : " ";
-      string nlt = formatNewLinesAndTabs ? Environment.NewLine + "\t" : " ";
+      string nlt = formatNewLinesAndTabs ? Environment.NewLine + "   " : " ";
 
       sql.AppendFormat("CREATE TABLE `{0}`.`{1}`{2}(", SchemaName, TableName, nl);
 
@@ -1042,158 +798,6 @@ namespace MySQL.ForExcel.Classes
       sql.Append(nl);
       sql.Append(")");
       return sql.ToString();
-    }
-
-    /// <summary>
-    /// Creates a SQL query to insert rows in this table into the corresponding MySQL database table.
-    /// </summary>
-    /// <param name="startRow">Values to be inserted are taken from this row number forward.</param>
-    /// <param name="limit">Maximum number of rows in the table to be inserted with this query, if -1 all rows are included.</param>
-    /// <param name="formatNewLinesAndTabs">Flag indicating if the SQL statement must be formatted to insert new line and tab characters for display purposes.</param>
-    /// <param name="nextRow">Last row processed if the query needs to be split, -1 if all rows were processed.</param>
-    /// <param name="insertingRowsCount">Number of rows to be inserted into the database with this query.</param>
-    /// <returns>INSERT INTO SQL query.</returns>
-    public string GetInsertSql(int startRow, int limit, bool formatNewLinesAndTabs, out int nextRow, out int insertingRowsCount)
-    {
-      nextRow = -1;
-      insertingRowsCount = 0;
-
-      if (startRow < 0)
-      {
-        startRow = 0;
-      }
-
-      if (_firstRowIsHeaders && startRow == 0)
-      {
-        startRow++;
-      }
-
-      if (startRow >= Rows.Count)
-      {
-        return null;
-      }
-
-      ulong maxByteCount = _mysqlMaxAllowedPacket > 0 ? _mysqlMaxAllowedPacket - SAFE_BYTES_BEFORE_REACHING_MAX_ALLOWED_PACKET : 0;
-      ulong queryStringByteCount = 0;
-      StringBuilder queryString = new StringBuilder();
-      string nl = formatNewLinesAndTabs ? Environment.NewLine : " ";
-      int rowIdx;
-      int colIdx;
-      int startingColNum = AddPrimaryKeyColumn ? (_useFirstColumnAsPk ? 0 : 1) : 0;
-      List<string> insertColumnNames = new List<string>(Columns.Count);
-
-      string rowsSeparator = string.Empty;
-      string colsSeparator = string.Empty;
-      queryString.AppendFormat(
-        "INSERT INTO `{0}`.`{1}`{2}(",
-        SchemaName,
-        TableNameForSqlQueries,
-        nl);
-
-      // Loop columns to assemble the piece of the query that includes the column names that we will insert data into.
-      for (colIdx = startingColNum; colIdx < Columns.Count; colIdx++)
-      {
-        MySqlDataColumn column = GetColumnAtIndex(colIdx);
-        if (column.ExcludeColumn)
-        {
-          continue;
-        }
-
-        queryString.AppendFormat(
-          "{0}`{1}`",
-          colsSeparator,
-          column.DisplayNameForSqlQueries);
-        colsSeparator = ",";
-        insertColumnNames.Add(column.ColumnName);
-      }
-
-      queryString.AppendFormat("){0}VALUES{0}", nl);
-      int absRowIdx = 0;
-      StringBuilder singleRowValuesBuilder = new StringBuilder();
-      if (maxByteCount > 0)
-      {
-        queryStringByteCount = (ulong)Encoding.ASCII.GetByteCount(queryString.ToString());
-      }
-
-      // Loop all rows in this table to include the values for insertion in the query.
-      for (rowIdx = startRow; rowIdx < Rows.Count; rowIdx++)
-      {
-        if (limit > 0 && absRowIdx > limit)
-        {
-          if (rowIdx < Rows.Count)
-          {
-            nextRow = rowIdx;
-          }
-
-          break;
-        }
-
-        absRowIdx++;
-
-        // Within the current row, loop all columns to extract each value and append it to the query string.
-        DataRow dr = Rows[rowIdx];
-        singleRowValuesBuilder.Clear();
-        singleRowValuesBuilder.AppendFormat("{0}(", rowsSeparator);
-        colsSeparator = string.Empty;
-        foreach (string insertingColName in insertColumnNames)
-        {
-          MySqlDataColumn column = Columns[insertingColName] as MySqlDataColumn;
-          bool insertingValueIsNull;
-          string valueToDb = DataTypeUtilities.GetStringValueForColumn(dr[insertingColName], column, true, out insertingValueIsNull);
-          singleRowValuesBuilder.AppendFormat(
-            "{0}{1}{2}{1}",
-            colsSeparator,
-            column != null && column.ColumnsRequireQuotes && !insertingValueIsNull ? "'" : string.Empty,
-            valueToDb);
-          colsSeparator = ",";
-        }
-
-        // Close the current row values piece of the query and check if we have not exceeded the maximum packet size allowed by the server,
-        //  otherwise we return the query string as is and return the last row number that was processed so another INSERT INTO query is
-        //  assembled starting from the row we left on.
-        singleRowValuesBuilder.Append(")");
-        string singleRowValuesString = singleRowValuesBuilder.ToString();
-        if (maxByteCount > 0)
-        {
-          ulong singleValueRowQueryByteCount = (ulong)Encoding.ASCII.GetByteCount(singleRowValuesString);
-          if (queryStringByteCount + singleValueRowQueryByteCount > maxByteCount)
-          {
-            nextRow = rowIdx;
-            break;
-          }
-
-          queryStringByteCount += singleValueRowQueryByteCount;
-        }
-
-        // Add a , separator for the collection of values in the INSERT QUERY.
-        queryString.Append(singleRowValuesString);
-        if (rowsSeparator.Length == 0)
-        {
-          rowsSeparator = "," + nl;
-        }
-
-        insertingRowsCount++;
-      }
-
-      if (nextRow >= 0)
-      {
-        queryString.AppendFormat(";{0}", nl);
-      }
-
-      return queryString.ToString();
-    }
-
-    /// <summary>
-    /// Creates a SQL query to insert all rows in this table into the corresponding MySQL database table.
-    /// </summary>
-    /// <param name="limit">Maximum number of rows in the table to be inserted with this query, if -1 all rows are included.</param>
-    /// <param name="formatNewLinesAndTabs">Flag indicating if the SQL statement must be formatted to insert new line and tab characters for display purposes.</param>
-    /// <returns>INSERT INTO SQL query.</returns>
-    public string GetInsertSql(int limit, bool formatNewLinesAndTabs)
-    {
-      int nextRow;
-      int insertingRowsCount;
-      return GetInsertSql(0, limit, formatNewLinesAndTabs, out nextRow, out insertingRowsCount);
     }
 
     /// <summary>
@@ -1307,164 +911,35 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Inserts data contained in this table into the corresponding database table with the same name.
-    /// </summary>
-    /// <param name="exception">Exception thrown back (if any) when trying to insert data into the database table.</param>
-    /// <param name="sqlQuery">The SQL query to insert data in this table into the database table.</param>
-    /// <param name="insertingRows">Number of rows to be inserted into the database with this query.</param>
-    /// <param name="insertedRows">Number of rows actually inserted into the database.</param>
-    /// <returns><see cref="DataTable"/> object containing warnings thrown by the data insertion, null if no warnings were generated.</returns>
-    public DataTable InsertDataWithManualQuery(out Exception exception, out string sqlQuery, out int insertingRows, out int insertedRows)
-    {
-      DataSet warningsDs = null;
-      insertedRows = 0;
-      insertingRows = 0;
-      exception = null;
-      MySqlTransaction transaction = null;
-      sqlQuery = string.Empty;
-
-      string connectionString = WbConnection.GetConnectionStringBuilder().ConnectionString;
-      using (MySqlConnection conn = new MySqlConnection(connectionString))
-      {
-        try
-        {
-          conn.Open();
-          if (_mysqlMaxAllowedPacket == 0)
-          {
-            _mysqlMaxAllowedPacket = conn.GetMySqlServerMaxAllowedPacket();
-          }
-
-          transaction = conn.BeginTransaction();
-          MySqlCommand cmd = new MySqlCommand(string.Empty, conn, transaction);
-          int nextRow = 0;
-          while (nextRow >= 0)
-          {
-            int insertingRowsCount;
-            string chunkQuery = GetInsertSql(nextRow, -1, true, out nextRow, out insertingRowsCount);
-            cmd.CommandText = chunkQuery;
-            sqlQuery += chunkQuery;
-            insertedRows += cmd.ExecuteNonQuery();
-            insertingRows += insertingRowsCount;
-          }
-
-          transaction.Commit();
-          warningsDs = MySqlHelper.ExecuteDataset(conn, "SHOW WARNINGS");
-        }
-        catch (MySqlException mysqlEx)
-        {
-          if (transaction != null)
-          {
-            transaction.Rollback();
-          }
-
-          exception = mysqlEx;
-          MySqlSourceTrace.WriteAppErrorToLog(mysqlEx);
-        }
-        catch (Exception ex)
-        {
-          if (transaction != null)
-          {
-            transaction.Rollback();
-          }
-
-          exception = ex;
-          MySqlSourceTrace.WriteAppErrorToLog(ex);
-        }
-      }
-
-      return warningsDs != null && warningsDs.Tables.Count > 0 ? warningsDs.Tables[0] : null;
-    }
-
-    /// <summary>
     /// Pushes all changes in this table's data to its corresponding database table.
     /// </summary>
-    public void PushData()
+    /// <param name="showMySqlScriptDialog">Flag indicating whether the <see cref="MySqlScriptDialog"/> is shown before applying the query.</param>
+    /// <returns></returns>
+    public List<IMySqlDataRow> PushData(bool showMySqlScriptDialog)
     {
       var dataTable = GetChanges();
-      if (dataTable != null && dataTable.Rows.Count == 0)
+      if (dataTable != null && dataTable.Rows.Count == 0 && !CreateTableWithoutData)
       {
-        return;
+        // No rows have any changes, so exit.
+        return null;
       }
 
-      if (PushResultsTable == null)
+      List<IMySqlDataRow> statementRowsList;
+      using (var sqlScriptDialog = new MySqlScriptDialog(this))
       {
-        PushResultsTable = new PushResultsDataTable();
-      }
-      else
-      {
-        PushResultsTable.Clear();
-      }
-
-      MySqlTransaction transaction = null;
-      string connectionString = WbConnection.GetConnectionStringBuilder().ConnectionString;
-      DataRowState[] pushOperationsArray = { DataRowState.Deleted, DataRowState.Added, DataRowState.Modified };
-      MySqlDataRow lastRow = null;
-      using (MySqlConnection conn = new MySqlConnection(connectionString))
-      {
-        try
+        if (showMySqlScriptDialog)
         {
-          conn.Open();
-          if (_mysqlMaxAllowedPacket == 0)
-          {
-            _mysqlMaxAllowedPacket = conn.GetMySqlServerMaxAllowedPacket();
-          }
-
-          transaction = conn.BeginTransaction();
-          MySqlCommand cmd = new MySqlCommand(string.Empty, conn, transaction);
-
-          foreach (MySqlDataRow mySqlRow in pushOperationsArray.SelectMany(operationCopy => Rows.Cast<MySqlDataRow>().Where(dr => dr.RowState == operationCopy)))
-          {
-            lastRow = mySqlRow;
-            mySqlRow.PushData(cmd);
-          }
-
-          transaction.Commit();
-
-          // After commiting the transaction, selectively commit the rows that did not result in errors.
-          for (int rowIdx = 0; rowIdx < Rows.Count; rowIdx++)
-          {
-            DataRow dr = Rows[rowIdx];
-            if (dr.RowState == DataRowState.Unchanged || dr.RowError == MySqlDataRow.NO_MATCH)
-            {
-              continue;
-            }
-
-            if (dr.RowState == DataRowState.Deleted)
-            {
-              rowIdx--;
-            }
-
-            dr.AcceptChanges();
-            dr.ClearErrors();
-          }
+          sqlScriptDialog.ShowDialog();
         }
-        catch (Exception ex)
+        else
         {
-          if (transaction != null)
-          {
-            transaction.Rollback();
-          }
-
-          if (lastRow != null)
-          {
-            lastRow.RowError = ex.Message;
-            string errorText;
-            if (ex is MySqlException)
-            {
-              MySqlException mysqlEx = ex as MySqlException;
-              errorText = string.Format(Resources.ErrorMySQLText, mysqlEx.Number) + Environment.NewLine + mysqlEx.Message;
-            }
-            else
-            {
-              errorText = Resources.ErrorAdoNetText + Environment.NewLine + ex.Message;
-            }
-
-            PushResultsTable.AddResult(lastRow.OperationType, PushResultsDataTable.OperationResult.Error, lastRow.SqlQuery, errorText, 0);
-          }
-
-          MySqlSourceTrace.WriteAppErrorToLog(ex);
+          sqlScriptDialog.ApplyScript();
         }
+
+        statementRowsList = sqlScriptDialog.ActualStatementRowsList;
       }
+
+      return statementRowsList;
     }
 
     /// <summary>
@@ -1542,56 +1017,88 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Creates data rows in this table for data in the given Excel range.
+    /// </summary>
+    /// <param name="dataRange">Excel data range containing the data to fill the table.</param>
+    /// <param name="useMappedColumns">Flag indicating if the data is added to the mapped column instead of to the column with the same index as the Excel data.</param>
+    /// <param name="columnsHaveAnyDataList">A list of boolean values for each of the columns in the Excel range representing if the column has data or not.</param>
+    public void AddExcelData(Excel.Range dataRange, bool useMappedColumns, List<bool> columnsHaveAnyDataList = null)
+    {
+      if (dataRange == null)
+      {
+        return;
+      }
+
+      if (columnsHaveAnyDataList == null)
+      {
+        columnsHaveAnyDataList = dataRange.GetColumnsWithDataInfoList(AddPrimaryKeyColumn);
+      }
+
+      var excelData = dataRange.ToBidimensionalArray(IsFormatted);
+      int numRows = excelData.GetUpperBound(0);
+      int colAdjustIdx = AddPrimaryKeyColumn ? 1 : 0;
+      int pkRowValueAdjust = _firstRowIsHeaders ? 1 : 0;
+      for (int row = 1; row <= numRows; row++)
+      {
+        bool rowHasAnyData = false;
+        var dataRow = NewRow() as MySqlDataRow;
+        if (dataRow == null)
+        {
+          continue;
+        }
+
+        foreach (MySqlDataColumn mySqlColumn in Columns.Cast<MySqlDataColumn>().Where(mySqlColumn => !useMappedColumns || (!mySqlColumn.ExcludeColumn && mySqlColumn.MappedDataColOrdinal >= 0)))
+        {
+          if (mySqlColumn.AutoPk)
+          {
+            dataRow[0] = row - pkRowValueAdjust;
+            continue;
+          }
+
+          var rangeColumnIndex = useMappedColumns ? mySqlColumn.MappedDataColOrdinal : mySqlColumn.Ordinal - colAdjustIdx;
+          if (!columnsHaveAnyDataList[rangeColumnIndex])
+          {
+            continue;
+          }
+
+          // Increment the rangeColumnIndex by 1 because the indexes within the Excel range begin with 1 not 0.
+          rangeColumnIndex++;
+          rowHasAnyData = rowHasAnyData || excelData[row, rangeColumnIndex] != null;
+          dataRow[mySqlColumn.Ordinal] = excelData[row, rangeColumnIndex] != null && excelData[row, rangeColumnIndex].Equals(0.0) && mySqlColumn.IsDate
+            ? DataTypeUtilities.MYSQL_EMPTY_DATE
+            : dataRow[mySqlColumn.Ordinal] = excelData[row, rangeColumnIndex];
+        }
+
+        if (rowHasAnyData)
+        {
+          if (row == 1 && _firstRowIsHeaders)
+          {
+            dataRow.IsHeadersRow = true;
+          }
+
+          Rows.Add(dataRow);
+        }
+        else
+        {
+          pkRowValueAdjust++;
+        }
+      }
+    }
+
+    /// <summary>
     /// Creates data rows, fills them with the given Excel data and sets column properties automatically given user options.
     /// </summary>
     /// <param name="dataRange">Excel data range containing the data to fill the table.</param>
     /// <param name="recreateColumnsFromData">Flag indicating if any existing columns in the table must be dropped and re-created based on the given data range.</param>
     /// <param name="emptyColumnsToVarchar">Flag indicating if the data type for columns with no data is automatically set to varchar(255).</param>
-    public void SetData(Excel.Range dataRange, bool recreateColumnsFromData, bool emptyColumnsToVarchar)
+    public void SetupColumnsWithData(Excel.Range dataRange, bool recreateColumnsFromData, bool emptyColumnsToVarchar)
     {
-      object[,] excelData;
       Clear();
-
-      // We have to treat a single cell specially.  It doesn't come in as an array but as a single value
-      if (dataRange.Count == 1)
-      {
-        excelData = new object[2, 2];
-        excelData[1, 1] = IsFormatted ? dataRange.Value : dataRange.Value2;
-      }
-      else
-      {
-        excelData = IsFormatted ? dataRange.Value : dataRange.Value2;
-      }
-
-      int numRows = excelData.GetUpperBound(0);
-      int numCols = excelData.GetUpperBound(1);
-      int colAdjustIdx = AddPrimaryKeyColumn ? 0 : 1;
-      List<bool> columnsHaveAnyDataList = new List<bool>(numCols + 1);
-      List<bool> columnsContainDatesList = new List<bool>(numCols + 1);
+      int numCols = dataRange.Columns.Count;
       List<string> colsToDelete = new List<string>(numCols);
 
       // Create a list of boolean values that state if each column has any data or none.
-      if (AddPrimaryKeyColumn)
-      {
-        columnsHaveAnyDataList.Add(true);
-      }
-
-      for (int colIdx = 1; colIdx <= numCols; colIdx++)
-      {
-        bool colHasAnyData = false;
-        for (int rowIdx = 1; rowIdx <= numRows; rowIdx++)
-        {
-          if (excelData[rowIdx, colIdx] == null)
-          {
-            continue;
-          }
-
-          colHasAnyData = true;
-          break;
-        }
-
-        columnsHaveAnyDataList.Add(colHasAnyData);
-      }
+      var columnsHaveAnyDataList = dataRange.GetColumnsWithDataInfoList(AddPrimaryKeyColumn);
 
       // Drop all columns and re-create them or create them if none have been created so far.
       if (recreateColumnsFromData || Columns.Count == 0)
@@ -1600,6 +1107,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Set the IsEmpty and Exclude properties of columns based on the filling data
+      List<bool> columnsContainDatesList = new List<bool>(numCols + 1);
       for (int colIdx = 0; colIdx < Columns.Count; colIdx++)
       {
         MySqlDataColumn column = GetColumnAtIndex(colIdx);
@@ -1617,39 +1125,13 @@ namespace MySQL.ForExcel.Classes
         }
       }
 
-      // Create excelData rows and fill them with the Excel data.
-      int pkRowValueAdjust = _firstRowIsHeaders ? 1 : 0;
-      for (int row = 1; row <= numRows; row++)
-      {
-        bool rowHasAnyData = false;
-        DataRow dataRow = NewRow();
-        dataRow[0] = row - pkRowValueAdjust;
-        for (int col = 1; col <= numCols; col++)
-        {
-          int adjColIdx = col - colAdjustIdx;
-          if (!columnsHaveAnyDataList[adjColIdx])
-          {
-            continue;
-          }
-
-          rowHasAnyData = rowHasAnyData || excelData[row, col] != null;
-          dataRow[adjColIdx] = excelData[row, col] != null && excelData[row, col].Equals(0.0) && columnsContainDatesList[adjColIdx] ? DataTypeUtilities.MYSQL_EMPTY_DATE : dataRow[adjColIdx] = excelData[row, col];
-        }
-
-        if (rowHasAnyData)
-        {
-          Rows.Add(dataRow);
-        }
-        else
-        {
-          pkRowValueAdjust++;
-        }
-      }
+      // Add the Excel data to rows in this table.
+      AddExcelData(dataRange, false, columnsHaveAnyDataList);
 
       // Automatically detect the excelData type for columns based on their data.
       if (DetectDatatype)
       {
-        DetectTypes(excelData, emptyColumnsToVarchar);
+        DetectTypes(dataRange, emptyColumnsToVarchar);
       }
 
       // Remove from the Columns collection the columns without data if the Remove Empty Columns option is true.
@@ -1662,14 +1144,12 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Flag columns as allowing nulls if the option to Allow Empty columns is true, valid only for non-index columns.
-      if (!AutoAllowEmptyNonIndexColumns)
+      if (AutoAllowEmptyNonIndexColumns)
       {
-        return;
-      }
-
-      foreach (MySqlDataColumn mysqlCol in Columns)
-      {
-        mysqlCol.AllowNull = !mysqlCol.CreateIndex;
+        foreach (MySqlDataColumn mysqlCol in Columns)
+        {
+          mysqlCol.AllowNull = !mysqlCol.CreateIndex;
+        }
       }
     }
 
@@ -1903,14 +1383,14 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Analyzes the given Excel data by columns and automatically detects the table columns data types.
     /// </summary>
-    /// <param name="excelData">Two-dimensional array containing the Excel data used to fill the table.</param>
+    /// <param name="dataRange">The Excel range containing data to detect data types from.</param>
     /// <param name="emptyColumnsToVarchar">Flag indicating if the data type for columns with no data is automatically set to varchar(255).</param>
-    private void DetectTypes(object[,] excelData, bool emptyColumnsToVarchar)
+    private void DetectTypes(Excel.Range dataRange, bool emptyColumnsToVarchar)
     {
+      object[,] excelData = dataRange.ToBidimensionalArray(IsFormatted);
       int rowsCount = excelData.GetUpperBound(0);
       int colsCount = excelData.GetUpperBound(1);
       int colAdjustIdx = AddPrimaryKeyColumn ? 0 : 1;
-
       for (int dataColPos = 1; dataColPos <= colsCount; dataColPos++)
       {
         string proposedType = string.Empty;

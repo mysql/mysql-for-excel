@@ -271,6 +271,48 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Analyzes an Excel range to detect if each column within contains any data.
+    /// </summary>
+    /// <param name="range">The Excel range whose columns are analyzed for data presence.</param>
+    /// <param name="prependPkColumn">Flag indicating if a column representing a primary key is prepended to the list of columns from the Excel of data.</param>
+    /// <returns>A list of boolean values for each of the columns in the Excel range representing if the column has data or not.</returns>
+    public static List<bool> GetColumnsWithDataInfoList(this Excel.Range range, bool prependPkColumn = false)
+    {
+      if (range == null)
+      {
+        return null;
+      }
+
+      var excelData = range.ToBidimensionalArray();
+      int numCols = excelData.GetUpperBound(1);
+      int numRows = excelData.GetUpperBound(0);
+      List<bool> columnsHaveAnyDataList = new List<bool>(numCols + 1);
+      if (prependPkColumn)
+      {
+        columnsHaveAnyDataList.Add(true);
+      }
+
+      for (int colIdx = 1; colIdx <= numCols; colIdx++)
+      {
+        bool colHasAnyData = false;
+        for (int rowIdx = 1; rowIdx <= numRows; rowIdx++)
+        {
+          if (excelData[rowIdx, colIdx] == null)
+          {
+            continue;
+          }
+
+          colHasAnyData = true;
+          break;
+        }
+
+        columnsHaveAnyDataList.Add(colHasAnyData);
+      }
+
+      return columnsHaveAnyDataList;
+    }
+
+    /// <summary>
     /// Gets a valid name for a new <see cref="Excel.Worksheet"/> that avoids duplicates with existing ones in the current <see cref="Excel.Workbook"/>.
     /// </summary>
     /// <param name="worksheetName">The proposed name for a <see cref="Excel.Worksheet"/>.</param>
@@ -398,6 +440,34 @@ namespace MySQL.ForExcel.Classes
       }
 
       rangesList.Clear();
+    }
+
+    /// <summary>
+    /// Converts an Excel data range to a bidimensional array of data objects.
+    /// </summary>
+    /// <param name="range">An Excel range to convert.</param>
+    /// <param name="isFormatted">Flag indicating whether the data from Excel is formatted for dates or not.</param>
+    /// <returns>A bidimensional arraty of objects representing the data in the Excel range.</returns>
+    public static object[,] ToBidimensionalArray(this Excel.Range range, bool isFormatted = true)
+    {
+      if (range == null)
+      {
+        return null;
+      }
+
+      object[,] excelData;
+      if (range.Count == 1)
+      {
+        // Teat a single cell specially, it doesn't come in as an array but as a single value
+        excelData = new object[2, 2];
+        excelData[1, 1] = isFormatted ? range.Value : range.Value2;
+      }
+      else
+      {
+        excelData = isFormatted ? range.Value : range.Value2;
+      }
+
+      return excelData;
     }
 
     /// <summary>

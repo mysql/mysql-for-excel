@@ -52,7 +52,6 @@ namespace MySQL.ForExcel.Forms
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
       this.TextChangedTimer = new System.Windows.Forms.Timer(this.components);
-      this.CopySQLButton = new System.Windows.Forms.Button();
       this.AdvancedOptionsButton = new System.Windows.Forms.Button();
       this.ExportButton = new System.Windows.Forms.Button();
       this.DialogCancelButton = new System.Windows.Forms.Button();
@@ -71,7 +70,7 @@ namespace MySQL.ForExcel.Forms
       this.ColumnOptionsWarningLabel = new System.Windows.Forms.Label();
       this.ColumnOptionsWarningPictureBox = new System.Windows.Forms.PictureBox();
       this.FirstRowHeadersCheckBox = new System.Windows.Forms.CheckBox();
-      this.PreviewDataGridView = new PreviewDataGridView();
+      this.PreviewDataGridView = new MySQL.ForExcel.Controls.PreviewDataGridView();
       this.ColumnOptionsSubLabel = new System.Windows.Forms.Label();
       this.ColumnOptionsMainLabel = new System.Windows.Forms.Label();
       this.ColumnOptionsPictureBox = new System.Windows.Forms.PictureBox();
@@ -91,6 +90,10 @@ namespace MySQL.ForExcel.Forms
       this.TablePictureBox = new System.Windows.Forms.PictureBox();
       this.ExportDataLabel = new System.Windows.Forms.Label();
       this.SubSetOfDataLabel = new System.Windows.Forms.Label();
+      this.DropDownButton = new System.Windows.Forms.Button();
+      this.ExportContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.ExportDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.CreateTableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.PrimaryKeyWarningPictureBox)).BeginInit();
@@ -101,12 +104,13 @@ namespace MySQL.ForExcel.Forms
       ((System.ComponentModel.ISupportInitialize)(this.TableNameWarningPictureBox)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.PrimaryKeyPictureBox)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.TablePictureBox)).BeginInit();
+      this.ExportContextMenuStrip.SuspendLayout();
       this.SuspendLayout();
       // 
       // FootnoteAreaPanel
       // 
-      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 522);
-      this.FootnoteAreaPanel.Size = new System.Drawing.Size(844, 0);
+      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 292);
+      this.FootnoteAreaPanel.Size = new System.Drawing.Size(634, 0);
       // 
       // ContentAreaPanel
       // 
@@ -140,7 +144,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // CommandAreaPanel
       // 
-      this.CommandAreaPanel.Controls.Add(this.CopySQLButton);
+      this.CommandAreaPanel.Controls.Add(this.DropDownButton);
       this.CommandAreaPanel.Controls.Add(this.AdvancedOptionsButton);
       this.CommandAreaPanel.Controls.Add(this.ExportButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
@@ -151,18 +155,6 @@ namespace MySQL.ForExcel.Forms
       // 
       this.TextChangedTimer.Interval = 800;
       this.TextChangedTimer.Tick += new System.EventHandler(this.TextChangedTimerTick);
-      // 
-      // CopySQLButton
-      // 
-      this.CopySQLButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.CopySQLButton.Location = new System.Drawing.Point(595, 12);
-      this.CopySQLButton.Name = "CopySQLButton";
-      this.CopySQLButton.Size = new System.Drawing.Size(75, 23);
-      this.CopySQLButton.TabIndex = 1;
-      this.CopySQLButton.Text = "Copy SQL";
-      this.CopySQLButton.UseVisualStyleBackColor = true;
-      this.CopySQLButton.Visible = false;
-      this.CopySQLButton.Click += new System.EventHandler(this.CopySQLButton_Click);
       // 
       // AdvancedOptionsButton
       // 
@@ -179,11 +171,11 @@ namespace MySQL.ForExcel.Forms
       // 
       this.ExportButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.ExportButton.Enabled = false;
-      this.ExportButton.Location = new System.Drawing.Point(676, 12);
+      this.ExportButton.Location = new System.Drawing.Point(649, 12);
       this.ExportButton.Name = "ExportButton";
-      this.ExportButton.Size = new System.Drawing.Size(75, 23);
-      this.ExportButton.TabIndex = 2;
-      this.ExportButton.Text = "Export";
+      this.ExportButton.Size = new System.Drawing.Size(102, 23);
+      this.ExportButton.TabIndex = 1;
+      this.ExportButton.Text = "Export Data  ";
       this.ExportButton.UseVisualStyleBackColor = true;
       this.ExportButton.Click += new System.EventHandler(this.ExportButton_Click);
       // 
@@ -645,6 +637,47 @@ namespace MySQL.ForExcel.Forms
       this.SubSetOfDataLabel.TabIndex = 17;
       this.SubSetOfDataLabel.Text = "This is a small subset of the data for preview purposes only.";
       // 
+      // DropDownButton
+      // 
+      this.DropDownButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.DropDownButton.FlatAppearance.BorderSize = 0;
+      this.DropDownButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+      this.DropDownButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.DropDownButton.Location = new System.Drawing.Point(737, 15);
+      this.DropDownButton.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
+      this.DropDownButton.Name = "DropDownButton";
+      this.DropDownButton.Size = new System.Drawing.Size(12, 18);
+      this.DropDownButton.TabIndex = 2;
+      this.DropDownButton.Text = "▼";
+      this.DropDownButton.UseVisualStyleBackColor = true;
+      this.DropDownButton.Click += new System.EventHandler(this.DropDownButton_Click);
+      // 
+      // ExportContextMenuStrip
+      // 
+      this.ExportContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ExportDataToolStripMenuItem,
+            this.CreateTableToolStripMenuItem});
+      this.ExportContextMenuStrip.Name = "ExportContextMenuStrip";
+      this.ExportContextMenuStrip.ShowCheckMargin = true;
+      this.ExportContextMenuStrip.ShowImageMargin = false;
+      this.ExportContextMenuStrip.Size = new System.Drawing.Size(141, 48);
+      // 
+      // ExportDataToolStripMenuItem
+      // 
+      this.ExportDataToolStripMenuItem.Checked = true;
+      this.ExportDataToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+      this.ExportDataToolStripMenuItem.Name = "ExportDataToolStripMenuItem";
+      this.ExportDataToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+      this.ExportDataToolStripMenuItem.Text = "Export Data";
+      this.ExportDataToolStripMenuItem.Click += new System.EventHandler(this.ExportDataToolStripMenuItem_Click);
+      // 
+      // CreateTableToolStripMenuItem
+      // 
+      this.CreateTableToolStripMenuItem.Name = "CreateTableToolStripMenuItem";
+      this.CreateTableToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+      this.CreateTableToolStripMenuItem.Text = "Create Table";
+      this.CreateTableToolStripMenuItem.Click += new System.EventHandler(this.CreateTableToolStripMenuItem_Click);
+      // 
       // ExportDataForm
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -657,6 +690,9 @@ namespace MySQL.ForExcel.Forms
       this.Name = "ExportDataForm";
       this.Text = "Export Data";
       this.Load += new System.EventHandler(this.ExportDataForm_Load);
+      this.Controls.SetChildIndex(this.FootnoteAreaPanel, 0);
+      this.Controls.SetChildIndex(this.ContentAreaPanel, 0);
+      this.Controls.SetChildIndex(this.CommandAreaPanel, 0);
       this.ContentAreaPanel.ResumeLayout(false);
       this.ContentAreaPanel.PerformLayout();
       this.CommandAreaPanel.ResumeLayout(false);
@@ -669,6 +705,7 @@ namespace MySQL.ForExcel.Forms
       ((System.ComponentModel.ISupportInitialize)(this.TableNameWarningPictureBox)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.PrimaryKeyPictureBox)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.TablePictureBox)).EndInit();
+      this.ExportContextMenuStrip.ResumeLayout(false);
       this.ResumeLayout(false);
 
     }
@@ -676,7 +713,6 @@ namespace MySQL.ForExcel.Forms
     #endregion
 
     private System.Windows.Forms.Timer TextChangedTimer;
-    private System.Windows.Forms.Button CopySQLButton;
     private System.Windows.Forms.Button AdvancedOptionsButton;
     private System.Windows.Forms.Button ExportButton;
     private System.Windows.Forms.Button DialogCancelButton;
@@ -715,5 +751,9 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.PictureBox TablePictureBox;
     private System.Windows.Forms.Label ExportDataLabel;
     private System.Windows.Forms.Label SubSetOfDataLabel;
+    private System.Windows.Forms.Button DropDownButton;
+    private System.Windows.Forms.ContextMenuStrip ExportContextMenuStrip;
+    private System.Windows.Forms.ToolStripMenuItem ExportDataToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem CreateTableToolStripMenuItem;
   }
 }

@@ -19,9 +19,11 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using MySql.Data.MySqlClient;
 using MySQL.ForExcel.Forms;
+using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
@@ -131,6 +133,33 @@ namespace MySQL.ForExcel.Classes
       }
 
       return sb.ToString();
+    }
+
+    /// <summary>
+    /// Checks if the length of the SQL statement would exceed the MySQL Server's MAX_ALLOWED_PACKET variable value.
+    /// </summary>
+    /// <param name="sqlStatement">The string representing the SQL statement to be sent to the MySQL server.</param>
+    /// <param name="maxAllowedPacketValue">The value of the the MySQL Server's MAX_ALLOWED_PACKET variable.</param>
+    /// <param name="safetyBytes">A safety value before reaching the MAX_ALLOWED_PACKET variable value.</param>
+    /// <returns><c>true</c> if the length of the statement exceeds the vlaue of the server's MAX_ALLOWED_PACKET variable, <c>false</c> otherwise.</returns>
+    public static bool ExceedsMySqlMaxAllowedPacketValue(this string sqlStatement, ulong maxAllowedPacketValue, ulong safetyBytes = 0)
+    {
+      ulong maxByteCount = maxAllowedPacketValue > 0 ? maxAllowedPacketValue - safetyBytes : 0;
+      ulong statementByteCount = (ulong)Encoding.ASCII.GetByteCount(sqlStatement);
+      return statementByteCount > maxByteCount;
+    }
+
+    /// <summary>
+    /// Checks if the length of the SQL statement would exceed the MySQL Server's MAX_ALLOWED_PACKET variable value.
+    /// </summary>
+    /// <param name="sqlStatement">The string representing the SQL statement to be sent to the MySQL server.</param>
+    /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
+    /// <param name="safetyBytes">A safety value before reaching the MAX_ALLOWED_PACKET variable value.</param>
+    /// <returns><c>true</c> if the length of the statement exceeds the vlaue of the server's MAX_ALLOWED_PACKET variable, <c>false</c> otherwise.</returns>
+    public static bool ExceedsMySqlMaxAllowedPacketValue(this string sqlStatement, MySqlWorkbenchConnection wbConnection, ulong safetyBytes = 0)
+    {
+      ulong maxAllowedPacketValue = wbConnection.GetMySqlServerMaxAllowedPacket();
+      return ExceedsMySqlMaxAllowedPacketValue(sqlStatement, maxAllowedPacketValue, safetyBytes);
     }
 
     /// <summary>
@@ -254,7 +283,7 @@ namespace MySQL.ForExcel.Classes
     public static ulong GetMySqlServerMaxAllowedPacket(this MySqlWorkbenchConnection connection)
     {
       const string sql = "SELECT @@max_allowed_packet";
-      object objCount = MySqlHelper.ExecuteScalar(connection.GetConnectionStringBuilder().ConnectionString, sql);
+      object objCount = connection != null ? MySqlHelper.ExecuteScalar(connection.GetConnectionStringBuilder().ConnectionString, sql) : null;
       return objCount != null ? (ulong)objCount : 0;
     }
 
@@ -266,8 +295,21 @@ namespace MySQL.ForExcel.Classes
     public static ulong GetMySqlServerMaxAllowedPacket(this MySqlConnection connection)
     {
       const string sql = "SELECT @@max_allowed_packet";
-      object objCount = MySqlHelper.ExecuteScalar(connection, sql);
+      object objCount = connection != null ? MySqlHelper.ExecuteScalar(connection, sql) : null;
       return objCount != null ? (ulong)objCount : 0;
+    }
+
+    /// <summary>
+    /// Gets the total count of affected rows within the given list of rows with statements of a given type.
+    /// </summary>
+    /// <param name="rowsList">The list of <see cref="IMySqlDataRow"/> objects holding <see cref="MySqlStatement"/>s.</param>
+    /// <param name="statementType">The type of statements to account affected rows for.</param>
+    /// <returns>The total count of affected rows for a given statement type.</returns>
+    public static int GetResultsCount(this List<IMySqlDataRow> rowsList, MySqlStatement.SqlStatementType statementType)
+    {
+      return rowsList != null
+          ? rowsList.Where(iMsqlRow => iMsqlRow.Statement.StatementType == statementType && iMsqlRow.Statement.AffectedRows > 0).Sum(iMsqlRow => iMsqlRow.Statement.AffectedRows)
+          : 0;
     }
 
     /// <summary>
@@ -547,6 +589,16 @@ namespace MySQL.ForExcel.Classes
     public static string ToValidMySqlColumnName(this string proposedName)
     {
       return proposedName != null ? proposedName.Replace(" ", "_").Replace("(", string.Empty).Replace(")", string.Empty) : string.Empty;
+    }
+
+    /// <summary>
+    /// Verifies if a statement result was applied to the server, i.e. that it was successful or had warnings.
+    /// </summary>
+    /// <param name="statementResult">The statement result to evaluate.</param>
+    /// <returns><c>true</c> if the result is successful or had warnings, <c>false</c> otherwise.</returns>
+    public static bool WasApplied(this MySqlStatement.StatementResultType statementResult)
+    {
+      return statementResult == MySqlStatement.StatementResultType.Successful || statementResult == MySqlStatement.StatementResultType.WarningsFound;
     }
 
     /// <summary>

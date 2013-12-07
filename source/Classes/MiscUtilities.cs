@@ -16,6 +16,7 @@
 // 02110-1301  USA
 
 using System;
+using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
@@ -28,6 +29,25 @@ namespace MySQL.ForExcel.Classes
   /// </summary>
   public static class MiscUtilities
   {
+    /// <summary>
+    /// Adds new lines to the <see cref="StringBuilder"/>.
+    /// </summary>
+    /// <param name="stringBuilder">The <see cref="StringBuilder"/> to add new lines to.</param>
+    /// <param name="quantity">The quantity of new lines to add, adds only 1 if the parameter is not specified.</param>
+    /// <param name="onlyIfNotEmpty">Flag indicating if the new lines are only added if the string builder is not empty.</param>
+    public static void AddNewLine(this StringBuilder stringBuilder, int quantity = 1, bool onlyIfNotEmpty = false)
+    {
+      if (stringBuilder == null || (onlyIfNotEmpty && stringBuilder.Length == 0))
+      {
+        return;
+      }
+
+      for (int index = 1; index <= quantity; index++)
+      {
+        stringBuilder.Append(Environment.NewLine);
+      }
+    }
+
     /// <summary>
     /// Returns the position of a given integer number within an array of integers.
     /// </summary>
