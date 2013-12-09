@@ -48,6 +48,11 @@ namespace MySQL.ForExcel.Classes
     public const string DEFAULT_LOCKED_CELLS_HTML_COLOR = "#D7D7D7";
 
     /// <summary>
+    /// The default name for the default MySQL style used for Excel tables.
+    /// </summary>
+    public const string DEFAULT_MYSQL_STYLE_NAME = "MySqlDefault";
+
+    /// <summary>
     /// The default interior color for Excel cells accepting data from users to create a new row in the table during an Edit Data operation.
     /// </summary>
     /// <remarks>Yellow-ish.</remarks>
@@ -261,6 +266,25 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Creates a default <see cref="Excel.TableStyle"/> for MySQL imported data.
+    /// </summary>
+    /// <param name="workbook">The workbook where the new <see cref="Excel.Style"/> is added to.</param>
+    /// <returns>A new <see cref="Excel.TableStyle"/> for MySQL imported data.</returns>
+    public static Excel.TableStyle CreateMySqlTableStyle(this Excel.Workbook workbook)
+    {
+      if (workbook == null || workbook.TableStyles.Cast<Excel.TableStyle>().Any(style => style.Name == DEFAULT_MYSQL_STYLE_NAME))
+      {
+        return null;
+      }
+
+      Excel.TableStyle mySqlTableStyle = workbook.TableStyles.Add(DEFAULT_MYSQL_STYLE_NAME);
+      mySqlTableStyle.ShowAsAvailableTableStyle = false;
+      mySqlTableStyle.TableStyleElements[Excel.XlTableStyleElementType.xlWholeTable].SetAsMySqlStyle();
+      mySqlTableStyle.TableStyleElements[Excel.XlTableStyleElementType.xlHeaderRow].SetAsMySqlStyle(LockedCellsOleColor, true);
+      return mySqlTableStyle;
+    }
+
+    /// <summary>
     /// Returns an Excel range with the first row cells corresponding to the column names.
     /// </summary>
     /// <param name="mysqlDataRange">If <c>null</c> the whole first row is returned, otherwise only the column cells within the editing range.</param>
@@ -313,6 +337,16 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets a valid name for a new <see cref="Excel.ListObject"/> that avoids duplicates with existing ones in the current <see cref="Excel.Worksheet"/>.
+    /// </summary>
+    /// <param name="tableName">The proposed name for a <see cref="Excel.ListObject"/>.</param>
+    /// <returns>A <see cref="Excel.ListObject"/> valid name.</returns>
+    public static string GetTableNameAvoidingDuplicates(this string tableName)
+    {
+      return tableName.GetTableNameAvoidingDuplicates(1);
+    }
+
+    /// <summary>
     /// Gets a valid name for a new <see cref="Excel.Worksheet"/> that avoids duplicates with existing ones in the current <see cref="Excel.Workbook"/>.
     /// </summary>
     /// <param name="worksheetName">The proposed name for a <see cref="Excel.Worksheet"/>.</param>
@@ -331,6 +365,27 @@ namespace MySQL.ForExcel.Classes
     public static Excel.Range IntersectWith(this Excel.Range range, Excel.Range otherRange)
     {
       return Globals.ThisAddIn.Application.Intersect(range, otherRange);
+    }
+
+    /// <summary>
+    /// Returns a list of <see cref="Excel.TableStyle"/> names available to be used within the given <see cref="Excel.Workbook"/>.
+    /// </summary>
+    /// <param name="workbook">An <see cref="Excel.Workbook"/>.</param>
+    /// <param name="prependMySqlStyle">Flag indicating whether an empty element is prepended to the list.</param>
+    /// <returns>A list of style names available in the given <see cref="Excel.Workbook"/>.</returns>
+    public static List<string> ListTableStyles(this Excel.Workbook workbook, bool prependMySqlStyle = false)
+    {
+      if (workbook == null)
+      {
+        return null;
+      }
+
+      if (prependMySqlStyle)
+      {
+        workbook.CreateMySqlTableStyle();
+      }
+
+      return (from Excel.TableStyle tableStyle in workbook.TableStyles orderby tableStyle.Name select tableStyle.Name).ToList();
     }
 
     /// <summary>
@@ -443,6 +498,27 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Sets the font and color properties of a <see cref="Excel.TableStyleElement"/> as a MySQL minimalistic style.
+    /// </summary>
+    /// <param name="styleElement">The <see cref="Excel.TableStyleElement"/> to modify.</param>
+    /// <param name="interiorOleColor">The OLE color to paint the Excel cells interior with.</param>
+    /// <param name="makeBold">Flag indicating whether the font is set to bold.</param>
+    public static void SetAsMySqlStyle(this Excel.TableStyleElement styleElement, int interiorOleColor = EMPTY_CELLS_OLE_COLOR, bool makeBold = false)
+    {
+      styleElement.Font.Color = ColorTranslator.ToOle(Color.Black);
+      if (interiorOleColor == EMPTY_CELLS_OLE_COLOR)
+      {
+        styleElement.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+      }
+      else
+      {
+        styleElement.Interior.Color = interiorOleColor;
+      }
+
+      styleElement.Font.Bold = makeBold;
+    }
+
+    /// <summary>
     /// Converts an Excel data range to a bidimensional array of data objects.
     /// </summary>
     /// <param name="range">An Excel range to convert.</param>
@@ -489,6 +565,30 @@ namespace MySQL.ForExcel.Classes
       }
 
       worksheet.Unprotect(protectionKey);
+    }
+
+    /// <summary>
+    /// Gets a valid name for a new <see cref="Excel.ListObject"/> that avoids duplicates with existing ones in the current <see cref="Excel.Worksheet"/>.
+    /// </summary>
+    /// <param name="tableName">The proposed name for a <see cref="Excel.ListObject"/>.</param>
+    /// <param name="copyIndex">Number of the copy of a <see cref="Excel.Worksheet"/> within its name.</param>
+    /// <returns>A <see cref="Excel.ListObject"/> valid name.</returns>
+    private static string GetTableNameAvoidingDuplicates(this string tableName, int copyIndex)
+    {
+      var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+      if (activeWorkbook == null)
+      {
+        return tableName;
+      }
+
+      string retName;
+      do
+      {
+        retName = copyIndex > 1 ? string.Format("{0}.{1}", tableName, copyIndex) : tableName;
+        copyIndex++;
+      } while (activeWorkbook.Worksheets.Cast<Excel.Worksheet>().Any(ws => ws.ListObjects.Cast<Excel.ListObject>().Any(excelTable => excelTable.Name == retName)));
+
+      return retName;
     }
 
     /// <summary>

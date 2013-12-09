@@ -294,5 +294,31 @@ namespace MySQL.ForExcel.Properties {
                 this["GlobalSqlQueriesShowQueriesWithResults"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ImportCreateExcelTable {
+            get {
+                return ((bool)(this["ImportCreateExcelTable"]));
+            }
+            set {
+                this["ImportCreateExcelTable"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("MySqlDefault")]
+        public string ImportExcelTableStyleName {
+            get {
+                return ((string)(this["ImportExcelTableStyleName"]));
+            }
+            set {
+                this["ImportExcelTableStyleName"] = value;
+            }
+        }
     }
 }

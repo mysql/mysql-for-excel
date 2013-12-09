@@ -256,7 +256,7 @@ namespace MySQL.ForExcel.Forms
 
         if (dt != null)
         {
-          ImportDataTable = new MySqlDataTable(ImportDbObject.Name, dt, WbConnection);
+          ImportDataTable = new MySqlDataTable(ImportDbObject.Name, dt, WbConnection, ImportWithinEditOperation);
           ImportDataTable.AddExtendedProperties(dt.ExtendedProperties["QueryString"].ToString(), ImportHeaders, ImportDbObject.Name);
         }
       }

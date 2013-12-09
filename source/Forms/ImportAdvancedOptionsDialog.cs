@@ -46,6 +46,20 @@ namespace MySQL.ForExcel.Forms
 
       PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.ImportPreviewRowsQuantity);
       EscapeFormulaValuesCheckBox.Checked = Settings.Default.ImportEscapeFormulaTextValues;
+      CreateExcelTableCheckbox.Checked = Settings.Default.ImportCreateExcelTable;
+      UseStyleComboBox.DataSource = Globals.ThisAddIn.Application.ActiveWorkbook.ListTableStyles(true);
+      UseStyleComboBox.Text = Settings.Default.ImportExcelTableStyleName;
+      SetExcelTableControlsAvailability();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="CreateExcelTableCheckbox"/> checkbox is checked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void CreateExcelTableCheckbox_CheckedChanged(object sender, EventArgs e)
+    {
+      SetExcelTableControlsAvailability();
     }
 
     /// <summary>
@@ -65,7 +79,23 @@ namespace MySQL.ForExcel.Forms
 
       Settings.Default.ImportPreviewRowsQuantity = previewRowsQuantity;
       Settings.Default.ImportEscapeFormulaTextValues = EscapeFormulaValuesCheckBox.Checked;
+      Settings.Default.ImportCreateExcelTable = CreateExcelTableCheckbox.Checked;
+      Settings.Default.ImportExcelTableStyleName = UseStyleComboBox.Text;
       MiscUtilities.SaveSettings();
+    }
+
+    /// <summary>
+    /// Set sthe availability of the Excel table creation controls.
+    /// </summary>
+    private void SetExcelTableControlsAvailability()
+    {
+      UseStyle1Label.Enabled = CreateExcelTableCheckbox.Checked;
+      UseStyle2Label.Enabled = CreateExcelTableCheckbox.Checked;
+      UseStyleComboBox.Enabled = CreateExcelTableCheckbox.Checked;
+      if (!CreateExcelTableCheckbox.Checked)
+      {
+        UseStyleComboBox.Text = ExcelUtilities.DEFAULT_MYSQL_STYLE_NAME;
+      }
     }
   }
 }

@@ -144,11 +144,12 @@ namespace MySQL.ForExcel.Classes
     /// <param name="tableName">Name of the table.</param>
     /// <param name="filledTable"><see cref="DataTable"/> object containing imported excelData from the MySQL table to be edited.</param>
     /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    public MySqlDataTable(string tableName, DataTable filledTable, MySqlWorkbenchConnection wbConnection)
+    /// <param name="importForEditData"><c>true</c> if the import is part of an Edit operation, <c>false</c> otherwise.</param>
+    public MySqlDataTable(string tableName, DataTable filledTable, MySqlWorkbenchConnection wbConnection, bool importForEditData)
       : this(tableName, true, true, false, wbConnection)
     {
       CopyTableData(filledTable);
-      OperationType = DataOperationType.Edit;
+      OperationType = importForEditData ? DataOperationType.Edit : DataOperationType.Import;
     }
 
     /// <summary>
@@ -891,10 +892,21 @@ namespace MySQL.ForExcel.Classes
 
         fillingRange.ClearFormats();
         fillingRange.Value = fillingArray;
-        if (importColumnNames)
+
+        // Create Named Table for the imported data
+        if (Settings.Default.ImportCreateExcelTable && OperationType == DataOperationType.Import)
+        {
+          Excel.XlYesNoGuess containsColumnNames = importColumnNames ? Excel.XlYesNoGuess.xlYes : Excel.XlYesNoGuess.xlNo;
+          var namedTable = fillingRange.Worksheet.ListObjects.Add(Excel.XlListObjectSourceType.xlSrcRange, fillingRange, containsColumnNames);
+          namedTable.Name = string.Format("MySQL.{0}.{1}", SchemaName, TableName).GetTableNameAvoidingDuplicates();
+          namedTable.DisplayName = namedTable.Name;
+          namedTable.TableStyle = Settings.Default.ImportExcelTableStyleName;
+        }
+        else if (importColumnNames)
         {
           Excel.Range headerRange = fillingRange.GetColumnNamesRange();
           headerRange.SetInteriorColor(ExcelUtilities.LockedCellsOleColor);
+          headerRange.Font.Bold = true;
         }
 
         atCell.Worksheet.Columns.AutoFit();

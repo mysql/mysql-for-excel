@@ -52,7 +52,12 @@ namespace MySQL.ForExcel.Forms
       this.PreviewRowsQuantity1Label = new System.Windows.Forms.Label();
       this.PreviewRowsQuantity2Label = new System.Windows.Forms.Label();
       this.PreviewRowsQuantityNumericUpDown = new System.Windows.Forms.NumericUpDown();
-      this.ColumnDatatypeOptionsLabel = new System.Windows.Forms.Label();
+      this.GeneralOptionsLabel = new System.Windows.Forms.Label();
+      this.CreateExcelTableCheckbox = new System.Windows.Forms.CheckBox();
+      this.ExcelTableOptionsLabel = new System.Windows.Forms.Label();
+      this.UseStyle1Label = new System.Windows.Forms.Label();
+      this.UseStyleComboBox = new System.Windows.Forms.ComboBox();
+      this.UseStyle2Label = new System.Windows.Forms.Label();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.PreviewRowsQuantityNumericUpDown)).BeginInit();
@@ -65,19 +70,24 @@ namespace MySQL.ForExcel.Forms
       // 
       // ContentAreaPanel
       // 
+      this.ContentAreaPanel.Controls.Add(this.UseStyle2Label);
+      this.ContentAreaPanel.Controls.Add(this.UseStyleComboBox);
+      this.ContentAreaPanel.Controls.Add(this.UseStyle1Label);
+      this.ContentAreaPanel.Controls.Add(this.CreateExcelTableCheckbox);
+      this.ContentAreaPanel.Controls.Add(this.ExcelTableOptionsLabel);
       this.ContentAreaPanel.Controls.Add(this.PreviewRowsQuantityNumericUpDown);
       this.ContentAreaPanel.Controls.Add(this.PreviewRowsQuantity2Label);
       this.ContentAreaPanel.Controls.Add(this.PreviewRowsQuantity1Label);
       this.ContentAreaPanel.Controls.Add(this.AdvancedImportOptionsLabel);
       this.ContentAreaPanel.Controls.Add(this.EscapeFormulaValuesCheckBox);
-      this.ContentAreaPanel.Controls.Add(this.ColumnDatatypeOptionsLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(544, 201);
+      this.ContentAreaPanel.Controls.Add(this.GeneralOptionsLabel);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(544, 301);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 156);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 256);
       this.CommandAreaPanel.Size = new System.Drawing.Size(544, 45);
       // 
       // DialogAcceptButton
@@ -168,24 +178,78 @@ namespace MySQL.ForExcel.Forms
             0,
             0});
       // 
-      // ColumnDatatypeOptionsLabel
+      // GeneralOptionsLabel
       // 
-      this.ColumnDatatypeOptionsLabel.AutoSize = true;
-      this.ColumnDatatypeOptionsLabel.BackColor = System.Drawing.Color.Transparent;
-      this.ColumnDatatypeOptionsLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.ColumnDatatypeOptionsLabel.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.ColumnDatatypeOptionsLabel.Location = new System.Drawing.Point(24, 56);
-      this.ColumnDatatypeOptionsLabel.Name = "ColumnDatatypeOptionsLabel";
-      this.ColumnDatatypeOptionsLabel.Size = new System.Drawing.Size(103, 17);
-      this.ColumnDatatypeOptionsLabel.TabIndex = 1;
-      this.ColumnDatatypeOptionsLabel.Text = "General Options";
+      this.GeneralOptionsLabel.AutoSize = true;
+      this.GeneralOptionsLabel.BackColor = System.Drawing.Color.Transparent;
+      this.GeneralOptionsLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.GeneralOptionsLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.GeneralOptionsLabel.Location = new System.Drawing.Point(24, 56);
+      this.GeneralOptionsLabel.Name = "GeneralOptionsLabel";
+      this.GeneralOptionsLabel.Size = new System.Drawing.Size(103, 17);
+      this.GeneralOptionsLabel.TabIndex = 1;
+      this.GeneralOptionsLabel.Text = "General Options";
+      // 
+      // CreateExcelTableCheckbox
+      // 
+      this.CreateExcelTableCheckbox.AutoSize = true;
+      this.CreateExcelTableCheckbox.BackColor = System.Drawing.Color.Transparent;
+      this.CreateExcelTableCheckbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.CreateExcelTableCheckbox.Location = new System.Drawing.Point(53, 178);
+      this.CreateExcelTableCheckbox.Name = "CreateExcelTableCheckbox";
+      this.CreateExcelTableCheckbox.Size = new System.Drawing.Size(334, 19);
+      this.CreateExcelTableCheckbox.TabIndex = 8;
+      this.CreateExcelTableCheckbox.Text = "Create an Excel table for the imported MySQL table data.";
+      this.CreateExcelTableCheckbox.UseVisualStyleBackColor = false;
+      this.CreateExcelTableCheckbox.CheckedChanged += new System.EventHandler(this.CreateExcelTableCheckbox_CheckedChanged);
+      // 
+      // ExcelTableOptionsLabel
+      // 
+      this.ExcelTableOptionsLabel.AutoSize = true;
+      this.ExcelTableOptionsLabel.BackColor = System.Drawing.Color.Transparent;
+      this.ExcelTableOptionsLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ExcelTableOptionsLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.ExcelTableOptionsLabel.Location = new System.Drawing.Point(24, 150);
+      this.ExcelTableOptionsLabel.Name = "ExcelTableOptionsLabel";
+      this.ExcelTableOptionsLabel.Size = new System.Drawing.Size(123, 17);
+      this.ExcelTableOptionsLabel.TabIndex = 6;
+      this.ExcelTableOptionsLabel.Text = "Excel Table Options";
+      // 
+      // UseStyle1Label
+      // 
+      this.UseStyle1Label.AutoSize = true;
+      this.UseStyle1Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.UseStyle1Label.Location = new System.Drawing.Point(70, 205);
+      this.UseStyle1Label.Name = "UseStyle1Label";
+      this.UseStyle1Label.Size = new System.Drawing.Size(56, 15);
+      this.UseStyle1Label.TabIndex = 9;
+      this.UseStyle1Label.Text = "Use style";
+      // 
+      // UseStyleComboBox
+      // 
+      this.UseStyleComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.UseStyleComboBox.FormattingEnabled = true;
+      this.UseStyleComboBox.Location = new System.Drawing.Point(132, 204);
+      this.UseStyleComboBox.Name = "UseStyleComboBox";
+      this.UseStyleComboBox.Size = new System.Drawing.Size(225, 21);
+      this.UseStyleComboBox.TabIndex = 10;
+      // 
+      // UseStyle2Label
+      // 
+      this.UseStyle2Label.AutoSize = true;
+      this.UseStyle2Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.UseStyle2Label.Location = new System.Drawing.Point(363, 205);
+      this.UseStyle2Label.Name = "UseStyle2Label";
+      this.UseStyle2Label.Size = new System.Drawing.Size(133, 15);
+      this.UseStyle2Label.TabIndex = 11;
+      this.UseStyle2Label.Text = "for the new Excel table.";
       // 
       // ImportAdvancedOptionsDialog
       // 
       this.AcceptButton = this.DialogAcceptButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(544, 201);
+      this.ClientSize = new System.Drawing.Size(544, 301);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
@@ -209,6 +273,11 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.NumericUpDown PreviewRowsQuantityNumericUpDown;
     private System.Windows.Forms.Label PreviewRowsQuantity2Label;
     private System.Windows.Forms.Label PreviewRowsQuantity1Label;
-    private System.Windows.Forms.Label ColumnDatatypeOptionsLabel;
+    private System.Windows.Forms.Label GeneralOptionsLabel;
+    private System.Windows.Forms.CheckBox CreateExcelTableCheckbox;
+    private System.Windows.Forms.Label ExcelTableOptionsLabel;
+    private System.Windows.Forms.Label UseStyle1Label;
+    private System.Windows.Forms.ComboBox UseStyleComboBox;
+    private System.Windows.Forms.Label UseStyle2Label;
   }
 }
