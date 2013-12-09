@@ -55,6 +55,7 @@ namespace MySQL.ForExcel.Panels
 
       ConnectionNameLabel.Paint += Label_Paint;
       UserIPLabel.Paint += Label_Paint;
+      SchemaLabel.Paint += Label_Paint;
 
       InheritFontToControlsExceptionList.Add(ExportToNewTableHotLabel.Name);
       InheritFontToControlsExceptionList.Add(SelectDatabaseObjectHotLabel.Name);
@@ -127,6 +128,7 @@ namespace MySQL.ForExcel.Panels
         _wbConnection = value;
         ConnectionNameLabel.Text = _wbConnection.Name;
         UserIPLabel.Text = string.Format("User: {0}, IP: {1}", _wbConnection.UserName, _wbConnection.Host);
+        SchemaLabel.Text = string.Format("Schema: {0}", _wbConnection.Schema);
         RefreshDbObjectsList();
         DBObjectList_AfterSelect(null, null);
       }

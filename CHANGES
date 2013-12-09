@@ -1,4 +1,5 @@
 1.2.0
+- Added a new label "Schema:" to the panel "Select a Database Object" that shows the name of the current schema, located just below the "User:" and "IP:" labels.
 - Added "Preview SQL statements before they are sent to the server" and "Show executed SQL statements along with their results" global options. The first option
   lets users preview the SQL statements used in an Export, Append or Edit data operation before they are sent to the MySQL server and edit them if needed. The
   second option lets users apply the statements directly and show the executed SQL statements after they were applied along with the results of the operations.
