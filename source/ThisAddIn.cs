@@ -149,7 +149,7 @@ namespace MySQL.ForExcel
     {
       Office.CustomTaskPane activeCustomPane = ActiveCustomPane;
 
-      //// If there is no custom pane associated to the Excel Add-In in the active window, create one.
+      // If there is no custom pane associated to the Excel Add-In in the active window, create one.
       if (activeCustomPane != null)
       {
         return activeCustomPane;
@@ -164,7 +164,7 @@ namespace MySQL.ForExcel
       // Instantiate the Excel Add-In pane to attach it to the Excel's custom task pane.
       // Note that in Excel 2007 and 2010 a MDI model is used so only a single Excel pane is instantiated, whereas in Excel 2013 and greater
       //  a SDI model is used instead, so an Excel pane is instantiated for each custom task pane appearing in each Excel window.
-      ExcelAddInPane excelPane = new ExcelAddInPane(Application) { Dock = DockStyle.Fill };
+      ExcelAddInPane excelPane = new ExcelAddInPane { Dock = DockStyle.Fill };
       excelPane.SizeChanged += ExcelPane_SizeChanged;
       ExcelPanesList.Add(excelPane);
 
@@ -175,9 +175,71 @@ namespace MySQL.ForExcel
       activeCustomPane.DockPositionRestrict = OfficeCore.MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoHorizontal;
       activeCustomPane.Width = ADD_IN_PANE_WIDTH;
 
-      Application.Cursor = Excel.XlMousePointer.xlDefault;
+      // Create custom MySQL Excel table style in the active workbook if it exists
+      Application.ActiveWorkbook.CreateMySqlTableStyle();
 
+      Application.Cursor = Excel.XlMousePointer.xlDefault;
       return activeCustomPane;
+    }
+
+    /// <summary>
+    /// Event delegate method fired when an Excel <see cref="Excel.Worksheet"/> is activated.
+    /// </summary>
+    /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
+    private void Application_SheetActivate(object workSheet)
+    {
+      if (ActiveExcelPane == null)
+      {
+        return;
+      }
+
+      Excel.Worksheet activeSheet = workSheet as Excel.Worksheet;
+      ActiveExcelPane.WorksheetActivated(activeSheet);
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the contents of the current selection of Excel cells in a given <see cref="Excel.Worksheet"/> change.
+    /// </summary>
+    /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
+    /// <param name="targetRange">A selection of Excel cells.</param>
+    private void Application_SheetChange(object workSheet, Excel.Range targetRange)
+    {
+      if (ActiveExcelPane == null)
+      {
+        return;
+      }
+
+      ActiveExcelPane.UpdateExcelSelectedDataStatus(targetRange);
+    }
+
+    /// <summary>
+    /// Event delegate method fired when an Excel <see cref="Excel.Worksheet"/> is deactivated.
+    /// </summary>
+    /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
+    private void Application_SheetDeactivate(object workSheet)
+    {
+      if (ActiveExcelPane == null)
+      {
+        return;
+      }
+
+      Excel.Worksheet deactivatedSheet = workSheet as Excel.Worksheet;
+      ActiveExcelPane.WorksheetDeactivated(deactivatedSheet);
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the selection of Excel cells in a given <see cref="Excel.Worksheet"/> changes.
+    /// </summary>
+    /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
+    /// <param name="targetRange">The new selection of Excel cells.</param>
+    private void Application_SheetSelectionChange(object workSheet, Excel.Range targetRange)
+    {
+      if (ActiveExcelPane == null)
+      {
+        return;
+      }
+
+      ActiveExcelPane.UpdateExcelSelectedDataStatus(targetRange);
     }
 
     /// <summary>
@@ -224,6 +286,67 @@ namespace MySQL.ForExcel
 
       Office.Ribbon.RibbonToggleButton toggleButton = ribbonControl as Office.Ribbon.RibbonToggleButton;
       toggleButton.Checked = ActiveCustomPane != null && ActiveCustomPane.Visible;
+    }
+
+    /// <summary>
+    /// Event delegate method fired when an Excel <see cref="Excel.Workbook"/> is activated.
+    /// </summary>
+    /// <param name="workBook">A <see cref="Excel.Workbook"/> object.</param>
+    private void Application_WorkbookActivate(object workBook)
+    {
+      if (ActiveExcelPane == null)
+      {
+        return;
+      }
+
+      Excel.Workbook activeWorkbook = workBook as Excel.Workbook;
+      ActiveExcelPane.WorkbookActivated(activeWorkbook);
+    }
+
+    /// <summary>
+    /// Event delegate method fired before an Excel <see cref="Excel.Workbook"/> is saved to disk.
+    /// </summary>
+    /// <param name="workBook">A <see cref="Excel.Workbook"/> object.</param>
+    /// <param name="saveAsUi">Flag indicating whether the Save As dialog was displayed.</param>
+    /// <param name="cancel">Flag indicating whether the event is cancelled.</param>
+    private void Application_WorkbookBeforeSave(Excel.Workbook workBook, bool saveAsUi, ref bool cancel)
+    {
+      if (ActiveExcelPane == null)
+      {
+        return;
+      }
+
+      ActiveExcelPane.WorkbookBeforeSaved(workBook);
+    }
+
+    /// <summary>
+    /// Event delegate method fired when an Excel <see cref="Excel.Workbook"/> is deactivated.
+    /// </summary>
+    /// <param name="workBook">A <see cref="Excel.Workbook"/> object.</param>
+    private void Application_WorkbookDeactivate(object workBook)
+    {
+      if (ActiveExcelPane == null)
+      {
+        return;
+      }
+
+      Excel.Workbook deactivatedWorkbook = workBook as Excel.Workbook;
+      ActiveExcelPane.WorkbookActivated(deactivatedWorkbook);
+    }
+
+    /// <summary>
+    /// Event delegate method fired when a <see cref="Excel.Workbook"/> is opened.
+    /// </summary>
+    /// <param name="workBook">The <see cref="Excel.Workbook"/> being opened.</param>
+    private void Application_WorkbookOpen(Excel.Workbook workBook)
+    {
+      if (workBook == null)
+      {
+        return;
+      }
+
+      // Add the custom MySQL table style (for Excel tables) to this workbook.
+      workBook.CreateMySqlTableStyle();
     }
 
     /// <summary>
@@ -338,6 +461,48 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="subscribe"></param>
+    private void SetupExcelEvents(bool subscribe)
+    {
+      if (subscribe)
+      {
+        // Excel version corresponds to Excel 2013 or greater.
+        if (ExcelVersionNumber >= EXCEL_2013_VERSION_NUMBER)
+        {
+          //  Monitor the Excel windows activation and deactivation in order to synchronize the Add-In's toggle button state and dispose custom task panes when its parent window closes.
+          Application.WindowActivate += Application_WindowActivate;
+        }
+
+        Application.SheetChange += Application_SheetChange;
+        Application.SheetSelectionChange += Application_SheetSelectionChange;
+        Application.SheetActivate += Application_SheetActivate;
+        Application.SheetDeactivate += Application_SheetDeactivate;
+        Application.WorkbookDeactivate += Application_WorkbookDeactivate;
+        Application.WorkbookActivate += Application_WorkbookActivate;
+        Application.WorkbookBeforeSave += Application_WorkbookBeforeSave;
+        Application.WorkbookOpen += Application_WorkbookOpen;
+      }
+      else
+      {
+        if (ExcelVersionNumber >= EXCEL_2013_VERSION_NUMBER)
+        {
+          Application.WindowActivate -= Application_WindowActivate;
+        }
+
+        Application.SheetChange -= Application_SheetChange;
+        Application.SheetSelectionChange -= Application_SheetSelectionChange;
+        Application.SheetActivate -= Application_SheetActivate;
+        Application.SheetDeactivate -= Application_SheetDeactivate;
+        Application.WorkbookDeactivate -= Application_WorkbookDeactivate;
+        Application.WorkbookActivate -= Application_WorkbookActivate;
+        Application.WorkbookBeforeSave -= Application_WorkbookBeforeSave;
+        Application.WorkbookOpen -= Application_WorkbookOpen;
+      }
+    }
+
+    /// <summary>
     /// Event delegate method fired when the <see cref="ThisAddIn"/> is closed.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -351,6 +516,9 @@ namespace MySQL.ForExcel
       {
         return;
       }
+
+      // Unsibscribe from Excel events
+      SetupExcelEvents(false);
 
       foreach (ExcelAddInPane excelPane in ExcelPanesList)
       {
@@ -394,12 +562,8 @@ namespace MySQL.ForExcel
         // This method is used to migrate all connections created with 1.0.6 (in a local connections file) to the Workbench connections file.
         MySqlWorkbench.MigrateExternalConnectionsToWorkbench();
 
-        // If the Excel version corresponds to Excel 2013 or greater we need to monitoring the Excel windows activation and deactivation
-        //  in order to synchronize the Add-In's toggle button state and dispose custom task panes when its parent window closes.
-        if (ExcelVersionNumber >= EXCEL_2013_VERSION_NUMBER)
-        {
-          Application.WindowActivate += Application_WindowActivate;
-        }
+        // Subscribe to Excel events
+        SetupExcelEvents(true);
       }
       catch (Exception ex)
       {

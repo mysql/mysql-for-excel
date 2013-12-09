@@ -37,13 +37,6 @@ namespace MySQL.ForExcel.Controls
       if (disposing)
       {
         CloseConnection();
-        ExcelApplication.SheetChange -= ExcelApplication_SheetChange;
-        ExcelApplication.SheetSelectionChange -= ExcelApplication_SheetSelectionChange;
-        ExcelApplication.SheetActivate -= ExcelApplication_SheetActivate;
-        ExcelApplication.SheetDeactivate -= ExcelApplication_SheetDeactivate;
-        ExcelApplication.WorkbookDeactivate -= ExcelApplication_WorkbookDeactivate;
-        ExcelApplication.WorkbookActivate -= ExcelApplication_WorkbookActivate;
-        ExcelApplication.WorkbookBeforeSave -= ExcelApplication_WorkbookBeforeSave;
         if (ProtectedWorksheetPasskeys.Count > 0)
         {
           foreach (var dictEntry in ProtectedWorksheetPasskeys)

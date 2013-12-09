@@ -47,7 +47,7 @@ namespace MySQL.ForExcel.Forms
       PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.ImportPreviewRowsQuantity);
       EscapeFormulaValuesCheckBox.Checked = Settings.Default.ImportEscapeFormulaTextValues;
       CreateExcelTableCheckbox.Checked = Settings.Default.ImportCreateExcelTable;
-      UseStyleComboBox.DataSource = Globals.ThisAddIn.Application.ActiveWorkbook.ListTableStyles(true);
+      UseStyleComboBox.DataSource = Globals.ThisAddIn.Application.ActiveWorkbook.ListTableStyles();
       UseStyleComboBox.Text = Settings.Default.ImportExcelTableStyleName;
       SetExcelTableControlsAvailability();
     }

@@ -371,21 +371,10 @@ namespace MySQL.ForExcel.Classes
     /// Returns a list of <see cref="Excel.TableStyle"/> names available to be used within the given <see cref="Excel.Workbook"/>.
     /// </summary>
     /// <param name="workbook">An <see cref="Excel.Workbook"/>.</param>
-    /// <param name="prependMySqlStyle">Flag indicating whether an empty element is prepended to the list.</param>
     /// <returns>A list of style names available in the given <see cref="Excel.Workbook"/>.</returns>
-    public static List<string> ListTableStyles(this Excel.Workbook workbook, bool prependMySqlStyle = false)
+    public static List<string> ListTableStyles(this Excel.Workbook workbook)
     {
-      if (workbook == null)
-      {
-        return null;
-      }
-
-      if (prependMySqlStyle)
-      {
-        workbook.CreateMySqlTableStyle();
-      }
-
-      return (from Excel.TableStyle tableStyle in workbook.TableStyles orderby tableStyle.Name select tableStyle.Name).ToList();
+      return workbook == null ? null : (from Excel.TableStyle tableStyle in workbook.TableStyles orderby tableStyle.Name select tableStyle.Name).ToList();
     }
 
     /// <summary>

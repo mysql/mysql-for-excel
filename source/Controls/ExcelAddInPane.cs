@@ -39,18 +39,8 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Initializes a new instance of the <see cref="ExcelAddInPane"/> class.
     /// </summary>
-    /// <param name="app">An instance of the Excel application running the add-in.</param>
-    public ExcelAddInPane(Excel.Application app)
+    public ExcelAddInPane()
     {
-      ExcelApplication = app;
-      ExcelApplication.SheetChange += ExcelApplication_SheetChange;
-      ExcelApplication.SheetSelectionChange += ExcelApplication_SheetSelectionChange;
-      ExcelApplication.SheetActivate += ExcelApplication_SheetActivate;
-      ExcelApplication.SheetDeactivate += ExcelApplication_SheetDeactivate;
-      ExcelApplication.WorkbookDeactivate += ExcelApplication_WorkbookDeactivate;
-      ExcelApplication.WorkbookActivate += ExcelApplication_WorkbookActivate;
-      ExcelApplication.WorkbookBeforeSave += ExcelApplication_WorkbookBeforeSave;
-
       InitializeComponent();
 
       DBObjectSelectionPanel3.ExcelSelectionContainsData = false;
@@ -84,7 +74,7 @@ namespace MySQL.ForExcel.Controls
     {
       get
       {
-        return ExcelApplication.ActiveWorkbook ?? ExcelApplication.Workbooks.Add(1);
+        return Globals.ThisAddIn.Application.ActiveWorkbook ?? Globals.ThisAddIn.Application.Workbooks.Add(1);
       }
     }
 
@@ -95,8 +85,8 @@ namespace MySQL.ForExcel.Controls
     public Excel.Worksheet ActiveWorksheet
     {
       get
-      { 
-        return ExcelApplication.ActiveSheet as Excel.Worksheet;
+      {
+        return Globals.ThisAddIn.Application.ActiveSheet as Excel.Worksheet;
       }
     }
 
@@ -114,12 +104,6 @@ namespace MySQL.ForExcel.Controls
                 && ActiveEditDialogsList.Exists(ac => ac.EditDialog.EditingWorksheet == ActiveWorksheet);
       }
     }
-
-    /// <summary>
-    /// Gets an instance of the Excel application running the add-in.
-    /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public Excel.Application ExcelApplication { get; private set; }
 
     /// <summary>
     /// Gets the name of the last deactivated Excel <see cref="Excel.Worksheet"/>.
@@ -155,7 +139,7 @@ namespace MySQL.ForExcel.Controls
     public bool AppendDataToTable(DbObject toTableObject)
     {
       DialogResult dr;
-      Excel.Range exportRange = ExcelApplication.Selection as Excel.Range;
+      Excel.Range exportRange = Globals.ThisAddIn.Application.Selection as Excel.Range;
       if (exportRange == null)
       {
         return false;
@@ -342,7 +326,7 @@ namespace MySQL.ForExcel.Controls
       Excel.Range editingRange = importForm.ImportDataTable.ImportDataAtGivenExcelCell(importForm.ImportHeaders, atCell);
 
       // Create and show the Edit Data Dialog
-      ActiveEditDialog = new EditDataDialog(this, new NativeWindowWrapper(ExcelApplication.Hwnd), WbConnection, editingRange, importForm.ImportDataTable, currentWorksheet);
+      ActiveEditDialog = new EditDataDialog(this, new NativeWindowWrapper(Globals.ThisAddIn.Application.Hwnd), WbConnection, editingRange, importForm.ImportDataTable, currentWorksheet);
       ActiveEditDialog.Show(ActiveEditDialog.ParentWindow);
 
       // Maintain hashtables for open Edit Data Dialogs
@@ -365,17 +349,17 @@ namespace MySQL.ForExcel.Controls
     /// <returns>The active or new <see cref="Excel.Worksheet"/> object.</returns>
     public Excel.Worksheet GetActiveOrCreateWorksheet(string proposedName, bool alwaysCreate, bool checkForDuplicates)
     {
-      Excel.Worksheet currentWorksheet = ExcelApplication.ActiveSheet as Excel.Worksheet;
+      Excel.Worksheet currentWorksheet = Globals.ThisAddIn.Application.ActiveSheet as Excel.Worksheet;
       if (currentWorksheet != null && !alwaysCreate)
       {
         return currentWorksheet;
       }
 
       proposedName = checkForDuplicates ? proposedName.GetWorksheetNameAvoidingDuplicates() : proposedName;
-      if (ExcelApplication.ActiveWorkbook != null)
+      if (Globals.ThisAddIn.Application.ActiveWorkbook != null)
       {
         Excel.Worksheet currentActiveSheet = ActiveWorksheet;
-        currentWorksheet = ExcelApplication.Sheets.Add(Type.Missing, ExcelApplication.ActiveSheet, Type.Missing, Type.Missing);
+        currentWorksheet = Globals.ThisAddIn.Application.Sheets.Add(Type.Missing, Globals.ThisAddIn.Application.ActiveSheet, Type.Missing, Type.Missing);
         if (ActiveEditDialogsList != null)
         {
           ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList.Find(ac => ac.EditDialog.EditingWorksheet.Equals(currentActiveSheet));
@@ -387,7 +371,7 @@ namespace MySQL.ForExcel.Controls
       }
       else
       {
-        Excel.Workbook currentWorkbook = ExcelApplication.Workbooks.Add(Type.Missing);
+        Excel.Workbook currentWorkbook = Globals.ThisAddIn.Application.Workbooks.Add(Type.Missing);
         currentWorksheet = currentWorkbook.Worksheets[1] as Excel.Worksheet;
       }
 
@@ -408,7 +392,7 @@ namespace MySQL.ForExcel.Controls
     /// <param name="selectedResultSet">Number of resultset to import when the <see cref="importType"/> is ImportMultipleType.SelectedResultSet.</param>
     public void ImportDataToExcel(DataSet ds, bool importColumnNames, ImportProcedureForm.ImportMultipleType importType, int selectedResultSet)
     {
-      Excel.Range atCell = ExcelApplication.ActiveCell;
+      Excel.Range atCell = Globals.ThisAddIn.Application.ActiveCell;
 
       int tableIdx = 0;
       foreach (MySqlDataTable mySqlTable in ds.Tables)
@@ -537,7 +521,7 @@ namespace MySQL.ForExcel.Controls
       }
 
       // Means has an edit ongoing we need to make sure the edit has a valid sheet otherwise we need to release it
-      if (ExcelApplication.Worksheets.Cast<Excel.Worksheet>().Contains(editContainer.EditDialog.EditingWorksheet))
+      if (Globals.ThisAddIn.Application.Worksheets.Cast<Excel.Worksheet>().Contains(editContainer.EditDialog.EditingWorksheet))
       {
         return true;
       }
@@ -552,144 +536,30 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Checks if an Excel <see cref="Excel.Worksheet"/> with a given name exists in a <see cref="Excel.Workbook"/> with the given name.
+    /// Checks if the selected <see cref="Excel.Range"/> contains any data in it and updates that status in the corresponidng panel.
     /// </summary>
-    /// <param name="workBookName">Name of the <see cref="Excel.Workbook"/>.</param>
-    /// <param name="workSheetName">Name of the <see cref="Excel.Worksheet"/>.</param>
-    /// <returns><c>true</c> if the <see cref="Excel.Worksheet"/> exists, <c>false</c> otherwise.</returns>
-    public bool WorksheetExists(string workBookName, string workSheetName)
+    /// <param name="range">The <see cref="Excel.Range"/> where the selection is.</param>
+    public void UpdateExcelSelectedDataStatus(Excel.Range range)
     {
-      bool exists;
-      if (workBookName.Length <= 0 || workSheetName.Length <= 0)
-      {
-        return false;
-      }
-
-      // Maybe the last deactivated sheet has been deleted?
-      try
-      {
-        // Do NOT remove the following lines although the wSheet variable is not used in the method the casting of the
-        // wBook.Worksheets[workSheetName] is needed to determine if the Worksheet is still valid and has not been disposed of.
-        Excel.Workbook wBook = ExcelApplication.Workbooks[workBookName];
-        Excel.Worksheet wSheet = wBook.Worksheets[workSheetName] as Excel.Worksheet;
-        exists = true;
-      }
-      catch
-      {
-        exists = false;
-      }
-
-      return exists;
-    }
-
-    /// <summary>
-    /// Shows or hides the <see cref="EditDataDialog"/> window associated to the given <see cref="Excel.Worksheet"/>.
-    /// </summary>
-    /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
-    /// <param name="show">Flag indicating if the dialog will be shown or hidden.</param>
-    private void ChangeEditDialogVisibility(Excel.Worksheet workSheet, bool show)
-    {
-      if (workSheet == null || ActiveEditDialogsList == null || ActiveEditDialogsList.Count <= 0)
+      if (!Visible)
       {
         return;
       }
 
-      ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList.Find(ac => ac.EditDialog.EditingWorksheet == workSheet);
-      if (activeEditContainer == null)
-      {
-        return;
-      }
-
-      if (show)
-      {
-        activeEditContainer.EditDialog.ShowInactiveTopmost();
-      }
-      else
-      {
-        activeEditContainer.EditDialog.Hide();
-      }
+      DBObjectSelectionPanel3.ExcelSelectionContainsData = range.ContainsAnyData();
     }
 
     /// <summary>
-    /// Event delegate method fired when an Excel <see cref="Excel.Worksheet"/> is activated.
+    /// Signals that an Excel <see cref="Excel.Workbook"/> related to this pane has been activated.
     /// </summary>
-    /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
-    private void ExcelApplication_SheetActivate(object workSheet)
+    /// <param name="activeWorkbook">A <see cref="Excel.Workbook"/> object.</param>
+    public void WorkbookActivated(Excel.Workbook activeWorkbook)
     {
       if (ActiveEditDialogsList == null || ActiveEditDialogsList.Count == 0)
       {
         return;
       }
 
-      Excel.Worksheet activeSheet = workSheet as Excel.Worksheet;
-      ChangeEditDialogVisibility(activeSheet, true);
-      if (LastDeactivatedSheetName.Length <= 0 || WorksheetExists(ActiveWorkbook.Name, LastDeactivatedSheetName))
-      {
-        return;
-      }
-
-      // Worksheet was deleted
-      ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList.Find(ac => !ac.EditDialog.EditingWorksheetExists);
-      if (activeEditContainer == null)
-      {
-        return;
-      }
-
-      activeEditContainer.EditDialog.Close();
-      if (ActiveEditDialogsList.Contains(activeEditContainer))
-      {
-        ActiveEditDialogsList.Remove(activeEditContainer);
-      }
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the contents of the current selection of Excel cells in a given <see cref="Excel.Worksheet"/> change.
-    /// </summary>
-    /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
-    /// <param name="targetRange">A selection of Excel cells.</param>
-    private void ExcelApplication_SheetChange(object workSheet, Excel.Range targetRange)
-    {
-      UpdateExcelSelectedDataStatus(targetRange);
-    }
-
-    /// <summary>
-    /// Event delegate method fired when an Excel <see cref="Excel.Worksheet"/> is deactivated.
-    /// </summary>
-    /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
-    private void ExcelApplication_SheetDeactivate(object workSheet)
-    {
-      if (ActiveEditDialogsList == null || ActiveEditDialogsList.Count == 0)
-      {
-        return;
-      }
-
-      Excel.Worksheet deactivatedSheet = workSheet as Excel.Worksheet;
-      LastDeactivatedSheetName = deactivatedSheet != null ? deactivatedSheet.Name : string.Empty;
-      ChangeEditDialogVisibility(deactivatedSheet, false);
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the selection of Excel cells in a given <see cref="Excel.Worksheet"/> changes.
-    /// </summary>
-    /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
-    /// <param name="targetRange">The new selection of Excel cells.</param>
-    private void ExcelApplication_SheetSelectionChange(object workSheet, Excel.Range targetRange)
-    {
-      UpdateExcelSelectedDataStatus(targetRange);
-    }
-
-    /// <summary>
-    /// Event delegate method fired when an Excel <see cref="Excel.Workbook"/> is activated.
-    /// </summary>
-    /// <param name="workBook">A <see cref="Excel.Workbook"/> object.</param>
-    private void ExcelApplication_WorkbookActivate(object workBook)
-    {
-      if (ActiveEditDialogsList == null || ActiveEditDialogsList.Count == 0)
-      {
-        return;
-      }
-
-      Excel.Workbook activeWorkbook = workBook as Excel.Workbook;
       if (activeWorkbook != null)
       {
         ChangeEditDialogVisibility(activeWorkbook.ActiveSheet as Excel.Worksheet, true);
@@ -740,20 +610,18 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Event delegate method fired before an Excel <see cref="Excel.Workbook"/> is saved to disk.
+    /// Signals that an Excel <see cref="Excel.Workbook"/> is about to be saved to disk.
     /// </summary>
-    /// <param name="wb">A <see cref="Excel.Workbook"/> object.</param>
-    /// <param name="saveAsUi">Flag indicating whether the Save As dialog was displayed.</param>
-    /// <param name="cancel">Flag indicating whether the event is cancelled.</param>
-    private void ExcelApplication_WorkbookBeforeSave(Excel.Workbook wb, bool saveAsUi, ref bool cancel)
+    /// <param name="workBook">A <see cref="Excel.Workbook"/> object.</param>
+    public void WorkbookBeforeSaved(Excel.Workbook workBook)
     {
-      if (!ActiveEditDialogsList.Exists(editContainer => editContainer.EditDialog.WorkbookName == wb.Name))
+      if (workBook == null || !ActiveEditDialogsList.Exists(editContainer => editContainer.EditDialog.WorkbookName == workBook.Name))
       {
         return;
       }
 
       bool closeEditingWorksheets = InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.WorkSheetInEditModeSavingWarningTitle, Resources.WorkSheetInEditModeSavingWarningDetail, null, Resources.WorkSheetInEditModeSavingWarningMoreInfo) == DialogResult.Yes;
-      foreach (Excel.Worksheet worksheet in wb.Worksheets)
+      foreach (Excel.Worksheet worksheet in workBook.Worksheets)
       {
         ActiveEditDialogContainer editContainer = ActiveEditDialogsList.FirstOrDefault(editDialogContainer => editDialogContainer.EditDialog.EditingWorksheet == worksheet);
         if (editContainer == null)
@@ -777,23 +645,25 @@ namespace MySQL.ForExcel.Controls
         }
         else
         {
-          ProtectedWorksheetPasskeys.Add(worksheet.Name, editContainer.EditDialog.WorksheetProtectionKey);
+          if (!ProtectedWorksheetPasskeys.ContainsKey(worksheet.Name))
+          {
+            ProtectedWorksheetPasskeys.Add(worksheet.Name, editContainer.EditDialog.WorksheetProtectionKey);
+          }
         }
       }
     }
 
     /// <summary>
-    /// Event delegate method fired when an Excel <see cref="Excel.Workbook"/> is deactivated.
+    /// Signals that an Excel <see cref="Excel.Workbook"/> related to this pane has been deactivated.
     /// </summary>
-    /// <param name="workBook">A <see cref="Excel.Workbook"/> object.</param>
-    private void ExcelApplication_WorkbookDeactivate(object workBook)
+    /// <param name="deactivatedWorkbook">A <see cref="Excel.Workbook"/> object.</param>
+    public void WorkbookDeactivated(Excel.Workbook deactivatedWorkbook)
     {
       if (ActiveEditDialogsList == null || ActiveEditDialogsList.Count == 0)
       {
         return;
       }
 
-      Excel.Workbook deactivatedWorkbook = workBook as Excel.Workbook;
       if (deactivatedWorkbook == null)
       {
         return;
@@ -809,17 +679,108 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Checks if the selected <see cref="Excel.Range"/> contains any data in it and updates that status in the corresponidng panel.
+    /// Signals that an <see cref="Excel.Worksheet"/> related to this pane has been activated.
     /// </summary>
-    /// <param name="range">The <see cref="Excel.Range"/> where the selection is.</param>
-    private void UpdateExcelSelectedDataStatus(Excel.Range range)
+    /// <param name="activeSheet">A <see cref="Excel.Worksheet"/> object.</param>
+    public void WorksheetActivated(Excel.Worksheet activeSheet)
     {
-      if (!Visible)
+      if (ActiveEditDialogsList == null || ActiveEditDialogsList.Count == 0)
       {
         return;
       }
 
-      DBObjectSelectionPanel3.ExcelSelectionContainsData = range.ContainsAnyData();
+      ChangeEditDialogVisibility(activeSheet, true);
+      if (LastDeactivatedSheetName.Length <= 0 || WorksheetExists(ActiveWorkbook.Name, LastDeactivatedSheetName))
+      {
+        return;
+      }
+
+      // Worksheet was deleted
+      ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList.Find(ac => !ac.EditDialog.EditingWorksheetExists);
+      if (activeEditContainer == null)
+      {
+        return;
+      }
+
+      activeEditContainer.EditDialog.Close();
+      if (ActiveEditDialogsList.Contains(activeEditContainer))
+      {
+        ActiveEditDialogsList.Remove(activeEditContainer);
+      }
+    }
+
+    /// <summary>
+    /// Signals that an <see cref="Excel.Worksheet"/> related to this pane has been deactivated.
+    /// </summary>
+    /// <param name="deactivatedSheet">A <see cref="Excel.Worksheet"/> object.</param>
+    public void WorksheetDeactivated(Excel.Worksheet deactivatedSheet)
+    {
+      if (ActiveEditDialogsList == null || ActiveEditDialogsList.Count == 0)
+      {
+        return;
+      }
+
+      LastDeactivatedSheetName = deactivatedSheet != null ? deactivatedSheet.Name : string.Empty;
+      ChangeEditDialogVisibility(deactivatedSheet, false);
+    }
+
+    /// <summary>
+    /// Checks if an Excel <see cref="Excel.Worksheet"/> with a given name exists in a <see cref="Excel.Workbook"/> with the given name.
+    /// </summary>
+    /// <param name="workBookName">Name of the <see cref="Excel.Workbook"/>.</param>
+    /// <param name="workSheetName">Name of the <see cref="Excel.Worksheet"/>.</param>
+    /// <returns><c>true</c> if the <see cref="Excel.Worksheet"/> exists, <c>false</c> otherwise.</returns>
+    public bool WorksheetExists(string workBookName, string workSheetName)
+    {
+      bool exists;
+      if (workBookName.Length <= 0 || workSheetName.Length <= 0)
+      {
+        return false;
+      }
+
+      // Maybe the last deactivated sheet has been deleted?
+      try
+      {
+        // Do NOT remove the following lines although the wSheet variable is not used in the method the casting of the
+        // wBook.Worksheets[workSheetName] is needed to determine if the Worksheet is still valid and has not been disposed of.
+        Excel.Workbook wBook = Globals.ThisAddIn.Application.Workbooks[workBookName];
+        Excel.Worksheet wSheet = wBook.Worksheets[workSheetName] as Excel.Worksheet;
+        exists = true;
+      }
+      catch
+      {
+        exists = false;
+      }
+
+      return exists;
+    }
+
+    /// <summary>
+    /// Shows or hides the <see cref="EditDataDialog"/> window associated to the given <see cref="Excel.Worksheet"/>.
+    /// </summary>
+    /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
+    /// <param name="show">Flag indicating if the dialog will be shown or hidden.</param>
+    private void ChangeEditDialogVisibility(Excel.Worksheet workSheet, bool show)
+    {
+      if (workSheet == null || ActiveEditDialogsList == null || ActiveEditDialogsList.Count <= 0)
+      {
+        return;
+      }
+
+      ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList.Find(ac => ac.EditDialog.EditingWorksheet == workSheet);
+      if (activeEditContainer == null)
+      {
+        return;
+      }
+
+      if (show)
+      {
+        activeEditContainer.EditDialog.ShowInactiveTopmost();
+      }
+      else
+      {
+        activeEditContainer.EditDialog.Hide();
+      }
     }
   }
 }
