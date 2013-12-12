@@ -57,8 +57,9 @@ namespace MySQL.ForExcel.Forms
       this.QueryTimeout1Label = new System.Windows.Forms.Label();
       this.SqlQueriesLabel = new System.Windows.Forms.Label();
       this.UseOptimisticUpdatesCheckBox = new System.Windows.Forms.CheckBox();
-      this.PreviewSqlQueriesCheckBox = new System.Windows.Forms.CheckBox();
-      this.ShowExecutedSqlQueryCheckBox = new System.Windows.Forms.CheckBox();
+      this.NoSqlStatementsRadioButton = new System.Windows.Forms.RadioButton();
+      this.PreviewSqlQueriesRadioButton = new System.Windows.Forms.RadioButton();
+      this.ShowExecutedSqlQueryRadioButton = new System.Windows.Forms.RadioButton();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.ConnectionTimeoutNumericUpDown)).BeginInit();
@@ -72,8 +73,9 @@ namespace MySQL.ForExcel.Forms
       // 
       // ContentAreaPanel
       // 
-      this.ContentAreaPanel.Controls.Add(this.ShowExecutedSqlQueryCheckBox);
-      this.ContentAreaPanel.Controls.Add(this.PreviewSqlQueriesCheckBox);
+      this.ContentAreaPanel.Controls.Add(this.ShowExecutedSqlQueryRadioButton);
+      this.ContentAreaPanel.Controls.Add(this.PreviewSqlQueriesRadioButton);
+      this.ContentAreaPanel.Controls.Add(this.NoSqlStatementsRadioButton);
       this.ContentAreaPanel.Controls.Add(this.UseOptimisticUpdatesCheckBox);
       this.ContentAreaPanel.Controls.Add(this.SqlQueriesLabel);
       this.ContentAreaPanel.Controls.Add(this.QueryTimeout2Label);
@@ -84,13 +86,13 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.ConnectionTimeout1Label);
       this.ContentAreaPanel.Controls.Add(this.GlobalOptionsLabel);
       this.ContentAreaPanel.Controls.Add(this.ConnectionOptionsLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(504, 318);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(504, 341);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 273);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 296);
       this.CommandAreaPanel.Size = new System.Drawing.Size(504, 45);
       // 
       // DialogAcceptButton
@@ -246,34 +248,45 @@ namespace MySQL.ForExcel.Forms
       this.UseOptimisticUpdatesCheckBox.Text = "Use optimistic updates on all Edit Data sessions";
       this.UseOptimisticUpdatesCheckBox.UseVisualStyleBackColor = true;
       // 
-      // PreviewSqlQueriesCheckBox
+      // NoSqlStatementsRadioButton
       // 
-      this.PreviewSqlQueriesCheckBox.AutoSize = true;
-      this.PreviewSqlQueriesCheckBox.Location = new System.Drawing.Point(53, 203);
-      this.PreviewSqlQueriesCheckBox.Name = "PreviewSqlQueriesCheckBox";
-      this.PreviewSqlQueriesCheckBox.Size = new System.Drawing.Size(301, 17);
-      this.PreviewSqlQueriesCheckBox.TabIndex = 15;
-      this.PreviewSqlQueriesCheckBox.Text = "Preview SQL statements before they are sent to the server";
-      this.PreviewSqlQueriesCheckBox.UseVisualStyleBackColor = true;
-      this.PreviewSqlQueriesCheckBox.CheckedChanged += new System.EventHandler(this.PreviewSqlQueriesCheckBox_CheckedChanged);
+      this.NoSqlStatementsRadioButton.AutoSize = true;
+      this.NoSqlStatementsRadioButton.Location = new System.Drawing.Point(53, 203);
+      this.NoSqlStatementsRadioButton.Name = "NoSqlStatementsRadioButton";
+      this.NoSqlStatementsRadioButton.Size = new System.Drawing.Size(248, 17);
+      this.NoSqlStatementsRadioButton.TabIndex = 17;
+      this.NoSqlStatementsRadioButton.TabStop = true;
+      this.NoSqlStatementsRadioButton.Text = "Do not show SQL statements sent to the server";
+      this.NoSqlStatementsRadioButton.UseVisualStyleBackColor = true;
       // 
-      // ShowExecutedSqlQueryCheckBox
+      // PreviewSqlQueriesRadioButton
       // 
-      this.ShowExecutedSqlQueryCheckBox.AutoSize = true;
-      this.ShowExecutedSqlQueryCheckBox.Location = new System.Drawing.Point(53, 226);
-      this.ShowExecutedSqlQueryCheckBox.Name = "ShowExecutedSqlQueryCheckBox";
-      this.ShowExecutedSqlQueryCheckBox.Size = new System.Drawing.Size(285, 17);
-      this.ShowExecutedSqlQueryCheckBox.TabIndex = 16;
-      this.ShowExecutedSqlQueryCheckBox.Text = "Show executed SQL statements along with their results";
-      this.ShowExecutedSqlQueryCheckBox.UseVisualStyleBackColor = true;
-      this.ShowExecutedSqlQueryCheckBox.CheckedChanged += new System.EventHandler(this.ShowExecutedSqlQueryCheckBox_CheckedChanged);
+      this.PreviewSqlQueriesRadioButton.AutoSize = true;
+      this.PreviewSqlQueriesRadioButton.Location = new System.Drawing.Point(53, 226);
+      this.PreviewSqlQueriesRadioButton.Name = "PreviewSqlQueriesRadioButton";
+      this.PreviewSqlQueriesRadioButton.Size = new System.Drawing.Size(300, 17);
+      this.PreviewSqlQueriesRadioButton.TabIndex = 18;
+      this.PreviewSqlQueriesRadioButton.TabStop = true;
+      this.PreviewSqlQueriesRadioButton.Text = "Preview SQL statements before they are sent to the server";
+      this.PreviewSqlQueriesRadioButton.UseVisualStyleBackColor = true;
+      // 
+      // ShowExecutedSqlQueryRadioButton
+      // 
+      this.ShowExecutedSqlQueryRadioButton.AutoSize = true;
+      this.ShowExecutedSqlQueryRadioButton.Location = new System.Drawing.Point(53, 249);
+      this.ShowExecutedSqlQueryRadioButton.Name = "ShowExecutedSqlQueryRadioButton";
+      this.ShowExecutedSqlQueryRadioButton.Size = new System.Drawing.Size(284, 17);
+      this.ShowExecutedSqlQueryRadioButton.TabIndex = 19;
+      this.ShowExecutedSqlQueryRadioButton.TabStop = true;
+      this.ShowExecutedSqlQueryRadioButton.Text = "Show executed SQL statements along with their results";
+      this.ShowExecutedSqlQueryRadioButton.UseVisualStyleBackColor = true;
       // 
       // GlobalOptionsDialog
       // 
       this.AcceptButton = this.DialogAcceptButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(504, 318);
+      this.ClientSize = new System.Drawing.Size(504, 341);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
@@ -302,8 +315,9 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.Label QueryTimeout1Label;
     private System.Windows.Forms.Label ConnectionTimeout2Label;
     private System.Windows.Forms.Label SqlQueriesLabel;
-    private System.Windows.Forms.CheckBox ShowExecutedSqlQueryCheckBox;
-    private System.Windows.Forms.CheckBox PreviewSqlQueriesCheckBox;
     private System.Windows.Forms.CheckBox UseOptimisticUpdatesCheckBox;
+    private System.Windows.Forms.RadioButton ShowExecutedSqlQueryRadioButton;
+    private System.Windows.Forms.RadioButton PreviewSqlQueriesRadioButton;
+    private System.Windows.Forms.RadioButton NoSqlStatementsRadioButton;
   }
 }

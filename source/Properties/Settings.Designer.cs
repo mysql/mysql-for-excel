@@ -272,7 +272,7 @@ namespace MySQL.ForExcel.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool GlobalSqlQueriesPreviewQueries {
             get {
                 return ((bool)(this["GlobalSqlQueriesPreviewQueries"]));

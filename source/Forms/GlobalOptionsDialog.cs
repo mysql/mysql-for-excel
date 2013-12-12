@@ -39,8 +39,9 @@ namespace MySQL.ForExcel.Forms
       ConnectionTimeoutNumericUpDown.Value = Math.Min(ConnectionTimeoutNumericUpDown.Maximum, Settings.Default.GlobalConnectionConnectionTimeout);
       QueryTimeoutNumericUpDown.Value = Settings.Default.GlobalConnectionCommandTimeout;
       UseOptimisticUpdatesCheckBox.Checked = Settings.Default.EditUseOptimisticUpdate;
-      PreviewSqlQueriesCheckBox.Checked = Settings.Default.GlobalSqlQueriesPreviewQueries;
-      ShowExecutedSqlQueryCheckBox.Checked = Settings.Default.GlobalSqlQueriesShowQueriesWithResults;
+      PreviewSqlQueriesRadioButton.Checked = Settings.Default.GlobalSqlQueriesPreviewQueries;
+      ShowExecutedSqlQueryRadioButton.Checked = Settings.Default.GlobalSqlQueriesShowQueriesWithResults;
+      NoSqlStatementsRadioButton.Checked = !PreviewSqlQueriesRadioButton.Checked && !ShowExecutedSqlQueryRadioButton.Checked;
     }
 
     /// <summary>
@@ -58,35 +59,9 @@ namespace MySQL.ForExcel.Forms
       Settings.Default.GlobalConnectionConnectionTimeout = (uint)ConnectionTimeoutNumericUpDown.Value;
       Settings.Default.GlobalConnectionCommandTimeout = (uint)QueryTimeoutNumericUpDown.Value;
       Settings.Default.EditUseOptimisticUpdate = UseOptimisticUpdatesCheckBox.Checked;
-      Settings.Default.GlobalSqlQueriesPreviewQueries = PreviewSqlQueriesCheckBox.Checked;
-      Settings.Default.GlobalSqlQueriesShowQueriesWithResults = ShowExecutedSqlQueryCheckBox.Checked;
+      Settings.Default.GlobalSqlQueriesPreviewQueries = PreviewSqlQueriesRadioButton.Checked;
+      Settings.Default.GlobalSqlQueriesShowQueriesWithResults = ShowExecutedSqlQueryRadioButton.Checked;
       MiscUtilities.SaveSettings();
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="PreviewSqlQueriesCheckBox"/> checked state is changed.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void PreviewSqlQueriesCheckBox_CheckedChanged(object sender, EventArgs e)
-    {
-      if (PreviewSqlQueriesCheckBox.Checked)
-      {
-        ShowExecutedSqlQueryCheckBox.Checked = false;
-      }
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="PreviewSqlQueriesCheckBox"/> checked state is changed.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void ShowExecutedSqlQueryCheckBox_CheckedChanged(object sender, EventArgs e)
-    {
-      if (ShowExecutedSqlQueryCheckBox.Checked)
-      {
-        PreviewSqlQueriesCheckBox.Checked = false;
-      }
     }
   }
 }
