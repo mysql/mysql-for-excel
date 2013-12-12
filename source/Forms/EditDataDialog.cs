@@ -690,7 +690,11 @@ namespace MySQL.ForExcel.Forms
       operationSummary.AppendFormat(Resources.EditedDataForTable, EditingTableName);
       if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults)
       {
-        operationDetails.AppendFormat(Resources.EditDataCommittedWithQueryText, EditMySqlDataTable.DeletingOperations, EditMySqlDataTable.InsertingOperations, EditMySqlDataTable.UpdatingOperations);
+        operationDetails.AppendFormat(
+          Resources.EditDataCommittedWithQueryText,
+          modifiedRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Delete),
+          modifiedRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Insert),
+          modifiedRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Update));
         operationDetails.AddNewLine();
       }
 
@@ -750,7 +754,7 @@ namespace MySQL.ForExcel.Forms
         operationDetails.Append(warningDetails);
       }
 
-      if (Settings.Default.GlobalSqlQueriesPreviewQueries)
+      if (!Settings.Default.GlobalSqlQueriesShowQueriesWithResults)
       {
         operationDetails.AddNewLine(2, true);
         operationDetails.AppendFormat(

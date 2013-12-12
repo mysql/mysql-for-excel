@@ -1814,11 +1814,65 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Creating Table &apos;{0}&apos;.
+        /// </summary>
+        internal static string ScriptCreatingTableText {
+            get {
+                return ResourceManager.GetString("ScriptCreatingTableText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deleting {0}.
+        /// </summary>
+        internal static string ScriptDeletingRowsText {
+            get {
+                return ResourceManager.GetString("ScriptDeletingRowsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Errors found while executing the SQL script, no changes were applied..
         /// </summary>
         internal static string ScriptErrorThrownSummary {
             get {
                 return ResourceManager.GetString("ScriptErrorThrownSummary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Inserting {0}.
+        /// </summary>
+        internal static string ScriptInsertingRowsText {
+            get {
+                return ResourceManager.GetString("ScriptInsertingRowsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to row(s).
+        /// </summary>
+        internal static string ScriptRowsText {
+            get {
+                return ResourceManager.GetString("ScriptRowsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Updating {0}.
+        /// </summary>
+        internal static string ScriptUpdatingRowsText {
+            get {
+                return ResourceManager.GetString("ScriptUpdatingRowsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to  with the following SQL statement(s):.
+        /// </summary>
+        internal static string ScriptWithSqlStatementsText {
+            get {
+                return ResourceManager.GetString("ScriptWithSqlStatementsText", resourceCulture);
             }
         }
         

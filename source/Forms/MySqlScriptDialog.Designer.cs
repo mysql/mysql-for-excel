@@ -58,6 +58,7 @@ namespace MySQL.ForExcel.Forms
       this.QueryChangedTimer = new System.Windows.Forms.Timer(this.components);
       this.QueryWarningLabel = new System.Windows.Forms.Label();
       this.QueryWarningPictureBox = new System.Windows.Forms.PictureBox();
+      this.OriginalOperationsLabel = new System.Windows.Forms.Label();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       this.QueryEditorContextMenuStrip.SuspendLayout();
@@ -71,10 +72,11 @@ namespace MySQL.ForExcel.Forms
       // 
       // ContentAreaPanel
       // 
+      this.ContentAreaPanel.Controls.Add(this.QueryTextBox);
       this.ContentAreaPanel.Controls.Add(this.QueryWarningLabel);
       this.ContentAreaPanel.Controls.Add(this.QueryWarningPictureBox);
-      this.ContentAreaPanel.Controls.Add(this.QueryTextBox);
       this.ContentAreaPanel.Controls.Add(this.TitleLabel);
+      this.ContentAreaPanel.Controls.Add(this.OriginalOperationsLabel);
       this.ContentAreaPanel.Size = new System.Drawing.Size(884, 461);
       // 
       // CommandAreaPanel
@@ -114,7 +116,7 @@ namespace MySQL.ForExcel.Forms
       this.TitleLabel.AutoSize = true;
       this.TitleLabel.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.TitleLabel.ForeColor = System.Drawing.Color.Navy;
-      this.TitleLabel.Location = new System.Drawing.Point(17, 17);
+      this.TitleLabel.Location = new System.Drawing.Point(11, 19);
       this.TitleLabel.Name = "TitleLabel";
       this.TitleLabel.Size = new System.Drawing.Size(409, 20);
       this.TitleLabel.TabIndex = 0;
@@ -131,9 +133,9 @@ namespace MySQL.ForExcel.Forms
       this.QueryTextBox.EnableAutoDragDrop = true;
       this.QueryTextBox.Font = new System.Drawing.Font("Consolas", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.QueryTextBox.HideSelection = false;
-      this.QueryTextBox.Location = new System.Drawing.Point(12, 50);
+      this.QueryTextBox.Location = new System.Drawing.Point(12, 68);
       this.QueryTextBox.Name = "QueryTextBox";
-      this.QueryTextBox.Size = new System.Drawing.Size(860, 335);
+      this.QueryTextBox.Size = new System.Drawing.Size(860, 317);
       this.QueryTextBox.TabIndex = 1;
       this.QueryTextBox.Text = "";
       this.QueryTextBox.WordWrap = false;
@@ -216,6 +218,17 @@ namespace MySQL.ForExcel.Forms
       this.QueryWarningPictureBox.TabStop = false;
       this.QueryWarningPictureBox.Visible = false;
       // 
+      // OriginalOperationsLabel
+      // 
+      this.OriginalOperationsLabel.AutoSize = true;
+      this.OriginalOperationsLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.OriginalOperationsLabel.Location = new System.Drawing.Point(12, 48);
+      this.OriginalOperationsLabel.Name = "OriginalOperationsLabel";
+      this.OriginalOperationsLabel.Size = new System.Drawing.Size(530, 15);
+      this.OriginalOperationsLabel.TabIndex = 41;
+      this.OriginalOperationsLabel.Text = "Creating Table \'??\', Deleting ??, Inserting ??, Updating ?? row(s) with the follo" +
+    "wing SQL statement(s):";
+      // 
       // MySqlScriptDialog
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -254,5 +267,6 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.Timer QueryChangedTimer;
     private System.Windows.Forms.Label QueryWarningLabel;
     private System.Windows.Forms.PictureBox QueryWarningPictureBox;
+    private System.Windows.Forms.Label OriginalOperationsLabel;
   }
 }

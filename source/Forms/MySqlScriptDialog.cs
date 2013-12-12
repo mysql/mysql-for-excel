@@ -37,10 +37,34 @@ namespace MySQL.ForExcel.Forms
   /// </summary>
   public partial class MySqlScriptDialog : AutoStyleableBaseDialog
   {
+    #region Constants
+
     /// <summary>
     /// The zooming step used to increase or decrease the font size of text in the rich text editor. 
     /// </summary>
     public const float ZOOMING_STEP = 1.1F;
+
+    /// <summary>
+    /// The default height for the <see cref="QueryTextBox"/> control when the original operations information label is not shown.
+    /// </summary>
+    private const int DEFAULT_HEIGHT_QUERY_TEXTBOX_NO_INFO = 337;
+
+    /// <summary>
+    /// The default height for the <see cref="QueryTextBox"/> control when the original operations information label is shown.
+    /// </summary>
+    private const int DEFAULT_HEIGHT_QUERY_TEXTBOX_WITH_INFO = 317;
+
+    /// <summary>
+    /// The default vertical location for the <see cref="QueryTextBox"/> control when the original operations information label is not shown.
+    /// </summary>
+    private const int DEFAULT_Y_LOCATION_QUERY_TEXTBOX_NO_INFO = 48;
+
+    /// <summary>
+    /// The default vertical location for the <see cref="QueryTextBox"/> control when the original operations information label is shown.
+    /// </summary>
+    private const int DEFAULT_Y_LOCATION_QUERY_TEXTBOX_WITH_INFO = 68;
+
+    #endregion Constants
 
     #region Fields
 
@@ -92,6 +116,7 @@ namespace MySQL.ForExcel.Forms
       UseOptimisticUpdate = useOptimisticUpdate;
       CreateOriginalStatementsList();
       ApplyButton.Enabled = SqlScript.Trim().Length > 0;
+      SetOriginalOperationsInfoAvailability();
     }
 
     /// <summary>
@@ -125,7 +150,9 @@ namespace MySQL.ForExcel.Forms
         _mySqlTable = mySqlTable;
         _wbConnection = _mySqlTable.WbConnection;
         UseOptimisticUpdate = _mySqlTable.UseOptimisticUpdate;
+        ShowOriginalOperationsInformation = true;
         CreateOriginalStatementsList();
+        SetOriginalOperationsInfoAvailability();
       }
 
       SqlScript = OriginalSqlScript;
@@ -147,6 +174,7 @@ namespace MySQL.ForExcel.Forms
       OriginalSqlScript = null;
       OriginalStatementRowsList = null;
       ScriptResult = MySqlStatement.StatementResultType.NotApplied;
+      ShowOriginalOperationsInformation = false;
 
       InitializeComponent();
       OriginalQueryButton.Enabled = false;
@@ -207,6 +235,11 @@ namespace MySQL.ForExcel.Forms
     /// Gets the overall result type of the applied script.
     /// </summary>
     public MySqlStatement.StatementResultType ScriptResult { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicating whether original operations from a <see cref="MySqlDataTable"/> are shown above the SQL statements.
+    /// </summary>
+    public bool ShowOriginalOperationsInformation { get; private set; }
 
     /// <summary>
     /// Gets the SQL query edited by the user.
@@ -532,6 +565,78 @@ namespace MySQL.ForExcel.Forms
       ZoomResetToolStripMenuItem.Visible = false;
       ZoomInToolStripMenuItem.Enabled = true;
       ZoomOutToolStripMenuItem.Enabled = true;
+    }
+
+    /// <summary>
+    /// Sets up the visibility and arrangement of the label showing original operations information reflected on the SQL script.
+    /// </summary>
+    private void SetOriginalOperationsInfoAvailability()
+    {
+      SetOriginalOperationsInfoText();
+      OriginalOperationsLabel.Visible = ShowOriginalOperationsInformation;
+      QueryTextBox.Anchor = AnchorStyles.None;
+      QueryTextBox.Location = ShowOriginalOperationsInformation
+        ? new Point(QueryTextBox.Location.X, DEFAULT_Y_LOCATION_QUERY_TEXTBOX_WITH_INFO)
+        : new Point(QueryTextBox.Location.X, DEFAULT_Y_LOCATION_QUERY_TEXTBOX_NO_INFO);
+      QueryTextBox.Height = ShowOriginalOperationsInformation
+        ? DEFAULT_HEIGHT_QUERY_TEXTBOX_WITH_INFO
+        : DEFAULT_HEIGHT_QUERY_TEXTBOX_NO_INFO;
+      QueryTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right;
+    }
+
+    /// <summary>
+    /// Sets up the label text showing original operations information reflected on the SQL script.
+    /// </summary>
+    private void SetOriginalOperationsInfoText()
+    {
+      if (ShowOriginalOperationsInformation)
+      {
+        StringBuilder originalOperationsInfo = new StringBuilder(3);
+        if (_mySqlTable.OperationType == MySqlDataTable.DataOperationType.Export)
+        {
+          originalOperationsInfo.AppendFormat(Resources.ScriptCreatingTableText, _mySqlTable.TableNameForSqlQueries);
+        }
+
+        if (_mySqlTable.OperationType != MySqlDataTable.DataOperationType.Export || !_mySqlTable.CreateTableWithoutData)
+        {
+          int operationRows = _mySqlTable.DeletingOperations;
+          int totalOperationRows = operationRows;
+          if (operationRows > 0)
+          {
+            originalOperationsInfo.AddSeparator(", ", true);
+            originalOperationsInfo.AppendFormat(Resources.ScriptDeletingRowsText, operationRows);
+          }
+
+          operationRows = _mySqlTable.InsertingOperations;
+          totalOperationRows += operationRows;
+          if (operationRows > 0)
+          {
+            originalOperationsInfo.AddSeparator(", ", true);
+            originalOperationsInfo.AppendFormat(Resources.ScriptInsertingRowsText, operationRows);
+          }
+
+          operationRows = _mySqlTable.UpdatingOperations;
+          totalOperationRows += operationRows;
+          if (operationRows > 0)
+          {
+            originalOperationsInfo.AddSeparator(", ", true);
+            originalOperationsInfo.AppendFormat(Resources.ScriptUpdatingRowsText, operationRows);
+          }
+
+          if (totalOperationRows > 0)
+          {
+            originalOperationsInfo.AddSeparator(" ", true);
+            originalOperationsInfo.Append(Resources.ScriptRowsText);
+          }
+        }
+
+        if (originalOperationsInfo.Length > 0)
+        {
+          originalOperationsInfo.Append(Resources.ScriptWithSqlStatementsText);
+        }
+
+        OriginalOperationsLabel.Text = originalOperationsInfo.ToString();
+      }
     }
 
     /// <summary>

@@ -825,4 +825,22 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
   <data name="SqlStatementsProducingWarningsText" xml:space="preserve">
     <value>The following SQL statements produced warnings:</value>
   </data>
+  <data name="ScriptCreatingTableText" xml:space="preserve">
+    <value>Creating Table '{0}'</value>
+  </data>
+  <data name="ScriptDeletingRowsText" xml:space="preserve">
+    <value>Deleting {0}</value>
+  </data>
+  <data name="ScriptInsertingRowsText" xml:space="preserve">
+    <value>Inserting {0}</value>
+  </data>
+  <data name="ScriptRowsText" xml:space="preserve">
+    <value>row(s)</value>
+  </data>
+  <data name="ScriptUpdatingRowsText" xml:space="preserve">
+    <value>Updating {0}</value>
+  </data>
+  <data name="ScriptWithSqlStatementsText" xml:space="preserve">
+    <value> with the following SQL statement(s):</value>
+  </data>
 </root>

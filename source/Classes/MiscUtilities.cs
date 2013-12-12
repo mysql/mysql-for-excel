@@ -49,6 +49,22 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Adds new lines to the <see cref="StringBuilder"/>.
+    /// </summary>
+    /// <param name="stringBuilder">The <see cref="StringBuilder"/> to add new lines to.</param>
+    /// <param name="separator">The separator text.</param>
+    /// <param name="onlyIfNotEmpty">Flag indicating if the separator is only added if the string builder is not empty.</param>
+    public static void AddSeparator(this StringBuilder stringBuilder, string separator, bool onlyIfNotEmpty = false)
+    {
+      if (stringBuilder == null || (onlyIfNotEmpty && stringBuilder.Length == 0))
+      {
+        return;
+      }
+
+      stringBuilder.Append(separator);
+    }
+
+    /// <summary>
     /// Returns the position of a given integer number within an array of integers.
     /// </summary>
     /// <param name="intArray">The array of integers to look for the given number.</param>
