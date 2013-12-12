@@ -772,7 +772,6 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the type is a valid MySQL data type, <c>false</c> otherwise.</returns>
     public bool SetMySqlDataType(string dataType, bool validateType = false, bool testTypeOnData = false)
     {
-      bool warningsChanged;
       IsMySqlDataTypeValid = true;
       dataType = dataType.Trim();
       MySqlDataType = dataType;
@@ -787,7 +786,7 @@ namespace MySQL.ForExcel.Classes
         return IsMySqlDataTypeValid;
       }
 
-      warningsChanged = UpdateWarnings(false, Resources.ColumnDataTypeRequiredWarning);
+      bool warningsChanged = UpdateWarnings(false, Resources.ColumnDataTypeRequiredWarning);
       if (validateType)
       {
         IsMySqlDataTypeValid = DataTypeUtilities.ValidateUserDataType(dataType);

@@ -174,23 +174,28 @@ namespace MySQL.ForExcel.Classes
       switch (rowAction)
       {
         case DataRowAction.Add:
+          SetupTablePropertyListener(true);
           ReflectChangesForAddedRow();
           break;
 
         case DataRowAction.Change:
+          SetupTablePropertyListener(true);
           ReflectChangesForModifiedRow();
           break;
 
         case DataRowAction.Commit:
+          SetupTablePropertyListener(false);
           ReflectChangesForCommittedRow();
           break;
 
         case DataRowAction.Delete:
+          SetupTablePropertyListener(true);
           ExcelRange = null;
           IsBeingDeleted = true;
           break;
 
         case DataRowAction.Rollback:
+          SetupTablePropertyListener(false);
           ReflectChangesForRolledbackRow();
           break;
       }
@@ -341,6 +346,21 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Event delegate method fired when a property value in the parent <see cref="MySqlTable"/> changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void MySqlTablePropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+      switch (e.PropertyName)
+      {
+        case "UseOptimisticUpdate":
+          _sqlQuery = null;
+          break;
+      }
+    }
+
+    /// <summary>
     /// Reflects changes in Excel worksheet if this row has just been added to a <see cref="MySqlDataTable"/>.
     /// </summary>
     private void ReflectChangesForAddedRow()
@@ -434,6 +454,24 @@ namespace MySQL.ForExcel.Classes
 
       ChangedColumnNames.Clear();
       IsBeingDeleted = false;
+    }
+
+    /// <summary>
+    /// Subscribes on unsubscribes to the table's property changed event.
+    /// </summary>
+    /// <param name="subscribe">Flag indicating whether the event is subscribed or unsubscribed.</param>
+    private void SetupTablePropertyListener(bool subscribe)
+    {
+      if (MySqlTable == null)
+      {
+        return;
+      }
+
+      MySqlTable.PropertyChanged -= MySqlTablePropertyChanged;
+      if (subscribe)
+      {
+        MySqlTable.PropertyChanged += MySqlTablePropertyChanged;
+      }
     }
   }
 }

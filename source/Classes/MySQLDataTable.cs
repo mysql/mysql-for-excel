@@ -53,6 +53,11 @@ namespace MySQL.ForExcel.Classes
     private bool _copyingTableData;
 
     /// <summary>
+    /// Flag indicating whether data type for each column is automatically detected when data is loaded by the <see cref="SetupColumnsWithData"/> method.
+    /// </summary>
+    private bool _detectDatatype;
+
+    /// <summary>
     /// Flag indicating if the first row in the Excel region to be exported contains the column names of the MySQL table that will be created.
     /// </summary>
     private bool _firstRowIsHeaders;
@@ -63,12 +68,22 @@ namespace MySQL.ForExcel.Classes
     private bool _changedColumnNamesWithFirstRowOfData;
 
     /// <summary>
+    /// Flag indicating whether during an Export operation only the table will be created without any data.
+    /// </summary>
+    private bool _createTableWithoutData;
+
+    /// <summary>
     /// Contains the value of the max_allowed_packet system variable of the MySQL Server currently connected to.
     /// </summary>
     private ulong _mysqlMaxAllowedPacket;
 
     /// <summary>
-    ///
+    /// The SELECT query used to retrieve the excelData from the corresponding MySQL table to fill this one.
+    /// </summary>
+    private string _selectQuery;
+
+    /// <summary>
+    /// Flag indicating whether there is a MySQL table in the connected schema with the same name as in <see cref="TableName"/>.
     /// </summary>
     private bool? _tableExistsInSchema;
 
@@ -81,6 +96,11 @@ namespace MySQL.ForExcel.Classes
     /// Flag indicating if the first column in the Excel region to be exported will be used to create the MySQL table's primary key.
     /// </summary>
     private bool _useFirstColumnAsPk;
+
+    /// <summary>
+    /// Flag indicating whether optimistic locking is used for the update of rows.
+    /// </summary>
+    private bool _useOptimisticUpdate;
 
     #endregion Fields
 
@@ -181,24 +201,24 @@ namespace MySQL.ForExcel.Classes
       _autoPkWarningTextsList = new List<string>(1);
       _changedColumnNamesWithFirstRowOfData = false;
       _copyingTableData = false;
+      _createTableWithoutData = false;
+      _detectDatatype = false;
       _mysqlMaxAllowedPacket = 0;
       _tableExistsInSchema = null;
       _tableWarningsTextList = new List<string>(3);
+      _selectQuery = string.Format("SELECT * FROM `{0}`", TableNameForSqlQueries);
+      _useOptimisticUpdate = false;
       AddBufferToVarchar = false;
       AddPrimaryKeyColumn = false;
       AutoAllowEmptyNonIndexColumns = false;
       AutoIndexIntColumns = false;
-      CreateTableWithoutData = false;
-      DetectDatatype = false;
       FirstRowIsHeaders = false;
       IsTableNameValid = !string.IsNullOrEmpty(TableName);
       IsFormatted = false;
       OperationType = DataOperationType.Import;
       RemoveEmptyColumns = false;
       SchemaName = string.Empty;
-      SelectQuery = string.Format("SELECT * FROM `{0}`", TableNameForSqlQueries);
       UseFirstColumnAsPk = false;
-      UseOptimisticUpdate = false;
       WbConnection = null;
     }
 
@@ -276,7 +296,23 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets or sets a value indicating whether during an Export operation only the table will be created without any data.
     /// </summary>
-    public bool CreateTableWithoutData { get; set; }
+    public bool CreateTableWithoutData
+    {
+      get
+      {
+        return _createTableWithoutData;
+      }
+
+      set
+      {
+        if (_createTableWithoutData != value)
+        {
+          OnPropertyChanged("CreateTableWithoutData");
+        }
+
+        _createTableWithoutData = value;
+      }
+    }
 
     /// <summary>
     /// Gets the last warning text associated to the auto-generated primary key.
@@ -315,7 +351,23 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a value indicating whether data type for each column is automatically detected when data is loaded by the <see cref="SetupColumnsWithData"/> method.
     /// </summary>
-    public bool DetectDatatype { get; set; }
+    public bool DetectDatatype
+    {
+      get
+      {
+        return _detectDatatype;
+      }
+
+      set
+      {
+        if (_detectDatatype != value)
+        {
+          OnPropertyChanged("DetectDatatype");
+        }
+
+        _detectDatatype = value;
+      }
+    }
 
     /// <summary>
     /// Gets a value indicating whether the first column contains numeric whole numbers.
@@ -361,6 +413,11 @@ namespace MySQL.ForExcel.Classes
 
       set
       {
+        if (_firstRowIsHeaders != value)
+        {
+          OnPropertyChanged("FirstRowIsHeaders");
+        }
+
         _firstRowIsHeaders = value;
         UseFirstRowAsHeaders();
       }
@@ -464,7 +521,23 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets or sets the SELECT query used to retrieve the excelData from the corresponding MySQL table to fill this one.
     /// </summary>
-    public string SelectQuery { get; set; }
+    public string SelectQuery
+    {
+      get
+      {
+        return _selectQuery;
+      }
+
+      set
+      {
+        if (!string.Equals(_selectQuery, value, StringComparison.InvariantCulture))
+        {
+          OnPropertyChanged("SelectQuery");
+        }
+
+        _selectQuery = value;
+      }
+    }
 
     /// <summary>
     /// Gets a value indicating whether there is a MySQL table in the connected schema with the same name as in <see cref="TableName"/>.
@@ -495,8 +568,9 @@ namespace MySQL.ForExcel.Classes
 
       set
       {
-        if (base.TableName != value)
+        if (!string.Equals(base.TableName, value, StringComparison.InvariantCulture))
         {
+          OnPropertyChanged("TableName");
           _tableExistsInSchema = null;
         }
 
@@ -558,6 +632,11 @@ namespace MySQL.ForExcel.Classes
 
       set
       {
+        if (_useFirstColumnAsPk != value)
+        {
+          OnPropertyChanged("UseFirstColumnAsPk");
+        }
+
         _useFirstColumnAsPk = value;
         if (!AddPrimaryKeyColumn)
         {
@@ -574,7 +653,23 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets or sets a value indicating whether optimistic locking is used for the update of rows.
     /// </summary>
-    public bool UseOptimisticUpdate { get; set; }
+    public bool UseOptimisticUpdate
+    {
+      get
+      {
+        return _useOptimisticUpdate;
+      }
+
+      set
+      {
+        if (_useOptimisticUpdate != value)
+        {
+          OnPropertyChanged("UseOptimisticUpdate");
+        }
+
+        _useOptimisticUpdate = value;
+      }
+    }
 
     /// <summary>
     /// Gets a <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.
@@ -583,10 +678,17 @@ namespace MySQL.ForExcel.Classes
 
     #endregion Properties
 
+    #region Events
+
     /// <summary>
     /// Occurs when a property value on any of the columns in this table changes.
     /// </summary>
     public event PropertyChangedEventHandler TableColumnPropertyValueChanged;
+
+    /// <summary>
+    /// Occurs when a property value in this table changes.
+    /// </summary>
+    public event PropertyChangedEventHandler PropertyChanged;
 
     /// <summary>
     /// Delegate handler for the <see cref="TableWarningsChanged"/> event.
@@ -599,6 +701,8 @@ namespace MySQL.ForExcel.Classes
     /// Occurs when the warnings associated to any of the columns in this table change.
     /// </summary>
     public event TableWarningsChangedEventHandler TableWarningsChanged;
+
+    #endregion Events
 
     /// <summary>
     /// Creates a new <see cref="MySqlDataTable"/> object with its schema cloned from this table but no data.
@@ -1534,6 +1638,18 @@ namespace MySQL.ForExcel.Classes
         col.RowsFrom1stDataType = proposedType;
         col.SetMySqlDataType(_firstRowIsHeaders ? col.RowsFrom2ndDataType : col.RowsFrom1stDataType);
         col.CreateIndex = AutoIndexIntColumns && col.IsInteger;
+      }
+    }
+
+    /// <summary>
+    /// Raises the <see cref="PropertyChanged"/> event.
+    /// </summary>
+    /// <param name="propertyName">The name of the property whose value changed.</param>
+    private void OnPropertyChanged(string propertyName)
+    {
+      if (PropertyChanged != null)
+      {
+        PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
       }
     }
 
