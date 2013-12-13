@@ -60,14 +60,14 @@ namespace MySQL.ForExcel.Panels
       this.EditDataHotLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.ImportDataHotLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.UpperPanel = new System.Windows.Forms.Panel();
-      this.SeparatorImage = new TransparentPictureBox();
+      this.SchemaLabel = new System.Windows.Forms.Label();
+      this.SeparatorImage = new MySQL.ForExcel.Controls.TransparentPictureBox();
       this.UserIPLabel = new System.Windows.Forms.Label();
-      this.DBObjectsFilter = new SearchEdit();
+      this.DBObjectsFilter = new MySQL.ForExcel.Controls.SearchEdit();
       this.SelectDatabaseObjectHotLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.ConnectionNameLabel = new System.Windows.Forms.Label();
       this.ExportToNewTableHotLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.MainLogoPictureBox = new System.Windows.Forms.PictureBox();
-      this.SchemaLabel = new System.Windows.Forms.Label();
       this.DBObjectsContextMenuStrip.SuspendLayout();
       this.UpperPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.MainLogoPictureBox)).BeginInit();
@@ -280,6 +280,16 @@ namespace MySQL.ForExcel.Panels
       this.UpperPanel.Size = new System.Drawing.Size(260, 195);
       this.UpperPanel.TabIndex = 28;
       // 
+      // SchemaLabel
+      // 
+      this.SchemaLabel.AutoEllipsis = true;
+      this.SchemaLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.SchemaLabel.Location = new System.Drawing.Point(61, 45);
+      this.SchemaLabel.Name = "SchemaLabel";
+      this.SchemaLabel.Size = new System.Drawing.Size(190, 18);
+      this.SchemaLabel.TabIndex = 35;
+      this.SchemaLabel.Text = "Schema: ??";
+      // 
       // SeparatorImage
       // 
       this.SeparatorImage.BackColor = System.Drawing.Color.Transparent;
@@ -294,7 +304,7 @@ namespace MySQL.ForExcel.Panels
       // 
       this.UserIPLabel.AutoEllipsis = true;
       this.UserIPLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.UserIPLabel.Location = new System.Drawing.Point(61, 26);
+      this.UserIPLabel.Location = new System.Drawing.Point(61, 28);
       this.UserIPLabel.Name = "UserIPLabel";
       this.UserIPLabel.Size = new System.Drawing.Size(190, 18);
       this.UserIPLabel.TabIndex = 29;
@@ -394,16 +404,6 @@ namespace MySQL.ForExcel.Panels
       this.MainLogoPictureBox.Size = new System.Drawing.Size(64, 64);
       this.MainLogoPictureBox.TabIndex = 30;
       this.MainLogoPictureBox.TabStop = false;
-      // 
-      // SchemaLabel
-      // 
-      this.SchemaLabel.AutoEllipsis = true;
-      this.SchemaLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.SchemaLabel.Location = new System.Drawing.Point(61, 44);
-      this.SchemaLabel.Name = "SchemaLabel";
-      this.SchemaLabel.Size = new System.Drawing.Size(190, 18);
-      this.SchemaLabel.TabIndex = 35;
-      this.SchemaLabel.Text = "Schema: ??";
       // 
       // DbObjectSelectionPanel
       // 

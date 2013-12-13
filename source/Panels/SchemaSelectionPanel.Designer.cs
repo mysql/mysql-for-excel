@@ -58,9 +58,9 @@ namespace MySQL.ForExcel.Panels
       this.RefreshSchemasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.CreateNewSchemaHotLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.UpperPanel = new System.Windows.Forms.Panel();
-      this.SeparatorImage = new TransparentPictureBox();
+      this.SeparatorImage = new MySQL.ForExcel.Controls.TransparentPictureBox();
       this.UserIPLabel = new System.Windows.Forms.Label();
-      this.SchemaFilter = new SearchEdit();
+      this.SchemaFilter = new MySQL.ForExcel.Controls.SearchEdit();
       this.SelectSchemaHotLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.InstructionsLabel = new MySQL.ForExcel.Controls.TransparentLabel();
       this.ConnectionNameLabel = new System.Windows.Forms.Label();
@@ -221,7 +221,7 @@ namespace MySQL.ForExcel.Panels
       // 
       this.UserIPLabel.AutoEllipsis = true;
       this.UserIPLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.UserIPLabel.Location = new System.Drawing.Point(61, 36);
+      this.UserIPLabel.Location = new System.Drawing.Point(61, 28);
       this.UserIPLabel.Name = "UserIPLabel";
       this.UserIPLabel.Size = new System.Drawing.Size(190, 18);
       this.UserIPLabel.TabIndex = 28;
@@ -291,7 +291,7 @@ namespace MySQL.ForExcel.Panels
       // 
       this.ConnectionNameLabel.AutoEllipsis = true;
       this.ConnectionNameLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.ConnectionNameLabel.Location = new System.Drawing.Point(61, 18);
+      this.ConnectionNameLabel.Location = new System.Drawing.Point(61, 8);
       this.ConnectionNameLabel.Name = "ConnectionNameLabel";
       this.ConnectionNameLabel.Size = new System.Drawing.Size(190, 18);
       this.ConnectionNameLabel.TabIndex = 27;
