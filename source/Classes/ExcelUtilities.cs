@@ -33,7 +33,7 @@ namespace MySQL.ForExcel.Classes
     /// The default interior color for Excel cells committed to the MySQL server during an Edit Data operation.
     /// </summary>
     /// <remarks>Blue-ish.</remarks>
-    public const string DEFAULT_COMMITED_CELLS_HTML_COLOR = "#B8E5F7";
+    public const string DEFAULT_COMMITED_CELLS_HTML_COLOR = "#7CC576";
 
     /// <summary>
     /// The default interior color for Excel cells that caused errors during a commit of an Edit Data operation.
@@ -62,7 +62,13 @@ namespace MySQL.ForExcel.Classes
     /// The default interior color for Excel cells containing values that have been changed by the user but not yet committed during an Edit Data operation.
     /// </summary>
     /// <remarks>Green-ish.</remarks>
-    public const string DEFAULT_UNCOMMITTED_CELLS_HTML_COLOR = "#7CC576";
+    public const string DEFAULT_UNCOMMITTED_CELLS_HTML_COLOR = "#B8E5F7";
+
+    /// <summary>
+    /// The default interior color for Excel cells containing values that caused concurrency warnings during an Edit Data operation using optimistic updates.
+    /// </summary>
+    /// <remarks>Green-ish.</remarks>
+    public const string DEFAULT_WARNING_CELLS_HTML_COLOR = "#FCC451";
 
     /// <summary>
     /// The interior color used to revert Excel cells to their original background color.
@@ -71,6 +77,9 @@ namespace MySQL.ForExcel.Classes
 
     #endregion Constants
 
+    /// <summary>
+    /// Initializes the <see cref="ExcelUtilities"/> class.
+    /// </summary>
     static ExcelUtilities()
     {
       CommitedCellsHtmlColor = DEFAULT_COMMITED_CELLS_HTML_COLOR;
@@ -78,6 +87,7 @@ namespace MySQL.ForExcel.Classes
       LockedCellsHtmlColor = DEFAULT_LOCKED_CELLS_HTML_COLOR;
       NewRowCellsHtmlColor = DEFAULT_NEW_ROW_CELLS_HTML_COLOR;
       UncommittedCellsHtmlColor = DEFAULT_UNCOMMITTED_CELLS_HTML_COLOR;
+      WarningCellsHtmlColor = DEFAULT_WARNING_CELLS_HTML_COLOR;
     }
 
     #region Properties
@@ -184,6 +194,27 @@ namespace MySQL.ForExcel.Classes
       set
       {
         UncommittedCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
+      }
+    }
+
+    /// <summary>
+    /// Gets the interior color for Excel cells containing values that caused concurrency warnings during an Edit Data operation using optimistic updates.
+    /// </summary>
+    public static int WarningCellsOleColor { get; private set; }
+
+    /// <summary>
+    /// Gets or sets the interior color for Excel cells containing values that caused concurrency warnings during an Edit Data operation using optimistic updates.
+    /// </summary>
+    public static string WarningCellsHtmlColor
+    {
+      get
+      {
+        return ColorTranslator.ToHtml(ColorTranslator.FromOle(WarningCellsOleColor));
+      }
+
+      set
+      {
+        WarningCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
       }
     }
 

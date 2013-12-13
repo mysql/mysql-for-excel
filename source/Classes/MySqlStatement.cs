@@ -165,13 +165,19 @@ namespace MySQL.ForExcel.Classes
     public string ResultText { get; private set; }
 
     /// <summary>
-    /// Gets a value indicating whether the statement was applied either successfuly or with warnings.
+    /// Gets the query text of this SQL statement to be applied against the database.
     /// </summary>
-    public bool StatementAppliedSuccessfully
+    public string SqlQuery
     {
       get
       {
-        return StatementResult.WasApplied();
+        string freshQuery = _mySqlRow != null ? _mySqlRow.GetSql() : string.Empty;
+        if (!string.IsNullOrEmpty(freshQuery))
+        {
+          _sqlQuery = freshQuery;
+        }
+
+        return _sqlQuery;
       }
     }
 
@@ -192,19 +198,13 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the query text of this SQL statement to be applied against the database.
+    /// Gets a value indicating whether the statement was applied either successfuly or with warnings.
     /// </summary>
-    public string SqlQuery
+    public bool StatementWasApplied
     {
       get
       {
-        string freshQuery = _mySqlRow != null ? _mySqlRow.GetSql() : string.Empty;
-        if (!string.IsNullOrEmpty(freshQuery))
-        {
-          _sqlQuery = freshQuery;
-        }
-
-        return _sqlQuery;
+        return StatementResult.WasApplied();
       }
     }
 

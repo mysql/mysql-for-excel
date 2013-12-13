@@ -15,6 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
@@ -73,6 +74,28 @@ namespace MySQL.ForExcel.Classes
     /// Gets a list of <see cref="Excel.Range"/> objects representing cells with modified values.
     /// </summary>
     public List<Excel.Range> ExcelModifiedRangesList { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicating whether there are concurrency warnings in a row.
+    /// </summary>
+    public bool HasConcurrencyWarnings
+    {
+      get
+      {
+        return !string.IsNullOrEmpty(RowError) && string.Equals(RowError, MySqlStatement.NO_MATCH, StringComparison.InvariantCulture);
+      }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether there are errors in a row.
+    /// </summary>
+    public new bool HasErrors
+    {
+      get
+      {
+        return !string.IsNullOrEmpty(RowError) && !string.Equals(RowError, MySqlStatement.NO_MATCH, StringComparison.InvariantCulture);
+      }
+    }
 
     /// <summary>
     /// Gets a value indicating whether the row is being deleted.
@@ -162,6 +185,20 @@ namespace MySQL.ForExcel.Classes
       }
 
       return _sqlQuery;
+    }
+
+    /// <summary>
+    /// Reflects the error set to the row into a user interface.
+    /// </summary>
+    public void ReflectError()
+    {
+      if (IsBeingDeleted || ExcelRange == null)
+      {
+        return;
+      }
+
+      var cellsColor = HasConcurrencyWarnings ? ExcelUtilities.WarningCellsOleColor : ExcelUtilities.ErroredCellsOleColor;
+      ExcelModifiedRangesList.SetInteriorColor(cellsColor);
     }
 
     /// <summary>
@@ -381,8 +418,7 @@ namespace MySQL.ForExcel.Classes
     {
       if (!IsBeingDeleted && ExcelRange != null)
       {
-        var cellsColor = HasErrors ? ExcelUtilities.ErroredCellsOleColor : ExcelUtilities.CommitedCellsOleColor;
-        ExcelModifiedRangesList.SetInteriorColor(cellsColor);
+        ExcelModifiedRangesList.SetInteriorColor(ExcelUtilities.CommitedCellsOleColor);
         if (!HasErrors)
         {
           ExcelModifiedRangesList.Clear();

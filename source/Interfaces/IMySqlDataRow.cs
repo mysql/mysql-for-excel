@@ -25,6 +25,16 @@ namespace MySQL.ForExcel.Interfaces
   public interface IMySqlDataRow
   {
     /// <summary>
+    /// Gets a value indicating whether there are concurrency warnings in a row.
+    /// </summary>
+    bool HasConcurrencyWarnings { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether there are errors in a row.
+    /// </summary>
+    bool HasErrors { get; }
+
+    /// <summary>
     /// Gets or sets the custom error description for a row.
     /// </summary>
     string RowError { get; set; }
@@ -49,5 +59,10 @@ namespace MySQL.ForExcel.Interfaces
     /// </summary>
     /// <returns>A SQL query containing the data changes.</returns>
     string GetSql();
+
+    /// <summary>
+    /// Reflects the error set to the row into a user interface.
+    /// </summary>
+    void ReflectError();
   }
 }

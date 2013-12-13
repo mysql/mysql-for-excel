@@ -15,6 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
+using System;
 using MySQL.ForExcel.Interfaces;
 
 namespace MySQL.ForExcel.Classes
@@ -44,6 +45,30 @@ namespace MySQL.ForExcel.Classes
       Statement = new MySqlStatement(this);
     }
 
+    #region Properties
+
+    /// <summary>
+    /// Gets a value indicating whether there are concurrency warnings in a row.
+    /// </summary>
+    public bool HasConcurrencyWarnings
+    {
+      get
+      {
+        return !string.IsNullOrEmpty(RowError) && string.Equals(RowError, MySqlStatement.NO_MATCH, StringComparison.InvariantCulture);
+      }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether there are errors in a row.
+    /// </summary>
+    public bool HasErrors
+    {
+      get
+      {
+        return !string.IsNullOrEmpty(RowError) && !string.Equals(RowError, MySqlStatement.NO_MATCH, StringComparison.InvariantCulture);
+      }
+    }
+
     /// <summary>
     /// Gets or sets the custom error description for a row.
     /// </summary>
@@ -53,6 +78,8 @@ namespace MySQL.ForExcel.Classes
     /// Gets the <see cref="MySqlStatement"/> object containing a SQL query to push changes to the database.
     /// </summary>
     public MySqlStatement Statement { get; private set; }
+
+    #endregion Properties
 
     /// <summary>
     /// Commits all the changes made to this row since the last time AcceptChanges was called.
@@ -76,6 +103,13 @@ namespace MySQL.ForExcel.Classes
     public string GetSql()
     {
       return _sqlQuery;
+    }
+
+    /// <summary>
+    /// Reflects the error set to the row into a user interface.
+    /// </summary>
+    public void ReflectError()
+    {
     }
   }
 }

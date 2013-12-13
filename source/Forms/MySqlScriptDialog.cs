@@ -343,23 +343,33 @@ namespace MySQL.ForExcel.Forms
           ScriptResult = mySqlRow.Statement.JoinResultTypes(ScriptResult);
           if (mySqlRow.Statement.StatementResult == MySqlStatement.StatementResultType.ErrorThrown)
           {
+            mySqlRow.ReflectError();
             break;
           }
         }
 
-        if (ScriptResult == MySqlStatement.StatementResultType.ErrorThrown)
+        switch (ScriptResult)
         {
-          transaction.Rollback();
-        }
-        else
-        {
-          // After commiting the transaction, selectively commit the rows that did not result in errors.
-          transaction.Commit();
-          foreach (var mySqlRow in ActualStatementRowsList.Where(mySqlRow => mySqlRow.Statement.StatementAppliedSuccessfully && mySqlRow.RowError != MySqlStatement.NO_MATCH))
-          {
-            mySqlRow.AcceptChanges();
-            mySqlRow.ClearErrors();
-          }
+          case MySqlStatement.StatementResultType.ErrorThrown:
+            transaction.Rollback();
+            break;
+
+          case MySqlStatement.StatementResultType.WarningsFound:
+          case MySqlStatement.StatementResultType.Successful:
+            // After commiting the transaction, selectively commit the rows that did not result in errors.
+            transaction.Commit();
+            foreach (var mySqlRow in ActualStatementRowsList.Where(mySqlRow => mySqlRow.Statement.StatementWasApplied))
+            {
+              if (mySqlRow.HasConcurrencyWarnings)
+              {
+                mySqlRow.ReflectError();
+                continue;
+              }
+
+              mySqlRow.AcceptChanges();
+              mySqlRow.ClearErrors();
+            }
+            break;
         }
       }
     }
