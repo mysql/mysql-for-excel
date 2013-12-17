@@ -368,6 +368,22 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets the name of the parent <see cref="Excel.Workbook"/> of the given <see cref="Excel.Worksheet"/>.
+    /// </summary>
+    /// <param name="worksheet">An <see cref="Excel.Worksheet"/> object.</param>
+    /// <returns>The name of the parent <see cref="Excel.Workbook"/>.</returns>
+    public static string GetParentWorkbookName(this Excel.Worksheet worksheet)
+    {
+      if (worksheet == null)
+      {
+        return string.Empty;
+      }
+
+      Excel.Workbook parentWorkbook = worksheet.Parent as Excel.Workbook;
+      return parentWorkbook != null ? parentWorkbook.Name : string.Empty;
+    }
+
+    /// <summary>
     /// Gets a valid name for a new <see cref="Excel.ListObject"/> that avoids duplicates with existing ones in the current <see cref="Excel.Worksheet"/>.
     /// </summary>
     /// <param name="tableName">The proposed name for a <see cref="Excel.ListObject"/>.</param>
@@ -585,6 +601,37 @@ namespace MySQL.ForExcel.Classes
       }
 
       worksheet.Unprotect(protectionKey);
+    }
+
+    /// <summary>
+    /// Checks if an Excel <see cref="Excel.Worksheet"/> with a given name exists in a <see cref="Excel.Workbook"/> with the given name.
+    /// </summary>
+    /// <param name="workBookName">Name of the <see cref="Excel.Workbook"/>.</param>
+    /// <param name="workSheetName">Name of the <see cref="Excel.Worksheet"/>.</param>
+    /// <returns><c>true</c> if the <see cref="Excel.Worksheet"/> exists, <c>false</c> otherwise.</returns>
+    public static bool WorksheetExists(string workBookName, string workSheetName)
+    {
+      bool exists;
+      if (workBookName.Length <= 0 || workSheetName.Length <= 0)
+      {
+        return false;
+      }
+
+      // Maybe the last deactivated sheet has been deleted?
+      try
+      {
+        // Do NOT remove the following lines although the wSheet variable is not used in the method the casting of the
+        // wBook.Worksheets[workSheetName] is needed to determine if the Worksheet is still valid and has not been disposed of.
+        Excel.Workbook wBook = Globals.ThisAddIn.Application.Workbooks[workBookName];
+        Excel.Worksheet wSheet = wBook.Worksheets[workSheetName] as Excel.Worksheet;
+        exists = true;
+      }
+      catch
+      {
+        exists = false;
+      }
+
+      return exists;
     }
 
     /// <summary>

@@ -41,7 +41,7 @@ namespace MySQL.ForExcel.Controls
         {
           foreach (var dictEntry in ProtectedWorksheetPasskeys)
           {
-            MySqlSourceTrace.WriteToLog(string.Format(Properties.Resources.WorkSheetInEditModeSavedLogWarning, dictEntry.Key, dictEntry.Value), SourceLevels.Warning);
+            MySqlSourceTrace.WriteToLog(string.Format(Properties.Resources.WorksheetInEditModeSavedLogWarning, dictEntry.Key, dictEntry.Value), SourceLevels.Warning);
           }
 
           ProtectedWorksheetPasskeys.Clear();

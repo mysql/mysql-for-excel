@@ -2135,20 +2135,29 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Want to save your changes to &apos;{0}&apos;?.
+        /// </summary>
+        internal static string WorkbookSavingDetailText {
+            get {
+                return ResourceManager.GetString("WorkbookSavingDetailText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Excel Worksheet is in Compatibility Mode which has a row limit of 65,535 rows..
         /// </summary>
-        internal static string WorkSheetInCompatibilityModeWarning {
+        internal static string WorksheetInCompatibilityModeWarning {
             get {
-                return ResourceManager.GetString("WorkSheetInCompatibilityModeWarning", resourceCulture);
+                return ResourceManager.GetString("WorksheetInCompatibilityModeWarning", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Warning: Excel Worksheet {0} was saved password-protected because it was used within an Edit Data operation. To unprotect it use the password: {1}.
         /// </summary>
-        internal static string WorkSheetInEditModeSavedLogWarning {
+        internal static string WorksheetInEditModeSavedLogWarning {
             get {
-                return ResourceManager.GetString("WorkSheetInEditModeSavedLogWarning", resourceCulture);
+                return ResourceManager.GetString("WorksheetInEditModeSavedLogWarning", resourceCulture);
             }
         }
         
@@ -2156,9 +2165,9 @@ namespace MySQL.ForExcel.Properties {
         ///   Looks up a localized string similar to The Excel Workbook being saved contains Worksheets that are password-protected to be used by MySQL for Excel in Edit Mode.
         ///Do you want to exit Edit Mode on all Worksheets within the Workbook before saving?.
         /// </summary>
-        internal static string WorkSheetInEditModeSavingWarningDetail {
+        internal static string WorksheetInEditModeSavingWarningDetail {
             get {
-                return ResourceManager.GetString("WorkSheetInEditModeSavingWarningDetail", resourceCulture);
+                return ResourceManager.GetString("WorksheetInEditModeSavingWarningDetail", resourceCulture);
             }
         }
         
@@ -2168,36 +2177,36 @@ namespace MySQL.ForExcel.Properties {
         ///* Exit Edit Mode in all Excel Worksheets before saving so this warning is not shown.
         ///* If you choose not to exit Edit Mode and save anyway, you will be able to unprotect the Worksheets after MySQL for Excel is closed using the protection passwords output to the application log..
         /// </summary>
-        internal static string WorkSheetInEditModeSavingWarningMoreInfo {
+        internal static string WorksheetInEditModeSavingWarningMoreInfo {
             get {
-                return ResourceManager.GetString("WorkSheetInEditModeSavingWarningMoreInfo", resourceCulture);
+                return ResourceManager.GetString("WorksheetInEditModeSavingWarningMoreInfo", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Workbook contains password protected Worksheets..
         /// </summary>
-        internal static string WorkSheetInEditModeSavingWarningTitle {
+        internal static string WorksheetInEditModeSavingWarningTitle {
             get {
-                return ResourceManager.GetString("WorkSheetInEditModeSavingWarningTitle", resourceCulture);
+                return ResourceManager.GetString("WorksheetInEditModeSavingWarningTitle", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Data Imports cannot be done into a Worksheet in Edit Mode, do you want to import the data into a new Worksheet?.
         /// </summary>
-        internal static string WorkSheetInEditModeWarningDetail {
+        internal static string WorksheetInEditModeWarningDetail {
             get {
-                return ResourceManager.GetString("WorkSheetInEditModeWarningDetail", resourceCulture);
+                return ResourceManager.GetString("WorksheetInEditModeWarningDetail", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Active Worksheet in Edit Mode.
         /// </summary>
-        internal static string WorkSheetInEditModeWarningTitle {
+        internal static string WorksheetInEditModeWarningTitle {
             get {
-                return ResourceManager.GetString("WorkSheetInEditModeWarningTitle", resourceCulture);
+                return ResourceManager.GetString("WorksheetInEditModeWarningTitle", resourceCulture);
             }
         }
         

@@ -194,7 +194,22 @@ namespace MySQL.ForExcel
       }
 
       Excel.Worksheet activeSheet = workSheet as Excel.Worksheet;
-      ActiveExcelPane.WorksheetActivated(activeSheet);
+      ActiveExcelPane.ChangeEditDialogVisibility(activeSheet , true);
+    }
+
+    /// <summary>
+    /// Event delegate method fired before an Excel <see cref="Excel.Worksheet"/> is deleted.
+    /// </summary>
+    /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
+    private void Application_SheetBeforeDelete(object workSheet)
+    {
+      if (ActiveExcelPane == null)
+      {
+        return;
+      }
+
+      Excel.Worksheet activeSheet = workSheet as Excel.Worksheet;
+      ActiveExcelPane.CloseWorksheetEditSession(activeSheet);
     }
 
     /// <summary>
@@ -224,7 +239,7 @@ namespace MySQL.ForExcel
       }
 
       Excel.Worksheet deactivatedSheet = workSheet as Excel.Worksheet;
-      ActiveExcelPane.WorksheetDeactivated(deactivatedSheet);
+      ActiveExcelPane.ChangeEditDialogVisibility(deactivatedSheet, false);
     }
 
     /// <summary>
@@ -245,9 +260,9 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Event delegate method fired when an Excel window is activated.
     /// </summary>
-    /// <param name="wb">The Excel workbook tied to the activated window.</param>
-    /// <param name="wn">The activated Excel window.</param>
-    private void Application_WindowActivate(Excel.Workbook wb, Excel.Window wn)
+    /// <param name="workbook">The Excel workbook tied to the activated window.</param>
+    /// <param name="window">The activated Excel window.</param>
+    private void Application_WindowActivate(Excel.Workbook workbook, Excel.Window window)
     {
       // Verify the collection of custom task panes to dispose of custom task panes pointing to closed (invalid) windows.
       bool disposePane = false;
@@ -289,7 +304,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Event delegate method fired when an Excel <see cref="Excel.Workbook"/> is activated.
+    /// Event delegate method fired when a <see cref="Excel.Workbook"/> is activated.
     /// </summary>
     /// <param name="workBook">A <see cref="Excel.Workbook"/> object.</param>
     private void Application_WorkbookActivate(object workBook)
@@ -300,53 +315,101 @@ namespace MySQL.ForExcel
       }
 
       Excel.Workbook activeWorkbook = workBook as Excel.Workbook;
-      ActiveExcelPane.WorkbookActivated(activeWorkbook);
+      Excel.Worksheet activeSheet = activeWorkbook != null ? activeWorkbook.ActiveSheet as Excel.Worksheet : null;
+      ActiveExcelPane.ChangeEditDialogVisibility(activeSheet, true);
+    }
+
+    /// <summary>
+    /// Event delegate method fired before a <see cref="Excel.Workbook"/> is closed.
+    /// </summary>
+    /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
+    /// <param name="cancel">Flag indicating whether the user cancelled the closing event.</param>
+    private void Application_WorkbookBeforeClose(Excel.Workbook workbook, ref bool cancel)
+    {
+      if (ActiveExcelPane == null)
+      {
+        return;
+      }
+
+      bool flagAsSaved = false;
+      if (!workbook.Saved)
+      {
+        switch (MessageBox.Show(string.Format(Resources.WorkbookSavingDetailText, workbook.Name), Application.Name, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1))
+        {
+          case DialogResult.Yes:
+            workbook.Save();
+            break;
+
+          case DialogResult.No:
+            flagAsSaved = true;
+            break;
+
+          case DialogResult.Cancel:
+            cancel = true;
+            return;
+        }
+      }
+
+      ActiveExcelPane.CloseWorkbookEditSessions(workbook);
+      if (flagAsSaved)
+      {
+        workbook.Saved = true;
+      }
     }
 
     /// <summary>
     /// Event delegate method fired before an Excel <see cref="Excel.Workbook"/> is saved to disk.
     /// </summary>
-    /// <param name="workBook">A <see cref="Excel.Workbook"/> object.</param>
+    /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
     /// <param name="saveAsUi">Flag indicating whether the Save As dialog was displayed.</param>
-    /// <param name="cancel">Flag indicating whether the event is cancelled.</param>
-    private void Application_WorkbookBeforeSave(Excel.Workbook workBook, bool saveAsUi, ref bool cancel)
+    /// <param name="cancel">Flag indicating whether the user cancelled the saving event.</param>
+    private void Application_WorkbookBeforeSave(Excel.Workbook workbook, bool saveAsUi, ref bool cancel)
     {
       if (ActiveExcelPane == null)
       {
         return;
       }
 
-      ActiveExcelPane.WorkbookBeforeSaved(workBook);
+      ActiveExcelPane.CloseWorkbookEditSessionsOnSave(workbook);
     }
 
     /// <summary>
     /// Event delegate method fired when an Excel <see cref="Excel.Workbook"/> is deactivated.
     /// </summary>
-    /// <param name="workBook">A <see cref="Excel.Workbook"/> object.</param>
-    private void Application_WorkbookDeactivate(object workBook)
+    /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
+    private void Application_WorkbookDeactivate(object workbook)
     {
       if (ActiveExcelPane == null)
       {
         return;
       }
 
-      Excel.Workbook deactivatedWorkbook = workBook as Excel.Workbook;
-      ActiveExcelPane.WorkbookActivated(deactivatedWorkbook);
+      // Hide editDialogs from deactivated Workbook
+      Excel.Workbook deactivatedWorkbook = workbook as Excel.Workbook;
+      if (deactivatedWorkbook == null)
+      {
+        return;
+      }
+
+      foreach (Excel.Worksheet wSheet in deactivatedWorkbook.Worksheets)
+      {
+        ActiveExcelPane.ChangeEditDialogVisibility(wSheet, false);
+      }
     }
 
     /// <summary>
     /// Event delegate method fired when a <see cref="Excel.Workbook"/> is opened.
     /// </summary>
-    /// <param name="workBook">The <see cref="Excel.Workbook"/> being opened.</param>
-    private void Application_WorkbookOpen(Excel.Workbook workBook)
+    /// <param name="workbook">The <see cref="Excel.Workbook"/> being opened.</param>
+    private void Application_WorkbookOpen(Excel.Workbook workbook)
     {
-      if (workBook == null)
+      if (workbook == null)
       {
         return;
       }
 
       // Add the custom MySQL table style (for Excel tables) to this workbook.
-      workBook.CreateMySqlTableStyle();
+      workbook.CreateMySqlTableStyle();
     }
 
     /// <summary>
@@ -475,13 +538,15 @@ namespace MySQL.ForExcel
           Application.WindowActivate += Application_WindowActivate;
         }
 
-        Application.SheetChange += Application_SheetChange;
-        Application.SheetSelectionChange += Application_SheetSelectionChange;
         Application.SheetActivate += Application_SheetActivate;
+        Application.SheetBeforeDelete += Application_SheetBeforeDelete;
+        Application.SheetChange += Application_SheetChange;
         Application.SheetDeactivate += Application_SheetDeactivate;
-        Application.WorkbookDeactivate += Application_WorkbookDeactivate;
+        Application.SheetSelectionChange += Application_SheetSelectionChange;
         Application.WorkbookActivate += Application_WorkbookActivate;
+        Application.WorkbookBeforeClose += Application_WorkbookBeforeClose;
         Application.WorkbookBeforeSave += Application_WorkbookBeforeSave;
+        Application.WorkbookDeactivate += Application_WorkbookDeactivate;
         Application.WorkbookOpen += Application_WorkbookOpen;
       }
       else
@@ -491,13 +556,15 @@ namespace MySQL.ForExcel
           Application.WindowActivate -= Application_WindowActivate;
         }
 
-        Application.SheetChange -= Application_SheetChange;
-        Application.SheetSelectionChange -= Application_SheetSelectionChange;
         Application.SheetActivate -= Application_SheetActivate;
+        Application.SheetBeforeDelete -= Application_SheetBeforeDelete;
+        Application.SheetChange -= Application_SheetChange;
         Application.SheetDeactivate -= Application_SheetDeactivate;
-        Application.WorkbookDeactivate -= Application_WorkbookDeactivate;
+        Application.SheetSelectionChange -= Application_SheetSelectionChange;
         Application.WorkbookActivate -= Application_WorkbookActivate;
+        Application.WorkbookBeforeClose -= Application_WorkbookBeforeClose;
         Application.WorkbookBeforeSave -= Application_WorkbookBeforeSave;
+        Application.WorkbookDeactivate -= Application_WorkbookDeactivate;
         Application.WorkbookOpen -= Application_WorkbookOpen;
       }
     }
