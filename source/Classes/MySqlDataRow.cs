@@ -71,6 +71,18 @@ namespace MySQL.ForExcel.Classes
     public Excel.Range ExcelRange { get; set; }
 
     /// <summary>
+    /// Gets the related Excel row number if any.
+    /// A valule of 0 indicates there is no related Excel row.
+    /// </summary>
+    public int ExcelRow
+    {
+      get
+      {
+        return ExcelRange != null ? ExcelRange.Row : 0;
+      }
+    }
+
+    /// <summary>
     /// Gets a list of <see cref="Excel.Range"/> objects representing cells with modified values.
     /// </summary>
     public List<Excel.Range> ExcelModifiedRangesList { get; private set; }

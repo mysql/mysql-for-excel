@@ -17,6 +17,7 @@
 
 using System;
 using System.Data;
+using System.Globalization;
 using System.Text;
 using MySql.Data.MySqlClient;
 using MySQL.ForExcel.Interfaces;
@@ -281,7 +282,8 @@ namespace MySQL.ForExcel.Classes
     /// <param name="mySqlTransaction">The <see cref="MySqlTransaction"/> transaction this statement belongs to.</param>
     /// <param name="executionOrder">The numeric index with the order in which this statement was executed.</param>
     /// <param name="useOptimisticUpdate">Flag indicating whether optimistic locking is used for the update of rows.</param>
-    public void Execute(MySqlTransaction mySqlTransaction, uint executionOrder, bool useOptimisticUpdate)
+    /// <param name="statementsQuantityFormat">The format for displaying the statement execution order.</param>
+    public void Execute(MySqlTransaction mySqlTransaction, uint executionOrder, bool useOptimisticUpdate, string statementsQuantityFormat = "000")
     {
       StatementResult = StatementResultType.NotApplied;
       if (_mySqlRow == null)
@@ -303,28 +305,35 @@ namespace MySQL.ForExcel.Classes
             || (AffectedRows == 0 && StatementType != SqlStatementType.CreateTable))
         {
           string nl = string.Empty;
+          string warningsFormat;
+          string excelRowText = _mySqlRow.ExcelRow > 0 ? _mySqlRow.ExcelRow.ToString(CultureInfo.InvariantCulture) : string.Empty;
           if (AffectedRows == 0)
           {
             WarningsQuantity++;
             _mySqlRow.RowError = NO_MATCH;
+            warningsFormat = "{2}{0:" + statementsQuantityFormat + "}: {1}";
             warningText.AppendFormat(
-              "{2}{0:000}: {1}",
+              warningsFormat,
               ExecutionOrder,
-              string.Format(Resources.QueryDidNotMatchRowsWarning, useOptimisticUpdate ? string.Empty : Resources.PrimaryKeyText),
+              string.Format(Resources.QueryDidNotMatchRowsWarning,
+                useOptimisticUpdate ? string.Empty : Resources.PrimaryKeyText,
+                !string.IsNullOrEmpty(excelRowText) ? excelRowText + " " : string.Empty),
               nl);
             nl = Environment.NewLine;
           }
 
           if (warningsDs != null)
           {
+            warningsFormat = "{3}{0:" + statementsQuantityFormat + "}: {1} - {2}{3}";
             foreach (DataRow warningRow in warningsDs.Tables[0].Rows)
             {
               WarningsQuantity++;
               warningText.AppendFormat(
-                "{3}{0:000}: {1} - {2}",
+                warningsFormat,
                 ExecutionOrder,
                 warningRow[1],
                 warningRow[2],
+                !string.IsNullOrEmpty(excelRowText) ? string.Format(" (Excel row: {0}).", excelRowText) : string.Empty,
                 nl);
               nl = Environment.NewLine;
             }

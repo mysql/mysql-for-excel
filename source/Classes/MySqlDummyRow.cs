@@ -48,6 +48,18 @@ namespace MySQL.ForExcel.Classes
     #region Properties
 
     /// <summary>
+    /// Gets the related Excel row number if any.
+    /// A valule of 0 indicates there is no related Excel row.
+    /// </summary>
+    public int ExcelRow
+    {
+      get
+      {
+        return 0;
+      }
+    }
+
+    /// <summary>
     /// Gets a value indicating whether there are concurrency warnings in a row.
     /// </summary>
     public bool HasConcurrencyWarnings

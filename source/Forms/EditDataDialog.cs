@@ -686,7 +686,8 @@ namespace MySQL.ForExcel.Forms
 
       StringBuilder operationSummary = new StringBuilder();
       StringBuilder operationDetails = new StringBuilder();
-      string warningDetails = string.Empty;
+      StringBuilder warningDetails = new StringBuilder();
+      StringBuilder warningStatementDetails = new StringBuilder();
       operationSummary.AppendFormat(Resources.EditedDataForTable, EditingTableName);
       if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults)
       {
@@ -699,12 +700,14 @@ namespace MySQL.ForExcel.Forms
       }
 
       bool warningDetailHeaderAppended = false;
+      string statementsQuantityFormat = new string('0', modifiedRowsList.Count.StringSize());
+      string sqlQueriesFormat = "{0:" + statementsQuantityFormat + "}: {1}";
       foreach (var statement in modifiedRowsList.Select(statementRow => statementRow.Statement))
       {
         if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults && statement.SqlQuery.Length > 0)
         {
           operationDetails.AddNewLine();
-          operationDetails.AppendFormat("{0:000}: {1}", statement.ExecutionOrder, statement.SqlQuery);
+          operationDetails.AppendFormat(sqlQueriesFormat, statement.ExecutionOrder, statement.SqlQuery);
         }
 
         switch (statement.StatementResult)
@@ -715,19 +718,20 @@ namespace MySQL.ForExcel.Forms
               if (!warningDetailHeaderAppended)
               {
                 warningDetailHeaderAppended = true;
-                operationDetails.AddNewLine(1, true);
-                operationDetails.Append(Resources.SqlStatementsProducingWarningsText);
+                warningStatementDetails.AddNewLine(1, true);
+                warningStatementDetails.Append(Resources.SqlStatementsProducingWarningsText);
               }
 
               if (statement.SqlQuery.Length > 0)
               {
-                operationDetails.AddNewLine(1, true);
-                operationDetails.AppendFormat("{0:000}: {1}", statement.ExecutionOrder, statement.SqlQuery);
+                warningStatementDetails.AddNewLine(1, true);
+                warningStatementDetails.AppendFormat(sqlQueriesFormat, statement.ExecutionOrder, statement.SqlQuery);
               }
             }
 
             warningsFound = true;
-            warningDetails = statement.ResultText;
+            warningDetails.AddNewLine(1, true);
+            warningDetails.Append(statement.ResultText);
             warningsCount += statement.WarningsQuantity;
             break;
 
@@ -751,6 +755,12 @@ namespace MySQL.ForExcel.Forms
         operationDetails.AddNewLine(2, true);
         operationDetails.AppendFormat(Resources.EditDataCommittedWarningsFound, warningsCount);
         operationDetails.AddNewLine();
+        if (warningStatementDetails.Length > 0)
+        {
+          operationDetails.Append(warningStatementDetails);
+          operationDetails.AddNewLine();
+        }
+
         operationDetails.Append(warningDetails);
       }
 

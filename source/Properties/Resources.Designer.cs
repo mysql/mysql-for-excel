@@ -837,6 +837,24 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The MySQL Table &quot;{0}&quot; could not be created because of the following error(s):.
+        /// </summary>
+        internal static string ExportDataErrorCreatingTableText {
+            get {
+                return ResourceManager.GetString("ExportDataErrorCreatingTableText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Errors found while trying to export data to MySQLTable &quot;{0}&quot;..
+        /// </summary>
+        internal static string ExportDataGenericErrorText {
+            get {
+                return ResourceManager.GetString("ExportDataGenericErrorText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Attempted to insert {0} rows, but only {1} rows were inserted with no further errors. Please check the MySQL Server log for more information..
         /// </summary>
         internal static string ExportDataLessRowsThanExpectedInsertedText {
@@ -873,11 +891,20 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The MySQL Table &quot;{0}&quot; has been created with no data due errors..
+        /// </summary>
+        internal static string ExportDataOperationErrorNoRowsText {
+            get {
+                return ResourceManager.GetString("ExportDataOperationErrorNoRowsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The MySQL Table &quot;{0}&quot; could not be created..
         /// </summary>
-        internal static string ExportDataOperationErrorText {
+        internal static string ExportDataOperationErrorNoTableText {
             get {
-                return ResourceManager.GetString("ExportDataOperationErrorText", resourceCulture);
+                return ResourceManager.GetString("ExportDataOperationErrorNoTableText", resourceCulture);
             }
         }
         
@@ -1713,7 +1740,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Query did not match any rows in the DB, {0}values in the row may have changed; please refresh values from the DB..
+        ///   Looks up a localized string similar to Query did not match any rows in the DB, {0}values in the row {1}may have changed; please refresh values from the DB..
         /// </summary>
         internal static string QueryDidNotMatchRowsWarning {
             get {

@@ -25,6 +25,12 @@ namespace MySQL.ForExcel.Interfaces
   public interface IMySqlDataRow
   {
     /// <summary>
+    /// Gets the related Excel row number if any.
+    /// A valule of 0 indicates there is no related Excel row.
+    /// </summary>
+    int ExcelRow { get; }
+
+    /// <summary>
     /// Gets a value indicating whether there are concurrency warnings in a row.
     /// </summary>
     bool HasConcurrencyWarnings { get; }

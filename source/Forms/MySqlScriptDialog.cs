@@ -131,7 +131,7 @@ namespace MySQL.ForExcel.Forms
         switch (mySqlTable.OperationType)
         {
           case MySqlDataTable.DataOperationType.Export:
-            _errorDialogSummary = string.Format(Resources.ExportDataOperationErrorText, mySqlTable.TableName);
+            _errorDialogSummary = string.Format(Resources.ExportDataGenericErrorText, mySqlTable.TableName);
             break;
 
           case MySqlDataTable.DataOperationType.Append:
@@ -337,9 +337,10 @@ namespace MySQL.ForExcel.Forms
         conn.Open();
         MySqlTransaction transaction = conn.BeginTransaction();
         uint executionOrder = 1;
+        string statementsQuantityFormat = new string('0', ActualStatementRowsList.Count.StringSize());
         foreach (var mySqlRow in ActualStatementRowsList)
         {
-          mySqlRow.Statement.Execute(transaction, executionOrder++, UseOptimisticUpdate);
+          mySqlRow.Statement.Execute(transaction, executionOrder++, UseOptimisticUpdate, statementsQuantityFormat);
           ScriptResult = mySqlRow.Statement.JoinResultTypes(ScriptResult);
           if (mySqlRow.Statement.StatementResult == MySqlStatement.StatementResultType.ErrorThrown)
           {

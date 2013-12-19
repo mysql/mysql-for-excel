@@ -547,7 +547,7 @@ To be able to make modifications on cells not related to MySQL data please exit 
     <value>Edited data for Table {0} </value>
   </data>
   <data name="QueryDidNotMatchRowsWarning" xml:space="preserve">
-    <value>Query did not match any rows in the DB, {0}values in the row may have changed; please refresh values from the DB.</value>
+    <value>Query did not match any rows in the DB, {0}values in the row {1}may have changed; please refresh values from the DB.</value>
   </data>
   <data name="ShutdownMessage" xml:space="preserve">
     <value>MySQL for Excel Shutdown</value>
@@ -684,7 +684,7 @@ To be able to make modifications on cells not related to MySQL data please exit 
   <data name="ExportDataMultiPrimaryKeyText" xml:space="preserve">
     <value>&lt;Multiple Items&gt;</value>
   </data>
-  <data name="ExportDataOperationErrorText" xml:space="preserve">
+  <data name="ExportDataOperationErrorNoTableText" xml:space="preserve">
     <value>The MySQL Table "{0}" could not be created.</value>
   </data>
   <data name="ExportDataOperationSuccessNoDataText" xml:space="preserve">
@@ -845,5 +845,14 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
   </data>
   <data name="WorkbookSavingDetailText" xml:space="preserve">
     <value>Want to save your changes to '{0}'?</value>
+  </data>
+  <data name="ExportDataErrorCreatingTableText" xml:space="preserve">
+    <value>The MySQL Table "{0}" could not be created because of the following error(s):</value>
+  </data>
+  <data name="ExportDataGenericErrorText" xml:space="preserve">
+    <value>Errors found while trying to export data to MySQLTable "{0}".</value>
+  </data>
+  <data name="ExportDataOperationErrorNoRowsText" xml:space="preserve">
+    <value>The MySQL Table "{0}" has been created with no data due errors.</value>
   </data>
 </root>

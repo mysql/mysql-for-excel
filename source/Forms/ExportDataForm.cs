@@ -439,7 +439,6 @@ namespace MySQL.ForExcel.Forms
     {
       Cursor = Cursors.WaitCursor;
 
-      DialogResult dr;
       if (ExportDataTable == null)
       {
         ExportDataTable = PreviewDataTable.CloneSchema();
@@ -458,7 +457,7 @@ namespace MySQL.ForExcel.Forms
       bool tableContainsDataToExport = ExportDataTable.Rows.Count > (ExportDataTable.FirstRowIsHeaders ? 1 : 0);
       if (!tableContainsDataToExport)
       {
-        dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.ExportDataNoDataToExportTitleWarning, Resources.ExportDataNoDataToExportDetailWarning);
+        DialogResult dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.ExportDataNoDataToExportTitleWarning, Resources.ExportDataNoDataToExportDetailWarning);
         if (dr == DialogResult.No)
         {
           return;
@@ -469,9 +468,11 @@ namespace MySQL.ForExcel.Forms
       int warningsCount = 0;
       bool errorsFound = false;
       bool warningsFound = false;
+      bool tableCreated = true;
       string operationSummary;
       StringBuilder operationDetails = new StringBuilder();
       StringBuilder warningDetails = new StringBuilder();
+      StringBuilder warningStatementDetails = new StringBuilder();
       ExportDataTable.CreateTableWithoutData = CreateTableToolStripMenuItem.Checked;
       var modifiedRowsList = ExportDataTable.PushData(Settings.Default.GlobalSqlQueriesPreviewQueries);
       if (modifiedRowsList == null)
@@ -481,6 +482,8 @@ namespace MySQL.ForExcel.Forms
       }
 
       bool warningDetailHeaderAppended = false;
+      string statementsQuantityFormat = new string('0', modifiedRowsList.Count.StringSize());
+      string sqlQueriesFormat = "{0:" + statementsQuantityFormat + "}: {1}";
       foreach (var statement in modifiedRowsList.Select(statementRow => statementRow.Statement))
       {
         // Create details text for the table creation.
@@ -505,11 +508,13 @@ namespace MySQL.ForExcel.Forms
               operationDetails.AppendFormat(Resources.ExportDataTableCreatedWithWarningsText, ExportDataTable.TableName, statement.WarningsQuantity);
               operationDetails.AddNewLine();
               operationDetails.Append(statement.ResultText);
-              operationDetails.AddNewLine();
               break;
 
             case MySqlStatement.StatementResultType.ErrorThrown:
               errorsFound = true;
+              tableCreated = false;
+              operationDetails.AppendFormat(Resources.ExportDataErrorCreatingTableText, ExportDataTable.TableName);
+              operationDetails.AddNewLine();
               operationDetails.Append(statement.ResultText);
               break;
           }
@@ -520,10 +525,11 @@ namespace MySQL.ForExcel.Forms
             break;
           }
 
+          operationDetails.AddNewLine(2, true);
+
           // Create a title entry for the rows to be inserted if the creation was successful
           if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults && !errorsFound)
           {
-            operationDetails.AddNewLine(2, true);
             operationDetails.AppendFormat(Resources.InsertedExcelDataWithQueryText, ExportDataTable.TableName);
             operationDetails.AddNewLine();
           }
@@ -535,7 +541,7 @@ namespace MySQL.ForExcel.Forms
         if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults && statement.SqlQuery.Length > 0)
         {
           operationDetails.AddNewLine(1, true);
-          operationDetails.AppendFormat("{0:000}: {1}", statement.ExecutionOrder - 1, statement.SqlQuery);
+          operationDetails.AppendFormat(sqlQueriesFormat, statement.ExecutionOrder - 1, statement.SqlQuery);
         }
 
         switch (statement.StatementResult)
@@ -546,26 +552,28 @@ namespace MySQL.ForExcel.Forms
               if (!warningDetailHeaderAppended)
               {
                 warningDetailHeaderAppended = true;
-                operationDetails.AddNewLine(1, true);
-                operationDetails.Append(Resources.SqlStatementsProducingWarningsText);
+                warningStatementDetails.AddNewLine(1, true);
+                warningStatementDetails.Append(Resources.SqlStatementsProducingWarningsText);
               }
 
               if (statement.SqlQuery.Length > 0)
               {
-                operationDetails.AddNewLine(1, true);
-                operationDetails.AppendFormat("{0:000}: {1}", statement.ExecutionOrder, statement.SqlQuery);
+                warningStatementDetails.AddNewLine(1, true);
+                warningStatementDetails.AppendFormat(sqlQueriesFormat, statement.ExecutionOrder, statement.SqlQuery);
               }
             }
 
             warningsFound = true;
+            warningDetails.AddNewLine(1, true);
             warningDetails.Append(statement.ResultText);
             warningsCount += statement.WarningsQuantity;
             break;
 
           case MySqlStatement.StatementResultType.ErrorThrown:
             errorsFound = true;
+            operationDetails.AddNewLine(2 ,true);
             operationDetails.Append(Resources.ExportDataRowsInsertionErrorText);
-            operationDetails.AddNewLine(2);
+            operationDetails.AddNewLine();
             operationDetails.Append(statement.ResultText);
             break;
         }
@@ -581,7 +589,7 @@ namespace MySQL.ForExcel.Forms
       InfoDialog.InfoType operationsType;
       if (errorsFound)
       {
-        operationSummary = string.Format(Resources.ExportDataOperationErrorText, ExportDataTable.TableName);
+        operationSummary = string.Format(tableCreated ? Resources.ExportDataOperationErrorNoRowsText : Resources.ExportDataOperationErrorNoTableText, ExportDataTable.TableName);
         operationsType = InfoDialog.InfoType.Error;
       }
       else
@@ -602,6 +610,12 @@ namespace MySQL.ForExcel.Forms
             }
 
             operationDetails.AddNewLine();
+            if (warningStatementDetails.Length > 0)
+            {
+              operationDetails.Append(warningStatementDetails);
+              operationDetails.AddNewLine();
+            }
+
             operationDetails.Append(warningDetails);
           }
           else

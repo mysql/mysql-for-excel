@@ -234,6 +234,7 @@ namespace MySQL.ForExcel.Forms
       string operationSummary;
       StringBuilder operationDetails = new StringBuilder();
       StringBuilder warningDetails = new StringBuilder();
+      StringBuilder warningStatementDetails = new StringBuilder();
       var targetMySqlFinalDataTable = TargetMySqlPreviewDataTable.CloneSchema();
       targetMySqlFinalDataTable.AddExcelData(AppendDataRange, true);
       var modifiedRowsList = targetMySqlFinalDataTable.PushData(Settings.Default.GlobalSqlQueriesPreviewQueries);
@@ -250,13 +251,15 @@ namespace MySQL.ForExcel.Forms
       }
 
       bool warningDetailHeaderAppended = false;
+      string statementsQuantityFormat = new string('0', modifiedRowsList.Count.StringSize());
+      string sqlQueriesFormat = "{0:" + statementsQuantityFormat + "}: {1}";
       foreach (var statement in modifiedRowsList.Select(statementRow => statementRow.Statement))
       {
         // Create details text each row inserted in the new table.
         if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults && statement.SqlQuery.Length > 0)
         {
           operationDetails.AddNewLine();
-          operationDetails.AppendFormat("{0:000}: {1}", statement.ExecutionOrder, statement.SqlQuery);
+          operationDetails.AppendFormat(sqlQueriesFormat, statement.ExecutionOrder, statement.SqlQuery);
         }
 
         switch (statement.StatementResult)
@@ -267,14 +270,14 @@ namespace MySQL.ForExcel.Forms
               if (!warningDetailHeaderAppended)
               {
                 warningDetailHeaderAppended = true;
-                operationDetails.AddNewLine(1, true);
-                operationDetails.Append(Resources.SqlStatementsProducingWarningsText);
+                warningStatementDetails.AddNewLine(1, true);
+                warningStatementDetails.Append(Resources.SqlStatementsProducingWarningsText);
               }
 
               if (statement.SqlQuery.Length > 0)
               {
-                operationDetails.AddNewLine(1, true);
-                operationDetails.AppendFormat("{0:000}: {1}", statement.ExecutionOrder, statement.SqlQuery);
+                warningStatementDetails.AddNewLine(1, true);
+                warningStatementDetails.AppendFormat(sqlQueriesFormat, statement.ExecutionOrder, statement.SqlQuery);
               }
             }
 
@@ -285,6 +288,7 @@ namespace MySQL.ForExcel.Forms
 
           case MySqlStatement.StatementResultType.ErrorThrown:
             errorsFound = true;
+            operationDetails.AddNewLine(2, true);
             operationDetails.Append(Resources.AppendDataRowsInsertionErrorText);
             operationDetails.AddNewLine(2);
             operationDetails.Append(statement.ResultText);
@@ -312,12 +316,20 @@ namespace MySQL.ForExcel.Forms
         int appendedCount = modifiedRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Insert);
         if (warningsFound)
         {
+          operationDetails.AddNewLine(2, true);
           operationDetails.AppendFormat(Resources.AppendDataRowsAppendedWithWarningsText, appendedCount, warningsCount);
           operationDetails.AddNewLine();
+          if (warningStatementDetails.Length > 0)
+          {
+            operationDetails.Append(warningStatementDetails);
+            operationDetails.AddNewLine();
+          }
+
           operationDetails.Append(warningDetails);
         }
         else
         {
+          operationDetails.AddNewLine(2, true);
           operationDetails.AppendFormat(Resources.AppendDataRowsAppendedSuccessfullyText, appendedCount);
         }
       }

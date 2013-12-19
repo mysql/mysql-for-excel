@@ -16,6 +16,7 @@
 // 02110-1301  USA
 
 using System;
+using System.Globalization;
 using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Properties;
@@ -215,6 +216,22 @@ namespace MySQL.ForExcel.Classes
     public static DialogResult ShowCustomizedWarningDialog(string title, string detail)
     {
       return InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, title, detail);
+    }
+
+    /// <summary>
+    /// Returns the string size of a given number.
+    /// </summary>
+    /// <param name="number">An integer number.</param>
+    /// <param name="ignoreSign">Flag indicating whether the sign of the number is ignored.</param>
+    /// <returns>The length of the string representation of this number.</returns>
+    public static int StringSize(this int number, bool ignoreSign = true)
+    {
+      if (ignoreSign)
+      {
+        number = Math.Abs(number);
+      }
+
+      return number == 0 ? 0 : number.ToString(CultureInfo.InvariantCulture).Length;
     }
   }
 }
