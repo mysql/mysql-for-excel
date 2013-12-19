@@ -371,5 +371,15 @@ namespace MySQL.ForExcel.Forms
       OptionsWarningLabel.Visible = show;
       OptionsWarningPictureBox.Visible = show;
     }
+
+    /// <summary>
+    /// Hides the Import form from the user at the same time it fakes the click over OK, silently opening an edit session.
+    /// </summary>
+    /// <returns>Always DialogResult.OK</returns>
+    public DialogResult ImportHidingDialog()
+    {
+      ImportButton_Click(this, EventArgs.Empty);
+      return DialogResult.OK;
+    }
   }
 }

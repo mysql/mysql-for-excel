@@ -726,6 +726,60 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The following tables no longer exist:.
+        /// </summary>
+        internal static string EditReopeningMissingTablesMessage {
+            get {
+                return ResourceManager.GetString("EditReopeningMissingTablesMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The schema {0}.{1} no longer exists. The probable reason for this is because it was deleted from the server&apos;s instance..
+        /// </summary>
+        internal static string EditReopeningSchemaNoLongerExistsFailed {
+            get {
+                return ResourceManager.GetString("EditReopeningSchemaNoLongerExistsFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There where some issues while opening sessions..
+        /// </summary>
+        internal static string EditReopeningWarningMessage {
+            get {
+                return ResourceManager.GetString("EditReopeningWarningMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The session&apos;s connection no longer exists. It was probably deleted from another program. Do you want to delete the saved sessions related to the current workbook?.
+        /// </summary>
+        internal static string EditReopeningWBConnectionNoLongerExistsFailedDetail {
+            get {
+                return ResourceManager.GetString("EditReopeningWBConnectionNoLongerExistsFailedDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to open session&apos;s connection.
+        /// </summary>
+        internal static string EditReopeningWBConnectionNoLongerExistsFailedTitle {
+            get {
+                return ResourceManager.GetString("EditReopeningWBConnectionNoLongerExistsFailedTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saved sessions belong to schema &apos;{0}&apos; and cannot be opened, the current schema &apos;{1}&apos; contains active sessions..
+        /// </summary>
+        internal static string EditUnableToOpenSessionsMessage {
+            get {
+                return ResourceManager.GetString("EditUnableToOpenSessionsMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ADO.NET Error:.
         /// </summary>
         internal static string ErrorAdoNetText {
@@ -2040,15 +2094,6 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error while creating new Excel Worksheet.
-        /// </summary>
-        internal static string TaskPaneErrorCreatingWorksheetText {
-            get {
-                return ResourceManager.GetString("TaskPaneErrorCreatingWorksheetText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Adding new connections is not allowed when MySQL Workbench is running..
         /// </summary>
         internal static string UnableToAddConnectionsWhenWBRunning {
@@ -2171,6 +2216,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error while creating new Excel Worksheet.
+        /// </summary>
+        internal static string WorksheetCreationErrorText {
+            get {
+                return ResourceManager.GetString("WorksheetCreationErrorText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Excel Worksheet is in Compatibility Mode which has a row limit of 65,535 rows..
         /// </summary>
         internal static string WorksheetInCompatibilityModeWarning {
@@ -2179,6 +2233,24 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Data Imports cannot be done into a Worksheet in Edit Mode, do you want to import the data into a new Worksheet?.
+        /// </summary>
+        internal static string WorksheetInEditModeWarningDetail {
+            get {
+                return ResourceManager.GetString("WorksheetInEditModeWarningDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Active Worksheet in Edit Mode.
+        /// </summary>
+        internal static string WorksheetInEditModeWarningTitle {
+            get {
+                return ResourceManager.GetString("WorksheetInEditModeWarningTitle", resourceCulture);
+            }
+        }
+		
         /// <summary>
         ///   Looks up a localized string similar to Warning: Excel Worksheet {0} was saved password-protected because it was used within an Edit Data operation. To unprotect it use the password: {1}.
         /// </summary>
@@ -2199,41 +2271,11 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MySQL for Excel password-protects Excel Worksheets in Edit Mode. The next time the saved Workbook is opened those Worksheets will remain protected, so in order to save the Workbook the following is recommended:
-        ///
-        ///* Exit Edit Mode in all Excel Worksheets before saving so this warning is not shown.
-        ///* If you choose not to exit Edit Mode and save anyway, you will be able to unprotect the Worksheets after MySQL for Excel is closed using the protection passwords output to the application log..
-        /// </summary>
-        internal static string WorksheetInEditModeSavingWarningMoreInfo {
-            get {
-                return ResourceManager.GetString("WorksheetInEditModeSavingWarningMoreInfo", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Workbook contains password protected Worksheets..
         /// </summary>
         internal static string WorksheetInEditModeSavingWarningTitle {
             get {
                 return ResourceManager.GetString("WorksheetInEditModeSavingWarningTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Data Imports cannot be done into a Worksheet in Edit Mode, do you want to import the data into a new Worksheet?.
-        /// </summary>
-        internal static string WorksheetInEditModeWarningDetail {
-            get {
-                return ResourceManager.GetString("WorksheetInEditModeWarningDetail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Active Worksheet in Edit Mode.
-        /// </summary>
-        internal static string WorksheetInEditModeWarningTitle {
-            get {
-                return ResourceManager.GetString("WorksheetInEditModeWarningTitle", resourceCulture);
             }
         }
         

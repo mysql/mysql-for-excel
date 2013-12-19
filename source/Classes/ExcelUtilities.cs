@@ -15,9 +15,13 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using Microsoft.Office.Core;
+using MySQL.ForExcel.Properties;
+using MySQL.Utility.Classes;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
@@ -316,6 +320,40 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets a <see cref="Excel.Worksheet"/> with a given name existing in the given <see cref="Excel.Workbook"/> or creates a new one.
+    /// </summary>
+    /// <param name="workBook">The <see cref="Excel.Workbook"/> to look for a <see cref="Excel.Worksheet"/>.</param>
+    /// <param name="workSheetName">The name of the new <see cref="Excel.Worksheet"/>.</param>
+    /// <param name="selectTopLeftCell">Flag indicating whether the cell A1 receives focus.</param>
+    /// <returns>The existing or new <see cref="Excel.Worksheet"/> object.</returns>
+    public static Excel.Worksheet CreateWorksheet(this Excel.Workbook workBook, string workSheetName, bool selectTopLeftCell)
+    {
+      if (workBook == null)
+      {
+        return null;
+      }
+
+      Excel.Worksheet newWorksheet = null;
+      try
+      {
+        newWorksheet = workBook.Worksheets.Add(Type.Missing, workBook.ActiveSheet, Type.Missing, Type.Missing);
+        newWorksheet.Name = workBook.GetWorksheetNameAvoidingDuplicates(workSheetName);
+
+        if (selectTopLeftCell)
+        {
+          newWorksheet.SelectTopLeftCell();
+        }
+      }
+      catch (Exception ex)
+      {
+        MiscUtilities.ShowCustomizedErrorDialog(Resources.WorksheetCreationErrorText, ex.Message, true);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
+
+      return newWorksheet;
+    }
+
+    /// <summary>
     /// Returns an Excel range with the first row cells corresponding to the column names.
     /// </summary>
     /// <param name="mysqlDataRange">If <c>null</c> the whole first row is returned, otherwise only the column cells within the editing range.</param>
@@ -368,6 +406,62 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets the active <see cref="Excel.Worksheet"/> existing in the given <see cref="Excel.Workbook"/> or creates a new one.
+    /// </summary>
+    /// <param name="workBook">The <see cref="Excel.Workbook"/> to look for a <see cref="Excel.Worksheet"/>.</param>
+    /// <param name="worksheetName">The name of the new <see cref="Excel.Worksheet"/>.</param>
+    /// <param name="selectTopLeftCell">Flag indicating whether the cell A1 receives focus.</param>
+    /// <returns>The existing or new <see cref="Excel.Worksheet"/> object.</returns>
+    public static Excel.Worksheet GetActiveOrCreateWorksheet(this Excel.Workbook workBook, string worksheetName, bool selectTopLeftCell)
+    {
+      Excel.Worksheet activeWorksheet;
+      if (workBook != null)
+      {
+        activeWorksheet = workBook.ActiveSheet as Excel.Worksheet;
+        if (activeWorksheet != null)
+        {
+          return activeWorksheet;
+        }
+
+        worksheetName = workBook.GetWorksheetNameAvoidingDuplicates(worksheetName);
+      }
+      else
+      {
+        workBook = Globals.ThisAddIn.Application.Workbooks.Add(Type.Missing);
+      }
+
+      activeWorksheet = workBook.CreateWorksheet(worksheetName, selectTopLeftCell);
+      return activeWorksheet;
+    }
+
+    /// <summary>
+    /// Gets a <see cref="Excel.Worksheet"/> with a given name existing in the given <see cref="Excel.Workbook"/> or creates a new one.
+    /// </summary>
+    /// <param name="workbook">The <see cref="Excel.Workbook"/> to look for a <see cref="Excel.Worksheet"/>.</param>
+    /// <param name="workSheetName">The name of the new <see cref="Excel.Worksheet"/>.</param>
+    /// <param name="selectTopLeftCell">Flag indicating whether the cell A1 receives focus.</param>
+    /// <returns>The existing or new <see cref="Excel.Worksheet"/> object.</returns>
+    public static Excel.Worksheet GetOrCreateWorksheet(this Excel.Workbook workbook, string workSheetName, bool selectTopLeftCell)
+    {
+      if (workbook == null)
+      {
+        return null;
+      }
+
+      Excel.Worksheet existingWorksheet = workbook.Worksheets.Cast<Excel.Worksheet>().FirstOrDefault(worksheet => string.Equals(worksheet.Name, workSheetName, StringComparison.InvariantCulture));
+      if (existingWorksheet == null)
+      {
+        workbook.CreateWorksheet(workSheetName, selectTopLeftCell);
+      }
+      else if (selectTopLeftCell)
+      {
+        existingWorksheet.SelectTopLeftCell();
+      }
+
+      return existingWorksheet;
+    }
+
+    /// <summary>
     /// Gets the name of the parent <see cref="Excel.Workbook"/> of the given <see cref="Excel.Worksheet"/>.
     /// </summary>
     /// <param name="worksheet">An <see cref="Excel.Worksheet"/> object.</param>
@@ -394,13 +488,58 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a valid name for a new <see cref="Excel.Worksheet"/> that avoids duplicates with existing ones in the current <see cref="Excel.Workbook"/>.
+    /// Gets the active workbook unique identifier if exists, if not, creates one and returns it.
     /// </summary>
+    /// <returns>The guid string for the current workbook.</returns>
+    public static string GetOrCreateId(this Excel.Workbook workbook)
+    {
+      if (workbook == null || workbook.CustomDocumentProperties == null)
+      {
+        return null;
+      }
+
+      DocumentProperty guid = ((DocumentProperties)workbook.CustomDocumentProperties).Cast<DocumentProperty>().FirstOrDefault(property => property.Name.Equals("WorkbookGuid"));
+      if (guid != null)
+      {
+        return guid.Value.ToString();
+      }
+
+      string newGuid = Guid.NewGuid().ToString();
+      DocumentProperties properties = workbook.CustomDocumentProperties;
+      properties.Add("WorkbookGuid", false, MsoDocProperties.msoPropertyTypeString, newGuid);
+      return newGuid;
+    }
+
+    /// <summary>
+    /// Gets the a protection key for the provided worksheet if exists.
+    /// </summary>
+    /// <returns>The worksheet's protection key if the property exist, otherwise returns null.</returns>
+    public static string GetProtectionKey(this Excel.Worksheet worksheet)
+    {
+      if (worksheet == null)
+      {
+        return null;
+      }
+
+      Excel.CustomProperties properties = worksheet.CustomProperties;
+      if (properties == null)
+      {
+        return null;
+      }
+
+      Excel.CustomProperty guid = properties.Cast<Excel.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetkGuid"));
+      return guid == null ? null : guid.Value.ToString();
+    }
+
+    /// <summary>
+    /// Gets a valid name for a new <see cref="Excel.Worksheet"/> that avoids duplicates with existing ones in the given <see cref="Excel.Workbook"/>.
+    /// </summary>
+    /// <param name="workbook">A <see cref="Excel.Workbook"/>.</param>
     /// <param name="worksheetName">The proposed name for a <see cref="Excel.Worksheet"/>.</param>
     /// <returns>A <see cref="Excel.Worksheet"/> valid name.</returns>
-    public static string GetWorksheetNameAvoidingDuplicates(this string worksheetName)
+    public static string GetWorksheetNameAvoidingDuplicates(this Excel.Workbook workbook, string worksheetName)
     {
-      return worksheetName.GetWorksheetNameAvoidingDuplicates(0);
+      return workbook.GetWorksheetNameAvoidingDuplicates(worksheetName, 0);
     }
 
     /// <summary>
@@ -492,6 +631,58 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Removes the protectionKey property (if exists) for the current worksheet.
+    /// </summary>    
+    public static void RemoveRemoveProtectionKey(this Excel.Worksheet worksheet)
+    {
+      if (worksheet == null)
+      {
+        return;
+      }
+
+      var protectionKeyProperty = worksheet.CustomProperties.Cast<Excel.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetkGuid"));
+      if (protectionKeyProperty != null)
+      {
+        protectionKeyProperty.Delete();
+      }
+    }
+
+    /// <summary>
+    /// Places the A1 cell of the given <see cref="Excel.Worksheet"/> in focus.
+    /// </summary>
+    /// <param name="worksheet">A <see cref="Excel.Worksheet"/>.</param>
+    public static void SelectTopLeftCell(this Excel.Worksheet worksheet)
+    {
+      if (worksheet == null)
+      {
+        return;
+      }
+
+      Globals.ThisAddIn.Application.Goto(worksheet.Range["A1", Type.Missing], false);
+    }
+
+    /// <summary>
+    /// Sets the font and color properties of a <see cref="Excel.TableStyleElement"/> as a MySQL minimalistic style.
+    /// </summary>
+    /// <param name="styleElement">The <see cref="Excel.TableStyleElement"/> to modify.</param>
+    /// <param name="interiorOleColor">The OLE color to paint the Excel cells interior with.</param>
+    /// <param name="makeBold">Flag indicating whether the font is set to bold.</param>
+    public static void SetAsMySqlStyle(this Excel.TableStyleElement styleElement, int interiorOleColor = EMPTY_CELLS_OLE_COLOR, bool makeBold = false)
+    {
+      styleElement.Font.Color = ColorTranslator.ToOle(Color.Black);
+      if (interiorOleColor == EMPTY_CELLS_OLE_COLOR)
+      {
+        styleElement.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+      }
+      else
+      {
+        styleElement.Interior.Color = interiorOleColor;
+      }
+
+      styleElement.Font.Bold = makeBold;
+    }
+
+    /// <summary>
     /// Sets the range cells interior color to the specified OLE color.
     /// </summary>
     /// <param name="range">Excel range to have their interior color changed.</param>
@@ -534,24 +725,25 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Sets the font and color properties of a <see cref="Excel.TableStyleElement"/> as a MySQL minimalistic style.
+    /// Sets the protection key for the worksheet.
     /// </summary>
-    /// <param name="styleElement">The <see cref="Excel.TableStyleElement"/> to modify.</param>
-    /// <param name="interiorOleColor">The OLE color to paint the Excel cells interior with.</param>
-    /// <param name="makeBold">Flag indicating whether the font is set to bold.</param>
-    public static void SetAsMySqlStyle(this Excel.TableStyleElement styleElement, int interiorOleColor = EMPTY_CELLS_OLE_COLOR, bool makeBold = false)
+    /// <returns>The new protection key provided for the worksheet.</returns>
+    public static bool StoreProtectionKey(this Excel.Worksheet worksheet, string protectionKey)
     {
-      styleElement.Font.Color = ColorTranslator.ToOle(Color.Black);
-      if (interiorOleColor == EMPTY_CELLS_OLE_COLOR)
+      if (worksheet == null || string.IsNullOrEmpty(protectionKey))
       {
-        styleElement.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
-      }
-      else
-      {
-        styleElement.Interior.Color = interiorOleColor;
+        return false;
       }
 
-      styleElement.Font.Bold = makeBold;
+      var protectionKeyProperty = worksheet.CustomProperties.Cast<Excel.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetkGuid"));
+      if (protectionKeyProperty == null)
+      {
+        Excel.CustomProperties properties = worksheet.CustomProperties;
+        properties.Add("WorksheetkGuid", protectionKey);
+        return true;
+      }
+      protectionKeyProperty.Value = protectionKey;
+      return true;
     }
 
     /// <summary>
@@ -600,7 +792,7 @@ namespace MySQL.ForExcel.Classes
         worksheet.Change -= changeEventHandlerDelegate;
       }
 
-      worksheet.Unprotect(protectionKey);
+      worksheet.Unprotect(worksheet.GetProtectionKey());
     }
 
     /// <summary>
@@ -659,14 +851,15 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a valid name for a new <see cref="Excel.Worksheet"/> that avoids duplicates with existing ones in the current <see cref="Excel.Workbook"/>.
+    /// Gets a valid name for a new <see cref="Excel.Worksheet"/> that avoids duplicates with existing ones in the given <see cref="Excel.Workbook"/>.
     /// </summary>
+    /// <param name="workbook">A <see cref="Excel.Workbook"/>.</param>
     /// <param name="worksheetName">The proposed name for a <see cref="Excel.Worksheet"/>.</param>
     /// <param name="copyIndex">Number of the copy of a <see cref="Excel.Worksheet"/> within its name.</param>
     /// <returns>A <see cref="Excel.Worksheet"/> valid name.</returns>
-    private static string GetWorksheetNameAvoidingDuplicates(this string worksheetName, int copyIndex)
+    private static string GetWorksheetNameAvoidingDuplicates(this Excel.Workbook workbook, string worksheetName, int copyIndex)
     {
-      if (Globals.ThisAddIn.Application.ActiveWorkbook == null)
+      if (workbook == null)
       {
         return worksheetName;
       }
@@ -676,7 +869,7 @@ namespace MySQL.ForExcel.Classes
       {
         retName = copyIndex > 0 ? string.Format("Copy {0} of {1}", copyIndex, worksheetName) : worksheetName;
         copyIndex++;
-      } while (Globals.ThisAddIn.Application.Worksheets.Cast<Excel.Worksheet>().Any(ws => ws.Name == retName));
+      } while (workbook.Worksheets.Cast<Excel.Worksheet>().Any(ws => ws.Name == retName));
 
       return retName;
     }

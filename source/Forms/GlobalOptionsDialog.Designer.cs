@@ -60,6 +60,8 @@ namespace MySQL.ForExcel.Forms
       this.NoSqlStatementsRadioButton = new System.Windows.Forms.RadioButton();
       this.PreviewSqlQueriesRadioButton = new System.Windows.Forms.RadioButton();
       this.ShowExecutedSqlQueryRadioButton = new System.Windows.Forms.RadioButton();
+      this.AllowToSaveEditingSessionsCheckBox = new System.Windows.Forms.CheckBox();
+      this.EditSessionOptionsLabel = new System.Windows.Forms.Label();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.ConnectionTimeoutNumericUpDown)).BeginInit();
@@ -73,6 +75,8 @@ namespace MySQL.ForExcel.Forms
       // 
       // ContentAreaPanel
       // 
+      this.ContentAreaPanel.Controls.Add(this.AllowToSaveEditingSessionsCheckBox);
+      this.ContentAreaPanel.Controls.Add(this.EditSessionOptionsLabel);
       this.ContentAreaPanel.Controls.Add(this.ShowExecutedSqlQueryRadioButton);
       this.ContentAreaPanel.Controls.Add(this.PreviewSqlQueriesRadioButton);
       this.ContentAreaPanel.Controls.Add(this.NoSqlStatementsRadioButton);
@@ -86,13 +90,13 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.ConnectionTimeout1Label);
       this.ContentAreaPanel.Controls.Add(this.GlobalOptionsLabel);
       this.ContentAreaPanel.Controls.Add(this.ConnectionOptionsLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(504, 341);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(504, 401);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 296);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 356);
       this.CommandAreaPanel.Size = new System.Drawing.Size(504, 45);
       // 
       // DialogAcceptButton
@@ -281,12 +285,34 @@ namespace MySQL.ForExcel.Forms
       this.ShowExecutedSqlQueryRadioButton.Text = "Show executed SQL statements along with their results";
       this.ShowExecutedSqlQueryRadioButton.UseVisualStyleBackColor = true;
       // 
+      // AllowToSaveEditingSessionsCheckBox
+      // 
+      this.AllowToSaveEditingSessionsCheckBox.AutoSize = true;
+      this.AllowToSaveEditingSessionsCheckBox.Location = new System.Drawing.Point(53, 315);
+      this.AllowToSaveEditingSessionsCheckBox.Name = "AllowToSaveEditingSessionsCheckBox";
+      this.AllowToSaveEditingSessionsCheckBox.Size = new System.Drawing.Size(193, 17);
+      this.AllowToSaveEditingSessionsCheckBox.TabIndex = 18;
+      this.AllowToSaveEditingSessionsCheckBox.Text = "Allow to restore active edit sessions";
+      this.AllowToSaveEditingSessionsCheckBox.UseVisualStyleBackColor = true;
+      // 
+      // EditSessionOptionsLabel
+      // 
+      this.EditSessionOptionsLabel.AutoSize = true;
+      this.EditSessionOptionsLabel.BackColor = System.Drawing.Color.Transparent;
+      this.EditSessionOptionsLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.EditSessionOptionsLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.EditSessionOptionsLabel.Location = new System.Drawing.Point(24, 286);
+      this.EditSessionOptionsLabel.Name = "EditSessionOptionsLabel";
+      this.EditSessionOptionsLabel.Size = new System.Drawing.Size(134, 17);
+      this.EditSessionOptionsLabel.TabIndex = 17;
+      this.EditSessionOptionsLabel.Text = "Edit Sesssion Options";
+      // 
       // GlobalOptionsDialog
       // 
       this.AcceptButton = this.DialogAcceptButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(504, 341);
+      this.ClientSize = new System.Drawing.Size(504, 401);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
@@ -319,5 +345,7 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.RadioButton ShowExecutedSqlQueryRadioButton;
     private System.Windows.Forms.RadioButton PreviewSqlQueriesRadioButton;
     private System.Windows.Forms.RadioButton NoSqlStatementsRadioButton;
+    private System.Windows.Forms.CheckBox AllowToSaveEditingSessionsCheckBox;
+    private System.Windows.Forms.Label EditSessionOptionsLabel;
   }
 }

@@ -42,6 +42,7 @@ namespace MySQL.ForExcel.Forms
       PreviewSqlQueriesRadioButton.Checked = Settings.Default.GlobalSqlQueriesPreviewQueries;
       ShowExecutedSqlQueryRadioButton.Checked = Settings.Default.GlobalSqlQueriesShowQueriesWithResults;
       NoSqlStatementsRadioButton.Checked = !PreviewSqlQueriesRadioButton.Checked && !ShowExecutedSqlQueryRadioButton.Checked;
+      AllowToSaveEditingSessionsCheckBox.Checked = Settings.Default.EditRestoreEditSessions;
     }
 
     /// <summary>
@@ -61,6 +62,7 @@ namespace MySQL.ForExcel.Forms
       Settings.Default.EditUseOptimisticUpdate = UseOptimisticUpdatesCheckBox.Checked;
       Settings.Default.GlobalSqlQueriesPreviewQueries = PreviewSqlQueriesRadioButton.Checked;
       Settings.Default.GlobalSqlQueriesShowQueriesWithResults = ShowExecutedSqlQueryRadioButton.Checked;
+      Settings.Default.EditRestoreEditSessions = AllowToSaveEditingSessionsCheckBox.Checked;
       MiscUtilities.SaveSettings();
     }
   }

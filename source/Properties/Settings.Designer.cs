@@ -12,7 +12,7 @@ namespace MySQL.ForExcel.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "11.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "12.0.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -318,6 +318,31 @@ namespace MySQL.ForExcel.Properties {
             }
             set {
                 this["ImportExcelTableStyleName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool EditRestoreEditSessions {
+            get {
+                return ((bool)(this["EditRestoreEditSessions"]));
+            }
+            set {
+                this["EditRestoreEditSessions"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Generic.List<MySQL.ForExcel.Classes.EditSessionInfo> EditSessionsList {
+            get {
+                return ((global::System.Collections.Generic.List<MySQL.ForExcel.Classes.EditSessionInfo>)(this["EditSessionsList"]));
+            }
+            set {
+                this["EditSessionsList"] = value;
             }
         }
     }

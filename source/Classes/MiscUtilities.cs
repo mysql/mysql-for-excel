@@ -17,11 +17,14 @@
 
 using System;
 using System.Globalization;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Forms;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -66,6 +69,64 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets the active Edit session related to a given <see cref="Excel.Workbook"/>.
+    /// </summary>
+    /// <param name="sessionsList">The Edit sessions list.</param>
+    /// <param name="workbook">The <see cref="Excel.Workbook"/> related to the active Edit session.</param>
+    /// <param name="tableName">Name of the table being edited in the Edit session.</param>
+    /// <returns>An <see cref="EditSessionInfo"/> containing the active edit session.</returns>
+    public static EditSessionInfo GetActiveEditSession(this List<EditSessionInfo> sessionsList, Excel.Workbook workbook, string tableName)
+    {
+      var workBookId = workbook.GetOrCreateId();
+      return sessionsList == null ? null : sessionsList.FirstOrDefault(session => session.EditDialog != null && 
+      string.Equals(session.WorkbookGuid,workBookId, StringComparison.InvariantCulture) && 
+      session.TableName == tableName);
+    }
+
+    /// <summary>
+    /// Gets the active Edit session related to a given <see cref="Excel.Worksheet"/>.
+    /// </summary>
+    /// <param name="sessionsList">The Edit sessions list.</param>
+    /// <param name="worksheet">The <see cref="Excel.Worksheet"/> related to the active Edit session.</param>
+    /// <returns>An <see cref="EditSessionInfo"/> containing the active Edit session.</returns>
+    public static EditSessionInfo GetActiveEditSession(this List<EditSessionInfo> sessionsList, Excel.Worksheet worksheet)
+    {
+      return sessionsList == null ? null : sessionsList.FirstOrDefault(session => session.EditDialog != null && session.EditDialog.EditingWorksheet.Name == worksheet.Name);
+    }
+
+    /// <summary>
+    /// Explores a tree and returns the node being searched if it exists.
+    /// </summary>
+    /// <param name="nodes">The tree nodes to be browsed.</param>
+    /// <param name="nodeText">Node to be found by its text.</param>
+    /// <returns>A <see cref="TreeNode"/> object whose text equals the given text.</returns>
+    public static TreeNode GetNode(this TreeNodeCollection nodes, string nodeText)
+    {
+      foreach (TreeNode node in nodes)
+      {
+        if (string.Equals(node.Text, nodeText, StringComparison.InvariantCulture))
+        {
+          return node;
+        }
+
+        if (node.Nodes.Count <= 0)
+        {
+          continue;
+        }
+
+        var returnNode = node.Nodes.GetNode(nodeText);
+        if (returnNode == null)
+        {
+          continue;
+        }
+
+        return returnNode;
+      }
+
+      return null;
+    }
+
+    /// <summary>
     /// Returns the position of a given integer number within an array of integers.
     /// </summary>
     /// <param name="intArray">The array of integers to look for the given number.</param>
@@ -102,7 +163,6 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The ordinal position of the given string within the list, or <c>-1</c> if not found.</returns>
     public static int IndexOfStringInArray(string[] stringArray, string stringElement, bool caseSensitive)
     {
-      
       if (stringArray == null)
       {
         return -1;

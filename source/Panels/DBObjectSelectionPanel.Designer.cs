@@ -435,7 +435,7 @@ namespace MySQL.ForExcel.Panels
     private HotLabel ImportDataHotLabel;
     private HotLabel EditDataHotLabel;
     private HotLabel AppendDataHotLabel;
-    private MyTreeView DBObjectList;
+    public MyTreeView DBObjectList;
     private System.Windows.Forms.ContextMenuStrip DBObjectsContextMenuStrip;
     private System.Windows.Forms.ToolStripMenuItem RefreshDatabaseObjectsToolStripMenuItem;
     private System.Windows.Forms.Panel UpperPanel;

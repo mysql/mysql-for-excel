@@ -71,5 +71,11 @@
     <Setting Name="ImportExcelTableStyleName" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.String" Scope="User">
       <Value Profile="(Default)">MySqlDefault</Value>
     </Setting>
+    <Setting Name="EditRestoreEditSessions" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="EditSessionsList" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Collections.Generic.List&lt;MySQL.ForExcel.Classes.EditSessionInfo&gt;" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

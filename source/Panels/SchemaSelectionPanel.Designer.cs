@@ -332,7 +332,7 @@ namespace MySQL.ForExcel.Panels
     private System.Windows.Forms.ImageList LargeImagesList;
     public System.Windows.Forms.Button OptionsButton;
     private HotLabel CreateNewSchemaHotLabel;
-    private MyTreeView SchemasList;
+    public MyTreeView SchemasList;
     private System.Windows.Forms.ContextMenuStrip SchemasContextMenuStrip;
     private System.Windows.Forms.ToolStripMenuItem RefreshSchemasToolStripMenuItem;
     private System.Windows.Forms.Panel UpperPanel;

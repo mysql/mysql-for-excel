@@ -37,16 +37,6 @@ namespace MySQL.ForExcel.Controls
       if (disposing)
       {
         CloseConnection();
-        if (ProtectedWorksheetPasskeys.Count > 0)
-        {
-          foreach (var dictEntry in ProtectedWorksheetPasskeys)
-          {
-            MySqlSourceTrace.WriteToLog(string.Format(Properties.Resources.WorksheetInEditModeSavedLogWarning, dictEntry.Key, dictEntry.Value), SourceLevels.Warning);
-          }
-
-          ProtectedWorksheetPasskeys.Clear();
-        }
-
         if (components != null)
         {
           components.Dispose();

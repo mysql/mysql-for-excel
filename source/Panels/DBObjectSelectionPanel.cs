@@ -25,6 +25,7 @@ using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Panels
 {
@@ -225,7 +226,9 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void DBObjectList_AfterSelect(object sender, TreeViewEventArgs e)
     {
-      RefreshActionLabelsEnabledStatus(null, false);
+      var editPane = Parent as ExcelAddInPane;
+      var editActive = e!=null && editPane != null && editPane.TableHasEditOnGoing(e.Node.Text);
+      RefreshActionLabelsEnabledStatus(null, editActive);
     }
 
     /// <summary>
@@ -274,11 +277,7 @@ namespace MySQL.ForExcel.Panels
       try
       {
         var excelAddInPane = Parent as ExcelAddInPane;
-        bool editActivated = excelAddInPane != null && excelAddInPane.EditTableData(selDbObject);
-        if (editActivated)
-        {
-          EditDataHotLabel.Enabled = false;
-        }
+        EditDataHotLabel.Enabled = excelAddInPane != null && !excelAddInPane.EditTableData(selDbObject, false, null);
       }
       catch (Exception ex)
       {
@@ -360,7 +359,7 @@ namespace MySQL.ForExcel.Panels
           return;
         }
 
-        Microsoft.Office.Interop.Excel.Worksheet newWorksheet = parentTaskPane.CreateNewWorksheet(dbo.Name, true);
+        Excel.Worksheet newWorksheet = parentTaskPane.ActiveWorkbook.GetOrCreateWorksheet(dbo.Name, true);
         if (newWorksheet == null)
         {
           return;

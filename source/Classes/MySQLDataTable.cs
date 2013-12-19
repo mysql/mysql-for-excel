@@ -994,6 +994,7 @@ namespace MySQL.ForExcel.Classes
           fillingRowIdx++;
         }
 
+        Globals.ThisAddIn.Application.Goto(fillingRange, false);
         fillingRange.ClearFormats();
         fillingRange.Value = fillingArray;
 

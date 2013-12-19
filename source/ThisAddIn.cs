@@ -117,6 +117,17 @@ namespace MySQL.ForExcel
     /// </summary>
     public int ExcelVersionNumber { get; private set; }
 
+    /// <summary>
+    /// Gets a list of <see cref="EditSessionInfo"/> objects saved to disk.
+    /// </summary>
+    public List<EditSessionInfo> StoredEditSessions
+    {
+      get
+      {
+        return Settings.Default.EditSessionsList ?? (Settings.Default.EditSessionsList = new List<EditSessionInfo>());
+      }
+    }
+
     #endregion Properties
 
     /// <summary>
@@ -194,7 +205,7 @@ namespace MySQL.ForExcel
       }
 
       Excel.Worksheet activeSheet = workSheet as Excel.Worksheet;
-      ActiveExcelPane.ChangeEditDialogVisibility(activeSheet , true);
+      ActiveExcelPane.ChangeEditDialogVisibility(activeSheet, true);
     }
 
     /// <summary>
@@ -358,6 +369,32 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Event delegate method fired after an Excel <see cref="Excel.Workbook"/> is saved to disk.
+    /// </summary>
+    /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
+    /// <param name="success">Flag indicating whether the save operation was successful.</param>
+    private void Application_WorkbookAfterSave(Excel.Workbook workbook, bool success)
+    {
+      if (ActiveExcelPane == null || ActiveExcelPane.WorkbookEditSessions == null || ActiveExcelPane.WorkbookEditSessions.Count <= 0)
+      {
+        return;
+      }
+
+      if (ActiveExcelPane.WorkbookEditSessions == null
+          || !ActiveExcelPane.WorkbookEditSessions.Exists(session => session.EditDialog != null && session.EditDialog.WorkbookName == workbook.Name))
+      {
+        return;
+      }
+
+      foreach (var activeSession in workbook.Worksheets.Cast<Excel.Worksheet>().Select(worksheet => ActiveExcelPane.WorkbookEditSessions.GetActiveEditSession(worksheet)).Where(activeSession => activeSession != null))
+      {
+        activeSession.EditDialog.ProtectWorksheet();
+      }
+
+      workbook.Saved = true;
+    }
+
+    /// <summary>
     /// Event delegate method fired before an Excel <see cref="Excel.Workbook"/> is saved to disk.
     /// </summary>
     /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
@@ -365,12 +402,30 @@ namespace MySQL.ForExcel
     /// <param name="cancel">Flag indicating whether the user cancelled the saving event.</param>
     private void Application_WorkbookBeforeSave(Excel.Workbook workbook, bool saveAsUi, ref bool cancel)
     {
-      if (ActiveExcelPane == null)
+      if (ActiveExcelPane == null || ActiveExcelPane.WorkbookEditSessions == null || ActiveExcelPane.WorkbookEditSessions.Count <= 0)
       {
         return;
       }
 
-      ActiveExcelPane.CloseWorkbookEditSessionsOnSave(workbook);
+      // Unprotect all worksheets with an active edit session.
+      foreach (var activeSession in ActiveExcelPane.WorkbookEditSessions)
+      {
+        activeSession.EditDialog.UnprotectWorksheet();
+
+        // Add new Edit sessions in memory collection to serialized collection
+        if (!Settings.Default.EditSessionsList.Exists(session => session.HasSameWorkbookAndTable(activeSession)))
+        {
+          Settings.Default.EditSessionsList.Add(activeSession);
+        }
+      }
+
+      // Remove deleted Edit sessions from memory collection also from serialized collection
+      foreach (var deletedSession in Settings.Default.EditSessionsList.FindAll(deletedSession => !ActiveExcelPane.WorkbookEditSessions.Exists(session => session.HasSameWorkbookAndTable(deletedSession))))
+      {
+        Settings.Default.EditSessionsList.Remove(deletedSession);
+      }
+
+      Settings.Default.Save();
     }
 
     /// <summary>
@@ -410,6 +465,14 @@ namespace MySQL.ForExcel
 
       // Add the custom MySQL table style (for Excel tables) to this workbook.
       workbook.CreateMySqlTableStyle();
+
+      if (ActiveExcelPane == null)
+      {
+        return;
+      }
+
+      // Attempt to restore Edit sessions for the workbook beeing opened
+      ActiveExcelPane.RestoreEditSessions(workbook);
     }
 
     /// <summary>
@@ -524,9 +587,9 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// 
+    /// Setups the excel events.
     /// </summary>
-    /// <param name="subscribe"></param>
+    /// <param name="subscribe">if set to <c>true</c> [subscribe].</param>
     private void SetupExcelEvents(bool subscribe)
     {
       if (subscribe)
@@ -544,6 +607,7 @@ namespace MySQL.ForExcel
         Application.SheetDeactivate += Application_SheetDeactivate;
         Application.SheetSelectionChange += Application_SheetSelectionChange;
         Application.WorkbookActivate += Application_WorkbookActivate;
+        Application.WorkbookAfterSave += Application_WorkbookAfterSave;
         Application.WorkbookBeforeClose += Application_WorkbookBeforeClose;
         Application.WorkbookBeforeSave += Application_WorkbookBeforeSave;
         Application.WorkbookDeactivate += Application_WorkbookDeactivate;
@@ -562,6 +626,7 @@ namespace MySQL.ForExcel
         Application.SheetDeactivate -= Application_SheetDeactivate;
         Application.SheetSelectionChange -= Application_SheetSelectionChange;
         Application.WorkbookActivate -= Application_WorkbookActivate;
+        Application.WorkbookAfterSave -= Application_WorkbookAfterSave;
         Application.WorkbookBeforeClose -= Application_WorkbookBeforeClose;
         Application.WorkbookBeforeSave -= Application_WorkbookBeforeSave;
         Application.WorkbookDeactivate -= Application_WorkbookDeactivate;

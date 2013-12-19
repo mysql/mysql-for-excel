@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Forms;
@@ -36,18 +37,27 @@ namespace MySQL.ForExcel.Controls
   /// </summary>
   public partial class ExcelAddInPane : UserControl
   {
+
+    /// <summary>
+    /// True while restoring existing sessions for the current workbook, avoiding unwanted actions to be raised during the process.
+    /// </summary>
+    private bool _restoringExistingSessions;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ExcelAddInPane"/> class.
     /// </summary>
     public ExcelAddInPane()
     {
+      _restoringExistingSessions = false;
       InitializeComponent();
 
       DBObjectSelectionPanel3.ExcelSelectionContainsData = false;
       ActiveEditDialog = null;
-      ActiveEditDialogsList = null;
-      ProtectedWorksheetPasskeys = new Dictionary<string, string>();
+      FirstSession = null;
+      LastDeactivatedSheetName = string.Empty;
+      LastDeactivatedWorkbookName = string.Empty;
       WbConnection = null;
+      RestoreEditSessions(ActiveWorkbook);
     }
 
     #region Properties
@@ -59,12 +69,6 @@ namespace MySQL.ForExcel.Controls
     public EditDataDialog ActiveEditDialog { get; private set; }
 
     /// <summary>
-    /// Gets a list of <see cref="ActiveEditDialogContainer"/> objects.
-    /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<ActiveEditDialogContainer> ActiveEditDialogsList { get; private set; }
-
-    /// <summary>
     /// Gets the active <see cref="Excel.Workbook"/> in the Excel application.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -73,6 +77,18 @@ namespace MySQL.ForExcel.Controls
       get
       {
         return Globals.ThisAddIn.Application.ActiveWorkbook ?? Globals.ThisAddIn.Application.Workbooks.Add(1);
+      }
+    }
+
+    /// <summary>
+    /// Gets the active <see cref="Excel.Workbook"/> unique identifier.
+    /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public string ActiveWorkbookId
+    {
+      get
+      {
+        return ActiveWorkbook.GetOrCreateId();
       }
     }
 
@@ -97,23 +113,41 @@ namespace MySQL.ForExcel.Controls
       get
       {
         return ActiveWorksheet != null
-                && ActiveEditDialogsList != null
-                && ActiveEditDialogsList.Count > 0
-                && ActiveEditDialogsList.Exists(ac => ac.EditDialog.EditingWorksheet == ActiveWorksheet);
+                && WorkbookEditSessions != null
+                && WorkbookEditSessions.Count > 0
+                && WorkbookEditSessions.Exists(session => session.EditDialog != null && session.EditDialog.EditingWorksheet == ActiveWorksheet);
       }
     }
 
     /// <summary>
-    /// Gets a dictionary with the names and passkeys of Worksheets that were protected in Edit Data operations and saved to disk.
+    /// Gets or sets the first session of Edit sessions.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public Dictionary<string, string> ProtectedWorksheetPasskeys { get; private set; }
+    public EditSessionInfo FirstSession { get; private set; }
+
+    /// <summary>
+    /// Gets the name of the last deactivated Excel <see cref="Excel.Worksheet"/>.
+    /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public string LastDeactivatedSheetName { get; private set; }
+
+    /// <summary>
+    /// Gets the name of the last deactivated Excel <see cref="Excel.Workbook"/>.
+    /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public string LastDeactivatedWorkbookName { get; private set; }
 
     /// <summary>
     /// Gets a <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public MySqlWorkbenchConnection WbConnection { get; private set; }
+
+    /// <summary>
+    /// Gets or sets the List of Edit sessions.
+    /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public List<EditSessionInfo> WorkbookEditSessions { get; private set; }
 
     #endregion Properties
 
@@ -162,24 +196,24 @@ namespace MySQL.ForExcel.Controls
     /// <param name="show">Flag indicating if the dialog will be shown or hidden.</param>
     public void ChangeEditDialogVisibility(Excel.Worksheet workSheet, bool show)
     {
-      if (workSheet == null || ActiveEditDialogsList == null || ActiveEditDialogsList.Count <= 0)
+      if (workSheet == null || WorkbookEditSessions.Count < 1 || _restoringExistingSessions)
       {
         return;
       }
 
-      ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList.Find(ac => ac.EditDialog.EditingWorksheet == workSheet);
-      if (activeEditContainer == null)
+      var activeSession = WorkbookEditSessions.GetActiveEditSession(workSheet);
+      if (activeSession == null)
       {
         return;
       }
 
       if (show)
       {
-        activeEditContainer.EditDialog.ShowInactiveTopmost();
+        activeSession.EditDialog.ShowDialog();
       }
       else
       {
-        activeEditContainer.EditDialog.Hide();
+        activeSession.EditDialog.Hide();
       }
     }
 
@@ -189,61 +223,16 @@ namespace MySQL.ForExcel.Controls
     /// <param name="workbook">The <see cref="Excel.Workbook"/> associated to the Edit sessions to close.</param>
     public void CloseWorkbookEditSessions(Excel.Workbook workbook)
     {
-      if (workbook == null || ActiveEditDialogsList == null)
+      if (workbook == null)
       {
         return;
       }
 
-      foreach (var workbookEditContainer in ActiveEditDialogsList.Where(ac => string.Equals(ac.EditDialog.WorkbookName, workbook.Name, StringComparison.InvariantCulture)).ToList())
+      var sessionsToFreeResources = WorkbookEditSessions.FindAll(session => session.EditDialog != null && string.Equals(session.EditDialog.WorkbookName, workbook.Name, StringComparison.InvariantCulture));
+      foreach (var session in sessionsToFreeResources)
       {
-        // The Close method is both closing the dialog and removing itself from the collection of ActiveEditDialogContainer objects.
-        workbookEditContainer.EditDialog.Close();
-      }
-
-      if (ActiveEditDialogsList.Count == 0)
-      {
-        ActiveEditDialogsList = null;
-      }
-    }
-
-    /// <summary>
-    /// Signals that an Excel <see cref="Excel.Workbook"/> is about to be saved to disk.
-    /// </summary>
-    /// <param name="workBook">A <see cref="Excel.Workbook"/> object.</param>
-    public void CloseWorkbookEditSessionsOnSave(Excel.Workbook workBook)
-    {
-      if (workBook == null || ActiveEditDialogsList == null || !ActiveEditDialogsList.Exists(editContainer => editContainer.EditDialog.WorkbookName == workBook.Name))
-      {
-        return;
-      }
-
-      bool closeEditingWorksheets = InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.WorksheetInEditModeSavingWarningTitle, Resources.WorksheetInEditModeSavingWarningDetail, null, Resources.WorksheetInEditModeSavingWarningMoreInfo) == DialogResult.Yes;
-      foreach (Excel.Worksheet worksheet in workBook.Worksheets)
-      {
-        ActiveEditDialogContainer editContainer = ActiveEditDialogsList.FirstOrDefault(editDialogContainer => editDialogContainer.EditDialog.EditingWorksheet == worksheet);
-        if (editContainer == null)
-        {
-          continue;
-        }
-
-        if (closeEditingWorksheets)
-        {
-          if (editContainer.EditDialog != null)
-          {
-            editContainer.EditDialog.Close();
-          }
-
-          if (ActiveEditDialogsList.Contains(editContainer))
-          {
-            ActiveEditDialogsList.Remove(editContainer);
-          }
-
-          ProtectedWorksheetPasskeys.Remove(worksheet.Name);
-        }
-        else if (!ProtectedWorksheetPasskeys.ContainsKey(worksheet.Name))
-        {
-          ProtectedWorksheetPasskeys.Add(worksheet.Name, editContainer.EditDialog.WorksheetProtectionKey);
-        }
+        // The Close method is both closing the dialog and removing itself from the collection of EditSessionInfo objects.
+        session.EditDialog.Close();
       }
     }
 
@@ -253,56 +242,18 @@ namespace MySQL.ForExcel.Controls
     /// <param name="worksheet">The <see cref="Excel.Worksheet"/> associated to the Edit session to close.</param>
     public void CloseWorksheetEditSession(Excel.Worksheet worksheet)
     {
-      ActiveEditDialogContainer activeEditContainer = worksheet == null || ActiveEditDialogsList == null
-        ? null
-        : ActiveEditDialogsList.FirstOrDefault(ac => ac.EditDialog.WorkbookName == worksheet.GetParentWorkbookName() && ac.EditDialog.WorksheetName == worksheet.Name);
-      if (activeEditContainer == null)
+      var wsSession = WorkbookEditSessions.FirstOrDefault(session => session.EditDialog.WorkbookName == worksheet.GetParentWorkbookName() &&
+      string.Equals(session.EditDialog.WorksheetName, worksheet.Name, StringComparison.InvariantCulture));
+      if (wsSession == null)
       {
         return;
       }
 
-      activeEditContainer.EditDialog.Close();
-      if (ActiveEditDialogsList.Contains(activeEditContainer))
+      wsSession.EditDialog.Close();
+      if (WorkbookEditSessions.Contains(wsSession))
       {
-        ActiveEditDialogsList.Remove(activeEditContainer);
+        WorkbookEditSessions.Remove(wsSession);
       }
-    }
-
-    /// <summary>
-    /// Closes all the active <see cref="EditDataDialog"/> forms.
-    /// </summary>
-    public void CloseAllEditingSessions()
-    {
-      if (ActiveEditDialogsList == null)
-      {
-        return;
-      }
-
-      int listCount = ActiveEditDialogsList.Count;
-      for (int containerIndex = 0; containerIndex < listCount; containerIndex++)
-      {
-        ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList[containerIndex];
-        if (activeEditContainer.EditDialog != null)
-        {
-          activeEditContainer.EditDialog.Close();
-        }
-
-        if (ActiveEditDialogsList.Contains(activeEditContainer))
-        {
-          ActiveEditDialogsList.Remove(activeEditContainer);
-        }
-
-        if (listCount == ActiveEditDialogsList.Count)
-        {
-          continue;
-        }
-
-        listCount = ActiveEditDialogsList.Count;
-        containerIndex--;
-      }
-
-      ActiveEditDialogsList.Clear();
-      ActiveEditDialogsList = null;
     }
 
     /// <summary>
@@ -314,7 +265,7 @@ namespace MySQL.ForExcel.Controls
       WelcomePanel1.BringToFront();
 
       // Free up open Edit Dialogs
-      CloseAllEditingSessions();
+      CloseWorkbookEditSessions(ActiveWorkbook);
     }
 
     /// <summary>
@@ -323,7 +274,7 @@ namespace MySQL.ForExcel.Controls
     public void CloseSchema()
     {
       // If there are Active Edit sessions warn the users that by closing the schema the sessions will be terminated
-      if (ActiveEditDialogsList != null && ActiveEditDialogsList.Count > 0)
+      if (WorkbookEditSessions != null && WorkbookEditSessions.Count > 0)
       {
         DialogResult dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.ActiveEditingSessionsCloseWarningTitle, Resources.ActiveEditingSessionsCloseWarningDetail);
         if (dr == DialogResult.No)
@@ -331,43 +282,45 @@ namespace MySQL.ForExcel.Controls
           return;
         }
 
-        CloseAllEditingSessions();
+        CloseWorkbookEditSessions(ActiveWorkbook);
       }
 
       SchemaSelectionPanel2.BringToFront();
     }
 
     /// <summary>
-    /// Creates a new Excel <see cref="Excel.Worksheet"/>.
+    /// Delete the closed workbook's edit sessions from the settings file.
     /// </summary>
-    /// <param name="proposedWorksheetName">The name of the new <see cref="Excel.Worksheet"/>.</param>
-    /// <param name="checkForDuplicates">Flag indicating if the name of the Worksheet is set to avoid a duplicate name.</param>
-    /// <returns>The newly created <see cref="Excel.Worksheet"/> object.</returns>
-    public Excel.Worksheet CreateNewWorksheet(string proposedWorksheetName, bool checkForDuplicates)
+    private void DeleteCurrentWorkbookEditSessions(Excel.Workbook workbook)
     {
-      Excel.Worksheet newWorksheet = null;
-
-      try
+      if (WorkbookEditSessions == null || string.IsNullOrEmpty(workbook.GetOrCreateId()))
       {
-        newWorksheet = GetActiveOrCreateWorksheet(proposedWorksheetName, true, checkForDuplicates);
-        Excel.Range atCell = newWorksheet.Range["A1", Type.Missing];
-        atCell.Select();
-      }
-      catch (Exception ex)
-      {
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.TaskPaneErrorCreatingWorksheetText, ex.Message, true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        return;
       }
 
-      return newWorksheet;
+      if (!_restoringExistingSessions)
+      {
+        // Remove all sessions from the current workbook.
+        foreach (var session in Globals.ThisAddIn.StoredEditSessions.FindAll(session => ActiveWorkbook != null && session.WorkbookGuid.Equals(workbook.GetOrCreateId())))
+        {
+          Globals.ThisAddIn.StoredEditSessions.Remove(session);
+        }
+      }
+
+      WorkbookEditSessions = new List<EditSessionInfo>();
+      Settings.Default.Save();
     }
 
     /// <summary>
     /// Opens an editing session for a MySQL table.
     /// </summary>
     /// <param name="tableObject">Table to start an editing session for.</param>
-    /// <returns><c>true</c> if the export/append action was executed, <c>false</c> otherwise.</returns>
-    public bool EditTableData(DbObject tableObject)
+    /// <param name="showImportDialog">Indicates whether to open the import dialog for the user when MySQL for Excel its not (silently) restoring sessions.</param>
+    /// <param name="workbook">The workbook.</param>
+    /// <returns>
+    ///   <c>true</c> If the export/append action was executed, <c>false</c> otherwise.
+    /// </returns>
+    public bool EditTableData(DbObject tableObject, bool showImportDialog, Excel.Workbook workbook)
     {
       string schemaAndTableNames = WbConnection.Schema + "." + tableObject.Name;
 
@@ -387,9 +340,9 @@ namespace MySQL.ForExcel.Controls
       }
 
       // Attempt to Import Data unless the user cancels the import operation
-      string proposedWorksheetName = tableObject.Name.GetWorksheetNameAvoidingDuplicates();
+      string proposedWorksheetName = _restoringExistingSessions ? tableObject.Name : ActiveWorkbook.GetWorksheetNameAvoidingDuplicates(tableObject.Name);
       ImportTableViewForm importForm = new ImportTableViewForm(WbConnection, tableObject, proposedWorksheetName, ActiveWorkbook.Excel8CompatibilityMode, true);
-      DialogResult dr = importForm.ShowDialog();
+      DialogResult dr = showImportDialog ? importForm.ImportHidingDialog() : importForm.ShowDialog();
       if (dr == DialogResult.Cancel)
       {
         importForm.Dispose();
@@ -403,83 +356,48 @@ namespace MySQL.ForExcel.Controls
         return false;
       }
 
-      // Before creating the new Excel Worksheet check if ActiveWorksheet is in Editing Mode and if so hide its Edit Dialog
-      if (ActiveEditDialogsList != null)
+      // Hide all other open EditDataDialog forms before opening a new one.
+      foreach (var session in WorkbookEditSessions.Where(session => session.EditDialog != null && session.EditDialog.Visible))
       {
-        ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList.Find(ac => ac.EditDialog.EditingWorksheet.Equals(ActiveWorksheet));
-        if (activeEditContainer != null && activeEditContainer.EditDialog.Visible)
-        {
-          activeEditContainer.EditDialog.Hide();
-        }
+        session.EditDialog.Hide();
       }
 
       // Create the new Excel Worksheet and import the editing data there
-      Excel.Worksheet currentWorksheet = CreateNewWorksheet(proposedWorksheetName, false);
+      Excel.Worksheet currentWorksheet = _restoringExistingSessions ? workbook.GetOrCreateWorksheet(proposedWorksheetName, true) : ActiveWorkbook.CreateWorksheet(proposedWorksheetName, true);
       if (currentWorksheet == null)
       {
         importForm.Dispose();
         return false;
       }
 
-      Excel.Range atCell = currentWorksheet.Cells[1, 1];
-      Excel.Range editingRange = importForm.ImportDataTable.ImportDataAtGivenExcelCell(importForm.ImportHeaders, atCell);
-
       // Create and show the Edit Data Dialog
-      ActiveEditDialog = new EditDataDialog(this, new NativeWindowWrapper(Globals.ThisAddIn.Application.Hwnd), WbConnection, editingRange, importForm.ImportDataTable, currentWorksheet);
-      ActiveEditDialog.Show(ActiveEditDialog.ParentWindow);
-
-      // Maintain hashtables for open Edit Data Dialogs
-      if (ActiveEditDialogsList == null)
+      var editSession = GetEditSession(tableObject, importForm, currentWorksheet);
+      ActiveEditDialog = editSession.EditDialog;
+      if (!_restoringExistingSessions)
       {
-        ActiveEditDialogsList = new List<ActiveEditDialogContainer>();
+        ActiveEditDialog.ShowDialog();
       }
 
-      ActiveEditDialogsList.Add(new ActiveEditDialogContainer(tableObject.Name, ActiveEditDialog));
-      importForm.Dispose();
-      return true;
-    }
-
-    /// <summary>
-    /// Gets an active Excel <see cref="Excel.Worksheet"/> or creates a new one.
-    /// </summary>
-    /// <param name="proposedName">The name of the new <see cref="Excel.Worksheet"/>.</param>
-    /// <param name="alwaysCreate">Flag indicating if a new <see cref="Excel.Worksheet"/> will always be created skipping the check for an active one.</param>
-    /// <param name="checkForDuplicates">Flag indicating if the name of the Worksheet is set to avoid a duplicate name.</param>
-    /// <returns>The active or new <see cref="Excel.Worksheet"/> object.</returns>
-    public Excel.Worksheet GetActiveOrCreateWorksheet(string proposedName, bool alwaysCreate, bool checkForDuplicates)
-    {
-      Excel.Worksheet currentWorksheet = Globals.ThisAddIn.Application.ActiveSheet as Excel.Worksheet;
-      if (currentWorksheet != null && !alwaysCreate)
+      // When restoring sessions (the import dialog was shown) the table being opened is already on the list.
+      if (WorkbookEditSessions != null)
       {
-        return currentWorksheet;
-      }
-
-      proposedName = checkForDuplicates ? proposedName.GetWorksheetNameAvoidingDuplicates() : proposedName;
-      if (Globals.ThisAddIn.Application.ActiveWorkbook != null)
-      {
-        Excel.Worksheet currentActiveSheet = ActiveWorksheet;
-        currentWorksheet = Globals.ThisAddIn.Application.Sheets.Add(Type.Missing, Globals.ThisAddIn.Application.ActiveSheet, Type.Missing, Type.Missing);
-        if (ActiveEditDialogsList != null)
+        if (!_restoringExistingSessions && !WorkbookEditSessions.Contains(editSession))
         {
-          ActiveEditDialogContainer activeEditContainer = ActiveEditDialogsList.Find(ac => ac.EditDialog.EditingWorksheet.Equals(currentActiveSheet));
-          if (activeEditContainer != null && activeEditContainer.EditDialog.Visible)
+          WorkbookEditSessions.Add(editSession);
+        }
+        else
+        {
+          var editSessionBeingRestored = WorkbookEditSessions.FirstOrDefault(session => session != null &&
+           session.TableName.Equals(editSession.TableName));
+          if (editSessionBeingRestored != null)
           {
-            activeEditContainer.EditDialog.Hide();
+            editSessionBeingRestored.EditDialog = editSession.EditDialog;
           }
         }
       }
-      else
-      {
-        Excel.Workbook currentWorkbook = Globals.ThisAddIn.Application.Workbooks.Add(Type.Missing);
-        currentWorksheet = currentWorkbook.Worksheets[1] as Excel.Worksheet;
-      }
 
-      if (currentWorksheet != null)
-      {
-        currentWorksheet.Name = proposedName;
-      }
-
-      return currentWorksheet;
+      importForm.Dispose();
+      return true;
     }
 
     /// <summary>
@@ -540,19 +458,86 @@ namespace MySQL.ForExcel.Controls
     /// Sets and opens the current active connection used to browse schemas and DB objects.
     /// </summary>
     /// <param name="connection">A <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.</param>
-    public void OpenConnection(MySqlWorkbenchConnection connection)
+    public PasswordDialogFlags OpenConnection(MySqlWorkbenchConnection connection)
     {
       WbConnection = connection;
       RefreshWbConnectionTimeouts();
-      PasswordDialogFlags passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
-      if (!passwordFlags.ConnectionSuccess)
+      var passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
+      if (passwordFlags.ConnectionSuccess && SchemaSelectionPanel2.SetConnection(WbConnection))
+      {
+        SchemaSelectionPanel2.BringToFront();
+      }
+      return passwordFlags;
+    }
+
+    /// <summary>
+    /// Checks for saved editing sessions, promts the user for action and reopens them if told to.
+    /// </summary>
+    /// <param name="workbook">The workbook.</param>
+    public void RestoreEditSessions(Excel.Workbook workbook)
+    {
+      // First, we load the sessions from the settings file into memory. Since we'll only work with those related to the current workbook we find the subset that matches that cryteria.      
+      WorkbookEditSessions = Globals.ThisAddIn.StoredEditSessions.FindAll(session => session != null && session.WorkbookGuid != null && session.WorkbookGuid.Equals(workbook.GetOrCreateId()));
+      if (!Settings.Default.EditRestoreEditSessions || string.IsNullOrEmpty(workbook.Name) || WorkbookEditSessions.Count < 1)
       {
         return;
       }
 
-      if (SchemaSelectionPanel2.SetConnection(WbConnection))
+      // In case we have some saved sessions for the current Workbook, we verify we can re-open them.
+      FirstSession = WorkbookEditSessions.FirstOrDefault(session => session != null);
+      if (FirstSession == null)
       {
-        SchemaSelectionPanel2.BringToFront();
+        return;
+      }
+
+      var wbSessionConnection = MySqlWorkbench.Connections.GetConnectionForId(FirstSession.ConnectionId);
+      if (wbSessionConnection == null || !OpenConnection(wbSessionConnection).ConnectionSuccess)
+      {
+        // If the session's workbench connection was deleted, no session could be loaded.
+        var dialogResult = MiscUtilities.ShowCustomizedWarningDialog(Resources.EditReopeningWBConnectionNoLongerExistsFailedTitle, Resources.EditReopeningWBConnectionNoLongerExistsFailedDetail);
+        if (dialogResult == DialogResult.Yes)
+        {
+          DeleteCurrentWorkbookEditSessions(workbook);
+        }
+        return;
+      }
+
+      var wbSessionHostIdentifier = wbSessionConnection.HostIdentifier;
+      WbConnection = WbConnection ?? wbSessionConnection;
+      var enableOpenSessions = true;
+      var currentSchema = WbConnection.Schema;
+      // If the Excel version is higher than 2013 or there's no currentSchema selected, we need to open the one the session specifies.
+      if (Globals.ThisAddIn.ExcelVersionNumber >= 15 || string.IsNullOrEmpty(currentSchema))
+      {
+        OpenSchema(FirstSession.SchemaName);
+      }
+
+      // Otherwise, we verify the selected schema is the same than the one we are trying to restore, if it is not, we cannot reopen them.
+      else if (!string.Equals(wbSessionHostIdentifier, WbConnection.HostIdentifier, StringComparison.InvariantCulture)
+      || !string.Equals(currentSchema, FirstSession.SchemaName, StringComparison.InvariantCulture))
+      {
+        enableOpenSessions = false;
+      }
+
+      // Verify the session's schema still exists in the data base, if the schema was deleted, no session could be loaded.
+      if (SchemaSelectionPanel2.SchemasList.Nodes.GetNode(FirstSession.SchemaName) == null)
+      {
+        var errorMessage = string.Format(Resources.EditReopeningSchemaNoLongerExistsFailed, wbSessionHostIdentifier, FirstSession.SchemaName);
+        MiscUtilities.ShowCustomizedInfoDialog(InfoDialog.InfoType.Error, errorMessage);
+        MySqlSourceTrace.WriteToLog(errorMessage);
+        return;
+      }
+
+      switch (new OpenEditingSessionsDialog(enableOpenSessions, FirstSession.SchemaName, currentSchema).ShowDialog())
+      {
+        case DialogResult.Abort:
+          // Discard: Do not open any and delete all saved sessions for the current workbook.
+          DeleteCurrentWorkbookEditSessions(workbook);
+          break;
+
+        case DialogResult.Yes:
+          OpenEditSessionTables(workbook);
+          break;
       }
     }
 
@@ -565,6 +550,59 @@ namespace MySQL.ForExcel.Controls
       WbConnection.Schema = schema;
       DBObjectSelectionPanel3.WbConnection = WbConnection;
       DBObjectSelectionPanel3.BringToFront();
+    }
+
+    /// <summary>
+    /// Opens the Edit session's tables.
+    /// </summary>
+    /// <param name="workbook">The workbook.</param>
+    private void OpenEditSessionTables(Excel.Workbook workbook)
+    {
+      if (WorkbookEditSessions == null || WorkbookEditSessions.Count == 0)
+      {
+        return;
+      }
+
+      var missingTables = new List<string>();
+      _restoringExistingSessions = true;
+      foreach (var session in WorkbookEditSessions)
+      {
+        // Browsing the session's tables and verify those still exists in the data base.
+        var tableNode = DBObjectSelectionPanel3.DBObjectList.Nodes.GetNode(session.TableName);
+        var dboNode = tableNode != null ? tableNode.Tag as DbObject : null;
+        if (dboNode == null)
+        {
+          missingTables.Add(session.TableName);
+          continue;
+        }
+
+        EditTableData(dboNode, true, workbook);
+      }
+
+      if (WorkbookEditSessions.Count - missingTables.Count > 0)
+      {
+        ActiveEditDialog.ShowDialog();
+      }
+
+      _restoringExistingSessions = false;
+
+      // If no errors were found at the opening sessions process do not display the warning message at the end.
+      if (missingTables.Count <= 0)
+      {
+        return;
+      }
+
+      var errorMessage = new StringBuilder();
+      if (missingTables.Count > 0)
+      {
+        errorMessage.AppendLine(Resources.EditReopeningMissingTablesMessage);
+        foreach (var table in missingTables)
+        {
+          errorMessage.AppendLine(table);
+        }
+      }
+
+      MiscUtilities.ShowCustomizedInfoDialog(InfoDialog.InfoType.Warning, Resources.EditReopeningWarningMessage, errorMessage.ToString());
     }
 
     /// <summary>
@@ -608,12 +646,12 @@ namespace MySQL.ForExcel.Controls
     /// <returns><c>true</c> if the table has is in editing mode, <c>false</c> otherwise.</returns>
     public bool TableHasEditOnGoing(string tableName)
     {
-      if (ActiveEditDialogsList == null || ActiveEditDialogsList.Count == 0)
+      if (WorkbookEditSessions == null || WorkbookEditSessions.Count == 0)
       {
         return false;
       }
 
-      ActiveEditDialogContainer editContainer = ActiveEditDialogsList.Find(ac => ac.TableName == tableName);
+      var editContainer = WorkbookEditSessions.FirstOrDefault(ac => ac.EditDialog != null && ac.TableName == tableName);
       if (editContainer == null)
       {
         return false;
@@ -626,11 +664,6 @@ namespace MySQL.ForExcel.Controls
       }
 
       editContainer.EditDialog.Close();
-      if (ActiveEditDialogsList.Contains(editContainer))
-      {
-        ActiveEditDialogsList.Remove(editContainer);
-      }
-
       return false;
     }
 
@@ -646,6 +679,41 @@ namespace MySQL.ForExcel.Controls
       }
 
       DBObjectSelectionPanel3.ExcelSelectionContainsData = range.ContainsAnyData();
+    }
+
+    /// <summary>
+    /// Creates the editing session or restores the saved one.
+    /// </summary>
+    /// <param name="tableObject">The table used on the current session.</param>
+    /// <param name="importForm">The import form used on the current session.</param>
+    /// <param name="currentWorksheet">The current worksheet.</param>
+    /// <returns>A new or restored <see cref="EditSessionInfo"/> object.</returns>
+    private EditSessionInfo GetEditSession(DbObject tableObject, ImportTableViewForm importForm, Excel.Worksheet currentWorksheet)
+    {
+      Excel.Range atCell = currentWorksheet.Range["A1", Type.Missing];
+      Excel.Range editingRange = importForm.ImportDataTable.ImportDataAtGivenExcelCell(importForm.ImportHeaders, atCell);
+      EditSessionInfo session = null;
+
+      if (WorkbookEditSessions != null && WorkbookEditSessions.Count > 0)
+      {
+        session = WorkbookEditSessions.GetActiveEditSession(ActiveWorkbook, tableObject.Name);
+      }
+
+      // The Session is new and has to be created from scratch.
+      if (session == null)
+      {
+        session = new EditSessionInfo(ActiveWorkbookId, WbConnection.Id, WbConnection.Schema, tableObject.Name);
+      }
+
+      if (session.EditDialog != null)
+      {
+        return session;
+      }
+
+      // The Edit session is being either restored from the settings file or created for the newborn session.
+      session.EditDialog = new EditDataDialog(this, new NativeWindowWrapper(Globals.ThisAddIn.Application.Hwnd), WbConnection, editingRange, importForm.ImportDataTable, currentWorksheet);
+      currentWorksheet.StoreProtectionKey(session.EditDialog.WorksheetProtectionKey);
+      return session;
     }
   }
 }

@@ -61,6 +61,11 @@ namespace MySQL.ForExcel.Forms
     #region Fields
 
     /// <summary>
+    /// True since the EditDataDialog is created until the first time its displayed, allows to handle the Show events correctly.
+    /// </summary>
+    private bool _neverBeenShown;
+
+    /// <summary>
     /// A point object used as a placeholder to track where the mouse has been pressed.
     /// </summary>
     private Point _mouseDownPoint;
@@ -89,12 +94,14 @@ namespace MySQL.ForExcel.Forms
     public EditDataDialog(ExcelAddInPane parentTaskPane, IWin32Window parentWindow, MySqlWorkbenchConnection wbConnection, Excel.Range originalEditDataRange, MySqlDataTable importTable, Excel.Worksheet editingWorksheet)
     {
       _mouseDownPoint = Point.Empty;
+      _neverBeenShown = true;
       _undoingChanges = false;
       _updatingUSeOptimisticUpdateSetting = false;
 
       InitializeComponent();
 
-      WorksheetProtectionKey = Guid.NewGuid().ToString();
+      var existingProtectionKey = editingWorksheet.GetProtectionKey();
+      WorksheetProtectionKey = string.IsNullOrEmpty(existingProtectionKey) ? Guid.NewGuid().ToString() : existingProtectionKey;
       ParentTaskPane = parentTaskPane;
       ParentWindow = parentWindow;
       WbConnection = wbConnection;
@@ -111,6 +118,14 @@ namespace MySQL.ForExcel.Forms
       ForAllSessionsToolStripMenuItem.Checked = UseOptimisticUpdateForThisSession;
       UseOptimisticUpdateToolStripMenuItem.Checked = UseOptimisticUpdateForThisSession;
       Settings.Default.PropertyChanged += SettingsPropertyValueChanged;
+    }
+
+    /// <summary>
+    /// Protects the edit dialog's worksheet.
+    /// </summary>
+    public void ProtectWorksheet()
+    {
+      EditingWorksheet.ProtectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey, EditDataRange);
     }
 
     #region Properties
@@ -262,12 +277,27 @@ namespace MySQL.ForExcel.Forms
     #endregion Properties
 
     /// <summary>
-    /// Shows the dialog as the topmost window without placing the focus on it (i.e. leaving the focus on the parent window).
+    /// Displays the control to the user.
     /// </summary>
-    public void ShowInactiveTopmost()
+    public new void ShowDialog()
     {
-      ShowWindow(Handle, SW_SHOWNOACTIVATE);
-      SetWindowPos(Handle.ToInt32(), HWND_NOTOPMOST, Left, Top, Width, Height, SWP_NOACTIVATE);
+      if (_neverBeenShown)
+      {
+        Show(ParentWindow);
+        _neverBeenShown = false;
+      }
+      else
+      {
+        ShowInactiveTopmost();
+      }
+    }
+
+    /// <summary>
+    /// Unprotects the edit dialog's worksheet.
+    /// </summary>
+    public void UnprotectWorksheet()
+    {
+      EditingWorksheet.UnprotectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey);
     }
 
     /// <summary>
@@ -280,14 +310,19 @@ namespace MySQL.ForExcel.Forms
       ParentTaskPane.RefreshDbObjectPanelActionLabelsEnabledStatus(EditingTableName, false);
       if (EditingWorksheetExists)
       {
-        EditingWorksheet.Unprotect(WorksheetProtectionKey);
+        UnprotectWorksheet();
         EditingWorksheet.UsedRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
       }
 
-      ActiveEditDialogContainer editContainer = ParentTaskPane.ActiveEditDialogsList.Find(ac => ac.EditDialog.Equals(this));
-      if (editContainer != null)
+      var session = ParentTaskPane.WorkbookEditSessions.FirstOrDefault(ac => ac.EditDialog.Equals(this));
+      if (session != null)
       {
-        ParentTaskPane.ActiveEditDialogsList.Remove(editContainer);
+        ParentTaskPane.WorkbookEditSessions.Remove(session);
+      }
+
+      if (!string.IsNullOrEmpty(EditingWorksheet.GetProtectionKey()))
+      {
+        EditingWorksheet.RemoveRemoveProtectionKey();
       }
 
       Dispose();
@@ -889,6 +924,15 @@ namespace MySQL.ForExcel.Forms
       }
 
       SetUseOptimisticUpdateForAllSessions(Settings.Default.EditUseOptimisticUpdate, false);
+    }
+
+    /// <summary>
+    /// Shows the dialog as the topmost window without placing the focus on it (i.e. leaving the focus on the parent window).
+    /// </summary>
+    private void ShowInactiveTopmost()
+    {
+      ShowWindow(Handle, SW_SHOWNOACTIVATE);
+      SetWindowPos(Handle.ToInt32(), HWND_NOTOPMOST, Left, Top, Width, Height, SWP_NOACTIVATE);
     }
 
     /// <summary>
