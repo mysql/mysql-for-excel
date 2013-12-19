@@ -68,7 +68,7 @@ namespace MySQL.ForExcel.Forms
 
       LimitRowsCheckBox.Checked = false;
       TableNameMainLabel.Text = importDbObject.Type.ToString() + @" Name:";
-      OptionsWarningLabel.Text = Resources.WorkSheetInCompatibilityModeWarning;
+      OptionsWarningLabel.Text = Resources.WorksheetInCompatibilityModeWarning;
       Text = @"Import Data - " + importToWorksheetName;
       TableNameSubLabel.Text = importDbObject.Name;
       FillPreviewGrid();

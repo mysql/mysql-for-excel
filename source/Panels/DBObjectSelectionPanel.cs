@@ -354,7 +354,7 @@ namespace MySQL.ForExcel.Panels
 
       if (parentTaskPane.ActiveWorksheetInEditMode)
       {
-        DialogResult dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.WorkSheetInEditModeWarningTitle, Resources.WorkSheetInEditModeWarningDetail);
+        DialogResult dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.WorksheetInEditModeWarningTitle, Resources.WorksheetInEditModeWarningDetail);
         if (dr != DialogResult.Yes)
         {
           return;

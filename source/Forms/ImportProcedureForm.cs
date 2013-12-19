@@ -71,7 +71,7 @@ namespace MySQL.ForExcel.Forms
       Text = @"Import Data - " + importToWorksheetName;
       _procedureParamsProperties = new PropertiesCollection();
       ProcedureNameLabel.Text = importDbObject.Name;
-      OptionsWarningLabel.Text = Resources.WorkSheetInCompatibilityModeWarning;
+      OptionsWarningLabel.Text = Resources.WorksheetInCompatibilityModeWarning;
       ParametersPropertyGrid.SelectedObject = _procedureParamsProperties;
 
       InitializeMultipleResultSetsCombo();
