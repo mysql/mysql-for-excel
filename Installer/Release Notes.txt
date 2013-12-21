@@ -1,3 +1,38 @@
+MySQL for Excel 1.2.0 Release Notes
+------------------------------------
+
+Welcome to the release notes for MySQL for Excel 1.2.0
+
+* Added support for edition of MySQL Workbench connections right from the Welcome Panel where
+  connections are shown. Any of the listed MySQL Workbench connections can be right-clicked
+  and a new "Edit Connection" context menu is available for users to edit the Workbench
+  connection properties. There is no longer a need to have MySQL Workbench installed in order
+  to edit an existing connection.
+* Added support for optimistic updates to Edit Data operations via a configurable option, using
+  optimistic updates will ensure that pushing changes in the current editing session does not
+  overwrite changes done by another person to the set of data retrieved initially. This option
+  can be set globally for all editing sessions open by the current user which is persisted in the
+  settings file, or for a specific editing session so when the session is over the optimistic
+  update value is reset to the global one.
+* Changes done to the Advanced Options dialogues for Import, Export and Append Data forms are now
+  immediately reflected without requiring to close and reopen those forms.
+* Added "Preview SQL statements before they are sent to the server" and "Show executed SQL statements
+  along with their results" global options. The first option lets users preview the SQL statements
+  used in an Export, Append or Edit data operation before they are sent to the MySQL server and edit
+  them if needed. The second option lets users apply the statements directly and show the executed
+  SQL statements after they were applied along with the results of the operations.
+* Added "Allow to save active editing sessions" global option. This allows to save Edit sessions
+  when saving the Excel workbook, and restoring them when the workbook is opened again.
+* Added the "Create an Excel table for the imported MySQL table data" option to the Import Data
+  dialog's advanced options to automatically create an Excel table object for every MySQL table
+  imported to Excel so it can be used for Excel data analysis. Additionally the user can override the
+  default style for the Excel table and choose one of the available styles within a drop down list.
+* Added a new informational label "Schema:" to the panel "Select a Database Object" that shows the
+  name of the current schema, located just below the "User:" and "IP:" labels.
+* Fixed code that was not detecting an Excel row deletion but instead was detecting an Excel row
+  change during an Edit Data operation.
+
+
 MySQL for Excel 1.1.2 Release Notes
 ------------------------------------
 
