@@ -111,11 +111,11 @@ namespace MySQL.ForExcel.Panels
         return;
       }
 
-      MySqlWorkbenchConnection c = ConnectionsList.SelectedNode.Tag as MySqlWorkbenchConnection;
+      MySqlWorkbenchConnection selectedConnection = ConnectionsList.SelectedNode.Tag as MySqlWorkbenchConnection;
       var excelAddInPane = Parent as ExcelAddInPane;
       if (excelAddInPane != null)
       {
-        excelAddInPane.OpenConnection(c);
+        excelAddInPane.OpenConnection(selectedConnection, true);
       }
     }
 

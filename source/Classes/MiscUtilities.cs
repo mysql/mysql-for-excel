@@ -95,38 +95,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Explores a tree and returns the node being searched if it exists.
-    /// </summary>
-    /// <param name="nodes">The tree nodes to be browsed.</param>
-    /// <param name="nodeText">Node to be found by its text.</param>
-    /// <returns>A <see cref="TreeNode"/> object whose text equals the given text.</returns>
-    public static TreeNode GetNode(this TreeNodeCollection nodes, string nodeText)
-    {
-      foreach (TreeNode node in nodes)
-      {
-        if (string.Equals(node.Text, nodeText, StringComparison.InvariantCulture))
-        {
-          return node;
-        }
-
-        if (node.Nodes.Count <= 0)
-        {
-          continue;
-        }
-
-        var returnNode = node.Nodes.GetNode(nodeText);
-        if (returnNode == null)
-        {
-          continue;
-        }
-
-        return returnNode;
-      }
-
-      return null;
-    }
-
-    /// <summary>
     /// Returns the position of a given integer number within an array of integers.
     /// </summary>
     /// <param name="intArray">The array of integers to look for the given number.</param>

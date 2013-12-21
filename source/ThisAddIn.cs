@@ -25,6 +25,7 @@ using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
+using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
@@ -58,6 +59,25 @@ namespace MySQL.ForExcel
     public const int EXCEL_2013_VERSION_NUMBER = 15;
 
     #endregion Constants
+
+    #region Fields
+
+    /// <summary>
+    /// A dictionary containing subsets of the <see cref="StoredEditSessions"/> list containing only sessions of a <see cref="Excel.Workbook"/>.
+    /// </summary>
+    private Dictionary<string, List<EditSessionInfo>> _editSessionsByWorkbook;
+
+    /// <summary>
+    /// The name of the last deactivated Excel <see cref="Excel.Worksheet"/>.
+    /// </summary>
+    private string _lastDeactivatedSheetName;
+
+    /// <summary>
+    /// True while restoring existing sessions for the current workbook, avoiding unwanted actions to be raised during the process.
+    /// </summary>
+    private bool _restoringExistingSession;
+
+    #endregion Fields
 
     #region Properties
 
@@ -103,6 +123,17 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Gets a subset of the <see cref="StoredEditSessions"/> list containing only sessions assocaiated to the active <see cref="Excel.Workbook"/>.
+    /// </summary>
+    public List<EditSessionInfo> ActiveWorkbookSessions
+    {
+      get
+      {
+        return GetWorkbookEditSessions(Application.ActiveWorkbook);
+      }
+    }
+
+    /// <summary>
     /// Gets the title given to the assembly of the Add-In.
     /// </summary>
     public string AssemblyTitle { get; private set; }
@@ -143,6 +174,11 @@ namespace MySQL.ForExcel
 
       Office.CustomTaskPane customPane = CustomTaskPanes.FirstOrDefault(ctp => ctp.Control is ExcelAddInPane && ctp.Control == excelPane);
       ExcelPanesList.Remove(excelPane);
+      if (ExcelPanesList.Count == 0)
+      {
+        ExcelAddInPanesClosed();
+      }
+
       excelPane.Dispose();
       if (customPane != null)
       {
@@ -150,6 +186,26 @@ namespace MySQL.ForExcel
       }
 
       CustomTaskPanes.Remove(customPane);
+    }
+
+    /// <summary>
+    /// Closes and removes all Edit sessions associated to the given <see cref="Excel.Workbook"/>.
+    /// </summary>
+    /// <param name="workbook">The <see cref="Excel.Workbook"/> associated to the Edit sessions to close.</param>
+    public void CloseWorkbookEditSessions(Excel.Workbook workbook)
+    {
+      if (workbook == null)
+      {
+        return;
+      }
+
+      var workbookSessions = GetWorkbookEditSessions(workbook);
+      var sessionsToFreeResources = workbookSessions.FindAll(session => session.EditDialog != null && session.EditDialog.WorkbookName == workbook.Name);
+      foreach (var session in sessionsToFreeResources)
+      {
+        // The Close method is both closing the dialog and removing itself from the collection of EditSessionInfo objects.
+        session.EditDialog.Close();
+      }
     }
 
     /// <summary>
@@ -172,6 +228,8 @@ namespace MySQL.ForExcel
         ExcelPanesList = new List<ExcelAddInPane>();
       }
 
+      bool firstRun = ExcelPanesList.Count == 0;
+
       // Instantiate the Excel Add-In pane to attach it to the Excel's custom task pane.
       // Note that in Excel 2007 and 2010 a MDI model is used so only a single Excel pane is instantiated, whereas in Excel 2013 and greater
       //  a SDI model is used instead, so an Excel pane is instantiated for each custom task pane appearing in each Excel window.
@@ -189,6 +247,12 @@ namespace MySQL.ForExcel
       // Create custom MySQL Excel table style in the active workbook if it exists
       Application.ActiveWorkbook.CreateMySqlTableStyle();
 
+      // First run if no Excel panes have been opened yet.
+      if (firstRun)
+      {
+        ExcelAddInPaneFirstRun();
+      }
+
       Application.Cursor = Excel.XlMousePointer.xlDefault;
       return activeCustomPane;
     }
@@ -205,7 +269,13 @@ namespace MySQL.ForExcel
       }
 
       Excel.Worksheet activeSheet = workSheet as Excel.Worksheet;
-      ActiveExcelPane.ChangeEditDialogVisibility(activeSheet, true);
+      if (_lastDeactivatedSheetName.Length > 0 && !Application.ActiveWorkbook.WorksheetExists(_lastDeactivatedSheetName))
+      {
+        // Worksheet was deleted and the Application_SheetBeforeDelete did not run, user is running Excel 2010 or earlier.
+        CloseMissingWorksheetEditSession(Application.ActiveWorkbook, _lastDeactivatedSheetName);
+      }
+
+      ChangeEditDialogVisibility(activeSheet, true);
     }
 
     /// <summary>
@@ -220,7 +290,14 @@ namespace MySQL.ForExcel
       }
 
       Excel.Worksheet activeSheet = workSheet as Excel.Worksheet;
-      ActiveExcelPane.CloseWorksheetEditSession(activeSheet);
+      CloseWorksheetEditSession(activeSheet);
+
+      // If the _lastDeactivatedSheetName is not empty it means a deactivated sheet may have been deleted, if this method ran it means the user is running
+      // Excel 2013 or later where this method is supported, so we need to clean the _lastDeactivatedSheetName.
+      if (_lastDeactivatedSheetName.Length > 0)
+      {
+        _lastDeactivatedSheetName = string.Empty;
+      }
     }
 
     /// <summary>
@@ -250,7 +327,8 @@ namespace MySQL.ForExcel
       }
 
       Excel.Worksheet deactivatedSheet = workSheet as Excel.Worksheet;
-      ActiveExcelPane.ChangeEditDialogVisibility(deactivatedSheet, false);
+      _lastDeactivatedSheetName = deactivatedSheet != null ? deactivatedSheet.Name : string.Empty;
+      ChangeEditDialogVisibility(deactivatedSheet, false);
     }
 
     /// <summary>
@@ -327,7 +405,48 @@ namespace MySQL.ForExcel
 
       Excel.Workbook activeWorkbook = workBook as Excel.Workbook;
       Excel.Worksheet activeSheet = activeWorkbook != null ? activeWorkbook.ActiveSheet as Excel.Worksheet : null;
-      ActiveExcelPane.ChangeEditDialogVisibility(activeSheet, true);
+      ChangeEditDialogVisibility(activeSheet, true);
+      ActiveExcelPane.RefreshDbObjectPanelActionLabelsEnabledStatus();
+    }
+
+    /// <summary>
+    /// Event delegate method fired after an Excel <see cref="Excel.Workbook"/> is saved to disk.
+    /// </summary>
+    /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
+    /// <param name="success">Flag indicating whether the save operation was successful.</param>
+    private void Application_WorkbookAfterSave(Excel.Workbook workbook, bool success)
+    {
+      var workbookId = workbook.GetOrCreateId();
+      var workbookSessions = GetWorkbookEditSessions(workbook);
+
+      // Protect all worksheets with an active edit session.
+      foreach (var activeSession in workbookSessions)
+      {
+        activeSession.WorkbookFilePath = workbook.FullName;
+        if (activeSession.EditDialog != null)
+        {
+          activeSession.EditDialog.ProtectWorksheet();
+        }
+
+        var storedSession = StoredEditSessions.FirstOrDefault(session => session.HasSameWorkbookAndTable(activeSession));
+        if (storedSession != null)
+        {
+          storedSession.WorkbookFilePath = workbook.FullName;
+          continue;
+        }
+
+        // Add new Edit sessions in memory collection to serialized collection
+        StoredEditSessions.Add(activeSession);
+      }
+
+      // Remove deleted Edit sessions from memory collection also from serialized collection
+      foreach (var storedSession in StoredEditSessions.FindAll(storedSession => string.Equals(storedSession.WorkbookGuid, workbookId, StringComparison.InvariantCulture) && !workbookSessions.Exists(wbSession => wbSession.HasSameWorkbookAndTable(storedSession))))
+      {
+        StoredEditSessions.Remove(storedSession);
+      }
+
+      Settings.Default.Save();
+      workbook.Saved = true;
     }
 
     /// <summary>
@@ -342,8 +461,8 @@ namespace MySQL.ForExcel
         return;
       }
 
-      bool flagAsSaved = false;
-      if (!workbook.Saved)
+      bool wasAlreadySaved = workbook.Saved;
+      if (!wasAlreadySaved)
       {
         switch (MessageBox.Show(string.Format(Resources.WorkbookSavingDetailText, workbook.Name), Application.Name, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1))
         {
@@ -352,7 +471,7 @@ namespace MySQL.ForExcel
             break;
 
           case DialogResult.No:
-            flagAsSaved = true;
+            wasAlreadySaved = true;
             break;
 
           case DialogResult.Cancel:
@@ -361,37 +480,14 @@ namespace MySQL.ForExcel
         }
       }
 
-      ActiveExcelPane.CloseWorkbookEditSessions(workbook);
-      if (flagAsSaved)
+      CloseWorkbookEditSessions(workbook);
+      if (wasAlreadySaved)
       {
         workbook.Saved = true;
       }
-    }
 
-    /// <summary>
-    /// Event delegate method fired after an Excel <see cref="Excel.Workbook"/> is saved to disk.
-    /// </summary>
-    /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
-    /// <param name="success">Flag indicating whether the save operation was successful.</param>
-    private void Application_WorkbookAfterSave(Excel.Workbook workbook, bool success)
-    {
-      if (ActiveExcelPane == null || ActiveExcelPane.WorkbookEditSessions == null || ActiveExcelPane.WorkbookEditSessions.Count <= 0)
-      {
-        return;
-      }
-
-      if (ActiveExcelPane.WorkbookEditSessions == null
-          || !ActiveExcelPane.WorkbookEditSessions.Exists(session => session.EditDialog != null && session.EditDialog.WorkbookName == workbook.Name))
-      {
-        return;
-      }
-
-      foreach (var activeSession in workbook.Worksheets.Cast<Excel.Worksheet>().Select(worksheet => ActiveExcelPane.WorkbookEditSessions.GetActiveEditSession(worksheet)).Where(activeSession => activeSession != null))
-      {
-        activeSession.EditDialog.ProtectWorksheet();
-      }
-
-      workbook.Saved = true;
+      // Remove the Edit sessions for the workbook being closed from the dictionary.
+      _editSessionsByWorkbook.Remove(workbook.GetOrCreateId());
     }
 
     /// <summary>
@@ -402,30 +498,13 @@ namespace MySQL.ForExcel
     /// <param name="cancel">Flag indicating whether the user cancelled the saving event.</param>
     private void Application_WorkbookBeforeSave(Excel.Workbook workbook, bool saveAsUi, ref bool cancel)
     {
-      if (ActiveExcelPane == null || ActiveExcelPane.WorkbookEditSessions == null || ActiveExcelPane.WorkbookEditSessions.Count <= 0)
-      {
-        return;
-      }
+      var workbookSessions = GetWorkbookEditSessions(workbook);
 
       // Unprotect all worksheets with an active edit session.
-      foreach (var activeSession in ActiveExcelPane.WorkbookEditSessions)
+      foreach (var activeSession in workbookSessions.Where(activeSession => activeSession.EditDialog != null))
       {
         activeSession.EditDialog.UnprotectWorksheet();
-
-        // Add new Edit sessions in memory collection to serialized collection
-        if (!Settings.Default.EditSessionsList.Exists(session => session.HasSameWorkbookAndTable(activeSession)))
-        {
-          Settings.Default.EditSessionsList.Add(activeSession);
-        }
       }
-
-      // Remove deleted Edit sessions from memory collection also from serialized collection
-      foreach (var deletedSession in Settings.Default.EditSessionsList.FindAll(deletedSession => !ActiveExcelPane.WorkbookEditSessions.Exists(session => session.HasSameWorkbookAndTable(deletedSession))))
-      {
-        Settings.Default.EditSessionsList.Remove(deletedSession);
-      }
-
-      Settings.Default.Save();
     }
 
     /// <summary>
@@ -448,7 +527,7 @@ namespace MySQL.ForExcel
 
       foreach (Excel.Worksheet wSheet in deactivatedWorkbook.Worksheets)
       {
-        ActiveExcelPane.ChangeEditDialogVisibility(wSheet, false);
+        ChangeEditDialogVisibility(wSheet, false);
       }
     }
 
@@ -471,8 +550,96 @@ namespace MySQL.ForExcel
         return;
       }
 
-      // Attempt to restore Edit sessions for the workbook beeing opened
-      ActiveExcelPane.RestoreEditSessions(workbook);
+      ShowOpenEditSessionsDialog(workbook);
+    }
+
+    /// <summary>
+    /// Shows or hides an Edit dialog associated to the given <see cref="Excel.Worksheet"/>.
+    /// </summary>
+    /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
+    /// <param name="show">Flag indicating if the dialog will be shown or hidden.</param>
+    private void ChangeEditDialogVisibility(Excel.Worksheet workSheet, bool show)
+    {
+      if (workSheet == null)
+      {
+        return;
+      }
+
+      var parentWorkbook = workSheet.Parent as Excel.Workbook;
+      if (parentWorkbook == null)
+      {
+        return;
+      }
+
+      var workbookSessions = GetWorkbookEditSessions(parentWorkbook);
+      if (workbookSessions.Count == 0 || _restoringExistingSession)
+      {
+        return;
+      }
+
+      var activeSession = workbookSessions.GetActiveEditSession(workSheet);
+      if (activeSession == null)
+      {
+        return;
+      }
+
+      if (show)
+      {
+        activeSession.EditDialog.ShowDialog();
+      }
+      else
+      {
+        activeSession.EditDialog.Hide();
+      }
+    }
+
+    /// <summary>
+    /// Closes and removes the Edit session associated to the given <see cref="Excel.Worksheet"/>.
+    /// </summary>
+    /// <param name="workbook">An <see cref="Excel.Workbook"/>.</param>
+    /// <param name="missingWorksheetName">The name of the <see cref="Excel.Worksheet"/> that no longer exists and that is associated to the Edit session to close.</param>
+    private void CloseMissingWorksheetEditSession(Excel.Workbook workbook, string missingWorksheetName)
+    {
+      if (workbook == null || missingWorksheetName.Length == 0)
+      {
+        return;
+      }
+
+      var workbookSessions = GetWorkbookEditSessions(workbook);
+      var wsSession = workbookSessions.FirstOrDefault(session => !session.EditDialog.EditingWorksheetExists);
+      if (wsSession == null)
+      {
+        return;
+      }
+
+      wsSession.EditDialog.Close();
+    }
+
+    /// <summary>
+    /// Closes and removes the Edit session associated to the given <see cref="Excel.Worksheet"/>.
+    /// </summary>
+    /// <param name="worksheet">The <see cref="Excel.Worksheet"/> associated to the Edit session to close.</param>
+    private void CloseWorksheetEditSession(Excel.Worksheet worksheet)
+    {
+      if (worksheet == null)
+      {
+        return;
+      }
+
+      Excel.Workbook parentWorkbook = worksheet.Parent as Excel.Workbook;
+      if (parentWorkbook == null)
+      {
+        return;
+      }
+
+      var workbookSessions = GetWorkbookEditSessions(parentWorkbook);
+      var wsSession = workbookSessions.FirstOrDefault(session => string.Equals(session.EditDialog.WorkbookName, parentWorkbook.Name, StringComparison.InvariantCulture) && string.Equals(session.EditDialog.WorksheetName, worksheet.Name, StringComparison.InvariantCulture));
+      if (wsSession == null)
+      {
+        return;
+      }
+
+      wsSession.EditDialog.Close();
     }
 
     /// <summary>
@@ -539,6 +706,30 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Delete the closed workbook's edit sessions from the settings file.
+    /// </summary>
+    private void DeleteCurrentWorkbookEditSessions(Excel.Workbook workbook)
+    {
+      if (workbook == null || string.IsNullOrEmpty(workbook.GetOrCreateId()))
+      {
+        return;
+      }
+
+      // Remove all sessions from the current workbook.
+      var workbookSessions = GetWorkbookEditSessions(workbook);
+      foreach (var session in workbookSessions)
+      {
+        StoredEditSessions.Remove(session);
+      }
+
+      Settings.Default.Save();
+      if (workbookSessions.Count > 0)
+      {
+        _editSessionsByWorkbook.Remove(workbook.GetOrCreateId());
+      }
+    }
+
+    /// <summary>
     /// Event delegate method fired when the <see cref="ExcelAddInPane"/> size changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -574,6 +765,35 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Performs initializations that must occur when the first Excel pane is opened by the user and not at the Add-In startup.
+    /// </summary>
+    private void ExcelAddInPaneFirstRun()
+    {
+      _editSessionsByWorkbook = new Dictionary<string, List<EditSessionInfo>>(StoredEditSessions.Count);
+      _lastDeactivatedSheetName = string.Empty;
+      _restoringExistingSession = false;
+
+      // This method is used to migrate all connections created with 1.0.6 (in a local connections file) to the Workbench connections file.
+      MySqlWorkbench.MigrateExternalConnectionsToWorkbench();
+
+      // Subscribe to Excel events
+      SetupExcelEvents(true);
+
+      // Restore saved Edit sessons
+      ShowOpenEditSessionsDialog(Application.ActiveWorkbook);
+    }
+
+    /// <summary>
+    /// Performs clean-up code that must be done after all Excel panes have been closed by the user.
+    /// </summary>
+    private void ExcelAddInPanesClosed()
+    {
+      // Unsubscribe from Excel events
+      SetupExcelEvents(false);
+      _editSessionsByWorkbook.Clear();
+    }
+
+    /// <summary>
     /// Initializes settings for the <see cref="MySqlWorkbench"/> and <see cref="MySqlWorkbenchPasswordVault"/> classes.
     /// </summary>
     private void InitializeMySqlWorkbenchStaticSettings()
@@ -584,6 +804,234 @@ namespace MySQL.ForExcel
       MySqlWorkbench.ExternalApplicationConnectionsFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\connections.xml";
       MySqlSourceTrace.LogFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\MySQLForExcel.log";
       MySqlSourceTrace.SourceTraceClass = "MySQLForExcel";
+    }
+
+    /// <summary>
+    /// Gets a subset of the <see cref="StoredEditSessions"/> list containing only sessions assocaiated to the given <see cref="Excel.Workbook"/>.
+    /// </summary>
+    /// <param name="workbook">A <see cref="Excel.Workbook"/> with active Edit sessions.</param>
+    /// <returns>A subset of the <see cref="StoredEditSessions"/> list containing only sessions assocaiated to the given <see cref="Excel.Workbook"/></returns>
+    private List<EditSessionInfo> GetWorkbookEditSessions(Excel.Workbook workbook)
+    {
+      List<EditSessionInfo> workbookSessions = null;
+      string workbookId = workbook.GetOrCreateId();
+      if (_editSessionsByWorkbook != null && !string.IsNullOrEmpty(workbookId))
+      {
+        if (_editSessionsByWorkbook.ContainsKey(workbookId))
+        {
+          workbookSessions = _editSessionsByWorkbook[workbookId];
+        }
+        else
+        {
+          workbookSessions = StoredEditSessions.FindAll(session => string.Equals(session.WorkbookGuid, workbookId, StringComparison.InvariantCulture));
+          _editSessionsByWorkbook.Add(workbookId, workbookSessions);
+        }
+      }
+
+      return workbookSessions ?? new List<EditSessionInfo>();
+    }
+
+    /// <summary>
+    /// Opens an <see cref="EditDataDialog"/> representing a saved Edit session for each of the tables.
+    /// </summary>
+    /// <param name="workbook">The workbook.</param>
+    private void OpenEditSessionsOfTables(Excel.Workbook workbook)
+    {
+      if (workbook == null)
+      {
+        return;
+      }
+
+      var workbookSessions = GetWorkbookEditSessions(workbook);
+      if (workbookSessions.Count == 0)
+      {
+        return;
+      }
+
+      var missingTables = new List<string>();
+      _restoringExistingSession = true;
+      foreach (var session in workbookSessions)
+      {
+        DbObject sessionTableObject = ActiveExcelPane.LoadedTables.FirstOrDefault(dbo => string.Equals(dbo.Name, session.TableName, StringComparison.InvariantCulture));
+        if (sessionTableObject == null)
+        {
+          missingTables.Add(session.TableName);
+          continue;
+        }
+
+        ActiveExcelPane.EditTableData(sessionTableObject, true, workbook);
+      }
+
+      if (workbookSessions.Count - missingTables.Count > 0)
+      {
+        ActiveExcelPane.ActiveEditDialog.ShowDialog();
+      }
+
+      _restoringExistingSession = false;
+
+      // If no errors were found at the opening sessions process do not display the warning message at the end.
+      if (missingTables.Count <= 0)
+      {
+        return;
+      }
+
+      var errorMessage = new StringBuilder();
+      if (missingTables.Count > 0)
+      {
+        errorMessage.AppendLine(Resources.RestoreSessionsMissingTablesMessage);
+        foreach (var table in missingTables)
+        {
+          errorMessage.AppendLine(table);
+        }
+      }
+
+      MiscUtilities.ShowCustomizedInfoDialog(InfoDialog.InfoType.Warning, Resources.RestoreSessionsWarningMessage, errorMessage.ToString());
+    }
+
+    /// <summary>
+    /// Attempts to open a <see cref="MySqlWorkbenchConnection"/> of a saved session.
+    /// </summary>
+    /// <param name="sessionConection">A <see cref="MySqlWorkbenchConnection"/> of a stored session.</param>
+    /// <returns><c>true</c> if the connection was successfully opened, <c>false</c> otherwise.</returns>
+    private bool OpenConnectionForSavedSession(MySqlWorkbenchConnection sessionConection)
+    {
+      var connectionResult = ActiveExcelPane.OpenConnection(sessionConection, false);
+      if (connectionResult.Cancelled)
+      {
+        return false;
+      }
+
+      if (connectionResult.ConnectionSuccess)
+      {
+        return true;
+      }
+
+      InfoDialog.ShowWarningDialog(Resources.RestoreSessionsOpenConnectionErrorTitle, Resources.RestoreSessionsOpenConnectionErrorDetail);
+      return false;
+    }
+
+    /// <summary>
+    /// Attempts to open a <see cref="MySqlWorkbenchConnection"/> of a saved session.
+    /// </summary>
+    /// <param name="session">A saved <see cref="EditSessionInfo"/> object.</param>
+    /// <param name="workbook">A <see cref="Excel.Workbook"/> object related to the saved session.</param>
+    /// <returns>The opened <see cref="MySqlWorkbenchConnection"/>.</returns>
+    private MySqlWorkbenchConnection OpenConnectionForSavedSession(EditSessionInfo session, Excel.Workbook workbook)
+    {
+      if (session == null || workbook == null)
+      {
+        return null;
+      }
+
+      // Check if connection in stored session still exists in the collection of Workbench connections.
+      var wbSessionConnection = MySqlWorkbench.Connections.GetConnectionForId(session.ConnectionId);
+      DialogResult dialogResult;
+      if (wbSessionConnection == null)
+      {
+        dialogResult = MiscUtilities.ShowCustomizedWarningDialog(Resources.RestoreSessionsOpenConnectionErrorTitle, Resources.RestoreSessionsWBConnectionNoLongerExistsFailedDetail);
+        if (dialogResult == DialogResult.Yes)
+        {
+          DeleteCurrentWorkbookEditSessions(workbook);
+        }
+
+        return null;
+      }
+
+      if (ActiveExcelPane.WbConnection == null)
+      {
+        // If the connection in the active pane is null it means an active connection does not exist, so open a connection.
+        if (!OpenConnectionForSavedSession(wbSessionConnection))
+        {
+          return null;
+        }
+      }
+      else if (!string.Equals(wbSessionConnection.HostIdentifier, ActiveExcelPane.WbConnection.HostIdentifier, StringComparison.InvariantCulture))
+      {
+        // If the stored connection points to a different host as the current connection, ask the user if he wants to open a new connection only if there are active Edit dialogs.
+        if (_editSessionsByWorkbook.Count > 1)
+        {
+          dialogResult = InfoDialog.ShowYesNoDialog(
+            InfoDialog.InfoType.Warning,
+            Resources.RestoreSessionsTitle,
+            Resources.RestoreSessionsOpenConnectionCloseEditDialogsDetail,
+            null,
+            Resources.RestoreSessionsOpenConnectionCloseEditDialogsMoreInfo);
+          if (dialogResult == DialogResult.No)
+          {
+            return null;
+          }
+
+          ActiveExcelPane.CloseSchema(false, false);
+          ActiveExcelPane.CloseConnection(false);
+        }
+
+        if (!OpenConnectionForSavedSession(wbSessionConnection))
+        {
+          return null;
+        }
+      }
+
+      return ActiveExcelPane.WbConnection;
+    }
+
+    ///  <summary>
+    /// Restores saved Edit sessions from the given <see cref="Excel.Workbook"/>.
+    /// </summary>
+    /// <param name="workbook">An <see cref="Excel.Workbook"/> with saved Edit sessions.</param>
+    private void RestoreEditSessions(Excel.Workbook workbook)
+    {
+      if (workbook == null || ActiveExcelPane == null || _editSessionsByWorkbook.ContainsKey(workbook.GetOrCreateId()))
+      {
+        return;
+      }
+
+      // Add the sessions for the workbook being opened to the dictionary of sessions.
+      // The GetWorkbookEditSessions method will add the sessions related to the workbook it if they haven't been added.
+      var  workbookEditSessions = GetWorkbookEditSessions(workbook);
+      if (!Settings.Default.EditSessionsRestoreWhenOpeningWorkbook || workbookEditSessions.Count == 0)
+      {
+        return;
+      }
+
+      // Open the connection from the session, check also if the current connection can be used to avoid opening a new one.
+      var currenConnection = ActiveExcelPane.WbConnection;
+      var firstSession = workbookEditSessions[0];
+      var currentSchema = currenConnection != null ? currenConnection.Schema : string.Empty;
+      var sessionConnection = OpenConnectionForSavedSession(firstSession, workbook);
+      if (sessionConnection == null)
+      {
+        return;
+      }
+
+      // Close the current schema if the current connection is being reused but the session schema is different
+      bool connectionReused = sessionConnection.Equals(currenConnection);
+      bool openSchema = !connectionReused;
+      if (connectionReused && !string.Equals(currentSchema, firstSession.SchemaName, StringComparison.InvariantCulture))
+      {
+        if (!ActiveExcelPane.CloseSchema(true, false))
+        {
+          return;
+        }
+
+        openSchema = true;
+      }
+
+      if (openSchema)
+      {
+        // Verify if the session schema to be opened still exists in the connected MySQL server
+        if (!ActiveExcelPane.LoadedSchemas.Contains(firstSession.SchemaName))
+        {
+          var errorMessage = string.Format(Resources.RestoreSessionsSchemaNoLongerExistsFailed, sessionConnection.HostIdentifier, sessionConnection.Schema);
+          MiscUtilities.ShowCustomizedInfoDialog(InfoDialog.InfoType.Error, errorMessage);
+          return;
+        }
+
+        // Open the session schema
+        ActiveExcelPane.OpenSchema(firstSession.SchemaName, true);
+      }
+
+      // Open the Edit sessions for each of the tables being edited
+      OpenEditSessionsOfTables(workbook);
     }
 
     /// <summary>
@@ -635,27 +1083,56 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Shows a <see cref="RestoreEditSessionsDialog"/> to the users to decide what to do with saved Edit sessions.
+    /// </summary>
+    /// <param name="workbook">The <see cref="Excel.Workbook"/> that may contain saved Edit sessions.</param>
+    private void ShowOpenEditSessionsDialog(Excel.Workbook workbook)
+    {
+      if (workbook == null)
+      {
+        return;
+      }
+
+      var workbookId = workbook.GetOrCreateId();
+      if (!StoredEditSessions.Exists(session => session.WorkbookGuid == workbookId) || _editSessionsByWorkbook.ContainsKey(workbookId))
+      {
+        return;
+      }
+
+      switch (RestoreEditSessionsDialog.ShowAndDispose())
+      {
+        case DialogResult.Abort:
+          // Discard: Do not open any and delete all saved sessions for the current workbook.
+          DeleteCurrentWorkbookEditSessions(workbook);
+          break;
+
+        case DialogResult.Yes:
+          // Attempt to restore Edit sessions for the workbook beeing opened
+          RestoreEditSessions(workbook);
+          break;
+      }
+    }
+
+    /// <summary>
     /// Event delegate method fired when the <see cref="ThisAddIn"/> is closed.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
     private void ThisAddIn_Shutdown(object sender, EventArgs e)
     {
-      MySqlSourceTrace.WriteToLog(Resources.ShutdownMessage, SourceLevels.Information);
-
       // Close all Excel panes created
       if (ExcelPanesList == null)
       {
         return;
       }
 
-      // Unsibscribe from Excel events
-      SetupExcelEvents(false);
-
       foreach (ExcelAddInPane excelPane in ExcelPanesList)
       {
         excelPane.Dispose();
       }
+
+      ExcelAddInPanesClosed();
+      MySqlSourceTrace.WriteToLog(Resources.ShutdownMessage, SourceLevels.Information);
     }
 
     /// <summary>
@@ -690,12 +1167,6 @@ namespace MySQL.ForExcel
         {
           ConvertSettingsStoredMappingsCasing();
         }
-
-        // This method is used to migrate all connections created with 1.0.6 (in a local connections file) to the Workbench connections file.
-        MySqlWorkbench.MigrateExternalConnectionsToWorkbench();
-
-        // Subscribe to Excel events
-        SetupExcelEvents(true);
       }
       catch (Exception ex)
       {

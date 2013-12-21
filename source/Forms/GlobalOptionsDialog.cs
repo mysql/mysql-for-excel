@@ -42,7 +42,9 @@ namespace MySQL.ForExcel.Forms
       PreviewSqlQueriesRadioButton.Checked = Settings.Default.GlobalSqlQueriesPreviewQueries;
       ShowExecutedSqlQueryRadioButton.Checked = Settings.Default.GlobalSqlQueriesShowQueriesWithResults;
       NoSqlStatementsRadioButton.Checked = !PreviewSqlQueriesRadioButton.Checked && !ShowExecutedSqlQueryRadioButton.Checked;
-      AllowToSaveEditingSessionsCheckBox.Checked = Settings.Default.EditRestoreEditSessions;
+      RestoreSavedEditSessionsCheckBox.Checked = Settings.Default.EditSessionsRestoreWhenOpeningWorkbook;
+      ReuseWorksheetsRadioButton.Checked = Settings.Default.EditSessionsReuseWorksheets;
+      CreateNewWorksheetsRadioButton.Checked = !ReuseWorksheetsRadioButton.Checked;
     }
 
     /// <summary>
@@ -62,8 +64,20 @@ namespace MySQL.ForExcel.Forms
       Settings.Default.EditUseOptimisticUpdate = UseOptimisticUpdatesCheckBox.Checked;
       Settings.Default.GlobalSqlQueriesPreviewQueries = PreviewSqlQueriesRadioButton.Checked;
       Settings.Default.GlobalSqlQueriesShowQueriesWithResults = ShowExecutedSqlQueryRadioButton.Checked;
-      Settings.Default.EditRestoreEditSessions = AllowToSaveEditingSessionsCheckBox.Checked;
+      Settings.Default.EditSessionsRestoreWhenOpeningWorkbook = RestoreSavedEditSessionsCheckBox.Checked;
+      Settings.Default.EditSessionsReuseWorksheets = ReuseWorksheetsRadioButton.Checked;
       MiscUtilities.SaveSettings();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="RestoreSavedEditSessionsCheckBox"/> checked value changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void RestoreSavedEditSessionsCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+      ReuseWorksheetsRadioButton.Enabled = RestoreSavedEditSessionsCheckBox.Checked;
+      CreateNewWorksheetsRadioButton.Enabled = RestoreSavedEditSessionsCheckBox.Checked;
     }
   }
 }

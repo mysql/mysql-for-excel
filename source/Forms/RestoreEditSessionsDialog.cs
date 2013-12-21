@@ -17,7 +17,6 @@
 
 using System;
 using System.Windows.Forms;
-using MySQL.ForExcel.Properties;
 using MySQL.Utility.Forms;
 
 namespace MySQL.ForExcel.Forms
@@ -25,24 +24,29 @@ namespace MySQL.ForExcel.Forms
   /// <summary>
   /// Offers users options to delete, keep for later or reopen saved edit sessions in the current workbook.
   /// </summary>
-  public partial class OpenEditingSessionsDialog : AutoStyleableBaseDialog
+  public partial class RestoreEditSessionsDialog : AutoStyleableBaseDialog
   {
     /// <summary>
-    /// Initializes a new instance of the <see cref="OpenEditingSessionsDialog"/> class.
+    /// Initializes a new instance of the <see cref="RestoreEditSessionsDialog"/> class.
     /// </summary>
-    public OpenEditingSessionsDialog(bool enableOpenSessions, string openingSchema, string activeSchema)
+    public RestoreEditSessionsDialog()
     {
       InitializeComponent();
-      OpenButton.Enabled = enableOpenSessions;
-      if (enableOpenSessions)
+    }
+
+    /// <summary>
+    /// Shows the <see cref="RestoreEditSessionsDialog"/>.
+    /// </summary>
+    /// <returns>One of the <see cref="DialogResult"/> values.</returns>
+    public static DialogResult ShowAndDispose()
+    {
+      DialogResult dr;
+      using (var openEditSessionsDialog = new RestoreEditSessionsDialog())
       {
-        return;
+        dr = openEditSessionsDialog.ShowDialog();
       }
 
-      LogoPictureBox.Image = Resources.MySQLforExcel_InfoDlg_Warning_64x64;
-      OperationSummaryLabel.Visible = false;
-      OperationSummaryWarningLabel.Text = string.Format(Resources.EditUnableToOpenSessionsMessage, openingSchema, activeSchema);
-      OperationSummaryWarningLabel.Visible = true;
+      return dr;
     }
 
     /// <summary>

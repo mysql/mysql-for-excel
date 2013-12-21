@@ -486,7 +486,7 @@ To be able to make modifications on cells not related to MySQL data please exit 
   <data name="EditDataDeleteLastRowNotPermittedErrorTitle" xml:space="preserve">
     <value>Deleting last row for insertions is not permitted.</value>
   </data>
-    <data name="WorksheetInEditModeWarningDetail" xml:space="preserve">
+  <data name="WorksheetInEditModeWarningDetail" xml:space="preserve">
     <value>Data Imports cannot be done into a Worksheet in Edit Mode, do you want to import the data into a new Worksheet?</value>
   </data>
   <data name="WorksheetInEditModeWarningTitle" xml:space="preserve">
@@ -771,6 +771,12 @@ Please select your MySQL connection again to retry.</value>
     <value>The Excel Workbook being saved contains Worksheets that are password-protected to be used by MySQL for Excel in Edit Mode.
 Do you want to exit Edit Mode on all Worksheets within the Workbook before saving?</value>
   </data>
+  <data name="WorksheetInEditModeSavingWarningMoreInfo" xml:space="preserve">
+    <value>MySQL for Excel password-protects Excel Worksheets in Edit Mode. The next time the saved Workbook is opened those Worksheets will remain protected, so in order to save the Workbook the following is recommended:
+
+* Exit Edit Mode in all Excel Worksheets before saving so this warning is not shown.
+* If you choose not to exit Edit Mode and save anyway, you will be able to unprotect the Worksheets after MySQL for Excel is closed using the protection passwords output to the application log.</value>
+  </data>
   <data name="WorksheetInEditModeSavingWarningTitle" xml:space="preserve">
     <value>Workbook contains password protected Worksheets.</value>
   </data>
@@ -840,6 +846,33 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
   <data name="WorkbookSavingDetailText" xml:space="preserve">
     <value>Want to save your changes to '{0}'?</value>
   </data>
+  <data name="RestoreSessionsWBConnectionNoLongerExistsFailedDetail" xml:space="preserve">
+    <value>The session's connection no longer exists. It was probably deleted from another program. Do you want to delete the saved sessions related to the current workbook?</value>
+  </data>
+  <data name="RestoreSessionsSchemaNoLongerExistsFailed" xml:space="preserve">
+    <value>The schema {0}.{1} no longer exists. The probable reason for this is because it was deleted from the server's instance.</value>
+  </data>
+  <data name="RestoreSessionsMissingTablesMessage" xml:space="preserve">
+    <value>The following tables no longer exist:</value>
+  </data>
+  <data name="RestoreSessionsWarningMessage" xml:space="preserve">
+    <value>There where some issues while opening sessions.</value>
+  </data>
+  <data name="RestoreSessionsOpenConnectionErrorTitle" xml:space="preserve">
+    <value>Unable to open session's connection</value>
+  </data>
+  <data name="RestoreSessionsOpenConnectionErrorDetail" xml:space="preserve">
+    <value>A connection to the host in the saved session could not be made, the host is unreachable or credentials are wrong.</value>
+  </data>
+  <data name="RestoreSessionsOpenConnectionCloseEditDialogsDetail" xml:space="preserve">
+    <value>The current connection needs to be closed along with any open Edit sessions in order to restore the Edit sessions. Do you want to continue?</value>
+  </data>
+  <data name="RestoreSessionsOpenConnectionCloseEditDialogsMoreInfo" xml:space="preserve">
+    <value>The saved Edit sessions use a connection to a MySQL server different than the currently connected one. In order to restore the saved Edit sessions the current connection must be closed before opening a new one. Closing a connection also closes any active Edit sessions using that connection.</value>
+  </data>
+  <data name="RestoreSessionsTitle" xml:space="preserve">
+    <value>Restoring Edit Sessions</value>
+  </data>
   <data name="ExportDataErrorCreatingTableText" xml:space="preserve">
     <value>The MySQL Table "{0}" could not be created because of the following error(s):</value>
   </data>
@@ -848,23 +881,5 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
   </data>
   <data name="ExportDataOperationErrorNoRowsText" xml:space="preserve">
     <value>The MySQL Table "{0}" has been created with no data due errors.</value>
-  </data>
-  <data name="EditUnableToOpenSessionsMessage" xml:space="preserve">
-    <value>Saved sessions belong to schema '{0}' and cannot be opened, the current schema '{1}' contains active sessions.</value>
-  </data>
-  <data name="EditReopeningWBConnectionNoLongerExistsFailedDetail" xml:space="preserve">
-    <value>The session's connection no longer exists. It was probably deleted from another program. Do you want to delete the saved sessions related to the current workbook?</value>
-  </data>
-  <data name="EditReopeningSchemaNoLongerExistsFailed" xml:space="preserve">
-    <value>The schema {0}.{1} no longer exists. The probable reason for this is because it was deleted from the server's instance.</value>
-  </data>
-  <data name="EditReopeningMissingTablesMessage" xml:space="preserve">
-    <value>The following tables no longer exist:</value>
-  </data>
-  <data name="EditReopeningWarningMessage" xml:space="preserve">
-    <value>There where some issues while opening sessions.</value>
-  </data>
-  <data name="EditReopeningWBConnectionNoLongerExistsFailedTitle" xml:space="preserve">
-    <value>Unable to open session's connection</value>
   </data>
 </root>

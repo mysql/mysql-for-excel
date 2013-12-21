@@ -16,8 +16,11 @@
 // 02110-1301  USA
 
 using System;
+using System.Drawing;
 using System.Xml.Serialization;
+using Microsoft.Office.Interop.Excel;
 using MySQL.ForExcel.Forms;
+using Point = System.Drawing.Point;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -27,13 +30,18 @@ namespace MySQL.ForExcel.Classes
   [Serializable]
   public class EditSessionInfo
   {
+    #region Fields
+
     private EditDataDialog _editDialog;
+
+    #endregion Fields
 
     /// <summary>
     /// DO NOT REMOVE. Default constructor required for serialization-deserialization.
     /// </summary>
     public EditSessionInfo()
     {
+      _editDialog = null;
     }
 
     /// <summary>
@@ -43,38 +51,24 @@ namespace MySQL.ForExcel.Classes
     /// <param name="wbConnectionId">Workbench Connection information to open the edit session.</param>
     /// <param name="schema">Name of the Schema used by the edit session.</param>
     /// <param name="table">Name of the table used by the edit session.</param>
-    public EditSessionInfo(string workbookGuid, string wbConnectionId, string schema, string table)
+    /// <param name="workbookFilePath">The workbook full path name.</param>
+    public EditSessionInfo(string workbookGuid, string wbConnectionId, string schema, string table, string workbookFilePath)
     {
-      WorkbookGuid = workbookGuid;
+      _editDialog = null;
       ConnectionId = wbConnectionId;
       SchemaName = schema;
       TableName = table;
-      _editDialog = null;
+      WorkbookGuid = workbookGuid;
+      WorkbookFilePath = workbookFilePath;
     }
 
-    /// <summary>
-    /// Gets or sets the workbook guid on excel the session is making the edit.
-    /// </summary>
-    [XmlAttribute]
-    public string WorkbookGuid { get; set; }
+    #region Properties
 
     /// <summary>
     /// Gets or sets the connection information the session works with, contains credentials with remote access permissions to the reffered MySQL instance in it.
     /// </summary>
     [XmlAttribute]
     public string ConnectionId { get; set; }
-
-    /// <summary>
-    /// Gets or sets the name of the schema the connection works with.
-    /// </summary>
-    [XmlAttribute]
-    public string SchemaName { get; set; }
-
-    /// <summary>
-    /// Gets or sets the table name the connection works with.
-    /// </summary>
-    [XmlAttribute]
-    public string TableName { get; set; }
 
     /// <summary>
     /// Gets or sets the active <see cref="EditDataDialog"/> object of an editing session.
@@ -96,6 +90,32 @@ namespace MySQL.ForExcel.Classes
         }
       }
     }
+
+    /// <summary>
+    /// Gets or sets the name of the schema the connection works with.
+    /// </summary>
+    [XmlAttribute]
+    public string SchemaName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the table name the connection works with.
+    /// </summary>
+    [XmlAttribute]
+    public string TableName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the workbook guid on excel the session is making the edit.
+    /// </summary>
+    [XmlAttribute]
+    public string WorkbookGuid { get; set; }
+
+    /// <summary>
+    /// Gets or sets the workbook full path name.
+    /// </summary>
+    [XmlAttribute]
+    public string WorkbookFilePath { get; set; }
+
+    #endregion Properties
 
     /// <summary>
     /// Determines whether this session has same workbook and table as the specified comparing session.

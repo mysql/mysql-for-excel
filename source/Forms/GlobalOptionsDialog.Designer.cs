@@ -56,16 +56,22 @@ namespace MySQL.ForExcel.Forms
       this.QueryTimeoutNumericUpDown = new System.Windows.Forms.NumericUpDown();
       this.QueryTimeout1Label = new System.Windows.Forms.Label();
       this.SqlQueriesLabel = new System.Windows.Forms.Label();
-      this.UseOptimisticUpdatesCheckBox = new System.Windows.Forms.CheckBox();
-      this.NoSqlStatementsRadioButton = new System.Windows.Forms.RadioButton();
-      this.PreviewSqlQueriesRadioButton = new System.Windows.Forms.RadioButton();
-      this.ShowExecutedSqlQueryRadioButton = new System.Windows.Forms.RadioButton();
-      this.AllowToSaveEditingSessionsCheckBox = new System.Windows.Forms.CheckBox();
+      this.RestoreSavedEditSessionsCheckBox = new System.Windows.Forms.CheckBox();
       this.EditSessionOptionsLabel = new System.Windows.Forms.Label();
+      this.UseOptimisticUpdatesCheckBox = new System.Windows.Forms.CheckBox();
+      this.ShowQueriesOptionsPanel = new System.Windows.Forms.Panel();
+      this.ShowExecutedSqlQueryRadioButton = new System.Windows.Forms.RadioButton();
+      this.PreviewSqlQueriesRadioButton = new System.Windows.Forms.RadioButton();
+      this.NoSqlStatementsRadioButton = new System.Windows.Forms.RadioButton();
+      this.panel1 = new System.Windows.Forms.Panel();
+      this.CreateNewWorksheetsRadioButton = new System.Windows.Forms.RadioButton();
+      this.ReuseWorksheetsRadioButton = new System.Windows.Forms.RadioButton();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.ConnectionTimeoutNumericUpDown)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.QueryTimeoutNumericUpDown)).BeginInit();
+      this.ShowQueriesOptionsPanel.SuspendLayout();
+      this.panel1.SuspendLayout();
       this.SuspendLayout();
       // 
       // FootnoteAreaPanel
@@ -75,12 +81,11 @@ namespace MySQL.ForExcel.Forms
       // 
       // ContentAreaPanel
       // 
-      this.ContentAreaPanel.Controls.Add(this.AllowToSaveEditingSessionsCheckBox);
-      this.ContentAreaPanel.Controls.Add(this.EditSessionOptionsLabel);
-      this.ContentAreaPanel.Controls.Add(this.ShowExecutedSqlQueryRadioButton);
-      this.ContentAreaPanel.Controls.Add(this.PreviewSqlQueriesRadioButton);
-      this.ContentAreaPanel.Controls.Add(this.NoSqlStatementsRadioButton);
+      this.ContentAreaPanel.Controls.Add(this.panel1);
       this.ContentAreaPanel.Controls.Add(this.UseOptimisticUpdatesCheckBox);
+      this.ContentAreaPanel.Controls.Add(this.ShowQueriesOptionsPanel);
+      this.ContentAreaPanel.Controls.Add(this.RestoreSavedEditSessionsCheckBox);
+      this.ContentAreaPanel.Controls.Add(this.EditSessionOptionsLabel);
       this.ContentAreaPanel.Controls.Add(this.SqlQueriesLabel);
       this.ContentAreaPanel.Controls.Add(this.QueryTimeout2Label);
       this.ContentAreaPanel.Controls.Add(this.QueryTimeoutNumericUpDown);
@@ -90,13 +95,13 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.ConnectionTimeout1Label);
       this.ContentAreaPanel.Controls.Add(this.GlobalOptionsLabel);
       this.ContentAreaPanel.Controls.Add(this.ConnectionOptionsLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(504, 401);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(504, 451);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 356);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 406);
       this.CommandAreaPanel.Size = new System.Drawing.Size(504, 45);
       // 
       // DialogAcceptButton
@@ -184,7 +189,7 @@ namespace MySQL.ForExcel.Forms
       this.ConnectionTimeout2Label.Location = new System.Drawing.Point(148, 85);
       this.ConnectionTimeout2Label.Name = "ConnectionTimeout2Label";
       this.ConnectionTimeout2Label.Size = new System.Drawing.Size(310, 15);
-      this.ConnectionTimeout2Label.TabIndex = 9;
+      this.ConnectionTimeout2Label.TabIndex = 4;
       this.ConnectionTimeout2Label.Text = "seconds for a connection to the server before timing out.";
       // 
       // QueryTimeout2Label
@@ -194,7 +199,7 @@ namespace MySQL.ForExcel.Forms
       this.QueryTimeout2Label.Location = new System.Drawing.Point(148, 112);
       this.QueryTimeout2Label.Name = "QueryTimeout2Label";
       this.QueryTimeout2Label.Size = new System.Drawing.Size(324, 15);
-      this.QueryTimeout2Label.TabIndex = 12;
+      this.QueryTimeout2Label.TabIndex = 7;
       this.QueryTimeout2Label.Text = "seconds for a database query to execute before timing out.";
       // 
       // QueryTimeoutNumericUpDown
@@ -213,7 +218,7 @@ namespace MySQL.ForExcel.Forms
             0});
       this.QueryTimeoutNumericUpDown.Name = "QueryTimeoutNumericUpDown";
       this.QueryTimeoutNumericUpDown.Size = new System.Drawing.Size(52, 21);
-      this.QueryTimeoutNumericUpDown.TabIndex = 11;
+      this.QueryTimeoutNumericUpDown.TabIndex = 6;
       this.QueryTimeoutNumericUpDown.Value = new decimal(new int[] {
             1,
             0,
@@ -227,7 +232,7 @@ namespace MySQL.ForExcel.Forms
       this.QueryTimeout1Label.Location = new System.Drawing.Point(50, 112);
       this.QueryTimeout1Label.Name = "QueryTimeout1Label";
       this.QueryTimeout1Label.Size = new System.Drawing.Size(34, 15);
-      this.QueryTimeout1Label.TabIndex = 10;
+      this.QueryTimeout1Label.TabIndex = 5;
       this.QueryTimeout1Label.Text = "Wait ";
       // 
       // SqlQueriesLabel
@@ -239,61 +244,19 @@ namespace MySQL.ForExcel.Forms
       this.SqlQueriesLabel.Location = new System.Drawing.Point(24, 151);
       this.SqlQueriesLabel.Name = "SqlQueriesLabel";
       this.SqlQueriesLabel.Size = new System.Drawing.Size(130, 17);
-      this.SqlQueriesLabel.TabIndex = 13;
+      this.SqlQueriesLabel.TabIndex = 8;
       this.SqlQueriesLabel.Text = "SQL Queries Options";
       // 
-      // UseOptimisticUpdatesCheckBox
+      // RestoreSavedEditSessionsCheckBox
       // 
-      this.UseOptimisticUpdatesCheckBox.AutoSize = true;
-      this.UseOptimisticUpdatesCheckBox.Location = new System.Drawing.Point(53, 180);
-      this.UseOptimisticUpdatesCheckBox.Name = "UseOptimisticUpdatesCheckBox";
-      this.UseOptimisticUpdatesCheckBox.Size = new System.Drawing.Size(250, 17);
-      this.UseOptimisticUpdatesCheckBox.TabIndex = 14;
-      this.UseOptimisticUpdatesCheckBox.Text = "Use optimistic updates on all Edit Data sessions";
-      this.UseOptimisticUpdatesCheckBox.UseVisualStyleBackColor = true;
-      // 
-      // NoSqlStatementsRadioButton
-      // 
-      this.NoSqlStatementsRadioButton.AutoSize = true;
-      this.NoSqlStatementsRadioButton.Location = new System.Drawing.Point(53, 203);
-      this.NoSqlStatementsRadioButton.Name = "NoSqlStatementsRadioButton";
-      this.NoSqlStatementsRadioButton.Size = new System.Drawing.Size(248, 17);
-      this.NoSqlStatementsRadioButton.TabIndex = 17;
-      this.NoSqlStatementsRadioButton.TabStop = true;
-      this.NoSqlStatementsRadioButton.Text = "Do not show SQL statements sent to the server";
-      this.NoSqlStatementsRadioButton.UseVisualStyleBackColor = true;
-      // 
-      // PreviewSqlQueriesRadioButton
-      // 
-      this.PreviewSqlQueriesRadioButton.AutoSize = true;
-      this.PreviewSqlQueriesRadioButton.Location = new System.Drawing.Point(53, 226);
-      this.PreviewSqlQueriesRadioButton.Name = "PreviewSqlQueriesRadioButton";
-      this.PreviewSqlQueriesRadioButton.Size = new System.Drawing.Size(300, 17);
-      this.PreviewSqlQueriesRadioButton.TabIndex = 18;
-      this.PreviewSqlQueriesRadioButton.TabStop = true;
-      this.PreviewSqlQueriesRadioButton.Text = "Preview SQL statements before they are sent to the server";
-      this.PreviewSqlQueriesRadioButton.UseVisualStyleBackColor = true;
-      // 
-      // ShowExecutedSqlQueryRadioButton
-      // 
-      this.ShowExecutedSqlQueryRadioButton.AutoSize = true;
-      this.ShowExecutedSqlQueryRadioButton.Location = new System.Drawing.Point(53, 249);
-      this.ShowExecutedSqlQueryRadioButton.Name = "ShowExecutedSqlQueryRadioButton";
-      this.ShowExecutedSqlQueryRadioButton.Size = new System.Drawing.Size(284, 17);
-      this.ShowExecutedSqlQueryRadioButton.TabIndex = 19;
-      this.ShowExecutedSqlQueryRadioButton.TabStop = true;
-      this.ShowExecutedSqlQueryRadioButton.Text = "Show executed SQL statements along with their results";
-      this.ShowExecutedSqlQueryRadioButton.UseVisualStyleBackColor = true;
-      // 
-      // AllowToSaveEditingSessionsCheckBox
-      // 
-      this.AllowToSaveEditingSessionsCheckBox.AutoSize = true;
-      this.AllowToSaveEditingSessionsCheckBox.Location = new System.Drawing.Point(53, 315);
-      this.AllowToSaveEditingSessionsCheckBox.Name = "AllowToSaveEditingSessionsCheckBox";
-      this.AllowToSaveEditingSessionsCheckBox.Size = new System.Drawing.Size(193, 17);
-      this.AllowToSaveEditingSessionsCheckBox.TabIndex = 18;
-      this.AllowToSaveEditingSessionsCheckBox.Text = "Allow to restore active edit sessions";
-      this.AllowToSaveEditingSessionsCheckBox.UseVisualStyleBackColor = true;
+      this.RestoreSavedEditSessionsCheckBox.AutoSize = true;
+      this.RestoreSavedEditSessionsCheckBox.Location = new System.Drawing.Point(53, 315);
+      this.RestoreSavedEditSessionsCheckBox.Name = "RestoreSavedEditSessionsCheckBox";
+      this.RestoreSavedEditSessionsCheckBox.Size = new System.Drawing.Size(323, 17);
+      this.RestoreSavedEditSessionsCheckBox.TabIndex = 12;
+      this.RestoreSavedEditSessionsCheckBox.Text = "Restore saved Edit sessions when opening an Excel workbook";
+      this.RestoreSavedEditSessionsCheckBox.UseVisualStyleBackColor = true;
+      this.RestoreSavedEditSessionsCheckBox.CheckedChanged += new System.EventHandler(this.RestoreSavedEditSessionsCheckBox_CheckedChanged);
       // 
       // EditSessionOptionsLabel
       // 
@@ -304,15 +267,99 @@ namespace MySQL.ForExcel.Forms
       this.EditSessionOptionsLabel.Location = new System.Drawing.Point(24, 286);
       this.EditSessionOptionsLabel.Name = "EditSessionOptionsLabel";
       this.EditSessionOptionsLabel.Size = new System.Drawing.Size(134, 17);
-      this.EditSessionOptionsLabel.TabIndex = 17;
+      this.EditSessionOptionsLabel.TabIndex = 11;
       this.EditSessionOptionsLabel.Text = "Edit Sesssion Options";
+      // 
+      // UseOptimisticUpdatesCheckBox
+      // 
+      this.UseOptimisticUpdatesCheckBox.AutoSize = true;
+      this.UseOptimisticUpdatesCheckBox.Location = new System.Drawing.Point(53, 180);
+      this.UseOptimisticUpdatesCheckBox.Name = "UseOptimisticUpdatesCheckBox";
+      this.UseOptimisticUpdatesCheckBox.Size = new System.Drawing.Size(250, 17);
+      this.UseOptimisticUpdatesCheckBox.TabIndex = 9;
+      this.UseOptimisticUpdatesCheckBox.Text = "Use optimistic updates on all Edit Data sessions";
+      this.UseOptimisticUpdatesCheckBox.UseVisualStyleBackColor = true;
+      // 
+      // ShowQueriesOptionsPanel
+      // 
+      this.ShowQueriesOptionsPanel.Controls.Add(this.ShowExecutedSqlQueryRadioButton);
+      this.ShowQueriesOptionsPanel.Controls.Add(this.PreviewSqlQueriesRadioButton);
+      this.ShowQueriesOptionsPanel.Controls.Add(this.NoSqlStatementsRadioButton);
+      this.ShowQueriesOptionsPanel.Location = new System.Drawing.Point(21, 191);
+      this.ShowQueriesOptionsPanel.Name = "ShowQueriesOptionsPanel";
+      this.ShowQueriesOptionsPanel.Size = new System.Drawing.Size(461, 79);
+      this.ShowQueriesOptionsPanel.TabIndex = 10;
+      // 
+      // ShowExecutedSqlQueryRadioButton
+      // 
+      this.ShowExecutedSqlQueryRadioButton.AutoSize = true;
+      this.ShowExecutedSqlQueryRadioButton.Location = new System.Drawing.Point(32, 56);
+      this.ShowExecutedSqlQueryRadioButton.Name = "ShowExecutedSqlQueryRadioButton";
+      this.ShowExecutedSqlQueryRadioButton.Size = new System.Drawing.Size(284, 17);
+      this.ShowExecutedSqlQueryRadioButton.TabIndex = 2;
+      this.ShowExecutedSqlQueryRadioButton.TabStop = true;
+      this.ShowExecutedSqlQueryRadioButton.Text = "Show executed SQL statements along with their results";
+      this.ShowExecutedSqlQueryRadioButton.UseVisualStyleBackColor = true;
+      // 
+      // PreviewSqlQueriesRadioButton
+      // 
+      this.PreviewSqlQueriesRadioButton.AutoSize = true;
+      this.PreviewSqlQueriesRadioButton.Location = new System.Drawing.Point(32, 33);
+      this.PreviewSqlQueriesRadioButton.Name = "PreviewSqlQueriesRadioButton";
+      this.PreviewSqlQueriesRadioButton.Size = new System.Drawing.Size(300, 17);
+      this.PreviewSqlQueriesRadioButton.TabIndex = 1;
+      this.PreviewSqlQueriesRadioButton.TabStop = true;
+      this.PreviewSqlQueriesRadioButton.Text = "Preview SQL statements before they are sent to the server";
+      this.PreviewSqlQueriesRadioButton.UseVisualStyleBackColor = true;
+      // 
+      // NoSqlStatementsRadioButton
+      // 
+      this.NoSqlStatementsRadioButton.AutoSize = true;
+      this.NoSqlStatementsRadioButton.Location = new System.Drawing.Point(32, 10);
+      this.NoSqlStatementsRadioButton.Name = "NoSqlStatementsRadioButton";
+      this.NoSqlStatementsRadioButton.Size = new System.Drawing.Size(248, 17);
+      this.NoSqlStatementsRadioButton.TabIndex = 0;
+      this.NoSqlStatementsRadioButton.TabStop = true;
+      this.NoSqlStatementsRadioButton.Text = "Do not show SQL statements sent to the server";
+      this.NoSqlStatementsRadioButton.UseVisualStyleBackColor = true;
+      // 
+      // panel1
+      // 
+      this.panel1.Controls.Add(this.CreateNewWorksheetsRadioButton);
+      this.panel1.Controls.Add(this.ReuseWorksheetsRadioButton);
+      this.panel1.Location = new System.Drawing.Point(21, 333);
+      this.panel1.Name = "panel1";
+      this.panel1.Size = new System.Drawing.Size(461, 51);
+      this.panel1.TabIndex = 13;
+      // 
+      // CreateNewWorksheetsRadioButton
+      // 
+      this.CreateNewWorksheetsRadioButton.AutoSize = true;
+      this.CreateNewWorksheetsRadioButton.Location = new System.Drawing.Point(52, 28);
+      this.CreateNewWorksheetsRadioButton.Name = "CreateNewWorksheetsRadioButton";
+      this.CreateNewWorksheetsRadioButton.Size = new System.Drawing.Size(303, 17);
+      this.CreateNewWorksheetsRadioButton.TabIndex = 1;
+      this.CreateNewWorksheetsRadioButton.TabStop = true;
+      this.CreateNewWorksheetsRadioButton.Text = "Create new Excel worksheets for the restored Edit sessions";
+      this.CreateNewWorksheetsRadioButton.UseVisualStyleBackColor = true;
+      // 
+      // ReuseWorksheetsRadioButton
+      // 
+      this.ReuseWorksheetsRadioButton.AutoSize = true;
+      this.ReuseWorksheetsRadioButton.Location = new System.Drawing.Point(52, 5);
+      this.ReuseWorksheetsRadioButton.Name = "ReuseWorksheetsRadioButton";
+      this.ReuseWorksheetsRadioButton.Size = new System.Drawing.Size(383, 17);
+      this.ReuseWorksheetsRadioButton.TabIndex = 0;
+      this.ReuseWorksheetsRadioButton.TabStop = true;
+      this.ReuseWorksheetsRadioButton.Text = "Reuse Excel worksheets matching their names with the session table names";
+      this.ReuseWorksheetsRadioButton.UseVisualStyleBackColor = true;
       // 
       // GlobalOptionsDialog
       // 
       this.AcceptButton = this.DialogAcceptButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(504, 401);
+      this.ClientSize = new System.Drawing.Size(504, 451);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
@@ -324,6 +371,10 @@ namespace MySQL.ForExcel.Forms
       this.CommandAreaPanel.ResumeLayout(false);
       ((System.ComponentModel.ISupportInitialize)(this.ConnectionTimeoutNumericUpDown)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.QueryTimeoutNumericUpDown)).EndInit();
+      this.ShowQueriesOptionsPanel.ResumeLayout(false);
+      this.ShowQueriesOptionsPanel.PerformLayout();
+      this.panel1.ResumeLayout(false);
+      this.panel1.PerformLayout();
       this.ResumeLayout(false);
 
     }
@@ -341,11 +392,15 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.Label QueryTimeout1Label;
     private System.Windows.Forms.Label ConnectionTimeout2Label;
     private System.Windows.Forms.Label SqlQueriesLabel;
+    private System.Windows.Forms.CheckBox RestoreSavedEditSessionsCheckBox;
+    private System.Windows.Forms.Label EditSessionOptionsLabel;
     private System.Windows.Forms.CheckBox UseOptimisticUpdatesCheckBox;
+    private System.Windows.Forms.Panel ShowQueriesOptionsPanel;
     private System.Windows.Forms.RadioButton ShowExecutedSqlQueryRadioButton;
     private System.Windows.Forms.RadioButton PreviewSqlQueriesRadioButton;
     private System.Windows.Forms.RadioButton NoSqlStatementsRadioButton;
-    private System.Windows.Forms.CheckBox AllowToSaveEditingSessionsCheckBox;
-    private System.Windows.Forms.Label EditSessionOptionsLabel;
+    private System.Windows.Forms.Panel panel1;
+    private System.Windows.Forms.RadioButton CreateNewWorksheetsRadioButton;
+    private System.Windows.Forms.RadioButton ReuseWorksheetsRadioButton;
   }
 }

@@ -312,17 +312,16 @@ namespace MySQL.ForExcel.Forms
       {
         UnprotectWorksheet();
         EditingWorksheet.UsedRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+        if (!string.IsNullOrEmpty(EditingWorksheet.GetProtectionKey()))
+        {
+          EditingWorksheet.RemoveProtectionKey();
+        }
       }
 
-      var session = ParentTaskPane.WorkbookEditSessions.FirstOrDefault(ac => ac.EditDialog.Equals(this));
+      var session = Globals.ThisAddIn.ActiveWorkbookSessions.FirstOrDefault(ac => ac.EditDialog.Equals(this));
       if (session != null)
       {
-        ParentTaskPane.WorkbookEditSessions.Remove(session);
-      }
-
-      if (!string.IsNullOrEmpty(EditingWorksheet.GetProtectionKey()))
-      {
-        EditingWorksheet.RemoveRemoveProtectionKey();
+        Globals.ThisAddIn.ActiveWorkbookSessions.Remove(session);
       }
 
       Dispose();

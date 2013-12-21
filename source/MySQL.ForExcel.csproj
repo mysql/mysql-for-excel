@@ -308,12 +308,6 @@
     <Compile Include="Forms\AppendNewColumnMappingDialog.Designer.cs">
       <DependentUpon>AppendNewColumnMappingDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\OpenEditingSessionsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\OpenEditingSessionsDialog.Designer.cs">
-      <DependentUpon>OpenEditingSessionsDialog.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\GlobalOptionsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -380,6 +374,12 @@
     <Compile Include="Forms\PasswordDialog.designer.cs">
       <DependentUpon>PasswordDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\RestoreEditSessionsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\RestoreEditSessionsDialog.Designer.cs">
+      <DependentUpon>RestoreEditSessionsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\TransparentPictureBox.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -437,9 +437,6 @@
     <EmbeddedResource Include="Forms\AppendNewColumnMappingDialog.resx">
       <DependentUpon>AppendNewColumnMappingDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\OpenEditingSessionsDialog.resx">
-      <DependentUpon>OpenEditingSessionsDialog.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\GlobalOptionsDialog.resx">
       <DependentUpon>GlobalOptionsDialog.cs</DependentUpon>
     </EmbeddedResource>
@@ -472,6 +469,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PasswordDialog.resx">
       <DependentUpon>PasswordDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\RestoreEditSessionsDialog.resx">
+      <DependentUpon>RestoreEditSessionsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Panels\AutoStyleableBasePanel.resx">
       <DependentUpon>AutoStyleableBasePanel.cs</DependentUpon>
@@ -593,7 +593,7 @@
   <ProjectExtensions>
     <VisualStudio>
       <FlavorProperties GUID="{BAA0C2D2-18E2-41B9-852F-F413020CAA33}">
-        <ProjectProperties HostName="Excel" HostPackage="{29A7B9D7-A7F1-4328-8EF0-6B2D1A56B2C1}" OfficeVersion="15.0" VstxVersion="4.0" ApplicationType="Excel" Language="cs" TemplatesPath="VSTOTemplates" DebugInfoExeName="#Software\Microsoft\Office\14.0\Excel\InstallRoot\Path#excel.exe" DebugInfoCommandLine="/x " AddItemTemplatesGuid="{51063C3A-E220-4D12-8922-BDA915ACD783}" />
+        <ProjectProperties HostName="Excel" HostPackage="{29A7B9D7-A7F1-4328-8EF0-6B2D1A56B2C1}" OfficeVersion="15.0" VstxVersion="4.0" ApplicationType="Excel" Language="cs" TemplatesPath="VSTOTemplates" DebugInfoExeName="#Software\Microsoft\Office\15.0\Excel\InstallRoot\Path#excel.exe" DebugInfoCommandLine="/x " AddItemTemplatesGuid="{51063C3A-E220-4D12-8922-BDA915ACD783}" />
         <Host Name="Excel" GeneratedCodeNamespace="MySQL.ForExcel" IconIndex="0">
           <HostItem Name="ThisAddIn" Code="ThisAddIn.cs" CanonicalName="AddIn" CanActivate="false" IconIndex="1" Blueprint="ThisAddIn.Designer.xml" GeneratedCode="ThisAddIn.Designer.cs" />
         </Host>

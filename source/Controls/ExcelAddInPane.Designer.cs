@@ -36,7 +36,7 @@ namespace MySQL.ForExcel.Controls
     {
       if (disposing)
       {
-        CloseConnection();
+        CloseConnection(false);
         if (components != null)
         {
           components.Dispose();

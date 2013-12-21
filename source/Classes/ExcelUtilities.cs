@@ -527,7 +527,7 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      Excel.CustomProperty guid = properties.Cast<Excel.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetkGuid"));
+      Excel.CustomProperty guid = properties.Cast<Excel.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetGuid"));
       return guid == null ? null : guid.Value.ToString();
     }
 
@@ -632,15 +632,15 @@ namespace MySQL.ForExcel.Classes
 
     /// <summary>
     /// Removes the protectionKey property (if exists) for the current worksheet.
-    /// </summary>    
-    public static void RemoveRemoveProtectionKey(this Excel.Worksheet worksheet)
+    /// </summary>
+    public static void RemoveProtectionKey(this Excel.Worksheet worksheet)
     {
       if (worksheet == null)
       {
         return;
       }
 
-      var protectionKeyProperty = worksheet.CustomProperties.Cast<Excel.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetkGuid"));
+      var protectionKeyProperty = worksheet.CustomProperties.Cast<Excel.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetGuid"));
       if (protectionKeyProperty != null)
       {
         protectionKeyProperty.Delete();
@@ -735,11 +735,11 @@ namespace MySQL.ForExcel.Classes
         return false;
       }
 
-      var protectionKeyProperty = worksheet.CustomProperties.Cast<Excel.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetkGuid"));
+      var protectionKeyProperty = worksheet.CustomProperties.Cast<Excel.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetGuid"));
       if (protectionKeyProperty == null)
       {
         Excel.CustomProperties properties = worksheet.CustomProperties;
-        properties.Add("WorksheetkGuid", protectionKey);
+        properties.Add("WorksheetGuid", protectionKey);
         return true;
       }
       protectionKeyProperty.Value = protectionKey;
@@ -796,34 +796,36 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Checks if an Excel <see cref="Excel.Worksheet"/> with a given name exists in a <see cref="Excel.Workbook"/> with the given name.
+    /// Checks if an Excel <see cref="Excel.Worksheet"/> with a given name exists in the given <see cref="Excel.Workbook"/>.
     /// </summary>
-    /// <param name="workBookName">Name of the <see cref="Excel.Workbook"/>.</param>
-    /// <param name="workSheetName">Name of the <see cref="Excel.Worksheet"/>.</param>
+    /// <param name="workbook">The <see cref="Excel.Workbook"/>.</param>
+    /// <param name="worksheetName">Name of the <see cref="Excel.Worksheet"/>.</param>
     /// <returns><c>true</c> if the <see cref="Excel.Worksheet"/> exists, <c>false</c> otherwise.</returns>
-    public static bool WorksheetExists(string workBookName, string workSheetName)
+    public static bool WorksheetExists(this Excel.Workbook workbook, string worksheetName)
     {
-      bool exists;
-      if (workBookName.Length <= 0 || workSheetName.Length <= 0)
+      if (workbook == null || worksheetName.Length <= 0)
       {
         return false;
       }
 
-      // Maybe the last deactivated sheet has been deleted?
-      try
+      return workbook.Worksheets.Cast<Excel.Worksheet>().Any(ws => string.Equals(ws.Name, worksheetName, StringComparison.InvariantCulture));
+    }
+
+    /// <summary>
+    /// Checks if an Excel <see cref="Excel.Worksheet"/> with a given name exists in a <see cref="Excel.Workbook"/> with the given name.
+    /// </summary>
+    /// <param name="workbookName">Name of the <see cref="Excel.Workbook"/>.</param>
+    /// <param name="worksheetName">Name of the <see cref="Excel.Worksheet"/>.</param>
+    /// <returns><c>true</c> if the <see cref="Excel.Worksheet"/> exists, <c>false</c> otherwise.</returns>
+    public static bool WorksheetExists(string workbookName, string worksheetName)
+    {
+      if (workbookName.Length <= 0)
       {
-        // Do NOT remove the following lines although the wSheet variable is not used in the method the casting of the
-        // wBook.Worksheets[workSheetName] is needed to determine if the Worksheet is still valid and has not been disposed of.
-        Excel.Workbook wBook = Globals.ThisAddIn.Application.Workbooks[workBookName];
-        Excel.Worksheet wSheet = wBook.Worksheets[workSheetName] as Excel.Worksheet;
-        exists = true;
-      }
-      catch
-      {
-        exists = false;
+        return false;
       }
 
-      return exists;
+      var wBook = Globals.ThisAddIn.Application.Workbooks.Cast<Excel.Workbook>().FirstOrDefault(wb => string.Equals(wb.Name, workbookName, StringComparison.InvariantCulture));
+      return wBook != null && wBook.WorksheetExists(worksheetName);
     }
 
     /// <summary>

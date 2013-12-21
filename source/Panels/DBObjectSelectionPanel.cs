@@ -16,8 +16,10 @@
 // 02110-1301  USA
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Linq;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
@@ -34,6 +36,8 @@ namespace MySQL.ForExcel.Panels
   /// </summary>
   public partial class DbObjectSelectionPanel : AutoStyleableBasePanel
   {
+    #region Fields
+
     /// <summary>
     /// Flag indicating if the currently selected Excel range contains any data.
     /// </summary>
@@ -44,6 +48,8 @@ namespace MySQL.ForExcel.Panels
     /// </summary>
     private MySqlWorkbenchConnection _wbConnection;
 
+    #endregion Fields
+
     /// <summary>
     /// Initializes a new instance of the <see cref="DbObjectSelectionPanel"/> class.
     /// </summary>
@@ -52,6 +58,9 @@ namespace MySQL.ForExcel.Panels
       _excelSelectionContainsData = false;
       _wbConnection = null;
       Filter = string.Empty;
+      LoadedProcedures = new List<DbObject>();
+      LoadedTables = new List<DbObject>();
+      LoadedViews = new List<DbObject>();
       InitializeComponent();
 
       ConnectionNameLabel.Paint += Label_Paint;
@@ -112,6 +121,24 @@ namespace MySQL.ForExcel.Panels
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Filter { get; private set; }
+
+    /// <summary>
+    /// Gets a list of stored procedures loaded in this panel.
+    /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public List<DbObject> LoadedProcedures { get; private set; }
+
+    /// <summary>
+    /// Gets a list of tables loaded in this panel.
+    /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public List<DbObject> LoadedTables { get; private set; }
+
+    /// <summary>
+    /// Gets a list of views loaded in this panel.
+    /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public List<DbObject> LoadedViews { get; private set; }
 
     /// <summary>
     /// Gets a <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.
@@ -205,7 +232,7 @@ namespace MySQL.ForExcel.Panels
       var excelAddInPane = Parent as ExcelAddInPane;
       if (excelAddInPane != null)
       {
-        excelAddInPane.CloseSchema();
+        excelAddInPane.CloseSchema(true, true);
       }
     }
 
@@ -446,42 +473,57 @@ namespace MySQL.ForExcel.Panels
     /// <param name="dataObjectType">Type of DB object to load.</param>
     private void LoadDataObjects(DbObject.DbObjectType dataObjectType)
     {
-      DataTable objs;
-      TreeNode parent;
+      DataTable dataObjects = null;
+      TreeNode parentNode = null;
+      string objectName = string.Empty;
+      List<DbObject> loadedObjectsList = null;
 
-      string objectName;
-      if (dataObjectType == DbObject.DbObjectType.Procedure)
+      // 0 - Tables
+      // 1 - Views
+      // 2 - Procedures
+      int objectIndex = 0;
+      switch (dataObjectType)
       {
-        objs = WbConnection.GetSchemaCollection("Procedures", null, WbConnection.Schema, null, "PROCEDURE");
-        objectName = "ROUTINE_NAME";
-        parent = DBObjectList.Nodes[2];
-      }
-      else
-      {
-        objs = WbConnection.GetSchemaCollection(dataObjectType.ToString() + "s", null, WbConnection.Schema);
-        objectName = "TABLE_NAME";
-        parent = DBObjectList.Nodes[(int)dataObjectType];
+        case DbObject.DbObjectType.Procedure:
+          objectIndex = 2;
+          dataObjects = WbConnection.GetSchemaCollection("Procedures", null, WbConnection.Schema, null, "PROCEDURE");
+          objectName = "ROUTINE_NAME";
+          parentNode = DBObjectList.Nodes[objectIndex];
+          loadedObjectsList = LoadedProcedures;
+          break;
+
+        case DbObject.DbObjectType.Table:
+          dataObjects = WbConnection.GetSchemaCollection("Tables", null, WbConnection.Schema);
+          objectName = "TABLE_NAME";
+          parentNode = DBObjectList.Nodes[objectIndex];
+          loadedObjectsList = LoadedTables;
+          break;
+
+        case DbObject.DbObjectType.View:
+          objectIndex = 1;
+          dataObjects = WbConnection.GetSchemaCollection("Views", null, WbConnection.Schema);
+          objectName = "TABLE_NAME";
+          parentNode = DBObjectList.Nodes[objectIndex];
+          loadedObjectsList = LoadedViews;
+          break;
       }
 
-      if (objs == null)
+      if (dataObjects == null)
       {
         return;
       }
 
-      foreach (DataRow dataRow in objs.Rows)
+      loadedObjectsList.Clear();
+      foreach (string dbObjectName
+                in dataObjects.Rows.Cast<DataRow>()
+                .Select(dataRow => dataRow[objectName].ToString())
+                .Where(dbObjectName => string.IsNullOrEmpty(Filter) || dbObjectName.ToUpper().Contains(Filter)))
       {
-        string dataName = dataRow[objectName].ToString();
-
-        // Check our filter
-        if (!string.IsNullOrEmpty(Filter) && !dataName.ToUpper().Contains(Filter))
-        {
-          continue;
-        }
-
-        string text = dataName;
-        TreeNode node = DBObjectList.AddNode(parent, text);
-        node.Tag = new DbObject(dataName, dataObjectType);
-        node.ImageIndex = (int)dataObjectType;
+        TreeNode node = DBObjectList.AddNode(parentNode, dbObjectName);
+        var dbObj = new DbObject(dbObjectName, dataObjectType);
+        node.Tag = dbObj;
+        loadedObjectsList.Add(dbObj);
+        node.ImageIndex = objectIndex;
       }
     }
 
