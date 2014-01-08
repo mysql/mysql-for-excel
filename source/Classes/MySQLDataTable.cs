@@ -195,6 +195,19 @@ namespace MySQL.ForExcel.Classes
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MySqlDataTable"/> class.
+    /// This constructor is meant to be used by the <see cref="ImportProcedureForm"/> class to copy the contents of result set tables from an executed procedure.
+    /// </summary>
+    /// <param name="filledTable"><see cref="DataTable"/> object containing imported excelData from the MySQL table to be edited.</param>
+    public MySqlDataTable(DataTable filledTable)
+      : this()
+    {
+      TableName = filledTable.TableName;
+      CopyTableSchemaAndData(filledTable);
+      OperationType = DataOperationType.Import;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MySqlDataTable"/> class.
     /// </summary>
     public MySqlDataTable()
     {
@@ -1448,6 +1461,21 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Copies the schema and data contents of the given <see cref="DataTable"/> object to this table.
+    /// </summary>
+    /// <param name="filledTable"><see cref="DataTable"/> object containing previously retrieved data from a MySQL table.</param>
+    /// <param name="schemaOnly">Flag indicating whether only the schema is copied without data.</param>
+    private void CopyTableSchemaAndData(DataTable filledTable, bool schemaOnly = false)
+    {
+      DataTable columnsInfoTable = filledTable.GetSchemaInfo();
+      CreateTableSchema(columnsInfoTable, true);
+      if (!schemaOnly)
+      {
+        CopyTableData(filledTable);
+      }
+    }
+
+    /// <summary>
     /// Adds a specified number of <see cref="MySqlDataColumn"/> objects to the Columns collection where the first column may be an automatically created one for the table's primary index.
     /// </summary>
     /// <param name="numCols">Number of columns to add to the table not counting the auto-generated primary key column.</param>
@@ -1478,14 +1506,24 @@ namespace MySQL.ForExcel.Classes
     /// <param name="datesAsMySqlDates">Flag indicating if the dates are stored in the table as <see cref="System.DateTime"/> or <see cref="MySql.Data.Types.MySqlDateTime"/> objects.</param>
     private void CreateTableSchema(string tableName, bool datesAsMySqlDates)
     {
-      Columns.Clear();
       DataTable columnsInfoTable = WbConnection.GetSchemaCollection("Columns Short", null, WbConnection.Schema, tableName);
-      if (columnsInfoTable == null)
+      CreateTableSchema(columnsInfoTable, datesAsMySqlDates);
+    }
+
+    /// <summary>
+    /// Creates columns for this table using the information schema of a MySQL table with the given name to mirror their properties.
+    /// </summary>
+    /// <param name="schemaInfoTable">Table with schema information.</param>
+    /// <param name="datesAsMySqlDates">Flag indicating if the dates are stored in the table as <see cref="System.DateTime"/> or <see cref="MySql.Data.Types.MySqlDateTime"/> objects.</param>
+    private void CreateTableSchema(DataTable schemaInfoTable, bool datesAsMySqlDates)
+    {
+      if (schemaInfoTable == null)
       {
         return;
       }
 
-      foreach (DataRow columnInfoRow in columnsInfoTable.Rows)
+      Columns.Clear();
+      foreach (DataRow columnInfoRow in schemaInfoTable.Rows)
       {
         string colName = columnInfoRow["Field"].ToString();
         string dataType = columnInfoRow["Type"].ToString();

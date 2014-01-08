@@ -557,7 +557,8 @@ namespace MySQL.ForExcel.Classes
         }
 
         int lParensIndex = MySqlDataType.IndexOf("(", StringComparison.Ordinal);
-        return lParensIndex < 0 ? MySqlDataType : MySqlDataType.Substring(0, lParensIndex);
+        string typeMinusParenthesis = lParensIndex < 0 ? MySqlDataType : MySqlDataType.Substring(0, lParensIndex);
+        return typeMinusParenthesis.Replace("unsigned", string.Empty).TrimEnd();
       }
     }
 

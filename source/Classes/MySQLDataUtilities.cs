@@ -402,6 +402,41 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets the schema information ofr the given database collection.
+    /// </summary>
+    /// <param name="dataTable">The data table to get the schema info for.</param>
+    /// <returns>Table with schema information.</returns>
+    public static DataTable GetSchemaInfo(this DataTable dataTable)
+    {
+      if (dataTable == null)
+      {
+        return null;
+      }
+
+      DataTable schemaInfoTable = new DataTable("SchemaInfo");
+      schemaInfoTable.Columns.Add("Field");
+      schemaInfoTable.Columns.Add("Type");
+      schemaInfoTable.Columns.Add("Null");
+      schemaInfoTable.Columns.Add("Key");
+      schemaInfoTable.Columns.Add("Default");
+      schemaInfoTable.Columns.Add("Extra");
+
+      foreach (DataColumn column in dataTable.Columns)
+      {
+        var newRow = schemaInfoTable.NewRow();
+        newRow["Field"] = column.ColumnName;
+        newRow["Type"] = column.DataType.GetMySqlDataType();
+        newRow["Null"] = column.AllowDBNull ? "YES" : "NO";
+        newRow["Key"] = dataTable.PrimaryKey.Any(indexCol => indexCol.ColumnName == column.ColumnName) ? "PRI" : string.Empty;
+        newRow["Default"] = column.DefaultValue != null ? column.DefaultValue.ToString() : string.Empty;
+        newRow["Extra"] = column.AutoIncrement ? "auto_increment" : string.Empty;
+        schemaInfoTable.Rows.Add(newRow);
+      }
+
+      return schemaInfoTable;
+    }
+
+    /// <summary>
     /// Checks if an index with the given name exists in the given schema and table.
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>

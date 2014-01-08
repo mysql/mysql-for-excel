@@ -218,7 +218,7 @@ namespace MySQL.ForExcel.Forms
       try
       {
         // Prepare parameters and execute the procedure and create OutAndReturnValues table
-        DataTable outParamsTable = new DataTable("OutAndReturnValues");
+        MySqlDataTable outParamsTable = new MySqlDataTable { TableName = "OutAndReturnValues" };
         for (int paramIdx = 0; paramIdx < _procedureParamsProperties.Count; paramIdx++)
         {
           _mysqlParameters[paramIdx].Value = _procedureParamsProperties[paramIdx].Value;
@@ -228,14 +228,29 @@ namespace MySQL.ForExcel.Forms
           }
         }
 
-        ImportDataSet = WbConnection.GetDataSetFromProcedure(ImportDbObject, _mysqlParameters);
-        if (ImportDataSet == null || ImportDataSet.Tables.Count == 0)
+        var resultSetDs = WbConnection.GetDataSetFromProcedure(ImportDbObject, _mysqlParameters);
+        if (resultSetDs == null || resultSetDs.Tables.Count == 0)
         {
           ImportButton.Enabled = false;
           return;
         }
 
+        // Clear or create result set dataset.
         ImportButton.Enabled = true;
+        if (ImportDataSet == null)
+        {
+          ImportDataSet = new DataSet(ImportDbObject.Name + "ResultSet");
+        }
+        else
+        {
+          ImportDataSet.Tables.Clear();
+        }
+
+        // Create MySqlDataTable tables for each table in the result sets
+        foreach (var mySqlDataTable in from DataTable table in resultSetDs.Tables select new MySqlDataTable(table))
+        {
+          ImportDataSet.Tables.Add(mySqlDataTable);
+        }
 
         // Refresh output/return parameter values in PropertyGrid and add them to OutAndReturnValues table
         if (outParamsTable.Columns.Count > 0)
@@ -318,23 +333,14 @@ namespace MySQL.ForExcel.Forms
     private void InitializeMultipleResultSetsCombo()
     {
       DataTable dt = new DataTable();
-      dt.Columns.Add("value", Type.GetType("System.Int32"));
-      dt.Columns.Add("description", Type.GetType("System.String"));
-      DataRow dr = dt.NewRow();
-      dr["value"] = ImportMultipleType.SelectedResultSet;
-      dr["description"] = Resources.ImportProcedureSelectedResultSet;
-      dt.Rows.Add(dr);
-      dr = dt.NewRow();
-      dr["value"] = ImportMultipleType.AllResultSetsHorizontally;
-      dr["description"] = Resources.ImportProcedureAllResultSetsHorizontally;
-      dt.Rows.Add(dr);
-      dr = dt.NewRow();
-      dr["value"] = ImportMultipleType.AllResultSetsVertically;
-      dr["description"] = Resources.ImportProcedureAllResultSetsVertically;
-      dt.Rows.Add(dr);
+      dt.Columns.Add("Value", Type.GetType("System.Int32"));
+      dt.Columns.Add("Description");
+      dt.Rows.Add(new object[] { ImportMultipleType.SelectedResultSet, Resources.ImportProcedureSelectedResultSet });
+      dt.Rows.Add(new object[] { ImportMultipleType.AllResultSetsHorizontally, Resources.ImportProcedureAllResultSetsHorizontally });
+      dt.Rows.Add(new object[] { ImportMultipleType.AllResultSetsVertically, Resources.ImportProcedureAllResultSetsVertically });
       ImportResultsetsComboBox.DataSource = dt;
-      ImportResultsetsComboBox.DisplayMember = "description";
-      ImportResultsetsComboBox.ValueMember = "value";
+      ImportResultsetsComboBox.DisplayMember = "Description";
+      ImportResultsetsComboBox.ValueMember = "Value";
     }
 
     /// <summary>

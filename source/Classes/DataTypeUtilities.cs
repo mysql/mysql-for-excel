@@ -541,16 +541,32 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The matching MySQL data type.</returns>
     public static string GetMySqlDataType(object packedValue)
     {
-      string retType = string.Empty;
       if (packedValue == null)
+      {
+        return string.Empty;
+      }
+
+      Type objUnpackedType = packedValue.GetType();
+      int strLength = packedValue.ToString().Length;
+      strLength = strLength + (10 - strLength%10);
+      return objUnpackedType.GetMySqlDataType(strLength);
+    }
+
+    /// <summary>
+    /// Gets the matching MySQL data type from unboxing a packed value.
+    /// </summary>
+    /// <param name="dotNetType">A valid .NET data type.</param>
+    /// <param name="strLength">In case of a string type, the lenght of the string data.</param>
+    /// <returns>The matching MySQL data type.</returns>
+    public static string GetMySqlDataType(this Type dotNetType, int strLength = 0)
+    {
+      string retType = string.Empty;
+      if (dotNetType == null)
       {
         return retType;
       }
 
-      Type objUnpackedType = packedValue.GetType();
-      string strType = objUnpackedType.FullName;
-      int strLength = packedValue.ToString().Length;
-      strLength = strLength + (10 - strLength % 10);
+      string strType = dotNetType.FullName;
       bool unsigned = strType.Contains(".U");
 
       switch (strType)
