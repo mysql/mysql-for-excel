@@ -14,14 +14,13 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>bin\debug\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <DefineConstants>Debug;IsGPL=1</DefineConstants>
+    <DefineConstants>Debug</DefineConstants>
     <Cultures>en-US</Cultures>
     <SuppressValidation>True</SuppressValidation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\release\</OutputPath>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <DefineConstants>IsGPL=1</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="main.wxs" />
@@ -61,7 +60,7 @@
     <CreateProperty Value="$(FullVersion.Substring(0, $(FullVersion.LastIndexOf('.'))))">
       <Output TaskParameter="Value" PropertyName="Version" />
     </CreateProperty>
-    <CreateProperty Value="Version=$(Version);$(DefineConstants)">
+    <CreateProperty Value="Version=$(Version);IsGPL=true;$(DefineConstants)">
       <Output TaskParameter="Value" PropertyName="DefineConstants" />
     </CreateProperty>
     <CreateProperty Value="mysql-excel-$(Version)">

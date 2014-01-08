@@ -58,7 +58,7 @@
               <File Id="VSTOFile" Name="MySQL.ForExcel.vsto" Source="..\Source\bin\release\MySQL.ForExcel.vsto" />
               <File Id="AddIn" Name="MySQL.ForExcel.dll" KeyPath="yes" Source="..\Source\bin\release\MySQL.ForExcel.dll" />
               <File Id='ReleaseNotes' Name='Release Notes.txt' Source='Release Notes.txt'/>
-              <?if $(var.IsGPL) = 1?>
+              <?if $(var.IsGPL) = true ?>
               <File Id='ReadMe' Name='README' Source='README'/>
               <File Id="COPYING" Name="COPYING" Source="COPYING" DiskId="1" />
               <?else?>
