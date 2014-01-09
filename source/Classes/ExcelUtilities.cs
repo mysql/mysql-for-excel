@@ -406,35 +406,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the active <see cref="Excel.Worksheet"/> existing in the given <see cref="Excel.Workbook"/> or creates a new one.
-    /// </summary>
-    /// <param name="workBook">The <see cref="Excel.Workbook"/> to look for a <see cref="Excel.Worksheet"/>.</param>
-    /// <param name="worksheetName">The name of the new <see cref="Excel.Worksheet"/>.</param>
-    /// <param name="selectTopLeftCell">Flag indicating whether the cell A1 receives focus.</param>
-    /// <returns>The existing or new <see cref="Excel.Worksheet"/> object.</returns>
-    public static Excel.Worksheet GetActiveOrCreateWorksheet(this Excel.Workbook workBook, string worksheetName, bool selectTopLeftCell)
-    {
-      Excel.Worksheet activeWorksheet;
-      if (workBook != null)
-      {
-        activeWorksheet = workBook.ActiveSheet as Excel.Worksheet;
-        if (activeWorksheet != null)
-        {
-          return activeWorksheet;
-        }
-
-        worksheetName = workBook.GetWorksheetNameAvoidingDuplicates(worksheetName);
-      }
-      else
-      {
-        workBook = Globals.ThisAddIn.Application.Workbooks.Add(Type.Missing);
-      }
-
-      activeWorksheet = workBook.CreateWorksheet(worksheetName, selectTopLeftCell);
-      return activeWorksheet;
-    }
-
-    /// <summary>
     /// Gets a <see cref="Excel.Worksheet"/> with a given name existing in the given <see cref="Excel.Workbook"/> or creates a new one.
     /// </summary>
     /// <param name="workbook">The <see cref="Excel.Workbook"/> to look for a <see cref="Excel.Worksheet"/>.</param>

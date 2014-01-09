@@ -386,7 +386,7 @@ namespace MySQL.ForExcel.Panels
           return;
         }
 
-        Excel.Worksheet newWorksheet = parentTaskPane.ActiveWorkbook.GetOrCreateWorksheet(dbo.Name, true);
+        Excel.Worksheet newWorksheet = parentTaskPane.ActiveWorkbook.CreateWorksheet(dbo.Name, true);
         if (newWorksheet == null)
         {
           return;
