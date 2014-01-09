@@ -480,11 +480,11 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a valid name for a new <see cref="Excel.ListObject"/> that avoids duplicates with existing ones in the current <see cref="Excel.Worksheet"/>.
     /// </summary>
-    /// <param name="tableName">The proposed name for a <see cref="Excel.ListObject"/>.</param>
+    /// <param name="excelTableName">The proposed name for a <see cref="Excel.ListObject"/>.</param>
     /// <returns>A <see cref="Excel.ListObject"/> valid name.</returns>
-    public static string GetTableNameAvoidingDuplicates(this string tableName)
+    public static string GetExcelTableNameAvoidingDuplicates(this string excelTableName)
     {
-      return tableName.GetTableNameAvoidingDuplicates(1);
+      return excelTableName.GetExcelTableNameAvoidingDuplicates(1);
     }
 
     /// <summary>
@@ -831,21 +831,21 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a valid name for a new <see cref="Excel.ListObject"/> that avoids duplicates with existing ones in the current <see cref="Excel.Worksheet"/>.
     /// </summary>
-    /// <param name="tableName">The proposed name for a <see cref="Excel.ListObject"/>.</param>
+    /// <param name="excelTableName">The proposed name for a <see cref="Excel.ListObject"/>.</param>
     /// <param name="copyIndex">Number of the copy of a <see cref="Excel.Worksheet"/> within its name.</param>
     /// <returns>A <see cref="Excel.ListObject"/> valid name.</returns>
-    private static string GetTableNameAvoidingDuplicates(this string tableName, int copyIndex)
+    private static string GetExcelTableNameAvoidingDuplicates(this string excelTableName, int copyIndex)
     {
       var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
       if (activeWorkbook == null)
       {
-        return tableName;
+        return excelTableName;
       }
 
       string retName;
       do
       {
-        retName = copyIndex > 1 ? string.Format("{0}.{1}", tableName, copyIndex) : tableName;
+        retName = copyIndex > 1 ? string.Format("{0}.{1}", excelTableName, copyIndex) : excelTableName;
         copyIndex++;
       } while (activeWorkbook.Worksheets.Cast<Excel.Worksheet>().Any(ws => ws.ListObjects.Cast<Excel.ListObject>().Any(excelTable => excelTable.Name == retName)));
 

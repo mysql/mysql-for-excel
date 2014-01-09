@@ -198,10 +198,10 @@ namespace MySQL.ForExcel.Classes
     /// This constructor is meant to be used by the <see cref="ImportProcedureForm"/> class to copy the contents of result set tables from an executed procedure.
     /// </summary>
     /// <param name="filledTable"><see cref="DataTable"/> object containing imported excelData from the MySQL table to be edited.</param>
-    public MySqlDataTable(DataTable filledTable)
-      : this()
+    /// <param name="schemaName">Name of the schema where this table exists.</param>
+    public MySqlDataTable(DataTable filledTable, string schemaName)
+      : this(schemaName, filledTable.TableName)
     {
-      TableName = filledTable.TableName;
       CopyTableSchemaAndData(filledTable);
       OperationType = DataOperationType.Import;
     }
@@ -1015,10 +1015,14 @@ namespace MySQL.ForExcel.Classes
         if (Settings.Default.ImportCreateExcelTable && OperationType.IsForImport())
         {
           Excel.XlYesNoGuess containsColumnNames = importColumnNames ? Excel.XlYesNoGuess.xlYes : Excel.XlYesNoGuess.xlNo;
-          var namedTable = fillingRange.Worksheet.ListObjects.Add(Excel.XlListObjectSourceType.xlSrcRange, fillingRange, containsColumnNames);
-          namedTable.Name = string.Format("MySQL.{0}.{1}", SchemaName, TableName).GetTableNameAvoidingDuplicates();
-          namedTable.DisplayName = namedTable.Name;
-          namedTable.TableStyle = Settings.Default.ImportExcelTableStyleName;
+          var excelTable = fillingRange.Worksheet.ListObjects.Add(Excel.XlListObjectSourceType.xlSrcRange, fillingRange, containsColumnNames);
+          string excelTableNamePrefix = Settings.Default.ImportPrefixExcelTable && !string.IsNullOrEmpty(Settings.Default.ImportPrefixExcelTableText) ? Settings.Default.ImportPrefixExcelTableText + "." : string.Empty;
+          string excelTableNameSchemaPiece = !string.IsNullOrEmpty(SchemaName) ? SchemaName + "." : string.Empty;
+          string excelTableNameTablePiece = !string.IsNullOrEmpty(TableName) ? TableName : "Table";
+          string excelTableName = excelTableNamePrefix + excelTableNameSchemaPiece + excelTableNameTablePiece;
+          excelTable.Name = excelTableName.GetExcelTableNameAvoidingDuplicates();
+          excelTable.DisplayName = excelTable.Name;
+          excelTable.TableStyle = Settings.Default.ImportExcelTableStyleName;
         }
         else if (importColumnNames)
         {

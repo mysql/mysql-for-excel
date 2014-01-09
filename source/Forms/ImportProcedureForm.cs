@@ -218,7 +218,7 @@ namespace MySQL.ForExcel.Forms
       try
       {
         // Prepare parameters and execute the procedure and create OutAndReturnValues table
-        MySqlDataTable outParamsTable = new MySqlDataTable { TableName = "OutAndReturnValues" };
+        MySqlDataTable outParamsTable = new MySqlDataTable(WbConnection.Schema, "OutAndReturnValues");
         for (int paramIdx = 0; paramIdx < _procedureParamsProperties.Count; paramIdx++)
         {
           _mysqlParameters[paramIdx].Value = _procedureParamsProperties[paramIdx].Value;
@@ -247,8 +247,11 @@ namespace MySQL.ForExcel.Forms
         }
 
         // Create MySqlDataTable tables for each table in the result sets
-        foreach (var mySqlDataTable in from DataTable table in resultSetDs.Tables select new MySqlDataTable(table))
+        int resultIndex = 1;
+        foreach (DataTable table in resultSetDs.Tables)
         {
+          table.TableName = string.Format("Result{0}", resultIndex++);
+          var mySqlDataTable = new MySqlDataTable(table, WbConnection.Schema);
           ImportDataSet.Tables.Add(mySqlDataTable);
         }
 
@@ -321,6 +324,11 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void ImportButton_Click(object sender, EventArgs e)
     {
+      foreach (MySqlDataTable table in ImportDataSet.Tables)
+      {
+        table.TableName = ImportDbObject.Name + "." + table.TableName;
+      }
+
       if (SumOfResultSetsExceedsMaxCompatibilityRows && ImportType == ImportMultipleType.AllResultSetsVertically && ImportDataSet.Tables.Count > 1)
       {
         InfoDialog.ShowWarningDialog(Resources.ImportVerticallyExceedsMaxRowsTitleWarning, Resources.ImportVerticallyExceedsMaxRowsDetailWarning);

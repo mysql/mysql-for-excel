@@ -80,5 +80,11 @@
     <Setting Name="EditSessionsReuseWorksheets" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="ImportPrefixExcelTable" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ImportPrefixExcelTableText" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.String" Scope="User">
+      <Value Profile="(Default)">MySQL</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

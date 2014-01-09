@@ -358,5 +358,31 @@ namespace MySQL.ForExcel.Properties {
                 this["EditSessionsReuseWorksheets"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ImportPrefixExcelTable {
+            get {
+                return ((bool)(this["ImportPrefixExcelTable"]));
+            }
+            set {
+                this["ImportPrefixExcelTable"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("MySQL")]
+        public string ImportPrefixExcelTableText {
+            get {
+                return ((string)(this["ImportPrefixExcelTableText"]));
+            }
+            set {
+                this["ImportPrefixExcelTableText"] = value;
+            }
+        }
     }
 }

@@ -49,6 +49,8 @@ namespace MySQL.ForExcel.Forms
       CreateExcelTableCheckbox.Checked = Settings.Default.ImportCreateExcelTable;
       UseStyleComboBox.DataSource = Globals.ThisAddIn.Application.ActiveWorkbook.ListTableStyles();
       UseStyleComboBox.Text = Settings.Default.ImportExcelTableStyleName;
+      PrefixExcelTablesCheckBox.Checked = Settings.Default.ImportPrefixExcelTable;
+      PrefixExcelTablesTextBox.Text = Settings.Default.ImportPrefixExcelTableText;
       SetExcelTableControlsAvailability();
     }
 
@@ -81,7 +83,19 @@ namespace MySQL.ForExcel.Forms
       Settings.Default.ImportEscapeFormulaTextValues = EscapeFormulaValuesCheckBox.Checked;
       Settings.Default.ImportCreateExcelTable = CreateExcelTableCheckbox.Checked;
       Settings.Default.ImportExcelTableStyleName = UseStyleComboBox.Text;
+      Settings.Default.ImportPrefixExcelTable = PrefixExcelTablesCheckBox.Checked;
+      Settings.Default.ImportPrefixExcelTableText = PrefixExcelTablesTextBox.Text;
       MiscUtilities.SaveSettings();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="PrefixExcelTablesCheckBox"/> checkbox is checked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void PrefixExcelTablesCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+      PrefixExcelTablesTextBox.ReadOnly = !(CreateExcelTableCheckbox.Checked && PrefixExcelTablesCheckBox.Checked);
     }
 
     /// <summary>
@@ -92,6 +106,8 @@ namespace MySQL.ForExcel.Forms
       UseStyle1Label.Enabled = CreateExcelTableCheckbox.Checked;
       UseStyle2Label.Enabled = CreateExcelTableCheckbox.Checked;
       UseStyleComboBox.Enabled = CreateExcelTableCheckbox.Checked;
+      PrefixExcelTablesCheckBox.Enabled = CreateExcelTableCheckbox.Checked;
+      PrefixExcelTablesTextBox.ReadOnly = !(CreateExcelTableCheckbox.Checked && PrefixExcelTablesCheckBox.Checked);
       if (!CreateExcelTableCheckbox.Checked)
       {
         UseStyleComboBox.Text = ExcelUtilities.DEFAULT_MYSQL_STYLE_NAME;

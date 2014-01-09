@@ -58,6 +58,8 @@ namespace MySQL.ForExcel.Forms
       this.UseStyle1Label = new System.Windows.Forms.Label();
       this.UseStyleComboBox = new System.Windows.Forms.ComboBox();
       this.UseStyle2Label = new System.Windows.Forms.Label();
+      this.PrefixExcelTablesTextBox = new System.Windows.Forms.TextBox();
+      this.PrefixExcelTablesCheckBox = new System.Windows.Forms.CheckBox();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.PreviewRowsQuantityNumericUpDown)).BeginInit();
@@ -70,6 +72,8 @@ namespace MySQL.ForExcel.Forms
       // 
       // ContentAreaPanel
       // 
+      this.ContentAreaPanel.Controls.Add(this.PrefixExcelTablesCheckBox);
+      this.ContentAreaPanel.Controls.Add(this.PrefixExcelTablesTextBox);
       this.ContentAreaPanel.Controls.Add(this.UseStyle2Label);
       this.ContentAreaPanel.Controls.Add(this.UseStyleComboBox);
       this.ContentAreaPanel.Controls.Add(this.UseStyle1Label);
@@ -81,13 +85,13 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.AdvancedImportOptionsLabel);
       this.ContentAreaPanel.Controls.Add(this.EscapeFormulaValuesCheckBox);
       this.ContentAreaPanel.Controls.Add(this.GeneralOptionsLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(544, 301);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(544, 331);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 256);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 286);
       this.CommandAreaPanel.Size = new System.Drawing.Size(544, 45);
       // 
       // DialogAcceptButton
@@ -120,7 +124,7 @@ namespace MySQL.ForExcel.Forms
       this.EscapeFormulaValuesCheckBox.Location = new System.Drawing.Point(53, 110);
       this.EscapeFormulaValuesCheckBox.Name = "EscapeFormulaValuesCheckBox";
       this.EscapeFormulaValuesCheckBox.Size = new System.Drawing.Size(443, 19);
-      this.EscapeFormulaValuesCheckBox.TabIndex = 5;
+      this.EscapeFormulaValuesCheckBox.TabIndex = 6;
       this.EscapeFormulaValuesCheckBox.Text = "Escape text values that start with \"=\" so Excel does not treat them as formulas";
       this.EscapeFormulaValuesCheckBox.UseVisualStyleBackColor = false;
       // 
@@ -132,7 +136,7 @@ namespace MySQL.ForExcel.Forms
       this.AdvancedImportOptionsLabel.Location = new System.Drawing.Point(17, 17);
       this.AdvancedImportOptionsLabel.Name = "AdvancedImportOptionsLabel";
       this.AdvancedImportOptionsLabel.Size = new System.Drawing.Size(180, 20);
-      this.AdvancedImportOptionsLabel.TabIndex = 0;
+      this.AdvancedImportOptionsLabel.TabIndex = 1;
       this.AdvancedImportOptionsLabel.Text = "Advanced Import Options";
       // 
       // PreviewRowsQuantity1Label
@@ -142,7 +146,7 @@ namespace MySQL.ForExcel.Forms
       this.PreviewRowsQuantity1Label.Location = new System.Drawing.Point(50, 85);
       this.PreviewRowsQuantity1Label.Name = "PreviewRowsQuantity1Label";
       this.PreviewRowsQuantity1Label.Size = new System.Drawing.Size(71, 15);
-      this.PreviewRowsQuantity1Label.TabIndex = 2;
+      this.PreviewRowsQuantity1Label.TabIndex = 3;
       this.PreviewRowsQuantity1Label.Text = "Use the first";
       // 
       // PreviewRowsQuantity2Label
@@ -152,7 +156,7 @@ namespace MySQL.ForExcel.Forms
       this.PreviewRowsQuantity2Label.Location = new System.Drawing.Point(185, 85);
       this.PreviewRowsQuantity2Label.Name = "PreviewRowsQuantity2Label";
       this.PreviewRowsQuantity2Label.Size = new System.Drawing.Size(223, 15);
-      this.PreviewRowsQuantity2Label.TabIndex = 4;
+      this.PreviewRowsQuantity2Label.TabIndex = 5;
       this.PreviewRowsQuantity2Label.Text = "rows to preview the MySQL table\'s data.";
       // 
       // PreviewRowsQuantityNumericUpDown
@@ -171,7 +175,7 @@ namespace MySQL.ForExcel.Forms
             0});
       this.PreviewRowsQuantityNumericUpDown.Name = "PreviewRowsQuantityNumericUpDown";
       this.PreviewRowsQuantityNumericUpDown.Size = new System.Drawing.Size(52, 21);
-      this.PreviewRowsQuantityNumericUpDown.TabIndex = 3;
+      this.PreviewRowsQuantityNumericUpDown.TabIndex = 4;
       this.PreviewRowsQuantityNumericUpDown.Value = new decimal(new int[] {
             1,
             0,
@@ -187,7 +191,7 @@ namespace MySQL.ForExcel.Forms
       this.GeneralOptionsLabel.Location = new System.Drawing.Point(24, 56);
       this.GeneralOptionsLabel.Name = "GeneralOptionsLabel";
       this.GeneralOptionsLabel.Size = new System.Drawing.Size(103, 17);
-      this.GeneralOptionsLabel.TabIndex = 1;
+      this.GeneralOptionsLabel.TabIndex = 2;
       this.GeneralOptionsLabel.Text = "General Options";
       // 
       // CreateExcelTableCheckbox
@@ -212,7 +216,7 @@ namespace MySQL.ForExcel.Forms
       this.ExcelTableOptionsLabel.Location = new System.Drawing.Point(24, 150);
       this.ExcelTableOptionsLabel.Name = "ExcelTableOptionsLabel";
       this.ExcelTableOptionsLabel.Size = new System.Drawing.Size(123, 17);
-      this.ExcelTableOptionsLabel.TabIndex = 6;
+      this.ExcelTableOptionsLabel.TabIndex = 7;
       this.ExcelTableOptionsLabel.Text = "Excel Table Options";
       // 
       // UseStyle1Label
@@ -244,12 +248,32 @@ namespace MySQL.ForExcel.Forms
       this.UseStyle2Label.TabIndex = 11;
       this.UseStyle2Label.Text = "for the new Excel table.";
       // 
+      // PrefixExcelTablesTextBox
+      // 
+      this.PrefixExcelTablesTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+      this.PrefixExcelTablesTextBox.Location = new System.Drawing.Point(327, 231);
+      this.PrefixExcelTablesTextBox.Name = "PrefixExcelTablesTextBox";
+      this.PrefixExcelTablesTextBox.Size = new System.Drawing.Size(169, 21);
+      this.PrefixExcelTablesTextBox.TabIndex = 13;
+      // 
+      // PrefixExcelTablesCheckBox
+      // 
+      this.PrefixExcelTablesCheckBox.AutoSize = true;
+      this.PrefixExcelTablesCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+      this.PrefixExcelTablesCheckBox.Location = new System.Drawing.Point(73, 233);
+      this.PrefixExcelTablesCheckBox.Name = "PrefixExcelTablesCheckBox";
+      this.PrefixExcelTablesCheckBox.Size = new System.Drawing.Size(248, 19);
+      this.PrefixExcelTablesCheckBox.TabIndex = 12;
+      this.PrefixExcelTablesCheckBox.Text = "Prefix Excel tables with the following text:";
+      this.PrefixExcelTablesCheckBox.UseVisualStyleBackColor = true;
+      this.PrefixExcelTablesCheckBox.CheckedChanged += new System.EventHandler(this.PrefixExcelTablesCheckBox_CheckedChanged);
+      // 
       // ImportAdvancedOptionsDialog
       // 
       this.AcceptButton = this.DialogAcceptButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(544, 301);
+      this.ClientSize = new System.Drawing.Size(544, 331);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
@@ -279,5 +303,7 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.Label UseStyle1Label;
     private System.Windows.Forms.ComboBox UseStyleComboBox;
     private System.Windows.Forms.Label UseStyle2Label;
+    private System.Windows.Forms.CheckBox PrefixExcelTablesCheckBox;
+    private System.Windows.Forms.TextBox PrefixExcelTablesTextBox;
   }
 }
