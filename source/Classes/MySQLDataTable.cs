@@ -21,11 +21,13 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
+using MySQL.Utility.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
@@ -959,17 +961,33 @@ namespace MySQL.ForExcel.Classes
       try
       {
         int currentRow = atCell.Row - 1;
-        int colsCount = Columns.Count;
         Excel.Workbook activeWorkbook = atCell.Worksheet.Parent as Excel.Workbook;
         int cappedNumRows = activeWorkbook != null && activeWorkbook.Excel8CompatibilityMode ? Math.Min(rowsCount, UInt16.MaxValue - currentRow) : rowsCount;
+        fillingRange = atCell.Resize[cappedNumRows, Columns.Count];
+
+        // Check if the data being imported does not overlap with the data of an existing Excel table.
+        if (fillingRange.IntersectsWithAnyExcelTable())
+        {
+          if (InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelTableErrorTitle, Resources.ImportOverExcelTableErrorDetail, Resources.ImportOverExcelTableErrorSubDetail) == DialogResult.No)
+          {
+            return null;
+          }
+
+          var newWorkSheet = activeWorkbook.CreateWorksheet(TableName, true);
+          if (newWorkSheet == null)
+          {
+            return null;
+          }
+
+          Excel.Range newWorkSheetCell = newWorkSheet.Range["A1", Type.Missing];
+          return ImportDataAtGivenExcelCell(importColumnNames, newWorkSheetCell);
+        }
+
         bool escapeFormulaTexts = Settings.Default.ImportEscapeFormulaTextValues;
-
-        fillingRange = atCell.Resize[cappedNumRows, colsCount];
-        object[,] fillingArray = new object[cappedNumRows, colsCount];
-
+        object[,] fillingArray = new object[cappedNumRows, Columns.Count];
         if (importColumnNames)
         {
-          for (int currCol = 0; currCol < colsCount; currCol++)
+          for (int currCol = 0; currCol < Columns.Count; currCol++)
           {
             fillingArray[0, currCol] = Columns[currCol].ColumnName;
           }
@@ -985,15 +1003,14 @@ namespace MySQL.ForExcel.Classes
             continue;
           }
 
-          for (int currCol = 0; currCol < colsCount; currCol++)
+          for (int currCol = 0; currCol < Columns.Count; currCol++)
           {
             object importingValue = DataTypeUtilities.GetImportingValueForDateType(mySqlRow[currCol]);
             if (importingValue is string)
             {
               string importingValueText = importingValue as string;
 
-              // If the imported value is a text that starts with an equal sign Excel will treat it as a formula
-              //  so it needs to be escaped prepending an apostrophe to it for Excel to treat it as standard text.
+              // If the imported value is a text that starts with an equal sign Excel will treat it as a formula so it needs to be escaped prepending an apostrophe to it for Excel to treat it as standard text.
               if (escapeFormulaTexts && importingValueText.StartsWith("="))
               {
                 importingValue = "'" + importingValueText;
@@ -1014,21 +1031,14 @@ namespace MySQL.ForExcel.Classes
         // Create Named Table for the imported data
         if (Settings.Default.ImportCreateExcelTable && OperationType.IsForImport())
         {
-          Excel.XlYesNoGuess containsColumnNames = importColumnNames ? Excel.XlYesNoGuess.xlYes : Excel.XlYesNoGuess.xlNo;
-          var excelTable = fillingRange.Worksheet.ListObjects.Add(Excel.XlListObjectSourceType.xlSrcRange, fillingRange, containsColumnNames);
           string excelTableNamePrefix = Settings.Default.ImportPrefixExcelTable && !string.IsNullOrEmpty(Settings.Default.ImportPrefixExcelTableText) ? Settings.Default.ImportPrefixExcelTableText + "." : string.Empty;
           string excelTableNameSchemaPiece = !string.IsNullOrEmpty(SchemaName) ? SchemaName + "." : string.Empty;
           string excelTableNameTablePiece = !string.IsNullOrEmpty(TableName) ? TableName : "Table";
-          string excelTableName = excelTableNamePrefix + excelTableNameSchemaPiece + excelTableNameTablePiece;
-          excelTable.Name = excelTableName.GetExcelTableNameAvoidingDuplicates();
-          excelTable.DisplayName = excelTable.Name;
-          excelTable.TableStyle = Settings.Default.ImportExcelTableStyleName;
+          fillingRange.CreateExcelTable(excelTableNamePrefix + excelTableNameSchemaPiece + excelTableNameTablePiece, importColumnNames);
         }
         else if (importColumnNames)
         {
-          Excel.Range headerRange = fillingRange.GetColumnNamesRange();
-          headerRange.SetInteriorColor(ExcelUtilities.LockedCellsOleColor);
-          headerRange.Font.Bold = true;
+          fillingRange.SetHeaderStyle();
         }
 
         atCell.Worksheet.Columns.AutoFit();

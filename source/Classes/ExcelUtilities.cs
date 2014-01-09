@@ -301,6 +301,26 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Creates an Excel table from a given <see cref="Excel.Range"/> object.
+    /// </summary>
+    /// <param name="range">A <see cref="Excel.Range"/> object.</param>
+    /// <param name="excelTableName">The proposed name for the new Excel table.</param>
+    /// <param name="containsColumnNames">Flag indicating whether column names appear in the first row of the Excel range.</param>
+    public static void CreateExcelTable(this Excel.Range range, string excelTableName, bool containsColumnNames)
+    {
+      if (range == null)
+      {
+        return;
+      }
+
+      Excel.XlYesNoGuess hasHeaders = containsColumnNames ? Excel.XlYesNoGuess.xlYes : Excel.XlYesNoGuess.xlNo;
+      var namedTable = range.Worksheet.ListObjects.Add(Excel.XlListObjectSourceType.xlSrcRange, range, hasHeaders);
+      namedTable.Name = excelTableName.GetExcelTableNameAvoidingDuplicates();
+      namedTable.DisplayName = namedTable.Name;
+      namedTable.TableStyle = Settings.Default.ImportExcelTableStyleName;
+    }
+
+    /// <summary>
     /// Creates a default <see cref="Excel.TableStyle"/> for MySQL imported data.
     /// </summary>
     /// <param name="workbook">The workbook where the new <see cref="Excel.Style"/> is added to.</param>
@@ -422,7 +442,7 @@ namespace MySQL.ForExcel.Classes
       Excel.Worksheet existingWorksheet = workbook.Worksheets.Cast<Excel.Worksheet>().FirstOrDefault(worksheet => string.Equals(worksheet.Name, workSheetName, StringComparison.InvariantCulture));
       if (existingWorksheet == null)
       {
-        workbook.CreateWorksheet(workSheetName, selectTopLeftCell);
+        existingWorksheet = workbook.CreateWorksheet(workSheetName, selectTopLeftCell);
       }
       else if (selectTopLeftCell)
       {
@@ -516,12 +536,22 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Returns a Range object that represents the rectangular intersection of the given range with another range.
     /// </summary>
-    /// <param name="range">The given Excel range.</param>
-    /// <param name="otherRange">The intersecting Excel range.</param>
-    /// <returns>The rectangular intersection of the given range with another range.</returns>
+    /// <param name="range">A <see cref="Excel.Range"/> object.</param>
+    /// <param name="otherRange">An intersecting <see cref="Excel.Range"/> object.</param>
+    /// <returns>A <see cref="Excel.Range"/> object representing the rectangular intersection of the given range with another range.</returns>
     public static Excel.Range IntersectWith(this Excel.Range range, Excel.Range otherRange)
     {
       return Globals.ThisAddIn.Application.Intersect(range, otherRange);
+    }
+
+    /// <summary>
+    /// Checks if a given <see cref="Excel.Range"/> intersects with any Excel table in its containing <see cref="Excel.Worksheet"/>. 
+    /// </summary>
+    /// <param name="range">A <see cref="Excel.Range"/> object.</param>
+    /// <returns><c>true</c> if the given <see cref="Excel.Range"/> intersects with any Excel table in its containing <see cref="Excel.Worksheet"/>, <c>false</c> otherwise.</returns>
+    public static bool IntersectsWithAnyExcelTable(this Excel.Range range)
+    {
+      return range != null && (from Excel.ListObject excelTable in range.Worksheet.ListObjects select excelTable.Range.IntersectWith(range)).Any(intersectRange => intersectRange != null && intersectRange.Count != 0);
     }
 
     /// <summary>
@@ -651,6 +681,22 @@ namespace MySQL.ForExcel.Classes
       }
 
       styleElement.Font.Bold = makeBold;
+    }
+
+    /// <summary>
+    /// Sets the style of the first row of a given range that represents its header with column names.
+    /// </summary>
+    /// <param name="range">A <see cref="Excel.Range"/> object.</param>
+    public static void SetHeaderStyle(this Excel.Range range)
+    {
+      if (range == null)
+      {
+        return;
+      }
+
+      Excel.Range headerRange = range.GetColumnNamesRange();
+      headerRange.SetInteriorColor(LockedCellsOleColor);
+      headerRange.Font.Bold = true;
     }
 
     /// <summary>

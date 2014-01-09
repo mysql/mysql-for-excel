@@ -888,4 +888,13 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
   <data name="AppendDataNotSuitableForColumnTypeWarning" xml:space="preserve">
     <value>Appending data is not suitable for the mapped target column's data type.</value>
   </data>
+  <data name="ImportOverExcelTableErrorDetail" xml:space="preserve">
+    <value>The importing data will overwrite cells belonging to an existing Excel table.</value>
+  </data>
+  <data name="ImportOverExcelTableErrorSubDetail" xml:space="preserve">
+    <value>Do you want to import the data in a new Worksheet?</value>
+  </data>
+  <data name="ImportOverExcelTableErrorTitle" xml:space="preserve">
+    <value>Cannot import data over existing Excel table</value>
+  </data>
 </root>

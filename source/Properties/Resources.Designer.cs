@@ -1053,6 +1053,33 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The importing data will overwrite cells belonging to an existing Excel table..
+        /// </summary>
+        internal static string ImportOverExcelTableErrorDetail {
+            get {
+                return ResourceManager.GetString("ImportOverExcelTableErrorDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you want to import the data in a new Worksheet?.
+        /// </summary>
+        internal static string ImportOverExcelTableErrorSubDetail {
+            get {
+                return ResourceManager.GetString("ImportOverExcelTableErrorSubDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot import data over existing Excel table.
+        /// </summary>
+        internal static string ImportOverExcelTableErrorTitle {
+            get {
+                return ResourceManager.GetString("ImportOverExcelTableErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to All Result Sets - Arranged Horizontally.
         /// </summary>
         internal static string ImportProcedureAllResultSetsHorizontally {
