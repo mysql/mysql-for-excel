@@ -45,6 +45,7 @@ namespace MySQL.ForExcel.Forms
       RestoreSavedEditSessionsCheckBox.Checked = Settings.Default.EditSessionsRestoreWhenOpeningWorkbook;
       ReuseWorksheetsRadioButton.Checked = Settings.Default.EditSessionsReuseWorksheets;
       CreateNewWorksheetsRadioButton.Checked = !ReuseWorksheetsRadioButton.Checked;
+      SetRestoreSessionsRadioButtonsEnabledStatus();
     }
 
     /// <summary>
@@ -75,6 +76,14 @@ namespace MySQL.ForExcel.Forms
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
     private void RestoreSavedEditSessionsCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+      SetRestoreSessionsRadioButtonsEnabledStatus();
+    }
+
+    /// <summary>
+    /// Enables or disables the radio buttons related to the restore Edit sessions options based on the value of the <see cref="RestoreSavedEditSessionsCheckBox"/> checkbox.
+    /// </summary>
+    private void SetRestoreSessionsRadioButtonsEnabledStatus()
     {
       ReuseWorksheetsRadioButton.Enabled = RestoreSavedEditSessionsCheckBox.Checked;
       CreateNewWorksheetsRadioButton.Enabled = RestoreSavedEditSessionsCheckBox.Checked;
