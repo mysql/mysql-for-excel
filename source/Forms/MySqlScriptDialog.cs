@@ -410,7 +410,7 @@ namespace MySQL.ForExcel.Forms
         StringBuilder sqlScript = new StringBuilder(_mySqlTable.Rows.Count);
 
         // Create CREATE statement if the table is being exported to a new MySQL table.
-        if (_mySqlTable.OperationType == MySqlDataTable.DataOperationType.Export)
+        if (_mySqlTable.OperationType.IsForExport())
         {
           var dummyRow = new MySqlDummyRow(_mySqlTable.GetCreateSql(true));
           OriginalStatementRowsList.Add(dummyRow);
@@ -600,54 +600,56 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void SetOriginalOperationsInfoText()
     {
-      if (ShowOriginalOperationsInformation)
+      if (!ShowOriginalOperationsInformation)
       {
-        StringBuilder originalOperationsInfo = new StringBuilder(3);
-        if (_mySqlTable.OperationType == MySqlDataTable.DataOperationType.Export)
-        {
-          originalOperationsInfo.AppendFormat(Resources.ScriptCreatingTableText, _mySqlTable.TableNameForSqlQueries);
-        }
-
-        if (_mySqlTable.OperationType != MySqlDataTable.DataOperationType.Export || !_mySqlTable.CreateTableWithoutData)
-        {
-          int operationRows = _mySqlTable.DeletingOperations;
-          int totalOperationRows = operationRows;
-          if (operationRows > 0)
-          {
-            originalOperationsInfo.AddSeparator(", ", true);
-            originalOperationsInfo.AppendFormat(Resources.ScriptDeletingRowsText, operationRows);
-          }
-
-          operationRows = _mySqlTable.InsertingOperations;
-          totalOperationRows += operationRows;
-          if (operationRows > 0)
-          {
-            originalOperationsInfo.AddSeparator(", ", true);
-            originalOperationsInfo.AppendFormat(Resources.ScriptInsertingRowsText, operationRows);
-          }
-
-          operationRows = _mySqlTable.UpdatingOperations;
-          totalOperationRows += operationRows;
-          if (operationRows > 0)
-          {
-            originalOperationsInfo.AddSeparator(", ", true);
-            originalOperationsInfo.AppendFormat(Resources.ScriptUpdatingRowsText, operationRows);
-          }
-
-          if (totalOperationRows > 0)
-          {
-            originalOperationsInfo.AddSeparator(" ", true);
-            originalOperationsInfo.Append(Resources.ScriptRowsText);
-          }
-        }
-
-        if (originalOperationsInfo.Length > 0)
-        {
-          originalOperationsInfo.Append(Resources.ScriptWithSqlStatementsText);
-        }
-
-        OriginalOperationsLabel.Text = originalOperationsInfo.ToString();
+        return;
       }
+
+      StringBuilder originalOperationsInfo = new StringBuilder(3);
+      if (_mySqlTable.OperationType.IsForExport())
+      {
+        originalOperationsInfo.AppendFormat(Resources.ScriptCreatingTableText, _mySqlTable.TableNameForSqlQueries);
+      }
+
+      if (_mySqlTable.OperationType != MySqlDataTable.DataOperationType.Export || !_mySqlTable.CreateTableWithoutData)
+      {
+        int operationRows = _mySqlTable.DeletingOperations;
+        int totalOperationRows = operationRows;
+        if (operationRows > 0)
+        {
+          originalOperationsInfo.AddSeparator(", ", true);
+          originalOperationsInfo.AppendFormat(Resources.ScriptDeletingRowsText, operationRows);
+        }
+
+        operationRows = _mySqlTable.InsertingOperations;
+        totalOperationRows += operationRows;
+        if (operationRows > 0)
+        {
+          originalOperationsInfo.AddSeparator(", ", true);
+          originalOperationsInfo.AppendFormat(Resources.ScriptInsertingRowsText, operationRows);
+        }
+
+        operationRows = _mySqlTable.UpdatingOperations;
+        totalOperationRows += operationRows;
+        if (operationRows > 0)
+        {
+          originalOperationsInfo.AddSeparator(", ", true);
+          originalOperationsInfo.AppendFormat(Resources.ScriptUpdatingRowsText, operationRows);
+        }
+
+        if (totalOperationRows > 0)
+        {
+          originalOperationsInfo.AddSeparator(" ", true);
+          originalOperationsInfo.Append(Resources.ScriptRowsText);
+        }
+      }
+
+      if (originalOperationsInfo.Length > 0)
+      {
+        originalOperationsInfo.Append(Resources.ScriptWithSqlStatementsText);
+      }
+
+      OriginalOperationsLabel.Text = originalOperationsInfo.ToString();
     }
 
     /// <summary>

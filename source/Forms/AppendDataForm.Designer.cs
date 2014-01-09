@@ -57,7 +57,7 @@ namespace MySQL.ForExcel.Forms
       this.DialogCancelButton = new System.Windows.Forms.Button();
       this.ManuallyAdjustMappingMainSubLabel = new System.Windows.Forms.Label();
       this.FirstRowHeadersCheckBox = new System.Windows.Forms.CheckBox();
-      this.SourceExcelDataDataGridView = new PreviewDataGridView();
+      this.SourceExcelDataDataGridView = new MySQL.ForExcel.Controls.PreviewDataGridView();
       this.ChooseColumnMappingMainSubLabel = new System.Windows.Forms.Label();
       this.ChooseColumnMappingMainLabel = new System.Windows.Forms.Label();
       this.ChooseColumnMappingPictureBox = new System.Windows.Forms.PictureBox();
@@ -73,11 +73,13 @@ namespace MySQL.ForExcel.Forms
       this.MappingMethodComboBox = new System.Windows.Forms.ComboBox();
       this.AdvancedOptionsButton = new System.Windows.Forms.Button();
       this.StoreMappingButton = new System.Windows.Forms.Button();
-      this.TargetMySQLTableDataGridView = new MultiHeaderDataGridView();
+      this.TargetMySQLTableDataGridView = new MySQL.ForExcel.Controls.MultiHeaderDataGridView();
       this.AppendContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.RemoveColumnMappingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.ClearAllMappingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.SubSetOfDataLabel = new System.Windows.Forms.Label();
+      this.ColumnWarningLabel = new System.Windows.Forms.Label();
+      this.ColumnWarningPictureBox = new System.Windows.Forms.PictureBox();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.SourceExcelDataDataGridView)).BeginInit();
@@ -88,6 +90,7 @@ namespace MySQL.ForExcel.Forms
       ((System.ComponentModel.ISupportInitialize)(this.DownArrowPictureBox)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.TargetMySQLTableDataGridView)).BeginInit();
       this.AppendContextMenu.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.ColumnWarningPictureBox)).BeginInit();
       this.SuspendLayout();
       // 
       // FootnoteAreaPanel
@@ -98,7 +101,9 @@ namespace MySQL.ForExcel.Forms
       // ContentAreaPanel
       // 
       this.ContentAreaPanel.AllowDrop = true;
+      this.ContentAreaPanel.Controls.Add(this.ColumnWarningLabel);
       this.ContentAreaPanel.Controls.Add(this.SubSetOfDataLabel);
+      this.ContentAreaPanel.Controls.Add(this.ColumnWarningPictureBox);
       this.ContentAreaPanel.Controls.Add(this.TargetMySQLTableDataGridView);
       this.ContentAreaPanel.Controls.Add(this.MappingMethodComboBox);
       this.ContentAreaPanel.Controls.Add(this.MappingMethodLabel);
@@ -191,6 +196,7 @@ namespace MySQL.ForExcel.Forms
       dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
       this.SourceExcelDataDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
       this.SourceExcelDataDataGridView.ColumnsMaximumWidth = 200;
+      this.SourceExcelDataDataGridView.ContextMenuStrip = this.AppendContextMenu;
       dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
       dataGridViewCellStyle4.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -204,6 +210,7 @@ namespace MySQL.ForExcel.Forms
       this.SourceExcelDataDataGridView.Size = new System.Drawing.Size(686, 150);
       this.SourceExcelDataDataGridView.TabIndex = 9;
       this.SourceExcelDataDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.SourceExcelDataDataGridView_DataBindingComplete);
+      this.SourceExcelDataDataGridView.SelectionChanged += new System.EventHandler(this.SourceExcelDataDataGridView_SelectionChanged);
       this.SourceExcelDataDataGridView.GiveFeedback += new System.Windows.Forms.GiveFeedbackEventHandler(this.DataGridView_GiveFeedback);
       this.SourceExcelDataDataGridView.QueryContinueDrag += new System.Windows.Forms.QueryContinueDragEventHandler(this.DataGridView_QueryContinueDrag);
       this.SourceExcelDataDataGridView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.DataGridView_MouseDown);
@@ -453,6 +460,30 @@ namespace MySQL.ForExcel.Forms
       this.SubSetOfDataLabel.TabIndex = 8;
       this.SubSetOfDataLabel.Text = "This is a small subset of the data for preview purposes only.";
       // 
+      // ColumnWarningLabel
+      // 
+      this.ColumnWarningLabel.AutoSize = true;
+      this.ColumnWarningLabel.BackColor = System.Drawing.SystemColors.Window;
+      this.ColumnWarningLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ColumnWarningLabel.ForeColor = System.Drawing.Color.Red;
+      this.ColumnWarningLabel.Location = new System.Drawing.Point(477, 519);
+      this.ColumnWarningLabel.Name = "ColumnWarningLabel";
+      this.ColumnWarningLabel.Size = new System.Drawing.Size(291, 12);
+      this.ColumnWarningLabel.TabIndex = 25;
+      this.ColumnWarningLabel.Text = "Appending data is not suitable for the mapped target column\'s data type.";
+      this.ColumnWarningLabel.Visible = false;
+      // 
+      // ColumnWarningPictureBox
+      // 
+      this.ColumnWarningPictureBox.BackColor = System.Drawing.SystemColors.Window;
+      this.ColumnWarningPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
+      this.ColumnWarningPictureBox.Location = new System.Drawing.Point(455, 515);
+      this.ColumnWarningPictureBox.Name = "ColumnWarningPictureBox";
+      this.ColumnWarningPictureBox.Size = new System.Drawing.Size(20, 20);
+      this.ColumnWarningPictureBox.TabIndex = 26;
+      this.ColumnWarningPictureBox.TabStop = false;
+      this.ColumnWarningPictureBox.Visible = false;
+      // 
       // AppendDataForm
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -479,6 +510,7 @@ namespace MySQL.ForExcel.Forms
       ((System.ComponentModel.ISupportInitialize)(this.DownArrowPictureBox)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.TargetMySQLTableDataGridView)).EndInit();
       this.AppendContextMenu.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.ColumnWarningPictureBox)).EndInit();
       this.ResumeLayout(false);
 
     }
@@ -510,5 +542,7 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.ToolStripMenuItem RemoveColumnMappingToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem ClearAllMappingsToolStripMenuItem;
     private System.Windows.Forms.Label SubSetOfDataLabel;
+    private System.Windows.Forms.Label ColumnWarningLabel;
+    private System.Windows.Forms.PictureBox ColumnWarningPictureBox;
   }
 }

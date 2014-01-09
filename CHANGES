@@ -1,4 +1,6 @@
 1.2.0
+- Added visual warnings to the Append Data dialog for source Excel columns being mapped to target MySQL columns where the source data is not suitable for the
+  mapped target column's data type, so the user can make corrections before the data is attempted to be appended on the server.
 - Added "Allow to save active editing sessions" global option. This will let users to save their opened edit sessions when saving the workbook, and restoring them
   by reopening the workbook.
 - Added the "Create an Excel table for the imported MySQL table data" option to the Import Data dialog's advanced options to automatically create an Excel table

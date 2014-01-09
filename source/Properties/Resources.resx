@@ -325,8 +325,8 @@
   <data name="MySQLforExcel_WelcomePanel_Connection_Disabled_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySQLforExcel-WelcomePanel-Connection-Disabled-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="EditCommitDetailsUdatedRows" xml:space="preserve">
-    <value>{1}{0} rows have been updated successfully.</value>
+  <data name="EditCommitDetailsUpdatedRows" xml:space="preserve">
+    <value>{1}Updated {0} row(s) successfully.</value>
   </data>
   <data name="EditCommitDetailsUpdatingRows" xml:space="preserve">
     <value>Updating data rows...{0}{0}</value>
@@ -523,7 +523,7 @@ To be able to make modifications on cells not related to MySQL data please exit 
     <value>Deleted {0}, Inserted {1}, Updated {2} row(s).</value>
   </data>
   <data name="EditDataCommittedWarningsFound" xml:space="preserve">
-    <value>The following {0} warning(s) were generated:</value>
+    <value>The server returned {0} warning(s):</value>
   </data>
   <data name="EditDataCommittedWithQueryText" xml:space="preserve">
     <value>Deleted {0}, Inserted {1}, Updated {2} row(s) with the following SQL statement(s):</value>
@@ -613,7 +613,7 @@ To be able to make modifications on cells not related to MySQL data please exit 
     <value>The following connections were migrated to the MySQL Workbench connections file:</value>
   </data>
   <data name="ExcelConnectionsMigratedSuccessfullyTitle" xml:space="preserve">
-    <value>{0} database connections were migrated successfully.</value>
+    <value>Migrated {0} database connection(s) successfully.</value>
   </data>
   <data name="ExcelConnectionsMigrationErrorDetail" xml:space="preserve">
     <value>Database connections were not migrated because the following error ocurred:</value>
@@ -625,10 +625,10 @@ To be able to make modifications on cells not related to MySQL data please exit 
     <value>Excel data could not be appended to MySQL Table "{0}".</value>
   </data>
   <data name="AppendDataDetailsDoneSuccessText" xml:space="preserve">
-    <value>Excel data was appended successfully to MySQL Table "{0}".</value>
+    <value>Appended Excel data successfully to MySQL Table "{0}".</value>
   </data>
   <data name="AppendDataDetailsDoneWarningsText" xml:space="preserve">
-    <value>Excel data was appended with warnings to MySQL Table "{0}".</value>
+    <value>Appended Excel data with warnings to MySQL Table "{0}".</value>
   </data>
   <data name="ErrorAdoNetText" xml:space="preserve">
     <value>ADO.NET Error:</value>
@@ -670,16 +670,16 @@ To be able to make modifications on cells not related to MySQL data please exit 
     <value>MySQL For Excel</value>
   </data>
   <data name="AppendDataRowsAppendedSuccessfullyText" xml:space="preserve">
-    <value>{0} rows were appended successfully.</value>
+    <value>Appended {0} row(s) successfully.</value>
   </data>
   <data name="AppendDataRowsAppendedWithWarningsText" xml:space="preserve">
-    <value>{0} rows were appended with {0} warnings:</value>
+    <value>Appended {0} row(s) with {1} warning(s):</value>
   </data>
   <data name="ExportDataTableExecutedQuery" xml:space="preserve">
     <value>Executed the following statement to create MySQL Table "{0}":</value>
   </data>
   <data name="ExportDataLessRowsThanExpectedInsertedText" xml:space="preserve">
-    <value>Attempted to insert {0} rows, but only {1} rows were inserted with no further errors. Please check the MySQL Server log for more information.</value>
+    <value>Attempted to insert {0} row(s), but only {1} row(s) were inserted with no further errors. Please check the MySQL Server log for more information.</value>
   </data>
   <data name="ExportDataMultiPrimaryKeyText" xml:space="preserve">
     <value>&lt;Multiple Items&gt;</value>
@@ -688,25 +688,25 @@ To be able to make modifications on cells not related to MySQL data please exit 
     <value>The MySQL Table "{0}" could not be created.</value>
   </data>
   <data name="ExportDataOperationSuccessNoDataText" xml:space="preserve">
-    <value>The MySQL Table "{0}" has been created with no data.</value>
+    <value>Created the MySQL Table "{0}" with no data.</value>
   </data>
   <data name="ExportDataOperationSuccessWithDataText" xml:space="preserve">
-    <value>The MySQL Table "{0}" has been created with data.</value>
+    <value>Created the MySQL Table "{0}" with data.</value>
   </data>
   <data name="ExportDataRowsInsertedSuccessfullyText" xml:space="preserve">
-    <value>{0} rows have been inserted successfully.</value>
+    <value>Inserted {0} row(s) successfully.</value>
   </data>
   <data name="ExportDataRowsInsertedWithWarningsText" xml:space="preserve">
-    <value>{0} rows have been inserted with {1} warnings:</value>
+    <value>Inserted {0} row(s) with {1} warning(s):</value>
   </data>
   <data name="ExportDataRowsInsertionErrorText" xml:space="preserve">
     <value>Error while inserting rows...</value>
   </data>
   <data name="ExportDataTableCreatedSuccessfullyText" xml:space="preserve">
-    <value>MySQL Table "{0}" has been created successfully.</value>
+    <value>Created the MySQL Table "{0}" successfully.</value>
   </data>
   <data name="ExportDataTableCreatedWithWarningsText" xml:space="preserve">
-    <value>MySQL Table "{0}" has been created with {1} warnings:</value>
+    <value>Created the MySQL Table "{0}" with {1} warning(s):</value>
   </data>
   <data name="ImportProcedureAllResultSetsHorizontally" xml:space="preserve">
     <value>All Result Sets - Arranged Horizontally</value>
@@ -880,6 +880,12 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
     <value>Errors found while trying to export data to MySQLTable "{0}".</value>
   </data>
   <data name="ExportDataOperationErrorNoRowsText" xml:space="preserve">
-    <value>The MySQL Table "{0}" has been created with no data due errors.</value>
+    <value>Created the MySQL Table "{0}" with no data due errors.</value>
+  </data>
+  <data name="TableDataAdditionErrorTitle" xml:space="preserve">
+    <value>Error adding data to {0} table.</value>
+  </data>
+  <data name="AppendDataNotSuitableForColumnTypeWarning" xml:space="preserve">
+    <value>Appending data is not suitable for the mapped target column's data type.</value>
   </data>
 </root>

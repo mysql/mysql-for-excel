@@ -1012,7 +1012,7 @@ namespace MySQL.ForExcel.Classes
         fillingRange.Value = fillingArray;
 
         // Create Named Table for the imported data
-        if (Settings.Default.ImportCreateExcelTable && OperationType == DataOperationType.Import)
+        if (Settings.Default.ImportCreateExcelTable && OperationType.IsForImport())
         {
           Excel.XlYesNoGuess containsColumnNames = importColumnNames ? Excel.XlYesNoGuess.xlYes : Excel.XlYesNoGuess.xlNo;
           var namedTable = fillingRange.Worksheet.ListObjects.Add(Excel.XlListObjectSourceType.xlSrcRange, fillingRange, containsColumnNames);
@@ -1152,67 +1152,83 @@ namespace MySQL.ForExcel.Classes
     /// <param name="dataRange">Excel data range containing the data to fill the table.</param>
     /// <param name="useMappedColumns">Flag indicating if the data is added to the mapped column instead of to the column with the same index as the Excel data.</param>
     /// <param name="columnsHaveAnyDataList">A list of boolean values for each of the columns in the Excel range representing if the column has data or not.</param>
-    public void AddExcelData(Excel.Range dataRange, bool useMappedColumns, List<bool> columnsHaveAnyDataList = null)
+    /// <returns><c>true</c> if the data addition was successful, <c>false</c> otherwise.</returns>
+    public bool AddExcelData(Excel.Range dataRange, bool useMappedColumns, List<bool> columnsHaveAnyDataList = null)
     {
       if (dataRange == null)
       {
-        return;
+        return false;
       }
 
-      if (columnsHaveAnyDataList == null)
+      try
       {
-        columnsHaveAnyDataList = dataRange.GetColumnsWithDataInfoList(AddPrimaryKeyColumn);
-      }
-
-      var excelData = dataRange.ToBidimensionalArray(IsFormatted);
-      int numRows = excelData.GetUpperBound(0);
-      int colAdjustIdx = AddPrimaryKeyColumn ? 1 : 0;
-      int pkRowValueAdjust = _firstRowIsHeaders ? 1 : 0;
-      for (int row = 1; row <= numRows; row++)
-      {
-        bool rowHasAnyData = false;
-        var dataRow = NewRow() as MySqlDataRow;
-        if (dataRow == null)
+        if (columnsHaveAnyDataList == null)
         {
-          continue;
+          columnsHaveAnyDataList = dataRange.GetColumnsWithDataInfoList(AddPrimaryKeyColumn);
         }
 
-        foreach (MySqlDataColumn mySqlColumn in Columns.Cast<MySqlDataColumn>().Where(mySqlColumn => !useMappedColumns || (!mySqlColumn.ExcludeColumn && mySqlColumn.MappedDataColOrdinal >= 0)))
+        var excelData = dataRange.ToBidimensionalArray(IsFormatted);
+        int numRows = excelData.GetUpperBound(0);
+        int colAdjustIdx = AddPrimaryKeyColumn ? 1 : 0;
+        int rowAdjustValue = _firstRowIsHeaders ? 1 : 0;
+        for (int row = 1 + rowAdjustValue; row <= numRows; row++)
         {
-          if (mySqlColumn.AutoPk)
-          {
-            dataRow[0] = row - pkRowValueAdjust;
-            continue;
-          }
-
-          var rangeColumnIndex = useMappedColumns ? mySqlColumn.MappedDataColOrdinal : mySqlColumn.Ordinal - colAdjustIdx;
-          if (!columnsHaveAnyDataList[rangeColumnIndex])
+          bool rowHasAnyData = false;
+          var dataRow = NewRow() as MySqlDataRow;
+          if (dataRow == null)
           {
             continue;
           }
 
-          // Increment the rangeColumnIndex by 1 because the indexes within the Excel range begin with 1 not 0.
-          rangeColumnIndex++;
-          rowHasAnyData = rowHasAnyData || excelData[row, rangeColumnIndex] != null;
-          dataRow[mySqlColumn.Ordinal] = excelData[row, rangeColumnIndex] != null && excelData[row, rangeColumnIndex].Equals(0.0) && mySqlColumn.IsDate
-            ? DataTypeUtilities.MYSQL_EMPTY_DATE
-            : dataRow[mySqlColumn.Ordinal] = excelData[row, rangeColumnIndex];
-        }
-
-        if (rowHasAnyData)
-        {
-          if (row == 1 && _firstRowIsHeaders)
+          foreach (MySqlDataColumn mySqlColumn in Columns.Cast<MySqlDataColumn>().Where(mySqlColumn => !useMappedColumns || (!mySqlColumn.ExcludeColumn && mySqlColumn.MappedDataColOrdinal >= 0)))
           {
-            dataRow.IsHeadersRow = true;
+            if (mySqlColumn.AutoPk)
+            {
+              dataRow[0] = row - rowAdjustValue;
+              continue;
+            }
+
+            var rangeColumnIndex = useMappedColumns
+              ? mySqlColumn.MappedDataColOrdinal
+              : mySqlColumn.Ordinal - colAdjustIdx;
+            if (!columnsHaveAnyDataList[rangeColumnIndex])
+            {
+              continue;
+            }
+
+            // Increment the rangeColumnIndex by 1 because the indexes within the Excel range begin with 1 not 0.
+            rangeColumnIndex++;
+            rowHasAnyData = rowHasAnyData || excelData[row, rangeColumnIndex] != null;
+            dataRow[mySqlColumn.Ordinal] = excelData[row, rangeColumnIndex] != null &&
+                                           excelData[row, rangeColumnIndex].Equals(0.0) && mySqlColumn.IsDate
+              ? DataTypeUtilities.MYSQL_EMPTY_DATE
+              : dataRow[mySqlColumn.Ordinal] = excelData[row, rangeColumnIndex];
           }
 
-          Rows.Add(dataRow);
-        }
-        else
-        {
-          pkRowValueAdjust++;
+          if (rowHasAnyData)
+          {
+            if (row == 1 && _firstRowIsHeaders)
+            {
+              dataRow.IsHeadersRow = true;
+            }
+
+            Rows.Add(dataRow);
+          }
+          else
+          {
+            rowAdjustValue++;
+          }
         }
       }
+      catch (Exception ex)
+      {
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        string errorTitle = string.Format(Resources.TableDataAdditionErrorTitle, OperationType.IsForExport() ? "exporting" : "appending");
+        MiscUtilities.ShowCustomizedErrorDialog(errorTitle, ex.Message + Environment.NewLine + Environment.NewLine + ex.StackTrace, false);
+        return false;
+      }
+
+      return true;
     }
 
     /// <summary>
@@ -1221,7 +1237,8 @@ namespace MySQL.ForExcel.Classes
     /// <param name="dataRange">Excel data range containing the data to fill the table.</param>
     /// <param name="recreateColumnsFromData">Flag indicating if any existing columns in the table must be dropped and re-created based on the given data range.</param>
     /// <param name="emptyColumnsToVarchar">Flag indicating if the data type for columns with no data is automatically set to varchar(255).</param>
-    public void SetupColumnsWithData(Excel.Range dataRange, bool recreateColumnsFromData, bool emptyColumnsToVarchar)
+    /// <return><c>true</c> if the columns setup is successful, <c>false</c> otherwise.</return>
+    public bool SetupColumnsWithData(Excel.Range dataRange, bool recreateColumnsFromData, bool emptyColumnsToVarchar)
     {
       Clear();
       int numCols = dataRange.Columns.Count;
@@ -1256,7 +1273,10 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Add the Excel data to rows in this table.
-      AddExcelData(dataRange, false, columnsHaveAnyDataList);
+      if (!AddExcelData(dataRange, false, columnsHaveAnyDataList))
+      {
+        return false;
+      }
 
       // Automatically detect the excelData type for columns based on their data.
       if (DetectDatatype)
@@ -1281,6 +1301,8 @@ namespace MySQL.ForExcel.Classes
           mysqlCol.AllowNull = !mysqlCol.CreateIndex;
         }
       }
+
+      return true;
     }
 
     /// <summary>
@@ -1486,7 +1508,7 @@ namespace MySQL.ForExcel.Classes
       int startCol = AddPrimaryKeyColumn ? 0 : 1;
       for (int colIdx = startCol; colIdx <= numCols; colIdx++)
       {
-        MySqlDataColumn column = new MySqlDataColumn(OperationType == DataOperationType.Export)
+        MySqlDataColumn column = new MySqlDataColumn(OperationType.IsForExport())
         {
           ColumnName = AddPrimaryKeyColumn && colIdx == 0 ? "AutoPK" : "Column" + colIdx
         };
@@ -1698,7 +1720,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="args">Event arguments.</param>
     private void RowWasChangedOrDeleted(DataRowChangeEventArgs args)
     {
-      if (OperationType == DataOperationType.Import || !(args.Row is MySqlDataRow))
+      if (OperationType.IsForImport() || !(args.Row is MySqlDataRow))
       {
         return;
       }

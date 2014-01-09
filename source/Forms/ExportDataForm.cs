@@ -193,36 +193,38 @@ namespace MySQL.ForExcel.Forms
       {
         optionsDialog.ShowDialog();
 
-        if (optionsDialog.ParentFormRequiresRefresh)
+        if (!optionsDialog.ParentFormRequiresRefresh)
         {
-          if (optionsDialog.ExportRemoveEmptyColumnsChanged && !Settings.Default.ExportRemoveEmptyColumns)
-          {
-            // Prevent InvalidOperationException from being thrown at LoadPreviewData() when overwritting the Datasource property,
-            // Somehow the PreviewDataGridView.SelectionMode its set to FullColumnSelect and the overwrite of that property cannot be done.
-            PreviewDataGridView.SelectionMode = DataGridViewSelectionMode.CellSelect;
-          }
-
-          LoadPreviewData();
-
-          if (optionsDialog.ExportDetectDatatypeChanged && Settings.Default.ExportDetectDatatype)
-          {
-            // Reset background colors to default since those aren't reset when the condition above is fullfilled.
-            foreach (MySqlDataColumn mysqldc in PreviewDataTable.Columns.Cast<MySqlDataColumn>().Where(mysqldc => mysqldc != null))
-            {
-              PreviewTableWarningsChanged(mysqldc, new TableWarningsChangedArgs(mysqldc));
-            }
-          }
-
-          // Trigger Warning Refresh
-          PreviewDataTable.FirstRowIsHeaders = FirstRowHeadersCheckBox.Checked;
-
-          // Force Empty columns with emtpy column names from being stated defaulty when this is not desired.
-          RecreateColumns();
-
-          // Refresh first row headers accordingly
-          PreviewDataGridView.CurrentCell = null;
-          PreviewDataGridView.Rows[0].Visible = !FirstRowHeadersCheckBox.Checked;
+          return;
         }
+
+        if (optionsDialog.ExportRemoveEmptyColumnsChanged && !Settings.Default.ExportRemoveEmptyColumns)
+        {
+          // Prevent InvalidOperationException from being thrown at LoadPreviewData() when overwritting the Datasource property,
+          // Somehow the PreviewDataGridView.SelectionMode its set to FullColumnSelect and the overwrite of that property cannot be done.
+          PreviewDataGridView.SelectionMode = DataGridViewSelectionMode.CellSelect;
+        }
+
+        LoadPreviewData();
+
+        if (optionsDialog.ExportDetectDatatypeChanged && Settings.Default.ExportDetectDatatype)
+        {
+          // Reset background colors to default since those aren't reset when the condition above is fullfilled.
+          foreach (MySqlDataColumn mysqldc in PreviewDataTable.Columns.Cast<MySqlDataColumn>().Where(mysqldc => mysqldc != null))
+          {
+            PreviewTableWarningsChanged(mysqldc, new TableWarningsChangedArgs(mysqldc));
+          }
+        }
+
+        // Trigger Warning Refresh
+        PreviewDataTable.FirstRowIsHeaders = FirstRowHeadersCheckBox.Checked;
+
+        // Force Empty columns with emtpy column names from being stated defaulty when this is not desired.
+        RecreateColumns();
+
+        // Refresh first row headers accordingly
+        PreviewDataGridView.CurrentCell = null;
+        PreviewDataGridView.Rows[0].Visible = !FirstRowHeadersCheckBox.Checked;
       }
     }
 
@@ -439,11 +441,12 @@ namespace MySQL.ForExcel.Forms
     {
       Cursor = Cursors.WaitCursor;
 
+      bool setupDataSuccessful = true;
       if (ExportDataTable == null)
       {
         ExportDataTable = PreviewDataTable.CloneSchema();
         ExportDataTable.DetectDatatype = false;
-        ExportDataTable.SetupColumnsWithData(ExportDataRange, false, true);
+        setupDataSuccessful = ExportDataTable.SetupColumnsWithData(ExportDataRange, false, true);
       }
       else
       {
@@ -452,6 +455,10 @@ namespace MySQL.ForExcel.Forms
 
       ExportDataTable.TableName = PreviewDataTable.TableName;
       Cursor = Cursors.Default;
+      if (!setupDataSuccessful)
+      {
+        return;
+      }
 
       // Check if there is data to export, if there is not then ask the user if he wants to proceed with the table creation only.
       bool tableContainsDataToExport = ExportDataTable.Rows.Count > (ExportDataTable.FirstRowIsHeaders ? 1 : 0);

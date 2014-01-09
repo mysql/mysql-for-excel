@@ -88,7 +88,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Excel data was appended successfully to MySQL Table &quot;{0}&quot;..
+        ///   Looks up a localized string similar to Appended Excel data successfully to MySQL Table &quot;{0}&quot;..
         /// </summary>
         internal static string AppendDataDetailsDoneSuccessText {
             get {
@@ -97,7 +97,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Excel data was appended with warnings to MySQL Table &quot;{0}&quot;..
+        ///   Looks up a localized string similar to Appended Excel data with warnings to MySQL Table &quot;{0}&quot;..
         /// </summary>
         internal static string AppendDataDetailsDoneWarningsText {
             get {
@@ -115,7 +115,16 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} rows were appended successfully..
+        ///   Looks up a localized string similar to Appending data is not suitable for the mapped target column&apos;s data type..
+        /// </summary>
+        internal static string AppendDataNotSuitableForColumnTypeWarning {
+            get {
+                return ResourceManager.GetString("AppendDataNotSuitableForColumnTypeWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Appended {0} row(s) successfully..
         /// </summary>
         internal static string AppendDataRowsAppendedSuccessfullyText {
             get {
@@ -124,7 +133,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} rows were appended with {0} warnings:.
+        ///   Looks up a localized string similar to Appended {0} row(s) with {1} warning(s):.
         /// </summary>
         internal static string AppendDataRowsAppendedWithWarningsText {
             get {
@@ -500,11 +509,11 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {1}{0} rows have been updated successfully..
+        ///   Looks up a localized string similar to {1}Updated {0} row(s) successfully..
         /// </summary>
-        internal static string EditCommitDetailsUdatedRows {
+        internal static string EditCommitDetailsUpdatedRows {
             get {
-                return ResourceManager.GetString("EditCommitDetailsUdatedRows", resourceCulture);
+                return ResourceManager.GetString("EditCommitDetailsUpdatedRows", resourceCulture);
             }
         }
         
@@ -554,7 +563,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The following {0} warning(s) were generated:.
+        ///   Looks up a localized string similar to The server returned {0} warning(s):.
         /// </summary>
         internal static string EditDataCommittedWarningsFound {
             get {
@@ -772,7 +781,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} database connections were migrated successfully..
+        ///   Looks up a localized string similar to Migrated {0} database connection(s) successfully..
         /// </summary>
         internal static string ExcelConnectionsMigratedSuccessfullyTitle {
             get {
@@ -855,7 +864,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Attempted to insert {0} rows, but only {1} rows were inserted with no further errors. Please check the MySQL Server log for more information..
+        ///   Looks up a localized string similar to Attempted to insert {0} row(s), but only {1} row(s) were inserted with no further errors. Please check the MySQL Server log for more information..
         /// </summary>
         internal static string ExportDataLessRowsThanExpectedInsertedText {
             get {
@@ -891,7 +900,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The MySQL Table &quot;{0}&quot; has been created with no data due errors..
+        ///   Looks up a localized string similar to Created the MySQL Table &quot;{0}&quot; with no data due errors..
         /// </summary>
         internal static string ExportDataOperationErrorNoRowsText {
             get {
@@ -909,7 +918,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The MySQL Table &quot;{0}&quot; has been created with no data..
+        ///   Looks up a localized string similar to Created the MySQL Table &quot;{0}&quot; with no data..
         /// </summary>
         internal static string ExportDataOperationSuccessNoDataText {
             get {
@@ -918,7 +927,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The MySQL Table &quot;{0}&quot; has been created with data..
+        ///   Looks up a localized string similar to Created the MySQL Table &quot;{0}&quot; with data..
         /// </summary>
         internal static string ExportDataOperationSuccessWithDataText {
             get {
@@ -927,7 +936,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} rows have been inserted successfully..
+        ///   Looks up a localized string similar to Inserted {0} row(s) successfully..
         /// </summary>
         internal static string ExportDataRowsInsertedSuccessfullyText {
             get {
@@ -936,7 +945,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} rows have been inserted with {1} warnings:.
+        ///   Looks up a localized string similar to Inserted {0} row(s) with {1} warning(s):.
         /// </summary>
         internal static string ExportDataRowsInsertedWithWarningsText {
             get {
@@ -954,7 +963,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MySQL Table &quot;{0}&quot; has been created successfully..
+        ///   Looks up a localized string similar to Created the MySQL Table &quot;{0}&quot; successfully..
         /// </summary>
         internal static string ExportDataTableCreatedSuccessfullyText {
             get {
@@ -963,7 +972,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MySQL Table &quot;{0}&quot; has been created with {1} warnings:.
+        ///   Looks up a localized string similar to Created the MySQL Table &quot;{0}&quot; with {1} warning(s):.
         /// </summary>
         internal static string ExportDataTableCreatedWithWarningsText {
             get {
@@ -2063,6 +2072,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string StartupMessage {
             get {
                 return ResourceManager.GetString("StartupMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error adding data to {0} table..
+        /// </summary>
+        internal static string TableDataAdditionErrorTitle {
+            get {
+                return ResourceManager.GetString("TableDataAdditionErrorTitle", resourceCulture);
             }
         }
         

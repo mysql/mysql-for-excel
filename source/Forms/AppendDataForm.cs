@@ -206,9 +206,23 @@ namespace MySQL.ForExcel.Forms
       using (AppendAdvancedOptionsDialog optionsDialog = new AppendAdvancedOptionsDialog())
       {
         optionsDialog.ShowDialog();
-        if (optionsDialog.ParentFormRequiresRefresh)
+        if (!optionsDialog.ParentFormRequiresRefresh)
         {
-          InitializeSourceTableGrid();
+          return;
+        }
+
+        InitializeSourceTableGrid();
+        for (int targetColumnIndex = 0; targetColumnIndex < CurrentColumnMapping.MappedSourceIndexes.Length; targetColumnIndex++)
+        {
+          int mappedSourceColumnIndex = CurrentColumnMapping.MappedSourceIndexes[targetColumnIndex];
+          if (mappedSourceColumnIndex < 0)
+          {
+            continue;
+          }
+
+          var sourceColumn = SourceMySqlPreviewDataTable.GetColumnAtIndex(mappedSourceColumnIndex);
+          var targetColumn = TargetMySqlPreviewDataTable.GetColumnAtIndex(targetColumnIndex);
+          CheckIfSourceDataAgainstMappedTargetColumn(sourceColumn, targetColumn);
         }
       }
     }
@@ -222,7 +236,7 @@ namespace MySQL.ForExcel.Forms
     {
       // If not all columns where mapped between the source and target tables ask the user if he still wants to produce with the append operation.
       if (TargetMySqlPreviewDataTable.MappedColumnsQuantity < MaxMappingColumnsQuantity 
-        && InfoDialog.ShowWarningDialog(Resources.ColumnMappingIncompleteTitleWarning, Resources.ColumnMappingIncompleteDetailWarning) == DialogResult.No)
+        && InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ColumnMappingIncompleteTitleWarning, Resources.ColumnMappingIncompleteDetailWarning) == DialogResult.No)
       {
         return;
       }
@@ -236,7 +250,13 @@ namespace MySQL.ForExcel.Forms
       StringBuilder warningDetails = new StringBuilder();
       StringBuilder warningStatementDetails = new StringBuilder();
       var targetMySqlFinalDataTable = TargetMySqlPreviewDataTable.CloneSchema();
-      targetMySqlFinalDataTable.AddExcelData(AppendDataRange, true);
+      targetMySqlFinalDataTable.FirstRowIsHeaders = SourceMySqlPreviewDataTable.FirstRowIsHeaders;
+      if (!targetMySqlFinalDataTable.AddExcelData(AppendDataRange, true))
+      {
+        Cursor = Cursors.Default;
+        return;
+      }
+
       var modifiedRowsList = targetMySqlFinalDataTable.PushData(Settings.Default.GlobalSqlQueriesPreviewQueries);
       if (modifiedRowsList == null)
       {
@@ -282,6 +302,7 @@ namespace MySQL.ForExcel.Forms
             }
 
             warningsFound = true;
+            warningDetails.AddNewLine(1, true);
             warningDetails.Append(statement.ResultText);
             warningsCount += statement.WarningsQuantity;
             break;
@@ -364,8 +385,11 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      AppendContextMenu.Items["removeColumnMappingToolStripMenuItem"].Visible = CurrentColumnMapping.MappedSourceIndexes[_gridColumnClicked] >= 0;
-      AppendContextMenu.Items["clearAllMappingsToolStripMenuItem"].Visible = CurrentColumnMapping.MappedQuantity > 0;
+      bool columnHasMapping = AppendContextMenu.SourceControl.Name == TargetMySQLTableDataGridView.Name
+        ? CurrentColumnMapping.MappedSourceIndexes[_gridColumnClicked] >= 0
+        : CurrentColumnMapping.MappedSourceIndexes.Contains(_gridColumnClicked);
+      AppendContextMenu.Items["RemoveColumnMappingToolStripMenuItem"].Visible = columnHasMapping;
+      AppendContextMenu.Items["ClearAllMappingsToolStripMenuItem"].Visible = CurrentColumnMapping.MappedQuantity > 0;
     }
 
     /// <summary>
@@ -429,6 +453,32 @@ namespace MySQL.ForExcel.Forms
       targetColumn.MappedDataColOrdinal = mapping ? sourceColumnIndex : -1;
 
       CurrentColumnMapping.MappedSourceIndexes[targetColumnIndex] = sourceColumnIndex;
+      if (mapping)
+      {
+        CheckIfSourceDataAgainstMappedTargetColumn(sourceColumn, targetColumn);
+      }
+      else
+      {
+        ClearSourceColumnVisualWarnings(previouslyMappedFromIndex);
+      }
+    }
+
+    /// <summary>
+    /// Checks if the source data is suitable for the target's column data type to raise visual warnings.
+    /// </summary>
+    /// <param name="sourceColumn">Source data column.</param>
+    /// <param name="targetColumn">Target column.</param>
+    private void CheckIfSourceDataAgainstMappedTargetColumn(MySqlDataColumn sourceColumn, MySqlDataColumn targetColumn)
+    {
+      if (sourceColumn == null || targetColumn == null)
+      {
+        return;
+      }
+
+      sourceColumn.TestColumnDataTypeAgainstColumnData(targetColumn.MySqlDataType);
+      var gridCol = SourceExcelDataDataGridView.Columns[sourceColumn.Ordinal];
+      SetGridColumnColor(gridCol, sourceColumn);
+      SetGridColumnWarningVisibility(gridCol);
     }
 
     /// <summary>
@@ -443,6 +493,24 @@ namespace MySQL.ForExcel.Forms
       {
         MappingMethodComboBox.SelectedIndex = 0;
       }
+    }
+
+    /// <summary>
+    /// Clears all visual warnings related to a source grid column.
+    /// </summary>
+    /// <param name="sourceColumnIndex">Source column index.</param>
+    private void ClearSourceColumnVisualWarnings(int sourceColumnIndex)
+    {
+      if (sourceColumnIndex < 0)
+      {
+        return;
+      }
+
+      var previousSourceColumn = SourceMySqlPreviewDataTable.GetColumnAtIndex(sourceColumnIndex);
+      previousSourceColumn.ClearWarnings();
+      var gridCol = SourceExcelDataDataGridView.Columns[sourceColumnIndex];
+      SetGridColumnColor(SourceExcelDataDataGridView.Columns[sourceColumnIndex], previousSourceColumn);
+      SetGridColumnWarningVisibility(gridCol);
     }
 
     /// <summary>
@@ -479,6 +547,11 @@ namespace MySQL.ForExcel.Forms
         DataGridViewCellStyle newStyle = new DataGridViewCellStyle(SourceExcelDataDataGridView.Columns[colIdx].HeaderCell.Style);
         newStyle.SelectionBackColor = newStyle.BackColor = SystemColors.Control;
         SourceExcelDataDataGridView.Columns[colIdx].HeaderCell.Style = newStyle;
+
+        // Clear source column warnings
+        var previousSourceColumn = SourceMySqlPreviewDataTable.GetColumnAtIndex(colIdx);
+        previousSourceColumn.ClearWarnings();
+        SetGridColumnColor(SourceExcelDataDataGridView.Columns[colIdx], previousSourceColumn);
       }
 
       if (CurrentColumnMapping != null && !onlyGrids)
@@ -1048,9 +1121,12 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void RemoveColumnMappingToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      if (_gridColumnClicked > -1)
+      int targetColumnIndex = AppendContextMenu.SourceControl.Name == TargetMySQLTableDataGridView.Name
+        ? _gridColumnClicked
+        : CurrentColumnMapping.MappedSourceIndexes.ToList().FindIndex(sourceIndex => sourceIndex == _gridColumnClicked);
+      if (targetColumnIndex > -1)
       {
-        PerformManualSingleColumnMapping(-1, _gridColumnClicked, null);
+        PerformManualSingleColumnMapping(-1, targetColumnIndex, null);
       }
     }
 
@@ -1084,6 +1160,33 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
+    /// Sets the background color of a grid column bound to a <see cref="MySqlDataColumn"/> depending on its warnings.
+    /// </summary>
+    /// <param name="gridCol">The <see cref="DataGridViewColumn"/> to color.</param>
+    /// <param name="mysqlCol">The <see cref="MySqlDataColumn"/> bound to the grid column.</param>
+    private void SetGridColumnColor(DataGridViewColumn gridCol, MySqlDataColumn mysqlCol)
+    {
+      gridCol.DefaultCellStyle.BackColor = mysqlCol.WarningsQuantity > 0 ? Color.OrangeRed : gridCol.DataGridView.DefaultCellStyle.BackColor;
+    }
+
+    /// <summary>
+    /// Shows or hides the warning controls related to the given grid column.
+    /// </summary>
+    /// <param name="gridCol">The <see cref="DataGridViewColumn"/> to color.</param>
+    private void SetGridColumnWarningVisibility(DataGridViewColumn gridCol)
+    {
+      if (gridCol == null)
+      {
+        return;
+      }
+
+      MySqlDataColumn mysqlCol = SourceMySqlPreviewDataTable.GetColumnAtIndex(gridCol.Index);
+      bool showWarning = mysqlCol.WarningsQuantity > 0;
+      ColumnWarningPictureBox.Visible = showWarning;
+      ColumnWarningLabel.Visible = showWarning;
+    }
+
+    /// <summary>
     /// Event delegate method fired when the <see cref="SourceExcelDataDataGridView"/> data binding is complete.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -1091,6 +1194,21 @@ namespace MySQL.ForExcel.Forms
     private void SourceExcelDataDataGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
     {
       SourceExcelDataDataGridView.ClearSelection();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="SourceExcelDataDataGridView"/> grid selection changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void SourceExcelDataDataGridView_SelectionChanged(object sender, EventArgs e)
+    {
+      if (SourceExcelDataDataGridView.SelectedColumns.Count == 0)
+      {
+        return;
+      }
+
+      SetGridColumnWarningVisibility(SourceExcelDataDataGridView.SelectedColumns[0]);
     }
 
     /// <summary>

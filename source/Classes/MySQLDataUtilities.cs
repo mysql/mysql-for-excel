@@ -456,6 +456,46 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Checks if the given data operation type is for appending data.
+    /// </summary>
+    /// <param name="operationType">A <see cref="MySqlDataTable.DataOperationType"/> enumeration value.</param>
+    /// <returns><c>true</c> if the given data operation type is for appending data, <c>false</c> otherwise.</returns>
+    public static bool IsForAppend(this MySqlDataTable.DataOperationType operationType)
+    {
+      return operationType == MySqlDataTable.DataOperationType.Append;
+    }
+
+    /// <summary>
+    /// Checks if the given data operation type is for editing data.
+    /// </summary>
+    /// <param name="operationType">A <see cref="MySqlDataTable.DataOperationType"/> enumeration value.</param>
+    /// <returns><c>true</c> if the given data operation type is for editing data, <c>false</c> otherwise.</returns>
+    public static bool IsForEdit(this MySqlDataTable.DataOperationType operationType)
+    {
+      return operationType == MySqlDataTable.DataOperationType.Edit;
+    }
+
+    /// <summary>
+    /// Checks if the given data operation type is for exporting data.
+    /// </summary>
+    /// <param name="operationType">A <see cref="MySqlDataTable.DataOperationType"/> enumeration value.</param>
+    /// <returns><c>true</c> if the given data operation type is for exporting data, <c>false</c> otherwise.</returns>
+    public static bool IsForExport(this MySqlDataTable.DataOperationType operationType)
+    {
+      return operationType == MySqlDataTable.DataOperationType.Export;
+    }
+
+    /// <summary>
+    /// Checks if the given data operation type is for importing data.
+    /// </summary>
+    /// <param name="operationType">A <see cref="MySqlDataTable.DataOperationType"/> enumeration value.</param>
+    /// <returns><c>true</c> if the given data operation type is for importing data, <c>false</c> otherwise.</returns>
+    public static bool IsForImport(this MySqlDataTable.DataOperationType operationType)
+    {
+      return operationType == MySqlDataTable.DataOperationType.Import;
+    }
+
+    /// <summary>
     /// Checks if the given connection may be using SSL.
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>

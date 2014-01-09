@@ -623,6 +623,14 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Clears all warnings from this column.
+    /// </summary>
+    public void ClearWarnings()
+    {
+      _columnWarningTextsList.Clear();
+    }
+
+    /// <summary>
     /// Creates a new <see cref="MySqlDataColumn"/> object with a schema identical to this column's schema.
     /// </summary>
     /// <returns>A new <see cref="MySqlDataColumn"/> object with a schema cloned from this column.</returns>
@@ -690,38 +698,6 @@ namespace MySQL.ForExcel.Classes
       }
 
       return colDefinition.ToString();
-    }
-
-    /// <summary>
-    /// Raises the <see cref="ColumnWarningsChanged"/> event.
-    /// </summary>
-    protected virtual void OnColumnWarningsChanged()
-    {
-      if (ColumnWarningsChanged != null)
-      {
-        ColumnWarningsChanged(this, new ColumnWarningsChangedArgs(this));
-      }
-    }
-
-    /// <summary>
-    /// Raises the <see cref="PropertyChanged"/> event.
-    /// </summary>
-    /// <param name="args">Event arguments.</param>
-    protected void OnPropertyChanged(PropertyChangedEventArgs args)
-    {
-      if (PropertyChanged != null)
-      {
-        PropertyChanged(this, args);
-      }
-    }
-
-    /// <summary>
-    /// Raises the <see cref="PropertyChanged"/> event.
-    /// </summary>
-    /// <param name="propertyName">Name of the property whose value changed.</param>
-    protected void OnPropertyChanged(string propertyName)
-    {
-      OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
     }
 
     /// <summary>
@@ -796,7 +772,7 @@ namespace MySQL.ForExcel.Classes
       warningsChanged = UpdateWarnings(!IsMySqlDataTypeValid, Resources.ExportDataTypeNotValidWarning) || warningsChanged;
       if (IsMySqlDataTypeValid && testTypeOnData)
       {
-        TestColumnDataTypeAgainstColumnData();
+        TestColumnDataTypeAgainstColumnData(MySqlDataType);
       }
 
       MySqlDataTable parentTable = Table as MySqlDataTable;
@@ -825,16 +801,52 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Checks if this column's data type is right for the data currently stored in the column.
     /// </summary>
+    /// <param name="mySqlDataType">The MySQL data type to test the column's data with.</param>
     /// <returns><c>true</c> if the column's data fits the data type, <c>false</c> otherwise.</returns>
-    private bool TestColumnDataTypeAgainstColumnData()
+    public bool TestColumnDataTypeAgainstColumnData(string mySqlDataType)
     {
-      bool dataFitsIntoType = MySqlDataType.Length > 0 && CanBeOfMySqlDataType(MySqlDataType);
-      if (UpdateWarnings(!dataFitsIntoType, Resources.ExportDataTypeNotSuitableWarning))
+      bool dataFitsIntoType = mySqlDataType.Length > 0 && CanBeOfMySqlDataType(mySqlDataType);
+      string warningText = ParentTable != null && ParentTable.OperationType.IsForAppend()
+        ? Resources.AppendDataNotSuitableForColumnTypeWarning
+        : Resources.ExportDataTypeNotSuitableWarning;
+      if (UpdateWarnings(!dataFitsIntoType, warningText))
       {
         OnColumnWarningsChanged();
       }
 
       return dataFitsIntoType;
+    }
+
+    /// <summary>
+    /// Raises the <see cref="ColumnWarningsChanged"/> event.
+    /// </summary>
+    protected virtual void OnColumnWarningsChanged()
+    {
+      if (ColumnWarningsChanged != null)
+      {
+        ColumnWarningsChanged(this, new ColumnWarningsChangedArgs(this));
+      }
+    }
+
+    /// <summary>
+    /// Raises the <see cref="PropertyChanged"/> event.
+    /// </summary>
+    /// <param name="args">Event arguments.</param>
+    protected void OnPropertyChanged(PropertyChangedEventArgs args)
+    {
+      if (PropertyChanged != null)
+      {
+        PropertyChanged(this, args);
+      }
+    }
+
+    /// <summary>
+    /// Raises the <see cref="PropertyChanged"/> event.
+    /// </summary>
+    /// <param name="propertyName">Name of the property whose value changed.</param>
+    protected void OnPropertyChanged(string propertyName)
+    {
+      OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
     }
 
     /// <summary>

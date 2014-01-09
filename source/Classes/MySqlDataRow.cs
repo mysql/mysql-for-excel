@@ -270,7 +270,7 @@ namespace MySQL.ForExcel.Classes
       for (colIdx = startingColNum; colIdx < MySqlTable.Columns.Count; colIdx++)
       {
         MySqlDataColumn column = MySqlTable.GetColumnAtIndex(colIdx);
-        if (column.ExcludeColumn)
+        if (column.ExcludeColumn || (MySqlTable.OperationType.IsForAppend() && column.MappedDataColOrdinal < 0))
         {
           continue;
         }
