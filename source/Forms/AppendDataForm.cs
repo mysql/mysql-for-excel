@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -891,7 +891,7 @@ namespace MySQL.ForExcel.Forms
           gridObject.DoDragDrop(_gridColumnIndexToDrag, DragDropEffects.Link);
           break;
 
-        case "grdToMySQLTable":
+        case "TargetMySQLTableDataGridView":
           if (_gridColumnIndexToDrag >= 0 && CurrentColumnMapping != null && CurrentColumnMapping.MappedSourceIndexes[_gridColumnIndexToDrag] >= 0)
           {
             gridObject.DoDragDrop(_gridColumnIndexToDrag, DragDropEffects.Move);
@@ -1343,7 +1343,7 @@ namespace MySQL.ForExcel.Forms
                 DialogResult dr = DialogResult.No;
                 if (!isIdenticalMapping)
                 {
-                  dr = InfoDialog.ShowWarningDialog(Resources.ColumnMappedOverwriteTitleWarning, Resources.ColumnMappedOverwriteDetailWarning);
+                  dr = InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ColumnMappedOverwriteTitleWarning, Resources.ColumnMappedOverwriteDetailWarning);
                 }
 
                 if (dr == DialogResult.Yes)
@@ -1375,7 +1375,7 @@ namespace MySQL.ForExcel.Forms
                 DialogResult dr = DialogResult.No;
                 if (!isIdenticalMapping)
                 {
-                  dr = InfoDialog.ShowWarningDialog(Resources.ColumnMappedOverwriteTitleWarning, Resources.ColumnMappedExchangeDetailWarning);
+                  dr = InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ColumnMappedOverwriteTitleWarning, Resources.ColumnMappedExchangeDetailWarning);
                 }
 
                 if (dr == DialogResult.No)
