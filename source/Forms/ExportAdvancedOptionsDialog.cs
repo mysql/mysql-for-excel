@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -29,6 +29,28 @@ namespace MySQL.ForExcel.Forms
   public partial class ExportAdvancedOptionsDialog : AutoStyleableBaseDialog
   {
     /// <summary>
+    /// Initializes a new instance of the <see cref="ExportAdvancedOptionsDialog"/> class.
+    /// </summary>
+    public ExportAdvancedOptionsDialog()
+    {
+      InitializeComponent();
+
+      ExportDetectDatatypeChanged = false;
+      ExportRemoveEmptyColumnsChanged = false;
+      ParentFormRequiresRefresh = false;
+      PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.ExportLimitPreviewRowsQuantity);
+      DetectDatatypeCheckBox.Checked = Settings.Default.ExportDetectDatatype;
+      AddBufferToVarcharCheckBox.Checked = Settings.Default.ExportAddBufferToVarchar;
+      AutoIndexIntColumnsCheckBox.Checked = Settings.Default.ExportAutoIndexIntColumns;
+      AutoAllowEmptyNonIndexColumnsCheckBox.Checked = Settings.Default.ExportAutoAllowEmptyNonIndexColumns;
+      UseFormattedValuesCheckBox.Checked = Settings.Default.ExportUseFormattedValues;
+      RemoveEmptyColumnsCheckBox.Checked = Settings.Default.ExportRemoveEmptyColumns;
+      AddBufferToVarcharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
+    }
+
+    #region Properties
+
+    /// <summary>
     /// Gets a value indicating whether the parent form requires to refresh its data grid view control.
     /// </summary>
     public bool ParentFormRequiresRefresh { get; private set; }
@@ -43,26 +65,26 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     public bool ExportRemoveEmptyColumnsChanged { get; private set; }
 
+    #endregion Properties
+
     /// <summary>
-    /// Initializes a new instance of the <see cref="ExportAdvancedOptionsDialog"/> class.
+    /// Event delegate method fired when the <see cref="AutoIndexIntColumnsCheckBox"/> checkbox is checked.
     /// </summary>
-    public ExportAdvancedOptionsDialog()
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void AutoIndexIntColumnsCheckBox_CheckedChanged(object sender, EventArgs e)
     {
-      ParentFormRequiresRefresh = false;
-      ExportDetectDatatypeChanged = false;
-      ExportRemoveEmptyColumnsChanged = false;
+      GetParentFormRequiresRefresh();
+    }
 
-      InitializeComponent();
-
-      PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.ExportLimitPreviewRowsQuantity);
-      DetectDatatypeCheckBox.Checked = Settings.Default.ExportDetectDatatype;
-      AddBufferToVarcharCheckBox.Checked = Settings.Default.ExportAddBufferToVarchar;
-      AutoIndexIntColumnsCheckBox.Checked = Settings.Default.ExportAutoIndexIntColumns;
-      AutoAllowEmptyNonIndexColumnsCheckBox.Checked = Settings.Default.ExportAutoAllowEmptyNonIndexColumns;
-      UseFormattedValuesCheckBox.Checked = Settings.Default.ExportUseFormattedValues;
-      RemoveEmptyColumnsCheckBox.Checked = Settings.Default.ExportRemoveEmptyColumns;
-      //chkShowCopySQLButton.Checked = Settings.Default.ExportShowCopySQLButton;
-      AddBufferToVarcharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
+    /// <summary>
+    /// Event delegate method fired when the <see cref="AutoAllowEmptyNonIndexColumnsCheckBox"/> checkbox is checked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void AutoAllowEmptyNonIndexColumnsCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+      GetParentFormRequiresRefresh();
     }
 
     /// <summary>
@@ -77,6 +99,9 @@ namespace MySQL.ForExcel.Forms
       {
         AddBufferToVarcharCheckBox.Checked = false;
       }
+
+      ExportDetectDatatypeChanged = Settings.Default.ExportDetectDatatype != DetectDatatypeCheckBox.Checked;
+      GetParentFormRequiresRefresh();
     }
 
     /// <summary>
@@ -91,27 +116,70 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      var previewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
-
-      ExportDetectDatatypeChanged = Settings.Default.ExportDetectDatatype != DetectDatatypeCheckBox.Checked;
-      ExportRemoveEmptyColumnsChanged = Settings.Default.ExportRemoveEmptyColumns != RemoveEmptyColumnsCheckBox.Checked;
-      ParentFormRequiresRefresh = ExportDetectDatatypeChanged ||
-                                  ExportRemoveEmptyColumnsChanged ||
-                                  Settings.Default.ExportLimitPreviewRowsQuantity != previewRowsQuantity ||
-                                  Settings.Default.ExportAutoIndexIntColumns != AutoIndexIntColumnsCheckBox.Checked ||
-                                  Settings.Default.ExportAutoAllowEmptyNonIndexColumns != AutoAllowEmptyNonIndexColumnsCheckBox.Checked ||
-                                  Settings.Default.ExportUseFormattedValues != UseFormattedValuesCheckBox.Checked;
-
-
-      Settings.Default.ExportLimitPreviewRowsQuantity = previewRowsQuantity;
+      Settings.Default.ExportLimitPreviewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
       Settings.Default.ExportDetectDatatype = DetectDatatypeCheckBox.Checked;
       Settings.Default.ExportAddBufferToVarchar = AddBufferToVarcharCheckBox.Checked;
       Settings.Default.ExportAutoIndexIntColumns = AutoIndexIntColumnsCheckBox.Checked;
       Settings.Default.ExportAutoAllowEmptyNonIndexColumns = AutoAllowEmptyNonIndexColumnsCheckBox.Checked;
       Settings.Default.ExportUseFormattedValues = UseFormattedValuesCheckBox.Checked;
       Settings.Default.ExportRemoveEmptyColumns = RemoveEmptyColumnsCheckBox.Checked;
-      //Settings.Default.ExportShowCopySQLButton = chkShowCopySQLButton.Checked;
       MiscUtilities.SaveSettings();
+    }
+
+    /// <summary>
+    /// Recalculates the value of the <see cref="ParentFormRequiresRefresh"/> property.
+    /// </summary>
+    /// <returns>The recalculated value of the <see cref="ParentFormRequiresRefresh"/> property.</returns>
+    private bool GetParentFormRequiresRefresh()
+    {
+      ParentFormRequiresRefresh = ExportDetectDatatypeChanged
+                                  || ExportRemoveEmptyColumnsChanged
+                                  || Settings.Default.ExportLimitPreviewRowsQuantity != (int)PreviewRowsQuantityNumericUpDown.Value
+                                  || Settings.Default.ExportAutoIndexIntColumns != AutoIndexIntColumnsCheckBox.Checked
+                                  || Settings.Default.ExportAutoAllowEmptyNonIndexColumns != AutoAllowEmptyNonIndexColumnsCheckBox.Checked
+                                  || Settings.Default.ExportUseFormattedValues != UseFormattedValuesCheckBox.Checked;
+      SetWarningControlsVisibility();
+      return ParentFormRequiresRefresh;
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="RemoveEmptyColumnsCheckBox"/> checkbox is checked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void RemoveEmptyColumnsCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+      ExportRemoveEmptyColumnsChanged = Settings.Default.ExportRemoveEmptyColumns != RemoveEmptyColumnsCheckBox.Checked;
+      GetParentFormRequiresRefresh();
+    }
+
+    /// <summary>
+    /// Sets the visibility of the controls depicting a warning about column options changes being lost.
+    /// </summary>
+    private void SetWarningControlsVisibility()
+    {
+      ColumnOptionsLostWarningLabel.Visible = ParentFormRequiresRefresh;
+      ColumnOptionsLostWarningPictureBox.Visible = ParentFormRequiresRefresh;
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="PreviewRowsQuantityNumericUpDown"/> value changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void PreviewRowsQuantityNumericUpDown_ValueChanged(object sender, EventArgs e)
+    {
+      GetParentFormRequiresRefresh();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="UseFormattedValuesCheckBox"/> checkbox is checked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void UseFormattedValuesCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+      GetParentFormRequiresRefresh();
     }
   }
 }

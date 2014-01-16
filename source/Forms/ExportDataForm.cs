@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -216,11 +216,14 @@ namespace MySQL.ForExcel.Forms
           }
         }
 
-        // Trigger Warning Refresh
+        // Update table properties with user properties
+        PreviewDataTable.TableName = TableNameInputTextBox.Text.Trim();
+        PreviewDataTable.UseFirstColumnAsPk = AddPrimaryKeyRadioButton.Checked;
         PreviewDataTable.FirstRowIsHeaders = FirstRowHeadersCheckBox.Checked;
 
         // Force Empty columns with emtpy column names from being stated defaulty when this is not desired.
         RecreateColumns();
+        SetDefaultPrimaryKey();
 
         // Refresh first row headers accordingly
         PreviewDataGridView.CurrentCell = null;

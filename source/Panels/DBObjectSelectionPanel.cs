@@ -254,7 +254,7 @@ namespace MySQL.ForExcel.Panels
     private void DBObjectList_AfterSelect(object sender, TreeViewEventArgs e)
     {
       var editPane = Parent as ExcelAddInPane;
-      var editActive = e!=null && editPane != null && editPane.TableHasEditOnGoing(e.Node.Text);
+      var editActive = editPane != null && e != null && e.Node != null && editPane.TableHasEditOnGoing(e.Node.Text);
       RefreshActionLabelsEnabledStatus(null, editActive);
     }
 
