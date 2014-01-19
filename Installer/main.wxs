@@ -27,11 +27,14 @@
     </Condition>
 
     <!-- See if VSTO is installed -->
-    <Property Id="VSTOINSTALLED">
-      <RegistrySearch Id="RegVSTOSearch" Root="HKLM" Key="Software\Microsoft\VSTO Runtime Setup\v4" Name="Install" Type="raw"/>
+    <Property Id="VSTO_X86_INSTALLED">
+	  <RegistrySearch Id="VSTOx86InstalledSearch" Root="HKLM" Key="SOFTWARE\Wow6432Node\Microsoft\VSTO Runtime Setup\v4R" Name="VSTORFeature_CLR40" Type="raw"/>
+    </Property>
+	<Property Id="VSTO_X64_INSTALLED">
+	  <RegistrySearch Id="VSTOx64InstalledSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VSTO Runtime Setup\v4R" Name="VSTORFeature_CLR40" Type="raw"/>
     </Property>
     <Condition Message="The Microsoft Visual Studio Tools for Office Runtime must be installed prior to running this installation.">
-      <![CDATA[Installed OR VSTOINSTALLED]]>
+      <![CDATA[Installed OR VSTO_X86_INSTALLED OR VSTO_X64_INSTALLED]]>
     </Condition>
 
     <!-- First make sure that .NET is installed -->
