@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -96,7 +96,7 @@ namespace MySQL.ForExcel
             // If running on Excel 2013 or later a MDI is used for the windows so the active custom pane is matched with its
             // window and the application active window.
             Excel.Window paneWindow = ctp.Window as Excel.Window;
-            isParentWindowActiveExcelWindow = paneWindow != null && paneWindow.Hwnd == Application.ActiveWindow.Hwnd;
+            isParentWindowActiveExcelWindow = paneWindow != null && Application.ActiveWindow != null && paneWindow.Hwnd == Application.ActiveWindow.Hwnd;
           }
           else
           {
@@ -147,6 +147,12 @@ namespace MySQL.ForExcel
     /// Gets the MS Excel major version number.
     /// </summary>
     public int ExcelVersionNumber { get; private set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the detection of contents for a cell selection should be skipped.
+    /// Used mainly when a cells selection is being done programatically and not by the user.
+    /// </summary>
+    public bool SkipSelectedDataContentsDetection { get; set; }
 
     /// <summary>
     /// Gets a list of <see cref="EditSessionInfo"/> objects saved to disk.
@@ -312,7 +318,10 @@ namespace MySQL.ForExcel
         return;
       }
 
-      ActiveExcelPane.UpdateExcelSelectedDataStatus(targetRange);
+      if (!SkipSelectedDataContentsDetection)
+      {
+        ActiveExcelPane.UpdateExcelSelectedDataStatus(targetRange);
+      }
     }
 
     /// <summary>
@@ -343,7 +352,10 @@ namespace MySQL.ForExcel
         return;
       }
 
-      ActiveExcelPane.UpdateExcelSelectedDataStatus(targetRange);
+      if (!SkipSelectedDataContentsDetection)
+      {
+        ActiveExcelPane.UpdateExcelSelectedDataStatus(targetRange);
+      }
     }
 
     /// <summary>
@@ -772,6 +784,7 @@ namespace MySQL.ForExcel
       _editSessionsByWorkbook = new Dictionary<string, List<EditSessionInfo>>(StoredEditSessions.Count);
       _lastDeactivatedSheetName = string.Empty;
       _restoringExistingSession = false;
+      SkipSelectedDataContentsDetection = false;
 
       // This method is used to migrate all connections created with 1.0.6 (in a local connections file) to the Workbench connections file.
       MySqlWorkbench.MigrateExternalConnectionsToWorkbench();

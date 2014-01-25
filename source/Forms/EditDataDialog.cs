@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -472,7 +472,7 @@ namespace MySQL.ForExcel.Forms
       string operationDetails = null;
 
       Excel.Range intersectRange = EditDataRange.IntersectWith(target);
-      if (intersectRange == null || intersectRange.Count == 0)
+      if (intersectRange == null || intersectRange.CountLarge == 0)
       {
         undoChanges = true;
         if (rowWasDeleted)
@@ -610,7 +610,7 @@ namespace MySQL.ForExcel.Forms
     private void EditingWorksheet_SelectionChange(Excel.Range target)
     {
       Excel.Range intersectRange = EditDataRange.IntersectWith(target);
-      if (intersectRange == null || intersectRange.Count == 0)
+      if (intersectRange == null || intersectRange.CountLarge == 0)
       {
         Hide();
       }
@@ -876,6 +876,7 @@ namespace MySQL.ForExcel.Forms
         MiscUtilities.ShowCustomizedErrorDialog(refreshFromDb ? Resources.EditDataRefreshErrorText : Resources.EditDataRevertErrorText, exception.Message);
       }
 
+      Globals.ThisAddIn.SkipSelectedDataContentsDetection = true;
       EditingWorksheet.UnprotectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey);
       EditDataRange.Clear();
       Excel.Range topLeftCell = EditDataRange.Cells[1, 1];

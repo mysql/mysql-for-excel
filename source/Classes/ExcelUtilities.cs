@@ -267,37 +267,12 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the given range is not empty, <c>false</c> otherwise.</returns>
     public static bool ContainsAnyData(this Excel.Range range)
     {
-      if (range == null || range.Count < 1)
+      if (range == null || range.CountLarge < 1)
       {
         return false;
       }
 
-      bool hasData = false;
-      if (range.Count == 1)
-      {
-        hasData = range.Value2 != null;
-      }
-      else if (range.Count > 1)
-      {
-        object[,] values = range.Value2;
-        if (values == null)
-        {
-          return false;
-        }
-
-        foreach (object o in values)
-        {
-          if (o == null)
-          {
-            continue;
-          }
-
-          hasData = true;
-          break;
-        }
-      }
-
-      return hasData;
+      return Globals.ThisAddIn.Application.WorksheetFunction.CountA(range).CompareTo(0) != 0;
     }
 
     /// <summary>
@@ -396,32 +371,13 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      var excelData = range.ToBidimensionalArray();
-      int numCols = excelData.GetUpperBound(1);
-      int numRows = excelData.GetUpperBound(0);
-      List<bool> columnsHaveAnyDataList = new List<bool>(numCols + 1);
+      List<bool> columnsHaveAnyDataList = new List<bool>(range.Columns.Count + 1);
       if (prependPkColumn)
       {
         columnsHaveAnyDataList.Add(true);
       }
 
-      for (int colIdx = 1; colIdx <= numCols; colIdx++)
-      {
-        bool colHasAnyData = false;
-        for (int rowIdx = 1; rowIdx <= numRows; rowIdx++)
-        {
-          if (excelData[rowIdx, colIdx] == null)
-          {
-            continue;
-          }
-
-          colHasAnyData = true;
-          break;
-        }
-
-        columnsHaveAnyDataList.Add(colHasAnyData);
-      }
-
+      columnsHaveAnyDataList.AddRange(from Excel.Range columnRange in range.Columns select columnRange.ContainsAnyData());
       return columnsHaveAnyDataList;
     }
 
@@ -551,7 +507,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the given <see cref="Excel.Range"/> intersects with any Excel table in its containing <see cref="Excel.Worksheet"/>, <c>false</c> otherwise.</returns>
     public static bool IntersectsWithAnyExcelTable(this Excel.Range range)
     {
-      return range != null && (from Excel.ListObject excelTable in range.Worksheet.ListObjects select excelTable.Range.IntersectWith(range)).Any(intersectRange => intersectRange != null && intersectRange.Count != 0);
+      return range != null && (from Excel.ListObject excelTable in range.Worksheet.ListObjects select excelTable.Range.IntersectWith(range)).Any(intersectRange => intersectRange != null && intersectRange.CountLarge != 0);
     }
 
     /// <summary>
@@ -761,34 +717,6 @@ namespace MySQL.ForExcel.Classes
       }
       protectionKeyProperty.Value = protectionKey;
       return true;
-    }
-
-    /// <summary>
-    /// Converts an Excel data range to a bidimensional array of data objects.
-    /// </summary>
-    /// <param name="range">An Excel range to convert.</param>
-    /// <param name="isFormatted">Flag indicating whether the data from Excel is formatted for dates or not.</param>
-    /// <returns>A bidimensional arraty of objects representing the data in the Excel range.</returns>
-    public static object[,] ToBidimensionalArray(this Excel.Range range, bool isFormatted = true)
-    {
-      if (range == null)
-      {
-        return null;
-      }
-
-      object[,] excelData;
-      if (range.Count == 1)
-      {
-        // Teat a single cell specially, it doesn't come in as an array but as a single value
-        excelData = new object[2, 2];
-        excelData[1, 1] = isFormatted ? range.Value : range.Value2;
-      }
-      else
-      {
-        excelData = isFormatted ? range.Value : range.Value2;
-      }
-
-      return excelData;
     }
 
     /// <summary>

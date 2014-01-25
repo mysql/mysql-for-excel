@@ -791,12 +791,7 @@ namespace MySQL.ForExcel.Classes
 
         case "System.DateTime":
         case "MySql.Data.Types.MySqlDateTime":
-          if (strValue.Contains(":"))
-          {
-            return "Datetime";
-          }
-
-          return "Date";
+          return strValue.Contains(":") ? "Datetime" : "Date";
 
         case "System.TimeSpan":
           return "Time";

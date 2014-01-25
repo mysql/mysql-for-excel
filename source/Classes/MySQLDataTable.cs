@@ -962,7 +962,9 @@ namespace MySQL.ForExcel.Classes
       {
         int currentRow = atCell.Row - 1;
         Excel.Workbook activeWorkbook = atCell.Worksheet.Parent as Excel.Workbook;
-        int cappedNumRows = activeWorkbook != null && activeWorkbook.Excel8CompatibilityMode ? Math.Min(rowsCount, UInt16.MaxValue - currentRow) : rowsCount;
+        int cappedNumRows = activeWorkbook != null && activeWorkbook.Excel8CompatibilityMode
+          ? Math.Min(rowsCount, UInt16.MaxValue - currentRow)
+          : rowsCount;
         fillingRange = atCell.Resize[cappedNumRows, Columns.Count];
 
         // Check if the data being imported does not overlap with the data of an existing Excel table.
@@ -1010,7 +1012,8 @@ namespace MySQL.ForExcel.Classes
             {
               string importingValueText = importingValue as string;
 
-              // If the imported value is a text that starts with an equal sign Excel will treat it as a formula so it needs to be escaped prepending an apostrophe to it for Excel to treat it as standard text.
+              // If the imported value is a text that starts with an equal sign Excel will treat it as a formula so it needs to be escaped
+              // prepending an apostrophe to it for Excel to treat it as standard text.
               if (escapeFormulaTexts && importingValueText.StartsWith("="))
               {
                 importingValue = "'" + importingValueText;
@@ -1024,6 +1027,7 @@ namespace MySQL.ForExcel.Classes
           fillingRowIdx++;
         }
 
+        Globals.ThisAddIn.SkipSelectedDataContentsDetection = true;
         Globals.ThisAddIn.Application.Goto(fillingRange, false);
         fillingRange.ClearFormats();
         fillingRange.Value = fillingArray;
@@ -1031,7 +1035,9 @@ namespace MySQL.ForExcel.Classes
         // Create Named Table for the imported data
         if (Settings.Default.ImportCreateExcelTable && OperationType.IsForImport())
         {
-          string excelTableNamePrefix = Settings.Default.ImportPrefixExcelTable && !string.IsNullOrEmpty(Settings.Default.ImportPrefixExcelTableText) ? Settings.Default.ImportPrefixExcelTableText + "." : string.Empty;
+          string excelTableNamePrefix = Settings.Default.ImportPrefixExcelTable && !string.IsNullOrEmpty(Settings.Default.ImportPrefixExcelTableText)
+            ? Settings.Default.ImportPrefixExcelTableText + "."
+            : string.Empty;
           string excelTableNameSchemaPiece = !string.IsNullOrEmpty(SchemaName) ? SchemaName + "." : string.Empty;
           string excelTableNameTablePiece = !string.IsNullOrEmpty(TableName) ? TableName : "Table";
           fillingRange.CreateExcelTable(excelTableNamePrefix + excelTableNameSchemaPiece + excelTableNameTablePiece, importColumnNames);
@@ -1043,10 +1049,12 @@ namespace MySQL.ForExcel.Classes
 
         atCell.Worksheet.Columns.AutoFit();
         fillingRange.Rows.AutoFit();
+        Globals.ThisAddIn.SkipSelectedDataContentsDetection = false;
         atCell.Select();
       }
       catch (Exception ex)
       {
+        Globals.ThisAddIn.SkipSelectedDataContentsDetection = false;
         MiscUtilities.ShowCustomizedErrorDialog(Resources.ImportDataErrorDetailText, ex.Message, true);
         MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
@@ -1181,13 +1189,18 @@ namespace MySQL.ForExcel.Classes
           columnsHaveAnyDataList = dataRange.GetColumnsWithDataInfoList(AddPrimaryKeyColumn);
         }
 
-        var excelData = dataRange.ToBidimensionalArray(IsFormatted);
-        int numRows = excelData.GetUpperBound(0);
+        int numRows = dataRange.Rows.Count;
         int colAdjustIdx = AddPrimaryKeyColumn ? 1 : 0;
         int rowAdjustValue = _firstRowIsHeaders ? 1 : 0;
         for (int row = 1 + rowAdjustValue; row <= numRows; row++)
         {
-          bool rowHasAnyData = false;
+          Excel.Range rowRange = dataRange.Rows[row];
+          if (!rowRange.ContainsAnyData())
+          {
+            rowAdjustValue++;
+            continue;
+          }
+
           var dataRow = NewRow() as MySqlDataRow;
           if (dataRow == null)
           {
@@ -1212,33 +1225,26 @@ namespace MySQL.ForExcel.Classes
 
             // Increment the rangeColumnIndex by 1 because the indexes within the Excel range begin with 1 not 0.
             rangeColumnIndex++;
-            rowHasAnyData = rowHasAnyData || excelData[row, rangeColumnIndex] != null;
-            dataRow[mySqlColumn.Ordinal] = excelData[row, rangeColumnIndex] != null &&
-                                           excelData[row, rangeColumnIndex].Equals(0.0) && mySqlColumn.IsDate
+            Excel.Range excelCell = rowRange.Columns[rangeColumnIndex];
+            object excelCellData = excelCell != null ? (IsFormatted ? excelCell.Value : excelCell.Value2) : null;
+            dataRow[mySqlColumn.Ordinal] = excelCellData != null && excelCellData.Equals(0.0) && mySqlColumn.IsDate
               ? DataTypeUtilities.MYSQL_EMPTY_DATE
-              : dataRow[mySqlColumn.Ordinal] = excelData[row, rangeColumnIndex];
+              : dataRow[mySqlColumn.Ordinal] = excelCellData;
           }
 
-          if (rowHasAnyData)
+          if (row == 1 && _firstRowIsHeaders)
           {
-            if (row == 1 && _firstRowIsHeaders)
-            {
-              dataRow.IsHeadersRow = true;
-            }
+            dataRow.IsHeadersRow = true;
+          }
 
-            Rows.Add(dataRow);
-          }
-          else
-          {
-            rowAdjustValue++;
-          }
+          Rows.Add(dataRow);
         }
       }
       catch (Exception ex)
       {
         MySqlSourceTrace.WriteAppErrorToLog(ex);
         string errorTitle = string.Format(Resources.TableDataAdditionErrorTitle, OperationType.IsForExport() ? "exporting" : "appending");
-        MiscUtilities.ShowCustomizedErrorDialog(errorTitle, ex.Message + Environment.NewLine + Environment.NewLine + ex.StackTrace, false);
+        MiscUtilities.ShowCustomizedErrorDialog(errorTitle, ex.Message + Environment.NewLine + Environment.NewLine + ex.StackTrace);
         return false;
       }
 
@@ -1578,9 +1584,8 @@ namespace MySQL.ForExcel.Classes
     /// <param name="emptyColumnsToVarchar">Flag indicating if the data type for columns with no data is automatically set to varchar(255).</param>
     private void DetectTypes(Excel.Range dataRange, bool emptyColumnsToVarchar)
     {
-      object[,] excelData = dataRange.ToBidimensionalArray(IsFormatted);
-      int rowsCount = excelData.GetUpperBound(0);
-      int colsCount = excelData.GetUpperBound(1);
+      int rowsCount = dataRange.Rows.Count;
+      int colsCount = dataRange.Columns.Count;
       int colAdjustIdx = AddPrimaryKeyColumn ? 0 : 1;
       for (int dataColPos = 1; dataColPos <= colsCount; dataColPos++)
       {
@@ -1593,6 +1598,7 @@ namespace MySQL.ForExcel.Classes
         int[] varCharMaxLen = { 0, 0 };        // 0 - All rows original datatype varcharmaxlen, 1 - All rows Varchar forced datatype maxlen
         int[] decimalMaxLen1stRow = { 0, 0 };  // 0 - Integral part max length, 1 - decimal part max length
         int[] decimalMaxLen = { 0, 0 };        // 0 - Integral part max length, 1 - decimal part max length
+        int rowAdjustValue = 1;
 
         MySqlDataColumn col = GetColumnAtIndex(dataColPos - colAdjustIdx);
         if (!col.IsEmpty)
@@ -1600,14 +1606,16 @@ namespace MySQL.ForExcel.Classes
           for (int rowPos = 1; rowPos <= rowsCount; rowPos++)
           {
             strippedType = string.Empty;
-            object valueFromArray = excelData[rowPos, dataColPos];
-            if (valueFromArray == null)
+            Excel.Range excelCell = dataRange[rowPos, dataColPos];
+            object excelCellValue = excelCell != null ? (IsFormatted ? excelCell.Value : excelCell.Value2) : null;
+            if (excelCellValue == null)
             {
+              rowAdjustValue++;
               continue;
             }
 
             // Treat always as a Varchar value first in case all rows do not have a consistent datatype just to see the varchar len calculated by GetMySQLExportDataType
-            string valueAsString = valueFromArray.ToString();
+            string valueAsString = excelCellValue.ToString();
             bool valueOverflow;
             proposedType = DataTypeUtilities.GetMySqlExportDataType(valueAsString, out valueOverflow);
             if (proposedType == "Bool")
@@ -1628,7 +1636,7 @@ namespace MySQL.ForExcel.Classes
             }
 
             // Normal datatype detection
-            proposedType = DataTypeUtilities.GetMySqlExportDataType(valueFromArray, out valueOverflow);
+            proposedType = DataTypeUtilities.GetMySqlExportDataType(excelCellValue, out valueOverflow);
             leftParensIndex = proposedType.IndexOf("(", StringComparison.Ordinal);
             strippedType = leftParensIndex < 0 ? proposedType : proposedType.Substring(0, leftParensIndex);
             switch (strippedType)
@@ -1640,8 +1648,8 @@ namespace MySQL.ForExcel.Classes
                   break;
                 }
 
-                DateTime dtValue = (DateTime)valueFromArray;
-                Rows[rowPos - 1][dataColPos - colAdjustIdx] = dtValue.ToString(DataTypeUtilities.MYSQL_DATE_FORMAT);
+                DateTime dtValue = (DateTime)excelCellValue;
+                Rows[rowPos - rowAdjustValue][dataColPos - colAdjustIdx] = dtValue.ToString(DataTypeUtilities.MYSQL_DATE_FORMAT);
                 break;
 
               case "Varchar":
