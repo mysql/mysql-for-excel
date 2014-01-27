@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -47,6 +47,7 @@ namespace MySQL.ForExcel.Controls
       ActiveEditDialog = null;
       FirstSession = null;
       WbConnection = null;
+      WelcomePanel1.LoadConnections(true);
     }
 
     #region Properties

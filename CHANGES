@@ -1,13 +1,15 @@
 1.2.1
+- Enabled MySQL for Excel to create default connections at startup for every MySQL service found locally when no default connections exist and MySQL Workbench
+  is not installed. (Bug #16238788 - CONNECTIONS FOR FOUND MYSQL SERVICES SHOULD BE AUTOMATICALLY CREATED)
 - New column mappings are selected by default when the user creates them.
   (Bug #17665496 - APPEND DATA - NEW STORED MAPPING NOT APPLIED AFTER CREATION)
+- Changed the way the MySQL for Excel objects panel is refreshed on Windows XP.
+  (Bug #16238484 - TABLE ICON IS CUTOFF ON THE TABLE LIST WHEN TABLE IS EXPORTED TO AN EMPTY SCHEMA)
 - Implemented a new strategy for checking if a selection of Excel cells contain values to enable/disable the Export Data to New Table action label, this new
   strategy uses Excel native functions which are optimized for speed and memory usage. Optimized the way selected Excel data is fed to the Export Data's preview
   grid so the Export Data dialog loads faster with huge selections of data.
   (Bug #17349260 - ERROR WHEN SELECTING THE WHOLE SPREADSHEET'S CELLS)
   (Bug #14362824 - SELECTING A HUGE AMOUNT OF CELLS IN EXCEL FREEZES EXCEL)
-- Changed the way the MySQL for Excel objects panel is refreshed on Windows XP.
-  (Bug #16238484 - TABLE ICON IS CUTOFF ON THE TABLE LIST WHEN TABLE IS EXPORTED TO AN EMPTY SCHEMA)
 
 1.2.0
 - Added visual warnings to the Append Data dialog for source Excel columns being mapped to target MySQL columns where the source data is not suitable for the

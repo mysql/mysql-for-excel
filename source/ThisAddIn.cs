@@ -814,6 +814,7 @@ namespace MySQL.ForExcel
       string applicationDataFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
       MySqlWorkbench.ExternalApplicationName = AssemblyTitle;
       MySqlWorkbenchPasswordVault.ApplicationPasswordVaultFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\user_data.dat";
+      MySqlWorkbench.ExternalConnections.CreateDefaultConnections = !MySqlWorkbench.IsInstalled && !File.Exists(MySqlWorkbench.ConnectionsFilePath) && MySqlWorkbench.Connections.Count == 0;
       MySqlWorkbench.ExternalApplicationConnectionsFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\connections.xml";
       MySqlSourceTrace.LogFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\MySQLForExcel.log";
       MySqlSourceTrace.SourceTraceClass = "MySQLForExcel";
@@ -1000,7 +1001,7 @@ namespace MySQL.ForExcel
 
       // Add the sessions for the workbook being opened to the dictionary of sessions.
       // The GetWorkbookEditSessions method will add the sessions related to the workbook it if they haven't been added.
-      var  workbookEditSessions = GetWorkbookEditSessions(workbook);
+      var workbookEditSessions = GetWorkbookEditSessions(workbook);
       if (!Settings.Default.EditSessionsRestoreWhenOpeningWorkbook || workbookEditSessions.Count == 0)
       {
         return;

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -53,6 +53,44 @@ namespace MySQL.ForExcel.Panels
       DoubleBuffered = true;
       ManageConnectionsHotLabel.Enabled = MySqlWorkbench.AllowsExternalConnectionsManagement;
       LoadConnections(false);
+    }
+
+    /// <summary>
+    /// Searches for Workbench connections to load on the Connections list, if Workbench is not installed it loads connections created locally in MySQL for Excel.
+    /// <param name="reloadConnections">Flag indicating if connections are to be re-read from the connections file.</param>
+    /// </summary>
+    public void LoadConnections(bool reloadConnections)
+    {
+      if (reloadConnections)
+      {
+        MySqlWorkbench.Connections.Load();
+      }
+
+      // Avoids flickering of connections list while adding the items to it.
+      ConnectionsList.BeginUpdate();
+
+      // Clear currently loaded connections
+      foreach (TreeNode node in ConnectionsList.Nodes)
+      {
+        node.Nodes.Clear();
+      }
+
+      // Load connections just obtained from Workbench or locally created
+      foreach (MySqlWorkbenchConnection conn in MySqlWorkbench.Connections.OrderBy(conn => conn.Name))
+      {
+        conn.AllowZeroDateTimeValues = true;
+        AddConnectionToList(conn);
+      }
+
+      // Expand connection nodes
+      ConnectionsList.ExpandAll();
+      if (ConnectionsList.Nodes.Count > 0)
+      {
+        ConnectionsList.Nodes[0].EnsureVisible();
+      }
+
+      // Avoids flickering of connections list while adding the items to it.
+      ConnectionsList.EndUpdate();
     }
 
     /// <summary>
@@ -177,44 +215,6 @@ namespace MySQL.ForExcel.Panels
       {
         LoadConnections(false);
       }
-    }
-
-    /// <summary>
-    /// Searches for Workbench connections to load on the Connections list, if Workbench is not installed it loads connections created locally in MySQL for Excel.
-    /// <param name="reloadConnections">Flag indicating if connections are to be re-read from the connections file.</param>
-    /// </summary>
-    private void LoadConnections(bool reloadConnections)
-    {
-      if (reloadConnections)
-      {
-        MySqlWorkbench.Connections.Load();
-      }
-
-      // Avoids flickering of connections list while adding the items to it.
-      ConnectionsList.BeginUpdate();
-
-      // Clear currently loaded connections
-      foreach (TreeNode node in ConnectionsList.Nodes)
-      {
-        node.Nodes.Clear();
-      }
-
-      // Load connections just obtained from Workbench or locally created
-      foreach (MySqlWorkbenchConnection conn in MySqlWorkbench.Connections.OrderBy(conn => conn.Name))
-      {
-        conn.AllowZeroDateTimeValues = true;
-        AddConnectionToList(conn);
-      }
-
-      // Expand connection nodes
-      ConnectionsList.ExpandAll();
-      if (ConnectionsList.Nodes.Count > 0)
-      {
-        ConnectionsList.Nodes[0].EnsureVisible();
-      }
-
-      // Avoids flickering of connections list while adding the items to it.
-      ConnectionsList.EndUpdate();
     }
 
     /// <summary>
