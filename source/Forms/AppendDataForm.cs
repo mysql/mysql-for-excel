@@ -235,7 +235,7 @@ namespace MySQL.ForExcel.Forms
     private void AppendButton_Click(object sender, EventArgs e)
     {
       // If not all columns where mapped between the source and target tables ask the user if he still wants to produce with the append operation.
-      if (TargetMySqlPreviewDataTable.MappedColumnsQuantity < MaxMappingColumnsQuantity 
+      if (TargetMySqlPreviewDataTable.MappedColumnsQuantity < MaxMappingColumnsQuantity
         && InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ColumnMappingIncompleteTitleWarning, Resources.ColumnMappingIncompleteDetailWarning) == DialogResult.No)
       {
         return;
@@ -571,7 +571,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void ContentAreaPanel_DragDrop(object sender, DragEventArgs e)
     {
-      if (e.Effect != DragDropEffects.Move || !e.Data.GetDataPresent(typeof (Int32)))
+      if (e.Effect != DragDropEffects.Move || !e.Data.GetDataPresent(typeof(Int32)))
       {
         return;
       }
@@ -1271,6 +1271,7 @@ namespace MySQL.ForExcel.Forms
       CurrentColumnMapping.TableName = TargetMySqlPreviewDataTable.TableName;
 
       StoreColumnMappingInFile(CurrentColumnMapping);
+      MappingMethodComboBox.SelectedIndex = MappingMethodComboBox.Items.Count - 1;
     }
 
     /// <summary>

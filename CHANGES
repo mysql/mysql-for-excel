@@ -1,4 +1,6 @@
 1.2.1
+- New column mappings are selected by default when the user creates them.
+  (Bug #17665496 - APPEND DATA - NEW STORED MAPPING NOT APPLIED AFTER CREATION)
 - Implemented a new strategy for checking if a selection of Excel cells contain values to enable/disable the Export Data to New Table action label, this new
   strategy uses Excel native functions which are optimized for speed and memory usage. Optimized the way selected Excel data is fed to the Export Data's preview
   grid so the Export Data dialog loads faster with huge selections of data.
