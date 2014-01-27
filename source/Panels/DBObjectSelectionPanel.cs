@@ -92,7 +92,7 @@ namespace MySQL.ForExcel.Panels
         {
           return (DBObjectList.SelectedNode.Tag as DbObject);
         }
-        
+
         return null;
       }
     }
@@ -344,7 +344,20 @@ namespace MySQL.ForExcel.Panels
       }
 
       DBObjectList.Nodes[0].Nodes.Clear();
-      LoadDataObjects(DbObject.DbObjectType.Table);
+
+      // Objects are rendered a little differently on Windows XP than in newer OS versions.
+      // We need to verify which OS version is currently running to address the correct render method.
+      if (Environment.OSVersion.Version.Major <= 5)
+      {
+        // This is the correct render method for Windows XP and older OS versions.
+        RefreshDbObjectsList();
+      }
+      else
+      {
+        // This is the correct render method for Windows Vista and newer OS versions.
+        LoadDataObjects(DbObject.DbObjectType.Table);
+      }
+
       DBObjectList_AfterSelect(DBObjectList, new TreeViewEventArgs(null));
     }
 
