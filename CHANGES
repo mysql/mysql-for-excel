@@ -1,4 +1,6 @@
 1.2.1
+- Connector .NET, an internal component to MySQL for Excel fixed a bug that occurred when working with Unique keys, which caused this problem.
+  (Bug #17891357 - ONLY ONE TABLE FROM A DATABASE WON'T IMPORT)
 - Enabled MySQL for Excel to create default connections at startup for every MySQL service found locally when no default connections exist and MySQL Workbench
   is not installed. (Bug #16238788 - CONNECTIONS FOR FOUND MYSQL SERVICES SHOULD BE AUTOMATICALLY CREATED)
 - New column mappings are selected by default when the user creates them.
