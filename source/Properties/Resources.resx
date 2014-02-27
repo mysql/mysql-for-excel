@@ -880,7 +880,7 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
     <value>Errors found while trying to export data to MySQLTable "{0}".</value>
   </data>
   <data name="ExportDataOperationErrorNoRowsText" xml:space="preserve">
-    <value>Created the MySQL Table "{0}" with no data due errors.</value>
+    <value>The MySQL Table "{0}" was not created due errors on rows insertion.</value>
   </data>
   <data name="TableDataAdditionErrorTitle" xml:space="preserve">
     <value>Error adding data to {0} table.</value>
@@ -896,5 +896,8 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
   </data>
   <data name="ImportOverExcelTableErrorTitle" xml:space="preserve">
     <value>Cannot import data over existing Excel table</value>
+  </data>
+  <data name="ConnectionLostErrorText" xml:space="preserve">
+    <value>The connection to the MySQL server has been lost or was unexpectedly closed.</value>
   </data>
 </root>

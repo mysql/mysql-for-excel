@@ -32,14 +32,84 @@ namespace MySQL.ForExcel.Classes
     #region Constants
 
     /// <summary>
+    /// The maximum length a MySQL bigint column can hold.
+    /// </summary>
+    public const int MYSQL_BIGINT_MAX_LENGTH = 20;
+
+    /// <summary>
+    /// The maximum length a MySQL bit column can hold.
+    /// </summary>
+    public const int MYSQL_BIT_MAX_LENGTH = 64;
+
+    /// <summary>
     /// The date format used by DateTime fields in MySQL databases.
     /// </summary>
     public const string MYSQL_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     /// <summary>
+    /// The maximum length a MySQL date column can hold.
+    /// </summary>
+    public const int MYSQL_DATE_MAX_LENGTH = 10;
+
+    /// <summary>
+    /// The maximum length a MySQL date column can hold.
+    /// </summary>
+    public const int MYSQL_DATETIME_MAX_LENGTH = 26;
+
+    /// <summary>
+    /// The maximum length MySQL database objects can hold.
+    /// </summary>
+    public const int MYSQL_DB_OBJECTS_MAX_LENGTH = 64;
+
+    /// <summary>
+    /// The maximum length a MySQL decimal column can hold.
+    /// </summary>
+    public const int MYSQL_DECIMAL_MAX_LENGTH = 65;
+
+    /// <summary>
+    /// The maximum length a MySQL double column can hold.
+    /// </summary>
+    public const int MYSQL_DOUBLE_MAX_LENGTH = 310;
+
+    /// <summary>
     /// Represents an empty date in MySQL DateTime format.
     /// </summary>
     public const string MYSQL_EMPTY_DATE = "0000-00-00 00:00:00";
+
+    /// <summary>
+    /// The maximum length a MySQL float column can hold.
+    /// </summary>
+    public const int MYSQL_FLOAT_MAX_LENGTH = 41;
+
+    /// <summary>
+    /// The maximum length a MySQL int column can hold.
+    /// </summary>
+    public const int MYSQL_INT_MAX_LENGTH = 11;
+
+    /// <summary>
+    /// The maximum length a MySQL mediumint column can hold.
+    /// </summary>
+    public const int MYSQL_MEDIUMINT_MAX_LENGTH = 8;
+
+    /// <summary>
+    /// The maximum length a MySQL mediumtext column can hold.
+    /// </summary>
+    public const int MYSQL_MEDIUMTEXT_MAX_LENGTH = 16777215;
+
+    /// <summary>
+    /// The maximum length a MySQL smallint column can hold.
+    /// </summary>
+    public const int MYSQL_SMALLINT_MAX_LENGTH = 6;
+
+    /// <summary>
+    /// The maximum length a MySQL time column can hold.
+    /// </summary>
+    public const int MYSQL_TIME_MAX_LENGTH = 17;
+
+    /// <summary>
+    /// The maximum length a MySQL tinyint column can hold.
+    /// </summary>
+    public const int MYSQL_TINYINT_MAX_LENGTH = 4;
 
     /// <summary>
     /// The maximum proposed length of the MySQL varchar data type.
@@ -436,7 +506,7 @@ namespace MySQL.ForExcel.Classes
               retValue = new MySql.Data.Types.MySqlDateTime(0, 0, 0, 0, 0, 0, 0);
             }
           }
-          else if (againstTypeColumn.ColumnsRequireQuotes)
+          else if (againstTypeColumn.ColumnRequiresQuotes)
           {
             retValue = string.Empty;
           }
@@ -525,7 +595,7 @@ namespace MySQL.ForExcel.Classes
               break;
           }
         }
-        else if (againstTypeColumn.ColumnsRequireQuotes)
+        else if (againstTypeColumn.ColumnRequiresQuotes)
         {
           retValue = escapeStringForTextTypes ? rawValue.ToString().EscapeDataValueString() : rawValue.ToString();
         }
@@ -625,6 +695,93 @@ namespace MySQL.ForExcel.Classes
       }
 
       return retType;
+    }
+
+    /// <summary>
+    /// Gets the Connector.NET data type object corresponding to a given MySQL data type.
+    /// </summary>
+    /// <param name="strippedMySqlDataType">The MySQL data type name stripped of formatting and modifiers.</param>
+    /// <param name="unsigned">Flag indicating whether integer data types are unsigned.</param>
+    /// <param name="realAsFloat">Flag indicating if real is translated to float or to double.</param>
+    /// <returns>The Connector.NET data type object corresponding to the given MySQL data type.</returns>
+    public static long GetMySqlDataTypeMaxLength(string strippedMySqlDataType, bool unsigned, bool realAsFloat)
+    {
+      switch (strippedMySqlDataType.ToUpper(CultureInfo.InvariantCulture))
+      {
+        case "TINYINT":
+        case "YEAR":
+          return MYSQL_TINYINT_MAX_LENGTH;
+
+        case "BOOL":
+        case "BOOLEAN":
+          return MYSQL_TINYINT_MAX_LENGTH + 1;
+
+        case "BIT":
+          return MYSQL_BIT_MAX_LENGTH;
+
+        case "SMALLINT":
+          return MYSQL_SMALLINT_MAX_LENGTH;
+
+        case "MEDIUMINT":
+          return MYSQL_MEDIUMINT_MAX_LENGTH;
+
+        case "INT":
+        case "INTEGER":
+          return MYSQL_INT_MAX_LENGTH;
+
+        case "BIGINT":
+        case "SERIAL":
+          return MYSQL_BIGINT_MAX_LENGTH;
+
+        case "NUMERIC":
+        case "DECIMAL":
+        case "DEC":
+        case "FIXED":
+          return MYSQL_DECIMAL_MAX_LENGTH;
+
+        case "FLOAT":
+          return MYSQL_FLOAT_MAX_LENGTH;
+
+        case "DOUBLE":
+          return MYSQL_DOUBLE_MAX_LENGTH;
+
+        case "REAL":
+          return realAsFloat ? MYSQL_FLOAT_MAX_LENGTH : MYSQL_DOUBLE_MAX_LENGTH;
+
+        case "CHAR":
+        case "BINARY":
+        case "TINYTEXT":
+        case "TINYBLOB":
+          return byte.MaxValue;
+
+        case "VARCHAR":
+        case "VARBINARY":
+        case "BLOB":
+        case "TEXT":
+        case "SET":
+        case "ENUM":
+          return ushort.MaxValue;
+
+        case "MEDIUMBLOB":
+        case "MEDIUMTEXT":
+          return MYSQL_MEDIUMTEXT_MAX_LENGTH;
+
+        case "LONGBLOB":
+        case "LONGTEXT":
+          return uint.MaxValue;
+
+        case "DATE":
+          return MYSQL_DATE_MAX_LENGTH;
+
+        case "DATETIME":
+        case "TIMESTAMP":
+          return MYSQL_DATETIME_MAX_LENGTH;
+
+        case "TIME":
+          return MYSQL_TIME_MAX_LENGTH;
+      }
+
+      throw new UnhandledMySqlTypeException();
     }
 
     /// <summary>
@@ -942,6 +1099,52 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets the MySQL data type name stripped of formatting and modifiers.
+    /// </summary>
+    /// <param name="mySqlDataType">The full MySQL data type.</param>
+    /// <param name="maxLenIfNotSpecified">Flag indicating whether the maximum length of the data type should be returned if not specified within the full data type.</param>
+    /// <param name="length">The length declared for this data type.</param>
+    /// <returns>The MySQL data type name stripped of formatting and modifiers.</returns>
+    public static string GetStrippedMySqlDataType(string mySqlDataType, bool maxLenIfNotSpecified, out long length)
+    {
+      mySqlDataType = mySqlDataType.Trim();
+      string strippedType = string.Empty;
+      length = 0;
+      if (string.IsNullOrEmpty(mySqlDataType))
+      {
+        return strippedType;
+      }
+
+      bool unsigned = mySqlDataType.ToLowerInvariant().Contains("unsigned");
+      int spaceIndex = mySqlDataType.IndexOf(' ');
+      if (spaceIndex > 0)
+      {
+        mySqlDataType = mySqlDataType.Substring(0, spaceIndex);
+      }
+
+      int lParensIndex = mySqlDataType.IndexOf('(');
+      if (lParensIndex < 0)
+      {
+        strippedType = mySqlDataType;
+      }
+      else
+      {
+        strippedType = mySqlDataType.Substring(0, lParensIndex);
+        int commaPos = mySqlDataType.IndexOf(',');
+        length = commaPos < 0
+          ? int.Parse(mySqlDataType.Substring(lParensIndex + 1, mySqlDataType.Length - lParensIndex - 2))
+          : int.Parse(mySqlDataType.Substring(lParensIndex + 1, commaPos - lParensIndex - 1)) + 1;
+      }
+
+      if (length == 0 && maxLenIfNotSpecified)
+      {
+        length = GetMySqlDataTypeMaxLength(strippedType, unsigned, false);
+      }
+
+      return strippedType;
+    }
+
+    /// <summary>
     /// Checks if the string value representing a date is a MySQL zero date.
     /// </summary>
     /// <param name="dateValueAsString">The string value representing a date.</param>
@@ -961,13 +1164,13 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the Connector.NET data type object corresponding to a given MySQL data type.
     /// </summary>
-    /// <param name="mySqlDataType">The MySQL data type name.</param>
+    /// <param name="strippedMySqlDataType">The MySQL data type name stripped of formatting and modifiers.</param>
     /// <param name="unsigned">Flag indicating whether integer data types are unsigned.</param>
     /// <param name="realAsFloat">Flag indicating if real is translated to float or to double.</param>
     /// <returns>The Connector.NET data type object corresponding to the given MySQL data type.</returns>
-    public static MySqlDbType NameToMySqlType(string mySqlDataType, bool unsigned, bool realAsFloat)
+    public static MySqlDbType NameToMySqlType(string strippedMySqlDataType, bool unsigned, bool realAsFloat)
     {
-      switch (mySqlDataType.ToUpper(CultureInfo.InvariantCulture))
+      switch (strippedMySqlDataType.ToUpper(CultureInfo.InvariantCulture))
       {
         case "CHAR":
           return MySqlDbType.String;
@@ -1077,13 +1280,13 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the .NET data type corresponding to a given MySQL data type.
     /// </summary>
-    /// <param name="mySqlDataType">The MySQL data type name.</param>
+    /// <param name="strippedMySqlDataType">The MySQL data type name stripped of formatting and modifiers.</param>
     /// <param name="unsigned">Flag indicating whether integer data types are unsigned.</param>
     /// <param name="datesAsMySqlDates">Flag indicating if a date data type will use a Connector.NET MySQLDateTime type or the native DateTime type.</param>
     /// <returns>The .NET type corresponding to the given MySQL data type.</returns>
-    public static Type NameToType(string mySqlDataType, bool unsigned, bool datesAsMySqlDates)
+    public static Type NameToType(string strippedMySqlDataType, bool unsigned, bool datesAsMySqlDates)
     {
-      string upperType = mySqlDataType.ToUpper(CultureInfo.InvariantCulture);
+      string upperType = strippedMySqlDataType.ToUpper(CultureInfo.InvariantCulture);
       switch (upperType)
       {
         case "CHAR":
@@ -1320,8 +1523,8 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Checks whether values with a given data type can be safely stored in a column with a second data type.
     /// </summary>
-    /// <param name="strippedType1">The data type tested to fit within a second data type.</param>
-    /// <param name="strippedType2">The second data type where values would fit or not.</param>
+    /// <param name="strippedType1">The first MySQL data type name stripped of formatting and modifiers.</param>
+    /// <param name="strippedType2">The second MySQL data type name stripped of formatting and modifiers.</param>
     /// <returns><c>true</c> if the first data type fits in the second one, <c>false</c> otherwise.</returns>
     public static bool Type1FitsIntoType2(string strippedType1, string strippedType2)
     {

@@ -67,7 +67,7 @@ namespace MySQL.ForExcel.Interfaces
     string GetSql();
 
     /// <summary>
-    /// Reflects the error set to the row into a user interface.
+    /// Reflects the error set to the row on its corresponding Excel range cells.
     /// </summary>
     void ReflectError();
   }

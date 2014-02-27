@@ -248,6 +248,7 @@
     <Compile Include="Classes\MySqlForExcelSettings.cs" />
     <Compile Include="Classes\MySqlStatement.cs" />
     <Compile Include="Classes\NativeWindowWrapper.cs" />
+    <Compile Include="Classes\TempRange.cs" />
     <Compile Include="Controls\ExcelAddInPane.cs">
       <SubType>UserControl</SubType>
     </Compile>

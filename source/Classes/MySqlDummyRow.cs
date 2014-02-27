@@ -118,7 +118,7 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Reflects the error set to the row into a user interface.
+    /// Reflects the error set to the row on its corresponding Excel range cells.
     /// </summary>
     public void ReflectError()
     {

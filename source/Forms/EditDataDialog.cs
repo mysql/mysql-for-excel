@@ -212,8 +212,7 @@ namespace MySQL.ForExcel.Forms
     {
       get
       {
-        var changesTable = EditMySqlDataTable.GetChanges();
-        return changesTable != null && changesTable.Rows.Count > 0;
+        return EditMySqlDataTable.ChangedOrDeletedRows > 0;
       }
     }
 
@@ -833,6 +832,10 @@ namespace MySQL.ForExcel.Forms
         MiscUtilities.ShowCustomizedInfoDialog(operationsType, operationSummary.ToString(), operationDetails.ToString(), false);
       }
 
+      operationSummary.Clear();
+      operationDetails.Clear();
+      warningDetails.Clear();
+      warningStatementDetails.Clear();
       CommitChangesButton.Enabled = UncommitedDataExists && !autoCommitOn;
       Cursor = Cursors.Default;
       return !errorsFound;

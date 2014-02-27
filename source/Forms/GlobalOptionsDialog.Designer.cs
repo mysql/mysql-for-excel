@@ -45,6 +45,8 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void InitializeComponent()
     {
+      this.components = new System.ComponentModel.Container();
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GlobalOptionsDialog));
       this.DialogAcceptButton = new System.Windows.Forms.Button();
       this.DialogCancelButton = new System.Windows.Forms.Button();
       this.ConnectionOptionsLabel = new System.Windows.Forms.Label();
@@ -66,6 +68,7 @@ namespace MySQL.ForExcel.Forms
       this.panel1 = new System.Windows.Forms.Panel();
       this.CreateNewWorksheetsRadioButton = new System.Windows.Forms.RadioButton();
       this.ReuseWorksheetsRadioButton = new System.Windows.Forms.RadioButton();
+      this.ExcelToolTip = new System.Windows.Forms.ToolTip(this.components);
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.ConnectionTimeoutNumericUpDown)).BeginInit();
@@ -176,6 +179,8 @@ namespace MySQL.ForExcel.Forms
       this.ConnectionTimeoutNumericUpDown.Name = "ConnectionTimeoutNumericUpDown";
       this.ConnectionTimeoutNumericUpDown.Size = new System.Drawing.Size(52, 21);
       this.ConnectionTimeoutNumericUpDown.TabIndex = 3;
+      this.ExcelToolTip.SetToolTip(this.ConnectionTimeoutNumericUpDown, "Number of seconds to wait before a connection to a MySQL server times out.\r\nOn ve" +
+        "ry slow connections it is advised to raise this value.");
       this.ConnectionTimeoutNumericUpDown.Value = new decimal(new int[] {
             1,
             0,
@@ -219,6 +224,9 @@ namespace MySQL.ForExcel.Forms
       this.QueryTimeoutNumericUpDown.Name = "QueryTimeoutNumericUpDown";
       this.QueryTimeoutNumericUpDown.Size = new System.Drawing.Size(52, 21);
       this.QueryTimeoutNumericUpDown.TabIndex = 6;
+      this.ExcelToolTip.SetToolTip(this.QueryTimeoutNumericUpDown, "Number of seconds to wait before a query sent to a MySQL server times out.\r\nOn ve" +
+        "ry slow connections or when connecting to a slow computer it is advised to raise" +
+        " this value.");
       this.QueryTimeoutNumericUpDown.Value = new decimal(new int[] {
             1,
             0,
@@ -255,6 +263,8 @@ namespace MySQL.ForExcel.Forms
       this.RestoreSavedEditSessionsCheckBox.Size = new System.Drawing.Size(323, 17);
       this.RestoreSavedEditSessionsCheckBox.TabIndex = 12;
       this.RestoreSavedEditSessionsCheckBox.Text = "Restore saved Edit sessions when opening an Excel workbook";
+      this.ExcelToolTip.SetToolTip(this.RestoreSavedEditSessionsCheckBox, "When checked Edit Data sessions that were active when an Excel workbook was saved" +
+        ", are restored when the workbook is opened again.");
       this.RestoreSavedEditSessionsCheckBox.UseVisualStyleBackColor = true;
       this.RestoreSavedEditSessionsCheckBox.CheckedChanged += new System.EventHandler(this.RestoreSavedEditSessionsCheckBox_CheckedChanged);
       // 
@@ -278,6 +288,7 @@ namespace MySQL.ForExcel.Forms
       this.UseOptimisticUpdatesCheckBox.Size = new System.Drawing.Size(250, 17);
       this.UseOptimisticUpdatesCheckBox.TabIndex = 9;
       this.UseOptimisticUpdatesCheckBox.Text = "Use optimistic updates on all Edit Data sessions";
+      this.ExcelToolTip.SetToolTip(this.UseOptimisticUpdatesCheckBox, resources.GetString("UseOptimisticUpdatesCheckBox.ToolTip"));
       this.UseOptimisticUpdatesCheckBox.UseVisualStyleBackColor = true;
       // 
       // ShowQueriesOptionsPanel
@@ -299,6 +310,8 @@ namespace MySQL.ForExcel.Forms
       this.ShowExecutedSqlQueryRadioButton.TabIndex = 2;
       this.ShowExecutedSqlQueryRadioButton.TabStop = true;
       this.ShowExecutedSqlQueryRadioButton.Text = "Show executed SQL statements along with their results";
+      this.ExcelToolTip.SetToolTip(this.ShowExecutedSqlQueryRadioButton, "SQL statements and their execution results are shown after they are sent to the s" +
+        "erver.");
       this.ShowExecutedSqlQueryRadioButton.UseVisualStyleBackColor = true;
       // 
       // PreviewSqlQueriesRadioButton
@@ -310,6 +323,8 @@ namespace MySQL.ForExcel.Forms
       this.PreviewSqlQueriesRadioButton.TabIndex = 1;
       this.PreviewSqlQueriesRadioButton.TabStop = true;
       this.PreviewSqlQueriesRadioButton.Text = "Preview SQL statements before they are sent to the server";
+      this.ExcelToolTip.SetToolTip(this.PreviewSqlQueriesRadioButton, "SQL statements are shown, and can be modified, before they are sent to the server" +
+        ".");
       this.PreviewSqlQueriesRadioButton.UseVisualStyleBackColor = true;
       // 
       // NoSqlStatementsRadioButton
@@ -321,6 +336,7 @@ namespace MySQL.ForExcel.Forms
       this.NoSqlStatementsRadioButton.TabIndex = 0;
       this.NoSqlStatementsRadioButton.TabStop = true;
       this.NoSqlStatementsRadioButton.Text = "Do not show SQL statements sent to the server";
+      this.ExcelToolTip.SetToolTip(this.NoSqlStatementsRadioButton, "SQL statements are never shown, only the results of the executed queries are.");
       this.NoSqlStatementsRadioButton.UseVisualStyleBackColor = true;
       // 
       // panel1
@@ -341,6 +357,7 @@ namespace MySQL.ForExcel.Forms
       this.CreateNewWorksheetsRadioButton.TabIndex = 1;
       this.CreateNewWorksheetsRadioButton.TabStop = true;
       this.CreateNewWorksheetsRadioButton.Text = "Create new Excel worksheets for the restored Edit sessions";
+      this.ExcelToolTip.SetToolTip(this.CreateNewWorksheetsRadioButton, "When restoring Edit Data sessions the data will be imported on new worksheets.");
       this.CreateNewWorksheetsRadioButton.UseVisualStyleBackColor = true;
       // 
       // ReuseWorksheetsRadioButton
@@ -352,7 +369,15 @@ namespace MySQL.ForExcel.Forms
       this.ReuseWorksheetsRadioButton.TabIndex = 0;
       this.ReuseWorksheetsRadioButton.TabStop = true;
       this.ReuseWorksheetsRadioButton.Text = "Reuse Excel worksheets matching their names with the session table names";
+      this.ExcelToolTip.SetToolTip(this.ReuseWorksheetsRadioButton, "When restoring Edit Data sessions the data will be imported on worksheets that ha" +
+        "ve the same name as the MySQL table being edited.");
       this.ReuseWorksheetsRadioButton.UseVisualStyleBackColor = true;
+      // 
+      // ExcelToolTip
+      // 
+      this.ExcelToolTip.AutoPopDelay = 5000;
+      this.ExcelToolTip.InitialDelay = 1000;
+      this.ExcelToolTip.ReshowDelay = 100;
       // 
       // GlobalOptionsDialog
       // 
@@ -402,5 +427,6 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.Panel panel1;
     private System.Windows.Forms.RadioButton CreateNewWorksheetsRadioButton;
     private System.Windows.Forms.RadioButton ReuseWorksheetsRadioButton;
+    private System.Windows.Forms.ToolTip ExcelToolTip;
   }
 }

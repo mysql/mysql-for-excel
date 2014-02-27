@@ -45,7 +45,7 @@
       <Value Profile="(Default)">15</Value>
     </Setting>
     <Setting Name="GlobalConnectionCommandTimeout" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.UInt32" Scope="User">
-      <Value Profile="(Default)">30</Value>
+      <Value Profile="(Default)">60</Value>
     </Setting>
     <Setting Name="ImportPreviewRowsQuantity" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">10</Value>
@@ -85,6 +85,12 @@
     </Setting>
     <Setting Name="ImportPrefixExcelTableText" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.String" Scope="User">
       <Value Profile="(Default)">MySQL</Value>
+    </Setting>
+    <Setting Name="AppendSqlQueriesDisableIndexes" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ExportSqlQueriesCreateIndexesLast" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

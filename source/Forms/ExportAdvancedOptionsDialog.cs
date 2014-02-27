@@ -46,6 +46,7 @@ namespace MySQL.ForExcel.Forms
       UseFormattedValuesCheckBox.Checked = Settings.Default.ExportUseFormattedValues;
       RemoveEmptyColumnsCheckBox.Checked = Settings.Default.ExportRemoveEmptyColumns;
       AddBufferToVarcharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
+      CreateTableIndexesLastCheckBox.Checked = Settings.Default.ExportSqlQueriesCreateIndexesLast;
     }
 
     #region Properties
@@ -123,6 +124,7 @@ namespace MySQL.ForExcel.Forms
       Settings.Default.ExportAutoAllowEmptyNonIndexColumns = AutoAllowEmptyNonIndexColumnsCheckBox.Checked;
       Settings.Default.ExportUseFormattedValues = UseFormattedValuesCheckBox.Checked;
       Settings.Default.ExportRemoveEmptyColumns = RemoveEmptyColumnsCheckBox.Checked;
+      Settings.Default.ExportSqlQueriesCreateIndexesLast = CreateTableIndexesLastCheckBox.Checked;
       MiscUtilities.SaveSettings();
     }
 

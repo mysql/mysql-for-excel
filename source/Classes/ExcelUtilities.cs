@@ -79,6 +79,11 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public const int EMPTY_CELLS_OLE_COLOR = 0;
 
+    /// <summary>
+    /// The en-us locale code.
+    /// </summary>
+    public const int EN_US_LOCALE_CODE = 1033;
+
     #endregion Constants
 
     /// <summary>
@@ -225,6 +230,64 @@ namespace MySQL.ForExcel.Classes
     #endregion Properties
 
     /// <summary>
+    /// Adds names to the whole application related to localized date format strings.
+    /// </summary>
+    /// <param name="workbook">The workbook where the new <see cref="Excel.Style"/> is added to.</param>
+    public static void AddLocalizedDateFormatStringsAsNames(this Excel.Workbook workbook)
+    {
+      if (workbook == null)
+      {
+        return;
+      }
+
+      IList<Excel.Name> namesCollection = workbook.Names.Cast<Excel.Name>().ToList();
+      if (namesCollection.All(name => name.Name != "LOCAL_DATE_SEPARATOR"))
+      {
+        workbook.Names.Add("LOCAL_DATE_SEPARATOR", "=INDEX(GET.WORKSPACE(37),17)");
+      }
+
+      if (namesCollection.All(name => name.Name != "LOCAL_TIME_SEPARATOR"))
+      {
+        workbook.Names.Add("LOCAL_TIME_SEPARATOR", "=INDEX(GET.WORKSPACE(37),18)");
+      }
+
+      if (namesCollection.All(name => name.Name != "LOCAL_YEAR_FORMAT"))
+      {
+        workbook.Names.Add("LOCAL_YEAR_FORMAT", "=INDEX(GET.WORKSPACE(37),19)");
+      }
+
+      if (namesCollection.All(name => name.Name != "LOCAL_MONTH_FORMAT"))
+      {
+        workbook.Names.Add("LOCAL_MONTH_FORMAT", "=INDEX(GET.WORKSPACE(37),20)");
+      }
+
+      if (namesCollection.All(name => name.Name != "LOCAL_DAY_FORMAT"))
+      {
+        workbook.Names.Add("LOCAL_DAY_FORMAT", "=INDEX(GET.WORKSPACE(37),21)");
+      }
+
+      if (namesCollection.All(name => name.Name != "LOCAL_HOUR_FORMAT"))
+      {
+        workbook.Names.Add("LOCAL_HOUR_FORMAT", "=INDEX(GET.WORKSPACE(37),22)");
+      }
+
+      if (namesCollection.All(name => name.Name != "LOCAL_MINUTE_FORMAT"))
+      {
+        workbook.Names.Add("LOCAL_MINUTE_FORMAT", "=INDEX(GET.WORKSPACE(37),23)");
+      }
+
+      if (namesCollection.All(name => name.Name != "LOCAL_MINUTE_FORMAT"))
+      {
+        workbook.Names.Add("LOCAL_SECOND_FORMAT", "=INDEX(GET.WORKSPACE(37),24)");
+      }
+
+      if (namesCollection.All(name => name.Name != "LOCAL_MYSQL_DATE_FORMAT"))
+      {
+        workbook.Names.Add("LOCAL_MYSQL_DATE_FORMAT", "=REPT(LOCAL_YEAR_FORMAT,4)&LOCAL_DATE_SEPARATOR&REPT(LOCAL_MONTH_FORMAT,2)&LOCAL_DATE_SEPARATOR&REPT(LOCAL_DAY_FORMAT,2)&\" \"&REPT(LOCAL_HOUR_FORMAT,2)&LOCAL_TIME_SEPARATOR&REPT(LOCAL_MINUTE_FORMAT,2)&LOCAL_TIME_SEPARATOR&REPT(LOCAL_SECOND_FORMAT,2)");
+      }
+    }
+
+    /// <summary>
     /// Adds a new row at the bottom of the given Excel range.
     /// </summary>
     /// <param name="range">The Excel range to add a new row to the end of it.</param>
@@ -359,29 +422,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Analyzes an Excel range to detect if each column within contains any data.
-    /// </summary>
-    /// <param name="range">The Excel range whose columns are analyzed for data presence.</param>
-    /// <param name="prependPkColumn">Flag indicating if a column representing a primary key is prepended to the list of columns from the Excel of data.</param>
-    /// <returns>A list of boolean values for each of the columns in the Excel range representing if the column has data or not.</returns>
-    public static List<bool> GetColumnsWithDataInfoList(this Excel.Range range, bool prependPkColumn = false)
-    {
-      if (range == null)
-      {
-        return null;
-      }
-
-      List<bool> columnsHaveAnyDataList = new List<bool>(range.Columns.Count + 1);
-      if (prependPkColumn)
-      {
-        columnsHaveAnyDataList.Add(true);
-      }
-
-      columnsHaveAnyDataList.AddRange(from Excel.Range columnRange in range.Columns select columnRange.ContainsAnyData());
-      return columnsHaveAnyDataList;
-    }
-
-    /// <summary>
     /// Gets a <see cref="Excel.Worksheet"/> with a given name existing in the given <see cref="Excel.Workbook"/> or creates a new one.
     /// </summary>
     /// <param name="workbook">The <see cref="Excel.Workbook"/> to look for a <see cref="Excel.Worksheet"/>.</param>
@@ -411,7 +451,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the name of the parent <see cref="Excel.Workbook"/> of the given <see cref="Excel.Worksheet"/>.
     /// </summary>
-    /// <param name="worksheet">An <see cref="Excel.Worksheet"/> object.</param>
+    /// <param name="worksheet">A <see cref="Excel.Worksheet"/> object.</param>
     /// <returns>The name of the parent <see cref="Excel.Workbook"/>.</returns>
     public static string GetParentWorkbookName(this Excel.Worksheet worksheet)
     {
@@ -422,6 +462,28 @@ namespace MySQL.ForExcel.Classes
 
       Excel.Workbook parentWorkbook = worksheet.Parent as Excel.Workbook;
       return parentWorkbook != null ? parentWorkbook.Name : string.Empty;
+    }
+
+    /// <summary>
+    /// Gets a linear array with the values of the cells of a single row within an <see cref="Excel.Range"/>.
+    /// </summary>
+    /// <param name="range">A <see cref="Excel.Range"/> object.</param>
+    /// <param name="rowIndex">The index of the row within the <see cref="Excel.Range"/> to get values from.</param>
+    /// <param name="formattedValues">Falg indicating whether the data is formatted (numbers, dates, text) or not (numbers and text).</param>
+    /// <returns>A linear array with the values of the cells of a single row within an <see cref="Excel.Range"/>.</returns>
+    public static object[] GetRowValuesAsLinearArray(this Excel.Range range, int rowIndex, bool formattedValues = true)
+    {
+      if (range == null || rowIndex < 1 || rowIndex > range.Rows.Count)
+      {
+        return null;
+      }
+
+      Excel.Range rowRange = range.Rows[rowIndex];
+      var rangeValues = formattedValues ? rowRange.Value : rowRange.Value2;
+      var valuesBidimensionalArray = rowRange.Columns.Count > 1
+        ? rangeValues as object[,]
+        : new object[,] { { rangeValues } };
+      return valuesBidimensionalArray.GetLinearArray(1, true).ToArray();
     }
 
     /// <summary>
@@ -437,6 +499,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the active workbook unique identifier if exists, if not, creates one and returns it.
     /// </summary>
+    /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
     /// <returns>The guid string for the current workbook.</returns>
     public static string GetOrCreateId(this Excel.Workbook workbook)
     {
@@ -460,6 +523,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the a protection key for the provided worksheet if exists.
     /// </summary>
+    /// <param name="worksheet">A <see cref="Excel.Worksheet"/> object.</param>
     /// <returns>The worksheet's protection key if the property exist, otherwise returns null.</returns>
     public static string GetProtectionKey(this Excel.Worksheet worksheet)
     {
@@ -476,6 +540,152 @@ namespace MySQL.ForExcel.Classes
 
       Excel.CustomProperty guid = properties.Cast<Excel.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetGuid"));
       return guid == null ? null : guid.Value.ToString();
+    }
+
+    /// <summary>
+    /// Gets an <see cref="Excel.Range"/> object that represents all non-empty cells.
+    /// </summary>
+    /// <param name="range">A <see cref="Excel.Range"/> object.</param>
+    /// <returns>An <see cref="Excel.Range"/> object that represents all non-empty cells.</returns>
+    public static Excel.Range GetNonEmptyRange(this Excel.Range range)
+    {
+      if (range == null)
+      {
+        return null;
+      }
+
+      // Perform this validation since the SpecialCells method returns all cells in Worksheet if only 1 cell is in the range.
+      if (range.Cells.Count == 1)
+      {
+        return range.Value != null ? range : null;
+      }
+
+      Excel.Range rangeWithFormulas = null;
+      Excel.Range rangeWithConstants = null;
+      Excel.Range finalRange = null;
+
+      // SpecialCells method throws exception if no cells are found matching criteria (possible bug in VSTO).
+      try
+      {
+        rangeWithFormulas = range.SpecialCells(Excel.XlCellType.xlCellTypeFormulas);
+      }
+      catch
+      {
+      }
+
+      // SpecialCells method throws exception if no cells are found matching criteria (possible bug in VSTO).
+      try
+      {
+        rangeWithConstants = range.SpecialCells(Excel.XlCellType.xlCellTypeConstants, (int)Excel.XlSpecialCellsValue.xlTextValues + (int)Excel.XlSpecialCellsValue.xlNumbers);
+      }
+      catch
+      {
+      }
+
+      if (rangeWithFormulas != null && rangeWithConstants != null)
+      {
+        finalRange = Globals.ThisAddIn.Application.Union(rangeWithFormulas, rangeWithConstants);
+      }
+      else if (rangeWithFormulas != null)
+      {
+        finalRange = rangeWithFormulas;
+      }
+      else if (rangeWithConstants != null)
+      {
+        finalRange = rangeWithConstants;
+      }
+
+      return finalRange;
+    }
+
+    /// <summary>
+    /// Gets an <see cref="Excel.Range"/> object representing an unique rectangular area where cells inside it contain values.
+    /// There may be empty cells inside, the rectangular area is calculated by finding a topmost-leftmost cell with data and 
+    /// a bottommost-rightmost cell with data to then compose the corners of the rectangular area.
+    /// </summary>
+    /// <param name="range">A <see cref="Excel.Range"/> object.</param>
+    /// <returns>an <see cref="Excel.Range"/> object representing an unique rectangular area where cells inside it contain values.</returns>
+    public static Excel.Range GetNonEmptyRectangularAreaRange(this Excel.Range range)
+    {
+      if (range == null)
+      {
+        return null;
+      }
+
+      // Inf only one cell in range no need to even perform the Find calls.
+      if (range.Cells.CountLarge == 1)
+      {
+        return range.Value != null ? range : null;
+      }
+
+      Excel.Range firstOriginalCell = range.Cells[1, 1];
+      Excel.Range lastRowCell = range.Cells.Find(
+        "*",
+        firstOriginalCell,
+        Excel.XlFindLookIn.xlValues,
+        Type.Missing,
+        Excel.XlSearchOrder.xlByRows,
+        Excel.XlSearchDirection.xlPrevious,
+        Type.Missing,
+        Type.Missing,
+        Type.Missing);
+      if (lastRowCell == null)
+      {
+        return null;
+      }
+
+      int lastCellRow = lastRowCell.Row;
+      Excel.Range lastColumnCell = range.Cells.Find(
+        "*",
+        firstOriginalCell,
+        Excel.XlFindLookIn.xlValues,
+        Type.Missing,
+        Excel.XlSearchOrder.xlByColumns,
+        Excel.XlSearchDirection.xlPrevious,
+        Type.Missing,
+        Type.Missing,
+        Type.Missing);
+      if (lastColumnCell == null)
+      {
+        return null;
+      }
+
+      int lastCellColumn = lastColumnCell.Column;
+      Excel.Range lastCell = range.Cells[lastCellRow, lastCellColumn];
+      Excel.Range firstRowCell = range.Cells.Find(
+        "*",
+        lastCell,
+        Excel.XlFindLookIn.xlValues,
+        Type.Missing,
+        Excel.XlSearchOrder.xlByRows,
+        Excel.XlSearchDirection.xlNext,
+        Type.Missing,
+        Type.Missing,
+        Type.Missing);
+      if (firstRowCell == null)
+      {
+        return null;
+      }
+
+      int firstCellRow = firstRowCell.Row;
+      Excel.Range firstColumnCell = range.Cells.Find(
+        "*",
+        lastCell,
+        Excel.XlFindLookIn.xlValues,
+        Type.Missing,
+        Excel.XlSearchOrder.xlByColumns,
+        Excel.XlSearchDirection.xlNext,
+        Type.Missing,
+        Type.Missing,
+        Type.Missing);
+      if (firstColumnCell == null)
+      {
+        return null;
+      }
+
+      int firstCellColumn = firstColumnCell.Column;
+      Excel.Range firstCell = range.Cells[firstCellRow, firstCellColumn];
+      return range.Range[firstCell, lastCell];
     }
 
     /// <summary>
@@ -511,9 +721,19 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Checks if the <see cref="Excel.Worksheet"/> is visible.
+    /// </summary>
+    /// <param name="worksheet">A <see cref="Excel.Worksheet"/> object.</param>
+    /// <returns><c>true</c> if the <see cref="Excel.Worksheet"/> is visible, <c>false</c> otherwise.</returns>
+    public static bool IsVisible(this Excel.Worksheet worksheet)
+    {
+      return worksheet != null && worksheet.Visible == Excel.XlSheetVisibility.xlSheetVisible;
+    }
+
+    /// <summary>
     /// Returns a list of <see cref="Excel.TableStyle"/> names available to be used within the given <see cref="Excel.Workbook"/>.
     /// </summary>
-    /// <param name="workbook">An <see cref="Excel.Workbook"/>.</param>
+    /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
     /// <returns>A list of style names available in the given <see cref="Excel.Workbook"/>.</returns>
     public static List<string> ListTableStyles(this Excel.Workbook workbook)
     {
@@ -523,7 +743,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Locks the given Excel range and sets its fill color accordingly.
     /// </summary>
-    /// <param name="range">The Excel range to lock or unlock.</param>
+    /// <param name="range">The <see cref="Excel.Range"/> to lock or unlock.</param>
     /// <param name="lockRange">Flag indicating whether the Excel range is locked or unlocked.</param>
     public static void LockRange(this Excel.Range range, bool lockRange)
     {
@@ -542,7 +762,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Unprotects the given Excel worksheet and stops listening for its Change event.
     /// </summary>
-    /// <param name="worksheet">The Excel worksheet to unprotect.</param>
+    /// <param name="worksheet">The <see cref="Excel.Worksheet"/> to unprotect.</param>
     /// <param name="changeEventHandlerDelegate">The change event handler delegate of the Excel worksheet.</param>
     /// <param name="protectionKey">The key used to unprotect the worksheet.</param>
     /// <param name="mysqlDataRange">The Excel range containing the MySQL data being edited.</param>
@@ -590,6 +810,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Removes the protectionKey property (if exists) for the current worksheet.
     /// </summary>
+    /// <param name="worksheet">A <see cref="Excel.Worksheet"/> object.</param>
     public static void RemoveProtectionKey(this Excel.Worksheet worksheet)
     {
       if (worksheet == null)
@@ -607,7 +828,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Places the A1 cell of the given <see cref="Excel.Worksheet"/> in focus.
     /// </summary>
-    /// <param name="worksheet">A <see cref="Excel.Worksheet"/>.</param>
+    /// <param name="worksheet">A <see cref="Excel.Worksheet"/> object.</param>
     public static void SelectTopLeftCell(this Excel.Worksheet worksheet)
     {
       if (worksheet == null)

@@ -246,12 +246,28 @@ namespace MySQL.ForExcel.Forms
       bool errorsFound = false;
       bool warningsFound = false;
       string operationSummary;
-      StringBuilder operationDetails = new StringBuilder();
-      StringBuilder warningDetails = new StringBuilder();
-      StringBuilder warningStatementDetails = new StringBuilder();
-      var targetMySqlFinalDataTable = TargetMySqlPreviewDataTable.CloneSchema();
+      var targetMySqlFinalDataTable = TargetMySqlPreviewDataTable.CloneSchema(true);
       targetMySqlFinalDataTable.FirstRowIsHeaders = SourceMySqlPreviewDataTable.FirstRowIsHeaders;
-      if (!targetMySqlFinalDataTable.AddExcelData(AppendDataRange, true))
+      var mappedIndexes = new List<int>(targetMySqlFinalDataTable.Columns.Count);
+      foreach (var sourceColumnIndex in from MySqlDataColumn targetColumn in targetMySqlFinalDataTable.Columns select targetColumn.MappedDataColOrdinal)
+      {
+        if (sourceColumnIndex < 0)
+        {
+          mappedIndexes.Add(0);
+          continue;
+        }
+
+        var sourceColumn = SourceMySqlPreviewDataTable.GetColumnAtIndex(sourceColumnIndex);
+        mappedIndexes.Add(sourceColumn == null ? 0 : sourceColumn.RangeColumnIndex);
+      }
+
+      bool addDataSuccessful;
+      using (var temporaryRange = new TempRange(AppendDataRange, true, true, false, mappedIndexes))
+      {
+        addDataSuccessful = targetMySqlFinalDataTable.AddExcelData(temporaryRange, true, true);
+      }
+
+      if (!addDataSuccessful)
       {
         Cursor = Cursors.Default;
         return;
@@ -264,6 +280,9 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
+      StringBuilder operationDetails = new StringBuilder();
+      StringBuilder warningDetails = new StringBuilder();
+      StringBuilder warningStatementDetails = new StringBuilder();
       if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults)
       {
         operationDetails.AppendFormat(Resources.InsertedExcelDataWithQueryText, targetMySqlFinalDataTable.TableName);
@@ -357,6 +376,9 @@ namespace MySQL.ForExcel.Forms
 
       Cursor = Cursors.Default;
       MiscUtilities.ShowCustomizedInfoDialog(operationsType, operationSummary, operationDetails.ToString(), false);
+      operationDetails.Clear();
+      warningDetails.Clear();
+      warningStatementDetails.Clear();
       if (errorsFound)
       {
         return;
@@ -1006,11 +1028,9 @@ namespace MySQL.ForExcel.Forms
         false,
         false,
         false,
-        WbConnection);
-
+        WbConnection) { IsPreviewTable = false };
       int previewRowsQty = Math.Min(AppendDataRange.Rows.Count, Settings.Default.AppendLimitPreviewRowsQuantity);
-      Excel.Range previewRange = AppendDataRange.Resize[previewRowsQty, AppendDataRange.Columns.Count];
-      SourceMySqlPreviewDataTable.SetupColumnsWithData(previewRange, true, false);
+      SourceMySqlPreviewDataTable.SetupColumnsWithData(AppendDataRange, true, false, previewRowsQty);
       SourceExcelDataDataGridView.DataSource = SourceMySqlPreviewDataTable;
       foreach (DataGridViewColumn gridCol in SourceExcelDataDataGridView.Columns)
       {
@@ -1026,7 +1046,12 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void InitializeTargetTableGrid()
     {
-      TargetMySqlPreviewDataTable = new MySqlDataTable(_importDbObject.Name, true, false, Settings.Default.AppendUseFormattedValues, WbConnection);
+      TargetMySqlPreviewDataTable = new MySqlDataTable(
+        _importDbObject.Name,
+        true,
+        false,
+        Settings.Default.AppendUseFormattedValues,
+        WbConnection) { IsPreviewTable = false };
       DataTable dt = WbConnection.GetDataFromTableOrView(_importDbObject, null, 0, 10);
       foreach (object[] rowValues in from DataRow dr in dt.Rows select dr.ItemArray)
       {

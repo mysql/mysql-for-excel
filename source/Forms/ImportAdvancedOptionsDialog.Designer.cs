@@ -45,6 +45,7 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void InitializeComponent()
     {
+      this.components = new System.ComponentModel.Container();
       this.DialogAcceptButton = new System.Windows.Forms.Button();
       this.DialogCancelButton = new System.Windows.Forms.Button();
       this.EscapeFormulaValuesCheckBox = new System.Windows.Forms.CheckBox();
@@ -60,6 +61,7 @@ namespace MySQL.ForExcel.Forms
       this.UseStyle2Label = new System.Windows.Forms.Label();
       this.PrefixExcelTablesTextBox = new System.Windows.Forms.TextBox();
       this.PrefixExcelTablesCheckBox = new System.Windows.Forms.CheckBox();
+      this.HelpToolTip = new System.Windows.Forms.ToolTip(this.components);
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.PreviewRowsQuantityNumericUpDown)).BeginInit();
@@ -126,6 +128,8 @@ namespace MySQL.ForExcel.Forms
       this.EscapeFormulaValuesCheckBox.Size = new System.Drawing.Size(443, 19);
       this.EscapeFormulaValuesCheckBox.TabIndex = 6;
       this.EscapeFormulaValuesCheckBox.Text = "Escape text values that start with \"=\" so Excel does not treat them as formulas";
+      this.HelpToolTip.SetToolTip(this.EscapeFormulaValuesCheckBox, "When checked the equals signs found at the start of text values in the importing " +
+        "MySQL data are removed so they are not treated as formulas by Excel.");
       this.EscapeFormulaValuesCheckBox.UseVisualStyleBackColor = false;
       // 
       // AdvancedImportOptionsLabel
@@ -176,6 +180,7 @@ namespace MySQL.ForExcel.Forms
       this.PreviewRowsQuantityNumericUpDown.Name = "PreviewRowsQuantityNumericUpDown";
       this.PreviewRowsQuantityNumericUpDown.Size = new System.Drawing.Size(52, 21);
       this.PreviewRowsQuantityNumericUpDown.TabIndex = 4;
+      this.HelpToolTip.SetToolTip(this.PreviewRowsQuantityNumericUpDown, "Limits the data preview to the given number of Excel data rows.");
       this.PreviewRowsQuantityNumericUpDown.Value = new decimal(new int[] {
             1,
             0,
@@ -204,6 +209,8 @@ namespace MySQL.ForExcel.Forms
       this.CreateExcelTableCheckbox.Size = new System.Drawing.Size(334, 19);
       this.CreateExcelTableCheckbox.TabIndex = 8;
       this.CreateExcelTableCheckbox.Text = "Create an Excel table for the imported MySQL table data.";
+      this.HelpToolTip.SetToolTip(this.CreateExcelTableCheckbox, "When checked an Excel table (previously known as Excel lists) will be created for" +
+        " the imported data.");
       this.CreateExcelTableCheckbox.UseVisualStyleBackColor = false;
       this.CreateExcelTableCheckbox.CheckedChanged += new System.EventHandler(this.CreateExcelTableCheckbox_CheckedChanged);
       // 
@@ -237,6 +244,8 @@ namespace MySQL.ForExcel.Forms
       this.UseStyleComboBox.Name = "UseStyleComboBox";
       this.UseStyleComboBox.Size = new System.Drawing.Size(225, 21);
       this.UseStyleComboBox.TabIndex = 10;
+      this.HelpToolTip.SetToolTip(this.UseStyleComboBox, "You can quickly format table data by applying a predefined or custom table style." +
+        "");
       // 
       // UseStyle2Label
       // 
@@ -265,8 +274,16 @@ namespace MySQL.ForExcel.Forms
       this.PrefixExcelTablesCheckBox.Size = new System.Drawing.Size(248, 19);
       this.PrefixExcelTablesCheckBox.TabIndex = 12;
       this.PrefixExcelTablesCheckBox.Text = "Prefix Excel tables with the following text:";
+      this.HelpToolTip.SetToolTip(this.PrefixExcelTablesCheckBox, "When checked the specified text will be used to prefix the names of created Excel" +
+        " tables.");
       this.PrefixExcelTablesCheckBox.UseVisualStyleBackColor = true;
       this.PrefixExcelTablesCheckBox.CheckedChanged += new System.EventHandler(this.PrefixExcelTablesCheckBox_CheckedChanged);
+      // 
+      // HelpToolTip
+      // 
+      this.HelpToolTip.AutoPopDelay = 5000;
+      this.HelpToolTip.InitialDelay = 1000;
+      this.HelpToolTip.ReshowDelay = 100;
       // 
       // ImportAdvancedOptionsDialog
       // 
@@ -305,5 +322,6 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.Label UseStyle2Label;
     private System.Windows.Forms.CheckBox PrefixExcelTablesCheckBox;
     private System.Windows.Forms.TextBox PrefixExcelTablesTextBox;
+    private System.Windows.Forms.ToolTip HelpToolTip;
   }
 }

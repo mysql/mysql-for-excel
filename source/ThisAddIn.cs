@@ -165,6 +165,11 @@ namespace MySQL.ForExcel
       }
     }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether a temporary hidden <see cref="Excel.Worksheet"/> is being used by a <see cref="TempRange"/> instance.
+    /// </summary>
+    public bool UsingTempWorksheet { get; set; }
+
     #endregion Properties
 
     /// <summary>
@@ -250,8 +255,9 @@ namespace MySQL.ForExcel
       activeCustomPane.DockPositionRestrict = OfficeCore.MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoHorizontal;
       activeCustomPane.Width = ADD_IN_PANE_WIDTH;
 
-      // Create custom MySQL Excel table style in the active workbook if it exists
+      // Create custom MySQL Excel table style and localized date format strings in the active workbook if it exists.
       Application.ActiveWorkbook.CreateMySqlTableStyle();
+      Application.ActiveWorkbook.AddLocalizedDateFormatStringsAsNames();
 
       // First run if no Excel panes have been opened yet.
       if (firstRun)
@@ -269,12 +275,17 @@ namespace MySQL.ForExcel
     /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
     private void Application_SheetActivate(object workSheet)
     {
-      if (ActiveExcelPane == null)
+      if (ActiveExcelPane == null || UsingTempWorksheet)
       {
         return;
       }
 
       Excel.Worksheet activeSheet = workSheet as Excel.Worksheet;
+      if (!activeSheet.IsVisible())
+      {
+        return;
+      }
+
       if (_lastDeactivatedSheetName.Length > 0 && !Application.ActiveWorkbook.WorksheetExists(_lastDeactivatedSheetName))
       {
         // Worksheet was deleted and the Application_SheetBeforeDelete did not run, user is running Excel 2010 or earlier.
@@ -290,12 +301,17 @@ namespace MySQL.ForExcel
     /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
     private void Application_SheetBeforeDelete(object workSheet)
     {
-      if (ActiveExcelPane == null)
+      if (ActiveExcelPane == null || UsingTempWorksheet)
       {
         return;
       }
 
       Excel.Worksheet activeSheet = workSheet as Excel.Worksheet;
+      if (!activeSheet.IsVisible())
+      {
+        return;
+      }
+
       CloseWorksheetEditSession(activeSheet);
 
       // If the _lastDeactivatedSheetName is not empty it means a deactivated sheet may have been deleted, if this method ran it means the user is running
@@ -313,7 +329,13 @@ namespace MySQL.ForExcel
     /// <param name="targetRange">A selection of Excel cells.</param>
     private void Application_SheetChange(object workSheet, Excel.Range targetRange)
     {
-      if (ActiveExcelPane == null)
+      if (ActiveExcelPane == null || UsingTempWorksheet)
+      {
+        return;
+      }
+
+      Excel.Worksheet activeSheet = workSheet as Excel.Worksheet;
+      if (!activeSheet.IsVisible())
       {
         return;
       }
@@ -330,12 +352,17 @@ namespace MySQL.ForExcel
     /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
     private void Application_SheetDeactivate(object workSheet)
     {
-      if (ActiveExcelPane == null)
+      if (ActiveExcelPane == null || UsingTempWorksheet)
       {
         return;
       }
 
       Excel.Worksheet deactivatedSheet = workSheet as Excel.Worksheet;
+      if (!deactivatedSheet.IsVisible())
+      {
+        return;
+      }
+
       _lastDeactivatedSheetName = deactivatedSheet != null ? deactivatedSheet.Name : string.Empty;
       ChangeEditDialogVisibility(deactivatedSheet, false);
     }
@@ -347,7 +374,13 @@ namespace MySQL.ForExcel
     /// <param name="targetRange">The new selection of Excel cells.</param>
     private void Application_SheetSelectionChange(object workSheet, Excel.Range targetRange)
     {
-      if (ActiveExcelPane == null)
+      if (ActiveExcelPane == null || UsingTempWorksheet)
+      {
+        return;
+      }
+
+      Excel.Worksheet activeSheet = workSheet as Excel.Worksheet;
+      if (!activeSheet.IsVisible())
       {
         return;
       }
@@ -554,8 +587,9 @@ namespace MySQL.ForExcel
         return;
       }
 
-      // Add the custom MySQL table style (for Excel tables) to this workbook.
+      // Add the custom MySQL table style (for Excel tables) and localized date format strings to this workbook.
       workbook.CreateMySqlTableStyle();
+      workbook.AddLocalizedDateFormatStringsAsNames();
 
       if (ActiveExcelPane == null)
       {
@@ -1158,15 +1192,16 @@ namespace MySQL.ForExcel
     {
       try
       {
-        // Make sure the settings directory exists
-        Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Oracle\MySQL for Excel");
-
         // Static initializations.
         System.Windows.Forms.Application.EnableVisualStyles();
         System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
         CustomizeInfoDialog();
         InitializeMySqlWorkbenchStaticSettings();
         AssemblyTitle = AssemblyInfo.AssemblyTitle;
+        UsingTempWorksheet = false;
+
+        // Make sure the settings directory exists
+        Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Oracle\MySQL for Excel");
 
         // Log the Add-In's Startup
         MySqlSourceTrace.WriteToLog(Resources.StartupMessage, SourceLevels.Information);

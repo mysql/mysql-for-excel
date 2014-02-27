@@ -45,6 +45,8 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void InitializeComponent()
     {
+      this.components = new System.ComponentModel.Container();
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExportAdvancedOptionsDialog));
       this.DialogAcceptButton = new System.Windows.Forms.Button();
       this.DialogCancelButton = new System.Windows.Forms.Button();
       this.OtherOptionsLabel = new System.Windows.Forms.Label();
@@ -62,6 +64,9 @@ namespace MySQL.ForExcel.Forms
       this.RemoveEmptyColumnsCheckBox = new System.Windows.Forms.CheckBox();
       this.ColumnOptionsLostWarningLabel = new System.Windows.Forms.Label();
       this.ColumnOptionsLostWarningPictureBox = new System.Windows.Forms.PictureBox();
+      this.CreateTableIndexesLastCheckBox = new System.Windows.Forms.CheckBox();
+      this.SqlQueriesLabel = new System.Windows.Forms.Label();
+      this.HelpToolTip = new System.Windows.Forms.ToolTip(this.components);
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.PreviewRowsQuantityNumericUpDown)).BeginInit();
@@ -75,6 +80,8 @@ namespace MySQL.ForExcel.Forms
       // 
       // ContentAreaPanel
       // 
+      this.ContentAreaPanel.Controls.Add(this.CreateTableIndexesLastCheckBox);
+      this.ContentAreaPanel.Controls.Add(this.SqlQueriesLabel);
       this.ContentAreaPanel.Controls.Add(this.ColumnOptionsLostWarningLabel);
       this.ContentAreaPanel.Controls.Add(this.RemoveEmptyColumnsCheckBox);
       this.ContentAreaPanel.Controls.Add(this.PreviewRowsQuantityNumericUpDown);
@@ -90,20 +97,20 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.AddBufferToVarcharCheckBox);
       this.ContentAreaPanel.Controls.Add(this.DetectDatatypeCheckBox);
       this.ContentAreaPanel.Controls.Add(this.ColumnDatatypeOptionsLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(544, 421);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(584, 491);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 376);
-      this.CommandAreaPanel.Size = new System.Drawing.Size(544, 45);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 446);
+      this.CommandAreaPanel.Size = new System.Drawing.Size(584, 45);
       // 
       // DialogAcceptButton
       // 
-      this.DialogAcceptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.DialogAcceptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.DialogAcceptButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.DialogAcceptButton.Location = new System.Drawing.Point(366, 11);
+      this.DialogAcceptButton.Location = new System.Drawing.Point(406, 11);
       this.DialogAcceptButton.Name = "DialogAcceptButton";
       this.DialogAcceptButton.Size = new System.Drawing.Size(75, 23);
       this.DialogAcceptButton.TabIndex = 0;
@@ -112,9 +119,9 @@ namespace MySQL.ForExcel.Forms
       // 
       // DialogCancelButton
       // 
-      this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.DialogCancelButton.Location = new System.Drawing.Point(447, 11);
+      this.DialogCancelButton.Location = new System.Drawing.Point(487, 11);
       this.DialogCancelButton.Name = "DialogCancelButton";
       this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
       this.DialogCancelButton.TabIndex = 1;
@@ -127,10 +134,10 @@ namespace MySQL.ForExcel.Forms
       this.OtherOptionsLabel.BackColor = System.Drawing.Color.Transparent;
       this.OtherOptionsLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.OtherOptionsLabel.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.OtherOptionsLabel.Location = new System.Drawing.Point(24, 290);
+      this.OtherOptionsLabel.Location = new System.Drawing.Point(24, 360);
       this.OtherOptionsLabel.Name = "OtherOptionsLabel";
       this.OtherOptionsLabel.Size = new System.Drawing.Size(91, 17);
-      this.OtherOptionsLabel.TabIndex = 11;
+      this.OtherOptionsLabel.TabIndex = 13;
       this.OtherOptionsLabel.Text = "Other Options";
       // 
       // UseFormattedValuesCheckBox
@@ -143,6 +150,8 @@ namespace MySQL.ForExcel.Forms
       this.UseFormattedValuesCheckBox.Size = new System.Drawing.Size(141, 19);
       this.UseFormattedValuesCheckBox.TabIndex = 10;
       this.UseFormattedValuesCheckBox.Text = "Use formatted values";
+      this.HelpToolTip.SetToolTip(this.UseFormattedValuesCheckBox, "If checked it treats dates in Excel as such, otherwise it treats them as numbers." +
+        "");
       this.UseFormattedValuesCheckBox.UseVisualStyleBackColor = false;
       this.UseFormattedValuesCheckBox.CheckedChanged += new System.EventHandler(this.UseFormattedValuesCheckBox_CheckedChanged);
       // 
@@ -168,6 +177,7 @@ namespace MySQL.ForExcel.Forms
       this.AutoAllowEmptyNonIndexColumnsCheckBox.Size = new System.Drawing.Size(436, 19);
       this.AutoAllowEmptyNonIndexColumnsCheckBox.TabIndex = 8;
       this.AutoAllowEmptyNonIndexColumnsCheckBox.Text = "Automatically check the Allow Empty checkbox for columns without an index";
+      this.HelpToolTip.SetToolTip(this.AutoAllowEmptyNonIndexColumnsCheckBox, "When checked the columns without an index are set to allow empty (null) values.");
       this.AutoAllowEmptyNonIndexColumnsCheckBox.UseVisualStyleBackColor = false;
       this.AutoAllowEmptyNonIndexColumnsCheckBox.CheckedChanged += new System.EventHandler(this.AutoAllowEmptyNonIndexColumnsCheckBox_CheckedChanged);
       // 
@@ -181,6 +191,8 @@ namespace MySQL.ForExcel.Forms
       this.AutoIndexIntColumnsCheckBox.Size = new System.Drawing.Size(349, 19);
       this.AutoIndexIntColumnsCheckBox.TabIndex = 7;
       this.AutoIndexIntColumnsCheckBox.Text = "Automatically check the Index checkbox for Integer columns";
+      this.HelpToolTip.SetToolTip(this.AutoIndexIntColumnsCheckBox, "When checked the columns with a detected data type of Integer are set to have an " +
+        "index added to the column.");
       this.AutoIndexIntColumnsCheckBox.UseVisualStyleBackColor = false;
       this.AutoIndexIntColumnsCheckBox.CheckedChanged += new System.EventHandler(this.AutoIndexIntColumnsCheckBox_CheckedChanged);
       // 
@@ -191,9 +203,10 @@ namespace MySQL.ForExcel.Forms
       this.AddBufferToVarcharCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.AddBufferToVarcharCheckBox.Location = new System.Drawing.Point(73, 135);
       this.AddBufferToVarcharCheckBox.Name = "AddBufferToVarcharCheckBox";
-      this.AddBufferToVarcharCheckBox.Size = new System.Drawing.Size(431, 19);
+      this.AddBufferToVarcharCheckBox.Size = new System.Drawing.Size(417, 19);
       this.AddBufferToVarcharCheckBox.TabIndex = 6;
-      this.AddBufferToVarcharCheckBox.Text = "Add additional buffer to VARCHAR length (round up to 12, 25, 45, 125, 255)";
+      this.AddBufferToVarcharCheckBox.Text = "Add additional buffer to Varchar length (round up to 12, 25, 45, 125, 255)";
+      this.HelpToolTip.SetToolTip(this.AddBufferToVarcharCheckBox, resources.GetString("AddBufferToVarcharCheckBox.ToolTip"));
       this.AddBufferToVarcharCheckBox.UseVisualStyleBackColor = false;
       // 
       // DetectDatatypeCheckBox
@@ -206,6 +219,8 @@ namespace MySQL.ForExcel.Forms
       this.DetectDatatypeCheckBox.Size = new System.Drawing.Size(418, 19);
       this.DetectDatatypeCheckBox.TabIndex = 5;
       this.DetectDatatypeCheckBox.Text = "Analyze and try to detect correct datatype based on column field contents";
+      this.HelpToolTip.SetToolTip(this.DetectDatatypeCheckBox, "When checked the data type on each new column will be automatically detected base" +
+        "d on the Excel data values.");
       this.DetectDatatypeCheckBox.UseVisualStyleBackColor = false;
       this.DetectDatatypeCheckBox.CheckedChanged += new System.EventHandler(this.DetectDatatypeCheckBox_CheckedChanged);
       // 
@@ -269,6 +284,7 @@ namespace MySQL.ForExcel.Forms
       this.PreviewRowsQuantityNumericUpDown.Name = "PreviewRowsQuantityNumericUpDown";
       this.PreviewRowsQuantityNumericUpDown.Size = new System.Drawing.Size(52, 21);
       this.PreviewRowsQuantityNumericUpDown.TabIndex = 3;
+      this.HelpToolTip.SetToolTip(this.PreviewRowsQuantityNumericUpDown, resources.GetString("PreviewRowsQuantityNumericUpDown.ToolTip"));
       this.PreviewRowsQuantityNumericUpDown.Value = new decimal(new int[] {
             1,
             0,
@@ -281,10 +297,10 @@ namespace MySQL.ForExcel.Forms
       this.RemoveEmptyColumnsCheckBox.AutoSize = true;
       this.RemoveEmptyColumnsCheckBox.BackColor = System.Drawing.Color.Transparent;
       this.RemoveEmptyColumnsCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.RemoveEmptyColumnsCheckBox.Location = new System.Drawing.Point(53, 319);
+      this.RemoveEmptyColumnsCheckBox.Location = new System.Drawing.Point(53, 389);
       this.RemoveEmptyColumnsCheckBox.Name = "RemoveEmptyColumnsCheckBox";
       this.RemoveEmptyColumnsCheckBox.Size = new System.Drawing.Size(445, 19);
-      this.RemoveEmptyColumnsCheckBox.TabIndex = 12;
+      this.RemoveEmptyColumnsCheckBox.TabIndex = 14;
       this.RemoveEmptyColumnsCheckBox.Text = "Remove columns that contain no data, otherwise just flag them as \"Excluded\"";
       this.RemoveEmptyColumnsCheckBox.UseVisualStyleBackColor = false;
       this.RemoveEmptyColumnsCheckBox.CheckedChanged += new System.EventHandler(this.RemoveEmptyColumnsCheckBox_CheckedChanged);
@@ -295,10 +311,10 @@ namespace MySQL.ForExcel.Forms
       this.ColumnOptionsLostWarningLabel.BackColor = System.Drawing.Color.Transparent;
       this.ColumnOptionsLostWarningLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.ColumnOptionsLostWarningLabel.ForeColor = System.Drawing.Color.Red;
-      this.ColumnOptionsLostWarningLabel.Location = new System.Drawing.Point(50, 355);
+      this.ColumnOptionsLostWarningLabel.Location = new System.Drawing.Point(50, 425);
       this.ColumnOptionsLostWarningLabel.Name = "ColumnOptionsLostWarningLabel";
       this.ColumnOptionsLostWarningLabel.Size = new System.Drawing.Size(282, 12);
-      this.ColumnOptionsLostWarningLabel.TabIndex = 46;
+      this.ColumnOptionsLostWarningLabel.TabIndex = 15;
       this.ColumnOptionsLostWarningLabel.Text = "Table columns will be recreated so column options changes will be lost.";
       this.ColumnOptionsLostWarningLabel.Visible = false;
       // 
@@ -306,19 +322,50 @@ namespace MySQL.ForExcel.Forms
       // 
       this.ColumnOptionsLostWarningPictureBox.BackColor = System.Drawing.Color.Transparent;
       this.ColumnOptionsLostWarningPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.ColumnOptionsLostWarningPictureBox.Location = new System.Drawing.Point(27, 350);
+      this.ColumnOptionsLostWarningPictureBox.Location = new System.Drawing.Point(27, 420);
       this.ColumnOptionsLostWarningPictureBox.Name = "ColumnOptionsLostWarningPictureBox";
       this.ColumnOptionsLostWarningPictureBox.Size = new System.Drawing.Size(20, 20);
       this.ColumnOptionsLostWarningPictureBox.TabIndex = 47;
       this.ColumnOptionsLostWarningPictureBox.TabStop = false;
       this.ColumnOptionsLostWarningPictureBox.Visible = false;
       // 
+      // CreateTableIndexesLastCheckBox
+      // 
+      this.CreateTableIndexesLastCheckBox.AutoSize = true;
+      this.CreateTableIndexesLastCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+      this.CreateTableIndexesLastCheckBox.Location = new System.Drawing.Point(53, 320);
+      this.CreateTableIndexesLastCheckBox.Name = "CreateTableIndexesLastCheckBox";
+      this.CreateTableIndexesLastCheckBox.Size = new System.Drawing.Size(512, 19);
+      this.CreateTableIndexesLastCheckBox.TabIndex = 12;
+      this.CreateTableIndexesLastCheckBox.Text = "Create table\'s secondary indexes after data has been exported to speed-up rows in" +
+    "sertion";
+      this.HelpToolTip.SetToolTip(this.CreateTableIndexesLastCheckBox, resources.GetString("CreateTableIndexesLastCheckBox.ToolTip"));
+      this.CreateTableIndexesLastCheckBox.UseVisualStyleBackColor = true;
+      // 
+      // SqlQueriesLabel
+      // 
+      this.SqlQueriesLabel.AutoSize = true;
+      this.SqlQueriesLabel.BackColor = System.Drawing.Color.Transparent;
+      this.SqlQueriesLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.SqlQueriesLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.SqlQueriesLabel.Location = new System.Drawing.Point(24, 291);
+      this.SqlQueriesLabel.Name = "SqlQueriesLabel";
+      this.SqlQueriesLabel.Size = new System.Drawing.Size(130, 17);
+      this.SqlQueriesLabel.TabIndex = 11;
+      this.SqlQueriesLabel.Text = "SQL Queries Options";
+      // 
+      // HelpToolTip
+      // 
+      this.HelpToolTip.AutoPopDelay = 5000;
+      this.HelpToolTip.InitialDelay = 1000;
+      this.HelpToolTip.ReshowDelay = 100;
+      // 
       // ExportAdvancedOptionsDialog
       // 
       this.AcceptButton = this.DialogAcceptButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(544, 421);
+      this.ClientSize = new System.Drawing.Size(584, 491);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
@@ -353,5 +400,8 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.CheckBox RemoveEmptyColumnsCheckBox;
     private System.Windows.Forms.Label ColumnOptionsLostWarningLabel;
     private System.Windows.Forms.PictureBox ColumnOptionsLostWarningPictureBox;
+    private System.Windows.Forms.CheckBox CreateTableIndexesLastCheckBox;
+    private System.Windows.Forms.Label SqlQueriesLabel;
+    private System.Windows.Forms.ToolTip HelpToolTip;
   }
 }

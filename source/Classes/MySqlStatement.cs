@@ -16,7 +16,6 @@
 // 02110-1301  USA
 
 using System;
-using System.Data;
 using System.Globalization;
 using System.Text;
 using MySql.Data.MySqlClient;
@@ -43,26 +42,51 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Key words used for a CREATE TABLE statement.
     /// </summary>
-    private const string STATEMENT_CREATE_TABLE = "CREATE TABLE";
+    public const string STATEMENT_ALTER_TABLE = "ALTER TABLE";
+
+    /// <summary>
+    /// Key words used for a CREATE TABLE statement.
+    /// </summary>
+    public const string STATEMENT_CREATE_TABLE = "CREATE TABLE";
 
     /// <summary>
     /// Key word used for an DELETE statement.
     /// </summary>
-    private const string STATEMENT_DELETE = "DELETE";
+    public const string STATEMENT_DELETE = "DELETE FROM";
 
     /// <summary>
     /// Key word used for an INSERT statement.
     /// </summary>
-    private const string STATEMENT_INSERT = "INSERT";
+    public const string STATEMENT_INSERT = "INSERT INTO";
+
+    /// <summary>
+    /// Key word used for a LOCK TABLES statement.
+    /// </summary>
+    public const string STATEMENT_LOCK_TABLES = "LOCK TABLES";
+
+    /// <summary>
+    /// Key word used for a LOCK TABLES statement.
+    /// </summary>
+    public const string STATEMENT_UNLOCK_TABLES = "UNLOCK TABLES";
 
     /// <summary>
     /// Key word used for an UPDATE statement.
     /// </summary>
-    private const string STATEMENT_UPDATE = "UPDATE";
+    public const string STATEMENT_UPDATE = "UPDATE";
+
+    /// <summary>
+    /// The default format for displaying the statement execution order.
+    /// </summary>
+    private const string STATEMENTS_QUANTITY_DEFAULT_FORMAT = "000";
 
     #endregion Constants
 
     #region Fields
+
+    /// <summary>
+    /// The format string used for the executed statement index.
+    /// </summary>
+    private string _executionOrderFormat;
 
     /// <summary>
     /// The <see cref="IMySqlDataRow"/> object holding a SQL statement to be applied against the database.
@@ -74,6 +98,16 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     private string _sqlQuery;
 
+    /// <summary>
+    /// The format for displaying the statement execution order.
+    /// </summary>
+    private string _statementsQuantityFormat;
+
+    /// <summary>
+    /// The <see cref="StringBuilder"/> holding the warnings from an executed statement.
+    /// </summary>
+    private StringBuilder _warningsBuilder;
+
     #endregion Fields
 
     /// <summary>
@@ -84,12 +118,16 @@ namespace MySQL.ForExcel.Classes
     {
       _mySqlRow = mySqlRow;
       _sqlQuery = string.Empty;
+      _warningsBuilder = null;
       AffectedRows = 0;
       ExecutionOrder = 0;
       ResultText = string.Empty;
       StatementResult = StatementResultType.NotApplied;
+      StatementsQuantityFormat = STATEMENTS_QUANTITY_DEFAULT_FORMAT;
       WarningsQuantity = 0;
     }
+
+    #region Enumerations
 
     /// <summary>
     /// Describes the type of operation done against the database server.
@@ -97,14 +135,19 @@ namespace MySQL.ForExcel.Classes
     public enum SqlStatementType
     {
       /// <summary>
-      /// No statement or unrecognized one.
+      /// Statement to alter the definition of an existing table.
       /// </summary>
-      Unknown,
+      AlterTable,
 
       /// <summary>
-      /// Statement to create a new table before rows are inserted to it.
+      /// Statement to create a new table.
       /// </summary>
       CreateTable,
+
+      /// <summary>
+      /// Statement to delete rows from the corresponding database table.
+      /// </summary>
+      Delete,
 
       /// <summary>
       /// Statement to insert new rows into the corresponding database table.
@@ -112,9 +155,24 @@ namespace MySQL.ForExcel.Classes
       Insert,
 
       /// <summary>
-      /// Statement to delete rows from the corresponding database table.
+      /// Statement to lock a database table.
       /// </summary>
-      Delete,
+      LockTables,
+
+      /// <summary>
+      /// No statement.
+      /// </summary>
+      None,
+
+      /// <summary>
+      /// Statement unrelated to the common operations in MySQL for Excel.
+      /// </summary>
+      Other,
+
+      /// <summary>
+      /// Statement to unlock database tables locked in this session.
+      /// </summary>
+      UnlockTables,
 
       /// <summary>
       /// Operation to update rows from the corresponding database table.
@@ -147,6 +205,8 @@ namespace MySQL.ForExcel.Classes
       /// </summary>
       WarningsFound
     }
+
+    #endregion Enumerations
 
     #region Properties
 
@@ -183,11 +243,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the result of the query after it is executed.
-    /// </summary>
-    public StatementResultType StatementResult { get; private set; }
-
-    /// <summary>
     /// Gets the type of operation to be performed against the database.
     /// </summary>
     public SqlStatementType StatementType
@@ -195,6 +250,28 @@ namespace MySQL.ForExcel.Classes
       get
       {
         return GetSqlStatementType(SqlQuery);
+      }
+    }
+
+    /// <summary>
+    /// Gets the result of the query after it is executed.
+    /// </summary>
+    public StatementResultType StatementResult { get; private set; }
+
+    /// <summary>
+    /// Gets or sets the format for displaying the statement execution order.
+    /// </summary>
+    public string StatementsQuantityFormat
+    {
+      get
+      {
+        return _statementsQuantityFormat;
+      }
+
+      set
+      {
+        _statementsQuantityFormat = value;
+        _executionOrderFormat = "{0:" + _statementsQuantityFormat + "}";
       }
     }
 
@@ -214,33 +291,18 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public int WarningsQuantity { get; private set; }
 
-    #endregion Properties
-
     /// <summary>
-    /// Gets the corresponding <see cref="SqlStatementType"/> for a <see cref="DataRowState"/> enumeration.
+    /// Gets the corresponding Excel row number converted to string.
     /// </summary>
-    /// <param name="rowState">The state of a <see cref="DataRow"/> object.</param>
-    /// <returns>Type of operation done against the database server</returns>
-    public static SqlStatementType GetRelatedStatementType(DataRowState rowState)
+    private string ExcelRowText
     {
-      SqlStatementType operationType = SqlStatementType.Unknown;
-      switch (rowState)
+      get
       {
-        case DataRowState.Deleted:
-          operationType = SqlStatementType.Delete;
-          break;
-
-        case DataRowState.Added:
-          operationType = SqlStatementType.Insert;
-          break;
-
-        case DataRowState.Modified:
-          operationType = SqlStatementType.Update;
-          break;
+        return _mySqlRow != null && _mySqlRow.ExcelRow > 0 ? _mySqlRow.ExcelRow.ToString(CultureInfo.InvariantCulture) : string.Empty;
       }
-
-      return operationType;
     }
+
+    #endregion Properties
 
     /// <summary>
     /// Gets the corresponding <see cref="SqlStatementType"/> for a SQL statement.
@@ -251,26 +313,38 @@ namespace MySQL.ForExcel.Classes
     {
       if (string.IsNullOrEmpty(sqlStatement))
       {
-        return SqlStatementType.Unknown;
+        return SqlStatementType.None;
       }
 
-      SqlStatementType statementType = SqlStatementType.Unknown;
+      SqlStatementType statementType = SqlStatementType.Other;
       sqlStatement = sqlStatement.TrimStart().ToUpperInvariant();
-      if (sqlStatement.StartsWith(STATEMENT_DELETE))
+      if (sqlStatement.StartsWith(STATEMENT_UPDATE))
       {
-        statementType = SqlStatementType.Delete;
+        statementType = SqlStatementType.Update;
       }
       else if (sqlStatement.StartsWith(STATEMENT_INSERT))
       {
         statementType = SqlStatementType.Insert;
       }
-      else if (sqlStatement.StartsWith(STATEMENT_UPDATE))
+      else if (sqlStatement.StartsWith(STATEMENT_DELETE))
       {
-        statementType = SqlStatementType.Update;
+        statementType = SqlStatementType.Delete;
       }
       else if (sqlStatement.StartsWith(STATEMENT_CREATE_TABLE))
       {
         statementType = SqlStatementType.CreateTable;
+      }
+      else if (sqlStatement.StartsWith(STATEMENT_ALTER_TABLE))
+      {
+        statementType = SqlStatementType.AlterTable;
+      }
+      else if (sqlStatement.StartsWith(STATEMENT_LOCK_TABLES))
+      {
+        statementType = SqlStatementType.LockTables;
+      }
+      else if (sqlStatement.StartsWith(STATEMENT_UNLOCK_TABLES))
+      {
+        statementType = SqlStatementType.UnlockTables;
       }
 
       return statementType;
@@ -279,12 +353,16 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Executes the statement pushing its related changes to the MySQL server connected in the given <see cref="MySqlCommand"/>.
     /// </summary>
-    /// <param name="mySqlTransaction">The <see cref="MySqlTransaction"/> transaction this statement belongs to.</param>
+    /// <param name="mySqlCommand">The <see cref="MySqlCommand"/> used to issue the statement to the server for execution.</param>
     /// <param name="executionOrder">The numeric index with the order in which this statement was executed.</param>
     /// <param name="useOptimisticUpdate">Flag indicating whether optimistic locking is used for the update of rows.</param>
-    /// <param name="statementsQuantityFormat">The format for displaying the statement execution order.</param>
-    public void Execute(MySqlTransaction mySqlTransaction, uint executionOrder, bool useOptimisticUpdate, string statementsQuantityFormat = "000")
+    public void Execute(MySqlCommand mySqlCommand, uint executionOrder, bool useOptimisticUpdate)
     {
+      if (mySqlCommand == null)
+      {
+        throw new ArgumentNullException("mySqlCommand");
+      }
+
       StatementResult = StatementResultType.NotApplied;
       if (_mySqlRow == null)
       {
@@ -292,55 +370,21 @@ namespace MySQL.ForExcel.Classes
       }
 
       ExecutionOrder = executionOrder;
-      DataSet warningsDs = null;
-      MySqlCommand mySqlCommand = null;
       try
       {
         WarningsQuantity = 0;
-        StringBuilder warningText = new StringBuilder();
-        mySqlCommand = new MySqlCommand(SqlQuery, mySqlTransaction.Connection, mySqlTransaction);
+        mySqlCommand.CommandText = SqlQuery;
+        mySqlCommand.Connection.InfoMessage -= FormatWarnings;
+        mySqlCommand.Connection.InfoMessage += FormatWarnings;
         AffectedRows = mySqlCommand.ExecuteNonQuery();
-        warningsDs = MySqlHelper.ExecuteDataset(mySqlCommand.Connection, "SHOW WARNINGS");
-        if ((warningsDs != null && warningsDs.Tables.Count > 0 && warningsDs.Tables[0].Rows.Count > 0)
-            || (AffectedRows == 0 && StatementType != SqlStatementType.CreateTable))
+        mySqlCommand.Connection.InfoMessage -= FormatWarnings;
+        if (WarningsQuantity > 0 || (AffectedRows == 0 && StatementType.AffectsRowsOnServer()))
         {
-          string nl = string.Empty;
-          string warningsFormat;
-          string excelRowText = _mySqlRow.ExcelRow > 0 ? _mySqlRow.ExcelRow.ToString(CultureInfo.InvariantCulture) : string.Empty;
-          if (AffectedRows == 0)
-          {
-            WarningsQuantity++;
-            _mySqlRow.RowError = NO_MATCH;
-            warningsFormat = "{2}{0:" + statementsQuantityFormat + "}: {1}";
-            warningText.AppendFormat(
-              warningsFormat,
-              ExecutionOrder,
-              string.Format(Resources.QueryDidNotMatchRowsWarning,
-                useOptimisticUpdate ? string.Empty : Resources.PrimaryKeyText,
-                !string.IsNullOrEmpty(excelRowText) ? excelRowText + " " : string.Empty),
-              nl);
-            nl = Environment.NewLine;
-          }
-
-          if (warningsDs != null)
-          {
-            warningsFormat = "{3}{0:" + statementsQuantityFormat + "}: {1} - {2}{3}";
-            foreach (DataRow warningRow in warningsDs.Tables[0].Rows)
-            {
-              WarningsQuantity++;
-              warningText.AppendFormat(
-                warningsFormat,
-                ExecutionOrder,
-                warningRow[1],
-                warningRow[2],
-                !string.IsNullOrEmpty(excelRowText) ? string.Format(" (Excel row: {0}).", excelRowText) : string.Empty,
-                nl);
-              nl = Environment.NewLine;
-            }
-          }
-
+          FormatOptimisticUpdateWarning(useOptimisticUpdate);
           StatementResult = StatementResultType.WarningsFound;
-          ResultText = warningText.ToString();
+          ResultText = _warningsBuilder.ToString();
+          _warningsBuilder.Clear();
+          _warningsBuilder = null;
         }
         else
         {
@@ -362,18 +406,6 @@ namespace MySQL.ForExcel.Classes
         else
         {
           ResultText = Resources.ErrorAdoNetText + Environment.NewLine + ex.Message;
-        }
-      }
-      finally
-      {
-        if (mySqlCommand != null)
-        {
-          mySqlCommand.Dispose();
-        }
-
-        if (warningsDs != null)
-        {
-          warningsDs.Dispose();
         }
       }
     }
@@ -401,6 +433,71 @@ namespace MySQL.ForExcel.Classes
       }
 
       return StatementResultType.NotApplied;
+    }
+
+    /// <summary>
+    /// Formats the warnings returned by an executed query contained in a <see cref="MySqlConnection"/> instance.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="args">Event arguments.</param>
+    private void FormatWarnings(object sender, MySqlInfoMessageEventArgs args)
+    {
+      if (args.errors.Length == 0)
+      {
+        return;
+      }
+
+      string nl = string.Empty;
+      if (_warningsBuilder == null)
+      {
+        _warningsBuilder = new StringBuilder(MiscUtilities.STRING_BUILDER_DEFAULT_CAPACITY);
+      }
+      else
+      {
+        nl = Environment.NewLine;
+      }
+
+      string excelRowText = ExcelRowText;
+      bool addExcelRowText = !string.IsNullOrEmpty(excelRowText);
+      foreach (var warning in args.errors)
+      {
+        WarningsQuantity++;
+        _warningsBuilder.Append(nl);
+        _warningsBuilder.AppendFormat(_executionOrderFormat, ExecutionOrder);
+        _warningsBuilder.AppendFormat(": {0} - {1}", warning.Code, warning.Message);
+        if (addExcelRowText)
+        {
+          _warningsBuilder.AppendFormat(" (Excel row: {0}).", excelRowText);
+        }
+
+        nl = Environment.NewLine;
+      }
+    }
+
+    /// <summary>
+    /// Formats the warnings returned by an executed query contained in a <see cref="MySqlConnection"/> instance.
+    /// </summary>
+    /// <param name="useOptimisticUpdate">Flag indicating whether optimistic locking is used for the update of rows.</param>
+    private void FormatOptimisticUpdateWarning(bool useOptimisticUpdate)
+    {
+      if (AffectedRows > 0)
+      {
+        return;
+      }
+
+      if (_warningsBuilder == null)
+      {
+        _warningsBuilder = new StringBuilder(MiscUtilities.STRING_BUILDER_DEFAULT_CAPACITY);
+      }
+
+      _mySqlRow.RowError = NO_MATCH;
+      WarningsQuantity++;
+      _warningsBuilder.AppendFormat(_executionOrderFormat, ExecutionOrder);
+      _warningsBuilder.Append(": ");
+      _warningsBuilder.AppendFormat(
+        Resources.QueryDidNotMatchRowsWarning,
+        useOptimisticUpdate ? string.Empty : Resources.PrimaryKeyText,
+        !string.IsNullOrEmpty(ExcelRowText) ? ExcelRowText + " " : string.Empty);
     }
   }
 }

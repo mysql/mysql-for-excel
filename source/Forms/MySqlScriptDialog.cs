@@ -69,6 +69,11 @@ namespace MySQL.ForExcel.Forms
     #region Fields
 
     /// <summary>
+    /// Flag indicating whether a statement to create a table was generated.
+    /// </summary>
+    private bool _createdTable;
+
+    /// <summary>
     /// String builder containing error messages displayed to the user.
     /// </summary>
     private StringBuilder _errorDetails;
@@ -76,12 +81,17 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Contains the summary text displayed to users if the script executes with errors.
     /// </summary>
-    private string _errorDialogSummary;
+    private readonly string _errorDialogSummary;
 
     /// <summary>
     /// Flag indicating whether when text changes in the <see cref="QueryTextBox"/> was due user input or programatic.
     /// </summary>
     private bool _isUserInput;
+
+    /// <summary>
+    /// Flag indicating whether a statement to lock a table was generated.
+    /// </summary>
+    private bool _lockedTable;
 
     /// <summary>
     /// The value of the MAX_ALLOWED_PACKET MySQL Server variable indicating the max size in bytes of the packet returned by a single query.
@@ -164,17 +174,21 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private MySqlScriptDialog()
     {
+      _createdTable = false;
       _errorDetails = null;
       _errorDialogSummary = null;
       _isUserInput = true;
+      _lockedTable = false;
       _mySqlMaxAllowedPacket = 0;
       _mySqlTable = null;
       _wbConnection = null;
       ActualStatementRowsList = null;
+      ErroredOutDataRow = null;
       OriginalSqlScript = null;
       OriginalStatementRowsList = null;
       ScriptResult = MySqlStatement.StatementResultType.NotApplied;
       ShowOriginalOperationsInformation = false;
+      UserChangedOriginalQuery = false;
 
       InitializeComponent();
       OriginalQueryButton.Enabled = false;
@@ -200,6 +214,11 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
+    /// Gets the <see cref="IMySqlDataRow"/> object that generated an error.
+    /// </summary>
+    public IMySqlDataRow ErroredOutDataRow { get; private set; }
+
+    /// <summary>
     /// Gets the number of insert operations successfully performed against the database server.
     /// </summary>
     public int InsertedOperations
@@ -223,6 +242,22 @@ namespace MySQL.ForExcel.Forms
         }
 
         return _mySqlMaxAllowedPacket;
+      }
+    }
+
+    /// <summary>
+    /// Gets the text describing the current operation this script belongs to.
+    /// </summary>
+    public string OperationText
+    {
+      get
+      {
+        if (_mySqlTable != null)
+        {
+          return _mySqlTable.OperationType.ToString() + "Data";
+        }
+
+        return "Current Operation";
       }
     }
 
@@ -280,6 +315,11 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     public bool UseOptimisticUpdate { get; private set; }
 
+    /// <summary>
+    /// Gets a value indicating whether the user edited the original query so the <see cref="SqlScript"/> and <see cref="OriginalSqlScript"/> values may differ.
+    /// </summary>
+    public bool UserChangedOriginalQuery { get; private set; }
+
     #endregion Properties
 
     /// <summary>
@@ -300,9 +340,10 @@ namespace MySQL.ForExcel.Forms
       }
 
       // Handle error messages thrown back by the server and show them to the user.
+      int statementsWithErrorsCount = ActualStatementRowsList.Count(row => row.Statement.StatementResult == MySqlStatement.StatementResultType.ErrorThrown);
       if (_errorDetails == null)
       {
-        _errorDetails = new StringBuilder();
+        _errorDetails = new StringBuilder(statementsWithErrorsCount * MiscUtilities.STRING_BUILDER_DEFAULT_CAPACITY);
       }
       else
       {
@@ -324,6 +365,7 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     public void ApplyScript()
     {
+      ErroredOutDataRow = null;
       ScriptResult = MySqlStatement.StatementResultType.NotApplied;
       CreateActualStatementsList();
       if (ActualStatementRowsList == null || ActualStatementRowsList.Count == 0)
@@ -336,31 +378,59 @@ namespace MySQL.ForExcel.Forms
       {
         conn.Open();
         MySqlTransaction transaction = conn.BeginTransaction();
+        MySqlCommand command = new MySqlCommand(string.Empty, conn, transaction);
         uint executionOrder = 1;
-        string statementsQuantityFormat = new string('0', ActualStatementRowsList.Count.StringSize());
         foreach (var mySqlRow in ActualStatementRowsList)
         {
-          mySqlRow.Statement.Execute(transaction, executionOrder++, UseOptimisticUpdate, statementsQuantityFormat);
-          ScriptResult = mySqlRow.Statement.JoinResultTypes(ScriptResult);
-          if (mySqlRow.Statement.StatementResult == MySqlStatement.StatementResultType.ErrorThrown)
+          if (conn.State != ConnectionState.Open)
           {
-            mySqlRow.ReflectError();
-            break;
+            ErroredOutDataRow = mySqlRow;
+            ErroredOutDataRow.RowError = Resources.ConnectionLostErrorText;
+            ScriptResult = MySqlStatement.StatementResultType.ErrorThrown;
+            return;
           }
+
+          var rowStatement = mySqlRow.Statement;
+          rowStatement.Execute(command, executionOrder++, UseOptimisticUpdate);
+          ScriptResult = rowStatement.JoinResultTypes(ScriptResult);
+          if (ScriptResult != MySqlStatement.StatementResultType.ErrorThrown)
+          {
+            continue;
+          }
+
+          mySqlRow.ReflectError();
+          ErroredOutDataRow = mySqlRow;
+          break;
         }
 
         switch (ScriptResult)
         {
+          case MySqlStatement.StatementResultType.NotApplied:
           case MySqlStatement.StatementResultType.ErrorThrown:
             transaction.Rollback();
+            if (_lockedTable)
+            {
+              _wbConnection.UnlockTablesInSession();
+            }
+
+            if (_createdTable)
+            {
+              _wbConnection.DropTableIfExists(_mySqlTable.TableNameForSqlQueries);
+            }
             break;
 
           case MySqlStatement.StatementResultType.WarningsFound:
           case MySqlStatement.StatementResultType.Successful:
             // After commiting the transaction, selectively commit the rows that did not result in errors.
             transaction.Commit();
-            foreach (var mySqlRow in ActualStatementRowsList.Where(mySqlRow => mySqlRow.Statement.StatementWasApplied))
+            // Do not convert to LINQ, it will use a Where clause that will consume more time than just skipping the row.
+            foreach (var mySqlRow in ActualStatementRowsList)
             {
+              if (!mySqlRow.Statement.StatementWasApplied)
+              {
+                continue;
+              }
+
               if (mySqlRow.HasConcurrencyWarnings)
               {
                 mySqlRow.ReflectError();
@@ -386,11 +456,21 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      ActualStatementRowsList = new List<IMySqlDataRow>(OriginalStatementRowsList.Count);
-      foreach (string sqlQuery in SqlScript.Split(';').Select(sqlStatement => sqlStatement.Trim()).Where(sqlQuery => sqlQuery.Length > 0))
+      if (UserChangedOriginalQuery &&
+          string.Compare(SqlScript, OriginalSqlScript, StringComparison.InvariantCultureIgnoreCase) != 0)
       {
-        var originalRow = OriginalStatementRowsList.FirstOrDefault(iMySqlRow => iMySqlRow.Statement.SqlQuery == sqlQuery && !ActualStatementRowsList.Contains(iMySqlRow));
-        ActualStatementRowsList.Add(originalRow ?? new MySqlDummyRow(sqlQuery));
+        // The user modified the original query and it is no longer the same as the original one, so the actual statements list is built from the modified SQL script text.
+        ActualStatementRowsList = new List<IMySqlDataRow>(OriginalStatementRowsList.Count);
+        foreach (string sqlQuery in SqlScript.Split(';').Select(sqlStatement => sqlStatement.Trim()).Where(sqlQuery => sqlQuery.Length > 0))
+        {
+          var originalRow = OriginalStatementRowsList.FirstOrDefault(iMySqlRow => iMySqlRow.Statement.SqlQuery == sqlQuery && !ActualStatementRowsList.Contains(iMySqlRow));
+          ActualStatementRowsList.Add(originalRow ?? new MySqlDummyRow(sqlQuery));
+        }
+      }
+      else
+      {
+        // The original query did not change so it is safe to assume the actual statements list is the same as the original one.
+        ActualStatementRowsList = OriginalStatementRowsList;
       }
     }
 
@@ -406,25 +486,67 @@ namespace MySQL.ForExcel.Forms
 
       if (_mySqlTable != null)
       {
+        _createdTable = false;
+        _lockedTable = false;
         OriginalStatementRowsList.Clear();
-        StringBuilder sqlScript = new StringBuilder(_mySqlTable.Rows.Count);
-
-        // Create CREATE statement if the table is being exported to a new MySQL table.
-        if (_mySqlTable.OperationType.IsForExport())
+        bool createTableOnly = _mySqlTable.OperationType.IsForExport() && _mySqlTable.CreateTableWithoutData;
+        if (!createTableOnly && _mySqlTable.ChangedOrDeletedRows == 0)
         {
-          var dummyRow = new MySqlDummyRow(_mySqlTable.GetCreateSql(true));
-          OriginalStatementRowsList.Add(dummyRow);
-          sqlScript.AppendFormat("{0};{1}", dummyRow.Statement.SqlQuery, Environment.NewLine);
+          return;
+        }
+
+        int builderLength = createTableOnly ? MiscUtilities.STRING_BUILDER_DEFAULT_CAPACITY : _mySqlTable.ChangedOrDeletedRows * _mySqlTable.MaxQueryLength;
+        StringBuilder sqlScript = new StringBuilder(builderLength);
+        IList<MySqlDummyRow> dummyRows;
+        bool createTableDummyRows = _mySqlTable.OperationType.IsForExport() || _mySqlTable.OperationType.IsForAppend();
+        if (createTableDummyRows)
+        {
+          // Create optimization statements for INSERTS that disable key constraints and lock table.
+          // Also incluldes a CREATE statement if table on Export mode.
+          dummyRows = _mySqlTable.GetTableDummyRows(true);
+          if (dummyRows != null)
+          {
+            foreach (var dummyRow in dummyRows)
+            {
+              if (dummyRow.Statement.StatementType == MySqlStatement.SqlStatementType.CreateTable)
+              {
+                _createdTable = true;
+              }
+
+              if (dummyRow.Statement.StatementType == MySqlStatement.SqlStatementType.LockTables)
+              {
+                _lockedTable = true;
+              }
+
+              OriginalStatementRowsList.Add(dummyRow);
+              sqlScript.AppendFormat("{0};{1}", dummyRow.Statement.SqlQuery, Environment.NewLine);
+            }
+          }
         }
 
         // Create DELETE, INSERT and UPDATE statements for table rows
-        if (_mySqlTable.OperationType != MySqlDataTable.DataOperationType.Export || !_mySqlTable.CreateTableWithoutData)
+        // Do not change this code to get changed rows via the GetChanges method since the references to the MySqlDataTable and MySqlDataTable objects will be broken.
+        if (!createTableOnly)
         {
           DataRowState[] rowStatesWithChanges = { DataRowState.Deleted, DataRowState.Added, DataRowState.Modified };
           foreach (MySqlDataRow mySqlRow in rowStatesWithChanges.SelectMany(rowState => _mySqlTable.Rows.Cast<MySqlDataRow>().Where(dr => !dr.IsHeadersRow && dr.RowState == rowState)))
           {
             OriginalStatementRowsList.Add(mySqlRow);
             sqlScript.AppendFormat("{0};{1}", mySqlRow.Statement.SqlQuery, Environment.NewLine);
+          }
+        }
+
+        // Create optimization statements for INSERTS that re-enable key constraints and unlock table.
+        if (createTableDummyRows)
+        {
+          dummyRows = _mySqlTable.GetTableDummyRows(false);
+          if (dummyRows != null)
+          {
+            foreach (var dummyRow in dummyRows)
+            {
+              OriginalStatementRowsList.Add(dummyRow);
+              sqlScript.AppendFormat("{0};{1}", dummyRow.Statement.SqlQuery, Environment.NewLine);
+            }
           }
         }
 
@@ -497,6 +619,7 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
+      UserChangedOriginalQuery = true;
       ResetQueryChangedTimer();
     }
 
@@ -507,6 +630,11 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void QueryTextBox_Validated(object sender, EventArgs e)
     {
+      if (!QueryChangedTimer.Enabled)
+      {
+        return;
+      }
+
       QueryChangedTimer.Stop();
 
       // Identify the statements that would exceed the server's max allowed packet value and highlight them for the user.

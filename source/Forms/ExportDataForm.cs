@@ -447,8 +447,9 @@ namespace MySQL.ForExcel.Forms
       bool setupDataSuccessful = true;
       if (ExportDataTable == null)
       {
-        ExportDataTable = PreviewDataTable.CloneSchema();
+        ExportDataTable = PreviewDataTable.CloneSchema(false);
         ExportDataTable.DetectDatatype = false;
+        ExportDataTable.IsPreviewTable = false;
         setupDataSuccessful = ExportDataTable.SetupColumnsWithData(ExportDataRange, false, true);
       }
       else
@@ -472,6 +473,12 @@ namespace MySQL.ForExcel.Forms
         {
           return;
         }
+
+        ExportDataTable.CreateTableWithoutData = true;
+      }
+      else
+      {
+        ExportDataTable.CreateTableWithoutData = CreateTableToolStripMenuItem.Checked;
       }
 
       Cursor = Cursors.WaitCursor;
@@ -480,10 +487,6 @@ namespace MySQL.ForExcel.Forms
       bool warningsFound = false;
       bool tableCreated = true;
       string operationSummary;
-      StringBuilder operationDetails = new StringBuilder();
-      StringBuilder warningDetails = new StringBuilder();
-      StringBuilder warningStatementDetails = new StringBuilder();
-      ExportDataTable.CreateTableWithoutData = CreateTableToolStripMenuItem.Checked;
       var modifiedRowsList = ExportDataTable.PushData(Settings.Default.GlobalSqlQueriesPreviewQueries);
       if (modifiedRowsList == null)
       {
@@ -494,6 +497,9 @@ namespace MySQL.ForExcel.Forms
       bool warningDetailHeaderAppended = false;
       string statementsQuantityFormat = new string('0', modifiedRowsList.Count.StringSize());
       string sqlQueriesFormat = "{0:" + statementsQuantityFormat + "}: {1}";
+      StringBuilder operationDetails = new StringBuilder();
+      StringBuilder warningDetails = new StringBuilder();
+      StringBuilder warningStatementDetails = new StringBuilder();
       foreach (var statement in modifiedRowsList.Select(statementRow => statementRow.Statement))
       {
         // Create details text for the table creation.
@@ -638,6 +644,9 @@ namespace MySQL.ForExcel.Forms
 
       Cursor = Cursors.Default;
       MiscUtilities.ShowCustomizedInfoDialog(operationsType, operationSummary, operationDetails.ToString(), false);
+      operationDetails.Clear();
+      warningDetails.Clear();
+      warningStatementDetails.Clear();
       if (errorsFound)
       {
         return;
@@ -792,12 +801,11 @@ namespace MySQL.ForExcel.Forms
         Settings.Default.ExportAddBufferToVarchar,
         Settings.Default.ExportAutoIndexIntColumns,
         Settings.Default.ExportAutoAllowEmptyNonIndexColumns,
-        WbConnection);
+        WbConnection) { IsPreviewTable = false };
       PreviewDataTable.TableColumnPropertyValueChanged += PreviewTableColumnPropertyValueChanged;
       PreviewDataTable.TableWarningsChanged += PreviewTableWarningsChanged;
       int previewRowsQty = Math.Min(ExportDataRange.Rows.Count, Settings.Default.ExportLimitPreviewRowsQuantity);
-      Excel.Range previewRange = ExportDataRange.Resize[previewRowsQty, ExportDataRange.Columns.Count];
-      PreviewDataTable.SetupColumnsWithData(previewRange, true, true);
+      PreviewDataTable.SetupColumnsWithData(ExportDataRange, true, false, previewRowsQty);
       PreviewDataGridView.DataSource = PreviewDataTable;
     }
 

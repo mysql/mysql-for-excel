@@ -475,6 +475,7 @@ namespace MySQL.ForExcel.Controls
 
       WbConnection.ConnectionTimeout = Settings.Default.GlobalConnectionConnectionTimeout;
       WbConnection.DefaultCommandTimeout = Settings.Default.GlobalConnectionCommandTimeout;
+      WbConnection.SetSessionReadWriteTimeouts();
     }
 
     /// <summary>

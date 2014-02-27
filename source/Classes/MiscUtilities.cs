@@ -34,6 +34,23 @@ namespace MySQL.ForExcel.Classes
   public static class MiscUtilities
   {
     /// <summary>
+    /// The default capacity to initialize a <see cref="StringBuilder"/> instance.
+    /// </summary>
+    public const int STRING_BUILDER_DEFAULT_CAPACITY = 255;
+
+    /// <summary>
+    /// Checks if the given <see cref="MySqlStatement.SqlStatementType"/> affects rows in the database.
+    /// </summary>
+    /// <param name="statementType">A <see cref="MySqlStatement.SqlStatementType"/> value.</param>
+    /// <returns><c>true</c> if the <see cref="MySqlStatement.SqlStatementType"/> affects rows in the database, <c>false</c> otherwise.</returns>
+    public static bool AffectsRowsOnServer(this MySqlStatement.SqlStatementType statementType)
+    {
+      return statementType == MySqlStatement.SqlStatementType.Delete ||
+             statementType == MySqlStatement.SqlStatementType.Insert ||
+             statementType == MySqlStatement.SqlStatementType.Update;
+    }
+
+    /// <summary>
     /// Adds new lines to the <see cref="StringBuilder"/>.
     /// </summary>
     /// <param name="stringBuilder">The <see cref="StringBuilder"/> to add new lines to.</param>
@@ -92,6 +109,23 @@ namespace MySQL.ForExcel.Classes
     public static EditSessionInfo GetActiveEditSession(this List<EditSessionInfo> sessionsList, Excel.Worksheet worksheet)
     {
       return sessionsList == null ? null : sessionsList.FirstOrDefault(session => session.EditDialog != null && session.EditDialog.EditingWorksheet.Name == worksheet.Name);
+    }
+
+    /// <summary>
+    /// Gets a linear array from a bidimensional one extracting the elements of the given dimension.
+    /// </summary>
+    /// <param name="biDimensionalArray">The bidimensional array.</param>
+    /// <param name="firstDimensionIndex">The index to extract elements from.</param>
+    /// <param name="shiftIndexes">Flag indicating whether the indexes are shifted +1 (for Excel arrays) or not.</param>
+    /// <returns>A linear array.</returns>
+    public static IEnumerable<object> GetLinearArray(this object[,] biDimensionalArray, int firstDimensionIndex, bool shiftIndexes = false)
+    {
+      int startingIndex = shiftIndexes ? 1 : 0;
+      int linearArrayLength = biDimensionalArray.GetLength(firstDimensionIndex) + startingIndex;
+      for (int i = startingIndex; i < linearArrayLength; i++)
+      {
+        yield return biDimensionalArray[firstDimensionIndex, i];
+      }
     }
 
     /// <summary>

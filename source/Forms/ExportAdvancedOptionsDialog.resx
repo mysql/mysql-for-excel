@@ -117,10 +117,18 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="FootnoteAreaPanel.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="CreateTableIndexesLastCheckBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="ContentAreaPanel.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="HelpToolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
+  <data name="CreateTableIndexesLastCheckBox.ToolTip" xml:space="preserve">
+    <value>When checked the unique and regular indexes will be created in the new MySQL table after all rows have been inserted.
+This causes that index rebuilding does not happen on every inserted row, so the data is indexed just once after it has been inserted.
+WARNING: If there are unique indexes in the table then be certain that the data contains no duplicate entries.</value>
+  </data>
+  <metadata name="SqlQueriesLabel.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="ColumnOptionsLostWarningLabel.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
@@ -132,6 +140,10 @@
   <metadata name="PreviewRowsQuantityNumericUpDown.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="PreviewRowsQuantityNumericUpDown.ToolTip" xml:space="preserve">
+    <value>Limits the data preview and data type automatic detection to the given number of Excel data rows.
+This number has a direct impact on the time MySQL for Excel will take on detecting the data type from the data if that option is turned on.</value>
+  </data>
   <metadata name="ColumnOptionsLostWarningPictureBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -162,13 +174,14 @@
   <metadata name="AddBufferToVarcharCheckBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="AddBufferToVarcharCheckBox.ToolTip" xml:space="preserve">
+    <value>When checked the columns with a detected data type of Varchar will have an extra padding by rounding up the maximum length detected on the column's pewview data.
+When unchecked the length is not round up and the maximum length detected on the column's preview data is used.</value>
+  </data>
   <metadata name="DetectDatatypeCheckBox.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="ColumnDatatypeOptionsLabel.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="CommandAreaPanel.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="DialogAcceptButton.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">

@@ -117,4 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <metadata name="ExcelToolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
+  </metadata>
+  <data name="UseOptimisticUpdatesCheckBox.ToolTip" xml:space="preserve">
+    <value>This setting affects all Edit Data sessions.
+When checked "optimistic updates" are used when committing changes to the database, meaning data changes done to the table outside of MySQL for Excel after the table's data was retrieved by the Edit Data session will not be overwritten by the session's commit.
+When unchecked "pesimistic updates" are used, meaning data changes done outside MySQL for Excel will be overwritten upon commiting the data changes.</value>
+  </data>
 </root>

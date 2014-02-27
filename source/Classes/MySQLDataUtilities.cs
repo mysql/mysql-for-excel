@@ -46,6 +46,11 @@ namespace MySQL.ForExcel.Classes
     /// <param name="tableName">The name of the MySQL table queried to produce the data stored in this data table.</param>
     public static void AddExtendedProperties(this DataTable dt, string queryString, bool importedHeaders, string tableName)
     {
+      if (dt == null)
+      {
+        return;
+      }
+
       if (dt.ExtendedProperties.ContainsKey("QueryString"))
       {
         dt.ExtendedProperties["QueryString"] = queryString;
@@ -75,12 +80,43 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Verifies if a <see cref="MySqlConnection"/> is open and has not been disconnected by the server.
+    /// </summary>
+    /// <param name="connection">A <see cref="MySqlConnection"/> object.</param>
+    /// <returns><c>true</c> if the connection is open and has not been disconnected by the server, <c>false</c> otherwise.</returns>
+    public static bool CheckIfOpenAndNotDisconnected(this MySqlConnection connection)
+    {
+      return connection != null && (connection.State == ConnectionState.Open || connection.Ping());
+    }
+
+    /// <summary>
+    /// Drops the given table from the connected schema.
+    /// </summary>
+    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
+    /// <param name="tableName">The name of the table to drop.</param>
+    public static void DropTableIfExists(this MySqlWorkbenchConnection connection, string tableName)
+    {
+      if (connection == null || string.IsNullOrEmpty(connection.Schema) || string.IsNullOrEmpty(tableName))
+      {
+        return;
+      }
+
+      string sql = string.Format("DROP TABLE IF EXISTS `{0}`.`{1}`", connection.Schema, tableName);
+      MySqlHelper.ExecuteNonQuery(connection.GetConnectionStringBuilder().ConnectionString, sql);
+    }
+
+    /// <summary>
     /// Escapes special characters that cause problems when passed within queries, from this data value string.
     /// </summary>
     /// <param name="valueToEscape">The data value text containing special characters.</param>
     /// <returns>A new string built from the given data value string withouth the special characters.</returns>
     public static string EscapeDataValueString(this string valueToEscape)
     {
+      if (string.IsNullOrEmpty(valueToEscape))
+      {
+        return valueToEscape;
+      }
+
       const string quotesAndOtherDangerousChars =
           "\\" + "\u2216" + "\uFF3C"               // backslashes
         + "'" + "\u00B4" + "\u02B9" + "\u02BC" + "\u02C8" + "\u02CA"
@@ -90,7 +126,7 @@ namespace MySQL.ForExcel.Classes
                 + "\uFF40"                       // back-tick
         + "\"" + "\u02BA" + "\u030E" + "\uFF02"; // double-quotes
 
-      StringBuilder sb = new StringBuilder();
+      StringBuilder sb = new StringBuilder(valueToEscape.Length * 2);
       foreach (char c in valueToEscape)
       {
         char escape = char.MinValue;
@@ -171,6 +207,11 @@ namespace MySQL.ForExcel.Classes
     /// <returns><see cref="DataSet"/> where each table within it represents each of the result sets returned by the routine.</returns>
     public static DataSet ExecuteRoutine(this MySqlWorkbenchConnection connection, string routineName, params MySqlParameter[] routineParameters)
     {
+      if (connection == null)
+      {
+        return null;
+      }
+
       // Create & open a SqlConnection, and dispose of it after we are done.
       using (MySqlConnection baseConnection = new MySqlConnection(connection.GetConnectionStringBuilder().ConnectionString))
       {
@@ -215,6 +256,11 @@ namespace MySQL.ForExcel.Classes
     /// <returns>Table containing the results of the query.</returns>
     public static DataTable GetDataFromTableOrView(this MySqlWorkbenchConnection connection, string query)
     {
+      if (connection == null)
+      {
+        return null;
+      }
+
       DataSet ds = MySqlHelper.ExecuteDataset(connection.GetConnectionStringBuilder().ConnectionString, query);
       if (ds.Tables.Count <= 0)
       {
@@ -238,6 +284,11 @@ namespace MySQL.ForExcel.Classes
     /// <returns>Table containing the results of the query.</returns>
     public static DataTable GetDataFromTableOrView(this MySqlWorkbenchConnection connection, DbObject dbo, List<string> columnsList, int firstRowIdx, int rowCount)
     {
+      if (connection == null)
+      {
+        return null;
+      }
+
       string queryString = AssembleSelectQuery(connection.Schema, dbo, columnsList, firstRowIdx, rowCount);
       return string.IsNullOrEmpty(queryString) ? null : connection.GetDataFromTableOrView(queryString);
     }
@@ -265,7 +316,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns><see cref="DataSet"/> where each table within it represents each of the result sets returned by the stored procedure.</returns>
     public static DataSet GetDataSetFromProcedure(this MySqlWorkbenchConnection connection, DbObject dbo, params MySqlParameter[] parameters)
     {
-      if (dbo.Type != DbObject.DbObjectType.Procedure)
+      if (connection == null || dbo.Type != DbObject.DbObjectType.Procedure)
       {
         return null;
       }
@@ -273,6 +324,18 @@ namespace MySQL.ForExcel.Classes
       string sql = string.Format("`{0}`.`{1}`", connection.Schema, dbo.Name);
       DataSet retDs = connection.ExecuteRoutine(sql, parameters);
       return retDs;
+    }
+
+    /// <summary>
+    /// Gets the value of the DEFAULT_STORAGE_ENGINE MySQL Server variable indicating the default DB engine used for new table creations.
+    /// </summary>
+    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
+    /// <returns>The default DB engine used for new table creations.</returns>
+    public static string GetMySqlServerDefaultEngine(this MySqlWorkbenchConnection connection)
+    {
+      const string sql = "SELECT @@default_storage_engine";
+      object objEngine = connection != null ? MySqlHelper.ExecuteScalar(connection.GetConnectionStringBuilder().ConnectionString, sql) : null;
+      return objEngine != null ? objEngine.ToString() : string.Empty;
     }
 
     /// <summary>
@@ -321,7 +384,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The number of rows in a given table or view.</returns>
     public static long GetRowsCountFromTableOrView(this MySqlWorkbenchConnection connection, DbObject dbo)
     {
-      if (dbo.Type == DbObject.DbObjectType.Procedure)
+      if (connection == null || dbo.Type == DbObject.DbObjectType.Procedure)
       {
         return 0;
       }
@@ -340,9 +403,13 @@ namespace MySQL.ForExcel.Classes
     /// <returns>Schema information within a data table.</returns>
     public static DataTable GetSchemaCollection(this MySqlWorkbenchConnection connection, string collection, params string[] restrictions)
     {
+      if (connection == null)
+      {
+        return null;
+      }
+
       string connectionString = connection.GetConnectionStringBuilder().ConnectionString;
       DataTable dt;
-
       try
       {
         using (MySqlConnection baseConnection = new MySqlConnection(connectionString))
@@ -446,7 +513,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the index exists, <c>false</c> otherwise.</returns>
     public static bool IndexExistsInSchema(this MySqlWorkbenchConnection connection, string schemaName, string tableName, string indexName)
     {
-      if (string.IsNullOrEmpty(schemaName) || string.IsNullOrEmpty(indexName))
+      if (connection == null || string.IsNullOrEmpty(schemaName) || string.IsNullOrEmpty(indexName))
       {
         return false;
       }
@@ -510,6 +577,35 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Sets the net_write_timeout and net_read_timeout MySQL server variables to the given value for the duration of the current session.
+    /// </summary>
+    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
+    /// <param name="timeoutInSeconds">
+    /// The number of seconds to wait for more data from a connection before aborting the read or for a block to be written to a connection before aborting the write.
+    /// If the parameter is ommitted or a value of <c>0</c> is passed to it, the <see cref="MySqlWorkbenchConnection.DefaultCommandTimeout"/> property value is used.
+    /// </param>
+    public static void SetSessionReadWriteTimeouts(this MySqlWorkbenchConnection connection, uint timeoutInSeconds = 0)
+    {
+      if (connection == null)
+      {
+        return;
+      }
+
+      if (timeoutInSeconds == 0)
+      {
+        timeoutInSeconds = connection.DefaultCommandTimeout;
+      }
+
+      if (timeoutInSeconds < 1)
+      {
+        return;
+      }
+
+      string sql = string.Format("SET SESSION net_write_timeout = {0}, SESSION net_read_timeout = {0}", timeoutInSeconds);
+      MySqlHelper.ExecuteNonQuery(connection.GetConnectionStringBuilder().ConnectionString, sql);
+    }
+
+    /// <summary>
     /// Checks if a table with the given name exists in the given schema.
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
@@ -518,7 +614,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the table exists, <c>false</c> otherwise.</returns>
     public static bool TableExistsInSchema(this MySqlWorkbenchConnection connection, string schemaName, string tableName)
     {
-      if (string.IsNullOrEmpty(schemaName) || string.IsNullOrEmpty(tableName))
+      if (connection == null || string.IsNullOrEmpty(schemaName) || string.IsNullOrEmpty(tableName))
       {
         return false;
       }
@@ -537,7 +633,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the table has a primary key, <c>false</c> otherwise.</returns>
     public static bool TableHasPrimaryKey(this MySqlWorkbenchConnection connection, string tableName)
     {
-      if (string.IsNullOrEmpty(tableName))
+      if (connection == null || string.IsNullOrEmpty(tableName))
       {
         return false;
       }
@@ -597,6 +693,11 @@ namespace MySQL.ForExcel.Classes
     /// <returns>Enumeration indicating the result of the connection test.</returns>
     public static TestConnectionResult TestConnectionAndReturnResult(this MySqlWorkbenchConnection connection, bool displayErrorOnEmptyPassword)
     {
+      if (connection == null)
+      {
+        return TestConnectionResult.None;
+      }
+
       Globals.ThisAddIn.Application.Cursor = Excel.XlMousePointer.xlWait;
       TestConnectionResult connectionResult;
       Exception connectionException;
@@ -664,6 +765,16 @@ namespace MySQL.ForExcel.Classes
     public static string ToValidMySqlColumnName(this string proposedName)
     {
       return proposedName != null ? proposedName.Replace(" ", "_").Replace("(", string.Empty).Replace(")", string.Empty) : string.Empty;
+    }
+
+    /// <summary>
+    /// Unlocks tables locked in the current session.
+    /// </summary>
+    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
+    public static void UnlockTablesInSession(this MySqlWorkbenchConnection connection)
+    {
+      const string sql = "UNLOCK TABLES";
+      MySqlHelper.ExecuteNonQuery(connection.GetConnectionStringBuilder().ConnectionString, sql);
     }
 
     /// <summary>

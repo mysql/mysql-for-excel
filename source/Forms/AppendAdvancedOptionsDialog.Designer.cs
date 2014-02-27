@@ -45,6 +45,8 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void InitializeComponent()
     {
+      this.components = new System.ComponentModel.Container();
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AppendAdvancedOptionsDialog));
       this.DialogAcceptButton = new System.Windows.Forms.Button();
       this.DialogCancelButton = new System.Windows.Forms.Button();
       this.UseFormattedValuesCheckBox = new System.Windows.Forms.CheckBox();
@@ -63,6 +65,9 @@ namespace MySQL.ForExcel.Forms
       this.PreviewRowsQuantityNumericUpDown = new System.Windows.Forms.NumericUpDown();
       this.PreviewRowsQuantity2Label = new System.Windows.Forms.Label();
       this.PreviewRowsQuantity1Label = new System.Windows.Forms.Label();
+      this.SqlQueriesLabel = new System.Windows.Forms.Label();
+      this.DisableTableIndexesCheckBox = new System.Windows.Forms.CheckBox();
+      this.HelpToolTip = new System.Windows.Forms.ToolTip(this.components);
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.PreviewRowsQuantityNumericUpDown)).BeginInit();
@@ -75,6 +80,8 @@ namespace MySQL.ForExcel.Forms
       // 
       // ContentAreaPanel
       // 
+      this.ContentAreaPanel.Controls.Add(this.DisableTableIndexesCheckBox);
+      this.ContentAreaPanel.Controls.Add(this.SqlQueriesLabel);
       this.ContentAreaPanel.Controls.Add(this.PreviewRowsQuantityNumericUpDown);
       this.ContentAreaPanel.Controls.Add(this.PreviewRowsQuantity2Label);
       this.ContentAreaPanel.Controls.Add(this.PreviewRowsQuantity1Label);
@@ -89,13 +96,13 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.AutoStoreColumnMappingCheckBox);
       this.ContentAreaPanel.Controls.Add(this.DoNotPerformAutoMapCheckBox);
       this.ContentAreaPanel.Controls.Add(this.MappingOptionsLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(484, 515);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(484, 586);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 470);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 541);
       this.CommandAreaPanel.Size = new System.Drawing.Size(484, 45);
       // 
       // DialogAcceptButton
@@ -128,8 +135,10 @@ namespace MySQL.ForExcel.Forms
       this.UseFormattedValuesCheckBox.Location = new System.Drawing.Point(53, 234);
       this.UseFormattedValuesCheckBox.Name = "UseFormattedValuesCheckBox";
       this.UseFormattedValuesCheckBox.Size = new System.Drawing.Size(141, 19);
-      this.UseFormattedValuesCheckBox.TabIndex = 6;
+      this.UseFormattedValuesCheckBox.TabIndex = 9;
       this.UseFormattedValuesCheckBox.Text = "Use formatted values";
+      this.HelpToolTip.SetToolTip(this.UseFormattedValuesCheckBox, "If checked it treats dates in Excel as such, otherwise it treats them as numbers." +
+        "");
       this.UseFormattedValuesCheckBox.UseVisualStyleBackColor = false;
       // 
       // FieldDataOptionsLabel
@@ -154,6 +163,9 @@ namespace MySQL.ForExcel.Forms
       this.ReloadColumnMappingCheckBox.Size = new System.Drawing.Size(390, 19);
       this.ReloadColumnMappingCheckBox.TabIndex = 4;
       this.ReloadColumnMappingCheckBox.Text = "Reload stored column mapping for the selected table automatically";
+      this.HelpToolTip.SetToolTip(this.ReloadColumnMappingCheckBox, "When checked If there is a stored mapping saved for the selected MySQL table, the" +
+        " mapping will be applied automatically next time data is appended to that table." +
+        "");
       this.ReloadColumnMappingCheckBox.UseVisualStyleBackColor = false;
       // 
       // AutoStoreColumnMappingCheckBox
@@ -166,6 +178,8 @@ namespace MySQL.ForExcel.Forms
       this.AutoStoreColumnMappingCheckBox.Size = new System.Drawing.Size(343, 19);
       this.AutoStoreColumnMappingCheckBox.TabIndex = 3;
       this.AutoStoreColumnMappingCheckBox.Text = "Automatically store the column mapping for the given table";
+      this.HelpToolTip.SetToolTip(this.AutoStoreColumnMappingCheckBox, "When checked a column mapping is automatically saved for the selected MySQL table" +
+        ".");
       this.AutoStoreColumnMappingCheckBox.UseVisualStyleBackColor = false;
       // 
       // DoNotPerformAutoMapCheckBox
@@ -178,6 +192,7 @@ namespace MySQL.ForExcel.Forms
       this.DoNotPerformAutoMapCheckBox.Size = new System.Drawing.Size(303, 19);
       this.DoNotPerformAutoMapCheckBox.TabIndex = 2;
       this.DoNotPerformAutoMapCheckBox.Text = "Perform an automatic mapping when dialog opens";
+      this.HelpToolTip.SetToolTip(this.DoNotPerformAutoMapCheckBox, resources.GetString("DoNotPerformAutoMapCheckBox.ToolTip"));
       this.DoNotPerformAutoMapCheckBox.UseVisualStyleBackColor = false;
       // 
       // MappingOptionsLabel
@@ -209,31 +224,30 @@ namespace MySQL.ForExcel.Forms
       this.StoredColumnMappingsLabel.BackColor = System.Drawing.Color.Transparent;
       this.StoredColumnMappingsLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.StoredColumnMappingsLabel.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.StoredColumnMappingsLabel.Location = new System.Drawing.Point(24, 280);
+      this.StoredColumnMappingsLabel.Location = new System.Drawing.Point(24, 353);
       this.StoredColumnMappingsLabel.Name = "StoredColumnMappingsLabel";
       this.StoredColumnMappingsLabel.Size = new System.Drawing.Size(158, 17);
-      this.StoredColumnMappingsLabel.TabIndex = 7;
+      this.StoredColumnMappingsLabel.TabIndex = 12;
       this.StoredColumnMappingsLabel.Text = "Stored Column Mappings";
       // 
       // RenameMappingButton
       // 
       this.RenameMappingButton.Enabled = false;
-      this.RenameMappingButton.Location = new System.Drawing.Point(387, 313);
+      this.RenameMappingButton.Location = new System.Drawing.Point(387, 383);
       this.RenameMappingButton.Name = "RenameMappingButton";
       this.RenameMappingButton.Size = new System.Drawing.Size(75, 23);
-      this.RenameMappingButton.TabIndex = 9;
+      this.RenameMappingButton.TabIndex = 14;
       this.RenameMappingButton.Text = "Rename";
       this.RenameMappingButton.UseVisualStyleBackColor = true;
       this.RenameMappingButton.Click += new System.EventHandler(this.RenameMappingButton_Click);
       // 
       // DeleteMappingButton
       // 
-      this.DeleteMappingButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.DeleteMappingButton.Enabled = false;
-      this.DeleteMappingButton.Location = new System.Drawing.Point(387, 342);
+      this.DeleteMappingButton.Location = new System.Drawing.Point(387, 412);
       this.DeleteMappingButton.Name = "DeleteMappingButton";
       this.DeleteMappingButton.Size = new System.Drawing.Size(75, 23);
-      this.DeleteMappingButton.TabIndex = 10;
+      this.DeleteMappingButton.TabIndex = 15;
       this.DeleteMappingButton.Text = "Delete";
       this.DeleteMappingButton.UseVisualStyleBackColor = true;
       this.DeleteMappingButton.Click += new System.EventHandler(this.DeleteMappingButton_Click);
@@ -245,11 +259,11 @@ namespace MySQL.ForExcel.Forms
             this.columnHeader2});
       this.MappingsListView.FullRowSelect = true;
       this.MappingsListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-      this.MappingsListView.Location = new System.Drawing.Point(53, 313);
+      this.MappingsListView.Location = new System.Drawing.Point(53, 383);
       this.MappingsListView.MultiSelect = false;
       this.MappingsListView.Name = "MappingsListView";
       this.MappingsListView.Size = new System.Drawing.Size(328, 127);
-      this.MappingsListView.TabIndex = 8;
+      this.MappingsListView.TabIndex = 13;
       this.MappingsListView.UseCompatibleStateImageBehavior = false;
       this.MappingsListView.View = System.Windows.Forms.View.Details;
       this.MappingsListView.SelectedIndexChanged += new System.EventHandler(this.MappingsListView_SelectedIndexChanged);
@@ -280,7 +294,9 @@ namespace MySQL.ForExcel.Forms
             0});
       this.PreviewRowsQuantityNumericUpDown.Name = "PreviewRowsQuantityNumericUpDown";
       this.PreviewRowsQuantityNumericUpDown.Size = new System.Drawing.Size(52, 21);
-      this.PreviewRowsQuantityNumericUpDown.TabIndex = 12;
+      this.PreviewRowsQuantityNumericUpDown.TabIndex = 7;
+      this.HelpToolTip.SetToolTip(this.PreviewRowsQuantityNumericUpDown, "Limits the data preview and data type automatic detection to the given number of " +
+        "Excel data rows.");
       this.PreviewRowsQuantityNumericUpDown.Value = new decimal(new int[] {
             1,
             0,
@@ -294,7 +310,7 @@ namespace MySQL.ForExcel.Forms
       this.PreviewRowsQuantity2Label.Location = new System.Drawing.Point(185, 211);
       this.PreviewRowsQuantity2Label.Name = "PreviewRowsQuantity2Label";
       this.PreviewRowsQuantity2Label.Size = new System.Drawing.Size(285, 15);
-      this.PreviewRowsQuantity2Label.TabIndex = 13;
+      this.PreviewRowsQuantity2Label.TabIndex = 8;
       this.PreviewRowsQuantity2Label.Text = "Excel data rows to preview and calculate datatypes.";
       // 
       // PreviewRowsQuantity1Label
@@ -304,15 +320,45 @@ namespace MySQL.ForExcel.Forms
       this.PreviewRowsQuantity1Label.Location = new System.Drawing.Point(50, 211);
       this.PreviewRowsQuantity1Label.Name = "PreviewRowsQuantity1Label";
       this.PreviewRowsQuantity1Label.Size = new System.Drawing.Size(71, 15);
-      this.PreviewRowsQuantity1Label.TabIndex = 11;
+      this.PreviewRowsQuantity1Label.TabIndex = 6;
       this.PreviewRowsQuantity1Label.Text = "Use the first";
+      // 
+      // SqlQueriesLabel
+      // 
+      this.SqlQueriesLabel.AutoSize = true;
+      this.SqlQueriesLabel.BackColor = System.Drawing.Color.Transparent;
+      this.SqlQueriesLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.SqlQueriesLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.SqlQueriesLabel.Location = new System.Drawing.Point(24, 280);
+      this.SqlQueriesLabel.Name = "SqlQueriesLabel";
+      this.SqlQueriesLabel.Size = new System.Drawing.Size(130, 17);
+      this.SqlQueriesLabel.TabIndex = 10;
+      this.SqlQueriesLabel.Text = "SQL Queries Options";
+      // 
+      // DisableTableIndexesCheckBox
+      // 
+      this.DisableTableIndexesCheckBox.AutoSize = true;
+      this.DisableTableIndexesCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+      this.DisableTableIndexesCheckBox.Location = new System.Drawing.Point(53, 309);
+      this.DisableTableIndexesCheckBox.Name = "DisableTableIndexesCheckBox";
+      this.DisableTableIndexesCheckBox.Size = new System.Drawing.Size(291, 19);
+      this.DisableTableIndexesCheckBox.TabIndex = 11;
+      this.DisableTableIndexesCheckBox.Text = "Disable table indexes to speed-up rows insertion";
+      this.HelpToolTip.SetToolTip(this.DisableTableIndexesCheckBox, resources.GetString("DisableTableIndexesCheckBox.ToolTip"));
+      this.DisableTableIndexesCheckBox.UseVisualStyleBackColor = true;
+      // 
+      // HelpToolTip
+      // 
+      this.HelpToolTip.AutoPopDelay = 5000;
+      this.HelpToolTip.InitialDelay = 1000;
+      this.HelpToolTip.ReshowDelay = 100;
       // 
       // AppendAdvancedOptionsDialog
       // 
       this.AcceptButton = this.DialogAcceptButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(484, 515);
+      this.ClientSize = new System.Drawing.Size(484, 586);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
@@ -347,5 +393,8 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.NumericUpDown PreviewRowsQuantityNumericUpDown;
     private System.Windows.Forms.Label PreviewRowsQuantity2Label;
     private System.Windows.Forms.Label PreviewRowsQuantity1Label;
+    private System.Windows.Forms.Label SqlQueriesLabel;
+    private System.Windows.Forms.CheckBox DisableTableIndexesCheckBox;
+    private System.Windows.Forms.ToolTip HelpToolTip;
   }
 }

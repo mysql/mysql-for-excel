@@ -19,7 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
 using MySQL.ForExcel.Classes.Exceptions;
 using MySQL.ForExcel.Interfaces;
@@ -161,22 +160,22 @@ namespace MySQL.ForExcel.Classes
         return _sqlQuery;
       }
 
-      MySqlDataTable mySqlTable = Table as MySqlDataTable;
-      ulong mysqlMaxAllowedPacket = mySqlTable != null ? mySqlTable.MySqlMaxAllowedPacket : 0;
-      ulong maxByteCount = mysqlMaxAllowedPacket > 0 ? mysqlMaxAllowedPacket - MySqlDataTable.SAFE_BYTES_BEFORE_REACHING_MAX_ALLOWED_PACKET : 0;
       _sqlQuery = string.Empty;
       switch (RowState)
       {
         case DataRowState.Added:
           _sqlQuery = GetSqlForAddedRow();
+          MySqlTable.SqlBuilderForInsert.Clear();
           break;
 
         case DataRowState.Deleted:
           _sqlQuery = GetSqlForDeletedRow();
+          MySqlTable.SqlBuilderForDelete.Clear();
           break;
 
         case DataRowState.Modified:
           _sqlQuery = GetSqlForModifiedRow();
+          MySqlTable.SqlBuilderForUpdate.Clear();
           break;
 
         case DataRowState.Unchanged:
@@ -185,13 +184,13 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Verify we have not exceeded the maximum packet size allowed by the server, otherwise throw an Exception.
-      if (maxByteCount <= 0)
+      if (MySqlTable.MySqlMaxAllowedPacket <= 0)
       {
         return _sqlQuery;
       }
 
       ulong queryStringByteCount = (ulong)Encoding.ASCII.GetByteCount(_sqlQuery);
-      if (queryStringByteCount > maxByteCount)
+      if (queryStringByteCount > MySqlTable.MySqlMaxAllowedPacket)
       {
         throw new QueryExceedsMaxAllowedPacketException();
       }
@@ -200,7 +199,7 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Reflects the error set to the row into a user interface.
+    /// Reflects the error set to the row on its corresponding Excel range cells.
     /// </summary>
     public void ReflectError()
     {
@@ -256,47 +255,29 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The INSERT SQL query.</returns>
     private string GetSqlForAddedRow()
     {
-      if (MySqlTable == null || RowState != DataRowState.Added)
+      if (MySqlTable == null || RowState != DataRowState.Added || MySqlTable.ColumnsForInsertion == null)
       {
         return string.Empty;
       }
 
-      StringBuilder queryString = new StringBuilder();
+      var sqlBuilderForInsert = MySqlTable.SqlBuilderForInsert;
+      sqlBuilderForInsert.Clear();
+      sqlBuilderForInsert.Append(MySqlTable.PreSqlForAddedRows);
       string colsSeparator = string.Empty;
-      int colIdx;
-      int startingColNum = MySqlTable.AddPrimaryKeyColumn ? (MySqlTable.UseFirstColumnAsPk ? 0 : 1) : 0;
-      List<string> insertColumnNames = new List<string>(MySqlTable.Columns.Count);
-      queryString.AppendFormat("INSERT INTO `{0}`.`{1}` (", MySqlTable.SchemaName, MySqlTable.TableNameForSqlQueries);
-      for (colIdx = startingColNum; colIdx < MySqlTable.Columns.Count; colIdx++)
+      foreach (MySqlDataColumn column in MySqlTable.ColumnsForInsertion)
       {
-        MySqlDataColumn column = MySqlTable.GetColumnAtIndex(colIdx);
-        if (column.ExcludeColumn || (MySqlTable.OperationType.IsForAppend() && column.MappedDataColOrdinal < 0))
-        {
-          continue;
-        }
-
-        queryString.AppendFormat("{0}`{1}`", colsSeparator, column.DisplayNameForSqlQueries);
-        colsSeparator = ",";
-        insertColumnNames.Add(column.ColumnName);
-      }
-
-      queryString.Append(") VALUES (");
-      colsSeparator = string.Empty;
-      foreach (string insertingColName in insertColumnNames)
-      {
-        MySqlDataColumn column = MySqlTable.Columns[insertingColName] as MySqlDataColumn;
         bool insertingValueIsNull;
-        string valueToDb = DataTypeUtilities.GetStringValueForColumn(this[insertingColName], column, true, out insertingValueIsNull);
-        queryString.AppendFormat(
+        string valueToDb = DataTypeUtilities.GetStringValueForColumn(this[column.ColumnName], column, true, out insertingValueIsNull);
+        sqlBuilderForInsert.AppendFormat(
           "{0}{1}{2}{1}",
           colsSeparator,
-          column != null && column.ColumnsRequireQuotes && !insertingValueIsNull ? "'" : string.Empty,
+          column.ColumnRequiresQuotes && !insertingValueIsNull ? "'" : string.Empty,
           valueToDb);
         colsSeparator = ",";
       }
 
-      queryString.Append(")");
-      return queryString.ToString();
+      sqlBuilderForInsert.Append(')');
+      return sqlBuilderForInsert.ToString();
     }
 
     /// <summary>
@@ -305,28 +286,30 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The DELETE SQL query.</returns>
     private string GetSqlForDeletedRow()
     {
-      if (MySqlTable == null || RowState != DataRowState.Deleted)
+      if (MySqlTable == null || RowState != DataRowState.Deleted || MySqlTable.PrimaryKeyColumns == null)
       {
         return string.Empty;
       }
 
-      StringBuilder queryString = new StringBuilder();
+      var sqlBuilderForDelete = MySqlTable.SqlBuilderForDelete;
+      sqlBuilderForDelete.Clear();
       string colsSeparator = string.Empty;
-      queryString.AppendFormat("DELETE FROM `{0}`.`{1}` WHERE ", MySqlTable.SchemaName, MySqlTable.TableNameForSqlQueries);
-      foreach (MySqlDataColumn pkCol in MySqlTable.Columns.Cast<MySqlDataColumn>().Where(pkCol => pkCol.PrimaryKey))
+      sqlBuilderForDelete.Append(MySqlStatement.STATEMENT_DELETE);
+      sqlBuilderForDelete.AppendFormat(" `{0}`.`{1}` WHERE ", MySqlTable.SchemaName, MySqlTable.TableNameForSqlQueries);
+      foreach (MySqlDataColumn pkCol in MySqlTable.PrimaryKeyColumns)
       {
         bool pkValueIsNull;
         string valueToDb = DataTypeUtilities.GetStringValueForColumn(this[pkCol.ColumnName, DataRowVersion.Original], pkCol, false, out pkValueIsNull);
-        queryString.AppendFormat(
+        sqlBuilderForDelete.AppendFormat(
           "{0}`{1}`={2}{3}{2}",
           colsSeparator,
           pkCol.ColumnNameForSqlQueries,
-          pkCol.ColumnsRequireQuotes && !pkValueIsNull ? "'" : string.Empty,
+          pkCol.ColumnRequiresQuotes && !pkValueIsNull ? "'" : string.Empty,
           valueToDb);
         colsSeparator = " AND ";
       }
 
-      return queryString.ToString();
+      return sqlBuilderForDelete.ToString();
     }
 
     /// <summary>
@@ -340,36 +323,41 @@ namespace MySQL.ForExcel.Classes
         return string.Empty;
       }
 
-      StringBuilder queryString = new StringBuilder();
+      // Reuse the builder we use for INSERT queries now for where clauses, instead of using a new one in order to save memory.
+      var wClauseBuilder = MySqlTable.SqlBuilderForInsert;
+      var sqlBuilderForUpdate = MySqlTable.SqlBuilderForUpdate;
+      wClauseBuilder.Clear();
+      sqlBuilderForUpdate.Clear();
       string colsSeparator = string.Empty;
-      StringBuilder wClauseString = new StringBuilder(" WHERE ");
+      wClauseBuilder.Append(" WHERE ");
       string wClauseColsSeparator = string.Empty;
-      queryString.AppendFormat("UPDATE `{0}`.`{1}` SET ", MySqlTable.SchemaName, MySqlTable.TableNameForSqlQueries);
+      sqlBuilderForUpdate.Append(MySqlStatement.STATEMENT_UPDATE);
+      sqlBuilderForUpdate.AppendFormat(" `{0}`.`{1}` SET ", MySqlTable.SchemaName, MySqlTable.TableNameForSqlQueries);
+      bool useOptimisticUpdates = MySqlTable.UseOptimisticUpdate;
       foreach (MySqlDataColumn column in MySqlTable.Columns)
       {
         bool updatingValueIsNull;
-        string finalColName = column.ColumnNameForSqlQueries;
         string valueToDb;
-        if (column.PrimaryKey || MySqlTable.UseOptimisticUpdate)
+        if (column.PrimaryKey || useOptimisticUpdates)
         {
           valueToDb = DataTypeUtilities.GetStringValueForColumn(this[column.ColumnName, DataRowVersion.Original], column, false, out updatingValueIsNull);
-          if (MySqlTable.UseOptimisticUpdate && column.AllowNull)
+          if (useOptimisticUpdates && column.AllowNull)
           {
-            wClauseString.AppendFormat(
+            wClauseBuilder.AppendFormat(
               "{0}(({2}{3}{2} IS NULL AND `{1}` IS NULL) OR `{1}`={2}{3}{2})",
               wClauseColsSeparator,
-              finalColName,
-              column.ColumnsRequireQuotes && !updatingValueIsNull ? "'" : string.Empty,
+              column.ColumnNameForSqlQueries,
+              column.ColumnRequiresQuotes && !updatingValueIsNull ? "'" : string.Empty,
               valueToDb);
             wClauseColsSeparator = " AND ";
           }
           else
           {
-            wClauseString.AppendFormat(
+            wClauseBuilder.AppendFormat(
               "{0}`{1}`={2}{3}{2}",
               wClauseColsSeparator,
-              finalColName,
-              column.ColumnsRequireQuotes && !updatingValueIsNull ? "'" : string.Empty,
+              column.ColumnNameForSqlQueries,
+              column.ColumnRequiresQuotes && !updatingValueIsNull ? "'" : string.Empty,
               valueToDb);
             wClauseColsSeparator = " AND ";
           }
@@ -381,17 +369,18 @@ namespace MySQL.ForExcel.Classes
         }
 
         valueToDb = DataTypeUtilities.GetStringValueForColumn(this[column.ColumnName], column, true, out updatingValueIsNull);
-        queryString.AppendFormat(
+        sqlBuilderForUpdate.AppendFormat(
           "{0}`{1}`={2}{3}{2}",
           colsSeparator,
-          finalColName,
-          column.ColumnsRequireQuotes && !updatingValueIsNull ? "'" : string.Empty,
+          column.ColumnNameForSqlQueries,
+          column.ColumnRequiresQuotes && !updatingValueIsNull ? "'" : string.Empty,
           valueToDb);
         colsSeparator = ",";
       }
 
-      queryString.Append(wClauseString);
-      return queryString.ToString();
+      sqlBuilderForUpdate.Append(wClauseBuilder);
+      wClauseBuilder.Clear();
+      return sqlBuilderForUpdate.ToString();
     }
 
     /// <summary>

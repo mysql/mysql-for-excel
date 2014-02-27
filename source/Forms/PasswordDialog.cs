@@ -331,7 +331,7 @@ namespace MySQL.ForExcel.Forms
       Cancelled = false;
       ConnectionResult = TestConnectionResult.None;
       NewPassword = null;
-      OldPassword = wbConnection.Password;
+      OldPassword = wbConnection != null ? wbConnection.Password : null;
     }
 
     /// <summary>

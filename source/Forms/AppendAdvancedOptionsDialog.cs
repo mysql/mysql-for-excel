@@ -61,6 +61,7 @@ namespace MySQL.ForExcel.Forms
       ReloadColumnMappingCheckBox.Checked = Settings.Default.AppendReloadColumnMapping;
       UseFormattedValuesCheckBox.Checked = Settings.Default.AppendUseFormattedValues;
       PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.AppendLimitPreviewRowsQuantity);
+      DisableTableIndexesCheckBox.Checked = Settings.Default.AppendSqlQueriesDisableIndexes;
       _mappings = new MySqlColumnMappingList();
       RefreshMappingList();
     }
@@ -86,6 +87,7 @@ namespace MySQL.ForExcel.Forms
       Settings.Default.AppendReloadColumnMapping = ReloadColumnMappingCheckBox.Checked;
       Settings.Default.AppendUseFormattedValues = UseFormattedValuesCheckBox.Checked;
       Settings.Default.AppendLimitPreviewRowsQuantity = previewRowsQuantity;
+      Settings.Default.AppendSqlQueriesDisableIndexes = DisableTableIndexesCheckBox.Checked;
       MiscUtilities.SaveSettings();
     }
 
