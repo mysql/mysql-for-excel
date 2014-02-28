@@ -328,7 +328,7 @@ namespace MySQL.ForExcel.Classes
       FirstRowIsHeaders = false;
       IsTableNameValid = !string.IsNullOrEmpty(TableName);
       IsFormatted = false;
-      IsPreviewTable = true;
+      IsPreviewTable = false;
       OperationType = DataOperationType.Import;
       RemoveEmptyColumns = false;
       SchemaName = string.Empty;
@@ -1094,8 +1094,10 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Creates a new <see cref="MySqlDataTable"/> object with its schema cloned from this table but no data.
     /// </summary>
+    /// <param name="autoPkCreationOnlyIfFirstColumnIsPk">Flag indicating whether an Auto PK column is prepended only if the value of the <see cref="UseFirstColumnAsPk"/> property is <c>strue</c>.</param>
+    /// <param name="subscribePropertyChangedEvent">Flag indicating whether the cloned columns subscribe to the parent table's <see cref="ColumnPropertyValueChanged"/> event.</param>
     /// <returns>Cloned <see cref="MySqlDataTable"/> object.</returns>
-    public MySqlDataTable CloneSchema(bool autoPkCreationOnlyIfFirstColumnIsPk)
+    public MySqlDataTable CloneSchema(bool autoPkCreationOnlyIfFirstColumnIsPk, bool subscribePropertyChangedEvent)
     {
       bool createAutoPkColumn = autoPkCreationOnlyIfFirstColumnIsPk ? UseFirstColumnAsPk : AddPrimaryKeyColumn;
       MySqlDataTable clonedTable = new MySqlDataTable(
@@ -1120,6 +1122,11 @@ namespace MySQL.ForExcel.Classes
 
       foreach (var clonedColumn in from MySqlDataColumn column in Columns where !column.AutoPk || createAutoPkColumn select column.CloneSchema())
       {
+        if (subscribePropertyChangedEvent)
+        {
+          clonedColumn.PropertyChanged += clonedTable.ColumnPropertyValueChanged;
+        }
+
         clonedTable.Columns.Add(clonedColumn);
       }
 
@@ -1675,13 +1682,15 @@ namespace MySQL.ForExcel.Classes
         for (int row = 1 + rowAdjustValue; row <= numRows; row++)
         {
           var valuesArray = temporaryRange.Range.GetRowValuesAsLinearArray(row, IsFormatted);
-          if (valuesArray != null && valuesArray.Length > 0 && valuesArray.Length <= Columns.Count)
+          if (valuesArray == null || valuesArray.Length <= 0 || valuesArray.Length > Columns.Count)
           {
-            var newRow = LoadDataRow(valuesArray, IsPreviewTable) as MySqlDataRow;
-            if (newRow != null && row == 1 && _firstRowIsHeaders)
-            {
-              newRow.IsHeadersRow = true;
-            }
+            continue;
+          }
+
+          var newRow = LoadDataRow(valuesArray, IsPreviewTable) as MySqlDataRow;
+          if (newRow != null && row == 1 && _firstRowIsHeaders)
+          {
+            newRow.IsHeadersRow = true;
           }
         }
       }
@@ -1747,15 +1756,7 @@ namespace MySQL.ForExcel.Classes
           continue;
         }
 
-        thisColumn.SetDisplayName(syncFromColumn.DisplayName);
-        thisColumn.SetMySqlDataType(syncFromColumn.MySqlDataType);
-        thisColumn.RowsFromFirstDataType = syncFromColumn.RowsFromFirstDataType;
-        thisColumn.RowsFromSecondDataType = syncFromColumn.RowsFromSecondDataType;
-        thisColumn.PrimaryKey = syncFromColumn.PrimaryKey;
-        thisColumn.AllowNull = syncFromColumn.AllowNull;
-        thisColumn.UniqueKey = syncFromColumn.UniqueKey;
-        thisColumn.CreateIndex = syncFromColumn.CreateIndex;
-        thisColumn.ExcludeColumn = syncFromColumn.ExcludeColumn;
+        thisColumn.SyncSchema(syncFromColumn);
       }
     }
 
@@ -1799,7 +1800,7 @@ namespace MySQL.ForExcel.Classes
     protected override void OnRowChanged(DataRowChangeEventArgs e)
     {
       base.OnRowChanged(e);
-      if (_copyingTableData || !IsPreviewTable)
+      if (_copyingTableData || IsPreviewTable)
       {
         return;
       }
@@ -1814,7 +1815,7 @@ namespace MySQL.ForExcel.Classes
     protected override void OnRowDeleted(DataRowChangeEventArgs e)
     {
       base.OnRowDeleted(e);
-      if (!IsPreviewTable)
+      if (IsPreviewTable)
       {
         return;
       }
@@ -1886,6 +1887,13 @@ namespace MySQL.ForExcel.Classes
         case "MySqlDataType":
           // Update the columns data length since a column data type changed.
           _columnsDataLength = 0;
+          break;
+
+        case "ExcludeColumn":
+          // If a column gets excluded then notify all child MySqlDataRow objects to recalculate SQL queries.
+          _columnsForInsertion = null;
+          _preSqlForAddedRows = null;
+          OnPropertyChanged("ColumnExcluded");
           break;
       }
 
@@ -1963,10 +1971,10 @@ namespace MySQL.ForExcel.Classes
       // Drop all columns and re-create them or create them if none have been created so far.
       Columns.Clear();
       bool isAutoPkRange = temporaryRange.RangeType == TempRange.TempRangeType.AutoPkRange;
-      int colIdx = 1;
+      int colIdx = isAutoPkRange ? 0 : 1;
       foreach (Excel.Range sourceColumnRange in temporaryRange.Range.Columns)
       {
-        bool autoPk = isAutoPkRange && colIdx == 1;
+        bool autoPk = isAutoPkRange && sourceColumnRange.Column == 1;
         MySqlDataColumn column = new MySqlDataColumn(OperationType.IsForExport(), autoPk, "Column" + colIdx, sourceColumnRange.Column);
         column.ColumnWarningsChanged += ColumnWarningsChanged;
         column.PropertyChanged += ColumnPropertyValueChanged;

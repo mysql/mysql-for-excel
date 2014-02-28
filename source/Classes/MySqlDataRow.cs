@@ -51,6 +51,7 @@ namespace MySQL.ForExcel.Classes
     {
       _sqlQuery = null;
       ChangedColumnNames = new List<string>(Table.Columns.Count);
+      ExcelRange = null;
       IsBeingDeleted = false;
       IsHeadersRow = false;
       ExcelModifiedRangesList = new List<Excel.Range>(Table.Columns.Count);
@@ -393,6 +394,7 @@ namespace MySQL.ForExcel.Classes
       switch (e.PropertyName)
       {
         case "UseOptimisticUpdate":
+        case "ColumnExcluded":
           _sqlQuery = null;
           break;
       }

@@ -89,20 +89,21 @@ namespace MySQL.ForExcel.Classes
       _columnNameForSqlQueries = null;
       _columnRequiresQuotes = null;
       _columnWarningTextsList = new List<string>(3);
+      _excludeColumn = false;
+      _mappedDataColOrdinal = -1;
+      _mySqlDataType = string.Empty;
       AutoIncrement = false;
       AutoPk = false;
       DisplayName = string.Empty;
       InExportMode = false;
       IsDisplayNameDuplicate = false;
-      ExcludeColumn = false;
       IsMySqlDataTypeValid = true;
       MappedDataColName = null;
-      MappedDataColOrdinal = -1;
-      MySqlDataType = string.Empty;
       PrimaryKey = false;
       RangeColumnIndex = 0;
       RowsFromFirstDataType = string.Empty;
       RowsFromSecondDataType = string.Empty;
+      StrippedMySqlDataType = string.Empty;
       Unsigned = false;
     }
 
@@ -726,22 +727,7 @@ namespace MySQL.ForExcel.Classes
     public MySqlDataColumn CloneSchema()
     {
       MySqlDataColumn clonedColumn = new MySqlDataColumn { ColumnName = ColumnName };
-      clonedColumn.SetDisplayName(DisplayName);
-      clonedColumn.DataType = DataType;
-      clonedColumn.SetMySqlDataType(MySqlDataType);
-      clonedColumn.RowsFromFirstDataType = RowsFromFirstDataType;
-      clonedColumn.RowsFromSecondDataType = RowsFromSecondDataType;
-      clonedColumn.AutoPk = AutoPk;
-      clonedColumn.AllowNull = AllowNull;
-      clonedColumn.PrimaryKey = PrimaryKey;
-      clonedColumn.Unsigned = Unsigned;
-      clonedColumn.AutoIncrement = AutoIncrement;
-      clonedColumn.UniqueKey = UniqueKey;
-      clonedColumn.ExcludeColumn = ExcludeColumn;
-      clonedColumn.CreateIndex = CreateIndex;
-      clonedColumn.MappedDataColName = MappedDataColName;
-      clonedColumn.MappedDataColOrdinal = MappedDataColOrdinal;
-      clonedColumn.RangeColumnIndex = RangeColumnIndex;
+      clonedColumn.SyncSchema(this);
       return clonedColumn;
     }
 
@@ -1017,6 +1003,34 @@ namespace MySQL.ForExcel.Classes
       }
 
       return IsMySqlDataTypeValid;
+    }
+
+    /// <summary>
+    /// Synchronizes this object properties copying the corresponding property values from another <see cref="MySqlDataColumn"/> object.
+    /// </summary>
+    /// <param name="fromColumn">The <see cref="MySqlDataColumn"/> object from which to copy property values.</param>
+    public void SyncSchema(MySqlDataColumn fromColumn)
+    {
+      // Set first some properties that need to be set before all others because of dependencies among them.
+      SetDisplayName(fromColumn.DisplayName);
+      DataType = fromColumn.DataType;
+      SetMySqlDataType(fromColumn.MySqlDataType);
+      RowsFromFirstDataType = fromColumn.RowsFromFirstDataType;
+      RowsFromSecondDataType = fromColumn.RowsFromSecondDataType;
+      AutoPk = fromColumn.AutoPk;
+      InExportMode = fromColumn.InExportMode;
+
+      // Set the rest of the properties.
+      AllowNull = fromColumn.AllowNull;
+      PrimaryKey = fromColumn.PrimaryKey;
+      AutoIncrement = fromColumn.AutoIncrement;
+      CreateIndex = fromColumn.CreateIndex;
+      ExcludeColumn = fromColumn.ExcludeColumn;
+      MappedDataColName = fromColumn.MappedDataColName;
+      MappedDataColOrdinal = fromColumn.MappedDataColOrdinal;
+      RangeColumnIndex = fromColumn.RangeColumnIndex;
+      UniqueKey = fromColumn.UniqueKey;
+      Unsigned = fromColumn.Unsigned;
     }
 
     /// <summary>

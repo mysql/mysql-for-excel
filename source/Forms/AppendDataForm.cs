@@ -246,7 +246,7 @@ namespace MySQL.ForExcel.Forms
       bool errorsFound = false;
       bool warningsFound = false;
       string operationSummary;
-      var targetMySqlFinalDataTable = TargetMySqlPreviewDataTable.CloneSchema(true);
+      var targetMySqlFinalDataTable = TargetMySqlPreviewDataTable.CloneSchema(true, false);
       targetMySqlFinalDataTable.FirstRowIsHeaders = SourceMySqlPreviewDataTable.FirstRowIsHeaders;
       var mappedIndexes = new List<int>(targetMySqlFinalDataTable.Columns.Count);
       foreach (var sourceColumnIndex in from MySqlDataColumn targetColumn in targetMySqlFinalDataTable.Columns select targetColumn.MappedDataColOrdinal)
@@ -1028,7 +1028,7 @@ namespace MySQL.ForExcel.Forms
         false,
         false,
         false,
-        WbConnection) { IsPreviewTable = false };
+        WbConnection) { IsPreviewTable = true };
       int previewRowsQty = Math.Min(AppendDataRange.Rows.Count, Settings.Default.AppendLimitPreviewRowsQuantity);
       SourceMySqlPreviewDataTable.SetupColumnsWithData(AppendDataRange, true, false, previewRowsQty);
       SourceExcelDataDataGridView.DataSource = SourceMySqlPreviewDataTable;
@@ -1051,7 +1051,7 @@ namespace MySQL.ForExcel.Forms
         true,
         false,
         Settings.Default.AppendUseFormattedValues,
-        WbConnection) { IsPreviewTable = false };
+        WbConnection);
       DataTable dt = WbConnection.GetDataFromTableOrView(_importDbObject, null, 0, 10);
       foreach (object[] rowValues in from DataRow dr in dt.Rows select dr.ItemArray)
       {

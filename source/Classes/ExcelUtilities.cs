@@ -651,7 +651,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       int lastCellColumn = lastColumnCell.Column;
-      Excel.Range lastCell = range.Cells[lastCellRow, lastCellColumn];
+      Excel.Range lastCell = range.Worksheet.Cells[lastCellRow, lastCellColumn];
       Excel.Range firstRowCell = range.Cells.Find(
         "*",
         lastCell,
@@ -684,8 +684,8 @@ namespace MySQL.ForExcel.Classes
       }
 
       int firstCellColumn = firstColumnCell.Column;
-      Excel.Range firstCell = range.Cells[firstCellRow, firstCellColumn];
-      return range.Range[firstCell, lastCell];
+      Excel.Range firstCell = range.Worksheet.Cells[firstCellRow, firstCellColumn];
+      return range.Worksheet.Range[firstCell, lastCell];
     }
 
     /// <summary>

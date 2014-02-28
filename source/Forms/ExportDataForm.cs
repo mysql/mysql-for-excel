@@ -447,7 +447,7 @@ namespace MySQL.ForExcel.Forms
       bool setupDataSuccessful = true;
       if (ExportDataTable == null)
       {
-        ExportDataTable = PreviewDataTable.CloneSchema(false);
+        ExportDataTable = PreviewDataTable.CloneSchema(false, true);
         ExportDataTable.DetectDatatype = false;
         ExportDataTable.IsPreviewTable = false;
         setupDataSuccessful = ExportDataTable.SetupColumnsWithData(ExportDataRange, false, true);
@@ -801,7 +801,7 @@ namespace MySQL.ForExcel.Forms
         Settings.Default.ExportAddBufferToVarchar,
         Settings.Default.ExportAutoIndexIntColumns,
         Settings.Default.ExportAutoAllowEmptyNonIndexColumns,
-        WbConnection) { IsPreviewTable = false };
+        WbConnection) { IsPreviewTable = true };
       PreviewDataTable.TableColumnPropertyValueChanged += PreviewTableColumnPropertyValueChanged;
       PreviewDataTable.TableWarningsChanged += PreviewTableWarningsChanged;
       int previewRowsQty = Math.Min(ExportDataRange.Rows.Count, Settings.Default.ExportLimitPreviewRowsQuantity);

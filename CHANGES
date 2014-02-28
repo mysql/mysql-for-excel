@@ -1,4 +1,15 @@
 1.2.1
+- Fixed code in the MySqlDataTable, MySqlDataColumn and MySqlDataRow classes that makes INSERT SQL queries recalculate after a column is excluded.
+  (Bug #18269602 - EXPORT DATA - EXCLUDING COLUMNS CAUSE THE EXPORT DATA TO FAIL)
+- Optimized INSERT statements which are now sent as single statements for each of the data rows. In average a 30-35% time improvement was achieved.
+  Optimized the way SQL queries are created for a changed row (in average a 30-40% time improvement) so processing is faster and less memory is used.
+  Optimized how the Excel data is loaded into a MySqlDataTable object (in average a 80% time improvement), so now a temporary hidden Excel worksheet is used to prepare
+  the data to be loaded and then load it after it was preprocesed instead of preprocessing cell by cell as it was done before.
+  Added an advanced option to the Insert Data dialog to create secondary indexes after all the data has been inserted, this saves a lot of disk I/O for bulk inserts
+  (thousands of rows) since reindexing will not happen every time a row is inserted but only once at the very end of the data insertion. This option is enabled by default.
+  Added an advanced option to the Append Data dialog to disable unique indexes and foreign keys temporarily for the duration of the data insertion. This option is
+  disabled by default since the user must make sure that if unique indexes are present the data mapped to that column does not contain duplicate data.
+  (Bug #17577014 - EXPORTING HUGE TABLE (250,000 ROWS) NEVER FINISH (SERVER LOST THE CONNECTION))
 - Connector .NET, an internal component to MySQL for Excel fixed a bug that occurred when working with Unique keys, which caused this problem.
   (Bug #17891357 - ONLY ONE TABLE FROM A DATABASE WON'T IMPORT)
 - Enabled MySQL for Excel to create default connections at startup for every MySQL service found locally when no default connections exist and MySQL Workbench
