@@ -49,7 +49,6 @@ namespace MySQL.ForExcel.Forms
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExportAdvancedOptionsDialog));
       this.DialogAcceptButton = new System.Windows.Forms.Button();
       this.DialogCancelButton = new System.Windows.Forms.Button();
-      this.OtherOptionsLabel = new System.Windows.Forms.Label();
       this.UseFormattedValuesCheckBox = new System.Windows.Forms.CheckBox();
       this.FieldDataOptionsLabel = new System.Windows.Forms.Label();
       this.AutoAllowEmptyNonIndexColumnsCheckBox = new System.Windows.Forms.CheckBox();
@@ -61,7 +60,6 @@ namespace MySQL.ForExcel.Forms
       this.PreviewRowsQuantity1Label = new System.Windows.Forms.Label();
       this.PreviewRowsQuantity2Label = new System.Windows.Forms.Label();
       this.PreviewRowsQuantityNumericUpDown = new System.Windows.Forms.NumericUpDown();
-      this.RemoveEmptyColumnsCheckBox = new System.Windows.Forms.CheckBox();
       this.ColumnOptionsLostWarningLabel = new System.Windows.Forms.Label();
       this.ColumnOptionsLostWarningPictureBox = new System.Windows.Forms.PictureBox();
       this.CreateTableIndexesLastCheckBox = new System.Windows.Forms.CheckBox();
@@ -83,13 +81,11 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.CreateTableIndexesLastCheckBox);
       this.ContentAreaPanel.Controls.Add(this.SqlQueriesLabel);
       this.ContentAreaPanel.Controls.Add(this.ColumnOptionsLostWarningLabel);
-      this.ContentAreaPanel.Controls.Add(this.RemoveEmptyColumnsCheckBox);
       this.ContentAreaPanel.Controls.Add(this.PreviewRowsQuantityNumericUpDown);
       this.ContentAreaPanel.Controls.Add(this.ColumnOptionsLostWarningPictureBox);
       this.ContentAreaPanel.Controls.Add(this.PreviewRowsQuantity2Label);
       this.ContentAreaPanel.Controls.Add(this.PreviewRowsQuantity1Label);
       this.ContentAreaPanel.Controls.Add(this.AdvancedExportOptionsLabel);
-      this.ContentAreaPanel.Controls.Add(this.OtherOptionsLabel);
       this.ContentAreaPanel.Controls.Add(this.UseFormattedValuesCheckBox);
       this.ContentAreaPanel.Controls.Add(this.FieldDataOptionsLabel);
       this.ContentAreaPanel.Controls.Add(this.AutoAllowEmptyNonIndexColumnsCheckBox);
@@ -97,13 +93,13 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.AddBufferToVarcharCheckBox);
       this.ContentAreaPanel.Controls.Add(this.DetectDatatypeCheckBox);
       this.ContentAreaPanel.Controls.Add(this.ColumnDatatypeOptionsLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(584, 491);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(584, 417);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 446);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 372);
       this.CommandAreaPanel.Size = new System.Drawing.Size(584, 45);
       // 
       // DialogAcceptButton
@@ -127,18 +123,6 @@ namespace MySQL.ForExcel.Forms
       this.DialogCancelButton.TabIndex = 1;
       this.DialogCancelButton.Text = "Cancel";
       this.DialogCancelButton.UseVisualStyleBackColor = true;
-      // 
-      // OtherOptionsLabel
-      // 
-      this.OtherOptionsLabel.AutoSize = true;
-      this.OtherOptionsLabel.BackColor = System.Drawing.Color.Transparent;
-      this.OtherOptionsLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.OtherOptionsLabel.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.OtherOptionsLabel.Location = new System.Drawing.Point(24, 360);
-      this.OtherOptionsLabel.Name = "OtherOptionsLabel";
-      this.OtherOptionsLabel.Size = new System.Drawing.Size(91, 17);
-      this.OtherOptionsLabel.TabIndex = 13;
-      this.OtherOptionsLabel.Text = "Other Options";
       // 
       // UseFormattedValuesCheckBox
       // 
@@ -292,26 +276,13 @@ namespace MySQL.ForExcel.Forms
             0});
       this.PreviewRowsQuantityNumericUpDown.ValueChanged += new System.EventHandler(this.PreviewRowsQuantityNumericUpDown_ValueChanged);
       // 
-      // RemoveEmptyColumnsCheckBox
-      // 
-      this.RemoveEmptyColumnsCheckBox.AutoSize = true;
-      this.RemoveEmptyColumnsCheckBox.BackColor = System.Drawing.Color.Transparent;
-      this.RemoveEmptyColumnsCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.RemoveEmptyColumnsCheckBox.Location = new System.Drawing.Point(53, 389);
-      this.RemoveEmptyColumnsCheckBox.Name = "RemoveEmptyColumnsCheckBox";
-      this.RemoveEmptyColumnsCheckBox.Size = new System.Drawing.Size(445, 19);
-      this.RemoveEmptyColumnsCheckBox.TabIndex = 14;
-      this.RemoveEmptyColumnsCheckBox.Text = "Remove columns that contain no data, otherwise just flag them as \"Excluded\"";
-      this.RemoveEmptyColumnsCheckBox.UseVisualStyleBackColor = false;
-      this.RemoveEmptyColumnsCheckBox.CheckedChanged += new System.EventHandler(this.RemoveEmptyColumnsCheckBox_CheckedChanged);
-      // 
       // ColumnOptionsLostWarningLabel
       // 
       this.ColumnOptionsLostWarningLabel.AutoSize = true;
       this.ColumnOptionsLostWarningLabel.BackColor = System.Drawing.Color.Transparent;
       this.ColumnOptionsLostWarningLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.ColumnOptionsLostWarningLabel.ForeColor = System.Drawing.Color.Red;
-      this.ColumnOptionsLostWarningLabel.Location = new System.Drawing.Point(50, 425);
+      this.ColumnOptionsLostWarningLabel.Location = new System.Drawing.Point(50, 349);
       this.ColumnOptionsLostWarningLabel.Name = "ColumnOptionsLostWarningLabel";
       this.ColumnOptionsLostWarningLabel.Size = new System.Drawing.Size(282, 12);
       this.ColumnOptionsLostWarningLabel.TabIndex = 15;
@@ -322,7 +293,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.ColumnOptionsLostWarningPictureBox.BackColor = System.Drawing.Color.Transparent;
       this.ColumnOptionsLostWarningPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.ColumnOptionsLostWarningPictureBox.Location = new System.Drawing.Point(27, 420);
+      this.ColumnOptionsLostWarningPictureBox.Location = new System.Drawing.Point(27, 344);
       this.ColumnOptionsLostWarningPictureBox.Name = "ColumnOptionsLostWarningPictureBox";
       this.ColumnOptionsLostWarningPictureBox.Size = new System.Drawing.Size(20, 20);
       this.ColumnOptionsLostWarningPictureBox.TabIndex = 47;
@@ -365,7 +336,7 @@ namespace MySQL.ForExcel.Forms
       this.AcceptButton = this.DialogAcceptButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(584, 491);
+      this.ClientSize = new System.Drawing.Size(584, 417);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
@@ -385,7 +356,6 @@ namespace MySQL.ForExcel.Forms
 
     private System.Windows.Forms.Button DialogAcceptButton;
     private System.Windows.Forms.Button DialogCancelButton;
-    private System.Windows.Forms.Label OtherOptionsLabel;
     private System.Windows.Forms.CheckBox UseFormattedValuesCheckBox;
     private System.Windows.Forms.Label FieldDataOptionsLabel;
     private System.Windows.Forms.CheckBox AutoAllowEmptyNonIndexColumnsCheckBox;
@@ -397,7 +367,6 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.NumericUpDown PreviewRowsQuantityNumericUpDown;
     private System.Windows.Forms.Label PreviewRowsQuantity2Label;
     private System.Windows.Forms.Label PreviewRowsQuantity1Label;
-    private System.Windows.Forms.CheckBox RemoveEmptyColumnsCheckBox;
     private System.Windows.Forms.Label ColumnOptionsLostWarningLabel;
     private System.Windows.Forms.PictureBox ColumnOptionsLostWarningPictureBox;
     private System.Windows.Forms.CheckBox CreateTableIndexesLastCheckBox;

@@ -205,7 +205,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="autoAllowEmptyNonIndexColumns">Flag indicating if columns that have their <see cref="MySqlDataColumn.CreateIndex"/> property value
     /// set to <c>false</c> will automatically get their <see cref="MySqlDataColumn.AllowNull"/> property value set to <c>true</c>.</param>
     /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    public MySqlDataTable(string schemaName, string proposedTableName, bool addPrimaryKeyCol, bool useFormattedValues, bool removeEmptyColumns, bool detectDataType, bool addBufferToVarchar, bool autoIndexIntColumns, bool autoAllowEmptyNonIndexColumns, MySqlWorkbenchConnection wbConnection)
+    public MySqlDataTable(string schemaName, string proposedTableName, bool addPrimaryKeyCol, bool useFormattedValues, bool detectDataType, bool addBufferToVarchar, bool autoIndexIntColumns, bool autoAllowEmptyNonIndexColumns, MySqlWorkbenchConnection wbConnection)
       : this(schemaName, proposedTableName)
     {
       AddBufferToVarchar = addBufferToVarchar;
@@ -215,7 +215,6 @@ namespace MySQL.ForExcel.Classes
       DetectDatatype = detectDataType;
       IsFormatted = useFormattedValues;
       OperationType = DataOperationType.Export;
-      RemoveEmptyColumns = removeEmptyColumns;
       TableName = proposedTableName;
       WbConnection = wbConnection;
     }
@@ -330,7 +329,6 @@ namespace MySQL.ForExcel.Classes
       IsFormatted = false;
       IsPreviewTable = false;
       OperationType = DataOperationType.Import;
-      RemoveEmptyColumns = false;
       SchemaName = string.Empty;
       UseFirstColumnAsPk = false;
       WbConnection = null;
@@ -415,7 +413,7 @@ namespace MySQL.ForExcel.Classes
       /// </summary>
       None
     }
-    
+
     #endregion Enums
 
     #region Properties
@@ -797,7 +795,8 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public MySqlDataColumn[] PrimaryKeyColumns
     {
-      get {
+      get
+      {
         return _primaryKeyColumns ??
                (_primaryKeyColumns = Columns.Cast<MySqlDataColumn>().Where(pkCol => pkCol.PrimaryKey).ToArray());
       }
@@ -834,11 +833,6 @@ namespace MySQL.ForExcel.Classes
         return _preSqlForAddedRows;
       }
     }
-
-    /// <summary>
-    /// Gets a value indicating whether columns with no excelData will be skipped for export to a new table so they are not created.
-    /// </summary>
-    public bool RemoveEmptyColumns { get; private set; }
 
     /// <summary>
     /// Gets the name of the schema where this table exists or will be created.
@@ -1105,7 +1099,6 @@ namespace MySQL.ForExcel.Classes
         TableName,
         createAutoPkColumn,
         IsFormatted,
-        RemoveEmptyColumns,
         DetectDatatype,
         AddBufferToVarchar,
         AutoIndexIntColumns,

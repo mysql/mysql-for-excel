@@ -1023,7 +1023,6 @@ namespace MySQL.ForExcel.Forms
         _importDbObject.Name,
         false,
         Settings.Default.AppendUseFormattedValues,
-        false,
         true,
         false,
         false,

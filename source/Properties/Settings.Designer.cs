@@ -181,19 +181,6 @@ namespace MySQL.ForExcel.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool ExportRemoveEmptyColumns {
-            get {
-                return ((bool)(this["ExportRemoveEmptyColumns"]));
-            }
-            set {
-                this["ExportRemoveEmptyColumns"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("15")]
         public uint GlobalConnectionConnectionTimeout {
             get {

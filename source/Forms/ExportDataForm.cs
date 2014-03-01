@@ -198,13 +198,6 @@ namespace MySQL.ForExcel.Forms
           return;
         }
 
-        if (optionsDialog.ExportRemoveEmptyColumnsChanged && !Settings.Default.ExportRemoveEmptyColumns)
-        {
-          // Prevent InvalidOperationException from being thrown at LoadPreviewData() when overwritting the Datasource property,
-          // Somehow the PreviewDataGridView.SelectionMode its set to FullColumnSelect and the overwrite of that property cannot be done.
-          PreviewDataGridView.SelectionMode = DataGridViewSelectionMode.CellSelect;
-        }
-
         LoadPreviewData();
 
         if (optionsDialog.ExportDetectDatatypeChanged && Settings.Default.ExportDetectDatatype)
@@ -587,7 +580,7 @@ namespace MySQL.ForExcel.Forms
 
           case MySqlStatement.StatementResultType.ErrorThrown:
             errorsFound = true;
-            operationDetails.AddNewLine(2 ,true);
+            operationDetails.AddNewLine(2, true);
             operationDetails.Append(Resources.ExportDataRowsInsertionErrorText);
             operationDetails.AddNewLine();
             operationDetails.Append(statement.ResultText);
@@ -796,7 +789,6 @@ namespace MySQL.ForExcel.Forms
         _proposedTableName,
         true,
         Settings.Default.ExportUseFormattedValues,
-        Settings.Default.ExportRemoveEmptyColumns,
         Settings.Default.ExportDetectDatatype,
         Settings.Default.ExportAddBufferToVarchar,
         Settings.Default.ExportAutoIndexIntColumns,

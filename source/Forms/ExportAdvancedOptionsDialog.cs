@@ -36,7 +36,6 @@ namespace MySQL.ForExcel.Forms
       InitializeComponent();
 
       ExportDetectDatatypeChanged = false;
-      ExportRemoveEmptyColumnsChanged = false;
       ParentFormRequiresRefresh = false;
       PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.ExportLimitPreviewRowsQuantity);
       DetectDatatypeCheckBox.Checked = Settings.Default.ExportDetectDatatype;
@@ -44,7 +43,6 @@ namespace MySQL.ForExcel.Forms
       AutoIndexIntColumnsCheckBox.Checked = Settings.Default.ExportAutoIndexIntColumns;
       AutoAllowEmptyNonIndexColumnsCheckBox.Checked = Settings.Default.ExportAutoAllowEmptyNonIndexColumns;
       UseFormattedValuesCheckBox.Checked = Settings.Default.ExportUseFormattedValues;
-      RemoveEmptyColumnsCheckBox.Checked = Settings.Default.ExportRemoveEmptyColumns;
       AddBufferToVarcharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
       CreateTableIndexesLastCheckBox.Checked = Settings.Default.ExportSqlQueriesCreateIndexesLast;
     }
@@ -60,11 +58,6 @@ namespace MySQL.ForExcel.Forms
     /// Gets a value indicating whether the auto-detect datatypes setting was changed by the user.
     /// </summary>
     public bool ExportDetectDatatypeChanged { get; private set; }
-
-    /// <summary>
-    /// Gets a value indicating whether the auto-remove empty columns setting changed by the user.
-    /// </summary>
-    public bool ExportRemoveEmptyColumnsChanged { get; private set; }
 
     #endregion Properties
 
@@ -123,7 +116,6 @@ namespace MySQL.ForExcel.Forms
       Settings.Default.ExportAutoIndexIntColumns = AutoIndexIntColumnsCheckBox.Checked;
       Settings.Default.ExportAutoAllowEmptyNonIndexColumns = AutoAllowEmptyNonIndexColumnsCheckBox.Checked;
       Settings.Default.ExportUseFormattedValues = UseFormattedValuesCheckBox.Checked;
-      Settings.Default.ExportRemoveEmptyColumns = RemoveEmptyColumnsCheckBox.Checked;
       Settings.Default.ExportSqlQueriesCreateIndexesLast = CreateTableIndexesLastCheckBox.Checked;
       MiscUtilities.SaveSettings();
     }
@@ -135,24 +127,12 @@ namespace MySQL.ForExcel.Forms
     private bool GetParentFormRequiresRefresh()
     {
       ParentFormRequiresRefresh = ExportDetectDatatypeChanged
-                                  || ExportRemoveEmptyColumnsChanged
                                   || Settings.Default.ExportLimitPreviewRowsQuantity != (int)PreviewRowsQuantityNumericUpDown.Value
                                   || Settings.Default.ExportAutoIndexIntColumns != AutoIndexIntColumnsCheckBox.Checked
                                   || Settings.Default.ExportAutoAllowEmptyNonIndexColumns != AutoAllowEmptyNonIndexColumnsCheckBox.Checked
                                   || Settings.Default.ExportUseFormattedValues != UseFormattedValuesCheckBox.Checked;
       SetWarningControlsVisibility();
       return ParentFormRequiresRefresh;
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="RemoveEmptyColumnsCheckBox"/> checkbox is checked.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void RemoveEmptyColumnsCheckBox_CheckedChanged(object sender, EventArgs e)
-    {
-      ExportRemoveEmptyColumnsChanged = Settings.Default.ExportRemoveEmptyColumns != RemoveEmptyColumnsCheckBox.Checked;
-      GetParentFormRequiresRefresh();
     }
 
     /// <summary>
