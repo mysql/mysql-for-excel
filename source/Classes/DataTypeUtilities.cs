@@ -472,136 +472,121 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The formatted string representation of the raw value.</returns>
     public static object GetInsertingValueForColumnType(object rawValue, MySqlDataColumn againstTypeColumn, bool escapeStringForTextTypes)
     {
-      object retValue = rawValue;
       if (againstTypeColumn == null)
       {
         return rawValue;
       }
 
-      bool cellWithNoData = rawValue == null || rawValue == DBNull.Value;
-      if (cellWithNoData)
+      // Return values for empty raw values
+      bool nullRawValue = rawValue == null || rawValue == DBNull.Value;
+      if (nullRawValue)
       {
         if (againstTypeColumn.AllowNull)
         {
-          retValue = DBNull.Value;
+          return DBNull.Value;
         }
-        else
+
+        if (againstTypeColumn.IsNumeric || againstTypeColumn.IsBinary)
         {
-          if (againstTypeColumn.IsNumeric || againstTypeColumn.IsBinary)
-          {
-            retValue = 0;
-          }
-          else if (againstTypeColumn.IsBool)
-          {
-            retValue = false;
-          }
-          else if (againstTypeColumn.IsDate)
-          {
-            if (againstTypeColumn.DataType.Name == "DateTime")
-            {
-              retValue = DateTime.MinValue;
-            }
-            else
-            {
-              retValue = new MySql.Data.Types.MySqlDateTime(0, 0, 0, 0, 0, 0, 0);
-            }
-          }
-          else if (againstTypeColumn.ColumnRequiresQuotes)
-          {
-            retValue = string.Empty;
-          }
+          return 0;
         }
+
+        if (againstTypeColumn.IsBool)
+        {
+          return false;
+        }
+
+        if (!againstTypeColumn.IsDate)
+        {
+          return againstTypeColumn.ColumnRequiresQuotes ? string.Empty : rawValue;
+        }
+
+        if (againstTypeColumn.DataType.Name == "DateTime")
+        {
+          return DateTime.MinValue;
+        }
+
+        return new MySql.Data.Types.MySqlDateTime(0, 0, 0, 0, 0, 0, 0);
       }
-      else
+
+      // Return values for raw values with data
+      if (againstTypeColumn.IsDate)
       {
-        retValue = rawValue;
-        if (againstTypeColumn.IsDate)
+        DateTime dtValue;
+        if (rawValue is DateTime)
         {
-          if (rawValue is DateTime)
+          dtValue = (DateTime)rawValue;
+          if (againstTypeColumn.DataType.Name == "DateTime")
           {
-            DateTime dtValue = (DateTime)rawValue;
-            if (againstTypeColumn.DataType.Name == "DateTime")
-            {
-              retValue = dtValue;
-            }
-            else
-            {
-              retValue = new MySql.Data.Types.MySqlDateTime(dtValue);
-            }
+            return dtValue;
           }
-          else if (rawValue is MySql.Data.Types.MySqlDateTime)
-          {
-            MySql.Data.Types.MySqlDateTime dtValue = (MySql.Data.Types.MySqlDateTime)rawValue;
-            if (againstTypeColumn.DataType.Name == "DateTime")
-            {
-              retValue = (!dtValue.IsValidDateTime ? DateTime.MinValue : dtValue.GetDateTime());
-            }
-            else
-            {
-              retValue = dtValue;
-            }
-          }
-          else
-          {
-            string rawValueAsString = rawValue.ToString();
-            if (rawValueAsString.IsMySqlZeroDateValue(true))
-            {
-              if (againstTypeColumn.DataType.Name == "DateTime")
-              {
-                retValue = DateTime.MinValue;
-              }
-              else
-              {
-                retValue = new MySql.Data.Types.MySqlDateTime(0, 0, 0, 0, 0, 0, 0);
-              }
-            }
-            else
-            {
-              DateTime dtValue;
-              if (DateTime.TryParse(rawValueAsString, out dtValue))
-              {
-                if (againstTypeColumn.DataType.Name == "DateTime")
-                {
-                  retValue = dtValue;
-                }
-                else
-                {
-                  retValue = new MySql.Data.Types.MySqlDateTime(dtValue);
-                }
-              }
-              else
-              {
-                retValue = rawValue;
-              }
-            }
-          }
+
+          return new MySql.Data.Types.MySqlDateTime(dtValue);
         }
-        else if (againstTypeColumn.IsBool)
+
+        if (rawValue is MySql.Data.Types.MySqlDateTime)
         {
-          string rawValueAsString = rawValue.ToString().ToLowerInvariant();
-          switch (rawValueAsString)
+          MySql.Data.Types.MySqlDateTime mdtValue = (MySql.Data.Types.MySqlDateTime)rawValue;
+          if (againstTypeColumn.DataType.Name == "DateTime")
           {
-            case "1":
-            case "true":
-            case "yes":
-            case "ja":
-              retValue = true;
-              break;
-            case "0":
-            case "false":
-            case "no":
-            case "nein":
-              retValue = false;
-              break;
+            return !mdtValue.IsValidDateTime ? DateTime.MinValue : mdtValue.GetDateTime();
           }
+
+          return mdtValue;
         }
-        else if (againstTypeColumn.ColumnRequiresQuotes)
+
+        string rawValueAsString = rawValue.ToString();
+        if (rawValueAsString.IsMySqlZeroDateValue(true))
         {
-          retValue = escapeStringForTextTypes ? rawValue.ToString().EscapeDataValueString() : rawValue.ToString();
+          if (againstTypeColumn.DataType.Name == "DateTime")
+          {
+            return DateTime.MinValue;
+          }
+
+          return new MySql.Data.Types.MySqlDateTime(0, 0, 0, 0, 0, 0, 0);
+        }
+
+        if (!DateTime.TryParse(rawValueAsString, out dtValue))
+        {
+          return rawValue;
+        }
+
+        if (againstTypeColumn.DataType.Name == "DateTime")
+        {
+          return dtValue;
+        }
+
+        return new MySql.Data.Types.MySqlDateTime(dtValue);
+      }
+
+      if (againstTypeColumn.IsBool)
+      {
+        string rawValueAsString = rawValue.ToString().ToLowerInvariant();
+        switch (rawValueAsString)
+        {
+          case "1":
+          case "true":
+          case "yes":
+          case "ja":
+            return true;
+
+          case "0":
+          case "false":
+          case "no":
+          case "nein":
+            return false;
+
+          default:
+            throw new UnrecognizedBooleanValueException();
         }
       }
 
-      return retValue;
+      if (againstTypeColumn.ColumnRequiresQuotes)
+      {
+        return escapeStringForTextTypes ? rawValue.ToString().EscapeDataValueString() : rawValue.ToString();
+      }
+
+      return rawValue;
     }
 
     /// <summary>

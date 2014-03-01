@@ -1,4 +1,8 @@
 1.2.1
+- Fixed code that was causing the AutoPK column not to appear sometimes in the CREATE and INSERT statements, fixed the total count of inserted rows for Export Data and
+  Append Data operations depending on the status of the "First Row Contains Column Names" checkbox. Fixed the starting value of the AutoPK column depending on the status
+  of the "First Row Contains Column Names" checkbox.
+  (Bug #18269654 - EXPORT DATA - ERROR ON CHANGING PRIMARY KEY OPTIONS)
 - Changed functionality to always forcefully remove columns that contain no data. Empty columns will always be excluded now.
   (Bug #18113057 - EXPORT DATA: UNHANDLED EXCEPTION WHEN SELECTING THE WHOLE SPREADSHEEET'S DATA).
   (Bug #16501338 - EXPORT DATA - EMPTY COLUMNS ARE NOT ALWAYS FLAGGED AS EXCLUDED)

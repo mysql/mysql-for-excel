@@ -29,26 +29,23 @@ namespace MySQL.ForExcel.Classes
   public class TempRange : IDisposable
   {
     /// <summary>
-    /// Flag indicating whether screen updating will be disabled to speed up processing.
+    /// The formula text passed to the <see cref="Excel.Range.FormulaArray"/> of the <see cref="Excel.Range"/> representing an AutoPK column.
     /// </summary>
-    private readonly bool _disableScreenupdating;
+    private const string AUTO_PK_COLUMN_FORMULA = "=ROW() - 1";
+
+    #region Properties
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="TempRange"/> class copying its data from the source range.
+    /// Flag indicating whether screen updating will be disabled to speed up processing.
     /// </summary>
-    /// <param name="sourceRange">The original source <see cref="Excel.Range"/> whose data is copied to the temporary one.</param>
-    /// <param name="cropToNonEmptyRange">Flag indicating whether the range is cropped to a subrange with only non-empty cells.</param>
-    /// <param name="skipEmptyColumns">Flag indicating whether empty columns are not copied to the target range.</param>
-    /// <param name="hideWorksheet">Flag indicating whether the new temporary <see cref="Excel.Worksheet"/> will be hidden.</param>
-    /// <param name="dateColumnIndexes">Array of indexes of columns that will populate a date MySQL column.</param>
-    /// <param name="limitRowsQuantity">Gets a limit on the number of rows copied from the source range to the temporary range. If less than 1 it means there is no limit.</param>
-    /// <param name="disableScreenUpdating">Flag indicating whether screen updating will be disabled to speed up processing.</param>
-    public TempRange(Excel.Range sourceRange, bool cropToNonEmptyRange, bool skipEmptyColumns, bool hideWorksheet, int[] dateColumnIndexes = null, int limitRowsQuantity = 0, bool disableScreenUpdating = true)
-      : this(sourceRange, cropToNonEmptyRange, skipEmptyColumns, hideWorksheet, limitRowsQuantity, disableScreenUpdating)
-    {
-      RangeType = TempRangeType.CopiedRange;
-      CreateCopiedTempRange(dateColumnIndexes);
-    }
+    private readonly bool _disableScreenUpdating;
+
+    /// <summary>
+    /// Flag holding the current value in <see cref="Excel.Application.ScreenUpdating"/>.
+    /// </summary>
+    private readonly bool _previousScreenUpdatingValue;
+
+    #endregion Properties
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TempRange"/> class that prepends an AutoPK column to the range.
@@ -57,15 +54,23 @@ namespace MySQL.ForExcel.Classes
     /// <param name="cropToNonEmptyRange">Flag indicating whether the range is cropped to a subrange with only non-empty cells.</param>
     /// <param name="skipEmptyColumns">Flag indicating whether empty columns are not copied to the target range.</param>
     /// <param name="hideWorksheet">Flag indicating whether the new temporary <see cref="Excel.Worksheet"/> will be hidden.</param>
-    /// <param name="startWithNumber">The first number in the sequence for the new first column.</param>
+    /// <param name="createAutoPkRange">Flag indicating whether a sequential numbered column is prepended to the range to represent the values for an AutoPK column.</param>
     /// <param name="dateColumnIndexes">Array of indexes of columns that will populate a date MySQL column.</param>
     /// <param name="limitRowsQuantity">Gets a limit on the number of rows copied from the source range to the temporary range. If less than 1 it means there is no limit.</param>
     /// <param name="disableScreenUpdating">Flag indicating whether screen updating will be disabled to speed up processing.</param>
-    public TempRange(Excel.Range sourceRange, bool cropToNonEmptyRange, bool skipEmptyColumns, bool hideWorksheet, int startWithNumber = 1, int[] dateColumnIndexes = null, int limitRowsQuantity = 0, bool disableScreenUpdating = true)
+    public TempRange(Excel.Range sourceRange, bool cropToNonEmptyRange, bool skipEmptyColumns, bool hideWorksheet, bool createAutoPkRange, int[] dateColumnIndexes = null, int limitRowsQuantity = 0, bool disableScreenUpdating = true)
       : this(sourceRange, cropToNonEmptyRange, skipEmptyColumns, hideWorksheet, limitRowsQuantity, disableScreenUpdating)
     {
-      RangeType = TempRangeType.AutoPkRange;
-      CreateAutoPkTempRange(startWithNumber, dateColumnIndexes);
+      if (createAutoPkRange)
+      {
+        RangeType = TempRangeType.AutoPkRange;
+        CreateAutoPkTempRange(dateColumnIndexes);
+      }
+      else
+      {
+        RangeType = TempRangeType.CopiedRange;
+        CreateCopiedTempRange(dateColumnIndexes);
+      }
     }
 
     /// <summary>
@@ -95,19 +100,21 @@ namespace MySQL.ForExcel.Classes
     /// <param name="disableScreenUpdating">Flag indicating whether screen updating will be disabled to speed up processing.</param>
     private TempRange(Excel.Range sourceRange, bool cropToNonEmptyRange, bool skipEmptyColumns, bool hideWorksheet, int limitRowsQuantity = 0, bool disableScreenUpdating = true)
     {
-      _disableScreenupdating = disableScreenUpdating;
+      _disableScreenUpdating = disableScreenUpdating;
+      _previousScreenUpdatingValue = false;
+      if (_disableScreenUpdating)
+      {
+        _previousScreenUpdatingValue = Globals.ThisAddIn.Application.ScreenUpdating;
+        Globals.ThisAddIn.Application.ScreenUpdating = false;
+      }
+
+      Globals.ThisAddIn.UsingTempWorksheet = true;
       CropToNonEmptyRange = cropToNonEmptyRange;
       LimitRowsQuantity = limitRowsQuantity;
       SkipEmptyColumns = skipEmptyColumns;
       SourceRange = sourceRange;
       SourceCroppedRange = null;
       CreateTempWorksheet(hideWorksheet);
-      if (_disableScreenupdating)
-      {
-        Globals.ThisAddIn.Application.ScreenUpdating = false;
-      }
-
-      Globals.ThisAddIn.UsingTempWorksheet = true;
     }
 
     /// <summary>
@@ -194,6 +201,7 @@ namespace MySQL.ForExcel.Classes
       // Free managed resources
       if (disposing)
       {
+        var previousDisplayAlertsValue = Globals.ThisAddIn.Application.DisplayAlerts;
         Globals.ThisAddIn.Application.DisplayAlerts = false;
 
         // If the TempWorksheeet has been hidden, lower the hidden strength from VeryHidden to Hidden to avoid an error while attempting to delete it.
@@ -203,10 +211,10 @@ namespace MySQL.ForExcel.Classes
         }
 
         TempWorksheet.Delete();
-        Globals.ThisAddIn.Application.DisplayAlerts = true;
-        if (_disableScreenupdating)
+        Globals.ThisAddIn.Application.DisplayAlerts = previousDisplayAlertsValue;
+        if (_disableScreenUpdating)
         {
-          Globals.ThisAddIn.Application.ScreenUpdating = true;
+          Globals.ThisAddIn.Application.ScreenUpdating = _previousScreenUpdatingValue;
         }
 
         Globals.ThisAddIn.UsingTempWorksheet = false;
@@ -219,9 +227,8 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Creates a temporary <see cref="Excel.Range"/> containing a copy of the data in <see cref="SourceRange"/> with a new sequential numeric column prepended to it.
     /// </summary>
-    /// <param name="startWithNumber">The first number in the sequence for the new first column.</param>
     /// <param name="dateColumnIndexes">Array of indexes of columns that will populate a date MySQL column.</param>
-    private void CreateAutoPkTempRange(int startWithNumber = 1, int[] dateColumnIndexes = null)
+    private void CreateAutoPkTempRange(int[] dateColumnIndexes = null)
     {
       if (TempWorksheet == null)
       {
@@ -229,18 +236,12 @@ namespace MySQL.ForExcel.Classes
       }
 
       CreateCopiedTempRange(dateColumnIndexes);
-      if (startWithNumber < 0)
-      {
-        return;
-      }
-
-      --startWithNumber;
       int rowsCount = Range.Rows.Count;
       Excel.Range firstColumn = TempWorksheet.Columns[1];
       firstColumn.Insert();
       firstColumn = TempWorksheet.Cells[1, 1];
       firstColumn = firstColumn.Resize[rowsCount, 1];
-      firstColumn.FormulaArray = "=ROW()" + (startWithNumber > 0 ? string.Format(" + {0}", startWithNumber) : string.Empty);
+      firstColumn.FormulaArray = AUTO_PK_COLUMN_FORMULA;
       firstColumn = TempWorksheet.Cells[1, 1];
       Range = firstColumn.Resize[rowsCount, Range.Columns.Count + 1];
     }

@@ -900,4 +900,7 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
   <data name="ConnectionLostErrorText" xml:space="preserve">
     <value>The connection to the MySQL server has been lost or was unexpectedly closed.</value>
   </data>
+  <data name="UnrecognizedBooleanValueError" xml:space="preserve">
+    <value>Unrecognized value suitable for a bool column encountered.</value>
+  </data>
 </root>

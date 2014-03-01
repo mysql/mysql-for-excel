@@ -2269,6 +2269,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unrecognized value suitable for a bool column encountered..
+        /// </summary>
+        internal static string UnrecognizedBooleanValueError {
+            get {
+                return ResourceManager.GetString("UnrecognizedBooleanValueError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap Warning {

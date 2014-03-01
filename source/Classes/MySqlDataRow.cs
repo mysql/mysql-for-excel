@@ -36,6 +36,11 @@ namespace MySQL.ForExcel.Classes
     #region Fields
 
     /// <summary>
+    /// Gets the parent <see cref="MySqlDataTable"/> for this row.
+    /// </summary>
+    private MySqlDataTable _mySqlTable;
+
+    /// <summary>
     /// The SQL query needed to commit changes contained in this row to the SQL server.
     /// </summary>
     private string _sqlQuery;
@@ -49,6 +54,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="builder">A <see cref="DataRowBuilder"/> to construct the row.</param>
     protected internal MySqlDataRow(DataRowBuilder builder) : base(builder)
     {
+      _mySqlTable = null;
       _sqlQuery = null;
       ChangedColumnNames = new List<string>(Table.Columns.Count);
       ExcelRange = null;
@@ -126,7 +132,7 @@ namespace MySQL.ForExcel.Classes
     {
       get
       {
-        return Table != null ? Table as MySqlDataTable : null;
+        return _mySqlTable ?? (_mySqlTable = Table as MySqlDataTable);
       }
     }
 

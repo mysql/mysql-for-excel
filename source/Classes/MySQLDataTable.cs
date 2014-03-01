@@ -670,7 +670,8 @@ namespace MySQL.ForExcel.Classes
       get
       {
         DataTable changesDt = GetChanges(DataRowState.Added);
-        return changesDt != null ? changesDt.Rows.Count : 0;
+        var adjustOperationsValue = _firstRowIsHeaders && OperationType.IsForExport() ? 1 : 0;
+        return changesDt != null ? changesDt.Rows.Count - adjustOperationsValue : 0;
       }
     }
 
@@ -989,6 +990,7 @@ namespace MySQL.ForExcel.Classes
 
         _useFirstColumnAsPk = value;
         _columnsForInsertion = null;
+        _preSqlForAddedRows = null;
         if (!AddPrimaryKeyColumn)
         {
           return;
@@ -1325,9 +1327,15 @@ namespace MySQL.ForExcel.Classes
       // the ALTER statement is not 100% correct, but the NewTableSqlType.AlterComplete is not yet used throughout the code.
       if (sqlType != NewTableSqlType.AlterOnlyKeys)
       {
-        int skipNum = AddPrimaryKeyColumn ? (_useFirstColumnAsPk ? 0 : 1) : 0;
-        foreach (var col in Columns.OfType<MySqlDataColumn>().Skip(skipNum).Where(c => !c.ExcludeColumn))
+        foreach (var col in Columns.OfType<MySqlDataColumn>())
         {
+          // Skipping excluded columns is better than simplifying the foreach using a .Where LINQ form since using it will cause
+          // traversing the list of columns 2 times in most of the cases where none or just a very few columns are excluded.
+          if (col.ExcludeColumn)
+          {
+            continue;
+          }
+
           sql.AppendFormat("{0}{1}", delimiter, col.GetSql());
           delimiter = "," + nlt;
         }
@@ -1671,7 +1679,7 @@ namespace MySQL.ForExcel.Classes
       try
       {
         int numRows = temporaryRange.Range.Rows.Count;
-        int rowAdjustValue = _firstRowIsHeaders ? 1 : 0;
+        int rowAdjustValue = _firstRowIsHeaders && !OperationType.IsForExport() ? 1 : 0;
         for (int row = 1 + rowAdjustValue; row <= numRows; row++)
         {
           var valuesArray = temporaryRange.Range.GetRowValuesAsLinearArray(row, IsFormatted);
@@ -1680,11 +1688,12 @@ namespace MySQL.ForExcel.Classes
             continue;
           }
 
-          var newRow = LoadDataRow(valuesArray, IsPreviewTable) as MySqlDataRow;
-          if (newRow != null && row == 1 && _firstRowIsHeaders)
-          {
-            newRow.IsHeadersRow = true;
-          }
+          LoadDataRow(valuesArray, IsPreviewTable);
+        }
+
+        if (rowAdjustValue == 0)
+        {
+          ResetFirstRowIsHeaderValue();
         }
       }
       catch (Exception ex)
@@ -1713,10 +1722,7 @@ namespace MySQL.ForExcel.Classes
       // Add the Excel data to rows in this table.
       var dateColumnIndexes = new List<int>(Columns.Count);
       dateColumnIndexes.AddRange(from MySqlDataColumn column in Columns where column.IsDate select column.RangeColumnIndex);
-      int startingAutoPkValue = _firstRowIsHeaders ? 0 : 1;
-      using (var temporaryRange = AddPrimaryKeyColumn
-        ? new TempRange(dataRange, true, true, true, startingAutoPkValue, dateColumnIndexes.ToArray(), limitRowsQuantity)
-        : new TempRange(dataRange, true, true, true, dateColumnIndexes.ToArray(), limitRowsQuantity))
+      using (var temporaryRange = new TempRange(dataRange, true, true, true, AddPrimaryKeyColumn, dateColumnIndexes.ToArray(), limitRowsQuantity))
       {
         CreateColumns(temporaryRange, recreateColumnsFromData);
         bool success = AddExcelData(temporaryRange, false, asynchronous);
@@ -1741,6 +1747,13 @@ namespace MySQL.ForExcel.Classes
     /// <param name="syncFromTable">A <see cref="MySqlDataTable"/> object from which columns will be synchronized.</param>
     public void SyncSchema(MySqlDataTable syncFromTable)
     {
+      if (!string.Equals(TableName, syncFromTable.TableName, StringComparison.InvariantCulture))
+      {
+        TableName = syncFromTable.TableName;
+      }
+
+      FirstRowIsHeaders = syncFromTable.FirstRowIsHeaders;
+      UseFirstColumnAsPk = syncFromTable.UseFirstColumnAsPk;
       foreach (MySqlDataColumn syncFromColumn in syncFromTable.Columns)
       {
         var thisColumn = Columns[syncFromColumn.ColumnName] as MySqlDataColumn;
@@ -2169,6 +2182,23 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Resets the value of <see cref="MySqlDataRow.IsHeadersRow"/> with the value of <see cref="FirstRowIsHeaders"/>.
+    /// </summary>
+    private void ResetFirstRowIsHeaderValue()
+    {
+      if (Rows.Count <= 0)
+      {
+        return;
+      }
+
+      MySqlDataRow firstRow = Rows[0] as MySqlDataRow;
+      if (firstRow != null)
+      {
+        firstRow.IsHeadersRow = FirstRowIsHeaders;
+      }
+    }
+
+    /// <summary>
     /// Notifies a <see cref="MySqlDataRow"/> that it has been modified or deleted.
     /// </summary>
     /// <param name="args">Event arguments.</param>
@@ -2289,6 +2319,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       AdjustAutoPkValues();
+      ResetFirstRowIsHeaderValue();
       _changedColumnNamesWithFirstRowOfData = true;
     }
   }

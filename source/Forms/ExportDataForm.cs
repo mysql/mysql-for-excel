@@ -450,7 +450,6 @@ namespace MySQL.ForExcel.Forms
         ExportDataTable.SyncSchema(PreviewDataTable);
       }
 
-      ExportDataTable.TableName = PreviewDataTable.TableName;
       Cursor = Cursors.Default;
       if (!setupDataSuccessful)
       {
