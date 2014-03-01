@@ -1,3 +1,33 @@
+MySQL for Excel 1.2.1 Release Notes
+------------------------------------
+
+Welcome to the release notes for MySQL for Excel 1.2.1
+
+* Optimized the way SQL statements are sent to the server, INSERT statements for Export Data
+  operations are not sent anymore as single large statements but as single INSERT statements
+  for each of the data rows. In average a 30-35% time improvement was achieved.
+* Optimized the way SQL queries are created for a changed row (in average a 30-40% time
+  improvement), the processing of warnings returned by the SQL server and the overall creation
+  of result text for errors and warnings so processing is faster and less memory is used.
+* Optimized how the Excel data is loaded into a MySqlDataTable object (in average a 80% time
+  improvement), so now a temporary hidden Excel worksheet is used to prepare the data to be
+  loaded and then load it after it was preprocesed instead of preprocessing cell by cell as it
+  was done before. The preprocessing eliminates as many blank Excel cells as possible as well.
+* Added an advanced option to the Insert Data dialog to create secondary indexes after all the
+  data has been inserted, this saves a lot of disk I/O for bulk inserts (thousands of rows)
+  since reindexing will not happen every time a row is inserted but only once at the very end
+  of the data insertion. This option is enabled by default.
+* Added an advanced option to the Append Data dialog to disable unique indexes and foreign keys
+  temporarily for the duration of the data insertion. This option is disabled by default since
+  the user must make sure that if unique indexes are present the data mapped to that column does
+  not contain duplicate data.
+* Removed the 'Remove columns that contain no data, otherwise just flag them as "Excluded"' option
+  in the Advanced Export Data Options dialog so now empty columns in an Excel range selected for
+  an Export Data or Append Data operations are always removed. This change helps when users select
+  the whole worksheet's cells or whole rows/columns for exporting or appending data.
+* Other bug fixes (for a complete list refer to the CHANGES file).
+
+
 MySQL for Excel 1.2.0 Release Notes
 ------------------------------------
 

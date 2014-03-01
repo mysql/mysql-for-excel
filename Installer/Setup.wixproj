@@ -63,7 +63,7 @@
     <CreateProperty Value="Version=$(Version);IsGPL=true;$(DefineConstants)">
       <Output TaskParameter="Value" PropertyName="DefineConstants" />
     </CreateProperty>
-    <CreateProperty Value="mysql-excel-$(Version)">
+    <CreateProperty Value="mysql-for-excel-$(Version)">
       <Output TaskParameter="Value" PropertyName="TargetName" />
     </CreateProperty>
     <CreateProperty Value="$(TargetName)$(TargetExt)">
