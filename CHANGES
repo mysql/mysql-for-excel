@@ -1,4 +1,7 @@
 1.2.1
+- Fixed a bug in the MSIs present since version 1.1.2 that was trying to add Registry keys for MySQL for Excel during a product upgrade when the registry keys were
+  already present and should not be added. The Registry keys are just added now when the product is installed for the first time.
+  (Bug #18354533 - MYSQL FOR EXCELL ADDIN 1.2.0 (STAND ALONE) IS NOT ABLE TO UPDATE AN OLD VERSION)
 - Fixed code that was causing the AutoPK column not to appear sometimes in the CREATE and INSERT statements, fixed the total count of inserted rows for Export Data and
   Append Data operations depending on the status of the "First Row Contains Column Names" checkbox. Fixed the starting value of the AutoPK column depending on the status
   of the "First Row Contains Column Names" checkbox.

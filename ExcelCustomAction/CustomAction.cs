@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -122,18 +122,27 @@ namespace ExcelCustomAction
     /// <returns>An array of 2 elements containing the title and description.</returns>
     private static string[] GetMySqlForExelDllTitleAndDescription(string excelDll)
     {
-      string[] titleAndDescription = null;
       if (string.IsNullOrEmpty(excelDll) || !File.Exists(excelDll))
       {
         throw new ExcellDynamicLibraryNotFoundException();
       }
 
-      titleAndDescription = new string[2];
+      string[] titleAndDescription = new string[2];
       Assembly excelAssembly = Assembly.LoadFile(excelDll);
       object[] assemblyAttributes = excelAssembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), true);
-      titleAndDescription[0] = (assemblyAttributes[0] as AssemblyTitleAttribute).Title;
+      var assemblyTitle = assemblyAttributes[0] as AssemblyTitleAttribute;
+      if (assemblyTitle != null)
+      {
+        titleAndDescription[0] = assemblyTitle.Title;
+      }
+
       assemblyAttributes = excelAssembly.GetCustomAttributes(typeof(AssemblyDescriptionAttribute), true);
-      titleAndDescription[1] = (assemblyAttributes[0] as AssemblyDescriptionAttribute).Description;
+      var assemblyDescription = assemblyAttributes[0] as AssemblyDescriptionAttribute;
+      if (assemblyDescription != null)
+      {
+        titleAndDescription[1] = assemblyDescription.Description;
+      }
+
       return titleAndDescription;
     }
 
@@ -155,47 +164,54 @@ namespace ExcelCustomAction
         RegistryView registryView = addInRegistryView == AddInRegistryView.Registry32 ? RegistryView.Registry32 : RegistryView.Registry64;
         RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, registryView);
         RegistryKey officeKey = baseKey.OpenSubKey(MS_OFFICE_REGISTRY_KEY_LOCATION, RegistryKeyPermissionCheck.ReadWriteSubTree, RegistryRights.FullControl);
-        RegistryKey excelKey = null;
+        RegistryKey excelKey;
 
         switch (addInRegistryAction)
         {
           case AddInRegistryAction.Install:
-            //// Retrieve the MySQL for Excel DLL and VSTO file install locations needed for the registry installation.
+            // Retrieve the MySQL for Excel DLL and VSTO file install locations needed for the registry installation.
             string excelDll = session.CustomActionData["AddInDllLocation"];
             string vstoFile = session.CustomActionData["VstoFileLocation"];
             string[] excelDllTitleAndDesription = GetMySqlForExelDllTitleAndDescription(excelDll);
             ValidateVstoFile(vstoFile);
 
-            //// If the files were found proceed to create the registry keys.
-            excelKey = baseKey.CreateSubKey(MYSQL_FOR_EXCEL_REGISTRY_KEY_LOCATION);
-            if (excelKey != null)
+            // If the files were found proceed to create the registry key if it does not exist already.
+            excelKey = baseKey.OpenSubKey(MYSQL_FOR_EXCEL_REGISTRY_KEY_LOCATION);
+            if (excelKey == null)
             {
-              excelKey.SetValue("Description", excelDllTitleAndDesription[1], RegistryValueKind.String);
-              excelKey.SetValue("FriendlyName", excelDllTitleAndDesription[0], RegistryValueKind.String);
-              excelKey.SetValue("LoadBehavior", 3, RegistryValueKind.DWord);
-              excelKey.SetValue("Manifest", vstoFile + "|vstolocal", RegistryValueKind.String);
-              excelKey.Close();
+              excelKey = baseKey.CreateSubKey(MYSQL_FOR_EXCEL_REGISTRY_KEY_LOCATION);
+              if (excelKey != null)
+              {
+                excelKey.SetValue("Description", excelDllTitleAndDesription[1], RegistryValueKind.String);
+                excelKey.SetValue("FriendlyName", excelDllTitleAndDesription[0], RegistryValueKind.String);
+                excelKey.SetValue("LoadBehavior", 3, RegistryValueKind.DWord);
+                excelKey.SetValue("Manifest", vstoFile + "|vstolocal", RegistryValueKind.String);
+                excelKey.Close();
+              }
             }
             break;
 
           case AddInRegistryAction.Remove:
             if (officeKey != null)
             {
-              //// Remove the installed keys but also remove the container Excel and Addins keys if no more add-ins are present.
+              // Remove the installed keys but also remove the container Excel and Addins keys if no more add-ins are present.
               excelKey = officeKey.OpenSubKey("Excel", true);
               if (excelKey != null)
               {
-                RegistryKey addinsKey = excelKey.OpenSubKey("Addins", true);
-                addinsKey.DeleteSubKeyTree("MySQL.ForExcel");
-                if (addinsKey.SubKeyCount == 0 && addinsKey.ValueCount == 0)
+                var addinsKey = excelKey.OpenSubKey("Addins", true);
+                if (addinsKey != null)
                 {
-                  addinsKey.Close();
-                  excelKey.DeleteSubKey("Addins");
-                  if (excelKey.SubKeyCount == 0 && excelKey.ValueCount == 0)
+                  addinsKey.DeleteSubKeyTree("MySQL.ForExcel");
+                  if (addinsKey.SubKeyCount == 0 && addinsKey.ValueCount == 0)
                   {
-                    excelKey.Close();
-                    officeKey.DeleteSubKey("Excel");
-                    officeKey.Close();
+                    addinsKey.Close();
+                    excelKey.DeleteSubKey("Addins");
+                    if (excelKey.SubKeyCount == 0 && excelKey.ValueCount == 0)
+                    {
+                      excelKey.Close();
+                      officeKey.DeleteSubKey("Excel");
+                      officeKey.Close();
+                    }
                   }
                 }
               }
