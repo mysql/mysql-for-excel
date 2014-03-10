@@ -233,58 +233,43 @@ namespace MySQL.ForExcel.Classes
     /// Adds names to the whole application related to localized date format strings.
     /// </summary>
     /// <param name="workbook">The workbook where the new <see cref="Excel.Style"/> is added to.</param>
+    /// <remarks>This method relies on the value of the setting HideLocalizedDateFormatNames.</remarks>
     public static void AddLocalizedDateFormatStringsAsNames(this Excel.Workbook workbook)
     {
-      if (workbook == null)
+      bool hideNames = Settings.Default.HideLocalizedDateFormatNames;
+      workbook.AddNameWithInternationalFormula("LOCAL_DATE_SEPARATOR", "=INDEX(GET.WORKSPACE(37),17)", hideNames);
+      workbook.AddNameWithInternationalFormula("LOCAL_TIME_SEPARATOR", "=INDEX(GET.WORKSPACE(37),18)", hideNames);
+      workbook.AddNameWithInternationalFormula("LOCAL_YEAR_FORMAT", "=INDEX(GET.WORKSPACE(37),19)", hideNames);
+      workbook.AddNameWithInternationalFormula("LOCAL_MONTH_FORMAT", "=INDEX(GET.WORKSPACE(37),20)", hideNames);
+      workbook.AddNameWithInternationalFormula("LOCAL_DAY_FORMAT", "=INDEX(GET.WORKSPACE(37),21)", hideNames);
+      workbook.AddNameWithInternationalFormula("LOCAL_HOUR_FORMAT", "=INDEX(GET.WORKSPACE(37),22)", hideNames);
+      workbook.AddNameWithInternationalFormula("LOCAL_MINUTE_FORMAT", "=INDEX(GET.WORKSPACE(37),23)", hideNames);
+      workbook.AddNameWithInternationalFormula("LOCAL_SECOND_FORMAT", "=INDEX(GET.WORKSPACE(37),24)", hideNames);
+      workbook.AddNameWithInternationalFormula("LOCAL_MYSQL_DATE_FORMAT", "=REPT(LOCAL_YEAR_FORMAT,4)&LOCAL_DATE_SEPARATOR&REPT(LOCAL_MONTH_FORMAT,2)&LOCAL_DATE_SEPARATOR&REPT(LOCAL_DAY_FORMAT,2)&\" \"&REPT(LOCAL_HOUR_FORMAT,2)&LOCAL_TIME_SEPARATOR&REPT(LOCAL_MINUTE_FORMAT,2)&LOCAL_TIME_SEPARATOR&REPT(LOCAL_SECOND_FORMAT,2)", hideNames);
+    }
+
+    /// <summary>
+    /// Adds a <see cref="Excel.Name"/> object to the collection of names (if it does not exist already) of the given <see cref="Excel.Workbook"/> with a formula in English that is translated to the current locale.
+    /// </summary>
+    /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
+    /// <param name="name">The name of the <see cref="Excel.Name"/> object.</param>
+    /// <param name="internationalFormula">The tied formula expressed in English.</param>
+    /// <param name="hidden">Flag indicating whether the name is hidden from the user.</param>
+    public static void AddNameWithInternationalFormula(this Excel.Workbook workbook, string name, string internationalFormula, bool hidden)
+    {
+      if (workbook == null || string.IsNullOrEmpty(name) || string.IsNullOrEmpty(internationalFormula))
       {
         return;
       }
 
-      IList<Excel.Name> namesCollection = workbook.Names.Cast<Excel.Name>().ToList();
-      if (namesCollection.All(name => name.Name != "LOCAL_DATE_SEPARATOR"))
+      if (workbook.Names.Cast<Excel.Name>().Any(n => n.Name == name))
       {
-        workbook.Names.Add("LOCAL_DATE_SEPARATOR", "=INDEX(GET.WORKSPACE(37),17)");
+        return;
       }
 
-      if (namesCollection.All(name => name.Name != "LOCAL_TIME_SEPARATOR"))
-      {
-        workbook.Names.Add("LOCAL_TIME_SEPARATOR", "=INDEX(GET.WORKSPACE(37),18)");
-      }
-
-      if (namesCollection.All(name => name.Name != "LOCAL_YEAR_FORMAT"))
-      {
-        workbook.Names.Add("LOCAL_YEAR_FORMAT", "=INDEX(GET.WORKSPACE(37),19)");
-      }
-
-      if (namesCollection.All(name => name.Name != "LOCAL_MONTH_FORMAT"))
-      {
-        workbook.Names.Add("LOCAL_MONTH_FORMAT", "=INDEX(GET.WORKSPACE(37),20)");
-      }
-
-      if (namesCollection.All(name => name.Name != "LOCAL_DAY_FORMAT"))
-      {
-        workbook.Names.Add("LOCAL_DAY_FORMAT", "=INDEX(GET.WORKSPACE(37),21)");
-      }
-
-      if (namesCollection.All(name => name.Name != "LOCAL_HOUR_FORMAT"))
-      {
-        workbook.Names.Add("LOCAL_HOUR_FORMAT", "=INDEX(GET.WORKSPACE(37),22)");
-      }
-
-      if (namesCollection.All(name => name.Name != "LOCAL_MINUTE_FORMAT"))
-      {
-        workbook.Names.Add("LOCAL_MINUTE_FORMAT", "=INDEX(GET.WORKSPACE(37),23)");
-      }
-
-      if (namesCollection.All(name => name.Name != "LOCAL_MINUTE_FORMAT"))
-      {
-        workbook.Names.Add("LOCAL_SECOND_FORMAT", "=INDEX(GET.WORKSPACE(37),24)");
-      }
-
-      if (namesCollection.All(name => name.Name != "LOCAL_MYSQL_DATE_FORMAT"))
-      {
-        workbook.Names.Add("LOCAL_MYSQL_DATE_FORMAT", "=REPT(LOCAL_YEAR_FORMAT,4)&LOCAL_DATE_SEPARATOR&REPT(LOCAL_MONTH_FORMAT,2)&LOCAL_DATE_SEPARATOR&REPT(LOCAL_DAY_FORMAT,2)&\" \"&REPT(LOCAL_HOUR_FORMAT,2)&LOCAL_TIME_SEPARATOR&REPT(LOCAL_MINUTE_FORMAT,2)&LOCAL_TIME_SEPARATOR&REPT(LOCAL_SECOND_FORMAT,2)");
-      }
+      var excelName = workbook.Names.Add(name, " ", !hidden);
+      // The property is not set in the Add method above but below with the US locale.
+      SetPropertyInternational(excelName, "RefersTo", internationalFormula);
     }
 
     /// <summary>
@@ -497,52 +482,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the active workbook unique identifier if exists, if not, creates one and returns it.
-    /// </summary>
-    /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
-    /// <returns>The guid string for the current workbook.</returns>
-    public static string GetOrCreateId(this Excel.Workbook workbook)
-    {
-      if (workbook == null || workbook.CustomDocumentProperties == null)
-      {
-        return null;
-      }
-
-      DocumentProperty guid = ((DocumentProperties)workbook.CustomDocumentProperties).Cast<DocumentProperty>().FirstOrDefault(property => property.Name.Equals("WorkbookGuid"));
-      if (guid != null)
-      {
-        return guid.Value.ToString();
-      }
-
-      string newGuid = Guid.NewGuid().ToString();
-      DocumentProperties properties = workbook.CustomDocumentProperties;
-      properties.Add("WorkbookGuid", false, MsoDocProperties.msoPropertyTypeString, newGuid);
-      return newGuid;
-    }
-
-    /// <summary>
-    /// Gets the a protection key for the provided worksheet if exists.
-    /// </summary>
-    /// <param name="worksheet">A <see cref="Excel.Worksheet"/> object.</param>
-    /// <returns>The worksheet's protection key if the property exist, otherwise returns null.</returns>
-    public static string GetProtectionKey(this Excel.Worksheet worksheet)
-    {
-      if (worksheet == null)
-      {
-        return null;
-      }
-
-      Excel.CustomProperties properties = worksheet.CustomProperties;
-      if (properties == null)
-      {
-        return null;
-      }
-
-      Excel.CustomProperty guid = properties.Cast<Excel.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetGuid"));
-      return guid == null ? null : guid.Value.ToString();
-    }
-
-    /// <summary>
     /// Gets an <see cref="Excel.Range"/> object that represents all non-empty cells.
     /// </summary>
     /// <param name="range">A <see cref="Excel.Range"/> object.</param>
@@ -689,6 +628,69 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets the active workbook unique identifier if exists, if not, creates one and returns it.
+    /// </summary>
+    /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
+    /// <returns>The guid string for the current workbook.</returns>
+    public static string GetOrCreateId(this Excel.Workbook workbook)
+    {
+      if (workbook == null || workbook.CustomDocumentProperties == null)
+      {
+        return null;
+      }
+
+      DocumentProperty guid = ((DocumentProperties)workbook.CustomDocumentProperties).Cast<DocumentProperty>().FirstOrDefault(property => property.Name.Equals("WorkbookGuid"));
+      if (guid != null)
+      {
+        return guid.Value.ToString();
+      }
+
+      string newGuid = Guid.NewGuid().ToString();
+      DocumentProperties properties = workbook.CustomDocumentProperties;
+      properties.Add("WorkbookGuid", false, MsoDocProperties.msoPropertyTypeString, newGuid);
+      return newGuid;
+    }
+
+    /// <summary>
+    /// Gets the a protection key for the provided worksheet if exists.
+    /// </summary>
+    /// <param name="worksheet">A <see cref="Excel.Worksheet"/> object.</param>
+    /// <returns>The worksheet's protection key if the property exist, otherwise returns null.</returns>
+    public static string GetProtectionKey(this Excel.Worksheet worksheet)
+    {
+      if (worksheet == null)
+      {
+        return null;
+      }
+
+      Excel.CustomProperties properties = worksheet.CustomProperties;
+      if (properties == null)
+      {
+        return null;
+      }
+
+      Excel.CustomProperty guid = properties.Cast<Excel.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetGuid"));
+      return guid == null ? null : guid.Value.ToString();
+    }
+
+    /// <summary>
+    /// Gets a property from the given target object returned in an English locale after transformed from the native Excel locale.
+    /// </summary>
+    /// <param name="target">The Excel object from which a property value is to be extracted.</param>
+    /// <param name="name">The name of the property.</param>
+    /// <returns>The value of the property returned in an English locale.</returns>
+    static object GetPropertyInternational(object target, string name)
+    {
+      return target.GetType().InvokeMember(
+        name,
+        System.Reflection.BindingFlags.GetProperty | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
+        null,
+        target,
+        null,
+        new System.Globalization.CultureInfo(EN_US_LOCALE_CODE));
+    }
+
+    /// <summary>
     /// Gets a valid name for a new <see cref="Excel.Worksheet"/> that avoids duplicates with existing ones in the given <see cref="Excel.Workbook"/>.
     /// </summary>
     /// <param name="workbook">A <see cref="Excel.Workbook"/>.</param>
@@ -718,6 +720,24 @@ namespace MySQL.ForExcel.Classes
     public static bool IntersectsWithAnyExcelTable(this Excel.Range range)
     {
       return range != null && (from Excel.ListObject excelTable in range.Worksheet.ListObjects select excelTable.Range.IntersectWith(range)).Any(intersectRange => intersectRange != null && intersectRange.CountLarge != 0);
+    }
+
+    /// <summary>
+    /// Invokes a method present in the given target object receiving parameters in an English locale that are transformed to the native Excel locale.
+    /// </summary>
+    /// <param name="target">The Excel object containing the method.</param>
+    /// <param name="name">The name of the method to be invoked.</param>
+    /// <param name="args">The arguments passed to the method parameters.</param>
+    /// <returns>Any return value from the invoked method.</returns>
+    static object InvokeMethodInternational(object target, string name, params object[] args)
+    {
+      return target.GetType().InvokeMember(
+        name,
+        System.Reflection.BindingFlags.InvokeMethod | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
+        null,
+        target,
+        args,
+        new System.Globalization.CultureInfo(EN_US_LOCALE_CODE));
     }
 
     /// <summary>
@@ -916,6 +936,23 @@ namespace MySQL.ForExcel.Classes
       }
 
       rangesList.Clear();
+    }
+
+    /// <summary>
+    /// Sets a property value for the given target object given in an English locale to be transformed to the native Excel locale.
+    /// </summary>
+    /// <param name="target">The Excel object for which a property value is to be set.</param>
+    /// <param name="name">The name of the property.</param>
+    /// <param name="args">The property value in the English locale.</param>
+    static void SetPropertyInternational(object target, string name, params object[] args)
+    {
+      target.GetType().InvokeMember(
+        name,
+        System.Reflection.BindingFlags.SetProperty | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
+        null,
+        target,
+        args,
+        new System.Globalization.CultureInfo(EN_US_LOCALE_CODE));
     }
 
     /// <summary>

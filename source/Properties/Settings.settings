@@ -89,5 +89,8 @@
     <Setting Name="ExportSqlQueriesCreateIndexesLast" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="HideLocalizedDateFormatNames" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

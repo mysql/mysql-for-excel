@@ -1721,7 +1721,8 @@ namespace MySQL.ForExcel.Classes
 
       // Add the Excel data to rows in this table.
       var dateColumnIndexes = new List<int>(Columns.Count);
-      dateColumnIndexes.AddRange(from MySqlDataColumn column in Columns where column.IsDate select column.RangeColumnIndex);
+      int dateColumnIndexAdjust = AddPrimaryKeyColumn ? 1 : 0;
+      dateColumnIndexes.AddRange(from MySqlDataColumn column in Columns where column.IsDate select column.RangeColumnIndex - dateColumnIndexAdjust);
       using (var temporaryRange = new TempRange(dataRange, true, true, true, AddPrimaryKeyColumn, dateColumnIndexes.ToArray(), limitRowsQuantity))
       {
         CreateColumns(temporaryRange, recreateColumnsFromData);
