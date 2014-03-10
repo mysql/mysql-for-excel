@@ -407,10 +407,10 @@ namespace MySQL.ForExcel.Controls
     public PasswordDialogFlags OpenConnection(MySqlWorkbenchConnection connection, bool givePanelFocus)
     {
       WbConnection = connection;
-      RefreshWbConnectionTimeouts();
       var passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
       if (passwordFlags.ConnectionSuccess && SchemaSelectionPanel2.SetConnection(WbConnection) && givePanelFocus)
       {
+        RefreshWbConnectionTimeouts();
         SchemaSelectionPanel2.BringToFront();
       }
 
