@@ -337,7 +337,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       Excel.XlYesNoGuess hasHeaders = containsColumnNames ? Excel.XlYesNoGuess.xlYes : Excel.XlYesNoGuess.xlNo;
-      var namedTable = range.Worksheet.ListObjects.Add(Excel.XlListObjectSourceType.xlSrcRange, range, hasHeaders);
+      var namedTable = range.Worksheet.ListObjects.Add(Excel.XlListObjectSourceType.xlSrcRange, range, Type.Missing, hasHeaders, Type.Missing);
       namedTable.Name = excelTableName.GetExcelTableNameAvoidingDuplicates();
       namedTable.DisplayName = namedTable.Name;
       namedTable.TableStyle = Settings.Default.ImportExcelTableStyleName;

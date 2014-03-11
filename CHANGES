@@ -1,4 +1,6 @@
 1.2.1
+- Tables with Guid data are now imported correctly. Creation of the named tables is now working with Guid tables too.
+  (Bug #17806468 - IMPORTING TABLES WITH GUID TO EXCEL - EXCEPTION)
 - Fixed a bug in the MSIs present since version 1.1.2 that was trying to add Registry keys for MySQL for Excel during a product upgrade when the registry keys were
   already present and should not be added. The Registry keys are just added now when the product is installed for the first time.
   (Bug #18354533 - MYSQL FOR EXCELL ADDIN 1.2.0 (STAND ALONE) IS NOT ABLE TO UPDATE AN OLD VERSION)
