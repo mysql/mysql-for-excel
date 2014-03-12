@@ -93,9 +93,19 @@ namespace MySQL.ForExcel
           bool isParentWindowActiveExcelWindow;
           if (ExcelVersionNumber >= EXCEL_2013_VERSION_NUMBER)
           {
-            // If running on Excel 2013 or later a MDI is used for the windows so the active custom pane is matched with its
-            // window and the application active window.
-            Excel.Window paneWindow = ctp.Window as Excel.Window;
+            // If running on Excel 2013 or later a MDI is used for the windows so the active custom pane is matched with its window and the application active window.
+            Excel.Window paneWindow = null;
+            try
+            {
+              // This assignment is intentionally inside a try block because when an Excel window has been previously closed this property (ActiveCustomPane)
+              // is called before the CustomTaskPane linked to the closed Excel window is removed from the collection, so the ctp.Window can throw an Exception.
+              // A null check is not enough.
+              paneWindow = ctp.Window as Excel.Window;
+            }
+            catch
+            {
+            }
+
             isParentWindowActiveExcelWindow = paneWindow != null && Application.ActiveWindow != null && paneWindow.Hwnd == Application.ActiveWindow.Hwnd;
           }
           else
@@ -183,20 +193,26 @@ namespace MySQL.ForExcel
         return;
       }
 
-      Office.CustomTaskPane customPane = CustomTaskPanes.FirstOrDefault(ctp => ctp.Control is ExcelAddInPane && ctp.Control == excelPane);
-      ExcelPanesList.Remove(excelPane);
-      if (ExcelPanesList.Count == 0)
+      try
       {
-        ExcelAddInPanesClosed();
-      }
+        ExcelPanesList.Remove(excelPane);
+        if (ExcelPanesList.Count == 0)
+        {
+          ExcelAddInPanesClosed();
+        }
 
-      excelPane.Dispose();
-      if (customPane != null)
+        excelPane.Dispose();
+        Office.CustomTaskPane customPane = CustomTaskPanes.FirstOrDefault(ctp => ctp.Control is ExcelAddInPane && ctp.Control == excelPane);
+        if (customPane != null)
+        {
+          CustomTaskPanes.Remove(customPane);
+          customPane.Dispose();
+        }
+      }
+      catch (Exception ex)
       {
-        customPane.Dispose();
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
-
-      CustomTaskPanes.Remove(customPane);
     }
 
     /// <summary>

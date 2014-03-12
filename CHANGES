@@ -1,4 +1,7 @@
 1.2.1
+- Fixed a bug that happened after closing an Excel window containing an open MySQL for Excel add-in in Excel 2013, the custom task pane linked to the closed window was
+  not being disposed of correctly and not removed from the collection of Excel task panes either.
+  (Bug #18392674 - SEVERAL CLICKS NEEDED ON THE MYSQL FOR EXCEL RIBBON BUTTON TO START/CLOSE ADD-IN)
 - Tables with Guid data are now imported correctly. Creation of the named tables is now working with Guid tables too.
   (Bug #17806468 - IMPORTING TABLES WITH GUID TO EXCEL - EXCEPTION)
 - Fixed a bug in the MSIs present since version 1.1.2 that was trying to add Registry keys for MySQL for Excel during a product upgrade when the registry keys were
