@@ -2112,6 +2112,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An unknown error ocurred when trying to apply changes against the connected MySQL server..
+        /// </summary>
+        internal static string StatementExecutionGenericError {
+            get {
+                return ResourceManager.GetString("StatementExecutionGenericError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error adding data to {0} table..
         /// </summary>
         internal static string TableDataAdditionErrorTitle {

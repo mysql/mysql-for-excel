@@ -16,6 +16,7 @@
 // 02110-1301  USA
 
 using System;
+using System.Data;
 using System.Globalization;
 using System.Text;
 using MySql.Data.MySqlClient;
@@ -186,6 +187,16 @@ namespace MySQL.ForExcel.Classes
     public enum StatementResultType
     {
       /// <summary>
+      /// Connection was lost so statement could not be applied.
+      /// </summary>
+      ConnectionLost,
+
+      /// <summary>
+      /// Statement had errors so transaction was rolled back.
+      /// </summary>
+      ErrorThrown,
+
+      /// <summary>
       /// Statement was not applied, user cancelled it.
       /// </summary>
       NotApplied,
@@ -194,11 +205,6 @@ namespace MySQL.ForExcel.Classes
       /// Statement executed successfully and transaction committed.
       /// </summary>
       Successful,
-
-      /// <summary>
-      /// Statement had errors so transaction was rolled back.
-      /// </summary>
-      ErrorThrown,
 
       /// <summary>
       /// Statement executed, transaction was committed but warnings were found.
@@ -358,6 +364,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="useOptimisticUpdate">Flag indicating whether optimistic locking is used for the update of rows.</param>
     public void Execute(MySqlCommand mySqlCommand, uint executionOrder, bool useOptimisticUpdate)
     {
+      ExecutionOrder = executionOrder;
       if (mySqlCommand == null)
       {
         throw new ArgumentNullException("mySqlCommand");
@@ -369,7 +376,14 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      ExecutionOrder = executionOrder;
+      if (mySqlCommand.Connection == null || mySqlCommand.Connection.State != ConnectionState.Open)
+      {
+        StatementResult = StatementResultType.ConnectionLost;
+        ResultText = Resources.ConnectionLostErrorText;
+        _mySqlRow.RowError = ResultText;
+        return;
+      }
+
       try
       {
         WarningsQuantity = 0;
@@ -394,18 +408,19 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
+        Exception baseException = ex.GetBaseException();
         StatementResult = StatementResultType.ErrorThrown;
         AffectedRows = 0;
-        _mySqlRow.RowError = ex.Message;
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
-        if (ex is MySqlException)
+        _mySqlRow.RowError = baseException.Message;
+        MySqlSourceTrace.WriteAppErrorToLog(baseException);
+        if (baseException is MySqlException)
         {
-          MySqlException mysqlEx = ex as MySqlException;
+          MySqlException mysqlEx = baseException as MySqlException;
           ResultText = string.Format(Resources.ErrorMySQLText, mysqlEx.Number) + Environment.NewLine + mysqlEx.Message;
         }
         else
         {
-          ResultText = Resources.ErrorAdoNetText + Environment.NewLine + ex.Message;
+          ResultText = Resources.ErrorAdoNetText + Environment.NewLine + baseException.Message;
         }
       }
     }
@@ -417,6 +432,11 @@ namespace MySQL.ForExcel.Classes
     /// <returns>A resulting <see cref="StatementResultType"/> after joining the result with another one.</returns>
     public StatementResultType JoinResultTypes(StatementResultType anotherResult)
     {
+      if (anotherResult == StatementResultType.ConnectionLost || StatementResult == StatementResultType.ConnectionLost)
+      {
+        return StatementResultType.ConnectionLost;
+      }
+
       if (anotherResult == StatementResultType.ErrorThrown || StatementResult == StatementResultType.ErrorThrown)
       {
         return StatementResultType.ErrorThrown;

@@ -788,6 +788,16 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Verifies if a statement result was executed without any error.
+    /// </summary>
+    /// <param name="statementResult">The statement result to evaluate.</param>
+    /// <returns><c>true</c> if the result does not contain any kind of error, <c>false</c> otherwise.</returns>
+    public static bool WithoutErrors(this MySqlStatement.StatementResultType statementResult)
+    {
+      return statementResult != MySqlStatement.StatementResultType.ConnectionLost && statementResult != MySqlStatement.StatementResultType.ErrorThrown;
+    }
+
+    /// <summary>
     /// Creates a SELECT query against a Table or View database object.
     /// </summary>
     /// <remarks>Only works against Tables or Views, but not with Procedures.</remarks>

@@ -36,6 +36,7 @@ namespace MySQL.ForExcel.Forms
       InitializeComponent();
 
       ConnectionTimeoutNumericUpDown.Maximum = Int32.MaxValue / 1000;
+      QueryTimeoutNumericUpDown.Maximum = ConnectionTimeoutNumericUpDown.Maximum;
       ConnectionTimeoutNumericUpDown.Value = Math.Min(ConnectionTimeoutNumericUpDown.Maximum, Settings.Default.GlobalConnectionConnectionTimeout);
       QueryTimeoutNumericUpDown.Value = Settings.Default.GlobalConnectionCommandTimeout;
       UseOptimisticUpdatesCheckBox.Checked = Settings.Default.EditUseOptimisticUpdate;

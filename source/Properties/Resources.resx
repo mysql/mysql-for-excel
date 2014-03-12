@@ -903,4 +903,7 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
   <data name="UnrecognizedBooleanValueError" xml:space="preserve">
     <value>Unrecognized value suitable for a bool column encountered.</value>
   </data>
+  <data name="StatementExecutionGenericError" xml:space="preserve">
+    <value>An unknown error ocurred when trying to apply changes against the connected MySQL server.</value>
+  </data>
 </root>

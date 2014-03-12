@@ -74,11 +74,6 @@ namespace MySQL.ForExcel.Forms
     private bool _createdTable;
 
     /// <summary>
-    /// String builder containing error messages displayed to the user.
-    /// </summary>
-    private StringBuilder _errorDetails;
-
-    /// <summary>
     /// Contains the summary text displayed to users if the script executes with errors.
     /// </summary>
     private readonly string _errorDialogSummary;
@@ -175,7 +170,6 @@ namespace MySQL.ForExcel.Forms
     private MySqlScriptDialog()
     {
       _createdTable = false;
-      _errorDetails = null;
       _errorDialogSummary = null;
       _isUserInput = true;
       _lockedTable = false;
@@ -331,7 +325,7 @@ namespace MySQL.ForExcel.Forms
     {
       Cursor = Cursors.WaitCursor;
       ApplyScript();
-      if (ScriptResult != MySqlStatement.StatementResultType.ErrorThrown)
+      if (ScriptResult.WithoutErrors())
       {
         DialogResult = ScriptResult.WasApplied() ? DialogResult.OK : DialogResult.Cancel;
         Cursor = Cursors.Default;
@@ -339,25 +333,12 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      // Handle error messages thrown back by the server and show them to the user.
-      int statementsWithErrorsCount = ActualStatementRowsList.Count(row => row.Statement.StatementResult == MySqlStatement.StatementResultType.ErrorThrown);
-      if (_errorDetails == null)
-      {
-        _errorDetails = new StringBuilder(statementsWithErrorsCount * MiscUtilities.STRING_BUILDER_DEFAULT_CAPACITY);
-      }
-      else
-      {
-        _errorDetails.Clear();
-      }
-
-      foreach (var statement in ActualStatementRowsList.Select(row => row.Statement).Where(statement => statement.StatementResult == MySqlStatement.StatementResultType.ErrorThrown))
-      {
-        _errorDetails.Append(statement.ResultText);
-        _errorDetails.AddNewLine();
-      }
-
+      // Handle error message thrown back by the server and show it to the user.
+      var errorMessage = ErroredOutDataRow != null
+        ? ErroredOutDataRow.Statement.ResultText
+        : Resources.StatementExecutionGenericError;
       Cursor = Cursors.Default;
-      MiscUtilities.ShowCustomizedInfoDialog(InfoDialog.InfoType.Error, _errorDialogSummary, _errorDetails.ToString(), false);
+      MiscUtilities.ShowCustomizedInfoDialog(InfoDialog.InfoType.Error, _errorDialogSummary, errorMessage, false);
     }
 
     /// <summary>
@@ -382,29 +363,46 @@ namespace MySQL.ForExcel.Forms
         uint executionOrder = 1;
         foreach (var mySqlRow in ActualStatementRowsList)
         {
+          // Before attempting to execute the MySqlStatement object, check if the connection is still open.
           if (conn.State != ConnectionState.Open)
           {
             ErroredOutDataRow = mySqlRow;
             ErroredOutDataRow.RowError = Resources.ConnectionLostErrorText;
-            ScriptResult = MySqlStatement.StatementResultType.ErrorThrown;
-            return;
+            ScriptResult = MySqlStatement.StatementResultType.ConnectionLost;
+            break;
           }
 
           var rowStatement = mySqlRow.Statement;
           rowStatement.Execute(command, executionOrder++, UseOptimisticUpdate);
           ScriptResult = rowStatement.JoinResultTypes(ScriptResult);
-          if (ScriptResult != MySqlStatement.StatementResultType.ErrorThrown)
+          if (ScriptResult.WithoutErrors())
           {
             continue;
           }
 
-          mySqlRow.ReflectError();
           ErroredOutDataRow = mySqlRow;
+          if (ScriptResult == MySqlStatement.StatementResultType.ErrorThrown)
+          {
+            // Check if the result was errored out because the connection was broken and if so, flip the ScriptResult to its proper value.
+            if (conn.State != ConnectionState.Open)
+            {
+              ErroredOutDataRow.RowError = Resources.ConnectionLostErrorText;
+              ScriptResult = MySqlStatement.StatementResultType.ConnectionLost;
+              break;
+            }
+
+            mySqlRow.ReflectError();
+          }
+
           break;
         }
 
         switch (ScriptResult)
         {
+          case MySqlStatement.StatementResultType.ConnectionLost:
+            // Since the connection was lost the transaction can't be committed or rolled back, just errored out.
+            break;
+
           case MySqlStatement.StatementResultType.NotApplied:
           case MySqlStatement.StatementResultType.ErrorThrown:
             transaction.Rollback();
