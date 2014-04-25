@@ -34,16 +34,11 @@ namespace MySQL.ForExcel.Panels
   public sealed partial class WelcomePanel : AutoStyleableBasePanel
   {
     /// <summary>
-    /// String array containing valid values for localhost
-    /// </summary>
-    private static string[] _localHostValues;
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="WelcomePanel"/> class.
     /// </summary>
     public WelcomePanel()
     {
-      _localHostValues = new[] { string.Empty, "127.0.0.1", "localhost", "local" };
+
       InitializeComponent();
 
       InheritFontToControlsExceptionList.Add(OpenConnectionHotLabel.Name);
@@ -52,6 +47,8 @@ namespace MySQL.ForExcel.Panels
 
       DoubleBuffered = true;
       ManageConnectionsHotLabel.Enabled = MySqlWorkbench.AllowsExternalConnectionsManagement;
+      ConnectionsList.AddHeaderNode("Local Connections");
+      ConnectionsList.AddHeaderNode("Remote Connections");
       LoadConnections(false);
     }
 
@@ -110,31 +107,16 @@ namespace MySQL.ForExcel.Panels
     /// <param name="conn">Object containing the data to open a connection, normally shared with Workbench.</param>
     private void AddConnectionToList(MySqlWorkbenchConnection conn)
     {
-      int nodeIdx = 1;
-      bool isSsh = conn.DriverType == MySqlWorkbenchConnectionType.Ssh;
-      string hostName = (conn.Host ?? string.Empty).Trim();
-
-      if (isSsh)
+      if (conn == null || ConnectionsList.HeaderNodes.Count < 2)
       {
-        string[] sshConnection = conn.HostIdentifier.Split('@');
-        string dbHost = sshConnection[1].Split(':')[0].Trim();
-        if (_localHostValues.Contains(dbHost.ToLowerInvariant()))
-        {
-          nodeIdx = 0;
-        }
-
-        hostName = dbHost + " (SSH)";
-      }
-      else if (_localHostValues.Contains(hostName.ToLowerInvariant()))
-      {
-        nodeIdx = 0;
+        return;
       }
 
-      string subtitle = string.Format("User: {0}, Host: {1}:{2}", conn.UserName, hostName, conn.Port);
-      MyTreeNode node = ConnectionsList.AddNode(ConnectionsList.Nodes[nodeIdx], conn.Name, subtitle);
+      var isSsh = conn.DriverType == MySqlWorkbenchConnectionType.Ssh;
+      var headerNode = ConnectionsList.HeaderNodes[conn.IsLocalConnection ? 0 : 1];
+      var node = ConnectionsList.AddConnectionNode(headerNode, conn);
       node.ImageIndex = isSsh ? 1 : 0;
       node.Enable = !isSsh;
-      node.Tag = conn;
     }
 
     /// <summary>
@@ -144,16 +126,16 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void ConnectionsList_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
     {
-      if (e.Node == null || e.Node.Level == 0 || e.Node.ImageIndex > 0)
+      var selectedNode = ConnectionsList.SelectedNode;
+      if (selectedNode == null || selectedNode.Type == MySqlListViewNode.MySqlNodeType.Header || selectedNode.WbConnection == null)
       {
         return;
       }
 
-      MySqlWorkbenchConnection selectedConnection = ConnectionsList.SelectedNode.Tag as MySqlWorkbenchConnection;
       var excelAddInPane = Parent as ExcelAddInPane;
       if (excelAddInPane != null)
       {
-        excelAddInPane.OpenConnection(selectedConnection, true);
+        excelAddInPane.OpenConnection(selectedNode.WbConnection, true);
       }
     }
 
@@ -174,19 +156,19 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      if (ConnectionsList.SelectedNode == null || ConnectionsList.SelectedNode.Level == 0)
+      var selectedNode = ConnectionsList.SelectedNode;
+      if (selectedNode == null || selectedNode.Type != MySqlListViewNode.MySqlNodeType.Connection || selectedNode.WbConnection == null)
       {
         return;
       }
 
-      DialogResult dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.DeleteConnectionWarningTitle, Resources.DeleteConnectionWarningDetail);
+      var dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.DeleteConnectionWarningTitle, Resources.DeleteConnectionWarningDetail);
       if (dr == DialogResult.No)
       {
         return;
       }
 
-      MySqlWorkbenchConnection connectionToRemove = ConnectionsList.SelectedNode.Tag as MySqlWorkbenchConnection;
-      if (connectionToRemove != null && MySqlWorkbench.Connections.DeleteConnection(connectionToRemove.Id))
+      if (selectedNode.WbConnection != null && MySqlWorkbench.Connections.DeleteConnection(selectedNode.WbConnection.Id))
       {
         LoadConnections(false);
       }
@@ -199,12 +181,13 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void EditConnectionToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      if (ConnectionsList.SelectedNode == null || ConnectionsList.SelectedNode.Level == 0)
+      var selectedNode = ConnectionsList.SelectedNode;
+      if (selectedNode == null || selectedNode.Type != MySqlListViewNode.MySqlNodeType.Connection || selectedNode.WbConnection == null)
       {
         return;
       }
 
-      MySqlWorkbenchConnection connectionToEdit = ConnectionsList.SelectedNode.Tag as MySqlWorkbenchConnection;
+      var connectionToEdit = ConnectionsList.SelectedNode.Tag as MySqlWorkbenchConnection;
       bool editedConnection;
       using (var instanceConnectionDialog = new MySqlWorkbenchConnectionDialog(connectionToEdit))
       {

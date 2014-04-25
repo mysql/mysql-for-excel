@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -16,6 +16,7 @@
 // 02110-1301  USA
 
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using MySQL.Utility.Classes;
@@ -27,6 +28,8 @@ namespace MySQL.ForExcel.Controls
   /// </summary>
   public sealed partial class HotLabel : UserControl
   {
+    #region Fields
+
     /// <summary>
     /// The mouse button pressed by the user wheb clicking on the label.
     /// </summary>
@@ -37,6 +40,8 @@ namespace MySQL.ForExcel.Controls
     /// </summary>
     private bool _tracking;
 
+    #endregion Fields
+
     /// <summary>
     /// Initializes a new instance of the <see cref="HotLabel"/> class.
     /// </summary>
@@ -44,8 +49,9 @@ namespace MySQL.ForExcel.Controls
     {
       InitializeComponent();
 
+      Behavior = BehaviorType.Label;
+      CheckedState = CheckState.Indeterminate;
       DoubleBuffered = true;
-      HotTracking = true;
       DrawShadow = false;
       TitleColor = SystemColors.WindowText;
       DescriptionColor = SystemColors.GrayText;
@@ -69,7 +75,48 @@ namespace MySQL.ForExcel.Controls
       DescriptionFont = new Font(Font.FontFamily, Font.Size * 0.5f, FontStyle.Regular);
     }
 
+    #region Enums
+
+    /// <summary>
+    /// Specifies identifiers to indicate the type of behavior of the <see cref="HotLabel"/> control.
+    /// </summary>
+    public enum BehaviorType
+    {
+      /// <summary>
+      /// The control behaves as a button, when clicked an action is triggered.
+      /// </summary>
+      Button,
+
+      /// <summary>
+      /// The control behaves as a checkbox, when clicked the status changes to checked or unchecked.
+      /// </summary>
+      CheckBox,
+
+      /// <summary>
+      /// The control behaves as a label, clicking it has no effect.
+      /// </summary>
+      Label
+    }
+
+    #endregion Enums
+
     #region Properties
+
+    /// <summary>
+    /// Gets or sets the type of behavior of the <see cref="HotLabel"/> control.
+    /// </summary>
+    public BehaviorType Behavior { get; set; }
+
+    /// <summary>
+    /// Gets or sets the image used when the state of the control is checked.
+    /// </summary>
+    public Image CheckedImage { get; set; }
+
+    /// <summary>
+    /// Gets the state of the control, that can be checked, unchecked or set to an indeterminate state.
+    /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public CheckState CheckedState { get; private set; }
 
     /// <summary>
     /// Gets or sets the description text appearing below the title.
@@ -115,11 +162,6 @@ namespace MySQL.ForExcel.Controls
     /// Gets or sets a value indicating whether a shadow is drawn beneath the text.
     /// </summary>
     public bool DrawShadow { get; set; }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the label changes colors when the mouse cursor hovers over it.
-    /// </summary>
-    public bool HotTracking { get; set; }
 
     /// <summary>
     /// Gets or sets the image displayed at the left side of the label.
@@ -189,9 +231,15 @@ namespace MySQL.ForExcel.Controls
     /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
     protected override void OnClick(EventArgs e)
     {
-      if (_downButton != MouseButtons.Left)
+      if (_downButton != MouseButtons.Left || Behavior == BehaviorType.Label)
       {
         return;
+      }
+
+      if (Behavior == BehaviorType.CheckBox)
+      {
+        CheckedState = CheckedState != CheckState.Checked ? CheckState.Checked : CheckState.Unchecked;
+        Refresh();
       }
 
       base.OnClick(e);
@@ -214,7 +262,7 @@ namespace MySQL.ForExcel.Controls
     protected override void OnMouseEnter(EventArgs e)
     {
       base.OnMouseEnter(e);
-      if (!HotTracking)
+      if (Behavior == BehaviorType.Label)
       {
         return;
       }
@@ -230,7 +278,7 @@ namespace MySQL.ForExcel.Controls
     protected override void OnMouseLeave(EventArgs e)
     {
       base.OnMouseLeave(e);
-      if (!HotTracking)
+      if (Behavior == BehaviorType.Label)
       {
         return;
       }
@@ -247,7 +295,11 @@ namespace MySQL.ForExcel.Controls
     {
       base.OnPaint(e);
 
-      Image i = Enabled ? Image : (DisabledImage == null && Image != null ? new Bitmap(Image).MakeGrayscale() : DisabledImage);
+      Image i = Enabled 
+        ? (Behavior != BehaviorType.CheckBox
+          ? Image
+          : (CheckedState == CheckState.Checked ? CheckedImage : Image))
+        : (DisabledImage == null && Image != null ? new Bitmap(Image).MakeGrayscale() : DisabledImage);
       Size imageSize = Size.Empty;
       if (i != null)
       {
@@ -262,14 +314,19 @@ namespace MySQL.ForExcel.Controls
         Color currentTitleColor = _tracking ? SystemColors.HotTrack : TitleColor;
         if (DrawShadow && Enabled)
         {
-          SolidBrush titleShadowBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleShadowOpacity * 255), TitleColor));
-          e.Graphics.DrawString(Title, Font, titleShadowBrush, pt.X + TitleShadowPixelsXOffset, pt.Y + TitleShadowPixelsYOffset);
-          titleShadowBrush.Dispose();
+          using (var titleShadowBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleShadowOpacity * 255), TitleColor)))
+          {
+            e.Graphics.DrawString(Title, Font, titleShadowBrush, pt.X + TitleShadowPixelsXOffset, pt.Y + TitleShadowPixelsYOffset);
+          }
         }
 
-        SolidBrush titleBrush = Enabled ? new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), currentTitleColor)) : new SolidBrush(Color.FromArgb(80, 0, 0, 0));
-        e.Graphics.DrawString(Title, Font, titleBrush, pt.X, pt.Y);
-        titleBrush.Dispose();
+        using (var titleBrush = Enabled
+            ? new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity*255), currentTitleColor))
+            : new SolidBrush(Color.FromArgb(80, 0, 0, 0)))
+        {
+          e.Graphics.DrawString(Title, Font, titleBrush, pt.X, pt.Y);
+        }
+
         SizeF stringSize = e.Graphics.MeasureString(Title, Font);
         pt.Y += (int)(stringSize.Height + TitleDescriptionPixelsSpacing);
       }
@@ -281,14 +338,19 @@ namespace MySQL.ForExcel.Controls
 
       if (DrawShadow && Enabled)
       {
-        SolidBrush descriptionShadowBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionShadowOpacity * 255), Color.White));
-        e.Graphics.DrawString(Description, DescriptionFont, descriptionShadowBrush, pt.X + DescriptionShadowPixelsXOffset, pt.Y + DescriptionShadowPixelsYOffset);
-        descriptionShadowBrush.Dispose();
+        using (var descriptionShadowBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionShadowOpacity*255), Color.White)))
+        {
+          e.Graphics.DrawString(Description, DescriptionFont, descriptionShadowBrush,
+            pt.X + DescriptionShadowPixelsXOffset, pt.Y + DescriptionShadowPixelsYOffset);
+        }
       }
 
-      SolidBrush descriptionBrush = Enabled ? new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionColorOpacity * 255), DescriptionColor)) : new SolidBrush(Color.FromArgb(80, 0, 0, 0));
-      e.Graphics.DrawString(Description, DescriptionFont, descriptionBrush, pt.X, pt.Y);
-      descriptionBrush.Dispose();
+      using (var descriptionBrush = Enabled
+          ? new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionColorOpacity*255), DescriptionColor))
+          : new SolidBrush(Color.FromArgb(80, 0, 0, 0)))
+      {
+        e.Graphics.DrawString(Description, DescriptionFont, descriptionBrush, pt.X, pt.Y);
+      }
     }
   }
 }

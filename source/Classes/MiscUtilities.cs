@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -19,10 +19,12 @@ using System;
 using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 
@@ -220,6 +222,20 @@ namespace MySQL.ForExcel.Classes
 
       return errorMessage == null;
     }
+
+    /// <summary>
+    /// Sends the specified message to a window or windows. The SendMessage function calls the window procedure for
+    /// the specified window and does not return until the window procedure has processed the message.
+    /// </summary>
+    /// <param name="hWnd">A handle to the window whose window procedure will receive the message.
+    /// If this parameter is HWND_BROADCAST ((HWND)0xffff), the message is sent to all top-level windows in the system,
+    /// including disabled or invisible unowned windows, overlapped windows, and pop-up windows; but the message is not sent to child windows.</param>
+    /// <param name="msg">The message to be sent.</param>
+    /// <param name="wParam">Additional message-specific information.</param>
+    /// <param name="lParam">Additional message-specific information.</param>
+    /// <returns>Specifies the result of the message processing; it depends on the message sent.</returns>
+    [DllImport("user32.dll")]
+    public static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
     /// <summary>
     /// Shows an error dialog customized for MySQL for Excel.

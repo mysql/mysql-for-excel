@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -52,15 +52,13 @@ namespace MySQL.ForExcel.Panels
     {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WelcomePanel));
-      System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Local Connections");
-      System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Remote Connections");
       this.LargeImagesList = new System.Windows.Forms.ImageList(this.components);
       this.ManageConnectionsHotLabel = new MySQL.ForExcel.Controls.HotLabel();
-      this.ConnectionsList = new MySQL.ForExcel.Controls.MyTreeView();
+      this.ConnectionsList = new MySQL.ForExcel.Controls.MySqlListView();
       this.ConnectionsContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.DeleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.RefreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.EditConnectionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.RefreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.NewConnectionHotLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.UpperPanel = new System.Windows.Forms.Panel();
       this.SeparatorImage = new MySQL.ForExcel.Controls.TransparentPictureBox();
@@ -85,6 +83,8 @@ namespace MySQL.ForExcel.Panels
       // ManageConnectionsHotLabel
       // 
       this.ManageConnectionsHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.ManageConnectionsHotLabel.Behavior = MySQL.ForExcel.Controls.HotLabel.BehaviorType.Button;
+      this.ManageConnectionsHotLabel.CheckedImage = null;
       this.ManageConnectionsHotLabel.Description = "Launch MySQL Workbench";
       this.ManageConnectionsHotLabel.DescriptionColor = System.Drawing.SystemColors.WindowText;
       this.ManageConnectionsHotLabel.DescriptionColorOpacity = 0.6D;
@@ -95,7 +95,6 @@ namespace MySQL.ForExcel.Panels
       this.ManageConnectionsHotLabel.DisabledImage = null;
       this.ManageConnectionsHotLabel.DrawShadow = true;
       this.ManageConnectionsHotLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.ManageConnectionsHotLabel.HotTracking = true;
       this.ManageConnectionsHotLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_WelcomePanel_ManageConnection_24x24;
       this.ManageConnectionsHotLabel.ImagePixelsXOffset = 0;
       this.ManageConnectionsHotLabel.ImagePixelsYOffset = 0;
@@ -137,17 +136,6 @@ namespace MySQL.ForExcel.Panels
       this.ConnectionsList.Name = "ConnectionsList";
       this.ConnectionsList.NodeHeightMultiple = 2;
       this.ConnectionsList.NodeImages = this.LargeImagesList;
-      treeNode1.BackColor = System.Drawing.SystemColors.ControlLight;
-      treeNode1.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode1.Name = "LocalConnectionsNode";
-      treeNode1.Text = "Local Connections";
-      treeNode2.BackColor = System.Drawing.SystemColors.ControlLight;
-      treeNode2.ForeColor = System.Drawing.SystemColors.WindowText;
-      treeNode2.Name = "RemoteConnectionsNode";
-      treeNode2.Text = "Remote Connections";
-      this.ConnectionsList.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1,
-            treeNode2});
       this.ConnectionsList.ShowNodeToolTips = true;
       this.ConnectionsList.Size = new System.Drawing.Size(242, 315);
       this.ConnectionsList.TabIndex = 22;
@@ -162,7 +150,7 @@ namespace MySQL.ForExcel.Panels
             this.EditConnectionToolStripMenuItem,
             this.RefreshToolStripMenuItem});
       this.ConnectionsContextMenuStrip.Name = "contextMenuStripRefresh";
-      this.ConnectionsContextMenuStrip.Size = new System.Drawing.Size(184, 92);
+      this.ConnectionsContextMenuStrip.Size = new System.Drawing.Size(184, 70);
       this.ConnectionsContextMenuStrip.Text = "Refresh";
       this.ConnectionsContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.ConnectionsContextMenuStrip_Opening);
       // 
@@ -174,14 +162,6 @@ namespace MySQL.ForExcel.Panels
       this.DeleteToolStripMenuItem.Text = "Delete Connection";
       this.DeleteToolStripMenuItem.Click += new System.EventHandler(this.DeleteToolStripMenuItem_Click);
       // 
-      // RefreshToolStripMenuItem
-      // 
-      this.RefreshToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.refresh_sidebar;
-      this.RefreshToolStripMenuItem.Name = "RefreshToolStripMenuItem";
-      this.RefreshToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
-      this.RefreshToolStripMenuItem.Text = "Refresh Connections";
-      this.RefreshToolStripMenuItem.Click += new System.EventHandler(this.RefreshItem_Click);
-      // 
       // EditConnectionToolStripMenuItem
       // 
       this.EditConnectionToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.edit;
@@ -190,9 +170,19 @@ namespace MySQL.ForExcel.Panels
       this.EditConnectionToolStripMenuItem.Text = "Edit Connection";
       this.EditConnectionToolStripMenuItem.Click += new System.EventHandler(this.EditConnectionToolStripMenuItem_Click);
       // 
+      // RefreshToolStripMenuItem
+      // 
+      this.RefreshToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.refresh_sidebar;
+      this.RefreshToolStripMenuItem.Name = "RefreshToolStripMenuItem";
+      this.RefreshToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+      this.RefreshToolStripMenuItem.Text = "Refresh Connections";
+      this.RefreshToolStripMenuItem.Click += new System.EventHandler(this.RefreshItem_Click);
+      // 
       // NewConnectionHotLabel
       // 
       this.NewConnectionHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.NewConnectionHotLabel.Behavior = MySQL.ForExcel.Controls.HotLabel.BehaviorType.Button;
+      this.NewConnectionHotLabel.CheckedImage = null;
       this.NewConnectionHotLabel.Description = "Add a new Database Connection";
       this.NewConnectionHotLabel.DescriptionColor = System.Drawing.SystemColors.WindowText;
       this.NewConnectionHotLabel.DescriptionColorOpacity = 0.6D;
@@ -203,7 +193,6 @@ namespace MySQL.ForExcel.Panels
       this.NewConnectionHotLabel.DisabledImage = null;
       this.NewConnectionHotLabel.DrawShadow = true;
       this.NewConnectionHotLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.NewConnectionHotLabel.HotTracking = true;
       this.NewConnectionHotLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_WelcomePanel_NewConnection_24x24;
       this.NewConnectionHotLabel.ImagePixelsXOffset = 0;
       this.NewConnectionHotLabel.ImagePixelsYOffset = 0;
@@ -283,6 +272,8 @@ namespace MySQL.ForExcel.Panels
       // 
       // OpenConnectionHotLabel
       // 
+      this.OpenConnectionHotLabel.Behavior = MySQL.ForExcel.Controls.HotLabel.BehaviorType.Label;
+      this.OpenConnectionHotLabel.CheckedImage = null;
       this.OpenConnectionHotLabel.Description = "Double-Click a Connection to Start";
       this.OpenConnectionHotLabel.DescriptionColor = System.Drawing.SystemColors.WindowText;
       this.OpenConnectionHotLabel.DescriptionColorOpacity = 0.6D;
@@ -293,7 +284,6 @@ namespace MySQL.ForExcel.Panels
       this.OpenConnectionHotLabel.DisabledImage = null;
       this.OpenConnectionHotLabel.DrawShadow = true;
       this.OpenConnectionHotLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.OpenConnectionHotLabel.HotTracking = false;
       this.OpenConnectionHotLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_WelcomePanel_Connection_24x24;
       this.OpenConnectionHotLabel.ImagePixelsXOffset = 0;
       this.OpenConnectionHotLabel.ImagePixelsYOffset = -2;
@@ -315,6 +305,8 @@ namespace MySQL.ForExcel.Panels
       // AboutHotLabel
       // 
       this.AboutHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.AboutHotLabel.Behavior = MySQL.ForExcel.Controls.HotLabel.BehaviorType.Button;
+      this.AboutHotLabel.CheckedImage = null;
       this.AboutHotLabel.Description = "";
       this.AboutHotLabel.DescriptionColor = System.Drawing.SystemColors.WindowText;
       this.AboutHotLabel.DescriptionColorOpacity = 0.6D;
@@ -325,7 +317,6 @@ namespace MySQL.ForExcel.Panels
       this.AboutHotLabel.DisabledImage = null;
       this.AboutHotLabel.DrawShadow = true;
       this.AboutHotLabel.Font = new System.Drawing.Font("Tahoma", 7F);
-      this.AboutHotLabel.HotTracking = true;
       this.AboutHotLabel.Image = null;
       this.AboutHotLabel.ImagePixelsXOffset = 0;
       this.AboutHotLabel.ImagePixelsYOffset = 0;
@@ -369,7 +360,7 @@ namespace MySQL.ForExcel.Panels
     private System.Windows.Forms.ImageList LargeImagesList;
     private HotLabel NewConnectionHotLabel;
     private HotLabel ManageConnectionsHotLabel;
-    private MyTreeView ConnectionsList;
+    private MySqlListView ConnectionsList;
     private System.Windows.Forms.ContextMenuStrip ConnectionsContextMenuStrip;
     private System.Windows.Forms.ToolStripMenuItem RefreshToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem DeleteToolStripMenuItem;

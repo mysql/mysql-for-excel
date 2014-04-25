@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
@@ -61,6 +62,11 @@ namespace MySQL.ForExcel
     #endregion Constants
 
     #region Fields
+
+    /// <summary>
+    /// Built-in Refresh command button needed to override its standard functionality.
+    /// </summary>
+    private OfficeCore.CommandBarButton _builtInRefreshCommandButton;
 
     /// <summary>
     /// A dictionary containing subsets of the <see cref="StoredEditSessions"/> list containing only sessions of a <see cref="Excel.Workbook"/>.
@@ -422,7 +428,7 @@ namespace MySQL.ForExcel
         {
           // Do NOT remove the following line although the customPaneWindow variable is not used in the method the casting
           // of the customPane.Window is needed to determine if the window is still valid and has not been disposed of.
-          Excel.Window customPaneWindow = customPane.Window as Excel.Window;
+          var customPaneWindow = customPane.Window as Excel.Window;
         }
         catch
         {
@@ -847,6 +853,37 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Event delegate method fired when a <see cref="OfficeCore.CommandBarButton"/> control is clicked.
+    /// </summary>
+    /// <param name="ctrl">A <see cref="OfficeCore.CommandBarButton"/> control.</param>
+    /// <param name="cancelDefault">Flag indicating whether the base functionality is cancelled or not.</param>
+    private void RefreshButton_Click(OfficeCore.CommandBarButton ctrl, ref bool cancelDefault)
+    {
+      var listObject = Application.ActiveCell.ListObject;
+      if (listObject == null)
+      {
+        return;
+      }
+
+      var toolsListObject = Globals.Factory.GetVstoObject(listObject);
+      if (toolsListObject == null || !(toolsListObject.DataSource is MySqlDataTable))
+      {
+        return;
+      }
+
+      cancelDefault = true;
+      var mySqlTable = toolsListObject.DataSource as MySqlDataTable;
+      toolsListObject.Disconnect();
+      Exception ex;
+      mySqlTable.RevertData(true, out ex);
+      toolsListObject.SetDataBinding(mySqlTable);
+      foreach (MySqlDataColumn col in mySqlTable.Columns)
+      {
+        toolsListObject.ListColumns[col.Ordinal + 1].Name = col.DisplayName;
+      }
+    }
+
+    /// <summary>
     /// Performs clean-up code that must be done after all Excel panes have been closed by the user.
     /// </summary>
     private void ExcelAddInPanesClosed()
@@ -1083,7 +1120,7 @@ namespace MySQL.ForExcel
       if (openSchema)
       {
         // Verify if the session schema to be opened still exists in the connected MySQL server
-        if (!ActiveExcelPane.LoadedSchemas.Contains(firstSession.SchemaName))
+        if (!ActiveExcelPane.LoadedSchemas.Exists(schemaObj => schemaObj.Name == firstSession.SchemaName))
         {
           var errorMessage = string.Format(Resources.RestoreSessionsSchemaNoLongerExistsFailed, sessionConnection.HostIdentifier, sessionConnection.Schema);
           MiscUtilities.ShowCustomizedInfoDialog(InfoDialog.InfoType.Error, errorMessage);
@@ -1197,6 +1234,14 @@ namespace MySQL.ForExcel
 
       ExcelAddInPanesClosed();
       MySqlSourceTrace.WriteToLog(Resources.ShutdownMessage, SourceLevels.Information);
+
+      // Reset Refresh command button
+      if (_builtInRefreshCommandButton != null)
+      {
+        _builtInRefreshCommandButton.Reset();
+        _builtInRefreshCommandButton.Click -= RefreshButton_Click;
+        Marshal.ReleaseComObject(_builtInRefreshCommandButton);
+      }
     }
 
     /// <summary>
@@ -1231,6 +1276,16 @@ namespace MySQL.ForExcel
         if (!Settings.Default.ConvertedSettingsStoredMappingsCasing)
         {
           ConvertSettingsStoredMappingsCasing();
+        }
+
+        // Override refresh menus by subscribing the Click event for the first control, no need to subscribe all of them.
+        _builtInRefreshCommandButton = null;
+        foreach (OfficeCore.CommandBarButton button in Application.CommandBars.FindControls(OfficeCore.MsoControlType.msoControlButton, 459, Type.Missing, Type.Missing))
+        {
+          _builtInRefreshCommandButton = button;
+          //button.Tag = "MySQL";
+          button.Click += RefreshButton_Click;
+          break;
         }
       }
       catch (Exception ex)

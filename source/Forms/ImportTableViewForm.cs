@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -43,15 +43,15 @@ namespace MySQL.ForExcel.Forms
     /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="importDbObject">MySQL table, view or procedure from which to import data to an Excel spreadsheet.</param>
     /// <param name="importToWorksheetName">Name of the Excel worksheet where the data will be imported to.</param>
-    /// <param name="workSheetInCompatibilityMode">Flag indicating if the Excel worksheet where the data will be imported to is in Excel 2003 compatibility mode.</param>
+    /// <param name="workbookInCompatibilityMode">Flag indicating if the Excel workbook where the data will be imported to is in Excel 2003 compatibility mode.</param>
     /// <param name="importForEditData"><c>true</c> if the import is part of an Edit operation, <c>false</c> otherwise.</param>
-    public ImportTableViewForm(MySqlWorkbenchConnection wbConnection, DbObject importDbObject, string importToWorksheetName, bool workSheetInCompatibilityMode, bool importForEditData)
+    public ImportTableViewForm(MySqlWorkbenchConnection wbConnection, DbObject importDbObject, string importToWorksheetName, bool workbookInCompatibilityMode, bool importForEditData)
     {
       PreviewDataTable = null;
       ImportOperationGeneratedErrors = false;
       WbConnection = wbConnection;
       ImportDbObject = importDbObject;
-      WorkSheetInCompatibilityMode = workSheetInCompatibilityMode;
+      WorkbookInCompatibilityMode = workbookInCompatibilityMode;
       ImportDataTable = null;
 
       InitializeComponent();
@@ -67,8 +67,9 @@ namespace MySQL.ForExcel.Forms
       }
 
       LimitRowsCheckBox.Checked = false;
-      TableNameMainLabel.Text = importDbObject.Type.ToString() + @" Name:";
-      OptionsWarningLabel.Text = Resources.WorksheetInCompatibilityModeWarning;
+      TableNameMainLabel.Text = importDbObject.Type + @" Name:";
+      PickColumnsSubLabel.Text = string.Format(Resources.ImportTableOrViewSubText, importDbObject.Type.ToString().ToLowerInvariant());
+      OptionsWarningLabel.Text = Resources.WorkbookInCompatibilityModeWarning;
       Text = @"Import Data - " + importToWorksheetName;
       TableNameSubLabel.Text = importDbObject.Name;
       FillPreviewGrid();
@@ -79,6 +80,7 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets a value indicating whether all columns in the preview grid are selected for import.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool AllColumnsSelected
     {
       get
@@ -90,16 +92,19 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets a <see cref="MySqlDataTable"/> object containing the data to be imported to the active Excel Worksheet.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public MySqlDataTable ImportDataTable { get; private set; }
 
     /// <summary>
     /// Gets the type of DB object (MySQL table or view) from which to import data to the active Excel Worksheet.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public DbObject ImportDbObject { get; private set; }
 
     /// <summary>
     /// Gets a value indicating whether the column names will be imported as data headers in the first row of the Excel spreadsheet.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool ImportHeaders
     {
       get
@@ -111,16 +116,19 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets a value indicating whether the import operation generated errors so the form must not be closed right away.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool ImportOperationGeneratedErrors { get; private set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the import is part of an Edit operation.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool ImportWithinEditOperation { get; private set; }
 
     /// <summary>
     /// Gets a <see cref="DataTable"/> object containing a subset of the whole data which is shown in the preview grid.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public DataTable PreviewDataTable { get; private set; }
 
     /// <summary>
@@ -142,17 +150,20 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets the total rows contained in the MySQL table or view selected for import.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public long TotalRowsCount { get; private set; }
 
     /// <summary>
     /// Gets the connection to a MySQL server instance selected by users.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public MySqlWorkbenchConnection WbConnection { get; private set; }
 
     /// <summary>
-    /// Gets a value indicating whether the Excel Worksheet where the data will be imported to is in Excel 2003 compatibility mode.
+    /// Gets a value indicating whether the Excel workbook where the data will be imported to is in Excel 2003 compatibility mode.
     /// </summary>
-    public bool WorkSheetInCompatibilityMode { get; private set; }
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool WorkbookInCompatibilityMode { get; private set; }
 
     #endregion Properties
 
@@ -199,7 +210,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       PreviewDataGridView.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
-      bool cappingAtMaxCompatRows = WorkSheetInCompatibilityMode && TotalRowsCount > UInt16.MaxValue;
+      bool cappingAtMaxCompatRows = WorkbookInCompatibilityMode && TotalRowsCount > UInt16.MaxValue;
       SetCompatibilityWarningControlsVisibility(cappingAtMaxCompatRows);
       FromRowNumericUpDown.Maximum = cappingAtMaxCompatRows ? UInt16.MaxValue : TotalRowsCount;
       RowsToReturnNumericUpDown.Maximum = FromRowNumericUpDown.Maximum - FromRowNumericUpDown.Value + 1;
@@ -245,7 +256,7 @@ namespace MySQL.ForExcel.Forms
         {
           dt = WbConnection.GetDataFromTableOrView(ImportDbObject, importColumns, Convert.ToInt32(FromRowNumericUpDown.Value) - 1, Convert.ToInt32(RowsToReturnNumericUpDown.Value));
         }
-        else if (WorkSheetInCompatibilityMode)
+        else if (WorkbookInCompatibilityMode)
         {
           dt = WbConnection.GetDataFromTableOrView(ImportDbObject, importColumns, 0, UInt16.MaxValue);
         }

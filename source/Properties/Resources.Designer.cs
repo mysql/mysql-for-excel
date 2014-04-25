@@ -1062,6 +1062,24 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Relationships are not supported in Excel versions lower than 2013 so relationships will not be created..
+        /// </summary>
+        internal static string ImportMultipleRelationshipsNotSupportedExcelVersionWarningText {
+            get {
+                return ResourceManager.GetString("ImportMultipleRelationshipsNotSupportedExcelVersionWarningText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Option to create Excel tables is turned off so relationships can&apos;t be created..
+        /// </summary>
+        internal static string ImportMultipleRelationshipsNotSupportedNoExcelTablesWarningText {
+            get {
+                return ResourceManager.GetString("ImportMultipleRelationshipsNotSupportedNoExcelTablesWarningText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The importing data will overwrite cells belonging to an existing Excel table..
         /// </summary>
         internal static string ImportOverExcelTableErrorDetail {
@@ -1130,6 +1148,16 @@ namespace MySQL.ForExcel.Properties {
         internal static string ImportTableErrorTitle {
             get {
                 return ResourceManager.GetString("ImportTableErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click on column headers to exclude/include them when
+        ///importing the MySQL {0} data in Excel..
+        /// </summary>
+        internal static string ImportTableOrViewSubText {
+            get {
+                return ResourceManager.GetString("ImportTableOrViewSubText", resourceCulture);
             }
         }
         
@@ -1499,6 +1527,26 @@ namespace MySQL.ForExcel.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_ImportMany_24x24 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_ImportMany_24x24", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_ImportManyDisabled_24x24 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_ImportManyDisabled_24x24", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_ListItem_Routine_24x24 {
             get {
                 object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_ListItem_Routine_24x24", resourceCulture);
@@ -1522,6 +1570,36 @@ namespace MySQL.ForExcel.Properties {
         internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_ListItem_View_24x24 {
             get {
                 object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_ListItem_View_24x24", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_MultiSelectObject_24x24 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_MultiSelectObject_24x24", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_MultiSelectObject_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_MultiSelectObject_32x32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_RelatedObjects_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_RelatedObjects_32x32", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -2030,6 +2108,26 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap select_all {
+            get {
+                object obj = ResourceManager.GetObject("select_all", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap select_none {
+            get {
+                object obj = ResourceManager.GetObject("select_none", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Selected DB Object used for this action must be of Type =Table..
         /// </summary>
         internal static string SelectedDBObjectNotTable {
@@ -2306,6 +2404,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Excel Workbook is in Compatibility Mode which has a row limit of 65,535 rows..
+        /// </summary>
+        internal static string WorkbookInCompatibilityModeWarning {
+            get {
+                return ResourceManager.GetString("WorkbookInCompatibilityModeWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Want to save your changes to &apos;{0}&apos;?.
         /// </summary>
         internal static string WorkbookSavingDetailText {
@@ -2320,15 +2427,6 @@ namespace MySQL.ForExcel.Properties {
         internal static string WorksheetCreationErrorText {
             get {
                 return ResourceManager.GetString("WorksheetCreationErrorText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Excel Worksheet is in Compatibility Mode which has a row limit of 65,535 rows..
-        /// </summary>
-        internal static string WorksheetInCompatibilityModeWarning {
-            get {
-                return ResourceManager.GetString("WorksheetInCompatibilityModeWarning", resourceCulture);
             }
         }
         

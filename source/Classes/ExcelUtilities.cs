@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using Microsoft.Office.Core;
 using MySQL.ForExcel.Properties;
@@ -73,6 +74,11 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <remarks>Green-ish.</remarks>
     public const string DEFAULT_WARNING_CELLS_HTML_COLOR = "#FCC451";
+
+    /// <summary>
+    /// The connection string used on the creation of new <see cref="Excel.ListObject"/> instances holding imported MySQL data.
+    /// </summary>
+    public const string DUMMY_WORKBOOK_CONNECTION_STRING = @"OLEDB;Provider=MySqlDummy;Data Source=MySqlDummy;";
 
     /// <summary>
     /// The interior color used to revert Excel cells to their original background color.
@@ -482,6 +488,24 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets a valid name for a new <see cref="Excel.ListObject"/> that avoids duplicates with existing ones in the current <see cref="Excel.Worksheet"/>.
+    /// </summary>
+    /// <param name="schema">The schema containing the MySQL table.</param>
+    /// <param name="mySqlTableName">The name of the MySQL table that will feed the <see cref="Excel.ListObject"/>.</param>
+    /// <returns>A <see cref="Excel.ListObject"/> valid name.</returns>
+    public static string GetExcelTableNameAvoidingDuplicates(string schema, string mySqlTableName)
+    {
+      string excelTableNamePrefix = Settings.Default.ImportPrefixExcelTable &&
+                                      !string.IsNullOrEmpty(Settings.Default.ImportPrefixExcelTableText)
+          ? Settings.Default.ImportPrefixExcelTableText + "."
+          : string.Empty;
+      string excelTableNameSchemaPiece = !string.IsNullOrEmpty(schema) ? schema + "." : string.Empty;
+      string excelTableNameTablePiece = !string.IsNullOrEmpty(mySqlTableName) ? mySqlTableName : "Table";
+      string excelTableName = excelTableNamePrefix + excelTableNameSchemaPiece + excelTableNameTablePiece;
+      return excelTableName.GetExcelTableNameAvoidingDuplicates();
+    }
+
+    /// <summary>
     /// Gets an <see cref="Excel.Range"/> object that represents all non-empty cells.
     /// </summary>
     /// <param name="range">A <see cref="Excel.Range"/> object.</param>
@@ -738,6 +762,17 @@ namespace MySQL.ForExcel.Classes
         target,
         args,
         new System.Globalization.CultureInfo(EN_US_LOCALE_CODE));
+    }
+
+    /// <summary>
+    /// Checks if the PowerPivot add-in is installed in the computer.
+    /// </summary>
+    /// <returns><c>true</c> if PowerPivot is installed, <c>false</c> otherwise.</returns>
+    public static bool IsPowerPivotInstalled()
+    {
+      const string checkFile = @"\Microsoft Analysis Services\AS Excel Client\10\Microsoft.AnalysisServices.Modeler.FieldList.dll";
+      return File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + checkFile)
+        || (Environment.Is64BitOperatingSystem && File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + checkFile));
     }
 
     /// <summary>

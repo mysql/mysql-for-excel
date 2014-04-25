@@ -26,6 +26,7 @@ using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Properties;
+using MySQL.ForExcel.Structs;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 
@@ -57,9 +58,9 @@ namespace MySQL.ForExcel.Panels
       UserIPLabel.Paint += Label_Paint;
       InheritFontToControlsExceptionList.Add(SelectSchemaHotLabel.Name);
       InheritFontToControlsExceptionList.Add(CreateNewSchemaHotLabel.Name);
-      LoadedSchemas = new List<string>();
-      SchemasList.AddNode(null, "Schemas");
-      SchemasList.AddNode(null, "System Schemas");
+      LoadedSchemas = new List<DbObject>();
+      SchemasList.AddHeaderNode("Schemas");
+      SchemasList.AddHeaderNode("System Schemas");
     }
 
     #region Properties
@@ -74,7 +75,7 @@ namespace MySQL.ForExcel.Panels
     /// Gets a list of schemas loaded in this panel.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<string> LoadedSchemas { get; private set; }
+    public List<DbObject> LoadedSchemas { get; private set; }
 
     /// <summary>
     /// Gets a <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.
@@ -159,6 +160,11 @@ namespace MySQL.ForExcel.Panels
     /// <returns><c>true</c> if schemas were loaded successfully, <c>false</c> otherwise.</returns>
     private bool LoadSchemas()
     {
+      if (SchemasList.HeaderNodes.Count < 2)
+      {
+        return false;
+      }
+
       try
       {
         // Avoids flickering of schemas list while adding the items to it.
@@ -182,10 +188,10 @@ namespace MySQL.ForExcel.Panels
           }
 
           string lcSchemaName = schemaName.ToLowerInvariant();
-          int index = _systemSchemasListValues.Contains(lcSchemaName) ? 1 : 0;
-          LoadedSchemas.Add(schemaName);
-          TreeNode node = SchemasList.AddNode(SchemasList.Nodes[index], schemaName);
-          node.Tag = schemaName;
+          var headerNode = SchemasList.HeaderNodes[_systemSchemasListValues.Contains(lcSchemaName) ? 1 : 0];
+          var schemaObject = new DbObject(schemaName, DbObject.DbObjectType.Schema);
+          LoadedSchemas.Add(schemaObject);
+          var node = SchemasList.AddDbObjectNode(headerNode, schemaObject);
           node.ImageIndex = 0;
         }
 
@@ -214,7 +220,13 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void NextButton_Click(object sender, EventArgs e)
     {
-      PasswordDialogFlags passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
+      var selectedNode = SchemasList.SelectedNode;
+      if (selectedNode == null || selectedNode.Type == MySqlListViewNode.MySqlNodeType.Header || string.IsNullOrEmpty(selectedNode.DbObject.Name))
+      {
+        return;
+      }
+
+      var passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
       if (!passwordFlags.ConnectionSuccess)
       {
         return;
@@ -222,11 +234,10 @@ namespace MySQL.ForExcel.Panels
 
       try
       {
-        string databaseName = SchemasList.SelectedNode.Tag as string;
         var excelAddInPane = Parent as ExcelAddInPane;
         if (excelAddInPane != null)
         {
-          excelAddInPane.OpenSchema(databaseName, true);
+          excelAddInPane.OpenSchema(selectedNode.DbObject.Name, true);
         }
       }
       catch (Exception ex)
@@ -304,10 +315,7 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void SchemasList_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
     {
-      if (e.Node.Level > 0)
-      {
-        NextButton_Click(this, EventArgs.Empty);
-      }
+      NextButton_Click(this, EventArgs.Empty);
     }
   }
 }

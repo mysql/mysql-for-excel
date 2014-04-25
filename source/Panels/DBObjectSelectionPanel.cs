@@ -67,15 +67,20 @@ namespace MySQL.ForExcel.Panels
       UserIPLabel.Paint += Label_Paint;
       SchemaLabel.Paint += Label_Paint;
 
-      InheritFontToControlsExceptionList.Add(ExportToNewTableHotLabel.Name);
-      InheritFontToControlsExceptionList.Add(SelectDatabaseObjectHotLabel.Name);
-      InheritFontToControlsExceptionList.Add(ImportDataHotLabel.Name);
-      InheritFontToControlsExceptionList.Add(EditDataHotLabel.Name);
-      InheritFontToControlsExceptionList.Add(AppendDataHotLabel.Name);
+      InheritFontToControlsExceptionList.AddRange(new[]
+      {
+        ExportToNewTableHotLabel.Name,
+        SelectDatabaseObjectHotLabel.Name,
+        ImportDataHotLabel.Name,
+        EditDataHotLabel.Name,
+        AppendDataHotLabel.Name,
+        ImportMultiHotLabel.Name,
+        ImportJoinedDataHotLabel.Name
+      });
 
-      DBObjectList.AddNode(null, "Tables");
-      DBObjectList.AddNode(null, "Views");
-      DBObjectList.AddNode(null, "Procedures");
+      DBObjectList.AddHeaderNode("Tables");
+      DBObjectList.AddHeaderNode("Views");
+      DBObjectList.AddHeaderNode("Procedures");
     }
 
     #region Properties
@@ -88,12 +93,13 @@ namespace MySQL.ForExcel.Panels
     {
       get
       {
-        if (DBObjectList.Nodes.Count > 0 && DBObjectList.SelectedNode != null && DBObjectList.SelectedNode.Level > 0)
+        var selectedNode = DBObjectList.SelectedNode;
+        if (selectedNode == null || selectedNode.Type != MySqlListViewNode.MySqlNodeType.DbObject)
         {
-          return (DBObjectList.SelectedNode.Tag as DbObject);
+          return null;
         }
 
-        return null;
+        return selectedNode.DbObject;
       }
     }
 
@@ -157,8 +163,7 @@ namespace MySQL.ForExcel.Panels
         ConnectionNameLabel.Text = _wbConnection.Name;
         UserIPLabel.Text = string.Format("User: {0}, IP: {1}", _wbConnection.UserName, _wbConnection.Host);
         SchemaLabel.Text = string.Format("Schema: {0}", _wbConnection.Schema);
-        RefreshDbObjectsList();
-        DBObjectList_AfterSelect(null, null);
+        RefreshDbObjectsList(true);
       }
     }
 
@@ -171,15 +176,31 @@ namespace MySQL.ForExcel.Panels
     /// <param name="editActive">Flag indicating if the Edit Data action is enabled on the currently selected object.</param>
     public void RefreshActionLabelsEnabledStatus(string tableName, bool editActive)
     {
-      DbObject dbObj = CurrentSelectedDbObject;
-      if (dbObj == null || Parent == null || (!string.IsNullOrEmpty(tableName) && dbObj.Name != tableName))
+      bool multipleObjectsSelected = DBObjectList.SelectedNodes.Count > 1;
+      ImportDataHotLabel.Visible = !multipleObjectsSelected;
+      ImportDataHotLabel.Refresh();
+      ImportMultiHotLabel.Visible = multipleObjectsSelected;
+      ImportMultiHotLabel.Refresh();
+      ImportMultiHotLabel.Enabled = multipleObjectsSelected;
+      EditDataHotLabel.Visible = !multipleObjectsSelected;
+      EditDataHotLabel.Refresh();
+      ImportJoinedDataHotLabel.Visible = multipleObjectsSelected;
+      ImportJoinedDataHotLabel.Refresh();
+      ImportJoinedDataHotLabel.Enabled = multipleObjectsSelected;
+      AppendDataHotLabel.Visible = !multipleObjectsSelected;
+      AppendDataHotLabel.Refresh();
+      if (multipleObjectsSelected)
       {
         return;
       }
 
-      ImportDataHotLabel.Enabled = true;
-      EditDataHotLabel.Enabled = dbObj.Type == DbObject.DbObjectType.Table && !editActive;
-      AppendDataHotLabel.Enabled = dbObj.Type == DbObject.DbObjectType.Table && ExcelSelectionContainsData;
+      DbObject dbObj = CurrentSelectedDbObject;
+      bool isSelected = dbObj != null;
+      bool isTable = isSelected && dbObj.Type == DbObject.DbObjectType.Table;
+      bool tableNameMatches = isSelected && isTable && !string.IsNullOrEmpty(tableName) && dbObj.Name == tableName;
+      ImportDataHotLabel.Enabled = isSelected;
+      EditDataHotLabel.Enabled = isSelected && isTable && !editActive;
+      AppendDataHotLabel.Enabled = tableNameMatches && ExcelSelectionContainsData;
     }
 
     /// <summary>
@@ -189,7 +210,8 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void AppendDataHotLabel_Click(object sender, EventArgs e)
     {
-      if (DBObjectList.SelectedNode == null || WbConnection == null)
+      var selectedNode = DBObjectList.SelectedNode;
+      if (selectedNode == null || selectedNode.Type != MySqlListViewNode.MySqlNodeType.DbObject || selectedNode.DbObject.Type != DbObject.DbObjectType.Table || WbConnection == null)
       {
         return;
       }
@@ -202,11 +224,7 @@ namespace MySQL.ForExcel.Panels
 
       try
       {
-        DbObject selDbObject = DBObjectList.SelectedNode.Tag as DbObject;
-        if (selDbObject != null && selDbObject.Type == DbObject.DbObjectType.Table)
-        {
-          ExportDataToTable(selDbObject);
-        }
+        ExportDataToTable(selectedNode.DbObject);
       }
       catch (Exception ex)
       {
@@ -253,9 +271,31 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void DBObjectList_AfterSelect(object sender, TreeViewEventArgs e)
     {
-      var editPane = Parent as ExcelAddInPane;
-      var editActive = editPane != null && e != null && e.Node != null && editPane.TableHasEditOnGoing(e.Node.Text);
-      RefreshActionLabelsEnabledStatus(null, editActive);
+      var listControl = sender as MySqlListView;
+      if (listControl == null || listControl.SelectedNode == null || listControl.SelectedNodes.Count == 0)
+      {
+        return;
+      }
+      
+      if (listControl.SelectedNodes.Count > 1)
+      {
+        // Check if procedures are among the multiple selection, if so cancel the multi-selection since procedures are not allowed in it.
+        var proceduresInSelection = listControl.SelectedNodes.Any(node => node.DbObject.Type == DbObject.DbObjectType.Procedure);
+        if (proceduresInSelection)
+        {
+          listControl.SelectedNode = e.Node as MySqlListViewNode;
+          return;
+        }
+
+        RefreshActionLabelsEnabledStatus(null, false);
+      }
+      else
+      {
+        // Refresh the enabled/disabled status of actions related to the selected DbObject related node.
+        var addInPane = Parent as ExcelAddInPane;
+        var editActive = addInPane != null && addInPane.TableHasEditOnGoing(listControl.SelectedNode.DbObject.Name);
+        RefreshActionLabelsEnabledStatus(null, editActive);
+      }
     }
 
     /// <summary>
@@ -273,7 +313,7 @@ namespace MySQL.ForExcel.Panels
       Filter = DBObjectsFilter.Text.Trim().ToUpper();
       try
       {
-        RefreshDbObjectsList();
+        RefreshDbObjectsList(false);
       }
       catch (Exception ex)
       {
@@ -289,13 +329,13 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void EditDataHotLabel_Click(object sender, EventArgs e)
     {
-      DbObject selDbObject = DBObjectList.SelectedNode != null ? DBObjectList.SelectedNode.Tag as DbObject : null;
-      if (selDbObject == null || selDbObject.Type != DbObject.DbObjectType.Table)
+      var selectedNode = DBObjectList.SelectedNode;
+      if (selectedNode == null || selectedNode.Type != MySqlListViewNode.MySqlNodeType.DbObject || selectedNode.DbObject == null || selectedNode.DbObject.Type != DbObject.DbObjectType.Table || WbConnection == null)
       {
         return;
       }
 
-      PasswordDialogFlags passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
+      var passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
       if (!passwordFlags.ConnectionSuccess)
       {
         return;
@@ -304,7 +344,7 @@ namespace MySQL.ForExcel.Panels
       try
       {
         var excelAddInPane = Parent as ExcelAddInPane;
-        EditDataHotLabel.Enabled = excelAddInPane != null && !excelAddInPane.EditTableData(selDbObject, false, null);
+        EditDataHotLabel.Enabled = excelAddInPane != null && !excelAddInPane.EditTableData(selectedNode.DbObject, false, null);
       }
       catch (Exception ex)
       {
@@ -331,7 +371,7 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void ExportToNewTableHotLabel_Click(object sender, EventArgs e)
     {
-      PasswordDialogFlags passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
+      var passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
       if (!passwordFlags.ConnectionSuccess)
       {
         return;
@@ -350,12 +390,13 @@ namespace MySQL.ForExcel.Panels
       if (Environment.OSVersion.Version.Major <= 5)
       {
         // This is the correct render method for Windows XP and older OS versions.
-        RefreshDbObjectsList();
+        RefreshDbObjectsList(true);
       }
       else
       {
         // This is the correct render method for Windows Vista and newer OS versions.
         LoadDataObjects(DbObject.DbObjectType.Table);
+        RefreshDbObjectsList(false);
       }
 
       DBObjectList_AfterSelect(DBObjectList, new TreeViewEventArgs(null));
@@ -368,24 +409,14 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void ImportDataHotLabel_Click(object sender, EventArgs e)
     {
-      if (DBObjectList.SelectedNode == null)
+      var selectedNode = DBObjectList.SelectedNode;
+      var parentTaskPane = Parent as ExcelAddInPane;
+      if (selectedNode == null || parentTaskPane == null || selectedNode.Type != MySqlListViewNode.MySqlNodeType.DbObject || selectedNode.DbObject == null || WbConnection == null)
       {
         return;
       }
 
-      ExcelAddInPane parentTaskPane = (Parent as ExcelAddInPane);
-      if (parentTaskPane == null)
-      {
-        return;
-      }
-
-      DbObject dbo = DBObjectList.SelectedNode.Tag as DbObject;
-      if (dbo == null)
-      {
-        return;
-      }
-
-      PasswordDialogFlags passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
+      var passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
       if (!passwordFlags.ConnectionSuccess)
       {
         return;
@@ -393,13 +424,13 @@ namespace MySQL.ForExcel.Panels
 
       if (parentTaskPane.ActiveWorksheetInEditMode)
       {
-        DialogResult dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.WorksheetInEditModeWarningTitle, Resources.WorksheetInEditModeWarningDetail);
+        var dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.WorksheetInEditModeWarningTitle, Resources.WorksheetInEditModeWarningDetail);
         if (dr != DialogResult.Yes)
         {
           return;
         }
 
-        Excel.Worksheet newWorksheet = parentTaskPane.ActiveWorkbook.CreateWorksheet(dbo.Name, true);
+        var newWorksheet = parentTaskPane.ActiveWorkbook.CreateWorksheet(selectedNode.DbObject.Name, true);
         if (newWorksheet == null)
         {
           return;
@@ -408,15 +439,15 @@ namespace MySQL.ForExcel.Panels
 
       try
       {
-        switch (dbo.Type)
+        switch (selectedNode.DbObject.Type)
         {
           case DbObject.DbObjectType.Table:
           case DbObject.DbObjectType.View:
-            ImportTableOrView(dbo);
+            ImportTableOrView(selectedNode.DbObject);
             break;
 
           case DbObject.DbObjectType.Procedure:
-            ImportProcedure(dbo);
+            ImportProcedure(selectedNode.DbObject);
             break;
         }
       }
@@ -424,6 +455,89 @@ namespace MySQL.ForExcel.Panels
       {
         MiscUtilities.ShowCustomizedErrorDialog(Resources.ImportDataErrorTitle, ex.Message, true);
         MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when <see cref="ImportMultiHotLabel"/> is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ImportMultiHotLabel_Click(object sender, EventArgs e)
+    {
+      var addInPane = Parent as ExcelAddInPane;
+      if (addInPane == null)
+      {
+        return;
+      }
+
+      var tablesAndViewsList = new List<DbObject>(LoadedTables);
+      tablesAndViewsList.AddRange(LoadedViews);
+      using (var importDialog = new ImportMultipleDialog(WbConnection, tablesAndViewsList, addInPane.ActiveWorkbook.Excel8CompatibilityMode))
+      {
+        if (importDialog.ShowDialog() == DialogResult.Cancel || importDialog.ImportDataSet == null)
+        {
+          return;
+        }
+
+        // Import tables data in Excel worksheets
+        var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+        var excelTablesDictionary = new Dictionary<string, Excel.ListObject>(importDialog.ImportDataSet.Tables.Count);
+        foreach (MySqlDataTable mySqlTable in importDialog.ImportDataSet.Tables)
+        {
+          // Create a new Excel Worksheet and import the table/view data there
+          var currentWorksheet = activeWorkbook.CreateWorksheet(mySqlTable.TableName, true);
+          if (currentWorksheet == null)
+          {
+            continue;
+          }
+
+          var listObj = mySqlTable.ImportDataAtActiveExcelCell(true, true);
+          var excelTable = listObj as Excel.ListObject;
+          if (excelTable == null)
+          {
+            continue;
+          }
+
+          excelTablesDictionary.Add(mySqlTable.TableName, excelTable);
+        }
+
+        // Create Excel relationships
+        foreach (var relationship in importDialog.RelationshipsList)
+        {
+          if (relationship.Excluded)
+          {
+            continue;
+          }
+
+          // Get the ModelColumnName objects needed to define the relationship
+          Excel.ListObject excelTable;
+          Excel.ListObject relatedExcelTable;
+          bool excelTableExists = excelTablesDictionary.TryGetValue(relationship.TableOrViewName, out excelTable);
+          bool relatedExcelTableExists = excelTablesDictionary.TryGetValue(relationship.RelatedTableOrViewName, out relatedExcelTable);
+          if (!excelTableExists || !relatedExcelTableExists)
+          {
+            continue;
+          }
+
+          var table = activeWorkbook.Model.ModelTables.Cast<Excel.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, excelTable.Name.Replace(".", " "), StringComparison.InvariantCulture));
+          var relatedTable = activeWorkbook.Model.ModelTables.Cast<Excel.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, relatedExcelTable.Name.Replace(".", " "), StringComparison.InvariantCulture));
+          if (table == null || relatedTable == null)
+          {
+            continue;
+          }
+
+          var column = table.ModelTableColumns.Cast<Excel.ModelTableColumn>().FirstOrDefault(col => string.Equals(col.Name, relationship.ColumnName, StringComparison.InvariantCulture));
+          var relatedColumn = relatedTable.ModelTableColumns.Cast<Excel.ModelTableColumn>().FirstOrDefault(col => string.Equals(col.Name, relationship.RelatedColumnName, StringComparison.InvariantCulture));
+          if (column == null || relatedColumn == null)
+          {
+            continue;
+          }
+
+          activeWorkbook.Model.ModelRelationships.Add(column, relatedColumn);
+        }
+
+        excelTablesDictionary.Clear();
       }
     }
 
@@ -439,21 +553,22 @@ namespace MySQL.ForExcel.Panels
         return;
       }
 
-      ImportProcedureForm importProcedureForm = new ImportProcedureForm(WbConnection, dbo, addInPane.ActiveWorksheet.Name, addInPane.ActiveWorkbook.Excel8CompatibilityMode);
-      DialogResult dr = importProcedureForm.ShowDialog();
-      if (dr == DialogResult.Cancel)
+      using (var importProcedureForm = new ImportProcedureForm(WbConnection, dbo, addInPane.ActiveWorksheet.Name, addInPane.ActiveWorkbook.Excel8CompatibilityMode))
       {
-        return;
-      }
+        if (importProcedureForm.ShowDialog() == DialogResult.Cancel)
+        {
+          return;
+        }
 
-      if (importProcedureForm.ImportDataSet == null)
-      {
-        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, dbo.Type.ToString().ToLowerInvariant(), dbo.Name));
-        return;
-      }
+        if (importProcedureForm.ImportDataSet == null)
+        {
+          MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, dbo.Type.ToString().ToLowerInvariant(), dbo.Name));
+          return;
+        }
 
-      var excelAddInPane = addInPane;
-      excelAddInPane.ImportDataToExcel(importProcedureForm.ImportDataSet, importProcedureForm.ImportHeaders, importProcedureForm.ImportType, importProcedureForm.SelectedResultSetIndex);
+        var excelAddInPane = addInPane;
+        excelAddInPane.ImportDataToExcel(importProcedureForm.ImportDataSet, importProcedureForm.ImportHeaders, importProcedureForm.ImportType, importProcedureForm.SelectedResultSetIndex);
+      }
     }
 
     /// <summary>
@@ -463,21 +578,21 @@ namespace MySQL.ForExcel.Panels
     private void ImportTableOrView(DbObject dbo)
     {
       var taskPaneControl = (ExcelAddInPane)Parent;
-      ImportTableViewForm importForm = new ImportTableViewForm(WbConnection, dbo, taskPaneControl.ActiveWorkbook.ActiveSheet.Name, taskPaneControl.ActiveWorkbook.Excel8CompatibilityMode, false);
-
-      DialogResult dr = importForm.ShowDialog();
-      if (dr == DialogResult.Cancel)
+      using (var importForm = new ImportTableViewForm(WbConnection, dbo, taskPaneControl.ActiveWorkbook.ActiveSheet.Name, taskPaneControl.ActiveWorkbook.Excel8CompatibilityMode, false))
       {
-        return;
-      }
+        if (importForm.ShowDialog() == DialogResult.Cancel)
+        {
+          return;
+        }
 
-      if (importForm.ImportDataTable == null)
-      {
-        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, dbo.Type.ToString().ToLowerInvariant(), dbo.Name));
-        return;
-      }
+        if (importForm.ImportDataTable == null)
+        {
+          MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, dbo.Type.ToString().ToLowerInvariant(), dbo.Name));
+          return;
+        }
 
-      importForm.ImportDataTable.ImportDataAtActiveExcelCell(importForm.ImportHeaders);
+        importForm.ImportDataTable.ImportDataAtActiveExcelCell(importForm.ImportHeaders, Settings.Default.ImportCreateExcelTable);
+      }
     }
 
     /// <summary>
@@ -487,36 +602,29 @@ namespace MySQL.ForExcel.Panels
     private void LoadDataObjects(DbObject.DbObjectType dataObjectType)
     {
       DataTable dataObjects = null;
-      TreeNode parentNode = null;
       string objectName = string.Empty;
       List<DbObject> loadedObjectsList = null;
 
       // 0 - Tables
       // 1 - Views
       // 2 - Procedures
-      int objectIndex = 0;
       switch (dataObjectType)
       {
         case DbObject.DbObjectType.Procedure:
-          objectIndex = 2;
           dataObjects = WbConnection.GetSchemaCollection("Procedures", null, WbConnection.Schema, null, "PROCEDURE");
           objectName = "ROUTINE_NAME";
-          parentNode = DBObjectList.Nodes[objectIndex];
           loadedObjectsList = LoadedProcedures;
           break;
 
         case DbObject.DbObjectType.Table:
           dataObjects = WbConnection.GetSchemaCollection("Tables", null, WbConnection.Schema);
           objectName = "TABLE_NAME";
-          parentNode = DBObjectList.Nodes[objectIndex];
           loadedObjectsList = LoadedTables;
           break;
 
         case DbObject.DbObjectType.View:
-          objectIndex = 1;
           dataObjects = WbConnection.GetSchemaCollection("Views", null, WbConnection.Schema);
           objectName = "TABLE_NAME";
-          parentNode = DBObjectList.Nodes[objectIndex];
           loadedObjectsList = LoadedViews;
           break;
       }
@@ -527,17 +635,7 @@ namespace MySQL.ForExcel.Panels
       }
 
       loadedObjectsList.Clear();
-      foreach (string dbObjectName
-                in dataObjects.Rows.Cast<DataRow>()
-                .Select(dataRow => dataRow[objectName].ToString())
-                .Where(dbObjectName => string.IsNullOrEmpty(Filter) || dbObjectName.ToUpper().Contains(Filter)))
-      {
-        TreeNode node = DBObjectList.AddNode(parentNode, dbObjectName);
-        var dbObj = new DbObject(dbObjectName, dataObjectType);
-        node.Tag = dbObj;
-        loadedObjectsList.Add(dbObj);
-        node.ImageIndex = objectIndex;
-      }
+      loadedObjectsList.AddRange(dataObjects.Rows.Cast<DataRow>().Select(dataRow => dataRow[objectName].ToString()).Select(dbObjectName => new DbObject(dbObjectName, dataObjectType)));
     }
 
     /// <summary>
@@ -563,41 +661,93 @@ namespace MySQL.ForExcel.Panels
     }
 
     /// <summary>
-    /// Refreshes the DB objects list control with current objects in the connected schema.
-    /// </summary>
-    private void RefreshDbObjectsList()
-    {
-      // Avoids flickering of DB Objects lists while adding the items to it.
-      DBObjectList.BeginUpdate();
-
-      foreach (TreeNode node in DBObjectList.Nodes)
-      {
-        node.Nodes.Clear();
-      }
-
-      LoadDataObjects(DbObject.DbObjectType.Table);
-      LoadDataObjects(DbObject.DbObjectType.View);
-      LoadDataObjects(DbObject.DbObjectType.Procedure);
-
-      if (DBObjectList.Nodes[0].GetNodeCount(true) > 0)
-      {
-        DBObjectList.Nodes[0].Expand();
-      }
-
-      // Avoids flickering of DB Objects lists while adding the items to it.
-      DBObjectList.EndUpdate();
-    }
-
-    /// <summary>
     /// Event delegate method fired when <see cref="RefreshDatabaseObjectsToolStripMenuItem"/> is clicked.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
     private void RefreshDatabaseObjectsToolStripMenuItem_Click(object sender, EventArgs e)
     {
+      RefreshDbObjectsList(true);
+    }
+
+    /// <summary>
+    /// Refreshes the DB objects list control with current objects in the connected schema.
+    /// </summary>
+    /// <param name="reloadFromServer">Flag indicating whether DB objects must be reloaded from the connected MySQL server.</param>
+    /// <param name="includeTypes">Flags indicating what DB object types are included on the refresh.</param>
+    private void RefreshDbObjectsList(bool reloadFromServer, DbObject.DbObjectType includeTypes = DbObject.ALL_DB_OBJECT_TYPES)
+    {
+      if (DBObjectList.HeaderNodes.Count < 3)
+      {
+        return;
+      }
+
       try
       {
-        RefreshDbObjectsList();
+        // Avoids flickering of DB Objects lists while adding the items to it.
+        DBObjectList.BeginUpdate();
+
+        DBObjectList.ClearNodes();
+        if (reloadFromServer)
+        {
+          LoadDataObjects(DbObject.DbObjectType.Table);
+          LoadDataObjects(DbObject.DbObjectType.View);
+          LoadDataObjects(DbObject.DbObjectType.Procedure);
+        }
+
+        // 1 - Table
+        // 2 - View
+        // 4 - Procedure
+        foreach (DbObject.DbObjectType dbObjectType in Enum.GetValues(typeof(DbObject.DbObjectType)))
+        {
+          var andValue = (short) (dbObjectType & includeTypes);
+          if (andValue == 0)
+          {
+            continue;
+          }
+
+          int imageIndex = -1;
+          List<DbObject> objectsList = null;
+          MySqlListViewNode parentNode = null;
+          switch (dbObjectType)
+          {
+            case DbObject.DbObjectType.Table:
+              imageIndex = 0;
+              objectsList = LoadedTables;
+              parentNode = DBObjectList.HeaderNodes[0];
+              break;
+
+            case DbObject.DbObjectType.View:
+              imageIndex = 1;
+              objectsList = LoadedViews;
+              parentNode = DBObjectList.HeaderNodes[1];
+              break;
+
+            case DbObject.DbObjectType.Procedure:
+              imageIndex = 2;
+              objectsList = LoadedProcedures;
+              parentNode = DBObjectList.HeaderNodes[2];
+              break;
+          }
+
+          if (parentNode == null || objectsList == null)
+          {
+            continue;
+          }
+
+          foreach (var dbObject in objectsList.Where(dbObject => string.IsNullOrEmpty(Filter) || dbObject.Name.ToUpper().Contains(Filter)))
+          {
+            var node = DBObjectList.AddDbObjectNode(parentNode, dbObject);
+            dbObject.Selected = false;
+            node.ImageIndex = imageIndex;
+          }
+        }
+
+        DBObjectList.ExpandAll();
+        DBObjectList.Nodes[0].EnsureVisible();
+
+        // Avoids flickering of DB Objects lists while adding the items to it.
+        DBObjectList.EndUpdate();
         DBObjectList_AfterSelect(null, null);
       }
       catch (Exception ex)

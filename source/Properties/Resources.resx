@@ -420,8 +420,8 @@ Please re-enter your password to try again.</value>
   <data name="remove_col_mapping" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\remove_col_mapping.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="WorksheetInCompatibilityModeWarning" xml:space="preserve">
-    <value>Excel Worksheet is in Compatibility Mode which has a row limit of 65,535 rows.</value>
+  <data name="WorkbookInCompatibilityModeWarning" xml:space="preserve">
+    <value>Excel Workbook is in Compatibility Mode which has a row limit of 65,535 rows.</value>
   </data>
   <data name="ConnectSSLFailedDetailWarning" xml:space="preserve">
     <value>A possible fail reason could be that your user requires a SSL connection that is not currently supported by MySQL for Excel.
@@ -905,5 +905,36 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
   </data>
   <data name="StatementExecutionGenericError" xml:space="preserve">
     <value>An unknown error ocurred when trying to apply changes against the connected MySQL server.</value>
+  </data>
+  <data name="MySQLforExcel_ObjectPanel_ImportManyDisabled_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-ObjectPanel-ImportManyDisabled-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_ObjectPanel_ImportMany_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-ObjectPanel-ImportMany-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_ObjectPanel_MultiSelectObject_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-ObjectPanel-MultiSelectObject-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_ObjectPanel_MultiSelectObject_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-ObjectPanel-MultiSelectObject-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MySQLforExcel_ObjectPanel_RelatedObjects_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-ObjectPanel-RelatedObjects-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImportTableOrViewSubText" xml:space="preserve">
+    <value>Click on column headers to exclude/include them when
+importing the MySQL {0} data in Excel.</value>
+  </data>
+  <data name="select_all" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\select_all.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="select_none" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\select_none.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImportMultipleRelationshipsNotSupportedExcelVersionWarningText" xml:space="preserve">
+    <value>Relationships are not supported in Excel versions lower than 2013 so relationships will not be created.</value>
+  </data>
+  <data name="ImportMultipleRelationshipsNotSupportedNoExcelTablesWarningText" xml:space="preserve">
+    <value>Option to create Excel tables is turned off so relationships can't be created.</value>
   </data>
 </root>

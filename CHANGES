@@ -1,3 +1,8 @@
+1.3.0
+- Added new feature to allow the selection of multiple tables and views and an Import Multiple Tables and Views action that when clicked imports the data of all selected
+  database objects into individual Excel worksheets, Excel tables are created optionally for each imported Table or View. On Excel 2013 (and higher) PowerPivot model
+  relationships are created based on MySQL relationships defined with foreign key constraints.
+
 1.2.1
 - Fixed a bug that happened after closing an Excel window containing an open MySQL for Excel add-in in Excel 2013, the custom task pane linked to the closed window was
   not being disposed of correctly and not removed from the collection of Excel task panes either.

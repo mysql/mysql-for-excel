@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -15,6 +15,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
+using System;
+
 namespace MySQL.ForExcel.Classes
 {
   /// <summary>
@@ -22,6 +24,15 @@ namespace MySQL.ForExcel.Classes
   /// </summary>
   public class DbObject
   {
+    #region Constants
+
+    /// <summary>
+    /// The value representing all DB object types
+    /// </summary>
+    public const DbObjectType ALL_DB_OBJECT_TYPES = DbObjectType.Table | DbObjectType.View | DbObjectType.Procedure;
+
+    #endregion Constants
+
     /// <summary>
     /// Initializes a new instance of the <see cref="DbObject"/> class.
     /// </summary>
@@ -36,23 +47,31 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Specifies identifiers to indicate the MySQL database object type.
     /// </summary>
-    public enum DbObjectType
+    [Flags]
+    public enum DbObjectType : short
     {
       /// <summary>
       /// A MySQL table object.
       /// </summary>
-      Table,
+      Table = 1,
 
       /// <summary>
       /// A MySQL view object.
       /// </summary>
-      View,
+      View = 2,
 
       /// <summary>
       /// A MySQL stored procedure object.
       /// </summary>
-      Procedure
+      Procedure = 4,
+
+      /// <summary>
+      /// A MySQL schema.
+      /// </summary>
+      Schema = 8
     }
+
+    #region Properties
 
     /// <summary>
     /// Gets the name of the MySQL database object.
@@ -60,8 +79,15 @@ namespace MySQL.ForExcel.Classes
     public string Name { get; private set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the object is selected by the user or not.
+    /// </summary>
+    public bool Selected { get; set; }
+
+    /// <summary>
     /// Gets the MySQL database object type.
     /// </summary>
     public DbObjectType Type { get; private set; }
+
+    #endregion Properties
   }
 }
