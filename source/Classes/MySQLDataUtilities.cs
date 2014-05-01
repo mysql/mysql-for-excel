@@ -25,6 +25,7 @@ using MySql.Data.MySqlClient;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
+using MySQL.ForExcel.Structs;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
@@ -327,6 +328,31 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets the host name used in connection nodes.
+    /// </summary>
+    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
+    /// <returns>The host string for connection nodes subtitles.</returns>
+    public static string GetHostNameForConnectionSubtitle(this MySqlWorkbenchConnection connection)
+    {
+      if (connection == null)
+      {
+        return string.Empty;
+      }
+
+      bool isSsh = connection.DriverType == MySqlWorkbenchConnectionType.Ssh;
+      string hostName = (connection.Host ?? string.Empty).Trim();
+      if (!isSsh)
+      {
+        return hostName;
+      }
+
+      string[] sshConnection = connection.HostIdentifier.Split('@');
+      string dbHost = sshConnection[1].Split(':')[0].Trim();
+      hostName = dbHost + @" (SSH)";
+      return hostName;
+    }
+
+    /// <summary>
     /// Gets the value of the DEFAULT_STORAGE_ENGINE MySQL Server variable indicating the default DB engine used for new table creations.
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
@@ -469,11 +495,35 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the schema information ofr the given database collection.
+    /// Gets a list of column names contained within the given <see cref="DbObject"/>.
+    /// </summary>
+    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
+    /// <param name="dbObject">A table or view object.</param>
+    /// <returns>A list of column names contained within the given <see cref="DbObject"/></returns>
+    public static List<string> GetColumnNamesList(this MySqlWorkbenchConnection connection, DbObject dbObject)
+    {
+      if (connection == null || dbObject == null || dbObject.Type == DbObject.DbObjectType.Procedure)
+      {
+        return null;
+      }
+
+      var columnsInfoTable = connection.GetSchemaCollection("Columns", null, connection.Schema, dbObject.Name);
+      if (columnsInfoTable == null)
+      {
+        return null;
+      }
+
+      var columnsList = new List<string>(columnsInfoTable.Rows.Count);
+      columnsList.AddRange(from DataRow dr in columnsInfoTable.Rows select dr["COLUMN_NAME"].ToString());
+      return columnsList;
+    }
+
+    /// <summary>
+    /// Gets the columns schema information for the given database table.
     /// </summary>
     /// <param name="dataTable">The data table to get the schema info for.</param>
-    /// <returns>Table with schema information.</returns>
-    public static DataTable GetSchemaInfo(this DataTable dataTable)
+    /// <returns>Table with schema information regarding its columns.</returns>
+    public static DataTable GetColumnsSchemaInfo(this DataTable dataTable)
     {
       if (dataTable == null)
       {
@@ -504,6 +554,23 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets a list of <see cref="MySqlDataRelationship"/> objects representing relationships among the given <see cref="DbObject"/> and other ones.
+    /// </summary>
+    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
+    /// <param name="dbObject">A table or view object.</param>
+    /// <returns>A list of <see cref="MySqlDataRelationship"/> objects representing relationships among the given <see cref="DbObject"/> and other ones.</returns>
+    public static List<MySqlDataRelationship> GetRelationshipsFromForeignKeys(this MySqlWorkbenchConnection connection, DbObject dbObject)
+    {
+      if (connection == null || dbObject == null || dbObject.Type == DbObject.DbObjectType.Procedure)
+      {
+        return null;
+      }
+
+      var dt = connection.GetSchemaCollection("Foreign Key Columns", null, connection.Schema, dbObject.Name);
+      return dt == null ? null : (from DataRow row in dt.Rows select new MySqlDataRelationship(row["CONSTRAINT_NAME"].ToString(), row["TABLE_NAME"].ToString(), row["REFERENCED_TABLE_NAME"].ToString(), row["COLUMN_NAME"].ToString(), row["REFERENCED_COLUMN_NAME"].ToString())).ToList();
+    }
+
+    /// <summary>
     /// Checks if an index with the given name exists in the given schema and table.
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
@@ -518,8 +585,8 @@ namespace MySQL.ForExcel.Classes
         return false;
       }
 
-      DataTable dt = GetSchemaCollection(connection, "Indexes", null, schemaName, tableName, indexName);
-      return dt.Rows.Count > 0;
+      DataTable dt = connection.GetSchemaCollection("Indexes", null, schemaName, tableName, indexName);
+      return dt != null && dt.Rows.Count > 0;
     }
 
     /// <summary>

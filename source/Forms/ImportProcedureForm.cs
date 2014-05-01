@@ -16,10 +16,7 @@
 // 02110-1301  USA
 
 using System;
-using System.Collections;
-using System.ComponentModel;
 using System.Data;
-using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
@@ -56,14 +53,14 @@ namespace MySQL.ForExcel.Forms
     /// <param name="wbConnection">The connection to a MySQL server instance selected by users.</param>
     /// <param name="importDbObject">The Procedure DB object selected by the users to import data from.</param>
     /// <param name="importToWorksheetName">The name of the Excel worksheet where data will be imported.</param>
-    /// <param name="workSheetInCompatibilityMode">Flag indicating whether the Excel worksheet where data will be imported is open in compatibility mode.</param>
-    public ImportProcedureForm(MySqlWorkbenchConnection wbConnection, DbObject importDbObject, string importToWorksheetName, bool workSheetInCompatibilityMode)
+    /// <param name="workbookInCompatibilityMode">Flag indicating whether the Excel workbook where data will be imported is open in compatibility mode.</param>
+    public ImportProcedureForm(MySqlWorkbenchConnection wbConnection, DbObject importDbObject, string importToWorksheetName, bool workbookInCompatibilityMode)
     {
       ImportDbObject = importDbObject;
       PreviewDataSet = null;
       SumOfResultSetsExceedsMaxCompatibilityRows = false;
       WbConnection = wbConnection;
-      WorkSheetInCompatibilityMode = workSheetInCompatibilityMode;
+      WorkbookInCompatibilityMode = workbookInCompatibilityMode;
 
       InitializeComponent();
 
@@ -71,7 +68,7 @@ namespace MySQL.ForExcel.Forms
       Text = @"Import Data - " + importToWorksheetName;
       _procedureParamsProperties = new PropertiesCollection();
       ProcedureNameLabel.Text = importDbObject.Name;
-      OptionsWarningLabel.Text = Resources.WorksheetInCompatibilityModeWarning;
+      OptionsWarningLabel.Text = Resources.WorkbookInCompatibilityModeWarning;
       ParametersPropertyGrid.SelectedObject = _procedureParamsProperties;
 
       InitializeMultipleResultSetsCombo();
@@ -188,9 +185,9 @@ namespace MySQL.ForExcel.Forms
     public MySqlWorkbenchConnection WbConnection { get; private set; }
 
     /// <summary>
-    /// Gets a value indicating whether the Excel worksheet where data will be imported is open in compatibility mode.
+    /// Gets a value indicating whether the Excel workbook where data will be imported is open in compatibility mode.
     /// </summary>
-    public bool WorkSheetInCompatibilityMode { get; private set; }
+    public bool WorkbookInCompatibilityMode { get; private set; }
 
     #endregion Properties
 
@@ -281,7 +278,7 @@ namespace MySQL.ForExcel.Forms
         for (int tableIdx = 0; tableIdx < ImportDataSet.Tables.Count; tableIdx++)
         {
           resultSetsRowSum += ImportDataSet.Tables[tableIdx].Rows.Count;
-          if (WorkSheetInCompatibilityMode)
+          if (WorkbookInCompatibilityMode)
           {
             SumOfResultSetsExceedsMaxCompatibilityRows = SumOfResultSetsExceedsMaxCompatibilityRows || resultSetsRowSum > UInt16.MaxValue;
           }
@@ -524,7 +521,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       ResultSetsDataGridView.DataMember = PreviewDataSet.Tables[SelectedResultSetIndex].TableName;
-      bool cappingAtMaxCompatRows = WorkSheetInCompatibilityMode && ImportDataSet.Tables[SelectedResultSetIndex].Rows.Count > UInt16.MaxValue;
+      bool cappingAtMaxCompatRows = WorkbookInCompatibilityMode && ImportDataSet.Tables[SelectedResultSetIndex].Rows.Count > UInt16.MaxValue;
       SetCompatibilityWarning(cappingAtMaxCompatRows);
       foreach (DataGridViewColumn gridCol in ResultSetsDataGridView.Columns)
       {
@@ -543,358 +540,5 @@ namespace MySQL.ForExcel.Forms
       OptionsWarningLabel.Visible = show;
       OptionsWarningPictureBox.Visible = show;
     }
-  }
-
-  /// <summary>
-  /// Represents a collection of properties of the MySQL procedure's parameters.
-  /// </summary>
-  public class PropertiesCollection : CollectionBase, ICustomTypeDescriptor
-  {
-    /// <summary>
-    /// Gets or sets the custom property in the specified index position.
-    /// </summary>
-    /// <param name="index">Index position.</param>
-    /// <returns>The custom property object.</returns>
-    public CustomProperty this[int index]
-    {
-      get
-      {
-        return (CustomProperty)List[index];
-      }
-
-      set
-      {
-        List[index] = value;
-      }
-    }
-
-    /// <summary>
-    /// Adds a custom property to the collection.
-    /// </summary>
-    /// <param name="value">The custom property object to add.</param>
-    public void Add(CustomProperty value)
-    {
-      List.Add(value);
-    }
-
-    /// <summary>
-    /// Removes a custom property object from the collection.
-    /// </summary>
-    /// <param name="name">The name of the custom property to remove.</param>
-    public void Remove(string name)
-    {
-      foreach (CustomProperty prop in List.Cast<CustomProperty>().Where(prop => prop.Name == name))
-      {
-        List.Remove(prop);
-        return;
-      }
-    }
-
-    #region TypeDescriptor Implementation
-
-    /// <summary>
-    /// Returns a collection of attributes for the specified component and a Boolean indicating that a custom type descriptor has been created.
-    /// </summary>
-    /// <returns>An <see cref="AttributeCollection"/> with the attributes for the component. If the component is <c>null</c>, this method returns an empty collection.</returns>
-    public AttributeCollection GetAttributes()
-    {
-      return TypeDescriptor.GetAttributes(this, true);
-    }
-
-    /// <summary>
-    /// Returns the name of the class for the specified component using a custom type descriptor.
-    /// </summary>
-    /// <returns>A <see cref="String"/> containing the name of the class for the specified component.</returns>
-    public String GetClassName()
-    {
-      return TypeDescriptor.GetClassName(this, true);
-    }
-
-    /// <summary>
-    /// Returns the name of the specified component using a custom type descriptor.
-    /// </summary>
-    /// <returns>The name of the class for the specified component, or <c>null</c> if there is no component name.</returns>
-    public String GetComponentName()
-    {
-      return TypeDescriptor.GetComponentName(this, true);
-    }
-
-    /// <summary>
-    /// Returns a type converter for the type of the specified component with a custom type descriptor.
-    /// </summary>
-    /// <returns>A <see cref="TypeConverter"/> for the specified component.</returns>
-    public TypeConverter GetConverter()
-    {
-      return TypeDescriptor.GetConverter(this, true);
-    }
-
-    /// <summary>
-    /// Returns the default event for a component with a custom type descriptor.
-    /// </summary>
-    /// <returns>An <see cref="EventDescriptor"/> with the default event, or <c>null</c> if there are no events.</returns>
-    public EventDescriptor GetDefaultEvent()
-    {
-      return TypeDescriptor.GetDefaultEvent(this, true);
-    }
-
-    /// <summary>
-    /// Returns the default property for the specified component with a custom type descriptor.
-    /// </summary>
-    /// <returns>A <see cref="PropertyDescriptor"/> with the default property, or <c>null</c> if there are no properties.</returns>
-    public PropertyDescriptor GetDefaultProperty()
-    {
-      return TypeDescriptor.GetDefaultProperty(this, true);
-    }
-
-    /// <summary>
-    /// Returns an editor with the specified base type and with a custom type descriptor for the specified component.
-    /// </summary>
-    /// <param name="editorBaseType">A <see cref="Type"/> that represents the base type of the editor you want to find.</param>
-    /// <returns>An instance of the editor that can be cast to the specified editor type, or <c>null</c> if no editor of the requested type can be found.</returns>
-    public object GetEditor(Type editorBaseType)
-    {
-      return TypeDescriptor.GetEditor(this, editorBaseType, true);
-    }
-
-    /// <summary>
-    /// Returns the collection of events for a specified component using a specified array of attributes as a filter and using a custom type descriptor.
-    /// </summary>
-    /// <param name="attributes">An array of type <see cref="Attribute"/> to use as a filter.</param>
-    /// <returns>An <see cref="EventDescriptorCollection"/> with the events that match the specified attributes for this component.</returns>
-    public EventDescriptorCollection GetEvents(Attribute[] attributes)
-    {
-      return TypeDescriptor.GetEvents(this, attributes, true);
-    }
-
-    /// <summary>
-    /// Returns the collection of events for a specified component with a custom type descriptor.
-    /// </summary>
-    /// <returns>An <see cref="EventDescriptorCollection"/> with the events for this component.</returns>
-    public EventDescriptorCollection GetEvents()
-    {
-      return TypeDescriptor.GetEvents(this, true);
-    }
-
-    /// <summary>
-    /// Returns the collection of properties based on their corresponding attributes.
-    /// </summary>
-    /// <param name="attributes">Array of attributes.</param>
-    /// <returns>A <see cref="PropertyDescriptorCollection"/> with properties corresponding to thegiven attributes.</returns>
-    public PropertyDescriptorCollection GetProperties(Attribute[] attributes)
-    {
-      PropertyDescriptor[] newProps = new PropertyDescriptor[Count];
-      for (int i = 0; i < Count; i++)
-      {
-        CustomProperty prop = this[i];
-        newProps[i] = new CustomPropertyDescriptor(ref prop, attributes);
-      }
-
-      return new PropertyDescriptorCollection(newProps);
-    }
-
-    /// <summary>
-    /// Returns the collection of properties for a specified component using the default type descriptor.
-    /// </summary>
-    /// <returns>A <see cref="PropertyDescriptorCollection"/> with the properties for a specified component.</returns>
-    public PropertyDescriptorCollection GetProperties()
-    {
-      return TypeDescriptor.GetProperties(this, true);
-    }
-
-    /// <summary>
-    /// Returns an object that contains the property described by the specified property descriptor.
-    /// </summary>
-    /// <param name="pd">A <see cref="PropertyDescriptor"/> that represents the property whose owner is to be found.</param>
-    /// <returns>An <see cref="Object"/> that represents the owner of the specified property.</returns>
-    public object GetPropertyOwner(PropertyDescriptor pd)
-    {
-      return this;
-    }
-
-    #endregion TypeDescriptor Implementation
-  }
-
-  /// <summary>
-  /// Represents a single property that can be displayed in a property editor.
-  /// </summary>
-  public class CustomProperty
-  {
-    /// <summary>
-    /// Instantiates a new instance of the <see cref="CustomProperty"/> class.
-    /// </summary>
-    /// <param name="name">The property name.</param>
-    /// <param name="value">The property value.</param>
-    /// <param name="readOnly">Flag indicating whether the property is read only.</param>
-    /// <param name="visible">Flag indicating whether the property is visible in a property editor.</param>
-    public CustomProperty(string name, object value, bool readOnly, bool visible)
-    {
-      Name = name;
-      Value = value;
-      ReadOnly = readOnly;
-      Visible = visible;
-    }
-
-    /// <summary>
-    /// Gets or sets the property description.
-    /// </summary>
-    public string Description { get; set; }
-
-    /// <summary>
-    /// Gets the property name.
-    /// </summary>
-    public string Name { get; private set; }
-
-    /// <summary>
-    /// Gets a value indicating whether the property is read only.
-    /// </summary>
-    public bool ReadOnly { get; private set; }
-
-    /// <summary>
-    /// Gets or sets the property value.
-    /// </summary>
-    public object Value { get; set; }
-
-    /// <summary>
-    /// Gets a value indicating whether the property is visible in a property editor.
-    /// </summary>
-    public bool Visible { get; private set; }
-  }
-
-  /// <summary>
-  /// Provides an abstraction of a custom property on a class.
-  /// </summary>
-  public class CustomPropertyDescriptor : PropertyDescriptor
-  {
-    /// <summary>
-    /// A single property that can be displayed in a property editor.
-    /// </summary>
-    private readonly CustomProperty _property;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="CustomPropertyDescriptor"/> class.
-    /// </summary>
-    /// <param name="myProperty">A single property that can be displayed in a property editor.</param>
-    /// <param name="attrs">Property attributes.</param>
-    public CustomPropertyDescriptor(ref CustomProperty myProperty, Attribute[] attrs)
-      : base(myProperty.Name, attrs)
-    {
-      _property = myProperty;
-    }
-
-    #region PropertyDescriptor specific
-
-    /// <summary>
-    /// Gets the category name the property belongs to.
-    /// </summary>
-    public override string Category
-    {
-      get
-      {
-        return string.Empty;
-      }
-    }
-
-    public override Type ComponentType
-    {
-      get
-      {
-        return null;
-      }
-    }
-
-    /// <summary>
-    /// Gets the property description.
-    /// </summary>
-    public override string Description
-    {
-      get
-      {
-        return _property.Description;
-      }
-    }
-
-    /// <summary>
-    /// Gets the name of the property.
-    /// </summary>
-    public override string DisplayName
-    {
-      get
-      {
-        return _property.Name;
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether the property is read only.
-    /// </summary>
-    public override bool IsReadOnly
-    {
-      get
-      {
-        return _property.ReadOnly;
-      }
-    }
-
-    /// <summary>
-    /// Gets the data type of the property.
-    /// </summary>
-    public override Type PropertyType
-    {
-      get
-      {
-        return _property.Value.GetType();
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether the property value can be reset.
-    /// </summary>
-    /// <param name="component"></param>
-    /// <returns><c>true</c> if the value can be reset, <c>false</c> otherwise.</returns>
-    public override bool CanResetValue(object component)
-    {
-      return false;
-    }
-
-    /// <summary>
-    /// Gets the property value.
-    /// </summary>
-    /// <param name="component"></param>
-    /// <returns>The property value.</returns>
-    public override object GetValue(object component)
-    {
-      return _property.Value;
-    }
-
-    /// <summary>
-    /// Resets the property value.
-    /// </summary>
-    /// <param name="component"></param>
-    public override void ResetValue(object component)
-    {
-      //// Have to implement
-    }
-
-    /// <summary>
-    /// Sets the property value to the given one.
-    /// </summary>
-    /// <param name="component"></param>
-    /// <param name="value">The new property value.</param>
-    public override void SetValue(object component, object value)
-    {
-      _property.Value = value;
-    }
-
-    /// <summary>
-    /// Indicates whether the property value is serializable.
-    /// </summary>
-    /// <param name="component"></param>
-    /// <returns><c>true</c> if the property value is serializable, <c>false</c> otherwise.</returns>
-    public override bool ShouldSerializeValue(object component)
-    {
-      return false;
-    }
-
-    #endregion PropertyDescriptor specific
   }
 }

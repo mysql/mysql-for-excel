@@ -29,6 +29,7 @@ using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
+using ExcelTools = Microsoft.Office.Tools.Excel;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -64,31 +65,6 @@ namespace MySQL.ForExcel.Classes
     private readonly List<string> _autoPkWarningTextsList;
 
     /// <summary>
-    /// Array of <see cref="MySqlDataColumn"/> objects to be used in INSERT queries.
-    /// </summary>
-    private MySqlDataColumn[] _columnsForInsertion;
-
-    /// <summary>
-    /// Flag indicating if data is being copied from a regular <see cref="DataTable"/> object.
-    /// </summary>
-    private bool _copyingTableData;
-
-    /// <summary>
-    /// Flag indicating whether data type for each column is automatically detected when data is loaded by the <see cref="SetupColumnsWithData"/> method.
-    /// </summary>
-    private bool _detectDatatype;
-
-    /// <summary>
-    /// The default DB engine used for new table creations.
-    /// </summary>
-    private string _engine;
-
-    /// <summary>
-    /// Flag indicating if the first row in the Excel region to be exported contains the column names of the MySQL table that will be created.
-    /// </summary>
-    private bool _firstRowIsHeaders;
-
-    /// <summary>
     /// Flag indicating if the column names where changed to use the first row of data.
     /// </summary>
     private bool _changedColumnNamesWithFirstRowOfData;
@@ -104,9 +80,34 @@ namespace MySQL.ForExcel.Classes
     private long _columnsDataLength;
 
     /// <summary>
+    /// Array of <see cref="MySqlDataColumn"/> objects to be used in INSERT queries.
+    /// </summary>
+    private MySqlDataColumn[] _columnsForInsertion;
+
+    /// <summary>
+    /// Flag indicating if data is being copied from a regular <see cref="DataTable"/> object.
+    /// </summary>
+    private bool _copyingTableData;
+
+    /// <summary>
     /// Flag indicating whether during an Export operation only the table will be created without any data.
     /// </summary>
     private bool _createTableWithoutData;
+
+    /// <summary>
+    /// Flag indicating whether data type for each column is automatically detected when data is loaded by the <see cref="SetupColumnsWithData"/> method.
+    /// </summary>
+    private bool _detectDatatype;
+
+    /// <summary>
+    /// The default DB engine used for new table creations.
+    /// </summary>
+    private string _engine;
+
+    /// <summary>
+    /// Flag indicating if the first row in the Excel region to be exported contains the column names of the MySQL table that will be created.
+    /// </summary>
+    private bool _firstRowIsHeaders;
 
     /// <summary>
     /// An approximation for a maximum SQL query length.
@@ -1157,6 +1158,60 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Creates an Excel table from a given <see cref="Excel.Range"/> object.
+    /// </summary>
+    /// <param name="range">A <see cref="Excel.Range"/> object.</param>
+    /// <param name="excelTableName">The proposed name for the new Excel table.</param>
+    /// <param name="containsColumnNames">Flag indicating whether column names appear in the first row of the Excel range.</param>
+    public Excel.ListObject CreateExcelTable(Excel.Range range, string excelTableName, bool containsColumnNames)
+    {
+      if (range == null)
+      {
+        return null;
+      }
+
+      var worksheet = Globals.Factory.GetVstoObject(range.Worksheet);
+      var workbook = worksheet.Parent as Excel.Workbook;
+      if (workbook == null)
+      {
+        return null;
+      }
+
+      excelTableName = excelTableName.GetExcelTableNameAvoidingDuplicates();
+      var workbookName = Globals.ThisAddIn.Application.ActiveWorkbook.Name;
+      var commandText = string.Format("{0}!{1}", workbookName, excelTableName);
+      var connectionName = @"WorksheetConnection_" + commandText;
+      var connectionString = "WORKSHEET;" + workbookName;
+      var hasHeaders = containsColumnNames ? Excel.XlYesNoGuess.xlYes : Excel.XlYesNoGuess.xlNo;
+      var namedTable = range.Worksheet.ListObjects.Add(Excel.XlListObjectSourceType.xlSrcExternal, ExcelUtilities.DUMMY_WORKBOOK_CONNECTION_STRING, false, hasHeaders, range);
+      namedTable.Name = excelTableName;
+      namedTable.DisplayName = excelTableName;
+      namedTable.TableStyle = Settings.Default.ImportExcelTableStyleName;
+      namedTable.QueryTable.BackgroundQuery = false;
+      namedTable.QueryTable.CommandText = commandText;
+      var excelTable = Globals.Factory.GetVstoObject(namedTable);
+      excelTable.SetDataBinding(this);
+      foreach (MySqlDataColumn col in Columns)
+      {
+        excelTable.ListColumns[col.Ordinal + 1].Name = col.DisplayName;
+      }
+
+      excelTable.Range.Columns.AutoFit();
+
+      // Add a connection to the Workbook, the method used to add it differs since the Add method is obsolete for Excel 2013 and higher.
+      if (Globals.ThisAddIn.ExcelVersionNumber < ThisAddIn.EXCEL_2013_VERSION_NUMBER)
+      {
+        workbook.Connections.Add(connectionName, string.Empty, connectionString, commandText, Excel.XlCmdType.xlCmdExcel);
+      }
+      else
+      {
+        workbook.Connections.Add2(connectionName, string.Empty, connectionString, commandText, Excel.XlCmdType.xlCmdExcel, true, false);
+      }
+
+      return namedTable;
+    }
+
+    /// <summary>
     /// Gets the <see cref="MySqlDataColumn"/> object at the given position within the columns collection.
     /// </summary>
     /// <param name="index">Ordinal index within the columns collection</param>
@@ -1440,19 +1495,31 @@ namespace MySQL.ForExcel.Classes
     /// Imports data contained in the given <see cref="MySqlDataTable"/> object at the active Excel cell.
     /// </summary>
     /// <param name="importColumnNames">Flag indicating if column names will be imported as the first row of imported data.</param>
-    /// <returns>The <see cref="Excel.Range"/> containing the cells with the imported data.</returns>
-    public Excel.Range ImportDataAtActiveExcelCell(bool importColumnNames)
+    /// <param name="createExcelTable">Flag indicating whether an Excel table is created for the imported data.</param>
+    /// <returns>The <see cref="Excel.Range"/> or <see cref="Excel.ListObject"/> containing the cells with the imported data.</returns>
+    public object ImportDataAtActiveExcelCell(bool importColumnNames, bool createExcelTable)
     {
-      return ImportDataAtGivenExcelCell(importColumnNames, Globals.ThisAddIn.Application.ActiveCell);
+      var atCell = Globals.ThisAddIn.Application.ActiveCell;
+      object retObj = null;
+      if (createExcelTable)
+      {
+        retObj = ImportDataIntoExcelTable(importColumnNames, atCell);
+      }
+      else
+      {
+        retObj = ImportDataIntoExcelRange(importColumnNames, atCell);
+      }
+
+      return retObj;
     }
 
     /// <summary>
-    /// Imports data contained in the given <see cref="MySqlDataTable"/> object at the specified cell <see cref="Excel.Range"/>.
+    /// Imports the table's data at the specified Excel cell into a plain <see cref="Excel.Range"/>.
     /// </summary>
     /// <param name="importColumnNames">Flag indicating if column names will be imported as the first row of imported data.</param>
     /// <param name="atCell">The starting Excel (left-most and top-most) cell where the imported data is placed.</param>
     /// <returns>The <see cref="Excel.Range"/> containing the cells with the imported data.</returns>
-    public Excel.Range ImportDataAtGivenExcelCell(bool importColumnNames, Excel.Range atCell)
+    public Excel.Range ImportDataIntoExcelRange(bool importColumnNames, Excel.Range atCell)
     {
       int startingRow = importColumnNames ? 1 : 0;
       int rowsCount = Rows.Count + startingRow;
@@ -1474,7 +1541,10 @@ namespace MySQL.ForExcel.Classes
         // Check if the data being imported does not overlap with the data of an existing Excel table.
         if (fillingRange.IntersectsWithAnyExcelTable())
         {
-          if (InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelTableErrorTitle, Resources.ImportOverExcelTableErrorDetail, Resources.ImportOverExcelTableErrorSubDetail) == DialogResult.No)
+          if (
+            InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelTableErrorTitle,
+              Resources.ImportOverExcelTableErrorDetail, Resources.ImportOverExcelTableErrorSubDetail) ==
+            DialogResult.No)
           {
             return null;
           }
@@ -1486,11 +1556,11 @@ namespace MySQL.ForExcel.Classes
           }
 
           Excel.Range newWorkSheetCell = newWorkSheet.Range["A1", Type.Missing];
-          return ImportDataAtGivenExcelCell(importColumnNames, newWorkSheetCell);
+          return ImportDataIntoExcelRange(importColumnNames, newWorkSheetCell);
         }
 
         bool escapeFormulaTexts = Settings.Default.ImportEscapeFormulaTextValues;
-        object[,] fillingArray = new object[cappedNumRows, Columns.Count];
+        var fillingArray = new object[cappedNumRows, Columns.Count];
         if (importColumnNames)
         {
           for (int currCol = 0; currCol < Columns.Count; currCol++)
@@ -1503,7 +1573,7 @@ namespace MySQL.ForExcel.Classes
         cappedNumRows -= startingRow;
         for (int currRow = 0; currRow < cappedNumRows; currRow++)
         {
-          MySqlDataRow mySqlRow = Rows[currRow] as MySqlDataRow;
+          var mySqlRow = Rows[currRow] as MySqlDataRow;
           if (mySqlRow == null)
           {
             continue;
@@ -1511,10 +1581,10 @@ namespace MySQL.ForExcel.Classes
 
           for (int currCol = 0; currCol < Columns.Count; currCol++)
           {
-            object importingValue = DataTypeUtilities.GetImportingValueForDateType(mySqlRow[currCol]);
+            var importingValue = DataTypeUtilities.GetImportingValueForDateType(mySqlRow[currCol]);
             if (importingValue is string)
             {
-              string importingValueText = importingValue as string;
+              var importingValueText = importingValue as string;
 
               // If the imported value is a text that starts with an equal sign Excel will treat it as a formula so it needs to be escaped
               // prepending an apostrophe to it for Excel to treat it as standard text.
@@ -1536,34 +1606,88 @@ namespace MySQL.ForExcel.Classes
         fillingRange.ClearFormats();
         fillingRange.Value = fillingArray;
 
-        // Create Named Table for the imported data
-        if (Settings.Default.ImportCreateExcelTable && OperationType.IsForImport())
-        {
-          string excelTableNamePrefix = Settings.Default.ImportPrefixExcelTable && !string.IsNullOrEmpty(Settings.Default.ImportPrefixExcelTableText)
-            ? Settings.Default.ImportPrefixExcelTableText + "."
-            : string.Empty;
-          string excelTableNameSchemaPiece = !string.IsNullOrEmpty(SchemaName) ? SchemaName + "." : string.Empty;
-          string excelTableNameTablePiece = !string.IsNullOrEmpty(TableName) ? TableName : "Table";
-          fillingRange.CreateExcelTable(excelTableNamePrefix + excelTableNameSchemaPiece + excelTableNameTablePiece, importColumnNames);
-        }
-        else if (importColumnNames)
+        if (importColumnNames)
         {
           fillingRange.SetHeaderStyle();
         }
 
-        atCell.Worksheet.Columns.AutoFit();
+        fillingRange.Columns.AutoFit();
         fillingRange.Rows.AutoFit();
-        Globals.ThisAddIn.SkipSelectedDataContentsDetection = false;
         atCell.Select();
       }
       catch (Exception ex)
       {
-        Globals.ThisAddIn.SkipSelectedDataContentsDetection = false;
         MiscUtilities.ShowCustomizedErrorDialog(Resources.ImportDataErrorDetailText, ex.Message, true);
         MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
+      finally
+      {
+        Globals.ThisAddIn.SkipSelectedDataContentsDetection = false;
+      }
 
       return fillingRange;
+    }
+
+    /// <summary>
+    /// Imports the table's data at the specified Excel cell into a <see cref="Excel.ListObject"/>.
+    /// </summary>
+    /// <param name="importColumnNames">Flag indicating if column names will be imported as the first row of imported data.</param>
+    /// <param name="atCell">The starting Excel (left-most and top-most) cell where the imported data is placed.</param>
+    /// <returns>The created <see cref="Excel.ListObject"/> containing the imported data.</returns>
+    public Excel.ListObject ImportDataIntoExcelTable(bool importColumnNames, Excel.Range atCell)
+    {
+      int startingRow = importColumnNames ? 1 : 0;
+      int rowsCount = Rows.Count + startingRow;
+      if (rowsCount == 0)
+      {
+        return null;
+      }
+
+      Excel.ListObject excelTable = null;
+      try
+      {
+        Excel.Workbook activeWorkbook = atCell.Worksheet.Parent as Excel.Workbook;
+
+        // Check if the data being imported does not overlap with the data of an existing Excel table.
+        if (atCell.IntersectsWithAnyExcelTable())
+        {
+          if (
+            InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelTableErrorTitle,
+              Resources.ImportOverExcelTableErrorDetail, Resources.ImportOverExcelTableErrorSubDetail) ==
+            DialogResult.No)
+          {
+            return null;
+          }
+
+          var newWorkSheet = activeWorkbook.CreateWorksheet(TableName, true);
+          if (newWorkSheet == null)
+          {
+            return null;
+          }
+
+          Excel.Range newWorkSheetCell = newWorkSheet.Range["A1", Type.Missing];
+          return ImportDataIntoExcelTable(importColumnNames, newWorkSheetCell);
+        }
+
+        Globals.ThisAddIn.SkipSelectedDataContentsDetection = true;
+        Globals.ThisAddIn.Application.Goto(atCell, false);
+
+        // Create Excel Table for the imported data
+        string excelTableName = ExcelUtilities.GetExcelTableNameAvoidingDuplicates(SchemaName, TableName);
+        excelTable = CreateExcelTable(atCell, excelTableName, importColumnNames);
+        atCell.Select();
+      }
+      catch (Exception ex)
+      {
+        MiscUtilities.ShowCustomizedErrorDialog(Resources.ImportDataErrorDetailText, ex.Message, true);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
+      finally
+      {
+        Globals.ThisAddIn.SkipSelectedDataContentsDetection = false;
+      }
+
+      return excelTable;
     }
 
     /// <summary>
@@ -1954,7 +2078,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="schemaOnly">Flag indicating whether only the schema is copied without data.</param>
     private void CopyTableSchemaAndData(DataTable filledTable, bool schemaOnly = false)
     {
-      DataTable columnsInfoTable = filledTable.GetSchemaInfo();
+      DataTable columnsInfoTable = filledTable.GetColumnsSchemaInfo();
       CreateTableSchema(columnsInfoTable, true);
       if (!schemaOnly)
       {

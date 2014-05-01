@@ -227,6 +227,8 @@
     can be found.
   -->
   <ItemGroup>
+    <Compile Include="Classes\CustomProperty.cs" />
+    <Compile Include="Classes\CustomPropertyDescriptor.cs" />
     <Compile Include="Classes\DataTypeUtilities.cs" />
     <Compile Include="Classes\DbObject.cs" />
     <Compile Include="Classes\EditSessionInfo.cs" />
@@ -240,6 +242,7 @@
     <Compile Include="Classes\MySqlDataColumn.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Classes\MySqlDataRelationship.cs" />
     <Compile Include="Classes\MySqlDataRow.cs" />
     <Compile Include="Classes\MySqlDataTable.cs">
       <SubType>Component</SubType>
@@ -247,8 +250,10 @@
     <Compile Include="Classes\MySqlDataUtilities.cs" />
     <Compile Include="Classes\MySqlDummyRow.cs" />
     <Compile Include="Classes\MySqlForExcelSettings.cs" />
+    <Compile Include="Classes\MySqlListViewNode.cs" />
     <Compile Include="Classes\MySqlStatement.cs" />
     <Compile Include="Classes\NativeWindowWrapper.cs" />
+    <Compile Include="Classes\PropertiesCollection.cs" />
     <Compile Include="Classes\TempRange.cs" />
     <Compile Include="Controls\ExcelAddInPane.cs">
       <SubType>UserControl</SubType>
@@ -262,6 +267,9 @@
     <Compile Include="Controls\ManageTaskPaneRibbon.Designer.cs">
       <DependentUpon>ManageTaskPaneRibbon.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\MySqlListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\PreviewDataGridView.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -272,9 +280,6 @@
       <DependentUpon>HotLabel.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\MultiHeaderDataGridView.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\MyTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\SearchEdit.cs">
@@ -328,11 +333,23 @@
     <Compile Include="Forms\ImportAdvancedOptionsDialog.Designer.cs">
       <DependentUpon>ImportAdvancedOptionsDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\ImportMultipleDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ImportMultipleDialog.Designer.cs">
+      <DependentUpon>ImportMultipleDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\ImportProcedureForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\ImportProcedureForm.Designer.cs">
       <DependentUpon>ImportProcedureForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\PreviewTableViewDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\PreviewTableViewDialog.Designer.cs">
+      <DependentUpon>PreviewTableViewDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\ImportTableViewForm.cs">
       <SubType>Form</SubType>
@@ -448,8 +465,14 @@
     <EmbeddedResource Include="Forms\ImportAdvancedOptionsDialog.resx">
       <DependentUpon>ImportAdvancedOptionsDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ImportMultipleDialog.resx">
+      <DependentUpon>ImportMultipleDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportProcedureForm.resx">
       <DependentUpon>ImportProcedureForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\PreviewTableViewDialog.resx">
+      <DependentUpon>PreviewTableViewDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportTableViewForm.resx">
       <DependentUpon>ImportTableViewForm.cs</DependentUpon>
@@ -499,9 +522,6 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
-    <None Include="Properties\DataSources\MySqlColumn.datasource" />
-    <None Include="Properties\DataSources\MySqlDataColumn.datasource" />
-    <None Include="Properties\DataSources\MySqlTable.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -511,6 +531,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Structs\PasswordDialogFlags.cs" />
+    <Compile Include="Structs\TvItemEx.cs" />
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -578,11 +600,20 @@
     <None Include="Resources\MySQLforExcel-Cursor-Dragging-32x32.png" />
     <None Include="Resources\MySQLforExcel-InfoDlg-Warning-64x64.png" />
     <None Include="Resources\optimistic_update.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-MultiSelectObject-24x24.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-ListItem-Table-Many-24x24.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-ImportMany-24x24.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-ImportManyDisabled-24x24.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-RelatedObjects-32x32.png" />
+    <None Include="Resources\MySQLforExcel-ObjectPanel-MultiSelectObject-32x32.png" />
     <Content Include="Resources\refresh_sidebar.png" />
     <None Include="Resources\remove_col_mapping.png" />
     <None Include="Resources\SplashScreenExcel.png" />
+    <None Include="Resources\select_all.png" />
+    <None Include="Resources\select_none.png" />
     <Content Include="Resources\Warning.png" />
   </ItemGroup>
+  <ItemGroup />
   <!-- Include the build rules for a C# project. -->
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

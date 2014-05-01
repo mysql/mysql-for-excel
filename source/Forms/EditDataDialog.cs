@@ -884,7 +884,7 @@ namespace MySQL.ForExcel.Forms
       EditDataRange.Clear();
       Excel.Range topLeftCell = EditDataRange.Cells[1, 1];
       topLeftCell.Select();
-      EditDataRange = EditMySqlDataTable.ImportDataAtGivenExcelCell(true, topLeftCell);
+      EditDataRange = EditMySqlDataTable.ImportDataIntoExcelRange(true, topLeftCell);
       CommitChangesButton.Enabled = false;
       AddNewRowToEditingRange(false);
     }

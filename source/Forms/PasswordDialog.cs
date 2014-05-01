@@ -19,6 +19,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
+using MySQL.ForExcel.Structs;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
@@ -314,66 +315,6 @@ namespace MySQL.ForExcel.Forms
       PasswordLabel.Text = PasswordExpiredDialog ? Properties.Resources.OldPasswordLabelText : Properties.Resources.PasswordLabelText;
       StorePasswordSecurelyCheckBox.Location = PasswordExpiredDialog ?  StorePasswordSecurelyCheckBox.Location : NewPasswordTextBox.Location;
       DialogOKButton.Enabled = PasswordTextBox.Text.Trim().Length > 0;
-    }
-  }
-
-  /// <summary>
-  /// Specifies flags about password-related operations.
-  /// </summary>
-  public struct PasswordDialogFlags
-  {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PasswordDialogFlags"/> struct.
-    /// </summary>
-    /// <param name="wbConnection"></param>
-    public PasswordDialogFlags(MySqlWorkbenchConnection wbConnection)
-    {
-      Cancelled = false;
-      ConnectionResult = TestConnectionResult.None;
-      NewPassword = null;
-      OldPassword = wbConnection != null ? wbConnection.Password : null;
-    }
-
-    /// <summary>
-    /// Flag indicating whether the operation (password connection or reset password) was cancelled by the user.
-    /// </summary>
-    public bool Cancelled;
-
-    /// <summary>
-    /// Indicates the result of a connection test.
-    /// </summary>
-    public TestConnectionResult ConnectionResult;
-
-    /// <summary>
-    /// Gets a value indicating whether the connection was made sucessfully or if the password was just reset by the user.
-    /// </summary>
-    public bool ConnectionSuccess
-    {
-      get
-      {
-        return ConnectionResult == TestConnectionResult.ConnectionSuccess || ConnectionResult == TestConnectionResult.PasswordReset;
-      }
-    }
-
-    /// <summary>
-    /// The new password entered by the user.
-    /// </summary>
-    public string NewPassword;
-
-    /// <summary>
-    /// The original password provided to the <see cref="PasswordDialog"/> .
-    /// </summary>
-    public string OldPassword;
-
-    /// <summary>
-    /// Gets a value indicating whether the connection could not be made because of a wrong password.
-    /// </summary>
-    public bool WrongPassword
-    {
-      get
-      {
-        return ConnectionResult == TestConnectionResult.WrongPassword;
-      }
     }
   }
 }

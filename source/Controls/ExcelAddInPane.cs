@@ -25,6 +25,7 @@ using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Panels;
 using MySQL.ForExcel.Properties;
+using MySQL.ForExcel.Structs;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -129,7 +130,7 @@ namespace MySQL.ForExcel.Controls
     /// Gets a list of schemas loaded in this pane.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<string> LoadedSchemas
+    public List<DbObject> LoadedSchemas
     {
       get
       {
@@ -355,7 +356,6 @@ namespace MySQL.ForExcel.Controls
     public void ImportDataToExcel(DataSet ds, bool importColumnNames, ImportProcedureForm.ImportMultipleType importType, int selectedResultSet)
     {
       Excel.Range atCell = Globals.ThisAddIn.Application.ActiveCell;
-
       int tableIdx = 0;
       foreach (MySqlDataTable mySqlTable in ds.Tables)
       {
@@ -365,7 +365,15 @@ namespace MySQL.ForExcel.Controls
         }
 
         tableIdx++;
-        Excel.Range fillingRange = mySqlTable.ImportDataAtGivenExcelCell(importColumnNames, atCell);
+        var excelObj = mySqlTable.ImportDataAtActiveExcelCell(importColumnNames, Settings.Default.ImportCreateExcelTable);
+        if (excelObj == null)
+        {
+          continue;
+        }
+
+        var fillingRange = excelObj is Excel.ListObject
+          ? (excelObj as Excel.ListObject).Range
+          : excelObj as Excel.Range;
         Excel.Range endCell;
         if (fillingRange != null)
         {
@@ -530,7 +538,7 @@ namespace MySQL.ForExcel.Controls
     private EditSessionInfo GetEditSession(DbObject tableObject, ImportTableViewForm importForm, Excel.Worksheet currentWorksheet)
     {
       Excel.Range atCell = currentWorksheet.Range["A1", Type.Missing];
-      Excel.Range editingRange = importForm.ImportDataTable.ImportDataAtGivenExcelCell(importForm.ImportHeaders, atCell);
+      Excel.Range editingRange = importForm.ImportDataTable.ImportDataIntoExcelRange(importForm.ImportHeaders, atCell);
       EditSessionInfo session = null;
 
       if (Globals.ThisAddIn.ActiveWorkbookSessions.Count > 0)

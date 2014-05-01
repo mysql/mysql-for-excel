@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -53,7 +53,7 @@ namespace MySQL.ForExcel.Panels
       this.BackButton = new System.Windows.Forms.Button();
       this.NextButton = new System.Windows.Forms.Button();
       this.OptionsButton = new System.Windows.Forms.Button();
-      this.SchemasList = new MySQL.ForExcel.Controls.MyTreeView();
+      this.SchemasList = new MySQL.ForExcel.Controls.MySqlListView();
       this.SchemasContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.RefreshSchemasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.CreateNewSchemaHotLabel = new MySQL.ForExcel.Controls.HotLabel();
@@ -161,6 +161,8 @@ namespace MySQL.ForExcel.Panels
       // CreateNewSchemaHotLabel
       // 
       this.CreateNewSchemaHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.CreateNewSchemaHotLabel.Behavior = MySQL.ForExcel.Controls.HotLabel.BehaviorType.Button;
+      this.CreateNewSchemaHotLabel.CheckedImage = null;
       this.CreateNewSchemaHotLabel.Description = "Add a new Database Schema";
       this.CreateNewSchemaHotLabel.DescriptionColor = System.Drawing.SystemColors.WindowText;
       this.CreateNewSchemaHotLabel.DescriptionColorOpacity = 0.6D;
@@ -171,7 +173,6 @@ namespace MySQL.ForExcel.Panels
       this.CreateNewSchemaHotLabel.DisabledImage = null;
       this.CreateNewSchemaHotLabel.DrawShadow = true;
       this.CreateNewSchemaHotLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.CreateNewSchemaHotLabel.HotTracking = true;
       this.CreateNewSchemaHotLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_SchemaPanel_NewSchema_24x24;
       this.CreateNewSchemaHotLabel.ImagePixelsXOffset = 0;
       this.CreateNewSchemaHotLabel.ImagePixelsYOffset = 0;
@@ -241,6 +242,8 @@ namespace MySQL.ForExcel.Panels
       // 
       // SelectSchemaHotLabel
       // 
+      this.SelectSchemaHotLabel.Behavior = MySQL.ForExcel.Controls.HotLabel.BehaviorType.Label;
+      this.SelectSchemaHotLabel.CheckedImage = null;
       this.SelectSchemaHotLabel.Description = "Then click the [Next>] button below";
       this.SelectSchemaHotLabel.DescriptionColor = System.Drawing.SystemColors.WindowText;
       this.SelectSchemaHotLabel.DescriptionColorOpacity = 0.6D;
@@ -251,7 +254,6 @@ namespace MySQL.ForExcel.Panels
       this.SelectSchemaHotLabel.DisabledImage = null;
       this.SelectSchemaHotLabel.DrawShadow = true;
       this.SelectSchemaHotLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.SelectSchemaHotLabel.HotTracking = false;
       this.SelectSchemaHotLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_SchemaPanel_Schemas_24x24;
       this.SelectSchemaHotLabel.ImagePixelsXOffset = 0;
       this.SelectSchemaHotLabel.ImagePixelsYOffset = 2;
@@ -332,7 +334,7 @@ namespace MySQL.ForExcel.Panels
     private System.Windows.Forms.ImageList LargeImagesList;
     public System.Windows.Forms.Button OptionsButton;
     private HotLabel CreateNewSchemaHotLabel;
-    public MyTreeView SchemasList;
+    public MySqlListView SchemasList;
     private System.Windows.Forms.ContextMenuStrip SchemasContextMenuStrip;
     private System.Windows.Forms.ToolStripMenuItem RefreshSchemasToolStripMenuItem;
     private System.Windows.Forms.Panel UpperPanel;
