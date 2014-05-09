@@ -1,0 +1,14 @@
+thumbs.db
+source/bin/
+source/obj/
+Installer/bin/
+Installer/obj/
+*.user
+**/thumbs.db
+**/bin/**
+**/obj/**
+bin
+packages
+obj
+bin
+*.suo
