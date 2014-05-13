@@ -34,17 +34,7 @@ namespace MySQL.ForExcel.Forms
     public ExportAdvancedOptionsDialog()
     {
       InitializeComponent();
-
-      ExportDetectDatatypeChanged = false;
-      ParentFormRequiresRefresh = false;
-      PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.ExportLimitPreviewRowsQuantity);
-      DetectDatatypeCheckBox.Checked = Settings.Default.ExportDetectDatatype;
-      AddBufferToVarcharCheckBox.Checked = Settings.Default.ExportAddBufferToVarchar;
-      AutoIndexIntColumnsCheckBox.Checked = Settings.Default.ExportAutoIndexIntColumns;
-      AutoAllowEmptyNonIndexColumnsCheckBox.Checked = Settings.Default.ExportAutoAllowEmptyNonIndexColumns;
-      UseFormattedValuesCheckBox.Checked = Settings.Default.ExportUseFormattedValues;
-      AddBufferToVarcharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
-      CreateTableIndexesLastCheckBox.Checked = Settings.Default.ExportSqlQueriesCreateIndexesLast;
+      RefreshControlValues(false);
     }
 
     #region Properties
@@ -136,15 +126,6 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Sets the visibility of the controls depicting a warning about column options changes being lost.
-    /// </summary>
-    private void SetWarningControlsVisibility()
-    {
-      ColumnOptionsLostWarningLabel.Visible = ParentFormRequiresRefresh;
-      ColumnOptionsLostWarningPictureBox.Visible = ParentFormRequiresRefresh;
-    }
-
-    /// <summary>
     /// Event delegate method fired when the <see cref="PreviewRowsQuantityNumericUpDown"/> value changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -152,6 +133,60 @@ namespace MySQL.ForExcel.Forms
     private void PreviewRowsQuantityNumericUpDown_ValueChanged(object sender, EventArgs e)
     {
       GetParentFormRequiresRefresh();
+    }
+
+    /// <summary>
+    /// Refreshes the dialog controls' values.
+    /// </summary>
+    /// <param name="useDefaultValues">Controls are set to their default values if <c>true</c>. Current stored values in application settings are used otherwise.</param>
+    private void RefreshControlValues(bool useDefaultValues)
+    {
+      if (useDefaultValues)
+      {
+        var settings = Settings.Default;
+        PreviewRowsQuantityNumericUpDown.Value = settings.GetPropertyDefaultValueByName<int>("ExportLimitPreviewRowsQuantity");
+        DetectDatatypeCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportDetectDatatype");
+        AddBufferToVarcharCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportAddBufferToVarchar");
+        AutoIndexIntColumnsCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportAutoIndexIntColumns");
+        AutoAllowEmptyNonIndexColumnsCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportAutoAllowEmptyNonIndexColumns");
+        UseFormattedValuesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportUseFormattedValues");
+        AddBufferToVarcharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
+        CreateTableIndexesLastCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportSqlQueriesCreateIndexesLast");
+      }
+      else
+      {
+        ExportDetectDatatypeChanged = false;
+        ParentFormRequiresRefresh = false;
+        PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum,
+          Settings.Default.ExportLimitPreviewRowsQuantity);
+        DetectDatatypeCheckBox.Checked = Settings.Default.ExportDetectDatatype;
+        AddBufferToVarcharCheckBox.Checked = Settings.Default.ExportAddBufferToVarchar;
+        AutoIndexIntColumnsCheckBox.Checked = Settings.Default.ExportAutoIndexIntColumns;
+        AutoAllowEmptyNonIndexColumnsCheckBox.Checked = Settings.Default.ExportAutoAllowEmptyNonIndexColumns;
+        UseFormattedValuesCheckBox.Checked = Settings.Default.ExportUseFormattedValues;
+        AddBufferToVarcharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
+        CreateTableIndexesLastCheckBox.Checked = Settings.Default.ExportSqlQueriesCreateIndexesLast;
+      }
+    }
+
+    /// <summary>
+    /// Handles the Click event of the ResetToDefaultsButton control.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+    private void ResetToDefaultsButton_Click(object sender, EventArgs e)
+    {
+      RefreshControlValues(true);
+      Refresh();
+    }
+
+    /// <summary>
+    /// Sets the visibility of the controls depicting a warning about column options changes being lost.
+    /// </summary>
+    private void SetWarningControlsVisibility()
+    {
+      ColumnOptionsLostWarningLabel.Visible = ParentFormRequiresRefresh;
+      ColumnOptionsLostWarningPictureBox.Visible = ParentFormRequiresRefresh;
     }
 
     /// <summary>

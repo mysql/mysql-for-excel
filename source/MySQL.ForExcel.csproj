@@ -254,6 +254,7 @@
     <Compile Include="Classes\MySqlStatement.cs" />
     <Compile Include="Classes\NativeWindowWrapper.cs" />
     <Compile Include="Classes\PropertiesCollection.cs" />
+    <Compile Include="Classes\PropertyGroup.cs" />
     <Compile Include="Classes\TempRange.cs" />
     <Compile Include="Controls\ExcelAddInPane.cs">
       <SubType>UserControl</SubType>

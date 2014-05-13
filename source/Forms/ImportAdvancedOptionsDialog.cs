@@ -43,14 +43,7 @@ namespace MySQL.ForExcel.Forms
     {
       ParentFormRequiresRefresh = false;
       InitializeComponent();
-
-      PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.ImportPreviewRowsQuantity);
-      EscapeFormulaValuesCheckBox.Checked = Settings.Default.ImportEscapeFormulaTextValues;
-      CreateExcelTableCheckbox.Checked = Settings.Default.ImportCreateExcelTable;
-      UseStyleComboBox.DataSource = Globals.ThisAddIn.Application.ActiveWorkbook.ListTableStyles();
-      UseStyleComboBox.Text = Settings.Default.ImportExcelTableStyleName;
-      PrefixExcelTablesCheckBox.Checked = Settings.Default.ImportPrefixExcelTable;
-      PrefixExcelTablesTextBox.Text = Settings.Default.ImportPrefixExcelTableText;
+      RefreshControlValues();
       SetExcelTableControlsAvailability();
     }
 
@@ -96,6 +89,46 @@ namespace MySQL.ForExcel.Forms
     private void PrefixExcelTablesCheckBox_CheckedChanged(object sender, EventArgs e)
     {
       PrefixExcelTablesTextBox.ReadOnly = !(CreateExcelTableCheckbox.Checked && PrefixExcelTablesCheckBox.Checked);
+    }
+
+    /// <summary>
+    /// Refreshes the dialog controls' values.
+    /// </summary>
+    /// <param name="useDefaultValues">Controls are set to their default values if <c>true</c>. Current stored values in application settings are used otherwise.</param>
+    private void RefreshControlValues(bool useDefaultValues = false)
+    {
+      if (useDefaultValues)
+      {
+        var settings = Settings.Default;
+        PreviewRowsQuantityNumericUpDown.Value = settings.GetPropertyDefaultValueByName<int>("ImportPreviewRowsQuantity");
+        EscapeFormulaValuesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ImportEscapeFormulaTextValues");
+        CreateExcelTableCheckbox.Checked = settings.GetPropertyDefaultValueByName<bool>("ImportCreateExcelTable");
+        UseStyleComboBox.DataSource = Globals.ThisAddIn.Application.ActiveWorkbook.ListTableStyles();
+        UseStyleComboBox.Text = settings.GetPropertyDefaultValueByName<string>("ImportExcelTableStyleName");
+        PrefixExcelTablesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ImportPrefixExcelTable");
+        PrefixExcelTablesTextBox.Text = settings.GetPropertyDefaultValueByName<string>("ImportPrefixExcelTableText");
+      }
+      else
+      {
+        PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.ImportPreviewRowsQuantity);
+        EscapeFormulaValuesCheckBox.Checked = Settings.Default.ImportEscapeFormulaTextValues;
+        CreateExcelTableCheckbox.Checked = Settings.Default.ImportCreateExcelTable;
+        UseStyleComboBox.DataSource = Globals.ThisAddIn.Application.ActiveWorkbook.ListTableStyles();
+        UseStyleComboBox.Text = Settings.Default.ImportExcelTableStyleName;
+        PrefixExcelTablesCheckBox.Checked = Settings.Default.ImportPrefixExcelTable;
+        PrefixExcelTablesTextBox.Text = Settings.Default.ImportPrefixExcelTableText;
+      }
+    }
+
+    /// <summary>
+    /// Handles the Click event of the ResetToDefaultsButton control.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+    private void ResetToDefaultsButton_Click(object sender, EventArgs e)
+    {
+      RefreshControlValues(true);
+      Refresh();
     }
 
     /// <summary>

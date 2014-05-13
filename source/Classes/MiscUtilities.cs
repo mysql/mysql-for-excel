@@ -16,6 +16,7 @@
 // 02110-1301  USA
 
 using System;
+using System.Configuration;
 using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,6 @@ using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
-using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 
@@ -97,8 +97,8 @@ namespace MySQL.ForExcel.Classes
     public static EditSessionInfo GetActiveEditSession(this List<EditSessionInfo> sessionsList, Excel.Workbook workbook, string tableName)
     {
       var workBookId = workbook.GetOrCreateId();
-      return sessionsList == null ? null : sessionsList.FirstOrDefault(session => session.EditDialog != null && 
-      string.Equals(session.WorkbookGuid,workBookId, StringComparison.InvariantCulture) && 
+      return sessionsList == null ? null : sessionsList.FirstOrDefault(session => session.EditDialog != null &&
+      string.Equals(session.WorkbookGuid, workBookId, StringComparison.InvariantCulture) &&
       session.TableName == tableName);
     }
 
@@ -128,6 +128,25 @@ namespace MySQL.ForExcel.Classes
       {
         yield return biDimensionalArray[firstDimensionIndex, i];
       }
+    }
+
+    /// <summary>
+    /// Gets the default property value by property name.
+    /// </summary>
+    /// <typeparam name="T">Type to which the property must be cast to in the end.</typeparam>
+    /// <param name="settings">The application settings.</param>
+    /// <param name="propertyName">Name of the property we want to get the default value from.</param>
+    /// <returns></returns>
+    public static T GetPropertyDefaultValueByName<T>(this ApplicationSettingsBase settings, string propertyName)
+    {
+      var settingsProperty = settings.Properties[propertyName];
+      var propertyInfo = settings.GetType().GetProperties().FirstOrDefault(p => string.Equals(p.Name, propertyName, StringComparison.InvariantCulture));
+      if (propertyInfo == null || settingsProperty == null)
+      {
+        return default(T);
+      }
+
+      return (T)Convert.ChangeType(settingsProperty.DefaultValue, propertyInfo.PropertyType);
     }
 
     /// <summary>
@@ -190,6 +209,31 @@ namespace MySQL.ForExcel.Classes
       }
 
       return index;
+    }
+
+    /// <summary>
+    /// Resets the settings that correspond to the defined section to its default values.
+    /// </summary>
+    /// <param name="settings">The application defualt settings (extension method)</param>
+    /// <param name="section">The section type</param>
+    public static void ResetSectionToDefaultValues(this ApplicationSettingsBase settings, PropertyGroup.SettingsGroup section)
+    {
+      foreach (var propertyInfo in settings.GetType().GetProperties())
+      {
+        var att = propertyInfo.GetCustomAttributes(typeof(PropertyGroup), true).FirstOrDefault();
+        if (att == null || ((PropertyGroup)att).Value != section)
+        {
+          continue;
+        }
+
+        var settingsProperty = settings.Properties[propertyInfo.Name];
+        if (settingsProperty == null)
+        {
+          continue;
+        }
+
+        propertyInfo.SetValue(settings, Convert.ChangeType(settingsProperty.DefaultValue, propertyInfo.PropertyType), null);
+      }
     }
 
     /// <summary>

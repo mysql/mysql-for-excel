@@ -34,18 +34,8 @@ namespace MySQL.ForExcel.Forms
     public GlobalOptionsDialog()
     {
       InitializeComponent();
-
       ConnectionTimeoutNumericUpDown.Maximum = Int32.MaxValue / 1000;
-      QueryTimeoutNumericUpDown.Maximum = ConnectionTimeoutNumericUpDown.Maximum;
-      ConnectionTimeoutNumericUpDown.Value = Math.Min(ConnectionTimeoutNumericUpDown.Maximum, Settings.Default.GlobalConnectionConnectionTimeout);
-      QueryTimeoutNumericUpDown.Value = Settings.Default.GlobalConnectionCommandTimeout;
-      UseOptimisticUpdatesCheckBox.Checked = Settings.Default.EditUseOptimisticUpdate;
-      PreviewSqlQueriesRadioButton.Checked = Settings.Default.GlobalSqlQueriesPreviewQueries;
-      ShowExecutedSqlQueryRadioButton.Checked = Settings.Default.GlobalSqlQueriesShowQueriesWithResults;
-      NoSqlStatementsRadioButton.Checked = !PreviewSqlQueriesRadioButton.Checked && !ShowExecutedSqlQueryRadioButton.Checked;
-      RestoreSavedEditSessionsCheckBox.Checked = Settings.Default.EditSessionsRestoreWhenOpeningWorkbook;
-      ReuseWorksheetsRadioButton.Checked = Settings.Default.EditSessionsReuseWorksheets;
-      CreateNewWorksheetsRadioButton.Checked = !ReuseWorksheetsRadioButton.Checked;
+      RefreshControlValues();
       SetRestoreSessionsRadioButtonsEnabledStatus();
     }
 
@@ -69,6 +59,51 @@ namespace MySQL.ForExcel.Forms
       Settings.Default.EditSessionsRestoreWhenOpeningWorkbook = RestoreSavedEditSessionsCheckBox.Checked;
       Settings.Default.EditSessionsReuseWorksheets = ReuseWorksheetsRadioButton.Checked;
       MiscUtilities.SaveSettings();
+    }
+
+    /// <summary>
+    /// Refreshes the dialog controls' values.
+    /// </summary>
+    /// <param name="useDefaultValues">Controls are set to their default values if <c>true</c>. Current stored values in application settings are used otherwise.</param>
+    private void RefreshControlValues(bool useDefaultValues = false)
+    {
+      QueryTimeoutNumericUpDown.Maximum = ConnectionTimeoutNumericUpDown.Maximum;
+
+      if (useDefaultValues)
+      {
+        var settings = Settings.Default;
+        ConnectionTimeoutNumericUpDown.Value = Math.Min(ConnectionTimeoutNumericUpDown.Maximum, settings.GetPropertyDefaultValueByName<uint>("GlobalConnectionConnectionTimeout"));
+        QueryTimeoutNumericUpDown.Value = settings.GetPropertyDefaultValueByName<uint>("GlobalConnectionCommandTimeout");
+        UseOptimisticUpdatesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("EditUseOptimisticUpdate");
+        PreviewSqlQueriesRadioButton.Checked = settings.GetPropertyDefaultValueByName<bool>("GlobalSqlQueriesPreviewQueries");
+        ShowExecutedSqlQueryRadioButton.Checked = settings.GetPropertyDefaultValueByName<bool>("GlobalSqlQueriesShowQueriesWithResults");
+        RestoreSavedEditSessionsCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("EditSessionsRestoreWhenOpeningWorkbook");
+        ReuseWorksheetsRadioButton.Checked = settings.GetPropertyDefaultValueByName<bool>("EditSessionsReuseWorksheets");
+      }
+      else
+      {
+        ConnectionTimeoutNumericUpDown.Value = Math.Min(ConnectionTimeoutNumericUpDown.Maximum, Settings.Default.GlobalConnectionConnectionTimeout);
+        QueryTimeoutNumericUpDown.Value = Settings.Default.GlobalConnectionCommandTimeout;
+        UseOptimisticUpdatesCheckBox.Checked = Settings.Default.EditUseOptimisticUpdate;
+        PreviewSqlQueriesRadioButton.Checked = Settings.Default.GlobalSqlQueriesPreviewQueries;
+        ShowExecutedSqlQueryRadioButton.Checked = Settings.Default.GlobalSqlQueriesShowQueriesWithResults;
+        RestoreSavedEditSessionsCheckBox.Checked = Settings.Default.EditSessionsRestoreWhenOpeningWorkbook;
+        ReuseWorksheetsRadioButton.Checked = Settings.Default.EditSessionsReuseWorksheets;
+      }
+
+      NoSqlStatementsRadioButton.Checked = !PreviewSqlQueriesRadioButton.Checked && !ShowExecutedSqlQueryRadioButton.Checked;
+      CreateNewWorksheetsRadioButton.Checked = !ReuseWorksheetsRadioButton.Checked;
+    }
+
+    /// <summary>
+    /// Handles the Click event of the ResetToDefaultsButton control.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+    private void ResetToDefaultsButton_Click(object sender, EventArgs e)
+    {
+      RefreshControlValues(true);
+      Refresh();
     }
 
     /// <summary>

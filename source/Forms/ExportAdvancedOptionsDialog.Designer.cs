@@ -65,6 +65,7 @@ namespace MySQL.ForExcel.Forms
       this.CreateTableIndexesLastCheckBox = new System.Windows.Forms.CheckBox();
       this.SqlQueriesLabel = new System.Windows.Forms.Label();
       this.HelpToolTip = new System.Windows.Forms.ToolTip(this.components);
+      this.ResetToDefaultsButton = new System.Windows.Forms.Button();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.PreviewRowsQuantityNumericUpDown)).BeginInit();
@@ -97,6 +98,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // CommandAreaPanel
       // 
+      this.CommandAreaPanel.Controls.Add(this.ResetToDefaultsButton);
       this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
       this.CommandAreaPanel.Location = new System.Drawing.Point(0, 372);
@@ -106,7 +108,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.DialogAcceptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.DialogAcceptButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.DialogAcceptButton.Location = new System.Drawing.Point(406, 11);
+      this.DialogAcceptButton.Location = new System.Drawing.Point(416, 11);
       this.DialogAcceptButton.Name = "DialogAcceptButton";
       this.DialogAcceptButton.Size = new System.Drawing.Size(75, 23);
       this.DialogAcceptButton.TabIndex = 0;
@@ -117,7 +119,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.DialogCancelButton.Location = new System.Drawing.Point(487, 11);
+      this.DialogCancelButton.Location = new System.Drawing.Point(497, 11);
       this.DialogCancelButton.Name = "DialogCancelButton";
       this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
       this.DialogCancelButton.TabIndex = 1;
@@ -331,6 +333,17 @@ namespace MySQL.ForExcel.Forms
       this.HelpToolTip.InitialDelay = 1000;
       this.HelpToolTip.ReshowDelay = 100;
       // 
+      // ResetToDefaultsButton
+      // 
+      this.ResetToDefaultsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.ResetToDefaultsButton.Location = new System.Drawing.Point(12, 11);
+      this.ResetToDefaultsButton.Name = "ResetToDefaultsButton";
+      this.ResetToDefaultsButton.Size = new System.Drawing.Size(110, 23);
+      this.ResetToDefaultsButton.TabIndex = 2;
+      this.ResetToDefaultsButton.Text = "Reset to Defaults";
+      this.ResetToDefaultsButton.UseVisualStyleBackColor = true;
+      this.ResetToDefaultsButton.Click += new System.EventHandler(this.ResetToDefaultsButton_Click);
+      // 
       // ExportAdvancedOptionsDialog
       // 
       this.AcceptButton = this.DialogAcceptButton;
@@ -372,5 +385,6 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.CheckBox CreateTableIndexesLastCheckBox;
     private System.Windows.Forms.Label SqlQueriesLabel;
     private System.Windows.Forms.ToolTip HelpToolTip;
+    private System.Windows.Forms.Button ResetToDefaultsButton;
   }
 }

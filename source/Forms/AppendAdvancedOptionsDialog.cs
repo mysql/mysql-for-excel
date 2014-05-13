@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -55,13 +55,7 @@ namespace MySQL.ForExcel.Forms
     {
       ParentFormRequiresRefresh = false;
       InitializeComponent();
-
-      DoNotPerformAutoMapCheckBox.Checked = Settings.Default.AppendPerformAutoMap;
-      AutoStoreColumnMappingCheckBox.Checked = Settings.Default.AppendAutoStoreColumnMapping;
-      ReloadColumnMappingCheckBox.Checked = Settings.Default.AppendReloadColumnMapping;
-      UseFormattedValuesCheckBox.Checked = Settings.Default.AppendUseFormattedValues;
-      PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.AppendLimitPreviewRowsQuantity);
-      DisableTableIndexesCheckBox.Checked = Settings.Default.AppendSqlQueriesDisableIndexes;
+      RefreshControlValues();
       _mappings = new MySqlColumnMappingList();
       RefreshMappingList();
     }
@@ -117,6 +111,33 @@ namespace MySQL.ForExcel.Forms
       DeleteMappingButton.Enabled = MappingsListView.SelectedItems.Count > 0;
       _selectedMapping = MappingsListView.SelectedItems.Count > 0 ? MappingsListView.SelectedItems[0].Tag as MySqlColumnMapping : null;
       RenameMappingButton.Enabled = _selectedMapping != null;
+    }
+
+    /// <summary>
+    /// Refreshes the dialog controls' values.
+    /// </summary>
+    /// <param name="useDefaultValues">Controls are set to their default values if <c>true</c>. Current stored values in application settings are used otherwise.</param>
+    private void RefreshControlValues(bool useDefaultValues = false)
+    {
+      if (useDefaultValues)
+      {
+        var settings = Settings.Default;
+        DoNotPerformAutoMapCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendPerformAutoMap");
+        AutoStoreColumnMappingCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendAutoStoreColumnMapping");
+        ReloadColumnMappingCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendReloadColumnMapping");
+        UseFormattedValuesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendUseFormattedValues");
+        PreviewRowsQuantityNumericUpDown.Value = settings.GetPropertyDefaultValueByName<int>("AppendLimitPreviewRowsQuantity");
+        DisableTableIndexesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendSqlQueriesDisableIndexes");
+      }
+      else
+      {
+        DoNotPerformAutoMapCheckBox.Checked = Settings.Default.AppendPerformAutoMap;
+        AutoStoreColumnMappingCheckBox.Checked = Settings.Default.AppendAutoStoreColumnMapping;
+        ReloadColumnMappingCheckBox.Checked = Settings.Default.AppendReloadColumnMapping;
+        UseFormattedValuesCheckBox.Checked = Settings.Default.AppendUseFormattedValues;
+        PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.AppendLimitPreviewRowsQuantity);
+        DisableTableIndexesCheckBox.Checked = Settings.Default.AppendSqlQueriesDisableIndexes;
+      }
     }
 
     /// <summary>
@@ -197,6 +218,17 @@ namespace MySQL.ForExcel.Forms
       }
 
       MappingsListView.Focus();
+    }
+
+    /// <summary>
+    /// Handles the Click event of the ResetToDefaultsButton control.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+    private void ResetToDefaultsButton_Click(object sender, EventArgs e)
+    {
+      RefreshControlValues(true);
+      Refresh();
     }
   }
 }

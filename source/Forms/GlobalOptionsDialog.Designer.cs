@@ -69,6 +69,7 @@ namespace MySQL.ForExcel.Forms
       this.CreateNewWorksheetsRadioButton = new System.Windows.Forms.RadioButton();
       this.ReuseWorksheetsRadioButton = new System.Windows.Forms.RadioButton();
       this.ExcelToolTip = new System.Windows.Forms.ToolTip(this.components);
+      this.ResetToDefaultsButton = new System.Windows.Forms.Button();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.ConnectionTimeoutNumericUpDown)).BeginInit();
@@ -102,6 +103,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // CommandAreaPanel
       // 
+      this.CommandAreaPanel.Controls.Add(this.ResetToDefaultsButton);
       this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
       this.CommandAreaPanel.Location = new System.Drawing.Point(0, 406);
@@ -379,6 +381,17 @@ namespace MySQL.ForExcel.Forms
       this.ExcelToolTip.InitialDelay = 1000;
       this.ExcelToolTip.ReshowDelay = 100;
       // 
+      // ResetToDefaultsButton
+      // 
+      this.ResetToDefaultsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.ResetToDefaultsButton.Location = new System.Drawing.Point(12, 11);
+      this.ResetToDefaultsButton.Name = "ResetToDefaultsButton";
+      this.ResetToDefaultsButton.Size = new System.Drawing.Size(110, 23);
+      this.ResetToDefaultsButton.TabIndex = 3;
+      this.ResetToDefaultsButton.Text = "Reset to Defaults";
+      this.ResetToDefaultsButton.UseVisualStyleBackColor = true;
+      this.ResetToDefaultsButton.Click += new System.EventHandler(this.ResetToDefaultsButton_Click);
+      // 
       // GlobalOptionsDialog
       // 
       this.AcceptButton = this.DialogAcceptButton;
@@ -428,5 +441,6 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.RadioButton CreateNewWorksheetsRadioButton;
     private System.Windows.Forms.RadioButton ReuseWorksheetsRadioButton;
     private System.Windows.Forms.ToolTip ExcelToolTip;
+    private System.Windows.Forms.Button ResetToDefaultsButton;
   }
 }
