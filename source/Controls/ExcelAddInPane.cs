@@ -104,7 +104,7 @@ namespace MySQL.ForExcel.Controls
       get
       {
         return ActiveWorksheet != null
-                && Globals.ThisAddIn.ActiveWorkbookSessions.Exists(session => session.EditDialog != null && session.EditDialog.EditingWorksheet == ActiveWorksheet);
+                && Globals.ThisAddIn.ActiveWorkbookEditSessions.Exists(session => session.EditDialog != null && session.EditDialog.EditingWorksheet == ActiveWorksheet);
       }
     }
 
@@ -232,7 +232,7 @@ namespace MySQL.ForExcel.Controls
     /// <returns><c>true</c> if the schema and its open Edit sessions are closed, <c>false</c> otherwise.</returns>
     public bool CloseSchema(bool askToCloseConnections, bool givePanelFocus)
     {
-      if (askToCloseConnections && Globals.ThisAddIn.ActiveWorkbookSessions.Count > 0)
+      if (askToCloseConnections && Globals.ThisAddIn.ActiveWorkbookEditSessions.Count > 0)
       {
         // If there are Active Edit sessions warn the users that by closing the schema the sessions will be terminated
         DialogResult dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.ActiveEditingSessionsCloseWarningTitle, Resources.ActiveEditingSessionsCloseWarningDetail);
@@ -299,7 +299,7 @@ namespace MySQL.ForExcel.Controls
       // Hide all other open EditDataDialog forms before opening a new one.
       if (!fromSavedSession)
       {
-        foreach (var session in Globals.ThisAddIn.ActiveWorkbookSessions.Where(session => session.EditDialog != null && session.EditDialog.Visible))
+        foreach (var session in Globals.ThisAddIn.ActiveWorkbookEditSessions.Where(session => session.EditDialog != null && session.EditDialog.Visible))
         {
           session.EditDialog.Hide();
         }
@@ -328,7 +328,7 @@ namespace MySQL.ForExcel.Controls
       if (fromSavedSession)
       {
         // If restoring sessions we need to set the EditDialog to its session.
-        var editSessionBeingRestored = Globals.ThisAddIn.ActiveWorkbookSessions.FirstOrDefault(session => session.TableName.Equals(editSession.TableName));
+        var editSessionBeingRestored = Globals.ThisAddIn.ActiveWorkbookEditSessions.FirstOrDefault(session => session.TableName.Equals(editSession.TableName));
         if (editSessionBeingRestored != null)
         {
           editSessionBeingRestored.EditDialog = editSession.EditDialog;
@@ -339,7 +339,7 @@ namespace MySQL.ForExcel.Controls
         ActiveEditDialog.ShowDialog();
 
         // If not restoring sessions we need to add the manually triggered Edit session to the list of Edit sessions of the active workbook.
-        Globals.ThisAddIn.ActiveWorkbookSessions.Add(editSession);
+        Globals.ThisAddIn.ActiveWorkbookEditSessions.Add(editSession);
       }
 
       importForm.Dispose();
@@ -365,7 +365,7 @@ namespace MySQL.ForExcel.Controls
         }
 
         tableIdx++;
-        var excelObj = mySqlTable.ImportDataAtActiveExcelCell(importColumnNames, Settings.Default.ImportCreateExcelTable);
+        var excelObj = Settings.Default.ImportCreateExcelTable ? mySqlTable.ImportDataIntoExcelTable(atCell) : mySqlTable.ImportDataIntoExcelRange(atCell) as object;
         if (excelObj == null)
         {
           continue;
@@ -493,12 +493,12 @@ namespace MySQL.ForExcel.Controls
     /// <returns><c>true</c> if the table has is in editing mode, <c>false</c> otherwise.</returns>
     public bool TableHasEditOnGoing(string tableName)
     {
-      if (Globals.ThisAddIn.ActiveWorkbookSessions.Count == 0)
+      if (Globals.ThisAddIn.ActiveWorkbookEditSessions.Count == 0)
       {
         return false;
       }
 
-      var editContainer = Globals.ThisAddIn.ActiveWorkbookSessions.FirstOrDefault(ac => ac.EditDialog != null && ac.TableName == tableName);
+      var editContainer = Globals.ThisAddIn.ActiveWorkbookEditSessions.FirstOrDefault(ac => ac.EditDialog != null && ac.TableName == tableName);
       if (editContainer == null)
       {
         return false;
@@ -538,18 +538,18 @@ namespace MySQL.ForExcel.Controls
     private EditSessionInfo GetEditSession(DbObject tableObject, ImportTableViewForm importForm, Excel.Worksheet currentWorksheet)
     {
       Excel.Range atCell = currentWorksheet.Range["A1", Type.Missing];
-      Excel.Range editingRange = importForm.ImportDataTable.ImportDataIntoExcelRange(importForm.ImportHeaders, atCell);
+      Excel.Range editingRange = importForm.ImportDataTable.ImportDataIntoExcelRange(atCell);
       EditSessionInfo session = null;
 
-      if (Globals.ThisAddIn.ActiveWorkbookSessions.Count > 0)
+      if (Globals.ThisAddIn.ActiveWorkbookEditSessions.Count > 0)
       {
-        session = Globals.ThisAddIn.ActiveWorkbookSessions.GetActiveEditSession(ActiveWorkbook, tableObject.Name);
+        session = Globals.ThisAddIn.ActiveWorkbookEditSessions.GetActiveEditSession(ActiveWorkbook, tableObject.Name);
       }
 
       // The Session is new and has to be created from scratch.
       if (session == null)
       {
-        session = new EditSessionInfo(ActiveWorkbookId, WbConnection.Id, WbConnection.Schema, tableObject.Name, ActiveWorkbook.FullName);
+        session = new EditSessionInfo(ActiveWorkbookId, ActiveWorkbook.FullName, WbConnection.Id, WbConnection.Schema, tableObject.Name);
       }
 
       if (session.EditDialog != null)

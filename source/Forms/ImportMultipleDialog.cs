@@ -44,7 +44,7 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Flag indicating whether Excel relationships can and will be created.
     /// </summary>
-    private bool _importRelationships;
+    private readonly bool _importRelationships;
 
     /// <summary>
     /// The Table or View DB objects related to objects selected by the users.
@@ -214,18 +214,7 @@ namespace MySQL.ForExcel.Forms
         var fullImportList = _importDbObjects.Concat(_relatedDbObjects);
         foreach (var importDbObject in fullImportList)
         {
-          var dt = _workbookInCompatibilityMode
-            ? _wbConnection.GetDataFromTableOrView(importDbObject, null, 0, UInt16.MaxValue)
-            : _wbConnection.GetDataFromTableOrView(importDbObject, null);
-          if (dt == null)
-          {
-            continue;
-          }
-
-          var mySqlTable = new MySqlDataTable(importDbObject.Name, dt, _wbConnection, false)
-          {
-            SelectQuery = dt.ExtendedProperties["QueryString"].ToString()
-          };
+          var mySqlTable = _wbConnection.CreateMySqlTable(false, importDbObject.Name, _workbookInCompatibilityMode, true);
           ImportDataSet.Tables.Add(mySqlTable);
         }
       }

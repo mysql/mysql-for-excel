@@ -231,6 +231,7 @@
     <Compile Include="Classes\CustomPropertyDescriptor.cs" />
     <Compile Include="Classes\DataTypeUtilities.cs" />
     <Compile Include="Classes\DbObject.cs" />
+    <Compile Include="Classes\ImportSessionInfo.cs" />
     <Compile Include="Classes\EditSessionInfo.cs" />
     <Compile Include="Classes\ExcelUtilities.cs" />
     <Compile Include="Classes\Exceptions\QueryExceedsMaxAllowedPacketException.cs" />
@@ -404,6 +405,7 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Interfaces\IMySqlDataRow.cs" />
+    <Compile Include="Interfaces\ISessionInfo.cs" />
     <Compile Include="Panels\AutoStyleableBasePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>

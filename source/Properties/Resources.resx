@@ -937,4 +937,7 @@ importing the MySQL {0} data in Excel.</value>
   <data name="ImportMultipleRelationshipsNotSupportedNoExcelTablesWarningText" xml:space="preserve">
     <value>Option to create Excel tables is turned off so relationships can't be created.</value>
   </data>
+  <data name="SelectQueryReturnedNothing" xml:space="preserve">
+    <value>Select query returned nothing. {0}</value>
+  </data>
 </root>

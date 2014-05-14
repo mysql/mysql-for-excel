@@ -1045,13 +1045,9 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void InitializeTargetTableGrid()
     {
-      TargetMySqlPreviewDataTable = new MySqlDataTable(
-        _importDbObject.Name,
-        true,
-        false,
-        Settings.Default.AppendUseFormattedValues,
-        WbConnection);
-      DataTable dt = WbConnection.GetDataFromTableOrView(_importDbObject, null, 0, 10);
+      TargetMySqlPreviewDataTable = new MySqlDataTable(_importDbObject.Name, true, false, Settings.Default.AppendUseFormattedValues, WbConnection);
+
+      DataTable dt = WbConnection.GetDataFromTableOrView(_importDbObject.Name, null, 0, Settings.Default.AppendLimitPreviewRowsQuantity);
       foreach (object[] rowValues in from DataRow dr in dt.Rows select dr.ItemArray)
       {
         for (int colIdx = 0; colIdx < dt.Columns.Count; colIdx++)

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -16,11 +16,10 @@
 // 02110-1301  USA
 
 using System;
-using System.Drawing;
 using System.Xml.Serialization;
-using Microsoft.Office.Interop.Excel;
+using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.ForExcel.Forms;
-using Point = System.Drawing.Point;
+using MySQL.ForExcel.Interfaces;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -28,7 +27,7 @@ namespace MySQL.ForExcel.Classes
   /// This class stores all the information required by an Edit Session to be stored in disk, able to be reopened if excel is closed and restarted without closing the session.
   /// </summary>
   [Serializable]
-  public class EditSessionInfo
+  public class EditSessionInfo : ISessionInfo
   {
     #region Fields
 
@@ -48,11 +47,11 @@ namespace MySQL.ForExcel.Classes
     /// Initializes a new instance of the <see cref="EditSessionInfo"/> class.
     /// </summary>
     /// <param name="workbookGuid">Guid of the workbook used by the edit session.</param>
+    /// <param name="workbookFilePath">The workbook full path name.</param>
     /// <param name="wbConnectionId">Workbench Connection information to open the edit session.</param>
     /// <param name="schema">Name of the Schema used by the edit session.</param>
     /// <param name="table">Name of the table used by the edit session.</param>
-    /// <param name="workbookFilePath">The workbook full path name.</param>
-    public EditSessionInfo(string workbookGuid, string wbConnectionId, string schema, string table, string workbookFilePath)
+    public EditSessionInfo(string workbookGuid, string workbookFilePath, string wbConnectionId, string schema, string table)
     {
       _editDialog = null;
       ConnectionId = wbConnectionId;
@@ -115,17 +114,13 @@ namespace MySQL.ForExcel.Classes
     [XmlAttribute]
     public string WorkbookFilePath { get; set; }
 
-    #endregion Properties
-
     /// <summary>
-    /// Determines whether this session has same workbook and table as the specified comparing session.
+    /// Gets or sets the wb connection.
     /// </summary>
-    /// <param name="comparingSession">The comparing session.</param>
-    /// <returns><c>true</c> when this session has same workbook and table as the specified comparing session, <c>false</c> otherwise.</returns>
-    public bool HasSameWorkbookAndTable(EditSessionInfo comparingSession)
-    {
-      return comparingSession != null && (WorkbookGuid.Equals(comparingSession.WorkbookGuid) && string.Equals(TableName, comparingSession.TableName, StringComparison.InvariantCulture));
-    }
+    [XmlIgnore]
+    public MySqlWorkbenchConnection WbConnection { get; set; }
+
+    #endregion Properties
 
     /// <summary>
     /// Handles the Closed event of the EditDialog control.

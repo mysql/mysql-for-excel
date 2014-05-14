@@ -317,10 +317,10 @@ namespace MySQL.ForExcel.Forms
         }
       }
 
-      var session = Globals.ThisAddIn.ActiveWorkbookSessions.FirstOrDefault(ac => ac.EditDialog.Equals(this));
+      var session = Globals.ThisAddIn.ActiveWorkbookEditSessions.FirstOrDefault(ac => ac.EditDialog.Equals(this));
       if (session != null)
       {
-        Globals.ThisAddIn.ActiveWorkbookSessions.Remove(session);
+        Globals.ThisAddIn.ActiveWorkbookEditSessions.Remove(session);
       }
 
       Dispose();
@@ -872,11 +872,15 @@ namespace MySQL.ForExcel.Forms
     /// <param name="refreshFromDb">Flag indicating if instead of reverting the data back to the way it was when the editing session started, it is pulled to have the most recent version of it.</param>
     private void RevertDataChanges(bool refreshFromDb)
     {
-      Exception exception;
-      EditMySqlDataTable.RevertData(refreshFromDb, out exception);
-      if (exception != null)
+      if (!refreshFromDb)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(refreshFromDb ? Resources.EditDataRefreshErrorText : Resources.EditDataRevertErrorText, exception.Message);
+        EditMySqlDataTable.RejectChanges();
+      }
+      else
+      {
+        Exception exception;
+        EditMySqlDataTable.RefreshData(out exception);
+        MiscUtilities.ShowCustomizedErrorDialog(Resources.EditDataRefreshErrorText, exception.Message);
       }
 
       Globals.ThisAddIn.SkipSelectedDataContentsDetection = true;
@@ -884,7 +888,7 @@ namespace MySQL.ForExcel.Forms
       EditDataRange.Clear();
       Excel.Range topLeftCell = EditDataRange.Cells[1, 1];
       topLeftCell.Select();
-      EditDataRange = EditMySqlDataTable.ImportDataIntoExcelRange(true, topLeftCell);
+      EditDataRange = EditMySqlDataTable.ImportDataIntoExcelRange(topLeftCell);
       CommitChangesButton.Enabled = false;
       AddNewRowToEditingRange(false);
     }

@@ -98,7 +98,7 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void FillPreviewGrid()
     {
-      PreviewDataTable = WbConnection.GetDataFromTableOrView(PreviewDbObject, null, 0, (int)RowsNumericUpDown.Value);
+      PreviewDataTable = WbConnection.GetDataFromTableOrView(PreviewDbObject.Name, null, 0, (int)RowsNumericUpDown.Value);
       TotalRowsCount = WbConnection.GetRowsCountFromTableOrView(PreviewDbObject);
       RowsCountSubLabel.Text = TotalRowsCount.ToString(CultureInfo.InvariantCulture);
       PreviewDataGridView.DataSource = PreviewDataTable;

@@ -39,48 +39,6 @@ namespace MySQL.ForExcel.Classes
   public static class MySqlDataUtilities
   {
     /// <summary>
-    /// Adds or sets the values on extended properties within the <see cref="DataTable"/> object.
-    /// </summary>
-    /// <param name="dt">A data table where extended properties are set.</param>
-    /// <param name="queryString">The last query string used to produce the result set saved in this data table.</param>
-    /// <param name="importedHeaders">Flag indicating if the column names where returned by the query and stored in the first row of the data table.</param>
-    /// <param name="tableName">The name of the MySQL table queried to produce the data stored in this data table.</param>
-    public static void AddExtendedProperties(this DataTable dt, string queryString, bool importedHeaders, string tableName)
-    {
-      if (dt == null)
-      {
-        return;
-      }
-
-      if (dt.ExtendedProperties.ContainsKey("QueryString"))
-      {
-        dt.ExtendedProperties["QueryString"] = queryString;
-      }
-      else
-      {
-        dt.ExtendedProperties.Add("QueryString", queryString);
-      }
-
-      if (dt.ExtendedProperties.ContainsKey("ImportedHeaders"))
-      {
-        dt.ExtendedProperties["ImportedHeaders"] = importedHeaders;
-      }
-      else
-      {
-        dt.ExtendedProperties.Add("ImportedHeaders", importedHeaders);
-      }
-
-      if (dt.ExtendedProperties.ContainsKey("TableName"))
-      {
-        dt.ExtendedProperties["TableName"] = tableName;
-      }
-      else
-      {
-        dt.ExtendedProperties.Add("TableName", tableName);
-      }
-    }
-
-    /// <summary>
     /// Verifies if a <see cref="MySqlConnection"/> is open and has not been disconnected by the server.
     /// </summary>
     /// <param name="connection">A <see cref="MySqlConnection"/> object.</param>
@@ -88,6 +46,60 @@ namespace MySQL.ForExcel.Classes
     public static bool CheckIfOpenAndNotDisconnected(this MySqlConnection connection)
     {
       return connection != null && (connection.State == ConnectionState.Open || connection.Ping());
+    }
+
+    /// <summary>
+    /// Creates the import my SQL table.
+    /// </summary>
+    /// <param name="isEditOperation"><c>true</c> if the import is part of an Edit operation, <c>false</c> otherwise.</param>
+    /// <param name="wbConnection">The wb connection.</param>
+    /// <param name="dboName">Name of database object to query (Table, View or Procedure).</param>
+    /// <param name="importColumnNames">Flag indicating if column names will be imported as the first row of imported data.</param>
+    /// <param name="selectQuery">a SELECT query against a database object to fill the [MySqlDataTable] return object with.</param>
+    /// <returns>MySql Table created from the selectQuery.</returns>
+    public static MySqlDataTable CreateImportMySqlTable(this MySqlWorkbenchConnection wbConnection, bool isEditOperation, string dboName, bool importColumnNames, string selectQuery)
+    {
+      DataTable dt = GetDataFromTableOrView(wbConnection, selectQuery);
+      if (dt == null)
+      {
+        MySqlSourceTrace.WriteToLog(string.Format(Resources.SelectQueryReturnedNothing, selectQuery));
+        return null;
+      }
+
+      var importMySqlDataTable = new MySqlDataTable(dboName, dt, wbConnection, isEditOperation)
+      {
+        ImportColumnNames = importColumnNames,
+        SelectQuery = selectQuery
+      };
+
+      return importMySqlDataTable;
+    }
+
+    /// <summary>
+    /// Creates the import my SQL table.
+    /// </summary>
+    /// <param name="isEditOperation">If set to <c>true</c> [import within edit operation].</param>
+    /// <param name="wbConnection">The wb connection to the database.</param>
+    /// <param name="dboName">Name of database object to query (Table, View or Procedure).</param>
+    /// <param name="workbookInCompatibilityMode">If set to <c>true</c> [work sheet is in compatibility mode].</param>
+    /// <param name="includeColumnNames">Flag indicating if column names will be imported as the first row of imported data.</param>
+    /// <param name="columnsNamesList">The selected columns list. All columns are to be returned If null.</param>
+    /// <param name="limitRows">The number of rows on the select query is to be limited if set to <c>true</c>.</param>
+    /// <param name="firstRowIndex">Row where the select query will start pulling data from.</param>
+    /// <param name="rowCount">The number of rows to include in the select query.</param>
+    /// <returns></returns>
+    /// <exception cref="System.Data.NoNullAllowedException"></exception>
+    public static MySqlDataTable CreateMySqlTable(this MySqlWorkbenchConnection wbConnection, bool isEditOperation, string dboName, bool workbookInCompatibilityMode,
+      bool includeColumnNames, List<string> columnsNamesList = null, bool limitRows = false, int firstRowIndex = -1, int rowCount = -1)
+    {
+      if (wbConnection == null)
+      {
+        return null;
+      }
+
+
+      var selectQuery = AssembleSelectQuery(wbConnection.Schema, dboName, columnsNamesList, firstRowIndex, workbookInCompatibilityMode ? UInt16.MaxValue : rowCount);
+      return wbConnection.CreateImportMySqlTable(isEditOperation, dboName, includeColumnNames, selectQuery);
     }
 
     /// <summary>
@@ -269,7 +281,6 @@ namespace MySQL.ForExcel.Classes
       }
 
       DataTable retTable = ds.Tables[0];
-      retTable.AddExtendedProperties(query, true, string.Empty);
       return retTable;
     }
 
@@ -278,33 +289,20 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <remarks>Only works against Tables or Views, but not with Procedures.</remarks>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <param name="dbo">Type of database object to query (Table, View or Procedure).</param>
+    /// <param name="dboName">Name of database object to query (Table, View or Procedure).</param>
     /// <param name="columnsList">List of queries column names.</param>
     /// <param name="firstRowIdx">Row number from which to start returning results.</param>
     /// <param name="rowCount">Number of rows to return</param>
     /// <returns>Table containing the results of the query.</returns>
-    public static DataTable GetDataFromTableOrView(this MySqlWorkbenchConnection connection, DbObject dbo, List<string> columnsList, int firstRowIdx, int rowCount)
+    public static DataTable GetDataFromTableOrView(this MySqlWorkbenchConnection connection, string dboName, List<string> columnsList, int firstRowIdx, int rowCount)
     {
       if (connection == null)
       {
         return null;
       }
 
-      string queryString = AssembleSelectQuery(connection.Schema, dbo, columnsList, firstRowIdx, rowCount);
+      string queryString = AssembleSelectQuery(connection.Schema, dboName, columnsList, firstRowIdx, rowCount);
       return string.IsNullOrEmpty(queryString) ? null : connection.GetDataFromTableOrView(queryString);
-    }
-
-    /// <summary>
-    /// Executes the given query and returns the result set in a <see cref="DataTable"/> object.
-    /// </summary>
-    /// <remarks>Only works against Tables or Views, but not with Procedures.</remarks>
-    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <param name="dbo">Type of database object to query (Table, View or Procedure).</param>
-    /// <param name="columnsList">List of queries column names.</param>
-    /// <returns>Table containing the results of the query.</returns>
-    public static DataTable GetDataFromTableOrView(this MySqlWorkbenchConnection connection, DbObject dbo, List<string> columnsList)
-    {
-      return GetDataFromTableOrView(connection, dbo, columnsList, -1, -1);
     }
 
     /// <summary>
@@ -644,6 +642,24 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Removes the desired session depending on the type.
+    /// </summary>
+    /// <param name="sessionToRemove">The session to remove.</param>
+    public static void RemoveSession(ISessionInfo sessionToRemove)
+    {
+      if (sessionToRemove.GetType() == typeof(EditSessionInfo))
+      {
+        Globals.ThisAddIn.StoredEditSessions.Remove((EditSessionInfo)sessionToRemove);
+      }
+      else if (sessionToRemove.GetType() == typeof(ImportSessionInfo))
+      {
+        Globals.ThisAddIn.ActiveImportSessions.Remove((ImportSessionInfo)sessionToRemove);
+      }
+
+      MiscUtilities.SaveSettings();
+    }
+
+    /// <summary>
     /// Sets the net_write_timeout and net_read_timeout MySQL server variables to the given value for the duration of the current session.
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
@@ -869,20 +885,15 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <remarks>Only works against Tables or Views, but not with Procedures.</remarks>
     /// <param name="schemaName">Name of the schema (database) where the Table or View resides.</param>
-    /// <param name="dbo">Type of database object to query (Table, View or Procedure).</param>
+    /// <param name="dboName">Name of database object to query (Table, View or Procedure).</param>
     /// <param name="columnsList">List of queries column names.</param>
     /// <param name="firstRowIdx">Row number from which to start returning results.</param>
     /// <param name="rowCount">Number of rows to return</param>
     /// <returns>The SELECT query text.</returns>
-    private static string AssembleSelectQuery(string schemaName, DbObject dbo, ICollection<string> columnsList, int firstRowIdx, int rowCount)
+    private static string AssembleSelectQuery(string schemaName, string dboName, ICollection<string> columnsList, int firstRowIdx, int rowCount)
     {
-      if (dbo.Type == DbObject.DbObjectType.Procedure)
-      {
-        return null;
-      }
-
       const string bigRowCountLimit = "18446744073709551615";
-      StringBuilder queryStringBuilder = new StringBuilder("SELECT ");
+      var queryStringBuilder = new StringBuilder("SELECT ");
       if (columnsList == null || columnsList.Count == 0)
       {
         queryStringBuilder.Append("*");
@@ -897,7 +908,7 @@ namespace MySQL.ForExcel.Classes
         queryStringBuilder.Remove(queryStringBuilder.Length - 1, 1);
       }
 
-      queryStringBuilder.AppendFormat(" FROM `{0}`.`{1}`", schemaName, dbo.Name);
+      queryStringBuilder.AppendFormat(" FROM `{0}`.`{1}`", schemaName, dboName);
       if (firstRowIdx > 0)
       {
         string strCount = rowCount >= 0 ? rowCount.ToString(CultureInfo.InvariantCulture) : bigRowCountLimit;
@@ -908,7 +919,8 @@ namespace MySQL.ForExcel.Classes
         queryStringBuilder.AppendFormat(" LIMIT {0}", rowCount);
       }
 
-      return queryStringBuilder.ToString();
+      var returnString = queryStringBuilder.ToString();
+      return returnString;
     }
   }
 

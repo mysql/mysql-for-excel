@@ -27,7 +27,7 @@ using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
-using Excel = Microsoft.Office.Interop.Excel;
+using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Panels
 {
@@ -276,7 +276,7 @@ namespace MySQL.ForExcel.Panels
       {
         return;
       }
-      
+
       if (listControl.SelectedNodes.Count > 1)
       {
         // Check if procedures are among the multiple selection, if so cancel the multi-selection since procedures are not allowed in it.
@@ -482,7 +482,7 @@ namespace MySQL.ForExcel.Panels
 
         // Import tables data in Excel worksheets
         var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
-        var excelTablesDictionary = new Dictionary<string, Excel.ListObject>(importDialog.ImportDataSet.Tables.Count);
+        var excelTablesDictionary = new Dictionary<string, ExcelInterop.ListObject>(importDialog.ImportDataSet.Tables.Count);
         foreach (MySqlDataTable mySqlTable in importDialog.ImportDataSet.Tables)
         {
           // Create a new Excel Worksheet and import the table/view data there
@@ -492,8 +492,8 @@ namespace MySQL.ForExcel.Panels
             continue;
           }
 
-          var listObj = mySqlTable.ImportDataAtActiveExcelCell(true, true);
-          var excelTable = listObj as Excel.ListObject;
+          var listObj = mySqlTable.ImportDataIntoExcelTable(Globals.ThisAddIn.Application.ActiveCell);
+          var excelTable = listObj;
           if (excelTable == null)
           {
             continue;
@@ -511,8 +511,8 @@ namespace MySQL.ForExcel.Panels
           }
 
           // Get the ModelColumnName objects needed to define the relationship
-          Excel.ListObject excelTable;
-          Excel.ListObject relatedExcelTable;
+          ExcelInterop.ListObject excelTable;
+          ExcelInterop.ListObject relatedExcelTable;
           bool excelTableExists = excelTablesDictionary.TryGetValue(relationship.TableOrViewName, out excelTable);
           bool relatedExcelTableExists = excelTablesDictionary.TryGetValue(relationship.RelatedTableOrViewName, out relatedExcelTable);
           if (!excelTableExists || !relatedExcelTableExists)
@@ -520,15 +520,15 @@ namespace MySQL.ForExcel.Panels
             continue;
           }
 
-          var table = activeWorkbook.Model.ModelTables.Cast<Excel.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, excelTable.Name.Replace(".", " "), StringComparison.InvariantCulture));
-          var relatedTable = activeWorkbook.Model.ModelTables.Cast<Excel.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, relatedExcelTable.Name.Replace(".", " "), StringComparison.InvariantCulture));
+          var table = activeWorkbook.Model.ModelTables.Cast<ExcelInterop.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, excelTable.Name.Replace(".", " "), StringComparison.InvariantCulture));
+          var relatedTable = activeWorkbook.Model.ModelTables.Cast<ExcelInterop.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, relatedExcelTable.Name.Replace(".", " "), StringComparison.InvariantCulture));
           if (table == null || relatedTable == null)
           {
             continue;
           }
 
-          var column = table.ModelTableColumns.Cast<Excel.ModelTableColumn>().FirstOrDefault(col => string.Equals(col.Name, relationship.ColumnName, StringComparison.InvariantCulture));
-          var relatedColumn = relatedTable.ModelTableColumns.Cast<Excel.ModelTableColumn>().FirstOrDefault(col => string.Equals(col.Name, relationship.RelatedColumnName, StringComparison.InvariantCulture));
+          var column = table.ModelTableColumns.Cast<ExcelInterop.ModelTableColumn>().FirstOrDefault(col => string.Equals(col.Name, relationship.ColumnName, StringComparison.InvariantCulture));
+          var relatedColumn = relatedTable.ModelTableColumns.Cast<ExcelInterop.ModelTableColumn>().FirstOrDefault(col => string.Equals(col.Name, relationship.RelatedColumnName, StringComparison.InvariantCulture));
           if (column == null || relatedColumn == null)
           {
             continue;
@@ -591,7 +591,28 @@ namespace MySQL.ForExcel.Panels
           return;
         }
 
-        importForm.ImportDataTable.ImportDataAtActiveExcelCell(importForm.ImportHeaders, Settings.Default.ImportCreateExcelTable);
+        var excelTableName = importForm.ImportDataTable.ImportDataIntoExcelTable(Globals.ThisAddIn.Application.ActiveCell).DisplayName;
+        Globals.ThisAddIn.ActiveImportSessions.Add(new ImportSessionInfo(importForm.ImportDataTable, excelTableName));
+        var listObject = Globals.ThisAddIn.Application.ActiveCell.ListObject;
+        if (listObject == null)
+        {
+          return;
+        }
+
+        var toolsListObject = Globals.Factory.GetVstoObject(listObject);
+        if (toolsListObject == null)
+        {
+          return;
+        }
+
+        toolsListObject.SetDataBinding(importForm.ImportDataTable);
+        if (toolsListObject.ShowHeaders)
+        {
+          foreach (MySqlDataColumn col in importForm.ImportDataTable.Columns)
+          {
+            toolsListObject.ListColumns[col.Ordinal + 1].Name = col.DisplayName;
+          }
+        }
       }
     }
 
@@ -700,7 +721,7 @@ namespace MySQL.ForExcel.Panels
         // 4 - Procedure
         foreach (DbObject.DbObjectType dbObjectType in Enum.GetValues(typeof(DbObject.DbObjectType)))
         {
-          var andValue = (short) (dbObjectType & includeTypes);
+          var andValue = (short)(dbObjectType & includeTypes);
           if (andValue == 0)
           {
             continue;

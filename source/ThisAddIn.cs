@@ -21,7 +21,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
+using System.Management.Instrumentation;
 using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
@@ -31,9 +31,10 @@ using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
-using Excel = Microsoft.Office.Interop.Excel;
+using ExcelInterop = Microsoft.Office.Interop.Excel;
 using Office = Microsoft.Office.Tools;
 using OfficeCore = Microsoft.Office.Core;
+using System.Runtime.InteropServices;
 
 namespace MySQL.ForExcel
 {
@@ -69,12 +70,12 @@ namespace MySQL.ForExcel
     private OfficeCore.CommandBarButton _builtInRefreshCommandButton;
 
     /// <summary>
-    /// A dictionary containing subsets of the <see cref="StoredEditSessions"/> list containing only sessions of a <see cref="Excel.Workbook"/>.
+    /// A dictionary containing subsets of the <see cref="StoredEditSessions"/> list containing only sessions of a <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
     private Dictionary<string, List<EditSessionInfo>> _editSessionsByWorkbook;
 
     /// <summary>
-    /// The name of the last deactivated Excel <see cref="Excel.Worksheet"/>.
+    /// The name of the last deactivated Excel <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
     private string _lastDeactivatedSheetName;
 
@@ -100,13 +101,13 @@ namespace MySQL.ForExcel
           if (ExcelVersionNumber >= EXCEL_2013_VERSION_NUMBER)
           {
             // If running on Excel 2013 or later a MDI is used for the windows so the active custom pane is matched with its window and the application active window.
-            Excel.Window paneWindow = null;
+            ExcelInterop.Window paneWindow = null;
             try
             {
               // This assignment is intentionally inside a try block because when an Excel window has been previously closed this property (ActiveCustomPane)
               // is called before the CustomTaskPane linked to the closed Excel window is removed from the collection, so the ctp.Window can throw an Exception.
               // A null check is not enough.
-              paneWindow = ctp.Window as Excel.Window;
+              paneWindow = ctp.Window as ExcelInterop.Window;
             }
             catch
             {
@@ -139,13 +140,49 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Gets a subset of the <see cref="StoredEditSessions"/> list containing only sessions assocaiated to the active <see cref="Excel.Workbook"/>.
+    /// Gets a list of <see cref="ImportSessionInfo"/> objects saved to disk.
     /// </summary>
-    public List<EditSessionInfo> ActiveWorkbookSessions
+    public List<ImportSessionInfo> ActiveImportSessions
+    {
+      get
+      {
+        return Settings.Default.ImportSessionsList ?? (Settings.Default.ImportSessionsList = new List<ImportSessionInfo>());
+      }
+    }
+
+    /// <summary>
+    /// Gets a subset of the <see cref="StoredEditSessions"/> list containing only sessions assocaiated to the active <see cref="ExcelInterop.Workbook"/>.
+    /// </summary>
+    public List<EditSessionInfo> ActiveWorkbookEditSessions
     {
       get
       {
         return GetWorkbookEditSessions(Application.ActiveWorkbook);
+      }
+    }
+
+    /// <summary>
+    /// Gets a subset of the <see cref="ActiveImportSessions"/> list containing only sessions assocaiated to the active <see cref="ExcelInterop.Workbook"/>.
+    /// </summary>
+    public List<ImportSessionInfo> ActiveWorkbookImportSessions
+    {
+      get
+      {
+        var workbookId = Globals.ThisAddIn.Application.ActiveWorkbook.GetOrCreateId();
+        return GetWorkbookImportSessions(workbookId);
+      }
+    }
+
+    /// <summary>
+    /// Gets a subset of the <see cref="ActiveImportSessions"/> list containing only sessions assocaiated to the active <see cref="ExcelInterop.Worksheet"/>.
+    /// </summary>
+    public List<ImportSessionInfo> ActiveWorksheetImportSessions
+    {
+      get
+      {
+        var workbookId = Globals.ThisAddIn.Application.ActiveWorkbook.GetOrCreateId();
+        ExcelInterop.Worksheet worksheet = Globals.ThisAddIn.Application.ActiveWorkbook.ActiveSheet;
+        return GetWorkSheetImportSessions(workbookId, worksheet.Name);
       }
     }
 
@@ -182,7 +219,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether a temporary hidden <see cref="Excel.Worksheet"/> is being used by a <see cref="TempRange"/> instance.
+    /// Gets or sets a value indicating whether a temporary hidden <see cref="ExcelInterop.Worksheet"/> is being used by a <see cref="TempRange"/> instance.
     /// </summary>
     public bool UsingTempWorksheet { get; set; }
 
@@ -222,10 +259,10 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Closes and removes all Edit sessions associated to the given <see cref="Excel.Workbook"/>.
+    /// Closes and removes all Edit sessions associated to the given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
-    /// <param name="workbook">The <see cref="Excel.Workbook"/> associated to the Edit sessions to close.</param>
-    public void CloseWorkbookEditSessions(Excel.Workbook workbook)
+    /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/> associated to the Edit sessions to close.</param>
+    public void CloseWorkbookEditSessions(ExcelInterop.Workbook workbook)
     {
       if (workbook == null)
       {
@@ -255,7 +292,7 @@ namespace MySQL.ForExcel
         return activeCustomPane;
       }
 
-      Application.Cursor = Excel.XlMousePointer.xlWait;
+      Application.Cursor = ExcelInterop.XlMousePointer.xlWait;
       if (ExcelPanesList == null)
       {
         ExcelPanesList = new List<ExcelAddInPane>();
@@ -287,14 +324,14 @@ namespace MySQL.ForExcel
         ExcelAddInPaneFirstRun();
       }
 
-      Application.Cursor = Excel.XlMousePointer.xlDefault;
+      Application.Cursor = ExcelInterop.XlMousePointer.xlDefault;
       return activeCustomPane;
     }
 
     /// <summary>
-    /// Event delegate method fired when an Excel <see cref="Excel.Worksheet"/> is activated.
+    /// Event delegate method fired when an Excel <see cref="ExcelInterop.Worksheet"/> is activated.
     /// </summary>
-    /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
+    /// <param name="workSheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
     private void Application_SheetActivate(object workSheet)
     {
       if (ActiveExcelPane == null || UsingTempWorksheet)
@@ -302,7 +339,7 @@ namespace MySQL.ForExcel
         return;
       }
 
-      Excel.Worksheet activeSheet = workSheet as Excel.Worksheet;
+      ExcelInterop.Worksheet activeSheet = workSheet as ExcelInterop.Worksheet;
       if (!activeSheet.IsVisible())
       {
         return;
@@ -318,9 +355,9 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Event delegate method fired before an Excel <see cref="Excel.Worksheet"/> is deleted.
+    /// Event delegate method fired before an Excel <see cref="ExcelInterop.Worksheet"/> is deleted.
     /// </summary>
-    /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
+    /// <param name="workSheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
     private void Application_SheetBeforeDelete(object workSheet)
     {
       if (ActiveExcelPane == null || UsingTempWorksheet)
@@ -328,7 +365,7 @@ namespace MySQL.ForExcel
         return;
       }
 
-      Excel.Worksheet activeSheet = workSheet as Excel.Worksheet;
+      ExcelInterop.Worksheet activeSheet = workSheet as ExcelInterop.Worksheet;
       if (!activeSheet.IsVisible())
       {
         return;
@@ -345,18 +382,18 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Event delegate method fired when the contents of the current selection of Excel cells in a given <see cref="Excel.Worksheet"/> change.
+    /// Event delegate method fired when the contents of the current selection of Excel cells in a given <see cref="ExcelInterop.Worksheet"/> change.
     /// </summary>
-    /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
+    /// <param name="workSheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
     /// <param name="targetRange">A selection of Excel cells.</param>
-    private void Application_SheetChange(object workSheet, Excel.Range targetRange)
+    private void Application_SheetChange(object workSheet, ExcelInterop.Range targetRange)
     {
       if (ActiveExcelPane == null || UsingTempWorksheet)
       {
         return;
       }
 
-      Excel.Worksheet activeSheet = workSheet as Excel.Worksheet;
+      ExcelInterop.Worksheet activeSheet = workSheet as ExcelInterop.Worksheet;
       if (!activeSheet.IsVisible())
       {
         return;
@@ -369,9 +406,9 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Event delegate method fired when an Excel <see cref="Excel.Worksheet"/> is deactivated.
+    /// Event delegate method fired when an Excel <see cref="ExcelInterop.Worksheet"/> is deactivated.
     /// </summary>
-    /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
+    /// <param name="workSheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
     private void Application_SheetDeactivate(object workSheet)
     {
       if (ActiveExcelPane == null || UsingTempWorksheet)
@@ -379,7 +416,7 @@ namespace MySQL.ForExcel
         return;
       }
 
-      Excel.Worksheet deactivatedSheet = workSheet as Excel.Worksheet;
+      ExcelInterop.Worksheet deactivatedSheet = workSheet as ExcelInterop.Worksheet;
       if (!deactivatedSheet.IsVisible())
       {
         return;
@@ -390,18 +427,18 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Event delegate method fired when the selection of Excel cells in a given <see cref="Excel.Worksheet"/> changes.
+    /// Event delegate method fired when the selection of Excel cells in a given <see cref="ExcelInterop.Worksheet"/> changes.
     /// </summary>
-    /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
+    /// <param name="workSheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
     /// <param name="targetRange">The new selection of Excel cells.</param>
-    private void Application_SheetSelectionChange(object workSheet, Excel.Range targetRange)
+    private void Application_SheetSelectionChange(object workSheet, ExcelInterop.Range targetRange)
     {
       if (ActiveExcelPane == null || UsingTempWorksheet)
       {
         return;
       }
 
-      Excel.Worksheet activeSheet = workSheet as Excel.Worksheet;
+      var activeSheet = workSheet as ExcelInterop.Worksheet;
       if (!activeSheet.IsVisible())
       {
         return;
@@ -418,7 +455,7 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="workbook">The Excel workbook tied to the activated window.</param>
     /// <param name="window">The activated Excel window.</param>
-    private void Application_WindowActivate(Excel.Workbook workbook, Excel.Window window)
+    private void Application_WindowActivate(ExcelInterop.Workbook workbook, ExcelInterop.Window window)
     {
       // Verify the collection of custom task panes to dispose of custom task panes pointing to closed (invalid) windows.
       bool disposePane = false;
@@ -428,7 +465,7 @@ namespace MySQL.ForExcel
         {
           // Do NOT remove the following line although the customPaneWindow variable is not used in the method the casting
           // of the customPane.Window is needed to determine if the window is still valid and has not been disposed of.
-          var customPaneWindow = customPane.Window as Excel.Window;
+          var customPaneWindow = customPane.Window as ExcelInterop.Window;
         }
         catch
         {
@@ -460,9 +497,9 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Event delegate method fired when a <see cref="Excel.Workbook"/> is activated.
+    /// Event delegate method fired when a <see cref="ExcelInterop.Workbook"/> is activated.
     /// </summary>
-    /// <param name="workBook">A <see cref="Excel.Workbook"/> object.</param>
+    /// <param name="workBook">A <see cref="ExcelInterop.Workbook"/> object.</param>
     private void Application_WorkbookActivate(object workBook)
     {
       if (ActiveExcelPane == null)
@@ -470,58 +507,77 @@ namespace MySQL.ForExcel
         return;
       }
 
-      Excel.Workbook activeWorkbook = workBook as Excel.Workbook;
-      Excel.Worksheet activeSheet = activeWorkbook != null ? activeWorkbook.ActiveSheet as Excel.Worksheet : null;
+      ExcelInterop.Workbook activeWorkbook = workBook as ExcelInterop.Workbook;
+      ExcelInterop.Worksheet activeSheet = activeWorkbook != null ? activeWorkbook.ActiveSheet as ExcelInterop.Worksheet : null;
       ChangeEditDialogVisibility(activeSheet, true);
       ActiveExcelPane.RefreshDbObjectPanelActionLabelsEnabledStatus();
     }
 
     /// <summary>
-    /// Event delegate method fired after an Excel <see cref="Excel.Workbook"/> is saved to disk.
+    /// Event delegate method fired after an Excel <see cref="ExcelInterop.Workbook"/> is saved to disk.
     /// </summary>
-    /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
     /// <param name="success">Flag indicating whether the save operation was successful.</param>
-    private void Application_WorkbookAfterSave(Excel.Workbook workbook, bool success)
+    private void Application_WorkbookAfterSave(ExcelInterop.Workbook workbook, bool success)
     {
       var workbookId = workbook.GetOrCreateId();
-      var workbookSessions = GetWorkbookEditSessions(workbook);
+      var workbookEditSessions = GetWorkbookEditSessions(workbook);
 
       // Protect all worksheets with an active edit session.
-      foreach (var activeSession in workbookSessions)
+      foreach (var activeEditSession in workbookEditSessions)
       {
-        activeSession.WorkbookFilePath = workbook.FullName;
-        if (activeSession.EditDialog != null)
+        if (activeEditSession.EditDialog != null)
         {
-          activeSession.EditDialog.ProtectWorksheet();
-        }
-
-        var storedSession = StoredEditSessions.FirstOrDefault(session => session.HasSameWorkbookAndTable(activeSession));
-        if (storedSession != null)
-        {
-          storedSession.WorkbookFilePath = workbook.FullName;
-          continue;
+          activeEditSession.EditDialog.ProtectWorksheet();
         }
 
         // Add new Edit sessions in memory collection to serialized collection
-        StoredEditSessions.Add(activeSession);
+        StoredEditSessions.Add(activeEditSession);
       }
 
+      RemoveInvalidImportSessions();
+
       // Remove deleted Edit sessions from memory collection also from serialized collection
-      foreach (var storedSession in StoredEditSessions.FindAll(storedSession => string.Equals(storedSession.WorkbookGuid, workbookId, StringComparison.InvariantCulture) && !workbookSessions.Exists(wbSession => wbSession.HasSameWorkbookAndTable(storedSession))))
+      foreach (var storedSession in StoredEditSessions.FindAll(storedSession => string.Equals(storedSession.WorkbookGuid, workbookId, StringComparison.InvariantCulture) && !workbookEditSessions.Exists(wbSession => wbSession.HasSameWorkbookAndTable(storedSession))))
       {
         StoredEditSessions.Remove(storedSession);
       }
 
-      Settings.Default.Save();
+      MiscUtilities.SaveSettings();
       workbook.Saved = true;
     }
 
+    private void RemoveInvalidImportSessions()
+    {
+      var workbookImportSessions = ActiveWorkbookImportSessions;
+
+      //Remove all import sessions related to the active workbook that are no longer valid.
+      if (ActiveImportSessions.Count > 1)
+      {
+        int endloop = workbookImportSessions.Count;
+        for (int i = 0; i < endloop - 1; i++)
+        {
+          var importSession = workbookImportSessions[i];
+          for (int j = i + 1; j < endloop; j++)
+          {
+            if (!importSession.HasSameWorkbookWorkSheetAndExcelTable(workbookImportSessions[j]))
+            {
+              continue;
+            }
+
+            ActiveImportSessions.Remove(importSession);
+            break;
+          }
+        }
+      }
+    }
+
     /// <summary>
-    /// Event delegate method fired before a <see cref="Excel.Workbook"/> is closed.
+    /// Event delegate method fired before a <see cref="ExcelInterop.Workbook"/> is closed.
     /// </summary>
-    /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
     /// <param name="cancel">Flag indicating whether the user cancelled the closing event.</param>
-    private void Application_WorkbookBeforeClose(Excel.Workbook workbook, ref bool cancel)
+    private void Application_WorkbookBeforeClose(ExcelInterop.Workbook workbook, ref bool cancel)
     {
       if (ActiveExcelPane == null)
       {
@@ -531,6 +587,12 @@ namespace MySQL.ForExcel
       bool wasAlreadySaved = workbook.Saved;
       if (!wasAlreadySaved)
       {
+        //Close import sessions from the closing workbook.
+        foreach (var importSession in ActiveWorkbookImportSessions)
+        {
+          importSession.Close();
+        }
+
         switch (MessageBox.Show(string.Format(Resources.WorkbookSavingDetailText, workbook.Name), Application.Name, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1))
         {
           case DialogResult.Yes:
@@ -558,26 +620,26 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Event delegate method fired before an Excel <see cref="Excel.Workbook"/> is saved to disk.
+    /// Event delegate method fired before an Excel <see cref="ExcelInterop.Workbook"/> is saved to disk.
     /// </summary>
-    /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
     /// <param name="saveAsUi">Flag indicating whether the Save As dialog was displayed.</param>
     /// <param name="cancel">Flag indicating whether the user cancelled the saving event.</param>
-    private void Application_WorkbookBeforeSave(Excel.Workbook workbook, bool saveAsUi, ref bool cancel)
+    private void Application_WorkbookBeforeSave(ExcelInterop.Workbook workbook, bool saveAsUi, ref bool cancel)
     {
       var workbookSessions = GetWorkbookEditSessions(workbook);
 
       // Unprotect all worksheets with an active edit session.
-      foreach (var activeSession in workbookSessions.Where(activeSession => activeSession.EditDialog != null))
+      foreach (var activeEditSession in workbookSessions.Where(activeEditSession => activeEditSession.EditDialog != null))
       {
-        activeSession.EditDialog.UnprotectWorksheet();
+        activeEditSession.EditDialog.UnprotectWorksheet();
       }
     }
 
     /// <summary>
-    /// Event delegate method fired when an Excel <see cref="Excel.Workbook"/> is deactivated.
+    /// Event delegate method fired when an Excel <see cref="ExcelInterop.Workbook"/> is deactivated.
     /// </summary>
-    /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
     private void Application_WorkbookDeactivate(object workbook)
     {
       if (ActiveExcelPane == null)
@@ -586,23 +648,23 @@ namespace MySQL.ForExcel
       }
 
       // Hide editDialogs from deactivated Workbook
-      Excel.Workbook deactivatedWorkbook = workbook as Excel.Workbook;
+      ExcelInterop.Workbook deactivatedWorkbook = workbook as ExcelInterop.Workbook;
       if (deactivatedWorkbook == null)
       {
         return;
       }
 
-      foreach (Excel.Worksheet wSheet in deactivatedWorkbook.Worksheets)
+      foreach (ExcelInterop.Worksheet wSheet in deactivatedWorkbook.Worksheets)
       {
         ChangeEditDialogVisibility(wSheet, false);
       }
     }
 
     /// <summary>
-    /// Event delegate method fired when a <see cref="Excel.Workbook"/> is opened.
+    /// Event delegate method fired when a <see cref="ExcelInterop.Workbook"/> is opened.
     /// </summary>
-    /// <param name="workbook">The <see cref="Excel.Workbook"/> being opened.</param>
-    private void Application_WorkbookOpen(Excel.Workbook workbook)
+    /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/> being opened.</param>
+    private void Application_WorkbookOpen(ExcelInterop.Workbook workbook)
     {
       if (workbook == null)
       {
@@ -622,18 +684,18 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Shows or hides an Edit dialog associated to the given <see cref="Excel.Worksheet"/>.
+    /// Shows or hides an Edit dialog associated to the given <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
-    /// <param name="workSheet">A <see cref="Excel.Worksheet"/> object.</param>
+    /// <param name="workSheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
     /// <param name="show">Flag indicating if the dialog will be shown or hidden.</param>
-    private void ChangeEditDialogVisibility(Excel.Worksheet workSheet, bool show)
+    private void ChangeEditDialogVisibility(ExcelInterop.Worksheet workSheet, bool show)
     {
       if (workSheet == null)
       {
         return;
       }
 
-      var parentWorkbook = workSheet.Parent as Excel.Workbook;
+      var parentWorkbook = workSheet.Parent as ExcelInterop.Workbook;
       if (parentWorkbook == null)
       {
         return;
@@ -645,28 +707,28 @@ namespace MySQL.ForExcel
         return;
       }
 
-      var activeSession = workbookSessions.GetActiveEditSession(workSheet);
-      if (activeSession == null)
+      var activeEditSession = workbookSessions.GetActiveEditSession(workSheet);
+      if (activeEditSession == null)
       {
         return;
       }
 
       if (show)
       {
-        activeSession.EditDialog.ShowDialog();
+        activeEditSession.EditDialog.ShowDialog();
       }
       else
       {
-        activeSession.EditDialog.Hide();
+        activeEditSession.EditDialog.Hide();
       }
     }
 
     /// <summary>
-    /// Closes and removes the Edit session associated to the given <see cref="Excel.Worksheet"/>.
+    /// Closes and removes the Edit session associated to the given <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
-    /// <param name="workbook">An <see cref="Excel.Workbook"/>.</param>
-    /// <param name="missingWorksheetName">The name of the <see cref="Excel.Worksheet"/> that no longer exists and that is associated to the Edit session to close.</param>
-    private void CloseMissingWorksheetEditSession(Excel.Workbook workbook, string missingWorksheetName)
+    /// <param name="workbook">An <see cref="ExcelInterop.Workbook"/>.</param>
+    /// <param name="missingWorksheetName">The name of the <see cref="ExcelInterop.Worksheet"/> that no longer exists and that is associated to the Edit session to close.</param>
+    private void CloseMissingWorksheetEditSession(ExcelInterop.Workbook workbook, string missingWorksheetName)
     {
       if (workbook == null || missingWorksheetName.Length == 0)
       {
@@ -684,17 +746,17 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Closes and removes the Edit session associated to the given <see cref="Excel.Worksheet"/>.
+    /// Closes and removes the Edit session associated to the given <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
-    /// <param name="worksheet">The <see cref="Excel.Worksheet"/> associated to the Edit session to close.</param>
-    private void CloseWorksheetEditSession(Excel.Worksheet worksheet)
+    /// <param name="worksheet">The <see cref="ExcelInterop.Worksheet"/> associated to the Edit session to close.</param>
+    private void CloseWorksheetEditSession(ExcelInterop.Worksheet worksheet)
     {
       if (worksheet == null)
       {
         return;
       }
 
-      Excel.Workbook parentWorkbook = worksheet.Parent as Excel.Workbook;
+      ExcelInterop.Workbook parentWorkbook = worksheet.Parent as ExcelInterop.Workbook;
       if (parentWorkbook == null)
       {
         return;
@@ -751,7 +813,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Customizes the looks of the <see cref="MySQL.Utility.Forms.InfoDialog"/> form for MySQL for Excel.
+    /// Customizes the looks of the <see cref="MySQL.Utility.Forms.InfoDialog"/> form for MySQL for ExcelInterop.
     /// </summary>
     private void CustomizeInfoDialog()
     {
@@ -776,7 +838,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Delete the closed workbook's edit sessions from the settings file.
     /// </summary>
-    private void DeleteCurrentWorkbookEditSessions(Excel.Workbook workbook)
+    private void DeleteCurrentWorkbookEditSessions(ExcelInterop.Workbook workbook)
     {
       if (workbook == null || string.IsNullOrEmpty(workbook.GetOrCreateId()))
       {
@@ -859,6 +921,7 @@ namespace MySQL.ForExcel
     /// <param name="cancelDefault">Flag indicating whether the base functionality is cancelled or not.</param>
     private void RefreshButton_Click(OfficeCore.CommandBarButton ctrl, ref bool cancelDefault)
     {
+      RemoveInvalidImportSessions();
       var listObject = Application.ActiveCell.ListObject;
       if (listObject == null)
       {
@@ -866,17 +929,44 @@ namespace MySQL.ForExcel
       }
 
       var toolsListObject = Globals.Factory.GetVstoObject(listObject);
-      if (toolsListObject == null || !(toolsListObject.DataSource is MySqlDataTable))
+      if (toolsListObject == null)
       {
         return;
       }
 
-      cancelDefault = true;
-      var mySqlTable = toolsListObject.DataSource as MySqlDataTable;
-      toolsListObject.Disconnect();
-      Exception ex;
-      mySqlTable.RevertData(true, out ex);
+      MySqlDataTable mySqlTable;
+      if (toolsListObject.DataSource == null)
+      {
+        var importSession = Globals.ThisAddIn.ActiveWorksheetImportSessions.FirstOrDefault(session => session.ExcelTableName.Equals(toolsListObject.Name));
+        if (importSession == null)
+        {
+          MySqlSourceTrace.WriteAppErrorToLog(new InstanceNotFoundException("Session not found"));
+          return;
+        }
+
+        importSession.Refresh();
+        mySqlTable = importSession.MySqlTable;
+      }
+      else if (toolsListObject.DataSource is MySqlDataTable)
+      {
+        cancelDefault = true;
+        mySqlTable = toolsListObject.DataSource as MySqlDataTable;
+        toolsListObject.Disconnect();
+        Exception ex;
+        mySqlTable.RefreshData(out ex);
+      }
+      else
+      {
+        return;
+      }
+
       toolsListObject.SetDataBinding(mySqlTable);
+
+      if (!toolsListObject.ShowHeaders)
+      {
+        return;
+      }
+
       foreach (MySqlDataColumn col in mySqlTable.Columns)
       {
         toolsListObject.ListColumns[col.Ordinal + 1].Name = col.DisplayName;
@@ -903,16 +993,16 @@ namespace MySQL.ForExcel
       MySqlWorkbenchPasswordVault.ApplicationPasswordVaultFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\user_data.dat";
       MySqlWorkbench.ExternalConnections.CreateDefaultConnections = !MySqlWorkbench.IsInstalled && !File.Exists(MySqlWorkbench.ConnectionsFilePath) && MySqlWorkbench.Connections.Count == 0;
       MySqlWorkbench.ExternalApplicationConnectionsFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\connections.xml";
-      MySqlSourceTrace.LogFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\MySQLForExcel.log";
+      MySqlSourceTrace.LogFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\MySQLForExcelInterop.log";
       MySqlSourceTrace.SourceTraceClass = "MySQLForExcel";
     }
 
     /// <summary>
-    /// Gets a subset of the <see cref="StoredEditSessions"/> list containing only sessions assocaiated to the given <see cref="Excel.Workbook"/>.
+    /// Gets a subset of the <see cref="StoredEditSessions"/> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
-    /// <param name="workbook">A <see cref="Excel.Workbook"/> with active Edit sessions.</param>
-    /// <returns>A subset of the <see cref="StoredEditSessions"/> list containing only sessions assocaiated to the given <see cref="Excel.Workbook"/></returns>
-    private List<EditSessionInfo> GetWorkbookEditSessions(Excel.Workbook workbook)
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> with active Edit sessions.</param>
+    /// <returns>A subset of the <see cref="StoredEditSessions"/> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Workbook"/></returns>
+    private List<EditSessionInfo> GetWorkbookEditSessions(ExcelInterop.Workbook workbook)
     {
       List<EditSessionInfo> workbookSessions = null;
       string workbookId = workbook.GetOrCreateId();
@@ -933,10 +1023,32 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Gets a subset of the <see cref="ActiveImportSessions" /> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Workbook" />.
+    /// </summary>
+    /// <param name="workbookId">Workbook Id to match the sub set of sessions to.</param>
+    /// <returns> A subset of the <see cref="ActiveImportSessions" /> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Workbook" /></returns>
+    private List<ImportSessionInfo> GetWorkbookImportSessions(string workbookId)
+    {
+      return ActiveImportSessions.FindAll(session => string.Equals(session.WorkbookGuid, workbookId, StringComparison.InvariantCulture));
+    }
+
+    /// <summary>
+    /// Gets a subset of the <see cref="ActiveImportSessions" /> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Worksheet" />.
+    /// </summary>
+    /// <param name="workbookId">Workbook Id to match the sub set of sessions to.</param>
+    /// <param name="worksheetName">Worksheet Name to match the sub set of sessions to.</param>
+    /// <returns>A subset of the <see cref="ActiveImportSessions" /> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Worksheet" /></returns>
+    private List<ImportSessionInfo> GetWorkSheetImportSessions(string workbookId, string worksheetName)
+    {
+      List<ImportSessionInfo> worksheetSessions = GetWorkbookImportSessions(workbookId);
+      return worksheetSessions.FindAll(session => string.Equals(session.WorksheetName, worksheetName, StringComparison.InvariantCulture));
+    }
+
+    /// <summary>
     /// Opens an <see cref="EditDataDialog"/> representing a saved Edit session for each of the tables.
     /// </summary>
     /// <param name="workbook">The workbook.</param>
-    private void OpenEditSessionsOfTables(Excel.Workbook workbook)
+    private void OpenEditSessionsOfTables(ExcelInterop.Workbook workbook)
     {
       if (workbook == null)
       {
@@ -1015,9 +1127,9 @@ namespace MySQL.ForExcel
     /// Attempts to open a <see cref="MySqlWorkbenchConnection"/> of a saved session.
     /// </summary>
     /// <param name="session">A saved <see cref="EditSessionInfo"/> object.</param>
-    /// <param name="workbook">A <see cref="Excel.Workbook"/> object related to the saved session.</param>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object related to the saved session.</param>
     /// <returns>The opened <see cref="MySqlWorkbenchConnection"/>.</returns>
-    private MySqlWorkbenchConnection OpenConnectionForSavedSession(EditSessionInfo session, Excel.Workbook workbook)
+    private MySqlWorkbenchConnection OpenConnectionForSavedSession(EditSessionInfo session, ExcelInterop.Workbook workbook)
     {
       if (session == null || workbook == null)
       {
@@ -1076,10 +1188,10 @@ namespace MySQL.ForExcel
     }
 
     ///  <summary>
-    /// Restores saved Edit sessions from the given <see cref="Excel.Workbook"/>.
+    /// Restores saved Edit sessions from the given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
-    /// <param name="workbook">An <see cref="Excel.Workbook"/> with saved Edit sessions.</param>
-    private void RestoreEditSessions(Excel.Workbook workbook)
+    /// <param name="workbook">An <see cref="ExcelInterop.Workbook"/> with saved Edit sessions.</param>
+    private void RestoreEditSessions(ExcelInterop.Workbook workbook)
     {
       if (workbook == null || ActiveExcelPane == null || _editSessionsByWorkbook.ContainsKey(workbook.GetOrCreateId()))
       {
@@ -1186,8 +1298,8 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Shows a <see cref="RestoreEditSessionsDialog"/> to the users to decide what to do with saved Edit sessions.
     /// </summary>
-    /// <param name="workbook">The <see cref="Excel.Workbook"/> that may contain saved Edit sessions.</param>
-    private void ShowOpenEditSessionsDialog(Excel.Workbook workbook)
+    /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/> that may contain saved Edit sessions.</param>
+    private void ShowOpenEditSessionsDialog(ExcelInterop.Workbook workbook)
     {
       if (workbook == null)
       {

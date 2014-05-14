@@ -438,5 +438,18 @@ namespace MySQL.ForExcel.Properties {
                 this["HideLocalizedDateFormatNames"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Generic.List<MySQL.ForExcel.Classes.ImportSessionInfo> ImportSessionsList {
+            get {
+                return ((global::System.Collections.Generic.List<MySQL.ForExcel.Classes.ImportSessionInfo>)(this["ImportSessionsList"]));
+            }
+            set {
+                this["ImportSessionsList"] = value;
+            }
+        }
+
     }
 }

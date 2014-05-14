@@ -43,24 +43,22 @@ namespace MySQL.ForExcel.Forms
     /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="importDbObject">MySQL table, view or procedure from which to import data to an Excel spreadsheet.</param>
     /// <param name="importToWorksheetName">Name of the Excel worksheet where the data will be imported to.</param>
-    /// <param name="workbookInCompatibilityMode">Flag indicating if the Excel workbook where the data will be imported to is in Excel 2003 compatibility mode.</param>
+    /// <param name="workBookInCompatibilityMode">Flag indicating if the Excel workbook where the data will be imported to is in Excel 2003 compatibility mode.</param>
     /// <param name="importForEditData"><c>true</c> if the import is part of an Edit operation, <c>false</c> otherwise.</param>
-    public ImportTableViewForm(MySqlWorkbenchConnection wbConnection, DbObject importDbObject, string importToWorksheetName, bool workbookInCompatibilityMode, bool importForEditData)
+    public ImportTableViewForm(MySqlWorkbenchConnection wbConnection, DbObject importDbObject, string importToWorksheetName, bool workBookInCompatibilityMode, bool importForEditData)
     {
       PreviewDataTable = null;
       ImportOperationGeneratedErrors = false;
       WbConnection = wbConnection;
       ImportDbObject = importDbObject;
-      WorkbookInCompatibilityMode = workbookInCompatibilityMode;
-      ImportDataTable = null;
-
+      WorkbookInCompatibilityMode = workBookInCompatibilityMode;
       InitializeComponent();
       PreviewDataGridView.DataError += PreviewDataGridView_DataError;
 
       IncludeHeadersCheckBox.Checked = true;
       IncludeHeadersCheckBox.Enabled = !importForEditData;
-      ImportWithinEditOperation = importForEditData;
-      PreviewDataGridView.DisableColumnsSelection = ImportWithinEditOperation;
+      IsForEdit = importForEditData;
+      PreviewDataGridView.DisableColumnsSelection = IsForEdit;
       if (importForEditData)
       {
         PreviewDataGridView.ContextMenuStrip = null;
@@ -102,18 +100,6 @@ namespace MySQL.ForExcel.Forms
     public DbObject ImportDbObject { get; private set; }
 
     /// <summary>
-    /// Gets a value indicating whether the column names will be imported as data headers in the first row of the Excel spreadsheet.
-    /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool ImportHeaders
-    {
-      get
-      {
-        return IncludeHeadersCheckBox.Checked;
-      }
-    }
-
-    /// <summary>
     /// Gets a value indicating whether the import operation generated errors so the form must not be closed right away.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -122,9 +108,7 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets or sets a value indicating whether the import is part of an Edit operation.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool ImportWithinEditOperation { get; private set; }
-
+    public bool IsForEdit { get; private set; }
     /// <summary>
     /// Gets a <see cref="DataTable"/> object containing a subset of the whole data which is shown in the preview grid.
     /// </summary>
@@ -165,6 +149,41 @@ namespace MySQL.ForExcel.Forms
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool WorkbookInCompatibilityMode { get; private set; }
 
+    /// <summary>
+    /// Gets a value indicating the which should be index of the first row obtained by the select query.
+    /// </summary>
+    private int FirstRowIndex
+    {
+      get
+      {
+        var firstRowIndex = (int)FromRowNumericUpDown.Value - 1;
+        return (LimitRowsCheckBox.Checked) ? firstRowIndex : -1;
+      }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the column names will be imported as data headers in the first row of the Excel spreadsheet.
+    /// </summary>
+    private bool IncludeColumnNames
+    {
+      get
+      {
+        return IncludeHeadersCheckBox.Checked;
+      }
+    }
+
+    /// <summary>
+    /// Gets a value indicating the the number of rows to be obtained by the select query after the first row.
+    /// </summary>
+    private int RowsTo
+    {
+      get
+      {
+        var rowCount = (int)RowsToReturnNumericUpDown.Value;
+        return (LimitRowsCheckBox.Checked) ? (WorkbookInCompatibilityMode && rowCount > UInt16.MaxValue) ? UInt16.MaxValue : rowCount : -1;
+      }
+    }
+
     #endregion Properties
 
     /// <summary>
@@ -200,7 +219,12 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void FillPreviewGrid()
     {
-      PreviewDataTable = WbConnection.GetDataFromTableOrView(ImportDbObject, null, 0, Settings.Default.ImportPreviewRowsQuantity);
+      if (ImportDbObject.Type == DbObject.DbObjectType.Procedure)
+      {
+        return;
+      }
+
+      PreviewDataTable = WbConnection.GetDataFromTableOrView(ImportDbObject.Name, null, 0, Settings.Default.ImportPreviewRowsQuantity);
       TotalRowsCount = WbConnection.GetRowsCountFromTableOrView(ImportDbObject);
       RowsCountSubLabel.Text = TotalRowsCount.ToString(CultureInfo.InvariantCulture);
       PreviewDataGridView.DataSource = PreviewDataTable;
@@ -233,11 +257,11 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void ImportButton_Click(object sender, EventArgs e)
     {
-      List<string> importColumns = null;
-      List<DataGridViewColumn> selectedColumns = new List<DataGridViewColumn>();
+      List<string> columnNameList = null;
+      var selectedColumns = new List<DataGridViewColumn>();
       if (PreviewDataGridView.SelectedColumns.Count < PreviewDataGridView.Columns.Count)
       {
-        importColumns = new List<string>(PreviewDataGridView.SelectedColumns.Count);
+        columnNameList = new List<string>(PreviewDataGridView.SelectedColumns.Count);
         selectedColumns.AddRange(PreviewDataGridView.SelectedColumns.Cast<DataGridViewColumn>());
 
         if (selectedColumns.Count > 1)
@@ -245,31 +269,13 @@ namespace MySQL.ForExcel.Forms
           selectedColumns.Sort((c1, c2) => c1.Index.CompareTo(c2.Index));
         }
 
-        importColumns.AddRange(selectedColumns.Select(selCol => selCol.HeaderText));
+        columnNameList.AddRange(selectedColumns.Select(selCol => selCol.HeaderText));
       }
 
       try
       {
         Cursor = Cursors.WaitCursor;
-        DataTable dt;
-        if (LimitRowsCheckBox.Checked)
-        {
-          dt = WbConnection.GetDataFromTableOrView(ImportDbObject, importColumns, Convert.ToInt32(FromRowNumericUpDown.Value) - 1, Convert.ToInt32(RowsToReturnNumericUpDown.Value));
-        }
-        else if (WorkbookInCompatibilityMode)
-        {
-          dt = WbConnection.GetDataFromTableOrView(ImportDbObject, importColumns, 0, UInt16.MaxValue);
-        }
-        else
-        {
-          dt = WbConnection.GetDataFromTableOrView(ImportDbObject, importColumns);
-        }
-
-        if (dt != null)
-        {
-          ImportDataTable = new MySqlDataTable(ImportDbObject.Name, dt, WbConnection, ImportWithinEditOperation);
-          ImportDataTable.AddExtendedProperties(dt.ExtendedProperties["QueryString"].ToString(), ImportHeaders, ImportDbObject.Name);
-        }
+        ImportDataTable = WbConnection.CreateMySqlTable(IsForEdit, ImportDbObject.Name, WorkbookInCompatibilityMode, IncludeColumnNames, columnNameList, LimitRowsCheckBox.Checked, FirstRowIndex, RowsTo);
       }
       catch (Exception ex)
       {

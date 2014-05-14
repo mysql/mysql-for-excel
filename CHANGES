@@ -1,4 +1,5 @@
 1.3.0
+- Added new feature to allow imported data to be refreshed directly from the data base.
 - New feature that allows the user to reset option settings in Import, Export or Append advanced options and Global Options dialogues to their respective default values was added.
 - Added new feature to allow the selection of multiple tables and views and an Import Multiple Tables and Views action that when clicked imports the data of all selected
   database objects into individual Excel worksheets, Excel tables are created optionally for each imported Table or View. On Excel 2013 (and higher) PowerPivot model

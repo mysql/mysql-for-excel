@@ -27,6 +27,7 @@ using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
+using MySQL.ForExcel.Interfaces;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -147,6 +148,36 @@ namespace MySQL.ForExcel.Classes
       }
 
       return (T)Convert.ChangeType(settingsProperty.DefaultValue, propertyInfo.PropertyType);
+    }
+
+    /// <summary>
+    /// Determines whether this session has same workbook and table as the specified comparing session.
+    /// </summary>
+    /// <param name="session">The current session.</param>
+    /// <param name="comparingSession">The session we want to compare values with.</param>
+    /// <returns><c>true</c> when this session has same workbook and table as the specified comparing session, <c>false</c> otherwise.</returns>
+    public static bool HasSameWorkbookAndTable(this ISessionInfo session, ISessionInfo comparingSession)
+    {
+      return session != null && !string.IsNullOrEmpty(session.WorkbookGuid) && !string.IsNullOrEmpty(comparingSession.WorkbookGuid)
+      && string.Equals(session.WorkbookGuid, comparingSession.WorkbookGuid, StringComparison.InvariantCulture)
+      && !string.IsNullOrEmpty(session.TableName) && !string.IsNullOrEmpty(comparingSession.TableName)
+      && string.Equals(session.TableName, comparingSession.TableName, StringComparison.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Determines whether this session has same workbook and table as the specified comparing session.
+    /// </summary>
+    /// <param name="session">The current session.</param>
+    /// <param name="comparingSession">The session we want to compare values with.</param>
+    /// <returns><c>true</c> when this session has same workbook and table as the specified comparing session, <c>false</c> otherwise.</returns>
+    public static bool HasSameWorkbookWorkSheetAndExcelTable(this ImportSessionInfo session, ImportSessionInfo comparingSession)
+    {
+      return session != null && !string.IsNullOrEmpty(session.WorkbookGuid) && !string.IsNullOrEmpty(comparingSession.WorkbookGuid)
+      && string.Equals(session.WorkbookGuid, comparingSession.WorkbookGuid, StringComparison.InvariantCulture)
+      && !string.IsNullOrEmpty(session.WorksheetName) && !string.IsNullOrEmpty(comparingSession.WorksheetName)
+      && string.Equals(session.WorksheetName, comparingSession.WorksheetName, StringComparison.InvariantCulture)
+      && !string.IsNullOrEmpty(session.ExcelTableName) && !string.IsNullOrEmpty(comparingSession.ExcelTableName)
+      && string.Equals(session.ExcelTableName, comparingSession.ExcelTableName, StringComparison.InvariantCulture);
     }
 
     /// <summary>

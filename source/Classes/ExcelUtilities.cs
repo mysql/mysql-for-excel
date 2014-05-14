@@ -24,6 +24,7 @@ using Microsoft.Office.Core;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using Excel = Microsoft.Office.Interop.Excel;
+using MySQL.ForExcel.Interfaces;
 
 namespace MySQL.ForExcel.Classes
 {
