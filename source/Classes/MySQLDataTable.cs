@@ -413,6 +413,22 @@ namespace MySQL.ForExcel.Classes
       None
     }
 
+    /// <summary>
+    /// Specifies identifiers to indicate the position where new <see cref="ExcelInterop.PivotTable"/> objects are placed relative to imported table's data.
+    /// </summary>
+    public enum PivotTablePosition
+    {
+      /// <summary>
+      /// The <see cref="ExcelInterop.PivotTable"/> is placed below the imported data skipping one Excel row.
+      /// </summary>
+      Below,
+
+      /// <summary>
+      /// The <see cref="ExcelInterop.PivotTable"/> is placed to the right of the imported data skipping one Excel column.
+      /// </summary>
+      Right
+    }
+
     #endregion Enums
 
     #region Properties
@@ -604,6 +620,23 @@ namespace MySQL.ForExcel.Classes
         }
 
         return _engine;
+      }
+    }
+
+    /// <summary>
+    /// Gets the name to be used in related <see cref="ExcelInterop.ListObject"/> objects.
+    /// </summary>
+    public string ExcelTableName
+    {
+      get
+      {
+        string excelTableNamePrefix = Settings.Default.ImportPrefixExcelTable &&
+                                      !string.IsNullOrEmpty(Settings.Default.ImportPrefixExcelTableText)
+          ? Settings.Default.ImportPrefixExcelTableText + "."
+          : string.Empty;
+        string excelTableNameSchemaPiece = !string.IsNullOrEmpty(SchemaName) ? SchemaName + "." : string.Empty;
+        string excelTableNameTablePiece = !string.IsNullOrEmpty(TableName) ? TableName : "Table";
+        return excelTableNamePrefix + excelTableNameSchemaPiece + excelTableNameTablePiece;
       }
     }
 
@@ -1162,56 +1195,109 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Creates an Excel table from a given <see cref="ExcelInterop.Range"/> object.
+    /// Creates an Excel table starting at the given cell containing the data in this <see cref="MySqlDataTable"/> instance.
     /// </summary>
-    /// <param name="range">A <see cref="ExcelInterop.Range"/> object.</param>
-    /// <param name="excelTableName">The proposed name for the new Excel table.</param>
-    public ExcelInterop.ListObject CreateExcelTable(ExcelInterop.Range range, string excelTableName)
+    /// <param name="atCell">The top left Excel cell of the new <see cref="ExcelInterop.ListObject"/>.</param>
+    /// <returns>The newly created <see cref="ExcelInterop.ListObject"/>.</returns>
+    public ExcelInterop.ListObject CreateExcelTable(ExcelInterop.Range atCell)
     {
-      if (range == null)
+      if (atCell == null)
       {
         return null;
       }
 
-      var worksheet = Globals.Factory.GetVstoObject(range.Worksheet);
+      var worksheet = Globals.Factory.GetVstoObject(atCell.Worksheet);
       var workbook = worksheet.Parent as ExcelInterop.Workbook;
       if (workbook == null)
       {
         return null;
       }
 
-      excelTableName = excelTableName.GetExcelTableNameAvoidingDuplicates();
-      var workbookName = Globals.ThisAddIn.Application.ActiveWorkbook.Name;
-      var commandText = string.Format("{0}!{1}", workbookName, excelTableName);
-      var connectionName = @"WorksheetConnection_" + commandText;
-      var connectionString = "WORKSHEET;" + workbookName;
-      var hasHeaders = ImportColumnNames ? ExcelInterop.XlYesNoGuess.xlYes : ExcelInterop.XlYesNoGuess.xlNo;
-      var namedTable = range.Worksheet.ListObjects.Add(ExcelInterop.XlListObjectSourceType.xlSrcExternal, ExcelUtilities.DUMMY_WORKBOOK_CONNECTION_STRING, false, hasHeaders, range);
-      namedTable.Name = excelTableName;
-      namedTable.DisplayName = excelTableName;
-      namedTable.TableStyle = Settings.Default.ImportExcelTableStyleName;
-      namedTable.QueryTable.BackgroundQuery = false;
-      namedTable.QueryTable.CommandText = commandText;
-      var excelTable = Globals.Factory.GetVstoObject(namedTable);
-      excelTable.SetDataBinding(this);
-      foreach (MySqlDataColumn col in Columns)
+      ExcelInterop.ListObject namedTable = null;
+      try
       {
-        excelTable.ListColumns[col.Ordinal + 1].Name = col.DisplayName;
-      }
+        string proposedName = ExcelTableName.GetExcelTableNameAvoidingDuplicates();
+        var workbookName = Globals.ThisAddIn.Application.ActiveWorkbook.Name;
+        var commandText = string.Format("{0}!{1}", workbookName, proposedName);
+        var connectionName = @"WorksheetConnection_" + commandText;
+        var connectionString = "WORKSHEET;" + workbookName;
+        var hasHeaders = ImportColumnNames ? ExcelInterop.XlYesNoGuess.xlYes : ExcelInterop.XlYesNoGuess.xlNo;
+        namedTable = atCell.Worksheet.ListObjects.Add(ExcelInterop.XlListObjectSourceType.xlSrcExternal, ExcelUtilities.DUMMY_WORKBOOK_CONNECTION_STRING, false, hasHeaders, atCell);
+        namedTable.Name = proposedName;
+        namedTable.DisplayName = proposedName;
+        namedTable.TableStyle = Settings.Default.ImportExcelTableStyleName;
+        namedTable.QueryTable.BackgroundQuery = false;
+        namedTable.QueryTable.CommandText = commandText;
+        var excelTable = Globals.Factory.GetVstoObject(namedTable);
+        excelTable.SetDataBinding(this);
+        if (ImportColumnNames)
+        {
+          foreach (MySqlDataColumn col in Columns)
+          {
+            excelTable.ListColumns[col.Ordinal + 1].Name = col.DisplayName;
+          }
+        }
 
-      excelTable.Range.Columns.AutoFit();
+        excelTable.Range.Columns.AutoFit();
 
-      // Add a connection to the Workbook, the method used to add it differs since the Add method is obsolete for Excel 2013 and higher.
-      if (Globals.ThisAddIn.ExcelVersionNumber < ThisAddIn.EXCEL_2013_VERSION_NUMBER)
-      {
-        workbook.Connections.Add(connectionName, string.Empty, connectionString, commandText, ExcelInterop.XlCmdType.xlCmdExcel);
+        // Add a connection to the Workbook, the method used to add it differs since the Add method is obsolete for Excel 2013 and higher.
+        if (Globals.ThisAddIn.ExcelVersionNumber < ThisAddIn.EXCEL_2013_VERSION_NUMBER)
+        {
+          workbook.Connections.Add(connectionName, string.Empty, connectionString, commandText, ExcelInterop.XlCmdType.xlCmdExcel);
+        }
+        else
+        {
+          workbook.Connections.Add2(connectionName, string.Empty, connectionString, commandText, ExcelInterop.XlCmdType.xlCmdExcel, true, false);
+        }
+
+        // Add a new ImportSessionInfo object if not present already to the collection.
+        if (!Globals.ThisAddIn.ActiveImportSessions.Exists(session => session.MySqlTable == this && string.Equals(session.ExcelTableName, proposedName, StringComparison.InvariantCulture)))
+        {
+          Globals.ThisAddIn.ActiveImportSessions.Add(new ImportSessionInfo(this, proposedName));
+        }
       }
-      else
+      catch (Exception ex)
       {
-        workbook.Connections.Add2(connectionName, string.Empty, connectionString, commandText, ExcelInterop.XlCmdType.xlCmdExcel, true, false);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
 
       return namedTable;
+    }
+
+    /// <summary>
+    /// Creates an Excel PivotTable starting at the given cell containing the data in this <see cref="MySqlDataTable"/> instance.
+    /// </summary>
+    /// <param name="atCell">The top left Excel cell of the new <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <param name="dataRange">The top left Excel cell of the new <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <returns>The newly created <see cref="ExcelInterop.PivotTable"/>.</returns>
+    public ExcelInterop.PivotTable CreatePivotTable(ExcelInterop.Range atCell, ExcelInterop.Range dataRange)
+    {
+      if (atCell == null || dataRange == null)
+      {
+        return null;
+      }
+
+      var worksheet = Globals.Factory.GetVstoObject(atCell.Worksheet);
+      var workbook = worksheet.Parent as ExcelInterop.Workbook;
+      if (workbook == null)
+      {
+        return null;
+      }
+
+      ExcelInterop.PivotTable pivotTable = null;
+      try
+      {
+        string proposedName = ExcelTableName.GetExcelTableNameAvoidingDuplicates();
+        var pivotTableVersion = Globals.ThisAddIn.ExcelPivotTableVersion;
+        var pivotCache = workbook.PivotCaches().Create(ExcelInterop.XlPivotTableSourceType.xlDatabase, dataRange, pivotTableVersion);
+        pivotTable = pivotCache.CreatePivotTable(atCell, proposedName, true, pivotTableVersion);
+      }
+      catch (Exception ex)
+      {
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
+
+      return pivotTable;
     }
 
     /// <summary>
@@ -1498,12 +1584,14 @@ namespace MySQL.ForExcel.Classes
     /// Imports data contained in the given <see cref="MySqlDataTable"/> object at the active Excel cell.
     /// </summary>
     /// <param name="importColumnNames">Flag indicating if column names will be imported as the first row of imported data.</param>
-    /// <param name="createExcelTable">Flag indicating whether an Excel table is created for the imported data.</param>
+    /// <param name="createExcelTable">Flag indicating whether a <see cref="ExcelInterop.ListObject"/> is created for the imported data.</param>
+    /// <param name="createPivotTable">Flag indicating whether a <see cref="ExcelInterop.PivotTable"/> is created for the imported data.</param>
+    /// <param name="pivotPosition">The position where new <see cref="ExcelInterop.PivotTable"/> objects are placed relative to imported table's data.</param>
     /// <returns>The <see cref="ExcelInterop.Range"/> or <see cref="ExcelInterop.ListObject"/> containing the cells with the imported data.</returns>
-    public object ImportDataAtActiveExcelCell(bool importColumnNames, bool createExcelTable)
+    public object ImportDataAtActiveExcelCell(bool importColumnNames, bool createExcelTable, bool createPivotTable, PivotTablePosition pivotPosition = PivotTablePosition.Right)
     {
       var atCell = Globals.ThisAddIn.Application.ActiveCell;
-      object retObj = null;
+      object retObj;
       if (createExcelTable)
       {
         retObj = ImportDataIntoExcelTable(atCell);
@@ -1513,6 +1601,26 @@ namespace MySQL.ForExcel.Classes
         retObj = ImportDataIntoExcelRange(atCell);
       }
 
+      if (!createPivotTable || retObj == null)
+      {
+        return retObj;
+      }
+
+      var dataRange = retObj is ExcelInterop.ListObject
+        ? (retObj as ExcelInterop.ListObject).Range
+        : retObj as ExcelInterop.Range;
+      switch (pivotPosition)
+      {
+        case PivotTablePosition.Below:
+          atCell = atCell.Offset[atCell.Row + Rows.Count, 0];
+          break;
+
+        case PivotTablePosition.Right:
+          atCell = atCell.Offset[0, atCell.Column + Columns.Count];
+          break;
+      }
+
+      CreatePivotTable(atCell, dataRange);
       return retObj;
     }
 
@@ -1530,7 +1638,7 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      ExcelInterop.Range fillingRange = null;
+      ExcelInterop.Range fillingRange;
       try
       {
         int currentRow = atCell.Row - 1;
@@ -1541,7 +1649,7 @@ namespace MySQL.ForExcel.Classes
         fillingRange = atCell.Resize[cappedNumRows, Columns.Count];
 
         // Check if the data being imported does not overlap with the data of an existing Excel table.
-        if (fillingRange.IntersectsWithAnyExcelTable())
+        if (fillingRange.IntersectsWithAnyExcelObject())
         {
           if (
             InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelTableErrorTitle,
@@ -1620,6 +1728,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
+        fillingRange = null;
         MiscUtilities.ShowCustomizedErrorDialog(Resources.ImportDataErrorDetailText, ex.Message, true);
         MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
@@ -1645,18 +1754,15 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      ExcelInterop.ListObject excelTable = null;
+      ExcelInterop.ListObject excelTable;
       try
       {
-        ExcelInterop.Workbook activeWorkbook = atCell.Worksheet.Parent as ExcelInterop.Workbook;
+        var activeWorkbook = atCell.Worksheet.Parent as ExcelInterop.Workbook;
 
         // Check if the data being imported does not overlap with the data of an existing Excel table.
-        if (atCell.IntersectsWithAnyExcelTable())
+        if (atCell.IntersectsWithAnyExcelObject())
         {
-          if (
-            InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelTableErrorTitle,
-              Resources.ImportOverExcelTableErrorDetail, Resources.ImportOverExcelTableErrorSubDetail) ==
-            DialogResult.No)
+          if (InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelTableErrorTitle, Resources.ImportOverExcelTableErrorDetail, Resources.ImportOverExcelTableErrorSubDetail) == DialogResult.No)
           {
             return null;
           }
@@ -1675,12 +1781,12 @@ namespace MySQL.ForExcel.Classes
         Globals.ThisAddIn.Application.Goto(atCell, false);
 
         // Create Excel Table for the imported data
-        string excelTableName = ExcelUtilities.GetExcelTableNameAvoidingDuplicates(SchemaName, TableName);
-        excelTable = CreateExcelTable(atCell, excelTableName);
+        excelTable = CreateExcelTable(atCell);
         atCell.Select();
       }
       catch (Exception ex)
       {
+        excelTable = null;
         MiscUtilities.ShowCustomizedErrorDialog(Resources.ImportDataErrorDetailText, ex.Message, true);
         MySqlSourceTrace.WriteAppErrorToLog(ex);
       }

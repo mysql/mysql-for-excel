@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -30,9 +30,15 @@ namespace MySQL.ForExcel.Forms
     /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
     protected override void Dispose(bool disposing)
     {
-      if (disposing && (components != null))
+      if (disposing)
       {
-        components.Dispose();
+        if (components != null)
+        {
+          components.Dispose();
+        }
+
+        // Set variables to null so this object does not hold references to them and the GC disposes of them sooner.
+        _wbConnection = null;
       }
       base.Dispose(disposing);
     }

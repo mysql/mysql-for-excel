@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
@@ -28,7 +27,7 @@ using MySQL.ForExcel.Properties;
 using MySQL.ForExcel.Structs;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
-using Excel = Microsoft.Office.Interop.Excel;
+using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Controls
 {
@@ -60,10 +59,10 @@ namespace MySQL.ForExcel.Controls
     public EditDataDialog ActiveEditDialog { get; private set; }
 
     /// <summary>
-    /// Gets the active <see cref="Excel.Workbook"/> in the Excel application.
+    /// Gets the active <see cref="ExcelInterop.Workbook"/> in the Excel application.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public Excel.Workbook ActiveWorkbook
+    public ExcelInterop.Workbook ActiveWorkbook
     {
       get
       {
@@ -72,7 +71,7 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Gets the active <see cref="Excel.Workbook"/> unique identifier.
+    /// Gets the active <see cref="ExcelInterop.Workbook"/> unique identifier.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string ActiveWorkbookId
@@ -84,14 +83,14 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Gets the active <see cref="Excel.Worksheet"/> in the Excel application.
+    /// Gets the active <see cref="ExcelInterop.Worksheet"/> in the Excel application.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public Excel.Worksheet ActiveWorksheet
+    public ExcelInterop.Worksheet ActiveWorksheet
     {
       get
       {
-        return Globals.ThisAddIn.Application.ActiveSheet as Excel.Worksheet;
+        return Globals.ThisAddIn.Application.ActiveSheet as ExcelInterop.Worksheet;
       }
     }
 
@@ -178,7 +177,7 @@ namespace MySQL.ForExcel.Controls
     public bool AppendDataToTable(DbObject toTableObject)
     {
       DialogResult dr;
-      Excel.Range exportRange = Globals.ThisAddIn.Application.Selection as Excel.Range;
+      ExcelInterop.Range exportRange = Globals.ThisAddIn.Application.Selection as ExcelInterop.Range;
       if (exportRange == null)
       {
         return false;
@@ -260,7 +259,7 @@ namespace MySQL.ForExcel.Controls
     /// <returns>
     ///   <c>true</c> If the export/append action was executed, <c>false</c> otherwise.
     /// </returns>
-    public bool EditTableData(DbObject tableObject, bool fromSavedSession, Excel.Workbook workbook)
+    public bool EditTableData(DbObject tableObject, bool fromSavedSession, ExcelInterop.Workbook workbook)
     {
       string schemaAndTableNames = WbConnection.Schema + "." + tableObject.Name;
 
@@ -289,7 +288,7 @@ namespace MySQL.ForExcel.Controls
         return false;
       }
 
-      if (importForm.ImportDataTable == null || importForm.ImportDataTable.Columns.Count == 0)
+      if (importForm.MySqlTable == null || importForm.MySqlTable.Columns.Count == 0)
       {
         MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, tableObject.Name));
         importForm.Dispose();
@@ -306,7 +305,7 @@ namespace MySQL.ForExcel.Controls
       }
 
       // Create the new Excel Worksheet and import the editing data there
-      Excel.Workbook editWorkbook = fromSavedSession && workbook != null ? workbook : ActiveWorkbook;
+      ExcelInterop.Workbook editWorkbook = fromSavedSession && workbook != null ? workbook : ActiveWorkbook;
       var currentWorksheet = fromSavedSession && Settings.Default.EditSessionsReuseWorksheets
         ? editWorkbook.GetOrCreateWorksheet(proposedWorksheetName, true)
         : editWorkbook.CreateWorksheet(proposedWorksheetName, true);
@@ -344,67 +343,6 @@ namespace MySQL.ForExcel.Controls
 
       importForm.Dispose();
       return true;
-    }
-
-    /// <summary>
-    /// Imports data contained in the given <see cref="DataSet"/> object to the active Excel <see cref="Excel.Worksheet"/>.
-    /// </summary>
-    /// <param name="ds">The dataset containing the data to import to Excel.</param>
-    /// <param name="importColumnNames">Flag indicating if column names will be imported as the first row of imported data.</param>
-    /// <param name="importType">Indicates how to arrange multiple resultsets in the active Excel <see cref="Excel.Worksheet"/>.</param>
-    /// <param name="selectedResultSet">Number of resultset to import when the <see cref="importType"/> is ImportMultipleType.SelectedResultSet.</param>
-    public void ImportDataToExcel(DataSet ds, bool importColumnNames, ImportProcedureForm.ImportMultipleType importType, int selectedResultSet)
-    {
-      Excel.Range atCell = Globals.ThisAddIn.Application.ActiveCell;
-      int tableIdx = 0;
-      foreach (MySqlDataTable mySqlTable in ds.Tables)
-      {
-        if (importType == ImportProcedureForm.ImportMultipleType.SelectedResultSet && selectedResultSet < tableIdx)
-        {
-          continue;
-        }
-
-        tableIdx++;
-        var excelObj = Settings.Default.ImportCreateExcelTable ? mySqlTable.ImportDataIntoExcelTable(atCell) : mySqlTable.ImportDataIntoExcelRange(atCell) as object;
-        if (excelObj == null)
-        {
-          continue;
-        }
-
-        var fillingRange = excelObj is Excel.ListObject
-          ? (excelObj as Excel.ListObject).Range
-          : excelObj as Excel.Range;
-        Excel.Range endCell;
-        if (fillingRange != null)
-        {
-          endCell = fillingRange.Cells[fillingRange.Rows.Count, fillingRange.Columns.Count] as Excel.Range;
-        }
-        else
-        {
-          continue;
-        }
-
-        if (endCell == null || tableIdx >= ds.Tables.Count)
-        {
-          continue;
-        }
-
-        switch (importType)
-        {
-          case ImportProcedureForm.ImportMultipleType.AllResultSetsHorizontally:
-            atCell = endCell.Offset[atCell.Row - endCell.Row, 2];
-            break;
-
-          case ImportProcedureForm.ImportMultipleType.AllResultSetsVertically:
-            if (ActiveWorkbook.Excel8CompatibilityMode && endCell.Row + 2 > UInt16.MaxValue)
-            {
-              return;
-            }
-
-            atCell = endCell.Offset[2, atCell.Column - endCell.Column];
-            break;
-        }
-      }
     }
 
     /// <summary>
@@ -505,7 +443,7 @@ namespace MySQL.ForExcel.Controls
       }
 
       // Means has an edit ongoing we need to make sure the edit has a valid sheet otherwise we need to release it
-      if (Globals.ThisAddIn.Application.Worksheets.Cast<Excel.Worksheet>().Contains(editContainer.EditDialog.EditingWorksheet))
+      if (Globals.ThisAddIn.Application.Worksheets.Cast<ExcelInterop.Worksheet>().Contains(editContainer.EditDialog.EditingWorksheet))
       {
         return true;
       }
@@ -515,10 +453,10 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Checks if the selected <see cref="Excel.Range"/> contains any data in it and updates that status in the corresponidng panel.
+    /// Checks if the selected <see cref="ExcelInterop.Range"/> contains any data in it and updates that status in the corresponidng panel.
     /// </summary>
-    /// <param name="range">The <see cref="Excel.Range"/> where the selection is.</param>
-    public void UpdateExcelSelectedDataStatus(Excel.Range range)
+    /// <param name="range">The <see cref="ExcelInterop.Range"/> where the selection is.</param>
+    public void UpdateExcelSelectedDataStatus(ExcelInterop.Range range)
     {
       if (!Visible)
       {
@@ -535,10 +473,10 @@ namespace MySQL.ForExcel.Controls
     /// <param name="importForm">The import form used on the current session.</param>
     /// <param name="currentWorksheet">The current worksheet.</param>
     /// <returns>A new or restored <see cref="EditSessionInfo"/> object.</returns>
-    private EditSessionInfo GetEditSession(DbObject tableObject, ImportTableViewForm importForm, Excel.Worksheet currentWorksheet)
+    private EditSessionInfo GetEditSession(DbObject tableObject, ImportTableViewForm importForm, ExcelInterop.Worksheet currentWorksheet)
     {
-      Excel.Range atCell = currentWorksheet.Range["A1", Type.Missing];
-      Excel.Range editingRange = importForm.ImportDataTable.ImportDataIntoExcelRange(atCell);
+      ExcelInterop.Range atCell = currentWorksheet.Range["A1", Type.Missing];
+      ExcelInterop.Range editingRange = importForm.MySqlTable.ImportDataIntoExcelRange(atCell);
       EditSessionInfo session = null;
 
       if (Globals.ThisAddIn.ActiveWorkbookEditSessions.Count > 0)
@@ -558,7 +496,7 @@ namespace MySQL.ForExcel.Controls
       }
 
       // The Edit session is being either restored from the settings file or created for the newborn session.
-      session.EditDialog = new EditDataDialog(this, new NativeWindowWrapper(Globals.ThisAddIn.Application.Hwnd), WbConnection, editingRange, importForm.ImportDataTable, currentWorksheet);
+      session.EditDialog = new EditDataDialog(this, new NativeWindowWrapper(Globals.ThisAddIn.Application.Hwnd), WbConnection, editingRange, importForm.MySqlTable, currentWorksheet);
       currentWorksheet.StoreProtectionKey(session.EditDialog.WorksheetProtectionKey);
       return session;
     }

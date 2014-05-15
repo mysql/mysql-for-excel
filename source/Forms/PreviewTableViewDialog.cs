@@ -34,6 +34,30 @@ namespace MySQL.ForExcel.Forms
   /// </summary>
   public partial class PreviewTableViewDialog : AutoStyleableBaseDialog
   {
+    #region Fields
+
+    /// <summary>
+    /// The type of DB object (MySQL table or view) to preview data for.
+    /// </summary>
+    private DbObject _previewDbObject;
+
+    /// <summary>
+    /// A <see cref="DataTable"/> object containing a subset of the whole data which is shown in the preview grid.
+    /// </summary>
+    private DataTable _previewDataTable;
+
+    /// <summary>
+    /// The total rows contained in the MySQL table or view selected for import.
+    /// </summary>
+    private long _totalRowsCount;
+
+    /// <summary>
+    /// The connection to a MySQL server instance selected by users.
+    /// </summary>
+    private MySqlWorkbenchConnection _wbConnection;
+
+    #endregion Fields
+
     /// <summary>
     /// Initializes a new instance of the <see cref="PreviewTableViewDialog"/> class.
     /// </summary>
@@ -41,9 +65,9 @@ namespace MySQL.ForExcel.Forms
     /// <param name="previewDbObject">The type of DB object (MySQL table or view) to preview data for.</param>
     public PreviewTableViewDialog(MySqlWorkbenchConnection wbConnection, DbObject previewDbObject)
     {
-      PreviewDataTable = null;
-      PreviewDbObject = previewDbObject;
-      WbConnection = wbConnection;
+      _previewDataTable = null;
+      _previewDbObject = previewDbObject;
+      _wbConnection = wbConnection;
 
       InitializeComponent();
 
@@ -54,16 +78,6 @@ namespace MySQL.ForExcel.Forms
     }
 
     #region Properties
-
-    /// <summary>
-    /// Gets the type of DB object (MySQL table or view) to preview data for.
-    /// </summary>
-    public DbObject PreviewDbObject { get; private set; }
-
-    /// <summary>
-    /// Gets a <see cref="DataTable"/> object containing a subset of the whole data which is shown in the preview grid.
-    /// </summary>
-    public DataTable PreviewDataTable { get; private set; }
 
     /// <summary>
     /// Gets or sets the text associated with this control.
@@ -81,16 +95,6 @@ namespace MySQL.ForExcel.Forms
       }
     }
 
-    /// <summary>
-    /// Gets the total rows contained in the MySQL table or view selected for import.
-    /// </summary>
-    public long TotalRowsCount { get; private set; }
-
-    /// <summary>
-    /// Gets the connection to a MySQL server instance selected by users.
-    /// </summary>
-    public MySqlWorkbenchConnection WbConnection { get; private set; }
-
     #endregion Properties
 
     /// <summary>
@@ -98,17 +102,17 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void FillPreviewGrid()
     {
-      PreviewDataTable = WbConnection.GetDataFromTableOrView(PreviewDbObject.Name, null, 0, (int)RowsNumericUpDown.Value);
-      TotalRowsCount = WbConnection.GetRowsCountFromTableOrView(PreviewDbObject);
-      RowsCountSubLabel.Text = TotalRowsCount.ToString(CultureInfo.InvariantCulture);
-      PreviewDataGridView.DataSource = PreviewDataTable;
+      _previewDataTable = _wbConnection.GetDataFromTableOrView(_previewDbObject.Name, null, 0, (int)RowsNumericUpDown.Value);
+      _totalRowsCount = _wbConnection.GetRowsCountFromTableOrView(_previewDbObject);
+      RowsCountSubLabel.Text = _totalRowsCount.ToString(CultureInfo.InvariantCulture);
+      PreviewDataGridView.DataSource = _previewDataTable;
       foreach (DataGridViewColumn gridCol in PreviewDataGridView.Columns)
       {
         gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
       }
 
       PreviewDataGridView.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
-      RowsNumericUpDown.Maximum = TotalRowsCount;
+      RowsNumericUpDown.Maximum = _totalRowsCount;
     }
 
     /// <summary>

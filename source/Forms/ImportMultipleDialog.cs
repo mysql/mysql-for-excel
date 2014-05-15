@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
@@ -26,6 +25,7 @@ using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
+using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Forms
 {
@@ -52,13 +52,18 @@ namespace MySQL.ForExcel.Forms
     private readonly List<DbObject> _relatedDbObjects;
 
     /// <summary>
+    /// A list of relationships for the imported tables and views.
+    /// </summary>
+    private readonly List<MySqlDataRelationship> _relationshipsList;
+
+    /// <summary>
     /// The full Table or View DB objects list contained in the current selected schema.
     /// </summary>
     private readonly List<DbObject> _tableOrViewDbObjects;
     /// <summary>
     /// The connection to a MySQL server instance selected by users.
     /// </summary>
-    private readonly MySqlWorkbenchConnection _wbConnection;
+    private MySqlWorkbenchConnection _wbConnection;
 
     /// <summary>
     /// Flag indicating whether the Excel workbook where data will be imported is open in compatibility mode.
@@ -88,16 +93,15 @@ namespace MySQL.ForExcel.Forms
       _tableOrViewDbObjects = tableOrViewDbObjects;
       _importDbObjects = tableOrViewDbObjects.Where(dbObject => dbObject.Selected).ToList();
       _relatedDbObjects = new List<DbObject>(_importDbObjects.Count);
-      ImportDataSet = null;
       _wbConnection = wbConnection;
       _workbookInCompatibilityMode = workbookInCompatibilityMode;
       bool excel2010OrLower = Globals.ThisAddIn.ExcelVersionNumber < ThisAddIn.EXCEL_2013_VERSION_NUMBER;
       _importRelationships = !excel2010OrLower && Settings.Default.ImportCreateExcelTable;
+      _relationshipsList = new List<MySqlDataRelationship>();
 
       InitializeComponent();
 
       TotalTablesViewsLabel.Text += _importDbObjects.Count;
-      RelationshipsList = new List<MySqlDataRelationship>();
 
       // Set warnings.
       WorkbookInCompatibilityModeWarningLabel.Text = Resources.WorkbookInCompatibilityModeWarning;
@@ -108,6 +112,7 @@ namespace MySQL.ForExcel.Forms
         : Resources.ImportMultipleRelationshipsNotSupportedNoExcelTablesWarningText;
       RelationshipsNotSupportedPictureBox.Visible = !_importRelationships;
       RelationshipsNotSupportedLabel.Visible = !_importRelationships;
+      ImportRelationshipsFromDbCheckBox.Visible = _importRelationships;
 
       ProcessSelectedDbObjects();
     }
@@ -115,16 +120,20 @@ namespace MySQL.ForExcel.Forms
     #region Properties
 
     /// <summary>
-    /// Gets the <see cref="DataSet"/> containing tables with data from selected MySQL tables and views to be imported.
+    /// Gets or sets a value indicating whether <see cref="ExcelInterop.PivotTable"/> objects are created for each imported table or view.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public DataSet ImportDataSet { get; private set; }
+    public bool CreatePivotTables
+    {
+      get
+      {
+        return CreatePivotTableCheckBox.Checked;
+      }
 
-    /// <summary>
-    /// A list of relationships for the imported tables and views.
-    /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<MySqlDataRelationship> RelationshipsList { get; private set; }
+      set
+      {
+        CreatePivotTableCheckBox.Checked = value;
+      }
+    }
 
     /// <summary>
     /// Gets or sets the text associated with this control.
@@ -201,31 +210,98 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="ImportButton"/> button is clicked.
+    /// Imports the selected MySQL tables data into new Excel worksheets.
     /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void ImportButton_Click(object sender, EventArgs e)
+    /// <returns><c>true</c> if the import is successful, <c>false</c> if errros were found during the import.</returns>
+    private bool ImportData()
     {
+      bool success = true;
       try
       {
         Cursor = Cursors.WaitCursor;
-        ImportDataSet = new DataSet();
+
+        // Import tables data in Excel worksheets
+        var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+        var excelTablesDictionary = new Dictionary<string, ExcelInterop.ListObject>();
         var fullImportList = _importDbObjects.Concat(_relatedDbObjects);
         foreach (var importDbObject in fullImportList)
         {
           var mySqlTable = _wbConnection.CreateMySqlTable(false, importDbObject.Name, _workbookInCompatibilityMode, true);
-          ImportDataSet.Tables.Add(mySqlTable);
+
+          // Create a new Excel Worksheet and import the table/view data there
+          var currentWorksheet = activeWorkbook.CreateWorksheet(mySqlTable.TableName, true);
+          if (currentWorksheet == null)
+          {
+            continue;
+          }
+
+          var listObj = mySqlTable.ImportDataAtActiveExcelCell(true, true, CreatePivotTables);
+          var excelTable = listObj as ExcelInterop.ListObject;
+          if (excelTable == null)
+          {
+            continue;
+          }
+
+          excelTablesDictionary.Add(mySqlTable.TableName, excelTable);
         }
+
+        // Create Excel relationships
+        foreach (var relationship in _relationshipsList.Where(relationship => !relationship.Excluded))
+        {
+          // Get the ModelColumnName objects needed to define the relationship
+          ExcelInterop.ListObject excelTable;
+          ExcelInterop.ListObject relatedExcelTable;
+          bool excelTableExists = excelTablesDictionary.TryGetValue(relationship.TableOrViewName, out excelTable);
+          bool relatedExcelTableExists = excelTablesDictionary.TryGetValue(relationship.RelatedTableOrViewName, out relatedExcelTable);
+          if (!excelTableExists || !relatedExcelTableExists)
+          {
+            continue;
+          }
+
+          var table = activeWorkbook.Model.ModelTables.Cast<ExcelInterop.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, excelTable.Name.Replace(".", " "), StringComparison.InvariantCulture));
+          var relatedTable = activeWorkbook.Model.ModelTables.Cast<ExcelInterop.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, relatedExcelTable.Name.Replace(".", " "), StringComparison.InvariantCulture));
+          if (table == null || relatedTable == null)
+          {
+            continue;
+          }
+
+          var column = table.ModelTableColumns.Cast<ExcelInterop.ModelTableColumn>().FirstOrDefault(col => string.Equals(col.Name, relationship.ColumnName, StringComparison.InvariantCulture));
+          var relatedColumn = relatedTable.ModelTableColumns.Cast<ExcelInterop.ModelTableColumn>().FirstOrDefault(col => string.Equals(col.Name, relationship.RelatedColumnName, StringComparison.InvariantCulture));
+          if (column == null || relatedColumn == null)
+          {
+            continue;
+          }
+
+          activeWorkbook.Model.ModelRelationships.Add(column, relatedColumn);
+        }
+
+        excelTablesDictionary.Clear();
       }
       catch (Exception ex)
       {
+        success = false;
         MiscUtilities.ShowCustomizedErrorDialog(Resources.ImportTableErrorTitle, ex.Message, true);
-        ImportDataSet = null;
         MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
+      finally
+      {
+        Cursor = Cursors.Default;
+      }
 
-      Cursor = Cursors.Default;
+      return success;
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="ImportMultipleDialog"/> is closing.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ImportMultipleDialog_FormClosing(object sender, FormClosingEventArgs e)
+    {
+      if (DialogResult == DialogResult.OK)
+      {
+        e.Cancel = !ImportData();
+      }
     }
 
     /// <summary>
@@ -306,7 +382,7 @@ namespace MySQL.ForExcel.Forms
           }
 
           relationship.Excluded = _importDbObjects.All(dbObj => dbObj.Name != relationship.RelatedTableOrViewName);
-          RelationshipsList.Add(relationship);
+          _relationshipsList.Add(relationship);
           if (!relationship.Excluded)
           {
             continue;
@@ -353,7 +429,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       // Flag the relation related to the checked or unchecked DbObject as Excluded.
-      var relationship = RelationshipsList.FirstOrDefault(rel => rel.RelatedTableOrViewName == relatedDbObject.Name);
+      var relationship = _relationshipsList.FirstOrDefault(rel => rel.RelatedTableOrViewName == relatedDbObject.Name);
       if (relationship == null)
       {
         return;

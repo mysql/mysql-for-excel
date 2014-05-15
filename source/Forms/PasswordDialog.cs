@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -16,6 +16,7 @@
 // 02110-1301  USA
 
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
@@ -60,7 +61,12 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Flag indicating whether the connection is tested after setting the password.
     /// </summary>
-    private bool _testConnection;
+    private readonly bool _testConnection;
+
+    /// <summary>
+    /// The connection to a MySQL server instance selected by users
+    /// </summary>
+    private MySqlWorkbenchConnection _wbConnection;
 
     #endregion Fields
 
@@ -76,10 +82,10 @@ namespace MySQL.ForExcel.Forms
       _passwordFlags = new PasswordDialogFlags(wbConnection);
       InitializeComponent();
       PasswordExpiredDialog = passwordExpired;
-      WbConnection = wbConnection;
-      UserValueLabel.Text = WbConnection.UserName;
-      ConnectionValueLabel.Text = WbConnection.Name + @" - " + WbConnection.HostIdentifier;
-      PasswordTextBox.Text = WbConnection.Password;
+      _wbConnection = wbConnection;
+      UserValueLabel.Text = _wbConnection.UserName;
+      ConnectionValueLabel.Text = _wbConnection.Name + @" - " + _wbConnection.HostIdentifier;
+      PasswordTextBox.Text = _wbConnection.Password;
       SetDialogInterface();
     }
 
@@ -88,11 +94,12 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets a value indicating whether the dialog will be used to set a new password when an old one expired.
     /// </summary>
-    public bool PasswordExpiredDialog { get; private set; }
+    public bool PasswordExpiredDialog { get; set; }
 
     /// <summary>
     /// Gets a structure with data about the password operation.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public PasswordDialogFlags PasswordFlags
     {
       get
@@ -104,18 +111,13 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets a value indicating whether the password is saved in the password vault.
     /// </summary>
-    public bool StorePasswordSecurely
+    private bool StorePasswordSecurely
     {
       get
       {
         return StorePasswordSecurelyCheckBox.Checked;
       }
     }
-
-    /// <summary>
-    /// Gets the connection to a MySQL server instance selected by users
-    /// </summary>
-    public MySqlWorkbenchConnection WbConnection { get; private set; }
 
     #endregion Properties
 
@@ -203,10 +205,10 @@ namespace MySQL.ForExcel.Forms
         }
 
         // Reset the password and if the reset is successful assign the new password to the local connection.
-        WbConnection.Password = PasswordTextBox.Text;
+        _wbConnection.Password = PasswordTextBox.Text;
         try
         {
-          WbConnection.ResetPassword(ConfirmTextBox.Text);
+          _wbConnection.ResetPassword(ConfirmTextBox.Text);
         }
         catch (Exception ex)
         {
@@ -216,19 +218,19 @@ namespace MySQL.ForExcel.Forms
           return;
         }
 
-        WbConnection.Password = ConfirmTextBox.Text;
+        _wbConnection.Password = ConfirmTextBox.Text;
       }
       else
       {
-        WbConnection.Password = PasswordTextBox.Text;
+        _wbConnection.Password = PasswordTextBox.Text;
       }
 
-      _passwordFlags.NewPassword = WbConnection.Password;
+      _passwordFlags.NewPassword = _wbConnection.Password;
       bool connectionSuccessful = false;
       if (_testConnection)
       {
         // Test the connection and if not successful revert the password to the one before the dialog was shown to the user.
-        TestConnectionResult connectionResult = WbConnection.TestConnectionAndReturnResult(false);
+        TestConnectionResult connectionResult = _wbConnection.TestConnectionAndReturnResult(false);
         _passwordFlags.ConnectionResult = connectionResult;
         switch(connectionResult)
         {
@@ -239,7 +241,7 @@ namespace MySQL.ForExcel.Forms
             // If the pasword was reset within the connection test, then set it again in the new password flag.
             if (connectionResult == TestConnectionResult.PasswordReset)
             {
-              _passwordFlags.NewPassword = WbConnection.Password;
+              _passwordFlags.NewPassword = _wbConnection.Password;
             }
 
             break;
@@ -251,15 +253,15 @@ namespace MySQL.ForExcel.Forms
       }
 
       // If the connection was successful and the user chose to store the password, save it in the password vault.
-      if (!StorePasswordSecurely || !connectionSuccessful || string.IsNullOrEmpty(WbConnection.Password))
+      if (!StorePasswordSecurely || !connectionSuccessful || string.IsNullOrEmpty(_wbConnection.Password))
       {
         return;
       }
 
-      string storedPassword = MySqlWorkbenchPasswordVault.FindPassword(WbConnection.HostIdentifier, WbConnection.UserName);
-      if (storedPassword == null || storedPassword != WbConnection.Password)
+      string storedPassword = MySqlWorkbenchPasswordVault.FindPassword(_wbConnection.HostIdentifier, _wbConnection.UserName);
+      if (storedPassword == null || storedPassword != _wbConnection.Password)
       {
-        MySqlWorkbenchPasswordVault.StorePassword(WbConnection.HostIdentifier, WbConnection.UserName, WbConnection.Password);
+        MySqlWorkbenchPasswordVault.StorePassword(_wbConnection.HostIdentifier, _wbConnection.UserName, _wbConnection.Password);
       }
     }
 

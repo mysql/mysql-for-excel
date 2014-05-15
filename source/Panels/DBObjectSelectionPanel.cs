@@ -27,7 +27,6 @@ using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
-using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Panels
 {
@@ -74,8 +73,7 @@ namespace MySQL.ForExcel.Panels
         ImportDataHotLabel.Name,
         EditDataHotLabel.Name,
         AppendDataHotLabel.Name,
-        ImportMultiHotLabel.Name,
-        ImportJoinedDataHotLabel.Name
+        ImportMultiHotLabel.Name
       });
 
       DBObjectList.AddHeaderNode("Tables");
@@ -184,9 +182,6 @@ namespace MySQL.ForExcel.Panels
       ImportMultiHotLabel.Enabled = multipleObjectsSelected;
       EditDataHotLabel.Visible = !multipleObjectsSelected;
       EditDataHotLabel.Refresh();
-      ImportJoinedDataHotLabel.Visible = multipleObjectsSelected;
-      ImportJoinedDataHotLabel.Refresh();
-      ImportJoinedDataHotLabel.Enabled = multipleObjectsSelected;
       AppendDataHotLabel.Visible = !multipleObjectsSelected;
       AppendDataHotLabel.Refresh();
       if (multipleObjectsSelected)
@@ -443,11 +438,17 @@ namespace MySQL.ForExcel.Panels
         {
           case DbObject.DbObjectType.Table:
           case DbObject.DbObjectType.View:
-            ImportTableOrView(selectedNode.DbObject);
+            using (var importForm = new ImportTableViewForm(WbConnection, selectedNode.DbObject, parentTaskPane.ActiveWorkbook.ActiveSheet.Name, parentTaskPane.ActiveWorkbook.Excel8CompatibilityMode, false))
+            {
+              importForm.ShowDialog();
+            }
             break;
 
           case DbObject.DbObjectType.Procedure:
-            ImportProcedure(selectedNode.DbObject);
+            using (var importProcedureForm = new ImportProcedureForm(WbConnection, selectedNode.DbObject, parentTaskPane.ActiveWorksheet.Name, parentTaskPane.ActiveWorkbook.Excel8CompatibilityMode))
+            {
+              importProcedureForm.ShowDialog();
+            }
             break;
         }
       }
@@ -475,144 +476,7 @@ namespace MySQL.ForExcel.Panels
       tablesAndViewsList.AddRange(LoadedViews);
       using (var importDialog = new ImportMultipleDialog(WbConnection, tablesAndViewsList, addInPane.ActiveWorkbook.Excel8CompatibilityMode))
       {
-        if (importDialog.ShowDialog() == DialogResult.Cancel || importDialog.ImportDataSet == null)
-        {
-          return;
-        }
-
-        // Import tables data in Excel worksheets
-        var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
-        var excelTablesDictionary = new Dictionary<string, ExcelInterop.ListObject>(importDialog.ImportDataSet.Tables.Count);
-        foreach (MySqlDataTable mySqlTable in importDialog.ImportDataSet.Tables)
-        {
-          // Create a new Excel Worksheet and import the table/view data there
-          var currentWorksheet = activeWorkbook.CreateWorksheet(mySqlTable.TableName, true);
-          if (currentWorksheet == null)
-          {
-            continue;
-          }
-
-          var listObj = mySqlTable.ImportDataIntoExcelTable(Globals.ThisAddIn.Application.ActiveCell);
-          var excelTable = listObj;
-          if (excelTable == null)
-          {
-            continue;
-          }
-
-          excelTablesDictionary.Add(mySqlTable.TableName, excelTable);
-        }
-
-        // Create Excel relationships
-        foreach (var relationship in importDialog.RelationshipsList)
-        {
-          if (relationship.Excluded)
-          {
-            continue;
-          }
-
-          // Get the ModelColumnName objects needed to define the relationship
-          ExcelInterop.ListObject excelTable;
-          ExcelInterop.ListObject relatedExcelTable;
-          bool excelTableExists = excelTablesDictionary.TryGetValue(relationship.TableOrViewName, out excelTable);
-          bool relatedExcelTableExists = excelTablesDictionary.TryGetValue(relationship.RelatedTableOrViewName, out relatedExcelTable);
-          if (!excelTableExists || !relatedExcelTableExists)
-          {
-            continue;
-          }
-
-          var table = activeWorkbook.Model.ModelTables.Cast<ExcelInterop.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, excelTable.Name.Replace(".", " "), StringComparison.InvariantCulture));
-          var relatedTable = activeWorkbook.Model.ModelTables.Cast<ExcelInterop.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, relatedExcelTable.Name.Replace(".", " "), StringComparison.InvariantCulture));
-          if (table == null || relatedTable == null)
-          {
-            continue;
-          }
-
-          var column = table.ModelTableColumns.Cast<ExcelInterop.ModelTableColumn>().FirstOrDefault(col => string.Equals(col.Name, relationship.ColumnName, StringComparison.InvariantCulture));
-          var relatedColumn = relatedTable.ModelTableColumns.Cast<ExcelInterop.ModelTableColumn>().FirstOrDefault(col => string.Equals(col.Name, relationship.RelatedColumnName, StringComparison.InvariantCulture));
-          if (column == null || relatedColumn == null)
-          {
-            continue;
-          }
-
-          activeWorkbook.Model.ModelRelationships.Add(column, relatedColumn);
-        }
-
-        excelTablesDictionary.Clear();
-      }
-    }
-
-    /// <summary>
-    /// Imports data from the selected procedure DB object to the current Excel worksheet.
-    /// </summary>
-    /// <param name="dbo">DB object.</param>
-    private void ImportProcedure(DbObject dbo)
-    {
-      var addInPane = Parent as ExcelAddInPane;
-      if (addInPane == null)
-      {
-        return;
-      }
-
-      using (var importProcedureForm = new ImportProcedureForm(WbConnection, dbo, addInPane.ActiveWorksheet.Name, addInPane.ActiveWorkbook.Excel8CompatibilityMode))
-      {
-        if (importProcedureForm.ShowDialog() == DialogResult.Cancel)
-        {
-          return;
-        }
-
-        if (importProcedureForm.ImportDataSet == null)
-        {
-          MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, dbo.Type.ToString().ToLowerInvariant(), dbo.Name));
-          return;
-        }
-
-        var excelAddInPane = addInPane;
-        excelAddInPane.ImportDataToExcel(importProcedureForm.ImportDataSet, importProcedureForm.ImportHeaders, importProcedureForm.ImportType, importProcedureForm.SelectedResultSetIndex);
-      }
-    }
-
-    /// <summary>
-    /// Imports data from the selected table or view DB object to the current Excel worksheet.
-    /// </summary>
-    /// <param name="dbo">DB object.</param>
-    private void ImportTableOrView(DbObject dbo)
-    {
-      var taskPaneControl = (ExcelAddInPane)Parent;
-      using (var importForm = new ImportTableViewForm(WbConnection, dbo, taskPaneControl.ActiveWorkbook.ActiveSheet.Name, taskPaneControl.ActiveWorkbook.Excel8CompatibilityMode, false))
-      {
-        if (importForm.ShowDialog() == DialogResult.Cancel)
-        {
-          return;
-        }
-
-        if (importForm.ImportDataTable == null)
-        {
-          MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, dbo.Type.ToString().ToLowerInvariant(), dbo.Name));
-          return;
-        }
-
-        var excelTableName = importForm.ImportDataTable.ImportDataIntoExcelTable(Globals.ThisAddIn.Application.ActiveCell).DisplayName;
-        Globals.ThisAddIn.ActiveImportSessions.Add(new ImportSessionInfo(importForm.ImportDataTable, excelTableName));
-        var listObject = Globals.ThisAddIn.Application.ActiveCell.ListObject;
-        if (listObject == null)
-        {
-          return;
-        }
-
-        var toolsListObject = Globals.Factory.GetVstoObject(listObject);
-        if (toolsListObject == null)
-        {
-          return;
-        }
-
-        toolsListObject.SetDataBinding(importForm.ImportDataTable);
-        if (toolsListObject.ShowHeaders)
-        {
-          foreach (MySqlDataColumn col in importForm.ImportDataTable.Columns)
-          {
-            toolsListObject.ListColumns[col.Ordinal + 1].Name = col.DisplayName;
-          }
-        }
+        importDialog.ShowDialog();
       }
     }
 
@@ -666,7 +530,7 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void OptionsButton_Click(object sender, EventArgs e)
     {
-      using (GlobalOptionsDialog optionsDialog = new GlobalOptionsDialog())
+      using (var optionsDialog = new GlobalOptionsDialog())
       {
         if (optionsDialog.ShowDialog() != DialogResult.OK)
         {

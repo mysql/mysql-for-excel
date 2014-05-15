@@ -32,7 +32,7 @@ using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
-using Office = Microsoft.Office.Tools;
+using OfficeTools = Microsoft.Office.Tools;
 using OfficeCore = Microsoft.Office.Core;
 using System.Runtime.InteropServices;
 
@@ -54,6 +54,16 @@ namespace MySQL.ForExcel
     /// The string representation of the Escape key.
     /// </summary>
     public const string ESCAPE_KEY = "{ESC}";
+
+    /// <summary>
+    /// The Excel major version number corresponding to Excel 2007.
+    /// </summary>
+    public const int EXCEL_2007_VERSION_NUMBER = 12;
+
+    /// <summary>
+    /// The Excel major version number corresponding to Excel 2010.
+    /// </summary>
+    public const int EXCEL_2010_VERSION_NUMBER = 14;
 
     /// <summary>
     /// The Excel major version number corresponding to Excel 2013.
@@ -91,11 +101,11 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets the <see cref="Microsoft.Office.Tools.CustomTaskPane"/> contained in the active Excel window.
     /// </summary>
-    public Office.CustomTaskPane ActiveCustomPane
+    public OfficeTools.CustomTaskPane ActiveCustomPane
     {
       get
       {
-        Office.CustomTaskPane addInPane = CustomTaskPanes.FirstOrDefault(ctp =>
+        OfficeTools.CustomTaskPane addInPane = CustomTaskPanes.FirstOrDefault(ctp =>
         {
           bool isParentWindowActiveExcelWindow;
           if (ExcelVersionNumber >= EXCEL_2013_VERSION_NUMBER)
@@ -197,6 +207,27 @@ namespace MySQL.ForExcel
     public List<ExcelAddInPane> ExcelPanesList { get; private set; }
 
     /// <summary>
+    /// Gets the version for <see cref="ExcelInterop.PivotTable"/> objects creation.
+    /// </summary>
+    public ExcelInterop.XlPivotTableVersionList ExcelPivotTableVersion
+    {
+      get
+      {
+        switch (ExcelVersionNumber)
+        {
+          case EXCEL_2013_VERSION_NUMBER:
+            return ExcelInterop.XlPivotTableVersionList.xlPivotTableVersion15;
+
+          case EXCEL_2010_VERSION_NUMBER:
+            return ExcelInterop.XlPivotTableVersionList.xlPivotTableVersion14;
+
+          default:
+            return ExcelInterop.XlPivotTableVersionList.xlPivotTableVersion12;
+        }
+      }
+    }
+
+    /// <summary>
     /// Gets the MS Excel major version number.
     /// </summary>
     public int ExcelVersionNumber { get; private set; }
@@ -245,7 +276,7 @@ namespace MySQL.ForExcel
         }
 
         excelPane.Dispose();
-        Office.CustomTaskPane customPane = CustomTaskPanes.FirstOrDefault(ctp => ctp.Control is ExcelAddInPane && ctp.Control == excelPane);
+        OfficeTools.CustomTaskPane customPane = CustomTaskPanes.FirstOrDefault(ctp => ctp.Control is ExcelAddInPane && ctp.Control == excelPane);
         if (customPane != null)
         {
           CustomTaskPanes.Remove(customPane);
@@ -282,9 +313,9 @@ namespace MySQL.ForExcel
     /// Gets the custom task pane in the active window, if not found creates it.
     /// </summary>
     /// <returns>the active or newly created <see cref="Microsoft.Office.Tools.CustomTaskPane"/> object.</returns>
-    public Office.CustomTaskPane GetOrCreateActiveCustomPane()
+    public OfficeTools.CustomTaskPane GetOrCreateActiveCustomPane()
     {
-      Office.CustomTaskPane activeCustomPane = ActiveCustomPane;
+      OfficeTools.CustomTaskPane activeCustomPane = ActiveCustomPane;
 
       // If there is no custom pane associated to the Excel Add-In in the active window, create one.
       if (activeCustomPane != null)
@@ -459,7 +490,7 @@ namespace MySQL.ForExcel
     {
       // Verify the collection of custom task panes to dispose of custom task panes pointing to closed (invalid) windows.
       bool disposePane = false;
-      foreach (Office.CustomTaskPane customPane in CustomTaskPanes.Where(customPane => customPane.Control is ExcelAddInPane))
+      foreach (OfficeTools.CustomTaskPane customPane in CustomTaskPanes.Where(customPane => customPane.Control is ExcelAddInPane))
       {
         try
         {
@@ -486,13 +517,13 @@ namespace MySQL.ForExcel
       }
 
       // Synchronize the MySQL for Excel toggle button state of the currently activated window.
-      Office.Ribbon.RibbonControl ribbonControl = Globals.Ribbons.ManageTaskPaneRibbon.MySQLExcelAddInRibbonGroup.Items.FirstOrDefault(rc => rc.Name == "ShowTaskPaneRibbonToggleButton");
-      if (!(ribbonControl is Office.Ribbon.RibbonToggleButton))
+      OfficeTools.Ribbon.RibbonControl ribbonControl = Globals.Ribbons.ManageTaskPaneRibbon.MySQLExcelAddInRibbonGroup.Items.FirstOrDefault(rc => rc.Name == "ShowTaskPaneRibbonToggleButton");
+      if (!(ribbonControl is OfficeTools.Ribbon.RibbonToggleButton))
       {
         return;
       }
 
-      Office.Ribbon.RibbonToggleButton toggleButton = ribbonControl as Office.Ribbon.RibbonToggleButton;
+      OfficeTools.Ribbon.RibbonToggleButton toggleButton = ribbonControl as OfficeTools.Ribbon.RibbonToggleButton;
       toggleButton.Checked = ActiveCustomPane != null && ActiveCustomPane.Visible;
     }
 
@@ -825,13 +856,13 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="Office.CustomTaskPane"/> visible property value changes.
+    /// Event delegate method fired when the <see cref="OfficeTools.CustomTaskPane"/> visible property value changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Sender object.</param>
     private static void CustomTaskPaneVisibleChanged(object sender, EventArgs e)
     {
-      Office.CustomTaskPane customTaskPane = sender as Office.CustomTaskPane;
+      OfficeTools.CustomTaskPane customTaskPane = sender as OfficeTools.CustomTaskPane;
       Globals.Ribbons.ManageTaskPaneRibbon.ShowTaskPaneRibbonToggleButton.Checked = customTaskPane != null && customTaskPane.Visible;
     }
 
@@ -869,7 +900,7 @@ namespace MySQL.ForExcel
       ExcelAddInPane excelPane = sender as ExcelAddInPane;
 
       // Find the parent Custom Task Pane
-      Office.CustomTaskPane customTaskPane = CustomTaskPanes.FirstOrDefault(ctp => ctp.Control == excelPane);
+      OfficeTools.CustomTaskPane customTaskPane = CustomTaskPanes.FirstOrDefault(ctp => ctp.Control == excelPane);
       if (customTaskPane == null || !customTaskPane.Visible)
       {
         return;
@@ -961,7 +992,6 @@ namespace MySQL.ForExcel
       }
 
       toolsListObject.SetDataBinding(mySqlTable);
-
       if (!toolsListObject.ShowHeaders)
       {
         return;

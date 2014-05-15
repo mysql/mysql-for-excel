@@ -32,10 +32,23 @@ namespace MySQL.ForExcel.Forms
     /// <param name="disposing"><c>true</c> if managed resources should be disposed; otherwise, <c>false</c>.</param>
     protected override void Dispose(bool disposing)
     {
-      if (disposing && (components != null))
+      if (disposing)
       {
-        components.Dispose();
+        if (components != null)
+        {
+          components.Dispose();
+        }
+
+        if (_previewDataTable != null)
+        {
+          _previewDataTable.Dispose();
+        }
+
+        // Set variables to null so this object does not hold references to them and the GC disposes of them sooner.
+        _previewDbObject = null;
+        _wbConnection = null;
       }
+
       base.Dispose(disposing);
     }
 

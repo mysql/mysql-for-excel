@@ -42,9 +42,24 @@ namespace MySQL.ForExcel.Forms
     #region Fields
 
     /// <summary>
-    /// The _import database object.
+    /// The list of column mappings saved in file.
     /// </summary>
-    private DbObject _importDbObject;
+    private readonly MySqlColumnMappingList _columnsMappingInFileList;
+
+    /// <summary>
+    /// The maximum number of columns that can be mapped based on the maximum number of columns between the source and the target tables.
+    /// </summary>
+    private readonly int _maxMappingColumnsQuantity;
+
+    /// <summary>
+    /// The Excel range containing the data to append to a MySQL table.
+    /// </summary>
+    private Excel.Range _appendDataRange;
+
+    /// <summary>
+    /// The column mapping currently being used in the append session.
+    /// </summary>
+    private MySqlColumnMapping _currentColumnMapping;
 
     /// <summary>
     /// Rectangle used to measure drag and drop operations.
@@ -54,12 +69,12 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Cursor displayed during a mapping operation when a column is being dragged.
     /// </summary>
-    private Cursor _draggingCursor;
+    private readonly Cursor _draggingCursor;
 
     /// <summary>
     /// Cursor displayed during a mapping operation when a column is being dropped.
     /// </summary>
-    private Cursor _droppableCursor;
+    private readonly Cursor _droppableCursor;
 
     /// <summary>
     /// The index of the grid column where the mouse is right-clicked to open a context menu.
@@ -77,14 +92,33 @@ namespace MySQL.ForExcel.Forms
     private int _gridTargetTableColumnIndexToDrop;
 
     /// <summary>
+    /// The _import database object.
+    /// </summary>
+    private DbObject _importDbObject;
+    /// <summary>
     /// The reference point used in drag and drop operations.
     /// </summary>
     private Point _screenOffset;
 
     /// <summary>
+    /// The table containing a small preview subset of Excel data to append to a MySQL Server table.
+    /// </summary>
+    private MySqlDataTable _sourceMySqlPreviewDataTable;
+
+    /// <summary>
+    /// The table containing a small preview subset of the MySQL Server table where data is going to be appended to.
+    /// </summary>
+    private MySqlDataTable _targetMySqlPreviewDataTable;
+
+    /// <summary>
     /// Cursor displayed during a mapping operation when a column is being dragged out of the columns area, so the column is unmapped.
     /// </summary>
-    private Cursor _trashCursor;
+    private readonly Cursor _trashCursor;
+
+    /// <summary>
+    /// The connection to a MySQL server instance selected by users.
+    /// </summary>
+    private MySqlWorkbenchConnection _wbConnection;
 
     #endregion Fields
 
@@ -97,11 +131,11 @@ namespace MySQL.ForExcel.Forms
     /// <param name="appendingWorksheetName">The name of the worksheet holding the appending data.</param>
     public AppendDataForm(MySqlWorkbenchConnection wbConnection, Excel.Range appendDataRange, DbObject importDbObject, string appendingWorksheetName)
     {
-      AppendDataRange = appendDataRange;
-      ColumnsMappingInFileList = new MySqlColumnMappingList();
-      SourceMySqlPreviewDataTable = null;
-      TargetMySqlPreviewDataTable = null;
-      WbConnection = wbConnection;
+      _appendDataRange = appendDataRange;
+      _columnsMappingInFileList = new MySqlColumnMappingList();
+      _sourceMySqlPreviewDataTable = null;
+      _targetMySqlPreviewDataTable = null;
+      _wbConnection = wbConnection;
 
       _dragBoxFromMouseDown = Rectangle.Empty;
       _draggingCursor = new Bitmap(Resources.MySQLforExcel_Cursor_Dragging_32x32).CreateCursor(3, 3);
@@ -110,18 +144,18 @@ namespace MySQL.ForExcel.Forms
       _gridColumnIndexToDrag = -1;
       _gridTargetTableColumnIndexToDrop = -1;
       _trashCursor = new Bitmap(Resources.MySQLforExcel_Cursor_Trash_32x32).CreateCursor(3, 3);
+      _importDbObject = importDbObject;
 
       InitializeComponent();
 
       SourceExcelDataDataGridView.EnableHeadersVisualStyles = false;
-      _importDbObject = importDbObject;
 
       InitializeSourceTableGrid();
       InitializeTargetTableGrid();
 
       string excelRangeAddress = appendDataRange.Address.Replace("$", string.Empty);
       Text = string.Format("Append Data - {0} [{1}]", appendingWorksheetName, excelRangeAddress);
-      MaxMappingColumnsQuantity = Math.Min(TargetMySQLTableDataGridView.Columns.Count, SourceExcelDataDataGridView.Columns.Count);
+      _maxMappingColumnsQuantity = Math.Min(TargetMySQLTableDataGridView.Columns.Count, SourceExcelDataDataGridView.Columns.Count);
       ClearMappings(true);
       RefreshMappingMethodCombo();
       if (!SelectStoredMappingForTargetTable())
@@ -131,47 +165,6 @@ namespace MySQL.ForExcel.Forms
     }
 
     #region Properties
-
-    /// <summary>
-    /// Gets the Excel range containing the data to append to a MySQL table.
-    /// </summary>
-    public Excel.Range AppendDataRange { get; private set; }
-
-    /// <summary>
-    /// Gets the list of column mappings saved in file.
-    /// </summary>
-    public MySqlColumnMappingList ColumnsMappingInFileList { get; private set; }
-
-    /// <summary>
-    /// Gets the column mapping currently being used in the append session.
-    /// </summary>
-    public MySqlColumnMapping CurrentColumnMapping { get; private set; }
-
-    /// <summary>
-    /// Gets the maximum number of columns that can be mapped based on the maximum number of columns between the source and the target tables.
-    /// </summary>
-    public int MaxMappingColumnsQuantity { get; private set; }
-
-    /// <summary>
-    /// Gets the table containing a small preview subset of Excel data to append to a MySQL Server table.
-    /// </summary>
-    public MySqlDataTable SourceMySqlPreviewDataTable { get; private set; }
-
-    /// <summary>
-    /// Gets a list of column mappings for the current user.
-    /// </summary>
-    public List<MySqlColumnMapping> StoredColumnMappingsList
-    {
-      get
-      {
-        return ColumnsMappingInFileList.UserColumnMappingsList;
-      }
-    }
-
-    /// <summary>
-    /// Gets the table containing a small preview subset of the MySQL Server table where data is going to be appended to.
-    /// </summary>
-    public MySqlDataTable TargetMySqlPreviewDataTable { get; private set; }
 
     /// <summary>
     /// Gets or sets the text associated with this control.
@@ -190,9 +183,15 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Gets the connection to a MySQL server instance selected by users.
+    /// Gets a list of column mappings for the current user.
     /// </summary>
-    public MySqlWorkbenchConnection WbConnection { get; private set; }
+    private List<MySqlColumnMapping> StoredColumnMappingsList
+    {
+      get
+      {
+        return _columnsMappingInFileList.UserColumnMappingsList;
+      }
+    }
 
     #endregion Properties
 
@@ -212,16 +211,16 @@ namespace MySQL.ForExcel.Forms
         }
 
         InitializeSourceTableGrid();
-        for (int targetColumnIndex = 0; targetColumnIndex < CurrentColumnMapping.MappedSourceIndexes.Length; targetColumnIndex++)
+        for (int targetColumnIndex = 0; targetColumnIndex < _currentColumnMapping.MappedSourceIndexes.Length; targetColumnIndex++)
         {
-          int mappedSourceColumnIndex = CurrentColumnMapping.MappedSourceIndexes[targetColumnIndex];
+          int mappedSourceColumnIndex = _currentColumnMapping.MappedSourceIndexes[targetColumnIndex];
           if (mappedSourceColumnIndex < 0)
           {
             continue;
           }
 
-          var sourceColumn = SourceMySqlPreviewDataTable.GetColumnAtIndex(mappedSourceColumnIndex);
-          var targetColumn = TargetMySqlPreviewDataTable.GetColumnAtIndex(targetColumnIndex);
+          var sourceColumn = _sourceMySqlPreviewDataTable.GetColumnAtIndex(mappedSourceColumnIndex);
+          var targetColumn = _targetMySqlPreviewDataTable.GetColumnAtIndex(targetColumnIndex);
           CheckIfSourceDataAgainstMappedTargetColumn(sourceColumn, targetColumn);
         }
       }
@@ -235,7 +234,7 @@ namespace MySQL.ForExcel.Forms
     private void AppendButton_Click(object sender, EventArgs e)
     {
       // If not all columns where mapped between the source and target tables ask the user if he still wants to produce with the append operation.
-      if (TargetMySqlPreviewDataTable.MappedColumnsQuantity < MaxMappingColumnsQuantity
+      if (_targetMySqlPreviewDataTable.MappedColumnsQuantity < _maxMappingColumnsQuantity
         && InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ColumnMappingIncompleteTitleWarning, Resources.ColumnMappingIncompleteDetailWarning) == DialogResult.No)
       {
         return;
@@ -246,8 +245,8 @@ namespace MySQL.ForExcel.Forms
       bool errorsFound = false;
       bool warningsFound = false;
       string operationSummary;
-      var targetMySqlFinalDataTable = TargetMySqlPreviewDataTable.CloneSchema(true, false);
-      targetMySqlFinalDataTable.FirstRowIsHeaders = SourceMySqlPreviewDataTable.FirstRowIsHeaders;
+      var targetMySqlFinalDataTable = _targetMySqlPreviewDataTable.CloneSchema(true, false);
+      targetMySqlFinalDataTable.FirstRowIsHeaders = _sourceMySqlPreviewDataTable.FirstRowIsHeaders;
       var mappedIndexes = new List<int>(targetMySqlFinalDataTable.Columns.Count);
       foreach (var sourceColumnIndex in from MySqlDataColumn targetColumn in targetMySqlFinalDataTable.Columns select targetColumn.MappedDataColOrdinal)
       {
@@ -257,12 +256,12 @@ namespace MySQL.ForExcel.Forms
           continue;
         }
 
-        var sourceColumn = SourceMySqlPreviewDataTable.GetColumnAtIndex(sourceColumnIndex);
+        var sourceColumn = _sourceMySqlPreviewDataTable.GetColumnAtIndex(sourceColumnIndex);
         mappedIndexes.Add(sourceColumn == null ? 0 : sourceColumn.RangeColumnIndex);
       }
 
       bool addDataSuccessful;
-      using (var temporaryRange = new TempRange(AppendDataRange, true, true, false, mappedIndexes))
+      using (var temporaryRange = new TempRange(_appendDataRange, true, true, false, mappedIndexes))
       {
         addDataSuccessful = targetMySqlFinalDataTable.AddExcelData(temporaryRange, true, true);
       }
@@ -385,7 +384,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       if (Settings.Default.AppendAutoStoreColumnMapping
-          && !StoredColumnMappingsList.Exists(mapping => mapping.ConnectionName == WbConnection.Name && mapping.SchemaName == WbConnection.Schema && mapping.TableName == targetMySqlFinalDataTable.TableName))
+          && !StoredColumnMappingsList.Exists(mapping => mapping.ConnectionName == _wbConnection.Name && mapping.SchemaName == _wbConnection.Schema && mapping.TableName == targetMySqlFinalDataTable.TableName))
       {
         StoreCurrentColumnMapping(false);
       }
@@ -401,17 +400,17 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void AppendContextMenu_Opening(object sender, CancelEventArgs e)
     {
-      if (_gridColumnClicked < 0 || CurrentColumnMapping == null || CurrentColumnMapping.MappedQuantity == 0)
+      if (_gridColumnClicked < 0 || _currentColumnMapping == null || _currentColumnMapping.MappedQuantity == 0)
       {
         e.Cancel = true;
         return;
       }
 
       bool columnHasMapping = AppendContextMenu.SourceControl.Name == TargetMySQLTableDataGridView.Name
-        ? CurrentColumnMapping.MappedSourceIndexes[_gridColumnClicked] >= 0
-        : CurrentColumnMapping.MappedSourceIndexes.Contains(_gridColumnClicked);
+        ? _currentColumnMapping.MappedSourceIndexes[_gridColumnClicked] >= 0
+        : _currentColumnMapping.MappedSourceIndexes.Contains(_gridColumnClicked);
       AppendContextMenu.Items["RemoveColumnMappingToolStripMenuItem"].Visible = columnHasMapping;
-      AppendContextMenu.Items["ClearAllMappingsToolStripMenuItem"].Visible = CurrentColumnMapping.MappedQuantity > 0;
+      AppendContextMenu.Items["ClearAllMappingsToolStripMenuItem"].Visible = _currentColumnMapping.MappedQuantity > 0;
     }
 
     /// <summary>
@@ -419,22 +418,22 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void ApplySelectedStoredColumnMapping()
     {
-      if (CurrentColumnMapping == null)
+      if (_currentColumnMapping == null)
       {
         return;
       }
 
       ClearMappings(true);
-      for (int mappedIdx = 0; mappedIdx < CurrentColumnMapping.MappedSourceIndexes.Length; mappedIdx++)
+      for (int mappedIdx = 0; mappedIdx < _currentColumnMapping.MappedSourceIndexes.Length; mappedIdx++)
       {
-        int currentMappedSourceIndex = CurrentColumnMapping.MappedSourceIndexes[mappedIdx];
-        string currentMappedColName = currentMappedSourceIndex >= 0 ? CurrentColumnMapping.SourceColumns[currentMappedSourceIndex] : null;
+        int currentMappedSourceIndex = _currentColumnMapping.MappedSourceIndexes[mappedIdx];
+        string currentMappedColName = currentMappedSourceIndex >= 0 ? _currentColumnMapping.SourceColumns[currentMappedSourceIndex] : null;
         ApplySingleMapping(currentMappedSourceIndex, mappedIdx, currentMappedColName);
       }
 
       TargetMySQLTableDataGridView.Refresh();
       SourceExcelDataDataGridView.Refresh();
-      StoreMappingButton.Enabled = CurrentColumnMapping.MappedQuantity > 0;
+      StoreMappingButton.Enabled = _currentColumnMapping.MappedQuantity > 0;
     }
 
     /// <summary>
@@ -445,7 +444,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="mappedColName">Name of the target column in the target table.</param>
     private void ApplySingleMapping(int sourceColumnIndex, int targetColumnIndex, string mappedColName)
     {
-      int previouslyMappedFromIndex = CurrentColumnMapping.MappedSourceIndexes[targetColumnIndex];
+      int previouslyMappedFromIndex = _currentColumnMapping.MappedSourceIndexes[targetColumnIndex];
       bool mapping = !string.IsNullOrEmpty(mappedColName) && sourceColumnIndex >= 0;
       DataGridViewCellStyle newStyle;
 
@@ -461,7 +460,7 @@ namespace MySQL.ForExcel.Forms
         newStyle.SelectionBackColor = newStyle.BackColor = Color.LightGreen;
         SourceExcelDataDataGridView.Columns[sourceColumnIndex].HeaderCell.Style = newStyle;
       }
-      else if (previouslyMappedFromIndex >= 0 && CurrentColumnMapping.MappedSourceIndexes.Count(sourceIdx => sourceIdx == previouslyMappedFromIndex) <= 1)
+      else if (previouslyMappedFromIndex >= 0 && _currentColumnMapping.MappedSourceIndexes.Count(sourceIdx => sourceIdx == previouslyMappedFromIndex) <= 1)
       {
         newStyle = new DataGridViewCellStyle(SourceExcelDataDataGridView.Columns[previouslyMappedFromIndex].HeaderCell.Style);
         newStyle.SelectionBackColor = newStyle.BackColor = SystemColors.Control;
@@ -469,12 +468,12 @@ namespace MySQL.ForExcel.Forms
       }
 
       // Store the actual mapping
-      MySqlDataColumn sourceColumn = mapping ? SourceMySqlPreviewDataTable.GetColumnAtIndex(sourceColumnIndex) : null;
-      MySqlDataColumn targetColumn = TargetMySqlPreviewDataTable.GetColumnAtIndex(targetColumnIndex);
+      MySqlDataColumn sourceColumn = mapping ? _sourceMySqlPreviewDataTable.GetColumnAtIndex(sourceColumnIndex) : null;
+      MySqlDataColumn targetColumn = _targetMySqlPreviewDataTable.GetColumnAtIndex(targetColumnIndex);
       targetColumn.MappedDataColName = mapping ? sourceColumn.ColumnName : null;
       targetColumn.MappedDataColOrdinal = mapping ? sourceColumnIndex : -1;
 
-      CurrentColumnMapping.MappedSourceIndexes[targetColumnIndex] = sourceColumnIndex;
+      _currentColumnMapping.MappedSourceIndexes[targetColumnIndex] = sourceColumnIndex;
       if (mapping)
       {
         CheckIfSourceDataAgainstMappedTargetColumn(sourceColumn, targetColumn);
@@ -511,28 +510,10 @@ namespace MySQL.ForExcel.Forms
     private void ClearAllMappingsToolStripMenuItem_Click(object sender, EventArgs e)
     {
       ClearMappings(false);
-      if (CurrentColumnMapping.Name == "Automatic")
+      if (_currentColumnMapping.Name == "Automatic")
       {
         MappingMethodComboBox.SelectedIndex = 0;
       }
-    }
-
-    /// <summary>
-    /// Clears all visual warnings related to a source grid column.
-    /// </summary>
-    /// <param name="sourceColumnIndex">Source column index.</param>
-    private void ClearSourceColumnVisualWarnings(int sourceColumnIndex)
-    {
-      if (sourceColumnIndex < 0)
-      {
-        return;
-      }
-
-      var previousSourceColumn = SourceMySqlPreviewDataTable.GetColumnAtIndex(sourceColumnIndex);
-      previousSourceColumn.ClearWarnings();
-      var gridCol = SourceExcelDataDataGridView.Columns[sourceColumnIndex];
-      SetGridColumnColor(SourceExcelDataDataGridView.Columns[sourceColumnIndex], previousSourceColumn);
-      SetGridColumnWarningVisibility(gridCol);
     }
 
     /// <summary>
@@ -554,7 +535,7 @@ namespace MySQL.ForExcel.Forms
         }
 
         TargetMySQLTableDataGridView.MultiHeaderColumnList[colIdx].BackgroundColor = Color.OrangeRed;
-        MySqlDataColumn toCol = TargetMySqlPreviewDataTable.Columns[colIdx] as MySqlDataColumn;
+        MySqlDataColumn toCol = _targetMySqlPreviewDataTable.Columns[colIdx] as MySqlDataColumn;
         if (toCol != null)
         {
           toCol.MappedDataColName = null;
@@ -571,14 +552,14 @@ namespace MySQL.ForExcel.Forms
         SourceExcelDataDataGridView.Columns[colIdx].HeaderCell.Style = newStyle;
 
         // Clear source column warnings
-        var previousSourceColumn = SourceMySqlPreviewDataTable.GetColumnAtIndex(colIdx);
+        var previousSourceColumn = _sourceMySqlPreviewDataTable.GetColumnAtIndex(colIdx);
         previousSourceColumn.ClearWarnings();
         SetGridColumnColor(SourceExcelDataDataGridView.Columns[colIdx], previousSourceColumn);
       }
 
-      if (CurrentColumnMapping != null && !onlyGrids)
+      if (_currentColumnMapping != null && !onlyGrids)
       {
-        CurrentColumnMapping.ClearMappings();
+        _currentColumnMapping.ClearMappings();
       }
 
       TargetMySQLTableDataGridView.Refresh();
@@ -586,6 +567,23 @@ namespace MySQL.ForExcel.Forms
       StoreMappingButton.Enabled = false;
     }
 
+    /// <summary>
+    /// Clears all visual warnings related to a source grid column.
+    /// </summary>
+    /// <param name="sourceColumnIndex">Source column index.</param>
+    private void ClearSourceColumnVisualWarnings(int sourceColumnIndex)
+    {
+      if (sourceColumnIndex < 0)
+      {
+        return;
+      }
+
+      var previousSourceColumn = _sourceMySqlPreviewDataTable.GetColumnAtIndex(sourceColumnIndex);
+      previousSourceColumn.ClearWarnings();
+      var gridCol = SourceExcelDataDataGridView.Columns[sourceColumnIndex];
+      SetGridColumnColor(SourceExcelDataDataGridView.Columns[sourceColumnIndex], previousSourceColumn);
+      SetGridColumnWarningVisibility(gridCol);
+    }
     /// <summary>
     /// Event delegate method fired when the ContentAreaPanel receives a drop operation.
     /// </summary>
@@ -653,29 +651,29 @@ namespace MySQL.ForExcel.Forms
     /// <returns>A mapping object containing all column mappings.</returns>
     private MySqlColumnMapping CreateColumnMappingForAutomatic()
     {
-      MySqlColumnMapping autoMapping = new MySqlColumnMapping("Automatic", SourceMySqlPreviewDataTable.GetColumnNamesArray(true), TargetMySqlPreviewDataTable.GetColumnNamesArray())
+      MySqlColumnMapping autoMapping = new MySqlColumnMapping("Automatic", _sourceMySqlPreviewDataTable.GetColumnNamesArray(true), _targetMySqlPreviewDataTable.GetColumnNamesArray())
       {
-        SchemaName = WbConnection.Schema,
-        TableName = TargetMySqlPreviewDataTable.TableName,
-        ConnectionName = WbConnection.Name,
-        Port = WbConnection.Port
+        SchemaName = _wbConnection.Schema,
+        TableName = _targetMySqlPreviewDataTable.TableName,
+        ConnectionName = _wbConnection.Name,
+        Port = _wbConnection.Port
       };
       int autoMappedColumns = 0;
 
       // Attempt to auto-map using toColumn names regardless of positioning if the data types match
       if (FirstRowHeadersCheckBox.Checked)
       {
-        for (int targetColumnIndex = 0; targetColumnIndex < TargetMySqlPreviewDataTable.Columns.Count; targetColumnIndex++)
+        for (int targetColumnIndex = 0; targetColumnIndex < _targetMySqlPreviewDataTable.Columns.Count; targetColumnIndex++)
         {
-          string targetColumnName = TargetMySqlPreviewDataTable.Columns[targetColumnIndex].ColumnName;
-          int sourceColumnIndex = SourceMySqlPreviewDataTable.GetColumnIndex(targetColumnName, true, false);
+          string targetColumnName = _targetMySqlPreviewDataTable.Columns[targetColumnIndex].ColumnName;
+          int sourceColumnIndex = _sourceMySqlPreviewDataTable.GetColumnIndex(targetColumnName, true, false);
           if (sourceColumnIndex < 0)
           {
             continue;
           }
 
-          MySqlDataColumn sourceColumn = SourceMySqlPreviewDataTable.GetColumnAtIndex(sourceColumnIndex);
-          MySqlDataColumn targetColumn = TargetMySqlPreviewDataTable.GetColumnAtIndex(targetColumnIndex);
+          MySqlDataColumn sourceColumn = _sourceMySqlPreviewDataTable.GetColumnAtIndex(sourceColumnIndex);
+          MySqlDataColumn targetColumn = _targetMySqlPreviewDataTable.GetColumnAtIndex(targetColumnIndex);
           if (!DataTypeUtilities.Type1FitsIntoType2(sourceColumn.StrippedMySqlDataType, targetColumn.StrippedMySqlDataType))
           {
             continue;
@@ -693,15 +691,15 @@ namespace MySQL.ForExcel.Forms
       }
 
       autoMapping.ClearMappings();
-      for (int columnIndex = 0; columnIndex < TargetMySqlPreviewDataTable.Columns.Count; columnIndex++)
+      for (int columnIndex = 0; columnIndex < _targetMySqlPreviewDataTable.Columns.Count; columnIndex++)
       {
-        if (columnIndex >= MaxMappingColumnsQuantity)
+        if (columnIndex >= _maxMappingColumnsQuantity)
         {
           break;
         }
 
-        MySqlDataColumn sourceColumn = SourceMySqlPreviewDataTable.GetColumnAtIndex(columnIndex);
-        MySqlDataColumn targetColumn = TargetMySqlPreviewDataTable.GetColumnAtIndex(columnIndex);
+        MySqlDataColumn sourceColumn = _sourceMySqlPreviewDataTable.GetColumnAtIndex(columnIndex);
+        MySqlDataColumn targetColumn = _targetMySqlPreviewDataTable.GetColumnAtIndex(columnIndex);
         if (!DataTypeUtilities.Type1FitsIntoType2(sourceColumn.StrippedMySqlDataType, targetColumn.StrippedMySqlDataType))
         {
           continue;
@@ -721,19 +719,19 @@ namespace MySQL.ForExcel.Forms
     private MySqlColumnMapping CreateColumnMappingForManual()
     {
       MySqlColumnMapping manualMapping;
-      if (CurrentColumnMapping == null)
+      if (_currentColumnMapping == null)
       {
-        manualMapping = new MySqlColumnMapping(SourceMySqlPreviewDataTable.GetColumnNamesArray(), TargetMySqlPreviewDataTable.GetColumnNamesArray())
+        manualMapping = new MySqlColumnMapping(_sourceMySqlPreviewDataTable.GetColumnNamesArray(), _targetMySqlPreviewDataTable.GetColumnNamesArray())
         {
-          SchemaName = WbConnection.Schema,
-          TableName = TargetMySqlPreviewDataTable.TableName,
-          ConnectionName = WbConnection.Name,
-          Port = WbConnection.Port
+          SchemaName = _wbConnection.Schema,
+          TableName = _targetMySqlPreviewDataTable.TableName,
+          ConnectionName = _wbConnection.Name,
+          Port = _wbConnection.Port
         };
       }
       else
       {
-        manualMapping = CurrentColumnMapping;
+        manualMapping = _currentColumnMapping;
       }
 
       manualMapping.Name = "Manual";
@@ -746,15 +744,15 @@ namespace MySQL.ForExcel.Forms
     private void CreateColumnMappingForStoredMapping()
     {
       // Create a copy of the current stored mapping but with no source columns mapped that we will be doing the best matching on
-      MySqlColumnMapping matchedMapping = new MySqlColumnMapping(CurrentColumnMapping, SourceMySqlPreviewDataTable.GetColumnNamesArray(true), TargetMySqlPreviewDataTable.GetColumnNamesArray());
+      MySqlColumnMapping matchedMapping = new MySqlColumnMapping(_currentColumnMapping, _sourceMySqlPreviewDataTable.GetColumnNamesArray(true), _targetMySqlPreviewDataTable.GetColumnNamesArray());
 
       // Check if Target Columns still match with the Target Table, switch mapped indexes if columns changed positions
       //  and skip target column in stored mapping is not present anymore in Target Table
-      for (int storedMappedIdx = 0; storedMappedIdx < CurrentColumnMapping.TargetColumns.Length; storedMappedIdx++)
+      for (int storedMappedIdx = 0; storedMappedIdx < _currentColumnMapping.TargetColumns.Length; storedMappedIdx++)
       {
         // Get the source index of the stored mapping for the current tartet column, if -1 there was no mapping for the
         // target column at that position so we skip it.
-        int proposedSourceMapping = CurrentColumnMapping.MappedSourceIndexes[storedMappedIdx];
+        int proposedSourceMapping = _currentColumnMapping.MappedSourceIndexes[storedMappedIdx];
         if (proposedSourceMapping < 0)
         {
           continue;
@@ -762,22 +760,22 @@ namespace MySQL.ForExcel.Forms
 
         // Check if Target Column in Stored Mapping is found within any of the TargetColumns of the matching mapping.
         // If not found we should not map so we skip this Target Column.
-        string storedMappedColName = CurrentColumnMapping.TargetColumns[storedMappedIdx];
+        string storedMappedColName = _currentColumnMapping.TargetColumns[storedMappedIdx];
         int targetColumnIndex = matchedMapping.GetTargetColumnIndex(storedMappedColName);
         if (targetColumnIndex < 0)
         {
           continue;
         }
 
-        MySqlDataColumn targetColumn = TargetMySqlPreviewDataTable.GetColumnAtIndex(targetColumnIndex);
+        MySqlDataColumn targetColumn = _targetMySqlPreviewDataTable.GetColumnAtIndex(targetColumnIndex);
 
         // Check if mapped source column from Stored Mapping matches a Source Column in current "From Table"
         //  and if its data type matches its corresponding target column's data type, if so we are good to map it
-        string mappedSourceColName = CurrentColumnMapping.SourceColumns[proposedSourceMapping];
-        int sourceColFoundInFromTableIdx = SourceMySqlPreviewDataTable.GetColumnIndex(mappedSourceColName, true);
+        string mappedSourceColName = _currentColumnMapping.SourceColumns[proposedSourceMapping];
+        int sourceColFoundInFromTableIdx = _sourceMySqlPreviewDataTable.GetColumnIndex(mappedSourceColName, true);
         if (sourceColFoundInFromTableIdx >= 0)
         {
-          MySqlDataColumn sourceColumn = SourceMySqlPreviewDataTable.GetColumnAtIndex(sourceColFoundInFromTableIdx);
+          MySqlDataColumn sourceColumn = _sourceMySqlPreviewDataTable.GetColumnAtIndex(sourceColFoundInFromTableIdx);
           if (DataTypeUtilities.Type1FitsIntoType2(sourceColumn.StrippedMySqlDataType, targetColumn.StrippedMySqlDataType))
           {
             matchedMapping.MappedSourceIndexes[targetColumnIndex] = sourceColFoundInFromTableIdx;
@@ -785,18 +783,18 @@ namespace MySQL.ForExcel.Forms
         }
         // Since source columns do not match in name and type, try to match the mapped source column's datatype
         //  with the From column in that source index only if that From Column name is not in any source mapping.
-        else if (matchedMapping.MappedSourceIndexes[targetColumnIndex] < 0 && proposedSourceMapping < SourceMySqlPreviewDataTable.Columns.Count)
+        else if (matchedMapping.MappedSourceIndexes[targetColumnIndex] < 0 && proposedSourceMapping < _sourceMySqlPreviewDataTable.Columns.Count)
         {
-          string fromTableColName = SourceMySqlPreviewDataTable.GetColumnAtIndex(proposedSourceMapping).DisplayName;
-          int fromTableColNameFoundInStoredMappingSourceColumnsIdx = CurrentColumnMapping.GetSourceColumnIndex(fromTableColName);
+          string fromTableColName = _sourceMySqlPreviewDataTable.GetColumnAtIndex(proposedSourceMapping).DisplayName;
+          int fromTableColNameFoundInStoredMappingSourceColumnsIdx = _currentColumnMapping.GetSourceColumnIndex(fromTableColName);
           if (fromTableColNameFoundInStoredMappingSourceColumnsIdx >= 0
             && fromTableColNameFoundInStoredMappingSourceColumnsIdx != proposedSourceMapping
-            && CurrentColumnMapping.GetMappedSourceIndexIndex(fromTableColNameFoundInStoredMappingSourceColumnsIdx) >= 0)
+            && _currentColumnMapping.GetMappedSourceIndexIndex(fromTableColNameFoundInStoredMappingSourceColumnsIdx) >= 0)
           {
             continue;
           }
 
-          MySqlDataColumn sourceColumn = SourceMySqlPreviewDataTable.GetColumnAtIndex(proposedSourceMapping);
+          MySqlDataColumn sourceColumn = _sourceMySqlPreviewDataTable.GetColumnAtIndex(proposedSourceMapping);
           if (DataTypeUtilities.Type1FitsIntoType2(sourceColumn.StrippedMySqlDataType, targetColumn.StrippedMySqlDataType))
           {
             matchedMapping.MappedSourceIndexes[targetColumnIndex] = proposedSourceMapping;
@@ -804,7 +802,7 @@ namespace MySQL.ForExcel.Forms
         }
       }
 
-      CurrentColumnMapping = matchedMapping;
+      _currentColumnMapping = matchedMapping;
       ApplySelectedStoredColumnMapping();
     }
 
@@ -914,7 +912,7 @@ namespace MySQL.ForExcel.Forms
           break;
 
         case "TargetMySQLTableDataGridView":
-          if (_gridColumnIndexToDrag >= 0 && CurrentColumnMapping != null && CurrentColumnMapping.MappedSourceIndexes[_gridColumnIndexToDrag] >= 0)
+          if (_gridColumnIndexToDrag >= 0 && _currentColumnMapping != null && _currentColumnMapping.MappedSourceIndexes[_gridColumnIndexToDrag] >= 0)
           {
             gridObject.DoDragDrop(_gridColumnIndexToDrag, DragDropEffects.Move);
           }
@@ -968,17 +966,17 @@ namespace MySQL.ForExcel.Forms
       bool firstRowColNames = FirstRowHeadersCheckBox.Checked;
 
       // Flag the property in the "From" table
-      SourceMySqlPreviewDataTable.FirstRowIsHeaders = firstRowColNames;
+      _sourceMySqlPreviewDataTable.FirstRowIsHeaders = firstRowColNames;
 
       // Refresh the "From"/"Source" Grid and "From"/"Source" toColumn names in the current mapping
       SourceExcelDataDataGridView.CurrentCell = null;
       for (int colIdx = 0; colIdx < SourceExcelDataDataGridView.Columns.Count; colIdx++)
       {
         DataGridViewColumn gridCol = SourceExcelDataDataGridView.Columns[colIdx];
-        gridCol.HeaderText = firstRowColNames ? SourceExcelDataDataGridView.Rows[0].Cells[gridCol.Index].Value.ToString() : SourceMySqlPreviewDataTable.Columns[gridCol.Index].ColumnName;
-        if (CurrentColumnMapping != null)
+        gridCol.HeaderText = firstRowColNames ? SourceExcelDataDataGridView.Rows[0].Cells[gridCol.Index].Value.ToString() : _sourceMySqlPreviewDataTable.Columns[gridCol.Index].ColumnName;
+        if (_currentColumnMapping != null)
         {
-          CurrentColumnMapping.SourceColumns[colIdx] = gridCol.HeaderText;
+          _currentColumnMapping.SourceColumns[colIdx] = gridCol.HeaderText;
         }
       }
 
@@ -992,12 +990,12 @@ namespace MySQL.ForExcel.Forms
       for (int colIdx = 0; colIdx < TargetMySQLTableDataGridView.MultiHeaderColumnList.Count; colIdx++)
       {
         MultiHeaderColumn multiHeaderCol = TargetMySQLTableDataGridView.MultiHeaderColumnList[colIdx];
-        if (CurrentColumnMapping == null)
+        if (_currentColumnMapping == null)
         {
           continue;
         }
 
-        int mappedSourceIndex = CurrentColumnMapping.MappedSourceIndexes[colIdx];
+        int mappedSourceIndex = _currentColumnMapping.MappedSourceIndexes[colIdx];
         if (!string.IsNullOrEmpty(multiHeaderCol.HeaderText) && mappedSourceIndex >= 0)
         {
           multiHeaderCol.HeaderText = SourceExcelDataDataGridView.Columns[mappedSourceIndex].HeaderText;
@@ -1007,7 +1005,7 @@ namespace MySQL.ForExcel.Forms
       TargetMySQLTableDataGridView.Refresh();
 
       // Re-do the Currently Selected mapping (unless we are on Manual) since now columns may match
-      if (CurrentColumnMapping != null && CurrentColumnMapping.Name != "Manual")
+      if (_currentColumnMapping != null && _currentColumnMapping.Name != "Manual")
       {
         MappingMethodComboBox_SelectedIndexChanged(MappingMethodComboBox, EventArgs.Empty);
       }
@@ -1018,8 +1016,8 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void InitializeSourceTableGrid()
     {
-      SourceMySqlPreviewDataTable = new MySqlDataTable(
-        WbConnection.Schema,
+      _sourceMySqlPreviewDataTable = new MySqlDataTable(
+        _wbConnection.Schema,
         _importDbObject.Name,
         false,
         Settings.Default.AppendUseFormattedValues,
@@ -1027,10 +1025,10 @@ namespace MySQL.ForExcel.Forms
         false,
         false,
         false,
-        WbConnection) { IsPreviewTable = true };
-      int previewRowsQty = Math.Min(AppendDataRange.Rows.Count, Settings.Default.AppendLimitPreviewRowsQuantity);
-      SourceMySqlPreviewDataTable.SetupColumnsWithData(AppendDataRange, true, false, previewRowsQty);
-      SourceExcelDataDataGridView.DataSource = SourceMySqlPreviewDataTable;
+        _wbConnection) { IsPreviewTable = true };
+      int previewRowsQty = Math.Min(_appendDataRange.Rows.Count, Settings.Default.AppendLimitPreviewRowsQuantity);
+      _sourceMySqlPreviewDataTable.SetupColumnsWithData(_appendDataRange, true, false, previewRowsQty);
+      SourceExcelDataDataGridView.DataSource = _sourceMySqlPreviewDataTable;
       foreach (DataGridViewColumn gridCol in SourceExcelDataDataGridView.Columns)
       {
         gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
@@ -1045,9 +1043,13 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void InitializeTargetTableGrid()
     {
-      TargetMySqlPreviewDataTable = new MySqlDataTable(_importDbObject.Name, true, false, Settings.Default.AppendUseFormattedValues, WbConnection);
-
-      DataTable dt = WbConnection.GetDataFromTableOrView(_importDbObject.Name, null, 0, Settings.Default.AppendLimitPreviewRowsQuantity);
+      _targetMySqlPreviewDataTable = new MySqlDataTable(
+        _importDbObject.Name,
+        true,
+        false,
+        Settings.Default.AppendUseFormattedValues,
+        _wbConnection);
+      DataTable dt = _wbConnection.GetDataFromTableOrView(_importDbObject.Name, null, 0, Settings.Default.AppendLimitPreviewRowsQuantity);
       foreach (object[] rowValues in from DataRow dr in dt.Rows select dr.ItemArray)
       {
         for (int colIdx = 0; colIdx < dt.Columns.Count; colIdx++)
@@ -1055,11 +1057,11 @@ namespace MySQL.ForExcel.Forms
           rowValues[colIdx] = DataTypeUtilities.GetImportingValueForDateType(rowValues[colIdx]);
         }
 
-        TargetMySqlPreviewDataTable.LoadDataRow(rowValues, true);
+        _targetMySqlPreviewDataTable.LoadDataRow(rowValues, true);
       }
 
-      WbConnection.GetRowsCountFromTableOrView(_importDbObject);
-      TargetMySQLTableDataGridView.DataSource = TargetMySqlPreviewDataTable;
+      _wbConnection.GetRowsCountFromTableOrView(_importDbObject);
+      TargetMySQLTableDataGridView.DataSource = _targetMySqlPreviewDataTable;
       foreach (DataGridViewColumn gridCol in TargetMySQLTableDataGridView.Columns)
       {
         gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
@@ -1078,16 +1080,16 @@ namespace MySQL.ForExcel.Forms
       switch (MappingMethodComboBox.SelectedIndex)
       {
         case 0:
-          CurrentColumnMapping = CreateColumnMappingForAutomatic();
+          _currentColumnMapping = CreateColumnMappingForAutomatic();
           ApplySelectedStoredColumnMapping();
           break;
 
         case 1:
-          CurrentColumnMapping = CreateColumnMappingForManual();
+          _currentColumnMapping = CreateColumnMappingForManual();
           break;
 
         default:
-          CurrentColumnMapping = new MySqlColumnMapping(StoredColumnMappingsList[MappingMethodComboBox.SelectedIndex - 2]);
+          _currentColumnMapping = new MySqlColumnMapping(StoredColumnMappingsList[MappingMethodComboBox.SelectedIndex - 2]);
           CreateColumnMappingForStoredMapping();
           break;
       }
@@ -1101,7 +1103,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="mappedColName">The name of the column in the To table where data is being mapped to.</param>
     private void PerformManualSingleColumnMapping(int fromColumnIndex, int toColumnIndex, string mappedColName)
     {
-      if (CurrentColumnMapping.Name == "Automatic")
+      if (_currentColumnMapping.Name == "Automatic")
       {
         MappingMethodComboBox.SelectedIndex = 1;
       }
@@ -1111,7 +1113,7 @@ namespace MySQL.ForExcel.Forms
       // Refresh Grids
       TargetMySQLTableDataGridView.Refresh();
       SourceExcelDataDataGridView.Refresh();
-      StoreMappingButton.Enabled = CurrentColumnMapping.MappedQuantity > 0;
+      StoreMappingButton.Enabled = _currentColumnMapping.MappedQuantity > 0;
     }
 
     /// <summary>
@@ -1143,7 +1145,7 @@ namespace MySQL.ForExcel.Forms
     {
       int targetColumnIndex = AppendContextMenu.SourceControl.Name == TargetMySQLTableDataGridView.Name
         ? _gridColumnClicked
-        : CurrentColumnMapping.MappedSourceIndexes.ToList().FindIndex(sourceIndex => sourceIndex == _gridColumnClicked);
+        : _currentColumnMapping.MappedSourceIndexes.ToList().FindIndex(sourceIndex => sourceIndex == _gridColumnClicked);
       if (targetColumnIndex > -1)
       {
         PerformManualSingleColumnMapping(-1, targetColumnIndex, null);
@@ -1166,7 +1168,7 @@ namespace MySQL.ForExcel.Forms
       for (int mappingIdx = 0; mappingIdx < StoredColumnMappingsList.Count; mappingIdx++)
       {
         MySqlColumnMapping mapping = StoredColumnMappingsList[mappingIdx];
-        if (mapping.TableName != TargetMySqlPreviewDataTable.TableName || !mapping.AllColumnsMatch(TargetMySqlPreviewDataTable, true))
+        if (mapping.TableName != _targetMySqlPreviewDataTable.TableName || !mapping.AllColumnsMatch(_targetMySqlPreviewDataTable, true))
         {
           continue;
         }
@@ -1200,7 +1202,7 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      MySqlDataColumn mysqlCol = SourceMySqlPreviewDataTable.GetColumnAtIndex(gridCol.Index);
+      MySqlDataColumn mysqlCol = _sourceMySqlPreviewDataTable.GetColumnAtIndex(gridCol.Index);
       bool showWarning = mysqlCol.WarningsQuantity > 0;
       ColumnWarningPictureBox.Visible = showWarning;
       ColumnWarningLabel.Visible = showWarning;
@@ -1263,7 +1265,7 @@ namespace MySQL.ForExcel.Forms
       string proposedMappingName;
       do
       {
-        proposedMappingName = string.Format("{0}Mapping{1}", TargetMySqlPreviewDataTable.TableName, numericSuffix > 1 ? numericSuffix.ToString(CultureInfo.InvariantCulture) : string.Empty);
+        proposedMappingName = string.Format("{0}Mapping{1}", _targetMySqlPreviewDataTable.TableName, numericSuffix > 1 ? numericSuffix.ToString(CultureInfo.InvariantCulture) : string.Empty);
         numericSuffix++;
       }
       while (StoredColumnMappingsList.Any(mapping => mapping.Name == proposedMappingName));
@@ -1284,13 +1286,13 @@ namespace MySQL.ForExcel.Forms
       }
 
       // Initialize connection and DBObject information
-      CurrentColumnMapping.Name = proposedMappingName;
-      CurrentColumnMapping.ConnectionName = WbConnection.Name;
-      CurrentColumnMapping.Port = WbConnection.Port;
-      CurrentColumnMapping.SchemaName = WbConnection.Schema;
-      CurrentColumnMapping.TableName = TargetMySqlPreviewDataTable.TableName;
+      _currentColumnMapping.Name = proposedMappingName;
+      _currentColumnMapping.ConnectionName = _wbConnection.Name;
+      _currentColumnMapping.Port = _wbConnection.Port;
+      _currentColumnMapping.SchemaName = _wbConnection.Schema;
+      _currentColumnMapping.TableName = _targetMySqlPreviewDataTable.TableName;
 
-      StoreColumnMappingInFile(CurrentColumnMapping);
+      StoreColumnMappingInFile(_currentColumnMapping);
       MappingMethodComboBox.SelectedIndex = MappingMethodComboBox.Items.Count - 1;
     }
 
@@ -1311,32 +1313,32 @@ namespace MySQL.ForExcel.Forms
     /// <param name="mappingSourceIndex2">Index of the second column mapping.</param>
     private void SwapMappings(int mappingSourceIndex1, int mappingSourceIndex2)
     {
-      if (CurrentColumnMapping == null)
+      if (_currentColumnMapping == null)
       {
         return;
       }
 
-      int mappingsCount = CurrentColumnMapping.MappedSourceIndexes.Length;
+      int mappingsCount = _currentColumnMapping.MappedSourceIndexes.Length;
       if (mappingsCount == 0 || mappingSourceIndex1 < 0 || mappingSourceIndex1 >= mappingsCount || mappingSourceIndex2 < 0 || mappingSourceIndex2 >= mappingsCount)
       {
         return;
       }
 
       string mapping1ColName = TargetMySQLTableDataGridView.MultiHeaderColumnList[mappingSourceIndex1].HeaderText;
-      int mapping1Index = CurrentColumnMapping.MappedSourceIndexes[mappingSourceIndex1];
+      int mapping1Index = _currentColumnMapping.MappedSourceIndexes[mappingSourceIndex1];
       string mapping2ColName = TargetMySQLTableDataGridView.MultiHeaderColumnList[mappingSourceIndex2].HeaderText;
-      int mapping2Index = CurrentColumnMapping.MappedSourceIndexes[mappingSourceIndex2];
+      int mapping2Index = _currentColumnMapping.MappedSourceIndexes[mappingSourceIndex2];
 
       ApplySingleMapping(mapping1Index, mappingSourceIndex2, mapping1ColName);
       ApplySingleMapping(mapping2Index, mappingSourceIndex1, mapping2ColName);
 
-      CurrentColumnMapping.MappedSourceIndexes[mappingSourceIndex1] = mapping2Index;
-      CurrentColumnMapping.MappedSourceIndexes[mappingSourceIndex2] = mapping1Index;
+      _currentColumnMapping.MappedSourceIndexes[mappingSourceIndex1] = mapping2Index;
+      _currentColumnMapping.MappedSourceIndexes[mappingSourceIndex2] = mapping1Index;
 
       // Refresh Grids
       TargetMySQLTableDataGridView.Refresh();
       SourceExcelDataDataGridView.Refresh();
-      StoreMappingButton.Enabled = CurrentColumnMapping.MappedQuantity > 0;
+      StoreMappingButton.Enabled = _currentColumnMapping.MappedQuantity > 0;
     }
 
     /// <summary>
@@ -1357,7 +1359,7 @@ namespace MySQL.ForExcel.Forms
           {
             // We are mapping a column from the Source Grid to the Target Grid
             case DragDropEffects.Link:
-              MySqlDataColumn toCol = TargetMySqlPreviewDataTable.GetColumnAtIndex(_gridTargetTableColumnIndexToDrop);
+              MySqlDataColumn toCol = _targetMySqlPreviewDataTable.GetColumnAtIndex(_gridTargetTableColumnIndexToDrop);
               if (!string.IsNullOrEmpty(toCol.MappedDataColName))
               {
                 bool isIdenticalMapping = toCol.MappedDataColName == draggedColumnName;
@@ -1383,13 +1385,13 @@ namespace MySQL.ForExcel.Forms
 
             // We are moving a column mapping from a column on the Target Grid to another column in the same grid
             case DragDropEffects.Move:
-              if (CurrentColumnMapping == null)
+              if (_currentColumnMapping == null)
               {
                 return;
               }
 
-              int mappedIndexFromDraggedTargetColumn = CurrentColumnMapping.MappedSourceIndexes[fromColumnIndex];
-              int mappedIndexInDropTargetColumn = CurrentColumnMapping.MappedSourceIndexes[_gridTargetTableColumnIndexToDrop];
+              int mappedIndexFromDraggedTargetColumn = _currentColumnMapping.MappedSourceIndexes[fromColumnIndex];
+              int mappedIndexInDropTargetColumn = _currentColumnMapping.MappedSourceIndexes[_gridTargetTableColumnIndexToDrop];
               if (mappedIndexInDropTargetColumn >= 0)
               {
                 bool isIdenticalMapping = mappedIndexInDropTargetColumn == mappedIndexFromDraggedTargetColumn;

@@ -29,6 +29,7 @@ using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
+using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Forms
 {
@@ -37,28 +38,63 @@ namespace MySQL.ForExcel.Forms
   /// </summary>
   public partial class ImportTableViewForm : AutoStyleableBaseDialog
   {
+    #region Fields
+
+    /// <summary>
+    /// The type of DB object (MySQL table or view) from which to import data to the active Excel Worksheet.
+    /// </summary>
+    private DbObject _dbObject;
+
+    /// <summary>
+    /// A value indicating whether the import is part of an Edit operation.
+    /// </summary>
+    private readonly bool _isEditOperation;
+
+    /// <summary>
+    /// A <see cref="DataTable"/> object containing a subset of the whole data which is shown in the preview grid.
+    /// </summary>
+    private DataTable _previewDataTable;
+
+    /// <summary>
+    /// The total rows contained in the MySQL table or view selected for import.
+    /// </summary>
+    private long _totalRowsCount;
+
+    /// <summary>
+    /// The connection to a MySQL server instance selected by users.
+    /// </summary>
+    private MySqlWorkbenchConnection _wbConnection;
+
+    /// <summary>
+    /// A value indicating whether the Excel workbook where the data will be imported to is in Excel 2003 compatibility mode.
+    /// </summary>
+    private readonly bool _workbookInCompatibilityMode;
+
+    #endregion Fields
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ImportTableViewForm"/> class.
     /// </summary>
     /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="importDbObject">MySQL table, view or procedure from which to import data to an Excel spreadsheet.</param>
     /// <param name="importToWorksheetName">Name of the Excel worksheet where the data will be imported to.</param>
-    /// <param name="workBookInCompatibilityMode">Flag indicating if the Excel workbook where the data will be imported to is in Excel 2003 compatibility mode.</param>
+    /// <param name="workbookInCompatibilityMode">Flag indicating if the Excel workbook where the data will be imported to is in Excel 2003 compatibility mode.</param>
     /// <param name="importForEditData"><c>true</c> if the import is part of an Edit operation, <c>false</c> otherwise.</param>
-    public ImportTableViewForm(MySqlWorkbenchConnection wbConnection, DbObject importDbObject, string importToWorksheetName, bool workBookInCompatibilityMode, bool importForEditData)
+    public ImportTableViewForm(MySqlWorkbenchConnection wbConnection, DbObject importDbObject, string importToWorksheetName, bool workbookInCompatibilityMode, bool importForEditData)
     {
-      PreviewDataTable = null;
-      ImportOperationGeneratedErrors = false;
-      WbConnection = wbConnection;
-      ImportDbObject = importDbObject;
-      WorkbookInCompatibilityMode = workBookInCompatibilityMode;
+      _dbObject = importDbObject;
+      _isEditOperation = importForEditData;
+      _previewDataTable = null;
+      _wbConnection = wbConnection;
+      _workbookInCompatibilityMode = workbookInCompatibilityMode;
+      ImportedExcelRange = null;
+      MySqlTable = null;
       InitializeComponent();
-      PreviewDataGridView.DataError += PreviewDataGridView_DataError;
 
+      PreviewDataGridView.DataError += PreviewDataGridView_DataError;
       IncludeHeadersCheckBox.Checked = true;
       IncludeHeadersCheckBox.Enabled = !importForEditData;
-      IsForEdit = importForEditData;
-      PreviewDataGridView.DisableColumnsSelection = IsForEdit;
+      PreviewDataGridView.DisableColumnsSelection = _isEditOperation;
       if (importForEditData)
       {
         PreviewDataGridView.ContextMenuStrip = null;
@@ -76,44 +112,32 @@ namespace MySQL.ForExcel.Forms
     #region Properties
 
     /// <summary>
-    /// Gets a value indicating whether all columns in the preview grid are selected for import.
+    /// Gets or sets a value indicating whether a <see cref="ExcelInterop.PivotTable"/> is created for the imported data.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool AllColumnsSelected
+    public bool CreatePivotTable
     {
       get
       {
-        return (PreviewDataGridView.SelectedColumns.Count == PreviewDataGridView.Columns.Count);
+        return CreatePivotTableCheckBox.Checked;
+      }
+
+      set
+      {
+        CreatePivotTableCheckBox.Checked = value;
       }
     }
 
     /// <summary>
-    /// Gets a <see cref="MySqlDataTable"/> object containing the data to be imported to the active Excel Worksheet.
+    /// Gets the <see cref="ExcelInterop.Range"/> containing the imported data.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public MySqlDataTable ImportDataTable { get; private set; }
+    public ExcelInterop.Range ImportedExcelRange { get; private set; }
 
     /// <summary>
-    /// Gets the type of DB object (MySQL table or view) from which to import data to the active Excel Worksheet.
+    /// Gets the <see cref="MySqlDataTable"/> object containing the data to be imported to the active Excel Worksheet.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public DbObject ImportDbObject { get; private set; }
-
-    /// <summary>
-    /// Gets a value indicating whether the import operation generated errors so the form must not be closed right away.
-    /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool ImportOperationGeneratedErrors { get; private set; }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the import is part of an Edit operation.
-    /// </summary>
-    public bool IsForEdit { get; private set; }
-    /// <summary>
-    /// Gets a <see cref="DataTable"/> object containing a subset of the whole data which is shown in the preview grid.
-    /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public DataTable PreviewDataTable { get; private set; }
+    public MySqlDataTable MySqlTable { get; private set; }
 
     /// <summary>
     /// Gets or sets the text associated with this control.
@@ -130,24 +154,6 @@ namespace MySQL.ForExcel.Forms
         base.Text = value;
       }
     }
-
-    /// <summary>
-    /// Gets the total rows contained in the MySQL table or view selected for import.
-    /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public long TotalRowsCount { get; private set; }
-
-    /// <summary>
-    /// Gets the connection to a MySQL server instance selected by users.
-    /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public MySqlWorkbenchConnection WbConnection { get; private set; }
-
-    /// <summary>
-    /// Gets a value indicating whether the Excel workbook where the data will be imported to is in Excel 2003 compatibility mode.
-    /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool WorkbookInCompatibilityMode { get; private set; }
 
     /// <summary>
     /// Gets a value indicating the which should be index of the first row obtained by the select query.
@@ -180,11 +186,21 @@ namespace MySQL.ForExcel.Forms
       get
       {
         var rowCount = (int)RowsToReturnNumericUpDown.Value;
-        return (LimitRowsCheckBox.Checked) ? (WorkbookInCompatibilityMode && rowCount > UInt16.MaxValue) ? UInt16.MaxValue : rowCount : -1;
+        return (LimitRowsCheckBox.Checked) ? (_workbookInCompatibilityMode && rowCount > UInt16.MaxValue) ? UInt16.MaxValue : rowCount : -1;
       }
     }
 
     #endregion Properties
+
+    /// <summary>
+    /// Hides the Import form from the user at the same time it fakes the click over OK, silently opening an edit session.
+    /// </summary>
+    /// <returns>Always DialogResult.OK</returns>
+    public DialogResult ImportHidingDialog()
+    {
+      bool success = ImportData();
+      return success ? DialogResult.OK : DialogResult.Cancel;
+    }
 
     /// <summary>
     /// Event delegate method fired when the <see cref="AdvancedOptionsButton"/> button is clicked.
@@ -193,7 +209,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void AdvancedOptionsButton_Click(object sender, EventArgs e)
     {
-      using (ImportAdvancedOptionsDialog optionsDialog = new ImportAdvancedOptionsDialog())
+      using (var optionsDialog = new ImportAdvancedOptionsDialog())
       {
         optionsDialog.ShowDialog();
         if (optionsDialog.ParentFormRequiresRefresh)
@@ -219,24 +235,19 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void FillPreviewGrid()
     {
-      if (ImportDbObject.Type == DbObject.DbObjectType.Procedure)
-      {
-        return;
-      }
-
-      PreviewDataTable = WbConnection.GetDataFromTableOrView(ImportDbObject.Name, null, 0, Settings.Default.ImportPreviewRowsQuantity);
-      TotalRowsCount = WbConnection.GetRowsCountFromTableOrView(ImportDbObject);
-      RowsCountSubLabel.Text = TotalRowsCount.ToString(CultureInfo.InvariantCulture);
-      PreviewDataGridView.DataSource = PreviewDataTable;
+      _previewDataTable = _wbConnection.GetDataFromTableOrView(_dbObject.Name, null, 0, Settings.Default.ImportPreviewRowsQuantity);
+      _totalRowsCount = _wbConnection.GetRowsCountFromTableOrView(_dbObject);
+      RowsCountSubLabel.Text = _totalRowsCount.ToString(CultureInfo.InvariantCulture);
+      PreviewDataGridView.DataSource = _previewDataTable;
       foreach (DataGridViewColumn gridCol in PreviewDataGridView.Columns)
       {
         gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
       }
 
       PreviewDataGridView.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
-      bool cappingAtMaxCompatRows = WorkbookInCompatibilityMode && TotalRowsCount > UInt16.MaxValue;
+      bool cappingAtMaxCompatRows = _workbookInCompatibilityMode && _totalRowsCount > UInt16.MaxValue;
       SetCompatibilityWarningControlsVisibility(cappingAtMaxCompatRows);
-      FromRowNumericUpDown.Maximum = cappingAtMaxCompatRows ? UInt16.MaxValue : TotalRowsCount;
+      FromRowNumericUpDown.Maximum = cappingAtMaxCompatRows ? UInt16.MaxValue : _totalRowsCount;
       RowsToReturnNumericUpDown.Maximum = FromRowNumericUpDown.Maximum - FromRowNumericUpDown.Value + 1;
     }
 
@@ -251,40 +262,50 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="ImportButton"/> button is clicked.
+    /// Imports the selected MySQL table's data into the active Excel worksheet.
     /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void ImportButton_Click(object sender, EventArgs e)
+    /// <returns><c>true</c> if the import is successful, <c>false</c> if errros were found during the import.</returns>
+    private bool ImportData()
     {
-      List<string> columnNameList = null;
+      bool success = true;
+      List<string> importColumns = null;
       var selectedColumns = new List<DataGridViewColumn>();
       if (PreviewDataGridView.SelectedColumns.Count < PreviewDataGridView.Columns.Count)
       {
-        columnNameList = new List<string>(PreviewDataGridView.SelectedColumns.Count);
+        importColumns = new List<string>(PreviewDataGridView.SelectedColumns.Count);
         selectedColumns.AddRange(PreviewDataGridView.SelectedColumns.Cast<DataGridViewColumn>());
-
         if (selectedColumns.Count > 1)
         {
           selectedColumns.Sort((c1, c2) => c1.Index.CompareTo(c2.Index));
         }
 
-        columnNameList.AddRange(selectedColumns.Select(selCol => selCol.HeaderText));
+        importColumns.AddRange(selectedColumns.Select(selCol => selCol.HeaderText));
       }
 
       try
       {
         Cursor = Cursors.WaitCursor;
-        ImportDataTable = WbConnection.CreateMySqlTable(IsForEdit, ImportDbObject.Name, WorkbookInCompatibilityMode, IncludeColumnNames, columnNameList, LimitRowsCheckBox.Checked, FirstRowIndex, RowsTo);
+        MySqlTable = _wbConnection.CreateMySqlTable(_isEditOperation, _dbObject.Name, _workbookInCompatibilityMode, IncludeColumnNames, importColumns, LimitRowsCheckBox.Checked, FirstRowIndex, RowsTo);
+        var excelObj = MySqlTable.ImportDataAtActiveExcelCell(IncludeColumnNames, !_isEditOperation && Settings.Default.ImportCreateExcelTable, CreatePivotTable);
+        if (excelObj != null)
+        {
+          ImportedExcelRange = excelObj is ExcelInterop.ListObject
+            ? (excelObj as ExcelInterop.ListObject).Range
+            : excelObj as ExcelInterop.Range;
+        }
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.ImportTableErrorTitle, ex.Message, true);
-        ImportOperationGeneratedErrors = true;
+        success = false;
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, _dbObject.Type.ToString().ToLowerInvariant(), _dbObject.Name), ex.Message);
         MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
+      finally
+      {
+        Cursor = Cursors.Default;
+      }
 
-      Cursor = Cursors.Default;
+      return success;
     }
 
     /// <summary>
@@ -294,8 +315,10 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void ImportTableViewForm_FormClosing(object sender, FormClosingEventArgs e)
     {
-      e.Cancel = ImportOperationGeneratedErrors;
-      ImportOperationGeneratedErrors = false;
+      if (DialogResult == DialogResult.OK)
+      {
+        e.Cancel = !ImportData();
+      }
     }
 
     /// <summary>
@@ -387,16 +410,6 @@ namespace MySQL.ForExcel.Forms
     {
       OptionsWarningLabel.Visible = show;
       OptionsWarningPictureBox.Visible = show;
-    }
-
-    /// <summary>
-    /// Hides the Import form from the user at the same time it fakes the click over OK, silently opening an edit session.
-    /// </summary>
-    /// <returns>Always DialogResult.OK</returns>
-    public DialogResult ImportHidingDialog()
-    {
-      ImportButton_Click(this, EventArgs.Empty);
-      return DialogResult.OK;
     }
   }
 }

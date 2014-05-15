@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -32,14 +32,29 @@ namespace MySQL.ForExcel.Forms
     {
       if (disposing)
       {
+        if (components != null)
+        {
+          components.Dispose();
+        }
+
         if (EditingWorksheet != null)
         {
           EditingWorksheet.Change -= new Microsoft.Office.Interop.Excel.DocEvents_ChangeEventHandler(EditingWorksheet_Change);
           EditingWorksheet.SelectionChange -= new Microsoft.Office.Interop.Excel.DocEvents_SelectionChangeEventHandler(EditingWorksheet_SelectionChange);
           Properties.Settings.Default.PropertyChanged -= SettingsPropertyValueChanged;
         }
-        if (components != null)
-        components.Dispose();
+
+        if (_mySqlTable != null)
+        {
+          _mySqlTable.Dispose();
+        }
+
+        // Set variables to null so this object does not hold references to them and the GC disposes of them sooner.
+        _editDataRange = null;
+        _parentTaskPane = null;
+        _parentWindow = null;
+        _wbConnection = null;
+        EditingWorksheet = null;
       }
       base.Dispose(disposing);
     }

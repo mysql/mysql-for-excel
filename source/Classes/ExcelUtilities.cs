@@ -23,7 +23,7 @@ using System.Linq;
 using Microsoft.Office.Core;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
-using Excel = Microsoft.Office.Interop.Excel;
+using ExcelInterop = Microsoft.Office.Interop.Excel;
 using MySQL.ForExcel.Interfaces;
 
 namespace MySQL.ForExcel.Classes
@@ -77,7 +77,7 @@ namespace MySQL.ForExcel.Classes
     public const string DEFAULT_WARNING_CELLS_HTML_COLOR = "#FCC451";
 
     /// <summary>
-    /// The connection string used on the creation of new <see cref="Excel.ListObject"/> instances holding imported MySQL data.
+    /// The connection string used on the creation of new <see cref="ExcelInterop.ListObject"/> instances holding imported MySQL data.
     /// </summary>
     public const string DUMMY_WORKBOOK_CONNECTION_STRING = @"OLEDB;Provider=MySqlDummy;Data Source=MySqlDummy;";
 
@@ -109,11 +109,6 @@ namespace MySQL.ForExcel.Classes
     #region Properties
 
     /// <summary>
-    /// Gets the interior color for Excel cells committed to the MySQL server during an Edit Data operation.
-    /// </summary>
-    public static int CommitedCellsOleColor { get; private set; }
-
-    /// <summary>
     /// Gets or sets the interior color for Excel cells committed to the MySQL server during an Edit Data operation.
     /// </summary>
     public static string CommitedCellsHtmlColor
@@ -130,10 +125,9 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the interior color for Excel cells that caused errors during a commit of an Edit Data operation.
+    /// Gets the interior color for Excel cells committed to the MySQL server during an Edit Data operation.
     /// </summary>
-    public static int ErroredCellsOleColor { get; private set; }
-
+    public static int CommitedCellsOleColor { get; private set; }
     /// <summary>
     /// Gets or sets the interior color for Excel cells that caused errors during a commit of an Edit Data operation.
     /// </summary>
@@ -151,10 +145,9 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the default interior color for Excel cells locked during an Edit Data operation (like the headers containing column names).
+    /// Gets the interior color for Excel cells that caused errors during a commit of an Edit Data operation.
     /// </summary>
-    public static int LockedCellsOleColor { get; private set; }
-
+    public static int ErroredCellsOleColor { get; private set; }
     /// <summary>
     /// Gets or sets the interior color for Excel cells locked during an Edit Data operation (like the headers containing column names).
     /// </summary>
@@ -172,10 +165,9 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the interior color for Excel cells accepting data from users to create a new row in the table during an Edit Data operation.
+    /// Gets the default interior color for Excel cells locked during an Edit Data operation (like the headers containing column names).
     /// </summary>
-    public static int NewRowCellsOleColor { get; private set; }
-
+    public static int LockedCellsOleColor { get; private set; }
     /// <summary>
     /// Gets or sets the interior color for Excel cells accepting data from users to create a new row in the table during an Edit Data operation.
     /// </summary>
@@ -193,10 +185,9 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the interior color for Excel cells containing values that have been changed by the user but not yet committed during an Edit Data operation.
+    /// Gets the interior color for Excel cells accepting data from users to create a new row in the table during an Edit Data operation.
     /// </summary>
-    public static int UncommittedCellsOleColor { get; private set; }
-
+    public static int NewRowCellsOleColor { get; private set; }
     /// <summary>
     /// Gets or sets the interior color for Excel cells containing values that have been changed by the user but not yet committed during an Edit Data operation.
     /// </summary>
@@ -214,10 +205,9 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the interior color for Excel cells containing values that caused concurrency warnings during an Edit Data operation using optimistic updates.
+    /// Gets the interior color for Excel cells containing values that have been changed by the user but not yet committed during an Edit Data operation.
     /// </summary>
-    public static int WarningCellsOleColor { get; private set; }
-
+    public static int UncommittedCellsOleColor { get; private set; }
     /// <summary>
     /// Gets or sets the interior color for Excel cells containing values that caused concurrency warnings during an Edit Data operation using optimistic updates.
     /// </summary>
@@ -234,14 +224,19 @@ namespace MySQL.ForExcel.Classes
       }
     }
 
+    /// <summary>
+    /// Gets the interior color for Excel cells containing values that caused concurrency warnings during an Edit Data operation using optimistic updates.
+    /// </summary>
+    public static int WarningCellsOleColor { get; private set; }
+
     #endregion Properties
 
     /// <summary>
     /// Adds names to the whole application related to localized date format strings.
     /// </summary>
-    /// <param name="workbook">The workbook where the new <see cref="Excel.Style"/> is added to.</param>
+    /// <param name="workbook">The workbook where the new <see cref="ExcelInterop.Style"/> is added to.</param>
     /// <remarks>This method relies on the value of the setting HideLocalizedDateFormatNames.</remarks>
-    public static void AddLocalizedDateFormatStringsAsNames(this Excel.Workbook workbook)
+    public static void AddLocalizedDateFormatStringsAsNames(this ExcelInterop.Workbook workbook)
     {
       bool hideNames = Settings.Default.HideLocalizedDateFormatNames;
       workbook.AddNameWithInternationalFormula("LOCAL_DATE_SEPARATOR", "=INDEX(GET.WORKSPACE(37),17)", hideNames);
@@ -256,20 +251,20 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Adds a <see cref="Excel.Name"/> object to the collection of names (if it does not exist already) of the given <see cref="Excel.Workbook"/> with a formula in English that is translated to the current locale.
+    /// Adds a <see cref="ExcelInterop.Name"/> object to the collection of names (if it does not exist already) of the given <see cref="ExcelInterop.Workbook"/> with a formula in English that is translated to the current locale.
     /// </summary>
-    /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
-    /// <param name="name">The name of the <see cref="Excel.Name"/> object.</param>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
+    /// <param name="name">The name of the <see cref="ExcelInterop.Name"/> object.</param>
     /// <param name="internationalFormula">The tied formula expressed in English.</param>
     /// <param name="hidden">Flag indicating whether the name is hidden from the user.</param>
-    public static void AddNameWithInternationalFormula(this Excel.Workbook workbook, string name, string internationalFormula, bool hidden)
+    public static void AddNameWithInternationalFormula(this ExcelInterop.Workbook workbook, string name, string internationalFormula, bool hidden)
     {
       if (workbook == null || string.IsNullOrEmpty(name) || string.IsNullOrEmpty(internationalFormula))
       {
         return;
       }
 
-      if (workbook.Names.Cast<Excel.Name>().Any(n => n.Name == name))
+      if (workbook.Names.Cast<ExcelInterop.Name>().Any(n => n.Name == name))
       {
         return;
       }
@@ -286,7 +281,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="clearLastRowColoring">Flag indicating whether the previous row that was placeholder for new rows is cleared of its formatting.</param>
     /// <param name="newRowRange">An Excel range containing just the newly added row if <see cref="clearLastRowColoring"/> is <c>true</c>, or containing the row above the newly added one otherwise.</param>
     /// <returns>The original Excel range with the newly added row at the end of it.</returns>
-    public static Excel.Range AddNewRow(this Excel.Range range, bool clearLastRowColoring, out Excel.Range newRowRange)
+    public static ExcelInterop.Range AddNewRow(this ExcelInterop.Range range, bool clearLastRowColoring, out ExcelInterop.Range newRowRange)
     {
       newRowRange = null;
       if (range == null)
@@ -295,7 +290,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       range = range.Resize[range.Rows.Count + 1, range.Columns.Count];
-      newRowRange = range.Rows[range.Rows.Count] as Excel.Range;
+      newRowRange = range.Rows[range.Rows.Count] as ExcelInterop.Range;
       if (newRowRange != null)
       {
         newRowRange.Interior.Color = NewRowCellsOleColor;
@@ -306,21 +301,21 @@ namespace MySQL.ForExcel.Classes
         return range;
       }
 
-      newRowRange = range.Rows[range.Rows.Count - 1] as Excel.Range;
+      newRowRange = range.Rows[range.Rows.Count - 1] as ExcelInterop.Range;
       if (newRowRange != null)
       {
-        newRowRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+        newRowRange.Interior.ColorIndex = ExcelInterop.XlColorIndex.xlColorIndexNone;
       }
 
       return range;
     }
 
     /// <summary>
-    /// Checks if the given <see cref="Excel.Range"/> contains data in any of its cells.
+    /// Checks if the given <see cref="ExcelInterop.Range"/> contains data in any of its cells.
     /// </summary>
     /// <param name="range">An excel range.</param>
     /// <returns><c>true</c> if the given range is not empty, <c>false</c> otherwise.</returns>
-    public static bool ContainsAnyData(this Excel.Range range)
+    public static bool ContainsAnyData(this ExcelInterop.Range range)
     {
       if (range == null || range.CountLarge < 1)
       {
@@ -331,59 +326,59 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Creates an Excel table from a given <see cref="Excel.Range"/> object.
+    /// Creates an Excel table from a given <see cref="ExcelInterop.Range"/> object.
     /// </summary>
-    /// <param name="range">A <see cref="Excel.Range"/> object.</param>
+    /// <param name="range">A <see cref="ExcelInterop.Range"/> object.</param>
     /// <param name="excelTableName">The proposed name for the new Excel table.</param>
     /// <param name="containsColumnNames">Flag indicating whether column names appear in the first row of the Excel range.</param>
-    public static void CreateExcelTable(this Excel.Range range, string excelTableName, bool containsColumnNames)
+    public static void CreateExcelTable(this ExcelInterop.Range range, string excelTableName, bool containsColumnNames)
     {
       if (range == null)
       {
         return;
       }
 
-      Excel.XlYesNoGuess hasHeaders = containsColumnNames ? Excel.XlYesNoGuess.xlYes : Excel.XlYesNoGuess.xlNo;
-      var namedTable = range.Worksheet.ListObjects.Add(Excel.XlListObjectSourceType.xlSrcRange, range, Type.Missing, hasHeaders, Type.Missing);
+      var hasHeaders = containsColumnNames ? ExcelInterop.XlYesNoGuess.xlYes : ExcelInterop.XlYesNoGuess.xlNo;
+      var namedTable = range.Worksheet.ListObjects.Add(ExcelInterop.XlListObjectSourceType.xlSrcRange, range, Type.Missing, hasHeaders, Type.Missing);
       namedTable.Name = excelTableName.GetExcelTableNameAvoidingDuplicates();
       namedTable.DisplayName = namedTable.Name;
       namedTable.TableStyle = Settings.Default.ImportExcelTableStyleName;
     }
 
     /// <summary>
-    /// Creates a default <see cref="Excel.TableStyle"/> for MySQL imported data.
+    /// Creates a default <see cref="ExcelInterop.TableStyle"/> for MySQL imported data.
     /// </summary>
-    /// <param name="workbook">The workbook where the new <see cref="Excel.Style"/> is added to.</param>
-    /// <returns>A new <see cref="Excel.TableStyle"/> for MySQL imported data.</returns>
-    public static Excel.TableStyle CreateMySqlTableStyle(this Excel.Workbook workbook)
+    /// <param name="workbook">The workbook where the new <see cref="ExcelInterop.Style"/> is added to.</param>
+    /// <returns>A new <see cref="ExcelInterop.TableStyle"/> for MySQL imported data.</returns>
+    public static ExcelInterop.TableStyle CreateMySqlTableStyle(this ExcelInterop.Workbook workbook)
     {
-      if (workbook == null || workbook.TableStyles.Cast<Excel.TableStyle>().Any(style => style.Name == DEFAULT_MYSQL_STYLE_NAME))
+      if (workbook == null || workbook.TableStyles.Cast<ExcelInterop.TableStyle>().Any(style => style.Name == DEFAULT_MYSQL_STYLE_NAME))
       {
         return null;
       }
 
-      Excel.TableStyle mySqlTableStyle = workbook.TableStyles.Add(DEFAULT_MYSQL_STYLE_NAME);
+      var mySqlTableStyle = workbook.TableStyles.Add(DEFAULT_MYSQL_STYLE_NAME);
       mySqlTableStyle.ShowAsAvailableTableStyle = false;
-      mySqlTableStyle.TableStyleElements[Excel.XlTableStyleElementType.xlWholeTable].SetAsMySqlStyle();
-      mySqlTableStyle.TableStyleElements[Excel.XlTableStyleElementType.xlHeaderRow].SetAsMySqlStyle(LockedCellsOleColor, true);
+      mySqlTableStyle.TableStyleElements[ExcelInterop.XlTableStyleElementType.xlWholeTable].SetAsMySqlStyle();
+      mySqlTableStyle.TableStyleElements[ExcelInterop.XlTableStyleElementType.xlHeaderRow].SetAsMySqlStyle(LockedCellsOleColor, true);
       return mySqlTableStyle;
     }
 
     /// <summary>
-    /// Gets a <see cref="Excel.Worksheet"/> with a given name existing in the given <see cref="Excel.Workbook"/> or creates a new one.
+    /// Gets a <see cref="ExcelInterop.Worksheet"/> with a given name existing in the given <see cref="ExcelInterop.Workbook"/> or creates a new one.
     /// </summary>
-    /// <param name="workBook">The <see cref="Excel.Workbook"/> to look for a <see cref="Excel.Worksheet"/>.</param>
-    /// <param name="workSheetName">The name of the new <see cref="Excel.Worksheet"/>.</param>
+    /// <param name="workBook">The <see cref="ExcelInterop.Workbook"/> to look for a <see cref="ExcelInterop.Worksheet"/>.</param>
+    /// <param name="workSheetName">The name of the new <see cref="ExcelInterop.Worksheet"/>.</param>
     /// <param name="selectTopLeftCell">Flag indicating whether the cell A1 receives focus.</param>
-    /// <returns>The existing or new <see cref="Excel.Worksheet"/> object.</returns>
-    public static Excel.Worksheet CreateWorksheet(this Excel.Workbook workBook, string workSheetName, bool selectTopLeftCell)
+    /// <returns>The existing or new <see cref="ExcelInterop.Worksheet"/> object.</returns>
+    public static ExcelInterop.Worksheet CreateWorksheet(this ExcelInterop.Workbook workBook, string workSheetName, bool selectTopLeftCell)
     {
       if (workBook == null)
       {
         return null;
       }
 
-      Excel.Worksheet newWorksheet = null;
+      ExcelInterop.Worksheet newWorksheet = null;
       try
       {
         newWorksheet = workBook.Worksheets.Add(Type.Missing, workBook.ActiveSheet, Type.Missing, Type.Missing);
@@ -408,110 +403,27 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="mysqlDataRange">If <c>null</c> the whole first row is returned, otherwise only the column cells within the editing range.</param>
     /// <returns>The Excel range with the first row cells corresponding to the column names</returns>
-    public static Excel.Range GetColumnNamesRange(this Excel.Range mysqlDataRange)
+    public static ExcelInterop.Range GetColumnNamesRange(this ExcelInterop.Range mysqlDataRange)
     {
       return mysqlDataRange == null ? null : mysqlDataRange.Resize[1, mysqlDataRange.Columns.Count];
     }
 
     /// <summary>
-    /// Gets a <see cref="Excel.Worksheet"/> with a given name existing in the given <see cref="Excel.Workbook"/> or creates a new one.
+    /// Gets a valid name for a new <see cref="ExcelInterop.ListObject"/> that avoids duplicates with existing ones in the current <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
-    /// <param name="workbook">The <see cref="Excel.Workbook"/> to look for a <see cref="Excel.Worksheet"/>.</param>
-    /// <param name="workSheetName">The name of the new <see cref="Excel.Worksheet"/>.</param>
-    /// <param name="selectTopLeftCell">Flag indicating whether the cell A1 receives focus.</param>
-    /// <returns>The existing or new <see cref="Excel.Worksheet"/> object.</returns>
-    public static Excel.Worksheet GetOrCreateWorksheet(this Excel.Workbook workbook, string workSheetName, bool selectTopLeftCell)
-    {
-      if (workbook == null)
-      {
-        return null;
-      }
-
-      Excel.Worksheet existingWorksheet = workbook.Worksheets.Cast<Excel.Worksheet>().FirstOrDefault(worksheet => string.Equals(worksheet.Name, workSheetName, StringComparison.InvariantCulture));
-      if (existingWorksheet == null)
-      {
-        existingWorksheet = workbook.CreateWorksheet(workSheetName, selectTopLeftCell);
-      }
-      else if (selectTopLeftCell)
-      {
-        existingWorksheet.SelectTopLeftCell();
-      }
-
-      return existingWorksheet;
-    }
-
-    /// <summary>
-    /// Gets the name of the parent <see cref="Excel.Workbook"/> of the given <see cref="Excel.Worksheet"/>.
-    /// </summary>
-    /// <param name="worksheet">A <see cref="Excel.Worksheet"/> object.</param>
-    /// <returns>The name of the parent <see cref="Excel.Workbook"/>.</returns>
-    public static string GetParentWorkbookName(this Excel.Worksheet worksheet)
-    {
-      if (worksheet == null)
-      {
-        return string.Empty;
-      }
-
-      Excel.Workbook parentWorkbook = worksheet.Parent as Excel.Workbook;
-      return parentWorkbook != null ? parentWorkbook.Name : string.Empty;
-    }
-
-    /// <summary>
-    /// Gets a linear array with the values of the cells of a single row within an <see cref="Excel.Range"/>.
-    /// </summary>
-    /// <param name="range">A <see cref="Excel.Range"/> object.</param>
-    /// <param name="rowIndex">The index of the row within the <see cref="Excel.Range"/> to get values from.</param>
-    /// <param name="formattedValues">Falg indicating whether the data is formatted (numbers, dates, text) or not (numbers and text).</param>
-    /// <returns>A linear array with the values of the cells of a single row within an <see cref="Excel.Range"/>.</returns>
-    public static object[] GetRowValuesAsLinearArray(this Excel.Range range, int rowIndex, bool formattedValues = true)
-    {
-      if (range == null || rowIndex < 1 || rowIndex > range.Rows.Count)
-      {
-        return null;
-      }
-
-      Excel.Range rowRange = range.Rows[rowIndex];
-      var rangeValues = formattedValues ? rowRange.Value : rowRange.Value2;
-      var valuesBidimensionalArray = rowRange.Columns.Count > 1
-        ? rangeValues as object[,]
-        : new object[,] { { rangeValues } };
-      return valuesBidimensionalArray.GetLinearArray(1, true).ToArray();
-    }
-
-    /// <summary>
-    /// Gets a valid name for a new <see cref="Excel.ListObject"/> that avoids duplicates with existing ones in the current <see cref="Excel.Worksheet"/>.
-    /// </summary>
-    /// <param name="excelTableName">The proposed name for a <see cref="Excel.ListObject"/>.</param>
-    /// <returns>A <see cref="Excel.ListObject"/> valid name.</returns>
+    /// <param name="excelTableName">The proposed name for a <see cref="ExcelInterop.ListObject"/>.</param>
+    /// <returns>A <see cref="ExcelInterop.ListObject"/> valid name.</returns>
     public static string GetExcelTableNameAvoidingDuplicates(this string excelTableName)
     {
       return excelTableName.GetExcelTableNameAvoidingDuplicates(1);
     }
 
     /// <summary>
-    /// Gets a valid name for a new <see cref="Excel.ListObject"/> that avoids duplicates with existing ones in the current <see cref="Excel.Worksheet"/>.
+    /// Gets an <see cref="ExcelInterop.Range"/> object that represents all non-empty cells.
     /// </summary>
-    /// <param name="schema">The schema containing the MySQL table.</param>
-    /// <param name="mySqlTableName">The name of the MySQL table that will feed the <see cref="Excel.ListObject"/>.</param>
-    /// <returns>A <see cref="Excel.ListObject"/> valid name.</returns>
-    public static string GetExcelTableNameAvoidingDuplicates(string schema, string mySqlTableName)
-    {
-      string excelTableNamePrefix = Settings.Default.ImportPrefixExcelTable &&
-                                      !string.IsNullOrEmpty(Settings.Default.ImportPrefixExcelTableText)
-          ? Settings.Default.ImportPrefixExcelTableText + "."
-          : string.Empty;
-      string excelTableNameSchemaPiece = !string.IsNullOrEmpty(schema) ? schema + "." : string.Empty;
-      string excelTableNameTablePiece = !string.IsNullOrEmpty(mySqlTableName) ? mySqlTableName : "Table";
-      string excelTableName = excelTableNamePrefix + excelTableNameSchemaPiece + excelTableNameTablePiece;
-      return excelTableName.GetExcelTableNameAvoidingDuplicates();
-    }
-
-    /// <summary>
-    /// Gets an <see cref="Excel.Range"/> object that represents all non-empty cells.
-    /// </summary>
-    /// <param name="range">A <see cref="Excel.Range"/> object.</param>
-    /// <returns>An <see cref="Excel.Range"/> object that represents all non-empty cells.</returns>
-    public static Excel.Range GetNonEmptyRange(this Excel.Range range)
+    /// <param name="range">A <see cref="ExcelInterop.Range"/> object.</param>
+    /// <returns>An <see cref="ExcelInterop.Range"/> object that represents all non-empty cells.</returns>
+    public static ExcelInterop.Range GetNonEmptyRange(this ExcelInterop.Range range)
     {
       if (range == null)
       {
@@ -524,14 +436,14 @@ namespace MySQL.ForExcel.Classes
         return range.Value != null ? range : null;
       }
 
-      Excel.Range rangeWithFormulas = null;
-      Excel.Range rangeWithConstants = null;
-      Excel.Range finalRange = null;
+      ExcelInterop.Range rangeWithFormulas = null;
+      ExcelInterop.Range rangeWithConstants = null;
+      ExcelInterop.Range finalRange = null;
 
       // SpecialCells method throws exception if no cells are found matching criteria (possible bug in VSTO).
       try
       {
-        rangeWithFormulas = range.SpecialCells(Excel.XlCellType.xlCellTypeFormulas);
+        rangeWithFormulas = range.SpecialCells(ExcelInterop.XlCellType.xlCellTypeFormulas);
       }
       catch
       {
@@ -540,7 +452,7 @@ namespace MySQL.ForExcel.Classes
       // SpecialCells method throws exception if no cells are found matching criteria (possible bug in VSTO).
       try
       {
-        rangeWithConstants = range.SpecialCells(Excel.XlCellType.xlCellTypeConstants, (int)Excel.XlSpecialCellsValue.xlTextValues + (int)Excel.XlSpecialCellsValue.xlNumbers);
+        rangeWithConstants = range.SpecialCells(ExcelInterop.XlCellType.xlCellTypeConstants, (int)ExcelInterop.XlSpecialCellsValue.xlTextValues + (int)ExcelInterop.XlSpecialCellsValue.xlNumbers);
       }
       catch
       {
@@ -563,13 +475,13 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets an <see cref="Excel.Range"/> object representing an unique rectangular area where cells inside it contain values.
+    /// Gets an <see cref="ExcelInterop.Range"/> object representing an unique rectangular area where cells inside it contain values.
     /// There may be empty cells inside, the rectangular area is calculated by finding a topmost-leftmost cell with data and 
     /// a bottommost-rightmost cell with data to then compose the corners of the rectangular area.
     /// </summary>
-    /// <param name="range">A <see cref="Excel.Range"/> object.</param>
-    /// <returns>an <see cref="Excel.Range"/> object representing an unique rectangular area where cells inside it contain values.</returns>
-    public static Excel.Range GetNonEmptyRectangularAreaRange(this Excel.Range range)
+    /// <param name="range">A <see cref="ExcelInterop.Range"/> object.</param>
+    /// <returns>an <see cref="ExcelInterop.Range"/> object representing an unique rectangular area where cells inside it contain values.</returns>
+    public static ExcelInterop.Range GetNonEmptyRectangularAreaRange(this ExcelInterop.Range range)
     {
       if (range == null)
       {
@@ -582,14 +494,14 @@ namespace MySQL.ForExcel.Classes
         return range.Value != null ? range : null;
       }
 
-      Excel.Range firstOriginalCell = range.Cells[1, 1];
-      Excel.Range lastRowCell = range.Cells.Find(
+      ExcelInterop.Range firstOriginalCell = range.Cells[1, 1];
+      ExcelInterop.Range lastRowCell = range.Cells.Find(
         "*",
         firstOriginalCell,
-        Excel.XlFindLookIn.xlValues,
+        ExcelInterop.XlFindLookIn.xlValues,
         Type.Missing,
-        Excel.XlSearchOrder.xlByRows,
-        Excel.XlSearchDirection.xlPrevious,
+        ExcelInterop.XlSearchOrder.xlByRows,
+        ExcelInterop.XlSearchDirection.xlPrevious,
         Type.Missing,
         Type.Missing,
         Type.Missing);
@@ -599,13 +511,13 @@ namespace MySQL.ForExcel.Classes
       }
 
       int lastCellRow = lastRowCell.Row;
-      Excel.Range lastColumnCell = range.Cells.Find(
+      ExcelInterop.Range lastColumnCell = range.Cells.Find(
         "*",
         firstOriginalCell,
-        Excel.XlFindLookIn.xlValues,
+        ExcelInterop.XlFindLookIn.xlValues,
         Type.Missing,
-        Excel.XlSearchOrder.xlByColumns,
-        Excel.XlSearchDirection.xlPrevious,
+        ExcelInterop.XlSearchOrder.xlByColumns,
+        ExcelInterop.XlSearchDirection.xlPrevious,
         Type.Missing,
         Type.Missing,
         Type.Missing);
@@ -615,14 +527,14 @@ namespace MySQL.ForExcel.Classes
       }
 
       int lastCellColumn = lastColumnCell.Column;
-      Excel.Range lastCell = range.Worksheet.Cells[lastCellRow, lastCellColumn];
-      Excel.Range firstRowCell = range.Cells.Find(
+      ExcelInterop.Range lastCell = range.Worksheet.Cells[lastCellRow, lastCellColumn];
+      ExcelInterop.Range firstRowCell = range.Cells.Find(
         "*",
         lastCell,
-        Excel.XlFindLookIn.xlValues,
+        ExcelInterop.XlFindLookIn.xlValues,
         Type.Missing,
-        Excel.XlSearchOrder.xlByRows,
-        Excel.XlSearchDirection.xlNext,
+        ExcelInterop.XlSearchOrder.xlByRows,
+        ExcelInterop.XlSearchDirection.xlNext,
         Type.Missing,
         Type.Missing,
         Type.Missing);
@@ -632,13 +544,13 @@ namespace MySQL.ForExcel.Classes
       }
 
       int firstCellRow = firstRowCell.Row;
-      Excel.Range firstColumnCell = range.Cells.Find(
+      ExcelInterop.Range firstColumnCell = range.Cells.Find(
         "*",
         lastCell,
-        Excel.XlFindLookIn.xlValues,
+        ExcelInterop.XlFindLookIn.xlValues,
         Type.Missing,
-        Excel.XlSearchOrder.xlByColumns,
-        Excel.XlSearchDirection.xlNext,
+        ExcelInterop.XlSearchOrder.xlByColumns,
+        ExcelInterop.XlSearchDirection.xlNext,
         Type.Missing,
         Type.Missing,
         Type.Missing);
@@ -648,23 +560,23 @@ namespace MySQL.ForExcel.Classes
       }
 
       int firstCellColumn = firstColumnCell.Column;
-      Excel.Range firstCell = range.Worksheet.Cells[firstCellRow, firstCellColumn];
+      ExcelInterop.Range firstCell = range.Worksheet.Cells[firstCellRow, firstCellColumn];
       return range.Worksheet.Range[firstCell, lastCell];
     }
 
     /// <summary>
     /// Gets the active workbook unique identifier if exists, if not, creates one and returns it.
     /// </summary>
-    /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
     /// <returns>The guid string for the current workbook.</returns>
-    public static string GetOrCreateId(this Excel.Workbook workbook)
+    public static string GetOrCreateId(this ExcelInterop.Workbook workbook)
     {
       if (workbook == null || workbook.CustomDocumentProperties == null)
       {
         return null;
       }
 
-      DocumentProperty guid = ((DocumentProperties)workbook.CustomDocumentProperties).Cast<DocumentProperty>().FirstOrDefault(property => property.Name.Equals("WorkbookGuid"));
+      var guid = ((DocumentProperties)workbook.CustomDocumentProperties).Cast<DocumentProperty>().FirstOrDefault(property => property.Name.Equals("WorkbookGuid"));
       if (guid != null)
       {
         return guid.Value.ToString();
@@ -677,92 +589,158 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets a <see cref="ExcelInterop.Worksheet"/> with a given name existing in the given <see cref="ExcelInterop.Workbook"/> or creates a new one.
+    /// </summary>
+    /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/> to look for a <see cref="ExcelInterop.Worksheet"/>.</param>
+    /// <param name="workSheetName">The name of the new <see cref="ExcelInterop.Worksheet"/>.</param>
+    /// <param name="selectTopLeftCell">Flag indicating whether the cell A1 receives focus.</param>
+    /// <returns>The existing or new <see cref="ExcelInterop.Worksheet"/> object.</returns>
+    public static ExcelInterop.Worksheet GetOrCreateWorksheet(this ExcelInterop.Workbook workbook, string workSheetName, bool selectTopLeftCell)
+    {
+      if (workbook == null)
+      {
+        return null;
+      }
+
+      var existingWorksheet = workbook.Worksheets.Cast<ExcelInterop.Worksheet>().FirstOrDefault(worksheet => string.Equals(worksheet.Name, workSheetName, StringComparison.InvariantCulture));
+      if (existingWorksheet == null)
+      {
+        existingWorksheet = workbook.CreateWorksheet(workSheetName, selectTopLeftCell);
+      }
+      else if (selectTopLeftCell)
+      {
+        existingWorksheet.SelectTopLeftCell();
+      }
+
+      return existingWorksheet;
+    }
+
+    /// <summary>
+    /// Gets the name of the parent <see cref="ExcelInterop.Workbook"/> of the given <see cref="ExcelInterop.Worksheet"/>.
+    /// </summary>
+    /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
+    /// <returns>The name of the parent <see cref="ExcelInterop.Workbook"/>.</returns>
+    public static string GetParentWorkbookName(this ExcelInterop.Worksheet worksheet)
+    {
+      if (worksheet == null)
+      {
+        return string.Empty;
+      }
+
+      var parentWorkbook = worksheet.Parent as ExcelInterop.Workbook;
+      return parentWorkbook != null ? parentWorkbook.Name : string.Empty;
+    }
+
+    /// <summary>
     /// Gets the a protection key for the provided worksheet if exists.
     /// </summary>
-    /// <param name="worksheet">A <see cref="Excel.Worksheet"/> object.</param>
+    /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
     /// <returns>The worksheet's protection key if the property exist, otherwise returns null.</returns>
-    public static string GetProtectionKey(this Excel.Worksheet worksheet)
+    public static string GetProtectionKey(this ExcelInterop.Worksheet worksheet)
     {
       if (worksheet == null)
       {
         return null;
       }
 
-      Excel.CustomProperties properties = worksheet.CustomProperties;
+      ExcelInterop.CustomProperties properties = worksheet.CustomProperties;
       if (properties == null)
       {
         return null;
       }
 
-      Excel.CustomProperty guid = properties.Cast<Excel.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetGuid"));
+      var guid = properties.Cast<ExcelInterop.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetGuid"));
       return guid == null ? null : guid.Value.ToString();
     }
 
     /// <summary>
-    /// Gets a property from the given target object returned in an English locale after transformed from the native Excel locale.
+    /// Gets a linear array with the values of the cells of a single row within an <see cref="ExcelInterop.Range"/>.
     /// </summary>
-    /// <param name="target">The Excel object from which a property value is to be extracted.</param>
-    /// <param name="name">The name of the property.</param>
-    /// <returns>The value of the property returned in an English locale.</returns>
-    static object GetPropertyInternational(object target, string name)
+    /// <param name="range">A <see cref="ExcelInterop.Range"/> object.</param>
+    /// <param name="rowIndex">The index of the row within the <see cref="ExcelInterop.Range"/> to get values from.</param>
+    /// <param name="formattedValues">Falg indicating whether the data is formatted (numbers, dates, text) or not (numbers and text).</param>
+    /// <returns>A linear array with the values of the cells of a single row within an <see cref="ExcelInterop.Range"/>.</returns>
+    public static object[] GetRowValuesAsLinearArray(this ExcelInterop.Range range, int rowIndex, bool formattedValues = true)
     {
-      return target.GetType().InvokeMember(
-        name,
-        System.Reflection.BindingFlags.GetProperty | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
-        null,
-        target,
-        null,
-        new System.Globalization.CultureInfo(EN_US_LOCALE_CODE));
+      if (range == null || rowIndex < 1 || rowIndex > range.Rows.Count)
+      {
+        return null;
+      }
+
+      ExcelInterop.Range rowRange = range.Rows[rowIndex];
+      var rangeValues = formattedValues ? rowRange.Value : rowRange.Value2;
+      var valuesBidimensionalArray = rowRange.Columns.Count > 1
+        ? rangeValues as object[,]
+        : new object[,] { { rangeValues } };
+      return valuesBidimensionalArray.GetLinearArray(1, true).ToArray();
     }
 
     /// <summary>
-    /// Gets a valid name for a new <see cref="Excel.Worksheet"/> that avoids duplicates with existing ones in the given <see cref="Excel.Workbook"/>.
+    /// Gets a valid name for a new <see cref="ExcelInterop.Worksheet"/> that avoids duplicates with existing ones in the given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
-    /// <param name="workbook">A <see cref="Excel.Workbook"/>.</param>
-    /// <param name="worksheetName">The proposed name for a <see cref="Excel.Worksheet"/>.</param>
-    /// <returns>A <see cref="Excel.Worksheet"/> valid name.</returns>
-    public static string GetWorksheetNameAvoidingDuplicates(this Excel.Workbook workbook, string worksheetName)
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/>.</param>
+    /// <param name="worksheetName">The proposed name for a <see cref="ExcelInterop.Worksheet"/>.</param>
+    /// <returns>A <see cref="ExcelInterop.Worksheet"/> valid name.</returns>
+    public static string GetWorksheetNameAvoidingDuplicates(this ExcelInterop.Workbook workbook, string worksheetName)
     {
       return workbook.GetWorksheetNameAvoidingDuplicates(worksheetName, 0);
     }
 
     /// <summary>
+    /// Checks if a given <see cref="ExcelInterop.Range"/> intersects with any Excel table in its containing <see cref="ExcelInterop.Worksheet"/>. 
+    /// </summary>
+    /// <param name="range">A <see cref="ExcelInterop.Range"/> object.</param>
+    /// <returns><c>true</c> if the given <see cref="ExcelInterop.Range"/> intersects with any Excel table in its containing <see cref="ExcelInterop.Worksheet"/>, <c>false</c> otherwise.</returns>
+    public static bool IntersectsWithAnyExcelObject(this ExcelInterop.Range range)
+    {
+      bool intersects = (from ExcelInterop.ListObject excelTable in range.Worksheet.ListObjects select excelTable.Range.IntersectWith(range)).Any(intersectingRange => intersectingRange != null && intersectingRange.CountLarge != 0);
+      if (intersects)
+      {
+        return true;
+      }
+
+      foreach (var pivotTable in range.Worksheet.GetPivotTables())
+      {
+        var intersectingRange = pivotTable.TableRange1.IntersectWith(range);
+        if (intersectingRange == null || intersectingRange.CountLarge == 0)
+        {
+          continue;
+        }
+
+        intersectingRange = pivotTable.TableRange2.IntersectWith(range);
+        if (intersectingRange == null || intersectingRange.CountLarge == 0)
+        {
+          continue;
+        }
+
+        intersectingRange = pivotTable.PageRange.IntersectWith(range);
+        if (intersectingRange == null || intersectingRange.CountLarge == 0)
+        {
+          continue;
+        }
+
+        intersectingRange = pivotTable.DataBodyRange.IntersectWith(range);
+        if (intersectingRange == null || intersectingRange.CountLarge == 0)
+        {
+          continue;
+        }
+
+        intersects = true;
+        break;
+      }
+
+      return intersects;
+    }
+
+    /// <summary>
     /// Returns a Range object that represents the rectangular intersection of the given range with another range.
     /// </summary>
-    /// <param name="range">A <see cref="Excel.Range"/> object.</param>
-    /// <param name="otherRange">An intersecting <see cref="Excel.Range"/> object.</param>
-    /// <returns>A <see cref="Excel.Range"/> object representing the rectangular intersection of the given range with another range.</returns>
-    public static Excel.Range IntersectWith(this Excel.Range range, Excel.Range otherRange)
+    /// <param name="range">A <see cref="ExcelInterop.Range"/> object.</param>
+    /// <param name="otherRange">An intersecting <see cref="ExcelInterop.Range"/> object.</param>
+    /// <returns>A <see cref="ExcelInterop.Range"/> object representing the rectangular intersection of the given range with another range.</returns>
+    public static ExcelInterop.Range IntersectWith(this ExcelInterop.Range range, ExcelInterop.Range otherRange)
     {
       return Globals.ThisAddIn.Application.Intersect(range, otherRange);
-    }
-
-    /// <summary>
-    /// Checks if a given <see cref="Excel.Range"/> intersects with any Excel table in its containing <see cref="Excel.Worksheet"/>. 
-    /// </summary>
-    /// <param name="range">A <see cref="Excel.Range"/> object.</param>
-    /// <returns><c>true</c> if the given <see cref="Excel.Range"/> intersects with any Excel table in its containing <see cref="Excel.Worksheet"/>, <c>false</c> otherwise.</returns>
-    public static bool IntersectsWithAnyExcelTable(this Excel.Range range)
-    {
-      return range != null && (from Excel.ListObject excelTable in range.Worksheet.ListObjects select excelTable.Range.IntersectWith(range)).Any(intersectRange => intersectRange != null && intersectRange.CountLarge != 0);
-    }
-
-    /// <summary>
-    /// Invokes a method present in the given target object receiving parameters in an English locale that are transformed to the native Excel locale.
-    /// </summary>
-    /// <param name="target">The Excel object containing the method.</param>
-    /// <param name="name">The name of the method to be invoked.</param>
-    /// <param name="args">The arguments passed to the method parameters.</param>
-    /// <returns>Any return value from the invoked method.</returns>
-    static object InvokeMethodInternational(object target, string name, params object[] args)
-    {
-      return target.GetType().InvokeMember(
-        name,
-        System.Reflection.BindingFlags.InvokeMethod | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
-        null,
-        target,
-        args,
-        new System.Globalization.CultureInfo(EN_US_LOCALE_CODE));
     }
 
     /// <summary>
@@ -777,31 +755,31 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Checks if the <see cref="Excel.Worksheet"/> is visible.
+    /// Checks if the <see cref="ExcelInterop.Worksheet"/> is visible.
     /// </summary>
-    /// <param name="worksheet">A <see cref="Excel.Worksheet"/> object.</param>
-    /// <returns><c>true</c> if the <see cref="Excel.Worksheet"/> is visible, <c>false</c> otherwise.</returns>
-    public static bool IsVisible(this Excel.Worksheet worksheet)
+    /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
+    /// <returns><c>true</c> if the <see cref="ExcelInterop.Worksheet"/> is visible, <c>false</c> otherwise.</returns>
+    public static bool IsVisible(this ExcelInterop.Worksheet worksheet)
     {
-      return worksheet != null && worksheet.Visible == Excel.XlSheetVisibility.xlSheetVisible;
+      return worksheet != null && worksheet.Visible == ExcelInterop.XlSheetVisibility.xlSheetVisible;
     }
 
     /// <summary>
-    /// Returns a list of <see cref="Excel.TableStyle"/> names available to be used within the given <see cref="Excel.Workbook"/>.
+    /// Returns a list of <see cref="ExcelInterop.TableStyle"/> names available to be used within the given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
-    /// <param name="workbook">A <see cref="Excel.Workbook"/> object.</param>
-    /// <returns>A list of style names available in the given <see cref="Excel.Workbook"/>.</returns>
-    public static List<string> ListTableStyles(this Excel.Workbook workbook)
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
+    /// <returns>A list of style names available in the given <see cref="ExcelInterop.Workbook"/>.</returns>
+    public static List<string> ListTableStyles(this ExcelInterop.Workbook workbook)
     {
-      return workbook == null ? null : (from Excel.TableStyle tableStyle in workbook.TableStyles orderby tableStyle.Name select tableStyle.Name).ToList();
+      return workbook == null ? null : (from ExcelInterop.TableStyle tableStyle in workbook.TableStyles orderby tableStyle.Name select tableStyle.Name).ToList();
     }
 
     /// <summary>
     /// Locks the given Excel range and sets its fill color accordingly.
     /// </summary>
-    /// <param name="range">The <see cref="Excel.Range"/> to lock or unlock.</param>
+    /// <param name="range">The <see cref="ExcelInterop.Range"/> to lock or unlock.</param>
     /// <param name="lockRange">Flag indicating whether the Excel range is locked or unlocked.</param>
-    public static void LockRange(this Excel.Range range, bool lockRange)
+    public static void LockRange(this ExcelInterop.Range range, bool lockRange)
     {
       if (lockRange)
       {
@@ -809,7 +787,7 @@ namespace MySQL.ForExcel.Classes
       }
       else
       {
-        range.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+        range.Interior.ColorIndex = ExcelInterop.XlColorIndex.xlColorIndexNone;
       }
 
       range.Locked = lockRange;
@@ -818,11 +796,11 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Unprotects the given Excel worksheet and stops listening for its Change event.
     /// </summary>
-    /// <param name="worksheet">The <see cref="Excel.Worksheet"/> to unprotect.</param>
+    /// <param name="worksheet">The <see cref="ExcelInterop.Worksheet"/> to unprotect.</param>
     /// <param name="changeEventHandlerDelegate">The change event handler delegate of the Excel worksheet.</param>
     /// <param name="protectionKey">The key used to unprotect the worksheet.</param>
     /// <param name="mysqlDataRange">The Excel range containing the MySQL data being edited.</param>
-    public static void ProtectEditingWorksheet(this Excel.Worksheet worksheet, Excel.DocEvents_ChangeEventHandler changeEventHandlerDelegate, string protectionKey, Excel.Range mysqlDataRange)
+    public static void ProtectEditingWorksheet(this ExcelInterop.Worksheet worksheet, ExcelInterop.DocEvents_ChangeEventHandler changeEventHandlerDelegate, string protectionKey, ExcelInterop.Range mysqlDataRange)
     {
       if (worksheet == null)
       {
@@ -836,12 +814,12 @@ namespace MySQL.ForExcel.Classes
 
       if (mysqlDataRange != null)
       {
-        Excel.Range extendedRange = mysqlDataRange.Range["A2"];
+        ExcelInterop.Range extendedRange = mysqlDataRange.Range["A2"];
         extendedRange = extendedRange.Resize[mysqlDataRange.Rows.Count - 1, worksheet.Columns.Count];
         extendedRange.Locked = false;
 
         // Column names range code
-        Excel.Range headersRange = mysqlDataRange.GetColumnNamesRange();
+        ExcelInterop.Range headersRange = mysqlDataRange.GetColumnNamesRange();
         headersRange.LockRange(true);
       }
 
@@ -866,15 +844,15 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Removes the protectionKey property (if exists) for the current worksheet.
     /// </summary>
-    /// <param name="worksheet">A <see cref="Excel.Worksheet"/> object.</param>
-    public static void RemoveProtectionKey(this Excel.Worksheet worksheet)
+    /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
+    public static void RemoveProtectionKey(this ExcelInterop.Worksheet worksheet)
     {
       if (worksheet == null)
       {
         return;
       }
 
-      var protectionKeyProperty = worksheet.CustomProperties.Cast<Excel.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetGuid"));
+      var protectionKeyProperty = worksheet.CustomProperties.Cast<ExcelInterop.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetGuid"));
       if (protectionKeyProperty != null)
       {
         protectionKeyProperty.Delete();
@@ -882,10 +860,10 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Places the A1 cell of the given <see cref="Excel.Worksheet"/> in focus.
+    /// Places the A1 cell of the given <see cref="ExcelInterop.Worksheet"/> in focus.
     /// </summary>
-    /// <param name="worksheet">A <see cref="Excel.Worksheet"/> object.</param>
-    public static void SelectTopLeftCell(this Excel.Worksheet worksheet)
+    /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
+    public static void SelectTopLeftCell(this ExcelInterop.Worksheet worksheet)
     {
       if (worksheet == null)
       {
@@ -896,17 +874,17 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Sets the font and color properties of a <see cref="Excel.TableStyleElement"/> as a MySQL minimalistic style.
+    /// Sets the font and color properties of a <see cref="ExcelInterop.TableStyleElement"/> as a MySQL minimalistic style.
     /// </summary>
-    /// <param name="styleElement">The <see cref="Excel.TableStyleElement"/> to modify.</param>
+    /// <param name="styleElement">The <see cref="ExcelInterop.TableStyleElement"/> to modify.</param>
     /// <param name="interiorOleColor">The OLE color to paint the Excel cells interior with.</param>
     /// <param name="makeBold">Flag indicating whether the font is set to bold.</param>
-    public static void SetAsMySqlStyle(this Excel.TableStyleElement styleElement, int interiorOleColor = EMPTY_CELLS_OLE_COLOR, bool makeBold = false)
+    public static void SetAsMySqlStyle(this ExcelInterop.TableStyleElement styleElement, int interiorOleColor = EMPTY_CELLS_OLE_COLOR, bool makeBold = false)
     {
       styleElement.Font.Color = ColorTranslator.ToOle(Color.Black);
       if (interiorOleColor == EMPTY_CELLS_OLE_COLOR)
       {
-        styleElement.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+        styleElement.Interior.ColorIndex = ExcelInterop.XlColorIndex.xlColorIndexNone;
       }
       else
       {
@@ -919,15 +897,15 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Sets the style of the first row of a given range that represents its header with column names.
     /// </summary>
-    /// <param name="range">A <see cref="Excel.Range"/> object.</param>
-    public static void SetHeaderStyle(this Excel.Range range)
+    /// <param name="range">A <see cref="ExcelInterop.Range"/> object.</param>
+    public static void SetHeaderStyle(this ExcelInterop.Range range)
     {
       if (range == null)
       {
         return;
       }
 
-      Excel.Range headerRange = range.GetColumnNamesRange();
+      ExcelInterop.Range headerRange = range.GetColumnNamesRange();
       headerRange.SetInteriorColor(LockedCellsOleColor);
       headerRange.Font.Bold = true;
     }
@@ -937,7 +915,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="range">Excel range to have their interior color changed.</param>
     /// <param name="oleColor">The new interior color for the Excel cells.</param>
-    public static void SetInteriorColor(this Excel.Range range, int oleColor)
+    public static void SetInteriorColor(this ExcelInterop.Range range, int oleColor)
     {
       if (range == null)
       {
@@ -950,7 +928,7 @@ namespace MySQL.ForExcel.Classes
       }
       else
       {
-        range.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+        range.Interior.ColorIndex = ExcelInterop.XlColorIndex.xlColorIndexNone;
       }
     }
 
@@ -959,7 +937,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="rangesList">The list of Excel ranges to have their fill color changed.</param>
     /// <param name="oleColor">The new fill color for the Excel cells.</param>
-    public static void SetInteriorColor(this IList<Excel.Range> rangesList, int oleColor)
+    public static void SetInteriorColor(this IList<ExcelInterop.Range> rangesList, int oleColor)
     {
       if (rangesList == null)
       {
@@ -972,6 +950,225 @@ namespace MySQL.ForExcel.Classes
       }
 
       rangesList.Clear();
+    }
+
+    /// <summary>
+    /// Sets the protection key for the worksheet.
+    /// </summary>
+    /// <returns>The new protection key provided for the worksheet.</returns>
+    public static bool StoreProtectionKey(this ExcelInterop.Worksheet worksheet, string protectionKey)
+    {
+      if (worksheet == null || string.IsNullOrEmpty(protectionKey))
+      {
+        return false;
+      }
+
+      var protectionKeyProperty = worksheet.CustomProperties.Cast<ExcelInterop.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetGuid"));
+      if (protectionKeyProperty == null)
+      {
+        ExcelInterop.CustomProperties properties = worksheet.CustomProperties;
+        properties.Add("WorksheetGuid", protectionKey);
+        return true;
+      }
+      protectionKeyProperty.Value = protectionKey;
+      return true;
+    }
+
+    /// <summary>
+    /// Unprotects the given Excel worksheet and stops listening for its Change event.
+    /// </summary>
+    /// <param name="worksheet">The Excel worksheet to unprotect.</param>
+    /// <param name="changeEventHandlerDelegate">The change event handler delegate of the Excel worksheet.</param>
+    /// <param name="protectionKey">The key used to unprotect the worksheet.</param>
+    public static void UnprotectEditingWorksheet(this ExcelInterop.Worksheet worksheet, ExcelInterop.DocEvents_ChangeEventHandler changeEventHandlerDelegate, string protectionKey)
+    {
+      if (worksheet == null)
+      {
+        return;
+      }
+
+      if (changeEventHandlerDelegate != null)
+      {
+        worksheet.Change -= changeEventHandlerDelegate;
+      }
+
+      worksheet.Unprotect(worksheet.GetProtectionKey());
+    }
+
+    /// <summary>
+    /// Checks if an Excel <see cref="ExcelInterop.Worksheet"/> with a given name exists in the given <see cref="ExcelInterop.Workbook"/>.
+    /// </summary>
+    /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/>.</param>
+    /// <param name="worksheetName">Name of the <see cref="ExcelInterop.Worksheet"/>.</param>
+    /// <returns><c>true</c> if the <see cref="ExcelInterop.Worksheet"/> exists, <c>false</c> otherwise.</returns>
+    public static bool WorksheetExists(this ExcelInterop.Workbook workbook, string worksheetName)
+    {
+      if (workbook == null || worksheetName.Length <= 0)
+      {
+        return false;
+      }
+
+      return workbook.Worksheets.Cast<ExcelInterop.Worksheet>().Any(ws => string.Equals(ws.Name, worksheetName, StringComparison.InvariantCulture));
+    }
+
+    /// <summary>
+    /// Checks if an Excel <see cref="ExcelInterop.Worksheet"/> with a given name exists in a <see cref="ExcelInterop.Workbook"/> with the given name.
+    /// </summary>
+    /// <param name="workbookName">Name of the <see cref="ExcelInterop.Workbook"/>.</param>
+    /// <param name="worksheetName">Name of the <see cref="ExcelInterop.Worksheet"/>.</param>
+    /// <returns><c>true</c> if the <see cref="ExcelInterop.Worksheet"/> exists, <c>false</c> otherwise.</returns>
+    public static bool WorksheetExists(string workbookName, string worksheetName)
+    {
+      if (workbookName.Length <= 0)
+      {
+        return false;
+      }
+
+      var wBook = Globals.ThisAddIn.Application.Workbooks.Cast<ExcelInterop.Workbook>().FirstOrDefault(wb => string.Equals(wb.Name, workbookName, StringComparison.InvariantCulture));
+      return wBook != null && wBook.WorksheetExists(worksheetName);
+    }
+
+    /// <summary>
+    /// Gets a valid name for a new <see cref="ExcelInterop.ListObject"/> that avoids duplicates with existing ones in the current <see cref="ExcelInterop.Workbook"/>.
+    /// </summary>
+    /// <param name="excelTableName">The proposed name for a <see cref="ExcelInterop.ListObject"/>.</param>
+    /// <param name="copyIndex">Consecutive number for a <see cref="ExcelInterop.ListObject"/> if duplicates are found.</param>
+    /// <returns>A <see cref="ExcelInterop.ListObject"/> valid name.</returns>
+    private static string GetExcelTableNameAvoidingDuplicates(this string excelTableName, int copyIndex)
+    {
+      var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+      if (activeWorkbook == null)
+      {
+        return excelTableName;
+      }
+
+      string retName;
+      do
+      {
+        retName = copyIndex > 1 ? string.Format("{0}.{1}", excelTableName, copyIndex) : excelTableName;
+        copyIndex++;
+      } while (activeWorkbook.Worksheets.Cast<ExcelInterop.Worksheet>().Any(ws => ws.ListObjects.Cast<ExcelInterop.ListObject>().Any(excelTable => excelTable.Name == retName)));
+
+      return retName;
+    }
+
+    /// <summary>
+    /// Gets a valid name for a new <see cref="ExcelInterop.PivotTable"/> that avoids duplicates with existing ones in the current <see cref="ExcelInterop.Workbook"/>.
+    /// </summary>
+    /// <param name="pivotTableName">The proposed name for a <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <param name="copyIndex">Consecutive number for a <see cref="ExcelInterop.PivotTable"/> if duplicates are found.</param>
+    /// <returns>A <see cref="ExcelInterop.PivotTable"/> valid name.</returns>
+    private static string GetPivotTableNameAvoidingDuplicates(this string pivotTableName, int copyIndex)
+    {
+      var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+      if (activeWorkbook == null)
+      {
+        return pivotTableName;
+      }
+
+      string retName;
+      bool foundSameName;
+      do
+      {
+        foundSameName = true;
+        retName = copyIndex > 1 ? string.Format("{0}.{1}", pivotTableName, copyIndex) : pivotTableName;
+        copyIndex++;
+        foreach (var worksheetPivotTables in activeWorkbook.Worksheets.Cast<ExcelInterop.Worksheet>().Select(worksheet => worksheet.GetPivotTables()).Where(worksheetPivotTables => worksheetPivotTables != null))
+        {
+          foundSameName = worksheetPivotTables.Any(pt => pt.Name == retName);
+          if (foundSameName)
+          {
+            break;
+          }
+        }
+      } while (foundSameName);
+
+      return retName;
+    }
+
+    /// <summary>
+    /// Gets a collection of <see cref="ExcelInterop.PivotTable"/> objects in the given <see cref="ExcelInterop.Worksheet"/>.
+    /// This is used instead of the <see cref="ExcelInterop.Worksheet.PivotTables"/> method since it can return either a <see cref="ExcelInterop.PivotTables"/> or a <see cref="ExcelInterop.PivotTable"/> object.
+    /// </summary>
+    /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/>.</param>
+    /// <returns>a collection of <see cref="ExcelInterop.PivotTable"/> objects in the given <see cref="ExcelInterop.Worksheet"/>.</returns>
+    public static IEnumerable<ExcelInterop.PivotTable> GetPivotTables(this ExcelInterop.Worksheet worksheet)
+    {
+      if (worksheet == null)
+      {
+        return null;
+      }
+
+      // Since the PivotTables method of an Excel Worksheet can return either a collection of PivotTable objects or
+      // a single PivotTable instance, we need to test the type of the returned object first.
+      object pivotTables = worksheet.PivotTables();
+      if (pivotTables is ExcelInterop.PivotTables)
+      {
+        var pivotTablesCollection = pivotTables as ExcelInterop.PivotTables;
+        return pivotTablesCollection.Cast<ExcelInterop.PivotTable>();
+      }
+
+      var pivotTable = pivotTables as ExcelInterop.PivotTable;
+      return pivotTable != null ? new List<ExcelInterop.PivotTable>(1) { pivotTable } : null;
+    }
+
+    /// <summary>
+    /// Gets a property from the given target object returned in an English locale after transformed from the native Excel locale.
+    /// </summary>
+    /// <param name="target">The Excel object from which a property value is to be extracted.</param>
+    /// <param name="name">The name of the property.</param>
+    /// <returns>The value of the property returned in an English locale.</returns>
+    static object GetPropertyInternational(object target, string name)
+    {
+      return target.GetType().InvokeMember(
+        name,
+        System.Reflection.BindingFlags.GetProperty | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
+        null,
+        target,
+        null,
+        new System.Globalization.CultureInfo(EN_US_LOCALE_CODE));
+    }
+
+    /// <summary>
+    /// Gets a valid name for a new <see cref="ExcelInterop.Worksheet"/> that avoids duplicates with existing ones in the given <see cref="ExcelInterop.Workbook"/>.
+    /// </summary>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/>.</param>
+    /// <param name="worksheetName">The proposed name for a <see cref="ExcelInterop.Worksheet"/>.</param>
+    /// <param name="copyIndex">Number of the copy of a <see cref="ExcelInterop.Worksheet"/> within its name.</param>
+    /// <returns>A <see cref="ExcelInterop.Worksheet"/> valid name.</returns>
+    private static string GetWorksheetNameAvoidingDuplicates(this ExcelInterop.Workbook workbook, string worksheetName, int copyIndex)
+    {
+      if (workbook == null)
+      {
+        return worksheetName;
+      }
+
+      string retName;
+      do
+      {
+        retName = copyIndex > 0 ? string.Format("Copy {0} of {1}", copyIndex, worksheetName) : worksheetName;
+        copyIndex++;
+      } while (workbook.Worksheets.Cast<ExcelInterop.Worksheet>().Any(ws => ws.Name == retName));
+
+      return retName;
+    }
+
+    /// <summary>
+    /// Invokes a method present in the given target object receiving parameters in an English locale that are transformed to the native Excel locale.
+    /// </summary>
+    /// <param name="target">The Excel object containing the method.</param>
+    /// <param name="name">The name of the method to be invoked.</param>
+    /// <param name="args">The arguments passed to the method parameters.</param>
+    /// <returns>Any return value from the invoked method.</returns>
+    static object InvokeMethodInternational(object target, string name, params object[] args)
+    {
+      return target.GetType().InvokeMember(
+        name,
+        System.Reflection.BindingFlags.InvokeMethod | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
+        null,
+        target,
+        args,
+        new System.Globalization.CultureInfo(EN_US_LOCALE_CODE));
     }
 
     /// <summary>
@@ -989,130 +1186,6 @@ namespace MySQL.ForExcel.Classes
         target,
         args,
         new System.Globalization.CultureInfo(EN_US_LOCALE_CODE));
-    }
-
-    /// <summary>
-    /// Sets the protection key for the worksheet.
-    /// </summary>
-    /// <returns>The new protection key provided for the worksheet.</returns>
-    public static bool StoreProtectionKey(this Excel.Worksheet worksheet, string protectionKey)
-    {
-      if (worksheet == null || string.IsNullOrEmpty(protectionKey))
-      {
-        return false;
-      }
-
-      var protectionKeyProperty = worksheet.CustomProperties.Cast<Excel.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetGuid"));
-      if (protectionKeyProperty == null)
-      {
-        Excel.CustomProperties properties = worksheet.CustomProperties;
-        properties.Add("WorksheetGuid", protectionKey);
-        return true;
-      }
-      protectionKeyProperty.Value = protectionKey;
-      return true;
-    }
-
-    /// <summary>
-    /// Unprotects the given Excel worksheet and stops listening for its Change event.
-    /// </summary>
-    /// <param name="worksheet">The Excel worksheet to unprotect.</param>
-    /// <param name="changeEventHandlerDelegate">The change event handler delegate of the Excel worksheet.</param>
-    /// <param name="protectionKey">The key used to unprotect the worksheet.</param>
-    public static void UnprotectEditingWorksheet(this Excel.Worksheet worksheet, Excel.DocEvents_ChangeEventHandler changeEventHandlerDelegate, string protectionKey)
-    {
-      if (worksheet == null)
-      {
-        return;
-      }
-
-      if (changeEventHandlerDelegate != null)
-      {
-        worksheet.Change -= changeEventHandlerDelegate;
-      }
-
-      worksheet.Unprotect(worksheet.GetProtectionKey());
-    }
-
-    /// <summary>
-    /// Checks if an Excel <see cref="Excel.Worksheet"/> with a given name exists in the given <see cref="Excel.Workbook"/>.
-    /// </summary>
-    /// <param name="workbook">The <see cref="Excel.Workbook"/>.</param>
-    /// <param name="worksheetName">Name of the <see cref="Excel.Worksheet"/>.</param>
-    /// <returns><c>true</c> if the <see cref="Excel.Worksheet"/> exists, <c>false</c> otherwise.</returns>
-    public static bool WorksheetExists(this Excel.Workbook workbook, string worksheetName)
-    {
-      if (workbook == null || worksheetName.Length <= 0)
-      {
-        return false;
-      }
-
-      return workbook.Worksheets.Cast<Excel.Worksheet>().Any(ws => string.Equals(ws.Name, worksheetName, StringComparison.InvariantCulture));
-    }
-
-    /// <summary>
-    /// Checks if an Excel <see cref="Excel.Worksheet"/> with a given name exists in a <see cref="Excel.Workbook"/> with the given name.
-    /// </summary>
-    /// <param name="workbookName">Name of the <see cref="Excel.Workbook"/>.</param>
-    /// <param name="worksheetName">Name of the <see cref="Excel.Worksheet"/>.</param>
-    /// <returns><c>true</c> if the <see cref="Excel.Worksheet"/> exists, <c>false</c> otherwise.</returns>
-    public static bool WorksheetExists(string workbookName, string worksheetName)
-    {
-      if (workbookName.Length <= 0)
-      {
-        return false;
-      }
-
-      var wBook = Globals.ThisAddIn.Application.Workbooks.Cast<Excel.Workbook>().FirstOrDefault(wb => string.Equals(wb.Name, workbookName, StringComparison.InvariantCulture));
-      return wBook != null && wBook.WorksheetExists(worksheetName);
-    }
-
-    /// <summary>
-    /// Gets a valid name for a new <see cref="Excel.ListObject"/> that avoids duplicates with existing ones in the current <see cref="Excel.Worksheet"/>.
-    /// </summary>
-    /// <param name="excelTableName">The proposed name for a <see cref="Excel.ListObject"/>.</param>
-    /// <param name="copyIndex">Number of the copy of a <see cref="Excel.Worksheet"/> within its name.</param>
-    /// <returns>A <see cref="Excel.ListObject"/> valid name.</returns>
-    private static string GetExcelTableNameAvoidingDuplicates(this string excelTableName, int copyIndex)
-    {
-      var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
-      if (activeWorkbook == null)
-      {
-        return excelTableName;
-      }
-
-      string retName;
-      do
-      {
-        retName = copyIndex > 1 ? string.Format("{0}.{1}", excelTableName, copyIndex) : excelTableName;
-        copyIndex++;
-      } while (activeWorkbook.Worksheets.Cast<Excel.Worksheet>().Any(ws => ws.ListObjects.Cast<Excel.ListObject>().Any(excelTable => excelTable.Name == retName)));
-
-      return retName;
-    }
-
-    /// <summary>
-    /// Gets a valid name for a new <see cref="Excel.Worksheet"/> that avoids duplicates with existing ones in the given <see cref="Excel.Workbook"/>.
-    /// </summary>
-    /// <param name="workbook">A <see cref="Excel.Workbook"/>.</param>
-    /// <param name="worksheetName">The proposed name for a <see cref="Excel.Worksheet"/>.</param>
-    /// <param name="copyIndex">Number of the copy of a <see cref="Excel.Worksheet"/> within its name.</param>
-    /// <returns>A <see cref="Excel.Worksheet"/> valid name.</returns>
-    private static string GetWorksheetNameAvoidingDuplicates(this Excel.Workbook workbook, string worksheetName, int copyIndex)
-    {
-      if (workbook == null)
-      {
-        return worksheetName;
-      }
-
-      string retName;
-      do
-      {
-        retName = copyIndex > 0 ? string.Format("Copy {0} of {1}", copyIndex, worksheetName) : worksheetName;
-        copyIndex++;
-      } while (workbook.Worksheets.Cast<Excel.Worksheet>().Any(ws => ws.Name == retName));
-
-      return retName;
     }
   }
 }

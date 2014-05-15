@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -96,12 +97,32 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// A <see cref="MySqlDataTable"/> object containing data changes to be committed to the database.
     /// </summary>
-    private readonly MySqlDataTable _mySqlTable;
+    private MySqlDataTable _mySqlTable;
+
+    /// <summary>
+    /// A list of SQL statements tied to a specific data row.
+    /// </summary>
+    private List<IMySqlDataRow> _originalStatementRowsList;
+
+    /// <summary>
+    /// Flag indicating whether original operations from a <see cref="MySqlDataTable"/> are shown above the SQL statements.
+    /// </summary>
+    private readonly bool _showOriginalOperationsInformation;
+
+    /// <summary>
+    /// Flag indicating whether optimistic locking is used for the update of rows.
+    /// </summary>
+    private readonly bool _useOptimisticUpdate;
+
+    /// <summary>
+    /// Flag indicating whether the user edited the original query so the <see cref="SqlScript"/> and <see cref="OriginalSqlScript"/> values may differ.
+    /// </summary>
+    private bool _userChangedOriginalQuery;
 
     /// <summary>
     /// MySQL Workbench connection to a MySQL server instance selected by users.
     /// </summary>
-    private readonly MySqlWorkbenchConnection _wbConnection;
+    private MySqlWorkbenchConnection _wbConnection;
 
     #endregion Fields
 
@@ -118,7 +139,7 @@ namespace MySQL.ForExcel.Forms
       _wbConnection = wbConnection;
       OriginalSqlScript = sqlScript;
       SqlScript = OriginalSqlScript;
-      UseOptimisticUpdate = useOptimisticUpdate;
+      _useOptimisticUpdate = useOptimisticUpdate;
       CreateOriginalStatementsList();
       ApplyButton.Enabled = SqlScript.Trim().Length > 0;
       SetOriginalOperationsInfoAvailability();
@@ -154,8 +175,8 @@ namespace MySQL.ForExcel.Forms
 
         _mySqlTable = mySqlTable;
         _wbConnection = _mySqlTable.WbConnection;
-        UseOptimisticUpdate = _mySqlTable.UseOptimisticUpdate;
-        ShowOriginalOperationsInformation = true;
+        _useOptimisticUpdate = _mySqlTable.UseOptimisticUpdate;
+        _showOriginalOperationsInformation = true;
         CreateOriginalStatementsList();
         SetOriginalOperationsInfoAvailability();
       }
@@ -175,14 +196,15 @@ namespace MySQL.ForExcel.Forms
       _lockedTable = false;
       _mySqlMaxAllowedPacket = 0;
       _mySqlTable = null;
+      _originalStatementRowsList = null;
+      _showOriginalOperationsInformation = false;
+      _useOptimisticUpdate = false;
+      _userChangedOriginalQuery = false;
       _wbConnection = null;
       ActualStatementRowsList = null;
       ErroredOutDataRow = null;
       OriginalSqlScript = null;
-      OriginalStatementRowsList = null;
       ScriptResult = MySqlStatement.StatementResultType.NotApplied;
-      ShowOriginalOperationsInformation = false;
-      UserChangedOriginalQuery = false;
 
       InitializeComponent();
       OriginalQueryButton.Enabled = false;
@@ -194,11 +216,13 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets a list of SQL statements tied to a specific data row.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IMySqlDataRow> ActualStatementRowsList { get; private set; }
 
     /// <summary>
     /// Gets the number of delete operations successfully performed against the database server.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int DeletedOperations
     {
       get
@@ -210,11 +234,13 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets the <see cref="IMySqlDataRow"/> object that generated an error.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public IMySqlDataRow ErroredOutDataRow { get; private set; }
 
     /// <summary>
     /// Gets the number of insert operations successfully performed against the database server.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int InsertedOperations
     {
       get
@@ -224,24 +250,9 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Gets the value of the MAX_ALLOWED_PACKET MySQL Server variable indicating the max size in bytes of the packet returned by a single query.
-    /// </summary>
-    public ulong MySqlMaxAllowedPacket
-    {
-      get
-      {
-        if (_mySqlMaxAllowedPacket == 0)
-        {
-          _mySqlMaxAllowedPacket = _wbConnection.GetMySqlServerMaxAllowedPacket();
-        }
-
-        return _mySqlMaxAllowedPacket;
-      }
-    }
-
-    /// <summary>
     /// Gets the text describing the current operation this script belongs to.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string OperationText
     {
       get
@@ -258,21 +269,19 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets the original SQL script without any user modifications.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string OriginalSqlScript { get; private set; }
 
     /// <summary>
     /// Gets the overall result type of the applied script.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public MySqlStatement.StatementResultType ScriptResult { get; private set; }
-
-    /// <summary>
-    /// Gets a value indicating whether original operations from a <see cref="MySqlDataTable"/> are shown above the SQL statements.
-    /// </summary>
-    public bool ShowOriginalOperationsInformation { get; private set; }
 
     /// <summary>
     /// Gets the SQL query edited by the user.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string SqlScript
     {
       get
@@ -289,13 +298,9 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Gets a list of SQL statements tied to a specific data row.
-    /// </summary>
-    public List<IMySqlDataRow> OriginalStatementRowsList { get; private set; }
-
-    /// <summary>
     /// Gets the number of update operations successfully performed against the database server.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int UpdatedOperations
     {
       get
@@ -305,14 +310,20 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether optimistic locking is used for the update of rows.
+    /// Gets the value of the MAX_ALLOWED_PACKET MySQL Server variable indicating the max size in bytes of the packet returned by a single query.
     /// </summary>
-    public bool UseOptimisticUpdate { get; private set; }
+    private ulong MySqlMaxAllowedPacket
+    {
+      get
+      {
+        if (_mySqlMaxAllowedPacket == 0)
+        {
+          _mySqlMaxAllowedPacket = _wbConnection.GetMySqlServerMaxAllowedPacket();
+        }
 
-    /// <summary>
-    /// Gets a value indicating whether the user edited the original query so the <see cref="SqlScript"/> and <see cref="OriginalSqlScript"/> values may differ.
-    /// </summary>
-    public bool UserChangedOriginalQuery { get; private set; }
+        return _mySqlMaxAllowedPacket;
+      }
+    }
 
     #endregion Properties
 
@@ -373,7 +384,7 @@ namespace MySQL.ForExcel.Forms
           }
 
           var rowStatement = mySqlRow.Statement;
-          rowStatement.Execute(command, executionOrder++, UseOptimisticUpdate);
+          rowStatement.Execute(command, executionOrder++, _useOptimisticUpdate);
           ScriptResult = rowStatement.JoinResultTypes(ScriptResult);
           if (ScriptResult.WithoutErrors())
           {
@@ -454,21 +465,21 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      if (UserChangedOriginalQuery &&
+      if (_userChangedOriginalQuery &&
           string.Compare(SqlScript, OriginalSqlScript, StringComparison.InvariantCultureIgnoreCase) != 0)
       {
         // The user modified the original query and it is no longer the same as the original one, so the actual statements list is built from the modified SQL script text.
-        ActualStatementRowsList = new List<IMySqlDataRow>(OriginalStatementRowsList.Count);
+        ActualStatementRowsList = new List<IMySqlDataRow>(_originalStatementRowsList.Count);
         foreach (string sqlQuery in SqlScript.Split(';').Select(sqlStatement => sqlStatement.Trim()).Where(sqlQuery => sqlQuery.Length > 0))
         {
-          var originalRow = OriginalStatementRowsList.FirstOrDefault(iMySqlRow => iMySqlRow.Statement.SqlQuery == sqlQuery && !ActualStatementRowsList.Contains(iMySqlRow));
+          var originalRow = _originalStatementRowsList.FirstOrDefault(iMySqlRow => iMySqlRow.Statement.SqlQuery == sqlQuery && !ActualStatementRowsList.Contains(iMySqlRow));
           ActualStatementRowsList.Add(originalRow ?? new MySqlDummyRow(sqlQuery));
         }
       }
       else
       {
         // The original query did not change so it is safe to assume the actual statements list is the same as the original one.
-        ActualStatementRowsList = OriginalStatementRowsList;
+        ActualStatementRowsList = _originalStatementRowsList;
       }
     }
 
@@ -477,16 +488,16 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void CreateOriginalStatementsList()
     {
-      if (OriginalStatementRowsList == null)
+      if (_originalStatementRowsList == null)
       {
-        OriginalStatementRowsList = new List<IMySqlDataRow>();
+        _originalStatementRowsList = new List<IMySqlDataRow>();
       }
 
       if (_mySqlTable != null)
       {
         _createdTable = false;
         _lockedTable = false;
-        OriginalStatementRowsList.Clear();
+        _originalStatementRowsList.Clear();
         bool createTableOnly = _mySqlTable.OperationType.IsForExport() && _mySqlTable.CreateTableWithoutData;
         if (!createTableOnly && _mySqlTable.ChangedOrDeletedRows == 0)
         {
@@ -516,7 +527,7 @@ namespace MySQL.ForExcel.Forms
                 _lockedTable = true;
               }
 
-              OriginalStatementRowsList.Add(dummyRow);
+              _originalStatementRowsList.Add(dummyRow);
               sqlScript.AppendFormat("{0};{1}", dummyRow.Statement.SqlQuery, Environment.NewLine);
             }
           }
@@ -529,7 +540,7 @@ namespace MySQL.ForExcel.Forms
           DataRowState[] rowStatesWithChanges = { DataRowState.Deleted, DataRowState.Added, DataRowState.Modified };
           foreach (MySqlDataRow mySqlRow in rowStatesWithChanges.SelectMany(rowState => _mySqlTable.Rows.Cast<MySqlDataRow>().Where(dr => !dr.IsHeadersRow && dr.RowState == rowState)))
           {
-            OriginalStatementRowsList.Add(mySqlRow);
+            _originalStatementRowsList.Add(mySqlRow);
             sqlScript.AppendFormat("{0};{1}", mySqlRow.Statement.SqlQuery, Environment.NewLine);
           }
         }
@@ -542,7 +553,7 @@ namespace MySQL.ForExcel.Forms
           {
             foreach (var dummyRow in dummyRows)
             {
-              OriginalStatementRowsList.Add(dummyRow);
+              _originalStatementRowsList.Add(dummyRow);
               sqlScript.AppendFormat("{0};{1}", dummyRow.Statement.SqlQuery, Environment.NewLine);
             }
           }
@@ -550,11 +561,11 @@ namespace MySQL.ForExcel.Forms
 
         OriginalSqlScript = sqlScript.ToString();
       }
-      else if (!string.IsNullOrEmpty(OriginalSqlScript) && OriginalStatementRowsList.Count == 0)
+      else if (!string.IsNullOrEmpty(OriginalSqlScript) && _originalStatementRowsList.Count == 0)
       {
         foreach (string sqlQuery in SqlScript.Split(';').Select(sqlStatement => sqlStatement.Trim()).Where(sqlQuery => sqlQuery.Length > 0))
         {
-          OriginalStatementRowsList.Add(new MySqlDummyRow(sqlQuery));
+          _originalStatementRowsList.Add(new MySqlDummyRow(sqlQuery));
         }
       }
     }
@@ -617,7 +628,7 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      UserChangedOriginalQuery = true;
+      _userChangedOriginalQuery = true;
       ResetQueryChangedTimer();
     }
 
@@ -710,12 +721,12 @@ namespace MySQL.ForExcel.Forms
     private void SetOriginalOperationsInfoAvailability()
     {
       SetOriginalOperationsInfoText();
-      OriginalOperationsLabel.Visible = ShowOriginalOperationsInformation;
+      OriginalOperationsLabel.Visible = _showOriginalOperationsInformation;
       QueryTextBox.Anchor = AnchorStyles.None;
-      QueryTextBox.Location = ShowOriginalOperationsInformation
+      QueryTextBox.Location = _showOriginalOperationsInformation
         ? new Point(QueryTextBox.Location.X, DEFAULT_Y_LOCATION_QUERY_TEXTBOX_WITH_INFO)
         : new Point(QueryTextBox.Location.X, DEFAULT_Y_LOCATION_QUERY_TEXTBOX_NO_INFO);
-      QueryTextBox.Height = ShowOriginalOperationsInformation
+      QueryTextBox.Height = _showOriginalOperationsInformation
         ? DEFAULT_HEIGHT_QUERY_TEXTBOX_WITH_INFO
         : DEFAULT_HEIGHT_QUERY_TEXTBOX_NO_INFO;
       QueryTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Right;
@@ -726,7 +737,7 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void SetOriginalOperationsInfoText()
     {
-      if (!ShowOriginalOperationsInformation)
+      if (!_showOriginalOperationsInformation)
       {
         return;
       }

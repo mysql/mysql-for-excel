@@ -30,7 +30,7 @@ using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
-using Excel = Microsoft.Office.Interop.Excel;
+using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Forms
 {
@@ -61,6 +61,16 @@ namespace MySQL.ForExcel.Forms
     #region Fields
 
     /// <summary>
+    /// The Excel cells range containing the MySQL table's data being edited.
+    /// </summary>
+    private ExcelInterop.Range _editDataRange;
+
+    /// <summary>
+    /// The number of rows in the current editing session.
+    /// </summary>
+    private long _editingRowsQuantity;
+
+    /// <summary>
     /// True since the EditDataDialog is created until the first time its displayed, allows to handle the Show events correctly.
     /// </summary>
     private bool _neverBeenShown;
@@ -71,6 +81,21 @@ namespace MySQL.ForExcel.Forms
     private Point _mouseDownPoint;
 
     /// <summary>
+    /// The <see cref="MySqlDataTable"/> whose data is being edited.
+    /// </summary>
+    private readonly MySqlDataTable _mySqlTable;
+
+    /// <summary>
+    /// The <see cref="ExcelAddInPane"/> from which the <see cref="EditDataDialog"/> is called.
+    /// </summary>
+    private ExcelAddInPane _parentTaskPane;
+
+    /// <summary>
+    /// The parent window assigned to the <see cref="EditDataDialog"/> to be opened as a dialog.
+    /// </summary>
+    private IWin32Window _parentWindow;
+
+    /// <summary>
     /// Flag indicating whether the editing session is in process of undoing changes done
     /// </summary>
     private bool _undoingChanges;
@@ -79,6 +104,16 @@ namespace MySQL.ForExcel.Forms
     /// Flag indicating whether this editing session is changing the value of the global Use Optimistic Update setting.
     /// </summary>
     private bool _updatingUSeOptimisticUpdateSetting;
+
+    /// <summary>
+    /// Flag indicating whether optimistic update is used for the current editing session.
+    /// </summary>
+    private bool _useOptimisticUpdateForThisSession;
+
+    /// <summary>
+    /// The connection to a MySQL server instance selected by users.
+    /// </summary>
+    private MySqlWorkbenchConnection _wbConnection;
 
     #endregion Fields
 
@@ -91,7 +126,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="originalEditDataRange">The Excel cells range containing the MySQL table's data being edited.</param>
     /// <param name="importTable">The table containing the data imported from the MySQL table that will be edited.</param>
     /// <param name="editingWorksheet">The Excel worksheet tied to the current editing session.</param>
-    public EditDataDialog(ExcelAddInPane parentTaskPane, IWin32Window parentWindow, MySqlWorkbenchConnection wbConnection, Excel.Range originalEditDataRange, MySqlDataTable importTable, Excel.Worksheet editingWorksheet)
+    public EditDataDialog(ExcelAddInPane parentTaskPane, IWin32Window parentWindow, MySqlWorkbenchConnection wbConnection, ExcelInterop.Range originalEditDataRange, MySqlDataTable importTable, ExcelInterop.Worksheet editingWorksheet)
     {
       _mouseDownPoint = Point.Empty;
       _neverBeenShown = true;
@@ -102,68 +137,47 @@ namespace MySQL.ForExcel.Forms
 
       var existingProtectionKey = editingWorksheet.GetProtectionKey();
       WorksheetProtectionKey = string.IsNullOrEmpty(existingProtectionKey) ? Guid.NewGuid().ToString() : existingProtectionKey;
-      ParentTaskPane = parentTaskPane;
-      ParentWindow = parentWindow;
-      WbConnection = wbConnection;
-      EditDataRange = originalEditDataRange;
-      EditMySqlDataTable = importTable;
+      _parentTaskPane = parentTaskPane;
+      _parentWindow = parentWindow;
+      _wbConnection = wbConnection;
+      _editDataRange = originalEditDataRange;
+      _mySqlTable = importTable;
       EditingWorksheet = editingWorksheet;
       EditingWorksheet.SelectionChange += EditingWorksheet_SelectionChange;
       ResetToolTip();
-      EditingColsQuantity = editingWorksheet.UsedRange.Columns.Count;
       Opacity = 0.60;
       AddNewRowToEditingRange(false);
-      UseOptimisticUpdateForThisSession = Settings.Default.EditUseOptimisticUpdate;
-      ForThisSessionToolStripMenuItem.Checked = UseOptimisticUpdateForThisSession;
-      ForAllSessionsToolStripMenuItem.Checked = UseOptimisticUpdateForThisSession;
-      UseOptimisticUpdateToolStripMenuItem.Checked = UseOptimisticUpdateForThisSession;
+      _useOptimisticUpdateForThisSession = Settings.Default.EditUseOptimisticUpdate;
+      ForThisSessionToolStripMenuItem.Checked = _useOptimisticUpdateForThisSession;
+      ForAllSessionsToolStripMenuItem.Checked = _useOptimisticUpdateForThisSession;
+      UseOptimisticUpdateToolStripMenuItem.Checked = _useOptimisticUpdateForThisSession;
       Settings.Default.PropertyChanged += SettingsPropertyValueChanged;
-    }
-
-    /// <summary>
-    /// Protects the edit dialog's worksheet.
-    /// </summary>
-    public void ProtectWorksheet()
-    {
-      EditingWorksheet.ProtectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey, EditDataRange);
     }
 
     #region Properties
 
     /// <summary>
-    /// Gets the Excel cells range containing the MySQL table's data being edited.
-    /// </summary>
-    public Excel.Range EditDataRange { get; private set; }
-
-    /// <summary>
-    /// Gets the number of columns in the current editing session.
-    /// </summary>
-    public long EditingColsQuantity { get; private set; }
-
-    /// <summary>
-    /// Gets the number of rows in the current editing session.
-    /// </summary>
-    public long EditingRowsQuantity { get; private set; }
-
-    /// <summary>
     /// Gets the name of the MySQL table whose data is being edited.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string EditingTableName
     {
       get
       {
-        return EditMySqlDataTable != null ? EditMySqlDataTable.TableName : null;
+        return _mySqlTable != null ? _mySqlTable.TableName : null;
       }
     }
 
     /// <summary>
     /// Gets the Excel worksheet tied to the current editing session.
     /// </summary>
-    public Excel.Worksheet EditingWorksheet { get; private set; }
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public ExcelInterop.Worksheet EditingWorksheet { get; private set; }
 
     /// <summary>
     /// Gets a value indicating whether the Excel worksheet tied to the current editing session still exists.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool EditingWorksheetExists
     {
       get
@@ -178,7 +192,7 @@ namespace MySQL.ForExcel.Forms
         {
           // Do NOT remove the following line although the wb variable is not used in the method the casting of the
           // EditingWorksheet.Parent is needed to determine if the parent Workbook is valid and has not been disposed of.
-          Excel.Workbook wb = EditingWorksheet.Parent as Excel.Workbook;
+          ExcelInterop.Workbook wb = EditingWorksheet.Parent as ExcelInterop.Workbook;
           exists = true;
         }
         catch
@@ -191,51 +205,16 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Gets the <see cref="MySqlDataTable"/> whose data is being edited.
-    /// </summary>
-    public MySqlDataTable EditMySqlDataTable { get; private set; }
-
-    /// <summary>
-    /// Gets the <see cref="ExcelAddInPane"/> from which the <see cref="EditDataDialog"/> is called.
-    /// </summary>
-    public ExcelAddInPane ParentTaskPane { get; private set; }
-
-    /// <summary>
-    /// Gets the parent window assigned to the <see cref="EditDataDialog"/> to be opened as a dialog.
-    /// </summary>
-    public IWin32Window ParentWindow { get; private set; }
-
-    /// <summary>
-    /// Gets a value indicating whether uncommited data exists in the editing session.
-    /// </summary>
-    public bool UncommitedDataExists
-    {
-      get
-      {
-        return EditMySqlDataTable.ChangedOrDeletedRows > 0;
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether optimistic update is used for the current editing session.
-    /// </summary>
-    public bool UseOptimisticUpdateForThisSession { get; private set; }
-
-    /// <summary>
-    /// Gets the connection to a MySQL server instance selected by users.
-    /// </summary>
-    public MySqlWorkbenchConnection WbConnection { get; private set; }
-
-    /// <summary>
     /// Gets the name of the Excel workbook that contains the worksheet tied to the current editing session.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string WorkbookName
     {
       get
       {
         try
         {
-          var workbook = EditingWorksheet.Parent as Excel.Workbook;
+          var workbook = EditingWorksheet.Parent as ExcelInterop.Workbook;
           if (workbook != null)
           {
             return workbook.Name;
@@ -253,6 +232,7 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets the name of the Excel worksheet tied to the current editing session.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string WorksheetName
     {
       get
@@ -271,9 +251,29 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets the GUID used as a key to protect the editing Excel worksheet.
     /// </summary>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string WorksheetProtectionKey { get; private set; }
 
+    /// <summary>
+    /// Gets a value indicating whether uncommited data exists in the editing session.
+    /// </summary>
+    private bool UncommitedDataExists
+    {
+      get
+      {
+        return _mySqlTable.ChangedOrDeletedRows > 0;
+      }
+    }
+
     #endregion Properties
+
+    /// <summary>
+    /// Protects the edit dialog's worksheet.
+    /// </summary>
+    public void ProtectWorksheet()
+    {
+      EditingWorksheet.ProtectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey, _editDataRange);
+    }
 
     /// <summary>
     /// Displays the control to the user.
@@ -282,7 +282,7 @@ namespace MySQL.ForExcel.Forms
     {
       if (_neverBeenShown)
       {
-        Show(ParentWindow);
+        Show(_parentWindow);
         _neverBeenShown = false;
       }
       else
@@ -306,11 +306,11 @@ namespace MySQL.ForExcel.Forms
     protected override void OnClosing(CancelEventArgs e)
     {
       base.OnClosing(e);
-      ParentTaskPane.RefreshDbObjectPanelActionLabelsEnabledStatus(EditingTableName, false);
+      _parentTaskPane.RefreshDbObjectPanelActionLabelsEnabledStatus(EditingTableName, false);
       if (EditingWorksheetExists)
       {
         UnprotectWorksheet();
-        EditingWorksheet.UsedRange.Interior.ColorIndex = Excel.XlColorIndex.xlColorIndexNone;
+        EditingWorksheet.UsedRange.Interior.ColorIndex = ExcelInterop.XlColorIndex.xlColorIndexNone;
         if (!string.IsNullOrEmpty(EditingWorksheet.GetProtectionKey()))
         {
           EditingWorksheet.RemoveProtectionKey();
@@ -398,13 +398,13 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     /// <param name="clearColoringOfOldNewRow">Flag indicating whether the previous row that was placeholder for new rows is cleared of its formatting.</param>
     /// <returns>An Excel range containing just the newly added row.</returns>
-    private Excel.Range AddNewRowToEditingRange(bool clearColoringOfOldNewRow)
+    private ExcelInterop.Range AddNewRowToEditingRange(bool clearColoringOfOldNewRow)
     {
-      Excel.Range newRowRange;
+      ExcelInterop.Range newRowRange;
       EditingWorksheet.UnprotectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey);
-      EditDataRange = EditDataRange.AddNewRow(clearColoringOfOldNewRow, out newRowRange);
-      EditingWorksheet.ProtectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey, EditDataRange);
-      EditingRowsQuantity = EditDataRange.Rows.Count;
+      _editDataRange = _editDataRange.AddNewRow(clearColoringOfOldNewRow, out newRowRange);
+      EditingWorksheet.ProtectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey, _editDataRange);
+      _editingRowsQuantity = _editDataRange.Rows.Count;
       return newRowRange;
     }
 
@@ -458,19 +458,19 @@ namespace MySQL.ForExcel.Forms
     /// that later will generate queries to commit the data changes to the MySQL server.
     /// </remarks>
     /// <param name="target"></param>
-    private void EditingWorksheet_Change(Excel.Range target)
+    private void EditingWorksheet_Change(ExcelInterop.Range target)
     {
       if (_undoingChanges)
       {
         return;
       }
 
-      bool rowWasDeleted = EditingWorksheet.UsedRange.Rows.Count < EditingRowsQuantity && target.Columns.Count == EditingWorksheet.Columns.Count;
+      bool rowWasDeleted = EditingWorksheet.UsedRange.Rows.Count < _editingRowsQuantity && target.Columns.Count == EditingWorksheet.Columns.Count;
       bool undoChanges = false;
       string operationSummary = null;
       string operationDetails = null;
 
-      Excel.Range intersectRange = EditDataRange.IntersectWith(target);
+      ExcelInterop.Range intersectRange = _editDataRange.IntersectWith(target);
       if (intersectRange == null || intersectRange.CountLarge == 0)
       {
         undoChanges = true;
@@ -497,11 +497,11 @@ namespace MySQL.ForExcel.Forms
           return;
         }
 
-        EditDataRange = EditingWorksheet.UsedRange;
+        _editDataRange = EditingWorksheet.UsedRange;
         return;
       }
 
-      Excel.Range startCell = intersectRange.Item[1, 1] as Excel.Range;
+      ExcelInterop.Range startCell = intersectRange.Item[1, 1] as ExcelInterop.Range;
       if (startCell != null)
       {
         // Substract from the Excel indexes since they start at 1, ExcelRow is subtracted by 2 if we imported headers.
@@ -512,16 +512,16 @@ namespace MySQL.ForExcel.Forms
         if (rowWasDeleted)
         {
           List<int> skipDeletedRowsList = new List<int>();
-          foreach (Excel.Range deletedRow in target.Rows)
+          foreach (ExcelInterop.Range deletedRow in target.Rows)
           {
             startDataTableRow = deletedRow.Row - 2;
-            startDataTableRow = EditMySqlDataTable.SearchRowIndexNotDeleted(startDataTableRow, skipDeletedRowsList, EditDataRange.Rows.Count);
-            DataRow dr = EditMySqlDataTable.Rows[startDataTableRow];
+            startDataTableRow = _mySqlTable.SearchRowIndexNotDeleted(startDataTableRow, skipDeletedRowsList, _editDataRange.Rows.Count);
+            DataRow dr = _mySqlTable.Rows[startDataTableRow];
             dr.Delete();
             skipDeletedRowsList.Add(startDataTableRow);
           }
 
-          EditingRowsQuantity = EditDataRange.Rows.Count;
+          _editingRowsQuantity = _editDataRange.Rows.Count;
         }
         else
         {
@@ -533,41 +533,41 @@ namespace MySQL.ForExcel.Forms
             {
               for (int colIdx = 1; colIdx <= intersectRange.Columns.Count; colIdx++)
               {
-                Excel.Range cell = intersectRange.Cells[rowIdx, colIdx];
+                ExcelInterop.Range cell = intersectRange.Cells[rowIdx, colIdx];
                 if (cell == null)
                 {
                   continue;
                 }
 
                 // Detect if a data row has been added by the user and if so flag it for addition
-                if (cell.Row == EditDataRange.Rows.Count)
+                if (cell.Row == _editDataRange.Rows.Count)
                 {
                   if (cell.Value == null)
                   {
                     continue;
                   }
 
-                  Excel.Range insertingRowRange = AddNewRowToEditingRange(true);
-                  MySqlDataRow newRow = EditMySqlDataTable.NewRow() as MySqlDataRow;
+                  ExcelInterop.Range insertingRowRange = AddNewRowToEditingRange(true);
+                  MySqlDataRow newRow = _mySqlTable.NewRow() as MySqlDataRow;
                   if (newRow != null)
                   {
                     newRow.ExcelRange = insertingRowRange;
-                    EditMySqlDataTable.Rows.Add(newRow);
+                    _mySqlTable.Rows.Add(newRow);
                   }
                 }
 
                 int absRow = startDataTableRow + rowIdx - 1;
-                absRow = EditMySqlDataTable.SearchRowIndexNotDeleted(absRow, null, EditDataRange.Rows.Count);
+                absRow = _mySqlTable.SearchRowIndexNotDeleted(absRow, null, _editDataRange.Rows.Count);
                 int absCol = startDataTableCol + colIdx - 1;
 
-                currCol = EditMySqlDataTable.GetColumnAtIndex(absCol);
+                currCol = _mySqlTable.GetColumnAtIndex(absCol);
                 object insertingValue = DBNull.Value;
                 if (cell.Value != null)
                 {
                   insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(cell.Value, currCol, false);
                 }
 
-                EditMySqlDataTable.Rows[absRow][absCol] = insertingValue;
+                _mySqlTable.Rows[absRow][absCol] = insertingValue;
               }
             }
           }
@@ -606,9 +606,9 @@ namespace MySQL.ForExcel.Forms
     /// Event delegate method fired when the Excel cells selection changes within the <see cref="EditingWorksheet"/>.
     /// </summary>
     /// <param name="target"></param>
-    private void EditingWorksheet_SelectionChange(Excel.Range target)
+    private void EditingWorksheet_SelectionChange(ExcelInterop.Range target)
     {
-      Excel.Range intersectRange = EditDataRange.IntersectWith(target);
+      ExcelInterop.Range intersectRange = _editDataRange.IntersectWith(target);
       if (intersectRange == null || intersectRange.CountLarge == 0)
       {
         Hide();
@@ -646,9 +646,9 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void ForThisSessionToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      UseOptimisticUpdateForThisSession = !UseOptimisticUpdateForThisSession;
-      ForThisSessionToolStripMenuItem.Checked = UseOptimisticUpdateForThisSession;
-      UseOptimisticUpdateToolStripMenuItem.Checked = UseOptimisticUpdateForThisSession || ForAllSessionsToolStripMenuItem.Checked;
+      _useOptimisticUpdateForThisSession = !_useOptimisticUpdateForThisSession;
+      ForThisSessionToolStripMenuItem.Checked = _useOptimisticUpdateForThisSession;
+      UseOptimisticUpdateToolStripMenuItem.Checked = _useOptimisticUpdateForThisSession || ForAllSessionsToolStripMenuItem.Checked;
     }
 
     /// <summary>
@@ -709,8 +709,8 @@ namespace MySQL.ForExcel.Forms
       int warningsCount = 0;
 
       Cursor = Cursors.WaitCursor;
-      EditMySqlDataTable.UseOptimisticUpdate = UseOptimisticUpdateForThisSession;
-      var modifiedRowsList = EditMySqlDataTable.PushData(Settings.Default.GlobalSqlQueriesPreviewQueries);
+      _mySqlTable.UseOptimisticUpdate = _useOptimisticUpdateForThisSession;
+      var modifiedRowsList = _mySqlTable.PushData(Settings.Default.GlobalSqlQueriesPreviewQueries);
       if (modifiedRowsList == null)
       {
         Cursor = Cursors.Default;
@@ -846,7 +846,7 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void ResetToolTip()
     {
-      DialogToolTip.SetToolTip(this, string.Format(Resources.EditDataFormTooltipText, Environment.NewLine, WbConnection.Schema, EditingTableName, WorkbookName, WorksheetName));
+      DialogToolTip.SetToolTip(this, string.Format(Resources.EditDataFormTooltipText, Environment.NewLine, _wbConnection.Schema, EditingTableName, WorkbookName, WorksheetName));
     }
 
     /// <summary>
@@ -874,21 +874,21 @@ namespace MySQL.ForExcel.Forms
     {
       if (!refreshFromDb)
       {
-        EditMySqlDataTable.RejectChanges();
+        _mySqlTable.RejectChanges();
       }
       else
       {
         Exception exception;
-        EditMySqlDataTable.RefreshData(out exception);
+        _mySqlTable.RefreshData(out exception);
         MiscUtilities.ShowCustomizedErrorDialog(Resources.EditDataRefreshErrorText, exception.Message);
       }
 
       Globals.ThisAddIn.SkipSelectedDataContentsDetection = true;
       EditingWorksheet.UnprotectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey);
-      EditDataRange.Clear();
-      Excel.Range topLeftCell = EditDataRange.Cells[1, 1];
+      _editDataRange.Clear();
+      ExcelInterop.Range topLeftCell = _editDataRange.Cells[1, 1];
       topLeftCell.Select();
-      EditDataRange = EditMySqlDataTable.ImportDataIntoExcelRange(topLeftCell);
+      _editDataRange = _mySqlTable.ImportDataIntoExcelRange(topLeftCell);
       CommitChangesButton.Enabled = false;
       AddNewRowToEditingRange(false);
     }
@@ -910,7 +910,7 @@ namespace MySQL.ForExcel.Forms
       ForAllSessionsToolStripMenuItem.Checked = value;
       if (value)
       {
-        UseOptimisticUpdateForThisSession = true;
+        _useOptimisticUpdateForThisSession = true;
         ForThisSessionToolStripMenuItem.Checked = true;
         UseOptimisticUpdateToolStripMenuItem.Checked = true;
       }

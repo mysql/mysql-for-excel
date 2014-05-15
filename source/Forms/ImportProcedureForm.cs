@@ -25,6 +25,7 @@ using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
+using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Forms
 {
@@ -36,14 +37,49 @@ namespace MySQL.ForExcel.Forms
     #region Fields
 
     /// <summary>
+    /// The <see cref="DataSet"/> containing the tables with all the result sets returned by the MySQL procedure.
+    /// </summary>
+    private DataSet _importDataSet;
+
+    /// <summary>
+    /// The Procedure DB object selected by the users to import data from.
+    /// </summary>
+    private DbObject _dbObject;
+
+    /// <summary>
     /// Array of parameters for the selected MySQL procedure.
     /// </summary>
     private MySqlParameter[] _mysqlParameters;
 
     /// <summary>
+    /// The <see cref="DataSet"/> with a subset of data to import from the procedure's result set to show in the preview grid.
+    /// </summary>
+    private DataSet _previewDataSet;
+
+    /// <summary>
     /// Collection of properties of the MySQL procedure's parameters.
     /// </summary>
     private readonly PropertiesCollection _procedureParamsProperties;
+
+    /// <summary>
+    /// The index of the table representing the result set selected by users.
+    /// </summary>
+    private int _selectedResultSetIndex;
+
+    /// <summary>
+    /// A value indicating whether the sum of rows in all result sets returned by the procedure exceeds the maximum number of rows in an Excel worksheet open in compatibility mode.
+    /// </summary>
+    private bool _sumOfResultSetsExceedsMaxCompatibilityRows;
+
+    /// <summary>
+    /// The connection to a MySQL server instance selected by users.
+    /// </summary>
+    private MySqlWorkbenchConnection _wbConnection;
+
+    /// <summary>
+    /// A value indicating whether the Excel workbook where data will be imported is open in compatibility mode.
+    /// </summary>
+    private readonly bool _workbookInCompatibilityMode;
 
     #endregion Fields
 
@@ -51,35 +87,34 @@ namespace MySQL.ForExcel.Forms
     /// Initializes a new instance of the <see cref="ImportProcedureForm"/> class.
     /// </summary>
     /// <param name="wbConnection">The connection to a MySQL server instance selected by users.</param>
-    /// <param name="importDbObject">The Procedure DB object selected by the users to import data from.</param>
+    /// <param name="dbObject">The Procedure DB object selected by the users to import data from.</param>
     /// <param name="importToWorksheetName">The name of the Excel worksheet where data will be imported.</param>
     /// <param name="workbookInCompatibilityMode">Flag indicating whether the Excel workbook where data will be imported is open in compatibility mode.</param>
-    public ImportProcedureForm(MySqlWorkbenchConnection wbConnection, DbObject importDbObject, string importToWorksheetName, bool workbookInCompatibilityMode)
+    public ImportProcedureForm(MySqlWorkbenchConnection wbConnection, DbObject dbObject, string importToWorksheetName, bool workbookInCompatibilityMode)
     {
-      ImportDbObject = importDbObject;
-      PreviewDataSet = null;
-      SumOfResultSetsExceedsMaxCompatibilityRows = false;
-      WbConnection = wbConnection;
-      WorkbookInCompatibilityMode = workbookInCompatibilityMode;
+      _dbObject = dbObject;
+      _previewDataSet = null;
+      _procedureParamsProperties = new PropertiesCollection();
+      _selectedResultSetIndex = -1;
+      _sumOfResultSetsExceedsMaxCompatibilityRows = false;
+      _wbConnection = wbConnection;
+      _workbookInCompatibilityMode = workbookInCompatibilityMode;
 
       InitializeComponent();
 
-      SelectedResultSetIndex = -1;
       Text = @"Import Data - " + importToWorksheetName;
-      _procedureParamsProperties = new PropertiesCollection();
-      ProcedureNameLabel.Text = importDbObject.Name;
+      ProcedureNameLabel.Text = dbObject.Name;
       OptionsWarningLabel.Text = Resources.WorkbookInCompatibilityModeWarning;
       ParametersPropertyGrid.SelectedObject = _procedureParamsProperties;
 
       InitializeMultipleResultSetsCombo();
       PrepareParameters();
-      IncludeHeadersCheckBox.Checked = true;
     }
 
     /// <summary>
     /// Specifies identifiers to indicate the type of import for multiple result sets returned by a MySQL procedure.
     /// </summary>
-    public enum ImportMultipleType
+    private enum ImportMultipleType
     {
       /// <summary>
       /// Only the result seet selected by users is imported.
@@ -100,68 +135,20 @@ namespace MySQL.ForExcel.Forms
     #region Properties
 
     /// <summary>
-    /// Gets the <see cref="DataSet"/> containing the tables with all the result sets returned by the MySQL procedure.
+    /// Gets or sets a value indicating whether <see cref="ExcelInterop.PivotTable"/> objects are created for each imported result set.
     /// </summary>
-    public DataSet ImportDataSet { get; private set; }
-
-    /// <summary>
-    /// Get a value indicating whether column names are imported as the first data row in the Excel worksheet.
-    /// </summary>
-    public bool ImportHeaders
+    public bool CreatePivotTables
     {
       get
       {
-        return IncludeHeadersCheckBox.Checked;
+        return CreatePivotTableCheckBox.Checked;
       }
-    }
 
-    /// <summary>
-    /// Gets the Procedure DB object selected by the users to import data from.
-    /// </summary>
-    public DbObject ImportDbObject { get; private set; }
-
-    /// <summary>
-    /// Gets the import type selected by users.
-    /// </summary>
-    public ImportMultipleType ImportType
-    {
-      get
+      set
       {
-        ImportMultipleType retType = ImportMultipleType.SelectedResultSet;
-        int multTypeValue = ImportResultsetsComboBox != null && ImportResultsetsComboBox.Items.Count > 0 ? (int)ImportResultsetsComboBox.SelectedValue : 0;
-        switch (multTypeValue)
-        {
-          case 0:
-            retType = ImportMultipleType.SelectedResultSet;
-            break;
-
-          case 1:
-            retType = ImportMultipleType.AllResultSetsHorizontally;
-            break;
-
-          case 2:
-            retType = ImportMultipleType.AllResultSetsVertically;
-            break;
-        }
-        return retType;
+        CreatePivotTableCheckBox.Checked = value;
       }
     }
-
-    /// <summary>
-    /// Gets the <see cref="DataSet"/> with a subset of data to import from the procedure's result set to show in the preview grid.
-    /// </summary>
-    public DataSet PreviewDataSet { get; private set; }
-
-    /// <summary>
-    /// Gets the index of the table representing the result set selected by users.
-    /// </summary>
-    public int SelectedResultSetIndex { get; private set; }
-
-    /// <summary>
-    /// Gets a value indicating whether the sum of rows in all result sets returned by the procedure exceeds
-    /// the maximum number of rows in an Excel worksheet open in compatibility mode.
-    /// </summary>
-    public bool SumOfResultSetsExceedsMaxCompatibilityRows { get; private set; }
 
     /// <summary>
     /// Gets or sets the text associated with this control.
@@ -180,14 +167,48 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Gets the connection to a MySQL server instance selected by users.
+    /// Gets or sets a value indicating whether column names are imported as the first data row in the Excel worksheet.
     /// </summary>
-    public MySqlWorkbenchConnection WbConnection { get; private set; }
+    private bool ImportColumnNames
+    {
+      get
+      {
+        return IncludeHeadersCheckBox.Checked;
+      }
+
+      set
+      {
+        IncludeHeadersCheckBox.Checked = value;
+      }
+    }
 
     /// <summary>
-    /// Gets a value indicating whether the Excel workbook where data will be imported is open in compatibility mode.
+    /// Gets the import type selected by users.
     /// </summary>
-    public bool WorkbookInCompatibilityMode { get; private set; }
+    private ImportMultipleType ImportType
+    {
+      get
+      {
+        var retType = ImportMultipleType.SelectedResultSet;
+        int multTypeValue = ImportResultsetsComboBox != null && ImportResultsetsComboBox.Items.Count > 0 ? (int)ImportResultsetsComboBox.SelectedValue : 0;
+        switch (multTypeValue)
+        {
+          case 0:
+            retType = ImportMultipleType.SelectedResultSet;
+            break;
+
+          case 1:
+            retType = ImportMultipleType.AllResultSetsHorizontally;
+            break;
+
+          case 2:
+            retType = ImportMultipleType.AllResultSetsVertically;
+            break;
+        }
+
+        return retType;
+      }
+    }
 
     #endregion Properties
 
@@ -198,7 +219,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void AdvancedOptionsButton_Click(object sender, EventArgs e)
     {
-      using (ImportAdvancedOptionsDialog optionsDialog = new ImportAdvancedOptionsDialog())
+      using (var optionsDialog = new ImportAdvancedOptionsDialog())
       {
         optionsDialog.ShowDialog();
       }
@@ -215,17 +236,19 @@ namespace MySQL.ForExcel.Forms
       try
       {
         // Prepare parameters and execute the procedure and create OutAndReturnValues table
-        MySqlDataTable outParamsTable = new MySqlDataTable(WbConnection.Schema, "OutAndReturnValues");
+        var outParamsTable = new MySqlDataTable(_wbConnection.Schema, "OutAndReturnValues");
         for (int paramIdx = 0; paramIdx < _procedureParamsProperties.Count; paramIdx++)
         {
           _mysqlParameters[paramIdx].Value = _procedureParamsProperties[paramIdx].Value;
-          if (_mysqlParameters[paramIdx].Direction == ParameterDirection.Output || _mysqlParameters[paramIdx].Direction == ParameterDirection.ReturnValue)
+          if (_mysqlParameters[paramIdx].Direction == ParameterDirection.Output ||
+              _mysqlParameters[paramIdx].Direction == ParameterDirection.ReturnValue)
           {
-            outParamsTable.Columns.Add(_procedureParamsProperties[paramIdx].Name, _procedureParamsProperties[paramIdx].Value.GetType());
+            outParamsTable.Columns.Add(_procedureParamsProperties[paramIdx].Name,
+              _procedureParamsProperties[paramIdx].Value.GetType());
           }
         }
 
-        var resultSetDs = WbConnection.GetDataSetFromProcedure(ImportDbObject, _mysqlParameters);
+        var resultSetDs = _wbConnection.GetDataSetFromProcedure(_dbObject, _mysqlParameters);
         if (resultSetDs == null || resultSetDs.Tables.Count == 0)
         {
           ImportButton.Enabled = false;
@@ -234,13 +257,13 @@ namespace MySQL.ForExcel.Forms
 
         // Clear or create result set dataset.
         ImportButton.Enabled = true;
-        if (ImportDataSet == null)
+        if (_importDataSet == null)
         {
-          ImportDataSet = new DataSet(ImportDbObject.Name + "ResultSet");
+          _importDataSet = new DataSet(_dbObject.Name + "ResultSet");
         }
         else
         {
-          ImportDataSet.Tables.Clear();
+          _importDataSet.Tables.Clear();
         }
 
         // Create MySqlDataTable tables for each table in the result sets
@@ -248,8 +271,8 @@ namespace MySQL.ForExcel.Forms
         foreach (DataTable table in resultSetDs.Tables)
         {
           table.TableName = string.Format("Result{0}", resultIndex++);
-          var mySqlDataTable = new MySqlDataTable(table, WbConnection.Schema);
-          ImportDataSet.Tables.Add(mySqlDataTable);
+          var mySqlDataTable = new MySqlDataTable(table, _wbConnection.Schema);
+          _importDataSet.Tables.Add(mySqlDataTable);
         }
 
         // Refresh output/return parameter values in PropertyGrid and add them to OutAndReturnValues table
@@ -258,7 +281,8 @@ namespace MySQL.ForExcel.Forms
           DataRow valuesRow = outParamsTable.NewRow();
           for (int paramIdx = 0; paramIdx < _procedureParamsProperties.Count; paramIdx++)
           {
-            if (_mysqlParameters[paramIdx].Direction != ParameterDirection.Output && _mysqlParameters[paramIdx].Direction != ParameterDirection.ReturnValue)
+            if (_mysqlParameters[paramIdx].Direction != ParameterDirection.Output &&
+                _mysqlParameters[paramIdx].Direction != ParameterDirection.ReturnValue)
             {
               continue;
             }
@@ -268,67 +292,157 @@ namespace MySQL.ForExcel.Forms
           }
 
           outParamsTable.Rows.Add(valuesRow);
-          ImportDataSet.Tables.Add(outParamsTable);
+          _importDataSet.Tables.Add(outParamsTable);
           ParametersPropertyGrid.Refresh();
         }
 
         // Prepare Preview DataSet to show it on Grids
-        PreviewDataSet = ImportDataSet.Clone();
+        _previewDataSet = _importDataSet.Clone();
         int resultSetsRowSum = 0;
-        for (int tableIdx = 0; tableIdx < ImportDataSet.Tables.Count; tableIdx++)
+        for (int tableIdx = 0; tableIdx < _importDataSet.Tables.Count; tableIdx++)
         {
-          resultSetsRowSum += ImportDataSet.Tables[tableIdx].Rows.Count;
-          if (WorkbookInCompatibilityMode)
+          resultSetsRowSum += _importDataSet.Tables[tableIdx].Rows.Count;
+          if (_workbookInCompatibilityMode)
           {
-            SumOfResultSetsExceedsMaxCompatibilityRows = SumOfResultSetsExceedsMaxCompatibilityRows || resultSetsRowSum > UInt16.MaxValue;
+            _sumOfResultSetsExceedsMaxCompatibilityRows = _sumOfResultSetsExceedsMaxCompatibilityRows ||
+                                                          resultSetsRowSum > UInt16.MaxValue;
           }
 
-          int limitRows = Math.Min(ImportDataSet.Tables[tableIdx].Rows.Count, Settings.Default.ImportPreviewRowsQuantity);
+          int limitRows = Math.Min(_importDataSet.Tables[tableIdx].Rows.Count,
+            Settings.Default.ImportPreviewRowsQuantity);
           for (int rowIdx = 0; rowIdx < limitRows; rowIdx++)
           {
-            PreviewDataSet.Tables[tableIdx].ImportRow(ImportDataSet.Tables[tableIdx].Rows[rowIdx]);
+            _previewDataSet.Tables[tableIdx].ImportRow(_importDataSet.Tables[tableIdx].Rows[rowIdx]);
           }
         }
 
         // Refresh ResultSets in Tab Control
         ResultSetsDataGridView.DataSource = null;
         ResultSetsTabControl.TabPages.Clear();
-        for (int dtIdx = 0; dtIdx < ImportDataSet.Tables.Count; dtIdx++)
+        for (int dtIdx = 0; dtIdx < _importDataSet.Tables.Count; dtIdx++)
         {
-          ResultSetsTabControl.TabPages.Add(ImportDataSet.Tables[dtIdx].TableName);
+          ResultSetsTabControl.TabPages.Add(_importDataSet.Tables[dtIdx].TableName);
         }
 
         if (ResultSetsTabControl.TabPages.Count > 0)
         {
-          SelectedResultSetIndex = ResultSetsTabControl.SelectedIndex = 0;
+          _selectedResultSetIndex = ResultSetsTabControl.SelectedIndex = 0;
           ResultSetsTabControl_SelectedIndexChanged(ResultSetsTabControl, EventArgs.Empty);
         }
-
-        Cursor = Cursors.Default;
       }
       catch (Exception ex)
       {
-        Cursor = Cursors.Default;
         MiscUtilities.ShowCustomizedErrorDialog(Resources.ImportProcedureErrorTitle, ex.Message, true);
         MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
+      finally
+      {
+        Cursor = Cursors.Default;
       }
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="ImportButton"/> button is clicked.
+    /// Imports the selected MySQL procedure's result sets into the active <see cref="ExcelInterop.Worksheet"/>.
+    /// </summary>
+    private bool ImportData()
+    {
+      if (_importDataSet == null)
+      {
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, _dbObject.Type.ToString().ToLowerInvariant(), _dbObject.Name));
+        return false;
+      }
+
+      if (_sumOfResultSetsExceedsMaxCompatibilityRows && ImportType == ImportMultipleType.AllResultSetsVertically && _importDataSet.Tables.Count > 1)
+      {
+        InfoDialog.ShowWarningDialog(Resources.ImportVerticallyExceedsMaxRowsTitleWarning, Resources.ImportVerticallyExceedsMaxRowsDetailWarning);
+      }
+
+      bool success = true;
+      try
+      {
+        Cursor = Cursors.WaitCursor;
+        var atCell = Globals.ThisAddIn.Application.ActiveCell;
+        var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+        int tableIdx = 0;
+        var pivotPosition = ImportType == ImportMultipleType.AllResultSetsHorizontally
+          ? MySqlDataTable.PivotTablePosition.Below
+          : MySqlDataTable.PivotTablePosition.Right;
+        foreach (MySqlDataTable mySqlTable in _importDataSet.Tables)
+        {
+          mySqlTable.TableName = _dbObject.Name + "." + mySqlTable.TableName;
+          if (ImportType == ImportMultipleType.SelectedResultSet && _selectedResultSetIndex < tableIdx)
+          {
+            continue;
+          }
+
+          tableIdx++;
+          var excelObj = mySqlTable.ImportDataAtActiveExcelCell(ImportColumnNames, Settings.Default.ImportCreateExcelTable, CreatePivotTables, pivotPosition);
+          if (excelObj == null)
+          {
+            continue;
+          }
+
+          var fillingRange = excelObj is ExcelInterop.ListObject 
+            ? (excelObj as ExcelInterop.ListObject).Range
+            : excelObj as ExcelInterop.Range;
+          ExcelInterop.Range endCell;
+          if (fillingRange != null)
+          {
+            endCell = fillingRange.Cells[fillingRange.Rows.Count, fillingRange.Columns.Count] as ExcelInterop.Range;
+          }
+          else
+          {
+            continue;
+          }
+
+          if (endCell == null || tableIdx >= _importDataSet.Tables.Count)
+          {
+            continue;
+          }
+
+          switch (ImportType)
+          {
+            case ImportMultipleType.AllResultSetsHorizontally:
+              atCell = endCell.Offset[atCell.Row - endCell.Row, 2];
+              break;
+
+            case ImportMultipleType.AllResultSetsVertically:
+              if (activeWorkbook.Excel8CompatibilityMode && endCell.Row + 2 > UInt16.MaxValue)
+              {
+                return true;
+              }
+
+              atCell = endCell.Offset[2, atCell.Column - endCell.Column];
+              break;
+          }
+
+          Globals.ThisAddIn.Application.Goto(atCell, false);
+        }
+      }
+      catch (Exception ex)
+      {
+        success = false;
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, _dbObject.Type.ToString().ToLowerInvariant(), _dbObject.Name), ex.Message);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
+      finally
+      {
+        Cursor = Cursors.Default;
+      }
+
+      return success;
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="ImportProcedureForm"/> is being closed.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void ImportButton_Click(object sender, EventArgs e)
+    private void ImportProcedureForm_FormClosing(object sender, FormClosingEventArgs e)
     {
-      foreach (MySqlDataTable table in ImportDataSet.Tables)
+      if (DialogResult == DialogResult.OK)
       {
-        table.TableName = ImportDbObject.Name + "." + table.TableName;
-      }
-
-      if (SumOfResultSetsExceedsMaxCompatibilityRows && ImportType == ImportMultipleType.AllResultSetsVertically && ImportDataSet.Tables.Count > 1)
-      {
-        InfoDialog.ShowWarningDialog(Resources.ImportVerticallyExceedsMaxRowsTitleWarning, Resources.ImportVerticallyExceedsMaxRowsDetailWarning);
+        e.Cancel = !ImportData();
       }
     }
 
@@ -337,7 +451,7 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void InitializeMultipleResultSetsCombo()
     {
-      DataTable dt = new DataTable();
+      var dt = new DataTable();
       dt.Columns.Add("Value", Type.GetType("System.Int32"));
       dt.Columns.Add("Description");
       dt.Rows.Add(new object[] { ImportMultipleType.SelectedResultSet, Resources.ImportProcedureSelectedResultSet });
@@ -353,7 +467,7 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void PrepareParameters()
     {
-      DataTable parametersTable = WbConnection.GetSchemaCollection("Procedure Parameters", null, WbConnection.Schema, ImportDbObject.Name);
+      DataTable parametersTable = _wbConnection.GetSchemaCollection("Procedure Parameters", null, _wbConnection.Schema, _dbObject.Name);
       _mysqlParameters = new MySqlParameter[parametersTable.Rows.Count];
       int paramIdx = 0;
       MySqlDbType dbType = MySqlDbType.Guid;
@@ -511,17 +625,17 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      SelectedResultSetIndex = ResultSetsTabControl.SelectedIndex;
-      ResultSetsTabControl.TabPages[SelectedResultSetIndex].Controls.Add(ResultSetsDataGridView);
+      _selectedResultSetIndex = ResultSetsTabControl.SelectedIndex;
+      ResultSetsTabControl.TabPages[_selectedResultSetIndex].Controls.Add(ResultSetsDataGridView);
       ResultSetsDataGridView.Dock = DockStyle.Fill;
       ResultSetsDataGridView.SelectionMode = DataGridViewSelectionMode.CellSelect;
       if (ResultSetsDataGridView.DataSource == null)
       {
-        ResultSetsDataGridView.DataSource = PreviewDataSet;
+        ResultSetsDataGridView.DataSource = _previewDataSet;
       }
 
-      ResultSetsDataGridView.DataMember = PreviewDataSet.Tables[SelectedResultSetIndex].TableName;
-      bool cappingAtMaxCompatRows = WorkbookInCompatibilityMode && ImportDataSet.Tables[SelectedResultSetIndex].Rows.Count > UInt16.MaxValue;
+      ResultSetsDataGridView.DataMember = _previewDataSet.Tables[_selectedResultSetIndex].TableName;
+      bool cappingAtMaxCompatRows = _workbookInCompatibilityMode && _importDataSet.Tables[_selectedResultSetIndex].Rows.Count > UInt16.MaxValue;
       SetCompatibilityWarning(cappingAtMaxCompatRows);
       foreach (DataGridViewColumn gridCol in ResultSetsDataGridView.Columns)
       {

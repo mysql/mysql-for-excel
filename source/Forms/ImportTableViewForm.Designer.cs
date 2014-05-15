@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -32,10 +32,21 @@ namespace MySQL.ForExcel.Forms
     /// <param name="disposing"><c>true</c> if managed resources should be disposed; otherwise, <c>false</c>.</param>
     protected override void Dispose(bool disposing)
     {
-      if (disposing && (components != null))
+      if (disposing)
       {
-        components.Dispose();
+        if (components != null)
+        {
+          components.Dispose();
+        }
+
+        // Set variables to null so this object does not hold references to them and the GC disposes of them sooner.
+        // The MySqlDataTable object is not disposed but only set to null since it may be in use by a ListObject to refresh its data.
+        _dbObject = null;
+        _wbConnection = null;
+        ImportedExcelRange = null;
+        MySqlTable = null;
       }
+
       base.Dispose(disposing);
     }
 
@@ -62,7 +73,7 @@ namespace MySQL.ForExcel.Forms
       this.IncludeHeadersCheckBox = new System.Windows.Forms.CheckBox();
       this.OptionsWarningLabel = new System.Windows.Forms.Label();
       this.OptionsWarningPictureBox = new System.Windows.Forms.PictureBox();
-      this.PreviewDataGridView = new PreviewDataGridView();
+      this.PreviewDataGridView = new MySQL.ForExcel.Controls.PreviewDataGridView();
       this.ContextMenuForGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.SelectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.SelectNoneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -76,6 +87,7 @@ namespace MySQL.ForExcel.Forms
       this.DialogCancelButton = new System.Windows.Forms.Button();
       this.ExportDataLabel = new System.Windows.Forms.Label();
       this.AdvancedOptionsButton = new System.Windows.Forms.Button();
+      this.CreatePivotTableCheckBox = new System.Windows.Forms.CheckBox();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       this.OptionsGroupBox.SuspendLayout();
@@ -89,8 +101,8 @@ namespace MySQL.ForExcel.Forms
       // 
       // FootnoteAreaPanel
       // 
-      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 517);
-      this.FootnoteAreaPanel.Size = new System.Drawing.Size(849, 0);
+      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 292);
+      this.FootnoteAreaPanel.Size = new System.Drawing.Size(634, 0);
       // 
       // ContentAreaPanel
       // 
@@ -107,14 +119,14 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.RowsCountMainLabel);
       this.ContentAreaPanel.Controls.Add(this.TableNameSubLabel);
       this.ContentAreaPanel.Controls.Add(this.TableNameMainLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(849, 596);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(849, 611);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.AdvancedOptionsButton);
       this.CommandAreaPanel.Controls.Add(this.ImportButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 551);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 566);
       this.CommandAreaPanel.Size = new System.Drawing.Size(849, 45);
       // 
       // FromImageList
@@ -153,15 +165,16 @@ namespace MySQL.ForExcel.Forms
       // 
       this.OptionsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.OptionsGroupBox.BackColor = System.Drawing.Color.Transparent;
+      this.OptionsGroupBox.Controls.Add(this.CreatePivotTableCheckBox);
       this.OptionsGroupBox.Controls.Add(this.FromRowNumericUpDown);
       this.OptionsGroupBox.Controls.Add(this.RowsToReturnLabel);
       this.OptionsGroupBox.Controls.Add(this.RowsToReturnNumericUpDown);
       this.OptionsGroupBox.Controls.Add(this.LimitRowsCheckBox);
       this.OptionsGroupBox.Controls.Add(this.IncludeHeadersCheckBox);
       this.OptionsGroupBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.OptionsGroupBox.Location = new System.Drawing.Point(80, 442);
+      this.OptionsGroupBox.Location = new System.Drawing.Point(80, 439);
       this.OptionsGroupBox.Name = "OptionsGroupBox";
-      this.OptionsGroupBox.Size = new System.Drawing.Size(695, 60);
+      this.OptionsGroupBox.Size = new System.Drawing.Size(695, 80);
       this.OptionsGroupBox.TabIndex = 8;
       this.OptionsGroupBox.TabStop = false;
       this.OptionsGroupBox.Text = "Options";
@@ -235,13 +248,12 @@ namespace MySQL.ForExcel.Forms
       // 
       // OptionsWarningLabel
       // 
-      this.OptionsWarningLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+      this.OptionsWarningLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.OptionsWarningLabel.AutoSize = true;
       this.OptionsWarningLabel.BackColor = System.Drawing.SystemColors.Window;
       this.OptionsWarningLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.OptionsWarningLabel.ForeColor = System.Drawing.Color.Red;
-      this.OptionsWarningLabel.Location = new System.Drawing.Point(160, 445);
+      this.OptionsWarningLabel.Location = new System.Drawing.Point(160, 442);
       this.OptionsWarningLabel.Name = "OptionsWarningLabel";
       this.OptionsWarningLabel.Size = new System.Drawing.Size(76, 12);
       this.OptionsWarningLabel.TabIndex = 0;
@@ -250,9 +262,10 @@ namespace MySQL.ForExcel.Forms
       // 
       // OptionsWarningPictureBox
       // 
+      this.OptionsWarningPictureBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.OptionsWarningPictureBox.BackColor = System.Drawing.SystemColors.Window;
       this.OptionsWarningPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.OptionsWarningPictureBox.Location = new System.Drawing.Point(138, 440);
+      this.OptionsWarningPictureBox.Location = new System.Drawing.Point(138, 437);
       this.OptionsWarningPictureBox.Name = "OptionsWarningPictureBox";
       this.OptionsWarningPictureBox.Size = new System.Drawing.Size(20, 20);
       this.OptionsWarningPictureBox.TabIndex = 24;
@@ -295,14 +308,14 @@ namespace MySQL.ForExcel.Forms
             this.SelectAllToolStripMenuItem,
             this.SelectNoneToolStripMenuItem});
       this.ContextMenuForGrid.Name = "contextMenuForGrid";
-      this.ContextMenuForGrid.Size = new System.Drawing.Size(153, 70);
+      this.ContextMenuForGrid.Size = new System.Drawing.Size(138, 48);
       this.ContextMenuForGrid.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenuForGrid_Opening);
       // 
       // SelectAllToolStripMenuItem
       // 
       this.SelectAllToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
       this.SelectAllToolStripMenuItem.Name = "SelectAllToolStripMenuItem";
-      this.SelectAllToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.SelectAllToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
       this.SelectAllToolStripMenuItem.Text = "Select All";
       this.SelectAllToolStripMenuItem.Click += new System.EventHandler(this.SelectAllToolStripMenuItem_Click);
       // 
@@ -310,7 +323,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.SelectNoneToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
       this.SelectNoneToolStripMenuItem.Name = "SelectNoneToolStripMenuItem";
-      this.SelectNoneToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.SelectNoneToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
       this.SelectNoneToolStripMenuItem.Text = "Select None";
       this.SelectNoneToolStripMenuItem.Click += new System.EventHandler(this.SelectNoneToolStripMenuItem_Click);
       // 
@@ -396,7 +409,6 @@ namespace MySQL.ForExcel.Forms
       this.ImportButton.TabIndex = 1;
       this.ImportButton.Text = "Import";
       this.ImportButton.UseVisualStyleBackColor = true;
-      this.ImportButton.Click += new System.EventHandler(this.ImportButton_Click);
       // 
       // DialogCancelButton
       // 
@@ -432,15 +444,27 @@ namespace MySQL.ForExcel.Forms
       this.AdvancedOptionsButton.UseVisualStyleBackColor = true;
       this.AdvancedOptionsButton.Click += new System.EventHandler(this.AdvancedOptionsButton_Click);
       // 
+      // CreatePivotTableCheckBox
+      // 
+      this.CreatePivotTableCheckBox.AutoSize = true;
+      this.CreatePivotTableCheckBox.Location = new System.Drawing.Point(18, 50);
+      this.CreatePivotTableCheckBox.Name = "CreatePivotTableCheckBox";
+      this.CreatePivotTableCheckBox.Size = new System.Drawing.Size(255, 19);
+      this.CreatePivotTableCheckBox.TabIndex = 7;
+      this.CreatePivotTableCheckBox.Text = "Create a PivotTable with the imported data.";
+      this.CreatePivotTableCheckBox.UseVisualStyleBackColor = true;
+      // 
       // ImportTableViewForm
       // 
+      this.AcceptButton = this.ImportButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-      this.ClientSize = new System.Drawing.Size(849, 596);
+      this.CancelButton = this.DialogCancelButton;
+      this.ClientSize = new System.Drawing.Size(849, 611);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
       this.MainInstructionLocation = new System.Drawing.Point(10, 14);
-      this.MinimumSize = new System.Drawing.Size(865, 635);
+      this.MinimumSize = new System.Drawing.Size(865, 650);
       this.Name = "ImportTableViewForm";
       this.Text = "Import Data";
       this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ImportTableViewForm_FormClosing);
@@ -489,6 +513,7 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.ToolStripMenuItem SelectAllToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem SelectNoneToolStripMenuItem;
     private System.Windows.Forms.Button AdvancedOptionsButton;
+    private System.Windows.Forms.CheckBox CreatePivotTableCheckBox;
 
   }
 }

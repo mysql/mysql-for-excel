@@ -69,7 +69,6 @@ namespace MySQL.ForExcel.Panels
       this.ExportToNewTableHotLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.MainLogoPictureBox = new System.Windows.Forms.PictureBox();
       this.ImportMultiHotLabel = new MySQL.ForExcel.Controls.HotLabel();
-      this.ImportJoinedDataHotLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.DBObjectsContextMenuStrip.SuspendLayout();
       this.UpperPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.MainLogoPictureBox)).BeginInit();
@@ -449,41 +448,6 @@ namespace MySQL.ForExcel.Panels
       this.ImportMultiHotLabel.Visible = false;
       this.ImportMultiHotLabel.Click += new System.EventHandler(this.ImportMultiHotLabel_Click);
       // 
-      // ImportJoinedDataHotLabel
-      // 
-      this.ImportJoinedDataHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.ImportJoinedDataHotLabel.Behavior = MySQL.ForExcel.Controls.HotLabel.BehaviorType.Button;
-      this.ImportJoinedDataHotLabel.CheckedImage = null;
-      this.ImportJoinedDataHotLabel.Description = "Add joined data at the current cell";
-      this.ImportJoinedDataHotLabel.DescriptionColor = System.Drawing.SystemColors.WindowText;
-      this.ImportJoinedDataHotLabel.DescriptionColorOpacity = 0.6D;
-      this.ImportJoinedDataHotLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.ImportJoinedDataHotLabel.DescriptionShadowOpacity = 0.4D;
-      this.ImportJoinedDataHotLabel.DescriptionShadowPixelsXOffset = 0;
-      this.ImportJoinedDataHotLabel.DescriptionShadowPixelsYOffset = 1;
-      this.ImportJoinedDataHotLabel.DisabledImage = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ObjectPanel_ImportData_Disabled_24x24;
-      this.ImportJoinedDataHotLabel.DrawShadow = true;
-      this.ImportJoinedDataHotLabel.Enabled = false;
-      this.ImportJoinedDataHotLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.ImportJoinedDataHotLabel.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ObjectPanel_ImportData_24x24;
-      this.ImportJoinedDataHotLabel.ImagePixelsXOffset = 0;
-      this.ImportJoinedDataHotLabel.ImagePixelsYOffset = 2;
-      this.ImportJoinedDataHotLabel.Location = new System.Drawing.Point(9, 520);
-      this.ImportJoinedDataHotLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-      this.ImportJoinedDataHotLabel.Name = "ImportJoinedDataHotLabel";
-      this.ImportJoinedDataHotLabel.Size = new System.Drawing.Size(237, 28);
-      this.ImportJoinedDataHotLabel.TabIndex = 30;
-      this.ImportJoinedDataHotLabel.Title = "Import Joined MySQL Data";
-      this.ImportJoinedDataHotLabel.TitleColor = System.Drawing.SystemColors.WindowText;
-      this.ImportJoinedDataHotLabel.TitleColorOpacity = 0.95D;
-      this.ImportJoinedDataHotLabel.TitleDescriptionPixelsSpacing = 0;
-      this.ImportJoinedDataHotLabel.TitlePixelsXOffset = 3;
-      this.ImportJoinedDataHotLabel.TitlePixelsYOffset = 0;
-      this.ImportJoinedDataHotLabel.TitleShadowOpacity = 0.2D;
-      this.ImportJoinedDataHotLabel.TitleShadowPixelsXOffset = 0;
-      this.ImportJoinedDataHotLabel.TitleShadowPixelsYOffset = 1;
-      this.ImportJoinedDataHotLabel.Visible = false;
-      // 
       // DbObjectSelectionPanel
       // 
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -496,7 +460,6 @@ namespace MySQL.ForExcel.Panels
       this.Controls.Add(this.CloseButton);
       this.Controls.Add(this.BackButton);
       this.Controls.Add(this.ImportMultiHotLabel);
-      this.Controls.Add(this.ImportJoinedDataHotLabel);
       this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.Name = "DbObjectSelectionPanel";
       this.Size = new System.Drawing.Size(260, 625);
@@ -529,6 +492,5 @@ namespace MySQL.ForExcel.Panels
     private System.Windows.Forms.PictureBox MainLogoPictureBox;
     private System.Windows.Forms.Label SchemaLabel;
     private HotLabel ImportMultiHotLabel;
-    private HotLabel ImportJoinedDataHotLabel;
   }
 }
