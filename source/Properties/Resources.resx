@@ -937,7 +937,28 @@ importing the MySQL {0} data in Excel.</value>
   <data name="ImportMultipleRelationshipsNotSupportedNoExcelTablesWarningText" xml:space="preserve">
     <value>Option to create Excel tables is turned off so relationships can't be created.</value>
   </data>
+  <data name="ScriptCreatingSchemaText" xml:space="preserve">
+    <value>Creating Schema '{0}'</value>
+  </data>
   <data name="SelectQueryReturnedNothing" xml:space="preserve">
     <value>Select query returned nothing. {0}</value>
+  </data>
+  <data name="NewSchemaCreatedSuccessfullyText" xml:space="preserve">
+    <value>Created the MySQL Schema "{0}" successfully.</value>
+  </data>
+  <data name="NewSchemaCreatedWithWarningsText" xml:space="preserve">
+    <value>Created the MySQL Schema "{0}" with {1} warning(s):</value>
+  </data>
+  <data name="NewSchemaCreationErrorText" xml:space="preserve">
+    <value>The MySQL Schema "{0}" could not be created because of the following error(s):</value>
+  </data>
+  <data name="NewSchemaExecutedQuery" xml:space="preserve">
+    <value>Executed the following statement to create MySQL Schema "{0}":</value>
+  </data>
+  <data name="NewSchemaOperationErrorSummaryText" xml:space="preserve">
+    <value>The MySQL Schema "{0}" could not be created.</value>
+  </data>
+  <data name="NewSchemaOperationSuccessSummaryText" xml:space="preserve">
+    <value />
   </data>
 </root>

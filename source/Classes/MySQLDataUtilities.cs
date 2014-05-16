@@ -38,6 +38,15 @@ namespace MySQL.ForExcel.Classes
   /// </summary>
   public static class MySqlDataUtilities
   {
+    #region Constants
+
+    /// <summary>
+    /// The default name given to newly created schemas.
+    /// </summary>
+    public const string DEFAULT_NEW_SCHEMA_NAME = "new_schema";
+
+    #endregion Constants
+
     /// <summary>
     /// Verifies if a <see cref="MySqlConnection"/> is open and has not been disconnected by the server.
     /// </summary>
@@ -262,6 +271,46 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets a list of all MySQL character sets along with their available collations.
+    /// </summary>
+    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
+    /// <param name="firstElement">A custom string for the first element of the dictioary.</param>
+    /// <returns>A list of all MySQL character sets along with their available collations.</returns>
+    public static Dictionary<string, string[]> GetCollationsDictionary(this MySqlWorkbenchConnection connection, string firstElement = null)
+    {
+      if (connection == null)
+      {
+        return null;
+      }
+
+      var charSetsTable = connection.GetSchemaCollection("Collations", null);
+      if (charSetsTable == null)
+      {
+        return null;
+      }
+
+      const string defaultCollation = "default collation";
+      var rowsByGroup = charSetsTable.Select(string.Empty, "Charset, Collation").GroupBy(r => r["Charset"].ToString());
+      var collationsDictionary = new Dictionary<string, string[]>(270);
+      if (!string.IsNullOrEmpty(firstElement))
+      {
+        collationsDictionary.Add(firstElement, new [] { string.Empty, string.Empty });
+      }
+
+      foreach (var rowsGroup in rowsByGroup)
+      {
+        var charset = rowsGroup.Key;
+        collationsDictionary.Add(string.Format("{0} - {1}", charset, defaultCollation), new[] { charset, string.Empty });
+        foreach (var collation in rowsGroup.Select(row => row["Collation"].ToString()))
+        {
+          collationsDictionary.Add(string.Format("{0} - {1}", charset, collation), new[] { charset, collation });
+        }
+      }
+
+      return collationsDictionary;
+    }
+
+    /// <summary>
     /// Executes the given query and returns the result set in a <see cref="DataTable"/> object.
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
@@ -303,6 +352,57 @@ namespace MySQL.ForExcel.Classes
 
       string queryString = AssembleSelectQuery(connection.Schema, dboName, columnsList, firstRowIdx, rowCount);
       return string.IsNullOrEmpty(queryString) ? null : connection.GetDataFromTableOrView(queryString);
+    }
+
+    /// <summary>
+    /// Gets the SQL statements needed to create a new schema in the MySQL server instance specified in the given connection.
+    /// </summary>
+    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
+    /// <param name="schemaName">The name of the new schema.</param>
+    /// <param name="grantPrivileges">Flag indicating whether all privileges are granted to the user that opened the connection.</param>
+    /// <returns>The SQL statement used to create the new schema.</returns>
+    public static string GetCreateSchemaSql(this MySqlWorkbenchConnection connection, string schemaName, bool grantPrivileges = false)
+    {
+      return GetCreateSchemaSql(connection, schemaName, null, null, grantPrivileges);
+    }
+
+    /// <summary>
+    /// Gets the SQL statements needed to create a new schema in the MySQL server instance specified in the given connection.
+    /// </summary>
+    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
+    /// <param name="schemaName">The name of the new schema.</param>
+    /// <param name="charset">The default character set assigned to the new schema. If <c>null</c> or empty the server's default character set is used.</param>
+    /// <param name="collation">The collation of the character set, meaningful only if the <see cref="charset"/> parameter is not null or empty. If <c>null</c> or empty the default collation is used.</param>
+    /// <param name="grantPrivileges">Flag indicating whether all privileges are granted to the user that opened the connection.</param>
+    /// <returns>The SQL statement used to create the new schema.</returns>
+    public static string GetCreateSchemaSql(this MySqlWorkbenchConnection connection, string schemaName, string charset, string collation, bool grantPrivileges)
+    {
+      if (connection == null && grantPrivileges)
+      {
+        return null;
+      }
+
+      var sqlBuilder = new StringBuilder(100);
+      sqlBuilder.Append(MySqlStatement.STATEMENT_CREATE_SCHEMA);
+      sqlBuilder.AppendFormat(" `{0}`", schemaName);
+      if (!string.IsNullOrEmpty(charset))
+      {
+        sqlBuilder.AppendFormat(" {0} {1}", MySqlStatement.STATEMENT_DEFAULT_CHARSET, charset);
+        if (!string.IsNullOrEmpty(collation))
+        {
+          sqlBuilder.AppendFormat(" {0} {1}", MySqlStatement.STATEMENT_COLLATE, collation);
+        }
+      }
+
+      if (!grantPrivileges)
+      {
+        return sqlBuilder.ToString();
+      }
+
+      sqlBuilder.Append(";");
+      sqlBuilder.Append(Environment.NewLine);
+      sqlBuilder.AppendFormat("{0} `{1}`.* TO '{2}'.'{3}';", MySqlStatement.STATEMENT_GRANT_ALL, schemaName, connection.UserName, connection.Host);
+      return sqlBuilder.ToString();
     }
 
     /// <summary>
@@ -436,10 +536,9 @@ namespace MySQL.ForExcel.Classes
       DataTable dt;
       try
       {
-        using (MySqlConnection baseConnection = new MySqlConnection(connectionString))
+        using (var baseConnection = new MySqlConnection(connectionString))
         {
           baseConnection.Open();
-
           MySqlDataAdapter mysqlAdapter;
           switch (collection.ToUpperInvariant())
           {
@@ -490,6 +589,40 @@ namespace MySQL.ForExcel.Classes
       }
 
       return dt;
+    }
+
+    /// <summary>
+    /// Gets a schema name that is unique among the schemas in the current connection.
+    /// </summary>
+    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
+    /// <param name="proposedName">The proposed name for a new schema.</param>
+    /// <returns>A unique schema name.</returns>
+    public static string GetSchemaNameAvoidingDuplicates(this MySqlWorkbenchConnection connection, string proposedName)
+    {
+      if (connection == null)
+      {
+        return null;
+      }
+
+      if (string.IsNullOrEmpty(proposedName))
+      {
+        proposedName = DEFAULT_NEW_SCHEMA_NAME;
+      }
+
+      var schemas = connection.GetSchemaCollection("Databases", null);
+      if (schemas == null || schemas.Rows.Count == 0)
+      {
+        return proposedName;
+      }
+
+      int suffix = 2;
+      string finalName = proposedName;
+      while (schemas.Rows.Cast<DataRow>().Any(schemaRow => string.Equals(schemaRow["DATABASE_NAME"].ToString(), finalName, StringComparison.InvariantCultureIgnoreCase)))
+      {
+        finalName = proposedName + suffix++;
+      }
+
+      return finalName;
     }
 
     /// <summary>

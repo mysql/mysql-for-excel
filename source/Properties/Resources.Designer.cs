@@ -1734,6 +1734,60 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Created the MySQL Schema &quot;{0}&quot; successfully..
+        /// </summary>
+        internal static string NewSchemaCreatedSuccessfullyText {
+            get {
+                return ResourceManager.GetString("NewSchemaCreatedSuccessfullyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Created the MySQL Schema &quot;{0}&quot; with {1} warning(s):.
+        /// </summary>
+        internal static string NewSchemaCreatedWithWarningsText {
+            get {
+                return ResourceManager.GetString("NewSchemaCreatedWithWarningsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The MySQL Schema &quot;{0}&quot; could not be created because of the following error(s):.
+        /// </summary>
+        internal static string NewSchemaCreationErrorText {
+            get {
+                return ResourceManager.GetString("NewSchemaCreationErrorText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Executed the following statement to create MySQL Schema &quot;{0}&quot;:.
+        /// </summary>
+        internal static string NewSchemaExecutedQuery {
+            get {
+                return ResourceManager.GetString("NewSchemaExecutedQuery", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The MySQL Schema &quot;{0}&quot; could not be created..
+        /// </summary>
+        internal static string NewSchemaOperationErrorSummaryText {
+            get {
+                return ResourceManager.GetString("NewSchemaOperationErrorSummaryText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string NewSchemaOperationSuccessSummaryText {
+            get {
+                return ResourceManager.GetString("NewSchemaOperationSuccessSummaryText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Old Password:.
         /// </summary>
         internal static string OldPasswordLabelText {
@@ -2041,6 +2095,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string SchemasLoadingErrorTitle {
             get {
                 return ResourceManager.GetString("SchemasLoadingErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Creating Schema &apos;{0}&apos;.
+        /// </summary>
+        internal static string ScriptCreatingSchemaText {
+            get {
+                return ResourceManager.GetString("ScriptCreatingSchemaText", resourceCulture);
             }
         }
         

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -21,12 +21,10 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
-using MySql.Data.MySqlClient;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Properties;
-using MySQL.ForExcel.Structs;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 
@@ -40,9 +38,19 @@ namespace MySQL.ForExcel.Panels
     #region Fields
 
     /// <summary>
+    /// A string containing the filter to apply to the schemas list.
+    /// </summary>
+    private string _filter;
+
+    /// <summary>
     /// String array containing schema names considered system schemas.
     /// </summary>
     private static string[] _systemSchemasListValues;
+
+    /// <summary>
+    /// A <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.
+    /// </summary>
+    private MySqlWorkbenchConnection _wbConnection;
 
     #endregion Fields
 
@@ -66,22 +74,10 @@ namespace MySQL.ForExcel.Panels
     #region Properties
 
     /// <summary>
-    /// Gets a string containing the filter to apply to the schemas list.
-    /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public string Filter { get; private set; }
-
-    /// <summary>
     /// Gets a list of schemas loaded in this panel.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<DbObject> LoadedSchemas { get; private set; }
-
-    /// <summary>
-    /// Gets a <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.
-    /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public MySqlWorkbenchConnection WbConnection { get; private set; }
 
     #endregion Properties
 
@@ -92,8 +88,8 @@ namespace MySQL.ForExcel.Panels
     /// <returns><c>true</c> if schemas were loaded into the schemas list, <c>false</c> otherwise.</returns>
     public bool SetConnection(MySqlWorkbenchConnection connection)
     {
-      Filter = string.Empty;
-      WbConnection = connection;
+      _filter = string.Empty;
+      _wbConnection = connection;
       ConnectionNameLabel.Text = connection.Name;
       UserIPLabel.Text = string.Format("User: {0}, IP: {1}", connection.UserName, connection.Host);
       bool schemasLoaded = LoadSchemas();
@@ -126,32 +122,13 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void CreateNewSchemaHotLabel_Click(object sender, EventArgs e)
     {
-      NewSchemaDialog dlg = new NewSchemaDialog();
-      if (dlg.ShowDialog() == DialogResult.Cancel)
+      using (var newSchemaDialog = new NewSchemaDialog(_wbConnection))
       {
-        return;
+        if (newSchemaDialog.ShowDialog() == DialogResult.OK)
+        {
+          LoadSchemas();
+        }
       }
-
-      PasswordDialogFlags passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
-      if (!passwordFlags.ConnectionSuccess)
-      {
-        return;
-      }
-
-      string connectionString = WbConnection.GetConnectionStringBuilder().ConnectionString;
-      string sql = string.Format("CREATE DATABASE `{0}`", dlg.SchemaName);
-      try
-      {
-        MySqlHelper.ExecuteNonQuery(connectionString, sql);
-      }
-      catch (Exception ex)
-      {
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.ErrorCreatingNewSchema, ex.Message, true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
-        return;
-      }
-
-      LoadSchemas();
     }
 
     /// <summary>
@@ -176,13 +153,13 @@ namespace MySQL.ForExcel.Panels
           node.Nodes.Clear();
         }
 
-        DataTable databases = WbConnection.GetSchemaCollection("Databases", null);
+        DataTable databases = _wbConnection.GetSchemaCollection("Databases", null);
         foreach (DataRow row in databases.Rows)
         {
           string schemaName = row["DATABASE_NAME"].ToString();
 
           // If the user has specified a filter then check it
-          if (!string.IsNullOrEmpty(Filter) && !schemaName.ToUpper().Contains(Filter))
+          if (!string.IsNullOrEmpty(_filter) && !schemaName.ToUpper().Contains(_filter))
           {
             continue;
           }
@@ -226,7 +203,7 @@ namespace MySQL.ForExcel.Panels
         return;
       }
 
-      var passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
+      var passwordFlags = _wbConnection.TestConnectionAndRetryOnWrongPassword();
       if (!passwordFlags.ConnectionSuccess)
       {
         return;
@@ -294,7 +271,7 @@ namespace MySQL.ForExcel.Panels
         return;
       }
 
-      Filter = SchemaFilter.Text.Trim().ToUpper();
+      _filter = SchemaFilter.Text.Trim().ToUpper();
       LoadSchemas();
     }
 

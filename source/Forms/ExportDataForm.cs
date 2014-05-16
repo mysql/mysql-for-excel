@@ -16,6 +16,7 @@
 // 02110-1301  USA
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -92,6 +93,7 @@ namespace MySQL.ForExcel.Forms
       Text = string.Format("Export Data - {0} [{1}]", exportingWorksheetName, _exportDataRange.Address.Replace("$", string.Empty));
       LoadPreviewData();
       InitializeDataTypeCombo();
+      CollationComboBox.SetupCollations(_wbConnection, "Schema Default");
       FirstRowHeadersCheckBox_CheckedChanged(FirstRowHeadersCheckBox, EventArgs.Empty);
       SetDefaultPrimaryKey();
 
@@ -189,7 +191,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void AdvancedOptionsButton_Click(object sender, EventArgs e)
     {
-      using (ExportAdvancedOptionsDialog optionsDialog = new ExportAdvancedOptionsDialog())
+      using (var optionsDialog = new ExportAdvancedOptionsDialog())
       {
         optionsDialog.ShowDialog();
 
@@ -429,11 +431,10 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="ExportButton"/> button is clicked.
+    /// Exports the selected Excel data to a new MySQL table.
     /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void ExportButton_Click(object sender, EventArgs e)
+    /// <returns><c>true</c> if the export is successful, <c>false</c> otherwise.</returns>
+    private bool ExportData()
     {
       Cursor = Cursors.WaitCursor;
 
@@ -450,20 +451,32 @@ namespace MySQL.ForExcel.Forms
         _exportDataTable.SyncSchema(_previewDataTable);
       }
 
+      if (CollationComboBox.SelectedItem is KeyValuePair<string, string[]>)
+      {
+        var collationEntry = (KeyValuePair<string, string[]>)CollationComboBox.SelectedItem;
+        _exportDataTable.CharSet = collationEntry.Value[0];
+        _exportDataTable.Collation = collationEntry.Value[1];
+      }
+      else
+      {
+        _exportDataTable.CharSet = string.Empty;
+        _exportDataTable.Collation = string.Empty;
+      }
+
       Cursor = Cursors.Default;
       if (!setupDataSuccessful)
       {
-        return;
+        return false;
       }
 
       // Check if there is data to export, if there is not then ask the user if he wants to proceed with the table creation only.
       bool tableContainsDataToExport = _exportDataTable.Rows.Count > (_exportDataTable.FirstRowIsHeaders ? 1 : 0);
       if (!tableContainsDataToExport)
       {
-        DialogResult dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.ExportDataNoDataToExportTitleWarning, Resources.ExportDataNoDataToExportDetailWarning);
+        var dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.ExportDataNoDataToExportTitleWarning, Resources.ExportDataNoDataToExportDetailWarning);
         if (dr == DialogResult.No)
         {
-          return;
+          return false;
         }
 
         _exportDataTable.CreateTableWithoutData = true;
@@ -475,7 +488,7 @@ namespace MySQL.ForExcel.Forms
 
       Cursor = Cursors.WaitCursor;
       int warningsCount = 0;
-      bool errorsFound = false;
+      bool success = true;
       bool warningsFound = false;
       bool tableCreated = true;
       string operationSummary;
@@ -483,15 +496,15 @@ namespace MySQL.ForExcel.Forms
       if (modifiedRowsList == null)
       {
         Cursor = Cursors.Default;
-        return;
+        return false;
       }
 
       bool warningDetailHeaderAppended = false;
       string statementsQuantityFormat = new string('0', modifiedRowsList.Count.StringSize());
       string sqlQueriesFormat = "{0:" + statementsQuantityFormat + "}: {1}";
-      StringBuilder operationDetails = new StringBuilder();
-      StringBuilder warningDetails = new StringBuilder();
-      StringBuilder warningStatementDetails = new StringBuilder();
+      var operationDetails = new StringBuilder();
+      var warningDetails = new StringBuilder();
+      var warningStatementDetails = new StringBuilder();
       foreach (var statement in modifiedRowsList.Select(statementRow => statementRow.Statement))
       {
         // Create details text for the table creation.
@@ -519,7 +532,7 @@ namespace MySQL.ForExcel.Forms
               break;
 
             case MySqlStatement.StatementResultType.ErrorThrown:
-              errorsFound = true;
+              success = false;
               tableCreated = false;
               operationDetails.AppendFormat(Resources.ExportDataErrorCreatingTableText, _exportDataTable.TableName);
               operationDetails.AddNewLine();
@@ -536,7 +549,7 @@ namespace MySQL.ForExcel.Forms
           operationDetails.AddNewLine(2, true);
 
           // Create a title entry for the rows to be inserted if the creation was successful
-          if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults && !errorsFound)
+          if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults && success)
           {
             operationDetails.AppendFormat(Resources.InsertedExcelDataWithQueryText, _exportDataTable.TableName);
             operationDetails.AddNewLine();
@@ -578,7 +591,7 @@ namespace MySQL.ForExcel.Forms
             break;
 
           case MySqlStatement.StatementResultType.ErrorThrown:
-            errorsFound = true;
+            success = false;
             operationDetails.AddNewLine(2, true);
             operationDetails.Append(Resources.ExportDataRowsInsertionErrorText);
             operationDetails.AddNewLine();
@@ -586,7 +599,7 @@ namespace MySQL.ForExcel.Forms
             break;
         }
 
-        if (!errorsFound)
+        if (success)
         {
           continue;
         }
@@ -595,12 +608,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       InfoDialog.InfoType operationsType;
-      if (errorsFound)
-      {
-        operationSummary = string.Format(tableCreated ? Resources.ExportDataOperationErrorNoRowsText : Resources.ExportDataOperationErrorNoTableText, _exportDataTable.TableName);
-        operationsType = InfoDialog.InfoType.Error;
-      }
-      else
+      if (success)
       {
         operationSummary = string.Format(_exportDataTable.CreateTableWithoutData ? Resources.ExportDataOperationSuccessNoDataText : Resources.ExportDataOperationSuccessWithDataText, _exportDataTable.TableName);
         operationsType = warningsFound ? InfoDialog.InfoType.Warning : InfoDialog.InfoType.Success;
@@ -633,19 +641,31 @@ namespace MySQL.ForExcel.Forms
           }
         }
       }
+      else
+      {
+        operationSummary = string.Format(tableCreated ? Resources.ExportDataOperationErrorNoRowsText : Resources.ExportDataOperationErrorNoTableText, _exportDataTable.TableName);
+        operationsType = InfoDialog.InfoType.Error;
+      }
 
       Cursor = Cursors.Default;
       MiscUtilities.ShowCustomizedInfoDialog(operationsType, operationSummary, operationDetails.ToString(), false);
       operationDetails.Clear();
       warningDetails.Clear();
       warningStatementDetails.Clear();
-      if (errorsFound)
-      {
-        return;
-      }
+      return success;
+    }
 
-      DialogResult = DialogResult.OK;
-      Close();
+    /// <summary>
+    /// Event delegate method fired when the <see cref="ExportDataForm"/> form is being closed.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ExportDataForm_FormClosing(object sender, FormClosingEventArgs e)
+    {
+      if (DialogResult == DialogResult.OK)
+      {
+        e.Cancel = !ExportData();
+      }
     }
 
     /// <summary>
@@ -1152,7 +1172,7 @@ namespace MySQL.ForExcel.Forms
       PrimaryKeyColumnsComboBox.Items.Clear();
       if (!string.IsNullOrEmpty(Resources.ExportDataMultiPrimaryKeyText) && selectedItem == Resources.ExportDataMultiPrimaryKeyText && _previewDataTable.NumberOfPk > 1)
       {
-        PrimaryKeyColumnsComboBox.Items.Add(Resources.ExportDataMultiPrimaryKeyText);
+        PrimaryKeyColumnsComboBox.Items.Add(Resources.ExportDataMultiPrimaryKeyText ?? string.Empty);
       }
 
       foreach (MySqlDataColumn mysqlCol in _previewDataTable.Columns.Cast<MySqlDataColumn>().Where(mysqlCol => mysqlCol.Ordinal != 0 && !mysqlCol.ExcludeColumn))

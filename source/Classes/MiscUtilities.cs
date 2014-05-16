@@ -25,6 +25,7 @@ using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 using MySQL.ForExcel.Interfaces;
@@ -311,6 +312,30 @@ namespace MySQL.ForExcel.Classes
     /// <returns>Specifies the result of the message processing; it depends on the message sent.</returns>
     [DllImport("user32.dll")]
     public static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+    /// <summary>
+    /// Initializes the contents of a <see cref="ComboBox"/> with character sets and their corresponding collations.
+    /// </summary>
+    /// <param name="comboBox">The <see cref="ComboBox"/> to initialize.</param>
+    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
+    /// <param name="firstElement">A custom string for the first element of the dictioary.</param>
+    public static void SetupCollations(this ComboBox comboBox, MySqlWorkbenchConnection connection, string firstElement)
+    {
+      if (comboBox == null)
+      {
+        return;
+      }
+
+      var collationsDictionary = connection.GetCollationsDictionary(firstElement);
+      if (collationsDictionary == null)
+      {
+        return;
+      }
+
+      comboBox.DataSource = new BindingSource(collationsDictionary, null);
+      comboBox.DisplayMember = "Value";
+      comboBox.ValueMember = "Key";
+    }
 
     /// <summary>
     /// Shows an error dialog customized for MySQL for Excel.

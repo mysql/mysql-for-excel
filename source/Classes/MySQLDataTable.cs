@@ -323,6 +323,8 @@ namespace MySQL.ForExcel.Classes
       AddPrimaryKeyColumn = false;
       AutoAllowEmptyNonIndexColumns = false;
       AutoIndexIntColumns = false;
+      CharSet = null;
+      Collation = null;
       FirstRowIsHeaders = false;
       IsTableNameValid = !string.IsNullOrEmpty(TableName);
       IsFormatted = false;
@@ -443,7 +445,10 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public bool AddPrimaryKeyColumn
     {
-      get { return _addPrimaryKeyColumn; }
+      get
+      {
+        return _addPrimaryKeyColumn;
+      }
 
       private set
       {
@@ -501,6 +506,18 @@ namespace MySQL.ForExcel.Classes
         return _changedOrDeletedRows;
       }
     }
+
+    /// <summary>
+    /// Gets or sets the character set used to store text data in this table.
+    /// If null or empty it means the default schema character set is used.
+    /// </summary>
+    public string CharSet { get; set; }
+
+    /// <summary>
+    /// Gets or sets the collation used with the character set to store text data in this table.
+    /// If null or empty it means the default collation is used.
+    /// </summary>
+    public string Collation { get; set; }
 
     /// <summary>
     /// Gets the combined length of data representation as text for all columns.
@@ -1496,6 +1513,17 @@ namespace MySQL.ForExcel.Classes
       {
         sql.Append(nl);
         sql.Append(")");
+      }
+
+      if (!string.IsNullOrEmpty(CharSet))
+      {
+        sql.Append(nl);
+        sql.AppendFormat("{0} = {1}", MySqlStatement.STATEMENT_DEFAULT_CHARSET, CharSet);
+        if (!string.IsNullOrEmpty(Collation))
+        {
+          sql.Append(nl);
+          sql.AppendFormat("{0} = {1}", MySqlStatement.STATEMENT_COLLATE, Collation);
+        }
       }
 
       return sql.ToString();

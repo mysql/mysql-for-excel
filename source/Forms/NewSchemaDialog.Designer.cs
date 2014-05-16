@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -30,10 +30,17 @@ namespace MySQL.ForExcel.Forms
     /// <param name="disposing"><c>true</c> if managed resources should be disposed; otherwise, <c>false</c>.</param>
     protected override void Dispose(bool disposing)
     {
-      if (disposing && (components != null))
+      if (disposing)
       {
-        components.Dispose();
+        if (components != null)
+        {
+          components.Dispose();
+        }
+
+        // Set variables to null so this object does not hold references to them and the GC disposes of them sooner.
+        _wbConnection = null;
       }
+
       base.Dispose(disposing);
     }
 
@@ -52,6 +59,8 @@ namespace MySQL.ForExcel.Forms
       this.NewSchemaNameLabel = new System.Windows.Forms.Label();
       this.InstructionsLabel = new System.Windows.Forms.Label();
       this.SchemaNameLabel = new System.Windows.Forms.Label();
+      this.CollationLabel = new System.Windows.Forms.Label();
+      this.CollationComboBox = new System.Windows.Forms.ComboBox();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).BeginInit();
@@ -59,23 +68,25 @@ namespace MySQL.ForExcel.Forms
       // 
       // FootnoteAreaPanel
       // 
-      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 102);
-      this.FootnoteAreaPanel.Size = new System.Drawing.Size(514, 0);
+      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 292);
+      this.FootnoteAreaPanel.Size = new System.Drawing.Size(634, 0);
       // 
       // ContentAreaPanel
       // 
+      this.ContentAreaPanel.Controls.Add(this.CollationComboBox);
+      this.ContentAreaPanel.Controls.Add(this.CollationLabel);
       this.ContentAreaPanel.Controls.Add(this.SchemaNameLabel);
       this.ContentAreaPanel.Controls.Add(this.InstructionsLabel);
       this.ContentAreaPanel.Controls.Add(this.NewSchemaNameLabel);
       this.ContentAreaPanel.Controls.Add(this.LogoPictureBox);
       this.ContentAreaPanel.Controls.Add(this.SchemaNameTextBox);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(514, 182);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(514, 211);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.DialogOKButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 137);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 166);
       this.CommandAreaPanel.Size = new System.Drawing.Size(514, 45);
       // 
       // DialogOKButton
@@ -155,18 +166,41 @@ namespace MySQL.ForExcel.Forms
       this.SchemaNameLabel.TabIndex = 2;
       this.SchemaNameLabel.Text = "Schema Name:";
       // 
+      // CollationLabel
+      // 
+      this.CollationLabel.AutoSize = true;
+      this.CollationLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.CollationLabel.Location = new System.Drawing.Point(119, 117);
+      this.CollationLabel.Name = "CollationLabel";
+      this.CollationLabel.Size = new System.Drawing.Size(58, 15);
+      this.CollationLabel.TabIndex = 4;
+      this.CollationLabel.Text = "Collation:";
+      // 
+      // CollationComboBox
+      // 
+      this.CollationComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+      this.CollationComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+      this.CollationComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.CollationComboBox.Font = new System.Drawing.Font("Segoe UI", 9F);
+      this.CollationComboBox.FormattingEnabled = true;
+      this.CollationComboBox.Location = new System.Drawing.Point(183, 116);
+      this.CollationComboBox.Name = "CollationComboBox";
+      this.CollationComboBox.Size = new System.Drawing.Size(319, 23);
+      this.CollationComboBox.TabIndex = 5;
+      // 
       // NewSchemaDialog
       // 
       this.AcceptButton = this.DialogOKButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(514, 182);
+      this.ClientSize = new System.Drawing.Size(514, 211);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 13);
       this.MainInstructionLocationOffset = new System.Drawing.Size(-10, 10);
       this.Name = "NewSchemaDialog";
       this.Text = "MySQL for Excel";
+      this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.NewSchemaDialog_FormClosing);
       this.ContentAreaPanel.ResumeLayout(false);
       this.ContentAreaPanel.PerformLayout();
       this.CommandAreaPanel.ResumeLayout(false);
@@ -184,5 +218,7 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.PictureBox LogoPictureBox;
     private System.Windows.Forms.Label SchemaNameLabel;
     private System.Windows.Forms.Label InstructionsLabel;
+    private System.Windows.Forms.ComboBox CollationComboBox;
+    private System.Windows.Forms.Label CollationLabel;
   }
 }

@@ -1,4 +1,7 @@
 1.3.0
+- Added new feature to allow the specification of character set and collation options for new schemas created through the Create New Schema action label and for new
+  tables created through the Export Excel Data to New Table action label.  By default schemas are created using the server default character set and collation, and tables
+  are created using the schema ones just as previous Excel versions worked.
 - Added new feature to create Excel PivotTables for imported data if specified by the users, the feature is present on all import operations (Tables, Views, Procedures).
   The PivotTables are created next to the imported data so users can customize the PivotTable to suit their needs.
 - Added new feature to allow imported data to be refreshed directly from the data base.

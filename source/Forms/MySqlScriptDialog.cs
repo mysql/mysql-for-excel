@@ -120,6 +120,11 @@ namespace MySQL.ForExcel.Forms
     private bool _userChangedOriginalQuery;
 
     /// <summary>
+    /// The text showing original operations information reflected on the SQL script.
+    /// </summary>
+    private readonly string _operationsInfoText;
+
+    /// <summary>
     /// MySQL Workbench connection to a MySQL server instance selected by users.
     /// </summary>
     private MySqlWorkbenchConnection _wbConnection;
@@ -131,15 +136,18 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     /// <param name="wbConnection">The connection to a MySQL server instance selected by users.</param>
     /// <param name="sqlScript">The proposed SQL query for user review and possible modification.</param>
+    /// <param name="operationsInfoText">The text showing original operations information reflected on the SQL script.</param>
     /// <param name="useOptimisticUpdate">Flag indicating whether optimistic locking is used for the update of rows.</param>
-    public MySqlScriptDialog(MySqlWorkbenchConnection wbConnection, string sqlScript, bool useOptimisticUpdate)
+    public MySqlScriptDialog(MySqlWorkbenchConnection wbConnection, string sqlScript, string operationsInfoText, bool useOptimisticUpdate = false)
       : this()
     {
       _errorDialogSummary = Resources.ScriptErrorThrownSummary;
+      _operationsInfoText = operationsInfoText;
+      _showOriginalOperationsInformation = !string.IsNullOrEmpty(_operationsInfoText);
+      _useOptimisticUpdate = useOptimisticUpdate;
       _wbConnection = wbConnection;
       OriginalSqlScript = sqlScript;
       SqlScript = OriginalSqlScript;
-      _useOptimisticUpdate = useOptimisticUpdate;
       CreateOriginalStatementsList();
       ApplyButton.Enabled = SqlScript.Trim().Length > 0;
       SetOriginalOperationsInfoAvailability();
@@ -742,43 +750,51 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      StringBuilder originalOperationsInfo = new StringBuilder(3);
-      if (_mySqlTable.OperationType.IsForExport())
+      var originalOperationsInfo = new StringBuilder(120);
+      if (_mySqlTable != null)
       {
-        originalOperationsInfo.AppendFormat(Resources.ScriptCreatingTableText, _mySqlTable.TableNameForSqlQueries);
+        if (_mySqlTable.OperationType.IsForExport())
+        {
+          originalOperationsInfo.AppendFormat(Resources.ScriptCreatingTableText, _mySqlTable.TableNameForSqlQueries);
+        }
+
+        if (_mySqlTable.OperationType != MySqlDataTable.DataOperationType.Export || !_mySqlTable.CreateTableWithoutData)
+        {
+          int operationRows = _mySqlTable.DeletingOperations;
+          int totalOperationRows = operationRows;
+          if (operationRows > 0)
+          {
+            originalOperationsInfo.AddSeparator(", ", true);
+            originalOperationsInfo.AppendFormat(Resources.ScriptDeletingRowsText, operationRows);
+          }
+
+          operationRows = _mySqlTable.InsertingOperations;
+          totalOperationRows += operationRows;
+          if (operationRows > 0)
+          {
+            originalOperationsInfo.AddSeparator(", ", true);
+            originalOperationsInfo.AppendFormat(Resources.ScriptInsertingRowsText, operationRows);
+          }
+
+          operationRows = _mySqlTable.UpdatingOperations;
+          totalOperationRows += operationRows;
+          if (operationRows > 0)
+          {
+            originalOperationsInfo.AddSeparator(", ", true);
+            originalOperationsInfo.AppendFormat(Resources.ScriptUpdatingRowsText, operationRows);
+          }
+
+          if (totalOperationRows > 0)
+          {
+            originalOperationsInfo.AddSeparator(" ", true);
+            originalOperationsInfo.Append(Resources.ScriptRowsText);
+          }
+        }
       }
-
-      if (_mySqlTable.OperationType != MySqlDataTable.DataOperationType.Export || !_mySqlTable.CreateTableWithoutData)
+      else
       {
-        int operationRows = _mySqlTable.DeletingOperations;
-        int totalOperationRows = operationRows;
-        if (operationRows > 0)
-        {
-          originalOperationsInfo.AddSeparator(", ", true);
-          originalOperationsInfo.AppendFormat(Resources.ScriptDeletingRowsText, operationRows);
-        }
-
-        operationRows = _mySqlTable.InsertingOperations;
-        totalOperationRows += operationRows;
-        if (operationRows > 0)
-        {
-          originalOperationsInfo.AddSeparator(", ", true);
-          originalOperationsInfo.AppendFormat(Resources.ScriptInsertingRowsText, operationRows);
-        }
-
-        operationRows = _mySqlTable.UpdatingOperations;
-        totalOperationRows += operationRows;
-        if (operationRows > 0)
-        {
-          originalOperationsInfo.AddSeparator(", ", true);
-          originalOperationsInfo.AppendFormat(Resources.ScriptUpdatingRowsText, operationRows);
-        }
-
-        if (totalOperationRows > 0)
-        {
-          originalOperationsInfo.AddSeparator(" ", true);
-          originalOperationsInfo.Append(Resources.ScriptRowsText);
-        }
+        originalOperationsInfo.Append(_operationsInfoText);
+        originalOperationsInfo.Append(" ");
       }
 
       if (originalOperationsInfo.Length > 0)

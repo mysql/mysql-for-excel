@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -46,14 +46,34 @@ namespace MySQL.ForExcel.Classes
     public const string STATEMENT_ALTER_TABLE = "ALTER TABLE";
 
     /// <summary>
+    /// Key words used to specify a collation in a CREATE SCHEMA or CREATE TABLE statement.
+    /// </summary>
+    public const string STATEMENT_COLLATE = "COLLATE";
+
+    /// <summary>
+    /// Key words used for a CREATE SCHEMA statement.
+    /// </summary>
+    public const string STATEMENT_CREATE_SCHEMA = "CREATE SCHEMA";
+
+    /// <summary>
     /// Key words used for a CREATE TABLE statement.
     /// </summary>
     public const string STATEMENT_CREATE_TABLE = "CREATE TABLE";
 
     /// <summary>
-    /// Key word used for an DELETE statement.
+    /// Key words used to specify a default character set in a CREATE SCHEMA or CREATE TABLE statement.
+    /// </summary>
+    public const string STATEMENT_DEFAULT_CHARSET = "DEFAULT CHARACTER SET";
+
+    /// <summary>
+    /// Key word used for a DELETE statement.
     /// </summary>
     public const string STATEMENT_DELETE = "DELETE FROM";
+
+    /// <summary>
+    /// Key word used for a GRANT ALL statement.
+    /// </summary>
+    public const string STATEMENT_GRANT_ALL = "GRANT ALL ON";
 
     /// <summary>
     /// Key word used for an INSERT statement.
@@ -141,6 +161,11 @@ namespace MySQL.ForExcel.Classes
       AlterTable,
 
       /// <summary>
+      /// Statement to create a new schema.
+      /// </summary>
+      CreateSchema,
+
+      /// <summary>
       /// Statement to create a new table.
       /// </summary>
       CreateTable,
@@ -149,6 +174,11 @@ namespace MySQL.ForExcel.Classes
       /// Statement to delete rows from the corresponding database table.
       /// </summary>
       Delete,
+
+      /// <summary>
+      /// Statement to grant all privileges on a MySQL object to the user.
+      /// </summary>
+      GrantAll,
 
       /// <summary>
       /// Statement to insert new rows into the corresponding database table.
@@ -340,6 +370,10 @@ namespace MySQL.ForExcel.Classes
       {
         statementType = SqlStatementType.CreateTable;
       }
+      else if (sqlStatement.StartsWith(STATEMENT_CREATE_SCHEMA))
+      {
+        statementType = SqlStatementType.CreateSchema;
+      }
       else if (sqlStatement.StartsWith(STATEMENT_ALTER_TABLE))
       {
         statementType = SqlStatementType.AlterTable;
@@ -351,6 +385,10 @@ namespace MySQL.ForExcel.Classes
       else if (sqlStatement.StartsWith(STATEMENT_UNLOCK_TABLES))
       {
         statementType = SqlStatementType.UnlockTables;
+      }
+      else if (sqlStatement.StartsWith(STATEMENT_GRANT_ALL))
+      {
+        statementType = SqlStatementType.GrantAll;
       }
 
       return statementType;
