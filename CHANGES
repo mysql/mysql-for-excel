@@ -1,15 +1,15 @@
 1.3.0
 - Added new feature to optionally display all allowed MySQL data types in the Export Data dialog's Data Type combo box versus only the basic and mostly used data types that
-- Added new feature to include a row with summary fields to individually selected tables imported to Excel tables.
-  have been shown in previous versions of MySQL for Excel. The Data Type combo box has always allowed the manual entry of any allowed MySQL data type in case the drop-down
-  list does not contain the data type needed by the users. With this new feature users will be able to see within the drop-down list all available MySQL data types.
+  have been shown in previous versions of MySQL for Excel.
+- Added new feature to include a row with summary fields for imported MySQL data, the feature is present on all Import Data dialogues (for Tables, Views and Procedures).
 - Added new feature to allow the specification of character set and collation options for new schemas created through the Create New Schema action label and for new
   tables created through the Export Excel Data to New Table action label.  By default schemas are created using the server default character set and collation, and tables
   are created using the schema ones just as previous Excel versions worked.
 - Added new feature to create Excel PivotTables for imported data if specified by the users, the feature is present on all import operations (Tables, Views, Procedures).
   The PivotTables are created next to the imported data so users can customize the PivotTable to suit their needs.
-- Added new feature to allow imported data to be refreshed directly from the data base.
-- New feature that allows the user to reset option settings in Import, Export or Append advanced options and Global Options dialogues to their respective default values was added.
+- Added new feature to allow Excel tables created from imported MySQL data to be refreshed using Excel's Refresh commands. Saving an Excel Workbook where Excel tables
+  were created from imported MySQL data will retain the connection properties so the data can be refreshed after closing and reopening the Workbook later.
+- Added new feature that allows the user to reset option settings in Import, Export or Append advanced options and Global Options dialogues to their respective default values.
 - Added new feature to allow the selection of multiple tables and views and an Import Multiple Tables and Views action that when clicked imports the data of all selected
   database objects into individual Excel worksheets, Excel tables are created optionally for each imported Table or View. On Excel 2013 (and higher) PowerPivot model
   relationships are created based on MySQL relationships defined with foreign key constraints.
