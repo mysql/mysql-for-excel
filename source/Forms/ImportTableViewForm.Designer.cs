@@ -66,6 +66,7 @@ namespace MySQL.ForExcel.Forms
       this.SubSetOfDataLabel = new System.Windows.Forms.Label();
       this.RowsCountSubLabel = new System.Windows.Forms.Label();
       this.OptionsGroupBox = new System.Windows.Forms.GroupBox();
+      this.CreatePivotTableCheckBox = new System.Windows.Forms.CheckBox();
       this.FromRowNumericUpDown = new System.Windows.Forms.NumericUpDown();
       this.RowsToReturnLabel = new System.Windows.Forms.Label();
       this.RowsToReturnNumericUpDown = new System.Windows.Forms.NumericUpDown();
@@ -87,7 +88,7 @@ namespace MySQL.ForExcel.Forms
       this.DialogCancelButton = new System.Windows.Forms.Button();
       this.ExportDataLabel = new System.Windows.Forms.Label();
       this.AdvancedOptionsButton = new System.Windows.Forms.Button();
-      this.CreatePivotTableCheckBox = new System.Windows.Forms.CheckBox();
+      this.AddSummaryFieldsCheckBox = new System.Windows.Forms.CheckBox();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       this.OptionsGroupBox.SuspendLayout();
@@ -165,6 +166,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.OptionsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.OptionsGroupBox.BackColor = System.Drawing.Color.Transparent;
+      this.OptionsGroupBox.Controls.Add(this.AddSummaryFieldsCheckBox);
       this.OptionsGroupBox.Controls.Add(this.CreatePivotTableCheckBox);
       this.OptionsGroupBox.Controls.Add(this.FromRowNumericUpDown);
       this.OptionsGroupBox.Controls.Add(this.RowsToReturnLabel);
@@ -178,6 +180,16 @@ namespace MySQL.ForExcel.Forms
       this.OptionsGroupBox.TabIndex = 8;
       this.OptionsGroupBox.TabStop = false;
       this.OptionsGroupBox.Text = "Options";
+      // 
+      // CreatePivotTableCheckBox
+      // 
+      this.CreatePivotTableCheckBox.AutoSize = true;
+      this.CreatePivotTableCheckBox.Location = new System.Drawing.Point(18, 50);
+      this.CreatePivotTableCheckBox.Name = "CreatePivotTableCheckBox";
+      this.CreatePivotTableCheckBox.Size = new System.Drawing.Size(255, 19);
+      this.CreatePivotTableCheckBox.TabIndex = 7;
+      this.CreatePivotTableCheckBox.Text = "Create a PivotTable with the imported data.";
+      this.CreatePivotTableCheckBox.UseVisualStyleBackColor = true;
       // 
       // FromRowNumericUpDown
       // 
@@ -444,15 +456,15 @@ namespace MySQL.ForExcel.Forms
       this.AdvancedOptionsButton.UseVisualStyleBackColor = true;
       this.AdvancedOptionsButton.Click += new System.EventHandler(this.AdvancedOptionsButton_Click);
       // 
-      // CreatePivotTableCheckBox
+      // AddSummaryFieldsCheckBox
       // 
-      this.CreatePivotTableCheckBox.AutoSize = true;
-      this.CreatePivotTableCheckBox.Location = new System.Drawing.Point(18, 50);
-      this.CreatePivotTableCheckBox.Name = "CreatePivotTableCheckBox";
-      this.CreatePivotTableCheckBox.Size = new System.Drawing.Size(255, 19);
-      this.CreatePivotTableCheckBox.TabIndex = 7;
-      this.CreatePivotTableCheckBox.Text = "Create a PivotTable with the imported data.";
-      this.CreatePivotTableCheckBox.UseVisualStyleBackColor = true;
+      this.AddSummaryFieldsCheckBox.AutoSize = true;
+      this.AddSummaryFieldsCheckBox.Location = new System.Drawing.Point(334, 50);
+      this.AddSummaryFieldsCheckBox.Name = "AddSummaryFieldsCheckBox";
+      this.AddSummaryFieldsCheckBox.Size = new System.Drawing.Size(135, 19);
+      this.AddSummaryFieldsCheckBox.TabIndex = 8;
+      this.AddSummaryFieldsCheckBox.Text = "Add Summary Fields";
+      this.AddSummaryFieldsCheckBox.UseVisualStyleBackColor = true;
       // 
       // ImportTableViewForm
       // 
@@ -514,6 +526,7 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.ToolStripMenuItem SelectNoneToolStripMenuItem;
     private System.Windows.Forms.Button AdvancedOptionsButton;
     private System.Windows.Forms.CheckBox CreatePivotTableCheckBox;
+    private System.Windows.Forms.CheckBox AddSummaryFieldsCheckBox;
 
   }
 }

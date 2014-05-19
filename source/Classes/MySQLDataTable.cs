@@ -1615,14 +1615,15 @@ namespace MySQL.ForExcel.Classes
     /// <param name="createExcelTable">Flag indicating whether a <see cref="ExcelInterop.ListObject"/> is created for the imported data.</param>
     /// <param name="createPivotTable">Flag indicating whether a <see cref="ExcelInterop.PivotTable"/> is created for the imported data.</param>
     /// <param name="pivotPosition">The position where new <see cref="ExcelInterop.PivotTable"/> objects are placed relative to imported table's data.</param>
+    /// <param name="addSummaryFields">Indicates wheather to include a row with summary fields</param>
     /// <returns>The <see cref="ExcelInterop.Range"/> or <see cref="ExcelInterop.ListObject"/> containing the cells with the imported data.</returns>
-    public object ImportDataAtActiveExcelCell(bool importColumnNames, bool createExcelTable, bool createPivotTable, PivotTablePosition pivotPosition = PivotTablePosition.Right)
+    public object ImportDataAtActiveExcelCell(bool importColumnNames, bool createExcelTable, bool createPivotTable, PivotTablePosition pivotPosition = PivotTablePosition.Right, bool addSummaryFields = false)
     {
       var atCell = Globals.ThisAddIn.Application.ActiveCell;
       object retObj;
       if (createExcelTable)
       {
-        retObj = ImportDataIntoExcelTable(atCell);
+        retObj = ImportDataIntoExcelTable(atCell, addSummaryFields);
       }
       else
       {
@@ -1772,8 +1773,9 @@ namespace MySQL.ForExcel.Classes
     /// Imports the table's data at the specified Excel cell into a <see cref="ExcelInterop.ListObject"/>.
     /// </summary>
     /// <param name="atCell">The starting Excel (left-most and top-most) cell where the imported data is placed.</param>
+    /// <param name="addSummaryFields">Indicates wheather to include a row with summary fields</param>
     /// <returns>The created <see cref="ExcelInterop.ListObject"/> containing the imported data.</returns>
-    public ExcelInterop.ListObject ImportDataIntoExcelTable(ExcelInterop.Range atCell)
+    public ExcelInterop.ListObject ImportDataIntoExcelTable(ExcelInterop.Range atCell, bool addSummaryFields = false)
     {
       int startingRow = ImportColumnNames ? 1 : 0;
       int rowsCount = Rows.Count + startingRow;
@@ -1802,7 +1804,7 @@ namespace MySQL.ForExcel.Classes
           }
 
           ExcelInterop.Range newWorkSheetCell = newWorkSheet.Range["A1", Type.Missing];
-          return ImportDataIntoExcelTable(newWorkSheetCell);
+          return ImportDataIntoExcelTable(newWorkSheetCell, addSummaryFields);
         }
 
         Globals.ThisAddIn.SkipSelectedDataContentsDetection = true;
@@ -1810,6 +1812,7 @@ namespace MySQL.ForExcel.Classes
 
         // Create Excel Table for the imported data
         excelTable = CreateExcelTable(atCell);
+        excelTable.ShowTotals = addSummaryFields;
         atCell.Select();
       }
       catch (Exception ex)

@@ -286,7 +286,7 @@ namespace MySQL.ForExcel.Forms
       {
         Cursor = Cursors.WaitCursor;
         MySqlTable = _wbConnection.CreateMySqlTable(_isEditOperation, _dbObject.Name, _workbookInCompatibilityMode, IncludeColumnNames, importColumns, LimitRowsCheckBox.Checked, FirstRowIndex, RowsTo);
-        var excelObj = MySqlTable.ImportDataAtActiveExcelCell(IncludeColumnNames, !_isEditOperation && Settings.Default.ImportCreateExcelTable, CreatePivotTable);
+        var excelObj = MySqlTable.ImportDataAtActiveExcelCell(IncludeColumnNames, !_isEditOperation && Settings.Default.ImportCreateExcelTable, CreatePivotTable, MySqlDataTable.PivotTablePosition.Right, AddSummaryFieldsCheckBox.Checked);
         if (excelObj != null)
         {
           ImportedExcelRange = excelObj is ExcelInterop.ListObject
