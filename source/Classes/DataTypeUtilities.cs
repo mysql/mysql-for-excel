@@ -683,12 +683,12 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the Connector.NET data type object corresponding to a given MySQL data type.
+    /// Gets the estimated maximum length of the data hold in a given MySQL data type when converted to a string representation.
     /// </summary>
     /// <param name="strippedMySqlDataType">The MySQL data type name stripped of formatting and modifiers.</param>
     /// <param name="unsigned">Flag indicating whether integer data types are unsigned.</param>
     /// <param name="realAsFloat">Flag indicating if real is translated to float or to double.</param>
-    /// <returns>The Connector.NET data type object corresponding to the given MySQL data type.</returns>
+    /// <returns>The estimated maximum length of the data hold in a given MySQL data type when converted to a string representation.</returns>
     public static long GetMySqlDataTypeMaxLength(string strippedMySqlDataType, bool unsigned, bool realAsFloat)
     {
       switch (strippedMySqlDataType.ToUpper(CultureInfo.InvariantCulture))
@@ -745,6 +745,20 @@ namespace MySQL.ForExcel.Classes
         case "TEXT":
         case "SET":
         case "ENUM":
+        case "CURVE":
+        case "GEOMETRY":
+        case "GEOMETRYCOLLECTION":
+        case "LINE":
+        case "LINEARRING":
+        case "LINESTRING":
+        case "MULTICURVE":
+        case "MULTILINESTRING":
+        case "MULTIPOINT":
+        case "MULTIPOLYGON":
+        case "MULTISURFACE":
+        case "POINT":
+        case "POLYGON":
+        case "SURFACE":
           return ushort.MaxValue;
 
         case "MEDIUMBLOB":
@@ -767,65 +781,6 @@ namespace MySQL.ForExcel.Classes
       }
 
       throw new UnhandledMySqlTypeException();
-    }
-
-    /// <summary>
-    /// Gets a list of all the MySQL data types.
-    /// </summary>
-    /// <param name="paramsInParenthesisList">Output list of the number of parameters used with the data types declaration.</param>
-    /// <returns>The list of all the MySQL data types</returns>
-    public static List<string> GetMySqlDataTypes(out List<int> paramsInParenthesisList)
-    {
-      List<string> retList = new List<string>();
-      retList.AddRange(new[] {
-            "bit",
-            "tinyint",
-            "smallint",
-            "mediumint",
-            "int",
-            "integer",
-            "bigint",
-            "float",
-            "double",
-            "decimal",
-            "numeric",
-            "real",
-            "bool",
-            "boolean",
-            "date",
-            "datetime",
-            "timestamp",
-            "time",
-            "year",
-            "char",
-            "varchar",
-            "binary",
-            "varbinary",
-            "tinyblob",
-            "tinytext",
-            "blob",
-            "text",
-            "mediumblob",
-            "mediumtext",
-            "longblob",
-            "longtext",
-            "enum",
-            "set"});
-
-      // Assemble the list of the number of parameters used with each data type in the list above.
-      paramsInParenthesisList = new List<int>(retList.Count);
-      paramsInParenthesisList.AddRange(new[] { 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, -1, -1 });
-      return retList;
-    }
-
-    /// <summary>
-    /// Gets a list of all the MySQL data types.
-    /// </summary>
-    /// <returns>The list of all the MySQL data types</returns>
-    public static List<string> GetMySqlDataTypes()
-    {
-      List<int> unused;
-      return GetMySqlDataTypes(out unused);
     }
 
     /// <summary>
@@ -1357,6 +1312,13 @@ namespace MySQL.ForExcel.Classes
         return true;
       }
 
+      // Return immediately for spatial data types since values for them can be created in a wide variety of ways
+      // (using WKT, WKB or MySQL spatial functions that return spatial objects), so leave the validation to the MySQL Server.
+      if (mySqlDataType.Contains("curve") || mySqlDataType.Contains("geometry") || mySqlDataType.Contains("line") || mySqlDataType.Contains("curve") || mySqlDataType.Contains("point") || mySqlDataType.Contains("polygon") || mySqlDataType.Contains("surface"))
+      {
+        return true;
+      }
+
       // Check for boolean
       if (mySqlDataType.StartsWith("bool") || mySqlDataType == "bit" || mySqlDataType == "bit(1)")
       {
@@ -1525,8 +1487,7 @@ namespace MySQL.ForExcel.Classes
 
       strippedType1 = strippedType1.ToLowerInvariant();
       strippedType2 = strippedType2.ToLowerInvariant();
-      List<string> dataTypesList = GetMySqlDataTypes();
-      if (!dataTypesList.Contains(strippedType1) || !dataTypesList.Contains(strippedType2))
+      if (!MySqlDataType.BaseTypeNamesList.Contains(strippedType1) || !MySqlDataType.BaseTypeNamesList.Contains(strippedType2))
       {
         System.Diagnostics.Debug.WriteLine("Type1FitsIntoType2: One of the 2 types is Invalid.");
         return false;
@@ -1578,7 +1539,56 @@ namespace MySQL.ForExcel.Classes
         return true;
       }
 
-      return strippedType1.Contains("binary") && strippedType2.Contains("binary");
+      if (strippedType1.Contains("binary") && strippedType2.Contains("binary"))
+      {
+        return true;
+      }
+
+      // Spatial data
+      var type2IsGeometryCollection = strippedType2.Contains("geometrycollection");
+      var type2IsGeometry = strippedType2.Contains("geometry") && !type2IsGeometryCollection;
+      var type2IsMultiCurve = strippedType2.Contains("multicurve");
+      var type2IsCurve = strippedType2.Contains("curve") && !type2IsMultiCurve;
+      var type2IsMultiSurface = strippedType2.Contains("multisurface");
+      var type2IsSurface = strippedType2.Contains("surface") && !type2IsMultiSurface;
+      var type1IsMultiSpatial = strippedType1.Contains("multi");
+      if (strippedType1.Contains("multilinestring") && type2IsMultiCurve)
+      {
+        return true;
+      }
+
+      if (strippedType1.Contains("multipolygon") && type2IsMultiSurface)
+      {
+        return true;
+      }
+
+      if (type1IsMultiSpatial && (type2IsGeometryCollection || type2IsGeometry))
+      {
+        return true;
+      }
+
+      if (strippedType1.Contains("polygon") && type2IsSurface || type2IsGeometry)
+      {
+        return true;
+      }
+
+      var type1IsLineString = strippedType1.Contains("linestring");
+      if (type1IsLineString && (type2IsCurve || type2IsGeometry))
+      {
+        return true;
+      }
+
+      if (!type1IsMultiSpatial && !type1IsLineString && strippedType1.Contains("line") && (strippedType2.Contains("linestring") || type2IsCurve || type2IsGeometry))
+      {
+        return true;
+      }
+
+      if ((strippedType2.Contains("geometrycollection") || strippedType2.Contains("surface") || strippedType2.Contains("curve") || strippedType2.Contains("point")) && type2IsGeometry)
+      {
+        return true;
+      }
+
+      return false;
     }
 
     /// <summary>
@@ -1595,8 +1605,6 @@ namespace MySQL.ForExcel.Classes
         return true;
       }
 
-      List<int> validParamsPerDataType;
-      List<string> dataTypesList = GetMySqlDataTypes(out validParamsPerDataType);
       int rightParenthesisIndex = proposedUserType.IndexOf(")", StringComparison.Ordinal);
       int leftParenthesisIndex = proposedUserType.IndexOf("(", StringComparison.Ordinal);
 
@@ -1608,17 +1616,16 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Check if the data type stripped of parenthesis is found in the list of valid MySQL types.
-      string pureDataType = rightParenthesisIndex >= 0 ? proposedUserType.Substring(0, leftParenthesisIndex).ToLowerInvariant() : proposedUserType.ToLowerInvariant();
-      int typeFoundAt = dataTypesList.IndexOf(pureDataType);
-      if (typeFoundAt < 0)
+      var pureDataType = rightParenthesisIndex >= 0 ? proposedUserType.Substring(0, leftParenthesisIndex).ToLowerInvariant() : proposedUserType.ToLowerInvariant();
+      var mySqlDataType = MySqlDataType.DataTypesList.FirstOrDefault(mType => mType.IsBaseType && string.Equals(mType.Name, pureDataType, StringComparison.InvariantCultureIgnoreCase));
+      if (mySqlDataType == null)
       {
         return false;
       }
 
       // Parameters checks.
       bool enumOrSet = pureDataType == "enum" || pureDataType == "set";
-      int numOfValidParams = validParamsPerDataType[typeFoundAt];
-      if ((numOfValidParams == 0 || rightParenthesisIndex < 0) && !enumOrSet)
+      if ((mySqlDataType.ParametersCount == 0 || rightParenthesisIndex < 0) && !enumOrSet)
       {
         return true;
       }
@@ -1641,7 +1648,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       // If the quantity of parameters does not match the data type valid accepted parameters quantity the data type is invalid.
-      bool parametersQtyIsValid = enumOrSet ? parametersCount > 0 : numOfValidParams == parametersCount;
+      bool parametersQtyIsValid = enumOrSet ? parametersCount > 0 : mySqlDataType.ParametersCount == parametersCount;
       if (!parametersQtyIsValid)
       {
         return false;

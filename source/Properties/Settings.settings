@@ -95,5 +95,8 @@
     <Setting Name="ImportSessionsList" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Collections.Generic.List&lt;MySQL.ForExcel.Classes.ImportSessionInfo&gt;" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="ExportShowAllMySqlDataTypes" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

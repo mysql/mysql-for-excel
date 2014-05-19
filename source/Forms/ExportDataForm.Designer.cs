@@ -114,6 +114,7 @@ namespace MySQL.ForExcel.Forms
       this.CollationComboBox = new System.Windows.Forms.ComboBox();
       this.CollationLabel = new System.Windows.Forms.Label();
       this.PreviewDataGridView = new MySQL.ForExcel.Controls.PreviewDataGridView();
+      this.DataTypeBindingSource = new System.Windows.Forms.BindingSource(this.components);
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.PrimaryKeyWarningPictureBox)).BeginInit();
@@ -125,6 +126,7 @@ namespace MySQL.ForExcel.Forms
       ((System.ComponentModel.ISupportInitialize)(this.TablePictureBox)).BeginInit();
       this.ExportContextMenuStrip.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.PreviewDataGridView)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.DataTypeBindingSource)).BeginInit();
       this.SuspendLayout();
       // 
       // FootnoteAreaPanel
@@ -753,6 +755,7 @@ namespace MySQL.ForExcel.Forms
       ((System.ComponentModel.ISupportInitialize)(this.TablePictureBox)).EndInit();
       this.ExportContextMenuStrip.ResumeLayout(false);
       ((System.ComponentModel.ISupportInitialize)(this.PreviewDataGridView)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.DataTypeBindingSource)).EndInit();
       this.ResumeLayout(false);
 
     }
@@ -804,5 +807,6 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.ToolStripMenuItem CreateTableToolStripMenuItem;
     private System.Windows.Forms.ComboBox CollationComboBox;
     private System.Windows.Forms.Label CollationLabel;
+    private System.Windows.Forms.BindingSource DataTypeBindingSource;
   }
 }

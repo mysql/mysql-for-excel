@@ -49,30 +49,35 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     public bool ExportDetectDatatypeChanged { get; private set; }
 
+    /// <summary>
+    /// Gets a value indicating whether the setting to show all MySQL data types in the Data Type drop-down list was changed by the user.
+    /// </summary>
+    public bool ExportShowAllMySqlDataTypesChanged { get; private set; }
+
     #endregion Properties
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="AutoIndexIntColumnsCheckBox"/> checkbox is checked.
+    /// Event delegate method fired when the <see cref="AutoIndexIntColumnsCheckBox"/> checked state changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
     private void AutoIndexIntColumnsCheckBox_CheckedChanged(object sender, EventArgs e)
     {
-      GetParentFormRequiresRefresh();
+      RecalculateParentFormRequiresRefresh();
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="AutoAllowEmptyNonIndexColumnsCheckBox"/> checkbox is checked.
+    /// Event delegate method fired when the <see cref="AutoAllowEmptyNonIndexColumnsCheckBox"/> checked state changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
     private void AutoAllowEmptyNonIndexColumnsCheckBox_CheckedChanged(object sender, EventArgs e)
     {
-      GetParentFormRequiresRefresh();
+      RecalculateParentFormRequiresRefresh();
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="DetectDatatypeCheckBox"/> checkbox is checked.
+    /// Event delegate method fired when the <see cref="DetectDatatypeCheckBox"/> checked state changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
@@ -85,7 +90,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       ExportDetectDatatypeChanged = Settings.Default.ExportDetectDatatype != DetectDatatypeCheckBox.Checked;
-      GetParentFormRequiresRefresh();
+      RecalculateParentFormRequiresRefresh();
     }
 
     /// <summary>
@@ -107,22 +112,8 @@ namespace MySQL.ForExcel.Forms
       Settings.Default.ExportAutoAllowEmptyNonIndexColumns = AutoAllowEmptyNonIndexColumnsCheckBox.Checked;
       Settings.Default.ExportUseFormattedValues = UseFormattedValuesCheckBox.Checked;
       Settings.Default.ExportSqlQueriesCreateIndexesLast = CreateTableIndexesLastCheckBox.Checked;
+      Settings.Default.ExportShowAllMySqlDataTypes = ShowAllDataTypesCheckBox.Checked;
       MiscUtilities.SaveSettings();
-    }
-
-    /// <summary>
-    /// Recalculates the value of the <see cref="ParentFormRequiresRefresh"/> property.
-    /// </summary>
-    /// <returns>The recalculated value of the <see cref="ParentFormRequiresRefresh"/> property.</returns>
-    private bool GetParentFormRequiresRefresh()
-    {
-      ParentFormRequiresRefresh = ExportDetectDatatypeChanged
-                                  || Settings.Default.ExportLimitPreviewRowsQuantity != (int)PreviewRowsQuantityNumericUpDown.Value
-                                  || Settings.Default.ExportAutoIndexIntColumns != AutoIndexIntColumnsCheckBox.Checked
-                                  || Settings.Default.ExportAutoAllowEmptyNonIndexColumns != AutoAllowEmptyNonIndexColumnsCheckBox.Checked
-                                  || Settings.Default.ExportUseFormattedValues != UseFormattedValuesCheckBox.Checked;
-      SetWarningControlsVisibility();
-      return ParentFormRequiresRefresh;
     }
 
     /// <summary>
@@ -132,7 +123,21 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void PreviewRowsQuantityNumericUpDown_ValueChanged(object sender, EventArgs e)
     {
-      GetParentFormRequiresRefresh();
+      RecalculateParentFormRequiresRefresh();
+    }
+
+    /// <summary>
+    /// Recalculates the value of the <see cref="ParentFormRequiresRefresh"/> property.
+    /// </summary>
+    /// <returns>The recalculated value of the <see cref="ParentFormRequiresRefresh"/> property.</returns>
+    private void RecalculateParentFormRequiresRefresh()
+    {
+      ParentFormRequiresRefresh = ExportDetectDatatypeChanged
+                                  || Settings.Default.ExportLimitPreviewRowsQuantity != (int)PreviewRowsQuantityNumericUpDown.Value
+                                  || Settings.Default.ExportAutoIndexIntColumns != AutoIndexIntColumnsCheckBox.Checked
+                                  || Settings.Default.ExportAutoAllowEmptyNonIndexColumns != AutoAllowEmptyNonIndexColumnsCheckBox.Checked
+                                  || Settings.Default.ExportUseFormattedValues != UseFormattedValuesCheckBox.Checked;
+      SetWarningControlsVisibility();
     }
 
     /// <summary>
@@ -152,6 +157,7 @@ namespace MySQL.ForExcel.Forms
         UseFormattedValuesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportUseFormattedValues");
         AddBufferToVarcharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
         CreateTableIndexesLastCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportSqlQueriesCreateIndexesLast");
+        ShowAllDataTypesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportShowAllMySqlDataTypes");
       }
       else
       {
@@ -166,6 +172,7 @@ namespace MySQL.ForExcel.Forms
         UseFormattedValuesCheckBox.Checked = Settings.Default.ExportUseFormattedValues;
         AddBufferToVarcharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
         CreateTableIndexesLastCheckBox.Checked = Settings.Default.ExportSqlQueriesCreateIndexesLast;
+        ShowAllDataTypesCheckBox.Checked = Settings.Default.ExportShowAllMySqlDataTypes;
       }
     }
 
@@ -190,13 +197,23 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="UseFormattedValuesCheckBox"/> checkbox is checked.
+    /// Event delegate method fired when the <see cref="ShowAllDataTypesCheckBox"/> checked state changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ShowAllDataTypesCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+      ExportShowAllMySqlDataTypesChanged = ShowAllDataTypesCheckBox.Checked != Settings.Default.ExportShowAllMySqlDataTypes;
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="UseFormattedValuesCheckBox"/> checked state changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
     private void UseFormattedValuesCheckBox_CheckedChanged(object sender, EventArgs e)
     {
-      GetParentFormRequiresRefresh();
+      RecalculateParentFormRequiresRefresh();
     }
   }
 }

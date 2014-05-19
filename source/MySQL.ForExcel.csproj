@@ -248,6 +248,7 @@
     <Compile Include="Classes\MySqlDataTable.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Classes\MySqlDataType.cs" />
     <Compile Include="Classes\MySqlDataUtilities.cs" />
     <Compile Include="Classes\MySqlDummyRow.cs" />
     <Compile Include="Classes\MySqlForExcelSettings.cs" />

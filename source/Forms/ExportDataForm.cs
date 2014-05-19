@@ -84,7 +84,6 @@ namespace MySQL.ForExcel.Forms
       _exportDataRange = exportDataRange;
 
       InitializeComponent();
-
       if (!exportingWorksheetName.ToLowerInvariant().StartsWith("sheet"))
       {
         _proposedTableName = exportingWorksheetName.ToLower().Replace(' ', '_');
@@ -194,6 +193,10 @@ namespace MySQL.ForExcel.Forms
       using (var optionsDialog = new ExportAdvancedOptionsDialog())
       {
         optionsDialog.ShowDialog();
+        if (optionsDialog.ExportShowAllMySqlDataTypesChanged)
+        {
+          InitializeDataTypeCombo();
+        }
 
         if (!optionsDialog.ParentFormRequiresRefresh)
         {
@@ -201,11 +204,10 @@ namespace MySQL.ForExcel.Forms
         }
 
         LoadPreviewData();
-
         if (optionsDialog.ExportDetectDatatypeChanged && Settings.Default.ExportDetectDatatype)
         {
-          // Reset background colors to default since those aren't reset when the condition above is fullfilled.
-          foreach (MySqlDataColumn mysqldc in _previewDataTable.Columns.Cast<MySqlDataColumn>().Where(mysqldc => mysqldc != null))
+          // Reset background colors to default since those aren't reset when the condition above is fulfilled.
+          foreach (var mysqldc in _previewDataTable.Columns.Cast<MySqlDataColumn>().Where(mysqldc => mysqldc != null))
           {
             PreviewTableWarningsChanged(mysqldc, new TableWarningsChangedArgs(mysqldc));
           }
@@ -344,13 +346,13 @@ namespace MySQL.ForExcel.Forms
     private void DataTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
     {
       MySqlDataColumn currentCol = GetCurrentMySqlDataColumn();
-      var dataTable = DataTypeComboBox.DataSource as DataTable;
-      if (dataTable != null && (currentCol == null || DataTypeComboBox.Text.Length == 0 || DataTypeComboBox.Text == currentCol.MySqlDataType || dataTable.Select(string.Format("Value = '{0}'", DataTypeComboBox.Text)).Length == 0))
+      var selectedType = DataTypeComboBox.SelectedValue.ToString();
+      if (currentCol == null || string.IsNullOrEmpty(selectedType) || string.Equals(selectedType, currentCol.MySqlDataType, StringComparison.InvariantCultureIgnoreCase))
       {
         return;
       }
 
-      currentCol.SetMySqlDataType(DataTypeComboBox.Text, false, true);
+      currentCol.SetMySqlDataType(selectedType, false, true);
     }
 
     /// <summary>
@@ -390,8 +392,9 @@ namespace MySQL.ForExcel.Forms
     {
       e.DrawBackground();
       var comboItem = DataTypeComboBox.Items[e.Index];
-      var dataRowView = comboItem as DataRowView;
-      string itemText = dataRowView != null ? dataRowView["Description"].ToString() : comboItem.ToString();
+      string itemText = comboItem is KeyValuePair<string, string>
+        ? ((KeyValuePair<string, string>)comboItem).Value
+        : comboItem.ToString();
       e.Graphics.DrawString(itemText, DataTypeComboBox.Font, Brushes.Black, new RectangleF(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height));
       e.DrawFocusRectangle();
     }
@@ -765,31 +768,14 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void InitializeDataTypeCombo()
     {
-      DataTable dataTypesTable = new DataTable();
-      dataTypesTable.Columns.Add("Value");
-      dataTypesTable.Columns.Add("Description");
-
-      dataTypesTable.Rows.Add(new object[] { "Integer", "Integer - Default for whole-number columns" });
-      dataTypesTable.Rows.Add(new object[] { "Varchar(5)", "Varchar(5) - Small string up to 5 characters" });
-      dataTypesTable.Rows.Add(new object[] { "Varchar(12)", "Varchar(12) - Small string up to 12 characters" });
-      dataTypesTable.Rows.Add(new object[] { "Varchar(25)", "Varchar(25) - Small string up to 25 characters" });
-      dataTypesTable.Rows.Add(new object[] { "Varchar(45)", "Varchar(45) - Standard string up to 45 characters" });
-      dataTypesTable.Rows.Add(new object[] { "Varchar(255)", "Varchar(255) - Standard string up to 255 characters" });
-      dataTypesTable.Rows.Add(new object[] { "Varchar(4000)", "Varchar(4000) - Large string up to 4k characters" });
-      dataTypesTable.Rows.Add(new object[] { "Text", "Text - Maximum string up to 65k characters" });
-      dataTypesTable.Rows.Add(new object[] { "Datetime", "Datetime - For columns that store both, date and time" });
-      dataTypesTable.Rows.Add(new object[] { "Date", "Date - For columns that only store a date" });
-      dataTypesTable.Rows.Add(new object[] { "Time", "Time - For columns that only store a time" });
-      dataTypesTable.Rows.Add(new object[] { "Bool", "Bool - Holds values like (0, 1), (True, False) or (Yes, No)" });
-      dataTypesTable.Rows.Add(new object[] { "BigInt", "BigInt - For columns containing large whole-number integers with up to 19 digits" });
-      dataTypesTable.Rows.Add(new object[] { "Decimal(12, 2)", "Decimal(12, 2) - Exact decimal numbers with 12 digits with 2 of them after decimal point" });
-      dataTypesTable.Rows.Add(new object[] { "Decimal(65, 30)", "Decimal(65, 30) - Biggest exact decimal numbers with 65 digits with 30 of them after decimal point" });
-      dataTypesTable.Rows.Add(new object[] { "Double", "Double - Biggest float pointing number with approximately 15 decimal places" });
-
       _isUserInput = false;
-      DataTypeComboBox.DataSource = dataTypesTable;
-      DataTypeComboBox.ValueMember = "Value";
-      DataTypeComboBox.DisplayMember = "Value";
+      DataTypeBindingSource.DataSource = Settings.Default.ExportShowAllMySqlDataTypes
+        ? MySqlDataType.AllDataTypesDictionary
+        : MySqlDataType.CommonDataTypesDictionary;
+      DataTypeBindingSource.DataMember = null;
+      DataTypeComboBox.DataSource = DataTypeBindingSource;
+      DataTypeComboBox.DisplayMember = "Key";
+      DataTypeComboBox.ValueMember = "Key";
       _isUserInput = true;
     }
 

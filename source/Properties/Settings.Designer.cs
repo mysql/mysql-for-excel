@@ -450,6 +450,19 @@ namespace MySQL.ForExcel.Properties {
                 this["ImportSessionsList"] = value;
             }
         }
-
+        
+        [PropertyGroup(PropertyGroup.SettingsGroup.Export)]
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ExportShowAllMySqlDataTypes {
+            get {
+                return ((bool)(this["ExportShowAllMySqlDataTypes"]));
+            }
+            set {
+                this["ExportShowAllMySqlDataTypes"] = value;
+            }
+        }
     }
 }
