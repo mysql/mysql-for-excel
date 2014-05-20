@@ -563,9 +563,15 @@ namespace MySQL.ForExcel
         }
 
         // Add new Edit sessions in memory collection to serialized collection
+        activeEditSession.LastAccess = DateTime.Now;
         StoredEditSessions.Add(activeEditSession);
       }
 
+      // Scrubbing of duplicated Import sessions and setting last access time.
+      foreach (var activeImportSession in ActiveWorkbookImportSessions)
+      {
+        activeImportSession.LastAccess = DateTime.Now;
+      }
       RemoveInvalidImportSessions();
 
       // Remove deleted Edit sessions from memory collection also from serialized collection
@@ -578,6 +584,9 @@ namespace MySQL.ForExcel
       workbook.Saved = true;
     }
 
+    /// <summary>
+    /// Removes the duplicate import sessions.
+    /// </summary>
     private void RemoveInvalidImportSessions()
     {
       var workbookImportSessions = ActiveWorkbookImportSessions;

@@ -91,6 +91,12 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets or sets the last date and time the session was saved.
+    /// </summary>
+    [XmlAttribute]
+    public DateTime LastAccess { get; set; }
+
+    /// <summary>
     /// Gets or sets the name of the schema the connection works with.
     /// </summary>
     [XmlAttribute]

@@ -880,7 +880,10 @@ namespace MySQL.ForExcel.Forms
       {
         Exception exception;
         _mySqlTable.RefreshData(out exception);
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.EditDataRefreshErrorText, exception.Message);
+        if (exception != null)
+        {
+          MiscUtilities.ShowCustomizedErrorDialog(Resources.EditDataRefreshErrorText, exception.Message);
+        }
       }
 
       Globals.ThisAddIn.SkipSelectedDataContentsDetection = true;

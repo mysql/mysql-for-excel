@@ -15,6 +15,9 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
+using System;
+using System.Security.Cryptography.X509Certificates;
+
 namespace MySQL.ForExcel.Interfaces
 {
   /// <summary>
@@ -26,6 +29,11 @@ namespace MySQL.ForExcel.Interfaces
     /// Gets or sets the connection information the session works with, contains credentials with remote access permissions to the reffered MySQL instance in it.
     /// </summary>
     string ConnectionId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the last date and time the session was saved.
+    /// </summary>
+    DateTime LastAccess { get; set; }
 
     /// <summary>
     /// Gets or sets the name of the schema.

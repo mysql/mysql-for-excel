@@ -90,6 +90,12 @@ namespace MySQL.ForExcel.Classes
     public bool ImportColumnNames { get; set; }
 
     /// <summary>
+    /// Gets or sets the last date and time the session was saved.
+    /// </summary>
+    [XmlAttribute]
+    public DateTime LastAccess { get; set; }
+
+    /// <summary>
     /// Gets or sets MySQL table for the import session.
     /// </summary>
     [XmlIgnore]
@@ -167,7 +173,6 @@ namespace MySQL.ForExcel.Classes
         return false;
       }
 
-      Connection.Schema = SchemaName;
       Exception connectionException;
       bool connectionIsValid = Connection.TestConnection(out connectionException);
       if (connectionException != null)
@@ -196,6 +201,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       Connection.Schema = SchemaName;
+      Connection.AllowZeroDateTimeValues = true;
       MySqlTable = Connection.CreateImportMySqlTable(false, TableName, ImportColumnNames, SelectQuery);
     }
 
