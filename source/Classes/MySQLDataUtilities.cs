@@ -75,7 +75,7 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      var importMySqlDataTable = new MySqlDataTable(dboName, dt, wbConnection, isEditOperation)
+      var importMySqlDataTable = new MySqlDataTable(wbConnection, dboName, dt, isEditOperation)
       {
         ImportColumnNames = importColumnNames,
         SelectQuery = selectQuery

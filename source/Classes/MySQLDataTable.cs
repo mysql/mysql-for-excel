@@ -194,18 +194,16 @@ namespace MySQL.ForExcel.Classes
     /// Initializes a new instance of the <see cref="MySqlDataTable"/> class.
     /// This constructor is meant to be used by the <see cref="ExportDataForm"/> class.
     /// </summary>
-    /// <param name="schemaName">Name of the schema where this table will be created.</param>
+    /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="proposedTableName">Proposed name for this new table.</param>
     /// <param name="addPrimaryKeyCol">Flag indicating if an auto-generated primary key column will be added as the first column in the table.</param>
     /// <param name="useFormattedValues">Flag indicating if the Excel excelData used to populate this table is formatted (numbers, dates, text) or not (numbers and text).</param>
     /// <param name="detectDataType">Flag indicating if the data type for each column is automatically detected when data is loaded by the <see cref="SetupColumnsWithData"/> method.</param>
     /// <param name="addBufferToVarchar">Flag indicating if columns with an auto-detected varchar type will get a padding buffer for its size.</param>
     /// <param name="autoIndexIntColumns">Flag indicating if columns with an integer-based data-type will have their <see cref="MySqlDataColumn.CreateIndex"/> property value set to true.</param>
-    /// <param name="autoAllowEmptyNonIndexColumns">Flag indicating if columns that have their <see cref="MySqlDataColumn.CreateIndex"/> property value
-    /// set to <c>false</c> will automatically get their <see cref="MySqlDataColumn.AllowNull"/> property value set to <c>true</c>.</param>
-    /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    public MySqlDataTable(string schemaName, string proposedTableName, bool addPrimaryKeyCol, bool useFormattedValues, bool detectDataType, bool addBufferToVarchar, bool autoIndexIntColumns, bool autoAllowEmptyNonIndexColumns, MySqlWorkbenchConnection wbConnection)
-      : this(schemaName, proposedTableName)
+    /// <param name="autoAllowEmptyNonIndexColumns">Flag indicating if columns that have their <see cref="MySqlDataColumn.CreateIndex"/> property value set to <c>false</c> will automatically get their <see cref="MySqlDataColumn.AllowNull"/> property value set to <c>true</c>.</param>
+    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string proposedTableName, bool addPrimaryKeyCol, bool useFormattedValues, bool detectDataType, bool addBufferToVarchar, bool autoIndexIntColumns, bool autoAllowEmptyNonIndexColumns)
+      : this(wbConnection, proposedTableName)
     {
       AddBufferToVarchar = addBufferToVarchar;
       AddPrimaryKeyColumn = addPrimaryKeyCol;
@@ -215,24 +213,22 @@ namespace MySQL.ForExcel.Classes
       IsFormatted = useFormattedValues;
       OperationType = DataOperationType.Export;
       TableName = proposedTableName;
-      WbConnection = wbConnection;
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MySqlDataTable"/> class.
     /// This constructor is meant to be used by the <see cref="AppendDataForm"/> class to fetch schema information from the corresponding MySQL table before copying its excelData.
     /// </summary>
+    /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="tableName">Name of the table.</param>
     /// <param name="fetchColumnsSchemaInfo">Flag indicating if the schema information from the corresponding MySQL table is fetched and recreated before any excelData is added to the table.</param>
     /// <param name="datesAsMySqlDates">Flag indicating if the dates are stored in the table as <see cref="System.DateTime"/> or <see cref="MySql.Data.Types.MySqlDateTime"/> objects.</param>
     /// <param name="useFormattedValues">Flag indicating if the Excel excelData used to populate this table is formatted (numbers, dates, text) or not (numbers and text).</param>
-    /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    public MySqlDataTable(string tableName, bool fetchColumnsSchemaInfo, bool datesAsMySqlDates, bool useFormattedValues, MySqlWorkbenchConnection wbConnection)
-      : this(wbConnection.Schema, tableName)
+    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string tableName, bool fetchColumnsSchemaInfo, bool datesAsMySqlDates, bool useFormattedValues)
+      : this(wbConnection, tableName)
     {
       IsFormatted = useFormattedValues;
       OperationType = DataOperationType.Append;
-      WbConnection = wbConnection;
       if (fetchColumnsSchemaInfo)
       {
         CreateTableSchema(tableName, datesAsMySqlDates);
@@ -245,12 +241,12 @@ namespace MySQL.ForExcel.Classes
     /// Initializes a new instance of the <see cref="MySqlDataTable"/> class.
     /// This constructor is meant to be used by the <see cref="EditDataDialog"/> class to copy the contents of a table imported to Excel for edition and also by the import process.
     /// </summary>
+    /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="tableName">Name of the table.</param>
     /// <param name="filledTable"><see cref="DataTable"/> object containing imported excelData from the MySQL table to be edited.</param>
-    /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="isEditOperation"><c>true</c> if the import is part of an Edit operation, <c>false</c> otherwise.</param>
-    public MySqlDataTable(string tableName, DataTable filledTable, MySqlWorkbenchConnection wbConnection, bool isEditOperation)
-      : this(tableName, true, true, false, wbConnection)
+    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string tableName, DataTable filledTable, bool isEditOperation)
+      : this(wbConnection, tableName, true, true, false)
     {
       CopyTableData(filledTable);
       OperationType = isEditOperation ? DataOperationType.Edit : DataOperationType.Import;
@@ -259,14 +255,14 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Initializes a new instance of the <see cref="MySqlDataTable"/> class.
     /// </summary>
-    /// <param name="schemaName">Name of the schema where this table exists.</param>
+    /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="tableName">Name of the table.</param>
-    public MySqlDataTable(string schemaName, string tableName)
+    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string tableName)
       : this()
     {
-      if (!string.IsNullOrEmpty(schemaName))
+      if (wbConnection != null && !string.IsNullOrEmpty(wbConnection.Schema))
       {
-        SchemaName = schemaName;
+        SchemaName = wbConnection.Schema;
       }
 
       if (tableName != null)
@@ -275,16 +271,17 @@ namespace MySQL.ForExcel.Classes
       }
 
       SelectQuery = string.Format("SELECT * FROM `{0}`.`{1}`", SchemaName, TableNameForSqlQueries);
+      WbConnection = wbConnection;
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MySqlDataTable"/> class.
     /// This constructor is meant to be used by the <see cref="ImportProcedureForm"/> class to copy the contents of result set tables from an executed procedure.
     /// </summary>
+    /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="filledTable"><see cref="DataTable"/> object containing imported excelData from the MySQL table to be edited.</param>
-    /// <param name="schemaName">Name of the schema where this table exists.</param>
-    public MySqlDataTable(DataTable filledTable, string schemaName)
-      : this(schemaName, filledTable.TableName)
+    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, DataTable filledTable)
+      : this(wbConnection, filledTable.TableName)
     {
       CopyTableSchemaAndData(filledTable);
       OperationType = DataOperationType.Import;
@@ -1151,15 +1148,14 @@ namespace MySQL.ForExcel.Classes
     {
       bool createAutoPkColumn = autoPkCreationOnlyIfFirstColumnIsPk ? UseFirstColumnAsPk : AddPrimaryKeyColumn;
       MySqlDataTable clonedTable = new MySqlDataTable(
-        SchemaName,
+        WbConnection,
         TableName,
         createAutoPkColumn,
         IsFormatted,
         DetectDatatype,
         AddBufferToVarchar,
         AutoIndexIntColumns,
-        AutoAllowEmptyNonIndexColumns,
-        WbConnection)
+        AutoAllowEmptyNonIndexColumns)
       {
         UseFirstColumnAsPk = UseFirstColumnAsPk,
         IsFormatted = IsFormatted,
@@ -1251,7 +1247,7 @@ namespace MySQL.ForExcel.Classes
         {
           foreach (MySqlDataColumn col in Columns)
           {
-            excelTable.ListColumns[col.Ordinal + 1].Name = col.DisplayName;
+            excelTable.ListColumns[col.Ordinal + 1].Name = col.ColumnName;
           }
         }
 
@@ -1613,13 +1609,12 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Imports data contained in the given <see cref="MySqlDataTable"/> object at the active Excel cell.
     /// </summary>
-    /// <param name="importColumnNames">Flag indicating if column names will be imported as the first row of imported data.</param>
     /// <param name="createExcelTable">Flag indicating whether a <see cref="ExcelInterop.ListObject"/> is created for the imported data.</param>
     /// <param name="createPivotTable">Flag indicating whether a <see cref="ExcelInterop.PivotTable"/> is created for the imported data.</param>
     /// <param name="pivotPosition">The position where new <see cref="ExcelInterop.PivotTable"/> objects are placed relative to imported table's data.</param>
     /// <param name="addSummaryFields">Indicates wheather to include a row with summary fields</param>
     /// <returns>The <see cref="ExcelInterop.Range"/> or <see cref="ExcelInterop.ListObject"/> containing the cells with the imported data.</returns>
-    public object ImportDataAtActiveExcelCell(bool importColumnNames, bool createExcelTable, bool createPivotTable, PivotTablePosition pivotPosition = PivotTablePosition.Right, bool addSummaryFields = false)
+    public object ImportDataAtActiveExcelCell(bool createExcelTable, bool createPivotTable, PivotTablePosition pivotPosition = PivotTablePosition.Right, bool addSummaryFields = false)
     {
       var atCell = Globals.ThisAddIn.Application.ActiveCell;
       object retObj;

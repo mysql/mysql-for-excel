@@ -236,15 +236,17 @@ namespace MySQL.ForExcel.Forms
       try
       {
         // Prepare parameters and execute the procedure and create OutAndReturnValues table
-        var outParamsTable = new MySqlDataTable(_wbConnection.Schema, "OutAndReturnValues");
+        var outParamsTable = new MySqlDataTable(_wbConnection, "OutAndReturnValues");
         for (int paramIdx = 0; paramIdx < _procedureParamsProperties.Count; paramIdx++)
         {
           _mysqlParameters[paramIdx].Value = _procedureParamsProperties[paramIdx].Value;
           if (_mysqlParameters[paramIdx].Direction == ParameterDirection.Output ||
               _mysqlParameters[paramIdx].Direction == ParameterDirection.ReturnValue)
           {
-            outParamsTable.Columns.Add(_procedureParamsProperties[paramIdx].Name,
-              _procedureParamsProperties[paramIdx].Value.GetType());
+            outParamsTable.Columns.Add(new MySqlDataColumn(
+            _procedureParamsProperties[paramIdx].Name,
+            _procedureParamsProperties[paramIdx].Value.GetType().GetMySqlDataType(),
+            true));
           }
         }
 
@@ -271,7 +273,7 @@ namespace MySQL.ForExcel.Forms
         foreach (DataTable table in resultSetDs.Tables)
         {
           table.TableName = string.Format("Result{0}", resultIndex++);
-          var mySqlDataTable = new MySqlDataTable(table, _wbConnection.Schema);
+          var mySqlDataTable = new MySqlDataTable(_wbConnection, table);
           _importDataSet.Tables.Add(mySqlDataTable);
         }
 
@@ -369,6 +371,7 @@ namespace MySQL.ForExcel.Forms
           : MySqlDataTable.PivotTablePosition.Right;
         foreach (MySqlDataTable mySqlTable in _importDataSet.Tables)
         {
+          mySqlTable.ImportColumnNames = ImportColumnNames;
           mySqlTable.TableName = _dbObject.Name + "." + mySqlTable.TableName;
           if (ImportType == ImportMultipleType.SelectedResultSet && _selectedResultSetIndex < tableIdx)
           {
@@ -376,13 +379,13 @@ namespace MySQL.ForExcel.Forms
           }
 
           tableIdx++;
-          var excelObj = mySqlTable.ImportDataAtActiveExcelCell(ImportColumnNames, Settings.Default.ImportCreateExcelTable, CreatePivotTables, pivotPosition);
+          var excelObj = mySqlTable.ImportDataAtActiveExcelCell(Settings.Default.ImportCreateExcelTable, CreatePivotTables, pivotPosition, AddSummaryFieldsCheckBox.Checked);
           if (excelObj == null)
           {
             continue;
           }
 
-          var fillingRange = excelObj is ExcelInterop.ListObject 
+          var fillingRange = excelObj is ExcelInterop.ListObject
             ? (excelObj as ExcelInterop.ListObject).Range
             : excelObj as ExcelInterop.Range;
           ExcelInterop.Range endCell;

@@ -1017,15 +1017,17 @@ namespace MySQL.ForExcel.Forms
     private void InitializeSourceTableGrid()
     {
       _sourceMySqlPreviewDataTable = new MySqlDataTable(
-        _wbConnection.Schema,
+        _wbConnection,
         _importDbObject.Name,
         false,
         Settings.Default.AppendUseFormattedValues,
         true,
         false,
         false,
-        false,
-        _wbConnection) { IsPreviewTable = true };
+        false)
+      {
+        IsPreviewTable = true
+      };
       int previewRowsQty = Math.Min(_appendDataRange.Rows.Count, Settings.Default.AppendLimitPreviewRowsQuantity);
       _sourceMySqlPreviewDataTable.SetupColumnsWithData(_appendDataRange, true, false, previewRowsQty);
       SourceExcelDataDataGridView.DataSource = _sourceMySqlPreviewDataTable;
@@ -1044,11 +1046,11 @@ namespace MySQL.ForExcel.Forms
     private void InitializeTargetTableGrid()
     {
       _targetMySqlPreviewDataTable = new MySqlDataTable(
+        _wbConnection,
         _importDbObject.Name,
         true,
         false,
-        Settings.Default.AppendUseFormattedValues,
-        _wbConnection);
+        Settings.Default.AppendUseFormattedValues);
       DataTable dt = _wbConnection.GetDataFromTableOrView(_importDbObject.Name, null, 0, Settings.Default.AppendLimitPreviewRowsQuantity);
       foreach (object[] rowValues in from DataRow dr in dt.Rows select dr.ItemArray)
       {

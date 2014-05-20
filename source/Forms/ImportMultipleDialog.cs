@@ -244,7 +244,7 @@ namespace MySQL.ForExcel.Forms
             continue;
           }
 
-          var listObj = mySqlTable.ImportDataAtActiveExcelCell(true, true, CreatePivotTables);
+          var listObj = mySqlTable.ImportDataAtActiveExcelCell(true, CreatePivotTables);
           var excelTable = listObj as ExcelInterop.ListObject;
           if (excelTable == null)
           {

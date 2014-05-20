@@ -790,15 +790,17 @@ namespace MySQL.ForExcel.Forms
       }
 
       _previewDataTable = new MySqlDataTable(
-        _wbConnection.Schema,
+        _wbConnection,
         _proposedTableName,
         true,
         Settings.Default.ExportUseFormattedValues,
         Settings.Default.ExportDetectDatatype,
         Settings.Default.ExportAddBufferToVarchar,
         Settings.Default.ExportAutoIndexIntColumns,
-        Settings.Default.ExportAutoAllowEmptyNonIndexColumns,
-        _wbConnection) { IsPreviewTable = true };
+        Settings.Default.ExportAutoAllowEmptyNonIndexColumns)
+      {
+        IsPreviewTable = true
+      };
       _previewDataTable.TableColumnPropertyValueChanged += PreviewTableColumnPropertyValueChanged;
       _previewDataTable.TableWarningsChanged += PreviewTableWarningsChanged;
       int previewRowsQty = Math.Min(_exportDataRange.Rows.Count, Settings.Default.ExportLimitPreviewRowsQuantity);
