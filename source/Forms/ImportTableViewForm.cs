@@ -92,21 +92,13 @@ namespace MySQL.ForExcel.Forms
       InitializeComponent();
 
       PreviewDataGridView.DataError += PreviewDataGridView_DataError;
-      IncludeHeadersCheckBox.Checked = true;
-      IncludeHeadersCheckBox.Enabled = !importForEditData;
-      PreviewDataGridView.DisableColumnsSelection = _isEditOperation;
-      if (importForEditData)
-      {
-        PreviewDataGridView.ContextMenuStrip = null;
-      }
-
-      LimitRowsCheckBox.Checked = false;
       TableNameMainLabel.Text = importDbObject.Type + @" Name:";
       PickColumnsSubLabel.Text = string.Format(Resources.ImportTableOrViewSubText, importDbObject.Type.ToString().ToLowerInvariant());
       OptionsWarningLabel.Text = Resources.WorkbookInCompatibilityModeWarning;
       Text = @"Import Data - " + importToWorksheetName;
       TableNameSubLabel.Text = importDbObject.Name;
       FillPreviewGrid();
+      SetOptionsAvailability();
     }
 
     #region Properties
@@ -410,6 +402,25 @@ namespace MySQL.ForExcel.Forms
     {
       OptionsWarningLabel.Visible = show;
       OptionsWarningPictureBox.Visible = show;
+    }
+
+    /// <summary>
+    /// Disables some import options when the form is called from an Edit Data operation.
+    /// </summary>
+    private void SetOptionsAvailability()
+    {
+      IncludeHeadersCheckBox.Checked = true;
+      IncludeHeadersCheckBox.Enabled = !_isEditOperation;
+      PreviewDataGridView.DisableColumnsSelection = _isEditOperation;
+      if (_isEditOperation)
+      {
+        PreviewDataGridView.ContextMenuStrip = null;
+      }
+
+      LimitRowsCheckBox.Checked = false;
+      LimitRowsCheckBox.Enabled = !_isEditOperation;
+      CreatePivotTableCheckBox.Enabled = !_isEditOperation;
+      AddSummaryFieldsCheckBox.Enabled = !_isEditOperation;
     }
   }
 }
