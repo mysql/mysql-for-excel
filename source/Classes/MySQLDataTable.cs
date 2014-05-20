@@ -1489,8 +1489,9 @@ namespace MySQL.ForExcel.Classes
       {
         foreach (var col in Columns.OfType<MySqlDataColumn>())
         {
-          // Skipping excluded columns is better than simplifying the foreach using a .Where LINQ form since using it will cause
-          // traversing the list of columns 2 times in most of the cases where none or just a very few columns are excluded.
+          // DO NOT CHANGE TO LINQ: Skipping excluded columns is better than simplifying the foreach using a .Where LINQ form
+          // since using it will cause traversing the list of columns 2 times in most of the cases where none or just a very
+          // few columns are excluded.
           if (col.ExcludeColumn)
           {
             continue;
@@ -1509,12 +1510,13 @@ namespace MySQL.ForExcel.Classes
         sql.Append(GetIndexesSqlPiece(sqlType, IndexType.Index, ref delimiter));
       }
 
-      if (createTable)
+      if (!createTable)
       {
-        sql.Append(nl);
-        sql.Append(")");
+        return sql.ToString();
       }
 
+      sql.Append(nl);
+      sql.Append(")");
       if (!string.IsNullOrEmpty(CharSet))
       {
         sql.Append(nl);
