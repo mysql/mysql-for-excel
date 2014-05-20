@@ -58,7 +58,6 @@ namespace MySQL.ForExcel.Forms
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ImportMultipleDialog));
       this.DialogCancelButton = new System.Windows.Forms.Button();
       this.SelectTablesViewsSubLabel = new System.Windows.Forms.Label();
-      this.ImportRelationshipsFromDbCheckBox = new System.Windows.Forms.CheckBox();
       this.PickRelatedSubLabel = new System.Windows.Forms.Label();
       this.PickRelatedMainLabel = new System.Windows.Forms.Label();
       this.DefineRelationshipsPictureBox = new System.Windows.Forms.PictureBox();
@@ -79,18 +78,17 @@ namespace MySQL.ForExcel.Forms
       this.WorkbookInCompatibilityModeWarningPictureBox = new System.Windows.Forms.PictureBox();
       this.TotalTablesViewsLabel = new System.Windows.Forms.Label();
       this.AdvancedOptionsButton = new System.Windows.Forms.Button();
-      this.RelationshipsNotSupportedLabel = new System.Windows.Forms.Label();
-      this.RelationshipsNotSupportedPictureBox = new System.Windows.Forms.PictureBox();
       this.ImportButton = new System.Windows.Forms.Button();
       this.CreatePivotTableCheckBox = new System.Windows.Forms.CheckBox();
       this.OptionsGroupBox = new System.Windows.Forms.GroupBox();
+      this.WhyDisabledLinkLabel = new System.Windows.Forms.LinkLabel();
+      this.CreateExcelRelationshipsCheckBox = new System.Windows.Forms.CheckBox();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.DefineRelationshipsPictureBox)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.SelectTablesViewsPictureBox)).BeginInit();
       this.TablesViewsContextMenuStrip.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.WorkbookInCompatibilityModeWarningPictureBox)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.RelationshipsNotSupportedPictureBox)).BeginInit();
       this.OptionsGroupBox.SuspendLayout();
       this.SuspendLayout();
       // 
@@ -107,7 +105,6 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.TablesViewsListView);
       this.ContentAreaPanel.Controls.Add(this.RelatedTablesViewsListView);
       this.ContentAreaPanel.Controls.Add(this.ImportDataLabel);
-      this.ContentAreaPanel.Controls.Add(this.ImportRelationshipsFromDbCheckBox);
       this.ContentAreaPanel.Controls.Add(this.SelectTablesViewsSubLabel);
       this.ContentAreaPanel.Controls.Add(this.PickRelatedSubLabel);
       this.ContentAreaPanel.Controls.Add(this.PickRelatedMainLabel);
@@ -115,23 +112,21 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.SelectTablesViewsMainLabel);
       this.ContentAreaPanel.Controls.Add(this.SelectTablesViewsPictureBox);
       this.ContentAreaPanel.Controls.Add(this.OptionsGroupBox);
-      this.ContentAreaPanel.Controls.Add(this.RelationshipsNotSupportedLabel);
-      this.ContentAreaPanel.Controls.Add(this.RelationshipsNotSupportedPictureBox);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(704, 541);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(784, 556);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.ImportButton);
       this.CommandAreaPanel.Controls.Add(this.AdvancedOptionsButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 496);
-      this.CommandAreaPanel.Size = new System.Drawing.Size(704, 45);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 511);
+      this.CommandAreaPanel.Size = new System.Drawing.Size(784, 45);
       // 
       // DialogCancelButton
       // 
       this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.DialogCancelButton.Location = new System.Drawing.Point(617, 11);
+      this.DialogCancelButton.Location = new System.Drawing.Point(692, 11);
       this.DialogCancelButton.Name = "DialogCancelButton";
       this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
       this.DialogCancelButton.TabIndex = 2;
@@ -147,28 +142,16 @@ namespace MySQL.ForExcel.Forms
       this.SelectTablesViewsSubLabel.Name = "SelectTablesViewsSubLabel";
       this.SelectTablesViewsSubLabel.Size = new System.Drawing.Size(220, 33);
       this.SelectTablesViewsSubLabel.TabIndex = 2;
-      this.SelectTablesViewsSubLabel.Text = "Tables and Views selected below will be imported to individual Excel worksheets.";
-      // 
-      // ImportRelationshipsFromDbCheckBox
-      // 
-      this.ImportRelationshipsFromDbCheckBox.AutoSize = true;
-      this.ImportRelationshipsFromDbCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.ImportRelationshipsFromDbCheckBox.Location = new System.Drawing.Point(372, 121);
-      this.ImportRelationshipsFromDbCheckBox.Name = "ImportRelationshipsFromDbCheckBox";
-      this.ImportRelationshipsFromDbCheckBox.Size = new System.Drawing.Size(211, 19);
-      this.ImportRelationshipsFromDbCheckBox.TabIndex = 7;
-      this.ImportRelationshipsFromDbCheckBox.Text = "Import relationships from database";
-      this.ImportRelationshipsFromDbCheckBox.UseVisualStyleBackColor = true;
-      this.ImportRelationshipsFromDbCheckBox.CheckedChanged += new System.EventHandler(this.ImportRelationshipsFromDbCheckBox_CheckedChanged);
+      this.SelectTablesViewsSubLabel.Text = "Tables and views selected below will be imported to individual Excel worksheets.";
       // 
       // PickRelatedSubLabel
       // 
       this.PickRelatedSubLabel.BackColor = System.Drawing.Color.Transparent;
       this.PickRelatedSubLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.PickRelatedSubLabel.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.PickRelatedSubLabel.Location = new System.Drawing.Point(369, 71);
+      this.PickRelatedSubLabel.Location = new System.Drawing.Point(379, 73);
       this.PickRelatedSubLabel.Name = "PickRelatedSubLabel";
-      this.PickRelatedSubLabel.Size = new System.Drawing.Size(290, 33);
+      this.PickRelatedSubLabel.Size = new System.Drawing.Size(350, 33);
       this.PickRelatedSubLabel.TabIndex = 6;
       this.PickRelatedSubLabel.Text = "Related tables and views, not in the original selection, can be selected based on" +
     " their relationships.";
@@ -179,7 +162,7 @@ namespace MySQL.ForExcel.Forms
       this.PickRelatedMainLabel.BackColor = System.Drawing.Color.Transparent;
       this.PickRelatedMainLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.PickRelatedMainLabel.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.PickRelatedMainLabel.Location = new System.Drawing.Point(369, 54);
+      this.PickRelatedMainLabel.Location = new System.Drawing.Point(379, 54);
       this.PickRelatedMainLabel.Name = "PickRelatedMainLabel";
       this.PickRelatedMainLabel.Size = new System.Drawing.Size(174, 17);
       this.PickRelatedMainLabel.TabIndex = 5;
@@ -189,7 +172,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.DefineRelationshipsPictureBox.BackColor = System.Drawing.Color.Transparent;
       this.DefineRelationshipsPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ObjectPanel_RelatedObjects_32x32;
-      this.DefineRelationshipsPictureBox.Location = new System.Drawing.Point(331, 60);
+      this.DefineRelationshipsPictureBox.Location = new System.Drawing.Point(341, 60);
       this.DefineRelationshipsPictureBox.Name = "DefineRelationshipsPictureBox";
       this.DefineRelationshipsPictureBox.Size = new System.Drawing.Size(32, 32);
       this.DefineRelationshipsPictureBox.TabIndex = 31;
@@ -269,10 +252,10 @@ namespace MySQL.ForExcel.Forms
       this.WorkbookInCompatibilityModeWarningLabel.BackColor = System.Drawing.SystemColors.Window;
       this.WorkbookInCompatibilityModeWarningLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.WorkbookInCompatibilityModeWarningLabel.ForeColor = System.Drawing.Color.Red;
-      this.WorkbookInCompatibilityModeWarningLabel.Location = new System.Drawing.Point(157, 409);
+      this.WorkbookInCompatibilityModeWarningLabel.Location = new System.Drawing.Point(157, 417);
       this.WorkbookInCompatibilityModeWarningLabel.Name = "WorkbookInCompatibilityModeWarningLabel";
       this.WorkbookInCompatibilityModeWarningLabel.Size = new System.Drawing.Size(57, 12);
-      this.WorkbookInCompatibilityModeWarningLabel.TabIndex = 11;
+      this.WorkbookInCompatibilityModeWarningLabel.TabIndex = 9;
       this.WorkbookInCompatibilityModeWarningLabel.Text = "Warning Text";
       this.WorkbookInCompatibilityModeWarningLabel.Visible = false;
       // 
@@ -288,12 +271,12 @@ namespace MySQL.ForExcel.Forms
       this.RelatedTablesViewsListView.FullRowSelect = true;
       this.RelatedTablesViewsListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
       this.RelatedTablesViewsListView.HideSelection = false;
-      this.RelatedTablesViewsListView.Location = new System.Drawing.Point(372, 146);
+      this.RelatedTablesViewsListView.Location = new System.Drawing.Point(387, 136);
       this.RelatedTablesViewsListView.MultiSelect = false;
       this.RelatedTablesViewsListView.Name = "RelatedTablesViewsListView";
-      this.RelatedTablesViewsListView.Size = new System.Drawing.Size(287, 248);
+      this.RelatedTablesViewsListView.Size = new System.Drawing.Size(347, 258);
       this.RelatedTablesViewsListView.SmallImageList = this.DbObjectsImageList;
-      this.RelatedTablesViewsListView.TabIndex = 9;
+      this.RelatedTablesViewsListView.TabIndex = 7;
       this.RelatedTablesViewsListView.UseCompatibleStateImageBehavior = false;
       this.RelatedTablesViewsListView.View = System.Windows.Forms.View.Details;
       this.RelatedTablesViewsListView.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.RelatedTablesViewsListView_ItemChecked);
@@ -301,12 +284,12 @@ namespace MySQL.ForExcel.Forms
       // RelatedTableViewColumnHeader
       // 
       this.RelatedTableViewColumnHeader.Text = "Table / View";
-      this.RelatedTableViewColumnHeader.Width = 140;
+      this.RelatedTableViewColumnHeader.Width = 170;
       // 
       // RelatedToColumnHeader
       // 
       this.RelatedToColumnHeader.Text = "Related to";
-      this.RelatedToColumnHeader.Width = 140;
+      this.RelatedToColumnHeader.Width = 170;
       // 
       // DbObjectsImageList
       // 
@@ -325,10 +308,10 @@ namespace MySQL.ForExcel.Forms
       this.TablesViewsListView.FullRowSelect = true;
       this.TablesViewsListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
       this.TablesViewsListView.HideSelection = false;
-      this.TablesViewsListView.Location = new System.Drawing.Point(82, 146);
+      this.TablesViewsListView.Location = new System.Drawing.Point(82, 136);
       this.TablesViewsListView.MultiSelect = false;
       this.TablesViewsListView.Name = "TablesViewsListView";
-      this.TablesViewsListView.Size = new System.Drawing.Size(217, 248);
+      this.TablesViewsListView.Size = new System.Drawing.Size(217, 258);
       this.TablesViewsListView.SmallImageList = this.DbObjectsImageList;
       this.TablesViewsListView.TabIndex = 4;
       this.TablesViewsListView.UseCompatibleStateImageBehavior = false;
@@ -344,7 +327,7 @@ namespace MySQL.ForExcel.Forms
       this.WorkbookInCompatibilityModeWarningPictureBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.WorkbookInCompatibilityModeWarningPictureBox.BackColor = System.Drawing.SystemColors.Window;
       this.WorkbookInCompatibilityModeWarningPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.WorkbookInCompatibilityModeWarningPictureBox.Location = new System.Drawing.Point(135, 405);
+      this.WorkbookInCompatibilityModeWarningPictureBox.Location = new System.Drawing.Point(135, 413);
       this.WorkbookInCompatibilityModeWarningPictureBox.Name = "WorkbookInCompatibilityModeWarningPictureBox";
       this.WorkbookInCompatibilityModeWarningPictureBox.Size = new System.Drawing.Size(20, 20);
       this.WorkbookInCompatibilityModeWarningPictureBox.TabIndex = 37;
@@ -356,7 +339,7 @@ namespace MySQL.ForExcel.Forms
       this.TotalTablesViewsLabel.AutoSize = true;
       this.TotalTablesViewsLabel.BackColor = System.Drawing.Color.Transparent;
       this.TotalTablesViewsLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.TotalTablesViewsLabel.Location = new System.Drawing.Point(79, 125);
+      this.TotalTablesViewsLabel.Location = new System.Drawing.Point(79, 116);
       this.TotalTablesViewsLabel.Name = "TotalTablesViewsLabel";
       this.TotalTablesViewsLabel.Size = new System.Drawing.Size(133, 15);
       this.TotalTablesViewsLabel.TabIndex = 3;
@@ -373,37 +356,12 @@ namespace MySQL.ForExcel.Forms
       this.AdvancedOptionsButton.UseVisualStyleBackColor = true;
       this.AdvancedOptionsButton.Click += new System.EventHandler(this.AdvancedOptionsButton_Click);
       // 
-      // RelationshipsNotSupportedLabel
-      // 
-      this.RelationshipsNotSupportedLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.RelationshipsNotSupportedLabel.BackColor = System.Drawing.SystemColors.Window;
-      this.RelationshipsNotSupportedLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.RelationshipsNotSupportedLabel.ForeColor = System.Drawing.Color.Red;
-      this.RelationshipsNotSupportedLabel.Location = new System.Drawing.Point(397, 117);
-      this.RelationshipsNotSupportedLabel.Name = "RelationshipsNotSupportedLabel";
-      this.RelationshipsNotSupportedLabel.Size = new System.Drawing.Size(262, 26);
-      this.RelationshipsNotSupportedLabel.TabIndex = 8;
-      this.RelationshipsNotSupportedLabel.Text = "Warning Text";
-      this.RelationshipsNotSupportedLabel.Visible = false;
-      // 
-      // RelationshipsNotSupportedPictureBox
-      // 
-      this.RelationshipsNotSupportedPictureBox.BackColor = System.Drawing.SystemColors.Window;
-      this.RelationshipsNotSupportedPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.RelationshipsNotSupportedPictureBox.Location = new System.Drawing.Point(372, 117);
-      this.RelationshipsNotSupportedPictureBox.Name = "RelationshipsNotSupportedPictureBox";
-      this.RelationshipsNotSupportedPictureBox.Size = new System.Drawing.Size(20, 20);
-      this.RelationshipsNotSupportedPictureBox.TabIndex = 42;
-      this.RelationshipsNotSupportedPictureBox.TabStop = false;
-      this.RelationshipsNotSupportedPictureBox.Visible = false;
-      // 
       // ImportButton
       // 
       this.ImportButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.ImportButton.DialogResult = System.Windows.Forms.DialogResult.OK;
       this.ImportButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.ImportButton.Location = new System.Drawing.Point(536, 11);
+      this.ImportButton.Location = new System.Drawing.Point(611, 11);
       this.ImportButton.Name = "ImportButton";
       this.ImportButton.Size = new System.Drawing.Size(75, 23);
       this.ImportButton.TabIndex = 1;
@@ -413,35 +371,62 @@ namespace MySQL.ForExcel.Forms
       // CreatePivotTableCheckBox
       // 
       this.CreatePivotTableCheckBox.AutoSize = true;
+      this.CreatePivotTableCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.CreatePivotTableCheckBox.Location = new System.Drawing.Point(10, 23);
       this.CreatePivotTableCheckBox.Name = "CreatePivotTableCheckBox";
-      this.CreatePivotTableCheckBox.Size = new System.Drawing.Size(271, 17);
+      this.CreatePivotTableCheckBox.Size = new System.Drawing.Size(267, 19);
       this.CreatePivotTableCheckBox.TabIndex = 0;
-      this.CreatePivotTableCheckBox.Text = "Create a PivotTable for each imported table or view.";
+      this.CreatePivotTableCheckBox.Text = "Create a PivotTable for selected table or views";
       this.CreatePivotTableCheckBox.UseVisualStyleBackColor = true;
       // 
       // OptionsGroupBox
       // 
       this.OptionsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.OptionsGroupBox.Controls.Add(this.WhyDisabledLinkLabel);
+      this.OptionsGroupBox.Controls.Add(this.CreateExcelRelationshipsCheckBox);
       this.OptionsGroupBox.Controls.Add(this.CreatePivotTableCheckBox);
-      this.OptionsGroupBox.Location = new System.Drawing.Point(82, 408);
+      this.OptionsGroupBox.Location = new System.Drawing.Point(82, 416);
       this.OptionsGroupBox.Name = "OptionsGroupBox";
-      this.OptionsGroupBox.Size = new System.Drawing.Size(577, 55);
-      this.OptionsGroupBox.TabIndex = 10;
+      this.OptionsGroupBox.Size = new System.Drawing.Size(652, 70);
+      this.OptionsGroupBox.TabIndex = 8;
       this.OptionsGroupBox.TabStop = false;
       this.OptionsGroupBox.Text = "Options";
+      // 
+      // WhyDisabledLinkLabel
+      // 
+      this.WhyDisabledLinkLabel.AutoSize = true;
+      this.WhyDisabledLinkLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
+      this.WhyDisabledLinkLabel.Location = new System.Drawing.Point(358, 46);
+      this.WhyDisabledLinkLabel.Name = "WhyDisabledLinkLabel";
+      this.WhyDisabledLinkLabel.Size = new System.Drawing.Size(154, 15);
+      this.WhyDisabledLinkLabel.TabIndex = 2;
+      this.WhyDisabledLinkLabel.TabStop = true;
+      this.WhyDisabledLinkLabel.Text = "Why is this option disabled?";
+      this.WhyDisabledLinkLabel.Visible = false;
+      this.WhyDisabledLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.WhyDisabledLinkLabel_LinkClicked);
+      // 
+      // CreateExcelRelationshipsCheckBox
+      // 
+      this.CreateExcelRelationshipsCheckBox.AutoSize = true;
+      this.CreateExcelRelationshipsCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.CreateExcelRelationshipsCheckBox.Location = new System.Drawing.Point(10, 45);
+      this.CreateExcelRelationshipsCheckBox.Name = "CreateExcelRelationshipsCheckBox";
+      this.CreateExcelRelationshipsCheckBox.Size = new System.Drawing.Size(342, 19);
+      this.CreateExcelRelationshipsCheckBox.TabIndex = 1;
+      this.CreateExcelRelationshipsCheckBox.Text = "Create Excel relationships for selected related tables or views";
+      this.CreateExcelRelationshipsCheckBox.UseVisualStyleBackColor = true;
       // 
       // ImportMultipleDialog
       // 
       this.AcceptButton = this.ImportButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(704, 541);
+      this.ClientSize = new System.Drawing.Size(784, 556);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
       this.MainInstructionLocation = new System.Drawing.Point(11, 15);
-      this.MinimumSize = new System.Drawing.Size(720, 580);
+      this.MinimumSize = new System.Drawing.Size(800, 595);
       this.Name = "ImportMultipleDialog";
       this.Text = "Import Data";
       this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ImportMultipleDialog_FormClosing);
@@ -455,7 +440,6 @@ namespace MySQL.ForExcel.Forms
       ((System.ComponentModel.ISupportInitialize)(this.SelectTablesViewsPictureBox)).EndInit();
       this.TablesViewsContextMenuStrip.ResumeLayout(false);
       ((System.ComponentModel.ISupportInitialize)(this.WorkbookInCompatibilityModeWarningPictureBox)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.RelationshipsNotSupportedPictureBox)).EndInit();
       this.OptionsGroupBox.ResumeLayout(false);
       this.OptionsGroupBox.PerformLayout();
       this.ResumeLayout(false);
@@ -466,7 +450,6 @@ namespace MySQL.ForExcel.Forms
 
     private System.Windows.Forms.Button DialogCancelButton;
     private System.Windows.Forms.Label SelectTablesViewsSubLabel;
-    private System.Windows.Forms.CheckBox ImportRelationshipsFromDbCheckBox;
     private System.Windows.Forms.Label PickRelatedSubLabel;
     private System.Windows.Forms.Label PickRelatedMainLabel;
     private System.Windows.Forms.PictureBox DefineRelationshipsPictureBox;
@@ -487,10 +470,10 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.ToolStripMenuItem SelectAllToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem SelectNoneToolStripMenuItem;
     private System.Windows.Forms.Button AdvancedOptionsButton;
-    private System.Windows.Forms.Label RelationshipsNotSupportedLabel;
-    private System.Windows.Forms.PictureBox RelationshipsNotSupportedPictureBox;
     private System.Windows.Forms.Button ImportButton;
     private System.Windows.Forms.CheckBox CreatePivotTableCheckBox;
     private System.Windows.Forms.GroupBox OptionsGroupBox;
+    private System.Windows.Forms.CheckBox CreateExcelRelationshipsCheckBox;
+    private System.Windows.Forms.LinkLabel WhyDisabledLinkLabel;
   }
 }

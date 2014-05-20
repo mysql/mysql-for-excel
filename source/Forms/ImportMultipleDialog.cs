@@ -42,9 +42,9 @@ namespace MySQL.ForExcel.Forms
     private readonly List<DbObject> _importDbObjects;
 
     /// <summary>
-    /// Flag indicating whether Excel relationships can and will be created.
+    /// Flag indicating whether Excel relationships can be created.
     /// </summary>
-    private readonly bool _importRelationships;
+    private readonly bool _importRelationshipsEnabled;
 
     /// <summary>
     /// The Table or View DB objects related to objects selected by the users.
@@ -95,24 +95,22 @@ namespace MySQL.ForExcel.Forms
       _relatedDbObjects = new List<DbObject>(_importDbObjects.Count);
       _wbConnection = wbConnection;
       _workbookInCompatibilityMode = workbookInCompatibilityMode;
-      bool excel2010OrLower = Globals.ThisAddIn.ExcelVersionNumber < ThisAddIn.EXCEL_2013_VERSION_NUMBER;
-      _importRelationships = !excel2010OrLower && Settings.Default.ImportCreateExcelTable;
+      _importRelationshipsEnabled = !Excel2010OrLower && Settings.Default.ImportCreateExcelTable;
       _relationshipsList = new List<MySqlDataRelationship>();
 
       InitializeComponent();
 
       TotalTablesViewsLabel.Text += _importDbObjects.Count;
 
-      // Set warnings.
+      // Set warnings
       WorkbookInCompatibilityModeWarningLabel.Text = Resources.WorkbookInCompatibilityModeWarning;
       WorkbookInCompatibilityModeWarningLabel.Visible = workbookInCompatibilityMode;
       WorkbookInCompatibilityModeWarningPictureBox.Visible = workbookInCompatibilityMode;
-      RelationshipsNotSupportedLabel.Text = excel2010OrLower
-        ? Resources.ImportMultipleRelationshipsNotSupportedExcelVersionWarningText
-        : Resources.ImportMultipleRelationshipsNotSupportedNoExcelTablesWarningText;
-      RelationshipsNotSupportedPictureBox.Visible = !_importRelationships;
-      RelationshipsNotSupportedLabel.Visible = !_importRelationships;
-      ImportRelationshipsFromDbCheckBox.Visible = _importRelationships;
+
+      // Set enabled state for Create Relationships option
+      CreateExcelRelationshipsCheckBox.Checked = _importRelationshipsEnabled;
+      CreateExcelRelationshipsCheckBox.Enabled = _importRelationshipsEnabled;
+      WhyDisabledLinkLabel.Visible = !_importRelationshipsEnabled;
 
       ProcessSelectedDbObjects();
     }
@@ -148,6 +146,17 @@ namespace MySQL.ForExcel.Forms
       set
       {
         base.Text = value;
+      }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the Excel version is 2010 or lower.
+    /// </summary>
+    private bool Excel2010OrLower
+    {
+      get
+      {
+        return Globals.ThisAddIn.ExcelVersionNumber < ThisAddIn.EXCEL_2013_VERSION_NUMBER;
       }
     }
 
@@ -305,22 +314,6 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="ImportRelationshipsFromDbCheckBox"/> checked state changes.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void ImportRelationshipsFromDbCheckBox_CheckedChanged(object sender, EventArgs e)
-    {
-      RelatedTablesViewsListView.Enabled = ImportRelationshipsFromDbCheckBox.Checked;
-      if (RelatedTablesViewsListView.Enabled)
-      {
-        return;
-      }
-
-      ChangeAllRelatedItemsSelection(false);
-    }
-
-    /// <summary>
     /// Event delegate method fired when the <see cref="PreviewDataToolStripMenuItem"/> context menu item is clicked.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -362,7 +355,7 @@ namespace MySQL.ForExcel.Forms
         lvi.Tag = dbObject;
 
         // Get relationship for selected table or view.
-        if (!_importRelationships)
+        if (!_importRelationshipsEnabled)
         {
           continue;
         }
@@ -483,6 +476,22 @@ namespace MySQL.ForExcel.Forms
           SelectNoneToolStripMenuItem.Visible = true;
           break;
       }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="WhyDisabledLinkLabel"/> is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void WhyDisabledLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+      InfoDialog.ShowDialog(
+        InfoDialog.DialogType.OKOnly,
+        InfoDialog.InfoType.Info,
+        Resources.ImportMultipleRelationshipsNotSupportedTitleText,
+        Excel2010OrLower
+          ? Resources.ImportMultipleRelationshipsNotSupportedExcelVersionWarningText
+          : Resources.ImportMultipleRelationshipsNotSupportedNoExcelTablesWarningText);
     }
   }
 }

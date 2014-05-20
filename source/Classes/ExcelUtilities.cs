@@ -747,11 +747,9 @@ namespace MySQL.ForExcel.Classes
     /// Checks if the PowerPivot add-in is installed in the computer.
     /// </summary>
     /// <returns><c>true</c> if PowerPivot is installed, <c>false</c> otherwise.</returns>
-    public static bool IsPowerPivotInstalled()
+    public static bool IsPowerPivotEnabled()
     {
-      const string checkFile = @"\Microsoft Analysis Services\AS Excel Client\10\Microsoft.AnalysisServices.Modeler.FieldList.dll";
-      return File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + checkFile)
-        || (Environment.Is64BitOperatingSystem && File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles) + checkFile));
+      return Globals.ThisAddIn.Application.AddIns.Cast<ExcelInterop.AddIn>().Any(addIn => addIn.Title.Contains("PowerPivot") && addIn.Name == "PowerPivotExcelClientAddIn.dll" && addIn.Installed && addIn.IsOpen);
     }
 
     /// <summary>

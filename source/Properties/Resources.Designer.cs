@@ -1062,7 +1062,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Relationships are not supported in Excel versions lower than 2013 so relationships will not be created..
+        ///   Looks up a localized string similar to Excel Model Relationships are not supported in Excel versions lower than 2013..
         /// </summary>
         internal static string ImportMultipleRelationshipsNotSupportedExcelVersionWarningText {
             get {
@@ -1071,11 +1071,20 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Option to create Excel tables is turned off so relationships can&apos;t be created..
+        ///   Looks up a localized string similar to The advanced option to create Excel tables for imported data is turned off so relationships cannot be created..
         /// </summary>
         internal static string ImportMultipleRelationshipsNotSupportedNoExcelTablesWarningText {
             get {
                 return ResourceManager.GetString("ImportMultipleRelationshipsNotSupportedNoExcelTablesWarningText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Excel Relationships cannot be created..
+        /// </summary>
+        internal static string ImportMultipleRelationshipsNotSupportedTitleText {
+            get {
+                return ResourceManager.GetString("ImportMultipleRelationshipsNotSupportedTitleText", resourceCulture);
             }
         }
         
