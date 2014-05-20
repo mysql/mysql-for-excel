@@ -60,8 +60,6 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void InitializeComponent()
     {
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
       this.ImportButton = new System.Windows.Forms.Button();
       this.DialogCancelButton = new System.Windows.Forms.Button();
       this.CallButton = new System.Windows.Forms.Button();
@@ -78,17 +76,16 @@ namespace MySQL.ForExcel.Forms
       this.ProcedureParametersPictureBox = new System.Windows.Forms.PictureBox();
       this.ImportDataLabel = new System.Windows.Forms.Label();
       this.ResultSetsTabControl = new System.Windows.Forms.TabControl();
-      this.ResultSetsDataGridView = new MySQL.ForExcel.Controls.PreviewDataGridView();
       this.OptionsWarningLabel = new System.Windows.Forms.Label();
       this.OptionsWarningPictureBox = new System.Windows.Forms.PictureBox();
       this.SubSetOfDataLabel = new System.Windows.Forms.Label();
       this.AdvancedOptionsButton = new System.Windows.Forms.Button();
       this.CreatePivotTableCheckBox = new System.Windows.Forms.CheckBox();
+      this.AddSummaryFieldsCheckBox = new System.Windows.Forms.CheckBox();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.ColumnOptionsPictureBox)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.ProcedureParametersPictureBox)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.ResultSetsDataGridView)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.OptionsWarningPictureBox)).BeginInit();
       this.SuspendLayout();
       // 
@@ -99,6 +96,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // ContentAreaPanel
       // 
+      this.ContentAreaPanel.Controls.Add(this.AddSummaryFieldsCheckBox);
       this.ContentAreaPanel.Controls.Add(this.CreatePivotTableCheckBox);
       this.ContentAreaPanel.Controls.Add(this.OptionsWarningLabel);
       this.ContentAreaPanel.Controls.Add(this.ResultSetsTabControl);
@@ -116,16 +114,15 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.ProcedureNameLabel);
       this.ContentAreaPanel.Controls.Add(this.ProcedureParametersMainLabel);
       this.ContentAreaPanel.Controls.Add(this.ProcedureParametersPictureBox);
-      this.ContentAreaPanel.Controls.Add(this.ResultSetsDataGridView);
       this.ContentAreaPanel.Controls.Add(this.SubSetOfDataLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(846, 601);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(846, 646);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.AdvancedOptionsButton);
       this.CommandAreaPanel.Controls.Add(this.ImportButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 556);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 601);
       this.CommandAreaPanel.Size = new System.Drawing.Size(846, 45);
       // 
       // ImportButton
@@ -303,36 +300,12 @@ namespace MySQL.ForExcel.Forms
       this.ResultSetsTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.ResultSetsTabControl.Location = new System.Drawing.Point(82, 269);
+      this.ResultSetsTabControl.Location = new System.Drawing.Point(82, 294);
       this.ResultSetsTabControl.Name = "ResultSetsTabControl";
       this.ResultSetsTabControl.SelectedIndex = 0;
       this.ResultSetsTabControl.Size = new System.Drawing.Size(676, 238);
-      this.ResultSetsTabControl.TabIndex = 12;
+      this.ResultSetsTabControl.TabIndex = 13;
       this.ResultSetsTabControl.SelectedIndexChanged += new System.EventHandler(this.ResultSetsTabControl_SelectedIndexChanged);
-      // 
-      // ResultSetsDataGridView
-      // 
-      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-      dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.InactiveCaption;
-      dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
-      dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.ResultSetsDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-      this.ResultSetsDataGridView.ColumnsMaximumWidth = 200;
-      dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.InactiveCaption;
-      dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Window;
-      dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.ResultSetsDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
-      this.ResultSetsDataGridView.Location = new System.Drawing.Point(82, 269);
-      this.ResultSetsDataGridView.Name = "ResultSetsDataGridView";
-      this.ResultSetsDataGridView.Size = new System.Drawing.Size(676, 238);
-      this.ResultSetsDataGridView.TabIndex = 9;
       // 
       // OptionsWarningLabel
       // 
@@ -341,10 +314,10 @@ namespace MySQL.ForExcel.Forms
       this.OptionsWarningLabel.BackColor = System.Drawing.SystemColors.Window;
       this.OptionsWarningLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.OptionsWarningLabel.ForeColor = System.Drawing.Color.Red;
-      this.OptionsWarningLabel.Location = new System.Drawing.Point(104, 510);
+      this.OptionsWarningLabel.Location = new System.Drawing.Point(104, 535);
       this.OptionsWarningLabel.Name = "OptionsWarningLabel";
       this.OptionsWarningLabel.Size = new System.Drawing.Size(76, 12);
-      this.OptionsWarningLabel.TabIndex = 13;
+      this.OptionsWarningLabel.TabIndex = 14;
       this.OptionsWarningLabel.Text = "Warning Message";
       this.OptionsWarningLabel.Visible = false;
       // 
@@ -353,7 +326,7 @@ namespace MySQL.ForExcel.Forms
       this.OptionsWarningPictureBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.OptionsWarningPictureBox.BackColor = System.Drawing.SystemColors.Window;
       this.OptionsWarningPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.OptionsWarningPictureBox.Location = new System.Drawing.Point(82, 505);
+      this.OptionsWarningPictureBox.Location = new System.Drawing.Point(82, 530);
       this.OptionsWarningPictureBox.Name = "OptionsWarningPictureBox";
       this.OptionsWarningPictureBox.Size = new System.Drawing.Size(20, 20);
       this.OptionsWarningPictureBox.TabIndex = 26;
@@ -367,10 +340,10 @@ namespace MySQL.ForExcel.Forms
       this.SubSetOfDataLabel.BackColor = System.Drawing.Color.Transparent;
       this.SubSetOfDataLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.SubSetOfDataLabel.ForeColor = System.Drawing.SystemColors.InactiveCaption;
-      this.SubSetOfDataLabel.Location = new System.Drawing.Point(434, 508);
+      this.SubSetOfDataLabel.Location = new System.Drawing.Point(434, 533);
       this.SubSetOfDataLabel.Name = "SubSetOfDataLabel";
       this.SubSetOfDataLabel.Size = new System.Drawing.Size(319, 15);
-      this.SubSetOfDataLabel.TabIndex = 14;
+      this.SubSetOfDataLabel.TabIndex = 15;
       this.SubSetOfDataLabel.Text = "This is a small subset of the data for preview purposes only.";
       // 
       // AdvancedOptionsButton
@@ -395,17 +368,27 @@ namespace MySQL.ForExcel.Forms
       this.CreatePivotTableCheckBox.Text = "Create a PivotTable for each imported result set.";
       this.CreatePivotTableCheckBox.UseVisualStyleBackColor = true;
       // 
+      // AddSummaryFieldsCheckBox
+      // 
+      this.AddSummaryFieldsCheckBox.AutoSize = true;
+      this.AddSummaryFieldsCheckBox.Location = new System.Drawing.Point(395, 271);
+      this.AddSummaryFieldsCheckBox.Name = "AddSummaryFieldsCheckBox";
+      this.AddSummaryFieldsCheckBox.Size = new System.Drawing.Size(121, 17);
+      this.AddSummaryFieldsCheckBox.TabIndex = 12;
+      this.AddSummaryFieldsCheckBox.Text = "Add Summary Fields";
+      this.AddSummaryFieldsCheckBox.UseVisualStyleBackColor = true;
+      // 
       // ImportProcedureForm
       // 
       this.AcceptButton = this.ImportButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(846, 601);
+      this.ClientSize = new System.Drawing.Size(846, 646);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
       this.MainInstructionLocation = new System.Drawing.Point(11, 15);
-      this.MinimumSize = new System.Drawing.Size(862, 640);
+      this.MinimumSize = new System.Drawing.Size(862, 685);
       this.Name = "ImportProcedureForm";
       this.Text = "Import Data";
       this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ImportProcedureForm_FormClosing);
@@ -414,7 +397,6 @@ namespace MySQL.ForExcel.Forms
       this.CommandAreaPanel.ResumeLayout(false);
       ((System.ComponentModel.ISupportInitialize)(this.ColumnOptionsPictureBox)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.ProcedureParametersPictureBox)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.ResultSetsDataGridView)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.OptionsWarningPictureBox)).EndInit();
       this.ResumeLayout(false);
 
@@ -444,5 +426,6 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.Label SubSetOfDataLabel;
     private System.Windows.Forms.Button AdvancedOptionsButton;
     private System.Windows.Forms.CheckBox CreatePivotTableCheckBox;
+    private System.Windows.Forms.CheckBox AddSummaryFieldsCheckBox;
   }
 }

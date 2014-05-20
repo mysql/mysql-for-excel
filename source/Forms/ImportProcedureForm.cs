@@ -376,13 +376,13 @@ namespace MySQL.ForExcel.Forms
           }
 
           tableIdx++;
-          var excelObj = mySqlTable.ImportDataAtActiveExcelCell(ImportColumnNames, Settings.Default.ImportCreateExcelTable, CreatePivotTables, pivotPosition);
+          var excelObj = mySqlTable.ImportDataAtActiveExcelCell(ImportColumnNames, Settings.Default.ImportCreateExcelTable, CreatePivotTables, pivotPosition, AddSummaryFieldsCheckBox.Checked);
           if (excelObj == null)
           {
             continue;
           }
 
-          var fillingRange = excelObj is ExcelInterop.ListObject 
+          var fillingRange = excelObj is ExcelInterop.ListObject
             ? (excelObj as ExcelInterop.ListObject).Range
             : excelObj as ExcelInterop.Range;
           ExcelInterop.Range endCell;
