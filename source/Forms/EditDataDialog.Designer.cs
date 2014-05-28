@@ -56,6 +56,7 @@ namespace MySQL.ForExcel.Forms
         _wbConnection = null;
         EditingWorksheet = null;
       }
+
       base.Dispose(disposing);
     }
 

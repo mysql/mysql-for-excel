@@ -41,6 +41,10 @@ namespace MySQL.ForExcel.Controls
         {
           components.Dispose();
         }
+
+        // Set variables to null so this object does not hold references to them and the GC disposes of them sooner.
+        ActiveEditDialog = null;
+        WbConnection = null;
       }
 
       base.Dispose(disposing);

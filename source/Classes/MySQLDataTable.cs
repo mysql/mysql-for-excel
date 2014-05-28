@@ -29,6 +29,7 @@ using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
+using ExcelTools = Microsoft.Office.Tools.Excel;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -1229,19 +1230,58 @@ namespace MySQL.ForExcel.Classes
       ExcelInterop.ListObject namedTable = null;
       try
       {
-        string proposedName = ExcelTableName.GetExcelTableNameAvoidingDuplicates();
+        ExcelTools.ListObject excelTable;
+        string proposedName = ExcelTableName;
+        int consecutiveIfOrphanedTable = 2;
+        string commandText;
+        string connectionName;
         var workbookName = Globals.ThisAddIn.Application.ActiveWorkbook.Name;
-        var commandText = string.Format("{0}!{1}", workbookName, proposedName);
-        var connectionName = @"WorksheetConnection_" + commandText;
         var connectionString = "WORKSHEET;" + workbookName;
+        do
+        {
+          // Prepare Excel table name and dummy connection
+          proposedName = proposedName.GetExcelTableNameAvoidingDuplicates();
+          commandText = string.Format("{0}!{1}", workbookName, proposedName);
+          connectionName = @"WorksheetConnection_" + commandText;
+
+          // Check first if there is an orphaned Tools Excel table (leftover from a deleted Interop Excel table) and if so then attempt to free resources.
+          if (!worksheet.Controls.Contains(proposedName))
+          {
+            break;
+          }
+
+          excelTable = worksheet.Controls[proposedName] as ExcelTools.ListObject;
+          if (excelTable != null && excelTable.DataSource is MySqlDataTable)
+          {
+            if (excelTable.IsBinding)
+            {
+              excelTable.Disconnect();
+            }
+
+            var boundTable = excelTable.DataSource as MySqlDataTable;
+            if (boundTable != null)
+            {
+              boundTable.Dispose();
+            }
+
+            excelTable.DeleteSafely(false);
+          }
+
+          // At this point a new name is needed since for some reason or bug the Globals.Factory throws an error
+          // trying to check if there is a Tools Excel table already for the existing name, so go back to that point.
+          proposedName = string.Format("{0}-{1}", ExcelTableName, consecutiveIfOrphanedTable++);
+        } while (true);
+
+        // Create empty Interop Excel table that will be connected to a data source
         var hasHeaders = ImportColumnNames ? ExcelInterop.XlYesNoGuess.xlYes : ExcelInterop.XlYesNoGuess.xlNo;
-        namedTable = atCell.Worksheet.ListObjects.Add(ExcelInterop.XlListObjectSourceType.xlSrcExternal, ExcelUtilities.DUMMY_WORKBOOK_CONNECTION_STRING, false, hasHeaders, atCell);
+        namedTable = worksheet.ListObjects.Add(ExcelInterop.XlListObjectSourceType.xlSrcExternal, ExcelUtilities.DUMMY_WORKBOOK_CONNECTION_STRING, false, hasHeaders, atCell);
         namedTable.Name = proposedName;
-        namedTable.DisplayName = proposedName;
         namedTable.TableStyle = Settings.Default.ImportExcelTableStyleName;
         namedTable.QueryTable.BackgroundQuery = false;
         namedTable.QueryTable.CommandText = commandText;
-        var excelTable = Globals.Factory.GetVstoObject(namedTable);
+
+        // Create a corresponding Tools Excel table from the Interop one so we can bind it to this MySqlDataTable.
+        excelTable = Globals.Factory.GetVstoObject(namedTable);
         excelTable.SetDataBinding(this);
         if (ImportColumnNames)
         {

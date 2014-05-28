@@ -1373,14 +1373,21 @@ namespace MySQL.ForExcel
     private void ThisAddIn_Shutdown(object sender, EventArgs e)
     {
       // Close all Excel panes created
-      if (ExcelPanesList == null)
+      if (ExcelPanesList != null)
       {
-        return;
+        foreach (var excelPane in ExcelPanesList)
+        {
+          excelPane.Dispose();
+        }
       }
 
-      foreach (ExcelAddInPane excelPane in ExcelPanesList)
+      // Close all import sessions
+      if (ActiveWorkbookImportSessions != null && ActiveWorkbookImportSessions.Count > 0)
       {
-        excelPane.Dispose();
+        foreach (var importSession in ActiveWorkbookImportSessions)
+        {
+          importSession.Close();
+        }
       }
 
       ExcelAddInPanesClosed();

@@ -18,13 +18,12 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using Microsoft.Office.Core;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
-using MySQL.ForExcel.Interfaces;
+using ExcelTools = Microsoft.Office.Tools.Excel;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -396,6 +395,69 @@ namespace MySQL.ForExcel.Classes
       }
 
       return newWorksheet;
+    }
+
+    /// <summary>
+    /// Attempts to delete a <see cref="ExcelInterop.ListObject"/> trapping any COM exception.
+    /// </summary>
+    /// <param name="excelTable">A <see cref="ExcelInterop.ListObject"/> object.</param>
+    /// <param name="logException">Flag indicating whether any exception is written to the application log.</param>
+    /// <returns><c>true</c> if the deletion happened without errors, <c>false</c> otherwise.</returns>
+    public static bool DeleteSafely(this ExcelInterop.ListObject excelTable, bool logException)
+    {
+      if (excelTable == null)
+      {
+        return false;
+      }
+
+      bool success = true;
+      try
+      {
+        excelTable.Delete();
+      }
+      catch (Exception ex)
+      {
+        success = false;
+        if (logException)
+        {
+          MySqlSourceTrace.WriteAppErrorToLog(ex);
+        }
+      }
+
+      return success;
+    }
+
+    /// <summary>
+    /// Attempts to delete a <see cref="ExcelTools.ListObject"/> trapping any COM exception.
+    /// </summary>
+    /// <param name="excelTable">A <see cref="ExcelTools.ListObject"/> object.</param>
+    /// <param name="logException">Flag indicating whether any exception is written to the application log.</param>
+    /// <returns><c>true</c> if the deletion happened without errors, <c>false</c> otherwise.</returns>
+    public static bool DeleteSafely(this ExcelTools.ListObject excelTable, bool logException)
+    {
+      if (excelTable == null)
+      {
+        return false;
+      }
+
+      bool success = true;
+      try
+      {
+        var namedTable = excelTable.InnerObject as ExcelInterop.ListObject;
+        namedTable.DeleteSafely(logException);
+        excelTable.Delete();
+        excelTable.Dispose();
+      }
+      catch (Exception ex)
+      {
+        success = false;
+        if (logException)
+        {
+          MySqlSourceTrace.WriteAppErrorToLog(ex);
+        }
+      }
+
+      return success;
     }
 
     /// <summary>
