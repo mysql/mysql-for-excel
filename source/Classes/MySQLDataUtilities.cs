@@ -106,8 +106,8 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-
-      var selectQuery = AssembleSelectQuery(wbConnection.Schema, dboName, columnsNamesList, firstRowIndex, workbookInCompatibilityMode ? UInt16.MaxValue : rowCount);
+      rowCount = workbookInCompatibilityMode ? Math.Min(UInt16.MaxValue, rowCount) : rowCount;
+      var selectQuery = AssembleSelectQuery(wbConnection.Schema, dboName, columnsNamesList, firstRowIndex, rowCount);
       return wbConnection.CreateImportMySqlTable(isEditOperation, dboName, includeColumnNames, selectQuery);
     }
 
@@ -294,7 +294,7 @@ namespace MySQL.ForExcel.Classes
       var collationsDictionary = new Dictionary<string, string[]>(270);
       if (!string.IsNullOrEmpty(firstElement))
       {
-        collationsDictionary.Add(firstElement, new [] { string.Empty, string.Empty });
+        collationsDictionary.Add(firstElement, new[] { string.Empty, string.Empty });
       }
 
       foreach (var rowsGroup in rowsByGroup)
