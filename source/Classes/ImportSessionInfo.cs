@@ -18,10 +18,11 @@
 using System.Diagnostics;
 using System;
 using System.Xml.Serialization;
-using Microsoft.Office.Interop.Excel;
 using MySQL.ForExcel.Interfaces;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
+using ExcelInterop = Microsoft.Office.Interop.Excel;
+using ExcelTools = Microsoft.Office.Tools.Excel;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -31,45 +32,66 @@ namespace MySQL.ForExcel.Classes
   [Serializable]
   public class ImportSessionInfo : ISessionInfo
   {
+    #region Fields
+
+    /// <summary>
+    /// The workbench connection object the session works with.
+    /// </summary>
+    private MySqlWorkbenchConnection _connection;
+
+    /// <summary>
+    /// Flag indicating whether the <seealso cref="Dispose"/> method has already been called.
+    /// </summary>
+    private bool _disposed;
+
+    /// <summary>
+    /// The <see cref="ExcelInterop.ListObject"/> object related to the import session.
+    /// </summary>
+    private ExcelInterop.ListObject _excelTable;
+
+    /// <summary>
+    /// The Excel table name.
+    /// </summary>
+    private string _excelTableName;
+
+    #endregion Fields
+
     /// <summary>
     /// DO NOT REMOVE. Default constructor required for serialization-deserialization.
     /// </summary>
     public ImportSessionInfo()
     {
-      SessionStatus = SessionErrorType.None;
-      Connection = null;
+      _connection = null;
+      _excelTable = null;
+      _excelTableName = string.Empty;
+      SessionError = SessionErrorType.None;
       MySqlTable = null;
+      ToolsExcelTable = null;
     }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ImportSessionInfo" /> class.
     /// </summary>
     /// <param name="mySqlTable">MySqlDataTable object related to the import session.</param>
-    /// <param name="excelTableName">Excel Table Name</param>
-    public ImportSessionInfo(MySqlDataTable mySqlTable, string excelTableName)
+    /// <param name="excelTable">The <see cref="ExcelInterop.ListObject"/> object related to the import session.</param>
+    public ImportSessionInfo(MySqlDataTable mySqlTable, ExcelInterop.ListObject excelTable)
     {
+      _connection = mySqlTable.WbConnection;
+      ExcelTable = excelTable;
       MySqlTable = mySqlTable;
       SchemaName = mySqlTable.SchemaName;
       TableName = mySqlTable.TableName;
-      Connection = mySqlTable.WbConnection;
       ConnectionId = mySqlTable.WbConnection.Id;
       ImportColumnNames = mySqlTable.ImportColumnNames;
       SelectQuery = mySqlTable.SelectQuery;
       WorkbookGuid = Globals.ThisAddIn.Application.ActiveWorkbook.GetOrCreateId();
       WorkbookName = Globals.ThisAddIn.Application.ActiveWorkbook.Name;
       WorkbookFilePath = Globals.ThisAddIn.Application.ActiveWorkbook.FullName;
-      Worksheet worksheet = Globals.ThisAddIn.Application.ActiveWorkbook.ActiveSheet;
+      ExcelInterop.Worksheet worksheet = Globals.ThisAddIn.Application.ActiveWorkbook.ActiveSheet;
       WorksheetName = worksheet.Name;
-      ExcelTableName = excelTableName;
     }
 
     #region Properties
-
-    /// <summary>
-    /// Gets or sets the workbench connection object the session works with.
-    /// </summary>
-    [XmlIgnore]
-    public MySqlWorkbenchConnection Connection { get; set; }
 
     /// <summary>
     /// Gets or sets the connection identifier the session works with.
@@ -78,10 +100,48 @@ namespace MySQL.ForExcel.Classes
     public string ConnectionId { get; set; }
 
     /// <summary>
-    /// Gets or sets the named table object.
+    /// Gets or sets the <see cref="ExcelInterop.ListObject"/> object related to the import session.
+    /// </summary>
+    [XmlIgnore]
+    public ExcelInterop.ListObject ExcelTable
+    {
+      get
+      {
+        return _excelTable;
+      }
+
+      set
+      {
+        _excelTable = value;
+        if (_excelTable == null)
+        {
+          return;
+        }
+
+        _excelTableName = _excelTable.Name;
+        ToolsExcelTable = Globals.Factory.GetVstoObject(_excelTable);
+      }
+    }
+
+    /// <summary>
+    /// Gets or sets the Excel table name.
     /// </summary>
     [XmlAttribute]
-    public string ExcelTableName { get; set; }
+    public string ExcelTableName
+    {
+      get
+      {
+        return _excelTableName;
+      }
+
+      set
+      {
+        if (_excelTable == null)
+        {
+          _excelTableName = value;
+        }
+      }
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether [import column names].
@@ -114,16 +174,28 @@ namespace MySQL.ForExcel.Classes
     public string SelectQuery { get; set; }
 
     /// <summary>
-    /// Gets or sets the session type.
+    /// Gets or sets a session error identifier.
     /// </summary>
     [XmlAttribute]
-    public SessionErrorType SessionStatus { get; set; }
+    public SessionErrorType SessionError { get; set; }
 
     /// <summary>
     /// Gets or sets the table name the connection works with.
     /// </summary>
     [XmlAttribute]
     public string TableName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the table name the connection works with.
+    /// </summary>
+    [XmlIgnore]
+    public ExcelTools.ListObject ToolsExcelTable { get; private set; }
+
+    /// <summary>
+    /// Gets or sets the workbook full path name.
+    /// </summary>
+    [XmlAttribute]
+    public string WorkbookFilePath { get; set; }
 
     /// <summary>
     /// Gets or sets the workbook guid on excel the session is making the import.
@@ -138,12 +210,6 @@ namespace MySQL.ForExcel.Classes
     public string WorkbookName { get; set; }
 
     /// <summary>
-    /// Gets or sets the workbook full path name.
-    /// </summary>
-    [XmlAttribute]
-    public string WorkbookFilePath { get; set; }
-
-    /// <summary>
     /// Gets or sets the name of active worksheet.
     /// </summary>
     [XmlAttribute]
@@ -151,59 +217,7 @@ namespace MySQL.ForExcel.Classes
 
     #endregion Properties
 
-    /// <summary>
-    /// Closes this Import Session instance.
-    /// </summary>
-    public void Close()
-    {
-      Connection = null;
-      MySqlTable.Dispose();
-    }
-
-    /// <summary>
-    /// Tests the import session connection.
-    /// </summary>
-    /// <returns><c>true</c> if all connection parameters are valid to stablish the connection.</returns>
-    public bool TestConnection()
-    {
-      Connection = MySqlWorkbench.Connections.GetConnectionForId(ConnectionId);
-      if (Connection == null)
-      {
-        SessionStatus = SessionErrorType.WorkbenchConnectionDoesNotExist;
-        return false;
-      }
-
-      Exception connectionException;
-      bool connectionIsValid = Connection.TestConnection(out connectionException);
-      if (connectionException != null)
-      {
-        //TODO: Handle specific Exception Numbers (e.g. (connectionException as MySqlException).Number)
-        SessionStatus = SessionErrorType.ConnectionRefused;
-      }
-
-      return connectionIsValid;
-    }
-
-    /// <summary>
-    /// Refreshes the Import Session non serializable objects and specified cells on the excel table.
-    /// </summary>
-    public void Refresh()
-    {
-      if (!TestConnection())
-      {
-        if (SessionStatus == SessionErrorType.WorkbenchConnectionDoesNotExist)
-        {
-          MySqlSourceTrace.WriteToLog(string.Format("Session for excel table '{0}.{1}.{2}' on was removed since the connection no longer exists.", WorkbookName, WorksheetName, ExcelTableName), SourceLevels.Warning);
-          Globals.ThisAddIn.ActiveImportSessions.Remove(this);
-        }
-
-        return;
-      }
-
-      Connection.Schema = SchemaName;
-      Connection.AllowZeroDateTimeValues = true;
-      MySqlTable = Connection.CreateImportMySqlTable(false, TableName, ImportColumnNames, SelectQuery);
-    }
+    #region Enums
 
     /// <summary>
     /// This Enumeration is used to mark the error type the session presented when tried to refresh.
@@ -215,26 +229,127 @@ namespace MySQL.ForExcel.Classes
       /// The import session is working correctly.
       /// </summary>
       None = 0,
+
       /// <summary>
       /// The workbench connection was deleted and no longer exists.
       /// </summary>
       WorkbenchConnectionDoesNotExist = 1,
+
       /// <summary>
       /// The connection refused the current credentials or no password is provided.
       /// </summary>
       ConnectionRefused = 2,
+
       /// <summary>
       /// The schema was deleted from the database and no longer exists.
       /// </summary>
       SchemaNoLongerExists = 4,
+
       /// <summary>
       /// The table was deleted from the schema and longer exists.
       /// </summary>
       TableNoLongerExists = 8,
+
       /// <summary>
       /// The excel table no longer exists, the session is no longer valid and would be deleted.
       /// </summary>
       ExcelTableNoLongerExists = 16,
+    }
+
+    #endregion Enums
+
+    /// <summary>
+    /// Releases all resources used by the <see cref="ImportSessionInfo"/> class
+    /// </summary>
+    public void Dispose()
+    {
+      Dispose(true);
+      GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Refreshes the Import Session non serializable objects and specified cells on the excel table.
+    /// </summary>
+    public void Refresh()
+    {
+      if (!TestConnection())
+      {
+        if (SessionError == SessionErrorType.WorkbenchConnectionDoesNotExist)
+        {
+          MySqlSourceTrace.WriteToLog(string.Format("Session for excel table '{0}.{1}.{2}' on was removed since the connection no longer exists.", WorkbookName, WorksheetName, ExcelTableName), SourceLevels.Warning);
+          Globals.ThisAddIn.ActiveImportSessions.Remove(this);
+        }
+
+        return;
+      }
+
+      _connection.Schema = SchemaName;
+      _connection.AllowZeroDateTimeValues = true;
+      MySqlTable = _connection.CreateImportMySqlTable(false, TableName, ImportColumnNames, SelectQuery);
+    }
+
+    /// <summary>
+    /// Tests the import session connection.
+    /// </summary>
+    /// <returns><c>true</c> if all connection parameters are valid to stablish the connection.</returns>
+    public bool TestConnection()
+    {
+      _connection = MySqlWorkbench.Connections.GetConnectionForId(ConnectionId);
+      if (_connection == null)
+      {
+        SessionError = SessionErrorType.WorkbenchConnectionDoesNotExist;
+        return false;
+      }
+
+      Exception connectionException;
+      bool connectionIsValid = _connection.TestConnection(out connectionException);
+      if (connectionException != null)
+      {
+        //TODO: Handle specific Exception Numbers (e.g. (connectionException as MySqlException).Number)
+        SessionError = SessionErrorType.ConnectionRefused;
+      }
+
+      return connectionIsValid;
+    }
+
+    /// <summary>
+    /// Releases all resources used by the <see cref="ImportSessionInfo"/> class
+    /// </summary>
+    /// <param name="disposing">If true this is called by Dispose(), otherwise it is called by the finalizer</param>
+    protected virtual void Dispose(bool disposing)
+    {
+      if (_disposed)
+      {
+        return;
+      }
+
+      // Free managed resources
+      if (disposing)
+      {
+        if (ToolsExcelTable != null)
+        {
+          if (ToolsExcelTable.IsBinding)
+          {
+            ToolsExcelTable.Disconnect();
+          }
+
+          ToolsExcelTable.DeleteSafely(true);
+        }
+
+        if (MySqlTable != null)
+        {
+          MySqlTable.Dispose();
+        }
+
+        _connection = null;
+        MySqlTable = null;
+        ExcelTable = null;
+        ToolsExcelTable = null;
+      }
+
+      // Add class finalizer if unmanaged resources are added to the class
+      // Free unmanaged resources if there are any
+      _disposed = true;
     }
   }
 }

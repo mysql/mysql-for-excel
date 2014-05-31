@@ -16,14 +16,13 @@
 // 02110-1301  USA
 
 using System;
-using System.Security.Cryptography.X509Certificates;
 
 namespace MySQL.ForExcel.Interfaces
 {
   /// <summary>
   /// Interface that bridges common functionality to both Import and Edit sessions.
   /// </summary>
-  public interface ISessionInfo
+  public interface ISessionInfo : IDisposable
   {
     /// <summary>
     /// Gets or sets the connection information the session works with, contains credentials with remote access permissions to the reffered MySQL instance in it.

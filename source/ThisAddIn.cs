@@ -568,11 +568,11 @@ namespace MySQL.ForExcel
       }
 
       // Scrubbing of duplicated Import sessions and setting last access time.
+      RemoveInvalidImportSessions();
       foreach (var activeImportSession in ActiveWorkbookImportSessions)
       {
         activeImportSession.LastAccess = DateTime.Now;
       }
-      RemoveInvalidImportSessions();
 
       // Remove deleted Edit sessions from memory collection also from serialized collection
       foreach (var storedSession in StoredEditSessions.FindAll(storedSession => string.Equals(storedSession.WorkbookGuid, workbookId, StringComparison.InvariantCulture) && !workbookEditSessions.Exists(wbSession => wbSession.HasSameWorkbookAndTable(storedSession))))
@@ -627,10 +627,11 @@ namespace MySQL.ForExcel
       bool wasAlreadySaved = workbook.Saved;
       if (!wasAlreadySaved)
       {
-        //Close import sessions from the closing workbook.
+        // Cleanup and close import sessions from the closing workbook.
+        RemoveInvalidImportSessions();
         foreach (var importSession in ActiveWorkbookImportSessions)
         {
-          importSession.Close();
+          importSession.Dispose();
         }
 
         switch (MessageBox.Show(string.Format(Resources.WorkbookSavingDetailText, workbook.Name), Application.Name, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1))
@@ -961,7 +962,6 @@ namespace MySQL.ForExcel
     /// <param name="cancelDefault">Flag indicating whether the base functionality is cancelled or not.</param>
     private void RefreshButton_Click(OfficeCore.CommandBarButton ctrl, ref bool cancelDefault)
     {
-      RemoveInvalidImportSessions();
       var listObject = Application.ActiveCell.ListObject;
       if (listObject == null)
       {
@@ -1019,7 +1019,11 @@ namespace MySQL.ForExcel
     {
       // Unsubscribe from Excel events
       SetupExcelEvents(false);
-      _editSessionsByWorkbook.Clear();
+      if (_editSessionsByWorkbook != null)
+      {
+        _editSessionsByWorkbook.Clear();
+
+      }
     }
 
     /// <summary>
@@ -1372,21 +1376,21 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void ThisAddIn_Shutdown(object sender, EventArgs e)
     {
+      // Dispose (close) all import sessions
+      if (ActiveWorkbookImportSessions != null && ActiveWorkbookImportSessions.Count > 0)
+      {
+        foreach (var importSession in ActiveWorkbookImportSessions)
+        {
+          importSession.Dispose();
+        }
+      }
+
       // Close all Excel panes created
       if (ExcelPanesList != null)
       {
         foreach (var excelPane in ExcelPanesList)
         {
           excelPane.Dispose();
-        }
-      }
-
-      // Close all import sessions
-      if (ActiveWorkbookImportSessions != null && ActiveWorkbookImportSessions.Count > 0)
-      {
-        foreach (var importSession in ActiveWorkbookImportSessions)
-        {
-          importSession.Close();
         }
       }
 

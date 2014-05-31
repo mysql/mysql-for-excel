@@ -23,12 +23,12 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
-using Excel = Microsoft.Office.Interop.Excel;
-using MySQL.ForExcel.Interfaces;
+using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -90,13 +90,13 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the active Edit session related to a given <see cref="Excel.Workbook"/>.
+    /// Gets the active Edit session related to a given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
     /// <param name="sessionsList">The Edit sessions list.</param>
-    /// <param name="workbook">The <see cref="Excel.Workbook"/> related to the active Edit session.</param>
+    /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/> related to the active Edit session.</param>
     /// <param name="tableName">Name of the table being edited in the Edit session.</param>
     /// <returns>An <see cref="EditSessionInfo"/> containing the active edit session.</returns>
-    public static EditSessionInfo GetActiveEditSession(this List<EditSessionInfo> sessionsList, Excel.Workbook workbook, string tableName)
+    public static EditSessionInfo GetActiveEditSession(this List<EditSessionInfo> sessionsList, ExcelInterop.Workbook workbook, string tableName)
     {
       var workBookId = workbook.GetOrCreateId();
       return sessionsList == null ? null : sessionsList.FirstOrDefault(session => session.EditDialog != null &&
@@ -105,12 +105,12 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the active Edit session related to a given <see cref="Excel.Worksheet"/>.
+    /// Gets the active Edit session related to a given <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
     /// <param name="sessionsList">The Edit sessions list.</param>
-    /// <param name="worksheet">The <see cref="Excel.Worksheet"/> related to the active Edit session.</param>
+    /// <param name="worksheet">The <see cref="ExcelInterop.Worksheet"/> related to the active Edit session.</param>
     /// <returns>An <see cref="EditSessionInfo"/> containing the active Edit session.</returns>
-    public static EditSessionInfo GetActiveEditSession(this List<EditSessionInfo> sessionsList, Excel.Worksheet worksheet)
+    public static EditSessionInfo GetActiveEditSession(this List<EditSessionInfo> sessionsList, ExcelInterop.Worksheet worksheet)
     {
       return sessionsList == null ? null : sessionsList.FirstOrDefault(session => session.EditDialog != null && session.EditDialog.EditingWorksheet.Name == worksheet.Name);
     }

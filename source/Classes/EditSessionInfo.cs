@@ -17,7 +17,6 @@
 
 using System;
 using System.Xml.Serialization;
-using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Interfaces;
 
@@ -31,6 +30,14 @@ namespace MySQL.ForExcel.Classes
   {
     #region Fields
 
+    /// <summary>
+    /// Flag indicating whether the <seealso cref="Dispose"/> method has already been called.
+    /// </summary>
+    private bool _disposed;
+
+    /// <summary>
+    /// The <see cref="EditDataDialog"/> related to this editing session.
+    /// </summary>
     private EditDataDialog _editDialog;
 
     #endregion Fields
@@ -53,6 +60,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="table">Name of the table used by the edit session.</param>
     public EditSessionInfo(string workbookGuid, string workbookFilePath, string wbConnectionId, string schema, string table)
     {
+      _disposed = false;
       _editDialog = null;
       ConnectionId = wbConnectionId;
       SchemaName = schema;
@@ -79,14 +87,17 @@ namespace MySQL.ForExcel.Classes
       {
         return _editDialog;
       }
+
       set
       {
         _editDialog = value;
-        if (_editDialog != null)
+        if (_editDialog == null)
         {
-          EditDialog.Closed -= EditDialog_Closed;
-          EditDialog.Closed += EditDialog_Closed;
+          return;
         }
+
+        EditDialog.Closed -= EditDialog_Closed;
+        EditDialog.Closed += EditDialog_Closed;
       }
     }
 
@@ -120,26 +131,57 @@ namespace MySQL.ForExcel.Classes
     [XmlAttribute]
     public string WorkbookFilePath { get; set; }
 
-    /// <summary>
-    /// Gets or sets the wb connection.
-    /// </summary>
-    [XmlIgnore]
-    public MySqlWorkbenchConnection WbConnection { get; set; }
-
     #endregion Properties
 
     /// <summary>
-    /// Handles the Closed event of the EditDialog control.
+    /// Releases all resources used by the <see cref="EditSessionInfo"/> class
+    /// </summary>
+    public void Dispose()
+    {
+      Dispose(true);
+      GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Releases all resources used by the <see cref="EditSessionInfo"/> class
+    /// </summary>
+    /// <param name="disposing">If true this is called by Dispose(), otherwise it is called by the finalizer</param>
+    protected virtual void Dispose(bool disposing)
+    {
+      if (_disposed)
+      {
+        return;
+      }
+
+      // Free managed resources
+      if (disposing)
+      {
+        if (_editDialog != null)
+        {
+          // This event will handle the cleanup.
+          _editDialog.Close();
+        }
+      }
+
+      // Add class finalizer if unmanaged resources are added to the class
+      // Free unmanaged resources if there are any
+      _disposed = true;
+    }
+
+    /// <summary>
+    /// Handles the <see cref="EditDataDialog.Closed"/> event.
     /// </summary>
     /// <param name="sender">The source of the event.</param>
     /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
     private void EditDialog_Closed(object sender, EventArgs e)
     {
-      if (_editDialog != null)
+      if (_editDialog == null)
       {
-        _editDialog.Closed -= EditDialog_Closed;
-        _editDialog = null;
+        return;
       }
+
+      _editDialog.Closed -= EditDialog_Closed;
+      _editDialog = null;
     }
   }
 }

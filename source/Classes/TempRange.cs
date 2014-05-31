@@ -33,7 +33,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     private const string AUTO_PK_COLUMN_FORMULA = "=ROW() - 1";
 
-    #region Properties
+    #region Fields
 
     /// <summary>
     /// Flag indicating whether screen updating will be disabled to speed up processing.
@@ -41,11 +41,21 @@ namespace MySQL.ForExcel.Classes
     private readonly bool _disableScreenUpdating;
 
     /// <summary>
+    /// Flag indicating whether the <seealso cref="Dispose"/> method has already been called.
+    /// </summary>
+    private bool _disposed;
+
+    /// <summary>
     /// Flag holding the current value in <see cref="Excel.Application.ScreenUpdating"/>.
     /// </summary>
     private readonly bool _previousScreenUpdatingValue;
 
-    #endregion Properties
+    /// <summary>
+    /// The original source <see cref="Excel.Range"/> cropped to a subrange with only non-empty cells.
+    /// </summary>
+    private Excel.Range _sourceCroppedRange;
+
+    #endregion Fields
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TempRange"/> class that prepends an AutoPK column to the range.
@@ -101,7 +111,9 @@ namespace MySQL.ForExcel.Classes
     private TempRange(Excel.Range sourceRange, bool cropToNonEmptyRange, bool skipEmptyColumns, bool hideWorksheet, int limitRowsQuantity = 0, bool disableScreenUpdating = true)
     {
       _disableScreenUpdating = disableScreenUpdating;
+      _disposed = false;
       _previousScreenUpdatingValue = false;
+      _sourceCroppedRange = null;
       if (_disableScreenUpdating)
       {
         _previousScreenUpdatingValue = Globals.ThisAddIn.Application.ScreenUpdating;
@@ -113,7 +125,6 @@ namespace MySQL.ForExcel.Classes
       LimitRowsQuantity = limitRowsQuantity;
       SkipEmptyColumns = skipEmptyColumns;
       SourceRange = sourceRange;
-      SourceCroppedRange = null;
       CreateTempWorksheet(hideWorksheet);
     }
 
@@ -164,12 +175,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a value indicating whether empty columns are not copied to the target range.
     /// </summary>
-    public bool SkipEmptyColumns;
-
-    /// <summary>
-    /// Gets the original source <see cref="Excel.Range"/> cropped to a subrange with only non-empty cells.
-    /// </summary>
-    public Excel.Range SourceCroppedRange { get; private set; }
+    public bool SkipEmptyColumns { get; private set; }
 
     /// <summary>
     /// Gets the original source <see cref="Excel.Range"/> whose data is copied to the temporary one.
@@ -198,6 +204,11 @@ namespace MySQL.ForExcel.Classes
     /// <param name="disposing">If true this is called by Dispose(), otherwise it is called by the finalizer</param>
     protected virtual void Dispose(bool disposing)
     {
+      if (_disposed)
+      {
+        return;
+      }
+
       // Free managed resources
       if (disposing)
       {
@@ -211,6 +222,7 @@ namespace MySQL.ForExcel.Classes
         }
 
         TempWorksheet.Delete();
+        TempWorksheet = null;
         Globals.ThisAddIn.Application.DisplayAlerts = previousDisplayAlertsValue;
         if (_disableScreenUpdating)
         {
@@ -218,10 +230,13 @@ namespace MySQL.ForExcel.Classes
         }
 
         Globals.ThisAddIn.UsingTempWorksheet = false;
+        SourceRange = null;
+        Range = null;
       }
 
       // Add class finalizer if unmanaged resources are added to the class
       // Free unmanaged resources if there are any
+      _disposed = true;
     }
 
     /// <summary>
@@ -259,11 +274,11 @@ namespace MySQL.ForExcel.Classes
 
       if (CropToNonEmptyRange)
       {
-        SourceCroppedRange = SourceRange.GetNonEmptyRectangularAreaRange();
+        _sourceCroppedRange = SourceRange.GetNonEmptyRectangularAreaRange();
       }
 
       int firstTargetColumnIndex = 1;
-      var sourceCopyRange = CropToNonEmptyRange ? SourceCroppedRange : SourceRange;
+      var sourceCopyRange = CropToNonEmptyRange ? _sourceCroppedRange : SourceRange;
       int copiedRows = LimitRowsQuantity > 0 ? Math.Min(LimitRowsQuantity, sourceCopyRange.Rows.Count) : sourceCopyRange.Rows.Count;
       if (copiedRows < sourceCopyRange.Rows.Count)
       {
@@ -312,10 +327,10 @@ namespace MySQL.ForExcel.Classes
 
       if (CropToNonEmptyRange)
       {
-        SourceCroppedRange = SourceRange.GetNonEmptyRectangularAreaRange();
+        _sourceCroppedRange = SourceRange.GetNonEmptyRectangularAreaRange();
       }
 
-      var sourceCopyRange = CropToNonEmptyRange ? SourceCroppedRange : SourceRange;
+      var sourceCopyRange = CropToNonEmptyRange ? _sourceCroppedRange : SourceRange;
       for (int arrayIndex = 0; arrayIndex < mappedIndexes.Count; arrayIndex++)
       {
         int excelColumnIndex = arrayIndex + 1;
