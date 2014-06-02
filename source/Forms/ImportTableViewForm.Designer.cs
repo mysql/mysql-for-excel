@@ -43,7 +43,6 @@ namespace MySQL.ForExcel.Forms
         // The MySqlDataTable object is not disposed but only set to null since it may be in use by a ListObject to refresh its data.
         _dbObject = null;
         _wbConnection = null;
-        ImportedExcelRange = null;
         MySqlTable = null;
       }
 

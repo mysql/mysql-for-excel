@@ -87,7 +87,6 @@ namespace MySQL.ForExcel.Forms
       _previewDataTable = null;
       _wbConnection = wbConnection;
       _workbookInCompatibilityMode = workbookInCompatibilityMode;
-      ImportedExcelRange = null;
       MySqlTable = null;
       InitializeComponent();
 
@@ -118,12 +117,6 @@ namespace MySQL.ForExcel.Forms
         CreatePivotTableCheckBox.Checked = value;
       }
     }
-
-    /// <summary>
-    /// Gets the <see cref="ExcelInterop.Range"/> containing the imported data.
-    /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ExcelInterop.Range ImportedExcelRange { get; private set; }
 
     /// <summary>
     /// Gets the <see cref="MySqlDataTable"/> object containing the data to be imported to the active Excel Worksheet.
@@ -278,12 +271,9 @@ namespace MySQL.ForExcel.Forms
       {
         Cursor = Cursors.WaitCursor;
         MySqlTable = _wbConnection.CreateMySqlTable(_isEditOperation, _dbObject.Name, _workbookInCompatibilityMode, IncludeColumnNames, importColumns, LimitRowsCheckBox.Checked, FirstRowIndex, RowsTo);
-        var excelObj = MySqlTable.ImportDataAtActiveExcelCell(!_isEditOperation && Settings.Default.ImportCreateExcelTable, CreatePivotTable, MySqlDataTable.PivotTablePosition.Right, AddSummaryFieldsCheckBox.Checked);
-        if (excelObj != null)
+        if (!_isEditOperation)
         {
-          ImportedExcelRange = excelObj is ExcelInterop.ListObject
-            ? (excelObj as ExcelInterop.ListObject).Range
-            : excelObj as ExcelInterop.Range;
+          MySqlTable.ImportDataAtActiveExcelCell(!_isEditOperation && Settings.Default.ImportCreateExcelTable, CreatePivotTable, MySqlDataTable.PivotTablePosition.Right, AddSummaryFieldsCheckBox.Checked);
         }
       }
       catch (Exception ex)
