@@ -247,7 +247,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="filledTable"><see cref="DataTable"/> object containing imported excelData from the MySQL table to be edited.</param>
     /// <param name="isEditOperation"><c>true</c> if the import is part of an Edit operation, <c>false</c> otherwise.</param>
     public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string tableName, DataTable filledTable, bool isEditOperation)
-      : this(wbConnection, tableName, true, true, false)
+      : this(wbConnection, tableName, true, true, true)
     {
       CopyTableData(filledTable);
       OperationType = isEditOperation ? DataOperationType.Edit : DataOperationType.Import;
@@ -1227,6 +1227,7 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
+      string workbookGuid = workbook.GetOrCreateId();
       ExcelInterop.ListObject namedTable = null;
       try
       {
@@ -1280,19 +1281,6 @@ namespace MySQL.ForExcel.Classes
         namedTable.QueryTable.BackgroundQuery = false;
         namedTable.QueryTable.CommandText = commandText;
 
-        // Create a corresponding Tools Excel table from the Interop one so we can bind it to this MySqlDataTable.
-        excelTable = Globals.Factory.GetVstoObject(namedTable);
-        excelTable.SetDataBinding(this);
-        if (ImportColumnNames)
-        {
-          foreach (MySqlDataColumn col in Columns)
-          {
-            excelTable.ListColumns[col.Ordinal + 1].Name = col.ColumnName;
-          }
-        }
-
-        excelTable.Range.Columns.AutoFit();
-
         // Add a connection to the Workbook, the method used to add it differs since the Add method is obsolete for Excel 2013 and higher.
         if (Globals.ThisAddIn.ExcelVersionNumber < ThisAddIn.EXCEL_2013_VERSION_NUMBER)
         {
@@ -1304,10 +1292,14 @@ namespace MySQL.ForExcel.Classes
         }
 
         // Add a new ImportSessionInfo object if not present already to the collection.
-        if (!Globals.ThisAddIn.ActiveImportSessions.Exists(session => session.MySqlTable == this && string.Equals(session.ExcelTableName, proposedName, StringComparison.InvariantCulture)))
+        var importSession = Globals.ThisAddIn.ActiveImportSessions.FirstOrDefault(session => session.WorkbookGuid == workbookGuid && session.MySqlTable == this && string.Equals(session.ExcelTableName, proposedName, StringComparison.InvariantCultureIgnoreCase));
+        if (importSession == null)
         {
-          Globals.ThisAddIn.ActiveImportSessions.Add(new ImportSessionInfo(this, proposedName));
+          importSession = new ImportSessionInfo(this, namedTable);
+          Globals.ThisAddIn.ActiveImportSessions.Add(importSession);
         }
+
+        importSession.Refresh();
       }
       catch (Exception ex)
       {

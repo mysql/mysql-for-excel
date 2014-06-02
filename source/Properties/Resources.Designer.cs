@@ -1152,6 +1152,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A saved Import Session for the ListObject.
+        /// </summary>
+        internal static string ImportSessionNotFound {
+            get {
+                return ResourceManager.GetString("ImportSessionNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error importing table&apos;s data.
         /// </summary>
         internal static string ImportTableErrorTitle {

@@ -330,6 +330,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="range">A <see cref="ExcelInterop.Range"/> object.</param>
     /// <param name="excelTableName">The proposed name for the new Excel table.</param>
     /// <param name="containsColumnNames">Flag indicating whether column names appear in the first row of the Excel range.</param>
+    [Obsolete("This method is deprecated, the CreateExcelTable method in the MySqlDataTable class is being used instead.")]
     public static void CreateExcelTable(this ExcelInterop.Range range, string excelTableName, bool containsColumnNames)
     {
       if (range == null)
@@ -468,6 +469,24 @@ namespace MySQL.ForExcel.Classes
     public static ExcelInterop.Range GetColumnNamesRange(this ExcelInterop.Range mysqlDataRange)
     {
       return mysqlDataRange == null ? null : mysqlDataRange.Resize[1, mysqlDataRange.Columns.Count];
+    }
+
+    /// <summary>
+    /// Returns a <see cref="ExcelInterop.ListObject"/> contained in an <see cref="ExcelInterop.Worksheet"/> with the given names.
+    /// </summary>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
+    /// <param name="worksheetName">The name of the <see cref="ExcelInterop.Worksheet"/> containing the <see cref="ExcelInterop.ListObject"/>.</param>
+    /// <param name="excelTableName">The name of the <see cref="ExcelInterop.ListObject"/> to find.</param>
+    /// <returns>A <see cref="ExcelInterop.ListObject"/> contained in an <see cref="ExcelInterop.Worksheet"/> with the given names.</returns>
+    public static ExcelInterop.ListObject GetExcelTableByName(this ExcelInterop.Workbook workbook, string worksheetName, string excelTableName)
+    {
+      if (workbook == null)
+      {
+        return null;
+      }
+
+      var worksheet = workbook.Worksheets.Cast<ExcelInterop.Worksheet>().FirstOrDefault(ws => string.Equals(ws.Name, worksheetName, StringComparison.InvariantCultureIgnoreCase));
+      return worksheet == null ? null : worksheet.ListObjects.Cast<ExcelInterop.ListObject>().FirstOrDefault(lo => string.Equals(lo.Name, excelTableName, StringComparison.InvariantCultureIgnoreCase));
     }
 
     /// <summary>

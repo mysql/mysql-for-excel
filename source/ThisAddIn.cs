@@ -715,6 +715,7 @@ namespace MySQL.ForExcel
       // Add the custom MySQL table style (for Excel tables) and localized date format strings to this workbook.
       workbook.CreateMySqlTableStyle();
       workbook.AddLocalizedDateFormatStringsAsNames();
+      RestoreImportSessions(workbook);
 
       if (ActiveExcelPane == null)
       {
@@ -951,65 +952,8 @@ namespace MySQL.ForExcel
       // Subscribe to Excel events
       SetupExcelEvents(true);
 
-      // Restore saved Edit sessons
+      // Restore Edit sessons
       ShowOpenEditSessionsDialog(Application.ActiveWorkbook);
-    }
-
-    /// <summary>
-    /// Event delegate method fired when a <see cref="OfficeCore.CommandBarButton"/> control is clicked.
-    /// </summary>
-    /// <param name="ctrl">A <see cref="OfficeCore.CommandBarButton"/> control.</param>
-    /// <param name="cancelDefault">Flag indicating whether the base functionality is cancelled or not.</param>
-    private void RefreshButton_Click(OfficeCore.CommandBarButton ctrl, ref bool cancelDefault)
-    {
-      var listObject = Application.ActiveCell.ListObject;
-      if (listObject == null)
-      {
-        return;
-      }
-
-      var toolsListObject = Globals.Factory.GetVstoObject(listObject);
-      if (toolsListObject == null)
-      {
-        return;
-      }
-
-      MySqlDataTable mySqlTable;
-      if (toolsListObject.DataSource == null)
-      {
-        var importSession = Globals.ThisAddIn.ActiveWorksheetImportSessions.FirstOrDefault(session => session.ExcelTableName.Equals(toolsListObject.Name));
-        if (importSession == null)
-        {
-          MySqlSourceTrace.WriteAppErrorToLog(new InstanceNotFoundException("Session not found"));
-          return;
-        }
-
-        importSession.Refresh();
-        mySqlTable = importSession.MySqlTable;
-      }
-      else if (toolsListObject.DataSource is MySqlDataTable)
-      {
-        cancelDefault = true;
-        mySqlTable = toolsListObject.DataSource as MySqlDataTable;
-        toolsListObject.Disconnect();
-        Exception ex;
-        mySqlTable.RefreshData(out ex);
-      }
-      else
-      {
-        return;
-      }
-
-      toolsListObject.SetDataBinding(mySqlTable);
-      if (!toolsListObject.ShowHeaders)
-      {
-        return;
-      }
-
-      foreach (MySqlDataColumn col in mySqlTable.Columns)
-      {
-        toolsListObject.ListColumns[col.Ordinal + 1].Name = col.DisplayName;
-      }
     }
 
     /// <summary>
@@ -1149,7 +1093,7 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="sessionConection">A <see cref="MySqlWorkbenchConnection"/> of a stored session.</param>
     /// <returns><c>true</c> if the connection was successfully opened, <c>false</c> otherwise.</returns>
-    private bool OpenConnectionForSavedSession(MySqlWorkbenchConnection sessionConection)
+    private bool OpenConnectionForSavedEditSession(MySqlWorkbenchConnection sessionConection)
     {
       var connectionResult = ActiveExcelPane.OpenConnection(sessionConection, false);
       if (connectionResult.Cancelled)
@@ -1172,7 +1116,7 @@ namespace MySQL.ForExcel
     /// <param name="session">A saved <see cref="EditSessionInfo"/> object.</param>
     /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object related to the saved session.</param>
     /// <returns>The opened <see cref="MySqlWorkbenchConnection"/>.</returns>
-    private MySqlWorkbenchConnection OpenConnectionForSavedSession(EditSessionInfo session, ExcelInterop.Workbook workbook)
+    private MySqlWorkbenchConnection OpenConnectionForSavedEditSession(EditSessionInfo session, ExcelInterop.Workbook workbook)
     {
       if (session == null || workbook == null)
       {
@@ -1196,7 +1140,7 @@ namespace MySQL.ForExcel
       if (ActiveExcelPane.WbConnection == null)
       {
         // If the connection in the active pane is null it means an active connection does not exist, so open a connection.
-        if (!OpenConnectionForSavedSession(wbSessionConnection))
+        if (!OpenConnectionForSavedEditSession(wbSessionConnection))
         {
           return null;
         }
@@ -1221,13 +1165,35 @@ namespace MySQL.ForExcel
           ActiveExcelPane.CloseConnection(false);
         }
 
-        if (!OpenConnectionForSavedSession(wbSessionConnection))
+        if (!OpenConnectionForSavedEditSession(wbSessionConnection))
         {
           return null;
         }
       }
 
       return ActiveExcelPane.WbConnection;
+    }
+
+    /// <summary>
+    /// Event delegate method fired when a <see cref="OfficeCore.CommandBarButton"/> control is clicked.
+    /// </summary>
+    /// <param name="ctrl">A <see cref="OfficeCore.CommandBarButton"/> control.</param>
+    /// <param name="cancelDefault">Flag indicating whether the base functionality is cancelled or not.</param>
+    private void RefreshButton_Click(OfficeCore.CommandBarButton ctrl, ref bool cancelDefault)
+    {
+      var listObject = Application.ActiveCell.ListObject;
+
+      // Do not return from the method unless the overriden refresh code happens, to avoid skipping the default refresh functionality.
+      // Meaning DO NOT invert any of the 2 following if statements to return right away.
+      if (listObject != null)
+      {
+        var importSession = ActiveWorkbookImportSessions.FirstOrDefault(session => string.Equals(session.ExcelTableName, listObject.Name, StringComparison.InvariantCultureIgnoreCase));
+        if (importSession != null)
+        {
+          cancelDefault = true;
+          importSession.Refresh();
+        }
+      }
     }
 
     ///  <summary>
@@ -1253,7 +1219,7 @@ namespace MySQL.ForExcel
       var currenConnection = ActiveExcelPane.WbConnection;
       var firstSession = workbookEditSessions[0];
       var currentSchema = currenConnection != null ? currenConnection.Schema : string.Empty;
-      var sessionConnection = OpenConnectionForSavedSession(firstSession, workbook);
+      var sessionConnection = OpenConnectionForSavedEditSession(firstSession, workbook);
       if (sessionConnection == null)
       {
         return;
@@ -1291,6 +1257,30 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Restores the <see cref="ImportSessionInfo"/>s that are tied to the given <see cref="ExcelInterop.Workbook"/>.
+    /// </summary>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
+    private void RestoreImportSessions(ExcelInterop.Workbook workbook)
+    {
+      if (workbook == null)
+      {
+        return;
+      }
+
+      var workbookId = workbook.GetOrCreateId();
+      var importSessions = GetWorkbookImportSessions(workbookId);
+      if (importSessions == null)
+      {
+        return;
+      }
+
+      foreach (ImportSessionInfo session in importSessions)
+      {
+        session.Restore(workbook);
+      }
+    }
+
+    /// <summary>
     /// Setups the excel events.
     /// </summary>
     /// <param name="subscribe">if set to <c>true</c> [subscribe].</param>
@@ -1315,7 +1305,6 @@ namespace MySQL.ForExcel
         Application.WorkbookBeforeClose += Application_WorkbookBeforeClose;
         Application.WorkbookBeforeSave += Application_WorkbookBeforeSave;
         Application.WorkbookDeactivate += Application_WorkbookDeactivate;
-        Application.WorkbookOpen += Application_WorkbookOpen;
       }
       else
       {
@@ -1334,7 +1323,6 @@ namespace MySQL.ForExcel
         Application.WorkbookBeforeClose -= Application_WorkbookBeforeClose;
         Application.WorkbookBeforeSave -= Application_WorkbookBeforeSave;
         Application.WorkbookDeactivate -= Application_WorkbookDeactivate;
-        Application.WorkbookOpen -= Application_WorkbookOpen;
       }
     }
 
@@ -1376,15 +1364,6 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void ThisAddIn_Shutdown(object sender, EventArgs e)
     {
-      // Dispose (close) all import sessions
-      if (ActiveWorkbookImportSessions != null && ActiveWorkbookImportSessions.Count > 0)
-      {
-        foreach (var importSession in ActiveWorkbookImportSessions)
-        {
-          importSession.Dispose();
-        }
-      }
-
       // Close all Excel panes created
       if (ExcelPanesList != null)
       {
@@ -1403,6 +1382,18 @@ namespace MySQL.ForExcel
         _builtInRefreshCommandButton.Reset();
         _builtInRefreshCommandButton.Click -= RefreshButton_Click;
         Marshal.ReleaseComObject(_builtInRefreshCommandButton);
+      }
+
+      // Unsubscribe events tracked even when no Excel panes are open.
+      Application.WorkbookOpen -= Application_WorkbookOpen;
+
+      // Dispose (close) all import sessions
+      if (ActiveWorkbookImportSessions != null && ActiveWorkbookImportSessions.Count > 0)
+      {
+        foreach (var importSession in ActiveWorkbookImportSessions)
+        {
+          importSession.Dispose();
+        }
       }
     }
 
@@ -1445,10 +1436,12 @@ namespace MySQL.ForExcel
         foreach (OfficeCore.CommandBarButton button in Application.CommandBars.FindControls(OfficeCore.MsoControlType.msoControlButton, 459, Type.Missing, Type.Missing))
         {
           _builtInRefreshCommandButton = button;
-          //button.Tag = "MySQL";
           button.Click += RefreshButton_Click;
           break;
         }
+
+        // Subscribe events tracked even when no Excel panes are open.
+        Application.WorkbookOpen += Application_WorkbookOpen;
       }
       catch (Exception ex)
       {
