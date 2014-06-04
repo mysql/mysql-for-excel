@@ -1231,13 +1231,13 @@ namespace MySQL.ForExcel.Classes
       ExcelInterop.ListObject namedTable = null;
       try
       {
-        ExcelTools.ListObject excelTable;
         string proposedName = ExcelTableName;
         int consecutiveIfOrphanedTable = 2;
         string commandText;
         string connectionName;
         var workbookName = Globals.ThisAddIn.Application.ActiveWorkbook.Name;
-        var connectionString = "WORKSHEET;" + workbookName;
+        var connectionStringForCmdExcel = "WORKSHEET;" + workbookName;
+        var connectionStringForCmdDefault = string.Format("OLEDB;Provider=MSDASQL;Driver={{MySQL ODBC 5.2 ANSI Driver}};Server={0};Database={1};User={2};Option=3;", WbConnection.Host, WbConnection.Schema, WbConnection.UserName);
         do
         {
           // Prepare Excel table name and dummy connection
@@ -1251,7 +1251,7 @@ namespace MySQL.ForExcel.Classes
             break;
           }
 
-          excelTable = worksheet.Controls[proposedName] as ExcelTools.ListObject;
+          var excelTable = worksheet.Controls[proposedName] as ExcelTools.ListObject;
           if (excelTable != null && excelTable.DataSource is MySqlDataTable)
           {
             if (excelTable.IsBinding)
@@ -1284,11 +1284,11 @@ namespace MySQL.ForExcel.Classes
         // Add a connection to the Workbook, the method used to add it differs since the Add method is obsolete for Excel 2013 and higher.
         if (Globals.ThisAddIn.ExcelVersionNumber < ThisAddIn.EXCEL_2013_VERSION_NUMBER)
         {
-          workbook.Connections.Add(connectionName, string.Empty, connectionString, commandText, ExcelInterop.XlCmdType.xlCmdExcel);
+          workbook.Connections.Add(connectionName, string.Empty, connectionStringForCmdDefault, commandText, ExcelInterop.XlCmdType.xlCmdDefault);
         }
         else
         {
-          workbook.Connections.Add2(connectionName, string.Empty, connectionString, commandText, ExcelInterop.XlCmdType.xlCmdExcel, true, false);
+          workbook.Connections.Add2(connectionName, string.Empty, connectionStringForCmdExcel, commandText, ExcelInterop.XlCmdType.xlCmdExcel, true, false);
         }
 
         // Add a new ImportSessionInfo object if not present already to the collection.
