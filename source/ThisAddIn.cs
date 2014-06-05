@@ -564,6 +564,7 @@ namespace MySQL.ForExcel
 
         // Add new Edit sessions in memory collection to serialized collection
         activeEditSession.LastAccess = DateTime.Now;
+        activeEditSession.WorkbookFilePath = workbook.FullName;
         StoredEditSessions.Add(activeEditSession);
       }
 
@@ -572,6 +573,8 @@ namespace MySQL.ForExcel
       foreach (var activeImportSession in ActiveWorkbookImportSessions)
       {
         activeImportSession.LastAccess = DateTime.Now;
+        activeImportSession.WorkbookName = workbook.Name;
+        activeImportSession.WorkbookFilePath = workbook.FullName;
       }
 
       // Remove deleted Edit sessions from memory collection also from serialized collection
