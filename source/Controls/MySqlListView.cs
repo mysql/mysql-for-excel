@@ -19,6 +19,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -94,9 +95,19 @@ namespace MySQL.ForExcel.Controls
     private const int TVM_SETITEM = 0x113F;
 
     /// <summary>
-    /// Specifies how the background is erased or filled.
+    /// Specifies an extended style flag on how the background is erased or filled.
     /// </summary>
     private const int TVS_EX_DOUBLEBUFFER = 0x0004;
+
+    /// <summary>
+    /// Specifies a style flag to hide the control's horizontal scrollbar.
+    /// </summary>
+    private const int TVS_NOHSCROLL = 0x8000;
+
+    /// <summary>
+    /// Specifies an extended style flag needed to avoid bold redrawing on a node's text upon mouse hovering over.
+    /// </summary>
+    private const int WS_CLIPCHILDREN = 0x02000000;
 
     #endregion Constants
 
@@ -139,6 +150,8 @@ namespace MySQL.ForExcel.Controls
       TitleTextVerticalPixelsOffset = DEFAULT_TITLE_TEXT_VERTICAL_PIXELS_OFFSET;
       DescriptionTextVerticalPixelsOffset = DEFAULT_DESCRIPTION_TEXT_VERTICAL_PIXELS_OFFSET;
       Scrollable = true;
+      ShowLines = false;
+      base.ShowLines = false;
       ShowNodeToolTips = true;
     }
 
@@ -324,6 +337,13 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
+    /// Gets a value indicating whether lines are drawn between tree nodes in the tree view control.
+    /// </summary>
+    /// <remarks>Replaces base functionality to fix ShowLines/FullRowSelect issues in base.</remarks>
+    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public new bool ShowLines { get; private set; }
+
+    /// <summary>
     /// Gets or sets the tree view title color opacity factor.
     /// </summary>
     public double TitleColorOpacity { get; set; }
@@ -342,7 +362,13 @@ namespace MySQL.ForExcel.Controls
       get
       {
         var cp = base.CreateParams;
-        cp.Style |= 0x8000; // TVS_NOHSCROLL
+        cp.Style |= TVS_NOHSCROLL;
+        cp.ExStyle |= WS_CLIPCHILDREN;
+        if (DoubleBuffered)
+        {
+          cp.ExStyle |= TVS_EX_DOUBLEBUFFER;
+        }
+
         return cp;
       }
     }
@@ -471,7 +497,7 @@ namespace MySQL.ForExcel.Controls
       {
         if (node.Type == MySqlListViewNode.MySqlNodeType.Header)
         {
-          DrawTopLevelNode(e);
+          DrawHeaderNode(e);
         }
         else
         {
@@ -861,22 +887,22 @@ namespace MySQL.ForExcel.Controls
     private void DrawChildNode(DrawTreeNodeEventArgs e)
     {
       string truncatedText;
-      var myNode = e.Node as MySqlListViewNode;
-      if (myNode == null)
+      var node = e.Node as MySqlListViewNode;
+      if (node == null)
       {
         return;
       }
 
-      bool disabled = !myNode.Enable;
+      bool disabled = !node.Enable;
       Point pt = e.Bounds.Location;
-      SizeF titleStringSize = e.Graphics.MeasureString(myNode.Title, Font);
-      SizeF descriptionStringSize = e.Graphics.MeasureString(myNode.Subtitle, DescriptionFont);
-      Image img = NodeImages != null && NodeImages.Images.Count > 0 && e.Node.ImageIndex >= 0 && e.Node.ImageIndex < NodeImages.Images.Count ? NodeImages.Images[e.Node.ImageIndex] : null;
-      int textInitialY = myNode.Subtitle == null ? ((e.Bounds.Height - Convert.ToInt32(titleStringSize.Height) + Convert.ToInt32(descriptionStringSize.Height)) / 2) : 0;
-      myNode.ToolTipText = string.Empty;
+      SizeF titleStringSize = e.Graphics.MeasureString(node.Title, Font);
+      SizeF descriptionStringSize = e.Graphics.MeasureString(node.Subtitle, DescriptionFont);
+      Image img = NodeImages != null && NodeImages.Images.Count > 0 && node.ImageIndex >= 0 && node.ImageIndex < NodeImages.Images.Count ? NodeImages.Images[node.ImageIndex] : null;
+      int textInitialY = node.Subtitle == null ? ((e.Bounds.Height - Convert.ToInt32(titleStringSize.Height) + Convert.ToInt32(descriptionStringSize.Height)) / 2) : 0;
+      node.ToolTipText = string.Empty;
 
       // Paint background
-      var bkBrush = new SolidBrush(myNode.BackColor);
+      var bkBrush = new SolidBrush(node.BackColor);
       e.Graphics.FillRectangle(bkBrush, e.Bounds);
 
       // Paint node Image
@@ -893,30 +919,31 @@ namespace MySQL.ForExcel.Controls
 
       // Draw the title if we have one
       var titleBrush = disabled ? new SolidBrush(Color.FromArgb(80, 0, 0, 0)) : new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), ForeColor));
-      if (myNode.Title != null)
+      if (node.Title != null)
       {
-        SizeF stringSize = e.Graphics.MeasureString(myNode.Title, Font);
-        truncatedText = myNode.GetTruncatedTitle(e.Node.TreeView.ClientRectangle.Width - pt.X, e.Graphics, Font);
+        SizeF stringSize = e.Graphics.MeasureString(node.Title, Font);
+        truncatedText = node.GetTruncatedTitle(node.TreeView.ClientRectangle.Width - pt.X, e.Graphics, Font);
         e.Graphics.DrawString(truncatedText, Font, titleBrush, pt.X, pt.Y);
         pt.Y += (int)(stringSize.Height) + DescriptionTextVerticalPixelsOffset;
-        if (truncatedText != myNode.Title)
+        if (truncatedText != node.Title)
         {
-          e.Node.ToolTipText = myNode.Title;
+          node.ToolTipText = node.Title;
         }
       }
 
       // Draw the description if there is one
       var descBrush = disabled ? new SolidBrush(Color.FromArgb(80, 0, 0, 0)) : new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionColorOpacity * 255), DescriptionColor));
-      if (myNode.Subtitle != null)
+      if (node.Subtitle != null)
       {
-        truncatedText = myNode.GetTruncatedSubtitle(e.Node.TreeView.ClientRectangle.Width - pt.X, e.Graphics, DescriptionFont);
+        truncatedText = node.GetTruncatedSubtitle(node.TreeView.ClientRectangle.Width - pt.X, e.Graphics, DescriptionFont);
         e.Graphics.DrawString(truncatedText, DescriptionFont, descBrush, pt.X, pt.Y);
-        if (truncatedText != myNode.Subtitle)
+        if (truncatedText != node.Subtitle)
         {
-          e.Node.ToolTipText += (string.IsNullOrWhiteSpace(e.Node.ToolTipText) ? string.Empty : Environment.NewLine) + myNode.Subtitle;
+          node.ToolTipText += (string.IsNullOrWhiteSpace(node.ToolTipText) ? string.Empty : Environment.NewLine) + node.Subtitle;
         }
       }
 
+      Debug.Print("Drawing child node:" + node.Title + " - " + Font);
       bkBrush.Dispose();
       titleBrush.Dispose();
       descBrush.Dispose();
@@ -926,7 +953,7 @@ namespace MySQL.ForExcel.Controls
     /// Draws a group node containing child nodes.
     /// </summary>
     /// <param name="e">Event arguments containing a group node.</param>
-    private void DrawTopLevelNode(DrawTreeNodeEventArgs e)
+    private void DrawHeaderNode(DrawTreeNodeEventArgs e)
     {
       Graphics g = e.Graphics;
       SolidBrush nodeBackbrush = new SolidBrush(e.Node.BackColor);
