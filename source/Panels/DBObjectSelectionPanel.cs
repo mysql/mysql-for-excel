@@ -294,6 +294,20 @@ namespace MySQL.ForExcel.Panels
     }
 
     /// <summary>
+    /// Event delegate method fired when the <see cref="DBObjectsContextMenuStrip"/> is being opened.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void DBObjectsContextMenuStrip_Opening(object sender, CancelEventArgs e)
+    {
+      ImportRelatedToolStripMenuItem.Visible = DBObjectList.SelectedNodes.Count == 1
+        && DBObjectList.SelectedNode != null
+        && DBObjectList.SelectedNode.Type == MySqlListViewNode.MySqlNodeType.DbObject
+        && (DBObjectList.SelectedNode.DbObject.Type == DbObject.DbObjectType.Table
+            || DBObjectList.SelectedNode.DbObject.Type == DbObject.DbObjectType.View);
+    }
+
+    /// <summary>
     /// Event delegate method fired when a key is pressed within the <see cref="DBObjectsFilter"/> control.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -466,18 +480,31 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void ImportMultiHotLabel_Click(object sender, EventArgs e)
     {
-      var addInPane = Parent as ExcelAddInPane;
-      if (addInPane == null)
-      {
-        return;
-      }
+      ImportMultipleDbObjects(false);
+    }
 
+    /// <summary>
+    /// Opens the <see cref="ImportMultipleDialog"/> loading the selected database objects.
+    /// </summary>
+    /// <param name="selectAllRelatedDbObjects">Flag indicating whether all found related tables or views are selected by default.</param>
+    private void ImportMultipleDbObjects(bool selectAllRelatedDbObjects)
+    {
       var tablesAndViewsList = new List<DbObject>(LoadedTables);
       tablesAndViewsList.AddRange(LoadedViews);
-      using (var importDialog = new ImportMultipleDialog(WbConnection, tablesAndViewsList, addInPane.ActiveWorkbook.Excel8CompatibilityMode))
+      using (var importDialog = new ImportMultipleDialog(WbConnection, tablesAndViewsList, Globals.ThisAddIn.Application.ActiveWorkbook.Excel8CompatibilityMode, selectAllRelatedDbObjects))
       {
         importDialog.ShowDialog();
       }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when <see cref="ImportRelatedToolStripMenuItem"/> is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ImportRelatedToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      ImportMultipleDbObjects(true);
     }
 
     /// <summary>

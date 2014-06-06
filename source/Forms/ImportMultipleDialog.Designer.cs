@@ -76,13 +76,14 @@ namespace MySQL.ForExcel.Forms
       this.TablesViewsListView = new System.Windows.Forms.ListView();
       this.TableViewColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.WorkbookInCompatibilityModeWarningPictureBox = new System.Windows.Forms.PictureBox();
-      this.TotalTablesViewsLabel = new System.Windows.Forms.Label();
+      this.SelectedTablesViewsLabel = new System.Windows.Forms.Label();
       this.AdvancedOptionsButton = new System.Windows.Forms.Button();
       this.ImportButton = new System.Windows.Forms.Button();
       this.CreatePivotTableCheckBox = new System.Windows.Forms.CheckBox();
       this.OptionsGroupBox = new System.Windows.Forms.GroupBox();
       this.WhyDisabledLinkLabel = new System.Windows.Forms.LinkLabel();
       this.CreateExcelRelationshipsCheckBox = new System.Windows.Forms.CheckBox();
+      this.RelatedTablesViewsLabel = new System.Windows.Forms.Label();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.DefineRelationshipsPictureBox)).BeginInit();
@@ -99,9 +100,10 @@ namespace MySQL.ForExcel.Forms
       // 
       // ContentAreaPanel
       // 
+      this.ContentAreaPanel.Controls.Add(this.RelatedTablesViewsLabel);
       this.ContentAreaPanel.Controls.Add(this.WorkbookInCompatibilityModeWarningLabel);
       this.ContentAreaPanel.Controls.Add(this.WorkbookInCompatibilityModeWarningPictureBox);
-      this.ContentAreaPanel.Controls.Add(this.TotalTablesViewsLabel);
+      this.ContentAreaPanel.Controls.Add(this.SelectedTablesViewsLabel);
       this.ContentAreaPanel.Controls.Add(this.TablesViewsListView);
       this.ContentAreaPanel.Controls.Add(this.RelatedTablesViewsListView);
       this.ContentAreaPanel.Controls.Add(this.ImportDataLabel);
@@ -255,7 +257,7 @@ namespace MySQL.ForExcel.Forms
       this.WorkbookInCompatibilityModeWarningLabel.Location = new System.Drawing.Point(157, 417);
       this.WorkbookInCompatibilityModeWarningLabel.Name = "WorkbookInCompatibilityModeWarningLabel";
       this.WorkbookInCompatibilityModeWarningLabel.Size = new System.Drawing.Size(57, 12);
-      this.WorkbookInCompatibilityModeWarningLabel.TabIndex = 9;
+      this.WorkbookInCompatibilityModeWarningLabel.TabIndex = 10;
       this.WorkbookInCompatibilityModeWarningLabel.Text = "Warning Text";
       this.WorkbookInCompatibilityModeWarningLabel.Visible = false;
       // 
@@ -276,7 +278,7 @@ namespace MySQL.ForExcel.Forms
       this.RelatedTablesViewsListView.Name = "RelatedTablesViewsListView";
       this.RelatedTablesViewsListView.Size = new System.Drawing.Size(347, 258);
       this.RelatedTablesViewsListView.SmallImageList = this.DbObjectsImageList;
-      this.RelatedTablesViewsListView.TabIndex = 7;
+      this.RelatedTablesViewsListView.TabIndex = 8;
       this.RelatedTablesViewsListView.UseCompatibleStateImageBehavior = false;
       this.RelatedTablesViewsListView.View = System.Windows.Forms.View.Details;
       this.RelatedTablesViewsListView.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.RelatedTablesViewsListView_ItemChecked);
@@ -334,16 +336,16 @@ namespace MySQL.ForExcel.Forms
       this.WorkbookInCompatibilityModeWarningPictureBox.TabStop = false;
       this.WorkbookInCompatibilityModeWarningPictureBox.Visible = false;
       // 
-      // TotalTablesViewsLabel
+      // SelectedTablesViewsLabel
       // 
-      this.TotalTablesViewsLabel.AutoSize = true;
-      this.TotalTablesViewsLabel.BackColor = System.Drawing.Color.Transparent;
-      this.TotalTablesViewsLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.TotalTablesViewsLabel.Location = new System.Drawing.Point(79, 116);
-      this.TotalTablesViewsLabel.Name = "TotalTablesViewsLabel";
-      this.TotalTablesViewsLabel.Size = new System.Drawing.Size(133, 15);
-      this.TotalTablesViewsLabel.TabIndex = 3;
-      this.TotalTablesViewsLabel.Text = "Total Tables and Views: ";
+      this.SelectedTablesViewsLabel.AutoSize = true;
+      this.SelectedTablesViewsLabel.BackColor = System.Drawing.Color.Transparent;
+      this.SelectedTablesViewsLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
+      this.SelectedTablesViewsLabel.Location = new System.Drawing.Point(79, 116);
+      this.SelectedTablesViewsLabel.Name = "SelectedTablesViewsLabel";
+      this.SelectedTablesViewsLabel.Size = new System.Drawing.Size(150, 15);
+      this.SelectedTablesViewsLabel.TabIndex = 3;
+      this.SelectedTablesViewsLabel.Text = "Selected Tables and Views: ";
       // 
       // AdvancedOptionsButton
       // 
@@ -388,7 +390,7 @@ namespace MySQL.ForExcel.Forms
       this.OptionsGroupBox.Location = new System.Drawing.Point(82, 416);
       this.OptionsGroupBox.Name = "OptionsGroupBox";
       this.OptionsGroupBox.Size = new System.Drawing.Size(652, 70);
-      this.OptionsGroupBox.TabIndex = 8;
+      this.OptionsGroupBox.TabIndex = 9;
       this.OptionsGroupBox.TabStop = false;
       this.OptionsGroupBox.Text = "Options";
       // 
@@ -415,6 +417,17 @@ namespace MySQL.ForExcel.Forms
       this.CreateExcelRelationshipsCheckBox.TabIndex = 1;
       this.CreateExcelRelationshipsCheckBox.Text = "Create Excel relationships for selected related tables or views";
       this.CreateExcelRelationshipsCheckBox.UseVisualStyleBackColor = true;
+      // 
+      // RelatedTablesViewsLabel
+      // 
+      this.RelatedTablesViewsLabel.AutoSize = true;
+      this.RelatedTablesViewsLabel.BackColor = System.Drawing.Color.Transparent;
+      this.RelatedTablesViewsLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
+      this.RelatedTablesViewsLabel.Location = new System.Drawing.Point(384, 116);
+      this.RelatedTablesViewsLabel.Name = "RelatedTablesViewsLabel";
+      this.RelatedTablesViewsLabel.Size = new System.Drawing.Size(189, 15);
+      this.RelatedTablesViewsLabel.TabIndex = 7;
+      this.RelatedTablesViewsLabel.Text = "Selected related Tables and Views: ";
       // 
       // ImportMultipleDialog
       // 
@@ -465,7 +478,7 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.ColumnHeader RelatedToColumnHeader;
     private System.Windows.Forms.PictureBox WorkbookInCompatibilityModeWarningPictureBox;
     private System.Windows.Forms.ImageList DbObjectsImageList;
-    private System.Windows.Forms.Label TotalTablesViewsLabel;
+    private System.Windows.Forms.Label SelectedTablesViewsLabel;
     private System.Windows.Forms.ColumnHeader TableViewColumnHeader;
     private System.Windows.Forms.ToolStripMenuItem SelectAllToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem SelectNoneToolStripMenuItem;
@@ -475,5 +488,6 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.GroupBox OptionsGroupBox;
     private System.Windows.Forms.CheckBox CreateExcelRelationshipsCheckBox;
     private System.Windows.Forms.LinkLabel WhyDisabledLinkLabel;
+    private System.Windows.Forms.Label RelatedTablesViewsLabel;
   }
 }

@@ -2236,6 +2236,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Selected related Tables and Views: .
+        /// </summary>
+        internal static string SelectedRelatedTablesAndViewsText {
+            get {
+                return ResourceManager.GetString("SelectedRelatedTablesAndViewsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Empty or null Table used for this action.  A valid Table must be used..
         /// </summary>
         internal static string SelectedTableNull {

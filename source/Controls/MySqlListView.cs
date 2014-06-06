@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
@@ -141,6 +142,8 @@ namespace MySQL.ForExcel.Controls
       ShowNodeToolTips = true;
     }
 
+    #region Enums
+
     /// <summary>
     /// Specifies identifiers to indicate the type of source that triggered a single node selection.
     /// </summary>
@@ -161,6 +164,24 @@ namespace MySQL.ForExcel.Controls
       /// </summary>
       SelectNode
     }
+
+    /// <summary>
+    /// Specifies identifiers to indicate the direction in which nodes are traversed within a collection.
+    /// </summary>
+    private enum NodesTraversingDirection
+    {
+      /// <summary>
+      /// Nodes are traversed from end to start.
+      /// </summary>
+      Backward,
+
+      /// <summary>
+      /// Nodes are traversed from start to end.
+      /// </summary>
+      Forward
+    }
+
+    #endregion Enums
 
     #region Properties
 
@@ -544,12 +565,13 @@ namespace MySQL.ForExcel.Controls
 
       BeginUpdate();
       var shiftPressed = ModifierKeys == Keys.Shift;
+      var controlPressed = ModifierKeys == Keys.Control;
       try
       {
-        // Nothing is selected in the tree, this isn't a good state select the top node
-        if (_selectedNode == null && TopNode != null)
+        // Nothing is selected in the tree, this isn't a good state select the first node that is not a header node.
+        if (_selectedNode == null)
         {
-          MarkNodeAsSelected(TopNode as MySqlListViewNode, true);
+          MarkNodeAsSelected(GetFirstChildNode(), true);
         }
 
         // Nothing is still selected in the tree, this isn't a good state, leave.
@@ -676,6 +698,18 @@ namespace MySQL.ForExcel.Controls
             SelectSingleNode(ndCurrent as MySqlListViewNode, SingleSelectionSource.KeyDown);
             break;
 
+          case Keys.A:
+            if (!controlPressed)
+            {
+              goto default;
+            }
+
+            if (MultiSelect && !_selectedNode.ExcludeFromMultiSelection)
+            {
+              SelectAllNodes();
+            }
+            break;
+
           default:
             // Assume this is a search character a-z, A-Z, 0-9, etc.
             // Select the first node after the current node that starts with this character
@@ -768,6 +802,27 @@ namespace MySQL.ForExcel.Controls
     {
       base.OnResize(e);
       MarkTruncate(Nodes);
+    }
+
+    /// <summary>
+    /// Gets the first node that is not a header node starting the search from the top of the given <see cref="MySqlListViewNode"/>.
+    /// </summary>
+    /// <param name="parentNode">Node containing child nodes to traverse. If <c>null</c> it means we start at the very top root node.</param>
+    /// <returns>The first node that is not a header node.</returns>
+    private MySqlListViewNode GetFirstChildNode(MySqlListViewNode parentNode = null)
+    {
+      var childNodes = parentNode == null ? Nodes : parentNode.Nodes;
+      foreach (MySqlListViewNode node in childNodes)
+      {
+        if (node.Type == MySqlListViewNode.MySqlNodeType.Header || node.Nodes.Count > 0)
+        {
+          return GetFirstChildNode(node);
+        }
+
+        return node;
+      }
+
+      return null;
     }
 
     /// <summary>
@@ -935,7 +990,76 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Marks the given node as selected handling modifier keys.
+    /// Adds the nodes within the nodes range to the selected nodes collection.
+    /// </summary>
+    /// <param name="startingNode">The starting node of the range.</param>
+    /// <param name="endingNode">The ending node of the range.</param>
+    /// <param name="direction">The direction in which nodes are traversed within the range.</param>
+    /// <param name="includeStartingNode">Flag indicating whether the starting node is marked as selected.</param>
+    private void MarkNodesRangeAsSelected(MySqlListViewNode startingNode, MySqlListViewNode endingNode, NodesTraversingDirection direction, bool includeStartingNode = false)
+    {
+      if (startingNode == null || endingNode == null)
+      {
+        return;
+      }
+
+      if (includeStartingNode)
+      {
+        MarkNodeAsSelected(startingNode, true);
+      }
+
+      while (startingNode != endingNode)
+      {
+        startingNode = (direction == NodesTraversingDirection.Forward
+          ? startingNode.NextVisibleNode
+          : startingNode.PrevVisibleNode) as MySqlListViewNode;
+        if (startingNode == null)
+        {
+          break;
+        }
+
+        if (startingNode.ExcludeFromMultiSelection)
+        {
+          continue;
+        }
+
+        MarkNodeAsSelected(startingNode, true);
+      }
+    }
+
+    /// <summary>
+    /// Marks all nodes as selected.
+    /// </summary>
+    /// <param name="parentNode">Node containing child nodes to traverse. If <c>null</c> it means we start at the very top root node.</param>
+    private void SelectAllNodes(MySqlListViewNode parentNode = null)
+    {
+      if (parentNode == null)
+      {
+        ClearSelectedNodes();
+      }
+
+      var nodes = parentNode != null ? parentNode.Nodes : Nodes;
+      foreach (var childNode in nodes.Cast<MySqlListViewNode>().Where(childNode => !childNode.ExcludeFromMultiSelection))
+      {
+        MarkNodeAsSelected(childNode, true);
+        if (childNode.Nodes.Count > 0)
+        {
+          SelectAllNodes(childNode);
+        }
+      }
+
+      if (parentNode != null || _selectedNodes.Count <= 0)
+      {
+        return;
+      }
+
+      // When we are at the very top of the tree-control flag the first node as the selected node.
+      _selectedNode = _selectedNodes[0];
+      OnAfterSelect(new TreeViewEventArgs(_selectedNode));
+    }
+
+    /// <summary>
+    /// Marks the given node as selected and a range of nodes from the currently selected node to the given node if the modifier key is SHIFT.
     /// </summary>
     /// <param name="node">A <see cref="MySqlListViewNode"/> object.</param>
     private void SelectNodes(MySqlListViewNode node)
@@ -963,16 +1087,7 @@ namespace MySQL.ForExcel.Controls
               if (ndStart.Index < ndEnd.Index)
               {
                 // If the selected node is beneath the clicked node walk down selecting each Visible node until we reach the end.
-                while (ndStart != ndEnd)
-                {
-                  ndStart = ndStart.NextVisibleNode as MySqlListViewNode;
-                  if (ndStart == null)
-                  {
-                    break;
-                  }
-
-                  MarkNodeAsSelected(ndStart, true);
-                }
+                MarkNodesRangeAsSelected(ndStart, ndEnd, NodesTraversingDirection.Forward);
               }
               else if (ndStart.Index == ndEnd.Index)
               {
@@ -981,21 +1096,12 @@ namespace MySQL.ForExcel.Controls
               else
               {
                 // If the selected node is above the clicked node walk up selecting each Visible node until we reach the end.
-                while (ndStart != ndEnd)
-                {
-                  ndStart = ndStart.PrevVisibleNode as MySqlListViewNode;
-                  if (ndStart == null)
-                  {
-                    break;
-                  }
-
-                  MarkNodeAsSelected(ndStart, true);
-                }
+                MarkNodesRangeAsSelected(ndStart, ndEnd, NodesTraversingDirection.Backward);
               }
             }
             else
             {
-              // Selected node and clicked node have same parent, hard case.
+              // Selected node and clicked node have different parents, hard case.
               // We need to find a common parent to determine if we need to walk down selecting, or walk up selecting.
               TreeNode ndStartP = ndStart;
               TreeNode ndEndP = ndEnd;
@@ -1024,59 +1130,23 @@ namespace MySQL.ForExcel.Controls
               if (ndStartP.Index < ndEndP.Index)
               {
                 // If the selected node is beneath the clicked node walk down selecting each Visible node until we reach the end.
-                while (ndStart != ndEnd)
-                {
-                  ndStart = ndStart.NextVisibleNode as MySqlListViewNode;
-                  if (ndStart == null)
-                  {
-                    break;
-                  }
-
-                  MarkNodeAsSelected(ndStart, true);
-                }
+                MarkNodesRangeAsSelected(ndStart, ndEnd, NodesTraversingDirection.Forward);
               }
               else if (ndStartP.Index == ndEndP.Index)
               {
                 if (ndStart.Level < ndEnd.Level)
                 {
-                  while (ndStart != ndEnd)
-                  {
-                    ndStart = ndStart.NextVisibleNode as MySqlListViewNode;
-                    if (ndStart == null)
-                    {
-                      break;
-                    }
-
-                    MarkNodeAsSelected(ndStart, true);
-                  }
+                  MarkNodesRangeAsSelected(ndStart, ndEnd, NodesTraversingDirection.Forward);
                 }
                 else
                 {
-                  while (ndStart != ndEnd)
-                  {
-                    ndStart = ndStart.PrevVisibleNode as MySqlListViewNode;
-                    if (ndStart == null)
-                    {
-                      break;
-                    }
-
-                    MarkNodeAsSelected(ndStart, true);
-                  }
+                  MarkNodesRangeAsSelected(ndStart, ndEnd, NodesTraversingDirection.Backward);
                 }
               }
               else
               {
                 // If the selected node is above the clicked node walk up selecting each Visible node until we reach the end.
-                while (ndStart != ndEnd)
-                {
-                  ndStart = ndStart.PrevVisibleNode as MySqlListViewNode;
-                  if (ndStart == null)
-                  {
-                    break;
-                  }
-
-                  MarkNodeAsSelected(ndStart, true);
-                }
+                MarkNodesRangeAsSelected(ndStart, ndEnd, NodesTraversingDirection.Backward);
               }
             }
           }

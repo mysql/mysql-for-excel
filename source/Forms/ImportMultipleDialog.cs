@@ -78,7 +78,8 @@ namespace MySQL.ForExcel.Forms
     /// <param name="wbConnection">The connection to a MySQL server instance selected by users.</param>
     /// <param name="tableOrViewDbObjects">The full Table or View DB objects list contained in the current selected schema.</param>
     /// <param name="workbookInCompatibilityMode">Flag indicating whether the Excel workbook where data will be imported is open in compatibility mode.</param>
-    public ImportMultipleDialog(MySqlWorkbenchConnection wbConnection, List<DbObject> tableOrViewDbObjects, bool workbookInCompatibilityMode)
+    /// <param name="selectAllRelatedTablesOrViews">Flag indicating whether all found related tables or views are selected by default.</param>
+    public ImportMultipleDialog(MySqlWorkbenchConnection wbConnection, List<DbObject> tableOrViewDbObjects, bool workbookInCompatibilityMode, bool selectAllRelatedTablesOrViews)
     {
       if (wbConnection == null)
       {
@@ -100,7 +101,8 @@ namespace MySQL.ForExcel.Forms
 
       InitializeComponent();
 
-      TotalTablesViewsLabel.Text += _importDbObjects.Count;
+      SelectedTablesViewsLabel.Text += _importDbObjects.Count;
+      RelatedTablesViewsLabel.Text += 0;
 
       // Set warnings
       WorkbookInCompatibilityModeWarningLabel.Text = Resources.WorkbookInCompatibilityModeWarning;
@@ -112,7 +114,7 @@ namespace MySQL.ForExcel.Forms
       CreateExcelRelationshipsCheckBox.Enabled = _importRelationshipsEnabled;
       WhyDisabledLinkLabel.Visible = !_importRelationshipsEnabled;
 
-      ProcessSelectedDbObjects();
+      ProcessSelectedDbObjects(selectAllRelatedTablesOrViews);
     }
 
     #region Properties
@@ -346,7 +348,8 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Refreshes the list with tables and views.
     /// </summary>
-    private void ProcessSelectedDbObjects()
+    /// <param name="selectAllRelatedTablesOrViews">Flag indicating whether all found related tables or views are selected by default.</param>
+    private void ProcessSelectedDbObjects(bool selectAllRelatedTablesOrViews)
     {
       foreach (var dbObject in _importDbObjects)
       {
@@ -387,6 +390,7 @@ namespace MySQL.ForExcel.Forms
             lvi = RelatedTablesViewsListView.Items.Add(relationship.RelatedTableOrViewName, relationship.RelatedTableOrViewName, relateDbObject.Type == DbObject.DbObjectType.Table ? 0 : 1);
             lvi.SubItems.Add(relationship.TableOrViewName);
             lvi.Tag = relateDbObject;
+            lvi.Checked = selectAllRelatedTablesOrViews;
           }
           else if (lvi.SubItems.Count < 2 || !lvi.SubItems[1].Text.Split(',').Any(t => string.Equals(t.Trim(), relationship.TableOrViewName, StringComparison.InvariantCulture)))
           {
@@ -404,6 +408,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void RelatedTablesViewsListView_ItemChecked(object sender, ItemCheckedEventArgs e)
     {
+      RelatedTablesViewsLabel.Text = Resources.SelectedRelatedTablesAndViewsText + RelatedTablesViewsListView.CheckedIndices.Count;
       var relatedDbObject = e.Item.Tag as DbObject;
       if (relatedDbObject == null)
       {

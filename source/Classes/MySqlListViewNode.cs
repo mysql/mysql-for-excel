@@ -61,8 +61,9 @@ namespace MySQL.ForExcel.Classes
     /// Initializes a new instance of the <see cref="MySqlListViewNode"/> class holding MySQL connection information.
     /// </summary>
     /// <param name="connection">The <see cref="MySqlWorkbenchConnection"/> associated to the node.</param>
-    public MySqlListViewNode(MySqlWorkbenchConnection connection)
-      : this(connection.Name, string.Empty, MySqlNodeType.Connection)
+    /// <param name="excludeFromMultiSelection">Flag indicating whether the tree node is skipped during a multiple selection.</param>
+    public MySqlListViewNode(MySqlWorkbenchConnection connection, bool excludeFromMultiSelection = false)
+      : this(connection.Name, string.Empty, MySqlNodeType.Connection, excludeFromMultiSelection)
     {
       string hostName = connection.GetHostNameForConnectionSubtitle();
       Subtitle = string.Format("User: {0}, Host: {1}:{2}", connection.UserName, hostName, connection.Port);
@@ -73,8 +74,9 @@ namespace MySQL.ForExcel.Classes
     /// Initializes a new instance of the <see cref="MySqlListViewNode"/> class holding database objects information.
     /// </summary>
     /// <param name="dbObject">The <see cref="DbObject"/> related to the node.</param>
-    public MySqlListViewNode(DbObject dbObject)
-      : this(dbObject.Name, null, MySqlNodeType.DbObject)
+    /// <param name="includeOnlyTablesAndViewsInMultiSelection">Flag indicating whether only tree nodes holding Tables and Views are included during a multiple selection.</param>
+    public MySqlListViewNode(DbObject dbObject, bool includeOnlyTablesAndViewsInMultiSelection = true)
+      : this(dbObject.Name, null, MySqlNodeType.DbObject, includeOnlyTablesAndViewsInMultiSelection && dbObject.Type != DbObject.DbObjectType.Table && dbObject.Type != DbObject.DbObjectType.View)
     {
       DbObject = dbObject;
     }
@@ -83,8 +85,9 @@ namespace MySQL.ForExcel.Classes
     /// Initializes a new instance of the <see cref="MySqlListViewNode"/> class intended to be a header node containing sub-nodes.
     /// </summary>
     /// <param name="headerTitle">The title text of the tree node.</param>
-    public MySqlListViewNode(string headerTitle)
-      : this(headerTitle, null, MySqlNodeType.Header)
+    /// <param name="excludeFromMultiSelection">Flag indicating whether the tree node is skipped during a multiple selection.</param>
+    public MySqlListViewNode(string headerTitle, bool excludeFromMultiSelection = false)
+      : this(headerTitle, null, MySqlNodeType.Header, excludeFromMultiSelection)
     {
     }
 
@@ -94,10 +97,12 @@ namespace MySQL.ForExcel.Classes
     /// <param name="title">The title text of the tree node.</param>
     /// <param name="subtitle">The sub-title text of the tree node.</param>
     /// <param name="type">The type of MySQL information related to the node.</param>
-    private MySqlListViewNode(string title, string subtitle, MySqlNodeType type)
+    /// <param name="excludeFromMultiSelection">Flag indicating whether the tree node is skipped during a multiple selection.</param>
+    private MySqlListViewNode(string title, string subtitle, MySqlNodeType type, bool excludeFromMultiSelection)
       : base(title)
     {
       DbObject = null;
+      ExcludeFromMultiSelection = excludeFromMultiSelection;
       _isSelected = false;
       WbConnection = null;
       Enable = true;
@@ -138,6 +143,11 @@ namespace MySQL.ForExcel.Classes
     /// Gets or sets a value indicating whether the tree node is displayed as being enabled.
     /// </summary>
     public bool Enable { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the tree node is skipped during a multiple selection.
+    /// </summary>
+    public bool ExcludeFromMultiSelection { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the node is selected.

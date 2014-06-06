@@ -55,6 +55,7 @@ namespace MySQL.ForExcel.Panels
       this.OptionsButton = new System.Windows.Forms.Button();
       this.DBObjectList = new MySQL.ForExcel.Controls.MySqlListView();
       this.DBObjectsContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.ImportRelatedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.RefreshDatabaseObjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.AppendDataHotLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.EditDataHotLabel = new MySQL.ForExcel.Controls.HotLabel();
@@ -151,15 +152,25 @@ namespace MySQL.ForExcel.Panels
       // DBObjectsContextMenuStrip
       // 
       this.DBObjectsContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ImportRelatedToolStripMenuItem,
             this.RefreshDatabaseObjectsToolStripMenuItem});
       this.DBObjectsContextMenuStrip.Name = "contextMenuStrip";
-      this.DBObjectsContextMenuStrip.Size = new System.Drawing.Size(208, 26);
+      this.DBObjectsContextMenuStrip.Size = new System.Drawing.Size(284, 48);
+      this.DBObjectsContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.DBObjectsContextMenuStrip_Opening);
+      // 
+      // ImportRelatedToolStripMenuItem
+      // 
+      this.ImportRelatedToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ObjectPanel_ImportMany_24x24;
+      this.ImportRelatedToolStripMenuItem.Name = "ImportRelatedToolStripMenuItem";
+      this.ImportRelatedToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
+      this.ImportRelatedToolStripMenuItem.Text = "Import Selected and Related DB Objects";
+      this.ImportRelatedToolStripMenuItem.Click += new System.EventHandler(this.ImportRelatedToolStripMenuItem_Click);
       // 
       // RefreshDatabaseObjectsToolStripMenuItem
       // 
       this.RefreshDatabaseObjectsToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.refresh_sidebar;
       this.RefreshDatabaseObjectsToolStripMenuItem.Name = "RefreshDatabaseObjectsToolStripMenuItem";
-      this.RefreshDatabaseObjectsToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+      this.RefreshDatabaseObjectsToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
       this.RefreshDatabaseObjectsToolStripMenuItem.Text = "Refresh Database Objects";
       this.RefreshDatabaseObjectsToolStripMenuItem.Click += new System.EventHandler(this.RefreshDatabaseObjectsToolStripMenuItem_Click);
       // 
@@ -492,5 +503,6 @@ namespace MySQL.ForExcel.Panels
     private System.Windows.Forms.PictureBox MainLogoPictureBox;
     private System.Windows.Forms.Label SchemaLabel;
     private HotLabel ImportMultiHotLabel;
+    private System.Windows.Forms.ToolStripMenuItem ImportRelatedToolStripMenuItem;
   }
 }
