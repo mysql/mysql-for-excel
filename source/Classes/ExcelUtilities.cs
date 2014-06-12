@@ -76,11 +76,6 @@ namespace MySQL.ForExcel.Classes
     public const string DEFAULT_WARNING_CELLS_HTML_COLOR = "#FCC451";
 
     /// <summary>
-    /// The connection string used on the creation of new <see cref="ExcelInterop.ListObject"/> instances holding imported MySQL data.
-    /// </summary>
-    public const string DUMMY_WORKBOOK_CONNECTION_STRING = @"OLEDB;Provider=MySqlDummy;Data Source=MySqlDummy;";
-
-    /// <summary>
     /// The interior color used to revert Excel cells to their original background color.
     /// </summary>
     public const int EMPTY_CELLS_OLE_COLOR = 0;
@@ -431,12 +426,12 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Attempts to delete a <see cref="ExcelTools.ListObject"/> trapping any COM exception.
     /// </summary>
-    /// <param name="excelTable">A <see cref="ExcelTools.ListObject"/> object.</param>
+    /// <param name="toolsExcelTable">A <see cref="ExcelTools.ListObject"/> object.</param>
     /// <param name="logException">Flag indicating whether any exception is written to the application log.</param>
     /// <returns><c>true</c> if the deletion happened without errors, <c>false</c> otherwise.</returns>
-    public static bool DeleteSafely(this ExcelTools.ListObject excelTable, bool logException)
+    public static bool DeleteSafely(this ExcelTools.ListObject toolsExcelTable, bool logException)
     {
-      if (excelTable == null)
+      if (toolsExcelTable == null)
       {
         return false;
       }
@@ -444,10 +439,13 @@ namespace MySQL.ForExcel.Classes
       bool success = true;
       try
       {
-        var namedTable = excelTable.InnerObject as ExcelInterop.ListObject;
-        namedTable.DeleteSafely(logException);
-        excelTable.Delete();
-        excelTable.Dispose();
+        var interopExcelTable = toolsExcelTable.InnerObject;
+        toolsExcelTable.Delete();
+        toolsExcelTable.Dispose();
+        if (interopExcelTable != null)
+        {
+          interopExcelTable.Delete();
+        }
       }
       catch (Exception ex)
       {
@@ -462,6 +460,33 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Attempts to disconnect and delete a <see cref="ExcelTools.ListObject"/> trapping any COM exception.
+    /// </summary>
+    /// <param name="toolsExcelTable">A <see cref="ExcelTools.ListObject"/> object.</param>
+    /// <param name="logException">Flag indicating whether any exception is written to the application log.</param>
+    /// <returns><c>true</c> if the deletion happened without errors, <c>false</c> otherwise.</returns>
+    public static bool DisconnectAndDelete(this ExcelTools.ListObject toolsExcelTable, bool logException)
+    {
+      if (toolsExcelTable == null)
+      {
+        return false;
+      }
+
+      if (toolsExcelTable.IsBinding)
+      {
+        toolsExcelTable.Disconnect();
+      }
+
+      if (toolsExcelTable.DataSource is MySqlDataTable)
+      {
+        var boundTable = toolsExcelTable.DataSource as MySqlDataTable;
+        boundTable.Dispose();
+      }
+
+      return toolsExcelTable.DeleteSafely(logException);
+    }
+
+    /// <summary>
     /// Returns an Excel range with the first row cells corresponding to the column names.
     /// </summary>
     /// <param name="mysqlDataRange">If <c>null</c> the whole first row is returned, otherwise only the column cells within the editing range.</param>
@@ -469,6 +494,28 @@ namespace MySQL.ForExcel.Classes
     public static ExcelInterop.Range GetColumnNamesRange(this ExcelInterop.Range mysqlDataRange)
     {
       return mysqlDataRange == null ? null : mysqlDataRange.Resize[1, mysqlDataRange.Columns.Count];
+    }
+
+    /// <summary>
+    /// Returns the command text used for a new <see cref="ExcelInterop.WorkbookConnection"/>.
+    /// </summary>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
+    /// <param name="excelTableName">The name of a <see cref="ExcelInterop.ListObject"/>.</param>
+    /// <returns>The command text used for a new <see cref="ExcelInterop.WorkbookConnection"/>.</returns>
+    public static string GetCommandText(this ExcelInterop.Workbook workbook, string excelTableName)
+    {
+      return workbook == null ? string.Empty : string.Format("{0}!{1}", workbook.Name, excelTableName);
+    }
+
+    /// <summary>
+    /// Returns the connection name used for a new <see cref="ExcelInterop.WorkbookConnection"/>.
+    /// </summary>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
+    /// <param name="excelTableName">The name of a <see cref="ExcelInterop.ListObject"/>.</param>
+    /// <returns>The connection name used for a new <see cref="ExcelInterop.WorkbookConnection"/>.</returns>
+    public static string GetConnectionName(this ExcelInterop.Workbook workbook, string excelTableName)
+    {
+      return workbook == null ? string.Empty : @"WorkbookConnection_" + workbook.GetCommandText(excelTableName);
     }
 
     /// <summary>

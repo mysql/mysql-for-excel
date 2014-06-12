@@ -1861,6 +1861,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The parent workbook of worksheet {0} could not be obtained while trying to create the Excel table {1}..
+        /// </summary>
+        internal static string ParentWorkbookNullError {
+            get {
+                return ResourceManager.GetString("ParentWorkbookNullError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Native Excel&apos;s refresh functionality could not be overriden due to an error..
         /// </summary>
         internal static string OverrideNativeRefreshError {

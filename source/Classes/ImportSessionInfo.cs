@@ -20,6 +20,7 @@ using System;
 using System.Linq;
 using System.Xml.Serialization;
 using MySQL.ForExcel.Interfaces;
+using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
@@ -87,12 +88,18 @@ namespace MySQL.ForExcel.Classes
     /// Initializes a new instance of the <see cref="ImportSessionInfo" /> class.
     /// </summary>
     /// <param name="mySqlTable">MySqlDataTable object related to the import session.</param>
-    /// <param name="excelTable">The <see cref="ExcelInterop.ListObject"/> object related to the import session.</param>
-    public ImportSessionInfo(MySqlDataTable mySqlTable, ExcelInterop.ListObject excelTable)
+    /// <param name="atCell">The top left Excel cell of the new <see cref="ExcelInterop.ListObject"/>.</param>
+    /// <param name="addSummaryFields">Indicates wheather to include a row with summary fields</param>
+    /// <param name="refreshOnCreation">Flag indicating whether the session is refreshed right away after initialized.</param>
+    public ImportSessionInfo(MySqlDataTable mySqlTable, ExcelInterop.Range atCell, bool addSummaryFields, bool refreshOnCreation)
       : this()
     {
+      if (mySqlTable == null)
+      {
+        throw new ArgumentNullException("mySqlTable");
+      }
+
       _connection = mySqlTable.WbConnection;
-      ExcelTable = excelTable;
       MySqlTable = mySqlTable;
       SchemaName = mySqlTable.SchemaName;
       TableName = mySqlTable.TableName;
@@ -104,6 +111,7 @@ namespace MySQL.ForExcel.Classes
       WorkbookFilePath = Globals.ThisAddIn.Application.ActiveWorkbook.FullName;
       ExcelInterop.Worksheet worksheet = Globals.ThisAddIn.Application.ActiveWorkbook.ActiveSheet;
       WorksheetName = worksheet.Name;
+      CreateExcelTable(atCell, addSummaryFields, refreshOnCreation);
     }
 
     #region Properties
@@ -447,15 +455,126 @@ namespace MySQL.ForExcel.Classes
           MySqlTable.Dispose();
         }
 
+        // Set variables to null so this object does not hold references to them and the GC disposes of them sooner.
         _connection = null;
         MySqlTable = null;
         ExcelTable = null;
         ToolsExcelTable = null;
+
+        // Attempt to remove the dummy connection created for this import session
+        RemoveWorkbookConnection();
       }
 
       // Add class finalizer if unmanaged resources are added to the class
       // Free unmanaged resources if there are any
       _disposed = true;
+    }
+
+    /// <summary>
+    /// Creates an Excel table starting at the given cell containing the data in a <see cref="MySqlDataTable"/> instance.
+    /// </summary>
+    /// <param name="atCell">The top left Excel cell of the new <see cref="ExcelInterop.ListObject"/>.</param>
+    /// <param name="addSummaryFields">Indicates wheather to include a row with summary fields</param>
+    /// <param name="refreshOnCreation">Flag indicating whether the session is refreshed right away after initialized.</param>
+    private void CreateExcelTable(ExcelInterop.Range atCell, bool addSummaryFields, bool refreshOnCreation)
+    {
+      if (atCell == null)
+      {
+        throw new ArgumentNullException("atCell");
+      }
+
+      string proposedName = MySqlTable.ExcelTableName;
+      var worksheet = Globals.Factory.GetVstoObject(atCell.Worksheet);
+      var workbook = worksheet.Parent as ExcelInterop.Workbook;
+      if (workbook == null)
+      {
+        MySqlSourceTrace.WriteToLog(string.Format(Resources.ParentWorkbookNullError, worksheet.Name, proposedName));
+        return;
+      }
+
+      string workbookGuid = workbook.GetOrCreateId();
+      try
+      {
+        int consecutiveIfOrphanedTable = 2;
+        string commandText;
+        string connectionName;
+        string connectionStringForCmdDefault = MySqlTable.WbConnection.GetConnectionStringForCmdDefault();
+        do
+        {
+          // Prepare Excel table name and dummy connection
+          proposedName = proposedName.GetExcelTableNameAvoidingDuplicates();
+          commandText = workbook.GetCommandText(proposedName);
+          connectionName = workbook.GetConnectionName(proposedName);
+
+          // Check first if there is an orphaned Tools Excel table (leftover from a deleted Interop Excel table) and if so then attempt to free resources.
+          if (!worksheet.Controls.Contains(proposedName))
+          {
+            break;
+          }
+
+          var toolsExcelTable = worksheet.Controls[proposedName] as ExcelTools.ListObject;
+          toolsExcelTable.DisconnectAndDelete(false);
+
+          // At this point a new name is needed since for some reason or bug the Globals.Factory throws an error
+          // trying to check if there is a Tools Excel table already for the existing name, so go back to that point.
+          proposedName = string.Format("{0}-{1}", MySqlTable.ExcelTableName, consecutiveIfOrphanedTable++);
+        } while (true);
+
+        // Create empty Interop Excel table that will be connected to a data source
+        var hasHeaders = ImportColumnNames ? ExcelInterop.XlYesNoGuess.xlYes : ExcelInterop.XlYesNoGuess.xlNo;
+        var excelTable = worksheet.ListObjects.Add(ExcelInterop.XlListObjectSourceType.xlSrcExternal, connectionStringForCmdDefault, false, hasHeaders, atCell);
+        excelTable.Name = proposedName;
+        excelTable.TableStyle = Settings.Default.ImportExcelTableStyleName;
+        excelTable.QueryTable.BackgroundQuery = false;
+        excelTable.QueryTable.CommandText = commandText;
+        excelTable.ShowTotals = addSummaryFields;
+        ExcelTable = excelTable;
+
+        // Add a connection to the Workbook, the method used to add it differs since the Add method is obsolete for Excel 2013 and higher.
+        if (Globals.ThisAddIn.ExcelVersionNumber < ThisAddIn.EXCEL_2013_VERSION_NUMBER)
+        {
+          workbook.Connections.Add(connectionName, string.Empty, connectionStringForCmdDefault, commandText, ExcelInterop.XlCmdType.xlCmdDefault);
+        }
+        else
+        {
+          workbook.Connections.Add2(connectionName, string.Empty, connectionStringForCmdDefault, commandText, ExcelInterop.XlCmdType.xlCmdDefault);
+        }
+
+        // Add this instance of the ImportSessionInfo class if not present already in the global collection.;
+        if (!Globals.ThisAddIn.ActiveImportSessions.Exists(session => session.WorkbookGuid == workbookGuid && session.MySqlTable == MySqlTable && string.Equals(session.ExcelTableName, proposedName, StringComparison.InvariantCultureIgnoreCase)))
+        {
+          Globals.ThisAddIn.ActiveImportSessions.Add(this);
+        }
+
+        if (refreshOnCreation)
+        {
+          Refresh();
+        }
+      }
+      catch (Exception ex)
+      {
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
+    }
+
+    /// <summary>
+    /// Attempts to delete the <see cref="ExcelInterop.WorkbookConnection"/> created for this session.
+    /// </summary>
+    private void RemoveWorkbookConnection()
+    {
+      if (_excelTable == null)
+      {
+        return;
+      }
+
+      var workbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+      var workbookConnection = workbook.Connections.Cast<ExcelInterop.WorkbookConnection>().FirstOrDefault(conn => conn.Name == workbook.GetConnectionName(_excelTable.Name));
+      if (workbookConnection == null)
+      {
+        return;
+      }
+
+      workbookConnection.Delete();
     }
   }
 }

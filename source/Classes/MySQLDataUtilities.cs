@@ -29,7 +29,7 @@ using MySQL.ForExcel.Structs;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
-using Excel = Microsoft.Office.Interop.Excel;
+using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -308,6 +308,16 @@ namespace MySQL.ForExcel.Classes
       }
 
       return collationsDictionary;
+    }
+
+    /// <summary>
+    /// Returns the connection string used for a new <see cref="ExcelInterop.WorkbookConnection"/> that uses a <see cref="ExcelInterop.XlCmdType.xlCmdDefault"/> command type.
+    /// </summary>
+    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
+    /// <returns>The connection string used for a new <see cref="ExcelInterop.WorkbookConnection"/> that uses a <see cref="ExcelInterop.XlCmdType.xlCmdDefault"/> command type.</returns>
+    public static string GetConnectionStringForCmdDefault(this MySqlWorkbenchConnection connection)
+    {
+      return connection == null ? string.Empty : string.Format("OLEDB;Provider=MSDASQL;Driver={{MySQL ODBC 5.2 ANSI Driver}};Server={0};Database={1};User={2};Option=3;", connection.Host, connection.Schema, connection.UserName);
     }
 
     /// <summary>
@@ -914,13 +924,13 @@ namespace MySQL.ForExcel.Classes
         return TestConnectionResult.None;
       }
 
-      Globals.ThisAddIn.Application.Cursor = Excel.XlMousePointer.xlWait;
+      Globals.ThisAddIn.Application.Cursor = ExcelInterop.XlMousePointer.xlWait;
       TestConnectionResult connectionResult;
       Exception connectionException;
       if (connection.TestConnection(out connectionException))
       {
         connectionResult = TestConnectionResult.ConnectionSuccess;
-        Globals.ThisAddIn.Application.Cursor = Excel.XlMousePointer.xlDefault;
+        Globals.ThisAddIn.Application.Cursor = ExcelInterop.XlMousePointer.xlDefault;
         return connectionResult;
       }
 
@@ -969,7 +979,7 @@ namespace MySQL.ForExcel.Classes
         InfoDialog.ShowErrorDialog(Resources.ConnectFailedWarningTitle, connectionException.Message, null, connectionException.InnerException != null ? connectionException.InnerException.Message : null);
       }
 
-      Globals.ThisAddIn.Application.Cursor = Excel.XlMousePointer.xlDefault;
+      Globals.ThisAddIn.Application.Cursor = ExcelInterop.XlMousePointer.xlDefault;
       return connectionResult;
     }
 
