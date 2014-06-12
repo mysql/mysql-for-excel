@@ -169,6 +169,26 @@ namespace MySQL.ForExcel.Classes
     {
     }
 
+    #region Enumerations
+
+    /// <summary>
+    /// Describes the type of a MySQL collecion data type.
+    /// </summary>
+    public enum CollectionDataType
+    {
+      /// <summary>
+      /// An Enum type where only 1 value from a valid values list is stored.
+      /// </summary>
+      Enum,
+
+      /// <summary>
+      /// A Set type where a set of N values from a valid values list is stored.
+      /// </summary>
+      Set
+    }
+
+    #endregion Enumerations
+
     #region Properties
 
     /// <summary>
@@ -516,7 +536,7 @@ namespace MySQL.ForExcel.Classes
         return _mySqlDataType;
       }
 
-      set
+      private set
       {
         _mySqlDataType = value;
         _columnRequiresQuotes = null;
@@ -938,6 +958,25 @@ namespace MySQL.ForExcel.Classes
 
       DisplayName = addSuffixIfDuplicate ? nonDuplicateDisplayName : displayName;
       OnPropertyChanged("DisplayName");
+    }
+
+    /// <summary>
+    /// Sets the data type of the column to an enum or set type with a valid list of values built from the column values in all rows.
+    /// </summary>
+    /// <param name="type">A <see cref="CollectionDataType"/>.</param>
+    public void SetCollectionDataType(CollectionDataType type)
+    {
+      if (AutoPk)
+      {
+        return;
+      }
+
+      var values = string.Join(",", ParentTable.Rows.Cast<MySqlDataRow>().Select(row => string.Format("'{0}'", row[Ordinal].ToString().Replace("'", "''"))).Distinct().ToArray());
+      RowsFromFirstDataType = string.Format("{0}({1})", type, values);
+      int commaIndex = values.IndexOf(",", StringComparison.InvariantCultureIgnoreCase);
+      values = commaIndex < 0 ? string.Empty : values.Substring(commaIndex + 1);
+      RowsFromSecondDataType = string.Format("{0}({1})", type, values);
+      MySqlDataType = ParentTable.FirstRowIsHeaders ? RowsFromSecondDataType : RowsFromFirstDataType;
     }
 
     /// <summary>

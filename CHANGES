@@ -1,3 +1,14 @@
+1.3.1
+- Added new functionality to the Data Type combo box for Enum and Set types. When all data types are being shown in the Export Data dialog (via advanced option), if the
+  user selects Enum or Set, the list of valid values for the type declaration is assembled automatically from the column's data so there is no need to type the list of
+  values that goes between parenthesis manually.
+- Fixed a bug in the Export Data dialog where data types containing parenthesis entered manually in the Data Type combo box for new columns were not validated correctly.
+  (Bug #18962214 - DATA TYPES ENTERED MANUALLY IN DATA TYPE COMBO BOX ARE NOT VALIDATED CORRECTLY.)
+- Fixed a cosmetic problem on the graphical list of connections, schemas and database objects where the text of each list item turned bold when hovering the mouse over.
+  (Bug #18962130 - FIX PROBLEM WITH BOLD LETTERS IN MYSQLLISTVIEW.)
+- Implemented the use of <CTRL>+<A> as a shortcut in the list of database objects to select all MySQL tables and views.
+  (Bug #18961544 - IMPLEMENT CTRL+A IN TREE-VIEW TO SELECT ALL TABLES AND VIEWS)
+
 1.3.0
 - Added new feature to allow the selection of multiple tables and views in the Database Objects panel, the multiple selection can be done by using the CTRL or SHIFT keys
   along with arrow keys, paging keys or mouse clicks. Clicking CTRL+A selects all tables and views in the panel. A new Import Multiple Tables and Views action appears with

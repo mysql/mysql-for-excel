@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -352,7 +351,23 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      currentCol.SetMySqlDataType(selectedType, false, true);
+      // Fill in sets and enums
+      switch (selectedType)
+      {
+        case "Enum":
+          currentCol.SetCollectionDataType(MySqlDataColumn.CollectionDataType.Enum);
+          BeginInvoke(new Action(() => DataTypeComboBox.Text = currentCol.MySqlDataType));
+          break;
+
+        case "Set":
+          currentCol.SetCollectionDataType(MySqlDataColumn.CollectionDataType.Set);
+          BeginInvoke(new Action(() => DataTypeComboBox.Text = currentCol.MySqlDataType));
+          break;
+
+        default:
+          currentCol.SetMySqlDataType(selectedType, false, true);
+          break;
+      }
     }
 
     /// <summary>
@@ -1335,8 +1350,7 @@ namespace MySQL.ForExcel.Forms
       }
       else
       {
-        // The code should never hit this block in which case there is something wrong.
-        MySqlSourceTrace.WriteToLog("TextChangedTimer's Tick event fired but no valid control had focus.");
+        // In case no control has focus no validation is needed, just stop the timer.
         TextChangedTimer.Stop();
       }
     }

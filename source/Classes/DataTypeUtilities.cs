@@ -780,7 +780,8 @@ namespace MySQL.ForExcel.Classes
           return MYSQL_TIME_MAX_LENGTH;
       }
 
-      throw new UnhandledMySqlTypeException();
+      // Unknown data type.
+      return 0;
     }
 
     /// <summary>
@@ -1070,10 +1071,14 @@ namespace MySQL.ForExcel.Classes
       else
       {
         strippedType = mySqlDataType.Substring(0, lParensIndex);
-        int commaPos = mySqlDataType.IndexOf(',');
-        length = commaPos < 0
-          ? int.Parse(mySqlDataType.Substring(lParensIndex + 1, mySqlDataType.Length - lParensIndex - 2))
-          : int.Parse(mySqlDataType.Substring(lParensIndex + 1, commaPos - lParensIndex - 1)) + 1;
+        int commaIndex = mySqlDataType.IndexOf(',');
+        int rParensIndex = mySqlDataType.IndexOf(')');
+        int rPos = commaIndex < 0 ? rParensIndex : commaIndex;
+        if (rPos >= 0)
+        {
+          string lengthStr = mySqlDataType.Substring(lParensIndex + 1, rPos - lParensIndex - 1);
+          long.TryParse(lengthStr, out length);
+        }
       }
 
       if (length == 0 && maxLenIfNotSpecified)
