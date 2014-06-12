@@ -248,7 +248,7 @@ namespace MySQL.ForExcel.Forms
 
           var listObj = mySqlTable.ImportDataAtActiveExcelCell(true, CreatePivotTables);
           var excelTable = listObj as ExcelInterop.ListObject;
-          if (excelTable == null)
+          if (excelTable == null || !_importRelationshipsEnabled)
           {
             continue;
           }
@@ -257,36 +257,39 @@ namespace MySQL.ForExcel.Forms
         }
 
         // Create Excel relationships
-        foreach (var relationship in _relationshipsList.Where(relationship => !relationship.Excluded))
+        if (_importRelationshipsEnabled)
         {
-          // Get the ModelColumnName objects needed to define the relationship
-          ExcelInterop.ListObject excelTable;
-          ExcelInterop.ListObject relatedExcelTable;
-          bool excelTableExists = excelTablesDictionary.TryGetValue(relationship.TableOrViewName, out excelTable);
-          bool relatedExcelTableExists = excelTablesDictionary.TryGetValue(relationship.RelatedTableOrViewName, out relatedExcelTable);
-          if (!excelTableExists || !relatedExcelTableExists)
+          foreach (var relationship in _relationshipsList.Where(relationship => !relationship.Excluded))
           {
-            continue;
+            // Get the ModelColumnName objects needed to define the relationship
+            ExcelInterop.ListObject excelTable;
+            ExcelInterop.ListObject relatedExcelTable;
+            bool excelTableExists = excelTablesDictionary.TryGetValue(relationship.TableOrViewName, out excelTable);
+            bool relatedExcelTableExists = excelTablesDictionary.TryGetValue(relationship.RelatedTableOrViewName, out relatedExcelTable);
+            if (!excelTableExists || !relatedExcelTableExists)
+            {
+              continue;
+            }
+
+            var table = activeWorkbook.Model.ModelTables.Cast<ExcelInterop.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, excelTable.Name.Replace(".", " "), StringComparison.InvariantCulture));
+            var relatedTable = activeWorkbook.Model.ModelTables.Cast<ExcelInterop.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, relatedExcelTable.Name.Replace(".", " "), StringComparison.InvariantCulture));
+            if (table == null || relatedTable == null)
+            {
+              continue;
+            }
+
+            var column = table.ModelTableColumns.Cast<ExcelInterop.ModelTableColumn>().FirstOrDefault(col => string.Equals(col.Name, relationship.ColumnName, StringComparison.InvariantCulture));
+            var relatedColumn = relatedTable.ModelTableColumns.Cast<ExcelInterop.ModelTableColumn>().FirstOrDefault(col => string.Equals(col.Name, relationship.RelatedColumnName, StringComparison.InvariantCulture));
+            if (column == null || relatedColumn == null)
+            {
+              continue;
+            }
+
+            activeWorkbook.Model.ModelRelationships.Add(column, relatedColumn);
           }
 
-          var table = activeWorkbook.Model.ModelTables.Cast<ExcelInterop.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, excelTable.Name.Replace(".", " "), StringComparison.InvariantCulture));
-          var relatedTable = activeWorkbook.Model.ModelTables.Cast<ExcelInterop.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, relatedExcelTable.Name.Replace(".", " "), StringComparison.InvariantCulture));
-          if (table == null || relatedTable == null)
-          {
-            continue;
-          }
-
-          var column = table.ModelTableColumns.Cast<ExcelInterop.ModelTableColumn>().FirstOrDefault(col => string.Equals(col.Name, relationship.ColumnName, StringComparison.InvariantCulture));
-          var relatedColumn = relatedTable.ModelTableColumns.Cast<ExcelInterop.ModelTableColumn>().FirstOrDefault(col => string.Equals(col.Name, relationship.RelatedColumnName, StringComparison.InvariantCulture));
-          if (column == null || relatedColumn == null)
-          {
-            continue;
-          }
-
-          activeWorkbook.Model.ModelRelationships.Add(column, relatedColumn);
+          excelTablesDictionary.Clear();
         }
-
-        excelTablesDictionary.Clear();
       }
       catch (Exception ex)
       {
@@ -358,11 +361,6 @@ namespace MySQL.ForExcel.Forms
         lvi.Tag = dbObject;
 
         // Get relationship for selected table or view.
-        if (!_importRelationshipsEnabled)
-        {
-          continue;
-        }
-
         var relationships = _wbConnection.GetRelationshipsFromForeignKeys(dbObject);
         if (relationships == null)
         {
