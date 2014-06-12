@@ -1178,11 +1178,35 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Event delegate method fired when a <see cref="OfficeCore.CommandBarButton"/> control is clicked.
+    /// Overrides the native Excel refresh menus to call a customized event handler.
+    /// </summary>
+    private void OverrideNativeRefreshFunctionality()
+    {
+      _builtInRefreshCommandButton = null;
+
+      try
+      {
+        // Override native functionality by subscribing the Click event for the first control, no need to subscribe all of them
+        foreach (OfficeCore.CommandBarButton button in Application.CommandBars.FindControls(OfficeCore.MsoControlType.msoControlButton, 459, Type.Missing, Type.Missing))
+        {
+          _builtInRefreshCommandButton = button;
+          button.Click += RefreshDataCustomFunctionality;
+          break;
+        }
+      }
+      catch (Exception ex)
+      {
+        MySqlSourceTrace.WriteToLog(Resources.OverrideNativeRefreshError);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the Refresh <see cref="OfficeCore.CommandBarButton"/> is clicked, meant to override its native functionality.
     /// </summary>
     /// <param name="ctrl">A <see cref="OfficeCore.CommandBarButton"/> control.</param>
     /// <param name="cancelDefault">Flag indicating whether the base functionality is cancelled or not.</param>
-    private void RefreshButton_Click(OfficeCore.CommandBarButton ctrl, ref bool cancelDefault)
+    private void RefreshDataCustomFunctionality(OfficeCore.CommandBarButton ctrl, ref bool cancelDefault)
     {
       var listObject = Application.ActiveCell.ListObject;
 
@@ -1284,6 +1308,29 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Reverts back the native Excel refresh menus to call only its base functionality.
+    /// </summary>
+    private void RevertNativeRefreshFunctionality()
+    {
+      if (_builtInRefreshCommandButton == null)
+      {
+        return;
+      }
+
+      try
+      {
+        _builtInRefreshCommandButton.Reset();
+        _builtInRefreshCommandButton.Click -= RefreshDataCustomFunctionality;
+        Marshal.ReleaseComObject(_builtInRefreshCommandButton);
+      }
+      catch (Exception ex)
+      {
+        MySqlSourceTrace.WriteToLog(Resources.RevertNativeRefreshError);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
+    }
+
+    /// <summary>
     /// Setups the excel events.
     /// </summary>
     /// <param name="subscribe">if set to <c>true</c> [subscribe].</param>
@@ -1367,6 +1414,9 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void ThisAddIn_Shutdown(object sender, EventArgs e)
     {
+      // Revert Refresh command button's native functionality
+      RevertNativeRefreshFunctionality();
+
       // Close all Excel panes created
       if (ExcelPanesList != null)
       {
@@ -1378,14 +1428,6 @@ namespace MySQL.ForExcel
 
       ExcelAddInPanesClosed();
       MySqlSourceTrace.WriteToLog(Resources.ShutdownMessage, SourceLevels.Information);
-
-      // Reset Refresh command button
-      if (_builtInRefreshCommandButton != null)
-      {
-        _builtInRefreshCommandButton.Reset();
-        _builtInRefreshCommandButton.Click -= RefreshButton_Click;
-        Marshal.ReleaseComObject(_builtInRefreshCommandButton);
-      }
 
       // Unsubscribe events tracked even when no Excel panes are open.
       Application.WorkbookOpen -= Application_WorkbookOpen;
@@ -1435,13 +1477,7 @@ namespace MySQL.ForExcel
         }
 
         // Override refresh menus by subscribing the Click event for the first control, no need to subscribe all of them.
-        _builtInRefreshCommandButton = null;
-        foreach (OfficeCore.CommandBarButton button in Application.CommandBars.FindControls(OfficeCore.MsoControlType.msoControlButton, 459, Type.Missing, Type.Missing))
-        {
-          _builtInRefreshCommandButton = button;
-          button.Click += RefreshButton_Click;
-          break;
-        }
+        OverrideNativeRefreshFunctionality();
 
         // Subscribe events tracked even when no Excel panes are open.
         Application.WorkbookOpen += Application_WorkbookOpen;

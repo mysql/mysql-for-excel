@@ -1152,15 +1152,6 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A saved Import Session for the ListObject.
-        /// </summary>
-        internal static string ImportSessionNotFound {
-            get {
-                return ResourceManager.GetString("ImportSessionNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Error importing table&apos;s data.
         /// </summary>
         internal static string ImportTableErrorTitle {
@@ -1870,6 +1861,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Native Excel&apos;s refresh functionality could not be overriden due to an error..
+        /// </summary>
+        internal static string OverrideNativeRefreshError {
+            get {
+                return ResourceManager.GetString("OverrideNativeRefreshError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Connection failed with current password.
         ///Please re-enter your password to try again..
         /// </summary>
@@ -2077,6 +2077,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string RevertDataConfirmation {
             get {
                 return ResourceManager.GetString("RevertDataConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Native Excel&apos;s refresh functionality could not be reverted back due to an error..
+        /// </summary>
+        internal static string RevertNativeRefreshError {
+            get {
+                return ResourceManager.GetString("RevertNativeRefreshError", resourceCulture);
             }
         }
         
