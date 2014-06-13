@@ -202,8 +202,6 @@ namespace MySQL.ForExcel.Classes
           new MySqlDataType("Curve", "For spatial data, one-dimensional geometry represented by a sequence of points", 0, true, true, false),
           new MySqlDataType("Geometry", "For spatial data, base type for all geometry values", 0, true, true, false),
           new MySqlDataType("GeometryCollection", "For spatial data, a collection of one or more geometries of any type", 0, true, true, false),
-          new MySqlDataType("Line", "For spatial data, ??????", 0, true, true, false),
-          new MySqlDataType("LinearRing", "For spatial data, ??????", 0, true, true, false),
           new MySqlDataType("LineString", "For spatial data, a Curve with linear interpolation between points", 0, true, true, false),
           new MySqlDataType("MultiCurve", "For spatial data, a geometry collection composed of Curve elements", 0, true, true, false),
           new MySqlDataType("MultiLineString", "For spatial data, a geometry collection composed of LineString elements", 0, true, true, false),

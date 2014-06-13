@@ -1,4 +1,7 @@
 1.3.1
+- Removed the Line and LinearRing types from the list of valid data types supported by the MySQL server, meaning the types do not appear anymore in the Data Type combo
+  box located in the Export Data form and are not treated as valid if typed-in by the user. Line and LineaRing are not a part of the SFA-SQL nor SQL/MM-Spatial standards,
+  thus not implemented in the MySQL Server. (Bug #18962184 - DATA TYPE COMBO BOX IN EXPORT DATA DIALOG SHOWING 2 NON-WORKING SPATIAL TYPES)
 - Fixed some conditions in the code that was preventing relationships for selected tables and views (multi-selection) to be processed, so related tables and views were
   not found and listed in the Multiple Import dialog. (Bug #18962354 - NO TABLE RELATIONS DETECTED IN OFFICE 2007 AND 2010)
 - Changed the way connections are created for Excel 2013, instead of creating a connection for an Excel command type we create a default command type one (like we do for

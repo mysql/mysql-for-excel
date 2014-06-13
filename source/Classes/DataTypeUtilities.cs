@@ -748,8 +748,6 @@ namespace MySQL.ForExcel.Classes
         case "CURVE":
         case "GEOMETRY":
         case "GEOMETRYCOLLECTION":
-        case "LINE":
-        case "LINEARRING":
         case "LINESTRING":
         case "MULTICURVE":
         case "MULTILINESTRING":
