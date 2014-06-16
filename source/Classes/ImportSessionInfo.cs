@@ -527,6 +527,7 @@ namespace MySQL.ForExcel.Classes
         excelTable.TableStyle = Settings.Default.ImportExcelTableStyleName;
         excelTable.QueryTable.BackgroundQuery = false;
         excelTable.QueryTable.CommandText = commandText;
+        excelTable.Comment = Guid.NewGuid().ToString();
         excelTable.ShowTotals = addSummaryFields;
         ExcelTable = excelTable;
 

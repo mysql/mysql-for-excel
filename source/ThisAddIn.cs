@@ -21,7 +21,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Management.Instrumentation;
 using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
@@ -32,6 +31,7 @@ using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
+using ExcelTools = Microsoft.Office.Tools.Excel;
 using OfficeTools = Microsoft.Office.Tools;
 using OfficeCore = Microsoft.Office.Core;
 using System.Runtime.InteropServices;
@@ -1211,16 +1211,58 @@ namespace MySQL.ForExcel
       var listObject = Application.ActiveCell.ListObject;
 
       // Do not return from the method unless the overriden refresh code happens, to avoid skipping the default refresh functionality.
-      // Meaning DO NOT invert any of the 2 following if statements to return right away.
-      if (listObject != null)
+      // Meaning DO NOT use the 'return' statement under any circumstance to return right away in the scope of this method.
+      if (listObject != null && listObject.Comment != null)
       {
-        var importSession = ActiveWorkbookImportSessions.FirstOrDefault(session => string.Equals(session.ExcelTableName, listObject.Name, StringComparison.InvariantCultureIgnoreCase));
+        ImportSessionInfo importSession = GetListObjectSession(listObject);
         if (importSession != null)
         {
           cancelDefault = true;
           importSession.Refresh();
         }
+        else
+        {
+          listObject.Unlink();
+        }
       }
+    }
+
+    /// <summary>
+    /// Gets the correspondant Import Session for the current ListObject.
+    /// </summary>
+    /// <param name="listObject">The list object.</param>
+    /// <returns></returns>
+    private ImportSessionInfo GetListObjectSession(ExcelInterop.ListObject listObject)
+    {
+      ImportSessionInfo importSession = null;
+      var invalidSessions = new List<ImportSessionInfo>();
+      foreach (var workbookSession in ActiveWorkbookImportSessions)
+      {
+        try
+        {
+          if (string.Equals(workbookSession.ExcelTable.Comment, listObject.Comment,
+            StringComparison.InvariantCultureIgnoreCase))
+          {
+            importSession = workbookSession;
+            break;
+          }
+        }
+        catch (COMException)
+        {
+          //The session's list object was moved to another worksheet or when its columns had been deleted or the reference to it no longer exists.
+          invalidSessions.Add(workbookSession);
+        }
+      }
+
+      //Dispose of invalid sessions.
+      if (invalidSessions.Count > 0)
+      {
+        invalidSessions.ForEach(invalidSession => invalidSession.ExcelTable.DeleteSafely(false));
+        invalidSessions.ForEach(invalidSession => ActiveImportSessions.Remove(invalidSession));
+        MiscUtilities.SaveSettings();
+      }
+
+      return importSession;
     }
 
     ///  <summary>
