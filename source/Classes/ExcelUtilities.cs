@@ -360,6 +360,61 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Creates a <see cref="ExcelInterop.PivotTable"/> starting at the given cell containing the data in the given <see cref="ExcelInterop.Range"/>.
+    /// </summary>
+    /// <param name="fromExcelObject">A <see cref="ExcelInterop.ListObject"/> or <see cref="ExcelInterop.Range"/> containing the data from which to create the <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <param name="atCell">The top left Excel cell of the new <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <param name="proposedName">The proposed name for the new <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <returns>The newly created <see cref="ExcelInterop.PivotTable"/>.</returns>
+    public static ExcelInterop.PivotTable CreatePivotTable(object fromExcelObject, ExcelInterop.Range atCell, string proposedName)
+    {
+      if (atCell == null || !(fromExcelObject is ExcelInterop.ListObject || fromExcelObject is ExcelInterop.Range))
+      {
+        return null;
+      }
+
+      string pivotSource = null;
+      if (fromExcelObject is ExcelInterop.ListObject)
+      {
+        var fromExcelTable = fromExcelObject as ExcelInterop.ListObject;
+        pivotSource = fromExcelTable.Name;
+      }
+      else
+      {
+        var fromRange = fromExcelObject as ExcelInterop.Range;
+        pivotSource = fromRange.Address[true, true, ExcelInterop.XlReferenceStyle.xlR1C1, true];
+      }
+
+      if (string.IsNullOrEmpty(proposedName))
+      {
+        proposedName = "PivotTable";
+      }
+
+      var worksheet = Globals.Factory.GetVstoObject(atCell.Worksheet);
+      var workbook = worksheet.Parent as ExcelInterop.Workbook;
+      if (workbook == null)
+      {
+        return null;
+      }
+
+      ExcelInterop.PivotTable pivotTable = null;
+      try
+      {
+        proposedName = proposedName.GetPivotTableNameAvoidingDuplicates();
+        var pivotTableVersion = Globals.ThisAddIn.ExcelPivotTableVersion;
+        var pivotCache = workbook.PivotCaches().Create(ExcelInterop.XlPivotTableSourceType.xlDatabase, pivotSource, pivotTableVersion);
+        string tableDestination = atCell.Address[true, true, ExcelInterop.XlReferenceStyle.xlR1C1, true];
+        pivotTable = pivotCache.CreatePivotTable(tableDestination, proposedName, true, pivotTableVersion);
+      }
+      catch (Exception ex)
+      {
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
+
+      return pivotTable;
+    }
+
+    /// <summary>
     /// Gets a <see cref="ExcelInterop.Worksheet"/> with a given name existing in the given <see cref="ExcelInterop.Workbook"/> or creates a new one.
     /// </summary>
     /// <param name="workBook">The <see cref="ExcelInterop.Workbook"/> to look for a <see cref="ExcelInterop.Worksheet"/>.</param>
@@ -757,6 +812,16 @@ namespace MySQL.ForExcel.Classes
 
       var parentWorkbook = worksheet.Parent as ExcelInterop.Workbook;
       return parentWorkbook != null ? parentWorkbook.Name : string.Empty;
+    }
+
+    /// <summary>
+    /// Gets a valid name for a new <see cref="ExcelInterop.PivotTable"/> that avoids duplicates with existing ones in the current <see cref="ExcelInterop.Workbook"/>.
+    /// </summary>
+    /// <param name="pivotTableName">The proposed name for a <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <returns>A <see cref="ExcelInterop.PivotTable"/> valid name.</returns>
+    public static string GetPivotTableNameAvoidingDuplicates(this string pivotTableName)
+    {
+      return pivotTableName.GetPivotTableNameAvoidingDuplicates(1);
     }
 
     /// <summary>

@@ -1209,42 +1209,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Creates an Excel PivotTable starting at the given cell containing the data in this <see cref="MySqlDataTable"/> instance.
-    /// </summary>
-    /// <param name="atCell">The top left Excel cell of the new <see cref="ExcelInterop.PivotTable"/>.</param>
-    /// <param name="dataRange">The top left Excel cell of the new <see cref="ExcelInterop.PivotTable"/>.</param>
-    /// <returns>The newly created <see cref="ExcelInterop.PivotTable"/>.</returns>
-    public ExcelInterop.PivotTable CreatePivotTable(ExcelInterop.Range atCell, ExcelInterop.Range dataRange)
-    {
-      if (atCell == null || dataRange == null)
-      {
-        return null;
-      }
-
-      var worksheet = Globals.Factory.GetVstoObject(atCell.Worksheet);
-      var workbook = worksheet.Parent as ExcelInterop.Workbook;
-      if (workbook == null)
-      {
-        return null;
-      }
-
-      ExcelInterop.PivotTable pivotTable = null;
-      try
-      {
-        string proposedName = ExcelTableName.GetExcelTableNameAvoidingDuplicates();
-        var pivotTableVersion = Globals.ThisAddIn.ExcelPivotTableVersion;
-        var pivotCache = workbook.PivotCaches().Create(ExcelInterop.XlPivotTableSourceType.xlDatabase, dataRange, pivotTableVersion);
-        pivotTable = pivotCache.CreatePivotTable(atCell, proposedName, true, pivotTableVersion);
-      }
-      catch (Exception ex)
-      {
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
-      }
-
-      return pivotTable;
-    }
-
-    /// <summary>
     /// Gets the <see cref="MySqlDataColumn"/> object at the given position within the columns collection.
     /// </summary>
     /// <param name="index">Ordinal index within the columns collection</param>
@@ -1577,7 +1541,7 @@ namespace MySQL.ForExcel.Classes
           break;
       }
 
-      CreatePivotTable(atCell, dataRange);
+      ExcelUtilities.CreatePivotTable(retObj, atCell, ExcelTableName);
       return retObj;
     }
 

@@ -1,4 +1,6 @@
 1.3.1
+- Modified the way PivotTables are created to pass to the Excel native methods addresses in R1C1 notation rather than the actual range objects which works in all
+  scenarios (even with big data). (Bug #18962371 - PIVOT TABLE DIALOG NOT DISPLAYED FOR TABLES HOLDING LARGE DATA)
 - Fixed new comparison method to detect the correspondent session's ListObjects by GUID, while also deleting invalid leftover objects.
   (Bug #18961806 - FIX REFRESH PROBLEM WHEN USERS CHANGE EXCEL TABLE NAMES OF IMPORTED MYSQL DATA)
 - Removed the Line and LinearRing types from the list of valid data types supported by the MySQL server, meaning the types do not appear anymore in the Data Type combo
