@@ -187,7 +187,7 @@ namespace MySQL.ForExcel.Panels
         return;
       }
 
-      var connectionToEdit = ConnectionsList.SelectedNode.Tag as MySqlWorkbenchConnection;
+      var connectionToEdit = ConnectionsList.SelectedNode.WbConnection;
       bool editedConnection;
       using (var instanceConnectionDialog = new MySqlWorkbenchConnectionDialog(connectionToEdit))
       {
