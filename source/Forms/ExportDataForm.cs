@@ -24,7 +24,6 @@ using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -215,7 +214,7 @@ namespace MySQL.ForExcel.Forms
         // Update table properties with user properties
         _previewDataTable.TableName = TableNameInputTextBox.Text.Trim();
         _previewDataTable.UseFirstColumnAsPk = AddPrimaryKeyRadioButton.Checked;
-        _previewDataTable.FirstRowIsHeaders = FirstRowHeadersCheckBox.Checked;
+        _previewDataTable.FirstRowContainsColumnNames = FirstRowHeadersCheckBox.Checked;
 
         // Force Empty columns with emtpy column names from being stated defaulty when this is not desired.
         RecreateColumns();
@@ -488,7 +487,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       // Check if there is data to export, if there is not then ask the user if he wants to proceed with the table creation only.
-      bool tableContainsDataToExport = _exportDataTable.Rows.Count > (_exportDataTable.FirstRowIsHeaders ? 1 : 0);
+      bool tableContainsDataToExport = _exportDataTable.Rows.Count > (_exportDataTable.FirstRowContainsColumnNames ? 1 : 0);
       if (!tableContainsDataToExport)
       {
         var dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.ExportDataNoDataToExportTitleWarning, Resources.ExportDataNoDataToExportDetailWarning);
@@ -716,7 +715,7 @@ namespace MySQL.ForExcel.Forms
     private void FirstRowHeadersCheckBox_CheckedChanged(object sender, EventArgs e)
     {
       int grdIndex = PreviewDataGridView.SelectedColumns.Count > 0 ? PreviewDataGridView.SelectedColumns[0].Index : 0;
-      _previewDataTable.FirstRowIsHeaders = FirstRowHeadersCheckBox.Checked;
+      _previewDataTable.FirstRowContainsColumnNames = FirstRowHeadersCheckBox.Checked;
       RecreateColumns();
       SetControlTextValue(AddPrimaryKeyTextBox, _previewDataTable.AutoPkName);
       PreviewDataGridView.CurrentCell = null;

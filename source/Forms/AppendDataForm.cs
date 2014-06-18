@@ -246,7 +246,7 @@ namespace MySQL.ForExcel.Forms
       bool warningsFound = false;
       string operationSummary;
       var targetMySqlFinalDataTable = _targetMySqlPreviewDataTable.CloneSchema(true, false);
-      targetMySqlFinalDataTable.FirstRowIsHeaders = _sourceMySqlPreviewDataTable.FirstRowIsHeaders;
+      targetMySqlFinalDataTable.FirstRowContainsColumnNames = _sourceMySqlPreviewDataTable.FirstRowContainsColumnNames;
       var mappedIndexes = new List<int>(targetMySqlFinalDataTable.Columns.Count);
       foreach (var sourceColumnIndex in from MySqlDataColumn targetColumn in targetMySqlFinalDataTable.Columns select targetColumn.MappedDataColOrdinal)
       {
@@ -966,7 +966,7 @@ namespace MySQL.ForExcel.Forms
       bool firstRowColNames = FirstRowHeadersCheckBox.Checked;
 
       // Flag the property in the "From" table
-      _sourceMySqlPreviewDataTable.FirstRowIsHeaders = firstRowColNames;
+      _sourceMySqlPreviewDataTable.FirstRowContainsColumnNames = firstRowColNames;
 
       // Refresh the "From"/"Source" Grid and "From"/"Source" toColumn names in the current mapping
       SourceExcelDataDataGridView.CurrentCell = null;

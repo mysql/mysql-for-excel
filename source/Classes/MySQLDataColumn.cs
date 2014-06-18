@@ -718,7 +718,7 @@ namespace MySQL.ForExcel.Classes
         return true;
       }
 
-      foreach (string strValueFromArray in parentTable.Rows.Cast<DataRow>().Where(dr => !parentTable.FirstRowIsHeaders || rowIdx++ != 0).Select(dr => dr[Ordinal].ToString()).Where(strValueFromArray => strValueFromArray.Length != 0))
+      foreach (string strValueFromArray in parentTable.Rows.Cast<DataRow>().Where(dr => !parentTable.FirstRowContainsColumnNames || rowIdx++ != 0).Select(dr => dr[Ordinal].ToString()).Where(strValueFromArray => strValueFromArray.Length != 0))
       {
         result = DataTypeUtilities.StringValueCanBeStoredWithMySqlType(strValueFromArray, mySqlDataType);
 
@@ -883,7 +883,7 @@ namespace MySQL.ForExcel.Classes
       decimalMaxLen[1] = Math.Max(decimalMaxLen[1], decimalMaxLenFirstRow[1]);
       proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListForFirstAndRest, decimalMaxLen, varCharMaxLen);
       RowsFromFirstDataType = proposedType;
-      SetMySqlDataType(ParentTable.FirstRowIsHeaders ? RowsFromSecondDataType : RowsFromFirstDataType);
+      SetMySqlDataType(ParentTable.FirstRowContainsColumnNames ? RowsFromSecondDataType : RowsFromFirstDataType);
       CreateIndex = ParentTable.AutoIndexIntColumns && IsInteger;
       if (ParentTable.AutoAllowEmptyNonIndexColumns)
       {
@@ -976,7 +976,7 @@ namespace MySQL.ForExcel.Classes
       int commaIndex = values.IndexOf(",", StringComparison.InvariantCultureIgnoreCase);
       values = commaIndex < 0 ? string.Empty : values.Substring(commaIndex + 1);
       RowsFromSecondDataType = string.Format("{0}({1})", type, values);
-      MySqlDataType = ParentTable.FirstRowIsHeaders ? RowsFromSecondDataType : RowsFromFirstDataType;
+      MySqlDataType = ParentTable.FirstRowContainsColumnNames ? RowsFromSecondDataType : RowsFromFirstDataType;
     }
 
     /// <summary>

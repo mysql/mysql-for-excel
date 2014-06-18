@@ -107,7 +107,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Flag indicating if the first row in the Excel region to be exported contains the column names of the MySQL table that will be created.
     /// </summary>
-    private bool _firstRowIsHeaders;
+    private bool _firstRowContainsColumnNames;
 
     /// <summary>
     /// An approximation for a maximum SQL query length.
@@ -323,7 +323,7 @@ namespace MySQL.ForExcel.Classes
       AutoIndexIntColumns = false;
       CharSet = null;
       Collation = null;
-      FirstRowIsHeaders = false;
+      FirstRowContainsColumnNames = false;
       IsTableNameValid = !string.IsNullOrEmpty(TableName);
       IsFormatted = false;
       IsPreviewTable = false;
@@ -675,7 +675,7 @@ namespace MySQL.ForExcel.Classes
         }
 
         int rowsToAnalyzeCount = Math.Min(Rows.Count, 50);
-        int startingRow = _firstRowIsHeaders ? 1 : 0;
+        int startingRow = _firstRowContainsColumnNames ? 1 : 0;
         containsIntegers = startingRow < rowsToAnalyzeCount;
         for (int rowIdx = startingRow; rowIdx < rowsToAnalyzeCount; rowIdx++)
         {
@@ -690,21 +690,21 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets or sets a value indicating whether the the first row of excelData contains the column names for a new table.
     /// </summary>
-    public bool FirstRowIsHeaders
+    public bool FirstRowContainsColumnNames
     {
       get
       {
-        return _firstRowIsHeaders;
+        return _firstRowContainsColumnNames;
       }
 
       set
       {
-        if (_firstRowIsHeaders != value)
+        if (_firstRowContainsColumnNames != value)
         {
           OnPropertyChanged("FirstRowIsHeaders");
         }
 
-        _firstRowIsHeaders = value;
+        _firstRowContainsColumnNames = value;
         UseFirstRowAsHeaders();
       }
     }
@@ -722,7 +722,7 @@ namespace MySQL.ForExcel.Classes
       get
       {
         DataTable changesDt = GetChanges(DataRowState.Added);
-        var adjustOperationsValue = _firstRowIsHeaders && OperationType.IsForExport() ? 1 : 0;
+        var adjustOperationsValue = _firstRowContainsColumnNames && OperationType.IsForExport() ? 1 : 0;
         return changesDt != null ? changesDt.Rows.Count - adjustOperationsValue : 0;
       }
     }
@@ -1160,7 +1160,7 @@ namespace MySQL.ForExcel.Classes
       {
         UseFirstColumnAsPk = UseFirstColumnAsPk,
         IsFormatted = IsFormatted,
-        FirstRowIsHeaders = FirstRowIsHeaders,
+        FirstRowContainsColumnNames = FirstRowContainsColumnNames,
         IsPreviewTable = IsPreviewTable,
         OperationType = OperationType,
         UseOptimisticUpdate = UseOptimisticUpdate
@@ -1824,7 +1824,7 @@ namespace MySQL.ForExcel.Classes
       try
       {
         int numRows = temporaryRange.Range.Rows.Count;
-        int rowAdjustValue = _firstRowIsHeaders && !OperationType.IsForExport() ? 1 : 0;
+        int rowAdjustValue = _firstRowContainsColumnNames && !OperationType.IsForExport() ? 1 : 0;
         for (int row = 1 + rowAdjustValue; row <= numRows; row++)
         {
           var valuesArray = temporaryRange.Range.GetRowValuesAsLinearArray(row, IsFormatted);
@@ -1868,7 +1868,7 @@ namespace MySQL.ForExcel.Classes
       var dateColumnIndexes = new List<int>(Columns.Count);
       int dateColumnIndexAdjust = AddPrimaryKeyColumn ? 1 : 0;
       dateColumnIndexes.AddRange(from MySqlDataColumn column in Columns where column.IsDate select column.RangeColumnIndex - dateColumnIndexAdjust);
-      using (var temporaryRange = new TempRange(dataRange, true, true, true, AddPrimaryKeyColumn, dateColumnIndexes.ToArray(), limitRowsQuantity))
+      using (var temporaryRange = new TempRange(dataRange, true, true, true, _addPrimaryKeyColumn, _firstRowContainsColumnNames, dateColumnIndexes.ToArray(), limitRowsQuantity))
       {
         CreateColumns(temporaryRange, recreateColumnsFromData);
         bool success = AddExcelData(temporaryRange, false, asynchronous);
@@ -1898,7 +1898,7 @@ namespace MySQL.ForExcel.Classes
         TableName = syncFromTable.TableName;
       }
 
-      FirstRowIsHeaders = syncFromTable.FirstRowIsHeaders;
+      FirstRowContainsColumnNames = syncFromTable.FirstRowContainsColumnNames;
       UseFirstColumnAsPk = syncFromTable.UseFirstColumnAsPk;
       foreach (MySqlDataColumn syncFromColumn in syncFromTable.Columns)
       {
@@ -2000,7 +2000,7 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Recreates the values of the automatically created first column for the table's primary key depending on the value of the <see cref="_firstRowIsHeaders"/> field.
+    /// Recreates the values of the automatically created first column for the table's primary key depending on the value of the <see cref="_firstRowContainsColumnNames"/> field.
     /// </summary>
     private void AdjustAutoPkValues()
     {
@@ -2009,7 +2009,7 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      int adjustIdx = _firstRowIsHeaders ? 0 : 1;
+      int adjustIdx = _firstRowContainsColumnNames ? 0 : 1;
       for (int i = 0; i < Rows.Count; i++)
       {
         Rows[i][0] = i + adjustIdx;
@@ -2328,7 +2328,7 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Resets the value of <see cref="MySqlDataRow.IsHeadersRow"/> with the value of <see cref="FirstRowIsHeaders"/>.
+    /// Resets the value of <see cref="MySqlDataRow.IsHeadersRow"/> with the value of <see cref="FirstRowContainsColumnNames"/>.
     /// </summary>
     private void ResetFirstRowIsHeaderValue()
     {
@@ -2340,7 +2340,7 @@ namespace MySQL.ForExcel.Classes
       MySqlDataRow firstRow = Rows[0] as MySqlDataRow;
       if (firstRow != null)
       {
-        firstRow.IsHeadersRow = FirstRowIsHeaders;
+        firstRow.IsHeadersRow = FirstRowContainsColumnNames;
       }
     }
 
@@ -2437,7 +2437,7 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Updates the column names and the automatically generated primary key column values depending on the value of the <see cref="_firstRowIsHeaders"/> field.
+    /// Updates the column names and the automatically generated primary key column values depending on the value of the <see cref="_firstRowContainsColumnNames"/> field.
     /// </summary>
     private void UseFirstRowAsHeaders()
     {
@@ -2459,8 +2459,8 @@ namespace MySQL.ForExcel.Classes
       for (int i = startCol; i < Columns.Count; i++)
       {
         MySqlDataColumn col = GetColumnAtIndex(i);
-        col.SetDisplayName(_firstRowIsHeaders ? row[i].ToString().ToValidMySqlColumnName() : col.ColumnName);
-        col.SetMySqlDataType(_firstRowIsHeaders ? col.RowsFromSecondDataType : col.RowsFromFirstDataType);
+        col.SetDisplayName(_firstRowContainsColumnNames ? row[i].ToString().ToValidMySqlColumnName() : col.ColumnName);
+        col.SetMySqlDataType(_firstRowContainsColumnNames ? col.RowsFromSecondDataType : col.RowsFromFirstDataType);
         col.CreateIndex = AutoIndexIntColumns && col.IsInteger;
       }
 
