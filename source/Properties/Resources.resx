@@ -888,14 +888,14 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
   <data name="AppendDataNotSuitableForColumnTypeWarning" xml:space="preserve">
     <value>Appending data is not suitable for the mapped target column's data type.</value>
   </data>
-  <data name="ImportOverExcelTableErrorDetail" xml:space="preserve">
-    <value>The importing data will overwrite cells belonging to an existing Excel table.</value>
+  <data name="ImportOverExcelObjectErrorDetail" xml:space="preserve">
+    <value>The importing data will overwrite cells belonging to an existing Excel object.</value>
   </data>
-  <data name="ImportOverExcelTableErrorSubDetail" xml:space="preserve">
+  <data name="ImportOverExcelObjectErrorSubDetail" xml:space="preserve">
     <value>Do you want to import the data in a new Worksheet?</value>
   </data>
-  <data name="ImportOverExcelTableErrorTitle" xml:space="preserve">
-    <value>Cannot import data over existing Excel table</value>
+  <data name="ImportOverExcelObjectErrorTitle" xml:space="preserve">
+    <value>Cannot import data over existing Excel object</value>
   </data>
   <data name="ConnectionLostErrorText" xml:space="preserve">
     <value>The connection to the MySQL server has been lost or was unexpectedly closed.</value>
@@ -975,5 +975,14 @@ importing the MySQL {0} data in Excel.</value>
   </data>
   <data name="ParentWorkbookNullError" xml:space="preserve">
     <value>The parent workbook of worksheet {0} could not be obtained while trying to create the Excel table {1}.</value>
+  </data>
+  <data name="ExcelTableCreationError" xml:space="preserve">
+    <value>An error ocurred trying to create the Excel table {0}</value>
+  </data>
+  <data name="PivotTableCreationError" xml:space="preserve">
+    <value>An error ocurred trying to create the PivotTable {0}</value>
+  </data>
+  <data name="RefreshDataError" xml:space="preserve">
+    <value>An error ocurred trying to refresh MySQL data in Excel table {0}</value>
   </data>
 </root>

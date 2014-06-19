@@ -817,6 +817,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error ocurred trying to create the Excel table {0}.
+        /// </summary>
+        internal static string ExcelTableCreationError {
+            get {
+                return ResourceManager.GetString("ExcelTableCreationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap exit {
@@ -1089,29 +1098,29 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The importing data will overwrite cells belonging to an existing Excel table..
+        ///   Looks up a localized string similar to The importing data will overwrite cells belonging to an existing Excel object..
         /// </summary>
-        internal static string ImportOverExcelTableErrorDetail {
+        internal static string ImportOverExcelObjectErrorDetail {
             get {
-                return ResourceManager.GetString("ImportOverExcelTableErrorDetail", resourceCulture);
+                return ResourceManager.GetString("ImportOverExcelObjectErrorDetail", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Do you want to import the data in a new Worksheet?.
         /// </summary>
-        internal static string ImportOverExcelTableErrorSubDetail {
+        internal static string ImportOverExcelObjectErrorSubDetail {
             get {
-                return ResourceManager.GetString("ImportOverExcelTableErrorSubDetail", resourceCulture);
+                return ResourceManager.GetString("ImportOverExcelObjectErrorSubDetail", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Cannot import data over existing Excel table.
+        ///   Looks up a localized string similar to Cannot import data over existing Excel object.
         /// </summary>
-        internal static string ImportOverExcelTableErrorTitle {
+        internal static string ImportOverExcelObjectErrorTitle {
             get {
-                return ResourceManager.GetString("ImportOverExcelTableErrorTitle", resourceCulture);
+                return ResourceManager.GetString("ImportOverExcelObjectErrorTitle", resourceCulture);
             }
         }
         
@@ -1861,20 +1870,20 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The parent workbook of worksheet {0} could not be obtained while trying to create the Excel table {1}..
-        /// </summary>
-        internal static string ParentWorkbookNullError {
-            get {
-                return ResourceManager.GetString("ParentWorkbookNullError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Native Excel&apos;s refresh functionality could not be overriden due to an error..
         /// </summary>
         internal static string OverrideNativeRefreshError {
             get {
                 return ResourceManager.GetString("OverrideNativeRefreshError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The parent workbook of worksheet {0} could not be obtained while trying to create the Excel table {1}..
+        /// </summary>
+        internal static string ParentWorkbookNullError {
+            get {
+                return ResourceManager.GetString("ParentWorkbookNullError", resourceCulture);
             }
         }
         
@@ -1926,6 +1935,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error ocurred trying to create the PivotTable {0}.
+        /// </summary>
+        internal static string PivotTableCreationError {
+            get {
+                return ResourceManager.GetString("PivotTableCreationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Primary Key column cannot be created because another column has the same name..
         /// </summary>
         internal static string PrimaryKeyColumnExistsWarning {
@@ -1968,6 +1986,15 @@ namespace MySQL.ForExcel.Properties {
             get {
                 object obj = ResourceManager.GetObject("refresh_sidebar", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error ocurred trying to refresh MySQL data in Excel table {0}.
+        /// </summary>
+        internal static string RefreshDataError {
+            get {
+                return ResourceManager.GetString("RefreshDataError", resourceCulture);
             }
         }
         

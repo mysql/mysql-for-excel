@@ -1527,9 +1527,6 @@ namespace MySQL.ForExcel.Classes
         return retObj;
       }
 
-      var dataRange = retObj is ExcelInterop.ListObject
-        ? (retObj as ExcelInterop.ListObject).Range
-        : retObj as ExcelInterop.Range;
       switch (pivotPosition)
       {
         case PivotTablePosition.Below:
@@ -1573,8 +1570,8 @@ namespace MySQL.ForExcel.Classes
         if (fillingRange.IntersectsWithAnyExcelObject())
         {
           if (
-            InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelTableErrorTitle,
-              Resources.ImportOverExcelTableErrorDetail, Resources.ImportOverExcelTableErrorSubDetail) ==
+            InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelObjectErrorTitle,
+              Resources.ImportOverExcelObjectErrorDetail, Resources.ImportOverExcelObjectErrorSubDetail) ==
             DialogResult.No)
           {
             return null;
@@ -1682,9 +1679,10 @@ namespace MySQL.ForExcel.Classes
         var activeWorkbook = atCell.Worksheet.Parent as ExcelInterop.Workbook;
 
         // Check if the data being imported does not overlap with the data of an existing Excel table.
-        if (atCell.IntersectsWithAnyExcelObject())
+        var dataRange = atCell.Resize[rowsCount, Columns.Count];
+        if (dataRange.IntersectsWithAnyExcelObject())
         {
-          if (InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelTableErrorTitle, Resources.ImportOverExcelTableErrorDetail, Resources.ImportOverExcelTableErrorSubDetail) == DialogResult.No)
+          if (InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelObjectErrorTitle, Resources.ImportOverExcelObjectErrorDetail, Resources.ImportOverExcelObjectErrorSubDetail) == DialogResult.No)
           {
             return null;
           }

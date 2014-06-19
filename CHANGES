@@ -1,4 +1,7 @@
 1.3.1
+- Enhanced the code that refreshes an Excel table to smartly resize it before binding it according to the new size of its data source. If the new size is bigger than
+  before, new columns or rows will be inserted to make room for the new Excel table size. Added code to show errors to the user upon Excel tables or PivotTables creation.
+  (Bug #18962617 - IMPORT DOES NOT RETRIEVE DATA AT LEFT COLUMNS FROM A PREVIOUS IMPORT)
 - Fixed an issue with Edit Connections in the Welcome Panel, where the selected connection information was not being populated in the Edit Connection Dialog.
   (Bug #18968777 - EDIT EXISTING CONNECTIONS IS BROKEN)
 - Fixed the formula applied in the temporary Excel range used to feed the export data for a new MySQL table, the formula now considers the value of the option "First row

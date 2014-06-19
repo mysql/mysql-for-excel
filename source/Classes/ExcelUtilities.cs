@@ -373,7 +373,7 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      string pivotSource = null;
+      string pivotSource;
       if (fromExcelObject is ExcelInterop.ListObject)
       {
         var fromExcelTable = fromExcelObject as ExcelInterop.ListObject;
@@ -408,6 +408,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.PivotTableCreationError, proposedName), ex.Message, true);
         MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
 
@@ -542,6 +543,32 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets a collection of <see cref="ExcelInterop.PivotTable"/> objects in the given <see cref="ExcelInterop.Worksheet"/>.
+    /// This is used instead of the <see cref="ExcelInterop.Worksheet.ChartObjects"/> method since it can return either a <see cref="ExcelInterop.ChartObject"/> or a <see cref="ExcelInterop.ChartObjects"/> object.
+    /// </summary>
+    /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/>.</param>
+    /// <returns>a collection of <see cref="ExcelInterop.ChartObject"/> objects in the given <see cref="ExcelInterop.Worksheet"/>.</returns>
+    public static IEnumerable<ExcelInterop.ChartObject> GetChartObjects(this ExcelInterop.Worksheet worksheet)
+    {
+      if (worksheet == null)
+      {
+        return null;
+      }
+
+      // Since the PivotTables method of an Excel Worksheet can return either a collection of PivotTable objects or
+      // a single PivotTable instance, we need to test the type of the returned object first.
+      object chartObjects = worksheet.ChartObjects();
+      if (chartObjects is ExcelInterop.ChartObjects)
+      {
+        var chartObjectsCollection = chartObjects as ExcelInterop.ChartObjects;
+        return chartObjectsCollection.Cast<ExcelInterop.ChartObject>();
+      }
+
+      var chartObject = chartObjects as ExcelInterop.ChartObject;
+      return chartObject != null ? new List<ExcelInterop.ChartObject>(1) { chartObject } : null;
+    }
+
+    /// <summary>
     /// Returns an Excel range with the first row cells corresponding to the column names.
     /// </summary>
     /// <param name="mysqlDataRange">If <c>null</c> the whole first row is returned, otherwise only the column cells within the editing range.</param>
@@ -599,6 +626,94 @@ namespace MySQL.ForExcel.Classes
     public static string GetExcelTableNameAvoidingDuplicates(this string excelTableName)
     {
       return excelTableName.GetExcelTableNameAvoidingDuplicates(1);
+    }
+
+    /// <summary>
+    /// Checks if a given <see cref="ExcelInterop.Range"/> intersects with an Excel object in its containing <see cref="ExcelInterop.Worksheet"/>.
+    /// </summary>
+    /// <param name="range">A <see cref="ExcelInterop.Range"/> object.</param>
+    /// <param name="checkListObjects">Flag indicating whether intersection with <see cref="ExcelInterop.ListObject"/> objects is performed.</param>
+    /// <param name="checkPivotTables">Flag indicating whether intersection with <see cref="ExcelInterop.PivotTable"/> objects is performed.</param>
+    /// <param name="checkCharts">Flag indicating whether intersection with <see cref="ExcelInterop.ChartObject"/> objects is performed.</param>
+    /// <param name="skipListObjectsWithGuid">A GUID of a <see cref="ExcelInterop.ListObject"/> to skip it from the intersection check.</param>
+    /// <returns>A <see cref="ExcelInterop.Range"/> if an intersection was found, <c>null</c> otherwise.</returns>
+    public static ExcelInterop.Range GetIntersectingRangeWithAnyExcelObject(this ExcelInterop.Range range, bool checkListObjects = true, bool checkPivotTables = true, bool checkCharts = true, string skipListObjectsWithGuid = null)
+    {
+      ExcelInterop.Range intersectingRange = null;
+
+      if (checkListObjects)
+      {
+        foreach (ExcelInterop.ListObject listObject in range.Worksheet.ListObjects)
+        {
+          if (listObject.Comment.Length > 0 && listObject.Comment == skipListObjectsWithGuid)
+          {
+            continue;
+          }
+
+          intersectingRange = listObject.Range.IntersectWith(range);
+          if (intersectingRange != null && intersectingRange.CountLarge != 0)
+          {
+            break;
+          }
+        }
+
+        if (intersectingRange != null)
+        {
+          return intersectingRange;
+        }
+      }
+
+
+      if (checkPivotTables)
+      {
+        foreach (var pivotTable in range.Worksheet.GetPivotTables())
+        {
+          intersectingRange = pivotTable.TableRange1.IntersectWith(range);
+          if (intersectingRange == null || intersectingRange.CountLarge == 0)
+          {
+            continue;
+          }
+
+          intersectingRange = pivotTable.TableRange2.IntersectWith(range);
+          if (intersectingRange == null || intersectingRange.CountLarge == 0)
+          {
+            continue;
+          }
+
+          intersectingRange = pivotTable.PageRange.IntersectWith(range);
+          if (intersectingRange == null || intersectingRange.CountLarge == 0)
+          {
+            continue;
+          }
+
+          intersectingRange = pivotTable.DataBodyRange.IntersectWith(range);
+          if (intersectingRange == null || intersectingRange.CountLarge == 0)
+          {
+            continue;
+          }
+
+          break;
+        }
+
+        if (intersectingRange != null)
+        {
+          return intersectingRange;
+        }
+      }
+
+      if (checkCharts)
+      {
+        foreach (var chartObject in range.Worksheet.GetChartObjects())
+        {
+          intersectingRange = range.Worksheet.Range[chartObject.TopLeftCell, chartObject.BottomRightCell].IntersectWith(range);
+          if (intersectingRange != null && intersectingRange.CountLarge != 0)
+          {
+            break;
+          }
+        }
+      }
+
+      return intersectingRange;
     }
 
     /// <summary>
@@ -825,6 +940,49 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets a collection of <see cref="ExcelInterop.PivotTable"/> objects in the given <see cref="ExcelInterop.Worksheet"/>.
+    /// This is used instead of the <see cref="ExcelInterop.Worksheet.PivotTables"/> method since it can return either a <see cref="ExcelInterop.PivotTables"/> or a <see cref="ExcelInterop.PivotTable"/> object.
+    /// </summary>
+    /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/>.</param>
+    /// <returns>a collection of <see cref="ExcelInterop.PivotTable"/> objects in the given <see cref="ExcelInterop.Worksheet"/>.</returns>
+    public static IEnumerable<ExcelInterop.PivotTable> GetPivotTables(this ExcelInterop.Worksheet worksheet)
+    {
+      if (worksheet == null)
+      {
+        return null;
+      }
+
+      // Since the PivotTables method of an Excel Worksheet can return either a collection of PivotTable objects or
+      // a single PivotTable instance, we need to test the type of the returned object first.
+      object pivotTables = worksheet.PivotTables();
+      if (pivotTables is ExcelInterop.PivotTables)
+      {
+        var pivotTablesCollection = pivotTables as ExcelInterop.PivotTables;
+        return pivotTablesCollection.Cast<ExcelInterop.PivotTable>();
+      }
+
+      var pivotTable = pivotTables as ExcelInterop.PivotTable;
+      return pivotTable != null ? new List<ExcelInterop.PivotTable>(1) { pivotTable } : null;
+    }
+
+    /// <summary>
+    /// Gets a property from the given target object returned in an English locale after transformed from the native Excel locale.
+    /// </summary>
+    /// <param name="target">The Excel object from which a property value is to be extracted.</param>
+    /// <param name="name">The name of the property.</param>
+    /// <returns>The value of the property returned in an English locale.</returns>
+    public static object GetPropertyInternational(object target, string name)
+    {
+      return target.GetType().InvokeMember(
+        name,
+        System.Reflection.BindingFlags.GetProperty | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
+        null,
+        target,
+        null,
+        new System.Globalization.CultureInfo(EN_US_LOCALE_CODE));
+    }
+
+    /// <summary>
     /// Gets the a protection key for the provided worksheet if exists.
     /// </summary>
     /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
@@ -880,49 +1038,18 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Checks if a given <see cref="ExcelInterop.Range"/> intersects with any Excel table in its containing <see cref="ExcelInterop.Worksheet"/>. 
+    /// Checks if a given <see cref="ExcelInterop.Range"/> intersects with any Excel object in its containing <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
     /// <param name="range">A <see cref="ExcelInterop.Range"/> object.</param>
+    /// <param name="checkListObjects">Flag indicating whether intersection with <see cref="ExcelInterop.ListObject"/> objects is performed.</param>
+    /// <param name="checkPivotTables">Flag indicating whether intersection with <see cref="ExcelInterop.PivotTable"/> objects is performed.</param>
+    /// <param name="checkCharts">Flag indicating whether intersection with <see cref="ExcelInterop.ChartObject"/> objects is performed.</param>
+    /// <param name="skipListObjectsWithGuid">A GUID of a <see cref="ExcelInterop.ListObject"/> to skip it from the intersection check.</param>
     /// <returns><c>true</c> if the given <see cref="ExcelInterop.Range"/> intersects with any Excel table in its containing <see cref="ExcelInterop.Worksheet"/>, <c>false</c> otherwise.</returns>
-    public static bool IntersectsWithAnyExcelObject(this ExcelInterop.Range range)
+    public static bool IntersectsWithAnyExcelObject(this ExcelInterop.Range range, bool checkListObjects = true, bool checkPivotTables = true, bool checkCharts = true, string skipListObjectsWithGuid = null)
     {
-      bool intersects = (from ExcelInterop.ListObject excelTable in range.Worksheet.ListObjects select excelTable.Range.IntersectWith(range)).Any(intersectingRange => intersectingRange != null && intersectingRange.CountLarge != 0);
-      if (intersects)
-      {
-        return true;
-      }
-
-      foreach (var pivotTable in range.Worksheet.GetPivotTables())
-      {
-        var intersectingRange = pivotTable.TableRange1.IntersectWith(range);
-        if (intersectingRange == null || intersectingRange.CountLarge == 0)
-        {
-          continue;
-        }
-
-        intersectingRange = pivotTable.TableRange2.IntersectWith(range);
-        if (intersectingRange == null || intersectingRange.CountLarge == 0)
-        {
-          continue;
-        }
-
-        intersectingRange = pivotTable.PageRange.IntersectWith(range);
-        if (intersectingRange == null || intersectingRange.CountLarge == 0)
-        {
-          continue;
-        }
-
-        intersectingRange = pivotTable.DataBodyRange.IntersectWith(range);
-        if (intersectingRange == null || intersectingRange.CountLarge == 0)
-        {
-          continue;
-        }
-
-        intersects = true;
-        break;
-      }
-
-      return intersects;
+      ExcelInterop.Range intersectingRange = range.GetIntersectingRangeWithAnyExcelObject(checkListObjects, checkPivotTables, checkCharts, skipListObjectsWithGuid);
+      return intersectingRange != null && intersectingRange.CountLarge != 0;
     }
 
     /// <summary>
@@ -934,6 +1061,24 @@ namespace MySQL.ForExcel.Classes
     public static ExcelInterop.Range IntersectWith(this ExcelInterop.Range range, ExcelInterop.Range otherRange)
     {
       return Globals.ThisAddIn.Application.Intersect(range, otherRange);
+    }
+
+    /// <summary>
+    /// Invokes a method present in the given target object receiving parameters in an English locale that are transformed to the native Excel locale.
+    /// </summary>
+    /// <param name="target">The Excel object containing the method.</param>
+    /// <param name="name">The name of the method to be invoked.</param>
+    /// <param name="args">The arguments passed to the method parameters.</param>
+    /// <returns>Any return value from the invoked method.</returns>
+    public static object InvokeMethodInternational(object target, string name, params object[] args)
+    {
+      return target.GetType().InvokeMember(
+        name,
+        System.Reflection.BindingFlags.InvokeMethod | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
+        null,
+        target,
+        args,
+        new System.Globalization.CultureInfo(EN_US_LOCALE_CODE));
     }
 
     /// <summary>
@@ -1144,6 +1289,23 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Sets a property value for the given target object given in an English locale to be transformed to the native Excel locale.
+    /// </summary>
+    /// <param name="target">The Excel object for which a property value is to be set.</param>
+    /// <param name="name">The name of the property.</param>
+    /// <param name="args">The property value in the English locale.</param>
+    public static void SetPropertyInternational(object target, string name, params object[] args)
+    {
+      target.GetType().InvokeMember(
+        name,
+        System.Reflection.BindingFlags.SetProperty | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
+        null,
+        target,
+        args,
+        new System.Globalization.CultureInfo(EN_US_LOCALE_CODE));
+    }
+
+    /// <summary>
     /// Sets the protection key for the worksheet.
     /// </summary>
     /// <returns>The new protection key provided for the worksheet.</returns>
@@ -1278,49 +1440,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a collection of <see cref="ExcelInterop.PivotTable"/> objects in the given <see cref="ExcelInterop.Worksheet"/>.
-    /// This is used instead of the <see cref="ExcelInterop.Worksheet.PivotTables"/> method since it can return either a <see cref="ExcelInterop.PivotTables"/> or a <see cref="ExcelInterop.PivotTable"/> object.
-    /// </summary>
-    /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/>.</param>
-    /// <returns>a collection of <see cref="ExcelInterop.PivotTable"/> objects in the given <see cref="ExcelInterop.Worksheet"/>.</returns>
-    public static IEnumerable<ExcelInterop.PivotTable> GetPivotTables(this ExcelInterop.Worksheet worksheet)
-    {
-      if (worksheet == null)
-      {
-        return null;
-      }
-
-      // Since the PivotTables method of an Excel Worksheet can return either a collection of PivotTable objects or
-      // a single PivotTable instance, we need to test the type of the returned object first.
-      object pivotTables = worksheet.PivotTables();
-      if (pivotTables is ExcelInterop.PivotTables)
-      {
-        var pivotTablesCollection = pivotTables as ExcelInterop.PivotTables;
-        return pivotTablesCollection.Cast<ExcelInterop.PivotTable>();
-      }
-
-      var pivotTable = pivotTables as ExcelInterop.PivotTable;
-      return pivotTable != null ? new List<ExcelInterop.PivotTable>(1) { pivotTable } : null;
-    }
-
-    /// <summary>
-    /// Gets a property from the given target object returned in an English locale after transformed from the native Excel locale.
-    /// </summary>
-    /// <param name="target">The Excel object from which a property value is to be extracted.</param>
-    /// <param name="name">The name of the property.</param>
-    /// <returns>The value of the property returned in an English locale.</returns>
-    static object GetPropertyInternational(object target, string name)
-    {
-      return target.GetType().InvokeMember(
-        name,
-        System.Reflection.BindingFlags.GetProperty | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
-        null,
-        target,
-        null,
-        new System.Globalization.CultureInfo(EN_US_LOCALE_CODE));
-    }
-
-    /// <summary>
     /// Gets a valid name for a new <see cref="ExcelInterop.Worksheet"/> that avoids duplicates with existing ones in the given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
     /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/>.</param>
@@ -1342,41 +1461,6 @@ namespace MySQL.ForExcel.Classes
       } while (workbook.Worksheets.Cast<ExcelInterop.Worksheet>().Any(ws => ws.Name == retName));
 
       return retName;
-    }
-
-    /// <summary>
-    /// Invokes a method present in the given target object receiving parameters in an English locale that are transformed to the native Excel locale.
-    /// </summary>
-    /// <param name="target">The Excel object containing the method.</param>
-    /// <param name="name">The name of the method to be invoked.</param>
-    /// <param name="args">The arguments passed to the method parameters.</param>
-    /// <returns>Any return value from the invoked method.</returns>
-    static object InvokeMethodInternational(object target, string name, params object[] args)
-    {
-      return target.GetType().InvokeMember(
-        name,
-        System.Reflection.BindingFlags.InvokeMethod | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
-        null,
-        target,
-        args,
-        new System.Globalization.CultureInfo(EN_US_LOCALE_CODE));
-    }
-
-    /// <summary>
-    /// Sets a property value for the given target object given in an English locale to be transformed to the native Excel locale.
-    /// </summary>
-    /// <param name="target">The Excel object for which a property value is to be set.</param>
-    /// <param name="name">The name of the property.</param>
-    /// <param name="args">The property value in the English locale.</param>
-    static void SetPropertyInternational(object target, string name, params object[] args)
-    {
-      target.GetType().InvokeMember(
-        name,
-        System.Reflection.BindingFlags.SetProperty | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
-        null,
-        target,
-        args,
-        new System.Globalization.CultureInfo(EN_US_LOCALE_CODE));
     }
   }
 }

@@ -348,25 +348,67 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      // In case the table is bound (it should not be) then disconnect it.
-      if (ToolsExcelTable.IsBinding)
+      try
       {
+        // In case the table is bound (it should not be) then disconnect it.
+        if (ToolsExcelTable.IsBinding)
+        {
+          ToolsExcelTable.Disconnect();
+        }
+
+        // Refresh the data on the MySqlDataTable and bind it so the Excel table is refreshed.
+        Exception ex;
+        MySqlTable.RefreshData(out ex);
+
+        // Resize the ExcelTools.ListObject by giving it an ExcelInterop.Range calculated with the refreshed MySqlDataTable dimensions.
+        // Detection of a collision with another Excel object must be performed first and if any then shift rows and columns to fix the collision.
+        ExcelInterop.Range newRange = ToolsExcelTable.Range.Cells[1, 1];
+        newRange = newRange.Resize[MySqlTable.Rows.Count + 1, MySqlTable.Columns.Count];
+        var intersectingRange = newRange.GetIntersectingRangeWithAnyExcelObject(true, true, true, _excelTable.Comment);
+        if (intersectingRange != null && intersectingRange.CountLarge != 0)
+        {
+          ExcelInterop.Range bottomRightCell = newRange.Cells[newRange.Rows.Count, newRange.Columns.Count];
+
+          // Determine if the collision is avoided by inserting either new columns or new rows.
+          if (intersectingRange.Columns.Count < intersectingRange.Rows.Count)
+          {
+            for (int colIdx = 0; colIdx <= intersectingRange.Columns.Count; colIdx++)
+            {
+              bottomRightCell.EntireColumn.Insert(ExcelInterop.XlInsertShiftDirection.xlShiftToRight, Type.Missing);
+            }
+          }
+          else
+          {
+            for (int rowIdx = 0; rowIdx <= intersectingRange.Rows.Count; rowIdx++)
+            {
+              bottomRightCell.EntireRow.Insert(ExcelInterop.XlInsertShiftDirection.xlShiftDown, Type.Missing);
+            }
+          }
+
+          // Redimension the new range. This is needed since the new rows or columns inserted are not present in the previously calculated one.
+          newRange = ToolsExcelTable.Range.Cells[1, 1];
+          newRange = newRange.Resize[MySqlTable.Rows.Count + 1, MySqlTable.Columns.Count];
+        }
+
+        ToolsExcelTable.Resize(newRange);
+
+        // Bind the redimensioned ExcelTools.ListObject to the MySqlDataTable.
+        ToolsExcelTable.SetDataBinding(MySqlTable);
+        foreach (MySqlDataColumn col in MySqlTable.Columns)
+        {
+          ToolsExcelTable.ListColumns[col.Ordinal + 1].Name = col.DisplayName;
+        }
+
+        ToolsExcelTable.Range.Columns.AutoFit();
+
+        // Disconnect the table so users can freely modify the data imported to the Excel table's range.
         ToolsExcelTable.Disconnect();
       }
-
-      // Refresh the data on the MySqlDataTable and bind it so the Excel table is refreshed.
-      Exception ex;
-      MySqlTable.RefreshData(out ex);
-      ToolsExcelTable.SetDataBinding(MySqlTable);
-      foreach (MySqlDataColumn col in MySqlTable.Columns)
+      catch (Exception ex)
       {
-        ToolsExcelTable.ListColumns[col.Ordinal + 1].Name = col.DisplayName;
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.RefreshDataError, _excelTableName), ex.Message, true);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
-
-      ToolsExcelTable.Range.Columns.AutoFit();
-
-      // Disconnect the table so users can freely modify the data imported to the Excel table's range.
-      ToolsExcelTable.Disconnect();
     }
 
     /// <summary>
@@ -554,6 +596,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.ExcelTableCreationError, proposedName), ex.Message, true);
         MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
     }
