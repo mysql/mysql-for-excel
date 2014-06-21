@@ -355,6 +355,9 @@ namespace MySQL.ForExcel
         ExcelAddInPaneFirstRun();
       }
 
+      // Restore Edit sessions
+      ShowOpenEditSessionsDialog(Application.ActiveWorkbook);
+
       Application.Cursor = ExcelInterop.XlMousePointer.xlDefault;
       return activeCustomPane;
     }
@@ -954,9 +957,6 @@ namespace MySQL.ForExcel
 
       // Subscribe to Excel events
       SetupExcelEvents(true);
-
-      // Restore Edit sessons
-      ShowOpenEditSessionsDialog(Application.ActiveWorkbook);
     }
 
     /// <summary>
@@ -1140,6 +1140,7 @@ namespace MySQL.ForExcel
         return null;
       }
 
+      wbSessionConnection.AllowZeroDateTimeValues = true;
       if (ActiveExcelPane.WbConnection == null)
       {
         // If the connection in the active pane is null it means an active connection does not exist, so open a connection.

@@ -1,4 +1,7 @@
 1.3.1
+- Set the AllowZeroDateTimeValues property value of connections created from stored Edit Sessions being restored to true so they support MySQL zero dates. Fixed also a
+  bug preventing Edit Sessions from being restored when starting MySQL from Excel on an already opened Excel workbook.
+  (Bug #18889495 - SAVED EDIT DATA SESSIONS ARE NOT RESTORED IF DATA CONTAINS DATES)
 - Enhanced the code that refreshes an Excel table to smartly resize it before binding it according to the new size of its data source. If the new size is bigger than
   before, new columns or rows will be inserted to make room for the new Excel table size. Added code to show errors to the user upon Excel tables or PivotTables creation.
   (Bug #18962617 - IMPORT DOES NOT RETRIEVE DATA AT LEFT COLUMNS FROM A PREVIOUS IMPORT)
