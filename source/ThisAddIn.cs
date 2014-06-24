@@ -152,7 +152,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets a list of <see cref="ImportSessionInfo"/> objects saved to disk.
     /// </summary>
-    public List<ImportSessionInfo> ActiveImportSessions
+    public List<ImportSessionInfo> StoredImportSessions
     {
       get
       {
@@ -172,7 +172,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Gets a subset of the <see cref="ActiveImportSessions"/> list containing only sessions assocaiated to the active <see cref="ExcelInterop.Workbook"/>.
+    /// Gets a subset of the <see cref="StoredImportSessions"/> list containing only sessions assocaiated to the active <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
     public List<ImportSessionInfo> ActiveWorkbookImportSessions
     {
@@ -184,7 +184,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Gets a subset of the <see cref="ActiveImportSessions"/> list containing only sessions assocaiated to the active <see cref="ExcelInterop.Worksheet"/>.
+    /// Gets a subset of the <see cref="StoredImportSessions"/> list containing only sessions assocaiated to the active <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
     public List<ImportSessionInfo> ActiveWorksheetImportSessions
     {
@@ -598,7 +598,7 @@ namespace MySQL.ForExcel
       var workbookImportSessions = ActiveWorkbookImportSessions;
 
       //Remove all import sessions related to the active workbook that are no longer valid.
-      if (ActiveImportSessions.Count > 1)
+      if (StoredImportSessions.Count > 1)
       {
         int endloop = workbookImportSessions.Count;
         for (int i = 0; i < endloop - 1; i++)
@@ -611,7 +611,7 @@ namespace MySQL.ForExcel
               continue;
             }
 
-            ActiveImportSessions.Remove(importSession);
+            StoredImportSessions.Remove(importSession);
             break;
           }
         }
@@ -1013,21 +1013,21 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Gets a subset of the <see cref="ActiveImportSessions" /> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Workbook" />.
+    /// Gets a subset of the <see cref="StoredImportSessions" /> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Workbook" />.
     /// </summary>
     /// <param name="workbookId">Workbook Id to match the sub set of sessions to.</param>
-    /// <returns> A subset of the <see cref="ActiveImportSessions" /> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Workbook" /></returns>
+    /// <returns> A subset of the <see cref="StoredImportSessions" /> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Workbook" /></returns>
     private List<ImportSessionInfo> GetWorkbookImportSessions(string workbookId)
     {
-      return ActiveImportSessions.FindAll(session => string.Equals(session.WorkbookGuid, workbookId, StringComparison.InvariantCulture));
+      return StoredImportSessions.FindAll(session => string.Equals(session.WorkbookGuid, workbookId, StringComparison.InvariantCulture));
     }
 
     /// <summary>
-    /// Gets a subset of the <see cref="ActiveImportSessions" /> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Worksheet" />.
+    /// Gets a subset of the <see cref="StoredImportSessions" /> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Worksheet" />.
     /// </summary>
     /// <param name="workbookId">Workbook Id to match the sub set of sessions to.</param>
     /// <param name="worksheetName">Worksheet Name to match the sub set of sessions to.</param>
-    /// <returns>A subset of the <see cref="ActiveImportSessions" /> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Worksheet" /></returns>
+    /// <returns>A subset of the <see cref="StoredImportSessions" /> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Worksheet" /></returns>
     private List<ImportSessionInfo> GetWorkSheetImportSessions(string workbookId, string worksheetName)
     {
       List<ImportSessionInfo> worksheetSessions = GetWorkbookImportSessions(workbookId);
@@ -1259,7 +1259,7 @@ namespace MySQL.ForExcel
       if (invalidSessions.Count > 0)
       {
         invalidSessions.ForEach(invalidSession => invalidSession.ExcelTable.DeleteSafely(false));
-        invalidSessions.ForEach(invalidSession => ActiveImportSessions.Remove(invalidSession));
+        invalidSessions.ForEach(invalidSession => StoredImportSessions.Remove(invalidSession));
         MiscUtilities.SaveSettings();
       }
 
@@ -1354,7 +1354,7 @@ namespace MySQL.ForExcel
           foreach (var session in missingConnectionSessions)
           {
             session.ExcelTable.Unlink();
-            ActiveImportSessions.Remove(session);
+            StoredImportSessions.Remove(session);
           }
           break;
         case DialogResult.Abort: //The user selected Work offline so we will disconnect every invalid session.

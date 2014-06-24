@@ -796,7 +796,7 @@ namespace MySQL.ForExcel.Classes
       }
       else if (sessionToRemove.GetType() == typeof(ImportSessionInfo))
       {
-        Globals.ThisAddIn.ActiveImportSessions.Remove((ImportSessionInfo)sessionToRemove);
+        Globals.ThisAddIn.StoredImportSessions.Remove((ImportSessionInfo)sessionToRemove);
       }
 
       MiscUtilities.SaveSettings();

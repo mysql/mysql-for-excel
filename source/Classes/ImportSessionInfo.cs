@@ -356,7 +356,7 @@ namespace MySQL.ForExcel.Classes
         if (SessionError == SessionErrorType.WorkbenchConnectionDoesNotExist)
         {
           MySqlSourceTrace.WriteToLog(string.Format("Session for excel table '{0}.{1}.{2}' on was removed since the connection no longer exists.", WorkbookName, WorksheetName, ExcelTableName), SourceLevels.Warning);
-          Globals.ThisAddIn.ActiveImportSessions.Remove(this);
+          Globals.ThisAddIn.StoredImportSessions.Remove(this);
         }
 
         return;
@@ -604,9 +604,9 @@ namespace MySQL.ForExcel.Classes
         }
 
         // Add this instance of the ImportSessionInfo class if not present already in the global collection.;
-        if (!Globals.ThisAddIn.ActiveImportSessions.Exists(session => session.WorkbookGuid == workbookGuid && session.MySqlTable == MySqlTable && string.Equals(session.ExcelTableName, proposedName, StringComparison.InvariantCultureIgnoreCase)))
+        if (!Globals.ThisAddIn.StoredImportSessions.Exists(session => session.WorkbookGuid == workbookGuid && session.MySqlTable == MySqlTable && string.Equals(session.ExcelTableName, proposedName, StringComparison.InvariantCultureIgnoreCase)))
         {
-          Globals.ThisAddIn.ActiveImportSessions.Add(this);
+          Globals.ThisAddIn.StoredImportSessions.Add(this);
         }
 
         if (refreshOnCreation)

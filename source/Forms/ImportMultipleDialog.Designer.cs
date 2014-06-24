@@ -220,14 +220,14 @@ namespace MySQL.ForExcel.Forms
             this.SelectNoneToolStripMenuItem,
             this.PreviewDataToolStripMenuItem});
       this.TablesViewsContextMenuStrip.Name = "TablesViewsContextMenuStrip";
-      this.TablesViewsContextMenuStrip.Size = new System.Drawing.Size(143, 70);
+      this.TablesViewsContextMenuStrip.Size = new System.Drawing.Size(153, 92);
       this.TablesViewsContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.TablesViewsContextMenuStrip_Opening);
       // 
       // SelectAllToolStripMenuItem
       // 
       this.SelectAllToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.select_all;
       this.SelectAllToolStripMenuItem.Name = "SelectAllToolStripMenuItem";
-      this.SelectAllToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+      this.SelectAllToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
       this.SelectAllToolStripMenuItem.Text = "Select All";
       this.SelectAllToolStripMenuItem.Click += new System.EventHandler(this.SelectAllToolStripMenuItem_Click);
       // 
@@ -235,7 +235,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.SelectNoneToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.select_none;
       this.SelectNoneToolStripMenuItem.Name = "SelectNoneToolStripMenuItem";
-      this.SelectNoneToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+      this.SelectNoneToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
       this.SelectNoneToolStripMenuItem.Text = "Select None";
       this.SelectNoneToolStripMenuItem.Click += new System.EventHandler(this.SelectNoneToolStripMenuItem_Click);
       // 
@@ -243,7 +243,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.PreviewDataToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
       this.PreviewDataToolStripMenuItem.Name = "PreviewDataToolStripMenuItem";
-      this.PreviewDataToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+      this.PreviewDataToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
       this.PreviewDataToolStripMenuItem.Text = "Preview Data";
       this.PreviewDataToolStripMenuItem.Click += new System.EventHandler(this.PreviewDataToolStripMenuItem_Click);
       // 

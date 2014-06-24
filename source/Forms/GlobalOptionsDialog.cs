@@ -16,8 +16,10 @@
 // 02110-1301  USA
 
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
+using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Forms;
 
@@ -29,14 +31,38 @@ namespace MySQL.ForExcel.Forms
   public partial class GlobalOptionsDialog : AutoStyleableBaseDialog
   {
     /// <summary>
+    /// Gets or sets the sessions to be deleted.
+    /// </summary>
+    private List<ISessionInfo> _sessionsToDelete;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="GlobalOptionsDialog"/> class.
     /// </summary>
     public GlobalOptionsDialog()
     {
+      _sessionsToDelete = new List<ISessionInfo>();
       InitializeComponent();
       ConnectionTimeoutNumericUpDown.Maximum = Int32.MaxValue / 1000;
       RefreshControlValues();
       SetRestoreSessionsRadioButtonsEnabledStatus();
+    }
+
+    /// <summary>
+    /// Deletes the sessions marked to in the sessions management dialog.
+    /// </summary>
+    private void DeleteSessions()
+    {
+      foreach (var session in _sessionsToDelete)
+      {
+        if (session != null && session.GetType() == typeof(EditSessionInfo))
+        {
+          Globals.ThisAddIn.StoredEditSessions.Remove(session as EditSessionInfo);
+        }
+        else
+        {
+          Globals.ThisAddIn.StoredImportSessions.Remove(session as ImportSessionInfo);
+        }
+      }
     }
 
     /// <summary>
@@ -49,6 +75,11 @@ namespace MySQL.ForExcel.Forms
       if (DialogResult == DialogResult.Cancel)
       {
         return;
+      }
+
+      if (_sessionsToDelete.Count > 0)
+      {
+        DeleteSessions();
       }
 
       Settings.Default.GlobalConnectionConnectionTimeout = (uint)ConnectionTimeoutNumericUpDown.Value;
@@ -123,6 +154,24 @@ namespace MySQL.ForExcel.Forms
     {
       ReuseWorksheetsRadioButton.Enabled = RestoreSavedEditSessionsCheckBox.Checked;
       CreateNewWorksheetsRadioButton.Enabled = RestoreSavedEditSessionsCheckBox.Checked;
+    }
+
+    /// <summary>
+    /// Handles the Click event of the ManageSessionsButton control.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+    private void ManageSessionsButton_Click(object sender, EventArgs e)
+    {
+      using (var manageSessionsDialog = new ManageSessionsDialog())
+      {
+        _sessionsToDelete.Clear();
+        manageSessionsDialog.ShowDialog();
+        if (manageSessionsDialog.DialogResult != DialogResult.Cancel)
+        {
+          _sessionsToDelete = manageSessionsDialog.SessionsToDelete;
+        }
+      }
     }
   }
 }

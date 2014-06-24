@@ -348,6 +348,12 @@
     <Compile Include="Forms\ImportProcedureForm.Designer.cs">
       <DependentUpon>ImportProcedureForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\ManageSessionsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ManageSessionsDialog.Designer.cs">
+      <DependentUpon>ManageSessionsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\PreviewTableViewDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -468,6 +474,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportProcedureForm.resx">
       <DependentUpon>ImportProcedureForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ManageSessionsDialog.resx">
+      <DependentUpon>ManageSessionsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PreviewTableViewDialog.resx">
       <DependentUpon>PreviewTableViewDialog.cs</DependentUpon>

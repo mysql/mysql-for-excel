@@ -1209,6 +1209,143 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Creates an Excel table starting at the given cell containing the data in this <see cref="MySqlDataTable"/> instance.
+    /// </summary>
+    /// <param name="atCell">The top left Excel cell of the new <see cref="ExcelInterop.ListObject"/>.</param>
+    /// <returns>The newly created <see cref="ExcelInterop.ListObject"/>.</returns>
+    public ExcelInterop.ListObject CreateExcelTable(ExcelInterop.Range atCell)
+    {
+      if (atCell == null)
+      {
+        return null;
+      }
+
+      var worksheet = Globals.Factory.GetVstoObject(atCell.Worksheet);
+      var workbook = worksheet.Parent as ExcelInterop.Workbook;
+      if (workbook == null)
+      {
+        return null;
+      }
+
+      string workbookGuid = workbook.GetOrCreateId();
+      ExcelInterop.ListObject namedTable = null;
+      try
+      {
+        string proposedName = ExcelTableName;
+        int consecutiveIfOrphanedTable = 2;
+        string commandText;
+        string connectionName;
+        var workbookName = Globals.ThisAddIn.Application.ActiveWorkbook.Name;
+        var connectionStringForCmdExcel = "WORKSHEET;" + workbookName;
+        var connectionStringForCmdDefault = string.Format("OLEDB;Provider=MSDASQL;Driver={{MySQL ODBC 5.2 ANSI Driver}};Server={0};Database={1};User={2};Option=3;", WbConnection.Host, WbConnection.Schema, WbConnection.UserName);
+        do
+        {
+          // Prepare Excel table name and dummy connection
+          proposedName = proposedName.GetExcelTableNameAvoidingDuplicates();
+          commandText = string.Format("{0}!{1}", workbookName, proposedName);
+          connectionName = @"WorksheetConnection_" + commandText;
+
+          // Check first if there is an orphaned Tools Excel table (leftover from a deleted Interop Excel table) and if so then attempt to free resources.
+          if (!worksheet.Controls.Contains(proposedName))
+          {
+            break;
+          }
+
+          var excelTable = worksheet.Controls[proposedName] as ExcelTools.ListObject;
+          if (excelTable != null && excelTable.DataSource is MySqlDataTable)
+          {
+            if (excelTable.IsBinding)
+            {
+              excelTable.Disconnect();
+            }
+
+            var boundTable = excelTable.DataSource as MySqlDataTable;
+            if (boundTable != null)
+            {
+              boundTable.Dispose();
+            }
+
+            excelTable.DeleteSafely(false);
+          }
+
+          // At this point a new name is needed since for some reason or bug the Globals.Factory throws an error
+          // trying to check if there is a Tools Excel table already for the existing name, so go back to that point.
+          proposedName = string.Format("{0}-{1}", ExcelTableName, consecutiveIfOrphanedTable++);
+        } while (true);
+
+        // Create empty Interop Excel table that will be connected to a data source
+        var hasHeaders = ImportColumnNames ? ExcelInterop.XlYesNoGuess.xlYes : ExcelInterop.XlYesNoGuess.xlNo;
+        namedTable = worksheet.ListObjects.Add(ExcelInterop.XlListObjectSourceType.xlSrcExternal, connectionStringForCmdDefault, false, hasHeaders, atCell);
+        namedTable.Name = proposedName;
+        namedTable.TableStyle = Settings.Default.ImportExcelTableStyleName;
+        namedTable.QueryTable.BackgroundQuery = false;
+        namedTable.QueryTable.CommandText = commandText;
+
+        // Add a connection to the Workbook, the method used to add it differs since the Add method is obsolete for Excel 2013 and higher.
+        if (Globals.ThisAddIn.ExcelVersionNumber < ThisAddIn.EXCEL_2013_VERSION_NUMBER)
+        {
+          workbook.Connections.Add(connectionName, string.Empty, connectionStringForCmdDefault, commandText, ExcelInterop.XlCmdType.xlCmdDefault);
+        }
+        else
+        {
+          workbook.Connections.Add2(connectionName, string.Empty, connectionStringForCmdExcel, commandText, ExcelInterop.XlCmdType.xlCmdExcel, true, false);
+        }
+
+        // Add a new ImportSessionInfo object if not present already to the collection.
+        var importSession = Globals.ThisAddIn.StoredImportSessions.FirstOrDefault(session => session.WorkbookGuid == workbookGuid && session.MySqlTable == this && string.Equals(session.ExcelTableName, proposedName, StringComparison.InvariantCultureIgnoreCase));
+        if (importSession == null)
+        {
+          importSession = new ImportSessionInfo();
+          Globals.ThisAddIn.StoredImportSessions.Add(importSession);
+        }
+
+        importSession.Refresh();
+      }
+      catch (Exception ex)
+      {
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
+
+      return namedTable;
+    }
+
+    /// <summary>
+    /// Creates an Excel PivotTable starting at the given cell containing the data in this <see cref="MySqlDataTable"/> instance.
+    /// </summary>
+    /// <param name="atCell">The top left Excel cell of the new <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <param name="dataRange">The top left Excel cell of the new <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <returns>The newly created <see cref="ExcelInterop.PivotTable"/>.</returns>
+    public ExcelInterop.PivotTable CreatePivotTable(ExcelInterop.Range atCell, ExcelInterop.Range dataRange)
+    {
+      if (atCell == null || dataRange == null)
+      {
+        return null;
+      }
+
+      var worksheet = Globals.Factory.GetVstoObject(atCell.Worksheet);
+      var workbook = worksheet.Parent as ExcelInterop.Workbook;
+      if (workbook == null)
+      {
+        return null;
+      }
+
+      ExcelInterop.PivotTable pivotTable = null;
+      try
+      {
+        string proposedName = ExcelTableName.GetExcelTableNameAvoidingDuplicates();
+        var pivotTableVersion = Globals.ThisAddIn.ExcelPivotTableVersion;
+        var pivotCache = workbook.PivotCaches().Create(ExcelInterop.XlPivotTableSourceType.xlDatabase, dataRange, pivotTableVersion);
+        pivotTable = pivotCache.CreatePivotTable(atCell, proposedName, true, pivotTableVersion);
+      }
+      catch (Exception ex)
+      {
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
+
+      return pivotTable;
+    }
+
+    /// <summary>
     /// Gets the <see cref="MySqlDataColumn"/> object at the given position within the columns collection.
     /// </summary>
     /// <param name="index">Ordinal index within the columns collection</param>
