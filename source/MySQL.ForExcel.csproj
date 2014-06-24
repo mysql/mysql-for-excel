@@ -396,12 +396,6 @@
     <Compile Include="Forms\PasswordDialog.designer.cs">
       <DependentUpon>PasswordDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\RestoreEditSessionsDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\RestoreEditSessionsDialog.Designer.cs">
-      <DependentUpon>RestoreEditSessionsDialog.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controls\TransparentPictureBox.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -498,9 +492,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\PasswordDialog.resx">
       <DependentUpon>PasswordDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\RestoreEditSessionsDialog.resx">
-      <DependentUpon>RestoreEditSessionsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Panels\AutoStyleableBasePanel.resx">
       <DependentUpon>AutoStyleableBasePanel.cs</DependentUpon>

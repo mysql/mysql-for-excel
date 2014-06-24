@@ -136,8 +136,16 @@ namespace MySQL.ForExcel.Classes
         }
 
         _connection = MySqlWorkbench.Connections.GetConnectionForId(ConnectionId);
-        _connection.Schema = SchemaName;
-        _connection.AllowZeroDateTimeValues = true;
+        if (_connection == null)
+        {
+          SessionError = SessionErrorType.WorkbenchConnectionDoesNotExist;
+        }
+        else
+        {
+          _connection.Schema = SchemaName;
+          _connection.AllowZeroDateTimeValues = true;
+          HostIdentifier = _connection.HostIdentifier;
+        }
       }
     }
 
@@ -184,6 +192,12 @@ namespace MySQL.ForExcel.Classes
         }
       }
     }
+
+    /// <summary>
+    /// Gets or sets the host identifier.
+    /// </summary>
+    [XmlAttribute]
+    public string HostIdentifier { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether [import column names].
@@ -441,7 +455,14 @@ namespace MySQL.ForExcel.Classes
 
       if (MySqlTable == null)
       {
-        MySqlTable = _connection.CreateImportMySqlTable(false, TableName, ImportColumnNames, SelectQuery);
+        if (_connection != null)
+        {
+          MySqlTable = _connection.CreateImportMySqlTable(false, TableName, ImportColumnNames, SelectQuery);
+        }
+        else
+        {
+          SessionError = SessionErrorType.WorkbenchConnectionDoesNotExist;
+        }
       }
     }
 
@@ -461,7 +482,6 @@ namespace MySQL.ForExcel.Classes
       bool connectionIsValid = _connection.TestConnection(out connectionException);
       if (connectionException != null)
       {
-        //TODO: Handle specific Exception Numbers (e.g. (connectionException as MySqlException).Number)
         SessionError = SessionErrorType.ConnectionRefused;
       }
 

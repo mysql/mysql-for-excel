@@ -489,7 +489,7 @@ namespace MySQL.ForExcel.Forms
     private void WhyDisabledLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
       InfoDialog.ShowDialog(
-        InfoDialog.DialogType.OKOnly,
+        InfoDialog.DialogType.OkOnly,
         InfoDialog.InfoType.Info,
         Resources.ImportMultipleRelationshipsNotSupportedTitleText,
         Excel2010OrLower

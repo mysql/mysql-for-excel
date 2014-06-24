@@ -444,6 +444,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Create.
+        /// </summary>
+        internal static string CreateButtonText {
+            get {
+                return ResourceManager.GetString("CreateButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create Table  .
         /// </summary>
         internal static string CreateTableText {
@@ -476,6 +485,24 @@ namespace MySQL.ForExcel.Properties {
         internal static string DataLoadingError {
             get {
                 return ResourceManager.GetString("DataLoadingError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete All.
+        /// </summary>
+        internal static string DeleteAllButtonText {
+            get {
+                return ResourceManager.GetString("DeleteAllButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        internal static string DeleteButtonText {
+            get {
+                return ResourceManager.GetString("DeleteButtonText", resourceCulture);
             }
         }
         
@@ -1161,6 +1188,33 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Some connections for Import Sessions in this workbook can&apos;t be found..
+        /// </summary>
+        internal static string ImportSessionsMissingConnectionsDetail {
+            get {
+                return ResourceManager.GetString("ImportSessionsMissingConnectionsDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following connections were not found:.
+        /// </summary>
+        internal static string ImportSessionsMissingConnectionsMoreInfo {
+            get {
+                return ResourceManager.GetString("ImportSessionsMissingConnectionsMoreInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import Sessions Missing Connections.
+        /// </summary>
+        internal static string ImportSessionsMissingConnectionsTitle {
+            get {
+                return ResourceManager.GetString("ImportSessionsMissingConnectionsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error importing table&apos;s data.
         /// </summary>
         internal static string ImportTableErrorTitle {
@@ -1806,6 +1860,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Nothing.
+        /// </summary>
+        internal static string NothingButtonText {
+            get {
+                return ResourceManager.GetString("NothingButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Old Password:.
         /// </summary>
         internal static string OldPasswordLabelText {
@@ -2023,6 +2086,34 @@ namespace MySQL.ForExcel.Properties {
         internal static string RemoveColumnConfirmation {
             get {
                 return ResourceManager.GetString("RemoveColumnConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restore.
+        /// </summary>
+        internal static string RestoreButtonText {
+            get {
+                return ResourceManager.GetString("RestoreButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Excel workbook being opened contains saved Edit sessions.
+        ///What do you want to do with them?.
+        /// </summary>
+        internal static string RestoreEditSessionsDetail {
+            get {
+                return ResourceManager.GetString("RestoreEditSessionsDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restore Saved Edit Sessions.
+        /// </summary>
+        internal static string RestoreEditSessionsTitle {
+            get {
+                return ResourceManager.GetString("RestoreEditSessionsTitle", resourceCulture);
             }
         }
         
@@ -2562,6 +2653,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string WorkbookSavingDetailText {
             get {
                 return ResourceManager.GetString("WorkbookSavingDetailText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Work Offline.
+        /// </summary>
+        internal static string WorkOfflineButtonText {
+            get {
+                return ResourceManager.GetString("WorkOfflineButtonText", resourceCulture);
             }
         }
         

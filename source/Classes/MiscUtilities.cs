@@ -360,7 +360,7 @@ namespace MySQL.ForExcel.Classes
     public static DialogResult ShowCustomizedInfoDialog(InfoDialog.InfoType infoType, string detail, string moreInformation = null, bool wordWrapMoreInfo = true)
     {
       string title = string.Empty;
-      InfoDialog.DialogType dialogType = InfoDialog.DialogType.OKOnly;
+      InfoDialog.DialogType dialogType = InfoDialog.DialogType.OkOnly;
       switch (infoType)
       {
         case InfoDialog.InfoType.Success:

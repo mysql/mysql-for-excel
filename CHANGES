@@ -1,4 +1,8 @@
 1.3.1
+- When the user has created Import Sessions and saved the workbook, the connection these sessions are linked to can be deleted. When the workbook is reopened, these sessions
+  had no way to be used any further. Now, a new dialog was created to prompt the user to create a new connection to replace the old one not found and be able to continue working
+  with the same sessions afterwards.
+  (Bug #18961860 - PROMPT FOR CONNECTION CREATION IF NOT FOUND UPON IMPORT SESSION RESTORE)
 - Set the AllowZeroDateTimeValues property value of connections created from stored Edit Sessions being restored to true so they support MySQL zero dates. Fixed also a
   bug preventing Edit Sessions from being restored when starting MySQL from Excel on an already opened Excel workbook.
   (Bug #18889495 - SAVED EDIT DATA SESSIONS ARE NOT RESTORED IF DATA CONTAINS DATES)

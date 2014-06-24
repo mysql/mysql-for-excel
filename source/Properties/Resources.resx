@@ -985,4 +985,38 @@ importing the MySQL {0} data in Excel.</value>
   <data name="RefreshDataError" xml:space="preserve">
     <value>An error ocurred trying to refresh MySQL data in Excel table {0}</value>
   </data>
+  <data name="ImportSessionsMissingConnectionsDetail" xml:space="preserve">
+    <value>Some connections for Import Sessions in this workbook can't be found.</value>
+  </data>
+  <data name="ImportSessionsMissingConnectionsMoreInfo" xml:space="preserve">
+    <value>The following connections were not found:</value>
+  </data>
+  <data name="ImportSessionsMissingConnectionsTitle" xml:space="preserve">
+    <value>Import Sessions Missing Connections</value>
+  </data>
+  <data name="RestoreEditSessionsDetail" xml:space="preserve">
+    <value>The Excel workbook being opened contains saved Edit sessions.
+What do you want to do with them?</value>
+  </data>
+  <data name="RestoreEditSessionsTitle" xml:space="preserve">
+    <value>Restore Saved Edit Sessions</value>
+  </data>
+  <data name="CreateButtonText" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="DeleteAllButtonText" xml:space="preserve">
+    <value>Delete All</value>
+  </data>
+  <data name="DeleteButtonText" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="NothingButtonText" xml:space="preserve">
+    <value>Nothing</value>
+  </data>
+  <data name="RestoreButtonText" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="WorkOfflineButtonText" xml:space="preserve">
+    <value>Work Offline</value>
+  </data>
 </root>

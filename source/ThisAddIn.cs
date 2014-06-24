@@ -1266,6 +1266,103 @@ namespace MySQL.ForExcel
       return importSession;
     }
 
+    /// <summary>
+    /// Processes the missing connection sessions to either create and assign them a new connection or disconnect their excel tables.
+    /// </summary>
+    /// <param name="missingConnectionSessions">A list of <see cref="ImportSessionInfo" /> objects which connection is not found.</param>
+    /// <param name="workbook">The <see cref="Microsoft.Office.Interop.Excel.Workbook" /> the list of <see cref="ImportSessionInfo" /> belong to.</param>
+    private void ProcessMissingConnectionSessions(List<ImportSessionInfo> missingConnectionSessions, ExcelInterop.Workbook workbook)
+    {
+      if (missingConnectionSessions.Count <= 0)
+      {
+        return;
+      }
+
+      var moreInfoText = MySqlWorkbench.IsRunning
+        ? Resources.UnableToAddConnectionsWhenWBRunning + Environment.NewLine + Resources.ImportSessionsMissingConnectionsMoreInfo
+        : Resources.ImportSessionsMissingConnectionsMoreInfo;
+      var stringBuilder = new StringBuilder(moreInfoText);
+      List<string> missingHostIds = missingConnectionSessions.Select(i => i.HostIdentifier).Distinct().ToList();
+      foreach (var missingHostId in missingHostIds)
+      {
+        stringBuilder.Append(Environment.NewLine);
+        stringBuilder.Append(missingHostId);
+      }
+
+      var buttonsProperties = new InfoButtonsProperties(Resources.CreateButtonText, DialogResult.OK, Resources.DeleteAllButtonText, DialogResult.Cancel, Resources.WorkOfflineButtonText, DialogResult.Abort);
+      DialogResult dialogResult = InfoDialog.ShowDialog(InfoDialog.DialogType.Generic3Buttons, InfoDialog.InfoType.Warning,
+        Resources.ImportSessionsMissingConnectionsTitle, Resources.ImportSessionsMissingConnectionsDetail, null,
+        stringBuilder.ToString(), false, buttonsProperties);
+
+      switch (dialogResult)
+      {
+        case DialogResult.OK:
+          // If Workbench is running we can't add new connections, so we ask the user to close it. if he still decides not to do so we disconnect all excel tables to work offline.
+          var workbenchWarningDialogResult = DialogResult.None;
+          while (MySqlWorkbench.IsRunning && workbenchWarningDialogResult != DialogResult.Cancel)
+          {
+            workbenchWarningDialogResult = InfoDialog.ShowErrorDialog(Resources.OperationErrorTitle, Resources.UnableToAddConnectionsWhenWBRunning, Resources.CloseWBAdviceToAdd, Resources.CloseWBAdviceToAdd);
+          }
+
+          if (workbenchWarningDialogResult == DialogResult.Cancel)
+          {
+            missingConnectionSessions.ForEach(session => session.ExcelTable.Unlink());
+            break;
+          }
+
+          List<string> missingConnectionIds = missingConnectionSessions.Select(i => i.ConnectionId).Distinct().ToList();
+          foreach (var missingConnectionId in missingConnectionIds)
+          {
+            //Fill the new connection with the old HostIdentifier information for the New Connection Dialog if available;
+            var missingConnectionSession = missingConnectionSessions.FirstOrDefault(s => s.ConnectionId == missingConnectionId);
+            //Create the new connection and assign it to all corresponding sessions.
+            using (var newConnectionDialog = new MySqlWorkbenchConnectionDialog(null))
+            {
+              //If the HostIdentifier is set, we use it to fill in the blanks for the new connection in the dialog.
+              if (missingConnectionSession != null && !string.IsNullOrEmpty(missingConnectionSession.HostIdentifier))
+              {
+                var hostIdArray = missingConnectionSession.HostIdentifier.ToLower().Replace("mysql@", string.Empty).Split(':').ToArray();
+                var host = hostIdArray.Length > 0 ? hostIdArray[0] : string.Empty;
+                var portString = hostIdArray.Length > 1 ? hostIdArray[1] : string.Empty;
+                uint port;
+                uint.TryParse(portString, out port);
+                newConnectionDialog.WorkbenchConnection.Host = host;
+                newConnectionDialog.WorkbenchConnection.Port = port;
+              }
+
+              var result = newConnectionDialog.ShowDialog();
+              //For each session that is pointing to the same connection
+              foreach (var session in missingConnectionSessions.Where(session => session.ConnectionId == missingConnectionId).ToList())
+              {
+                if (result == DialogResult.OK)
+                {
+                  //If the connection was created we reassign every corresponding session of this set to it.
+                  session.ConnectionId = newConnectionDialog.WorkbenchConnection.Id;
+                  session.Restore(workbook);
+                  MiscUtilities.SaveSettings();
+                }
+                else
+                {
+                  //If the user cancels the creation of a new connection for this set of sessions, we just need to disconnect their Excel Tables.
+                  session.ExcelTable.Unlink();
+                }
+              }
+            }
+          }
+          break;
+        case DialogResult.Cancel:
+          foreach (var session in missingConnectionSessions)
+          {
+            session.ExcelTable.Unlink();
+            ActiveImportSessions.Remove(session);
+          }
+          break;
+        case DialogResult.Abort: //The user selected Work offline so we will disconnect every invalid session.
+          missingConnectionSessions.ForEach(session => session.ExcelTable.Unlink());
+          break;
+      }
+    }
+
     ///  <summary>
     /// Restores saved Edit sessions from the given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
@@ -1348,6 +1445,9 @@ namespace MySQL.ForExcel
       {
         session.Restore(workbook);
       }
+
+      // Verify missing connections and ask the user for action to take?
+      ProcessMissingConnectionSessions(importSessions.Where(session => session.SessionError == ImportSessionInfo.SessionErrorType.WorkbenchConnectionDoesNotExist).ToList(), workbook);
     }
 
     /// <summary>
@@ -1420,7 +1520,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Shows a <see cref="RestoreEditSessionsDialog"/> to the users to decide what to do with saved Edit sessions.
+    /// Shows a dialog to the users to decide what to do with saved Edit sessions.
     /// </summary>
     /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/> that may contain saved Edit sessions.</param>
     private void ShowOpenEditSessionsDialog(ExcelInterop.Workbook workbook)
@@ -1436,7 +1536,11 @@ namespace MySQL.ForExcel
         return;
       }
 
-      switch (RestoreEditSessionsDialog.ShowAndDispose())
+      var buttonsProperties = new InfoButtonsProperties(Resources.RestoreButtonText, DialogResult.Yes, Resources.NothingButtonText, DialogResult.Cancel, Resources.DeleteButtonText, DialogResult.Abort);
+      DialogResult dialogResult = InfoDialog.ShowDialog(InfoDialog.DialogType.Generic3Buttons, InfoDialog.InfoType.Warning,
+      Resources.RestoreEditSessionsTitle, Resources.RestoreEditSessionsDetail, null, null, false, buttonsProperties);
+
+      switch (dialogResult)
       {
         case DialogResult.Abort:
           // Discard: Do not open any and delete all saved sessions for the current workbook.
