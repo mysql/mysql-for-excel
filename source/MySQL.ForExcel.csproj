@@ -264,14 +264,11 @@
     <Compile Include="Controls\ExcelAddInPane.Designer.cs">
       <DependentUpon>ExcelAddInPane.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controls\ManageTaskPaneRibbon.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Controls\ManageTaskPaneRibbon.Designer.cs">
-      <DependentUpon>ManageTaskPaneRibbon.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controls\MySqlListView.cs">
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\MySqlRibbon.cs">
+      <SubType>Code</SubType>
     </Compile>
     <Compile Include="Controls\PreviewDataGridView.cs">
       <SubType>Component</SubType>
@@ -442,9 +439,7 @@
       <DependentUpon>HotLabel.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\ManageTaskPaneRibbon.resx">
-      <DependentUpon>ManageTaskPaneRibbon.cs</DependentUpon>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\MySqlRibbon.xml" />
     <EmbeddedResource Include="Controls\SearchEdit.resx">
       <DependentUpon>SearchEdit.cs</DependentUpon>
     </EmbeddedResource>

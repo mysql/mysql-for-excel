@@ -1933,15 +1933,6 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Native Excel&apos;s refresh functionality could not be overriden due to an error..
-        /// </summary>
-        internal static string OverrideNativeRefreshError {
-            get {
-                return ResourceManager.GetString("OverrideNativeRefreshError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The parent workbook of worksheet {0} could not be obtained while trying to create the Excel table {1}..
         /// </summary>
         internal static string ParentWorkbookNullError {
@@ -2204,15 +2195,6 @@ namespace MySQL.ForExcel.Properties {
         internal static string RevertDataConfirmation {
             get {
                 return ResourceManager.GetString("RevertDataConfirmation", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Native Excel&apos;s refresh functionality could not be reverted back due to an error..
-        /// </summary>
-        internal static string RevertNativeRefreshError {
-            get {
-                return ResourceManager.GetString("RevertNativeRefreshError", resourceCulture);
             }
         }
         

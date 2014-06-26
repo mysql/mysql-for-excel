@@ -34,7 +34,6 @@ using ExcelInterop = Microsoft.Office.Interop.Excel;
 using ExcelTools = Microsoft.Office.Tools.Excel;
 using OfficeTools = Microsoft.Office.Tools;
 using OfficeCore = Microsoft.Office.Core;
-using System.Runtime.InteropServices;
 
 namespace MySQL.ForExcel
 {
@@ -73,11 +72,6 @@ namespace MySQL.ForExcel
     #endregion Constants
 
     #region Fields
-
-    /// <summary>
-    /// Built-in Refresh command button needed to override its standard functionality.
-    /// </summary>
-    private OfficeCore.CommandBarButton _builtInRefreshCommandButton;
 
     /// <summary>
     /// A dictionary containing subsets of the <see cref="StoredEditSessions"/> list containing only sessions of a <see cref="ExcelInterop.Workbook"/>.
@@ -200,6 +194,11 @@ namespace MySQL.ForExcel
     /// Gets the title given to the assembly of the Add-In.
     /// </summary>
     public string AssemblyTitle { get; private set; }
+
+    /// <summary>
+    /// Gets the custom ribbon defined by this add-in.
+    /// </summary>
+    public MySqlRibbon CustomMySqlRibbon { get; protected set; }
 
     /// <summary>
     /// Gets a list with all the Excel panes instantiated in the Excel session, stored it to dispose of them when needed.
@@ -363,6 +362,42 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Loops all <see cref="ExcelInterop.ListObject"/> objects in the active <see cref="ExcelInterop.Workbook"/> and calls custom refresh functionality
+    /// if tied to a <see cref="ImportSessionInfo"/> object, calls native refresh functionality otherwise.
+    /// </summary>
+    /// <return><c>true</c> if the custom functionality was executed, <c>false</c> otherwise.</return>
+    public bool RefreshAllCustomFunctionality()
+    {
+      foreach (ExcelInterop.Worksheet worksheet in Application.ActiveWorkbook.Worksheets)
+      {
+        worksheet.RefreshAllListObjects();
+      }
+
+      return true;
+    }
+
+    /// <summary>
+    /// Loops all <see cref="ExcelInterop.ListObject"/> objects in the active <see cref="ExcelInterop.Worksheet"/> and calls custom refresh functionality
+    /// if tied to a <see cref="ImportSessionInfo"/> object, calls native refresh functionality otherwise.
+    /// </summary>
+    /// <returns><c>true</c> if the active <see cref="ExcelInterop.ListObject"/> has a related <see cref="ImportSessionInfo"/> and was refreshed, <c>false</c> otherwise.</returns>
+    public bool RefreshDataCustomFunctionality()
+    {
+      var listObject = Application.ActiveCell.ListObject;
+      return listObject.RefreshMySqlData();
+    }
+
+    /// <summary>
+    /// Creates and returns a new instance of the <see cref="MySqlRibbon"/> class.
+    /// </summary>
+    /// <returns>A new instance of the <see cref="MySqlRibbon"/> class.</returns>
+    protected override Microsoft.Office.Core.IRibbonExtensibility CreateRibbonExtensibilityObject()
+    {
+      CustomMySqlRibbon = new MySqlRibbon();
+      return CustomMySqlRibbon;
+    }
+
+    /// <summary>
     /// Event delegate method fired when an Excel <see cref="ExcelInterop.Worksheet"/> is activated.
     /// </summary>
     /// <param name="workSheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
@@ -520,14 +555,7 @@ namespace MySQL.ForExcel
       }
 
       // Synchronize the MySQL for Excel toggle button state of the currently activated window.
-      OfficeTools.Ribbon.RibbonControl ribbonControl = Globals.Ribbons.ManageTaskPaneRibbon.MySQLExcelAddInRibbonGroup.Items.FirstOrDefault(rc => rc.Name == "ShowTaskPaneRibbonToggleButton");
-      if (!(ribbonControl is OfficeTools.Ribbon.RibbonToggleButton))
-      {
-        return;
-      }
-
-      OfficeTools.Ribbon.RibbonToggleButton toggleButton = ribbonControl as OfficeTools.Ribbon.RibbonToggleButton;
-      toggleButton.Checked = ActiveCustomPane != null && ActiveCustomPane.Visible;
+      CustomMySqlRibbon.ChangeShowMySqlForExcelPaneToggleState(ActiveCustomPane != null && ActiveCustomPane.Visible);
     }
 
     /// <summary>
@@ -877,10 +905,10 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Sender object.</param>
-    private static void CustomTaskPaneVisibleChanged(object sender, EventArgs e)
+    private void CustomTaskPaneVisibleChanged(object sender, EventArgs e)
     {
       OfficeTools.CustomTaskPane customTaskPane = sender as OfficeTools.CustomTaskPane;
-      Globals.Ribbons.ManageTaskPaneRibbon.ShowTaskPaneRibbonToggleButton.Checked = customTaskPane != null && customTaskPane.Visible;
+      CustomMySqlRibbon.ChangeShowMySqlForExcelPaneToggleState(customTaskPane != null && customTaskPane.Visible);
     }
 
     /// <summary>
@@ -1179,94 +1207,6 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Overrides the native Excel refresh menus to call a customized event handler.
-    /// </summary>
-    private void OverrideNativeRefreshFunctionality()
-    {
-      _builtInRefreshCommandButton = null;
-
-      try
-      {
-        // Override native functionality by subscribing the Click event for the first control, no need to subscribe all of them
-        foreach (OfficeCore.CommandBarButton button in Application.CommandBars.FindControls(OfficeCore.MsoControlType.msoControlButton, 459, Type.Missing, Type.Missing))
-        {
-          _builtInRefreshCommandButton = button;
-          button.Click += RefreshDataCustomFunctionality;
-          break;
-        }
-      }
-      catch (Exception ex)
-      {
-        MySqlSourceTrace.WriteToLog(Resources.OverrideNativeRefreshError);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
-      }
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the Refresh <see cref="OfficeCore.CommandBarButton"/> is clicked, meant to override its native functionality.
-    /// </summary>
-    /// <param name="ctrl">A <see cref="OfficeCore.CommandBarButton"/> control.</param>
-    /// <param name="cancelDefault">Flag indicating whether the base functionality is cancelled or not.</param>
-    private void RefreshDataCustomFunctionality(OfficeCore.CommandBarButton ctrl, ref bool cancelDefault)
-    {
-      var listObject = Application.ActiveCell.ListObject;
-
-      // Do not return from the method unless the overriden refresh code happens, to avoid skipping the default refresh functionality.
-      // Meaning DO NOT use the 'return' statement under any circumstance to return right away in the scope of this method.
-      if (listObject != null && listObject.Comment != null)
-      {
-        ImportSessionInfo importSession = GetListObjectSession(listObject);
-        if (importSession != null)
-        {
-          cancelDefault = true;
-          importSession.Refresh();
-        }
-        else
-        {
-          listObject.Unlink();
-        }
-      }
-    }
-
-    /// <summary>
-    /// Gets the correspondant Import Session for the current ListObject.
-    /// </summary>
-    /// <param name="listObject">The list object.</param>
-    /// <returns></returns>
-    private ImportSessionInfo GetListObjectSession(ExcelInterop.ListObject listObject)
-    {
-      ImportSessionInfo importSession = null;
-      var invalidSessions = new List<ImportSessionInfo>();
-      foreach (var workbookSession in ActiveWorkbookImportSessions)
-      {
-        try
-        {
-          if (string.Equals(workbookSession.ExcelTable.Comment, listObject.Comment,
-            StringComparison.InvariantCultureIgnoreCase))
-          {
-            importSession = workbookSession;
-            break;
-          }
-        }
-        catch (COMException)
-        {
-          //The session's list object was moved to another worksheet or when its columns had been deleted or the reference to it no longer exists.
-          invalidSessions.Add(workbookSession);
-        }
-      }
-
-      //Dispose of invalid sessions.
-      if (invalidSessions.Count > 0)
-      {
-        invalidSessions.ForEach(invalidSession => invalidSession.ExcelTable.DeleteSafely(false));
-        invalidSessions.ForEach(invalidSession => StoredImportSessions.Remove(invalidSession));
-        MiscUtilities.SaveSettings();
-      }
-
-      return importSession;
-    }
-
-    /// <summary>
     /// Processes the missing connection sessions to either create and assign them a new connection or disconnect their excel tables.
     /// </summary>
     /// <param name="missingConnectionSessions">A list of <see cref="ImportSessionInfo" /> objects which connection is not found.</param>
@@ -1451,29 +1391,6 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Reverts back the native Excel refresh menus to call only its base functionality.
-    /// </summary>
-    private void RevertNativeRefreshFunctionality()
-    {
-      if (_builtInRefreshCommandButton == null)
-      {
-        return;
-      }
-
-      try
-      {
-        _builtInRefreshCommandButton.Reset();
-        _builtInRefreshCommandButton.Click -= RefreshDataCustomFunctionality;
-        Marshal.ReleaseComObject(_builtInRefreshCommandButton);
-      }
-      catch (Exception ex)
-      {
-        MySqlSourceTrace.WriteToLog(Resources.RevertNativeRefreshError);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
-      }
-    }
-
-    /// <summary>
     /// Setups the excel events.
     /// </summary>
     /// <param name="subscribe">if set to <c>true</c> [subscribe].</param>
@@ -1561,9 +1478,6 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void ThisAddIn_Shutdown(object sender, EventArgs e)
     {
-      // Revert Refresh command button's native functionality
-      RevertNativeRefreshFunctionality();
-
       // Close all Excel panes created
       if (ExcelPanesList != null)
       {
@@ -1622,9 +1536,6 @@ namespace MySQL.ForExcel
         {
           ConvertSettingsStoredMappingsCasing();
         }
-
-        // Override refresh menus by subscribing the Click event for the first control, no need to subscribe all of them.
-        OverrideNativeRefreshFunctionality();
 
         // Subscribe events tracked even when no Excel panes are open.
         Application.WorkbookOpen += Application_WorkbookOpen;

@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Microsoft.Office.Core;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
@@ -629,6 +630,50 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets a <see cref="ImportSessionInfo"/> object related to the given <see cref="ExcelInterop.ListObject"/>.
+    /// </summary>
+    /// <param name="excelTable">A <see cref="ExcelInterop.ListObject"/>.</param>
+    /// <returns>A <see cref="ImportSessionInfo"/> object related to the given <see cref="ExcelInterop.ListObject"/>.</returns>
+    public static ImportSessionInfo GetImportSession(this ExcelInterop.ListObject excelTable)
+    {
+      if (excelTable == null)
+      {
+        return null;
+      }
+
+      ImportSessionInfo importSession = null;
+      var invalidSessions = new List<ImportSessionInfo>();
+      foreach (var workbookSession in Globals.ThisAddIn.ActiveWorkbookImportSessions)
+      {
+        try
+        {
+          if (!string.Equals(workbookSession.ExcelTable.Comment, excelTable.Comment, StringComparison.InvariantCultureIgnoreCase))
+          {
+            continue;
+          }
+
+          importSession = workbookSession;
+          break;
+        }
+        catch (COMException)
+        {
+          // The session's list object was moved to another worksheet or when its columns had been deleted or the reference to it no longer exists.
+          invalidSessions.Add(workbookSession);
+        }
+      }
+
+      // Dispose of invalid sessions.
+      if (invalidSessions.Count > 0)
+      {
+        invalidSessions.ForEach(invalidSession => invalidSession.ExcelTable.DeleteSafely(false));
+        invalidSessions.ForEach(invalidSession => Globals.ThisAddIn.StoredImportSessions.Remove(invalidSession));
+        MiscUtilities.SaveSettings();
+      }
+
+      return importSession;
+    }
+
+    /// <summary>
     /// Checks if a given <see cref="ExcelInterop.Range"/> intersects with an Excel object in its containing <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
     /// <param name="range">A <see cref="ExcelInterop.Range"/> object.</param>
@@ -1175,6 +1220,53 @@ namespace MySQL.ForExcel.Classes
                         false,
                         false,
                         false);
+    }
+
+    /// <summary>
+    /// Refreshes all <see cref="ExcelInterop.ListObject"/> objects in the given <see cref="ExcelInterop.Worksheet"/>.
+    /// If a <see cref="ExcelInterop.ListObject"/> is related to a <see cref="ImportSessionInfo"/> object then its custom refresh functionality is performed, otherwise the native one is.
+    /// </summary>
+    /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/>.</param>
+    public static void RefreshAllListObjects(this ExcelInterop.Worksheet worksheet)
+    {
+      if (worksheet == null)
+      {
+        return;
+      }
+
+      foreach (ExcelInterop.ListObject listObject in worksheet.ListObjects)
+      {
+        if (listObject.RefreshMySqlData())
+        {
+          continue;
+        }
+
+        listObject.Refresh();
+      }
+    }
+
+    /// <summary>
+    /// Checks if the given <see cref="ExcelInterop.ListObject"/> object is related to a <see cref="ImportSessionInfo"/> object in order to perform its custom refresh functionality.
+    /// </summary>
+    /// <param name="excelTable">A <see cref="ExcelInterop.ListObject"/>.</param>
+    /// <returns><c>true</c> if the <see cref="ExcelInterop.ListObject"/> has a related <see cref="ImportSessionInfo"/> and was refreshed, <c>false</c> otherwise.</returns>
+    public static bool RefreshMySqlData(this ExcelInterop.ListObject excelTable)
+    {
+      bool refreshedMySqlData = false;
+
+      // Do not return from the method unless the overriden refresh code happens, to avoid skipping the default refresh functionality.
+      // Meaning DO NOT use the 'return' statement under any circumstance to return right away in the scope of this method.
+      if (excelTable != null && excelTable.Comment != null)
+      {
+        var importSession = excelTable.GetImportSession();
+        if (importSession != null)
+        {
+          refreshedMySqlData = true;
+          importSession.Refresh();
+        }
+      }
+
+      return refreshedMySqlData;
     }
 
     /// <summary>

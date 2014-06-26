@@ -967,12 +967,6 @@ importing the MySQL {0} data in Excel.</value>
   <data name="SelectedRelatedTablesAndViewsText" xml:space="preserve">
     <value>Selected related Tables and Views: </value>
   </data>
-  <data name="OverrideNativeRefreshError" xml:space="preserve">
-    <value>Native Excel's refresh functionality could not be overriden due to an error.</value>
-  </data>
-  <data name="RevertNativeRefreshError" xml:space="preserve">
-    <value>Native Excel's refresh functionality could not be reverted back due to an error.</value>
-  </data>
   <data name="ParentWorkbookNullError" xml:space="preserve">
     <value>The parent workbook of worksheet {0} could not be obtained while trying to create the Excel table {1}.</value>
   </data>
