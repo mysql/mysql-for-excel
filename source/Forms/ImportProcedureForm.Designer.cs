@@ -343,7 +343,7 @@ namespace MySQL.ForExcel.Forms
       this.OptionsWarningLabel.BackColor = System.Drawing.SystemColors.Window;
       this.OptionsWarningLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.OptionsWarningLabel.ForeColor = System.Drawing.Color.Red;
-      this.OptionsWarningLabel.Location = new System.Drawing.Point(104, 555);
+      this.OptionsWarningLabel.Location = new System.Drawing.Point(104, 545);
       this.OptionsWarningLabel.Name = "OptionsWarningLabel";
       this.OptionsWarningLabel.Size = new System.Drawing.Size(76, 12);
       this.OptionsWarningLabel.TabIndex = 13;
@@ -355,7 +355,7 @@ namespace MySQL.ForExcel.Forms
       this.OptionsWarningPictureBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.OptionsWarningPictureBox.BackColor = System.Drawing.SystemColors.Window;
       this.OptionsWarningPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.OptionsWarningPictureBox.Location = new System.Drawing.Point(82, 550);
+      this.OptionsWarningPictureBox.Location = new System.Drawing.Point(82, 540);
       this.OptionsWarningPictureBox.Name = "OptionsWarningPictureBox";
       this.OptionsWarningPictureBox.Size = new System.Drawing.Size(20, 20);
       this.OptionsWarningPictureBox.TabIndex = 26;
@@ -369,7 +369,7 @@ namespace MySQL.ForExcel.Forms
       this.SubSetOfDataLabel.BackColor = System.Drawing.Color.Transparent;
       this.SubSetOfDataLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.SubSetOfDataLabel.ForeColor = System.Drawing.SystemColors.InactiveCaption;
-      this.SubSetOfDataLabel.Location = new System.Drawing.Point(434, 553);
+      this.SubSetOfDataLabel.Location = new System.Drawing.Point(434, 542);
       this.SubSetOfDataLabel.Name = "SubSetOfDataLabel";
       this.SubSetOfDataLabel.Size = new System.Drawing.Size(319, 15);
       this.SubSetOfDataLabel.TabIndex = 14;
@@ -400,7 +400,7 @@ namespace MySQL.ForExcel.Forms
       // AddSummaryFieldsCheckBox
       // 
       this.AddSummaryFieldsCheckBox.AutoSize = true;
-      this.AddSummaryFieldsCheckBox.Location = new System.Drawing.Point(395, 275);
+      this.AddSummaryFieldsCheckBox.Location = new System.Drawing.Point(395, 271);
       this.AddSummaryFieldsCheckBox.Name = "AddSummaryFieldsCheckBox";
       this.AddSummaryFieldsCheckBox.Size = new System.Drawing.Size(121, 17);
       this.AddSummaryFieldsCheckBox.TabIndex = 32;

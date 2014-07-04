@@ -1,3 +1,8 @@
+1.3.2
+- Renamed the "Create an Excel table for the imported MySQL table data" advanced option in the Import Data dialogs to "Create an Excel table for the imported MySQL data"
+  which is consistent to the fact that we can import not only tables but also views and procedures.
+  (Bug #18979352 - CREATE AN EXCEL TABLE FOR THE IMPORTED MYSQL TABLE DATA OPTION SHOULD BE RENAMED)
+
 1.3.1
 - Changed the type of custom ribbon for MySQL for Excel to use the XML Ribbon approach of the Excel fluent interface in order to be able to override the native
   functionality for the Refresh and Refresh All ribbon commands, which was not possible using the Visual Designer Ribbon approach.

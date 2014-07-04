@@ -208,9 +208,9 @@ namespace MySQL.ForExcel.Forms
       this.CreateExcelTableCheckbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.CreateExcelTableCheckbox.Location = new System.Drawing.Point(53, 178);
       this.CreateExcelTableCheckbox.Name = "CreateExcelTableCheckbox";
-      this.CreateExcelTableCheckbox.Size = new System.Drawing.Size(334, 19);
+      this.CreateExcelTableCheckbox.Size = new System.Drawing.Size(304, 19);
       this.CreateExcelTableCheckbox.TabIndex = 8;
-      this.CreateExcelTableCheckbox.Text = "Create an Excel table for the imported MySQL table data.";
+      this.CreateExcelTableCheckbox.Text = "Create an Excel table for the imported MySQL data.";
       this.HelpToolTip.SetToolTip(this.CreateExcelTableCheckbox, "When checked an Excel table (previously known as Excel lists) will be created for" +
         " the imported data.");
       this.CreateExcelTableCheckbox.UseVisualStyleBackColor = false;

@@ -335,9 +335,9 @@ namespace MySQL.ForExcel.Forms
       this.DatatypeLabel.AutoSize = true;
       this.DatatypeLabel.Location = new System.Drawing.Point(28, 54);
       this.DatatypeLabel.Name = "DatatypeLabel";
-      this.DatatypeLabel.Size = new System.Drawing.Size(57, 15);
+      this.DatatypeLabel.Size = new System.Drawing.Size(63, 15);
       this.DatatypeLabel.TabIndex = 2;
-      this.DatatypeLabel.Text = "Datatype:";
+      this.DatatypeLabel.Text = "Data Type:";
       // 
       // ColumnNameTextBox
       // 
@@ -678,7 +678,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.CollationLabel.AutoSize = true;
       this.CollationLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.CollationLabel.Location = new System.Drawing.Point(63, 146);
+      this.CollationLabel.Location = new System.Drawing.Point(63, 148);
       this.CollationLabel.Name = "CollationLabel";
       this.CollationLabel.Size = new System.Drawing.Size(58, 15);
       this.CollationLabel.TabIndex = 5;
