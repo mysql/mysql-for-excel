@@ -844,6 +844,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Excel 97-2003 Workbook (*.xls),*.xls.
+        /// </summary>
+        internal static string ExcelDefaultFileExtensionText {
+            get {
+                return ResourceManager.GetString("ExcelDefaultFileExtensionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error ocurred trying to create the Excel table {0}.
         /// </summary>
         internal static string ExcelTableCreationError {

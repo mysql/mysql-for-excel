@@ -619,6 +619,41 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Method that overrides the default program flow on Excel 2007 since it doesn't exist an WorkbookAfterSave event in this version compared to 2010 and superior versions of Excel.
+    /// More info about this topic can be found at http://msdn.microsoft.com/en-us/library/office/ff836466(v=office.15).aspx" />
+    /// </summary>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
+    /// <param name="saveAsUi">Flag indicating whether the Save As dialog was displayed.</param>
+    private void Application_WorkbookAfterSave2007(ExcelInterop.Workbook workbook, bool saveAsUi)
+    {
+      Application.EnableEvents = false; //Stops beforesave event from re-running
+      bool triggerAfterSave = true;
+      if (saveAsUi)
+      {
+        dynamic cFile = Application.GetSaveAsFilename(workbook.Name, Resources.ExcelDefaultFileExtensionText); // GetSaveAsFilename returns a dynamic type, which is a boolean type with false value when the dialog was canceled.
+        //If the save as dialog was canceled we need to skip the after save method.
+        if (cFile is bool && !cFile)
+        {
+          triggerAfterSave = false;
+        }
+        else
+        {
+          workbook.SaveAs(cFile);
+        }
+      }
+      else
+      {
+        workbook.Save();
+      }
+
+      Application.EnableEvents = true;
+      if (triggerAfterSave)
+      {
+        Application_WorkbookAfterSave(workbook, saveAsUi);
+      }
+    }
+
+    /// <summary>
     /// Removes the duplicate import sessions.
     /// </summary>
     private void RemoveInvalidImportSessions()
@@ -708,6 +743,13 @@ namespace MySQL.ForExcel
       foreach (var activeEditSession in workbookSessions.Where(activeEditSession => activeEditSession.EditDialog != null))
       {
         activeEditSession.EditDialog.UnprotectWorksheet();
+      }
+
+      //The WorkbookAfterSave event in Excel 2007 does not exist so we need to sligthly alter the program flow to overcome this limitation.
+      if (ExcelVersionNumber <= EXCEL_2007_VERSION_NUMBER)
+      {
+        cancel = true; //Cancels the users original save command request in order to execute the following code override.
+        Application_WorkbookAfterSave2007(workbook, saveAsUi);
       }
     }
 

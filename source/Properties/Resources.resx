@@ -1013,4 +1013,7 @@ What do you want to do with them?</value>
   <data name="WorkOfflineButtonText" xml:space="preserve">
     <value>Work Offline</value>
   </data>
+  <data name="ExcelDefaultFileExtensionText" xml:space="preserve">
+    <value>Excel 97-2003 Workbook (*.xls),*.xls</value>
+  </data>
 </root>

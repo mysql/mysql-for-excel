@@ -1,4 +1,6 @@
 1.3.2
+- Added code to trigger WokbookAfterSave event handler on Excel 2007 since this version of Excel lacks the ability to trigger this event compared to later versions.
+  This prevented Import and Edit Sessions from being saved correctly. (Bug #19145707 - EDIT AND IMPORT SESSIONS ARE NOT SAVED IN OFFICE 2007 WIN7X64)
 - Renamed the "Create an Excel table for the imported MySQL table data" advanced option in the Import Data dialogs to "Create an Excel table for the imported MySQL data"
   which is consistent to the fact that we can import not only tables but also views and procedures.
   (Bug #18979352 - CREATE AN EXCEL TABLE FOR THE IMPORTED MYSQL TABLE DATA OPTION SHOULD BE RENAMED)
