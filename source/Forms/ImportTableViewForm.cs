@@ -201,6 +201,9 @@ namespace MySQL.ForExcel.Forms
         {
           FillPreviewGrid();
         }
+
+        AddSummaryFieldsCheckBox.Checked = Settings.Default.ImportCreateExcelTable && AddSummaryFieldsCheckBox.Checked;
+        AddSummaryFieldsCheckBox.Enabled = Settings.Default.ImportCreateExcelTable;
       }
     }
 
@@ -410,7 +413,7 @@ namespace MySQL.ForExcel.Forms
       LimitRowsCheckBox.Checked = false;
       LimitRowsCheckBox.Enabled = !_isEditOperation;
       CreatePivotTableCheckBox.Enabled = !_isEditOperation;
-      AddSummaryFieldsCheckBox.Enabled = !_isEditOperation;
+      AddSummaryFieldsCheckBox.Enabled = !_isEditOperation && Settings.Default.ImportCreateExcelTable;
     }
   }
 }

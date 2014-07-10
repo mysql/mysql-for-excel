@@ -106,6 +106,7 @@ namespace MySQL.ForExcel.Forms
       ProcedureNameLabel.Text = dbObject.Name;
       OptionsWarningLabel.Text = Resources.WorkbookInCompatibilityModeWarning;
       ParametersPropertyGrid.SelectedObject = _procedureParamsProperties;
+      AddSummaryFieldsCheckBox.Enabled = Settings.Default.ImportCreateExcelTable;
 
       InitializeMultipleResultSetsCombo();
       PrepareParameters();
@@ -222,6 +223,8 @@ namespace MySQL.ForExcel.Forms
       using (var optionsDialog = new ImportAdvancedOptionsDialog())
       {
         optionsDialog.ShowDialog();
+        AddSummaryFieldsCheckBox.Checked = Settings.Default.ImportCreateExcelTable && AddSummaryFieldsCheckBox.Checked;
+        AddSummaryFieldsCheckBox.Enabled = Settings.Default.ImportCreateExcelTable;
       }
     }
 
