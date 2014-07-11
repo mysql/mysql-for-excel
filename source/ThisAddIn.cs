@@ -593,10 +593,21 @@ namespace MySQL.ForExcel
           activeEditSession.EditDialog.ProtectWorksheet();
         }
 
+        if (!success)
+        {
+          continue;
+        }
+
         // Add new Edit sessions in memory collection to serialized collection
         activeEditSession.LastAccess = DateTime.Now;
         activeEditSession.WorkbookFilePath = workbook.FullName;
         StoredEditSessions.Add(activeEditSession);
+      }
+
+      if (!success)
+      {
+        workbook.Saved = false;
+        return;
       }
 
       // Scrubbing of duplicated Import sessions and setting last access time.

@@ -1,4 +1,6 @@
 1.3.2
+- Added token validation at AfterSave event to ensure no reconnection information is saved when the workbook saving process is cancelled.
+  (MySQL Bug #73192, Bug #19153978 - RECONNECTION INFO FOR EXCEL TABLES IS SAVED ALTHOUGH WORKBOOK SAVE IS CANCELLED)
 - Rewrote the code that handles tables relationships in the Import Multiple dialog, relationships are detected for all tables imported to Excel (both the ones in the
   original selection from the DB objects selection panel and their related ones flagged by the user to be imported).  The relationships are now detected in 2 directions
   based on MySQL foreign keys and are created in the Excel model if the "Create Excel relationships for imported tables" option is available and checked.  Added code to
