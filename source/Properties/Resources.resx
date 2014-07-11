@@ -915,11 +915,11 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
   <data name="MySQLforExcel_ObjectPanel_MultiSelectObject_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySQLforExcel-ObjectPanel-MultiSelectObject-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="MySQLforExcel_ObjectPanel_MultiSelectObject_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-ObjectPanel-MultiSelectObject-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="MySQLforExcel_MultiSelectObject_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-MultiSelectObject-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="MySQLforExcel_ObjectPanel_RelatedObjects_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-ObjectPanel-RelatedObjects-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="MySQLforExcel_RelatedObjects_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MySQLforExcel-RelatedObjects-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImportTableOrViewSubText" xml:space="preserve">
     <value>Click on column headers to exclude/include them when
@@ -1015,5 +1015,23 @@ What do you want to do with them?</value>
   </data>
   <data name="ExcelDefaultFileExtensionText" xml:space="preserve">
     <value>Excel 97-2003 Workbook (*.xls),*.xls</value>
+  </data>
+  <data name="ModelRelationshipsNotSupportedError" xml:space="preserve">
+    <value>Model Relationships are not supported in the current Excel version.</value>
+  </data>
+  <data name="ModelTableColumnsNotFoundError" xml:space="preserve">
+    <value>A Model Table Column defining the relationship was not found in one or both Model Table objects.</value>
+  </data>
+  <data name="ModelTablesNotFoundError" xml:space="preserve">
+    <value>A Model Table was not found for one or both tables in the relationship.</value>
+  </data>
+  <data name="PossibleCircularReferenceError" xml:space="preserve">
+    <value>A possible circular reference among tables already related in the Excel Model may be created so Excel can't create the Model Relationship.</value>
+  </data>
+  <data name="ExcelRelationshipsCreationErrorDetail" xml:space="preserve">
+    <value>Some Excel Model Relationships could not be created because errors were found.</value>
+  </data>
+  <data name="ExcelRelationshipsCreationErrorTitle" xml:space="preserve">
+    <value>Excel Model Relationships Creation Error</value>
   </data>
 </root>

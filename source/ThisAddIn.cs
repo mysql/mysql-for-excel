@@ -198,7 +198,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets the custom ribbon defined by this add-in.
     /// </summary>
-    public MySqlRibbon CustomMySqlRibbon { get; protected set; }
+    public MySqlRibbon CustomMySqlRibbon { get; private set; }
 
     /// <summary>
     /// Gets a list with all the Excel panes instantiated in the Excel session, stored it to dispose of them when needed.
@@ -1125,7 +1125,7 @@ namespace MySQL.ForExcel
       _restoringExistingSession = true;
       foreach (var session in workbookSessions)
       {
-        DbObject sessionTableObject = ActiveExcelPane.LoadedTables.FirstOrDefault(dbo => string.Equals(dbo.Name, session.TableName, StringComparison.InvariantCulture));
+        var sessionTableObject = ActiveExcelPane.LoadedTables.FirstOrDefault(dbo => string.Equals(dbo.Name, session.TableName, StringComparison.InvariantCulture));
         if (sessionTableObject == null)
         {
           missingTables.Add(session.TableName);

@@ -16,33 +16,40 @@
 // 02110-1301  USA
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using MySQL.ForExcel.Forms;
+using MySQL.ForExcel.Properties;
+using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
 {
   /// <summary>
-  /// Represents a relationship between 2 MySQL tables or views based on a single column on both database objects.
+  /// Represents a relationship between 2 MySQL tables based on a single column on both database objects.
   /// </summary>
   public class MySqlDataRelationship
   {
     /// <summary>
     /// Initializes a new instance of the <see cref="MySqlDataRelationship"/> class.
     /// </summary>
+    /// <param name="direction">The relationship direction dictated by what table defined the foreign key constraint.</param>
     /// <param name="mySqlForeignKeyName">The name of the foreign key constraint from which the relationship was created from.</param>
-    /// <param name="tableOrViewName">The name of the table or view defining the relationsip to a foreign one.</param>
-    /// <param name="relatedTableOrViewName">The name of the related foreign table or view.</param>
+    /// <param name="tableName">The name of the table defining the relationsip to a foreign one.</param>
+    /// <param name="relatedTableName">The name of the related foreign table.</param>
     /// <param name="columnName">The name of the column defining the relationship to a foreign one.</param>
     /// <param name="relatedColumnName">The name of the related foreign column.</param>
-    public MySqlDataRelationship(string mySqlForeignKeyName, string tableOrViewName, string relatedTableOrViewName, string columnName, string relatedColumnName)
+    public MySqlDataRelationship(DirectionType direction, string mySqlForeignKeyName, string tableName, string relatedTableName, string columnName, string relatedColumnName)
     {
+      Direction = direction;
       MySqlForeignKeyName = mySqlForeignKeyName;
-      if (string.IsNullOrEmpty(tableOrViewName))
+      if (string.IsNullOrEmpty(tableName))
       {
-        throw new ArgumentNullException("tableOrViewName");
+        throw new ArgumentNullException("tableName");
       }
 
-      if (string.IsNullOrEmpty(relatedTableOrViewName))
+      if (string.IsNullOrEmpty(relatedTableName))
       {
-        throw new ArgumentNullException("relatedTableOrViewName");
+        throw new ArgumentNullException("relatedTableName");
       }
 
       if (string.IsNullOrEmpty(columnName))
@@ -55,12 +62,62 @@ namespace MySQL.ForExcel.Classes
         throw new ArgumentNullException("relatedColumnName");
       }
 
-      TableOrViewName = tableOrViewName;
-      RelatedTableOrViewName = relatedTableOrViewName;
+      TableName = tableName;
+      RelatedTableName = relatedTableName;
       ColumnName = columnName;
       RelatedColumnName = relatedColumnName;
-      Excluded = false;
     }
+
+    #region Enumerations
+
+    /// <summary>
+    /// Specifies identifiers to indicate the resulting status of a <see cref="ExcelInterop.ModelRelationship"/> creation.
+    /// </summary>
+    public enum CreationStatus
+    {
+      /// <summary>
+      /// Model Relationships are not supported in the current Excel version.
+      /// </summary>
+      ModelRelationshipsNotSupported,
+
+      /// <summary>
+      /// A <see cref="ExcelInterop.ModelTableColumn"/> defining the <see cref="MySqlDataRelationship"/> was not found in one or both <see cref="ExcelInterop.ModelTable"/> objects.
+      /// </summary>
+      ModelTableColumnsNotFound,
+
+      /// <summary>
+      /// A <see cref="ExcelInterop.ModelTable"/> was not found for one or both tables in the <see cref="MySqlDataRelationship"/>.
+      /// </summary>
+      ModelTablesNotFound,
+
+      /// <summary>
+      /// A possible circular reference among tables already related in the Excel Model may be created so Excel can't create the <see cref="ExcelInterop.ModelRelationship"/>.
+      /// </summary>
+      PossibleCircularReference,
+
+      /// <summary>
+      /// The <see cref="ExcelInterop.ModelRelationship"/> was created successfully.
+      /// </summary>
+      Success
+    }
+
+    /// <summary>
+    /// Specifies identifiers to indicate the direction of the relationship.
+    /// </summary>
+    public enum DirectionType
+    {
+      /// <summary>
+      /// The foreign key is declared on the table with <see cref="TableName"/> and the <see cref="RelatedTableName"/> is the foreign table.
+      /// </summary>
+      Normal,
+
+      /// <summary>
+      /// The foreign key is declared on the table with <see cref="RelatedTableName"/> and the <see cref="TableName"/> is the foreign table.
+      /// </summary>
+      Reverse
+    }
+
+    #endregion Enumerations
 
     #region Properties
 
@@ -70,9 +127,9 @@ namespace MySQL.ForExcel.Classes
     public string ColumnName { get; private set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the relationship is excluded for further processing.
+    /// Gets the relationship direction dictated by what table defined the foreign key constraint.
     /// </summary>
-    public bool Excluded { get; set; }
+    public DirectionType Direction { get; private set; }
 
     /// <summary>
     /// Gets the name of the foreign key constraint from which the relationship was created from.
@@ -86,15 +143,128 @@ namespace MySQL.ForExcel.Classes
     public string RelatedColumnName { get; private set; }
 
     /// <summary>
-    /// Gets the name of the related foreign table or view.
+    /// Gets the name of the related foreign table.
     /// </summary>
-    public string RelatedTableOrViewName { get; private set; }
+    public string RelatedTableName { get; private set; }
 
     /// <summary>
-    /// Gets the name of the table or view defining the relationsip to a foreign one.
+    /// Gets the name of the table defining the relationsip to a foreign one.
     /// </summary>
-    public string TableOrViewName { get; private set; }
+    public string TableName { get; private set; }
 
     #endregion Properties
+
+    /// <summary>
+    /// Gets an error message corresponding to the given <see cref="CreationStatus"/>.
+    /// </summary>
+    /// <param name="creationStatus">A <see cref="CreationStatus"/> value.</param>
+    /// <returns>An error message corresponding to the given <see cref="CreationStatus"/>.</returns>
+    public static string GetCreationStatusErrorMessage(CreationStatus creationStatus)
+    {
+      switch (creationStatus)
+      {
+        case CreationStatus.ModelRelationshipsNotSupported:
+          return Resources.ModelRelationshipsNotSupportedError;
+
+        case CreationStatus.ModelTableColumnsNotFound:
+          return Resources.ModelTableColumnsNotFoundError;
+
+        case CreationStatus.ModelTablesNotFound:
+          return Resources.ModelTablesNotFoundError;
+
+        case CreationStatus.PossibleCircularReference:
+          return Resources.PossibleCircularReferenceError;
+      }
+
+      return string.Empty;
+    }
+
+    /// <summary>
+    /// Gets an error message corresponding to the given <see cref="CreationStatus"/>.
+    /// </summary>
+    /// <param name="creationStatus">A <see cref="CreationStatus"/> value.</param>
+    /// <returns>An error message corresponding to the given <see cref="CreationStatus"/>.</returns>
+    public string GetCreationErrorMessage(CreationStatus creationStatus)
+    {
+      var statusError = GetCreationStatusErrorMessage(creationStatus);
+      return string.IsNullOrEmpty(statusError)
+        ? string.Empty
+        : ToString() + ": " + Environment.NewLine + statusError;
+    }
+
+    /// <summary>
+    /// Creates a <see cref="ExcelInterop.ModelRelationship"/> based on the information of this object.
+    /// </summary>
+    /// <param name="modelTableName">The name of the <see cref="ExcelInterop.ModelTable"/> (or <see cref="ExcelInterop.ListObject"/>) defining the relationship to a foreign one.</param>
+    /// <param name="relatedModelTableName">The name of the <see cref="ExcelInterop.ModelTable"/> (or <see cref="ExcelInterop.ListObject"/>) defining the related foreign table.</param>
+    /// <returns>A <see cref="CreationStatus"/> reflecting the result of the <see cref="ExcelInterop.ModelRelationship"/> creation.</returns>
+    public CreationStatus CreateExcelRelationship(string modelTableName, string relatedModelTableName)
+    {
+      if (ImportMultipleDialog.Excel2010OrLower)
+      {
+        return CreationStatus.ModelRelationshipsNotSupported;
+      }
+
+      if (string.IsNullOrEmpty(modelTableName) || string.IsNullOrEmpty(relatedModelTableName))
+      {
+        return CreationStatus.ModelTablesNotFound;
+      }
+
+      modelTableName = modelTableName.Replace(".", " ");
+      relatedModelTableName = relatedModelTableName.Replace(".", " ");
+      try
+      {
+        // Get the ModelColumnName objects needed to define the relationship
+        var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+        var table = activeWorkbook.Model.ModelTables.Cast<ExcelInterop.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, modelTableName, StringComparison.InvariantCulture));
+        var relatedTable = activeWorkbook.Model.ModelTables.Cast<ExcelInterop.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, relatedModelTableName, StringComparison.InvariantCulture));
+        if (table == null || relatedTable == null)
+        {
+          return CreationStatus.ModelTablesNotFound;
+        }
+
+        var column = table.ModelTableColumns.Cast<ExcelInterop.ModelTableColumn>().FirstOrDefault(col => string.Equals(col.Name, ColumnName, StringComparison.InvariantCulture));
+        var relatedColumn = relatedTable.ModelTableColumns.Cast<ExcelInterop.ModelTableColumn>().FirstOrDefault(col => string.Equals(col.Name, RelatedColumnName, StringComparison.InvariantCulture));
+        if (column == null || relatedColumn == null)
+        {
+          return CreationStatus.ModelTableColumnsNotFound;
+        }
+
+        activeWorkbook.Model.ModelRelationships.Add(column, relatedColumn);
+      }
+      catch (Exception)
+      {
+        return CreationStatus.PossibleCircularReference;
+      }
+
+      return CreationStatus.Success;
+    }
+
+    /// <summary>
+    /// Checks whether this relationship can exist among tables in the given list.
+    /// </summary>
+    /// <param name="tableNames">A list of table names.</param>
+    /// <returns><c>true</c> if this relationship can exist among tables in the given list, <c>false</c> otherwise.</returns>
+    public bool ExistsAmongTablesInList(List<string> tableNames)
+    {
+      return tableNames != null
+             && Direction == DirectionType.Normal
+             && tableNames.Any(table => string.Equals(table, TableName, StringComparison.InvariantCultureIgnoreCase))
+             && tableNames.Any(table => string.Equals(table, RelatedTableName, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    /// <summary>
+    /// Returns a string describing the current relationship.
+    /// </summary>
+    /// <returns>A string describing the current relationship.</returns>
+    public override string ToString()
+    {
+      return string.Format("`{0}` (`{1}`) {2} `{3}` (`{4}`),",
+        TableName,
+        ColumnName,
+        Direction == DirectionType.Normal ? ">--" : "--<",
+        RelatedTableName,
+        RelatedColumnName);
+    }
   }
 }

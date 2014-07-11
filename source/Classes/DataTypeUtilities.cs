@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using MySql.Data.MySqlClient;
@@ -783,6 +784,112 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets the <see cref="MySqlDbType"/> corresponding to the given MySQL data type.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type name.</param>
+    /// <param name="unsigned">Flag indicating whether the type is unsigned.</param>
+    /// <param name="bitPrecision">The precision for a bit data type to determine if it represents a boolean value or a number.</param>
+    /// <param name="defaultValue">The default value of the data type.</param>
+    /// <returns>The <see cref="MySqlDbType"/> corresponding to the given MySQL data type.</returns>
+    public static MySqlDbType GetMySqlDbType(string mySqlType, bool unsigned, byte bitPrecision, out object defaultValue)
+    {
+      MySqlDbType dbType;
+      switch (mySqlType)
+      {
+        case "bit":
+          dbType = MySqlDbType.Bit;
+          if (bitPrecision > 1)
+          {
+            defaultValue = 0;
+          }
+          else
+          {
+            defaultValue = false;
+          }
+          break;
+
+        case "int":
+        case "integer":
+          dbType = MySqlDbType.Int32;
+          defaultValue = 0;
+          break;
+
+        case "tinyint":
+          dbType = unsigned ? MySqlDbType.UByte : MySqlDbType.Byte;
+          defaultValue = (Byte)0;
+          break;
+
+        case "smallint":
+          dbType = unsigned ? MySqlDbType.UInt16 : MySqlDbType.Int16;
+          defaultValue = (Int16)0;
+          break;
+
+        case "mediumint":
+          dbType = unsigned ? MySqlDbType.UInt24 : MySqlDbType.Int24;
+          defaultValue = 0;
+          break;
+
+        case "bigint":
+          dbType = unsigned ? MySqlDbType.UInt64 : MySqlDbType.Int64;
+          defaultValue = (Int64)0;
+          break;
+
+        case "numeric":
+        case "decimal":
+        case "float":
+        case "double":
+        case "real":
+          dbType = mySqlType == "float" ? MySqlDbType.Float : (mySqlType == "double" || mySqlType == "real" ? MySqlDbType.Double : MySqlDbType.Decimal);
+          defaultValue = (Double)0;
+          break;
+
+        case "char":
+        case "varchar":
+          dbType = MySqlDbType.VarChar;
+          defaultValue = string.Empty;
+          break;
+
+        case "binary":
+        case "varbinary":
+          dbType = mySqlType.StartsWith("var") ? MySqlDbType.VarBinary : MySqlDbType.Binary;
+          defaultValue = string.Empty;
+          break;
+
+        case "text":
+        case "tinytext":
+        case "mediumtext":
+        case "longtext":
+          dbType = mySqlType.StartsWith("var") ? MySqlDbType.VarBinary : MySqlDbType.Binary;
+          defaultValue = string.Empty;
+          break;
+
+        case "date":
+        case "datetime":
+        case "timestamp":
+          dbType = mySqlType == "date" ? MySqlDbType.Date : MySqlDbType.DateTime;
+          defaultValue = DateTime.Today;
+          break;
+
+        case "time":
+          dbType = MySqlDbType.Time;
+          defaultValue = TimeSpan.Zero;
+          break;
+
+        case "blob":
+          dbType = MySqlDbType.Blob;
+          defaultValue = null;
+          break;
+
+        default:
+          dbType = MySqlDbType.Guid;
+          defaultValue = null;
+          break;
+      }
+
+      return dbType;
+    }
+
+    /// <summary>
     /// Gets the best match for the MySQL data type to be used for a given raw value exported to a MySQL table.
     /// </summary>
     /// <param name="packedValue">Raw value to export</param>
@@ -1102,6 +1209,16 @@ namespace MySQL.ForExcel.Classes
       }
 
       return isZeroDate;
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the value of the given parameter should not be written to depending on its direction.
+    /// </summary>
+    /// <param name="parameter">A <see cref="MySqlParameter"/> object.</param>
+    /// <returns><c>true</c> if the parameter's direction is <see cref="ParameterDirection.Output"/> or <see cref="ParameterDirection.ReturnValue"/>, <c>false</c> otherwise.</returns>
+    public static bool IsReadOnly(this MySqlParameter parameter)
+    {
+      return parameter != null && (parameter.Direction == ParameterDirection.Output || parameter.Direction == ParameterDirection.ReturnValue);
     }
 
     /// <summary>

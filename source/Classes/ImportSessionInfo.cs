@@ -90,8 +90,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="mySqlTable">MySqlDataTable object related to the import session.</param>
     /// <param name="atCell">The top left Excel cell of the new <see cref="ExcelInterop.ListObject"/>.</param>
     /// <param name="addSummaryFields">Indicates wheather to include a row with summary fields</param>
-    /// <param name="refreshOnCreation">Flag indicating whether the session is refreshed right away after initialized.</param>
-    public ImportSessionInfo(MySqlDataTable mySqlTable, ExcelInterop.Range atCell, bool addSummaryFields, bool refreshOnCreation)
+    public ImportSessionInfo(MySqlDataTable mySqlTable, ExcelInterop.Range atCell, bool addSummaryFields)
       : this()
     {
       if (mySqlTable == null)
@@ -111,7 +110,7 @@ namespace MySQL.ForExcel.Classes
       WorkbookFilePath = Globals.ThisAddIn.Application.ActiveWorkbook.FullName;
       ExcelInterop.Worksheet worksheet = Globals.ThisAddIn.Application.ActiveWorkbook.ActiveSheet;
       WorksheetName = worksheet.Name;
-      CreateExcelTable(atCell, addSummaryFields, refreshOnCreation);
+      CreateExcelTable(atCell, addSummaryFields);
     }
 
     #region Properties
@@ -408,9 +407,12 @@ namespace MySQL.ForExcel.Classes
 
         // Bind the redimensioned ExcelTools.ListObject to the MySqlDataTable.
         ToolsExcelTable.SetDataBinding(MySqlTable);
-        foreach (MySqlDataColumn col in MySqlTable.Columns)
+        if (MySqlTable.ImportColumnNames)
         {
-          ToolsExcelTable.ListColumns[col.Ordinal + 1].Name = col.DisplayName;
+          foreach (MySqlDataColumn col in MySqlTable.Columns)
+          {
+            ToolsExcelTable.ListColumns[col.Ordinal + 1].Name = col.DisplayName;
+          }
         }
 
         ToolsExcelTable.Range.Columns.AutoFit();
@@ -537,8 +539,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="atCell">The top left Excel cell of the new <see cref="ExcelInterop.ListObject"/>.</param>
     /// <param name="addSummaryFields">Indicates wheather to include a row with summary fields</param>
-    /// <param name="refreshOnCreation">Flag indicating whether the session is refreshed right away after initialized.</param>
-    private void CreateExcelTable(ExcelInterop.Range atCell, bool addSummaryFields, bool refreshOnCreation)
+    private void CreateExcelTable(ExcelInterop.Range atCell, bool addSummaryFields)
     {
       if (atCell == null)
       {
@@ -593,6 +594,15 @@ namespace MySQL.ForExcel.Classes
         excelTable.ShowTotals = addSummaryFields;
         ExcelTable = excelTable;
 
+        // Add this instance of the ImportSessionInfo class if not present already in the global collection.
+        if (!Globals.ThisAddIn.StoredImportSessions.Exists(session => session.WorkbookGuid == workbookGuid && session.MySqlTable == MySqlTable && string.Equals(session.ExcelTableName, proposedName, StringComparison.InvariantCultureIgnoreCase)))
+        {
+          Globals.ThisAddIn.StoredImportSessions.Add(this);
+        }
+
+        // Fetch the MySQL data and bind the MySqlDataTable object to the Excel table.
+        Refresh();
+
         // Add a connection to the Workbook, the method used to add it differs since the Add method is obsolete for Excel 2013 and higher.
         if (Globals.ThisAddIn.ExcelVersionNumber < ThisAddIn.EXCEL_2013_VERSION_NUMBER)
         {
@@ -600,18 +610,7 @@ namespace MySQL.ForExcel.Classes
         }
         else
         {
-          workbook.Connections.Add2(connectionName, string.Empty, connectionStringForCmdDefault, commandText, ExcelInterop.XlCmdType.xlCmdDefault);
-        }
-
-        // Add this instance of the ImportSessionInfo class if not present already in the global collection.;
-        if (!Globals.ThisAddIn.StoredImportSessions.Exists(session => session.WorkbookGuid == workbookGuid && session.MySqlTable == MySqlTable && string.Equals(session.ExcelTableName, proposedName, StringComparison.InvariantCultureIgnoreCase)))
-        {
-          Globals.ThisAddIn.StoredImportSessions.Add(this);
-        }
-
-        if (refreshOnCreation)
-        {
-          Refresh();
+          workbook.Connections.Add2(connectionName, string.Empty, workbook.GetConnectionStringForCmdExcel(), commandText, ExcelInterop.XlCmdType.xlCmdExcel, true, false);
         }
       }
       catch (Exception ex)

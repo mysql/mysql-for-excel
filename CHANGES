@@ -1,49 +1,57 @@
 1.3.2
+- Rewrote the code that handles tables relationships in the Import Multiple dialog, relationships are detected for all tables imported to Excel (both the ones in the
+  original selection from the DB objects selection panel and their related ones flagged by the user to be imported).  The relationships are now detected in 2 directions
+  based on MySQL foreign keys and are created in the Excel model if the "Create Excel relationships for imported tables" option is available and checked.  Added code to
+  present a dialog to the users showing relationships that could not be created because of errors found instead of outputting that to the application log. Enhanced the
+  Import Multiple dialog to show all related tables for tables in the original selection as well as their related ones, so users can know in advance what Excel model
+  relationships will be potentially created.
+  (MySQL Bug #73191, Bug #19153946 - RELATIONSHIPS NOT CREATED FOR DB OBJECTS IN ORIGINAL SELECTION)
+  (MySQL Bug #73193, Bug #19154006 - RELATED MYSQL TABLES AND VIEWS ARE DETECTED ONLY IN A SINGLE DIRECTION)
 - Added validation to only enable the checkbox to Add Summary Fields when Excel Table Creation is enabled too.
-  (Bug #18979388 - ADD SUMMARY FIELDS ENABLED EVEN THOUGH EXCEL TABLE CREATION IS DISABLED)
+  (MySQL Bug #73004, Bug #18979388 - ADD SUMMARY FIELDS ENABLED EVEN THOUGH EXCEL TABLE CREATION IS DISABLED)
 - Added code to trigger WokbookAfterSave event handler on Excel 2007 since this version of Excel lacks the ability to trigger this event compared to later versions.
-  This prevented Import and Edit Sessions from being saved correctly. (Bug #19145707 - EDIT AND IMPORT SESSIONS ARE NOT SAVED IN OFFICE 2007 WIN7X64)
+  This prevented Import and Edit Sessions from being saved correctly. (MySQL Bug #73182, Bug #19145707 - EDIT AND IMPORT SESSIONS ARE NOT SAVED IN OFFICE 2007 WIN7X64)
 - Renamed the "Create an Excel table for the imported MySQL table data" advanced option in the Import Data dialogs to "Create an Excel table for the imported MySQL data"
   which is consistent to the fact that we can import not only tables but also views and procedures.
-  (Bug #18979352 - CREATE AN EXCEL TABLE FOR THE IMPORTED MYSQL TABLE DATA OPTION SHOULD BE RENAMED)
+  (MySQL Bug #73003, Bug #18979352 - CREATE AN EXCEL TABLE FOR THE IMPORTED MYSQL TABLE DATA OPTION SHOULD BE RENAMED)
 
 1.3.1
 - Changed the type of custom ribbon for MySQL for Excel to use the XML Ribbon approach of the Excel fluent interface in order to be able to override the native
   functionality for the Refresh and Refresh All ribbon commands, which was not possible using the Visual Designer Ribbon approach.
-  (Bug #18962538 - ERROR WHEN CLICKING REFRESH ALL IN DATA TAB)
+  (MySQL Bug #72974, Bug #18962538 - ERROR WHEN CLICKING REFRESH ALL IN DATA TAB)
 - When the user has created Import Sessions and saved the workbook, the connection these sessions are linked to can be deleted. When the workbook is reopened, these sessions
   had no way to be used any further. Now, a new dialog was created to prompt the user to create a new connection to replace the old one not found and be able to continue
-  working with the same sessions afterwards. (Bug #18961860 - PROMPT FOR CONNECTION CREATION IF NOT FOUND UPON IMPORT SESSION RESTORE)
+  working with the same sessions afterwards. (MySQL Bug #72966, Bug #18961860 - PROMPT FOR CONNECTION CREATION IF NOT FOUND UPON IMPORT SESSION RESTORE)
 - Set the AllowZeroDateTimeValues property value of connections created from stored Edit Sessions being restored to true so they support MySQL zero dates. Fixed also a
   bug preventing Edit Sessions from being restored when starting MySQL from Excel on an already opened Excel workbook.
-  (Bug #18889495 - SAVED EDIT DATA SESSIONS ARE NOT RESTORED IF DATA CONTAINS DATES)
+  (MySQL Bug #72842, Bug #18889495 - SAVED EDIT DATA SESSIONS ARE NOT RESTORED IF DATA CONTAINS DATES)
 - Enhanced the code that refreshes an Excel table to smartly resize it before binding it according to the new size of its data source. If the new size is bigger than
   before, new columns or rows will be inserted to make room for the new Excel table size. Added code to show errors to the user upon Excel tables or PivotTables creation.
-  (Bug #18962617 - IMPORT DOES NOT RETRIEVE DATA AT LEFT COLUMNS FROM A PREVIOUS IMPORT)
+  (MySQL Bug #72975, Bug #18962617 - IMPORT DOES NOT RETRIEVE DATA AT LEFT COLUMNS FROM A PREVIOUS IMPORT)
 - Fixed an issue with Edit Connections in the Welcome Panel, where the selected connection information was not being populated in the Edit Connection Dialog.
-  (Bug #18968777 - EDIT EXISTING CONNECTIONS IS BROKEN)
+  (MySQL Bug #72990, Bug #18968777 - EDIT EXISTING CONNECTIONS IS BROKEN)
 - Fixed the formula applied in the temporary Excel range used to feed the export data for a new MySQL table, the formula now considers the value of the option "First row
-  contains column names" in the Export Data dialog. (Bug #18962470 - DUPLICATE ENTRY FOR AUTOGENERATED PRIMARY KEY COLUMN)
+  contains column names" in the Export Data dialog. (MySQL Bug #72973, Bug #18962470 - DUPLICATE ENTRY FOR AUTOGENERATED PRIMARY KEY COLUMN)
 - Modified the way PivotTables are created to pass to the Excel native methods addresses in R1C1 notation rather than the actual range objects which works in all
-  scenarios (even with big data). (Bug #18962371 - PIVOT TABLE DIALOG NOT DISPLAYED FOR TABLES HOLDING LARGE DATA)
+  scenarios (even with big data). (MySQL Bug #72972, Bug #18962371 - PIVOT TABLE DIALOG NOT DISPLAYED FOR TABLES HOLDING LARGE DATA)
 - Fixed new comparison method to detect the correspondent session's ListObjects by GUID, while also deleting invalid leftover objects.
-  (Bug #18961806 - FIX REFRESH PROBLEM WHEN USERS CHANGE EXCEL TABLE NAMES OF IMPORTED MYSQL DATA)
+  (MySQL Bug #72964, Bug #18961806 - FIX REFRESH PROBLEM WHEN USERS CHANGE EXCEL TABLE NAMES OF IMPORTED MYSQL DATA)
 - Removed the Line and LinearRing types from the list of valid data types supported by the MySQL server, meaning the types do not appear anymore in the Data Type combo
   box located in the Export Data form and are not treated as valid if typed-in by the user. Line and LineaRing are not a part of the SFA-SQL nor SQL/MM-Spatial standards,
-  thus not implemented in the MySQL Server. (Bug #18962184 - DATA TYPE COMBO BOX IN EXPORT DATA DIALOG SHOWING 2 NON-WORKING SPATIAL TYPES)
+  thus not implemented in the MySQL Server. (MySQL Bug #72970, Bug #18962184 - DATA TYPE COMBO BOX IN EXPORT DATA DIALOG SHOWING 2 NON-WORKING SPATIAL TYPES)
 - Fixed some conditions in the code that was preventing relationships for selected tables and views (multi-selection) to be processed, so related tables and views were
-  not found and listed in the Multiple Import dialog. (Bug #18962354 - NO TABLE RELATIONS DETECTED IN OFFICE 2007 AND 2010)
+  not found and listed in the Multiple Import dialog. (MySQL Bug #72971, Bug #18962354 - NO TABLE RELATIONS DETECTED IN OFFICE 2007 AND 2010)
 - Changed the way connections are created for Excel 2013, instead of creating a connection for an Excel command type we create a default command type one (like we do for
-  Excel 2007 and 2010) which fixes this particular bug. (Bug #18962670 - IMPORTING SAME TABLE TWICE FAILS AFTER DELETING EXCEL TABLE LINKED TO THE FIRST)
+  Excel 2007 and 2010) which fixes this particular bug. (MySQL Bug #72976, Bug #18962670 - IMPORTING SAME TABLE TWICE FAILS AFTER DELETING EXCEL TABLE LINKED TO THE FIRST)
 - Added new functionality to the Data Type combo box for Enum and Set types. When all data types are being shown in the Export Data dialog (via advanced option), if the
   user selects Enum or Set, the list of valid values for the type declaration is assembled automatically from the column's data so there is no need to type the list of
   values that goes between parenthesis manually.
 - Fixed a bug in the Export Data dialog where data types containing parenthesis entered manually in the Data Type combo box for new columns were not validated correctly.
-  (Bug #18962214 - DATA TYPES ENTERED MANUALLY IN DATA TYPE COMBO BOX ARE NOT VALIDATED CORRECTLY.)
+  (MySQL Bug #72970, Bug #18962214 - DATA TYPES ENTERED MANUALLY IN DATA TYPE COMBO BOX ARE NOT VALIDATED CORRECTLY.)
 - Fixed a cosmetic problem on the graphical list of connections, schemas and database objects where the text of each list item turned bold when hovering the mouse over.
-  (Bug #18962130 - FIX PROBLEM WITH BOLD LETTERS IN MYSQLLISTVIEW.)
+  (MySQL Bug #72968, Bug #18962130 - FIX PROBLEM WITH BOLD LETTERS IN MYSQLLISTVIEW.)
 - Implemented the use of <CTRL>+<A> as a shortcut in the list of database objects to select all MySQL tables and views.
-  (Bug #18961544 - IMPLEMENT CTRL+A IN TREE-VIEW TO SELECT ALL TABLES AND VIEWS)
+  (MySQL Bug #72963, Bug #18961544 - IMPLEMENT CTRL+A IN TREE-VIEW TO SELECT ALL TABLES AND VIEWS)
 
 1.3.0
 - Added new feature to allow the selection of multiple tables and views in the Database Objects panel, the multiple selection can be done by using the CTRL or SHIFT keys

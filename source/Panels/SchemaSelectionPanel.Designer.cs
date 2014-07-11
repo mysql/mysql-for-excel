@@ -32,10 +32,21 @@ namespace MySQL.ForExcel.Panels
     /// <param name="disposing"><c>true</c> if managed resources should be disposed; otherwise, <c>false</c>.</param>
     protected override void Dispose(bool disposing)
     {
-      if (disposing && (components != null))
+      if (disposing)
       {
-        components.Dispose();
+        if (components != null)
+        {
+          components.Dispose();
+        }
+
+        _wbConnection = null;
+        if (LoadedSchemas != null)
+        {
+          LoadedSchemas.ForEach(dbo => dbo.Dispose());
+          LoadedSchemas.Clear();
+        }
       }
+
       base.Dispose(disposing);
     }
 

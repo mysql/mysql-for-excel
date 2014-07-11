@@ -66,7 +66,7 @@ namespace MySQL.ForExcel.Panels
       UserIPLabel.Paint += Label_Paint;
       InheritFontToControlsExceptionList.Add(SelectSchemaHotLabel.Name);
       InheritFontToControlsExceptionList.Add(CreateNewSchemaHotLabel.Name);
-      LoadedSchemas = new List<DbObject>();
+      LoadedSchemas = new List<DbSchema>();
       SchemasList.AddHeaderNode("Schemas");
       SchemasList.AddHeaderNode("System Schemas");
     }
@@ -77,7 +77,7 @@ namespace MySQL.ForExcel.Panels
     /// Gets a list of schemas loaded in this panel.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<DbObject> LoadedSchemas { get; private set; }
+    public List<DbSchema> LoadedSchemas { get; private set; }
 
     #endregion Properties
 
@@ -147,6 +147,7 @@ namespace MySQL.ForExcel.Panels
         // Avoids flickering of schemas list while adding the items to it.
         SchemasList.BeginUpdate();
 
+        LoadedSchemas.ForEach(schema => schema.Dispose());
         LoadedSchemas.Clear();
         foreach (TreeNode node in SchemasList.Nodes)
         {
@@ -166,7 +167,7 @@ namespace MySQL.ForExcel.Panels
 
           string lcSchemaName = schemaName.ToLowerInvariant();
           var headerNode = SchemasList.HeaderNodes[_systemSchemasListValues.Contains(lcSchemaName) ? 1 : 0];
-          var schemaObject = new DbObject(schemaName, DbObject.DbObjectType.Schema);
+          var schemaObject = new DbSchema(_wbConnection, schemaName);
           LoadedSchemas.Add(schemaObject);
           var node = SchemasList.AddDbObjectNode(headerNode, schemaObject);
           node.ImageIndex = 0;

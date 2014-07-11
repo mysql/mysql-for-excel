@@ -57,9 +57,9 @@ namespace MySQL.ForExcel.Panels
       _excelSelectionContainsData = false;
       _wbConnection = null;
       Filter = string.Empty;
-      LoadedProcedures = new List<DbObject>();
-      LoadedTables = new List<DbObject>();
-      LoadedViews = new List<DbObject>();
+      LoadedProcedures = new List<DbProcedure>();
+      LoadedTables = new List<DbTable>();
+      LoadedViews = new List<DbView>();
       InitializeComponent();
 
       ConnectionNameLabel.Paint += Label_Paint;
@@ -116,7 +116,7 @@ namespace MySQL.ForExcel.Panels
       {
         _excelSelectionContainsData = value;
         ExportToNewTableHotLabel.Enabled = value;
-        AppendDataHotLabel.Enabled = value && CurrentSelectedDbObject != null && CurrentSelectedDbObject.Type == DbObject.DbObjectType.Table;
+        AppendDataHotLabel.Enabled = value && CurrentSelectedDbObject is DbTable;
       }
     }
 
@@ -130,19 +130,19 @@ namespace MySQL.ForExcel.Panels
     /// Gets a list of stored procedures loaded in this panel.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<DbObject> LoadedProcedures { get; private set; }
+    public List<DbProcedure> LoadedProcedures { get; private set; }
 
     /// <summary>
     /// Gets a list of tables loaded in this panel.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<DbObject> LoadedTables { get; private set; }
+    public List<DbTable> LoadedTables { get; private set; }
 
     /// <summary>
     /// Gets a list of views loaded in this panel.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<DbObject> LoadedViews { get; private set; }
+    public List<DbView> LoadedViews { get; private set; }
 
     /// <summary>
     /// Gets a <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.
@@ -191,7 +191,7 @@ namespace MySQL.ForExcel.Panels
 
       DbObject dbObj = CurrentSelectedDbObject;
       bool isSelected = dbObj != null;
-      bool isTable = isSelected && dbObj.Type == DbObject.DbObjectType.Table;
+      bool isTable = dbObj is DbTable;
       bool tableNameMatches = isSelected && isTable && !string.IsNullOrEmpty(tableName) && dbObj.Name == tableName;
       ImportDataHotLabel.Enabled = isSelected;
       EditDataHotLabel.Enabled = isSelected && isTable && !editActive;
@@ -206,7 +206,7 @@ namespace MySQL.ForExcel.Panels
     private void AppendDataHotLabel_Click(object sender, EventArgs e)
     {
       var selectedNode = DBObjectList.SelectedNode;
-      if (selectedNode == null || selectedNode.Type != MySqlListViewNode.MySqlNodeType.DbObject || selectedNode.DbObject.Type != DbObject.DbObjectType.Table || WbConnection == null)
+      if (selectedNode == null || selectedNode.Type != MySqlListViewNode.MySqlNodeType.DbObject || !(selectedNode.DbObject is DbTable) || WbConnection == null)
       {
         return;
       }
@@ -219,7 +219,7 @@ namespace MySQL.ForExcel.Panels
 
       try
       {
-        ExportDataToTable(selectedNode.DbObject);
+        ExportDataToTable(selectedNode.DbObject as DbTable);
       }
       catch (Exception ex)
       {
@@ -275,7 +275,7 @@ namespace MySQL.ForExcel.Panels
       if (listControl.SelectedNodes.Count > 1)
       {
         // Check if procedures are among the multiple selection, if so cancel the multi-selection since procedures are not allowed in it.
-        var proceduresInSelection = listControl.SelectedNodes.Any(node => node.DbObject.Type == DbObject.DbObjectType.Procedure);
+        var proceduresInSelection = listControl.SelectedNodes.Any(node => node.DbObject is DbProcedure);
         if (proceduresInSelection)
         {
           listControl.SelectedNode = e.Node as MySqlListViewNode;
@@ -303,8 +303,7 @@ namespace MySQL.ForExcel.Panels
       ImportRelatedToolStripMenuItem.Visible = DBObjectList.SelectedNodes.Count == 1
         && DBObjectList.SelectedNode != null
         && DBObjectList.SelectedNode.Type == MySqlListViewNode.MySqlNodeType.DbObject
-        && (DBObjectList.SelectedNode.DbObject.Type == DbObject.DbObjectType.Table
-            || DBObjectList.SelectedNode.DbObject.Type == DbObject.DbObjectType.View);
+        && DBObjectList.SelectedNode.DbObject is DbTable;
     }
 
     /// <summary>
@@ -339,7 +338,8 @@ namespace MySQL.ForExcel.Panels
     private void EditDataHotLabel_Click(object sender, EventArgs e)
     {
       var selectedNode = DBObjectList.SelectedNode;
-      if (selectedNode == null || selectedNode.Type != MySqlListViewNode.MySqlNodeType.DbObject || selectedNode.DbObject == null || selectedNode.DbObject.Type != DbObject.DbObjectType.Table || WbConnection == null)
+      var selectedTable = selectedNode.DbObject as DbTable;
+      if (selectedNode == null || selectedNode.Type != MySqlListViewNode.MySqlNodeType.DbObject || selectedTable == null || WbConnection == null)
       {
         return;
       }
@@ -353,7 +353,7 @@ namespace MySQL.ForExcel.Panels
       try
       {
         var excelAddInPane = Parent as ExcelAddInPane;
-        EditDataHotLabel.Enabled = excelAddInPane != null && !excelAddInPane.EditTableData(selectedNode.DbObject, false, null);
+        EditDataHotLabel.Enabled = excelAddInPane != null && !excelAddInPane.EditTableData(selectedTable, false, null);
       }
       catch (Exception ex)
       {
@@ -367,7 +367,7 @@ namespace MySQL.ForExcel.Panels
     /// </summary>
     /// <param name="appendToTable">Table to append the data to, if null exports to a new table.</param>
     /// <returns><c>true</c> if data was exported/appended successfully, <c>false</c> otherwise.</returns>
-    private bool ExportDataToTable(DbObject appendToTable)
+    private bool ExportDataToTable(DbTable appendToTable)
     {
       var excelAddInPane = Parent as ExcelAddInPane;
       return excelAddInPane != null && excelAddInPane.AppendDataToTable(appendToTable);
@@ -404,7 +404,7 @@ namespace MySQL.ForExcel.Panels
       else
       {
         // This is the correct render method for Windows Vista and newer OS versions.
-        LoadDataObjects(DbObject.DbObjectType.Table);
+        LoadTables();
         RefreshDbObjectsList(false);
       }
 
@@ -448,28 +448,41 @@ namespace MySQL.ForExcel.Panels
 
       try
       {
-        switch (selectedNode.DbObject.Type)
+        Cursor = Cursors.WaitCursor;
+        if (selectedNode.DbObject is DbTable)
         {
-          case DbObject.DbObjectType.Table:
-          case DbObject.DbObjectType.View:
-            using (var importForm = new ImportTableViewForm(WbConnection, selectedNode.DbObject, parentTaskPane.ActiveWorkbook.ActiveSheet.Name, parentTaskPane.ActiveWorkbook.Excel8CompatibilityMode, false))
-            {
-              importForm.ShowDialog();
-            }
-            break;
-
-          case DbObject.DbObjectType.Procedure:
-            using (var importProcedureForm = new ImportProcedureForm(WbConnection, selectedNode.DbObject, parentTaskPane.ActiveWorksheet.Name, parentTaskPane.ActiveWorkbook.Excel8CompatibilityMode))
-            {
-              importProcedureForm.ShowDialog();
-            }
-            break;
+          var dbTable = selectedNode.DbObject as DbTable;
+          dbTable.ImportParameters.ForEditDataOperation = false;
+          using (var importForm = new ImportTableViewForm(selectedNode.DbObject as DbTable, parentTaskPane.ActiveWorkbook.ActiveSheet.Name))
+          {
+            importForm.ShowDialog();
+          }
+        }
+        else if (selectedNode.DbObject is DbView)
+        {
+          var dbView = selectedNode.DbObject as DbView;
+          dbView.ImportParameters.ForEditDataOperation = false;
+          using (var importForm = new ImportTableViewForm(dbView, parentTaskPane.ActiveWorkbook.ActiveSheet.Name))
+          {
+            importForm.ShowDialog();
+          }
+        }
+        else if (selectedNode.DbObject is DbProcedure)
+        {
+          using (var importProcedureForm = new ImportProcedureForm(selectedNode.DbObject as DbProcedure, parentTaskPane.ActiveWorksheet.Name))
+          {
+            importProcedureForm.ShowDialog();
+          }
         }
       }
       catch (Exception ex)
       {
         MiscUtilities.ShowCustomizedErrorDialog(Resources.ImportDataErrorTitle, ex.Message, true);
         MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
+      finally
+      {
+        Cursor = Cursors.Default;
       }
     }
 
@@ -489,12 +502,21 @@ namespace MySQL.ForExcel.Panels
     /// <param name="selectAllRelatedDbObjects">Flag indicating whether all found related tables or views are selected by default.</param>
     private void ImportMultipleDbObjects(bool selectAllRelatedDbObjects)
     {
-      var tablesAndViewsList = new List<DbObject>(LoadedTables);
+      var passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
+      if (!passwordFlags.ConnectionSuccess)
+      {
+        return;
+      }
+
+      var tablesAndViewsList = new List<DbView>(LoadedTables);
       tablesAndViewsList.AddRange(LoadedViews);
-      using (var importDialog = new ImportMultipleDialog(WbConnection, tablesAndViewsList, Globals.ThisAddIn.Application.ActiveWorkbook.Excel8CompatibilityMode, selectAllRelatedDbObjects))
+      Cursor = Cursors.WaitCursor;
+      using (var importDialog = new ImportMultipleDialog(tablesAndViewsList, selectAllRelatedDbObjects))
       {
         importDialog.ShowDialog();
       }
+
+      Cursor = Cursors.Default;
     }
 
     /// <summary>
@@ -508,46 +530,51 @@ namespace MySQL.ForExcel.Panels
     }
 
     /// <summary>
-    /// Fetches all DB object names of the given type from the current connection and loads them in the <see cref="DBObjectList"/> tree.
+    /// Fetches all MySQL store procedure names of the given type from the current connection and loads them in the <see cref="LoadedProcedures"/> list.
     /// </summary>
-    /// <param name="dataObjectType">Type of DB object to load.</param>
-    private void LoadDataObjects(DbObject.DbObjectType dataObjectType)
+    private void LoadProcedures()
     {
-      DataTable dataObjects = null;
-      string objectName = string.Empty;
-      List<DbObject> loadedObjectsList = null;
-
-      // 0 - Tables
-      // 1 - Views
-      // 2 - Procedures
-      switch (dataObjectType)
-      {
-        case DbObject.DbObjectType.Procedure:
-          dataObjects = WbConnection.GetSchemaCollection("Procedures", null, WbConnection.Schema, null, "PROCEDURE");
-          objectName = "ROUTINE_NAME";
-          loadedObjectsList = LoadedProcedures;
-          break;
-
-        case DbObject.DbObjectType.Table:
-          dataObjects = WbConnection.GetSchemaCollection("Tables", null, WbConnection.Schema);
-          objectName = "TABLE_NAME";
-          loadedObjectsList = LoadedTables;
-          break;
-
-        case DbObject.DbObjectType.View:
-          dataObjects = WbConnection.GetSchemaCollection("Views", null, WbConnection.Schema);
-          objectName = "TABLE_NAME";
-          loadedObjectsList = LoadedViews;
-          break;
-      }
-
-      if (dataObjects == null)
+      var proceduresTable = WbConnection.GetSchemaCollection("Procedures", null, WbConnection.Schema, null, "PROCEDURE");
+      if (proceduresTable == null)
       {
         return;
       }
 
-      loadedObjectsList.Clear();
-      loadedObjectsList.AddRange(dataObjects.Rows.Cast<DataRow>().Select(dataRow => dataRow[objectName].ToString()).Select(dbObjectName => new DbObject(dbObjectName, dataObjectType)));
+      LoadedProcedures.ForEach(dbo => dbo.Dispose());
+      LoadedProcedures.Clear();
+      LoadedProcedures.AddRange(proceduresTable.Rows.Cast<DataRow>().Select(dataRow => dataRow["ROUTINE_NAME"].ToString()).Select(procedureName => new DbProcedure(_wbConnection, procedureName)));
+    }
+
+    /// <summary>
+    /// Fetches all MySQL table names of the given type from the current connection and loads them in the <see cref="LoadedProcedures"/> list.
+    /// </summary>
+    private void LoadTables()
+    {
+      var tablesTable = WbConnection.GetSchemaCollection("Tables", null, WbConnection.Schema);
+      if (tablesTable == null)
+      {
+        return;
+      }
+
+      LoadedTables.ForEach(dbo => dbo.Dispose());
+      LoadedTables.Clear();
+      LoadedTables.AddRange(tablesTable.Rows.Cast<DataRow>().Select(dataRow => dataRow["TABLE_NAME"].ToString()).Select(tableName => new DbTable(_wbConnection, tableName)));
+    }
+
+    /// <summary>
+    /// Fetches all MySQL table names of the given type from the current connection and loads them in the <see cref="LoadedProcedures"/> list.
+    /// </summary>
+    private void LoadViews()
+    {
+      var viewsTable = WbConnection.GetSchemaCollection("Views", null, WbConnection.Schema);
+      if (viewsTable == null)
+      {
+        return;
+      }
+
+      LoadedViews.ForEach(dbo => dbo.Dispose());
+      LoadedViews.Clear();
+      LoadedViews.AddRange(viewsTable.Rows.Cast<DataRow>().Select(dataRow => dataRow["TABLE_NAME"].ToString()).Select(viewName => new DbView(_wbConnection, viewName)));
     }
 
     /// <summary>
@@ -586,8 +613,7 @@ namespace MySQL.ForExcel.Panels
     /// Refreshes the DB objects list control with current objects in the connected schema.
     /// </summary>
     /// <param name="reloadFromServer">Flag indicating whether DB objects must be reloaded from the connected MySQL server.</param>
-    /// <param name="includeTypes">Flags indicating what DB object types are included on the refresh.</param>
-    private void RefreshDbObjectsList(bool reloadFromServer, DbObject.DbObjectType includeTypes = DbObject.ALL_DB_OBJECT_TYPES)
+    private void RefreshDbObjectsList(bool reloadFromServer)
     {
       if (DBObjectList.HeaderNodes.Count < 3)
       {
@@ -602,57 +628,33 @@ namespace MySQL.ForExcel.Panels
         DBObjectList.ClearNodes();
         if (reloadFromServer)
         {
-          LoadDataObjects(DbObject.DbObjectType.Table);
-          LoadDataObjects(DbObject.DbObjectType.View);
-          LoadDataObjects(DbObject.DbObjectType.Procedure);
+          LoadTables();
+          LoadViews();
+          LoadProcedures();
         }
 
-        // 1 - Table
-        // 2 - View
-        // 4 - Procedure
-        foreach (DbObject.DbObjectType dbObjectType in Enum.GetValues(typeof(DbObject.DbObjectType)))
+        // Refresh Tables
+        foreach (var dbTable in LoadedTables.Where(table => string.IsNullOrEmpty(Filter) || table.Name.ToUpper().Contains(Filter)))
         {
-          var andValue = (short)(dbObjectType & includeTypes);
-          if (andValue == 0)
-          {
-            continue;
-          }
+          var node = DBObjectList.AddDbObjectNode(DBObjectList.HeaderNodes[0], dbTable);
+          dbTable.Selected = false;
+          node.ImageIndex = 0;
+        }
 
-          int imageIndex = -1;
-          List<DbObject> objectsList = null;
-          MySqlListViewNode parentNode = null;
-          switch (dbObjectType)
-          {
-            case DbObject.DbObjectType.Table:
-              imageIndex = 0;
-              objectsList = LoadedTables;
-              parentNode = DBObjectList.HeaderNodes[0];
-              break;
+        // Refresh Views
+        foreach (var dbView in LoadedViews.Where(view => string.IsNullOrEmpty(Filter) || view.Name.ToUpper().Contains(Filter)))
+        {
+          var node = DBObjectList.AddDbObjectNode(DBObjectList.HeaderNodes[1], dbView);
+          dbView.Selected = false;
+          node.ImageIndex = 1;
+        }
 
-            case DbObject.DbObjectType.View:
-              imageIndex = 1;
-              objectsList = LoadedViews;
-              parentNode = DBObjectList.HeaderNodes[1];
-              break;
-
-            case DbObject.DbObjectType.Procedure:
-              imageIndex = 2;
-              objectsList = LoadedProcedures;
-              parentNode = DBObjectList.HeaderNodes[2];
-              break;
-          }
-
-          if (parentNode == null || objectsList == null)
-          {
-            continue;
-          }
-
-          foreach (var dbObject in objectsList.Where(dbObject => string.IsNullOrEmpty(Filter) || dbObject.Name.ToUpper().Contains(Filter)))
-          {
-            var node = DBObjectList.AddDbObjectNode(parentNode, dbObject);
-            dbObject.Selected = false;
-            node.ImageIndex = imageIndex;
-          }
+        // Refresh Procedures
+        foreach (var dbProcedure in LoadedProcedures.Where(procedure => string.IsNullOrEmpty(Filter) || procedure.Name.ToUpper().Contains(Filter)))
+        {
+          var node = DBObjectList.AddDbObjectNode(DBObjectList.HeaderNodes[2], dbProcedure);
+          dbProcedure.Selected = false;
+          node.ImageIndex = 2;
         }
 
         DBObjectList.ExpandAll();

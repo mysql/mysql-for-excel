@@ -28,7 +28,6 @@ using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
-using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 
@@ -55,6 +54,11 @@ namespace MySQL.ForExcel.Forms
     /// The Excel range containing the data to append to a MySQL table.
     /// </summary>
     private Excel.Range _appendDataRange;
+
+    /// <summary>
+    /// The <see cref="DbTable"/> to which to append data to.
+    /// </summary>
+    private DbTable _appendDbTable;
 
     /// <summary>
     /// The column mapping currently being used in the append session.
@@ -92,10 +96,6 @@ namespace MySQL.ForExcel.Forms
     private int _gridTargetTableColumnIndexToDrop;
 
     /// <summary>
-    /// The _import database object.
-    /// </summary>
-    private DbObject _importDbObject;
-    /// <summary>
     /// The reference point used in drag and drop operations.
     /// </summary>
     private Point _screenOffset;
@@ -115,27 +115,26 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private readonly Cursor _trashCursor;
 
-    /// <summary>
-    /// The connection to a MySQL server instance selected by users.
-    /// </summary>
-    private MySqlWorkbenchConnection _wbConnection;
-
     #endregion Fields
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AppendDataForm"/> class.
     /// </summary>
-    /// <param name="wbConnection">The connection to a MySQL server instance selected by users.</param>
+    /// <param name="appendDbTable">The <see cref="DbTable"/> to which to append data to.</param>
     /// <param name="appendDataRange">The Excel range containing the data to append to a MySQL table.</param>
-    /// <param name="importDbObject">The database object to which to append data to.</param>
     /// <param name="appendingWorksheetName">The name of the worksheet holding the appending data.</param>
-    public AppendDataForm(MySqlWorkbenchConnection wbConnection, Excel.Range appendDataRange, DbObject importDbObject, string appendingWorksheetName)
+    public AppendDataForm(DbTable appendDbTable, Excel.Range appendDataRange, string appendingWorksheetName)
     {
+      if (appendDbTable == null)
+      {
+        throw new ArgumentNullException("appendDbTable");
+      }
+
       _appendDataRange = appendDataRange;
+      _appendDbTable = appendDbTable;
       _columnsMappingInFileList = new MySqlColumnMappingList();
       _sourceMySqlPreviewDataTable = null;
       _targetMySqlPreviewDataTable = null;
-      _wbConnection = wbConnection;
 
       _dragBoxFromMouseDown = Rectangle.Empty;
       _draggingCursor = new Bitmap(Resources.MySQLforExcel_Cursor_Dragging_32x32).CreateCursor(3, 3);
@@ -144,7 +143,6 @@ namespace MySQL.ForExcel.Forms
       _gridColumnIndexToDrag = -1;
       _gridTargetTableColumnIndexToDrop = -1;
       _trashCursor = new Bitmap(Resources.MySQLforExcel_Cursor_Trash_32x32).CreateCursor(3, 3);
-      _importDbObject = importDbObject;
 
       InitializeComponent();
 
@@ -202,7 +200,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void AdvancedOptionsButton_Click(object sender, EventArgs e)
     {
-      using (AppendAdvancedOptionsDialog optionsDialog = new AppendAdvancedOptionsDialog())
+      using (var optionsDialog = new AppendAdvancedOptionsDialog())
       {
         optionsDialog.ShowDialog();
         if (!optionsDialog.ParentFormRequiresRefresh)
@@ -211,6 +209,7 @@ namespace MySQL.ForExcel.Forms
         }
 
         InitializeSourceTableGrid();
+        InitializeTargetTableGrid();
         for (int targetColumnIndex = 0; targetColumnIndex < _currentColumnMapping.MappedSourceIndexes.Length; targetColumnIndex++)
         {
           int mappedSourceColumnIndex = _currentColumnMapping.MappedSourceIndexes[targetColumnIndex];
@@ -384,7 +383,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       if (Settings.Default.AppendAutoStoreColumnMapping
-          && !StoredColumnMappingsList.Exists(mapping => mapping.ConnectionName == _wbConnection.Name && mapping.SchemaName == _wbConnection.Schema && mapping.TableName == targetMySqlFinalDataTable.TableName))
+          && !StoredColumnMappingsList.Exists(mapping => mapping.ConnectionName == _appendDbTable.Connection.Name && mapping.SchemaName == _appendDbTable.Connection.Schema && mapping.TableName == targetMySqlFinalDataTable.TableName))
       {
         StoreCurrentColumnMapping(false);
       }
@@ -653,10 +652,10 @@ namespace MySQL.ForExcel.Forms
     {
       MySqlColumnMapping autoMapping = new MySqlColumnMapping("Automatic", _sourceMySqlPreviewDataTable.GetColumnNamesArray(true), _targetMySqlPreviewDataTable.GetColumnNamesArray())
       {
-        SchemaName = _wbConnection.Schema,
+        SchemaName = _appendDbTable.Connection.Schema,
         TableName = _targetMySqlPreviewDataTable.TableName,
-        ConnectionName = _wbConnection.Name,
-        Port = _wbConnection.Port
+        ConnectionName = _appendDbTable.Connection.Name,
+        Port = _appendDbTable.Connection.Port
       };
       int autoMappedColumns = 0;
 
@@ -723,10 +722,10 @@ namespace MySQL.ForExcel.Forms
       {
         manualMapping = new MySqlColumnMapping(_sourceMySqlPreviewDataTable.GetColumnNamesArray(), _targetMySqlPreviewDataTable.GetColumnNamesArray())
         {
-          SchemaName = _wbConnection.Schema,
+          SchemaName = _appendDbTable.Connection.Schema,
           TableName = _targetMySqlPreviewDataTable.TableName,
-          ConnectionName = _wbConnection.Name,
-          Port = _wbConnection.Port
+          ConnectionName = _appendDbTable.Connection.Name,
+          Port = _appendDbTable.Connection.Port
         };
       }
       else
@@ -1017,8 +1016,8 @@ namespace MySQL.ForExcel.Forms
     private void InitializeSourceTableGrid()
     {
       _sourceMySqlPreviewDataTable = new MySqlDataTable(
-        _wbConnection,
-        _importDbObject.Name,
+        _appendDbTable.Connection,
+        _appendDbTable.Name,
         false,
         Settings.Default.AppendUseFormattedValues,
         true,
@@ -1046,12 +1045,13 @@ namespace MySQL.ForExcel.Forms
     private void InitializeTargetTableGrid()
     {
       _targetMySqlPreviewDataTable = new MySqlDataTable(
-        _wbConnection,
-        _importDbObject.Name,
+        _appendDbTable.Connection,
+        _appendDbTable.Name,
         true,
         false,
         Settings.Default.AppendUseFormattedValues);
-      DataTable dt = _wbConnection.GetDataFromTableOrView(_importDbObject.Name, null, 0, Settings.Default.AppendLimitPreviewRowsQuantity);
+      SetPreviewParameterValues();
+      DataTable dt = _appendDbTable.GetData();
       foreach (object[] rowValues in from DataRow dr in dt.Rows select dr.ItemArray)
       {
         for (int colIdx = 0; colIdx < dt.Columns.Count; colIdx++)
@@ -1062,7 +1062,7 @@ namespace MySQL.ForExcel.Forms
         _targetMySqlPreviewDataTable.LoadDataRow(rowValues, true);
       }
 
-      _wbConnection.GetRowsCountFromTableOrView(_importDbObject);
+      _appendDbTable.GetRowsCount();
       TargetMySQLTableDataGridView.DataSource = _targetMySqlPreviewDataTable;
       foreach (DataGridViewColumn gridCol in TargetMySQLTableDataGridView.Columns)
       {
@@ -1211,6 +1211,17 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
+    /// Sets the import parameter values into the database object.
+    /// This is needed before getting any data from it.
+    /// </summary>
+    private void SetPreviewParameterValues()
+    {
+      _appendDbTable.ImportParameters.ColumnsNamesList = null;
+      _appendDbTable.ImportParameters.FirstRowIndex = 0;
+      _appendDbTable.ImportParameters.RowsCount = Settings.Default.AppendLimitPreviewRowsQuantity;
+    }
+
+    /// <summary>
     /// Event delegate method fired when the <see cref="SourceExcelDataDataGridView"/> data binding is complete.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -1240,21 +1251,19 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     /// <param name="mapping">Column mapping object to save.</param>
     /// <returns><c>true</c> if the mapping object did not exist in file already, <c>false</c> otherwise.</returns>
-    private bool StoreColumnMappingInFile(MySqlColumnMapping mapping)
+    private void StoreColumnMappingInFile(MySqlColumnMapping mapping)
     {
       if (StoredColumnMappingsList.Contains(mapping))
       {
-        return false;
+        return;
       }
 
-      MySqlColumnMappingList userList = new MySqlColumnMappingList();
+      var userList = new MySqlColumnMappingList();
       bool result = userList.Add(mapping);
       if (result)
       {
         RefreshMappingMethodCombo();
       }
-
-      return result;
     }
 
     /// <summary>
@@ -1289,9 +1298,9 @@ namespace MySQL.ForExcel.Forms
 
       // Initialize connection and DBObject information
       _currentColumnMapping.Name = proposedMappingName;
-      _currentColumnMapping.ConnectionName = _wbConnection.Name;
-      _currentColumnMapping.Port = _wbConnection.Port;
-      _currentColumnMapping.SchemaName = _wbConnection.Schema;
+      _currentColumnMapping.ConnectionName = _appendDbTable.Connection.Name;
+      _currentColumnMapping.Port = _appendDbTable.Connection.Port;
+      _currentColumnMapping.SchemaName = _appendDbTable.Connection.Schema;
       _currentColumnMapping.TableName = _targetMySqlPreviewDataTable.TableName;
 
       StoreColumnMappingInFile(_currentColumnMapping);

@@ -24,7 +24,6 @@ using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
-using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
 
 namespace MySQL.ForExcel.Forms
@@ -37,9 +36,9 @@ namespace MySQL.ForExcel.Forms
     #region Fields
 
     /// <summary>
-    /// The type of DB object (MySQL table or view) to preview data for.
+    /// The MySQL table or view to preview data for.
     /// </summary>
-    private DbObject _previewDbObject;
+    private readonly DbView _previewTableOrView;
 
     /// <summary>
     /// A <see cref="DataTable"/> object containing a subset of the whole data which is shown in the preview grid.
@@ -51,29 +50,27 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private long _totalRowsCount;
 
-    /// <summary>
-    /// The connection to a MySQL server instance selected by users.
-    /// </summary>
-    private MySqlWorkbenchConnection _wbConnection;
-
     #endregion Fields
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PreviewTableViewDialog"/> class.
     /// </summary>
-    /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <param name="previewDbObject">The type of DB object (MySQL table or view) to preview data for.</param>
-    public PreviewTableViewDialog(MySqlWorkbenchConnection wbConnection, DbObject previewDbObject)
+    /// <param name="previewTableOrView">The type of DB object (MySQL table or view) to preview data for.</param>
+    public PreviewTableViewDialog(DbView previewTableOrView)
     {
+      if (previewTableOrView == null)
+      {
+        throw new ArgumentNullException("previewTableOrView");
+      }
+
       _previewDataTable = null;
-      _previewDbObject = previewDbObject;
-      _wbConnection = wbConnection;
+      _previewTableOrView = previewTableOrView;
 
       InitializeComponent();
 
       RowsNumericUpDown.Value = Settings.Default.ImportPreviewRowsQuantity;
-      TableNameMainLabel.Text = previewDbObject.Type + @" Name:";
-      TableNameSubLabel.Text = previewDbObject.Name;
+      TableNameMainLabel.Text = previewTableOrView is DbTable ? "Table Name" : "View Name";
+      TableNameSubLabel.Text = previewTableOrView.Name;
       FillPreviewGrid();
     }
 
@@ -102,8 +99,9 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void FillPreviewGrid()
     {
-      _previewDataTable = _wbConnection.GetDataFromTableOrView(_previewDbObject.Name, null, 0, (int)RowsNumericUpDown.Value);
-      _totalRowsCount = _wbConnection.GetRowsCountFromTableOrView(_previewDbObject);
+      SetImportParameterValues();
+      _previewDataTable = _previewTableOrView.GetData();
+      _totalRowsCount = _previewTableOrView.GetRowsCount();
       RowsCountSubLabel.Text = _totalRowsCount.ToString(CultureInfo.InvariantCulture);
       PreviewDataGridView.DataSource = _previewDataTable;
       foreach (DataGridViewColumn gridCol in PreviewDataGridView.Columns)
@@ -140,7 +138,7 @@ namespace MySQL.ForExcel.Forms
       try
       {
         var img = (byte[])(PreviewDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex]).Value;
-        using (MemoryStream ms = new MemoryStream(img))
+        using (var ms = new MemoryStream(img))
         {
           Image.FromStream(ms);
         }
@@ -164,6 +162,17 @@ namespace MySQL.ForExcel.Forms
     private void RefreshButton_Click(object sender, EventArgs e)
     {
       FillPreviewGrid();
+    }
+
+    /// <summary>
+    /// Sets the import parameter values into the database object.
+    /// This is needed before getting any data from it.
+    /// </summary>
+    private void SetImportParameterValues()
+    {
+      _previewTableOrView.ImportParameters.ColumnsNamesList = null;
+      _previewTableOrView.ImportParameters.FirstRowIndex = 0;
+      _previewTableOrView.ImportParameters.RowsCount = (int)RowsNumericUpDown.Value;
     }
   }
 }

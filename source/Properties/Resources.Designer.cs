@@ -853,6 +853,24 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Some Excel Model Relationships could not be created because errors were found..
+        /// </summary>
+        internal static string ExcelRelationshipsCreationErrorDetail {
+            get {
+                return ResourceManager.GetString("ExcelRelationshipsCreationErrorDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Excel Model Relationships Creation Error.
+        /// </summary>
+        internal static string ExcelRelationshipsCreationErrorTitle {
+            get {
+                return ResourceManager.GetString("ExcelRelationshipsCreationErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error ocurred trying to create the Excel table {0}.
         /// </summary>
         internal static string ExcelTableCreationError {
@@ -1319,6 +1337,33 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Model Relationships are not supported in the current Excel version..
+        /// </summary>
+        internal static string ModelRelationshipsNotSupportedError {
+            get {
+                return ResourceManager.GetString("ModelRelationshipsNotSupportedError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A Model Table Column defining the relationship was not found in one or both Model Table objects..
+        /// </summary>
+        internal static string ModelTableColumnsNotFoundError {
+            get {
+                return ResourceManager.GetString("ModelTableColumnsNotFoundError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A Model Table was not found for one or both tables in the relationship..
+        /// </summary>
+        internal static string ModelTablesNotFoundError {
+            get {
+                return ResourceManager.GetString("ModelTablesNotFoundError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Operation can only be performed with 1 area selected, multiple selections are not supported..
         /// </summary>
         internal static string MultipleAreasNotSupportedWarningDetail {
@@ -1528,6 +1573,16 @@ namespace MySQL.ForExcel.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap MySQLforExcel_MultiSelectObject_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_MultiSelectObject_32x32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_AppendData_24x24 {
             get {
                 object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_AppendData_24x24", resourceCulture);
@@ -1668,29 +1723,19 @@ namespace MySQL.ForExcel.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_MultiSelectObject_32x32 {
-            get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_MultiSelectObject_32x32", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_RelatedObjects_32x32 {
-            get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_RelatedObjects_32x32", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap MySQLforExcel_ObjectPanel_SelectObject_24x24 {
             get {
                 object obj = ResourceManager.GetObject("MySQLforExcel_ObjectPanel_SelectObject_24x24", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap MySQLforExcel_RelatedObjects_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_RelatedObjects_32x32", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -2003,6 +2048,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string PivotTableCreationError {
             get {
                 return ResourceManager.GetString("PivotTableCreationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A possible circular reference among tables already related in the Excel Model may be created so Excel can&apos;t create the Model Relationship..
+        /// </summary>
+        internal static string PossibleCircularReferenceError {
+            get {
+                return ResourceManager.GetString("PossibleCircularReferenceError", resourceCulture);
             }
         }
         

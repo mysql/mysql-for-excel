@@ -43,10 +43,6 @@ namespace MySQL.ForExcel.Forms
         {
           _previewDataTable.Dispose();
         }
-
-        // Set variables to null so this object does not hold references to them and the GC disposes of them sooner.
-        _previewDbObject = null;
-        _wbConnection = null;
       }
 
       base.Dispose(disposing);
@@ -118,7 +114,7 @@ namespace MySQL.ForExcel.Forms
       this.RowsCountSubLabel.Location = new System.Drawing.Point(157, 73);
       this.RowsCountSubLabel.Name = "RowsCountSubLabel";
       this.RowsCountSubLabel.Size = new System.Drawing.Size(13, 15);
-      this.RowsCountSubLabel.TabIndex = 3;
+      this.RowsCountSubLabel.TabIndex = 4;
       this.RowsCountSubLabel.Text = "0";
       // 
       // PreviewDataGridView
@@ -147,7 +143,7 @@ namespace MySQL.ForExcel.Forms
       this.PreviewDataGridView.Location = new System.Drawing.Point(39, 106);
       this.PreviewDataGridView.Name = "PreviewDataGridView";
       this.PreviewDataGridView.Size = new System.Drawing.Size(668, 265);
-      this.PreviewDataGridView.TabIndex = 7;
+      this.PreviewDataGridView.TabIndex = 6;
       this.PreviewDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.PreviewDataGridView_DataBindingComplete);
       this.PreviewDataGridView.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.PreviewDataGridView_DataError);
       // 
@@ -170,7 +166,7 @@ namespace MySQL.ForExcel.Forms
       this.RowsCountMainLabel.Location = new System.Drawing.Point(77, 73);
       this.RowsCountMainLabel.Name = "RowsCountMainLabel";
       this.RowsCountMainLabel.Size = new System.Drawing.Size(69, 15);
-      this.RowsCountMainLabel.TabIndex = 2;
+      this.RowsCountMainLabel.TabIndex = 3;
       this.RowsCountMainLabel.Text = "Row Count:";
       // 
       // TableNameSubLabel
@@ -182,7 +178,7 @@ namespace MySQL.ForExcel.Forms
       this.TableNameSubLabel.Location = new System.Drawing.Point(157, 56);
       this.TableNameSubLabel.Name = "TableNameSubLabel";
       this.TableNameSubLabel.Size = new System.Drawing.Size(39, 15);
-      this.TableNameSubLabel.TabIndex = 1;
+      this.TableNameSubLabel.TabIndex = 2;
       this.TableNameSubLabel.Text = "Name";
       // 
       // TableNameMainLabel
@@ -194,7 +190,7 @@ namespace MySQL.ForExcel.Forms
       this.TableNameMainLabel.Location = new System.Drawing.Point(77, 56);
       this.TableNameMainLabel.Name = "TableNameMainLabel";
       this.TableNameMainLabel.Size = new System.Drawing.Size(74, 15);
-      this.TableNameMainLabel.TabIndex = 0;
+      this.TableNameMainLabel.TabIndex = 1;
       this.TableNameMainLabel.Text = "Table Name:";
       // 
       // OkButton
@@ -205,7 +201,7 @@ namespace MySQL.ForExcel.Forms
       this.OkButton.Location = new System.Drawing.Point(662, 10);
       this.OkButton.Name = "OkButton";
       this.OkButton.Size = new System.Drawing.Size(75, 23);
-      this.OkButton.TabIndex = 2;
+      this.OkButton.TabIndex = 0;
       this.OkButton.Text = "OK";
       this.OkButton.UseVisualStyleBackColor = true;
       // 
@@ -217,7 +213,7 @@ namespace MySQL.ForExcel.Forms
       this.ExportDataLabel.Location = new System.Drawing.Point(17, 17);
       this.ExportDataLabel.Name = "ExportDataLabel";
       this.ExportDataLabel.Size = new System.Drawing.Size(146, 20);
-      this.ExportDataLabel.TabIndex = 30;
+      this.ExportDataLabel.TabIndex = 0;
       this.ExportDataLabel.Text = "Preview MySQL Data";
       // 
       // SubSetOfDataLabel
@@ -230,22 +226,20 @@ namespace MySQL.ForExcel.Forms
       this.SubSetOfDataLabel.Location = new System.Drawing.Point(419, 88);
       this.SubSetOfDataLabel.Name = "SubSetOfDataLabel";
       this.SubSetOfDataLabel.Size = new System.Drawing.Size(288, 15);
-      this.SubSetOfDataLabel.TabIndex = 31;
+      this.SubSetOfDataLabel.TabIndex = 5;
       this.SubSetOfDataLabel.Text = "This is a subset of the data for preview purposes only.";
       // 
       // RowsLabel
       // 
-      this.RowsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.RowsLabel.AutoSize = true;
       this.RowsLabel.Location = new System.Drawing.Point(157, 380);
       this.RowsLabel.Name = "RowsLabel";
       this.RowsLabel.Size = new System.Drawing.Size(32, 13);
-      this.RowsLabel.TabIndex = 35;
+      this.RowsLabel.TabIndex = 9;
       this.RowsLabel.Text = "rows.";
       // 
       // RowsNumericUpDown
       // 
-      this.RowsNumericUpDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.RowsNumericUpDown.Location = new System.Drawing.Point(91, 377);
       this.RowsNumericUpDown.Minimum = new decimal(new int[] {
             1,
@@ -254,7 +248,7 @@ namespace MySQL.ForExcel.Forms
             0});
       this.RowsNumericUpDown.Name = "RowsNumericUpDown";
       this.RowsNumericUpDown.Size = new System.Drawing.Size(60, 20);
-      this.RowsNumericUpDown.TabIndex = 34;
+      this.RowsNumericUpDown.TabIndex = 8;
       this.RowsNumericUpDown.Value = new decimal(new int[] {
             10,
             0,
@@ -263,12 +257,11 @@ namespace MySQL.ForExcel.Forms
       // 
       // PreviewLabel
       // 
-      this.PreviewLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.PreviewLabel.AutoSize = true;
       this.PreviewLabel.Location = new System.Drawing.Point(40, 380);
       this.PreviewLabel.Name = "PreviewLabel";
       this.PreviewLabel.Size = new System.Drawing.Size(45, 13);
-      this.PreviewLabel.TabIndex = 36;
+      this.PreviewLabel.TabIndex = 7;
       this.PreviewLabel.Text = "Preview";
       // 
       // RefreshButton
@@ -276,7 +269,7 @@ namespace MySQL.ForExcel.Forms
       this.RefreshButton.Location = new System.Drawing.Point(195, 375);
       this.RefreshButton.Name = "RefreshButton";
       this.RefreshButton.Size = new System.Drawing.Size(75, 23);
-      this.RefreshButton.TabIndex = 37;
+      this.RefreshButton.TabIndex = 10;
       this.RefreshButton.Text = "Refresh";
       this.RefreshButton.UseVisualStyleBackColor = true;
       this.RefreshButton.Click += new System.EventHandler(this.RefreshButton_Click);

@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using MySql.Data.MySqlClient;
@@ -62,53 +61,26 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="isEditOperation"><c>true</c> if the import is part of an Edit operation, <c>false</c> otherwise.</param>
     /// <param name="wbConnection">The wb connection.</param>
-    /// <param name="dboName">Name of database object to query (Table, View or Procedure).</param>
+    /// <param name="tableOrViewName">The name of the MySQL table or view to import data from..</param>
     /// <param name="importColumnNames">Flag indicating if column names will be imported as the first row of imported data.</param>
     /// <param name="selectQuery">a SELECT query against a database object to fill the [MySqlDataTable] return object with.</param>
     /// <returns>MySql Table created from the selectQuery.</returns>
-    public static MySqlDataTable CreateImportMySqlTable(this MySqlWorkbenchConnection wbConnection, bool isEditOperation, string dboName, bool importColumnNames, string selectQuery)
+    public static MySqlDataTable CreateImportMySqlTable(this MySqlWorkbenchConnection wbConnection, bool isEditOperation, string tableOrViewName, bool importColumnNames, string selectQuery)
     {
-      DataTable dt = GetDataFromTableOrView(wbConnection, selectQuery);
+      DataTable dt = GetDataFromSelectQuery(wbConnection, selectQuery);
       if (dt == null)
       {
         MySqlSourceTrace.WriteToLog(string.Format(Resources.SelectQueryReturnedNothing, selectQuery));
         return null;
       }
 
-      var importMySqlDataTable = new MySqlDataTable(wbConnection, dboName, dt, isEditOperation)
+      var importMySqlDataTable = new MySqlDataTable(wbConnection, tableOrViewName, dt, isEditOperation)
       {
         ImportColumnNames = importColumnNames,
         SelectQuery = selectQuery
       };
 
       return importMySqlDataTable;
-    }
-
-    /// <summary>
-    /// Creates the import my SQL table.
-    /// </summary>
-    /// <param name="isEditOperation">If set to <c>true</c> [import within edit operation].</param>
-    /// <param name="wbConnection">The wb connection to the database.</param>
-    /// <param name="dboName">Name of database object to query (Table, View or Procedure).</param>
-    /// <param name="workbookInCompatibilityMode">If set to <c>true</c> [work sheet is in compatibility mode].</param>
-    /// <param name="includeColumnNames">Flag indicating if column names will be imported as the first row of imported data.</param>
-    /// <param name="columnsNamesList">The selected columns list. All columns are to be returned If null.</param>
-    /// <param name="limitRows">The number of rows on the select query is to be limited if set to <c>true</c>.</param>
-    /// <param name="firstRowIndex">Row where the select query will start pulling data from.</param>
-    /// <param name="rowCount">The number of rows to include in the select query.</param>
-    /// <returns></returns>
-    /// <exception cref="System.Data.NoNullAllowedException"></exception>
-    public static MySqlDataTable CreateMySqlTable(this MySqlWorkbenchConnection wbConnection, bool isEditOperation, string dboName, bool workbookInCompatibilityMode,
-      bool includeColumnNames, List<string> columnsNamesList = null, bool limitRows = false, int firstRowIndex = -1, int rowCount = -1)
-    {
-      if (wbConnection == null)
-      {
-        return null;
-      }
-
-      rowCount = workbookInCompatibilityMode ? Math.Min(UInt16.MaxValue, rowCount) : rowCount;
-      var selectQuery = AssembleSelectQuery(wbConnection.Schema, dboName, columnsNamesList, firstRowIndex, rowCount);
-      return wbConnection.CreateImportMySqlTable(isEditOperation, dboName, includeColumnNames, selectQuery);
     }
 
     /// <summary>
@@ -321,50 +293,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Executes the given query and returns the result set in a <see cref="DataTable"/> object.
-    /// </summary>
-    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <param name="query">Select query to be sent to the MySQL Server.</param>
-    /// <returns>Table containing the results of the query.</returns>
-    public static DataTable GetDataFromTableOrView(this MySqlWorkbenchConnection connection, string query)
-    {
-      if (connection == null)
-      {
-        return null;
-      }
-
-      DataSet ds = MySqlHelper.ExecuteDataset(connection.GetConnectionStringBuilder().ConnectionString, query);
-      if (ds.Tables.Count <= 0)
-      {
-        return null;
-      }
-
-      DataTable retTable = ds.Tables[0];
-      return retTable;
-    }
-
-    /// <summary>
-    /// Executes the given query and returns the result set in a <see cref="DataTable"/> object.
-    /// </summary>
-    /// <remarks>Only works against Tables or Views, but not with Procedures.</remarks>
-    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <param name="dboName">Name of database object to query (Table, View or Procedure).</param>
-    /// <param name="columnsList">List of queries column names.</param>
-    /// <param name="firstRowIdx">Row number from which to start returning results.</param>
-    /// <param name="rowCount">Number of rows to return</param>
-    /// <returns>Table containing the results of the query.</returns>
-    public static DataTable GetDataFromTableOrView(this MySqlWorkbenchConnection connection, string dboName, List<string> columnsList, int firstRowIdx, int rowCount)
-    {
-      if (connection == null)
-      {
-        return null;
-      }
-
-      string queryString = AssembleSelectQuery(connection.Schema, dboName, columnsList, firstRowIdx, rowCount);
-      return string.IsNullOrEmpty(queryString) ? null : connection.GetDataFromTableOrView(queryString);
-    }
-
-    /// <summary>
     /// Gets the SQL statements needed to create a new schema in the MySQL server instance specified in the given connection.
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
@@ -416,23 +344,26 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Executes the given procedure and returns its result sets in tables within a <see cref="DataSet"/> object.
+    /// Executes the given query and returns the result set in a <see cref="DataTable"/> object.
     /// </summary>
-    /// <remarks>Only works against Procedures, but not with Tables or Views.</remarks>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <param name="dbo">Type of database object to query (Table, View or Procedure)</param>
-    /// <param name="parameters">Array of arguments passed to the stored procedure parameters.</param>
-    /// <returns><see cref="DataSet"/> where each table within it represents each of the result sets returned by the stored procedure.</returns>
-    public static DataSet GetDataSetFromProcedure(this MySqlWorkbenchConnection connection, DbObject dbo, params MySqlParameter[] parameters)
+    /// <param name="query">Select query to be sent to the MySQL Server.</param>
+    /// <returns>Table containing the results of the query.</returns>
+    public static DataTable GetDataFromSelectQuery(this MySqlWorkbenchConnection connection, string query)
     {
-      if (connection == null || dbo.Type != DbObject.DbObjectType.Procedure)
+      if (connection == null)
       {
         return null;
       }
 
-      string sql = string.Format("`{0}`.`{1}`", connection.Schema, dbo.Name);
-      DataSet retDs = connection.ExecuteRoutine(sql, parameters);
-      return retDs;
+      DataSet ds = MySqlHelper.ExecuteDataset(connection.GetConnectionStringBuilder().ConnectionString, query);
+      if (ds.Tables.Count <= 0)
+      {
+        return null;
+      }
+
+      DataTable retTable = ds.Tables[0];
+      return retTable;
     }
 
     /// <summary>
@@ -507,25 +438,6 @@ namespace MySQL.ForExcel.Classes
       return rowsList != null
           ? rowsList.Where(iMsqlRow => iMsqlRow.Statement.StatementType == statementType && iMsqlRow.Statement.AffectedRows > 0).Sum(iMsqlRow => iMsqlRow.Statement.AffectedRows)
           : 0;
-    }
-
-    /// <summary>
-    /// Gets the total number of rows contained in a table or view.
-    /// </summary>
-    /// <remarks>Only works against Tables or Views, but not with Procedures.</remarks>
-    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <param name="dbo">Type of database object to query (Table, View or Procedure).</param>
-    /// <returns>The number of rows in a given table or view.</returns>
-    public static long GetRowsCountFromTableOrView(this MySqlWorkbenchConnection connection, DbObject dbo)
-    {
-      if (connection == null || dbo.Type == DbObject.DbObjectType.Procedure)
-      {
-        return 0;
-      }
-
-      string sql = string.Format("SELECT COUNT(*) FROM `{0}`.`{1}`", connection.Schema, dbo.Name);
-      object objCount = MySqlHelper.ExecuteScalar(connection.GetConnectionStringBuilder().ConnectionString, sql);
-      return objCount != null ? (long)objCount : 0;
     }
 
     /// <summary>
@@ -636,30 +548,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a list of column names contained within the given <see cref="DbObject"/>.
-    /// </summary>
-    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <param name="dbObject">A table or view object.</param>
-    /// <returns>A list of column names contained within the given <see cref="DbObject"/></returns>
-    public static List<string> GetColumnNamesList(this MySqlWorkbenchConnection connection, DbObject dbObject)
-    {
-      if (connection == null || dbObject == null || dbObject.Type == DbObject.DbObjectType.Procedure)
-      {
-        return null;
-      }
-
-      var columnsInfoTable = connection.GetSchemaCollection("Columns", null, connection.Schema, dbObject.Name);
-      if (columnsInfoTable == null)
-      {
-        return null;
-      }
-
-      var columnsList = new List<string>(columnsInfoTable.Rows.Count);
-      columnsList.AddRange(from DataRow dr in columnsInfoTable.Rows select dr["COLUMN_NAME"].ToString());
-      return columnsList;
-    }
-
-    /// <summary>
     /// Gets the columns schema information for the given database table.
     /// </summary>
     /// <param name="dataTable">The data table to get the schema info for.</param>
@@ -692,23 +580,6 @@ namespace MySQL.ForExcel.Classes
       }
 
       return schemaInfoTable;
-    }
-
-    /// <summary>
-    /// Gets a list of <see cref="MySqlDataRelationship"/> objects representing relationships among the given <see cref="DbObject"/> and other ones.
-    /// </summary>
-    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <param name="dbObject">A table or view object.</param>
-    /// <returns>A list of <see cref="MySqlDataRelationship"/> objects representing relationships among the given <see cref="DbObject"/> and other ones.</returns>
-    public static List<MySqlDataRelationship> GetRelationshipsFromForeignKeys(this MySqlWorkbenchConnection connection, DbObject dbObject)
-    {
-      if (connection == null || dbObject == null || dbObject.Type == DbObject.DbObjectType.Procedure)
-      {
-        return null;
-      }
-
-      var dt = connection.GetSchemaCollection("Foreign Key Columns", null, connection.Schema, dbObject.Name);
-      return dt == null ? null : (from DataRow row in dt.Rows select new MySqlDataRelationship(row["CONSTRAINT_NAME"].ToString(), row["TABLE_NAME"].ToString(), row["REFERENCED_TABLE_NAME"].ToString(), row["COLUMN_NAME"].ToString(), row["REFERENCED_COLUMN_NAME"].ToString())).ToList();
     }
 
     /// <summary>
@@ -865,7 +736,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       string sql = string.Format("SHOW KEYS FROM `{0}` IN `{1}` WHERE Key_name = 'PRIMARY';", tableName, connection.Schema);
-      DataTable dt = GetDataFromTableOrView(connection, sql);
+      DataTable dt = GetDataFromSelectQuery(connection, sql);
       return dt != null && dt.Rows.Count > 0;
     }
 
@@ -1021,49 +892,6 @@ namespace MySQL.ForExcel.Classes
     public static bool WithoutErrors(this MySqlStatement.StatementResultType statementResult)
     {
       return statementResult != MySqlStatement.StatementResultType.ConnectionLost && statementResult != MySqlStatement.StatementResultType.ErrorThrown;
-    }
-
-    /// <summary>
-    /// Creates a SELECT query against a Table or View database object.
-    /// </summary>
-    /// <remarks>Only works against Tables or Views, but not with Procedures.</remarks>
-    /// <param name="schemaName">Name of the schema (database) where the Table or View resides.</param>
-    /// <param name="dboName">Name of database object to query (Table, View or Procedure).</param>
-    /// <param name="columnsList">List of queries column names.</param>
-    /// <param name="firstRowIdx">Row number from which to start returning results.</param>
-    /// <param name="rowCount">Number of rows to return</param>
-    /// <returns>The SELECT query text.</returns>
-    private static string AssembleSelectQuery(string schemaName, string dboName, ICollection<string> columnsList, int firstRowIdx, int rowCount)
-    {
-      const string bigRowCountLimit = "18446744073709551615";
-      var queryStringBuilder = new StringBuilder("SELECT ");
-      if (columnsList == null || columnsList.Count == 0)
-      {
-        queryStringBuilder.Append("*");
-      }
-      else
-      {
-        foreach (string columnName in columnsList)
-        {
-          queryStringBuilder.AppendFormat("`{0}`,", columnName.Replace("`", "``"));
-        }
-
-        queryStringBuilder.Remove(queryStringBuilder.Length - 1, 1);
-      }
-
-      queryStringBuilder.AppendFormat(" FROM `{0}`.`{1}`", schemaName, dboName);
-      if (firstRowIdx > 0)
-      {
-        string strCount = rowCount >= 0 ? rowCount.ToString(CultureInfo.InvariantCulture) : bigRowCountLimit;
-        queryStringBuilder.AppendFormat(" LIMIT {0},{1}", firstRowIdx, strCount);
-      }
-      else if (rowCount >= 0)
-      {
-        queryStringBuilder.AppendFormat(" LIMIT {0}", rowCount);
-      }
-
-      var returnString = queryStringBuilder.ToString();
-      return returnString;
     }
   }
 

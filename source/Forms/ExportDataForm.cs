@@ -344,7 +344,7 @@ namespace MySQL.ForExcel.Forms
     private void DataTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
     {
       MySqlDataColumn currentCol = GetCurrentMySqlDataColumn();
-      var selectedType = DataTypeComboBox.SelectedValue.ToString();
+      var selectedType = DataTypeComboBox.SelectedValue != null ? DataTypeComboBox.SelectedValue.ToString() : string.Empty;
       if (currentCol == null || string.IsNullOrEmpty(selectedType) || string.Equals(selectedType, currentCol.MySqlDataType, StringComparison.InvariantCultureIgnoreCase))
       {
         return;

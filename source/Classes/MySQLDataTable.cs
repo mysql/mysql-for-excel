@@ -710,7 +710,7 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether [import column names].
+    /// Gets or sets a value indicating whether column names are imported along with the table's data.
     /// </summary>
     public bool ImportColumnNames { get; set; }
 
@@ -1644,7 +1644,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="createExcelTable">Flag indicating whether a <see cref="ExcelInterop.ListObject"/> is created for the imported data.</param>
     /// <param name="createPivotTable">Flag indicating whether a <see cref="ExcelInterop.PivotTable"/> is created for the imported data.</param>
     /// <param name="pivotPosition">The position where new <see cref="ExcelInterop.PivotTable"/> objects are placed relative to imported table's data.</param>
-    /// <param name="addSummaryFields">Indicates wheather to include a row with summary fields</param>
+    /// <param name="addSummaryFields">Indicates whether to include a row with summary fields at the end of the data rows.</param>
     /// <returns>The <see cref="ExcelInterop.Range"/> or <see cref="ExcelInterop.ListObject"/> containing the cells with the imported data.</returns>
     public object ImportDataAtActiveExcelCell(bool createExcelTable, bool createPivotTable, PivotTablePosition pivotPosition = PivotTablePosition.Right, bool addSummaryFields = false)
     {
@@ -1838,7 +1838,7 @@ namespace MySQL.ForExcel.Classes
         Globals.ThisAddIn.Application.Goto(atCell, false);
 
         // Create Excel Table for the imported data
-        importSession = new ImportSessionInfo(this, atCell, addSummaryFields, true);
+        importSession = new ImportSessionInfo(this, atCell, addSummaryFields);
         atCell.Select();
       }
       catch (Exception ex)
@@ -1895,7 +1895,7 @@ namespace MySQL.ForExcel.Classes
       try
       {
         Clear();
-        DataTable filledTable = WbConnection.GetDataFromTableOrView(SelectQuery);
+        DataTable filledTable = WbConnection.GetDataFromSelectQuery(SelectQuery);
         CreateTableSchema(TableName, true);
         CopyTableData(filledTable);
       }

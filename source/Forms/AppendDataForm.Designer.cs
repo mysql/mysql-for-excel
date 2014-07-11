@@ -38,7 +38,7 @@ namespace MySQL.ForExcel.Forms
         {
           components.Dispose();
         }
-
+        
         if (_droppableCursor != null)
         {
           _droppableCursor.Dispose();
@@ -66,8 +66,6 @@ namespace MySQL.ForExcel.Forms
 
         // Set variables to null so this object does not hold references to them and the GC disposes of them sooner.
         _appendDataRange = null;
-        _importDbObject = null;
-        _wbConnection = null;
       }
       base.Dispose(disposing);
     }

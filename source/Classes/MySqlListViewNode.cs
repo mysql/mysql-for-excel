@@ -76,7 +76,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="dbObject">The <see cref="DbObject"/> related to the node.</param>
     /// <param name="includeOnlyTablesAndViewsInMultiSelection">Flag indicating whether only tree nodes holding Tables and Views are included during a multiple selection.</param>
     public MySqlListViewNode(DbObject dbObject, bool includeOnlyTablesAndViewsInMultiSelection = true)
-      : this(dbObject.Name, null, MySqlNodeType.DbObject, includeOnlyTablesAndViewsInMultiSelection && dbObject.Type != DbObject.DbObjectType.Table && dbObject.Type != DbObject.DbObjectType.View)
+      : this(dbObject.Name, null, MySqlNodeType.DbObject, includeOnlyTablesAndViewsInMultiSelection && !(dbObject is DbTable) && !(dbObject is DbView))
     {
       DbObject = dbObject;
     }

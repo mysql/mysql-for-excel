@@ -602,7 +602,28 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Returns a <see cref="ExcelInterop.ListObject"/> contained in an <see cref="ExcelInterop.Worksheet"/> with the given names.
+    /// Returns the command string used when a <see cref="ExcelInterop.WorkbookConnection"/> is created with a command type of <see cref="ExcelInterop.XlCmdType.xlCmdExcel"/>.
+    /// </summary>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
+    /// <returns>The command string used when a <see cref="ExcelInterop.WorkbookConnection"/> is created with a command type of <see cref="ExcelInterop.XlCmdType.xlCmdExcel"/>.</returns>
+    public static string GetConnectionStringForCmdExcel(this ExcelInterop.Workbook workbook)
+    {
+      return workbook != null ? "WORKSHEET;" + workbook.Name : string.Empty;
+    }
+
+    /// <summary>
+    /// Returns a <see cref="ExcelInterop.ListObject"/> contained in the given <see cref="ExcelInterop.Worksheet"/> with the given name.
+    /// </summary>
+    /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
+    /// <param name="excelTableName">The name of the <see cref="ExcelInterop.ListObject"/> to find.</param>
+    /// <returns>A <see cref="ExcelInterop.ListObject"/> contained in an <see cref="ExcelInterop.Worksheet"/> with the given names.</returns>
+    public static ExcelInterop.ListObject GetExcelTableByName(this ExcelInterop.Worksheet worksheet, string excelTableName)
+    {
+      return worksheet == null ? null : worksheet.ListObjects.Cast<ExcelInterop.ListObject>().FirstOrDefault(lo => string.Equals(lo.Name, excelTableName, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    /// <summary>
+    /// Returns a <see cref="ExcelInterop.ListObject"/> contained in a <see cref="ExcelInterop.Worksheet"/> with the given names.
     /// </summary>
     /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
     /// <param name="worksheetName">The name of the <see cref="ExcelInterop.Worksheet"/> containing the <see cref="ExcelInterop.ListObject"/>.</param>
@@ -616,7 +637,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       var worksheet = workbook.Worksheets.Cast<ExcelInterop.Worksheet>().FirstOrDefault(ws => string.Equals(ws.Name, worksheetName, StringComparison.InvariantCultureIgnoreCase));
-      return worksheet == null ? null : worksheet.ListObjects.Cast<ExcelInterop.ListObject>().FirstOrDefault(lo => string.Equals(lo.Name, excelTableName, StringComparison.InvariantCultureIgnoreCase));
+      return worksheet.GetExcelTableByName(excelTableName);
     }
 
     /// <summary>

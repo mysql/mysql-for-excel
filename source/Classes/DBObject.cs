@@ -16,62 +16,55 @@
 // 02110-1301  USA
 
 using System;
+using MySQL.Utility.Classes.MySQLWorkbench;
+using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
 {
   /// <summary>
   /// Represents a MySQL database object that MySQL for Excel can interact with.
   /// </summary>
-  public class DbObject
+  public abstract class DbObject : IDisposable
   {
-    #region Constants
+    #region Fields
 
     /// <summary>
-    /// The value representing all DB object types
+    /// The active <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
-    public const DbObjectType ALL_DB_OBJECT_TYPES = DbObjectType.Table | DbObjectType.View | DbObjectType.Procedure;
+    protected ExcelInterop.Workbook ActiveWorkbook;
 
-    #endregion Constants
+    /// <summary>
+    /// Flag indicating whether the <seealso cref="Dispose"/> method has already been called.
+    /// </summary>
+    protected bool Disposed;
+
+    #endregion Fields
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DbObject"/> class.
     /// </summary>
+    /// <param name="connection">The MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="name">The name of the MySQL database object.</param>
-    /// <param name="type">The MySQL database object type.</param>
-    public DbObject(string name, DbObjectType type)
+    protected DbObject(MySqlWorkbenchConnection connection, string name)
     {
+      Connection = connection;
+      Disposed = false;
+      ActiveWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+      Excluded = false;
       Name = name;
-      Type = type;
-    }
-
-    /// <summary>
-    /// Specifies identifiers to indicate the MySQL database object type.
-    /// </summary>
-    [Flags]
-    public enum DbObjectType : short
-    {
-      /// <summary>
-      /// A MySQL table object.
-      /// </summary>
-      Table = 1,
-
-      /// <summary>
-      /// A MySQL view object.
-      /// </summary>
-      View = 2,
-
-      /// <summary>
-      /// A MySQL stored procedure object.
-      /// </summary>
-      Procedure = 4,
-
-      /// <summary>
-      /// A MySQL schema.
-      /// </summary>
-      Schema = 8
     }
 
     #region Properties
+
+    /// <summary>
+    /// Gets the MySQL Workbench connection to a MySQL server instance selected by users.
+    /// </summary>
+    public MySqlWorkbenchConnection Connection { get; private set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the object is excluded for further processing.
+    /// </summary>
+    public bool Excluded { get; set; }
 
     /// <summary>
     /// Gets the name of the MySQL database object.
@@ -83,11 +76,37 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public bool Selected { get; set; }
 
-    /// <summary>
-    /// Gets the MySQL database object type.
-    /// </summary>
-    public DbObjectType Type { get; private set; }
-
     #endregion Properties
+
+    /// <summary>
+    /// Releases all resources used by the <see cref="TempRange"/> class
+    /// </summary>
+    public void Dispose()
+    {
+      Dispose(true);
+      GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Releases all resources used by the <see cref="DbObject"/> class
+    /// </summary>
+    /// <param name="disposing">If true this is called by Dispose(), otherwise it is called by the finalizer</param>
+    protected virtual void Dispose(bool disposing)
+    {
+      if (Disposed)
+      {
+        return;
+      }
+
+      // Free managed resources
+      if (disposing)
+      {
+        Connection = null;
+      }
+
+      // Add class finalizer if unmanaged resources are added to the class
+      // Free unmanaged resources if there are any
+      Disposed = true;
+    }
   }
 }

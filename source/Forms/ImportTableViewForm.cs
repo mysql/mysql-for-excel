@@ -27,7 +27,6 @@ using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
-using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 
@@ -43,12 +42,12 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// The type of DB object (MySQL table or view) from which to import data to the active Excel Worksheet.
     /// </summary>
-    private DbObject _dbObject;
+    private readonly DbView _dbTableOrView;
 
     /// <summary>
-    /// A value indicating whether the import is part of an Edit operation.
+    /// The list of columns selected by the user to be imported to Excel.
     /// </summary>
-    private readonly bool _isEditOperation;
+    private List<string> _importColumns;
 
     /// <summary>
     /// A <see cref="DataTable"/> object containing a subset of the whole data which is shown in the preview grid.
@@ -61,11 +60,6 @@ namespace MySQL.ForExcel.Forms
     private long _totalRowsCount;
 
     /// <summary>
-    /// The connection to a MySQL server instance selected by users.
-    /// </summary>
-    private MySqlWorkbenchConnection _wbConnection;
-
-    /// <summary>
     /// A value indicating whether the Excel workbook where the data will be imported to is in Excel 2003 compatibility mode.
     /// </summary>
     private readonly bool _workbookInCompatibilityMode;
@@ -75,48 +69,33 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Initializes a new instance of the <see cref="ImportTableViewForm"/> class.
     /// </summary>
-    /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <param name="importDbObject">MySQL table, view or procedure from which to import data to an Excel spreadsheet.</param>
+    /// <param name="importDbTableOrView">MySQL table or view from which to import data to an Excel spreadsheet.</param>
     /// <param name="importToWorksheetName">Name of the Excel worksheet where the data will be imported to.</param>
-    /// <param name="workbookInCompatibilityMode">Flag indicating if the Excel workbook where the data will be imported to is in Excel 2003 compatibility mode.</param>
-    /// <param name="importForEditData"><c>true</c> if the import is part of an Edit operation, <c>false</c> otherwise.</param>
-    public ImportTableViewForm(MySqlWorkbenchConnection wbConnection, DbObject importDbObject, string importToWorksheetName, bool workbookInCompatibilityMode, bool importForEditData)
+    public ImportTableViewForm(DbView importDbTableOrView, string importToWorksheetName)
     {
-      _dbObject = importDbObject;
-      _isEditOperation = importForEditData;
+      if (importDbTableOrView == null)
+      {
+        throw new ArgumentNullException("importDbTableOrView");
+      }
+
+      _dbTableOrView = importDbTableOrView;
+      _importColumns = null;
       _previewDataTable = null;
-      _wbConnection = wbConnection;
-      _workbookInCompatibilityMode = workbookInCompatibilityMode;
+      _workbookInCompatibilityMode = Globals.ThisAddIn.Application.ActiveWorkbook.Excel8CompatibilityMode;
       MySqlTable = null;
       InitializeComponent();
 
       PreviewDataGridView.DataError += PreviewDataGridView_DataError;
-      TableNameMainLabel.Text = importDbObject.Type + @" Name:";
-      PickColumnsSubLabel.Text = string.Format(Resources.ImportTableOrViewSubText, importDbObject.Type.ToString().ToLowerInvariant());
+      TableNameMainLabel.Text = importDbTableOrView is DbTable ? "Table Name" : "View Name";
+      PickColumnsSubLabel.Text = string.Format(Resources.ImportTableOrViewSubText, importDbTableOrView is DbTable ? "table" : "view");
       OptionsWarningLabel.Text = Resources.WorkbookInCompatibilityModeWarning;
       Text = @"Import Data - " + importToWorksheetName;
-      TableNameSubLabel.Text = importDbObject.Name;
+      TableNameSubLabel.Text = importDbTableOrView.Name;
       FillPreviewGrid();
       SetOptionsAvailability();
     }
 
     #region Properties
-
-    /// <summary>
-    /// Gets or sets a value indicating whether a <see cref="ExcelInterop.PivotTable"/> is created for the imported data.
-    /// </summary>
-    public bool CreatePivotTable
-    {
-      get
-      {
-        return CreatePivotTableCheckBox.Checked;
-      }
-
-      set
-      {
-        CreatePivotTableCheckBox.Checked = value;
-      }
-    }
 
     /// <summary>
     /// Gets the <see cref="MySqlDataTable"/> object containing the data to be imported to the active Excel Worksheet.
@@ -149,17 +128,6 @@ namespace MySQL.ForExcel.Forms
       {
         var firstRowIndex = (int)FromRowNumericUpDown.Value - 1;
         return (LimitRowsCheckBox.Checked) ? firstRowIndex : -1;
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether the column names will be imported as data headers in the first row of the Excel spreadsheet.
-    /// </summary>
-    private bool IncludeColumnNames
-    {
-      get
-      {
-        return IncludeHeadersCheckBox.Checked;
       }
     }
 
@@ -223,8 +191,10 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void FillPreviewGrid()
     {
-      _previewDataTable = _wbConnection.GetDataFromTableOrView(_dbObject.Name, null, 0, Settings.Default.ImportPreviewRowsQuantity);
-      _totalRowsCount = _wbConnection.GetRowsCountFromTableOrView(_dbObject);
+      _importColumns = null;
+      SetImportParameterValues(Settings.Default.ImportPreviewRowsQuantity);
+      _previewDataTable = _dbTableOrView.GetData();
+      _totalRowsCount = _dbTableOrView.GetRowsCount();
       RowsCountSubLabel.Text = _totalRowsCount.ToString(CultureInfo.InvariantCulture);
       PreviewDataGridView.DataSource = _previewDataTable;
       foreach (DataGridViewColumn gridCol in PreviewDataGridView.Columns)
@@ -255,42 +225,27 @@ namespace MySQL.ForExcel.Forms
     /// <returns><c>true</c> if the import is successful, <c>false</c> if errros were found during the import.</returns>
     private bool ImportData()
     {
-      bool success = true;
-      List<string> importColumns = null;
+      _importColumns = null;
       var selectedColumns = new List<DataGridViewColumn>();
       if (PreviewDataGridView.SelectedColumns.Count < PreviewDataGridView.Columns.Count)
       {
-        importColumns = new List<string>(PreviewDataGridView.SelectedColumns.Count);
+        _importColumns = new List<string>(PreviewDataGridView.SelectedColumns.Count);
         selectedColumns.AddRange(PreviewDataGridView.SelectedColumns.Cast<DataGridViewColumn>());
         if (selectedColumns.Count > 1)
         {
           selectedColumns.Sort((c1, c2) => c1.Index.CompareTo(c2.Index));
         }
 
-        importColumns.AddRange(selectedColumns.Select(selCol => selCol.HeaderText));
+        _importColumns.AddRange(selectedColumns.Select(selCol => selCol.HeaderText));
       }
 
-      try
-      {
-        Cursor = Cursors.WaitCursor;
-        MySqlTable = _wbConnection.CreateMySqlTable(_isEditOperation, _dbObject.Name, _workbookInCompatibilityMode, IncludeColumnNames, importColumns, LimitRowsCheckBox.Checked, FirstRowIndex, RowsTo);
-        if (!_isEditOperation)
-        {
-          MySqlTable.ImportDataAtActiveExcelCell(!_isEditOperation && Settings.Default.ImportCreateExcelTable, CreatePivotTable, MySqlDataTable.PivotTablePosition.Right, AddSummaryFieldsCheckBox.Checked);
-        }
-      }
-      catch (Exception ex)
-      {
-        success = false;
-        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, _dbObject.Type.ToString().ToLowerInvariant(), _dbObject.Name), ex.Message);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
-      }
-      finally
-      {
-        Cursor = Cursors.Default;
-      }
+      Cursor = Cursors.WaitCursor;
 
-      return success;
+      // Import data into Excel
+      SetImportParameterValues(RowsTo);
+      var importTuple = _dbTableOrView.ImportData();
+      MySqlTable = importTuple != null ? importTuple.Item1 : null;
+      return MySqlTable != null;
     }
 
     /// <summary>
@@ -398,22 +353,39 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
+    /// Sets the import parameter values into the database object.
+    /// This is needed before getting any data from it.
+    /// </summary>
+    private void SetImportParameterValues(int rowsCount)
+    {
+      _dbTableOrView.ImportParameters.AddSummaryFields = AddSummaryFieldsCheckBox.Checked;
+      _dbTableOrView.ImportParameters.ColumnsNamesList = _importColumns;
+      _dbTableOrView.ImportParameters.CreatePivotTable = CreatePivotTableCheckBox.Checked;
+      _dbTableOrView.ImportParameters.FirstRowIndex = FirstRowIndex;
+      _dbTableOrView.ImportParameters.IncludeColumnNames = IncludeHeadersCheckBox.Checked;
+      _dbTableOrView.ImportParameters.IntoNewWorksheet = false;
+      _dbTableOrView.ImportParameters.PivotTablePosition = MySqlDataTable.PivotTablePosition.Right;
+      _dbTableOrView.ImportParameters.RowsCount = rowsCount;
+    }
+
+    /// <summary>
     /// Disables some import options when the form is called from an Edit Data operation.
     /// </summary>
     private void SetOptionsAvailability()
     {
+      bool isEditOperation = _dbTableOrView.ImportParameters.ForEditDataOperation;
       IncludeHeadersCheckBox.Checked = true;
-      IncludeHeadersCheckBox.Enabled = !_isEditOperation;
-      PreviewDataGridView.DisableColumnsSelection = _isEditOperation;
-      if (_isEditOperation)
+      IncludeHeadersCheckBox.Enabled = !isEditOperation;
+      PreviewDataGridView.DisableColumnsSelection = isEditOperation;
+      if (isEditOperation)
       {
         PreviewDataGridView.ContextMenuStrip = null;
       }
 
       LimitRowsCheckBox.Checked = false;
-      LimitRowsCheckBox.Enabled = !_isEditOperation;
-      CreatePivotTableCheckBox.Enabled = !_isEditOperation;
-      AddSummaryFieldsCheckBox.Enabled = !_isEditOperation && Settings.Default.ImportCreateExcelTable;
+      LimitRowsCheckBox.Enabled = !isEditOperation;
+      CreatePivotTableCheckBox.Enabled = !isEditOperation;
+      AddSummaryFieldsCheckBox.Enabled = !isEditOperation && Settings.Default.ImportCreateExcelTable;
     }
   }
 }

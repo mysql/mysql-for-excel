@@ -117,7 +117,7 @@ namespace MySQL.ForExcel.Controls
     /// Gets a list of stored procedures loaded in this pane.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<DbObject> LoadedProcedures
+    public List<DbProcedure> LoadedProcedures
     {
       get
       {
@@ -129,7 +129,7 @@ namespace MySQL.ForExcel.Controls
     /// Gets a list of schemas loaded in this pane.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<DbObject> LoadedSchemas
+    public List<DbSchema> LoadedSchemas
     {
       get
       {
@@ -141,7 +141,7 @@ namespace MySQL.ForExcel.Controls
     /// Gets a list of tables loaded in this pane.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<DbObject> LoadedTables
+    public List<DbTable> LoadedTables
     {
       get
       {
@@ -153,7 +153,7 @@ namespace MySQL.ForExcel.Controls
     /// Gets a list of views loaded in this pane.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<DbObject> LoadedViews
+    public List<DbView> LoadedViews
     {
       get
       {
@@ -174,7 +174,7 @@ namespace MySQL.ForExcel.Controls
     /// </summary>
     /// <param name="toTableObject">Table to append the data to, if null exports to a new table.</param>
     /// <returns><c>true</c> if the export/append action was executed, <c>false</c> otherwise.</returns>
-    public bool AppendDataToTable(DbObject toTableObject)
+    public bool AppendDataToTable(DbTable toTableObject)
     {
       DialogResult dr;
       ExcelInterop.Range exportRange = Globals.ThisAddIn.Application.Selection as ExcelInterop.Range;
@@ -189,21 +189,23 @@ namespace MySQL.ForExcel.Controls
         return false;
       }
 
+      Cursor = Cursors.WaitCursor;
       if (toTableObject != null)
       {
-        Cursor = Cursors.WaitCursor;
-        AppendDataForm appendDataForm = new AppendDataForm(WbConnection, exportRange, toTableObject, ActiveWorksheet.Name);
-        Cursor = Cursors.Default;
-        dr = appendDataForm.ShowDialog();
+        using (var appendDataForm = new AppendDataForm(toTableObject, exportRange, ActiveWorksheet.Name))
+        {
+          dr = appendDataForm.ShowDialog();
+        }
       }
       else
       {
-        Cursor = Cursors.WaitCursor;
-        ExportDataForm exportForm = new ExportDataForm(WbConnection, exportRange, ActiveWorksheet.Name);
-        Cursor = Cursors.Default;
-        dr = exportForm.ShowDialog();
+        using (var exportForm = new ExportDataForm(WbConnection, exportRange, ActiveWorksheet.Name))
+        {
+          dr = exportForm.ShowDialog();
+        }
       }
 
+      Cursor = Cursors.Default;
       return dr == DialogResult.OK;
     }
 
@@ -259,7 +261,7 @@ namespace MySQL.ForExcel.Controls
     /// <returns>
     ///   <c>true</c> If the export/append action was executed, <c>false</c> otherwise.
     /// </returns>
-    public bool EditTableData(DbObject tableObject, bool fromSavedSession, ExcelInterop.Workbook workbook)
+    public bool EditTableData(DbTable tableObject, bool fromSavedSession, ExcelInterop.Workbook workbook)
     {
       string schemaAndTableNames = WbConnection.Schema + "." + tableObject.Name;
 
@@ -280,7 +282,8 @@ namespace MySQL.ForExcel.Controls
 
       // Attempt to Import Data unless the user cancels the import operation
       string proposedWorksheetName = fromSavedSession ? tableObject.Name : ActiveWorkbook.GetWorksheetNameAvoidingDuplicates(tableObject.Name);
-      ImportTableViewForm importForm = new ImportTableViewForm(WbConnection, tableObject, proposedWorksheetName, ActiveWorkbook.Excel8CompatibilityMode, true);
+      tableObject.ImportParameters.ForEditDataOperation = true;
+      ImportTableViewForm importForm = new ImportTableViewForm(tableObject, proposedWorksheetName);
       DialogResult dr = fromSavedSession ? importForm.ImportHidingDialog() : importForm.ShowDialog();
       if (dr == DialogResult.Cancel)
       {

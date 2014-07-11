@@ -44,10 +44,6 @@ namespace MySQL.ForExcel.Forms
         {
           _previewDataSet.Dispose();
         }
-
-        // Set variables to null so this object does not hold references to them and the GC disposes of them sooner.
-        _dbObject = null;
-        _wbConnection = null;
       }
       base.Dispose(disposing);
     }

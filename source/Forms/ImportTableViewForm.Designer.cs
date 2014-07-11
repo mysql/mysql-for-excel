@@ -41,8 +41,6 @@ namespace MySQL.ForExcel.Forms
 
         // Set variables to null so this object does not hold references to them and the GC disposes of them sooner.
         // The MySqlDataTable object is not disposed but only set to null since it may be in use by a ListObject to refresh its data.
-        _dbObject = null;
-        _wbConnection = null;
         MySqlTable = null;
       }
 
@@ -65,6 +63,7 @@ namespace MySQL.ForExcel.Forms
       this.SubSetOfDataLabel = new System.Windows.Forms.Label();
       this.RowsCountSubLabel = new System.Windows.Forms.Label();
       this.OptionsGroupBox = new System.Windows.Forms.GroupBox();
+      this.AddSummaryFieldsCheckBox = new System.Windows.Forms.CheckBox();
       this.CreatePivotTableCheckBox = new System.Windows.Forms.CheckBox();
       this.FromRowNumericUpDown = new System.Windows.Forms.NumericUpDown();
       this.RowsToReturnLabel = new System.Windows.Forms.Label();
@@ -87,7 +86,6 @@ namespace MySQL.ForExcel.Forms
       this.DialogCancelButton = new System.Windows.Forms.Button();
       this.ExportDataLabel = new System.Windows.Forms.Label();
       this.AdvancedOptionsButton = new System.Windows.Forms.Button();
-      this.AddSummaryFieldsCheckBox = new System.Windows.Forms.CheckBox();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       this.OptionsGroupBox.SuspendLayout();
@@ -179,6 +177,16 @@ namespace MySQL.ForExcel.Forms
       this.OptionsGroupBox.TabIndex = 8;
       this.OptionsGroupBox.TabStop = false;
       this.OptionsGroupBox.Text = "Options";
+      // 
+      // AddSummaryFieldsCheckBox
+      // 
+      this.AddSummaryFieldsCheckBox.AutoSize = true;
+      this.AddSummaryFieldsCheckBox.Location = new System.Drawing.Point(334, 50);
+      this.AddSummaryFieldsCheckBox.Name = "AddSummaryFieldsCheckBox";
+      this.AddSummaryFieldsCheckBox.Size = new System.Drawing.Size(135, 19);
+      this.AddSummaryFieldsCheckBox.TabIndex = 8;
+      this.AddSummaryFieldsCheckBox.Text = "Add Summary Fields";
+      this.AddSummaryFieldsCheckBox.UseVisualStyleBackColor = true;
       // 
       // CreatePivotTableCheckBox
       // 
@@ -346,10 +354,10 @@ namespace MySQL.ForExcel.Forms
       this.PickColumnsSubLabel.ForeColor = System.Drawing.SystemColors.ControlText;
       this.PickColumnsSubLabel.Location = new System.Drawing.Point(77, 73);
       this.PickColumnsSubLabel.Name = "PickColumnsSubLabel";
-      this.PickColumnsSubLabel.Size = new System.Drawing.Size(302, 30);
+      this.PickColumnsSubLabel.Size = new System.Drawing.Size(519, 15);
       this.PickColumnsSubLabel.TabIndex = 5;
-      this.PickColumnsSubLabel.Text = "Click on column headers to exclude/include them when\r\nimporting the MySQL table d" +
-    "ata in Excel.";
+      this.PickColumnsSubLabel.Text = "Click on column headers to exclude/include them when importing the MySQL table da" +
+    "ta in Excel.";
       // 
       // PickColumnsMainLabel
       // 
@@ -454,16 +462,6 @@ namespace MySQL.ForExcel.Forms
       this.AdvancedOptionsButton.Text = "Advanced Options...";
       this.AdvancedOptionsButton.UseVisualStyleBackColor = true;
       this.AdvancedOptionsButton.Click += new System.EventHandler(this.AdvancedOptionsButton_Click);
-      // 
-      // AddSummaryFieldsCheckBox
-      // 
-      this.AddSummaryFieldsCheckBox.AutoSize = true;
-      this.AddSummaryFieldsCheckBox.Location = new System.Drawing.Point(334, 50);
-      this.AddSummaryFieldsCheckBox.Name = "AddSummaryFieldsCheckBox";
-      this.AddSummaryFieldsCheckBox.Size = new System.Drawing.Size(135, 19);
-      this.AddSummaryFieldsCheckBox.TabIndex = 8;
-      this.AddSummaryFieldsCheckBox.Text = "Add Summary Fields";
-      this.AddSummaryFieldsCheckBox.UseVisualStyleBackColor = true;
       // 
       // ImportTableViewForm
       // 
