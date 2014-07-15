@@ -272,7 +272,7 @@ namespace MySQL.ForExcel.Forms
       Cursor = Cursors.WaitCursor;
 
       // Refresh import parameter values
-      _dbProcedure.ImportParameters.AddSummaryFields = AddSummaryFieldsCheckBox.Checked;
+      _dbProcedure.ImportParameters.AddSummaryRow = AddSummaryFieldsCheckBox.Checked;
       _dbProcedure.ImportParameters.CreatePivotTable = CreatePivotTableCheckBox.Checked;
       _dbProcedure.ImportParameters.IncludeColumnNames = IncludeHeadersCheckBox.Checked;
       _dbProcedure.ImportParameters.IntoNewWorksheet = false;

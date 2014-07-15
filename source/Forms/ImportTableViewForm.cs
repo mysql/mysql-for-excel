@@ -358,7 +358,7 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void SetImportParameterValues(int rowsCount)
     {
-      _dbTableOrView.ImportParameters.AddSummaryFields = AddSummaryFieldsCheckBox.Checked;
+      _dbTableOrView.ImportParameters.AddSummaryRow = AddSummaryFieldsCheckBox.Checked;
       _dbTableOrView.ImportParameters.ColumnsNamesList = _importColumns;
       _dbTableOrView.ImportParameters.CreatePivotTable = CreatePivotTableCheckBox.Checked;
       _dbTableOrView.ImportParameters.FirstRowIndex = FirstRowIndex;

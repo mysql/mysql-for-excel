@@ -922,8 +922,7 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
     <value>..\Resources\MySQLforExcel-RelatedObjects-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="ImportTableOrViewSubText" xml:space="preserve">
-    <value>Click on column headers to exclude/include them when
-importing the MySQL {0} data in Excel.</value>
+    <value>Click on column headers to exclude/include them when importing the MySQL {0} data in Excel.</value>
   </data>
   <data name="select_all" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\select_all.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -968,7 +967,7 @@ importing the MySQL {0} data in Excel.</value>
     <value>Selected related Tables and Views: </value>
   </data>
   <data name="ParentWorkbookNullError" xml:space="preserve">
-    <value>The parent workbook of worksheet {0} could not be obtained while trying to create the Excel table {1}.</value>
+    <value>The parent workbook of worksheet {0} could not be obtained.</value>
   </data>
   <data name="ExcelTableCreationError" xml:space="preserve">
     <value>An error ocurred trying to create the Excel table {0}</value>
@@ -1030,5 +1029,11 @@ What do you want to do with them?</value>
   </data>
   <data name="ExcelRelationshipsCreationErrorTitle" xml:space="preserve">
     <value>Excel Model Relationships Creation Error</value>
+  </data>
+  <data name="WorkbookConnectionForExcelTableDescription" xml:space="preserve">
+    <value>Created by MySQL for Excel, for its internal use only.</value>
+  </data>
+  <data name="WorkbookConnectionForExcelModelDescription" xml:space="preserve">
+    <value>Created by MySQL for Excel in order for Excel to create a corresponding Model Table, for its internal use only.</value>
   </data>
 </root>

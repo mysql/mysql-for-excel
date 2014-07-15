@@ -193,7 +193,7 @@ namespace MySQL.ForExcel.Classes
 
         if (!ImportParameters.ForEditDataOperation)
         {
-          excelTableOrRange = mySqlTable.ImportDataAtActiveExcelCell(Settings.Default.ImportCreateExcelTable, ImportParameters.CreatePivotTable, ImportParameters.PivotTablePosition, ImportParameters.AddSummaryFields);
+          excelTableOrRange = mySqlTable.ImportDataAtActiveExcelCell(Settings.Default.ImportCreateExcelTable, ImportParameters.CreatePivotTable, ImportParameters.PivotTablePosition, ImportParameters.AddSummaryRow);
         }
 
         retTuple = new Tuple<MySqlDataTable, object>(mySqlTable, excelTableOrRange);

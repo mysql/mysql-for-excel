@@ -1251,8 +1251,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Click on column headers to exclude/include them when
-        ///importing the MySQL {0} data in Excel..
+        ///   Looks up a localized string similar to Click on column headers to exclude/include them when importing the MySQL {0} data in Excel..
         /// </summary>
         internal static string ImportTableOrViewSubText {
             get {
@@ -1978,7 +1977,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The parent workbook of worksheet {0} could not be obtained while trying to create the Excel table {1}..
+        ///   Looks up a localized string similar to The parent workbook of worksheet {0} could not be obtained..
         /// </summary>
         internal static string ParentWorkbookNullError {
             get {
@@ -2671,6 +2670,24 @@ namespace MySQL.ForExcel.Properties {
         internal static string WarningSingleText {
             get {
                 return ResourceManager.GetString("WarningSingleText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Created by MySQL for Excel in order for Excel to create a corresponding Model Table, for its internal use only..
+        /// </summary>
+        internal static string WorkbookConnectionForExcelModelDescription {
+            get {
+                return ResourceManager.GetString("WorkbookConnectionForExcelModelDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Created by MySQL for Excel, for its internal use only..
+        /// </summary>
+        internal static string WorkbookConnectionForExcelTableDescription {
+            get {
+                return ResourceManager.GetString("WorkbookConnectionForExcelTableDescription", resourceCulture);
             }
         }
         

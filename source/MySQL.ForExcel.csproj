@@ -235,6 +235,7 @@
     <Compile Include="Classes\DbSchema.cs" />
     <Compile Include="Classes\DbTable.cs" />
     <Compile Include="Classes\DbView.cs" />
+    <Compile Include="Classes\Exceptions\ParentWorkbookNullException.cs" />
     <Compile Include="Classes\ImportDataParams.cs" />
     <Compile Include="Classes\ImportSessionInfo.cs" />
     <Compile Include="Classes\EditSessionInfo.cs" />

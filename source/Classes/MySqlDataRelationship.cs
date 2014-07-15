@@ -210,11 +210,15 @@ namespace MySQL.ForExcel.Classes
         return CreationStatus.ModelTablesNotFound;
       }
 
-      modelTableName = modelTableName.Replace(".", " ");
-      relatedModelTableName = relatedModelTableName.Replace(".", " ");
       try
       {
+        // Create the Workbook connections that trigger the Model Tables creation
+        CreateExcelModelConnection(modelTableName);
+        CreateExcelModelConnection(relatedModelTableName);
+
         // Get the ModelColumnName objects needed to define the relationship
+        modelTableName = modelTableName.Replace(".", " ");
+        relatedModelTableName = relatedModelTableName.Replace(".", " ");
         var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
         var table = activeWorkbook.Model.ModelTables.Cast<ExcelInterop.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, modelTableName, StringComparison.InvariantCulture));
         var relatedTable = activeWorkbook.Model.ModelTables.Cast<ExcelInterop.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, relatedModelTableName, StringComparison.InvariantCulture));
@@ -259,12 +263,31 @@ namespace MySQL.ForExcel.Classes
     /// <returns>A string describing the current relationship.</returns>
     public override string ToString()
     {
-      return string.Format("`{0}` (`{1}`) {2} `{3}` (`{4}`),",
+      return string.Format("`{0}` (`{1}`) {2} `{3}` (`{4}`)",
         TableName,
         ColumnName,
         Direction == DirectionType.Normal ? ">--" : "--<",
         RelatedTableName,
         RelatedColumnName);
+    }
+
+    /// <summary>
+    /// Creates a <see cref="ExcelInterop.WorkbookConnection"/> for each of the tables in the relationship, needed so Excel automatically creates their corresponding <see cref="ExcelInterop.ModelTable"/> objects.
+    /// </summary>
+    /// <param name="modelTableName">The name of the <see cref="ExcelInterop.ModelTable"/> (or <see cref="ExcelInterop.ListObject"/>).</param>
+    private void CreateExcelModelConnection(string modelTableName)
+    {
+      if (ImportMultipleDialog.Excel2010OrLower)
+      {
+        return;
+      }
+
+      var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+      var commandText = string.Format("{0}!{1}", activeWorkbook.Name, modelTableName);
+      var connectionName = "ModelConnection_For_" + commandText;
+      var connectionStringForCmdExcel = "WORKSHEET;" + activeWorkbook.Name;
+      var workbookConnection = activeWorkbook.Connections.Add2(connectionName, string.Empty, connectionStringForCmdExcel, commandText, ExcelInterop.XlCmdType.xlCmdExcel, true, false);
+      workbookConnection.Description = Resources.WorkbookConnectionForExcelModelDescription;
     }
   }
 }

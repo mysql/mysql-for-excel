@@ -289,7 +289,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The connection string used for a new <see cref="ExcelInterop.WorkbookConnection"/> that uses a <see cref="ExcelInterop.XlCmdType.xlCmdDefault"/> command type.</returns>
     public static string GetConnectionStringForCmdDefault(this MySqlWorkbenchConnection connection)
     {
-      return connection == null ? string.Empty : string.Format("OLEDB;Provider=MSDASQL;Driver={{MySQL ODBC 5.2 ANSI Driver}};Server={0};Database={1};User={2};Option=3;", connection.Host, connection.Schema, connection.UserName);
+      return connection == null ? string.Empty : string.Format("OLEDB;Driver={{MySQL ODBC 5.3 ANSI Driver}};Provider=MSDASQL;Server={0};Port={1};Database={2};User={3};Option=3;", connection.Host, connection.Port, connection.Schema, connection.UserName);
     }
 
     /// <summary>

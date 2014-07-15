@@ -181,7 +181,7 @@ namespace MySQL.ForExcel.Classes
           }
 
           tableIdx++;
-          var excelObj = mySqlTable.ImportDataAtActiveExcelCell(Settings.Default.ImportCreateExcelTable, ImportParameters.CreatePivotTable, pivotPosition, ImportParameters.AddSummaryFields);
+          var excelObj = mySqlTable.ImportDataAtActiveExcelCell(Settings.Default.ImportCreateExcelTable, ImportParameters.CreatePivotTable, pivotPosition, ImportParameters.AddSummaryRow);
           if (excelObj == null)
           {
             continue;

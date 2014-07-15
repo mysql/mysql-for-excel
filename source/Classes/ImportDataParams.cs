@@ -41,7 +41,7 @@ namespace MySQL.ForExcel.Classes
     public ImportDataParams(string dbObjectName)
     {
       _rowsCount = -1;
-      AddSummaryFields = false;
+      AddSummaryRow = false;
       ColumnsNamesList = null;
       CreatePivotTable = false;
       DbObjectName = dbObjectName;
@@ -57,7 +57,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets or sets a value indicating whether to include a row with summary fields at the end of the data rows.
     /// </summary>
-    public bool AddSummaryFields { get; set; }
+    public bool AddSummaryRow { get; set; }
 
     /// <summary>
     /// Gets or sets the selected columns list. All columns are to be returned if <c>null</c>.

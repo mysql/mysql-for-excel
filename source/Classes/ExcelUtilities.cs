@@ -321,27 +321,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Creates an Excel table from a given <see cref="ExcelInterop.Range"/> object.
-    /// </summary>
-    /// <param name="range">A <see cref="ExcelInterop.Range"/> object.</param>
-    /// <param name="excelTableName">The proposed name for the new Excel table.</param>
-    /// <param name="containsColumnNames">Flag indicating whether column names appear in the first row of the Excel range.</param>
-    [Obsolete("This method is deprecated, the CreateExcelTable method in the MySqlDataTable class is being used instead.")]
-    public static void CreateExcelTable(this ExcelInterop.Range range, string excelTableName, bool containsColumnNames)
-    {
-      if (range == null)
-      {
-        return;
-      }
-
-      var hasHeaders = containsColumnNames ? ExcelInterop.XlYesNoGuess.xlYes : ExcelInterop.XlYesNoGuess.xlNo;
-      var namedTable = range.Worksheet.ListObjects.Add(ExcelInterop.XlListObjectSourceType.xlSrcRange, range, Type.Missing, hasHeaders, Type.Missing);
-      namedTable.Name = excelTableName.GetExcelTableNameAvoidingDuplicates();
-      namedTable.DisplayName = namedTable.Name;
-      namedTable.TableStyle = Settings.Default.ImportExcelTableStyleName;
-    }
-
-    /// <summary>
     /// Creates a default <see cref="ExcelInterop.TableStyle"/> for MySQL imported data.
     /// </summary>
     /// <param name="workbook">The workbook where the new <see cref="ExcelInterop.Style"/> is added to.</param>
@@ -522,7 +501,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="toolsExcelTable">A <see cref="ExcelTools.ListObject"/> object.</param>
     /// <param name="logException">Flag indicating whether any exception is written to the application log.</param>
     /// <returns><c>true</c> if the deletion happened without errors, <c>false</c> otherwise.</returns>
-    public static bool DisconnectAndDelete(this ExcelTools.ListObject toolsExcelTable, bool logException)
+    public static bool DisconnectAndDelete(this ExcelTools.ListObject toolsExcelTable, bool logException = false)
     {
       if (toolsExcelTable == null)
       {
@@ -580,38 +559,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Returns the command text used for a new <see cref="ExcelInterop.WorkbookConnection"/>.
-    /// </summary>
-    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
-    /// <param name="excelTableName">The name of a <see cref="ExcelInterop.ListObject"/>.</param>
-    /// <returns>The command text used for a new <see cref="ExcelInterop.WorkbookConnection"/>.</returns>
-    public static string GetCommandText(this ExcelInterop.Workbook workbook, string excelTableName)
-    {
-      return workbook == null ? string.Empty : string.Format("{0}!{1}", workbook.Name, excelTableName);
-    }
-
-    /// <summary>
-    /// Returns the connection name used for a new <see cref="ExcelInterop.WorkbookConnection"/>.
-    /// </summary>
-    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
-    /// <param name="excelTableName">The name of a <see cref="ExcelInterop.ListObject"/>.</param>
-    /// <returns>The connection name used for a new <see cref="ExcelInterop.WorkbookConnection"/>.</returns>
-    public static string GetConnectionName(this ExcelInterop.Workbook workbook, string excelTableName)
-    {
-      return workbook == null ? string.Empty : @"WorkbookConnection_" + workbook.GetCommandText(excelTableName);
-    }
-
-    /// <summary>
-    /// Returns the command string used when a <see cref="ExcelInterop.WorkbookConnection"/> is created with a command type of <see cref="ExcelInterop.XlCmdType.xlCmdExcel"/>.
-    /// </summary>
-    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
-    /// <returns>The command string used when a <see cref="ExcelInterop.WorkbookConnection"/> is created with a command type of <see cref="ExcelInterop.XlCmdType.xlCmdExcel"/>.</returns>
-    public static string GetConnectionStringForCmdExcel(this ExcelInterop.Workbook workbook)
-    {
-      return workbook != null ? "WORKSHEET;" + workbook.Name : string.Empty;
-    }
-
-    /// <summary>
     /// Returns a <see cref="ExcelInterop.ListObject"/> contained in the given <see cref="ExcelInterop.Worksheet"/> with the given name.
     /// </summary>
     /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
@@ -641,13 +588,38 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a valid name for a new <see cref="ExcelInterop.ListObject"/> that avoids duplicates with existing ones in the current <see cref="ExcelInterop.Worksheet"/>.
+    /// Gets a valid name for a new <see cref="ExcelInterop.ListObject"/> that avoids duplicates with existing ones in the current <see cref="ExcelTools.Worksheet"/>.
     /// </summary>
+    /// <param name="worksheet">A <see cref="ExcelTools.Workbook"/> object.</param>
     /// <param name="excelTableName">The proposed name for a <see cref="ExcelInterop.ListObject"/>.</param>
     /// <returns>A <see cref="ExcelInterop.ListObject"/> valid name.</returns>
-    public static string GetExcelTableNameAvoidingDuplicates(this string excelTableName)
+    public static string GetExcelTableNameAvoidingDuplicates(this ExcelTools.Worksheet worksheet, string excelTableName)
     {
-      return excelTableName.GetExcelTableNameAvoidingDuplicates(1);
+      var newName = excelTableName;
+      if (worksheet == null)
+      {
+        return newName;
+      }
+
+      int copyIndex = 1;
+      do
+      {
+        // Prepare Excel table name and dummy connection
+        newName = excelTableName.GetExcelTableNameAvoidingDuplicates(ref copyIndex);
+
+        // Check first if there is an orphaned Tools Excel table (leftover from a deleted Interop Excel table) and if so then attempt to free resources.
+        if (!worksheet.Controls.Contains(newName))
+        {
+          break;
+        }
+
+        var toolsExcelTable = worksheet.Controls[newName] as ExcelTools.ListObject;
+        toolsExcelTable.DisconnectAndDelete();
+
+        // At this point a new name is needed since for some reason or bug the Globals.Factory throws an error
+        // trying to check if there is a Tools Excel table already for the existing name, so continue in the loop.
+      } while (true);
+      return newName;
     }
 
     /// <summary>
@@ -668,6 +640,7 @@ namespace MySQL.ForExcel.Classes
       {
         try
         {
+          // Compare the comment values since they contain the GUID that identify the connection information.
           if (!string.Equals(workbookSession.ExcelTable.Comment, excelTable.Comment, StringComparison.InvariantCultureIgnoreCase))
           {
             continue;
@@ -1093,6 +1066,16 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets a valid name for a new <see cref="ExcelInterop.WorkbookConnection"/> that avoids duplicates with existing ones in the current <see cref="ExcelInterop.Workbook"/>.
+    /// </summary>
+    /// <param name="workbookConnectionName">The proposed name for a <see cref="ExcelInterop.WorkbookConnection"/>.</param>
+    /// <returns>A <see cref="ExcelInterop.WorkbookConnection"/> valid name.</returns>
+    public static string GetWorkbookConnectionNameAvoidingDuplicates(this string workbookConnectionName)
+    {
+      return workbookConnectionName.GetWorkbookConnectionNameAvoidingDuplicates(1);
+    }
+
+    /// <summary>
     /// Gets a valid name for a new <see cref="ExcelInterop.Worksheet"/> that avoids duplicates with existing ones in the given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
     /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/>.</param>
@@ -1500,7 +1483,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="excelTableName">The proposed name for a <see cref="ExcelInterop.ListObject"/>.</param>
     /// <param name="copyIndex">Consecutive number for a <see cref="ExcelInterop.ListObject"/> if duplicates are found.</param>
     /// <returns>A <see cref="ExcelInterop.ListObject"/> valid name.</returns>
-    private static string GetExcelTableNameAvoidingDuplicates(this string excelTableName, int copyIndex)
+    private static string GetExcelTableNameAvoidingDuplicates(this string excelTableName, ref int copyIndex)
     {
       var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
       if (activeWorkbook == null)
@@ -1548,6 +1531,30 @@ namespace MySQL.ForExcel.Classes
           }
         }
       } while (foundSameName);
+
+      return retName;
+    }
+
+    /// <summary>
+    /// Gets a valid name for a new <see cref="ExcelInterop.WorkbookConnection"/> that avoids duplicates with existing ones in the current <see cref="ExcelInterop.Workbook"/>.
+    /// </summary>
+    /// <param name="workbookConnectionName">The proposed name for a <see cref="ExcelInterop.WorkbookConnection"/>.</param>
+    /// <param name="copyIndex">Consecutive number for a <see cref="ExcelInterop.WorkbookConnection"/> if duplicates are found.</param>
+    /// <returns>A <see cref="ExcelInterop.WorkbookConnection"/> valid name.</returns>
+    private static string GetWorkbookConnectionNameAvoidingDuplicates(this string workbookConnectionName, int copyIndex)
+    {
+      var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+      if (activeWorkbook == null)
+      {
+        return workbookConnectionName;
+      }
+
+      string retName;
+      do
+      {
+        retName = copyIndex > 1 ? string.Format("{0}.{1}", workbookConnectionName, copyIndex) : workbookConnectionName;
+        copyIndex++;
+      } while (activeWorkbook.Connections.Cast<ExcelInterop.WorkbookConnection>().Any(wBconn => wBconn.Name == retName));
 
       return retName;
     }

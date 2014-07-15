@@ -1,4 +1,7 @@
 1.3.2
+- Optimized code that creates Workbook connections so instead of always creating 2 connections for each created Excel table now 1 is created. A second Workbook connection
+  is only created when creating Excel relationships for imported tables, that second connection is needed for Excel to create their corresponding Model Tables which are
+  used to create each Excel relationship.
 - Rewording of Restore Saved Edit Sessions and Import Sessions Missing Connections dialogs to make them more understandable.
 - Added token validation at AfterSave event to ensure no reconnection information is saved when the workbook saving process is cancelled.
   (MySQL Bug #73192, Bug #19153978 - RECONNECTION INFO FOR EXCEL TABLES IS SAVED ALTHOUGH WORKBOOK SAVE IS CANCELLED)
