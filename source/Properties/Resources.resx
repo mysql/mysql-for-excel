@@ -980,13 +980,13 @@ importing the MySQL {0} data in Excel.</value>
     <value>An error ocurred trying to refresh MySQL data in Excel table {0}</value>
   </data>
   <data name="ImportSessionsMissingConnectionsDetail" xml:space="preserve">
-    <value>Some connections for Import Sessions in this workbook can't be found.</value>
+    <value>Some Excel tables could not be reconnected to their corresponding MySQL databases because the connections could not be located.</value>
   </data>
   <data name="ImportSessionsMissingConnectionsMoreInfo" xml:space="preserve">
     <value>The following connections were not found:</value>
   </data>
   <data name="ImportSessionsMissingConnectionsTitle" xml:space="preserve">
-    <value>Import Sessions Missing Connections</value>
+    <value>Excel Tables Reconnection</value>
   </data>
   <data name="RestoreEditSessionsDetail" xml:space="preserve">
     <value>The Excel workbook being opened contains saved Edit sessions.
@@ -1003,9 +1003,6 @@ What do you want to do with them?</value>
   </data>
   <data name="DeleteButtonText" xml:space="preserve">
     <value>Delete</value>
-  </data>
-  <data name="NothingButtonText" xml:space="preserve">
-    <value>Nothing</value>
   </data>
   <data name="RestoreButtonText" xml:space="preserve">
     <value>Restore</value>

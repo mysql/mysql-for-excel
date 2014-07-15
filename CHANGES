@@ -1,4 +1,5 @@
 1.3.2
+- Rewording of Restore Saved Edit Sessions and Import Sessions Missing Connections dialogs to make them more understandable.
 - Added token validation at AfterSave event to ensure no reconnection information is saved when the workbook saving process is cancelled.
   (MySQL Bug #73192, Bug #19153978 - RECONNECTION INFO FOR EXCEL TABLES IS SAVED ALTHOUGH WORKBOOK SAVE IS CANCELLED)
 - Rewrote the code that handles tables relationships in the Import Multiple dialog, relationships are detected for all tables imported to Excel (both the ones in the

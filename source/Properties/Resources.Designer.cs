@@ -1215,7 +1215,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Some connections for Import Sessions in this workbook can&apos;t be found..
+        ///   Looks up a localized string similar to Some Excel tables could not be reconnected to their corresponding MySQL databases because the connections could not be located..
         /// </summary>
         internal static string ImportSessionsMissingConnectionsDetail {
             get {
@@ -1233,7 +1233,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Import Sessions Missing Connections.
+        ///   Looks up a localized string similar to Excel Tables Reconnection.
         /// </summary>
         internal static string ImportSessionsMissingConnectionsTitle {
             get {
@@ -1910,15 +1910,6 @@ namespace MySQL.ForExcel.Properties {
         internal static string NewSchemaOperationSuccessSummaryText {
             get {
                 return ResourceManager.GetString("NewSchemaOperationSuccessSummaryText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Nothing.
-        /// </summary>
-        internal static string NothingButtonText {
-            get {
-                return ResourceManager.GetString("NothingButtonText", resourceCulture);
             }
         }
         

@@ -1507,7 +1507,7 @@ namespace MySQL.ForExcel
         return;
       }
 
-      var buttonsProperties = new InfoButtonsProperties(Resources.RestoreButtonText, DialogResult.Yes, Resources.NothingButtonText, DialogResult.Cancel, Resources.DeleteButtonText, DialogResult.Abort);
+      var buttonsProperties = new InfoButtonsProperties(Resources.RestoreButtonText, DialogResult.Yes, Resources.WorkOfflineButtonText, DialogResult.Cancel, Resources.DeleteButtonText, DialogResult.Abort);
       DialogResult dialogResult = InfoDialog.ShowDialog(InfoDialog.DialogType.Generic3Buttons, InfoDialog.InfoType.Warning,
       Resources.RestoreEditSessionsTitle, Resources.RestoreEditSessionsDetail, null, null, false, buttonsProperties);
 
