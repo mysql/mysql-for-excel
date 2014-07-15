@@ -611,7 +611,7 @@ namespace MySQL.ForExcel
       }
 
       // Scrubbing of duplicated Import sessions and setting last access time.
-      RemoveInvalidImportSessions();
+      RemoveInvalidImportConnectionInformation();
       foreach (var activeImportSession in ActiveWorkbookImportSessions)
       {
         activeImportSession.LastAccess = DateTime.Now;
@@ -665,30 +665,31 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Removes the duplicate import sessions.
+    /// Removes invalid import connection information from the collection.
     /// </summary>
-    private void RemoveInvalidImportSessions()
+    private void RemoveInvalidImportConnectionInformation()
     {
-      var workbookImportSessions = ActiveWorkbookImportSessions;
-
-      //Remove all import sessions related to the active workbook that are no longer valid.
-      if (StoredImportSessions.Count > 1)
+      var invalidConnectionInfos = new List<ImportSessionInfo>();
+      foreach (var importConnectionInfo in ActiveWorkbookImportSessions)
       {
-        int endloop = workbookImportSessions.Count;
-        for (int i = 0; i < endloop - 1; i++)
+        try
         {
-          var importSession = workbookImportSessions[i];
-          for (int j = i + 1; j < endloop; j++)
-          {
-            if (!importSession.HasSameWorkbookWorkSheetAndExcelTable(workbookImportSessions[j]))
-            {
-              continue;
-            }
-
-            StoredImportSessions.Remove(importSession);
-            break;
-          }
+          // DO NOT REMOVE this line. If the excel table is invalid, accessing it will throw an exception.
+          var excelTableComment = importConnectionInfo.ExcelTable.Comment;
         }
+        catch
+        {
+          // The session's list object was moved to another worksheet or when its columns had been deleted or the reference to it no longer exists.
+          invalidConnectionInfos.Add(importConnectionInfo);
+        }
+      }
+
+      // Dispose of import sessions that are no longer valid for the current workbook.
+      if (invalidConnectionInfos.Count > 0)
+      {
+        invalidConnectionInfos.ForEach(invalidSession => invalidSession.ExcelTable.DeleteSafely(false));
+        invalidConnectionInfos.ForEach(invalidSession => StoredImportSessions.Remove(invalidSession));
+        MiscUtilities.SaveSettings();
       }
     }
 
@@ -708,7 +709,7 @@ namespace MySQL.ForExcel
       if (!wasAlreadySaved)
       {
         // Cleanup and close import sessions from the closing workbook.
-        RemoveInvalidImportSessions();
+        RemoveInvalidImportConnectionInformation();
         foreach (var importSession in ActiveWorkbookImportSessions)
         {
           importSession.Dispose();
