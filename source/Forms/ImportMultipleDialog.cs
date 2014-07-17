@@ -33,7 +33,21 @@ namespace MySQL.ForExcel.Forms
   /// </summary>
   public partial class ImportMultipleDialog : AutoStyleableBaseDialog
   {
+    #region Constants
+
+    /// <summary>
+    /// The proposed name for a <see cref="ExcelInterop.PivotTable"/> created for all <see cref="ExcelInterop.ModelTable"/> objects in the active <see cref="ExcelInterop.Workbook"/>.
+    /// </summary>
+    public const string DATA_MODEL_PIVOT_TABLE_PROPOSED_NAME = "MultiTablePivot";
+
+    #endregion Constants
+
     #region Fields
+
+    /// <summary>
+    /// A dictionary containing the names of imported <see cref="DbTable"/>s or <see cref="DbView"/>s and their corresponding created <see cref="ExcelInterop.ListObject"/> objects.
+    /// </summary>
+    private Dictionary<string, ExcelInterop.ListObject> _excelTablesDictionary;
 
     /// <summary>
     /// The Tables or Views selected by users for import.
@@ -49,6 +63,11 @@ namespace MySQL.ForExcel.Forms
     /// The Tables related to objects selected by the users.
     /// </summary>
     private readonly List<DbView> _relatedTables;
+
+    /// <summary>
+    /// A list of <see cref="MySqlDataRelationship"/> objects representing relationships to be created from the imported <see cref="DbTable"/> objects.
+    /// </summary>
+    private List<MySqlDataRelationship> _relationshipsToCreateList;
 
     /// <summary>
     /// The full Table or View DB objects list contained in the current selected schema.
@@ -141,6 +160,95 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
+    /// Creates a <see cref="ExcelInterop.ModelRelationship"/> objects representing relationships among imported <see cref="DbTable"/> objects.
+    /// </summary>
+    private void CreateExcelRelationships()
+    {
+      if (!_importRelationshipsEnabled || _relationshipsToCreateList == null || _relationshipsToCreateList.Count <= 0 || _excelTablesDictionary == null)
+      {
+        return;
+      }
+
+      var relationshipsCreationErrorBuilder = new StringBuilder(_relationshipsToCreateList.Count * 200);
+      foreach (var relationship in _relationshipsToCreateList)
+      {
+        ExcelInterop.ListObject excelTable;
+        ExcelInterop.ListObject relatedExcelTable;
+        bool excelTableExists = _excelTablesDictionary.TryGetValue(relationship.TableName, out excelTable);
+        bool relatedExcelTableExists = _excelTablesDictionary.TryGetValue(relationship.RelatedTableName, out relatedExcelTable);
+        if (!excelTableExists || !relatedExcelTableExists)
+        {
+          if (relationshipsCreationErrorBuilder.Length > 0)
+          {
+            relationshipsCreationErrorBuilder.Append(Environment.NewLine);
+          }
+
+          relationshipsCreationErrorBuilder.Append(relationship.GetCreationErrorMessage(MySqlDataRelationship.CreationStatus.ModelTablesNotFound));
+          continue;
+        }
+
+        var creationStatus = relationship.CreateExcelRelationship(excelTable.Name, relatedExcelTable.Name);
+        if (creationStatus == MySqlDataRelationship.CreationStatus.Success)
+        {
+          continue;
+        }
+
+        if (relationshipsCreationErrorBuilder.Length > 0)
+        {
+          relationshipsCreationErrorBuilder.Append(Environment.NewLine);
+        }
+
+        relationshipsCreationErrorBuilder.Append(relationship.GetCreationErrorMessage(creationStatus));
+      }
+
+      if (relationshipsCreationErrorBuilder.Length > 0)
+      {
+        InfoDialog.ShowErrorDialog(Resources.ExcelRelationshipsCreationErrorTitle, Resources.ExcelRelationshipsCreationErrorDetail, null, relationshipsCreationErrorBuilder.ToString(), false);
+        relationshipsCreationErrorBuilder.Clear();
+      }
+
+      _excelTablesDictionary.Clear();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="CreatePivotTableCheckBox"/> checked state changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void CreatePivotTableCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+      PivotTablesComboBox.Enabled = CreatePivotTableCheckBox.Checked;
+      PivotTablesComboBox.SelectedIndex = 0;
+    }
+
+    /// <summary>
+    /// Creates a <see cref="ExcelInterop.PivotTable"/> in a new <see cref="ExcelInterop.Worksheet"/> that contains all <see cref="ExcelInterop.ModelTable"/>s in the active <see cref="ExcelInterop.Workbook"/>.
+    /// </summary>
+    private void CreatePivotTableForAllRelatedModelTables()
+    {
+      if (!CreatePivotTableCheckBox.Checked || PivotTablesComboBox.SelectedIndex != 0)
+      {
+        return;
+      }
+
+      var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+      var workbookDataModelConnection = activeWorkbook.Connections.Cast<ExcelInterop.WorkbookConnection>().FirstOrDefault(wbConn => wbConn.Name == ExcelUtilities.WORKBOOK_DATA_MODEL_CONNECTION_NAME);
+      if (workbookDataModelConnection == null)
+      {
+        return;
+      }
+
+      // Create a new Excel Worksheet for the PivotTable since it will contain all related tables in the Workbook's data model
+      var currentWorksheet = activeWorkbook.CreateWorksheet(DATA_MODEL_PIVOT_TABLE_PROPOSED_NAME, true);
+      if (currentWorksheet == null)
+      {
+        return;
+      }
+
+      ExcelUtilities.CreatePivotTable(workbookDataModelConnection, Globals.ThisAddIn.Application.ActiveCell, DATA_MODEL_PIVOT_TABLE_PROPOSED_NAME);
+    }
+
+    /// <summary>
     /// Gets the owner <see cref="ListView"/> of a <see cref="ContextMenuStrip"/> control.
     /// </summary>
     /// <param name="toolStripMenuControl">An boxed object containing a <see cref="ContextMenuStrip"/> control.</param>
@@ -177,11 +285,10 @@ namespace MySQL.ForExcel.Forms
     /// <returns><c>true</c> if the import is successful, <c>false</c> if errros were found during the import.</returns>
     private void ImportData()
     {
-      Cursor = Cursors.WaitCursor;
-      var relationshipsList = new List<MySqlDataRelationship>();
+      _relationshipsToCreateList = new List<MySqlDataRelationship>();
 
       // Import tables data in Excel worksheets
-      var excelTablesDictionary = new Dictionary<string, ExcelInterop.ListObject>();
+      _excelTablesDictionary = new Dictionary<string, ExcelInterop.ListObject>();
       var fullImportList = _importTablesOrViews.Concat(_relatedTables.Where(dbo => !dbo.Excluded)).ToList();
       foreach (var importTableOrView in fullImportList)
       {
@@ -198,56 +305,10 @@ namespace MySQL.ForExcel.Forms
         }
 
         // Add relationships of the current importing
-        excelTablesDictionary.Add(importTuple.Item1.TableName, excelTable);
+        _excelTablesDictionary.Add(importTuple.Item1.TableName, excelTable);
         var importedTableNames = fullImportList.Where(dbo => dbo is DbTable).Select(dbo => dbo.Name).ToList();
-        relationshipsList.AddRange(dbTable.Relationships.Where(rel => rel.ExistsAmongTablesInList(importedTableNames)));
+        _relationshipsToCreateList.AddRange(dbTable.Relationships.Where(rel => rel.ExistsAmongTablesInList(importedTableNames)));
       }
-
-      // Create Excel relationships
-      if (_importRelationshipsEnabled && relationshipsList.Count > 0)
-      {
-        var relationshipsCreationErrorBuilder = new StringBuilder(relationshipsList.Count * 200);
-        foreach (var relationship in relationshipsList)
-        {
-          ExcelInterop.ListObject excelTable;
-          ExcelInterop.ListObject relatedExcelTable;
-          bool excelTableExists = excelTablesDictionary.TryGetValue(relationship.TableName, out excelTable);
-          bool relatedExcelTableExists = excelTablesDictionary.TryGetValue(relationship.RelatedTableName, out relatedExcelTable);
-          if (!excelTableExists || !relatedExcelTableExists)
-          {
-            if (relationshipsCreationErrorBuilder.Length > 0)
-            {
-              relationshipsCreationErrorBuilder.Append(Environment.NewLine);
-            }
-
-            relationshipsCreationErrorBuilder.Append(relationship.GetCreationErrorMessage(MySqlDataRelationship.CreationStatus.ModelTablesNotFound));
-            continue;
-          }
-
-          var creationStatus = relationship.CreateExcelRelationship(excelTable.Name, relatedExcelTable.Name);
-          if (creationStatus == MySqlDataRelationship.CreationStatus.Success)
-          {
-            continue;
-          }
-
-          if (relationshipsCreationErrorBuilder.Length > 0)
-          {
-            relationshipsCreationErrorBuilder.Append(Environment.NewLine);
-          }
-
-          relationshipsCreationErrorBuilder.Append(relationship.GetCreationErrorMessage(creationStatus));
-        }
-
-        if (relationshipsCreationErrorBuilder.Length > 0)
-        {
-          InfoDialog.ShowErrorDialog(Resources.ExcelRelationshipsCreationErrorTitle, Resources.ExcelRelationshipsCreationErrorDetail, null, relationshipsCreationErrorBuilder.ToString(), false);
-          relationshipsCreationErrorBuilder.Clear();
-        }
-
-        excelTablesDictionary.Clear();
-      }
-
-      Cursor = Cursors.Default;
     }
 
     /// <summary>
@@ -257,10 +318,16 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void ImportMultipleDialog_FormClosing(object sender, FormClosingEventArgs e)
     {
-      if (DialogResult == DialogResult.OK)
+      if (DialogResult != DialogResult.OK)
       {
-        ImportData();
+        return;
       }
+
+      Cursor = Cursors.WaitCursor;
+      ImportData();
+      CreateExcelRelationships();
+      CreatePivotTableForAllRelatedModelTables();
+      Cursor = Cursors.Default;
     }
 
     /// <summary>
@@ -386,6 +453,7 @@ namespace MySQL.ForExcel.Forms
       CreateExcelRelationshipsCheckBox.Checked = _importRelationshipsEnabled;
       CreateExcelRelationshipsCheckBox.Enabled = _importRelationshipsEnabled;
       WhyDisabledLinkLabel.Visible = !_importRelationshipsEnabled;
+      CreatePivotTableCheckBox_CheckedChanged(this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -396,12 +464,11 @@ namespace MySQL.ForExcel.Forms
     {
       dbTableOrView.ImportParameters.AddSummaryRow = AddSummaryFieldsCheckBox.Checked;
       dbTableOrView.ImportParameters.ColumnsNamesList = null;
-      dbTableOrView.ImportParameters.CreatePivotTable = CreatePivotTableCheckBox.Checked;
+      dbTableOrView.ImportParameters.CreatePivotTable = PivotTablesComboBox.SelectedIndex == 1;
       dbTableOrView.ImportParameters.FirstRowIndex = -1;
       dbTableOrView.ImportParameters.ForEditDataOperation = false;
       dbTableOrView.ImportParameters.IncludeColumnNames = true;
       dbTableOrView.ImportParameters.IntoNewWorksheet = true;
-      dbTableOrView.ImportParameters.PivotTablePosition = MySqlDataTable.PivotTablePosition.Right;
       dbTableOrView.ImportParameters.RowsCount = -1;
     }
 

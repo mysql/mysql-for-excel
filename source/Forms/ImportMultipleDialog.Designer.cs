@@ -38,6 +38,16 @@ namespace MySQL.ForExcel.Forms
         {
           components.Dispose();
         }
+
+        if (_excelTablesDictionary != null)
+        {
+          _excelTablesDictionary.Clear();
+        }
+
+        if (_relationshipsToCreateList != null)
+        {
+          _relationshipsToCreateList.Clear();
+        }
       }
 
       base.Dispose(disposing);
@@ -79,6 +89,7 @@ namespace MySQL.ForExcel.Forms
       this.ImportButton = new System.Windows.Forms.Button();
       this.CreatePivotTableCheckBox = new System.Windows.Forms.CheckBox();
       this.OptionsGroupBox = new System.Windows.Forms.GroupBox();
+      this.PivotTablesComboBox = new System.Windows.Forms.ComboBox();
       this.AddSummaryFieldsCheckBox = new System.Windows.Forms.CheckBox();
       this.WhyDisabledLinkLabel = new System.Windows.Forms.LinkLabel();
       this.CreateExcelRelationshipsCheckBox = new System.Windows.Forms.CheckBox();
@@ -385,15 +396,17 @@ namespace MySQL.ForExcel.Forms
       this.CreatePivotTableCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.CreatePivotTableCheckBox.Location = new System.Drawing.Point(10, 23);
       this.CreatePivotTableCheckBox.Name = "CreatePivotTableCheckBox";
-      this.CreatePivotTableCheckBox.Size = new System.Drawing.Size(267, 19);
+      this.CreatePivotTableCheckBox.Size = new System.Drawing.Size(128, 19);
       this.CreatePivotTableCheckBox.TabIndex = 0;
-      this.CreatePivotTableCheckBox.Text = "Create a PivotTable for selected table or views";
+      this.CreatePivotTableCheckBox.Text = "Create a PivotTable";
       this.CreatePivotTableCheckBox.UseVisualStyleBackColor = true;
+      this.CreatePivotTableCheckBox.CheckedChanged += new System.EventHandler(this.CreatePivotTableCheckBox_CheckedChanged);
       // 
       // OptionsGroupBox
       // 
       this.OptionsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+      this.OptionsGroupBox.Controls.Add(this.PivotTablesComboBox);
       this.OptionsGroupBox.Controls.Add(this.AddSummaryFieldsCheckBox);
       this.OptionsGroupBox.Controls.Add(this.WhyDisabledLinkLabel);
       this.OptionsGroupBox.Controls.Add(this.CreateExcelRelationshipsCheckBox);
@@ -405,13 +418,28 @@ namespace MySQL.ForExcel.Forms
       this.OptionsGroupBox.TabStop = false;
       this.OptionsGroupBox.Text = "Options";
       // 
+      // PivotTablesComboBox
+      // 
+      this.PivotTablesComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+      this.PivotTablesComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+      this.PivotTablesComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.PivotTablesComboBox.FormattingEnabled = true;
+      this.PivotTablesComboBox.Items.AddRange(new object[] {
+            "for all tables in the data model.",
+            "for each imported table or view."});
+      this.PivotTablesComboBox.Location = new System.Drawing.Point(136, 22);
+      this.PivotTablesComboBox.Name = "PivotTablesComboBox";
+      this.PivotTablesComboBox.Size = new System.Drawing.Size(209, 21);
+      this.PivotTablesComboBox.TabIndex = 1;
+      // 
       // AddSummaryFieldsCheckBox
       // 
+      this.AddSummaryFieldsCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.AddSummaryFieldsCheckBox.AutoSize = true;
-      this.AddSummaryFieldsCheckBox.Location = new System.Drawing.Point(434, 24);
+      this.AddSummaryFieldsCheckBox.Location = new System.Drawing.Point(434, 47);
       this.AddSummaryFieldsCheckBox.Name = "AddSummaryFieldsCheckBox";
       this.AddSummaryFieldsCheckBox.Size = new System.Drawing.Size(121, 17);
-      this.AddSummaryFieldsCheckBox.TabIndex = 1;
+      this.AddSummaryFieldsCheckBox.TabIndex = 4;
       this.AddSummaryFieldsCheckBox.Text = "Add Summary Fields";
       this.AddSummaryFieldsCheckBox.UseVisualStyleBackColor = true;
       // 
@@ -419,7 +447,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.WhyDisabledLinkLabel.AutoSize = true;
       this.WhyDisabledLinkLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.WhyDisabledLinkLabel.Location = new System.Drawing.Point(279, 46);
+      this.WhyDisabledLinkLabel.Location = new System.Drawing.Point(271, 46);
       this.WhyDisabledLinkLabel.Name = "WhyDisabledLinkLabel";
       this.WhyDisabledLinkLabel.Size = new System.Drawing.Size(154, 15);
       this.WhyDisabledLinkLabel.TabIndex = 3;
@@ -513,5 +541,6 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.Label RelatedTablesViewsLabel;
     private System.Windows.Forms.ColumnHeader RelatedToColumnHeader;
     private System.Windows.Forms.CheckBox AddSummaryFieldsCheckBox;
+    private System.Windows.Forms.ComboBox PivotTablesComboBox;
   }
 }

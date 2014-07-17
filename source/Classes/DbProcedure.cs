@@ -169,8 +169,8 @@ namespace MySQL.ForExcel.Classes
         var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
         int tableIdx = 0;
         var pivotPosition = importType == ProcedureResultSetsImportType.AllResultSetsHorizontally
-          ? MySqlDataTable.PivotTablePosition.Below
-          : MySqlDataTable.PivotTablePosition.Right;
+          ? ExcelUtilities.PivotTablePosition.Below
+          : ExcelUtilities.PivotTablePosition.Right;
         foreach (MySqlDataTable mySqlTable in resultSetsDataSet.Tables)
         {
           mySqlTable.ImportColumnNames = ImportParameters.IncludeColumnNames;
@@ -181,7 +181,9 @@ namespace MySQL.ForExcel.Classes
           }
 
           tableIdx++;
-          var excelObj = mySqlTable.ImportDataAtActiveExcelCell(Settings.Default.ImportCreateExcelTable, ImportParameters.CreatePivotTable, pivotPosition, ImportParameters.AddSummaryRow);
+          var excelObj = Settings.Default.ImportCreateExcelTable
+            ? mySqlTable.ImportDataIntoExcelTable(ImportParameters.CreatePivotTable, pivotPosition, ImportParameters.AddSummaryRow)
+            : mySqlTable.ImportDataIntoExcelRange(ImportParameters.CreatePivotTable, pivotPosition, ImportParameters.AddSummaryRow);
           if (excelObj == null)
           {
             continue;

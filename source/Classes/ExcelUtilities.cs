@@ -86,6 +86,11 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public const int EN_US_LOCALE_CODE = 1033;
 
+    /// <summary>
+    /// The name of the <see cref="ExcelInterop.WorkbookConnection"/> created for the whole Excel data model in the active <see cref="ExcelInterop.Workbook"/>.
+    /// </summary>
+    public const string WORKBOOK_DATA_MODEL_CONNECTION_NAME = "ThisWorkbookDataModel";
+
     #endregion Constants
 
     /// <summary>
@@ -227,6 +232,22 @@ namespace MySQL.ForExcel.Classes
     #endregion Properties
 
     /// <summary>
+    /// Specifies identifiers to indicate the position where new <see cref="ExcelInterop.PivotTable"/> objects are placed relative to imported table's data.
+    /// </summary>
+    public enum PivotTablePosition
+    {
+      /// <summary>
+      /// The <see cref="ExcelInterop.PivotTable"/> is placed below the imported data skipping one Excel row.
+      /// </summary>
+      Below,
+
+      /// <summary>
+      /// The <see cref="ExcelInterop.PivotTable"/> is placed to the right of the imported data skipping one Excel column.
+      /// </summary>
+      Right
+    }
+
+    /// <summary>
     /// Adds names to the whole application related to localized date format strings.
     /// </summary>
     /// <param name="workbook">The workbook where the new <see cref="ExcelInterop.Style"/> is added to.</param>
@@ -342,27 +363,57 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Creates a <see cref="ExcelInterop.PivotTable"/> starting at the given cell containing the data in the given <see cref="ExcelInterop.Range"/>.
     /// </summary>
-    /// <param name="fromExcelObject">A <see cref="ExcelInterop.ListObject"/> or <see cref="ExcelInterop.Range"/> containing the data from which to create the <see cref="ExcelInterop.PivotTable"/>.</param>
-    /// <param name="atCell">The top left Excel cell of the new <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <param name="fromExcelRange">A <see cref="ExcelInterop.Range"/> containing the data from which to create the <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <param name="pivotPosition">The position where new <see cref="ExcelInterop.PivotTable"/> objects are placed relative to imported table's data.</param>
     /// <param name="proposedName">The proposed name for the new <see cref="ExcelInterop.PivotTable"/>.</param>
     /// <returns>The newly created <see cref="ExcelInterop.PivotTable"/>.</returns>
-    public static ExcelInterop.PivotTable CreatePivotTable(object fromExcelObject, ExcelInterop.Range atCell, string proposedName)
+    public static ExcelInterop.PivotTable CreatePivotTable(ExcelInterop.Range fromExcelRange, PivotTablePosition pivotPosition, string proposedName)
     {
-      if (atCell == null || !(fromExcelObject is ExcelInterop.ListObject || fromExcelObject is ExcelInterop.Range))
+      if (fromExcelRange == null)
       {
         return null;
       }
 
-      string pivotSource;
-      if (fromExcelObject is ExcelInterop.ListObject)
+      var atCell = fromExcelRange.GetPivotTableTopLeftCell(pivotPosition);
+      return atCell == null ? null : CreatePivotTable(fromExcelRange, atCell, proposedName);
+    }
+
+    /// <summary>
+    /// Creates a <see cref="ExcelInterop.PivotTable"/> starting at the given cell containing the data in the given <see cref="ExcelInterop.Range"/>.
+    /// </summary>
+    /// <param name="fromExcelTable">A <see cref="ExcelInterop.ListObject"/> containing the data from which to create the <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <param name="pivotPosition">The position where new <see cref="ExcelInterop.PivotTable"/> objects are placed relative to imported table's data.</param>
+    /// <param name="proposedName">The proposed name for the new <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <returns>The newly created <see cref="ExcelInterop.PivotTable"/>.</returns>
+    public static ExcelInterop.PivotTable CreatePivotTable(ExcelInterop.ListObject fromExcelTable, PivotTablePosition pivotPosition, string proposedName)
+    {
+      return fromExcelTable == null ? null : CreatePivotTable(fromExcelTable.Range, pivotPosition, proposedName);
+    }
+
+    /// <summary>
+    /// Creates a <see cref="ExcelInterop.PivotTable"/> starting at the given cell containing the data in the given <see cref="ExcelInterop.Range"/>.
+    /// </summary>
+    /// <param name="fromExcelTable">A <see cref="ExcelInterop.ListObject"/> containing the data from which to create the <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <param name="atCell">The top left Excel cell of the new <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <param name="proposedName">The proposed name for the new <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <returns>The newly created <see cref="ExcelInterop.PivotTable"/>.</returns>
+    public static ExcelInterop.PivotTable CreatePivotTable(ExcelInterop.ListObject fromExcelTable, ExcelInterop.Range atCell, string proposedName)
+    {
+      return fromExcelTable == null ? null : CreatePivotTable(fromExcelTable.Range, atCell, proposedName);
+    }
+
+    /// <summary>
+    /// Creates a <see cref="ExcelInterop.PivotTable"/> starting at the given cell containing the data in the given <see cref="ExcelInterop.Range"/>.
+    /// </summary>
+    /// <param name="fromExcelRange">A <see cref="ExcelInterop.Range"/> containing the data from which to create the <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <param name="atCell">The top left Excel cell of the new <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <param name="proposedName">The proposed name for the new <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <returns>The newly created <see cref="ExcelInterop.PivotTable"/>.</returns>
+    public static ExcelInterop.PivotTable CreatePivotTable(ExcelInterop.Range fromExcelRange, ExcelInterop.Range atCell, string proposedName)
+    {
+      if (atCell == null || fromExcelRange == null)
       {
-        var fromExcelTable = fromExcelObject as ExcelInterop.ListObject;
-        pivotSource = fromExcelTable.Name;
-      }
-      else
-      {
-        var fromRange = fromExcelObject as ExcelInterop.Range;
-        pivotSource = fromRange.Address[true, true, ExcelInterop.XlReferenceStyle.xlR1C1, true];
+        return null;
       }
 
       if (string.IsNullOrEmpty(proposedName))
@@ -370,8 +421,51 @@ namespace MySQL.ForExcel.Classes
         proposedName = "PivotTable";
       }
 
-      var worksheet = Globals.Factory.GetVstoObject(atCell.Worksheet);
-      var workbook = worksheet.Parent as ExcelInterop.Workbook;
+      var workbook = atCell.Worksheet.Parent as ExcelInterop.Workbook;
+      if (workbook == null)
+      {
+        return null;
+      }
+
+      ExcelInterop.PivotTable pivotTable = null;
+      try
+      {
+        string pivotSource = fromExcelRange.Address[true, true, ExcelInterop.XlReferenceStyle.xlR1C1, true];
+        proposedName = proposedName.GetPivotTableNameAvoidingDuplicates();
+        var pivotTableVersion = Globals.ThisAddIn.ExcelPivotTableVersion;
+        var pivotCache = workbook.PivotCaches().Create(ExcelInterop.XlPivotTableSourceType.xlDatabase, pivotSource, pivotTableVersion);
+        string tableDestination = atCell.Address[true, true, ExcelInterop.XlReferenceStyle.xlR1C1, true];
+        pivotTable = pivotCache.CreatePivotTable(tableDestination, proposedName, true, pivotTableVersion);
+      }
+      catch (Exception ex)
+      {
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.PivotTableCreationError, proposedName), ex.Message, true);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
+
+      return pivotTable;
+    }
+
+    /// <summary>
+    /// Creates a <see cref="ExcelInterop.PivotTable"/> starting at the given cell containing the data in the given <see cref="ExcelInterop.Range"/>.
+    /// </summary>
+    /// <param name="fromWorkbookConnection">A <see cref="ExcelInterop.WorkbookConnection"/> pointing to the data from which to create the <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <param name="atCell">The top left Excel cell of the new <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <param name="proposedName">The proposed name for the new <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <returns>The newly created <see cref="ExcelInterop.PivotTable"/>.</returns>
+    public static ExcelInterop.PivotTable CreatePivotTable(ExcelInterop.WorkbookConnection fromWorkbookConnection, ExcelInterop.Range atCell, string proposedName)
+    {
+      if (atCell == null || fromWorkbookConnection == null)
+      {
+        return null;
+      }
+
+      if (string.IsNullOrEmpty(proposedName))
+      {
+        proposedName = "PivotTable";
+      }
+
+      var workbook = atCell.Worksheet.Parent as ExcelInterop.Workbook;
       if (workbook == null)
       {
         return null;
@@ -382,7 +476,7 @@ namespace MySQL.ForExcel.Classes
       {
         proposedName = proposedName.GetPivotTableNameAvoidingDuplicates();
         var pivotTableVersion = Globals.ThisAddIn.ExcelPivotTableVersion;
-        var pivotCache = workbook.PivotCaches().Create(ExcelInterop.XlPivotTableSourceType.xlDatabase, pivotSource, pivotTableVersion);
+        var pivotCache = workbook.PivotCaches().Create(ExcelInterop.XlPivotTableSourceType.xlExternal, fromWorkbookConnection, pivotTableVersion);
         string tableDestination = atCell.Address[true, true, ExcelInterop.XlReferenceStyle.xlR1C1, true];
         pivotTable = pivotCache.CreatePivotTable(tableDestination, proposedName, true, pivotTableVersion);
       }
@@ -976,6 +1070,35 @@ namespace MySQL.ForExcel.Classes
     public static string GetPivotTableNameAvoidingDuplicates(this string pivotTableName)
     {
       return pivotTableName.GetPivotTableNameAvoidingDuplicates(1);
+    }
+
+    /// <summary>
+    /// Gets the <see cref="ExcelInterop.Range"/> of the Excel cell where a <see cref="ExcelInterop.PivotTable"/> will be placed (its top left corner).
+    /// </summary>
+    /// <param name="fromSourceRange">The <see cref="ExcelInterop.Range"/> of the <see cref="ExcelInterop.PivotTable"/>'s source data.</param>
+    /// <param name="pivotPosition">The <see cref="PivotTablePosition"/> relative to the source data.</param>
+    /// <param name="skipCount">The number of rows or columns to skip before placing the <see cref="ExcelInterop.PivotTable"/>.</param>
+    /// <returns>The <see cref="ExcelInterop.Range"/> of the Excel cell where a <see cref="ExcelInterop.PivotTable"/> will be placed (its top left corner).</returns>
+    public static ExcelInterop.Range GetPivotTableTopLeftCell(this ExcelInterop.Range fromSourceRange, PivotTablePosition pivotPosition, int skipCount = 1)
+    {
+      if (fromSourceRange == null)
+      {
+        return null;
+      }
+
+      ExcelInterop.Range atCell = fromSourceRange.Cells[1, 1];
+      switch (pivotPosition)
+      {
+        case PivotTablePosition.Below:
+          atCell = atCell.Offset[atCell.Row + fromSourceRange.Rows.Count + skipCount - 1, 0];
+          break;
+
+        case PivotTablePosition.Right:
+          atCell = atCell.Offset[0, atCell.Column + fromSourceRange.Columns.Count + skipCount - 1];
+          break;
+      }
+
+      return atCell;
     }
 
     /// <summary>

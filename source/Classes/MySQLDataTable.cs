@@ -413,22 +413,6 @@ namespace MySQL.ForExcel.Classes
       None
     }
 
-    /// <summary>
-    /// Specifies identifiers to indicate the position where new <see cref="ExcelInterop.PivotTable"/> objects are placed relative to imported table's data.
-    /// </summary>
-    public enum PivotTablePosition
-    {
-      /// <summary>
-      /// The <see cref="ExcelInterop.PivotTable"/> is placed below the imported data skipping one Excel row.
-      /// </summary>
-      Below,
-
-      /// <summary>
-      /// The <see cref="ExcelInterop.PivotTable"/> is placed to the right of the imported data skipping one Excel column.
-      /// </summary>
-      Right
-    }
-
     #endregion Enums
 
     #region Properties
@@ -1473,44 +1457,41 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Imports data contained in the given <see cref="MySqlDataTable"/> object at the active Excel cell.
+    /// Imports data contained in the given <see cref="MySqlDataTable"/> object into a <see cref="ExcelInterop.Range"/>.
     /// </summary>
-    /// <param name="createExcelTable">Flag indicating whether a <see cref="ExcelInterop.ListObject"/> is created for the imported data.</param>
     /// <param name="createPivotTable">Flag indicating whether a <see cref="ExcelInterop.PivotTable"/> is created for the imported data.</param>
     /// <param name="pivotPosition">The position where new <see cref="ExcelInterop.PivotTable"/> objects are placed relative to imported table's data.</param>
     /// <param name="addSummaryFields">Indicates whether to include a row with summary fields at the end of the data rows.</param>
     /// <returns>The <see cref="ExcelInterop.Range"/> or <see cref="ExcelInterop.ListObject"/> containing the cells with the imported data.</returns>
-    public object ImportDataAtActiveExcelCell(bool createExcelTable, bool createPivotTable, PivotTablePosition pivotPosition = PivotTablePosition.Right, bool addSummaryFields = false)
+    public object ImportDataIntoExcelRange(bool createPivotTable, ExcelUtilities.PivotTablePosition pivotPosition = ExcelUtilities.PivotTablePosition.Right, bool addSummaryFields = false)
     {
       var atCell = Globals.ThisAddIn.Application.ActiveCell;
-      object retObj;
-      if (createExcelTable)
+      var importedExcelRange = ImportDataIntoExcelRange(atCell);
+      if (createPivotTable)
       {
-        retObj = ImportDataIntoExcelTable(atCell, addSummaryFields);
-      }
-      else
-      {
-        retObj = ImportDataIntoExcelRange(atCell);
+        ExcelUtilities.CreatePivotTable(importedExcelRange, pivotPosition, ExcelTableName);
       }
 
-      if (!createPivotTable || retObj == null)
+      return importedExcelRange;
+    }
+
+    /// <summary>
+    /// Imports data contained in the given <see cref="MySqlDataTable"/> object into a <see cref="ExcelInterop.ListObject"/>.
+    /// </summary>
+    /// <param name="createPivotTable">Flag indicating whether a <see cref="ExcelInterop.PivotTable"/> is created for the imported data.</param>
+    /// <param name="pivotPosition">The position where new <see cref="ExcelInterop.PivotTable"/> objects are placed relative to imported table's data.</param>
+    /// <param name="addSummaryFields">Indicates whether to include a row with summary fields at the end of the data rows.</param>
+    /// <returns>The <see cref="ExcelInterop.Range"/> or <see cref="ExcelInterop.ListObject"/> containing the cells with the imported data.</returns>
+    public object ImportDataIntoExcelTable(bool createPivotTable, ExcelUtilities.PivotTablePosition pivotPosition = ExcelUtilities.PivotTablePosition.Right, bool addSummaryFields = false)
+    {
+      var atCell = Globals.ThisAddIn.Application.ActiveCell;
+      var importedExcelTable = ImportDataIntoExcelTable(atCell, addSummaryFields);
+      if (createPivotTable)
       {
-        return retObj;
+        ExcelUtilities.CreatePivotTable(importedExcelTable, pivotPosition, ExcelTableName);
       }
 
-      switch (pivotPosition)
-      {
-        case PivotTablePosition.Below:
-          atCell = atCell.Offset[atCell.Row + Rows.Count, 0];
-          break;
-
-        case PivotTablePosition.Right:
-          atCell = atCell.Offset[0, atCell.Column + Columns.Count];
-          break;
-      }
-
-      ExcelUtilities.CreatePivotTable(retObj, atCell, ExcelTableName);
-      return retObj;
+      return importedExcelTable;
     }
 
     /// <summary>

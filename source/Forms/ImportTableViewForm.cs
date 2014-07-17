@@ -364,7 +364,6 @@ namespace MySQL.ForExcel.Forms
       _dbTableOrView.ImportParameters.FirstRowIndex = FirstRowIndex;
       _dbTableOrView.ImportParameters.IncludeColumnNames = IncludeHeadersCheckBox.Checked;
       _dbTableOrView.ImportParameters.IntoNewWorksheet = false;
-      _dbTableOrView.ImportParameters.PivotTablePosition = MySqlDataTable.PivotTablePosition.Right;
       _dbTableOrView.ImportParameters.RowsCount = rowsCount;
     }
 

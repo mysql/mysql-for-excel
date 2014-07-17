@@ -49,7 +49,7 @@ namespace MySQL.ForExcel.Classes
       ForEditDataOperation = false;
       IncludeColumnNames = true;
       IntoNewWorksheet = true;
-      PivotTablePosition = MySqlDataTable.PivotTablePosition.Right;
+      PivotTablePosition = ExcelUtilities.PivotTablePosition.Right;
     }
 
     #region Properties
@@ -97,7 +97,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets or sets the position where new <see cref="ExcelInterop.PivotTable"/> objects are placed relative to imported table's data.
     /// </summary>
-    public MySqlDataTable.PivotTablePosition PivotTablePosition { get; set; }
+    public ExcelUtilities.PivotTablePosition PivotTablePosition { get; set; }
 
     /// <summary>
     /// Gets or sets the number of rows to include in the select query.

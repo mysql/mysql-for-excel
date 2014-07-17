@@ -1,4 +1,7 @@
 1.3.2
+- Added a new combo box to the Import Multiple dialog to let users create one single PivotTable for all Excel tables in the active Workbook's data model, or to create a
+  PivotTable for each of the imported tables or views, when importing multiple database objects. By default the option to create a single Pivot Table is selected when the
+  "Create a PivotTable" checkbox is checked.
 - Optimized code that creates Workbook connections so instead of always creating 2 connections for each created Excel table now 1 is created. A second Workbook connection
   is only created when creating Excel relationships for imported tables, that second connection is needed for Excel to create their corresponding Model Tables which are
   used to create each Excel relationship.
