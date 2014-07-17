@@ -104,6 +104,8 @@ namespace MySQL.ForExcel.Classes
       TableName = mySqlTable.TableName;
       ConnectionId = mySqlTable.WbConnection.Id;
       ImportColumnNames = mySqlTable.ImportColumnNames;
+      OperationType = mySqlTable.OperationType;
+      ProcedureResultSetIndex = mySqlTable.ProcedureResultSetIndex;
       SelectQuery = mySqlTable.SelectQuery;
       WorkbookGuid = Globals.ThisAddIn.Application.ActiveWorkbook.GetOrCreateId();
       WorkbookName = Globals.ThisAddIn.Application.ActiveWorkbook.Name;
@@ -215,6 +217,19 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     [XmlIgnore]
     public MySqlDataTable MySqlTable { get; private set; }
+
+    /// <summary>
+    /// Gets or sets the <see cref="MySqlDataTable.DataOperationType"/> intended for the <see cref="MySqlTable"/>.
+    /// </summary>
+    [XmlAttribute]
+    public MySqlDataTable.DataOperationType OperationType { get; set; }
+
+    /// <summary>
+    /// Gets or sets the index of the result set of a stored procedure this table contains data for.
+    /// </summary>
+    /// <remarks>-1 represents the output parameters and return values result set.</remarks>
+    [XmlAttribute]
+    public int ProcedureResultSetIndex { get; set; }
 
     /// <summary>
     /// Gets or sets the name of the schema the connection works with.
@@ -342,7 +357,8 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Refreshes the Import Session non serializable objects and specified cells on the excel table.
     /// </summary>
-    public void Refresh()
+    /// <param name="bindOnly">Flag indicating whether the actual data refresh is skipped and just the data binding for the <see cref="ExcelTools.ListObject"/> is done.</param>
+    public void Refresh(bool bindOnly = false)
     {
       if (MySqlTable == null || ToolsExcelTable == null)
       {
@@ -370,8 +386,11 @@ namespace MySQL.ForExcel.Classes
         }
 
         // Refresh the data on the MySqlDataTable and bind it so the Excel table is refreshed.
-        Exception ex;
-        MySqlTable.RefreshData(out ex);
+        if (!bindOnly)
+        {
+          Exception ex;
+          MySqlTable.RefreshData(out ex);
+        }
 
         // Resize the ExcelTools.ListObject by giving it an ExcelInterop.Range calculated with the refreshed MySqlDataTable dimensions.
         // Detection of a collision with another Excel object must be performed first and if any then shift rows and columns to fix the collision.
@@ -447,16 +466,18 @@ namespace MySQL.ForExcel.Classes
         }
       }
 
-      if (MySqlTable == null)
+      if (MySqlTable != null)
       {
-        if (_connection != null)
-        {
-          MySqlTable = _connection.CreateImportMySqlTable(false, TableName, ImportColumnNames, SelectQuery);
-        }
-        else
-        {
-          SessionError = SessionErrorType.WorkbenchConnectionDoesNotExist;
-        }
+        return;
+      }
+
+      if (_connection != null)
+      {
+        MySqlTable = _connection.CreateImportMySqlTable(OperationType, TableName, ImportColumnNames, SelectQuery, ProcedureResultSetIndex);
+      }
+      else
+      {
+        SessionError = SessionErrorType.WorkbenchConnectionDoesNotExist;
       }
     }
 
@@ -549,7 +570,7 @@ namespace MySQL.ForExcel.Classes
         CreateExcelTableFromExternalSource(worksheet, importDataAtCell, addSummaryRow);
 
         // Fetch the MySQL data and bind the MySqlDataTable object to the Excel table.
-        Refresh();
+        Refresh(OperationType == MySqlDataTable.DataOperationType.ImportProcedure);
 
         // Add this instance of the ImportSessionInfo class if not present already in the global collection.
         if (!Globals.ThisAddIn.StoredImportSessions.Exists(session => session.WorkbookGuid == workbookGuid && session.MySqlTable == MySqlTable && string.Equals(session.ExcelTableName, ExcelTable.Name, StringComparison.InvariantCultureIgnoreCase)))

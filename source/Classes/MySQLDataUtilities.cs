@@ -59,13 +59,14 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Creates the import my SQL table.
     /// </summary>
-    /// <param name="isEditOperation"><c>true</c> if the import is part of an Edit operation, <c>false</c> otherwise.</param>
     /// <param name="wbConnection">The wb connection.</param>
+    /// <param name="operationType">The <see cref="MySqlDataTable.DataOperationType"/> intended for the new <see cref="MySqlDataTable"/>.</param>
     /// <param name="tableOrViewName">The name of the MySQL table or view to import data from..</param>
     /// <param name="importColumnNames">Flag indicating if column names will be imported as the first row of imported data.</param>
     /// <param name="selectQuery">a SELECT query against a database object to fill the [MySqlDataTable] return object with.</param>
+    /// <param name="procedureResultSetIndex">The index of the result set of a stored procedure this table contains data for.</param>
     /// <returns>MySql Table created from the selectQuery.</returns>
-    public static MySqlDataTable CreateImportMySqlTable(this MySqlWorkbenchConnection wbConnection, bool isEditOperation, string tableOrViewName, bool importColumnNames, string selectQuery)
+    public static MySqlDataTable CreateImportMySqlTable(this MySqlWorkbenchConnection wbConnection, MySqlDataTable.DataOperationType operationType, string tableOrViewName, bool importColumnNames, string selectQuery, int procedureResultSetIndex = 0)
     {
       DataTable dt = GetDataFromSelectQuery(wbConnection, selectQuery);
       if (dt == null)
@@ -74,9 +75,10 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      var importMySqlDataTable = new MySqlDataTable(wbConnection, tableOrViewName, dt, isEditOperation)
+      var importMySqlDataTable = new MySqlDataTable(wbConnection, tableOrViewName, dt, operationType)
       {
         ImportColumnNames = importColumnNames,
+        ProcedureResultSetIndex = procedureResultSetIndex,
         SelectQuery = selectQuery
       };
 
@@ -348,21 +350,24 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="query">Select query to be sent to the MySQL Server.</param>
+    /// <param name="tableIndex">The index of the table in the <see cref="DataSet"/> to be returned.</param>
     /// <returns>Table containing the results of the query.</returns>
-    public static DataTable GetDataFromSelectQuery(this MySqlWorkbenchConnection connection, string query)
+    public static DataTable GetDataFromSelectQuery(this MySqlWorkbenchConnection connection, string query, int tableIndex = 0)
     {
       if (connection == null)
       {
         return null;
       }
 
-      DataSet ds = MySqlHelper.ExecuteDataset(connection.GetConnectionStringBuilder().ConnectionString, query);
-      if (ds.Tables.Count <= 0)
+      var connectionBuilder = connection.GetConnectionStringBuilder();
+      connectionBuilder.AllowUserVariables = true;
+      DataSet ds = MySqlHelper.ExecuteDataset(connectionBuilder.ConnectionString, query);
+      if (ds == null || ds.Tables.Count <= 0 || tableIndex < 0 || tableIndex >= ds.Tables.Count)
       {
         return null;
       }
 
-      DataTable retTable = ds.Tables[0];
+      DataTable retTable = ds.Tables[tableIndex];
       return retTable;
     }
 
@@ -548,6 +553,27 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Assembles a SET statement that declares a user variable that contains the given <see cref="MySqlParameter"/> value.
+    /// </summary>
+    /// <param name="parameter">A <see cref="MySqlParameter"/> object.</param>
+    /// <param name="firstParameter">When <c>true</c> the SET token is prepended, otherwise a comma is.</param>
+    /// <returns>A SET statement that declares a user variable that contains the given <see cref="MySqlParameter"/> value.</returns>
+    public static string GetSetStatement(this MySqlParameter parameter, bool firstParameter = true)
+    {
+      if (parameter == null)
+      {
+        return string.Empty;
+      }
+
+      bool requireQuotes = parameter.DbType.RequiresQuotesForValue();
+      return string.Format("{0} @{1} = {2}{3}{2}",
+        firstParameter ? "SET" : ",",
+        parameter.ParameterName,
+        requireQuotes ? "'" : string.Empty,
+        requireQuotes ? parameter.Value.ToString().EscapeDataValueString() : parameter.Value);
+    }
+
+    /// <summary>
     /// Gets the columns schema information for the given database table.
     /// </summary>
     /// <param name="dataTable">The data table to get the schema info for.</param>
@@ -638,7 +664,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the given data operation type is for importing data, <c>false</c> otherwise.</returns>
     public static bool IsForImport(this MySqlDataTable.DataOperationType operationType)
     {
-      return operationType == MySqlDataTable.DataOperationType.Import;
+      return operationType == MySqlDataTable.DataOperationType.ImportTableOrView || operationType == MySqlDataTable.DataOperationType.ImportProcedure;
     }
 
     /// <summary>

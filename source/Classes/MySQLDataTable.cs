@@ -245,12 +245,12 @@ namespace MySQL.ForExcel.Classes
     /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="tableName">Name of the table.</param>
     /// <param name="filledTable"><see cref="DataTable"/> object containing imported excelData from the MySQL table to be edited.</param>
-    /// <param name="isEditOperation"><c>true</c> if the import is part of an Edit operation, <c>false</c> otherwise.</param>
-    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string tableName, DataTable filledTable, bool isEditOperation)
+    /// <param name="operationType">The <see cref="DataOperationType"/> intended for this object.</param>
+    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string tableName, DataTable filledTable, DataOperationType operationType)
       : this(wbConnection, tableName, true, true, true)
     {
       CopyTableData(filledTable);
-      OperationType = isEditOperation ? DataOperationType.Edit : DataOperationType.Import;
+      OperationType = operationType;
     }
 
     /// <summary>
@@ -281,11 +281,15 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="filledTable"><see cref="DataTable"/> object containing imported excelData from the MySQL table to be edited.</param>
-    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, DataTable filledTable)
+    /// <param name="procedureSql">The SQL containint the schema name and the name of the stored procedure for which this table is created.</param>
+    /// <param name="resultSetIndex">The index of the result set of a stored procedure this table contains data for. -1 represents the output parameters and return values result set.</param>
+    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, DataTable filledTable, string procedureSql, int resultSetIndex)
       : this(wbConnection, filledTable.TableName)
     {
       CopyTableSchemaAndData(filledTable);
-      OperationType = DataOperationType.Import;
+      OperationType = DataOperationType.ImportProcedure;
+      ProcedureResultSetIndex = resultSetIndex;
+      _selectQuery = procedureSql;
     }
 
     /// <summary>
@@ -327,7 +331,8 @@ namespace MySQL.ForExcel.Classes
       IsTableNameValid = !string.IsNullOrEmpty(TableName);
       IsFormatted = false;
       IsPreviewTable = false;
-      OperationType = DataOperationType.Import;
+      OperationType = DataOperationType.ImportTableOrView;
+      ProcedureResultSetIndex = 0;
       SchemaName = string.Empty;
       UseFirstColumnAsPk = false;
       WbConnection = null;
@@ -356,9 +361,14 @@ namespace MySQL.ForExcel.Classes
       Export,
 
       /// <summary>
-      /// Import data operation.
+      /// Import procedure data operation.
       /// </summary>
-      Import
+      ImportProcedure,
+
+      /// <summary>
+      /// Import table or view data operation.
+      /// </summary>
+      ImportTableOrView
     }
 
     /// <summary>
@@ -870,6 +880,12 @@ namespace MySQL.ForExcel.Classes
         return _preSqlForAddedRows;
       }
     }
+
+    /// <summary>
+    /// Gets or sets the index of the result set of a stored procedure this table contains data for.
+    /// </summary>
+    /// <remarks>-1 represents the output parameters and return values result set.</remarks>
+    public int ProcedureResultSetIndex { get; set; }
 
     /// <summary>
     /// Gets the name of the schema where this table exists or will be created.
@@ -1710,9 +1726,26 @@ namespace MySQL.ForExcel.Classes
       try
       {
         Clear();
-        DataTable filledTable = WbConnection.GetDataFromSelectQuery(SelectQuery);
-        CreateTableSchema(TableName, true);
-        CopyTableData(filledTable);
+        var filledTable = WbConnection.GetDataFromSelectQuery(SelectQuery, OperationType == DataOperationType.ImportProcedure ? ProcedureResultSetIndex : 0);
+        if (OperationType == DataOperationType.ImportProcedure)
+        {
+          CopyTableSchemaAndData(filledTable);
+          if (!TableName.EndsWith(DbProcedure.OUT_AND_RETURN_VALUES_TABLE_NAME))
+          {
+            return;
+          }
+
+          foreach (var column in Columns.Cast<MySqlDataColumn>().Where(column => column.ColumnName.StartsWith("@")))
+          {
+            column.ColumnName = column.ColumnName.Substring(1);
+            column.SetDisplayName(column.ColumnName);
+          }
+        }
+        else
+        {
+          CreateTableSchema(TableName, true);
+          CopyTableData(filledTable);
+        }
       }
       catch (Exception ex)
       {
@@ -2287,7 +2320,7 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      MySqlDataRow firstRow = Rows[0] as MySqlDataRow;
+      var firstRow = Rows[0] as MySqlDataRow;
       if (firstRow != null)
       {
         firstRow.IsHeadersRow = FirstRowContainsColumnNames;
@@ -2306,7 +2339,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       _changedOrDeletedRows = -1;
-      MySqlDataRow mySqlRow = args.Row as MySqlDataRow;
+      var mySqlRow = args.Row as MySqlDataRow;
       mySqlRow.RowChanged(args.Action);
     }
 

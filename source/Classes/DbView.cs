@@ -103,7 +103,10 @@ namespace MySQL.ForExcel.Classes
       }
 
       var selectQuery = GetSelectQuery();
-      return Connection.CreateImportMySqlTable(ImportParameters.ForEditDataOperation, ImportParameters.DbObjectName, ImportParameters.IncludeColumnNames, selectQuery);
+      var operationType = ImportParameters.ForEditDataOperation
+        ? MySqlDataTable.DataOperationType.Edit
+        : MySqlDataTable.DataOperationType.ImportTableOrView;
+      return Connection.CreateImportMySqlTable(operationType, ImportParameters.DbObjectName, ImportParameters.IncludeColumnNames, selectQuery);
     }
 
     /// <summary>

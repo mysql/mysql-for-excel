@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text;
 using MySql.Data.MySqlClient;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
@@ -118,12 +119,14 @@ namespace MySQL.ForExcel.Classes
 
       // Create result set dataset and MySqlDataTable tables for each table in the result sets
       var returnDataSet = new DataSet(Name + "ResultSet");
+      var procedureSql = GetSql();
       int resultIndex = 1;
       foreach (DataTable table in resultSetDs.Tables)
       {
-        table.TableName = string.Format("Result{0}", resultIndex++);
-        var mySqlDataTable = new MySqlDataTable(Connection, table);
+        table.TableName = string.Format("Result{0}", resultIndex);
+        var mySqlDataTable = new MySqlDataTable(Connection, table, procedureSql, resultIndex - 1);
         returnDataSet.Tables.Add(mySqlDataTable);
+        resultIndex++;
       }
 
       if (ReadOnlyParameters == null || ReadOnlyParameters.Count <= 0)
@@ -132,7 +135,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Create a table containing output parameters and return values
-      var outParamsTable = new MySqlDataTable(Connection, OUT_AND_RETURN_VALUES_TABLE_NAME);
+      var outParamsTable = new DataTable(OUT_AND_RETURN_VALUES_TABLE_NAME);
       foreach (var readOnlyTuple in ReadOnlyParameters)
       {
         var dataType = readOnlyTuple.Item1;
@@ -144,8 +147,65 @@ namespace MySQL.ForExcel.Classes
       var valuesRow = outParamsTable.NewRow();
       valuesRow.ItemArray = ReadOnlyParameters.Select(tuple => tuple.Item2.Value).ToArray();
       outParamsTable.Rows.Add(valuesRow);
-      returnDataSet.Tables.Add(outParamsTable);
+      var outParamsMySqlTable = new MySqlDataTable(Connection, outParamsTable, procedureSql, resultIndex - 1);
+      returnDataSet.Tables.Add(outParamsMySqlTable);
       return returnDataSet;
+    }
+
+    /// <summary>
+    /// Gets the SQL query text needed to call this stored procedure.
+    /// </summary>
+    /// <returns>The SQL query text needed to call this stored procedure.</returns>
+    public string GetSql()
+    {
+      if (Parameters == null)
+      {
+        InitializeParameters();
+      }
+
+      var sqlCallBuilder = new StringBuilder();
+      sqlCallBuilder.AppendFormat("CALL `{0}`.`{1}`(", Connection.Schema, Name);
+      if (Parameters == null || Parameters.Count == 0)
+      {
+        sqlCallBuilder.Append(");");
+        return sqlCallBuilder.ToString();
+      }
+
+      var sqlSetBuilder = new StringBuilder();
+      var sqlSelectBuilder = new StringBuilder();
+      for (int parameterIndex = 0; parameterIndex < Parameters.Count; parameterIndex++)
+      {
+        var parameter = Parameters[parameterIndex].Item2;
+        switch (parameter.Direction)
+        {
+          case ParameterDirection.Input:
+          case ParameterDirection.InputOutput:
+            sqlSetBuilder.Append(parameter.GetSetStatement(parameterIndex == 0));
+            break;
+
+          case ParameterDirection.Output:
+          case ParameterDirection.ReturnValue:
+            sqlSelectBuilder.AppendFormat("{0} @{1}", sqlSelectBuilder.Length == 0 ? "SELECT" : ",", parameter.ParameterName);
+            break;
+        }
+
+        sqlCallBuilder.AppendFormat("{0}@{1}", parameterIndex > 0 ? ", " : string.Empty, parameter.ParameterName);
+      }
+
+      sqlCallBuilder.Append("); ");
+      if (sqlSelectBuilder.Length > 0)
+      {
+        sqlSelectBuilder.Append(";");
+      }
+
+      if (sqlSetBuilder.Length > 0)
+      {
+        sqlSetBuilder.Append("; ");
+      }
+
+      sqlSetBuilder.Append(sqlCallBuilder);
+      sqlSetBuilder.Append(sqlSelectBuilder);
+      return sqlSetBuilder.ToString();
     }
 
     /// <summary>

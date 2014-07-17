@@ -1,4 +1,6 @@
 1.3.2
+- Fixed the import of stored procedure result sets into Excel tables (the import to Excel ranges was working), and more importantly implemented code that lets the Excel
+  tables created from stored procedures to be refreshed by the user. (MySQL Bug# 73151, Bug #19129583 - IMPORT PROCEDURE IS NOT WORKING)
 - Fixed a problem that arise when creating a new workbook without closing the Excel Addin Pane, making it impossible to import tables after that.
   (MySQL Bug #73263, Bug #19189185 - UNABLE TO IMPORT TABLES IN MYSQL FOR EXCEL UNDER WEIRD SCENARIO)
 - Added a new combo box to the Import Multiple dialog to let users create one single PivotTable for all Excel tables in the active Workbook's data model, or to create a

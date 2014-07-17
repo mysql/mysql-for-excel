@@ -1417,6 +1417,46 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Checks if a value for the given <see cref="DbType"/> must be wrapped in quotes.
+    /// </summary>
+    /// <param name="dbType">A <see cref="DbType"/>.</param>
+    /// <returns><c>true</c> if the given <see cref="DbType"/> must be wrapped in quotes, <c>false</c> otherwise.</returns>
+    public static bool RequiresQuotesForValue(this DbType dbType)
+    {
+      return dbType == DbType.AnsiString
+             || dbType == DbType.AnsiStringFixedLength
+             || dbType == DbType.Date
+             || dbType == DbType.DateTime
+             || dbType == DbType.DateTime2
+             || dbType == DbType.Guid
+             || dbType == DbType.String
+             || dbType == DbType.StringFixedLength;
+    }
+
+    /// <summary>
+    /// Checks if a value for the given <see cref="MySqlDbType"/> must be wrapped in quotes.
+    /// </summary>
+    /// <param name="mySqlDbType">A <see cref="MySqlDbType"/>.</param>
+    /// <returns><c>true</c> if the given <see cref="MySqlDbType"/> must be wrapped in quotes, <c>false</c> otherwise.</returns>
+    public static bool RequiresQuotesForValue(this MySqlDbType mySqlDbType)
+    {
+      return mySqlDbType == MySqlDbType.Date
+             || mySqlDbType == MySqlDbType.DateTime
+             || mySqlDbType == MySqlDbType.Enum
+             || mySqlDbType == MySqlDbType.Guid
+             || mySqlDbType == MySqlDbType.LongText
+             || mySqlDbType == MySqlDbType.MediumText
+             || mySqlDbType == MySqlDbType.Newdate
+             || mySqlDbType == MySqlDbType.Set
+             || mySqlDbType == MySqlDbType.String
+             || mySqlDbType == MySqlDbType.Text
+             || mySqlDbType == MySqlDbType.Timestamp
+             || mySqlDbType == MySqlDbType.TinyText
+             || mySqlDbType == MySqlDbType.VarChar
+             || mySqlDbType == MySqlDbType.VarString;
+    }
+
+    /// <summary>
     /// Checks whether a given string value can be converted and stored in a column with the given MySQL data type.
     /// </summary>
     /// <param name="strValue">String value to convert and store.</param>
