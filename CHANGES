@@ -1,4 +1,6 @@
 1.3.2
+- Fixed a problem that arise when creating a new workbook without closing the Excel Addin Pane, making it impossible to import tables after that.
+  (MySQL Bug #73263, Bug #19189185 - UNABLE TO IMPORT TABLES IN MYSQL FOR EXCEL UNDER WEIRD SCENARIO)
 - Added a new combo box to the Import Multiple dialog to let users create one single PivotTable for all Excel tables in the active Workbook's data model, or to create a
   PivotTable for each of the imported tables or views, when importing multiple database objects. By default the option to create a single Pivot Table is selected when the
   "Create a PivotTable" checkbox is checked.

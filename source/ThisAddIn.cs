@@ -665,6 +665,15 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Event delegate method fired when a new <see cref="ExcelInterop.Workbook"/> is created.
+    /// </summary>
+    /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/> being created.</param>
+    private void Application_WorkbookNewWorkbook(Microsoft.Office.Interop.Excel.Workbook workbook)
+    {
+      InitializeWorkbook(workbook, true);
+    }
+
+    /// <summary>
     /// Removes invalid import connection information from the collection.
     /// </summary>
     private void RemoveInvalidImportConnectionInformation()
@@ -795,22 +804,7 @@ namespace MySQL.ForExcel
     /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/> being opened.</param>
     private void Application_WorkbookOpen(ExcelInterop.Workbook workbook)
     {
-      if (workbook == null)
-      {
-        return;
-      }
-
-      // Add the custom MySQL table style (for Excel tables) and localized date format strings to this workbook.
-      workbook.CreateMySqlTableStyle();
-      workbook.AddLocalizedDateFormatStringsAsNames();
-      RestoreImportSessions(workbook);
-
-      if (ActiveExcelPane == null)
-      {
-        return;
-      }
-
-      ShowOpenEditSessionsDialog(workbook);
+      InitializeWorkbook(workbook);
     }
 
     /// <summary>
@@ -1067,6 +1061,37 @@ namespace MySQL.ForExcel
       MySqlWorkbench.ExternalApplicationConnectionsFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\connections.xml";
       MySqlSourceTrace.LogFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\MySQLForExcelInterop.log";
       MySqlSourceTrace.SourceTraceClass = "MySQLForExcel";
+    }
+
+    /// <summary>
+    /// Method used to initialize a <see cref="ExcelInterop.Workbook" /> when it is opened or created.
+    /// </summary>
+    /// <param name="workbook">The <see cref="ExcelInterop.Workbook" /> being opened.</param>
+    /// <param name="isNewWorkbook">If it is set to <c>true</c> the workbook will be initialized as if it is just being created.</param>
+    private void InitializeWorkbook(ExcelInterop.Workbook workbook, bool isNewWorkbook = false)
+    {
+      if (workbook == null)
+      {
+        return;
+      }
+
+      // Add the custom MySQL table style (for Excel tables) and localized date format strings to this workbook.
+      workbook.CreateMySqlTableStyle();
+      workbook.AddLocalizedDateFormatStringsAsNames();
+
+      // When it is a new workbook it won't have any sessions so we could skip the rest of the method altogether.
+      if (isNewWorkbook)
+      {
+        return;
+      }
+
+      RestoreImportSessions(workbook);
+      if (ActiveExcelPane == null)
+      {
+        return;
+      }
+
+      ShowOpenEditSessionsDialog(workbook);
     }
 
     /// <summary>
@@ -1459,6 +1484,7 @@ namespace MySQL.ForExcel
           Application.WindowActivate += Application_WindowActivate;
         }
 
+        ((ExcelInterop.AppEvents_Event)Application).NewWorkbook += Application_WorkbookNewWorkbook;
         Application.SheetActivate += Application_SheetActivate;
         Application.SheetBeforeDelete += Application_SheetBeforeDelete;
         Application.SheetChange += Application_SheetChange;
@@ -1477,6 +1503,7 @@ namespace MySQL.ForExcel
           Application.WindowActivate -= Application_WindowActivate;
         }
 
+        ((ExcelInterop.AppEvents_Event)Application).NewWorkbook -= Application_WorkbookNewWorkbook;
         Application.SheetActivate -= Application_SheetActivate;
         Application.SheetBeforeDelete -= Application_SheetBeforeDelete;
         Application.SheetChange -= Application_SheetChange;
