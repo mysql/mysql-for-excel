@@ -698,7 +698,6 @@ namespace MySQL.ForExcel
       {
         invalidConnectionInfos.ForEach(invalidSession => invalidSession.ExcelTable.DeleteSafely(false));
         invalidConnectionInfos.ForEach(invalidSession => StoredImportSessions.Remove(invalidSession));
-        MiscUtilities.SaveSettings();
       }
     }
 
