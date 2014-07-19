@@ -8,8 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using MySQL.ForExcel.Classes;
-
 namespace MySQL.ForExcel.Properties {
     
     
@@ -25,7 +23,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Export)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -39,7 +36,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Export)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -53,7 +49,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Export)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -67,7 +62,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Export)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -81,7 +75,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Export)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -95,7 +88,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Append)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -109,7 +101,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Append)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -123,7 +114,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Append)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -137,7 +127,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Append)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -163,7 +152,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Export)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -177,7 +165,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Append)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -190,8 +177,7 @@ namespace MySQL.ForExcel.Properties {
                 this["AppendLimitPreviewRowsQuantity"] = value;
             }
         }
-
-        [PropertyGroup(PropertyGroup.SettingsGroup.Global)]
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -204,8 +190,7 @@ namespace MySQL.ForExcel.Properties {
                 this["GlobalConnectionConnectionTimeout"] = value;
             }
         }
-
-        [PropertyGroup(PropertyGroup.SettingsGroup.Global)]
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -219,7 +204,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Import)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -233,7 +217,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Import)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -259,8 +242,7 @@ namespace MySQL.ForExcel.Properties {
                 this["ConvertedSettingsStoredMappingsCasing"] = value;
             }
         }
-
-        [PropertyGroup(PropertyGroup.SettingsGroup.Global)]
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -273,8 +255,7 @@ namespace MySQL.ForExcel.Properties {
                 this["EditUseOptimisticUpdate"] = value;
             }
         }
-
-        [PropertyGroup(PropertyGroup.SettingsGroup.Global)]
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -287,8 +268,7 @@ namespace MySQL.ForExcel.Properties {
                 this["GlobalSqlQueriesPreviewQueries"] = value;
             }
         }
-
-        [PropertyGroup(PropertyGroup.SettingsGroup.Global)]
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -302,7 +282,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Import)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -316,7 +295,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Import)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -329,8 +307,7 @@ namespace MySQL.ForExcel.Properties {
                 this["ImportExcelTableStyleName"] = value;
             }
         }
-
-        [PropertyGroup(PropertyGroup.SettingsGroup.Global)]
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -347,16 +324,15 @@ namespace MySQL.ForExcel.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Generic.List<MySQL.ForExcel.Classes.EditSessionInfo> EditSessionsList {
+        public global::System.Collections.Generic.List<MySQL.ForExcel.Classes.EditConnectionInfo> EditConnectionInfosList {
             get {
-                return ((global::System.Collections.Generic.List<MySQL.ForExcel.Classes.EditSessionInfo>)(this["EditSessionsList"]));
+                return ((global::System.Collections.Generic.List<MySQL.ForExcel.Classes.EditConnectionInfo>)(this["EditConnectionInfosList"]));
             }
             set {
-                this["EditSessionsList"] = value;
+                this["EditConnectionInfosList"] = value;
             }
         }
-
-        [PropertyGroup(PropertyGroup.SettingsGroup.Global)]
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -370,7 +346,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Import)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -384,7 +359,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Import)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -398,7 +372,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Append)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -412,7 +385,6 @@ namespace MySQL.ForExcel.Properties {
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Export)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
@@ -438,20 +410,19 @@ namespace MySQL.ForExcel.Properties {
                 this["HideLocalizedDateFormatNames"] = value;
             }
         }
-
+        
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Generic.List<MySQL.ForExcel.Classes.ImportSessionInfo> ImportSessionsList {
+        public global::System.Collections.Generic.List<MySQL.ForExcel.Classes.ImportConnectionInfo> ImportConnectionInfosList {
             get {
-                return ((global::System.Collections.Generic.List<MySQL.ForExcel.Classes.ImportSessionInfo>)(this["ImportSessionsList"]));
+                return ((global::System.Collections.Generic.List<MySQL.ForExcel.Classes.ImportConnectionInfo>)(this["ImportConnectionInfosList"]));
             }
             set {
-                this["ImportSessionsList"] = value;
+                this["ImportConnectionInfosList"] = value;
             }
         }
         
-        [PropertyGroup(PropertyGroup.SettingsGroup.Export)]
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]

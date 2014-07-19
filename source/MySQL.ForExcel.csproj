@@ -237,8 +237,8 @@
     <Compile Include="Classes\DbView.cs" />
     <Compile Include="Classes\Exceptions\ParentWorkbookNullException.cs" />
     <Compile Include="Classes\ImportDataParams.cs" />
-    <Compile Include="Classes\ImportSessionInfo.cs" />
-    <Compile Include="Classes\EditSessionInfo.cs" />
+    <Compile Include="Classes\ImportConnectionInfo.cs" />
+    <Compile Include="Classes\EditConnectionInfo.cs" />
     <Compile Include="Classes\ExcelUtilities.cs" />
     <Compile Include="Classes\Exceptions\QueryExceedsMaxAllowedPacketException.cs" />
     <Compile Include="Classes\Exceptions\UnhandledMySqlTypeException.cs" />
@@ -409,7 +409,7 @@
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Interfaces\IMySqlDataRow.cs" />
-    <Compile Include="Interfaces\ISessionInfo.cs" />
+    <Compile Include="Interfaces\IConnectionInfo.cs" />
     <Compile Include="Panels\AutoStyleableBasePanel.cs">
       <SubType>UserControl</SubType>
     </Compile>

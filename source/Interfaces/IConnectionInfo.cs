@@ -20,17 +20,17 @@ using System;
 namespace MySQL.ForExcel.Interfaces
 {
   /// <summary>
-  /// Interface that bridges common functionality to both Import and Edit sessions.
+  /// Interface that bridges common functionality to both Import and Edit connections.
   /// </summary>
-  public interface ISessionInfo : IDisposable
+  public interface IConnectionInfo : IDisposable
   {
     /// <summary>
-    /// Gets or sets the connection information the session works with, contains credentials with remote access permissions to the reffered MySQL instance in it.
+    /// Gets or sets the connection id, enabling to retrieve the credentials to access the reffered MySQL instance in it.
     /// </summary>
     string ConnectionId { get; set; }
 
     /// <summary>
-    /// Gets or sets the last date and time the session was saved.
+    /// Gets or sets the last date and time the connection info was saved.
     /// </summary>
     DateTime LastAccess { get; set; }
 

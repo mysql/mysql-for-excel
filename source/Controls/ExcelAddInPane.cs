@@ -45,7 +45,7 @@ namespace MySQL.ForExcel.Controls
 
       DBObjectSelectionPanel3.ExcelSelectionContainsData = false;
       ActiveEditDialog = null;
-      FirstSession = null;
+      FirstConnectionInfo = null;
       WbConnection = null;
       WelcomePanel1.LoadConnections(true);
     }
@@ -103,15 +103,15 @@ namespace MySQL.ForExcel.Controls
       get
       {
         return ActiveWorksheet != null
-                && Globals.ThisAddIn.ActiveWorkbookEditSessions.Exists(session => session.EditDialog != null && session.EditDialog.EditingWorksheet == ActiveWorksheet);
+                && Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.Exists(connectionInfo => connectionInfo.EditDialog != null && connectionInfo.EditDialog.EditingWorksheet == ActiveWorksheet);
       }
     }
 
     /// <summary>
-    /// Gets or sets the first session of Edit sessions.
+    /// Gets or sets the first <see cref="EditConnectionInfo"/> object.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public EditSessionInfo FirstSession { get; private set; }
+    public EditConnectionInfo FirstConnectionInfo { get; private set; }
 
     /// <summary>
     /// Gets a list of stored procedures loaded in this pane.
@@ -210,7 +210,7 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Closes the current connection, editing sessions and puts the welcome panel in focus.
+    /// Closes the current connection, editing dialogs and puts the welcome panel in focus.
     /// </summary>
     /// <param name="givePanelFocus">Flag indicating whether the <see cref="WelcomePanel"/> is given focus.</param>
     public void CloseConnection(bool givePanelFocus)
@@ -222,28 +222,28 @@ namespace MySQL.ForExcel.Controls
       }
 
       // Free up open Edit Dialogs
-      Globals.ThisAddIn.CloseWorkbookEditSessions(ActiveWorkbook);
+      Globals.ThisAddIn.CloseWorkbookEditConnectionInfos(ActiveWorkbook);
     }
 
     /// <summary>
-    /// Closes the current connection, editing sessions and puts the schema panel in focus.
+    /// Closes the current connection, editing tables and puts the schema panel in focus.
     /// </summary>
-    /// <param name="askToCloseConnections">Flag indicating whether users are asked for confirmation before closing active Edit sessions.</param>
+    /// <param name="askToCloseConnections">Flag indicating whether users are asked for confirmation before closing active <see cref="EditConnectionInfo"/>.</param>
     /// <param name="givePanelFocus">Flag indicating whether the <see cref="SchemaSelectionPanel"/> is given focus.</param>
-    /// <returns><c>true</c> if the schema and its open Edit sessions are closed, <c>false</c> otherwise.</returns>
+    /// <returns><c>true</c> if the schema and its open <see cref="EditConnectionInfo"/> objects are closed, <c>false</c> otherwise.</returns>
     public bool CloseSchema(bool askToCloseConnections, bool givePanelFocus)
     {
-      if (askToCloseConnections && Globals.ThisAddIn.ActiveWorkbookEditSessions.Count > 0)
+      if (askToCloseConnections && Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.Count > 0)
       {
-        // If there are Active Edit sessions warn the users that by closing the schema the sessions will be terminated
-        DialogResult dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.ActiveEditingSessionsCloseWarningTitle, Resources.ActiveEditingSessionsCloseWarningDetail);
+        // If there are Active EditConnectionInfos warn the users that by closing the schema the active EditConnectionInfos will be closed.
+        DialogResult dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.ActiveEditConnectionInfosCloseWarningTitle, Resources.ActiveEditConnectionInfosCloseWarningDetail);
         if (dr == DialogResult.No)
         {
           return false;
         }
       }
 
-      Globals.ThisAddIn.CloseWorkbookEditSessions(ActiveWorkbook);
+      Globals.ThisAddIn.CloseWorkbookEditConnectionInfos(ActiveWorkbook);
       if (givePanelFocus)
       {
         SchemaSelectionPanel2.BringToFront();
@@ -253,15 +253,15 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Opens an editing session for a MySQL table.
+    /// Opens an <see cref="EditConnectionInfo"/> for a MySQL table.
     /// </summary>
-    /// <param name="tableObject">Table to start an editing session for.</param>
-    /// <param name="fromSavedSession">Flag indicating whether the Edit session to be opened corresponds.</param>
+    /// <param name="tableObject">Table to start an editing for.</param>
+    /// <param name="fromSavedConnectionInfo">Flag indicating whether the <see cref="EditConnectionInfo"/> to be opened corresponds.</param>
     /// <param name="workbook">The workbook.</param>
     /// <returns>
     ///   <c>true</c> If the export/append action was executed, <c>false</c> otherwise.
     /// </returns>
-    public bool EditTableData(DbTable tableObject, bool fromSavedSession, ExcelInterop.Workbook workbook)
+    public bool EditTableData(DbTable tableObject, bool fromSavedConnectionInfo, ExcelInterop.Workbook workbook)
     {
       string schemaAndTableNames = WbConnection.Schema + "." + tableObject.Name;
 
@@ -281,10 +281,10 @@ namespace MySQL.ForExcel.Controls
       }
 
       // Attempt to Import Data unless the user cancels the import operation
-      string proposedWorksheetName = fromSavedSession ? tableObject.Name : ActiveWorkbook.GetWorksheetNameAvoidingDuplicates(tableObject.Name);
+      string proposedWorksheetName = fromSavedConnectionInfo ? tableObject.Name : ActiveWorkbook.GetWorksheetNameAvoidingDuplicates(tableObject.Name);
       tableObject.ImportParameters.ForEditDataOperation = true;
       ImportTableViewForm importForm = new ImportTableViewForm(tableObject, proposedWorksheetName);
-      DialogResult dr = fromSavedSession ? importForm.ImportHidingDialog() : importForm.ShowDialog();
+      DialogResult dr = fromSavedConnectionInfo ? importForm.ImportHidingDialog() : importForm.ShowDialog();
       if (dr == DialogResult.Cancel)
       {
         importForm.Dispose();
@@ -299,17 +299,17 @@ namespace MySQL.ForExcel.Controls
       }
 
       // Hide all other open EditDataDialog forms before opening a new one.
-      if (!fromSavedSession)
+      if (!fromSavedConnectionInfo)
       {
-        foreach (var session in Globals.ThisAddIn.ActiveWorkbookEditSessions.Where(session => session.EditDialog != null && session.EditDialog.Visible))
+        foreach (var connectionInfo in Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.Where(connectionInfo => connectionInfo.EditDialog != null && connectionInfo.EditDialog.Visible))
         {
-          session.EditDialog.Hide();
+          connectionInfo.EditDialog.Hide();
         }
       }
 
       // Create the new Excel Worksheet and import the editing data there
-      ExcelInterop.Workbook editWorkbook = fromSavedSession && workbook != null ? workbook : ActiveWorkbook;
-      var currentWorksheet = fromSavedSession && Settings.Default.EditSessionsReuseWorksheets
+      ExcelInterop.Workbook editWorkbook = fromSavedConnectionInfo && workbook != null ? workbook : ActiveWorkbook;
+      var currentWorksheet = fromSavedConnectionInfo && Settings.Default.EditSessionsReuseWorksheets
         ? editWorkbook.GetOrCreateWorksheet(proposedWorksheetName, true)
         : editWorkbook.CreateWorksheet(proposedWorksheetName, true);
       if (currentWorksheet == null)
@@ -318,30 +318,30 @@ namespace MySQL.ForExcel.Controls
         return false;
       }
 
-      // Clear the contents of the worksheet if we are restoring a saved Edit session since the user may have input data into it.
-      if (fromSavedSession)
+      // Clear the contents of the worksheet if we are restoring a saved <see cref="EditConnectionInfo"/> since the user may have input data into it.
+      if (fromSavedConnectionInfo)
       {
         currentWorksheet.UsedRange.Clear();
       }
 
       // Create and show the Edit Data Dialog
-      var editSession = GetEditSession(tableObject, importForm, currentWorksheet);
-      ActiveEditDialog = editSession.EditDialog;
-      if (fromSavedSession)
+      var editConnectionInfo = GetEditConnectionInfo(tableObject, importForm, currentWorksheet);
+      ActiveEditDialog = editConnectionInfo.EditDialog;
+      if (fromSavedConnectionInfo)
       {
-        // If restoring sessions we need to set the EditDialog to its session.
-        var editSessionBeingRestored = Globals.ThisAddIn.ActiveWorkbookEditSessions.FirstOrDefault(session => session.TableName.Equals(editSession.TableName));
-        if (editSessionBeingRestored != null)
+        // If restoring EditConnectionInfo objects we need to create and link their corresponding EditDialog to it.
+        var editConnectionInfoBeingRestored = Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.FirstOrDefault(connectionInfo => connectionInfo.TableName.Equals(editConnectionInfo.TableName));
+        if (editConnectionInfoBeingRestored != null)
         {
-          editSessionBeingRestored.EditDialog = editSession.EditDialog;
+          editConnectionInfoBeingRestored.EditDialog = editConnectionInfo.EditDialog;
         }
       }
       else
       {
         ActiveEditDialog.ShowDialog();
 
-        // If not restoring sessions we need to add the manually triggered Edit session to the list of Edit sessions of the active workbook.
-        Globals.ThisAddIn.ActiveWorkbookEditSessions.Add(editSession);
+        // If not restoring EditConnectionInfo objects we need to add the manually triggered EditConnectionInfo to the list of the active workbook.
+        Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.Add(editConnectionInfo);
       }
 
       importForm.Dispose();
@@ -424,7 +424,7 @@ namespace MySQL.ForExcel.Controls
 
       WbConnection.ConnectionTimeout = Settings.Default.GlobalConnectionConnectionTimeout;
       WbConnection.DefaultCommandTimeout = Settings.Default.GlobalConnectionCommandTimeout;
-      WbConnection.SetSessionReadWriteTimeouts();
+      WbConnection.SetClientSessionReadWriteTimeouts();
     }
 
     /// <summary>
@@ -434,12 +434,12 @@ namespace MySQL.ForExcel.Controls
     /// <returns><c>true</c> if the table has is in editing mode, <c>false</c> otherwise.</returns>
     public bool TableHasEditOnGoing(string tableName)
     {
-      if (Globals.ThisAddIn.ActiveWorkbookEditSessions.Count == 0)
+      if (Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.Count == 0)
       {
         return false;
       }
 
-      var editContainer = Globals.ThisAddIn.ActiveWorkbookEditSessions.FirstOrDefault(ac => ac.EditDialog != null && ac.TableName == tableName);
+      var editContainer = Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.FirstOrDefault(ac => ac.EditDialog != null && ac.TableName == tableName);
       if (editContainer == null)
       {
         return false;
@@ -470,38 +470,38 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Creates the editing session or restores the saved one.
+    /// Creates the <see cref="EditConnectionInfo"/> or restores the saved one.
     /// </summary>
-    /// <param name="tableObject">The table used on the current session.</param>
-    /// <param name="importForm">The import form used on the current session.</param>
+    /// <param name="tableObject">The table used on the current <see cref="EditConnectionInfo"/>.</param>
+    /// <param name="importForm">The import form used on the current <see cref="EditConnectionInfo"/>.</param>
     /// <param name="currentWorksheet">The current worksheet.</param>
-    /// <returns>A new or restored <see cref="EditSessionInfo"/> object.</returns>
-    private EditSessionInfo GetEditSession(DbObject tableObject, ImportTableViewForm importForm, ExcelInterop.Worksheet currentWorksheet)
+    /// <returns>A new or restored <see cref="EditConnectionInfo"/> object.</returns>
+    private EditConnectionInfo GetEditConnectionInfo(DbObject tableObject, ImportTableViewForm importForm, ExcelInterop.Worksheet currentWorksheet)
     {
       ExcelInterop.Range atCell = currentWorksheet.Range["A1", Type.Missing];
       ExcelInterop.Range editingRange = importForm.MySqlTable.ImportDataIntoExcelRange(atCell);
-      EditSessionInfo session = null;
+      EditConnectionInfo connectionInfo = null;
 
-      if (Globals.ThisAddIn.ActiveWorkbookEditSessions.Count > 0)
+      if (Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.Count > 0)
       {
-        session = Globals.ThisAddIn.ActiveWorkbookEditSessions.GetActiveEditSession(ActiveWorkbook, tableObject.Name);
+        connectionInfo = Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.GetActiveEditConnectionInfo(ActiveWorkbook, tableObject.Name);
       }
 
-      // The Session is new and has to be created from scratch.
-      if (session == null)
+      // The EditConnectionInfo is new and has to be created from scratch.
+      if (connectionInfo == null)
       {
-        session = new EditSessionInfo(ActiveWorkbookId, ActiveWorkbook.FullName, WbConnection.Id, WbConnection.Schema, tableObject.Name);
+        connectionInfo = new EditConnectionInfo(ActiveWorkbookId, ActiveWorkbook.FullName, WbConnection.Id, WbConnection.Schema, tableObject.Name);
       }
 
-      if (session.EditDialog != null)
+      if (connectionInfo.EditDialog != null)
       {
-        return session;
+        return connectionInfo;
       }
 
-      // The Edit session is being either restored from the settings file or created for the newborn session.
-      session.EditDialog = new EditDataDialog(this, new NativeWindowWrapper(Globals.ThisAddIn.Application.Hwnd), WbConnection, editingRange, importForm.MySqlTable, currentWorksheet);
-      currentWorksheet.StoreProtectionKey(session.EditDialog.WorksheetProtectionKey);
-      return session;
+      // The EditConnectionInfo is being either restored from the settings file or created for the newborn object.
+      connectionInfo.EditDialog = new EditDataDialog(this, new NativeWindowWrapper(Globals.ThisAddIn.Application.Hwnd), WbConnection, editingRange, importForm.MySqlTable, currentWorksheet);
+      currentWorksheet.StoreProtectionKey(connectionInfo.EditDialog.WorksheetProtectionKey);
+      return connectionInfo;
     }
   }
 }

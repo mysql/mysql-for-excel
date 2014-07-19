@@ -61,20 +61,20 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to All active editing sessions on the current schema will be terminated. Do you wish to continue?.
+        ///   Looks up a localized string similar to All active editing connection information on the current schema will be terminated. Do you wish to continue?.
         /// </summary>
-        internal static string ActiveEditingSessionsCloseWarningDetail {
+        internal static string ActiveEditConnectionInfosCloseWarningDetail {
             get {
-                return ResourceManager.GetString("ActiveEditingSessionsCloseWarningDetail", resourceCulture);
+                return ResourceManager.GetString("ActiveEditConnectionInfosCloseWarningDetail", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Active editing sessions on current schema.
+        ///   Looks up a localized string similar to Active editing connection information on current schema.
         /// </summary>
-        internal static string ActiveEditingSessionsCloseWarningTitle {
+        internal static string ActiveEditConnectionInfosCloseWarningTitle {
             get {
-                return ResourceManager.GetString("ActiveEditingSessionsCloseWarningTitle", resourceCulture);
+                return ResourceManager.GetString("ActiveEditConnectionInfosCloseWarningTitle", resourceCulture);
             }
         }
         
@@ -743,7 +743,8 @@ namespace MySQL.ForExcel.Properties {
         ///
         ///1. Open MySQL Workbench, connect to the database with the SQL Editor and browse to the table.
         ///2. Click the table with the right mouse button and select ALTER TABLE.
-        ///3. Check the PK checkbox of the column that uniquely identifies each row.        /// [rest of string was truncated]&quot;;.
+        ///3. Check the PK checkbox of the column that uniquely identifies each row.
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string EditOpenDetailsError {
             get {
@@ -1107,6 +1108,42 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Connection information for Excel table &apos;{0}.{1}.{2}&apos; on was removed since the connection no longer exists..
+        /// </summary>
+        internal static string ImportConnectionInfoRemovedConnectionText {
+            get {
+                return ResourceManager.GetString("ImportConnectionInfoRemovedConnectionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Some Excel tables could not be reconnected to their corresponding MySQL databases because the connections could not be located..
+        /// </summary>
+        internal static string ImportConnectionInfosMissingConnectionsDetail {
+            get {
+                return ResourceManager.GetString("ImportConnectionInfosMissingConnectionsDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The following connections were not found:.
+        /// </summary>
+        internal static string ImportConnectionInfosMissingConnectionsMoreInfo {
+            get {
+                return ResourceManager.GetString("ImportConnectionInfosMissingConnectionsMoreInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Excel Tables Reconnection.
+        /// </summary>
+        internal static string ImportConnectionInfosMissingConnectionsTitle {
+            get {
+                return ResourceManager.GetString("ImportConnectionInfosMissingConnectionsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error ocurred when trying to import the data..
         /// </summary>
         internal static string ImportDataErrorDetailText {
@@ -1211,33 +1248,6 @@ namespace MySQL.ForExcel.Properties {
         internal static string ImportProcedureSelectedResultSet {
             get {
                 return ResourceManager.GetString("ImportProcedureSelectedResultSet", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Some Excel tables could not be reconnected to their corresponding MySQL databases because the connections could not be located..
-        /// </summary>
-        internal static string ImportSessionsMissingConnectionsDetail {
-            get {
-                return ResourceManager.GetString("ImportSessionsMissingConnectionsDetail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The following connections were not found:.
-        /// </summary>
-        internal static string ImportSessionsMissingConnectionsMoreInfo {
-            get {
-                return ResourceManager.GetString("ImportSessionsMissingConnectionsMoreInfo", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Excel Tables Reconnection.
-        /// </summary>
-        internal static string ImportSessionsMissingConnectionsTitle {
-            get {
-                return ResourceManager.GetString("ImportSessionsMissingConnectionsTitle", resourceCulture);
             }
         }
         
@@ -2143,102 +2153,102 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The Excel workbook being opened contains saved Edit sessions.
-        ///What do you want to do with them?.
-        /// </summary>
-        internal static string RestoreEditSessionsDetail {
-            get {
-                return ResourceManager.GetString("RestoreEditSessionsDetail", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Restore Saved Edit Sessions.
-        /// </summary>
-        internal static string RestoreEditSessionsTitle {
-            get {
-                return ResourceManager.GetString("RestoreEditSessionsTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The following tables no longer exist:.
         /// </summary>
-        internal static string RestoreSessionsMissingTablesMessage {
+        internal static string RestoreConnectionInfosMissingTablesMessage {
             get {
-                return ResourceManager.GetString("RestoreSessionsMissingTablesMessage", resourceCulture);
+                return ResourceManager.GetString("RestoreConnectionInfosMissingTablesMessage", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The current connection needs to be closed along with any open Edit sessions in order to restore the Edit sessions. Do you want to continue?.
+        ///   Looks up a localized string similar to The current connection needs to be closed along with any open Editing table in order to restore the other Saved Editing tables. Do you want to continue?.
         /// </summary>
-        internal static string RestoreSessionsOpenConnectionCloseEditDialogsDetail {
+        internal static string RestoreConnectionInfosOpenConnectionCloseEditDialogsDetail {
             get {
-                return ResourceManager.GetString("RestoreSessionsOpenConnectionCloseEditDialogsDetail", resourceCulture);
+                return ResourceManager.GetString("RestoreConnectionInfosOpenConnectionCloseEditDialogsDetail", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The saved Edit sessions use a connection to a MySQL server different than the currently connected one. In order to restore the saved Edit sessions the current connection must be closed before opening a new one. Closing a connection also closes any active Edit sessions using that connection..
+        ///   Looks up a localized string similar to The Editing tables use a connection to a MySQL server different than the currently connected one. In order to reconnect them and enable syncronization to the database the current connection must be closed before opening a new one, these will also close any active Editing using that connection..
         /// </summary>
-        internal static string RestoreSessionsOpenConnectionCloseEditDialogsMoreInfo {
+        internal static string RestoreConnectionInfosOpenConnectionCloseEditDialogsMoreInfo {
             get {
-                return ResourceManager.GetString("RestoreSessionsOpenConnectionCloseEditDialogsMoreInfo", resourceCulture);
+                return ResourceManager.GetString("RestoreConnectionInfosOpenConnectionCloseEditDialogsMoreInfo", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A connection to the host in the saved session could not be made, the host is unreachable or credentials are wrong..
+        ///   Looks up a localized string similar to A connection to the host in the saved connection information could not be made, the host is unreachable or credentials are wrong..
         /// </summary>
-        internal static string RestoreSessionsOpenConnectionErrorDetail {
+        internal static string RestoreConnectionInfosOpenConnectionErrorDetail {
             get {
-                return ResourceManager.GetString("RestoreSessionsOpenConnectionErrorDetail", resourceCulture);
+                return ResourceManager.GetString("RestoreConnectionInfosOpenConnectionErrorDetail", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to open session&apos;s connection.
+        ///   Looks up a localized string similar to Unable to open connection.
         /// </summary>
-        internal static string RestoreSessionsOpenConnectionErrorTitle {
+        internal static string RestoreConnectionInfosOpenConnectionErrorTitle {
             get {
-                return ResourceManager.GetString("RestoreSessionsOpenConnectionErrorTitle", resourceCulture);
+                return ResourceManager.GetString("RestoreConnectionInfosOpenConnectionErrorTitle", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The schema {0}.{1} no longer exists. The probable reason for this is because it was deleted from the server&apos;s instance..
         /// </summary>
-        internal static string RestoreSessionsSchemaNoLongerExistsFailed {
+        internal static string RestoreConnectionInfosSchemaNoLongerExistsFailed {
             get {
-                return ResourceManager.GetString("RestoreSessionsSchemaNoLongerExistsFailed", resourceCulture);
+                return ResourceManager.GetString("RestoreConnectionInfosSchemaNoLongerExistsFailed", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Restoring Edit Sessions.
+        ///   Looks up a localized string similar to Restoring Edit Connection Information.
         /// </summary>
-        internal static string RestoreSessionsTitle {
+        internal static string RestoreConnectionInfosTitle {
             get {
-                return ResourceManager.GetString("RestoreSessionsTitle", resourceCulture);
+                return ResourceManager.GetString("RestoreConnectionInfosTitle", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There where some issues while opening sessions..
+        ///   Looks up a localized string similar to There where some issues while connecting to the database..
         /// </summary>
-        internal static string RestoreSessionsWarningMessage {
+        internal static string RestoreConnectionInfosWarningMessage {
             get {
-                return ResourceManager.GetString("RestoreSessionsWarningMessage", resourceCulture);
+                return ResourceManager.GetString("RestoreConnectionInfosWarningMessage", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The session&apos;s connection no longer exists. It was probably deleted from another program. Do you want to delete the saved sessions related to the current workbook?.
+        ///   Looks up a localized string similar to The connection information no longer exists. It was probably deleted from another program. Do you want to delete the related connection information from these tables in the current workbook?.
         /// </summary>
-        internal static string RestoreSessionsWBConnectionNoLongerExistsFailedDetail {
+        internal static string RestoreConnectionInfosWBConnectionNoLongerExistsFailedDetail {
             get {
-                return ResourceManager.GetString("RestoreSessionsWBConnectionNoLongerExistsFailedDetail", resourceCulture);
+                return ResourceManager.GetString("RestoreConnectionInfosWBConnectionNoLongerExistsFailedDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Excel workbook being opened contains saved Editing tables.
+        ///What do you want to do with them?.
+        /// </summary>
+        internal static string RestoreEditConnectionInfoDetail {
+            get {
+                return ResourceManager.GetString("RestoreEditConnectionInfoDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restore Saved Editing Tables.
+        /// </summary>
+        internal static string RestoreEditConnectionInfoTitle {
+            get {
+                return ResourceManager.GetString("RestoreEditConnectionInfoTitle", resourceCulture);
             }
         }
         

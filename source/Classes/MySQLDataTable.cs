@@ -1641,7 +1641,7 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      ImportSessionInfo importSession = null;
+      ImportConnectionInfo importConnectionInfo = null;
       try
       {
         var activeWorkbook = atCell.Worksheet.Parent as ExcelInterop.Workbook;
@@ -1669,7 +1669,7 @@ namespace MySQL.ForExcel.Classes
         Globals.ThisAddIn.Application.Goto(atCell, false);
 
         // Create Excel Table for the imported data
-        importSession = new ImportSessionInfo(this, atCell, addSummaryRow);
+        importConnectionInfo = new ImportConnectionInfo(this, atCell, addSummaryRow);
         atCell.Select();
       }
       catch (Exception ex)
@@ -1682,7 +1682,7 @@ namespace MySQL.ForExcel.Classes
         Globals.ThisAddIn.SkipSelectedDataContentsDetection = false;
       }
 
-      return importSession == null ? null : importSession.ExcelTable;
+      return importConnectionInfo == null ? null : importConnectionInfo.ExcelTable;
     }
 
     /// <summary>

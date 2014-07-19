@@ -495,11 +495,11 @@ To be able to make modifications on cells not related to MySQL data please exit 
   <data name="ColumnDataTypeRequiredWarning" xml:space="preserve">
     <value>Column DataType is required.</value>
   </data>
-  <data name="ActiveEditingSessionsCloseWarningDetail" xml:space="preserve">
-    <value>All active editing sessions on the current schema will be terminated. Do you wish to continue?</value>
+  <data name="ActiveEditConnectionInfosCloseWarningDetail" xml:space="preserve">
+    <value>All active editing connection information on the current schema will be terminated. Do you wish to continue?</value>
   </data>
-  <data name="ActiveEditingSessionsCloseWarningTitle" xml:space="preserve">
-    <value>Active editing sessions on current schema</value>
+  <data name="ActiveEditConnectionInfosCloseWarningTitle" xml:space="preserve">
+    <value>Active editing connection information on current schema</value>
   </data>
   <data name="ColumnNameRequiredWarning" xml:space="preserve">
     <value>Column name is required.</value>
@@ -846,32 +846,32 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
   <data name="WorkbookSavingDetailText" xml:space="preserve">
     <value>Want to save your changes to '{0}'?</value>
   </data>
-  <data name="RestoreSessionsWBConnectionNoLongerExistsFailedDetail" xml:space="preserve">
-    <value>The session's connection no longer exists. It was probably deleted from another program. Do you want to delete the saved sessions related to the current workbook?</value>
+  <data name="RestoreConnectionInfosWBConnectionNoLongerExistsFailedDetail" xml:space="preserve">
+    <value>The connection information no longer exists. It was probably deleted from another program. Do you want to delete the related connection information from these tables in the current workbook?</value>
   </data>
-  <data name="RestoreSessionsSchemaNoLongerExistsFailed" xml:space="preserve">
+  <data name="RestoreConnectionInfosSchemaNoLongerExistsFailed" xml:space="preserve">
     <value>The schema {0}.{1} no longer exists. The probable reason for this is because it was deleted from the server's instance.</value>
   </data>
-  <data name="RestoreSessionsMissingTablesMessage" xml:space="preserve">
+  <data name="RestoreConnectionInfosMissingTablesMessage" xml:space="preserve">
     <value>The following tables no longer exist:</value>
   </data>
-  <data name="RestoreSessionsWarningMessage" xml:space="preserve">
-    <value>There where some issues while opening sessions.</value>
+  <data name="RestoreConnectionInfosWarningMessage" xml:space="preserve">
+    <value>There where some issues while connecting to the database.</value>
   </data>
-  <data name="RestoreSessionsOpenConnectionErrorTitle" xml:space="preserve">
-    <value>Unable to open session's connection</value>
+  <data name="RestoreConnectionInfosOpenConnectionErrorTitle" xml:space="preserve">
+    <value>Unable to open connection</value>
   </data>
-  <data name="RestoreSessionsOpenConnectionErrorDetail" xml:space="preserve">
-    <value>A connection to the host in the saved session could not be made, the host is unreachable or credentials are wrong.</value>
+  <data name="RestoreConnectionInfosOpenConnectionErrorDetail" xml:space="preserve">
+    <value>A connection to the host in the saved connection information could not be made, the host is unreachable or credentials are wrong.</value>
   </data>
-  <data name="RestoreSessionsOpenConnectionCloseEditDialogsDetail" xml:space="preserve">
-    <value>The current connection needs to be closed along with any open Edit sessions in order to restore the Edit sessions. Do you want to continue?</value>
+  <data name="RestoreConnectionInfosOpenConnectionCloseEditDialogsDetail" xml:space="preserve">
+    <value>The current connection needs to be closed along with any open Editing table in order to restore the other Saved Editing tables. Do you want to continue?</value>
   </data>
-  <data name="RestoreSessionsOpenConnectionCloseEditDialogsMoreInfo" xml:space="preserve">
-    <value>The saved Edit sessions use a connection to a MySQL server different than the currently connected one. In order to restore the saved Edit sessions the current connection must be closed before opening a new one. Closing a connection also closes any active Edit sessions using that connection.</value>
+  <data name="RestoreConnectionInfosOpenConnectionCloseEditDialogsMoreInfo" xml:space="preserve">
+    <value>The Editing tables use a connection to a MySQL server different than the currently connected one. In order to reconnect them and enable syncronization to the database the current connection must be closed before opening a new one, these will also close any active Editing using that connection.</value>
   </data>
-  <data name="RestoreSessionsTitle" xml:space="preserve">
-    <value>Restoring Edit Sessions</value>
+  <data name="RestoreConnectionInfosTitle" xml:space="preserve">
+    <value>Restoring Edit Connection Information</value>
   </data>
   <data name="ExportDataErrorCreatingTableText" xml:space="preserve">
     <value>The MySQL Table "{0}" could not be created because of the following error(s):</value>
@@ -978,21 +978,21 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
   <data name="RefreshDataError" xml:space="preserve">
     <value>An error ocurred trying to refresh MySQL data in Excel table {0}</value>
   </data>
-  <data name="ImportSessionsMissingConnectionsDetail" xml:space="preserve">
+  <data name="ImportConnectionInfosMissingConnectionsDetail" xml:space="preserve">
     <value>Some Excel tables could not be reconnected to their corresponding MySQL databases because the connections could not be located.</value>
   </data>
-  <data name="ImportSessionsMissingConnectionsMoreInfo" xml:space="preserve">
+  <data name="ImportConnectionInfosMissingConnectionsMoreInfo" xml:space="preserve">
     <value>The following connections were not found:</value>
   </data>
-  <data name="ImportSessionsMissingConnectionsTitle" xml:space="preserve">
+  <data name="ImportConnectionInfosMissingConnectionsTitle" xml:space="preserve">
     <value>Excel Tables Reconnection</value>
   </data>
-  <data name="RestoreEditSessionsDetail" xml:space="preserve">
-    <value>The Excel workbook being opened contains saved Edit sessions.
+  <data name="RestoreEditConnectionInfoDetail" xml:space="preserve">
+    <value>The Excel workbook being opened contains saved Editing tables.
 What do you want to do with them?</value>
   </data>
-  <data name="RestoreEditSessionsTitle" xml:space="preserve">
-    <value>Restore Saved Edit Sessions</value>
+  <data name="RestoreEditConnectionInfoTitle" xml:space="preserve">
+    <value>Restore Saved Editing Tables</value>
   </data>
   <data name="CreateButtonText" xml:space="preserve">
     <value>Create</value>
@@ -1035,5 +1035,8 @@ What do you want to do with them?</value>
   </data>
   <data name="WorkbookConnectionForExcelModelDescription" xml:space="preserve">
     <value>Created by MySQL for Excel in order for Excel to create a corresponding Model Table, for its internal use only.</value>
+  </data>
+  <data name="ImportConnectionInfoRemovedConnectionText" xml:space="preserve">
+    <value>Connection information for Excel table '{0}.{1}.{2}' on was removed since the connection no longer exists.</value>
   </data>
 </root>

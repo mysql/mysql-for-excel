@@ -74,9 +74,9 @@ namespace MySQL.ForExcel
     #region Fields
 
     /// <summary>
-    /// A dictionary containing subsets of the <see cref="StoredEditSessions"/> list containing only sessions of a <see cref="ExcelInterop.Workbook"/>.
+    /// A dictionary containing subsets of the <see cref="EditConnectionInfo"/> list filtered by <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
-    private Dictionary<string, List<EditSessionInfo>> _editSessionsByWorkbook;
+    private Dictionary<string, List<EditConnectionInfo>> _editConnectionInfosByWorkbook;
 
     /// <summary>
     /// The name of the last deactivated Excel <see cref="ExcelInterop.Worksheet"/>.
@@ -84,9 +84,9 @@ namespace MySQL.ForExcel
     private string _lastDeactivatedSheetName;
 
     /// <summary>
-    /// True while restoring existing sessions for the current workbook, avoiding unwanted actions to be raised during the process.
+    /// True while restoring existing <see cref="EditConnectionInfo"/> objects for the current workbook, avoiding unwanted actions to be raised during the process.
     /// </summary>
-    private bool _restoringExistingSession;
+    private bool _restoringExistingConnectionInfo;
 
     #endregion Fields
 
@@ -144,49 +144,49 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Gets a list of <see cref="ImportSessionInfo"/> objects saved to disk.
+    /// Gets a list of <see cref="ImportConnectionInfo"/> objects saved to disk.
     /// </summary>
-    public List<ImportSessionInfo> StoredImportSessions
+    public List<ImportConnectionInfo> StoredImportConnectionInfos
     {
       get
       {
-        return Settings.Default.ImportSessionsList ?? (Settings.Default.ImportSessionsList = new List<ImportSessionInfo>());
+        return Settings.Default.ImportConnectionInfosList ?? (Settings.Default.ImportConnectionInfosList = new List<ImportConnectionInfo>());
       }
     }
 
     /// <summary>
-    /// Gets a subset of the <see cref="StoredEditSessions"/> list containing only sessions assocaiated to the active <see cref="ExcelInterop.Workbook"/>.
+    /// Gets a subset of the <see cref="EditConnectionInfos"/> objects listing only those associated to the active <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
-    public List<EditSessionInfo> ActiveWorkbookEditSessions
+    public List<EditConnectionInfo> ActiveWorkbookEditConnectionInfos
     {
       get
       {
-        return GetWorkbookEditSessions(Application.ActiveWorkbook);
+        return GetWorkbookEditConnectionInfos(Application.ActiveWorkbook);
       }
     }
 
     /// <summary>
-    /// Gets a subset of the <see cref="StoredImportSessions"/> list containing only sessions assocaiated to the active <see cref="ExcelInterop.Workbook"/>.
+    /// Gets a subset of the <see cref="StoredImportConnectionInfos"/> objects listing only those assocaiated to the active <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
-    public List<ImportSessionInfo> ActiveWorkbookImportSessions
+    public List<ImportConnectionInfo> ActiveWorkbookImportConnectionInfos
     {
       get
       {
         var workbookId = Globals.ThisAddIn.Application.ActiveWorkbook.GetOrCreateId();
-        return GetWorkbookImportSessions(workbookId);
+        return GetWorkbookImportConnectionInfos(workbookId);
       }
     }
 
     /// <summary>
-    /// Gets a subset of the <see cref="StoredImportSessions"/> list containing only sessions assocaiated to the active <see cref="ExcelInterop.Worksheet"/>.
+    /// Gets a subset of the <see cref="StoredImportConnectionInfos"/> listing only those assocaiated to the active <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
-    public List<ImportSessionInfo> ActiveWorksheetImportSessions
+    public List<ImportConnectionInfo> ActiveWorksheetImportConnectionInfos
     {
       get
       {
         var workbookId = Globals.ThisAddIn.Application.ActiveWorkbook.GetOrCreateId();
         ExcelInterop.Worksheet worksheet = Globals.ThisAddIn.Application.ActiveWorkbook.ActiveSheet;
-        return GetWorkSheetImportSessions(workbookId, worksheet.Name);
+        return GetWorkSheetImportConnectionInfos(workbookId, worksheet.Name);
       }
     }
 
@@ -201,7 +201,7 @@ namespace MySQL.ForExcel
     public MySqlRibbon CustomMySqlRibbon { get; private set; }
 
     /// <summary>
-    /// Gets a list with all the Excel panes instantiated in the Excel session, stored it to dispose of them when needed.
+    /// Gets a list with all the Excel panes instantiated in the Excel window, stored it to dispose of them when needed.
     /// </summary>
     public List<ExcelAddInPane> ExcelPanesList { get; private set; }
 
@@ -238,13 +238,13 @@ namespace MySQL.ForExcel
     public bool SkipSelectedDataContentsDetection { get; set; }
 
     /// <summary>
-    /// Gets a list of <see cref="EditSessionInfo"/> objects saved to disk.
+    /// Gets a list of <see cref="EditConnectionInfo"/> objects saved to disk.
     /// </summary>
-    public List<EditSessionInfo> StoredEditSessions
+    public List<EditConnectionInfo> EditConnectionInfos
     {
       get
       {
-        return Settings.Default.EditSessionsList ?? (Settings.Default.EditSessionsList = new List<EditSessionInfo>());
+        return Settings.Default.EditConnectionInfosList ?? (Settings.Default.EditConnectionInfosList = new List<EditConnectionInfo>());
       }
     }
 
@@ -289,22 +289,22 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Closes and removes all Edit sessions associated to the given <see cref="ExcelInterop.Workbook"/>.
+    /// Closes and removes all <see cref="EditConnectionInfo" /> associated to the given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
-    /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/> associated to the Edit sessions to close.</param>
-    public void CloseWorkbookEditSessions(ExcelInterop.Workbook workbook)
+    /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/> associated to the <see cref="EditConnectionInfo" /> objects to close.</param>
+    public void CloseWorkbookEditConnectionInfos(ExcelInterop.Workbook workbook)
     {
       if (workbook == null)
       {
         return;
       }
 
-      var workbookSessions = GetWorkbookEditSessions(workbook);
-      var sessionsToFreeResources = workbookSessions.FindAll(session => session.EditDialog != null && session.EditDialog.WorkbookName == workbook.Name);
-      foreach (var session in sessionsToFreeResources)
+      var workbookConnectionInfos = GetWorkbookEditConnectionInfos(workbook);
+      var connectionInfosToFreeResources = workbookConnectionInfos.FindAll(connectionInfo => connectionInfo.EditDialog != null && connectionInfo.EditDialog.WorkbookName == workbook.Name);
+      foreach (var connectionInfo in connectionInfosToFreeResources)
       {
-        // The Close method is both closing the dialog and removing itself from the collection of EditSessionInfo objects.
-        session.EditDialog.Close();
+        // The Close method is both closing the dialog and removing itself from the collection of <see cref="EditConnectionInfo" /> objects.
+        connectionInfo.EditDialog.Close();
       }
     }
 
@@ -354,8 +354,8 @@ namespace MySQL.ForExcel
         ExcelAddInPaneFirstRun();
       }
 
-      // Restore Edit sessions
-      ShowOpenEditSessionsDialog(Application.ActiveWorkbook);
+      // Restore EditConnectionInfos
+      ShowOpenEditConnectionInfosDialog(Application.ActiveWorkbook);
 
       Application.Cursor = ExcelInterop.XlMousePointer.xlDefault;
       return activeCustomPane;
@@ -363,7 +363,7 @@ namespace MySQL.ForExcel
 
     /// <summary>
     /// Loops all <see cref="ExcelInterop.ListObject"/> objects in the active <see cref="ExcelInterop.Workbook"/> and calls custom refresh functionality
-    /// if tied to a <see cref="ImportSessionInfo"/> object, calls native refresh functionality otherwise.
+    /// if tied to a <see cref="ImportConnectionInfo"/> object, calls native refresh functionality otherwise.
     /// </summary>
     /// <return><c>true</c> if the custom functionality was executed, <c>false</c> otherwise.</return>
     public bool RefreshAllCustomFunctionality()
@@ -378,9 +378,9 @@ namespace MySQL.ForExcel
 
     /// <summary>
     /// Loops all <see cref="ExcelInterop.ListObject"/> objects in the active <see cref="ExcelInterop.Worksheet"/> and calls custom refresh functionality
-    /// if tied to a <see cref="ImportSessionInfo"/> object, calls native refresh functionality otherwise.
+    /// if tied to a <see cref="ImportConnectionInfo"/> object, calls native refresh functionality otherwise.
     /// </summary>
-    /// <returns><c>true</c> if the active <see cref="ExcelInterop.ListObject"/> has a related <see cref="ImportSessionInfo"/> and was refreshed, <c>false</c> otherwise.</returns>
+    /// <returns><c>true</c> if the active <see cref="ExcelInterop.ListObject"/> has a related <see cref="ImportConnectionInfo"/> and was refreshed, <c>false</c> otherwise.</returns>
     public bool RefreshDataCustomFunctionality()
     {
       var listObject = Application.ActiveCell.ListObject;
@@ -417,7 +417,7 @@ namespace MySQL.ForExcel
       if (_lastDeactivatedSheetName.Length > 0 && !Application.ActiveWorkbook.WorksheetExists(_lastDeactivatedSheetName))
       {
         // Worksheet was deleted and the Application_SheetBeforeDelete did not run, user is running Excel 2010 or earlier.
-        CloseMissingWorksheetEditSession(Application.ActiveWorkbook, _lastDeactivatedSheetName);
+        CloseMissingWorksheetEditConnectionInfo(Application.ActiveWorkbook, _lastDeactivatedSheetName);
       }
 
       ChangeEditDialogVisibility(activeSheet, true);
@@ -440,7 +440,7 @@ namespace MySQL.ForExcel
         return;
       }
 
-      CloseWorksheetEditSession(activeSheet);
+      CloseWorksheetEditConnectionInfo(activeSheet);
 
       // If the _lastDeactivatedSheetName is not empty it means a deactivated sheet may have been deleted, if this method ran it means the user is running
       // Excel 2013 or later where this method is supported, so we need to clean the _lastDeactivatedSheetName.
@@ -583,14 +583,14 @@ namespace MySQL.ForExcel
     private void Application_WorkbookAfterSave(ExcelInterop.Workbook workbook, bool success)
     {
       var workbookId = workbook.GetOrCreateId();
-      var workbookEditSessions = GetWorkbookEditSessions(workbook);
+      var workbookEditConnectionInfos = GetWorkbookEditConnectionInfos(workbook);
 
-      // Protect all worksheets with an active edit session.
-      foreach (var activeEditSession in workbookEditSessions)
+      // Protect all worksheets with an active editing table.
+      foreach (var activeEditConnectionInfo in workbookEditConnectionInfos)
       {
-        if (activeEditSession.EditDialog != null)
+        if (activeEditConnectionInfo.EditDialog != null)
         {
-          activeEditSession.EditDialog.ProtectWorksheet();
+          activeEditConnectionInfo.EditDialog.ProtectWorksheet();
         }
 
         if (!success)
@@ -598,10 +598,10 @@ namespace MySQL.ForExcel
           continue;
         }
 
-        // Add new Edit sessions in memory collection to serialized collection
-        activeEditSession.LastAccess = DateTime.Now;
-        activeEditSession.WorkbookFilePath = workbook.FullName;
-        StoredEditSessions.Add(activeEditSession);
+        // Add new EditConnectionInfo in memory collection to serialized collection
+        activeEditConnectionInfo.LastAccess = DateTime.Now;
+        activeEditConnectionInfo.WorkbookFilePath = workbook.FullName;
+        EditConnectionInfos.Add(activeEditConnectionInfo);
       }
 
       if (!success)
@@ -610,19 +610,19 @@ namespace MySQL.ForExcel
         return;
       }
 
-      // Scrubbing of duplicated Import sessions and setting last access time.
+      // Scrubbing of invalid ImportConnectionInfo and setting last access time.
       RemoveInvalidImportConnectionInformation();
-      foreach (var activeImportSession in ActiveWorkbookImportSessions)
+      foreach (var activeImportConnectionInfo in ActiveWorkbookImportConnectionInfos)
       {
-        activeImportSession.LastAccess = DateTime.Now;
-        activeImportSession.WorkbookName = workbook.Name;
-        activeImportSession.WorkbookFilePath = workbook.FullName;
+        activeImportConnectionInfo.LastAccess = DateTime.Now;
+        activeImportConnectionInfo.WorkbookName = workbook.Name;
+        activeImportConnectionInfo.WorkbookFilePath = workbook.FullName;
       }
 
-      // Remove deleted Edit sessions from memory collection also from serialized collection
-      foreach (var storedSession in StoredEditSessions.FindAll(storedSession => string.Equals(storedSession.WorkbookGuid, workbookId, StringComparison.InvariantCulture) && !workbookEditSessions.Exists(wbSession => wbSession.HasSameWorkbookAndTable(storedSession))))
+      // Remove deleted EditConnectionInfo objects from memory collection also from serialized collection
+      foreach (var storedConnectionInfo in EditConnectionInfos.FindAll(storedConnectionInfo => string.Equals(storedConnectionInfo.WorkbookGuid, workbookId, StringComparison.InvariantCulture) && !workbookEditConnectionInfos.Exists(wbConnectionInfo => wbConnectionInfo.HasSameWorkbookAndTable(storedConnectionInfo))))
       {
-        StoredEditSessions.Remove(storedSession);
+        EditConnectionInfos.Remove(storedConnectionInfo);
       }
 
       MiscUtilities.SaveSettings();
@@ -678,8 +678,8 @@ namespace MySQL.ForExcel
     /// </summary>
     private void RemoveInvalidImportConnectionInformation()
     {
-      var invalidConnectionInfos = new List<ImportSessionInfo>();
-      foreach (var importConnectionInfo in ActiveWorkbookImportSessions)
+      var invalidConnectionInfos = new List<ImportConnectionInfo>();
+      foreach (var importConnectionInfo in ActiveWorkbookImportConnectionInfos)
       {
         try
         {
@@ -688,16 +688,16 @@ namespace MySQL.ForExcel
         }
         catch
         {
-          // The session's list object was moved to another worksheet or when its columns had been deleted or the reference to it no longer exists.
+          // The importConnectionInfo's list object was moved to another worksheet or when its columns had been deleted or the reference to it no longer exists.
           invalidConnectionInfos.Add(importConnectionInfo);
         }
       }
 
-      // Dispose of import sessions that are no longer valid for the current workbook.
+      // Dispose of ImportConnectionInfo objects that are no longer valid for the current workbook.
       if (invalidConnectionInfos.Count > 0)
       {
         invalidConnectionInfos.ForEach(invalidSession => invalidSession.ExcelTable.DeleteSafely(false));
-        invalidConnectionInfos.ForEach(invalidSession => StoredImportSessions.Remove(invalidSession));
+        invalidConnectionInfos.ForEach(invalidSession => StoredImportConnectionInfos.Remove(invalidSession));
       }
     }
 
@@ -716,11 +716,11 @@ namespace MySQL.ForExcel
       bool wasAlreadySaved = workbook.Saved;
       if (!wasAlreadySaved)
       {
-        // Cleanup and close import sessions from the closing workbook.
+        // Cleanup and close ImportConnectionInfo objects from the closing workbook.
         RemoveInvalidImportConnectionInformation();
-        foreach (var importSession in ActiveWorkbookImportSessions)
+        foreach (var importConnectionInfo in ActiveWorkbookImportConnectionInfos)
         {
-          importSession.Dispose();
+          importConnectionInfo.Dispose();
         }
 
         switch (MessageBox.Show(string.Format(Resources.WorkbookSavingDetailText, workbook.Name), Application.Name, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1))
@@ -739,14 +739,14 @@ namespace MySQL.ForExcel
         }
       }
 
-      CloseWorkbookEditSessions(workbook);
+      CloseWorkbookEditConnectionInfos(workbook);
       if (wasAlreadySaved)
       {
         workbook.Saved = true;
       }
 
-      // Remove the Edit sessions for the workbook being closed from the dictionary.
-      _editSessionsByWorkbook.Remove(workbook.GetOrCreateId());
+      // Remove the EditConnectionInfo objects for the workbook being closed from the dictionary.
+      _editConnectionInfosByWorkbook.Remove(workbook.GetOrCreateId());
     }
 
     /// <summary>
@@ -757,12 +757,12 @@ namespace MySQL.ForExcel
     /// <param name="cancel">Flag indicating whether the user cancelled the saving event.</param>
     private void Application_WorkbookBeforeSave(ExcelInterop.Workbook workbook, bool saveAsUi, ref bool cancel)
     {
-      var workbookSessions = GetWorkbookEditSessions(workbook);
+      var workbookConnectionInfos = GetWorkbookEditConnectionInfos(workbook);
 
-      // Unprotect all worksheets with an active edit session.
-      foreach (var activeEditSession in workbookSessions.Where(activeEditSession => activeEditSession.EditDialog != null))
+      // Unprotect all worksheets with an active editing table.
+      foreach (var activeEditConnectionInfo in workbookConnectionInfos.Where(activeEditConnectionInfo => activeEditConnectionInfo.EditDialog != null))
       {
-        activeEditSession.EditDialog.UnprotectWorksheet();
+        activeEditConnectionInfo.EditDialog.UnprotectWorksheet();
       }
 
       //The WorkbookAfterSave event in Excel 2007 does not exist so we need to sligthly alter the program flow to overcome this limitation.
@@ -824,55 +824,55 @@ namespace MySQL.ForExcel
         return;
       }
 
-      var workbookSessions = GetWorkbookEditSessions(parentWorkbook);
-      if (workbookSessions.Count == 0 || _restoringExistingSession)
+      var workbookConnectionInfos = GetWorkbookEditConnectionInfos(parentWorkbook);
+      if (workbookConnectionInfos.Count == 0 || _restoringExistingConnectionInfo)
       {
         return;
       }
 
-      var activeEditSession = workbookSessions.GetActiveEditSession(workSheet);
-      if (activeEditSession == null)
+      var activeEditConnectionInfo = workbookConnectionInfos.GetActiveEditConnectionInfo(workSheet);
+      if (activeEditConnectionInfo == null)
       {
         return;
       }
 
       if (show)
       {
-        activeEditSession.EditDialog.ShowDialog();
+        activeEditConnectionInfo.EditDialog.ShowDialog();
       }
       else
       {
-        activeEditSession.EditDialog.Hide();
+        activeEditConnectionInfo.EditDialog.Hide();
       }
     }
 
     /// <summary>
-    /// Closes and removes the Edit session associated to the given <see cref="ExcelInterop.Worksheet"/>.
+    /// Closes and removes the <see cref="EditConnectionInfo"/> associated to the given <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
     /// <param name="workbook">An <see cref="ExcelInterop.Workbook"/>.</param>
-    /// <param name="missingWorksheetName">The name of the <see cref="ExcelInterop.Worksheet"/> that no longer exists and that is associated to the Edit session to close.</param>
-    private void CloseMissingWorksheetEditSession(ExcelInterop.Workbook workbook, string missingWorksheetName)
+    /// <param name="missingWorksheetName">The name of the <see cref="ExcelInterop.Worksheet"/> that no longer exists and that is associated to the <see cref="EditConnectionInfo"/> to close.</param>
+    private void CloseMissingWorksheetEditConnectionInfo(ExcelInterop.Workbook workbook, string missingWorksheetName)
     {
       if (workbook == null || missingWorksheetName.Length == 0)
       {
         return;
       }
 
-      var workbookSessions = GetWorkbookEditSessions(workbook);
-      var wsSession = workbookSessions.FirstOrDefault(session => !session.EditDialog.EditingWorksheetExists);
-      if (wsSession == null)
+      var workbookConnectionInfos = GetWorkbookEditConnectionInfos(workbook);
+      var wsConnectionInfo = workbookConnectionInfos.FirstOrDefault(connectionInfo => !connectionInfo.EditDialog.EditingWorksheetExists);
+      if (wsConnectionInfo == null)
       {
         return;
       }
 
-      wsSession.EditDialog.Close();
+      wsConnectionInfo.EditDialog.Close();
     }
 
     /// <summary>
-    /// Closes and removes the Edit session associated to the given <see cref="ExcelInterop.Worksheet"/>.
+    /// Closes and removes the <see cref="EditConnectionInfo"/> associated to the given <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
-    /// <param name="worksheet">The <see cref="ExcelInterop.Worksheet"/> associated to the Edit session to close.</param>
-    private void CloseWorksheetEditSession(ExcelInterop.Worksheet worksheet)
+    /// <param name="worksheet">The <see cref="ExcelInterop.Worksheet"/> associated to the <see cref="EditConnectionInfo"/> to close.</param>
+    private void CloseWorksheetEditConnectionInfo(ExcelInterop.Worksheet worksheet)
     {
       if (worksheet == null)
       {
@@ -885,14 +885,14 @@ namespace MySQL.ForExcel
         return;
       }
 
-      var workbookSessions = GetWorkbookEditSessions(parentWorkbook);
-      var wsSession = workbookSessions.FirstOrDefault(session => string.Equals(session.EditDialog.WorkbookName, parentWorkbook.Name, StringComparison.InvariantCulture) && string.Equals(session.EditDialog.WorksheetName, worksheet.Name, StringComparison.InvariantCulture));
-      if (wsSession == null)
+      var workbookConnectionInfos = GetWorkbookEditConnectionInfos(parentWorkbook);
+      var wsConnectionInfo = workbookConnectionInfos.FirstOrDefault(connectionInfo => string.Equals(connectionInfo.EditDialog.WorkbookName, parentWorkbook.Name, StringComparison.InvariantCulture) && string.Equals(connectionInfo.EditDialog.WorksheetName, worksheet.Name, StringComparison.InvariantCulture));
+      if (wsConnectionInfo == null)
       {
         return;
       }
 
-      wsSession.EditDialog.Close();
+      wsConnectionInfo.EditDialog.Close();
     }
 
     /// <summary>
@@ -959,26 +959,26 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Delete the closed workbook's edit sessions from the settings file.
+    /// Delete the closed workbook's <see cref="EditConnectionInfo"/> objects from the settings file.
     /// </summary>
-    private void DeleteCurrentWorkbookEditSessions(ExcelInterop.Workbook workbook)
+    private void DeleteCurrentWorkbookEditConnectionInfos(ExcelInterop.Workbook workbook)
     {
       if (workbook == null || string.IsNullOrEmpty(workbook.GetOrCreateId()))
       {
         return;
       }
 
-      // Remove all sessions from the current workbook.
-      var workbookSessions = GetWorkbookEditSessions(workbook);
-      foreach (var session in workbookSessions)
+      // Remove all EditConnectionInfo objects from the current workbook.
+      var workbookConnectionInfos = GetWorkbookEditConnectionInfos(workbook);
+      foreach (var connectionInfo in workbookConnectionInfos)
       {
-        StoredEditSessions.Remove(session);
+        EditConnectionInfos.Remove(connectionInfo);
       }
 
       Settings.Default.Save();
-      if (workbookSessions.Count > 0)
+      if (workbookConnectionInfos.Count > 0)
       {
-        _editSessionsByWorkbook.Remove(workbook.GetOrCreateId());
+        _editConnectionInfosByWorkbook.Remove(workbook.GetOrCreateId());
       }
     }
 
@@ -1022,9 +1022,9 @@ namespace MySQL.ForExcel
     /// </summary>
     private void ExcelAddInPaneFirstRun()
     {
-      _editSessionsByWorkbook = new Dictionary<string, List<EditSessionInfo>>(StoredEditSessions.Count);
+      _editConnectionInfosByWorkbook = new Dictionary<string, List<EditConnectionInfo>>(EditConnectionInfos.Count);
       _lastDeactivatedSheetName = string.Empty;
-      _restoringExistingSession = false;
+      _restoringExistingConnectionInfo = false;
       SkipSelectedDataContentsDetection = false;
 
       // This method is used to migrate all connections created with 1.0.6 (in a local connections file) to the Workbench connections file.
@@ -1041,9 +1041,9 @@ namespace MySQL.ForExcel
     {
       // Unsubscribe from Excel events
       SetupExcelEvents(false);
-      if (_editSessionsByWorkbook != null)
+      if (_editConnectionInfosByWorkbook != null)
       {
-        _editSessionsByWorkbook.Clear();
+        _editConnectionInfosByWorkbook.Clear();
 
       }
     }
@@ -1078,107 +1078,107 @@ namespace MySQL.ForExcel
       workbook.CreateMySqlTableStyle();
       workbook.AddLocalizedDateFormatStringsAsNames();
 
-      // When it is a new workbook it won't have any sessions so we could skip the rest of the method altogether.
+      // When it is a new workbook it won't have any IConnectionInfo object related to it, so we could skip the rest of the method altogether.
       if (isNewWorkbook)
       {
         return;
       }
 
-      RestoreImportSessions(workbook);
+      RestoreImportConnectionInfos(workbook);
       if (ActiveExcelPane == null)
       {
         return;
       }
 
-      ShowOpenEditSessionsDialog(workbook);
+      ShowOpenEditConnectionInfosDialog(workbook);
     }
 
     /// <summary>
-    /// Gets a subset of the <see cref="StoredEditSessions"/> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Workbook"/>.
+    /// Gets a subset of the <see cref="EditConnectionInfos"/> listing only those assocaiated to the given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
-    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> with active Edit sessions.</param>
-    /// <returns>A subset of the <see cref="StoredEditSessions"/> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Workbook"/></returns>
-    private List<EditSessionInfo> GetWorkbookEditSessions(ExcelInterop.Workbook workbook)
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> with active <see cref="EditConnectionInfo"/> objects.</param>
+    /// <returns>A subset of the <see cref="EditConnectionInfos"/> listing only those assocaiated to the given <see cref="ExcelInterop.Workbook"/></returns>
+    private List<EditConnectionInfo> GetWorkbookEditConnectionInfos(ExcelInterop.Workbook workbook)
     {
-      List<EditSessionInfo> workbookSessions = null;
+      List<EditConnectionInfo> workbookConnectionInfos = null;
       string workbookId = workbook.GetOrCreateId();
-      if (_editSessionsByWorkbook != null && !string.IsNullOrEmpty(workbookId))
+      if (_editConnectionInfosByWorkbook != null && !string.IsNullOrEmpty(workbookId))
       {
-        if (_editSessionsByWorkbook.ContainsKey(workbookId))
+        if (_editConnectionInfosByWorkbook.ContainsKey(workbookId))
         {
-          workbookSessions = _editSessionsByWorkbook[workbookId];
+          workbookConnectionInfos = _editConnectionInfosByWorkbook[workbookId];
         }
         else
         {
-          workbookSessions = StoredEditSessions.FindAll(session => string.Equals(session.WorkbookGuid, workbookId, StringComparison.InvariantCulture));
-          _editSessionsByWorkbook.Add(workbookId, workbookSessions);
+          workbookConnectionInfos = EditConnectionInfos.FindAll(connectionInfo => string.Equals(connectionInfo.WorkbookGuid, workbookId, StringComparison.InvariantCulture));
+          _editConnectionInfosByWorkbook.Add(workbookId, workbookConnectionInfos);
         }
       }
 
-      return workbookSessions ?? new List<EditSessionInfo>();
+      return workbookConnectionInfos ?? new List<EditConnectionInfo>();
     }
 
     /// <summary>
-    /// Gets a subset of the <see cref="StoredImportSessions" /> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Workbook" />.
+    /// Gets a subset of the <see cref="StoredImportConnectionInfos" /> listing only those assocaiated to the given <see cref="ExcelInterop.Workbook" />.
     /// </summary>
-    /// <param name="workbookId">Workbook Id to match the sub set of sessions to.</param>
-    /// <returns> A subset of the <see cref="StoredImportSessions" /> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Workbook" /></returns>
-    private List<ImportSessionInfo> GetWorkbookImportSessions(string workbookId)
+    /// <param name="workbookId">Workbook Id to match the sub set of ImportConnectionInfos to.</param>
+    /// <returns> A subset of the <see cref="StoredImportConnectionInfos" /> listing only those assocaiated to the given <see cref="ExcelInterop.Workbook" /></returns>
+    private List<ImportConnectionInfo> GetWorkbookImportConnectionInfos(string workbookId)
     {
-      return StoredImportSessions.FindAll(session => string.Equals(session.WorkbookGuid, workbookId, StringComparison.InvariantCulture));
+      return StoredImportConnectionInfos.FindAll(connectionInfo => string.Equals(connectionInfo.WorkbookGuid, workbookId, StringComparison.InvariantCulture));
     }
 
     /// <summary>
-    /// Gets a subset of the <see cref="StoredImportSessions" /> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Worksheet" />.
+    /// Gets a subset of the <see cref="StoredImportConnectionInfos" /> listing only those assocaiated to the given <see cref="ExcelInterop.Worksheet" />.
     /// </summary>
-    /// <param name="workbookId">Workbook Id to match the sub set of sessions to.</param>
-    /// <param name="worksheetName">Worksheet Name to match the sub set of sessions to.</param>
-    /// <returns>A subset of the <see cref="StoredImportSessions" /> list containing only sessions assocaiated to the given <see cref="ExcelInterop.Worksheet" /></returns>
-    private List<ImportSessionInfo> GetWorkSheetImportSessions(string workbookId, string worksheetName)
+    /// <param name="workbookId">Workbook Id to match the sub set of <see cref="ImportConnectionInfo" /> to.</param>
+    /// <param name="worksheetName">Worksheet Name to match the sub set of <see cref="ImportConnectionInfo" /> to.</param>
+    /// <returns>A subset of the <see cref="StoredImportConnectionInfos" /> listing only those assocaiated to the given <see cref="ExcelInterop.Worksheet" /></returns>
+    private List<ImportConnectionInfo> GetWorkSheetImportConnectionInfos(string workbookId, string worksheetName)
     {
-      List<ImportSessionInfo> worksheetSessions = GetWorkbookImportSessions(workbookId);
-      return worksheetSessions.FindAll(session => string.Equals(session.WorksheetName, worksheetName, StringComparison.InvariantCulture));
+      List<ImportConnectionInfo> worksheetConnectionInfos = GetWorkbookImportConnectionInfos(workbookId);
+      return worksheetConnectionInfos.FindAll(connectionInfo => string.Equals(connectionInfo.WorksheetName, worksheetName, StringComparison.InvariantCulture));
     }
 
     /// <summary>
-    /// Opens an <see cref="EditDataDialog"/> representing a saved Edit session for each of the tables.
+    /// Opens an <see cref="EditDataDialog"/> for each <see cref="EditConnectionInfo" />.
     /// </summary>
     /// <param name="workbook">The workbook.</param>
-    private void OpenEditSessionsOfTables(ExcelInterop.Workbook workbook)
+    private void OpenEditConnectionInfosOfTables(ExcelInterop.Workbook workbook)
     {
       if (workbook == null)
       {
         return;
       }
 
-      var workbookSessions = GetWorkbookEditSessions(workbook);
-      if (workbookSessions.Count == 0)
+      var workbookConnectionInfos = GetWorkbookEditConnectionInfos(workbook);
+      if (workbookConnectionInfos.Count == 0)
       {
         return;
       }
 
       var missingTables = new List<string>();
-      _restoringExistingSession = true;
-      foreach (var session in workbookSessions)
+      _restoringExistingConnectionInfo = true;
+      foreach (var connectionInfos in workbookConnectionInfos)
       {
-        var sessionTableObject = ActiveExcelPane.LoadedTables.FirstOrDefault(dbo => string.Equals(dbo.Name, session.TableName, StringComparison.InvariantCulture));
-        if (sessionTableObject == null)
+        var editTableObject = ActiveExcelPane.LoadedTables.FirstOrDefault(dbo => string.Equals(dbo.Name, connectionInfos.TableName, StringComparison.InvariantCulture));
+        if (editTableObject == null)
         {
-          missingTables.Add(session.TableName);
+          missingTables.Add(connectionInfos.TableName);
           continue;
         }
 
-        ActiveExcelPane.EditTableData(sessionTableObject, true, workbook);
+        ActiveExcelPane.EditTableData(editTableObject, true, workbook);
       }
 
-      if (workbookSessions.Count - missingTables.Count > 0)
+      if (workbookConnectionInfos.Count - missingTables.Count > 0)
       {
         ActiveExcelPane.ActiveEditDialog.ShowDialog();
       }
 
-      _restoringExistingSession = false;
+      _restoringExistingConnectionInfo = false;
 
-      // If no errors were found at the opening sessions process do not display the warning message at the end.
+      // If no errors were found at the opening process do not display the warning dialog at the end.
       if (missingTables.Count <= 0)
       {
         return;
@@ -1187,24 +1187,24 @@ namespace MySQL.ForExcel
       var errorMessage = new StringBuilder();
       if (missingTables.Count > 0)
       {
-        errorMessage.AppendLine(Resources.RestoreSessionsMissingTablesMessage);
+        errorMessage.AppendLine(Resources.RestoreConnectionInfosMissingTablesMessage);
         foreach (var table in missingTables)
         {
           errorMessage.AppendLine(table);
         }
       }
 
-      MiscUtilities.ShowCustomizedInfoDialog(InfoDialog.InfoType.Warning, Resources.RestoreSessionsWarningMessage, errorMessage.ToString());
+      MiscUtilities.ShowCustomizedInfoDialog(InfoDialog.InfoType.Warning, Resources.RestoreConnectionInfosWarningMessage, errorMessage.ToString());
     }
 
     /// <summary>
-    /// Attempts to open a <see cref="MySqlWorkbenchConnection"/> of a saved session.
+    /// Attempts to open a <see cref="MySqlWorkbenchConnection"/> from an Editing table.
     /// </summary>
-    /// <param name="sessionConection">A <see cref="MySqlWorkbenchConnection"/> of a stored session.</param>
+    /// <param name="connectionInfoConnection">The <see cref="MySqlWorkbenchConnection"/> the <see cref="EditConnectionInfo" /> uses.</param>
     /// <returns><c>true</c> if the connection was successfully opened, <c>false</c> otherwise.</returns>
-    private bool OpenConnectionForSavedEditSession(MySqlWorkbenchConnection sessionConection)
+    private bool OpenConnectionForSavedEditConnectionInfo(MySqlWorkbenchConnection connectionInfoConnection)
     {
-      var connectionResult = ActiveExcelPane.OpenConnection(sessionConection, false);
+      var connectionResult = ActiveExcelPane.OpenConnection(connectionInfoConnection, false);
       if (connectionResult.Cancelled)
       {
         return false;
@@ -1215,57 +1215,57 @@ namespace MySQL.ForExcel
         return true;
       }
 
-      InfoDialog.ShowWarningDialog(Resources.RestoreSessionsOpenConnectionErrorTitle, Resources.RestoreSessionsOpenConnectionErrorDetail);
+      InfoDialog.ShowWarningDialog(Resources.RestoreConnectionInfosOpenConnectionErrorTitle, Resources.RestoreConnectionInfosOpenConnectionErrorDetail);
       return false;
     }
 
     /// <summary>
-    /// Attempts to open a <see cref="MySqlWorkbenchConnection"/> of a saved session.
+    /// Attempts to open a <see cref="MySqlWorkbenchConnection"/> from an Editing table.
     /// </summary>
-    /// <param name="session">A saved <see cref="EditSessionInfo"/> object.</param>
-    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object related to the saved session.</param>
+    /// <param name="connectionInfo">A saved <see cref="EditConnectionInfo"/> object.</param>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object related to the <see cref="EditConnectionInfo" />.</param>
     /// <returns>The opened <see cref="MySqlWorkbenchConnection"/>.</returns>
-    private MySqlWorkbenchConnection OpenConnectionForSavedEditSession(EditSessionInfo session, ExcelInterop.Workbook workbook)
+    private MySqlWorkbenchConnection OpenConnectionForSavedEditConnectionInfo(EditConnectionInfo connectionInfo, ExcelInterop.Workbook workbook)
     {
-      if (session == null || workbook == null)
+      if (connectionInfo == null || workbook == null)
       {
         return null;
       }
 
-      // Check if connection in stored session still exists in the collection of Workbench connections.
-      var wbSessionConnection = MySqlWorkbench.Connections.GetConnectionForId(session.ConnectionId);
+      // Check if connection in stored the <see cref="EditConnectionInfo" /> still exists in the collection of Workbench connections.
+      var wbConnectionInfoConnection = MySqlWorkbench.Connections.GetConnectionForId(connectionInfo.ConnectionId);
       DialogResult dialogResult;
-      if (wbSessionConnection == null)
+      if (wbConnectionInfoConnection == null)
       {
-        dialogResult = MiscUtilities.ShowCustomizedWarningDialog(Resources.RestoreSessionsOpenConnectionErrorTitle, Resources.RestoreSessionsWBConnectionNoLongerExistsFailedDetail);
+        dialogResult = MiscUtilities.ShowCustomizedWarningDialog(Resources.RestoreConnectionInfosOpenConnectionErrorTitle, Resources.RestoreConnectionInfosWBConnectionNoLongerExistsFailedDetail);
         if (dialogResult == DialogResult.Yes)
         {
-          DeleteCurrentWorkbookEditSessions(workbook);
+          DeleteCurrentWorkbookEditConnectionInfos(workbook);
         }
 
         return null;
       }
 
-      wbSessionConnection.AllowZeroDateTimeValues = true;
+      wbConnectionInfoConnection.AllowZeroDateTimeValues = true;
       if (ActiveExcelPane.WbConnection == null)
       {
         // If the connection in the active pane is null it means an active connection does not exist, so open a connection.
-        if (!OpenConnectionForSavedEditSession(wbSessionConnection))
+        if (!OpenConnectionForSavedEditConnectionInfo(wbConnectionInfoConnection))
         {
           return null;
         }
       }
-      else if (!string.Equals(wbSessionConnection.HostIdentifier, ActiveExcelPane.WbConnection.HostIdentifier, StringComparison.InvariantCulture))
+      else if (!string.Equals(wbConnectionInfoConnection.HostIdentifier, ActiveExcelPane.WbConnection.HostIdentifier, StringComparison.InvariantCulture))
       {
         // If the stored connection points to a different host as the current connection, ask the user if he wants to open a new connection only if there are active Edit dialogs.
-        if (_editSessionsByWorkbook.Count > 1)
+        if (_editConnectionInfosByWorkbook.Count > 1)
         {
           dialogResult = InfoDialog.ShowYesNoDialog(
             InfoDialog.InfoType.Warning,
-            Resources.RestoreSessionsTitle,
-            Resources.RestoreSessionsOpenConnectionCloseEditDialogsDetail,
+            Resources.RestoreConnectionInfosTitle,
+            Resources.RestoreConnectionInfosOpenConnectionCloseEditDialogsDetail,
             null,
-            Resources.RestoreSessionsOpenConnectionCloseEditDialogsMoreInfo);
+            Resources.RestoreConnectionInfosOpenConnectionCloseEditDialogsMoreInfo);
           if (dialogResult == DialogResult.No)
           {
             return null;
@@ -1275,7 +1275,7 @@ namespace MySQL.ForExcel
           ActiveExcelPane.CloseConnection(false);
         }
 
-        if (!OpenConnectionForSavedEditSession(wbSessionConnection))
+        if (!OpenConnectionForSavedEditConnectionInfo(wbConnectionInfoConnection))
         {
           return null;
         }
@@ -1285,22 +1285,22 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Processes the missing connection sessions to either create and assign them a new connection or disconnect their excel tables.
+    /// Processes the missing connections to either create and assign them a new connection or disconnect their excel tables.
     /// </summary>
-    /// <param name="missingConnectionSessions">A list of <see cref="ImportSessionInfo" /> objects which connection is not found.</param>
-    /// <param name="workbook">The <see cref="Microsoft.Office.Interop.Excel.Workbook" /> the list of <see cref="ImportSessionInfo" /> belong to.</param>
-    private void ProcessMissingConnectionSessions(List<ImportSessionInfo> missingConnectionSessions, ExcelInterop.Workbook workbook)
+    /// <param name="missingConnectionInfoConnections">A list of <see cref="ImportConnectionInfo" /> objects which connection is not found.</param>
+    /// <param name="workbook">The <see cref="Microsoft.Office.Interop.Excel.Workbook" /> the list of <see cref="ImportConnectionInfo" /> belong to.</param>
+    private void ProcessMissingConnectionInfoWorkbenchConnections(List<ImportConnectionInfo> missingConnectionInfoConnections, ExcelInterop.Workbook workbook)
     {
-      if (missingConnectionSessions.Count <= 0)
+      if (missingConnectionInfoConnections.Count <= 0)
       {
         return;
       }
 
       var moreInfoText = MySqlWorkbench.IsRunning
-        ? Resources.UnableToAddConnectionsWhenWBRunning + Environment.NewLine + Resources.ImportSessionsMissingConnectionsMoreInfo
-        : Resources.ImportSessionsMissingConnectionsMoreInfo;
+        ? Resources.UnableToAddConnectionsWhenWBRunning + Environment.NewLine + Resources.ImportConnectionInfosMissingConnectionsMoreInfo
+        : Resources.ImportConnectionInfosMissingConnectionsMoreInfo;
       var stringBuilder = new StringBuilder(moreInfoText);
-      List<string> missingHostIds = missingConnectionSessions.Select(i => i.HostIdentifier).Distinct().ToList();
+      List<string> missingHostIds = missingConnectionInfoConnections.Select(i => i.HostIdentifier).Distinct().ToList();
       foreach (var missingHostId in missingHostIds)
       {
         stringBuilder.Append(Environment.NewLine);
@@ -1309,7 +1309,7 @@ namespace MySQL.ForExcel
 
       var buttonsProperties = new InfoButtonsProperties(Resources.CreateButtonText, DialogResult.OK, Resources.DeleteAllButtonText, DialogResult.Cancel, Resources.WorkOfflineButtonText, DialogResult.Abort);
       DialogResult dialogResult = InfoDialog.ShowDialog(InfoDialog.DialogType.Generic3Buttons, InfoDialog.InfoType.Warning,
-        Resources.ImportSessionsMissingConnectionsTitle, Resources.ImportSessionsMissingConnectionsDetail, null,
+        Resources.ImportConnectionInfosMissingConnectionsTitle, Resources.ImportConnectionInfosMissingConnectionsDetail, null,
         stringBuilder.ToString(), false, buttonsProperties);
 
       switch (dialogResult)
@@ -1324,22 +1324,22 @@ namespace MySQL.ForExcel
 
           if (workbenchWarningDialogResult == DialogResult.Cancel)
           {
-            missingConnectionSessions.ForEach(session => session.ExcelTable.Unlink());
+            missingConnectionInfoConnections.ForEach(connectionInfo => connectionInfo.ExcelTable.Unlink());
             break;
           }
 
-          List<string> missingConnectionIds = missingConnectionSessions.Select(i => i.ConnectionId).Distinct().ToList();
+          List<string> missingConnectionIds = missingConnectionInfoConnections.Select(i => i.ConnectionId).Distinct().ToList();
           foreach (var missingConnectionId in missingConnectionIds)
           {
             //Fill the new connection with the old HostIdentifier information for the New Connection Dialog if available;
-            var missingConnectionSession = missingConnectionSessions.FirstOrDefault(s => s.ConnectionId == missingConnectionId);
-            //Create the new connection and assign it to all corresponding sessions.
+            var missingConnectionconnectionInfo = missingConnectionInfoConnections.FirstOrDefault(s => s.ConnectionId == missingConnectionId);
+            //Create the new connection and assign it to all corresponding connectionInfos.
             using (var newConnectionDialog = new MySqlWorkbenchConnectionDialog(null))
             {
               //If the HostIdentifier is set, we use it to fill in the blanks for the new connection in the dialog.
-              if (missingConnectionSession != null && !string.IsNullOrEmpty(missingConnectionSession.HostIdentifier))
+              if (missingConnectionconnectionInfo != null && !string.IsNullOrEmpty(missingConnectionconnectionInfo.HostIdentifier))
               {
-                var hostIdArray = missingConnectionSession.HostIdentifier.ToLower().Replace("mysql@", string.Empty).Split(':').ToArray();
+                var hostIdArray = missingConnectionconnectionInfo.HostIdentifier.ToLower().Replace("mysql@", string.Empty).Split(':').ToArray();
                 var host = hostIdArray.Length > 0 ? hostIdArray[0] : string.Empty;
                 var portString = hostIdArray.Length > 1 ? hostIdArray[1] : string.Empty;
                 uint port;
@@ -1349,71 +1349,71 @@ namespace MySQL.ForExcel
               }
 
               var result = newConnectionDialog.ShowDialog();
-              //For each session that is pointing to the same connection
-              foreach (var session in missingConnectionSessions.Where(session => session.ConnectionId == missingConnectionId).ToList())
+              //For each connectionInfo that is pointing to the same connection
+              foreach (var connectionInfo in missingConnectionInfoConnections.Where(connectionInfo => connectionInfo.ConnectionId == missingConnectionId).ToList())
               {
                 if (result == DialogResult.OK)
                 {
-                  //If the connection was created we reassign every corresponding session of this set to it.
-                  session.ConnectionId = newConnectionDialog.WorkbenchConnection.Id;
-                  session.Restore(workbook);
+                  //If the connection was created we reassign every corresponding connectionInfo of this set to it.
+                  connectionInfo.ConnectionId = newConnectionDialog.WorkbenchConnection.Id;
+                  connectionInfo.Restore(workbook);
                   MiscUtilities.SaveSettings();
                 }
                 else
                 {
-                  //If the user cancels the creation of a new connection for this set of sessions, we just need to disconnect their Excel Tables.
-                  session.ExcelTable.Unlink();
+                  //If the user cancels the creation of a new connection for this set of connectionInfos, we just need to disconnect their Excel Tables.
+                  connectionInfo.ExcelTable.Unlink();
                 }
               }
             }
           }
           break;
         case DialogResult.Cancel:
-          foreach (var session in missingConnectionSessions)
+          foreach (var connectionInfo in missingConnectionInfoConnections)
           {
-            session.ExcelTable.Unlink();
-            StoredImportSessions.Remove(session);
+            connectionInfo.ExcelTable.Unlink();
+            StoredImportConnectionInfos.Remove(connectionInfo);
           }
           break;
-        case DialogResult.Abort: //The user selected Work offline so we will disconnect every invalid session.
-          missingConnectionSessions.ForEach(session => session.ExcelTable.Unlink());
+        case DialogResult.Abort: //The user selected Work offline so we will disconnect every invalid connectionInfo.
+          missingConnectionInfoConnections.ForEach(connectionInfo => connectionInfo.ExcelTable.Unlink());
           break;
       }
     }
 
     ///  <summary>
-    /// Restores saved Edit sessions from the given <see cref="ExcelInterop.Workbook"/>.
+    /// Restores saved <see cref="EditConnectionInfo"/> objects from the given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
-    /// <param name="workbook">An <see cref="ExcelInterop.Workbook"/> with saved Edit sessions.</param>
-    private void RestoreEditSessions(ExcelInterop.Workbook workbook)
+    /// <param name="workbook">An <see cref="ExcelInterop.Workbook"/> with saved <see cref="EditConnectionInfo"/> objects.</param>
+    private void RestoreEditConnectionInfos(ExcelInterop.Workbook workbook)
     {
-      if (workbook == null || ActiveExcelPane == null || _editSessionsByWorkbook.ContainsKey(workbook.GetOrCreateId()))
+      if (workbook == null || ActiveExcelPane == null || _editConnectionInfosByWorkbook.ContainsKey(workbook.GetOrCreateId()))
       {
         return;
       }
 
-      // Add the sessions for the workbook being opened to the dictionary of sessions.
-      // The GetWorkbookEditSessions method will add the sessions related to the workbook it if they haven't been added.
-      var workbookEditSessions = GetWorkbookEditSessions(workbook);
-      if (!Settings.Default.EditSessionsRestoreWhenOpeningWorkbook || workbookEditSessions.Count == 0)
+      // Add the EditConnectionInfo objects for the workbook being opened to the dictionary.
+      // The GetWorkbookEditConnectionInfos method will add the EditConnectionInfo objects related to the workbook it if they haven't been added.
+      var workbookEditConnectionInfos = GetWorkbookEditConnectionInfos(workbook);
+      if (!Settings.Default.EditSessionsRestoreWhenOpeningWorkbook || workbookEditConnectionInfos.Count == 0)
       {
         return;
       }
 
-      // Open the connection from the session, check also if the current connection can be used to avoid opening a new one.
+      // Open the connection from the EditConnectionInfo, check also if the current connection can be used to avoid opening a new one.
       var currenConnection = ActiveExcelPane.WbConnection;
-      var firstSession = workbookEditSessions[0];
+      var firstConnectionInfo = workbookEditConnectionInfos[0];
       var currentSchema = currenConnection != null ? currenConnection.Schema : string.Empty;
-      var sessionConnection = OpenConnectionForSavedEditSession(firstSession, workbook);
-      if (sessionConnection == null)
+      var connectionInfoConnection = OpenConnectionForSavedEditConnectionInfo(firstConnectionInfo, workbook);
+      if (connectionInfoConnection == null)
       {
         return;
       }
 
-      // Close the current schema if the current connection is being reused but the session schema is different
-      bool connectionReused = sessionConnection.Equals(currenConnection);
+      // Close the current schema if the current connection is being reused but the EditConnectionInfo's schema is different
+      bool connectionReused = connectionInfoConnection.Equals(currenConnection);
       bool openSchema = !connectionReused;
-      if (connectionReused && !string.Equals(currentSchema, firstSession.SchemaName, StringComparison.InvariantCulture))
+      if (connectionReused && !string.Equals(currentSchema, firstConnectionInfo.SchemaName, StringComparison.InvariantCulture))
       {
         if (!ActiveExcelPane.CloseSchema(true, false))
         {
@@ -1425,27 +1425,27 @@ namespace MySQL.ForExcel
 
       if (openSchema)
       {
-        // Verify if the session schema to be opened still exists in the connected MySQL server
-        if (!ActiveExcelPane.LoadedSchemas.Exists(schemaObj => schemaObj.Name == firstSession.SchemaName))
+        // Verify if the EditConnectionInfo's schema to be opened still exists in the connected MySQL server
+        if (!ActiveExcelPane.LoadedSchemas.Exists(schemaObj => schemaObj.Name == firstConnectionInfo.SchemaName))
         {
-          var errorMessage = string.Format(Resources.RestoreSessionsSchemaNoLongerExistsFailed, sessionConnection.HostIdentifier, sessionConnection.Schema);
+          var errorMessage = string.Format(Resources.RestoreConnectionInfosSchemaNoLongerExistsFailed, connectionInfoConnection.HostIdentifier, connectionInfoConnection.Schema);
           MiscUtilities.ShowCustomizedInfoDialog(InfoDialog.InfoType.Error, errorMessage);
           return;
         }
 
-        // Open the session schema
-        ActiveExcelPane.OpenSchema(firstSession.SchemaName, true);
+        // Open the EditConnectionInfo's schema
+        ActiveExcelPane.OpenSchema(firstConnectionInfo.SchemaName, true);
       }
 
-      // Open the Edit sessions for each of the tables being edited
-      OpenEditSessionsOfTables(workbook);
+      // Open the EditConnectionInfo for each of the tables being edited
+      OpenEditConnectionInfosOfTables(workbook);
     }
 
     /// <summary>
-    /// Restores the <see cref="ImportSessionInfo"/>s that are tied to the given <see cref="ExcelInterop.Workbook"/>.
+    /// Restores the <see cref="ImportConnectionInfo"/>s that are tied to the given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
     /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
-    private void RestoreImportSessions(ExcelInterop.Workbook workbook)
+    private void RestoreImportConnectionInfos(ExcelInterop.Workbook workbook)
     {
       if (workbook == null)
       {
@@ -1453,19 +1453,19 @@ namespace MySQL.ForExcel
       }
 
       var workbookId = workbook.GetOrCreateId();
-      var importSessions = GetWorkbookImportSessions(workbookId);
-      if (importSessions == null)
+      var importConnectionInfos = GetWorkbookImportConnectionInfos(workbookId);
+      if (importConnectionInfos == null)
       {
         return;
       }
 
-      foreach (ImportSessionInfo session in importSessions)
+      foreach (ImportConnectionInfo connectionInfo in importConnectionInfos)
       {
-        session.Restore(workbook);
+        connectionInfo.Restore(workbook);
       }
 
       // Verify missing connections and ask the user for action to take?
-      ProcessMissingConnectionSessions(importSessions.Where(session => session.SessionError == ImportSessionInfo.SessionErrorType.WorkbenchConnectionDoesNotExist).ToList(), workbook);
+      ProcessMissingConnectionInfoWorkbenchConnections(importConnectionInfos.Where(connectionInfo => connectionInfo.ConnectionInfoError == ImportConnectionInfo.ConnectionInfoErrorType.WorkbenchConnectionDoesNotExist).ToList(), workbook);
     }
 
     /// <summary>
@@ -1517,10 +1517,10 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Shows a dialog to the users to decide what to do with saved Edit sessions.
+    /// Shows a dialog to the users to decide what to do with saved <see cref="EditConnectionInfo"/> objects.
     /// </summary>
-    /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/> that may contain saved Edit sessions.</param>
-    private void ShowOpenEditSessionsDialog(ExcelInterop.Workbook workbook)
+    /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/> that may contain saved <see cref="EditConnectionInfo"/> objects.</param>
+    private void ShowOpenEditConnectionInfosDialog(ExcelInterop.Workbook workbook)
     {
       if (workbook == null)
       {
@@ -1528,25 +1528,25 @@ namespace MySQL.ForExcel
       }
 
       var workbookId = workbook.GetOrCreateId();
-      if (!StoredEditSessions.Exists(session => session.WorkbookGuid == workbookId) || _editSessionsByWorkbook.ContainsKey(workbookId))
+      if (!EditConnectionInfos.Exists(connectionInfo => connectionInfo.WorkbookGuid == workbookId) || _editConnectionInfosByWorkbook.ContainsKey(workbookId))
       {
         return;
       }
 
       var buttonsProperties = new InfoButtonsProperties(Resources.RestoreButtonText, DialogResult.Yes, Resources.WorkOfflineButtonText, DialogResult.Cancel, Resources.DeleteButtonText, DialogResult.Abort);
       DialogResult dialogResult = InfoDialog.ShowDialog(InfoDialog.DialogType.Generic3Buttons, InfoDialog.InfoType.Warning,
-      Resources.RestoreEditSessionsTitle, Resources.RestoreEditSessionsDetail, null, null, false, buttonsProperties);
+      Resources.RestoreEditConnectionInfoTitle, Resources.RestoreEditConnectionInfoDetail, null, null, false, buttonsProperties);
 
       switch (dialogResult)
       {
         case DialogResult.Abort:
-          // Discard: Do not open any and delete all saved sessions for the current workbook.
-          DeleteCurrentWorkbookEditSessions(workbook);
+          // Discard: Do not open any and delete all saved EditConnectionInfo objects for the current workbook.
+          DeleteCurrentWorkbookEditConnectionInfos(workbook);
           break;
 
         case DialogResult.Yes:
-          // Attempt to restore Edit sessions for the workbook beeing opened
-          RestoreEditSessions(workbook);
+          // Attempt to restore EditConnectionInfo objects for the workbook beeing opened
+          RestoreEditConnectionInfos(workbook);
           break;
       }
     }
@@ -1573,12 +1573,12 @@ namespace MySQL.ForExcel
       // Unsubscribe events tracked even when no Excel panes are open.
       Application.WorkbookOpen -= Application_WorkbookOpen;
 
-      // Dispose (close) all import sessions
-      if (ActiveWorkbookImportSessions != null && ActiveWorkbookImportSessions.Count > 0)
+      // Dispose (close) all ImportConnectionInfo object
+      if (ActiveWorkbookImportConnectionInfos != null && ActiveWorkbookImportConnectionInfos.Count > 0)
       {
-        foreach (var importSession in ActiveWorkbookImportSessions)
+        foreach (var importConnectionInfo in ActiveWorkbookImportConnectionInfos)
         {
-          importSession.Dispose();
+          importConnectionInfo.Dispose();
         }
       }
     }

@@ -29,24 +29,24 @@ using System.Drawing;
 namespace MySQL.ForExcel.Forms
 {
   /// <summary>
-  /// Shows the list of MySQL for Excel Edit and Import stored sessions in a list to cherry pick and delete the ones that are no longer needed.
+  /// Shows the list of MySQL for Excel Edit and Import stored connection information in a list to cherry pick and delete the ones that are no longer needed.
   /// </summary>
-  public partial class ManageSessionsDialog : AutoStyleableBaseDialog
+  public partial class ManageConnectionInfosDialog : AutoStyleableBaseDialog
   {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ManageSessionsDialog"/> class.
+    /// Initializes a new instance of the <see cref="ManageConnectionInfosDialog"/> class.
     /// </summary>
-    public ManageSessionsDialog()
+    public ManageConnectionInfosDialog()
     {
-      SessionsToDelete = new List<ISessionInfo>();
+      ConnectionInfosToDelete = new List<IConnectionInfo>();
       InitializeComponent();
-      LoadListViewWithStoredSessions();
+      LoadListViewWithStoredConnectionInfos();
     }
 
     /// <summary>
     /// List of the sessions to delete.
     /// </summary>
-    public List<ISessionInfo> SessionsToDelete { get; private set; }
+    public List<IConnectionInfo> ConnectionInfosToDelete { get; private set; }
 
     /// <summary>
     /// Handles the Click event of the DeleteSelectedButton control.
@@ -55,42 +55,42 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
     private void DeleteSelectedButton_Click(object sender, EventArgs e)
     {
-      SessionsListView.Items.Cast<ListViewItem>().Where(item => item.Checked).ToList().ForEach(item => SessionsToDelete.Add(item.Tag as ISessionInfo));
+      ConnectionInfosListView.Items.Cast<ListViewItem>().Where(item => item.Checked).ToList().ForEach(item => ConnectionInfosToDelete.Add(item.Tag as IConnectionInfo));
     }
 
     /// <summary>
     /// Loads the ListView with stored sessions.
     /// </summary>
-    private void LoadListViewWithStoredSessions()
+    private void LoadListViewWithStoredConnectionInfos()
     {
-      var allSessions = new List<ISessionInfo>();
-      allSessions.AddRange(Globals.ThisAddIn.StoredEditSessions);
-      allSessions.AddRange(Globals.ThisAddIn.StoredImportSessions);
-      SessionsListView.Groups.Clear();
+      var allConnectionInfos = new List<IConnectionInfo>();
+      allConnectionInfos.AddRange(Globals.ThisAddIn.EditConnectionInfos);
+      allConnectionInfos.AddRange(Globals.ThisAddIn.StoredImportConnectionInfos);
+      ConnectionInfosListView.Groups.Clear();
 
-      foreach (var session in allSessions)
+      foreach (var connectionInfo in allConnectionInfos)
       {
-        var listViewItem = SessionsListView.Items.Add(session.GetHashCode().ToString(CultureInfo.InvariantCulture), String.Empty, 0);
-        if (session.GetType() == typeof(ImportSessionInfo))
+        var listViewItem = ConnectionInfosListView.Items.Add(connectionInfo.GetHashCode().ToString(CultureInfo.InvariantCulture), String.Empty, 0);
+        if (connectionInfo.GetType() == typeof(ImportConnectionInfo))
         {
           listViewItem.SubItems.Add("Import");
-          listViewItem.SubItems.Add(((ImportSessionInfo)session).ExcelTableName);
+          listViewItem.SubItems.Add(((ImportConnectionInfo)connectionInfo).ExcelTableName);
         }
         else
         {
           listViewItem.SubItems.Add("Edit");
-          listViewItem.SubItems.Add(((EditSessionInfo)session).SchemaName + "." + ((EditSessionInfo)session).TableName);
+          listViewItem.SubItems.Add(((EditConnectionInfo)connectionInfo).SchemaName + "." + ((EditConnectionInfo)connectionInfo).TableName);
         }
 
-        listViewItem.SubItems.Add(session.LastAccess.ToString(CultureInfo.InvariantCulture));
-        listViewItem.Tag = session;
+        listViewItem.SubItems.Add(connectionInfo.LastAccess.ToString(CultureInfo.InvariantCulture));
+        listViewItem.Tag = connectionInfo;
 
         //Get the list view group or create it.
-        ListViewGroup listViewGroup = SessionsListView.Groups.Cast<ListViewGroup>().FirstOrDefault(g => g.Name == session.WorkbookGuid);
+        ListViewGroup listViewGroup = ConnectionInfosListView.Groups.Cast<ListViewGroup>().FirstOrDefault(g => g.Name == connectionInfo.WorkbookGuid);
         if (listViewGroup == null)
         {
-          listViewGroup = new ListViewGroup(session.WorkbookGuid, session.WorkbookFilePath);
-          SessionsListView.Groups.Add(listViewGroup);
+          listViewGroup = new ListViewGroup(connectionInfo.WorkbookGuid, connectionInfo.WorkbookFilePath);
+          ConnectionInfosListView.Groups.Add(listViewGroup);
         }
 
         //Set the ListViewItem group
@@ -99,13 +99,13 @@ namespace MySQL.ForExcel.Forms
         //If the current session is from the active workbook, set its font in bold.
         var bold = new System.Drawing.Font(listViewItem.Font, listViewItem.Font.Style | FontStyle.Bold);
         var regular = new System.Drawing.Font(listViewItem.Font, listViewItem.Font.Style | FontStyle.Regular);
-        listViewItem.Font = Globals.ThisAddIn.Application.ActiveWorkbook.GetOrCreateId() == session.WorkbookGuid ? bold : regular;
+        listViewItem.Font = Globals.ThisAddIn.Application.ActiveWorkbook.GetOrCreateId() == connectionInfo.WorkbookGuid ? bold : regular;
 
         //Set the session's font in red if the worbooks it belongs to is not found in the system.
-        listViewItem.ForeColor = File.Exists(session.WorkbookFilePath) ? Color.Black : Color.Red;
+        listViewItem.ForeColor = File.Exists(connectionInfo.WorkbookFilePath) ? Color.Black : Color.Red;
       }
 
-      SessionsListView.OwnerDraw = false;
+      ConnectionInfosListView.OwnerDraw = false;
     }
 
     /// <summary>
@@ -115,18 +115,18 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void SelectNoneToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      SessionsListView.Items.Cast<ListViewItem>().ToList().ForEach(item => item.Checked = false);
+      ConnectionInfosListView.Items.Cast<ListViewItem>().ToList().ForEach(item => item.Checked = false);
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="SelectWorkbookSessionsToolStripMenuItem"/> context menu item is clicked.
+    /// Event delegate method fired when the <see cref="SelectWorkbookConnectionInfosToolStripMenuItem"/> context menu item is clicked.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void SelectWorkbookSessionsToolStripMenuItem_Click(object sender, EventArgs e)
+    private void SelectWorkbookConnectionInfosToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      var currentWorkbookGuid = ((ISessionInfo)SessionsListView.FocusedItem.Tag).WorkbookGuid;
-      SessionsListView.Items.Cast<ListViewItem>().Where(item => ((ISessionInfo)item.Tag).WorkbookGuid == currentWorkbookGuid).ToList().ForEach(item => item.Checked = true);
+      var currentWorkbookGuid = ((IConnectionInfo)ConnectionInfosListView.FocusedItem.Tag).WorkbookGuid;
+      ConnectionInfosListView.Items.Cast<ListViewItem>().Where(item => ((IConnectionInfo)item.Tag).WorkbookGuid == currentWorkbookGuid).ToList().ForEach(item => item.Checked = true);
     }
   }
 }

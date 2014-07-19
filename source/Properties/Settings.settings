@@ -71,7 +71,7 @@
     <Setting Name="EditSessionsRestoreWhenOpeningWorkbook" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="EditSessionsList" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Collections.Generic.List&lt;MySQL.ForExcel.Classes.EditSessionInfo&gt;" Scope="User">
+    <Setting Name="EditConnectionInfosList" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Collections.Generic.List&lt;MySQL.ForExcel.Classes.EditConnectionInfo&gt;" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="EditSessionsReuseWorksheets" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
@@ -92,7 +92,7 @@
     <Setting Name="HideLocalizedDateFormatNames" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ImportSessionsList" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Collections.Generic.List&lt;MySQL.ForExcel.Classes.ImportSessionInfo&gt;" Scope="User">
+    <Setting Name="ImportConnectionInfosList" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Collections.Generic.List&lt;MySQL.ForExcel.Classes.ImportConnectionInfo&gt;" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="ExportShowAllMySqlDataTypes" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">

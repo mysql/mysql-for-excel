@@ -1,4 +1,5 @@
 1.3.2
+- Changed every 'Session' reference in the application to 'Connection Information' to make the reference to these objects more accurate and less confusing.
 - Removed saving step that created invalid connection information entries in the settings.config file even when the user chose not to save the workbook.
   (MySQL Bug #73319, Bug #19242130 - INVALID CONNECTION INFORMATION IS SAVED WITHOUT THE USER SAVING THE WORKBOOK)
 - Fixed the import of stored procedure result sets into Excel tables (the import to Excel ranges was working), and more importantly implemented code that lets the Excel

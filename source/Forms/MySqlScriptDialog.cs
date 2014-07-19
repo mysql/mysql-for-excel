@@ -427,7 +427,7 @@ namespace MySQL.ForExcel.Forms
             transaction.Rollback();
             if (_lockedTable)
             {
-              _wbConnection.UnlockTablesInSession();
+              _wbConnection.UnlockTablesInClientSession();
             }
 
             if (_createdTable)

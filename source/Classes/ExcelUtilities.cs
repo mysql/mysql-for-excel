@@ -717,48 +717,48 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a <see cref="ImportSessionInfo"/> object related to the given <see cref="ExcelInterop.ListObject"/>.
+    /// Gets a <see cref="ImportConnectionInfo"/> object related to the given <see cref="ExcelInterop.ListObject"/>.
     /// </summary>
     /// <param name="excelTable">A <see cref="ExcelInterop.ListObject"/>.</param>
-    /// <returns>A <see cref="ImportSessionInfo"/> object related to the given <see cref="ExcelInterop.ListObject"/>.</returns>
-    public static ImportSessionInfo GetImportSession(this ExcelInterop.ListObject excelTable)
+    /// <returns>A <see cref="ImportConnectionInfo"/> object related to the given <see cref="ExcelInterop.ListObject"/>.</returns>
+    public static ImportConnectionInfo GetImportConnectionInfo(this ExcelInterop.ListObject excelTable)
     {
       if (excelTable == null)
       {
         return null;
       }
 
-      ImportSessionInfo importSession = null;
-      var invalidSessions = new List<ImportSessionInfo>();
-      foreach (var workbookSession in Globals.ThisAddIn.ActiveWorkbookImportSessions)
+      ImportConnectionInfo importConnectionInfo = null;
+      var invalidConnectionInfos = new List<ImportConnectionInfo>();
+      foreach (var workbookConnectionInfo in Globals.ThisAddIn.ActiveWorkbookImportConnectionInfos)
       {
         try
         {
           // Compare the comment values since they contain the GUID that identify the connection information.
-          if (!string.Equals(workbookSession.ExcelTable.Comment, excelTable.Comment, StringComparison.InvariantCultureIgnoreCase))
+          if (!string.Equals(workbookConnectionInfo.ExcelTable.Comment, excelTable.Comment, StringComparison.InvariantCultureIgnoreCase))
           {
             continue;
           }
 
-          importSession = workbookSession;
+          importConnectionInfo = workbookConnectionInfo;
           break;
         }
         catch (COMException)
         {
-          // The session's list object was moved to another worksheet or when its columns had been deleted or the reference to it no longer exists.
-          invalidSessions.Add(workbookSession);
+          // The ListObject was moved to another worksheet or when its columns had been deleted or the reference to it no longer exists.
+          invalidConnectionInfos.Add(workbookConnectionInfo);
         }
       }
 
-      // Dispose of invalid sessions.
-      if (invalidSessions.Count > 0)
+      // Dispose of invalid ImportConnectionInfo objects.
+      if (invalidConnectionInfos.Count > 0)
       {
-        invalidSessions.ForEach(invalidSession => invalidSession.ExcelTable.DeleteSafely(false));
-        invalidSessions.ForEach(invalidSession => Globals.ThisAddIn.StoredImportSessions.Remove(invalidSession));
+        invalidConnectionInfos.ForEach(invalidConnectionInfo => invalidConnectionInfo.ExcelTable.DeleteSafely(false));
+        invalidConnectionInfos.ForEach(invalidConnectionInfo => Globals.ThisAddIn.StoredImportConnectionInfos.Remove(invalidConnectionInfo));
         MiscUtilities.SaveSettings();
       }
 
-      return importSession;
+      return importConnectionInfo;
     }
 
     /// <summary>
@@ -1351,7 +1351,7 @@ namespace MySQL.ForExcel.Classes
 
     /// <summary>
     /// Refreshes all <see cref="ExcelInterop.ListObject"/> objects in the given <see cref="ExcelInterop.Worksheet"/>.
-    /// If a <see cref="ExcelInterop.ListObject"/> is related to a <see cref="ImportSessionInfo"/> object then its custom refresh functionality is performed, otherwise the native one is.
+    /// If a <see cref="ExcelInterop.ListObject"/> is related to a <see cref="ImportConnectionInfo"/> object then its custom refresh functionality is performed, otherwise the native one is.
     /// </summary>
     /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/>.</param>
     public static void RefreshAllListObjects(this ExcelInterop.Worksheet worksheet)
@@ -1373,10 +1373,10 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Checks if the given <see cref="ExcelInterop.ListObject"/> object is related to a <see cref="ImportSessionInfo"/> object in order to perform its custom refresh functionality.
+    /// Checks if the given <see cref="ExcelInterop.ListObject"/> object is related to a <see cref="ImportConnectionInfo"/> object in order to perform its custom refresh functionality.
     /// </summary>
     /// <param name="excelTable">A <see cref="ExcelInterop.ListObject"/>.</param>
-    /// <returns><c>true</c> if the <see cref="ExcelInterop.ListObject"/> has a related <see cref="ImportSessionInfo"/> and was refreshed, <c>false</c> otherwise.</returns>
+    /// <returns><c>true</c> if the <see cref="ExcelInterop.ListObject"/> has a related <see cref="ImportConnectionInfo"/> and was refreshed, <c>false</c> otherwise.</returns>
     public static bool RefreshMySqlData(this ExcelInterop.ListObject excelTable)
     {
       bool refreshedMySqlData = false;
@@ -1385,11 +1385,11 @@ namespace MySQL.ForExcel.Classes
       // Meaning DO NOT use the 'return' statement under any circumstance to return right away in the scope of this method.
       if (excelTable != null && excelTable.Comment != null)
       {
-        var importSession = excelTable.GetImportSession();
-        if (importSession != null)
+        var importConnectionInfo = excelTable.GetImportConnectionInfo();
+        if (importConnectionInfo != null)
         {
           refreshedMySqlData = true;
-          importSession.Refresh();
+          importConnectionInfo.Refresh();
         }
       }
 

@@ -682,32 +682,14 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Removes the desired session depending on the type.
-    /// </summary>
-    /// <param name="sessionToRemove">The session to remove.</param>
-    public static void RemoveSession(ISessionInfo sessionToRemove)
-    {
-      if (sessionToRemove.GetType() == typeof(EditSessionInfo))
-      {
-        Globals.ThisAddIn.StoredEditSessions.Remove((EditSessionInfo)sessionToRemove);
-      }
-      else if (sessionToRemove.GetType() == typeof(ImportSessionInfo))
-      {
-        Globals.ThisAddIn.StoredImportSessions.Remove((ImportSessionInfo)sessionToRemove);
-      }
-
-      MiscUtilities.SaveSettings();
-    }
-
-    /// <summary>
-    /// Sets the net_write_timeout and net_read_timeout MySQL server variables to the given value for the duration of the current session.
+    /// Sets the net_write_timeout and net_read_timeout MySQL server variables to the given value for the duration of the current client session.
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="timeoutInSeconds">
     /// The number of seconds to wait for more data from a connection before aborting the read or for a block to be written to a connection before aborting the write.
     /// If the parameter is ommitted or a value of <c>0</c> is passed to it, the <see cref="MySqlWorkbenchConnection.DefaultCommandTimeout"/> property value is used.
     /// </param>
-    public static void SetSessionReadWriteTimeouts(this MySqlWorkbenchConnection connection, uint timeoutInSeconds = 0)
+    public static void SetClientSessionReadWriteTimeouts(this MySqlWorkbenchConnection connection, uint timeoutInSeconds = 0)
     {
       if (connection == null)
       {
@@ -894,7 +876,7 @@ namespace MySQL.ForExcel.Classes
     /// Unlocks tables locked in the current session.
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    public static void UnlockTablesInSession(this MySqlWorkbenchConnection connection)
+    public static void UnlockTablesInClientSession(this MySqlWorkbenchConnection connection)
     {
       const string sql = "UNLOCK TABLES";
       MySqlHelper.ExecuteNonQuery(connection.GetConnectionStringBuilder().ConnectionString, sql);

@@ -317,10 +317,10 @@ namespace MySQL.ForExcel.Forms
         }
       }
 
-      var session = Globals.ThisAddIn.ActiveWorkbookEditSessions.FirstOrDefault(ac => ac.EditDialog.Equals(this));
-      if (session != null)
+      var connectionInfo = Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.FirstOrDefault(ac => ac.EditDialog.Equals(this));
+      if (connectionInfo != null)
       {
-        Globals.ThisAddIn.ActiveWorkbookEditSessions.Remove(session);
+        Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.Remove(connectionInfo);
       }
 
       Dispose();

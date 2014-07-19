@@ -90,29 +90,29 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the active Edit session related to a given <see cref="ExcelInterop.Workbook"/>.
+    /// Gets the active <see cref="EditConnectionInfo"/> related to a given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
-    /// <param name="sessionsList">The Edit sessions list.</param>
-    /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/> related to the active Edit session.</param>
-    /// <param name="tableName">Name of the table being edited in the Edit session.</param>
-    /// <returns>An <see cref="EditSessionInfo"/> containing the active edit session.</returns>
-    public static EditSessionInfo GetActiveEditSession(this List<EditSessionInfo> sessionsList, ExcelInterop.Workbook workbook, string tableName)
+    /// <param name="connectionInfosList">The <see cref="EditConnectionInfo"/> objects list.</param>
+    /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/> related to the active <see cref="EditConnectionInfo"/>.</param>
+    /// <param name="tableName">Name of the table being edited in the <see cref="EditConnectionInfo"/>.</param>
+    /// <returns>An <see cref="EditConnectionInfo"/> object.</returns>
+    public static EditConnectionInfo GetActiveEditConnectionInfo(this List<EditConnectionInfo> connectionInfosList, ExcelInterop.Workbook workbook, string tableName)
     {
       var workBookId = workbook.GetOrCreateId();
-      return sessionsList == null ? null : sessionsList.FirstOrDefault(session => session.EditDialog != null &&
-      string.Equals(session.WorkbookGuid, workBookId, StringComparison.InvariantCulture) &&
-      session.TableName == tableName);
+      return connectionInfosList == null ? null : connectionInfosList.FirstOrDefault(connectionInfo => connectionInfo.EditDialog != null &&
+      string.Equals(connectionInfo.WorkbookGuid, workBookId, StringComparison.InvariantCulture) &&
+      connectionInfo.TableName == tableName);
     }
 
     /// <summary>
-    /// Gets the active Edit session related to a given <see cref="ExcelInterop.Worksheet"/>.
+    /// Gets the active <see cref="EditConnectionInfo"/> object related to a given <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
-    /// <param name="sessionsList">The Edit sessions list.</param>
-    /// <param name="worksheet">The <see cref="ExcelInterop.Worksheet"/> related to the active Edit session.</param>
-    /// <returns>An <see cref="EditSessionInfo"/> containing the active Edit session.</returns>
-    public static EditSessionInfo GetActiveEditSession(this List<EditSessionInfo> sessionsList, ExcelInterop.Worksheet worksheet)
+    /// <param name="connectionInfosList">The <see cref="EditConnectionInfo"/> objects list.</param>
+    /// <param name="worksheet">The <see cref="ExcelInterop.Worksheet"/> related to the active <see cref="EditConnectionInfo"/> object.</param>
+    /// <returns>An <see cref="EditConnectionInfo"/> object.</returns>
+    public static EditConnectionInfo GetActiveEditConnectionInfo(this List<EditConnectionInfo> connectionInfosList, ExcelInterop.Worksheet worksheet)
     {
-      return sessionsList == null ? null : sessionsList.FirstOrDefault(session => session.EditDialog != null && session.EditDialog.EditingWorksheet.Name == worksheet.Name);
+      return connectionInfosList == null ? null : connectionInfosList.FirstOrDefault(connectionInfo => connectionInfo.EditDialog != null && connectionInfo.EditDialog.EditingWorksheet.Name == worksheet.Name);
     }
 
     /// <summary>
@@ -152,33 +152,17 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Determines whether this session has same workbook and table as the specified comparing session.
+    /// Determines whether this IConnectionInfo has same workbook and table as the specified comparing IConnectionInfo object.
     /// </summary>
-    /// <param name="session">The current session.</param>
-    /// <param name="comparingSession">The session we want to compare values with.</param>
-    /// <returns><c>true</c> when this session has same workbook and table as the specified comparing session, <c>false</c> otherwise.</returns>
-    public static bool HasSameWorkbookAndTable(this ISessionInfo session, ISessionInfo comparingSession)
+    /// <param name="connectionInfo">The current IConnectionInfo.</param>
+    /// <param name="comparingConnectionInfo">The IConnectionInfo we want to compare values with.</param>
+    /// <returns><c>true</c> when this IConnectionInfo has same workbook and table as the specified comparing IConnectionInfo object, <c>false</c> otherwise.</returns>
+    public static bool HasSameWorkbookAndTable(this IConnectionInfo connectionInfo, IConnectionInfo comparingConnectionInfo)
     {
-      return session != null && !string.IsNullOrEmpty(session.WorkbookGuid) && !string.IsNullOrEmpty(comparingSession.WorkbookGuid)
-      && string.Equals(session.WorkbookGuid, comparingSession.WorkbookGuid, StringComparison.InvariantCulture)
-      && !string.IsNullOrEmpty(session.TableName) && !string.IsNullOrEmpty(comparingSession.TableName)
-      && string.Equals(session.TableName, comparingSession.TableName, StringComparison.InvariantCulture);
-    }
-
-    /// <summary>
-    /// Determines whether this session has same workbook and table as the specified comparing session.
-    /// </summary>
-    /// <param name="session">The current session.</param>
-    /// <param name="comparingSession">The session we want to compare values with.</param>
-    /// <returns><c>true</c> when this session has same workbook and table as the specified comparing session, <c>false</c> otherwise.</returns>
-    public static bool HasSameWorkbookWorkSheetAndExcelTable(this ImportSessionInfo session, ImportSessionInfo comparingSession)
-    {
-      return session != null && !string.IsNullOrEmpty(session.WorkbookGuid) && !string.IsNullOrEmpty(comparingSession.WorkbookGuid)
-      && string.Equals(session.WorkbookGuid, comparingSession.WorkbookGuid, StringComparison.InvariantCulture)
-      && !string.IsNullOrEmpty(session.WorksheetName) && !string.IsNullOrEmpty(comparingSession.WorksheetName)
-      && string.Equals(session.WorksheetName, comparingSession.WorksheetName, StringComparison.InvariantCulture)
-      && !string.IsNullOrEmpty(session.ExcelTableName) && !string.IsNullOrEmpty(comparingSession.ExcelTableName)
-      && string.Equals(session.ExcelTableName, comparingSession.ExcelTableName, StringComparison.InvariantCulture);
+      return connectionInfo != null && !string.IsNullOrEmpty(connectionInfo.WorkbookGuid) && !string.IsNullOrEmpty(comparingConnectionInfo.WorkbookGuid)
+      && string.Equals(connectionInfo.WorkbookGuid, comparingConnectionInfo.WorkbookGuid, StringComparison.InvariantCulture)
+      && !string.IsNullOrEmpty(connectionInfo.TableName) && !string.IsNullOrEmpty(comparingConnectionInfo.TableName)
+      && string.Equals(connectionInfo.TableName, comparingConnectionInfo.TableName, StringComparison.InvariantCulture);
     }
 
     /// <summary>

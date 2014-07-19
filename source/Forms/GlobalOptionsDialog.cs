@@ -33,14 +33,14 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets or sets the sessions to be deleted.
     /// </summary>
-    private List<ISessionInfo> _sessionsToDelete;
+    private List<IConnectionInfo> _connectionInfosToDelete;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GlobalOptionsDialog"/> class.
     /// </summary>
     public GlobalOptionsDialog()
     {
-      _sessionsToDelete = new List<ISessionInfo>();
+      _connectionInfosToDelete = new List<IConnectionInfo>();
       InitializeComponent();
       ConnectionTimeoutNumericUpDown.Maximum = Int32.MaxValue / 1000;
       RefreshControlValues();
@@ -48,19 +48,19 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Deletes the sessions marked to in the sessions management dialog.
+    /// Deletes the edit/import connection information objects marked to in the management dialog.
     /// </summary>
-    private void DeleteSessions()
+    private void DeleteConnectionInfos()
     {
-      foreach (var session in _sessionsToDelete)
+      foreach (var connectionInfo in _connectionInfosToDelete)
       {
-        if (session != null && session.GetType() == typeof(EditSessionInfo))
+        if (connectionInfo != null && connectionInfo.GetType() == typeof(EditConnectionInfo))
         {
-          Globals.ThisAddIn.StoredEditSessions.Remove(session as EditSessionInfo);
+          Globals.ThisAddIn.EditConnectionInfos.Remove(connectionInfo as EditConnectionInfo);
         }
         else
         {
-          Globals.ThisAddIn.StoredImportSessions.Remove(session as ImportSessionInfo);
+          Globals.ThisAddIn.StoredImportConnectionInfos.Remove(connectionInfo as ImportConnectionInfo);
         }
       }
     }
@@ -77,9 +77,9 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      if (_sessionsToDelete.Count > 0)
+      if (_connectionInfosToDelete.Count > 0)
       {
-        DeleteSessions();
+        DeleteConnectionInfos();
       }
 
       Settings.Default.GlobalConnectionConnectionTimeout = (uint)ConnectionTimeoutNumericUpDown.Value;
@@ -157,19 +157,19 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Handles the Click event of the ManageSessionsButton control.
+    /// Handles the Click event of the ManageConnectionInfosButton control.
     /// </summary>
     /// <param name="sender">The source of the event.</param>
     /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-    private void ManageSessionsButton_Click(object sender, EventArgs e)
+    private void ManageConnectionInfosButton_Click(object sender, EventArgs e)
     {
-      using (var manageSessionsDialog = new ManageSessionsDialog())
+      using (var manageConnectionInfosDialog = new ManageConnectionInfosDialog())
       {
-        _sessionsToDelete.Clear();
-        manageSessionsDialog.ShowDialog();
-        if (manageSessionsDialog.DialogResult != DialogResult.Cancel)
+        _connectionInfosToDelete.Clear();
+        manageConnectionInfosDialog.ShowDialog();
+        if (manageConnectionInfosDialog.DialogResult != DialogResult.Cancel)
         {
-          _sessionsToDelete = manageSessionsDialog.SessionsToDelete;
+          _connectionInfosToDelete = manageConnectionInfosDialog.ConnectionInfosToDelete;
         }
       }
     }

@@ -69,7 +69,7 @@ namespace MySQL.ForExcel.Forms
       this.CreateNewWorksheetsRadioButton = new System.Windows.Forms.RadioButton();
       this.ReuseWorksheetsRadioButton = new System.Windows.Forms.RadioButton();
       this.ExcelToolTip = new System.Windows.Forms.ToolTip(this.components);
-      this.ManageSessionsButton = new System.Windows.Forms.Button();
+      this.ManageConnectionInfosButton = new System.Windows.Forms.Button();
       this.ResetToDefaultsButton = new System.Windows.Forms.Button();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
@@ -86,7 +86,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // ContentAreaPanel
       // 
-      this.ContentAreaPanel.Controls.Add(this.ManageSessionsButton);
+      this.ContentAreaPanel.Controls.Add(this.ManageConnectionInfosButton);
       this.ContentAreaPanel.Controls.Add(this.panel1);
       this.ContentAreaPanel.Controls.Add(this.UseOptimisticUpdatesCheckBox);
       this.ContentAreaPanel.Controls.Add(this.ShowQueriesOptionsPanel);
@@ -101,14 +101,14 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.ConnectionTimeout1Label);
       this.ContentAreaPanel.Controls.Add(this.GlobalOptionsLabel);
       this.ContentAreaPanel.Controls.Add(this.ConnectionOptionsLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(504, 500);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(504, 514);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.ResetToDefaultsButton);
       this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 455);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 469);
       this.CommandAreaPanel.Size = new System.Drawing.Size(504, 45);
       // 
       // DialogAcceptButton
@@ -280,9 +280,9 @@ namespace MySQL.ForExcel.Forms
       this.EditSessionOptionsLabel.ForeColor = System.Drawing.SystemColors.ControlText;
       this.EditSessionOptionsLabel.Location = new System.Drawing.Point(24, 286);
       this.EditSessionOptionsLabel.Name = "EditSessionOptionsLabel";
-      this.EditSessionOptionsLabel.Size = new System.Drawing.Size(108, 17);
+      this.EditSessionOptionsLabel.Size = new System.Drawing.Size(134, 17);
       this.EditSessionOptionsLabel.TabIndex = 11;
-      this.EditSessionOptionsLabel.Text = "Sesssion Options";
+      this.EditSessionOptionsLabel.Text = "Edit Sesssion Options";
       // 
       // UseOptimisticUpdatesCheckBox
       // 
@@ -383,17 +383,17 @@ namespace MySQL.ForExcel.Forms
       this.ExcelToolTip.InitialDelay = 1000;
       this.ExcelToolTip.ReshowDelay = 100;
       // 
-      // ManageSessionsButton
+      // ManageConnectionInfosButton
       // 
-      this.ManageSessionsButton.Location = new System.Drawing.Point(53, 393);
-      this.ManageSessionsButton.Name = "ManageSessionsButton";
-      this.ManageSessionsButton.Size = new System.Drawing.Size(234, 23);
-      this.ManageSessionsButton.TabIndex = 14;
-      this.ManageSessionsButton.Text = "Manage Stored Import and Edit Sesions";
-      this.ExcelToolTip.SetToolTip(this.ManageSessionsButton, "Allows you to select from all stored Import and Edit Sessions to be deleted once " +
-        "you press Accept.");
-      this.ManageSessionsButton.UseVisualStyleBackColor = true;
-      this.ManageSessionsButton.Click += new System.EventHandler(this.ManageSessionsButton_Click);
+      this.ManageConnectionInfosButton.Location = new System.Drawing.Point(27, 404);
+      this.ManageConnectionInfosButton.Name = "ManageConnectionInfosButton";
+      this.ManageConnectionInfosButton.Size = new System.Drawing.Size(276, 23);
+      this.ManageConnectionInfosButton.TabIndex = 14;
+      this.ManageConnectionInfosButton.Text = "Manage Stored Import and Edit Connection Information";
+      this.ExcelToolTip.SetToolTip(this.ManageConnectionInfosButton, "Allows you to select from all stored Import and Edit connection information to be" +
+        " deleted once you press Accept.");
+      this.ManageConnectionInfosButton.UseVisualStyleBackColor = true;
+      this.ManageConnectionInfosButton.Click += new System.EventHandler(this.ManageConnectionInfosButton_Click);
       // 
       // ResetToDefaultsButton
       // 
@@ -411,7 +411,7 @@ namespace MySQL.ForExcel.Forms
       this.AcceptButton = this.DialogAcceptButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(504, 500);
+      this.ClientSize = new System.Drawing.Size(504, 514);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
@@ -456,6 +456,6 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.RadioButton ReuseWorksheetsRadioButton;
     private System.Windows.Forms.ToolTip ExcelToolTip;
     private System.Windows.Forms.Button ResetToDefaultsButton;
-    private System.Windows.Forms.Button ManageSessionsButton;
+    private System.Windows.Forms.Button ManageConnectionInfosButton;
   }
 }
