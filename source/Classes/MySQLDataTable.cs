@@ -21,13 +21,11 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Text;
-using System.Windows.Forms;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
-using MySQL.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 using ExcelTools = Microsoft.Office.Tools.Excel;
 
@@ -1308,6 +1306,33 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets an array of <see cref="ExcelInterop.Range"/> objects that the data of this <see cref="MySqlDataTable"/> would occupy if imported.
+    /// The first element corresponds to the <see cref="ExcelInterop.Range"/> of the table's data, the second to the PivotTable placeholder.
+    /// </summary>
+    /// <param name="toLeftCell">The top left cell where the data would be imported.</param>
+    /// <param name="withSummaryRow">Flag indicating whether a summary row is to be created for the imported data.</param>
+    /// <param name="withPivotTable">Flag indicating whether a PivotTable is to be created along with the imported data.</param>
+    /// <param name="pivotPosition">The <see cref="ExcelUtilities.PivotTablePosition"/> of the PivotTable to be created relative to the imported data.</param>
+    /// <returns>An array of <see cref="ExcelInterop.Range"/> objects that the data of this <see cref="MySqlDataTable"/> would occupy if imported.</returns>
+    public ExcelInterop.Range[] GetExcelRangesToOccupy(ExcelInterop.Range toLeftCell, bool withSummaryRow, bool withPivotTable, ExcelUtilities.PivotTablePosition pivotPosition = ExcelUtilities.PivotTablePosition.Right)
+    {
+      if (toLeftCell == null)
+      {
+        return null;
+      }
+
+      var ranges = new ExcelInterop.Range[withPivotTable ? 2 : 1];
+      int rowsCount = Rows.Count + (ImportColumnNames || Settings.Default.ImportCreateExcelTable ? 1 : 0) + (withSummaryRow && Settings.Default.ImportCreateExcelTable ? 1 : 0);
+      ranges[0] = toLeftCell.Resize[rowsCount, Columns.Count];
+      if (withPivotTable)
+      {
+        ranges[1] = ranges[0].GetPivotTableTopLeftCell(pivotPosition).Resize[ExcelUtilities.PIVOT_TABLES_PLACEHOLDER_DEFAULT_ROWS_SIZE, ExcelUtilities.PIVOT_TABLES_PLACEHOLDER_DEFAULT_COLUMNS_SIZE];
+      }
+
+      return ranges;
+    }
+
+    /// <summary>
     /// Creates a SQL query to lock or unlock the table.
     /// </summary>
     /// <param name="lockTable">Flag indicating if the query is locking or unlocking the table.</param>
@@ -1533,28 +1558,6 @@ namespace MySQL.ForExcel.Classes
           ? Math.Min(rowsCount, UInt16.MaxValue - currentRow)
           : rowsCount;
         fillingRange = atCell.Resize[cappedNumRows, Columns.Count];
-
-        // Check if the data being imported does not overlap with the data of an existing Excel table.
-        if (fillingRange.IntersectsWithAnyExcelObject())
-        {
-          if (
-            InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelObjectErrorTitle,
-              Resources.ImportOverExcelObjectErrorDetail, Resources.ImportOverExcelObjectErrorSubDetail) ==
-            DialogResult.No)
-          {
-            return null;
-          }
-
-          var newWorkSheet = activeWorkbook.CreateWorksheet(TableName, true);
-          if (newWorkSheet == null)
-          {
-            return null;
-          }
-
-          ExcelInterop.Range newWorkSheetCell = newWorkSheet.Range["A1", Type.Missing];
-          return ImportDataIntoExcelRange(newWorkSheetCell);
-        }
-
         bool escapeFormulaTexts = Settings.Default.ImportEscapeFormulaTextValues;
         var fillingArray = new object[cappedNumRows, Columns.Count];
         if (ImportColumnNames)
@@ -1644,27 +1647,6 @@ namespace MySQL.ForExcel.Classes
       ImportConnectionInfo importConnectionInfo = null;
       try
       {
-        var activeWorkbook = atCell.Worksheet.Parent as ExcelInterop.Workbook;
-
-        // Check if the data being imported does not overlap with the data of an existing Excel table.
-        var dataRange = atCell.Resize[rowsCount, Columns.Count];
-        if (dataRange.IntersectsWithAnyExcelObject())
-        {
-          if (InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelObjectErrorTitle, Resources.ImportOverExcelObjectErrorDetail, Resources.ImportOverExcelObjectErrorSubDetail) == DialogResult.No)
-          {
-            return null;
-          }
-
-          var newWorkSheet = activeWorkbook.CreateWorksheet(TableName, true);
-          if (newWorkSheet == null)
-          {
-            return null;
-          }
-
-          ExcelInterop.Range newWorkSheetCell = newWorkSheet.Range["A1", Type.Missing];
-          return ImportDataIntoExcelTable(newWorkSheetCell, addSummaryRow);
-        }
-
         Globals.ThisAddIn.SkipSelectedDataContentsDetection = true;
         Globals.ThisAddIn.Application.Goto(atCell, false);
 

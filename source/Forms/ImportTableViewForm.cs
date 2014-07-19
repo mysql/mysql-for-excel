@@ -245,6 +245,8 @@ namespace MySQL.ForExcel.Forms
       SetImportParameterValues(RowsTo);
       var importTuple = _dbTableOrView.ImportData();
       MySqlTable = importTuple != null ? importTuple.Item1 : null;
+
+      Cursor = Cursors.Default;
       return MySqlTable != null;
     }
 

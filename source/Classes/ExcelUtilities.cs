@@ -87,6 +87,16 @@ namespace MySQL.ForExcel.Classes
     public const int EN_US_LOCALE_CODE = 1033;
 
     /// <summary>
+    /// The default number of columns a <see cref="ExcelInterop.PivotTable"/> placeholder occupies.
+    /// </summary>
+    public const int PIVOT_TABLES_PLACEHOLDER_DEFAULT_COLUMNS_SIZE = 3;
+
+    /// <summary>
+    /// The default number of rows a <see cref="ExcelInterop.PivotTable"/> placeholder occupies.
+    /// </summary>
+    public const int PIVOT_TABLES_PLACEHOLDER_DEFAULT_ROWS_SIZE = 18;
+
+    /// <summary>
     /// The name of the <see cref="ExcelInterop.WorkbookConnection"/> created for the whole Excel data model in the active <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
     public const string WORKBOOK_DATA_MODEL_CONNECTION_NAME = "ThisWorkbookDataModel";
@@ -447,7 +457,7 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Creates a <see cref="ExcelInterop.PivotTable"/> starting at the given cell containing the data in the given <see cref="ExcelInterop.Range"/>.
+    /// Creates a <see cref="ExcelInterop.PivotTable"/> starting at the given cell where the data is taken from sources in the given <see cref="ExcelInterop.WorkbookConnection"/>.
     /// </summary>
     /// <param name="fromWorkbookConnection">A <see cref="ExcelInterop.WorkbookConnection"/> pointing to the data from which to create the <see cref="ExcelInterop.PivotTable"/>.</param>
     /// <param name="atCell">The top left Excel cell of the new <see cref="ExcelInterop.PivotTable"/>.</param>
@@ -850,6 +860,41 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets a <see cref="ExcelInterop.Range"/> representing the top left cell where the next result set's data should be placed.
+    /// </summary>
+    /// <param name="currentResultSetRange">The <see cref="ExcelInterop.Range"/> of the current result set's data imported to Excel.</param>
+    /// <param name="importType">The <see cref="DbProcedure.ProcedureResultSetsImportType"/> defining what result sets are imported and how they are laid out in the Excel worksheet. </param>
+    /// <param name="withPivotTable">Flag indicating whether a PivotTable is to be created along with the imported data.</param>
+    /// <returns>A <see cref="ExcelInterop.Range"/> representing the top left cell where the next result set's data should be placed.</returns>
+    public static ExcelInterop.Range GetNextResultSetTopLeftCell(this ExcelInterop.Range currentResultSetRange, DbProcedure.ProcedureResultSetsImportType importType, bool withPivotTable)
+    {
+      if (currentResultSetRange == null)
+      {
+        return null;
+      }
+
+      ExcelInterop.Range currentTopLeftCell = currentResultSetRange.Cells[1, 1];
+      int columnsOffset = 0;
+      int rowsOffset = 0;
+      switch (importType)
+      {
+        case DbProcedure.ProcedureResultSetsImportType.AllResultSetsHorizontally:
+          columnsOffset = Math.Max(currentResultSetRange.Columns.Count, PIVOT_TABLES_PLACEHOLDER_DEFAULT_COLUMNS_SIZE) + 1;
+          break;
+
+        case DbProcedure.ProcedureResultSetsImportType.AllResultSetsVertically:
+          rowsOffset = Math.Max(currentResultSetRange.Rows.Count, PIVOT_TABLES_PLACEHOLDER_DEFAULT_ROWS_SIZE) + 1;
+          if (Globals.ThisAddIn.Application.ActiveWorkbook.Excel8CompatibilityMode && currentTopLeftCell.Row + rowsOffset > UInt16.MaxValue)
+          {
+            return null;
+          }
+          break;
+      }
+
+      return currentTopLeftCell.Offset[rowsOffset, columnsOffset];
+    }
+
+    /// <summary>
     /// Gets an <see cref="ExcelInterop.Range"/> object that represents all non-empty cells.
     /// </summary>
     /// <param name="range">A <see cref="ExcelInterop.Range"/> object.</param>
@@ -1090,11 +1135,11 @@ namespace MySQL.ForExcel.Classes
       switch (pivotPosition)
       {
         case PivotTablePosition.Below:
-          atCell = atCell.Offset[atCell.Row + fromSourceRange.Rows.Count + skipCount - 1, 0];
+          atCell = atCell.Offset[fromSourceRange.Rows.Count + skipCount, 0];
           break;
 
         case PivotTablePosition.Right:
-          atCell = atCell.Offset[0, atCell.Column + fromSourceRange.Columns.Count + skipCount - 1];
+          atCell = atCell.Offset[0, fromSourceRange.Columns.Count + skipCount];
           break;
       }
 

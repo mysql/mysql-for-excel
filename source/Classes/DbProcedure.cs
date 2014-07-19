@@ -20,10 +20,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
+using MySQL.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
@@ -211,10 +213,10 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Imports the result sets of this stored procedure to a <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
-    /// <param name="importType"></param>
-    /// <param name="selectedResultSetIndex"></param>
-    /// <param name="resultSetsDataSet"></param>
-    /// <returns></returns>
+    /// <param name="importType">The <see cref="ProcedureResultSetsImportType"/> defining what result sets are imported and how they are laid out in the Excel worksheet. </param>
+    /// <param name="selectedResultSetIndex">The index of the result set selected for import in case the <see cref="importType"/> is <see cref="ProcedureResultSetsImportType.SelectedResultSet"/>.</param>
+    /// <param name="resultSetsDataSet">The <see cref="DataSet"/> containing all result sets returned by the stored procedure's execution.</param>
+    /// <returns><c>true</c> if the import is successful, <c>false</c> otherwise.</returns>
     public bool ImportData(ProcedureResultSetsImportType importType, int selectedResultSetIndex, DataSet resultSetsDataSet = null)
     {
       if (resultSetsDataSet == null)
@@ -225,9 +227,26 @@ namespace MySQL.ForExcel.Classes
       bool success = true;
       try
       {
-        var atCell = Globals.ThisAddIn.Application.ActiveCell;
         var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+
+        // Check if the data being imported does not overlap with the data of an existing Excel table.
+        if (DetectDataForImportPossibleCollisions(importType, selectedResultSetIndex, resultSetsDataSet))
+        {
+          if (InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelObjectErrorTitle, Resources.ImportOverExcelObjectErrorDetail, Resources.ImportOverExcelObjectErrorSubDetail) == DialogResult.No)
+          {
+            return false;
+          }
+
+          var newWorkSheet = activeWorkbook.CreateWorksheet(Name, true);
+          if (newWorkSheet == null)
+          {
+            return false;
+          }
+        }
+
         int tableIdx = 0;
+        bool createPivotTable = ImportParameters.CreatePivotTable;
+        bool addSummaryRow = ImportParameters.AddSummaryRow;
         var pivotPosition = importType == ProcedureResultSetsImportType.AllResultSetsHorizontally
           ? ExcelUtilities.PivotTablePosition.Below
           : ExcelUtilities.PivotTablePosition.Right;
@@ -235,15 +254,14 @@ namespace MySQL.ForExcel.Classes
         {
           mySqlTable.ImportColumnNames = ImportParameters.IncludeColumnNames;
           mySqlTable.TableName = Name + "." + mySqlTable.TableName;
-          if (importType == ProcedureResultSetsImportType.SelectedResultSet && selectedResultSetIndex < tableIdx)
+          if (importType == ProcedureResultSetsImportType.SelectedResultSet && selectedResultSetIndex < tableIdx++)
           {
             continue;
           }
 
-          tableIdx++;
           var excelObj = Settings.Default.ImportCreateExcelTable
-            ? mySqlTable.ImportDataIntoExcelTable(ImportParameters.CreatePivotTable, pivotPosition, ImportParameters.AddSummaryRow)
-            : mySqlTable.ImportDataIntoExcelRange(ImportParameters.CreatePivotTable, pivotPosition, ImportParameters.AddSummaryRow);
+            ? mySqlTable.ImportDataIntoExcelTable(createPivotTable, pivotPosition, addSummaryRow)
+            : mySqlTable.ImportDataIntoExcelRange(createPivotTable, pivotPosition, addSummaryRow);
           if (excelObj == null)
           {
             continue;
@@ -252,38 +270,8 @@ namespace MySQL.ForExcel.Classes
           var fillingRange = excelObj is ExcelInterop.ListObject
             ? (excelObj as ExcelInterop.ListObject).Range
             : excelObj as ExcelInterop.Range;
-          ExcelInterop.Range endCell;
-          if (fillingRange != null)
-          {
-            endCell = fillingRange.Cells[fillingRange.Rows.Count, fillingRange.Columns.Count] as ExcelInterop.Range;
-          }
-          else
-          {
-            continue;
-          }
-
-          if (endCell == null || tableIdx >= resultSetsDataSet.Tables.Count)
-          {
-            continue;
-          }
-
-          switch (importType)
-          {
-            case ProcedureResultSetsImportType.AllResultSetsHorizontally:
-              atCell = endCell.Offset[atCell.Row - endCell.Row, 2];
-              break;
-
-            case ProcedureResultSetsImportType.AllResultSetsVertically:
-              if (activeWorkbook.Excel8CompatibilityMode && endCell.Row + 2 > UInt16.MaxValue)
-              {
-                return true;
-              }
-
-              atCell = endCell.Offset[2, atCell.Column - endCell.Column];
-              break;
-          }
-
-          Globals.ThisAddIn.Application.Goto(atCell, false);
+          var nextTopLeftCell = fillingRange.GetNextResultSetTopLeftCell(importType, createPivotTable);
+          Globals.ThisAddIn.Application.Goto(nextTopLeftCell, false);
         }
       }
       catch (Exception ex)
@@ -369,6 +357,52 @@ namespace MySQL.ForExcel.Classes
       }
 
       base.Dispose(disposing);
+    }
+
+    /// <summary>
+    /// Checks if any of the <see cref="ExcelInterop.Range"/>s where result sets returned by this procedure's execution are imported would collide with another Excel object.
+    /// </summary>
+    /// <param name="importType">The <see cref="ProcedureResultSetsImportType"/> defining what result sets are imported and how they are laid out in the Excel worksheet. </param>
+    /// <param name="selectedResultSetIndex">The index of the result set selected for import in case the <see cref="importType"/> is <see cref="ProcedureResultSetsImportType.SelectedResultSet"/>.</param>
+    /// <param name="resultSetsDataSet">The <see cref="DataSet"/> containing all result sets returned by the stored procedure's execution.</param>
+    /// <returns><c>true</c> if any of the <see cref="ExcelInterop.Range"/>s where result sets returned by this procedure's execution are imported would collide with another Excel object, <c>false</c> otherwise.</returns>
+    private bool DetectDataForImportPossibleCollisions(ProcedureResultSetsImportType importType, int selectedResultSetIndex, DataSet resultSetsDataSet)
+    {
+      if (resultSetsDataSet == null)
+      {
+        return false;
+      }
+
+      bool createPivotTable = ImportParameters.CreatePivotTable;
+      bool collisionDetected = false;
+      var atCell = Globals.ThisAddIn.Application.ActiveCell;
+      int tableIdx = 0;
+      var pivotPosition = importType == ProcedureResultSetsImportType.AllResultSetsHorizontally
+        ? ExcelUtilities.PivotTablePosition.Below
+        : ExcelUtilities.PivotTablePosition.Right;
+      foreach (MySqlDataTable mySqlTable in resultSetsDataSet.Tables)
+      {
+        if (importType == ProcedureResultSetsImportType.SelectedResultSet && selectedResultSetIndex < tableIdx++)
+        {
+          continue;
+        }
+
+        var ranges = mySqlTable.GetExcelRangesToOccupy(atCell, ImportParameters.AddSummaryRow, ImportParameters.CreatePivotTable, pivotPosition);
+        if (ranges == null)
+        {
+          continue;
+        }
+
+        collisionDetected = ranges.Aggregate(false, (current, range) => current || range.IntersectsWithAnyExcelObject());
+        if (collisionDetected)
+        {
+          break;
+        }
+
+        atCell = ranges[0].GetNextResultSetTopLeftCell(importType, createPivotTable);
+      }
+
+      return collisionDetected;
     }
   }
 }

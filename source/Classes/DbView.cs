@@ -21,10 +21,12 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
+using MySQL.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
@@ -193,6 +195,23 @@ namespace MySQL.ForExcel.Classes
             return null;
           }
         }
+        else
+        {
+          // Check if the data being imported does not overlap with the data of an existing Excel table.
+          if (DetectDataForImportPossibleCollisions(mySqlTable))
+          {
+            if (InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelObjectErrorTitle, Resources.ImportOverExcelObjectErrorDetail, Resources.ImportOverExcelObjectErrorSubDetail) == DialogResult.No)
+            {
+              return null;
+            }
+
+            var newWorkSheet = ActiveWorkbook.CreateWorksheet(mySqlTable.TableName, true);
+            if (newWorkSheet == null)
+            {
+              return null;
+            }
+          }
+        }
 
         if (!ImportParameters.ForEditDataOperation)
         {
@@ -211,6 +230,23 @@ namespace MySQL.ForExcel.Classes
       }
 
       return retTuple;
+    }
+
+    /// <summary>
+    /// Checks if the <see cref="ExcelInterop.Range"/> where the data of this <see cref="DbObject"/> is imported would collide with another Excel object.
+    /// </summary>
+    /// <param name="mySqlTable">A <see cref="MySqlDataTable"/> filled with data for this <see cref="DbObject"/>.</param>
+    /// <returns><c>true</c> if the <see cref="ExcelInterop.Range"/> where the data of this <see cref="DbObject"/> is imported would collide with another Excel object, <c>false</c> otherwise.</returns>
+    private bool DetectDataForImportPossibleCollisions(MySqlDataTable mySqlTable)
+    {
+      if (mySqlTable == null)
+      {
+        return false;
+      }
+
+      var atCell = Globals.ThisAddIn.Application.ActiveCell;
+      var ranges = mySqlTable.GetExcelRangesToOccupy(atCell, ImportParameters.AddSummaryRow, ImportParameters.CreatePivotTable);
+      return ranges != null && ranges.Aggregate(false, (current, range) => current || range.IntersectsWithAnyExcelObject());
     }
   }
 }
