@@ -356,7 +356,7 @@ namespace MySQL.ForExcel.Panels
       this.DBObjectsFilter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
       this.DBObjectsFilter.Location = new System.Drawing.Point(9, 171);
       this.DBObjectsFilter.Name = "DBObjectsFilter";
-      this.DBObjectsFilter.NoTextLabel = "Filter Schema Objects";
+      this.DBObjectsFilter.NoTextLabel = "Filter Database Objects";
       this.DBObjectsFilter.SearchImage = global::MySQL.ForExcel.Properties.Resources.ExcelAddinFilter;
       this.DBObjectsFilter.Size = new System.Drawing.Size(242, 21);
       this.DBObjectsFilter.TabIndex = 33;

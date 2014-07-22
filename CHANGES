@@ -1,4 +1,6 @@
 1.3.2
+- Added a new option to the context-menu of the schemas list (opened by right-clicking it) to display the default schema collation below their names, the option is
+  disabled by default.
 - Added code to check if PivotTables to be created for imported data would collide with an Excel object already in the importing worksheet, if so a dialog to import the
   data and the PivotTables into another worksheet will be shown. Also enhanced the way stored procedure result sets are laid out on a worksheet when all of them are
   imported horizontally or vertically and PivotTables are created for each result set, instead of just skipping one row or column, the necessary rows and columns are

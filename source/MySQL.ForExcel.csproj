@@ -611,6 +611,8 @@
     <None Include="Resources\MySQLforExcel-ObjectPanel-ImportManyDisabled-24x24.png" />
     <None Include="Resources\MySQLforExcel-ObjectPanel-RelatedObjects-32x32.png" />
     <None Include="Resources\MySQLforExcel-ObjectPanel-MultiSelectObject-32x32.png" />
+    <None Include="Resources\MySQLforExcel-SchemaPanel-ListItem-Schema-32x32.png" />
+    <None Include="Resources\MySQLforExcel-SchemaPanel-SchemaInspect-32x32.png" />
     <Content Include="Resources\refresh_sidebar.png" />
     <None Include="Resources\remove_col_mapping.png" />
     <None Include="Resources\SplashScreenExcel.png" />

@@ -66,6 +66,7 @@ namespace MySQL.ForExcel.Panels
       this.OptionsButton = new System.Windows.Forms.Button();
       this.SchemasList = new MySQL.ForExcel.Controls.MySqlListView();
       this.SchemasContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.DisplaySchemaCollationsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.RefreshSchemasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.CreateNewSchemaHotLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.UpperPanel = new System.Windows.Forms.Panel();
@@ -86,6 +87,7 @@ namespace MySQL.ForExcel.Panels
       this.LargeImagesList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("LargeImagesList.ImageStream")));
       this.LargeImagesList.TransparentColor = System.Drawing.Color.Transparent;
       this.LargeImagesList.Images.SetKeyName(0, "MySQLforExcel-SchemaPanel-ListItem-Schema-24x24.png");
+      this.LargeImagesList.Images.SetKeyName(1, "MySQLforExcel-SchemaPanel-ListItem-Schema-32x32.png");
       // 
       // BackButton
       // 
@@ -143,6 +145,7 @@ namespace MySQL.ForExcel.Panels
       this.SchemasList.Indent = 18;
       this.SchemasList.ItemHeight = 10;
       this.SchemasList.Location = new System.Drawing.Point(9, 226);
+      this.SchemasList.MultiSelect = false;
       this.SchemasList.Name = "SchemasList";
       this.SchemasList.NodeHeightMultiple = 3;
       this.SchemasList.NodeImages = this.LargeImagesList;
@@ -157,15 +160,25 @@ namespace MySQL.ForExcel.Panels
       // SchemasContextMenuStrip
       // 
       this.SchemasContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.DisplaySchemaCollationsToolStripMenuItem,
             this.RefreshSchemasToolStripMenuItem});
       this.SchemasContextMenuStrip.Name = "contextMenuStrip";
-      this.SchemasContextMenuStrip.Size = new System.Drawing.Size(164, 26);
+      this.SchemasContextMenuStrip.Size = new System.Drawing.Size(214, 48);
+      // 
+      // DisplaySchemaCollationsToolStripMenuItem
+      // 
+      this.DisplaySchemaCollationsToolStripMenuItem.CheckOnClick = true;
+      this.DisplaySchemaCollationsToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_SchemaPanel_SchemaInspect_32x32;
+      this.DisplaySchemaCollationsToolStripMenuItem.Name = "DisplaySchemaCollationsToolStripMenuItem";
+      this.DisplaySchemaCollationsToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
+      this.DisplaySchemaCollationsToolStripMenuItem.Text = "Display Schema Collations";
+      this.DisplaySchemaCollationsToolStripMenuItem.Click += new System.EventHandler(this.DisplaySchemaCollationsToolStripMenuItem_Click);
       // 
       // RefreshSchemasToolStripMenuItem
       // 
       this.RefreshSchemasToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.refresh_sidebar;
       this.RefreshSchemasToolStripMenuItem.Name = "RefreshSchemasToolStripMenuItem";
-      this.RefreshSchemasToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+      this.RefreshSchemasToolStripMenuItem.Size = new System.Drawing.Size(213, 22);
       this.RefreshSchemasToolStripMenuItem.Text = "Refresh Schemas";
       this.RefreshSchemasToolStripMenuItem.Click += new System.EventHandler(this.RefreshSchemasToolStripMenuItem_Click);
       // 
@@ -216,7 +229,7 @@ namespace MySQL.ForExcel.Panels
       this.UpperPanel.Controls.Add(this.MainLogoPictureBox);
       this.UpperPanel.Location = new System.Drawing.Point(0, 0);
       this.UpperPanel.Name = "UpperPanel";
-      this.UpperPanel.Size = new System.Drawing.Size(260, 224);
+      this.UpperPanel.Size = new System.Drawing.Size(260, 222);
       this.UpperPanel.TabIndex = 27;
       // 
       // SeparatorImage
@@ -241,6 +254,8 @@ namespace MySQL.ForExcel.Panels
       // 
       // SchemaFilter
       // 
+      this.SchemaFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.SchemaFilter.BackColor = System.Drawing.SystemColors.Window;
       this.SchemaFilter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
       this.SchemaFilter.Location = new System.Drawing.Point(9, 199);
@@ -356,5 +371,6 @@ namespace MySQL.ForExcel.Panels
     private TransparentLabel InstructionsLabel;
     private System.Windows.Forms.Label ConnectionNameLabel;
     private System.Windows.Forms.PictureBox MainLogoPictureBox;
+    private System.Windows.Forms.ToolStripMenuItem DisplaySchemaCollationsToolStripMenuItem;
   }
 }

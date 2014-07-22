@@ -743,8 +743,7 @@ namespace MySQL.ForExcel.Properties {
         ///
         ///1. Open MySQL Workbench, connect to the database with the SQL Editor and browse to the table.
         ///2. Click the table with the right mouse button and select ALTER TABLE.
-        ///3. Check the PK checkbox of the column that uniquely identifies each row.
-        /// [rest of string was truncated]&quot;;.
+        ///3. Check the PK checkbox of the column that uniquely identifies each row.        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string EditOpenDetailsError {
             get {
@@ -1762,9 +1761,29 @@ namespace MySQL.ForExcel.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap MySQLforExcel_SchemaPanel_ListItem_Schema_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_SchemaPanel_ListItem_Schema_32x32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap MySQLforExcel_SchemaPanel_NewSchema_24x24 {
             get {
                 object obj = ResourceManager.GetObject("MySQLforExcel_SchemaPanel_NewSchema_24x24", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap MySQLforExcel_SchemaPanel_SchemaInspect_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("MySQLforExcel_SchemaPanel_SchemaInspect_32x32", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

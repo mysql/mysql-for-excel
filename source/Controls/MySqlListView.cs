@@ -403,6 +403,32 @@ namespace MySQL.ForExcel.Controls
     #endregion Properties
 
     /// <summary>
+    /// Creates a new header node that holds connection information.
+    /// </summary>
+    /// <param name="parentNode">The parent node under which to add the new node.</param>
+    /// <param name="connection">The <see cref="MySqlWorkbenchConnection"/> associated to the node</param>
+    /// <returns>The newly created <see cref="MySqlListViewNode"/> object.</returns>
+    public MySqlListViewNode AddConnectionNode(MySqlListViewNode parentNode, MySqlWorkbenchConnection connection)
+    {
+      var childNode = new MySqlListViewNode(connection);
+      AddChildNode(parentNode, childNode);
+      return childNode;
+    }
+
+    /// <summary>
+    /// Creates a new header node that holds database objects information.
+    /// </summary>
+    /// <param name="parentNode">The parent node under which to add the new node.</param>
+    /// <param name="dbObject">The <see cref="DbObject"/> related to the node.</param>
+    /// <returns>The newly created <see cref="MySqlListViewNode"/> object.</returns>
+    public MySqlListViewNode AddDbObjectNode(MySqlListViewNode parentNode, DbObject dbObject)
+    {
+      var childNode = new MySqlListViewNode(dbObject);
+      AddChildNode(parentNode, childNode);
+      return childNode;
+    }
+
+    /// <summary>
     /// Creates a new header node that will contain sub-nodes.
     /// </summary>
     /// <param name="title">The new node's title text.</param>
@@ -419,42 +445,39 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Creates a new header node that holds connection information.
-    /// </summary>
-    /// <param name="parentNode">The parent node under which to add the new node.</param>
-    /// <param name="connection">The <see cref="MySqlWorkbenchConnection"/> associated to the node</param>
-    /// <returns>The newly created <see cref="MySqlListViewNode"/> object.</returns>
-    public MySqlListViewNode AddConnectionNode(MySqlListViewNode parentNode, MySqlWorkbenchConnection connection)
-    {
-      var node = new MySqlListViewNode(connection);
-      parentNode.Nodes.Add(node);
-      SetNodeHeight(node, NodeHeightMultiple);
-      return node;
-    }
-
-    /// <summary>
-    /// Creates a new header node that holds database objects information.
-    /// </summary>
-    /// <param name="parentNode">The parent node under which to add the new node.</param>
-    /// <param name="dbObject">The <see cref="DbObject"/> related to the node.</param>
-    /// <returns>The newly created <see cref="MySqlListViewNode"/> object.</returns>
-    public MySqlListViewNode AddDbObjectNode(MySqlListViewNode parentNode, DbObject dbObject)
-    {
-      var node = new MySqlListViewNode(dbObject);
-      parentNode.Nodes.Add(node);
-      SetNodeHeight(node, NodeHeightMultiple);
-      return node;
-    }
-
-    /// <summary>
     /// Clears the nodes under header nodes.
     /// </summary>
-    public void ClearNodes()
+    public void ClearChildNodes()
     {
       foreach (var headerNode in HeaderNodes)
       {
         headerNode.Nodes.Clear();
       }
+    }
+
+    /// <summary>
+    /// Clears all header nodes.
+    /// </summary>
+    public void ClearHeaderNodes()
+    {
+      HeaderNodes.Clear();
+      Nodes.Clear();
+    }
+
+    /// <summary>
+    /// Sets properties related to <see cref="MySqlListViewNode"/> children appearance.
+    /// </summary>
+    /// <param name="bigIcons">Flag indicating whether the appearance of nodes is big with 2 lines of text to the right, or small with only 1 line.</param>
+    /// <param name="titleInBold">Flag indicating whether the title text is drawn with a bold style.</param>
+    public void SetItemsAppearance(bool bigIcons, bool titleInBold = true)
+    {
+      DescriptionTextVerticalPixelsOffset = bigIcons ? -3 : 0;
+      Font = new Font("Segoe UI", 9.75F, bigIcons && titleInBold ? FontStyle.Bold : FontStyle.Regular, GraphicsUnit.Point, 0);
+      ImageHorizontalPixelsOffset = bigIcons ? 4 : 14;
+      ImageToTextHorizontalPixelsOffset = bigIcons ? 4 : 3;
+      ItemHeight = bigIcons ? 20 : 10;
+      NodeHeightMultiple = bigIcons ? 2 : 3;
+      TitleTextVerticalPixelsOffset = bigIcons ? 2 : 0;
     }
 
     /// <summary>
@@ -831,6 +854,17 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
+    /// Adds a <see cref="MySqlListViewNode"/> as a child of the given parent <see cref="MySqlListViewNode"/>.
+    /// </summary>
+    /// <param name="parentNode">The parent node under which to add the new node.</param>
+    /// <param name="childNode">The child node to be added.</param>
+    private void AddChildNode(MySqlListViewNode parentNode, MySqlListViewNode childNode)
+    {
+      parentNode.Nodes.Add(childNode);
+      SetNodeHeight(childNode, NodeHeightMultiple);
+    }
+
+    /// <summary>
     /// Gets the first node that is not a header node starting the search from the top of the given <see cref="MySqlListViewNode"/>.
     /// </summary>
     /// <param name="parentNode">Node containing child nodes to traverse. If <c>null</c> it means we start at the very top root node.</param>
@@ -919,7 +953,7 @@ namespace MySQL.ForExcel.Controls
 
       // Draw the title if we have one
       var titleBrush = disabled ? new SolidBrush(Color.FromArgb(80, 0, 0, 0)) : new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), ForeColor));
-      if (node.Title != null)
+      if (!string.IsNullOrEmpty(node.Title))
       {
         SizeF stringSize = e.Graphics.MeasureString(node.Title, Font);
         truncatedText = node.GetTruncatedTitle(node.TreeView.ClientRectangle.Width - pt.X, e.Graphics, Font);
@@ -933,7 +967,7 @@ namespace MySQL.ForExcel.Controls
 
       // Draw the description if there is one
       var descBrush = disabled ? new SolidBrush(Color.FromArgb(80, 0, 0, 0)) : new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionColorOpacity * 255), DescriptionColor));
-      if (node.Subtitle != null)
+      if (!string.IsNullOrEmpty(node.Subtitle))
       {
         truncatedText = node.GetTruncatedSubtitle(node.TreeView.ClientRectangle.Width - pt.X, e.Graphics, DescriptionFont);
         e.Graphics.DrawString(truncatedText, DescriptionFont, descBrush, pt.X, pt.Y);

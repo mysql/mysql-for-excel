@@ -373,9 +373,7 @@ namespace MySQL.ForExcel.Controls
     /// <param name="givePanelFocus">Flag indicating whether the <see cref="DbObjectSelectionPanel"/> is given focus.</param>
     public void OpenSchema(string schema, bool givePanelFocus)
     {
-      WbConnection.Schema = schema;
-      DBObjectSelectionPanel3.WbConnection = WbConnection;
-      if (givePanelFocus)
+      if (DBObjectSelectionPanel3.SetConnection(WbConnection, schema) && givePanelFocus)
       {
         DBObjectSelectionPanel3.BringToFront();
       }

@@ -435,5 +435,18 @@ namespace MySQL.ForExcel.Properties {
                 this["ExportShowAllMySqlDataTypes"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SchemasDisplayCollations {
+            get {
+                return ((bool)(this["SchemasDisplayCollations"]));
+            }
+            set {
+                this["SchemasDisplayCollations"] = value;
+            }
+        }
     }
 }

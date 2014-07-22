@@ -79,6 +79,11 @@ namespace MySQL.ForExcel.Classes
       : this(dbObject.Name, null, MySqlNodeType.DbObject, includeOnlyTablesAndViewsInMultiSelection && !(dbObject is DbTable) && !(dbObject is DbView))
     {
       DbObject = dbObject;
+      var dbSchema = dbObject as DbSchema;
+      if (dbSchema != null && dbSchema.DisplayCollation)
+      {
+        Subtitle = dbSchema.Collation;
+      }
     }
 
     /// <summary>

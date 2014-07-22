@@ -62,13 +62,13 @@ namespace MySQL.ForExcel.Panels
       _systemSchemasListValues = new[] { "mysql", "information_schema", "performance_schema" };
       InitializeComponent();
 
+      DisplaySchemaCollationsToolStripMenuItem.Checked = Settings.Default.SchemasDisplayCollations;
+      SetItemsAppearance(false);
       ConnectionNameLabel.Paint += Label_Paint;
       UserIPLabel.Paint += Label_Paint;
       InheritFontToControlsExceptionList.Add(SelectSchemaHotLabel.Name);
       InheritFontToControlsExceptionList.Add(CreateNewSchemaHotLabel.Name);
       LoadedSchemas = new List<DbSchema>();
-      SchemasList.AddHeaderNode("Schemas");
-      SchemasList.AddHeaderNode("System Schemas");
     }
 
     #region Properties
@@ -98,6 +98,7 @@ namespace MySQL.ForExcel.Panels
         SchemasList_AfterSelect(null, null);
       }
 
+      SchemaFilter.Width = SchemasList.Width;
       return schemasLoaded;
     }
 
@@ -129,6 +130,16 @@ namespace MySQL.ForExcel.Panels
           LoadSchemas();
         }
       }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when <see cref="DisplaySchemaCollationsToolStripMenuItem"/> is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void DisplaySchemaCollationsToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      SetItemsAppearance(true);
     }
 
     /// <summary>
@@ -165,12 +176,13 @@ namespace MySQL.ForExcel.Panels
             continue;
           }
 
+          // Create the DbSchema and MySqlListViewNode objects
+          var schemaObject = new DbSchema(_wbConnection, schemaName, row["DEFAULT_CHARACTER_SET_NAME"].ToString(), row["DEFAULT_COLLATION_NAME"].ToString(), DisplaySchemaCollationsToolStripMenuItem.Checked);
           string lcSchemaName = schemaName.ToLowerInvariant();
           var headerNode = SchemasList.HeaderNodes[_systemSchemasListValues.Contains(lcSchemaName) ? 1 : 0];
-          var schemaObject = new DbSchema(_wbConnection, schemaName);
           LoadedSchemas.Add(schemaObject);
           var node = SchemasList.AddDbObjectNode(headerNode, schemaObject);
-          node.ImageIndex = 0;
+          node.ImageIndex = DisplaySchemaCollationsToolStripMenuItem.Checked ? 1 : 0;
         }
 
         if (SchemasList.Nodes[0].GetNodeCount(true) > 0)
@@ -294,6 +306,29 @@ namespace MySQL.ForExcel.Panels
     private void SchemasList_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
     {
       NextButton_Click(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// Sets the appearance of <see cref="MySqlListViewNode"/> objects appearing in the <see cref="SchemasList"/>.
+    /// </summary>
+    /// <param name="refreshSchemasList">Flag indicating whether the <see cref="SchemasList"/> must be refreshed after resetting the appearance.</param>
+    private void SetItemsAppearance(bool refreshSchemasList)
+    {
+      bool displayCollations = DisplaySchemaCollationsToolStripMenuItem.Checked;
+      if (Settings.Default.SchemasDisplayCollations != displayCollations)
+      {
+        Settings.Default.SchemasDisplayCollations = displayCollations;
+        MiscUtilities.SaveSettings();
+      }
+
+      SchemasList.ClearHeaderNodes();
+      SchemasList.SetItemsAppearance(displayCollations, false);
+      SchemasList.AddHeaderNode("Schemas");
+      SchemasList.AddHeaderNode("System Schemas");
+      if (refreshSchemasList)
+      {
+        RefreshSchemasToolStripMenuItem_Click(null, EventArgs.Empty);
+      }
     }
   }
 }

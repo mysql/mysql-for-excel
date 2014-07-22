@@ -40,6 +40,11 @@ namespace MySQL.ForExcel.Classes
     #region Constants
 
     /// <summary>
+    /// The text used on default collations for a specific character set.
+    /// </summary>
+    public const string DEFAULT_COLLATION_TEXT = "default collation";
+
+    /// <summary>
     /// The default name given to newly created schemas.
     /// </summary>
     public const string DEFAULT_NEW_SCHEMA_NAME = "new_schema";
@@ -263,7 +268,6 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      const string defaultCollation = "default collation";
       var rowsByGroup = charSetsTable.Select(string.Empty, "Charset, Collation").GroupBy(r => r["Charset"].ToString());
       var collationsDictionary = new Dictionary<string, string[]>(270);
       if (!string.IsNullOrEmpty(firstElement))
@@ -274,7 +278,7 @@ namespace MySQL.ForExcel.Classes
       foreach (var rowsGroup in rowsByGroup)
       {
         var charset = rowsGroup.Key;
-        collationsDictionary.Add(string.Format("{0} - {1}", charset, defaultCollation), new[] { charset, string.Empty });
+        collationsDictionary.Add(string.Format("{0} - {1}", charset, DEFAULT_COLLATION_TEXT), new[] { charset, string.Empty });
         foreach (var collation in rowsGroup.Select(row => row["Collation"].ToString()))
         {
           collationsDictionary.Add(string.Format("{0} - {1}", charset, collation), new[] { charset, collation });

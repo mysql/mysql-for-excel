@@ -144,27 +144,6 @@ namespace MySQL.ForExcel.Panels
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<DbView> LoadedViews { get; private set; }
 
-    /// <summary>
-    /// Gets a <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.
-    /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public MySqlWorkbenchConnection WbConnection
-    {
-      get
-      {
-        return _wbConnection;
-      }
-
-      set
-      {
-        _wbConnection = value;
-        ConnectionNameLabel.Text = _wbConnection.Name;
-        UserIPLabel.Text = string.Format("User: {0}, IP: {1}", _wbConnection.UserName, _wbConnection.Host);
-        SchemaLabel.Text = string.Format("Schema: {0}", _wbConnection.Schema);
-        RefreshDbObjectsList(true);
-      }
-    }
-
     #endregion Properties
 
     /// <summary>
@@ -199,6 +178,23 @@ namespace MySQL.ForExcel.Panels
     }
 
     /// <summary>
+    /// Sets the current active connection used to query the database.
+    /// </summary>
+    /// <param name="connection">A <see cref="MySqlWorkbenchConnection"/> object representing the current connection to a MySQL server.</param>
+    /// <param name="schema"></param>
+    /// <returns><c>true</c> if schemas were loaded into the schemas list, <c>false</c> otherwise.</returns>
+    public bool SetConnection(MySqlWorkbenchConnection connection, string schema)
+    {
+      _wbConnection = connection;
+      _wbConnection.Schema = schema;
+      ConnectionNameLabel.Text = _wbConnection.Name;
+      UserIPLabel.Text = string.Format("User: {0}, IP: {1}", _wbConnection.UserName, _wbConnection.Host);
+      SchemaLabel.Text = string.Format("Schema: {0}", _wbConnection.Schema);
+      DBObjectsFilter.Width = DBObjectList.Width;
+      return RefreshDbObjectsList(true);
+    }
+
+    /// <summary>
     /// Event delegate method fired when <see cref="AppendDataHotLabel"/> is clicked.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -206,12 +202,12 @@ namespace MySQL.ForExcel.Panels
     private void AppendDataHotLabel_Click(object sender, EventArgs e)
     {
       var selectedNode = DBObjectList.SelectedNode;
-      if (selectedNode == null || selectedNode.Type != MySqlListViewNode.MySqlNodeType.DbObject || !(selectedNode.DbObject is DbTable) || WbConnection == null)
+      if (selectedNode == null || selectedNode.Type != MySqlListViewNode.MySqlNodeType.DbObject || !(selectedNode.DbObject is DbTable) || _wbConnection == null)
       {
         return;
       }
 
-      var passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
+      var passwordFlags = _wbConnection.TestConnectionAndRetryOnWrongPassword();
       if (!passwordFlags.ConnectionSuccess)
       {
         return;
@@ -339,12 +335,12 @@ namespace MySQL.ForExcel.Panels
     {
       var selectedNode = DBObjectList.SelectedNode;
       var selectedTable = selectedNode.DbObject as DbTable;
-      if (selectedNode == null || selectedNode.Type != MySqlListViewNode.MySqlNodeType.DbObject || selectedTable == null || WbConnection == null)
+      if (selectedNode == null || selectedNode.Type != MySqlListViewNode.MySqlNodeType.DbObject || selectedTable == null || _wbConnection == null)
       {
         return;
       }
 
-      var passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
+      var passwordFlags = _wbConnection.TestConnectionAndRetryOnWrongPassword();
       if (!passwordFlags.ConnectionSuccess)
       {
         return;
@@ -380,7 +376,7 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void ExportToNewTableHotLabel_Click(object sender, EventArgs e)
     {
-      var passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
+      var passwordFlags = _wbConnection.TestConnectionAndRetryOnWrongPassword();
       if (!passwordFlags.ConnectionSuccess)
       {
         return;
@@ -420,12 +416,12 @@ namespace MySQL.ForExcel.Panels
     {
       var selectedNode = DBObjectList.SelectedNode;
       var parentTaskPane = Parent as ExcelAddInPane;
-      if (selectedNode == null || parentTaskPane == null || selectedNode.Type != MySqlListViewNode.MySqlNodeType.DbObject || selectedNode.DbObject == null || WbConnection == null)
+      if (selectedNode == null || parentTaskPane == null || selectedNode.Type != MySqlListViewNode.MySqlNodeType.DbObject || selectedNode.DbObject == null || _wbConnection == null)
       {
         return;
       }
 
-      var passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
+      var passwordFlags = _wbConnection.TestConnectionAndRetryOnWrongPassword();
       if (!passwordFlags.ConnectionSuccess)
       {
         return;
@@ -502,7 +498,7 @@ namespace MySQL.ForExcel.Panels
     /// <param name="selectAllRelatedDbObjects">Flag indicating whether all found related tables or views are selected by default.</param>
     private void ImportMultipleDbObjects(bool selectAllRelatedDbObjects)
     {
-      var passwordFlags = WbConnection.TestConnectionAndRetryOnWrongPassword();
+      var passwordFlags = _wbConnection.TestConnectionAndRetryOnWrongPassword();
       if (!passwordFlags.ConnectionSuccess)
       {
         return;
@@ -534,7 +530,7 @@ namespace MySQL.ForExcel.Panels
     /// </summary>
     private void LoadProcedures()
     {
-      var proceduresTable = WbConnection.GetSchemaCollection("Procedures", null, WbConnection.Schema, null, "PROCEDURE");
+      var proceduresTable = _wbConnection.GetSchemaCollection("Procedures", null, _wbConnection.Schema, null, "PROCEDURE");
       if (proceduresTable == null)
       {
         return;
@@ -550,7 +546,7 @@ namespace MySQL.ForExcel.Panels
     /// </summary>
     private void LoadTables()
     {
-      var tablesTable = WbConnection.GetSchemaCollection("Tables", null, WbConnection.Schema);
+      var tablesTable = _wbConnection.GetSchemaCollection("Tables", null, _wbConnection.Schema);
       if (tablesTable == null)
       {
         return;
@@ -566,7 +562,7 @@ namespace MySQL.ForExcel.Panels
     /// </summary>
     private void LoadViews()
     {
-      var viewsTable = WbConnection.GetSchemaCollection("Views", null, WbConnection.Schema);
+      var viewsTable = _wbConnection.GetSchemaCollection("Views", null, _wbConnection.Schema);
       if (viewsTable == null)
       {
         return;
@@ -613,19 +609,20 @@ namespace MySQL.ForExcel.Panels
     /// Refreshes the DB objects list control with current objects in the connected schema.
     /// </summary>
     /// <param name="reloadFromServer">Flag indicating whether DB objects must be reloaded from the connected MySQL server.</param>
-    private void RefreshDbObjectsList(bool reloadFromServer)
+    private bool RefreshDbObjectsList(bool reloadFromServer)
     {
       if (DBObjectList.HeaderNodes.Count < 3)
       {
-        return;
+        return false;
       }
 
+      bool success = true;
       try
       {
         // Avoids flickering of DB Objects lists while adding the items to it.
         DBObjectList.BeginUpdate();
 
-        DBObjectList.ClearNodes();
+        DBObjectList.ClearChildNodes();
         if (reloadFromServer)
         {
           LoadTables();
@@ -666,9 +663,12 @@ namespace MySQL.ForExcel.Panels
       }
       catch (Exception ex)
       {
+        success = false;
         MiscUtilities.ShowCustomizedErrorDialog(Resources.RefreshDBObjectsErrorTitle, ex.Message, true);
         MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
+
+      return success;
     }
   }
 }
