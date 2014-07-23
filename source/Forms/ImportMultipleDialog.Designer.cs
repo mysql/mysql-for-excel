@@ -72,9 +72,10 @@ namespace MySQL.ForExcel.Forms
       this.SelectTablesViewsPictureBox = new System.Windows.Forms.PictureBox();
       this.ImportDataLabel = new System.Windows.Forms.Label();
       this.TablesViewsContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.AddRelatedTablesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.PreviewDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.SelectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.SelectNoneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.PreviewDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.WorkbookInCompatibilityModeWarningLabel = new System.Windows.Forms.Label();
       this.RelatedTablesListView = new System.Windows.Forms.ListView();
       this.RelatedTableColumnHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -229,18 +230,35 @@ namespace MySQL.ForExcel.Forms
       // TablesViewsContextMenuStrip
       // 
       this.TablesViewsContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.AddRelatedTablesToolStripMenuItem,
+            this.PreviewDataToolStripMenuItem,
             this.SelectAllToolStripMenuItem,
-            this.SelectNoneToolStripMenuItem,
-            this.PreviewDataToolStripMenuItem});
+            this.SelectNoneToolStripMenuItem});
       this.TablesViewsContextMenuStrip.Name = "TablesViewsContextMenuStrip";
-      this.TablesViewsContextMenuStrip.Size = new System.Drawing.Size(143, 70);
+      this.TablesViewsContextMenuStrip.Size = new System.Drawing.Size(176, 92);
       this.TablesViewsContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.TablesViewsContextMenuStrip_Opening);
+      // 
+      // AddRelatedTablesToolStripMenuItem
+      // 
+      this.AddRelatedTablesToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_RelatedObjects_32x32;
+      this.AddRelatedTablesToolStripMenuItem.Name = "AddRelatedTablesToolStripMenuItem";
+      this.AddRelatedTablesToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+      this.AddRelatedTablesToolStripMenuItem.Text = "Add Related Tables";
+      this.AddRelatedTablesToolStripMenuItem.Click += new System.EventHandler(this.AddRelatedTablesToolStripMenuItem_Click);
+      // 
+      // PreviewDataToolStripMenuItem
+      // 
+      this.PreviewDataToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
+      this.PreviewDataToolStripMenuItem.Name = "PreviewDataToolStripMenuItem";
+      this.PreviewDataToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+      this.PreviewDataToolStripMenuItem.Text = "Preview Data";
+      this.PreviewDataToolStripMenuItem.Click += new System.EventHandler(this.PreviewDataToolStripMenuItem_Click);
       // 
       // SelectAllToolStripMenuItem
       // 
       this.SelectAllToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.select_all;
       this.SelectAllToolStripMenuItem.Name = "SelectAllToolStripMenuItem";
-      this.SelectAllToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+      this.SelectAllToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
       this.SelectAllToolStripMenuItem.Text = "Select All";
       this.SelectAllToolStripMenuItem.Click += new System.EventHandler(this.SelectAllToolStripMenuItem_Click);
       // 
@@ -248,17 +266,9 @@ namespace MySQL.ForExcel.Forms
       // 
       this.SelectNoneToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.select_none;
       this.SelectNoneToolStripMenuItem.Name = "SelectNoneToolStripMenuItem";
-      this.SelectNoneToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+      this.SelectNoneToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
       this.SelectNoneToolStripMenuItem.Text = "Select None";
       this.SelectNoneToolStripMenuItem.Click += new System.EventHandler(this.SelectNoneToolStripMenuItem_Click);
-      // 
-      // PreviewDataToolStripMenuItem
-      // 
-      this.PreviewDataToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
-      this.PreviewDataToolStripMenuItem.Name = "PreviewDataToolStripMenuItem";
-      this.PreviewDataToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
-      this.PreviewDataToolStripMenuItem.Text = "Preview Data";
-      this.PreviewDataToolStripMenuItem.Click += new System.EventHandler(this.PreviewDataToolStripMenuItem_Click);
       // 
       // WorkbookInCompatibilityModeWarningLabel
       // 
@@ -284,7 +294,6 @@ namespace MySQL.ForExcel.Forms
             this.RelatedRelatedToColumnHeader});
       this.RelatedTablesListView.ContextMenuStrip = this.TablesViewsContextMenuStrip;
       this.RelatedTablesListView.FullRowSelect = true;
-      this.RelatedTablesListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
       this.RelatedTablesListView.HideSelection = false;
       this.RelatedTablesListView.Location = new System.Drawing.Point(516, 136);
       this.RelatedTablesListView.MultiSelect = false;
@@ -294,6 +303,7 @@ namespace MySQL.ForExcel.Forms
       this.RelatedTablesListView.TabIndex = 8;
       this.RelatedTablesListView.UseCompatibleStateImageBehavior = false;
       this.RelatedTablesListView.View = System.Windows.Forms.View.Details;
+      this.RelatedTablesListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.ListViewColumnClick);
       this.RelatedTablesListView.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.RelatedTablesViewsListView_ItemChecked);
       // 
       // RelatedTableColumnHeader
@@ -323,7 +333,6 @@ namespace MySQL.ForExcel.Forms
             this.RelatedToColumnHeader});
       this.TablesViewsListView.ContextMenuStrip = this.TablesViewsContextMenuStrip;
       this.TablesViewsListView.FullRowSelect = true;
-      this.TablesViewsListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
       this.TablesViewsListView.HideSelection = false;
       this.TablesViewsListView.Location = new System.Drawing.Point(80, 136);
       this.TablesViewsListView.MultiSelect = false;
@@ -333,6 +342,7 @@ namespace MySQL.ForExcel.Forms
       this.TablesViewsListView.TabIndex = 4;
       this.TablesViewsListView.UseCompatibleStateImageBehavior = false;
       this.TablesViewsListView.View = System.Windows.Forms.View.Details;
+      this.TablesViewsListView.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.ListViewColumnClick);
       // 
       // TableViewColumnHeader
       // 
@@ -427,7 +437,7 @@ namespace MySQL.ForExcel.Forms
       this.PivotTablesComboBox.Items.AddRange(new object[] {
             "for all tables in the data model.",
             "for each imported table or view."});
-      this.PivotTablesComboBox.Location = new System.Drawing.Point(136, 22);
+      this.PivotTablesComboBox.Location = new System.Drawing.Point(136, 21);
       this.PivotTablesComboBox.Name = "PivotTablesComboBox";
       this.PivotTablesComboBox.Size = new System.Drawing.Size(209, 21);
       this.PivotTablesComboBox.TabIndex = 1;
@@ -542,5 +552,6 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.ColumnHeader RelatedToColumnHeader;
     private System.Windows.Forms.CheckBox AddSummaryFieldsCheckBox;
     private System.Windows.Forms.ComboBox PivotTablesComboBox;
+    private System.Windows.Forms.ToolStripMenuItem AddRelatedTablesToolStripMenuItem;
   }
 }

@@ -133,6 +133,37 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets the owner <see cref="ListView"/> of a <see cref="ContextMenuStrip"/> control.
+    /// </summary>
+    /// <param name="toolStripMenuControl">An boxed object containing a <see cref="ContextMenuStrip"/> or <see cref="ToolStripMenuItem"/> control.</param>
+    /// <returns>The owner <see cref="ListView"/> of a <see cref="ContextMenuStrip"/> control.</returns>
+    public static ListView GetOwnerListViewControl(object toolStripMenuControl)
+    {
+      ContextMenuStrip ownerMenuStrip = null;
+      if (toolStripMenuControl is ToolStripMenuItem)
+      {
+        var menuItem = toolStripMenuControl as ToolStripMenuItem;
+        ownerMenuStrip = menuItem.Owner as ContextMenuStrip;
+        if (ownerMenuStrip == null)
+        {
+          return null;
+        }
+      }
+      else if (toolStripMenuControl is ContextMenuStrip)
+      {
+        ownerMenuStrip = toolStripMenuControl as ContextMenuStrip;
+      }
+
+      if (ownerMenuStrip == null)
+      {
+        return null;
+      }
+
+      var listView = ownerMenuStrip.SourceControl as ListView;
+      return listView;
+    }
+
+    /// <summary>
     /// Gets the default property value by property name.
     /// </summary>
     /// <typeparam name="T">Type to which the property must be cast to in the end.</typeparam>
@@ -149,6 +180,39 @@ namespace MySQL.ForExcel.Classes
       }
 
       return (T)Convert.ChangeType(settingsProperty.DefaultValue, propertyInfo.PropertyType);
+    }
+
+    /// <summary>
+    /// Gets the <see cref="DbView"/> object representing a selected table or view in the <see cref="ListView"/> control from which the given <see cref="ContextMenuStrip"/> or <see cref="ToolStripMenuItem"/> control is opened.
+    /// </summary>
+    /// <param name="toolStripMenuControl">A boxed object with a <see cref="ContextMenuStrip"/> or <see cref="ToolStripMenuItem"/> control.</param>
+    /// <param name="listView">The <see cref="ListView"/> control from which the given <see cref="ContextMenuStrip"/> or <see cref="ToolStripMenuItem"/> control is opened.</param>
+    /// <returns>A <see cref="DbView"/> object representing a selected table or view.</returns>
+    public static DbView GetSelectedDbTableOrView(object toolStripMenuControl, out ListView listView)
+    {
+      listView = GetOwnerListViewControl(toolStripMenuControl);
+      if (listView == null)
+      {
+        return null;
+      }
+
+      if (listView.SelectedItems.Count <= 0)
+      {
+        return null;
+      }
+
+      return listView.SelectedItems[0].Tag as DbView;
+    }
+
+    /// <summary>
+    /// Gets the <see cref="DbView"/> object representing a selected table or view in the <see cref="ListView"/> control from which the given <see cref="ContextMenuStrip"/> or <see cref="ToolStripMenuItem"/> control is opened.
+    /// </summary>
+    /// <param name="toolStripMenuControl">A boxed object with a <see cref="ContextMenuStrip"/> or <see cref="ToolStripMenuItem"/> control.</param>
+    /// <returns>A <see cref="DbView"/> object representing a selected table or view.</returns>
+    public static DbView GetSelectedDbTableOrView(object toolStripMenuControl)
+    {
+      ListView listView;
+      return GetSelectedDbTableOrView(toolStripMenuControl, out listView);
     }
 
     /// <summary>

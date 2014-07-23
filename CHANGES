@@ -1,4 +1,7 @@
 1.3.2
+- Added a new context-menu option called "Add Related Tables" available only when right-clicking a table already present in the Related Tables list view. When this new
+  option is clicked, all tables related to the right-clicked table one that have not been already included in the Related Tables list view will be added to it. These
+  tables are unchecked (i.e. not selected for import) by default so they can be reviewed first and included manually.
 - Corrected the logic that rules the Append Data action label to make it work correctly so that it is enabled in every case you are able to append data to a table.
   (MySQL Bug #73267, Bug #19190638 - APPEND DATA ACTION LABEL BECOMES UNAVAILABLE WHEN CHANGING DB OBJECT NODES)
 - Added a new option to the context-menu of the schemas list (opened by right-clicking it) to display the default schema collation below their names, the option is
