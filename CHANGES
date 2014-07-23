@@ -1,4 +1,6 @@
 1.3.2
+- Corrected the logic that rules the Append Data action label to make it work correctly so that it is enabled in every case you are able to append data to a table.
+  (MySQL Bug #73267, Bug #19190638 - APPEND DATA ACTION LABEL BECOMES UNAVAILABLE WHEN CHANGING DB OBJECT NODES)
 - Added a new option to the context-menu of the schemas list (opened by right-clicking it) to display the default schema collation below their names, the option is
   disabled by default.
 - Added code to check if PivotTables to be created for imported data would collide with an Excel object already in the importing worksheet, if so a dialog to import the

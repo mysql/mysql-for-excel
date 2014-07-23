@@ -171,10 +171,10 @@ namespace MySQL.ForExcel.Panels
       DbObject dbObj = CurrentSelectedDbObject;
       bool isSelected = dbObj != null;
       bool isTable = dbObj is DbTable;
-      bool tableNameMatches = isSelected && isTable && !string.IsNullOrEmpty(tableName) && dbObj.Name == tableName;
+      bool tableNameMatches = isTable && !string.IsNullOrEmpty(tableName) && dbObj.Name == tableName;
       ImportDataHotLabel.Enabled = isSelected;
-      EditDataHotLabel.Enabled = isSelected && isTable && !editActive;
-      AppendDataHotLabel.Enabled = tableNameMatches && ExcelSelectionContainsData;
+      EditDataHotLabel.Enabled = isTable && !editActive && (tableName == null || tableNameMatches);
+      AppendDataHotLabel.Enabled = isTable && ExcelSelectionContainsData;
     }
 
     /// <summary>
