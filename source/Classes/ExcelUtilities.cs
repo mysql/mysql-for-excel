@@ -765,7 +765,6 @@ namespace MySQL.ForExcel.Classes
       {
         invalidConnectionInfos.ForEach(invalidConnectionInfo => invalidConnectionInfo.ExcelTable.DeleteSafely(false));
         invalidConnectionInfos.ForEach(invalidConnectionInfo => Globals.ThisAddIn.StoredImportConnectionInfos.Remove(invalidConnectionInfo));
-        MiscUtilities.SaveSettings();
       }
 
       return importConnectionInfo;
