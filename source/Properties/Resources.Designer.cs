@@ -2071,7 +2071,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A possible circular reference among tables already related in the Excel Model may be created so Excel can&apos;t create the Model Relationship..
+        ///   Looks up a localized string similar to A possible circular reference among already related tables in the Excel Model may be created, so Excel can&apos;t create the Model Relationship..
         /// </summary>
         internal static string PossibleCircularReferenceError {
             get {

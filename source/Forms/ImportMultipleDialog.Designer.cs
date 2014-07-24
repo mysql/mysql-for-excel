@@ -446,9 +446,10 @@ namespace MySQL.ForExcel.Forms
       // 
       this.AddSummaryFieldsCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.AddSummaryFieldsCheckBox.AutoSize = true;
-      this.AddSummaryFieldsCheckBox.Location = new System.Drawing.Point(434, 47);
+      this.AddSummaryFieldsCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
+      this.AddSummaryFieldsCheckBox.Location = new System.Drawing.Point(434, 45);
       this.AddSummaryFieldsCheckBox.Name = "AddSummaryFieldsCheckBox";
-      this.AddSummaryFieldsCheckBox.Size = new System.Drawing.Size(121, 17);
+      this.AddSummaryFieldsCheckBox.Size = new System.Drawing.Size(135, 19);
       this.AddSummaryFieldsCheckBox.TabIndex = 4;
       this.AddSummaryFieldsCheckBox.Text = "Add Summary Fields";
       this.AddSummaryFieldsCheckBox.UseVisualStyleBackColor = true;

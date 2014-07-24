@@ -259,7 +259,7 @@ namespace MySQL.ForExcel.Forms
 
       if (relationshipsCreationErrorBuilder.Length > 0)
       {
-        InfoDialog.ShowErrorDialog(Resources.ExcelRelationshipsCreationErrorTitle, Resources.ExcelRelationshipsCreationErrorDetail, null, relationshipsCreationErrorBuilder.ToString(), false);
+        InfoDialog.ShowErrorDialog(Resources.ExcelRelationshipsCreationErrorTitle, Resources.ExcelRelationshipsCreationErrorDetail, null, relationshipsCreationErrorBuilder.ToString());
         relationshipsCreationErrorBuilder.Clear();
       }
 

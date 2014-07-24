@@ -1022,7 +1022,7 @@ What do you want to do with them?</value>
     <value>A Model Table was not found for one or both tables in the relationship.</value>
   </data>
   <data name="PossibleCircularReferenceError" xml:space="preserve">
-    <value>A possible circular reference among tables already related in the Excel Model may be created so Excel can't create the Model Relationship.</value>
+    <value>A possible circular reference among already related tables in the Excel Model may be created, so Excel can't create the Model Relationship.</value>
   </data>
   <data name="ExcelRelationshipsCreationErrorDetail" xml:space="preserve">
     <value>Some Excel Model Relationships could not be created because errors were found.</value>
