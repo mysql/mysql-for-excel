@@ -186,35 +186,35 @@ namespace MySQL.ForExcel.Classes
           return null;
         }
 
-        // Create a new Excel Worksheet and import the table/view data there
-        if (ImportParameters.IntoNewWorksheet)
-        {
-          var currentWorksheet = ActiveWorkbook.CreateWorksheet(mySqlTable.TableName, true);
-          if (currentWorksheet == null)
-          {
-            return null;
-          }
-        }
-        else
-        {
-          // Check if the data being imported does not overlap with the data of an existing Excel table.
-          if (DetectDataForImportPossibleCollisions(mySqlTable))
-          {
-            if (InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelObjectErrorTitle, Resources.ImportOverExcelObjectErrorDetail, Resources.ImportOverExcelObjectErrorSubDetail) == DialogResult.No)
-            {
-              return null;
-            }
-
-            var newWorkSheet = ActiveWorkbook.CreateWorksheet(mySqlTable.TableName, true);
-            if (newWorkSheet == null)
-            {
-              return null;
-            }
-          }
-        }
-
         if (!ImportParameters.ForEditDataOperation)
         {
+          // Create a new Excel Worksheet and import the table/view data there
+          if (ImportParameters.IntoNewWorksheet)
+          {
+            var currentWorksheet = ActiveWorkbook.CreateWorksheet(mySqlTable.TableName, true);
+            if (currentWorksheet == null)
+            {
+              return null;
+            }
+          }
+          else
+          {
+            // Check if the data being imported does not overlap with the data of an existing Excel table.
+            if (DetectDataForImportPossibleCollisions(mySqlTable))
+            {
+              if (InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelObjectErrorTitle, Resources.ImportOverExcelObjectErrorDetail, Resources.ImportOverExcelObjectErrorSubDetail) == DialogResult.No)
+              {
+                return null;
+              }
+
+              var newWorkSheet = ActiveWorkbook.CreateWorksheet(mySqlTable.TableName, true);
+              if (newWorkSheet == null)
+              {
+                return null;
+              }
+            }
+          }
+
           excelTableOrRange = Settings.Default.ImportCreateExcelTable
             ? mySqlTable.ImportDataIntoExcelTable(ImportParameters.CreatePivotTable, ImportParameters.PivotTablePosition, ImportParameters.AddSummaryRow)
             : mySqlTable.ImportDataIntoExcelRange(ImportParameters.CreatePivotTable, ImportParameters.PivotTablePosition, ImportParameters.AddSummaryRow);
