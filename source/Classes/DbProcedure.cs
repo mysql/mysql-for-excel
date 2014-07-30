@@ -250,15 +250,12 @@ namespace MySQL.ForExcel.Classes
         var pivotPosition = importType == ProcedureResultSetsImportType.AllResultSetsHorizontally
           ? ExcelUtilities.PivotTablePosition.Below
           : ExcelUtilities.PivotTablePosition.Right;
-        foreach (MySqlDataTable mySqlTable in resultSetsDataSet.Tables)
+        ExcelInterop.Range nextTopLeftCell = Globals.ThisAddIn.Application.ActiveCell;
+        foreach (var mySqlTable in resultSetsDataSet.Tables.Cast<MySqlDataTable>().Where(mySqlTable => importType != ProcedureResultSetsImportType.SelectedResultSet || selectedResultSetIndex == tableIdx++))
         {
+          Globals.ThisAddIn.Application.Goto(nextTopLeftCell, false);
           mySqlTable.ImportColumnNames = ImportParameters.IncludeColumnNames;
           mySqlTable.TableName = Name + "." + mySqlTable.TableName;
-          if (importType == ProcedureResultSetsImportType.SelectedResultSet && selectedResultSetIndex < tableIdx++)
-          {
-            continue;
-          }
-
           var excelObj = Settings.Default.ImportCreateExcelTable
             ? mySqlTable.ImportDataIntoExcelTable(createPivotTable, pivotPosition, addSummaryRow)
             : mySqlTable.ImportDataIntoExcelRange(createPivotTable, pivotPosition, addSummaryRow);
@@ -270,8 +267,7 @@ namespace MySQL.ForExcel.Classes
           var fillingRange = excelObj is ExcelInterop.ListObject
             ? (excelObj as ExcelInterop.ListObject).Range
             : excelObj as ExcelInterop.Range;
-          var nextTopLeftCell = fillingRange.GetNextResultSetTopLeftCell(importType, createPivotTable);
-          Globals.ThisAddIn.Application.Goto(nextTopLeftCell, false);
+          nextTopLeftCell = fillingRange.GetNextResultSetTopLeftCell(importType, createPivotTable);
         }
       }
       catch (Exception ex)
@@ -380,13 +376,8 @@ namespace MySQL.ForExcel.Classes
       var pivotPosition = importType == ProcedureResultSetsImportType.AllResultSetsHorizontally
         ? ExcelUtilities.PivotTablePosition.Below
         : ExcelUtilities.PivotTablePosition.Right;
-      foreach (MySqlDataTable mySqlTable in resultSetsDataSet.Tables)
+      foreach (var mySqlTable in resultSetsDataSet.Tables.Cast<MySqlDataTable>().Where(mySqlTable => importType != ProcedureResultSetsImportType.SelectedResultSet || selectedResultSetIndex == tableIdx++))
       {
-        if (importType == ProcedureResultSetsImportType.SelectedResultSet && selectedResultSetIndex < tableIdx++)
-        {
-          continue;
-        }
-
         var ranges = mySqlTable.GetExcelRangesToOccupy(atCell, ImportParameters.AddSummaryRow, ImportParameters.CreatePivotTable, pivotPosition);
         if (ranges == null)
         {

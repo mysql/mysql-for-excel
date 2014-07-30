@@ -864,8 +864,9 @@ namespace MySQL.ForExcel.Classes
     /// <param name="currentResultSetRange">The <see cref="ExcelInterop.Range"/> of the current result set's data imported to Excel.</param>
     /// <param name="importType">The <see cref="DbProcedure.ProcedureResultSetsImportType"/> defining what result sets are imported and how they are laid out in the Excel worksheet. </param>
     /// <param name="withPivotTable">Flag indicating whether a PivotTable is to be created along with the imported data.</param>
+    /// <param name="spacing">The number of columns or rows to skip before placing the next result set.</param>
     /// <returns>A <see cref="ExcelInterop.Range"/> representing the top left cell where the next result set's data should be placed.</returns>
-    public static ExcelInterop.Range GetNextResultSetTopLeftCell(this ExcelInterop.Range currentResultSetRange, DbProcedure.ProcedureResultSetsImportType importType, bool withPivotTable)
+    public static ExcelInterop.Range GetNextResultSetTopLeftCell(this ExcelInterop.Range currentResultSetRange, DbProcedure.ProcedureResultSetsImportType importType, bool withPivotTable, int spacing = 1)
     {
       if (currentResultSetRange == null)
       {
@@ -878,11 +879,13 @@ namespace MySQL.ForExcel.Classes
       switch (importType)
       {
         case DbProcedure.ProcedureResultSetsImportType.AllResultSetsHorizontally:
-          columnsOffset = Math.Max(currentResultSetRange.Columns.Count, PIVOT_TABLES_PLACEHOLDER_DEFAULT_COLUMNS_SIZE) + 1;
+          var pivotTablePlaceHolderColumns = withPivotTable ? PIVOT_TABLES_PLACEHOLDER_DEFAULT_COLUMNS_SIZE : 0;
+          columnsOffset = Math.Max(currentResultSetRange.Columns.Count, pivotTablePlaceHolderColumns) + spacing;
           break;
 
         case DbProcedure.ProcedureResultSetsImportType.AllResultSetsVertically:
-          rowsOffset = Math.Max(currentResultSetRange.Rows.Count, PIVOT_TABLES_PLACEHOLDER_DEFAULT_ROWS_SIZE) + 1;
+          var pivotTablePlaceHolderRows = withPivotTable ? PIVOT_TABLES_PLACEHOLDER_DEFAULT_ROWS_SIZE : 0;
+          rowsOffset = Math.Max(currentResultSetRange.Rows.Count, pivotTablePlaceHolderRows) + spacing;
           if (Globals.ThisAddIn.Application.ActiveWorkbook.Excel8CompatibilityMode && currentTopLeftCell.Row + rowsOffset > UInt16.MaxValue)
           {
             return null;
