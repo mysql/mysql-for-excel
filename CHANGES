@@ -1,4 +1,6 @@
 1.3.2
+- Changed the placement of PivotTables for stored procedure result sets imported into Excel with an horizontal alignment, before these were placed below the imported
+  data, now they are placed to the right of the data to avoid an error with refreshing the Excel tables tied to the PivotTables.
 - Added a new context-menu option called "Add Related Tables" available only when right-clicking a table already present in the Related Tables list view. When this new
   option is clicked, all tables related to the right-clicked table one that have not been already included in the Related Tables list view will be added to it. These
   tables are unchecked (i.e. not selected for import) by default so they can be reviewed first and included manually.

@@ -879,8 +879,8 @@ namespace MySQL.ForExcel.Classes
       switch (importType)
       {
         case DbProcedure.ProcedureResultSetsImportType.AllResultSetsHorizontally:
-          var pivotTablePlaceHolderColumns = withPivotTable ? PIVOT_TABLES_PLACEHOLDER_DEFAULT_COLUMNS_SIZE : 0;
-          columnsOffset = Math.Max(currentResultSetRange.Columns.Count, pivotTablePlaceHolderColumns) + spacing;
+          var pivotTablePlaceHolderColumns = withPivotTable ? PIVOT_TABLES_PLACEHOLDER_DEFAULT_COLUMNS_SIZE + spacing : 0;
+          columnsOffset = currentResultSetRange.Columns.Count + pivotTablePlaceHolderColumns +  spacing;
           break;
 
         case DbProcedure.ProcedureResultSetsImportType.AllResultSetsVertically:

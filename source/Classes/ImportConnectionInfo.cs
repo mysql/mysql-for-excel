@@ -17,6 +17,7 @@
 
 using System.Diagnostics;
 using System;
+using System.Text;
 using System.Xml.Serialization;
 using MySQL.ForExcel.Classes.Exceptions;
 using MySQL.ForExcel.Interfaces;
@@ -394,8 +395,10 @@ namespace MySQL.ForExcel.Classes
 
         // Resize the ExcelTools.ListObject by giving it an ExcelInterop.Range calculated with the refreshed MySqlDataTable dimensions.
         // Detection of a collision with another Excel object must be performed first and if any then shift rows and columns to fix the collision.
+        const int headerRows = 1;
+        int summaryRows = ExcelTable.ShowTotals ? 1 : 0;
         ExcelInterop.Range newRange = ToolsExcelTable.Range.Cells[1, 1];
-        newRange = newRange.Resize[MySqlTable.Rows.Count + 1, MySqlTable.Columns.Count];
+        newRange = newRange.Resize[MySqlTable.Rows.Count + headerRows + summaryRows, MySqlTable.Columns.Count];
         var intersectingRange = newRange.GetIntersectingRangeWithAnyExcelObject(true, true, true, _excelTable.Comment);
         if (intersectingRange != null && intersectingRange.CountLarge != 0)
         {
@@ -419,7 +422,7 @@ namespace MySQL.ForExcel.Classes
 
           // Redimension the new range. This is needed since the new rows or columns inserted are not present in the previously calculated one.
           newRange = ToolsExcelTable.Range.Cells[1, 1];
-          newRange = newRange.Resize[MySqlTable.Rows.Count + 1, MySqlTable.Columns.Count];
+          newRange = newRange.Resize[MySqlTable.Rows.Count + headerRows + summaryRows, MySqlTable.Columns.Count];
         }
 
         ToolsExcelTable.Resize(newRange);
@@ -441,7 +444,15 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.RefreshDataError, _excelTableName), ex.Message, true);
+        var moreInfoBuilder = new StringBuilder(ex.Message);
+        if (ex.InnerException != null)
+        {
+          moreInfoBuilder.Append(Environment.NewLine);
+          moreInfoBuilder.Append(Environment.NewLine);
+          moreInfoBuilder.Append(ex.InnerException.Message);
+        }
+
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.RefreshDataError, _excelTableName), moreInfoBuilder.ToString(), true);
         MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
     }
