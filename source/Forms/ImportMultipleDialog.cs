@@ -220,7 +220,7 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void CreateExcelRelationships()
     {
-      if (!_importRelationshipsEnabled || _relationshipsToCreateList == null || _relationshipsToCreateList.Count <= 0 || _excelTablesDictionary == null)
+      if (!CreateExcelRelationshipsCheckBox.Checked || _relationshipsToCreateList == null || _relationshipsToCreateList.Count <= 0 || _excelTablesDictionary == null)
       {
         return;
       }
@@ -324,7 +324,7 @@ namespace MySQL.ForExcel.Forms
         var importTuple = importTableOrView.ImportData();
         var excelTable = importTuple.Item2 as ExcelInterop.ListObject;
         var dbTable = importTableOrView as DbTable;
-        if (excelTable == null || !_importRelationshipsEnabled || dbTable == null)
+        if (excelTable == null || dbTable == null || !CreateExcelRelationshipsCheckBox.Checked)
         {
           continue;
         }

@@ -1,4 +1,6 @@
 1.3.2
+- Fixed code that was always attempting to create Excel relationships even when the option for that was not set by users.
+  (MySQL Bug #73402, Bug #19299550 - EXCEL RELATIONSHIPS CREATED EVEN IF THE OPTION FOR THAT IS UNCHECKED)
 - Removed the reference to "views" wherever relationships are mentioned, since relationships only concern tables, not views.
   (MySQL Bug #73398, Bug #19296989 - CHANGE SOME TEXT REFERENCES REGARDING VIEWS RELATED TO IMPORT MULTIPLE OPERATION)
 - Changed the placement of PivotTables for stored procedure result sets imported into Excel with an horizontal alignment, before these were placed below the imported
