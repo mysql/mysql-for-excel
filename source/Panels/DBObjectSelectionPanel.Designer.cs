@@ -179,22 +179,22 @@ namespace MySQL.ForExcel.Panels
             this.ImportRelatedToolStripMenuItem,
             this.RefreshDatabaseObjectsToolStripMenuItem});
       this.DBObjectsContextMenuStrip.Name = "contextMenuStrip";
-      this.DBObjectsContextMenuStrip.Size = new System.Drawing.Size(284, 48);
+      this.DBObjectsContextMenuStrip.Size = new System.Drawing.Size(260, 70);
       this.DBObjectsContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.DBObjectsContextMenuStrip_Opening);
       // 
       // ImportRelatedToolStripMenuItem
       // 
       this.ImportRelatedToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ObjectPanel_ImportMany_24x24;
       this.ImportRelatedToolStripMenuItem.Name = "ImportRelatedToolStripMenuItem";
-      this.ImportRelatedToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
-      this.ImportRelatedToolStripMenuItem.Text = "Import Selected and Related DB Objects";
+      this.ImportRelatedToolStripMenuItem.Size = new System.Drawing.Size(259, 22);
+      this.ImportRelatedToolStripMenuItem.Text = "Import Selected and Related Tables";
       this.ImportRelatedToolStripMenuItem.Click += new System.EventHandler(this.ImportRelatedToolStripMenuItem_Click);
       // 
       // RefreshDatabaseObjectsToolStripMenuItem
       // 
       this.RefreshDatabaseObjectsToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.refresh_sidebar;
       this.RefreshDatabaseObjectsToolStripMenuItem.Name = "RefreshDatabaseObjectsToolStripMenuItem";
-      this.RefreshDatabaseObjectsToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
+      this.RefreshDatabaseObjectsToolStripMenuItem.Size = new System.Drawing.Size(259, 22);
       this.RefreshDatabaseObjectsToolStripMenuItem.Text = "Refresh Database Objects";
       this.RefreshDatabaseObjectsToolStripMenuItem.Click += new System.EventHandler(this.RefreshDatabaseObjectsToolStripMenuItem_Click);
       // 
