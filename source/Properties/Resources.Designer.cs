@@ -2447,7 +2447,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Selected related Tables and Views: .
+        ///   Looks up a localized string similar to Selected related Tables: .
         /// </summary>
         internal static string SelectedRelatedTablesAndViewsText {
             get {

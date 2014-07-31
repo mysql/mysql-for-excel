@@ -964,7 +964,7 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
     <value>Excel Relationships cannot be created.</value>
   </data>
   <data name="SelectedRelatedTablesAndViewsText" xml:space="preserve">
-    <value>Selected related Tables and Views: </value>
+    <value>Selected related Tables: </value>
   </data>
   <data name="ParentWorkbookNullError" xml:space="preserve">
     <value>The parent workbook of worksheet {0} could not be obtained.</value>
