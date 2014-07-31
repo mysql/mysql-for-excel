@@ -108,10 +108,11 @@ namespace MySQL.ForExcel.Classes
       OperationType = mySqlTable.OperationType;
       ProcedureResultSetIndex = mySqlTable.ProcedureResultSetIndex;
       SelectQuery = mySqlTable.SelectQuery;
-      WorkbookGuid = Globals.ThisAddIn.Application.ActiveWorkbook.GetOrCreateId();
-      WorkbookName = Globals.ThisAddIn.Application.ActiveWorkbook.Name;
-      WorkbookFilePath = Globals.ThisAddIn.Application.ActiveWorkbook.FullName;
-      ExcelInterop.Worksheet worksheet = Globals.ThisAddIn.Application.ActiveWorkbook.ActiveSheet;
+      var activeWorkbook = Globals.ThisAddIn.ActiveWorkbook;
+      WorkbookGuid = activeWorkbook.GetOrCreateId();
+      WorkbookName = activeWorkbook.Name;
+      WorkbookFilePath = activeWorkbook.FullName;
+      ExcelInterop.Worksheet worksheet = activeWorkbook.ActiveSheet;
       WorksheetName = worksheet.Name;
       InitializeConnectionObjects(atCell, addSummaryRow);
     }

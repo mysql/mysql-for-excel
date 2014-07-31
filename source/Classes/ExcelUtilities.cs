@@ -886,7 +886,7 @@ namespace MySQL.ForExcel.Classes
         case DbProcedure.ProcedureResultSetsImportType.AllResultSetsVertically:
           var pivotTablePlaceHolderRows = withPivotTable ? PIVOT_TABLES_PLACEHOLDER_DEFAULT_ROWS_SIZE : 0;
           rowsOffset = Math.Max(currentResultSetRange.Rows.Count, pivotTablePlaceHolderRows) + spacing;
-          if (Globals.ThisAddIn.Application.ActiveWorkbook.Excel8CompatibilityMode && currentTopLeftCell.Row + rowsOffset > UInt16.MaxValue)
+          if (Globals.ThisAddIn.ActiveWorkbook.Excel8CompatibilityMode && currentTopLeftCell.Row + rowsOffset > UInt16.MaxValue)
           {
             return null;
           }
@@ -1655,7 +1655,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>A <see cref="ExcelInterop.ListObject"/> valid name.</returns>
     private static string GetExcelTableNameAvoidingDuplicates(this string excelTableName, ref int copyIndex)
     {
-      var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+      var activeWorkbook = Globals.ThisAddIn.ActiveWorkbook;
       if (activeWorkbook == null)
       {
         return excelTableName;
@@ -1679,7 +1679,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>A <see cref="ExcelInterop.PivotTable"/> valid name.</returns>
     private static string GetPivotTableNameAvoidingDuplicates(this string pivotTableName, int copyIndex)
     {
-      var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+      var activeWorkbook = Globals.ThisAddIn.ActiveWorkbook;
       if (activeWorkbook == null)
       {
         return pivotTableName;
@@ -1713,7 +1713,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>A <see cref="ExcelInterop.WorkbookConnection"/> valid name.</returns>
     private static string GetWorkbookConnectionNameAvoidingDuplicates(this string workbookConnectionName, int copyIndex)
     {
-      var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+      var activeWorkbook = Globals.ThisAddIn.ActiveWorkbook;
       if (activeWorkbook == null)
       {
         return workbookConnectionName;

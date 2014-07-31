@@ -219,7 +219,7 @@ namespace MySQL.ForExcel.Classes
         // Get the ModelColumnName objects needed to define the relationship
         modelTableName = modelTableName.Replace(".", " ");
         relatedModelTableName = relatedModelTableName.Replace(".", " ");
-        var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+        var activeWorkbook = Globals.ThisAddIn.ActiveWorkbook;
         var table = activeWorkbook.Model.ModelTables.Cast<ExcelInterop.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, modelTableName, StringComparison.InvariantCulture));
         var relatedTable = activeWorkbook.Model.ModelTables.Cast<ExcelInterop.ModelTable>().FirstOrDefault(mt => string.Equals(mt.Name, relatedModelTableName, StringComparison.InvariantCulture));
         if (table == null || relatedTable == null)
@@ -282,7 +282,7 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+      var activeWorkbook = Globals.ThisAddIn.ActiveWorkbook;
       var commandText = string.Format("{0}!{1}", activeWorkbook.Name, modelTableName);
       var connectionName = "ModelConnection_For_" + commandText;
       var connectionStringForCmdExcel = "WORKSHEET;" + activeWorkbook.Name;

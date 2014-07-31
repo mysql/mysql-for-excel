@@ -29,11 +29,6 @@ namespace MySQL.ForExcel.Classes
     #region Fields
 
     /// <summary>
-    /// The active <see cref="ExcelInterop.Workbook"/>.
-    /// </summary>
-    protected ExcelInterop.Workbook ActiveWorkbook;
-
-    /// <summary>
     /// Flag indicating whether the <seealso cref="Dispose"/> method has already been called.
     /// </summary>
     protected bool Disposed;
@@ -49,7 +44,6 @@ namespace MySQL.ForExcel.Classes
     {
       Connection = connection;
       Disposed = false;
-      ActiveWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
       Excluded = false;
       Name = name;
     }

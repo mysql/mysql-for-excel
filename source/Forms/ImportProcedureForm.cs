@@ -88,7 +88,7 @@ namespace MySQL.ForExcel.Forms
       _procedureParamsProperties = new PropertiesCollection();
       _selectedResultSetIndex = -1;
       _sumOfResultSetsExceedsMaxCompatibilityRows = false;
-      _workbookInCompatibilityMode = Globals.ThisAddIn.Application.ActiveWorkbook.Excel8CompatibilityMode;
+      _workbookInCompatibilityMode = Globals.ThisAddIn.ActiveWorkbook.Excel8CompatibilityMode;
 
       InitializeComponent();
 

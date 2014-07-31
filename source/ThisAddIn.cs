@@ -144,13 +144,13 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Gets a list of <see cref="ImportConnectionInfo"/> objects saved to disk.
+    /// Gets the active <see cref="ExcelInterop.Workbook"/> or creates one if there is no active one.
     /// </summary>
-    public List<ImportConnectionInfo> StoredImportConnectionInfos
+    public ExcelInterop.Workbook ActiveWorkbook
     {
       get
       {
-        return Settings.Default.ImportConnectionInfosList ?? (Settings.Default.ImportConnectionInfosList = new List<ImportConnectionInfo>());
+        return Application.ActiveWorkbook ?? Application.Workbooks.Add(1);
       }
     }
 
@@ -161,7 +161,7 @@ namespace MySQL.ForExcel
     {
       get
       {
-        return GetWorkbookEditConnectionInfos(Application.ActiveWorkbook);
+        return GetWorkbookEditConnectionInfos(ActiveWorkbook);
       }
     }
 
@@ -172,7 +172,7 @@ namespace MySQL.ForExcel
     {
       get
       {
-        var workbookId = Globals.ThisAddIn.Application.ActiveWorkbook.GetOrCreateId();
+        var workbookId = ActiveWorkbook.GetOrCreateId();
         return GetWorkbookImportConnectionInfos(workbookId);
       }
     }
@@ -184,8 +184,8 @@ namespace MySQL.ForExcel
     {
       get
       {
-        var workbookId = Globals.ThisAddIn.Application.ActiveWorkbook.GetOrCreateId();
-        ExcelInterop.Worksheet worksheet = Globals.ThisAddIn.Application.ActiveWorkbook.ActiveSheet;
+        var workbookId = ActiveWorkbook.GetOrCreateId();
+        ExcelInterop.Worksheet worksheet = ActiveWorkbook.ActiveSheet;
         return GetWorkSheetImportConnectionInfos(workbookId, worksheet.Name);
       }
     }
@@ -199,6 +199,17 @@ namespace MySQL.ForExcel
     /// Gets the custom ribbon defined by this add-in.
     /// </summary>
     public MySqlRibbon CustomMySqlRibbon { get; private set; }
+
+    /// <summary>
+    /// Gets a list of <see cref="EditConnectionInfo"/> objects saved to disk.
+    /// </summary>
+    public List<EditConnectionInfo> EditConnectionInfos
+    {
+      get
+      {
+        return Settings.Default.EditConnectionInfosList ?? (Settings.Default.EditConnectionInfosList = new List<EditConnectionInfo>());
+      }
+    }
 
     /// <summary>
     /// Gets a list with all the Excel panes instantiated in the Excel window, stored it to dispose of them when needed.
@@ -238,13 +249,13 @@ namespace MySQL.ForExcel
     public bool SkipSelectedDataContentsDetection { get; set; }
 
     /// <summary>
-    /// Gets a list of <see cref="EditConnectionInfo"/> objects saved to disk.
+    /// Gets a list of <see cref="ImportConnectionInfo"/> objects saved to disk.
     /// </summary>
-    public List<EditConnectionInfo> EditConnectionInfos
+    public List<ImportConnectionInfo> StoredImportConnectionInfos
     {
       get
       {
-        return Settings.Default.EditConnectionInfosList ?? (Settings.Default.EditConnectionInfosList = new List<EditConnectionInfo>());
+        return Settings.Default.ImportConnectionInfosList ?? (Settings.Default.ImportConnectionInfosList = new List<ImportConnectionInfo>());
       }
     }
 
@@ -345,8 +356,8 @@ namespace MySQL.ForExcel
       activeCustomPane.Width = ADD_IN_PANE_WIDTH;
 
       // Create custom MySQL Excel table style and localized date format strings in the active workbook if it exists.
-      Application.ActiveWorkbook.CreateMySqlTableStyle();
-      Application.ActiveWorkbook.AddLocalizedDateFormatStringsAsNames();
+      ActiveWorkbook.CreateMySqlTableStyle();
+      ActiveWorkbook.AddLocalizedDateFormatStringsAsNames();
 
       // First run if no Excel panes have been opened yet.
       if (firstRun)
@@ -355,7 +366,7 @@ namespace MySQL.ForExcel
       }
 
       // Restore EditConnectionInfos
-      ShowOpenEditConnectionInfosDialog(Application.ActiveWorkbook);
+      ShowOpenEditConnectionInfosDialog(ActiveWorkbook);
 
       Application.Cursor = ExcelInterop.XlMousePointer.xlDefault;
       return activeCustomPane;
@@ -368,7 +379,7 @@ namespace MySQL.ForExcel
     /// <return><c>true</c> if the custom functionality was executed, <c>false</c> otherwise.</return>
     public bool RefreshAllCustomFunctionality()
     {
-      foreach (ExcelInterop.Worksheet worksheet in Application.ActiveWorkbook.Worksheets)
+      foreach (ExcelInterop.Worksheet worksheet in ActiveWorkbook.Worksheets)
       {
         worksheet.RefreshAllListObjects();
       }
@@ -414,10 +425,10 @@ namespace MySQL.ForExcel
         return;
       }
 
-      if (_lastDeactivatedSheetName.Length > 0 && !Application.ActiveWorkbook.WorksheetExists(_lastDeactivatedSheetName))
+      if (_lastDeactivatedSheetName.Length > 0 && !ActiveWorkbook.WorksheetExists(_lastDeactivatedSheetName))
       {
         // Worksheet was deleted and the Application_SheetBeforeDelete did not run, user is running Excel 2010 or earlier.
-        CloseMissingWorksheetEditConnectionInfo(Application.ActiveWorkbook, _lastDeactivatedSheetName);
+        CloseMissingWorksheetEditConnectionInfo(ActiveWorkbook, _lastDeactivatedSheetName);
       }
 
       ChangeEditDialogVisibility(activeSheet, true);

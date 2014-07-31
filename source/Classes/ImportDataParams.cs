@@ -111,7 +111,7 @@ namespace MySQL.ForExcel.Classes
 
       set
       {
-        _rowsCount = Globals.ThisAddIn.Application.ActiveWorkbook.Excel8CompatibilityMode ? Math.Min(UInt16.MaxValue, value) : value;
+        _rowsCount = Globals.ThisAddIn.ActiveWorkbook.Excel8CompatibilityMode ? Math.Min(UInt16.MaxValue, value) : value;
       }
     }
 

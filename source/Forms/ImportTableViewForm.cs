@@ -81,7 +81,7 @@ namespace MySQL.ForExcel.Forms
       _dbTableOrView = importDbTableOrView;
       _importColumns = null;
       _previewDataTable = null;
-      _workbookInCompatibilityMode = Globals.ThisAddIn.Application.ActiveWorkbook.Excel8CompatibilityMode;
+      _workbookInCompatibilityMode = Globals.ThisAddIn.ActiveWorkbook.Excel8CompatibilityMode;
       MySqlTable = null;
       InitializeComponent();
 

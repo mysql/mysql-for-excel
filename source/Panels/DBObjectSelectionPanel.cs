@@ -21,6 +21,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
+using Microsoft.Office.Interop.Excel;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Forms;
@@ -435,7 +436,7 @@ namespace MySQL.ForExcel.Panels
           return;
         }
 
-        var newWorksheet = parentTaskPane.ActiveWorkbook.CreateWorksheet(selectedNode.DbObject.Name, true);
+        var newWorksheet = Globals.ThisAddIn.ActiveWorkbook.CreateWorksheet(selectedNode.DbObject.Name, true);
         if (newWorksheet == null)
         {
           return;
@@ -445,11 +446,12 @@ namespace MySQL.ForExcel.Panels
       try
       {
         Cursor = Cursors.WaitCursor;
+        var activeWorkbook = Globals.ThisAddIn.ActiveWorkbook;
         if (selectedNode.DbObject is DbTable)
         {
           var dbTable = selectedNode.DbObject as DbTable;
           dbTable.ImportParameters.ForEditDataOperation = false;
-          using (var importForm = new ImportTableViewForm(selectedNode.DbObject as DbTable, parentTaskPane.ActiveWorkbook.ActiveSheet.Name))
+          using (var importForm = new ImportTableViewForm(dbTable, activeWorkbook.ActiveSheet.Name))
           {
             importForm.ShowDialog();
           }
@@ -458,7 +460,7 @@ namespace MySQL.ForExcel.Panels
         {
           var dbView = selectedNode.DbObject as DbView;
           dbView.ImportParameters.ForEditDataOperation = false;
-          using (var importForm = new ImportTableViewForm(dbView, parentTaskPane.ActiveWorkbook.ActiveSheet.Name))
+          using (var importForm = new ImportTableViewForm(dbView, activeWorkbook.ActiveSheet.Name))
           {
             importForm.ShowDialog();
           }

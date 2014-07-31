@@ -287,7 +287,7 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+      var activeWorkbook = Globals.ThisAddIn.ActiveWorkbook;
       var workbookDataModelConnection = activeWorkbook.Connections.Cast<ExcelInterop.WorkbookConnection>().FirstOrDefault(wbConn => wbConn.Name == ExcelUtilities.WORKBOOK_DATA_MODEL_CONNECTION_NAME);
       if (workbookDataModelConnection == null)
       {
@@ -508,7 +508,7 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void SetWorkbookCompatibilityWarning()
     {
-      bool workbookInCompatibilityMode = Globals.ThisAddIn.Application.ActiveWorkbook.Excel8CompatibilityMode;
+      bool workbookInCompatibilityMode = Globals.ThisAddIn.ActiveWorkbook.Excel8CompatibilityMode;
       WorkbookInCompatibilityModeWarningLabel.Text = Resources.WorkbookInCompatibilityModeWarning;
       WorkbookInCompatibilityModeWarningLabel.Visible = workbookInCompatibilityMode;
       WorkbookInCompatibilityModeWarningPictureBox.Visible = workbookInCompatibilityMode;

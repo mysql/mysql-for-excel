@@ -59,18 +59,6 @@ namespace MySQL.ForExcel.Controls
     public EditDataDialog ActiveEditDialog { get; private set; }
 
     /// <summary>
-    /// Gets the active <see cref="ExcelInterop.Workbook"/> in the Excel application.
-    /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ExcelInterop.Workbook ActiveWorkbook
-    {
-      get
-      {
-        return Globals.ThisAddIn.Application.ActiveWorkbook ?? Globals.ThisAddIn.Application.Workbooks.Add(1);
-      }
-    }
-
-    /// <summary>
     /// Gets the active <see cref="ExcelInterop.Workbook"/> unique identifier.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -78,7 +66,7 @@ namespace MySQL.ForExcel.Controls
     {
       get
       {
-        return ActiveWorkbook.GetOrCreateId();
+        return Globals.ThisAddIn.ActiveWorkbook.GetOrCreateId();
       }
     }
 
@@ -222,7 +210,7 @@ namespace MySQL.ForExcel.Controls
       }
 
       // Free up open Edit Dialogs
-      Globals.ThisAddIn.CloseWorkbookEditConnectionInfos(ActiveWorkbook);
+      Globals.ThisAddIn.CloseWorkbookEditConnectionInfos(Globals.ThisAddIn.ActiveWorkbook);
     }
 
     /// <summary>
@@ -243,7 +231,7 @@ namespace MySQL.ForExcel.Controls
         }
       }
 
-      Globals.ThisAddIn.CloseWorkbookEditConnectionInfos(ActiveWorkbook);
+      Globals.ThisAddIn.CloseWorkbookEditConnectionInfos(Globals.ThisAddIn.ActiveWorkbook);
       if (givePanelFocus)
       {
         SchemaSelectionPanel2.BringToFront();
@@ -281,7 +269,7 @@ namespace MySQL.ForExcel.Controls
       }
 
       // Attempt to Import Data unless the user cancels the import operation
-      string proposedWorksheetName = fromSavedConnectionInfo ? tableObject.Name : ActiveWorkbook.GetWorksheetNameAvoidingDuplicates(tableObject.Name);
+      string proposedWorksheetName = fromSavedConnectionInfo ? tableObject.Name : Globals.ThisAddIn.ActiveWorkbook.GetWorksheetNameAvoidingDuplicates(tableObject.Name);
       tableObject.ImportParameters.ForEditDataOperation = true;
       ImportTableViewForm importForm = new ImportTableViewForm(tableObject, proposedWorksheetName);
       DialogResult dr = fromSavedConnectionInfo ? importForm.ImportHidingDialog() : importForm.ShowDialog();
@@ -308,7 +296,7 @@ namespace MySQL.ForExcel.Controls
       }
 
       // Create the new Excel Worksheet and import the editing data there
-      ExcelInterop.Workbook editWorkbook = fromSavedConnectionInfo && workbook != null ? workbook : ActiveWorkbook;
+      ExcelInterop.Workbook editWorkbook = fromSavedConnectionInfo && workbook != null ? workbook : Globals.ThisAddIn.ActiveWorkbook;
       var currentWorksheet = fromSavedConnectionInfo && Settings.Default.EditSessionsReuseWorksheets
         ? editWorkbook.GetOrCreateWorksheet(proposedWorksheetName, true)
         : editWorkbook.CreateWorksheet(proposedWorksheetName, true);
@@ -482,13 +470,13 @@ namespace MySQL.ForExcel.Controls
 
       if (Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.Count > 0)
       {
-        connectionInfo = Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.GetActiveEditConnectionInfo(ActiveWorkbook, tableObject.Name);
+        connectionInfo = Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.GetActiveEditConnectionInfo(Globals.ThisAddIn.ActiveWorkbook, tableObject.Name);
       }
 
       // The EditConnectionInfo is new and has to be created from scratch.
       if (connectionInfo == null)
       {
-        connectionInfo = new EditConnectionInfo(ActiveWorkbookId, ActiveWorkbook.FullName, WbConnection.Id, WbConnection.Schema, tableObject.Name);
+        connectionInfo = new EditConnectionInfo(ActiveWorkbookId, Globals.ThisAddIn.ActiveWorkbook.FullName, WbConnection.Id, WbConnection.Schema, tableObject.Name);
       }
 
       if (connectionInfo.EditDialog != null)

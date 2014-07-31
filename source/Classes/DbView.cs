@@ -176,6 +176,7 @@ namespace MySQL.ForExcel.Classes
     public Tuple<MySqlDataTable, object> ImportData()
     {
       Tuple<MySqlDataTable, object> retTuple;
+      var activeWorkbook = Globals.ThisAddIn.ActiveWorkbook;
       try
       {
         // Create the MySqlDataTable that holds the data to be imported to Excel
@@ -191,7 +192,7 @@ namespace MySQL.ForExcel.Classes
           // Create a new Excel Worksheet and import the table/view data there
           if (ImportParameters.IntoNewWorksheet)
           {
-            var currentWorksheet = ActiveWorkbook.CreateWorksheet(mySqlTable.TableName, true);
+            var currentWorksheet = activeWorkbook.CreateWorksheet(mySqlTable.TableName, true);
             if (currentWorksheet == null)
             {
               return null;
@@ -207,7 +208,7 @@ namespace MySQL.ForExcel.Classes
                 return null;
               }
 
-              var newWorkSheet = ActiveWorkbook.CreateWorksheet(mySqlTable.TableName, true);
+              var newWorkSheet = activeWorkbook.CreateWorksheet(mySqlTable.TableName, true);
               if (newWorkSheet == null)
               {
                 return null;

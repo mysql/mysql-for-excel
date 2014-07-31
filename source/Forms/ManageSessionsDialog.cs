@@ -99,7 +99,7 @@ namespace MySQL.ForExcel.Forms
         //If the current session is from the active workbook, set its font in bold.
         var bold = new System.Drawing.Font(listViewItem.Font, listViewItem.Font.Style | FontStyle.Bold);
         var regular = new System.Drawing.Font(listViewItem.Font, listViewItem.Font.Style | FontStyle.Regular);
-        listViewItem.Font = Globals.ThisAddIn.Application.ActiveWorkbook.GetOrCreateId() == connectionInfo.WorkbookGuid ? bold : regular;
+        listViewItem.Font = Globals.ThisAddIn.ActiveWorkbook.GetOrCreateId() == connectionInfo.WorkbookGuid ? bold : regular;
 
         //Set the session's font in red if the worbooks it belongs to is not found in the system.
         listViewItem.ForeColor = File.Exists(connectionInfo.WorkbookFilePath) ? Color.Black : Color.Red;

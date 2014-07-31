@@ -227,7 +227,7 @@ namespace MySQL.ForExcel.Classes
       bool success = true;
       try
       {
-        var activeWorkbook = Globals.ThisAddIn.Application.ActiveWorkbook;
+        var activeWorkbook = Globals.ThisAddIn.ActiveWorkbook;
 
         // Check if the data being imported does not overlap with the data of an existing Excel table.
         if (DetectDataForImportPossibleCollisions(importType, selectedResultSetIndex, resultSetsDataSet))
