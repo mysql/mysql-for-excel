@@ -410,7 +410,7 @@ namespace MySQL.ForExcel.Forms
       this.CreatePivotTableCheckBox.TabIndex = 0;
       this.CreatePivotTableCheckBox.Text = "Create a PivotTable";
       this.CreatePivotTableCheckBox.UseVisualStyleBackColor = true;
-      this.CreatePivotTableCheckBox.CheckedChanged += new System.EventHandler(this.CreatePivotTableCheckBox_CheckedChanged);
+      this.CreatePivotTableCheckBox.CheckedChanged += new System.EventHandler(this.CreatePivotOrRelationshipsCheckedChanged);
       // 
       // OptionsGroupBox
       // 
@@ -477,6 +477,7 @@ namespace MySQL.ForExcel.Forms
       this.CreateExcelRelationshipsCheckBox.TabIndex = 2;
       this.CreateExcelRelationshipsCheckBox.Text = "Create Excel relationships for imported tables";
       this.CreateExcelRelationshipsCheckBox.UseVisualStyleBackColor = true;
+      this.CreateExcelRelationshipsCheckBox.CheckedChanged += new System.EventHandler(this.CreatePivotOrRelationshipsCheckedChanged);
       // 
       // RelatedTablesViewsLabel
       // 

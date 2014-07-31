@@ -1188,6 +1188,17 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The PivotTable type drop-down has been disabled to only allow the creation of PivotTables for each imported table or view.
+        ///
+        ///Since Excel relationships cannot be created, a single PivotTable for the whole Excel data model cannot be created. This is because this type of PivotTable requires that the model tables are related among each other..
+        /// </summary>
+        internal static string ImportMultipleSinglePivotTableNotSupportedText {
+            get {
+                return ResourceManager.GetString("ImportMultipleSinglePivotTableNotSupportedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The importing data will overwrite cells belonging to an existing Excel object..
         /// </summary>
         internal static string ImportOverExcelObjectErrorDetail {

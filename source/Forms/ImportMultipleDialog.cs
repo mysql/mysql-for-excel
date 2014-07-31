@@ -267,14 +267,14 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="CreatePivotTableCheckBox"/> checked state changes.
+    /// Event delegate method fired when either the <see cref="CreatePivotTableCheckBox"/> or the <see cref="CreateExcelRelationshipsCheckBox"/> checked state changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void CreatePivotTableCheckBox_CheckedChanged(object sender, EventArgs e)
+    private void CreatePivotOrRelationshipsCheckedChanged(object sender, EventArgs e)
     {
-      PivotTablesComboBox.Enabled = CreatePivotTableCheckBox.Checked;
-      PivotTablesComboBox.SelectedIndex = 0;
+      PivotTablesComboBox.Enabled = !Excel2010OrLower && CreatePivotTableCheckBox.Checked && CreateExcelRelationshipsCheckBox.Checked;
+      PivotTablesComboBox.SelectedIndex = Excel2010OrLower || !CreateExcelRelationshipsCheckBox.Checked ? 1 : 0;
     }
 
     /// <summary>
@@ -484,7 +484,7 @@ namespace MySQL.ForExcel.Forms
       CreateExcelRelationshipsCheckBox.Checked = _importRelationshipsEnabled;
       CreateExcelRelationshipsCheckBox.Enabled = _importRelationshipsEnabled;
       WhyDisabledLinkLabel.Visible = !_importRelationshipsEnabled;
-      CreatePivotTableCheckBox_CheckedChanged(this, EventArgs.Empty);
+      CreatePivotOrRelationshipsCheckedChanged(this, EventArgs.Empty);
     }
 
     /// <summary>
@@ -549,7 +549,9 @@ namespace MySQL.ForExcel.Forms
         Resources.ImportMultipleRelationshipsNotSupportedTitleText,
         Excel2010OrLower
           ? Resources.ImportMultipleRelationshipsNotSupportedExcelVersionWarningText
-          : Resources.ImportMultipleRelationshipsNotSupportedNoExcelTablesWarningText);
+          : Resources.ImportMultipleRelationshipsNotSupportedNoExcelTablesWarningText,
+        null,
+        Resources.ImportMultipleSinglePivotTableNotSupportedText);
     }
   }
 }

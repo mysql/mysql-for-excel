@@ -1045,4 +1045,9 @@ What do you want to do with them?</value>
   <data name="MySQLforExcel_SchemaPanel_SchemaInspect_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySQLforExcel-SchemaPanel-SchemaInspect-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ImportMultipleSinglePivotTableNotSupportedText" xml:space="preserve">
+    <value>The PivotTable type drop-down has been disabled to only allow the creation of PivotTables for each imported table or view.
+
+Since Excel relationships cannot be created, a single PivotTable for the whole Excel data model cannot be created. This is because this type of PivotTable requires that the model tables are related among each other.</value>
+  </data>
 </root>
