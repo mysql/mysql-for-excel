@@ -226,17 +226,36 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="AppendButton"/> button is clicked.
+    /// Event delegate method fired when the <see cref="AppendContextMenu"/> menu is being opened.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void AppendButton_Click(object sender, EventArgs e)
+    private void AppendContextMenu_Opening(object sender, CancelEventArgs e)
     {
-      // If not all columns where mapped between the source and target tables ask the user if he still wants to produce with the append operation.
+      if (_gridColumnClicked < 0 || _currentColumnMapping == null || _currentColumnMapping.MappedQuantity == 0)
+      {
+        e.Cancel = true;
+        return;
+      }
+
+      bool columnHasMapping = AppendContextMenu.SourceControl.Name == TargetMySQLTableDataGridView.Name
+        ? _currentColumnMapping.MappedSourceIndexes[_gridColumnClicked] >= 0
+        : _currentColumnMapping.MappedSourceIndexes.Contains(_gridColumnClicked);
+      AppendContextMenu.Items["RemoveColumnMappingToolStripMenuItem"].Visible = columnHasMapping;
+      AppendContextMenu.Items["ClearAllMappingsToolStripMenuItem"].Visible = _currentColumnMapping.MappedQuantity > 0;
+    }
+
+    /// <summary>
+    /// Appends the selected Excel data to the selected MySQL table.
+    /// </summary>
+    /// <returns><c>true</c> if the append operation is successful, <c>false</c> otherwise.</returns>
+    private bool AppendData()
+    {
+      // If not all columns where mapped between the source and target tables ask the user if he still wants to proceed with the append operation.
       if (_targetMySqlPreviewDataTable.MappedColumnsQuantity < _maxMappingColumnsQuantity
         && InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ColumnMappingIncompleteTitleWarning, Resources.ColumnMappingIncompleteDetailWarning) == DialogResult.No)
       {
-        return;
+        return false;
       }
 
       Cursor = Cursors.WaitCursor;
@@ -260,7 +279,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       bool addDataSuccessful;
-      using (var temporaryRange = new TempRange(_appendDataRange, true, true, false, mappedIndexes))
+      using (var temporaryRange = new TempRange(_appendDataRange, true, true, mappedIndexes))
       {
         addDataSuccessful = targetMySqlFinalDataTable.AddExcelData(temporaryRange, true, true);
       }
@@ -268,19 +287,19 @@ namespace MySQL.ForExcel.Forms
       if (!addDataSuccessful)
       {
         Cursor = Cursors.Default;
-        return;
+        return false;
       }
 
       var modifiedRowsList = targetMySqlFinalDataTable.PushData(Settings.Default.GlobalSqlQueriesPreviewQueries);
       if (modifiedRowsList == null)
       {
         Cursor = Cursors.Default;
-        return;
+        return false;
       }
 
-      StringBuilder operationDetails = new StringBuilder();
-      StringBuilder warningDetails = new StringBuilder();
-      StringBuilder warningStatementDetails = new StringBuilder();
+      var operationDetails = new StringBuilder();
+      var warningDetails = new StringBuilder();
+      var warningStatementDetails = new StringBuilder();
       if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults)
       {
         operationDetails.AppendFormat(Resources.InsertedExcelDataWithQueryText, targetMySqlFinalDataTable.TableName);
@@ -288,7 +307,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       bool warningDetailHeaderAppended = false;
-      string statementsQuantityFormat = new string('0', modifiedRowsList.Count.StringSize());
+      var statementsQuantityFormat = new string('0', modifiedRowsList.Count.StringSize());
       string sqlQueriesFormat = "{0:" + statementsQuantityFormat + "}: {1}";
       foreach (var statement in modifiedRowsList.Select(statementRow => statementRow.Statement))
       {
@@ -379,7 +398,7 @@ namespace MySQL.ForExcel.Forms
       warningStatementDetails.Clear();
       if (errorsFound)
       {
-        return;
+        return false;
       }
 
       if (Settings.Default.AppendAutoStoreColumnMapping
@@ -388,28 +407,20 @@ namespace MySQL.ForExcel.Forms
         StoreCurrentColumnMapping(false);
       }
 
-      DialogResult = DialogResult.OK;
-      Close();
+      return true;
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="AppendContextMenu"/> menu is being opened.
+    /// Event delegate method fired when the <see cref="AppendDataForm"/> form is being closed.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void AppendContextMenu_Opening(object sender, CancelEventArgs e)
+    private void AppendDataForm_FormClosing(object sender, FormClosingEventArgs e)
     {
-      if (_gridColumnClicked < 0 || _currentColumnMapping == null || _currentColumnMapping.MappedQuantity == 0)
+      if (DialogResult == DialogResult.OK)
       {
-        e.Cancel = true;
-        return;
+        e.Cancel = !AppendData();
       }
-
-      bool columnHasMapping = AppendContextMenu.SourceControl.Name == TargetMySQLTableDataGridView.Name
-        ? _currentColumnMapping.MappedSourceIndexes[_gridColumnClicked] >= 0
-        : _currentColumnMapping.MappedSourceIndexes.Contains(_gridColumnClicked);
-      AppendContextMenu.Items["RemoveColumnMappingToolStripMenuItem"].Visible = columnHasMapping;
-      AppendContextMenu.Items["ClearAllMappingsToolStripMenuItem"].Visible = _currentColumnMapping.MappedQuantity > 0;
     }
 
     /// <summary>
@@ -1273,21 +1284,21 @@ namespace MySQL.ForExcel.Forms
     private void StoreCurrentColumnMapping(bool showNewColumnMappingDialog)
     {
       int numericSuffix = 1;
-      string proposedMappingName;
+      var proposedMappingName = new[] { string.Empty };
       do
       {
-        proposedMappingName = string.Format("{0}Mapping{1}", _targetMySqlPreviewDataTable.TableName, numericSuffix > 1 ? numericSuffix.ToString(CultureInfo.InvariantCulture) : string.Empty);
+        proposedMappingName[0] = string.Format("{0}Mapping{1}", _targetMySqlPreviewDataTable.TableName, numericSuffix > 1 ? numericSuffix.ToString(CultureInfo.InvariantCulture) : string.Empty);
         numericSuffix++;
       }
-      while (StoredColumnMappingsList.Any(mapping => mapping.Name == proposedMappingName));
+      while (StoredColumnMappingsList.Any(mapping => mapping.Name == proposedMappingName[0]));
 
       if (showNewColumnMappingDialog)
       {
         DialogResult dr;
-        using (AppendNewColumnMappingDialog newColumnMappingDialog = new AppendNewColumnMappingDialog(proposedMappingName))
+        using (var newColumnMappingDialog = new AppendNewColumnMappingDialog(proposedMappingName[0]))
         {
           dr = newColumnMappingDialog.ShowDialog();
-          proposedMappingName = newColumnMappingDialog.ColumnMappingName;
+          proposedMappingName[0] = newColumnMappingDialog.ColumnMappingName;
         }
 
         if (dr == DialogResult.Cancel)
@@ -1297,7 +1308,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       // Initialize connection and DBObject information
-      _currentColumnMapping.Name = proposedMappingName;
+      _currentColumnMapping.Name = proposedMappingName[0];
       _currentColumnMapping.ConnectionName = _appendDbTable.Connection.Name;
       _currentColumnMapping.Port = _appendDbTable.Connection.Port;
       _currentColumnMapping.SchemaName = _appendDbTable.Connection.Schema;
