@@ -365,9 +365,6 @@ namespace MySQL.ForExcel
         ExcelAddInPaneFirstRun();
       }
 
-      // Restore EditConnectionInfos
-      ShowOpenEditConnectionInfosDialog(ActiveWorkbook);
-
       Application.Cursor = ExcelInterop.XlMousePointer.xlDefault;
       return activeCustomPane;
     }
@@ -612,7 +609,10 @@ namespace MySQL.ForExcel
         // Add new EditConnectionInfo in memory collection to serialized collection
         activeEditConnectionInfo.LastAccess = DateTime.Now;
         activeEditConnectionInfo.WorkbookFilePath = workbook.FullName;
-        EditConnectionInfos.Add(activeEditConnectionInfo);
+        if (!EditConnectionInfos.Contains(activeEditConnectionInfo))
+        {
+          EditConnectionInfos.Add(activeEditConnectionInfo);
+        }
       }
 
       if (!success)
@@ -737,7 +737,16 @@ namespace MySQL.ForExcel
         switch (MessageBox.Show(string.Format(Resources.WorkbookSavingDetailText, workbook.Name), Application.Name, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1))
         {
           case DialogResult.Yes:
-            workbook.Save();
+            if (string.IsNullOrEmpty(workbook.Path))
+            {
+              // The workbook is being saved for the very first time, so show the Save As dialog to users which will save the Workbook where the user wants to.
+              Application.Dialogs[ExcelInterop.XlBuiltInDialog.xlDialogSaveAs].Show(workbook.Name);
+            }
+            else
+            {
+              // The workbook has been saved before, so just overwrite it.
+              workbook.Save();
+            }
             break;
 
           case DialogResult.No:
@@ -1043,6 +1052,9 @@ namespace MySQL.ForExcel
 
       // Subscribe to Excel events
       SetupExcelEvents(true);
+
+      // Restore EditConnectionInfos
+      ShowOpenEditConnectionInfosDialog(ActiveWorkbook);
     }
 
     /// <summary>
@@ -1545,9 +1557,7 @@ namespace MySQL.ForExcel
       }
 
       var buttonsProperties = new InfoButtonsProperties(Resources.RestoreButtonText, DialogResult.Yes, Resources.WorkOfflineButtonText, DialogResult.Cancel, Resources.DeleteButtonText, DialogResult.Abort);
-      DialogResult dialogResult = InfoDialog.ShowDialog(InfoDialog.DialogType.Generic3Buttons, InfoDialog.InfoType.Warning,
-      Resources.RestoreEditConnectionInfoTitle, Resources.RestoreEditConnectionInfoDetail, null, null, false, buttonsProperties);
-
+      var dialogResult = InfoDialog.ShowDialog(InfoDialog.DialogType.Generic3Buttons, InfoDialog.InfoType.Warning, Resources.RestoreEditConnectionInfoTitle, Resources.RestoreEditConnectionInfoDetail, null, null, false, buttonsProperties);
       switch (dialogResult)
       {
         case DialogResult.Abort:
@@ -1556,7 +1566,7 @@ namespace MySQL.ForExcel
           break;
 
         case DialogResult.Yes:
-          // Attempt to restore EditConnectionInfo objects for the workbook beeing opened
+          // Attempt to restore EditConnectionInfo objects for the workbook being opened
           RestoreEditConnectionInfos(workbook);
           break;
       }

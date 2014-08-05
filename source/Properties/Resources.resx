@@ -955,10 +955,10 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
     <value>Executed the following statement to create MySQL Schema "{0}":</value>
   </data>
   <data name="NewSchemaOperationErrorSummaryText" xml:space="preserve">
-    <value>The MySQL Schema "{0}" could not be created.</value>
+    <value>MySQL Schema "{0}" could not be created.</value>
   </data>
   <data name="NewSchemaOperationSuccessSummaryText" xml:space="preserve">
-    <value />
+    <value>MySQL Schema "{0}" has been created.</value>
   </data>
   <data name="ImportMultipleRelationshipsNotSupportedTitleText" xml:space="preserve">
     <value>Excel Relationships cannot be created.</value>

@@ -1935,7 +1935,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The MySQL Schema &quot;{0}&quot; could not be created..
+        ///   Looks up a localized string similar to MySQL Schema &quot;{0}&quot; could not be created..
         /// </summary>
         internal static string NewSchemaOperationErrorSummaryText {
             get {
@@ -1944,7 +1944,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to MySQL Schema &quot;{0}&quot; has been created..
         /// </summary>
         internal static string NewSchemaOperationSuccessSummaryText {
             get {

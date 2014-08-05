@@ -1,4 +1,7 @@
 1.3.2
+- Fixed code that was saving duplicate Edit Session connection information into the settings.config file, causing the same Edit Session to be attempted to be restored
+  more than once which caused the "Editing not possible" error message to be displayed. Also added code to show the Excel's "Save As" dialog when a workbook that has
+  not been saved is being closed, doing a better handling of close & save scenarios. (Bug #19347634 - EDITING NOT POSSIBLE MESSAGE AFTER WORK OFFLINE)
 - Fixed the logic that calculates the resulting mapped data to be appended to an existing MySQL table, this was failing in scenarios where the selected Excel data has
   more columns than the mapped columns to be inserted to the MySQL table. (MySQL Bug #73453, Bug #19346203 - APPEND NOT WORKING WHEN +1 COLUMN IS SELECTED)
 - Added logic to only let the creation of a single PivotTable for the whole data model to be selectable when Excel relationships are being created and if and only if
