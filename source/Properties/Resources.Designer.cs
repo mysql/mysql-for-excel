@@ -2741,6 +2741,24 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The Excel workbook can&apos;t be saved due to several errors, you can file a bug report about this..
+        /// </summary>
+        internal static string WorkbookSaveErrorFinalText {
+            get {
+                return ResourceManager.GetString("WorkbookSaveErrorFinalText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There was an error saving the Excel workbook, please try again..
+        /// </summary>
+        internal static string WorkbookSaveErrorText {
+            get {
+                return ResourceManager.GetString("WorkbookSaveErrorText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Want to save your changes to &apos;{0}&apos;?.
         /// </summary>
         internal static string WorkbookSavingDetailText {

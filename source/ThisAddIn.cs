@@ -339,6 +339,8 @@ namespace MySQL.ForExcel
         ExcelPanesList = new List<ExcelAddInPane>();
       }
 
+      // Determine if this is the first run of the Add-In by checking if there are no Excel panes in the collection.
+      // This must be done at this point of the code, before the lines below that create an Excel pane.
       bool firstRun = ExcelPanesList.Count == 0;
 
       // Instantiate the Excel Add-In pane to attach it to the Excel's custom task pane.
@@ -354,10 +356,6 @@ namespace MySQL.ForExcel
       activeCustomPane.DockPosition = OfficeCore.MsoCTPDockPosition.msoCTPDockPositionRight;
       activeCustomPane.DockPositionRestrict = OfficeCore.MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoHorizontal;
       activeCustomPane.Width = ADD_IN_PANE_WIDTH;
-
-      // Create custom MySQL Excel table style and localized date format strings in the active workbook if it exists.
-      ActiveWorkbook.CreateMySqlTableStyle();
-      ActiveWorkbook.AddLocalizedDateFormatStringsAsNames();
 
       // First run if no Excel panes have been opened yet.
       if (firstRun)
@@ -615,6 +613,9 @@ namespace MySQL.ForExcel
         }
       }
 
+      // Add back the localized date format strings to this workbook.
+      workbook.AddLocalizedDateFormatStringsAsNames();
+
       if (!success)
       {
         workbook.Saved = false;
@@ -652,7 +653,9 @@ namespace MySQL.ForExcel
       bool triggerAfterSave = true;
       if (saveAsUi)
       {
-        dynamic cFile = Application.GetSaveAsFilename(workbook.Name, Resources.ExcelDefaultFileExtensionText); // GetSaveAsFilename returns a dynamic type, which is a boolean type with false value when the dialog was canceled.
+        // GetSaveAsFilename returns a dynamic type, which is a boolean type with false value when the dialog was canceled.
+        dynamic cFile = Application.GetSaveAsFilename(workbook.Name, Resources.ExcelDefaultFileExtensionText);
+
         //If the save as dialog was canceled we need to skip the after save method.
         if (cFile is bool && !cFile)
         {
@@ -681,7 +684,7 @@ namespace MySQL.ForExcel
     /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/> being created.</param>
     private void Application_WorkbookNewWorkbook(Microsoft.Office.Interop.Excel.Workbook workbook)
     {
-      InitializeWorkbook(workbook, true);
+      InitializeWorkbook(workbook);
     }
 
     /// <summary>
@@ -737,16 +740,33 @@ namespace MySQL.ForExcel
         switch (MessageBox.Show(string.Format(Resources.WorkbookSavingDetailText, workbook.Name), Application.Name, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1))
         {
           case DialogResult.Yes:
-            if (string.IsNullOrEmpty(workbook.Path))
+            for (int retry = 1; retry <= 3 && !wasAlreadySaved; retry++)
             {
-              // The workbook is being saved for the very first time, so show the Save As dialog to users which will save the Workbook where the user wants to.
-              Application.Dialogs[ExcelInterop.XlBuiltInDialog.xlDialogSaveAs].Show(workbook.Name);
+              try
+              {
+                if (workbook.IsNew())
+                {
+                  // The workbook is being saved for the very first time, so show the Save As dialog to users which will save the Workbook where the user wants to.
+                  Application.Dialogs[ExcelInterop.XlBuiltInDialog.xlDialogSaveAs].Show(workbook.Name);
+                }
+                else
+                {
+                  // The workbook has been saved before, so just overwrite it.
+                  workbook.Save();
+                }
+
+                wasAlreadySaved = true;
+              }
+              catch (Exception ex)
+              {
+                var errorTitle = retry <= 3 ? Resources.WorkbookSaveErrorText : Resources.WorkbookSaveErrorFinalText;
+                MiscUtilities.ShowCustomizedErrorDialog(errorTitle, ex.Message, true);
+                MySqlSourceTrace.WriteToLog(errorTitle);
+                MySqlSourceTrace.WriteAppErrorToLog(ex);
+              }
             }
-            else
-            {
-              // The workbook has been saved before, so just overwrite it.
-              workbook.Save();
-            }
+
+            cancel = !wasAlreadySaved;
             break;
 
           case DialogResult.No:
@@ -791,6 +811,9 @@ namespace MySQL.ForExcel
         cancel = true; //Cancels the users original save command request in order to execute the following code override.
         Application_WorkbookAfterSave2007(workbook, saveAsUi);
       }
+
+      // Remove the localized date format strings from this workbook, since they can't be saved in a macro-free (normal) workbook.
+      workbook.RemoveLocalizedDateFormatNames();
     }
 
     /// <summary>
@@ -1047,11 +1070,14 @@ namespace MySQL.ForExcel
       _restoringExistingConnectionInfo = false;
       SkipSelectedDataContentsDetection = false;
 
-      // This method is used to migrate all connections created with 1.0.6 (in a local connections file) to the Workbench connections file.
+      // Migrate all Workbench connections created with version 1.0.6 (in a local connections file) to the Workbench connections file.
       MySqlWorkbench.MigrateExternalConnectionsToWorkbench();
 
       // Subscribe to Excel events
       SetupExcelEvents(true);
+
+      // Create custom MySQL Excel table style and localized date format strings in the active workbook if it exists.
+      InitializeWorkbook(ActiveWorkbook);
 
       // Restore EditConnectionInfos
       ShowOpenEditConnectionInfosDialog(ActiveWorkbook);
@@ -1089,8 +1115,7 @@ namespace MySQL.ForExcel
     /// Method used to initialize a <see cref="ExcelInterop.Workbook" /> when it is opened or created.
     /// </summary>
     /// <param name="workbook">The <see cref="ExcelInterop.Workbook" /> being opened.</param>
-    /// <param name="isNewWorkbook">If it is set to <c>true</c> the workbook will be initialized as if it is just being created.</param>
-    private void InitializeWorkbook(ExcelInterop.Workbook workbook, bool isNewWorkbook = false)
+    private void InitializeWorkbook(ExcelInterop.Workbook workbook)
     {
       if (workbook == null)
       {
@@ -1102,7 +1127,7 @@ namespace MySQL.ForExcel
       workbook.AddLocalizedDateFormatStringsAsNames();
 
       // When it is a new workbook it won't have any IConnectionInfo object related to it, so we could skip the rest of the method altogether.
-      if (isNewWorkbook)
+      if (workbook.IsNew())
       {
         return;
       }

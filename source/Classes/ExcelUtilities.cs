@@ -264,6 +264,11 @@ namespace MySQL.ForExcel.Classes
     /// <remarks>This method relies on the value of the setting HideLocalizedDateFormatNames.</remarks>
     public static void AddLocalizedDateFormatStringsAsNames(this ExcelInterop.Workbook workbook)
     {
+      if (workbook == null)
+      {
+        return;
+      }
+
       bool hideNames = Settings.Default.HideLocalizedDateFormatNames;
       workbook.AddNameWithInternationalFormula("LOCAL_DATE_SEPARATOR", "=INDEX(GET.WORKSPACE(37),17)", hideNames);
       workbook.AddNameWithInternationalFormula("LOCAL_TIME_SEPARATOR", "=INDEX(GET.WORKSPACE(37),18)", hideNames);
@@ -1301,6 +1306,17 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Checks if the <see cref="ExcelInterop.Workbook"/> has not been ever saved to disk.
+    /// </summary>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
+    /// <returns><c>true</c> if the <see cref="ExcelInterop.Workbook"/> has not been ever saved to disk, <c>false</c> otherwise.</returns>
+    public static bool IsNew(this ExcelInterop.Workbook workbook)
+    {
+      // If the Path value is empty it means the Workbook has not been ever saved to disk.
+      return workbook != null && string.IsNullOrEmpty(workbook.Path);
+    }
+
+    /// <summary>
     /// Checks if the PowerPivot add-in is installed in the computer.
     /// </summary>
     /// <returns><c>true</c> if PowerPivot is installed, <c>false</c> otherwise.</returns>
@@ -1441,6 +1457,50 @@ namespace MySQL.ForExcel.Classes
       }
 
       return refreshedMySqlData;
+    }
+
+    /// <summary>
+    /// Adds names to the whole application related to localized date format strings.
+    /// </summary>
+    /// <param name="workbook">The workbook where the new <see cref="ExcelInterop.Style"/> is added to.</param>
+    /// <remarks>This method relies on the value of the setting HideLocalizedDateFormatNames.</remarks>
+    public static void RemoveLocalizedDateFormatNames(this ExcelInterop.Workbook workbook)
+    {
+      if (workbook == null)
+      {
+        return;
+      }
+
+      workbook.RemoveName("LOCAL_DATE_SEPARATOR");
+      workbook.RemoveName("LOCAL_TIME_SEPARATOR");
+      workbook.RemoveName("LOCAL_YEAR_FORMAT");
+      workbook.RemoveName("LOCAL_MONTH_FORMAT");
+      workbook.RemoveName("LOCAL_DAY_FORMAT");
+      workbook.RemoveName("LOCAL_HOUR_FORMAT");
+      workbook.RemoveName("LOCAL_MINUTE_FORMAT");
+      workbook.RemoveName("LOCAL_SECOND_FORMAT");
+      workbook.RemoveName("LOCAL_MYSQL_DATE_FORMAT");
+    }
+
+    /// <summary>
+    /// Removes a <see cref="ExcelInterop.Name"/> object from the collection of names of the given <see cref="ExcelInterop.Workbook"/>.
+    /// </summary>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
+    /// <param name="name">The name of the <see cref="ExcelInterop.Name"/> object.</param>
+    public static void RemoveName(this ExcelInterop.Workbook workbook, string name)
+    {
+      if (workbook == null || string.IsNullOrEmpty(name))
+      {
+        return;
+      }
+
+      var removingName = workbook.Names.Cast<ExcelInterop.Name>().FirstOrDefault(n => n.Name == name);
+      if (removingName == null)
+      {
+        return;
+      }
+
+      removingName.Delete();
     }
 
     /// <summary>
