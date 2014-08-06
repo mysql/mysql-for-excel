@@ -1,4 +1,7 @@
 1.3.2
+- Enhanced the way the row with summary fields (inserted at the bottom of imported data when the "Add Summary Fields" option is checked) looks like, now it is formatted
+  in bold with a thick border above it. This was done to make a visual difference between the data rows and the summary row, necessary mostly when handling numeric data
+  (the summary row could be easily mistaken to be a normal data row).
 - Added code to remove the internationalization formulas used by MySQL for Excel stored in Workbook Names before the Workbook is saved, and they are added back again
   after the save operation. (MySQL Bug #73467, Bug #19358961 - WARNING ABOUT MACRO-FREE WORKBOOKS WHEN CLOSING & SAVING AN EXCEL WORKBOOK)
 - Fixed code that was saving duplicate Edit Session connection information into the settings.config file, causing the same Edit Session to be attempted to be restored

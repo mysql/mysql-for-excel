@@ -624,7 +624,11 @@ namespace MySQL.ForExcel.Classes
       excelTable.QueryTable.WorkbookConnection.Name = workbookConnectionName;
       excelTable.QueryTable.WorkbookConnection.Description = Resources.WorkbookConnectionForExcelTableDescription;
       excelTable.Comment = Guid.NewGuid().ToString();
-      excelTable.ShowTotals = addSummaryRow;
+      if (addSummaryRow)
+      {
+        excelTable.AddSummaryRow();
+      }
+
       ExcelTable = excelTable;
     }
   }

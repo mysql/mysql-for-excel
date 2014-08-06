@@ -342,9 +342,41 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Adds a summary row below the data of the given <see cref="ExcelInterop.ListObject"/>.
+    /// </summary>
+    /// <param name="excelTable">A <see cref="ExcelInterop.ListObject"/> object.</param>
+    public static void AddSummaryRow(this ExcelInterop.ListObject excelTable)
+    {
+      if (excelTable == null)
+      {
+        return;
+      }
+
+      excelTable.ShowTotals = true;
+      excelTable.TotalsRowRange.Font.Bold = true;
+
+      // Reset all of the other borders first
+      excelTable.TotalsRowRange.Borders[ExcelInterop.XlBordersIndex.xlDiagonalDown].LineStyle = ExcelInterop.XlLineStyle.xlLineStyleNone;
+      excelTable.TotalsRowRange.Borders[ExcelInterop.XlBordersIndex.xlDiagonalUp].LineStyle = ExcelInterop.XlLineStyle.xlLineStyleNone;
+      excelTable.TotalsRowRange.Borders[ExcelInterop.XlBordersIndex.xlEdgeLeft].LineStyle = ExcelInterop.XlLineStyle.xlLineStyleNone;
+      excelTable.TotalsRowRange.Borders[ExcelInterop.XlBordersIndex.xlEdgeBottom].LineStyle = ExcelInterop.XlLineStyle.xlLineStyleNone;
+      excelTable.TotalsRowRange.Borders[ExcelInterop.XlBordersIndex.xlEdgeTop].LineStyle = ExcelInterop.XlLineStyle.xlLineStyleNone;
+      excelTable.TotalsRowRange.Borders[ExcelInterop.XlBordersIndex.xlEdgeRight].LineStyle = ExcelInterop.XlLineStyle.xlLineStyleNone;
+      excelTable.TotalsRowRange.Borders[ExcelInterop.XlBordersIndex.xlInsideVertical].LineStyle = ExcelInterop.XlLineStyle.xlLineStyleNone;
+      excelTable.TotalsRowRange.Borders[ExcelInterop.XlBordersIndex.xlInsideHorizontal].LineStyle = ExcelInterop.XlLineStyle.xlLineStyleNone;
+
+      // Set the only border we care about.
+      var topBorder = excelTable.TotalsRowRange.Borders[ExcelInterop.XlBordersIndex.xlEdgeTop];
+      topBorder.LineStyle = ExcelInterop.XlLineStyle.xlContinuous;
+      topBorder.ColorIndex = 0;
+      topBorder.TintAndShade = 0;
+      topBorder.Weight = XlBorderWeight.xlMedium;
+    }
+
+    /// <summary>
     /// Checks if the given <see cref="ExcelInterop.Range"/> contains data in any of its cells.
     /// </summary>
-    /// <param name="range">An excel range.</param>
+    /// <param name="range">A <see cref="ExcelInterop.Range"/> object.</param>
     /// <returns><c>true</c> if the given range is not empty, <c>false</c> otherwise.</returns>
     public static bool ContainsAnyData(this ExcelInterop.Range range)
     {
