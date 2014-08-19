@@ -495,7 +495,7 @@ namespace MySQL.ForExcel.Forms
     {
       dbTableOrView.ImportParameters.AddSummaryRow = AddSummaryFieldsCheckBox.Checked;
       dbTableOrView.ImportParameters.ColumnsNamesList = null;
-      dbTableOrView.ImportParameters.CreatePivotTable = PivotTablesComboBox.SelectedIndex == 1;
+      dbTableOrView.ImportParameters.CreatePivotTable = CreatePivotTableCheckBox.Checked && PivotTablesComboBox.SelectedIndex == 1;
       dbTableOrView.ImportParameters.FirstRowIndex = -1;
       dbTableOrView.ImportParameters.ForEditDataOperation = false;
       dbTableOrView.ImportParameters.IncludeColumnNames = true;
