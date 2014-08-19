@@ -145,6 +145,14 @@ namespace MySQL.ForExcel.Forms
       PrimaryKeyColumnsComboBox.Enabled = false;
       AddPrimaryKeyTextBox.Enabled = true;
       _previewDataTable.UseFirstColumnAsPk = true;
+      if (!AddPrimaryKeyTextBox.CanFocus)
+      {
+        return;
+      }
+
+      // Give focus to the field related to the checkbox whose status changed.
+      AddPrimaryKeyTextBox.Focus();
+      AddPrimaryKeyTextBox.SelectAll();
     }
 
     /// <summary>
@@ -1395,6 +1403,13 @@ namespace MySQL.ForExcel.Forms
       AddPrimaryKeyTextBox.Enabled = false;
       _previewDataTable.UseFirstColumnAsPk = false;
       PreviewDataGridView.Columns[1].Selected = true;
+      if (!PrimaryKeyColumnsComboBox.CanFocus)
+      {
+        return;
+      }
+
+      // Give focus to the field related to the checkbox whose status changed.
+      PrimaryKeyColumnsComboBox.Focus();
     }
   }
 }

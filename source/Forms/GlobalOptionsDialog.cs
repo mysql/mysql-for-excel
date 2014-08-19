@@ -145,6 +145,13 @@ namespace MySQL.ForExcel.Forms
     private void RestoreSavedEditSessionsCheckBox_CheckedChanged(object sender, EventArgs e)
     {
       SetRestoreSessionsRadioButtonsEnabledStatus();
+      if (!RestoreSavedEditSessionsCheckBox.Checked || !ReuseWorksheetsRadioButton.CanFocus)
+      {
+        return;
+      }
+
+      // Give focus to the field related to the checkbox whose status changed.
+      ReuseWorksheetsRadioButton.Focus();
     }
 
     /// <summary>

@@ -459,6 +459,7 @@ namespace MySQL.ForExcel.Forms
       this.PrimaryKeyColumnsComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
       this.PrimaryKeyColumnsComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
       this.PrimaryKeyColumnsComboBox.DisplayMember = "DisplayName";
+      this.PrimaryKeyColumnsComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
       this.PrimaryKeyColumnsComboBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.PrimaryKeyColumnsComboBox.FormattingEnabled = true;
       this.PrimaryKeyColumnsComboBox.Location = new System.Drawing.Point(638, 144);

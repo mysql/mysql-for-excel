@@ -55,6 +55,13 @@ namespace MySQL.ForExcel.Forms
     private void CreateExcelTableCheckbox_CheckedChanged(object sender, EventArgs e)
     {
       SetExcelTableControlsAvailability();
+      if (!CreateExcelTableCheckbox.Checked || !UseStyleComboBox.CanFocus)
+      {
+        return;
+      }
+
+      // Give focus to the field related to the checkbox whose status changed.
+      UseStyleComboBox.Focus();
     }
 
     /// <summary>
@@ -88,7 +95,16 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void PrefixExcelTablesCheckBox_CheckedChanged(object sender, EventArgs e)
     {
-      PrefixExcelTablesTextBox.ReadOnly = !(CreateExcelTableCheckbox.Checked && PrefixExcelTablesCheckBox.Checked);
+      bool prefixExcelTableNames = PrefixExcelTablesCheckBox.Checked;
+      PrefixExcelTablesTextBox.ReadOnly = !(CreateExcelTableCheckbox.Checked && prefixExcelTableNames);
+      if (!prefixExcelTableNames || !PrefixExcelTablesTextBox.CanFocus)
+      {
+        return;
+      }
+
+      // Give focus to the field related to the checkbox whose status changed.
+      PrefixExcelTablesTextBox.Focus();
+      PrefixExcelTablesTextBox.SelectAll();
     }
 
     /// <summary>

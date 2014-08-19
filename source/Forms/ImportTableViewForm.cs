@@ -270,7 +270,17 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void LimitRowsCheckBox_CheckedChanged(object sender, EventArgs e)
     {
-      RowsToReturnNumericUpDown.Enabled = FromRowNumericUpDown.Enabled = LimitRowsCheckBox.Checked;
+      bool limitRows = LimitRowsCheckBox.Checked;
+      FromRowNumericUpDown.Enabled = limitRows;
+      RowsToReturnNumericUpDown.Enabled = limitRows;
+      if (!limitRows || !RowsToReturnNumericUpDown.CanFocus)
+      {
+        return;
+      }
+
+      // Give focus to the field related to the checkbox whose status changed.
+      RowsToReturnNumericUpDown.Focus();
+      RowsToReturnNumericUpDown.Select(0, RowsToReturnNumericUpDown.Text.Length);
     }
 
     /// <summary>

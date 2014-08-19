@@ -1,4 +1,7 @@
 1.3.2
+- Automatically set the focus (and select all contents if possible) on controls directly related to a checkbox or radio button in all dialogs. This change affected the
+  following dialogs so when a checkbox or radio button is checked, its related control is set to have focus: Import Data, Import Multiple Data, Export Data, Global Options,
+  Import Advanced Options.
 - Enhanced the way the row with summary fields (inserted at the bottom of imported data when the "Add Summary Fields" option is checked) looks like, now it is formatted
   in bold with a thick border above it. This was done to make a visual difference between the data rows and the summary row, necessary mostly when handling numeric data
   (the summary row could be easily mistaken to be a normal data row).

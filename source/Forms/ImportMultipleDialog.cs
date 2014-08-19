@@ -273,8 +273,16 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void CreatePivotOrRelationshipsCheckedChanged(object sender, EventArgs e)
     {
-      PivotTablesComboBox.Enabled = !Excel2010OrLower && CreatePivotTableCheckBox.Checked && CreateExcelRelationshipsCheckBox.Checked;
+      bool createPivotTable = CreatePivotTableCheckBox.Checked;
+      PivotTablesComboBox.Enabled = !Excel2010OrLower && createPivotTable && CreateExcelRelationshipsCheckBox.Checked;
       PivotTablesComboBox.SelectedIndex = Excel2010OrLower || !CreateExcelRelationshipsCheckBox.Checked ? 1 : 0;
+      if (!createPivotTable || !PivotTablesComboBox.CanFocus)
+      {
+        return;
+      }
+
+      // Give focus to the field related to the checkbox whose status changed.
+      PivotTablesComboBox.Focus();
     }
 
     /// <summary>
