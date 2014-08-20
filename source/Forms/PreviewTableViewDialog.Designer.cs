@@ -71,6 +71,7 @@ namespace MySQL.ForExcel.Forms
       this.RowsNumericUpDown = new System.Windows.Forms.NumericUpDown();
       this.PreviewLabel = new System.Windows.Forms.Label();
       this.RefreshButton = new System.Windows.Forms.Button();
+      this.DialogCancelButton = new System.Windows.Forms.Button();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.PreviewDataGridView)).BeginInit();
@@ -101,6 +102,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // CommandAreaPanel
       // 
+      this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
       this.CommandAreaPanel.Controls.Add(this.OkButton);
       this.CommandAreaPanel.Location = new System.Drawing.Point(0, 416);
       this.CommandAreaPanel.Size = new System.Drawing.Size(749, 45);
@@ -139,7 +141,7 @@ namespace MySQL.ForExcel.Forms
       dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.ControlText;
       dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
       this.PreviewDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
-      this.PreviewDataGridView.Enabled = false;
+      this.PreviewDataGridView.DisableColumnsSelection = true;
       this.PreviewDataGridView.Location = new System.Drawing.Point(39, 106);
       this.PreviewDataGridView.Name = "PreviewDataGridView";
       this.PreviewDataGridView.Size = new System.Drawing.Size(668, 265);
@@ -198,7 +200,7 @@ namespace MySQL.ForExcel.Forms
       this.OkButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.OkButton.DialogResult = System.Windows.Forms.DialogResult.OK;
       this.OkButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.OkButton.Location = new System.Drawing.Point(662, 10);
+      this.OkButton.Location = new System.Drawing.Point(581, 10);
       this.OkButton.Name = "OkButton";
       this.OkButton.Size = new System.Drawing.Size(75, 23);
       this.OkButton.TabIndex = 0;
@@ -231,6 +233,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // RowsLabel
       // 
+      this.RowsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.RowsLabel.AutoSize = true;
       this.RowsLabel.Location = new System.Drawing.Point(157, 380);
       this.RowsLabel.Name = "RowsLabel";
@@ -240,6 +243,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // RowsNumericUpDown
       // 
+      this.RowsNumericUpDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.RowsNumericUpDown.Location = new System.Drawing.Point(91, 377);
       this.RowsNumericUpDown.Minimum = new decimal(new int[] {
             1,
@@ -257,6 +261,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // PreviewLabel
       // 
+      this.PreviewLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.PreviewLabel.AutoSize = true;
       this.PreviewLabel.Location = new System.Drawing.Point(40, 380);
       this.PreviewLabel.Name = "PreviewLabel";
@@ -266,6 +271,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // RefreshButton
       // 
+      this.RefreshButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.RefreshButton.Location = new System.Drawing.Point(195, 375);
       this.RefreshButton.Name = "RefreshButton";
       this.RefreshButton.Size = new System.Drawing.Size(75, 23);
@@ -274,11 +280,23 @@ namespace MySQL.ForExcel.Forms
       this.RefreshButton.UseVisualStyleBackColor = true;
       this.RefreshButton.Click += new System.EventHandler(this.RefreshButton_Click);
       // 
+      // DialogCancelButton
+      // 
+      this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.DialogCancelButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.DialogCancelButton.Location = new System.Drawing.Point(662, 10);
+      this.DialogCancelButton.Name = "DialogCancelButton";
+      this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
+      this.DialogCancelButton.TabIndex = 1;
+      this.DialogCancelButton.Text = "Cancel";
+      this.DialogCancelButton.UseVisualStyleBackColor = true;
+      // 
       // PreviewTableViewDialog
       // 
       this.AcceptButton = this.OkButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-      this.CancelButton = this.OkButton;
+      this.CancelButton = this.DialogCancelButton;
       this.ClientSize = new System.Drawing.Size(749, 461);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
@@ -312,6 +330,7 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.Label RowsLabel;
     private System.Windows.Forms.NumericUpDown RowsNumericUpDown;
     private System.Windows.Forms.Button RefreshButton;
+    private System.Windows.Forms.Button DialogCancelButton;
 
   }
 }

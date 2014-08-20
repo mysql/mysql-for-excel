@@ -70,6 +70,7 @@ namespace MySQL.ForExcel.Forms
       this.ReuseWorksheetsRadioButton = new System.Windows.Forms.RadioButton();
       this.ExcelToolTip = new System.Windows.Forms.ToolTip(this.components);
       this.ManageConnectionInfosButton = new System.Windows.Forms.Button();
+      this.PreviewTableDataCheckBox = new System.Windows.Forms.CheckBox();
       this.ResetToDefaultsButton = new System.Windows.Forms.Button();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
@@ -86,6 +87,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // ContentAreaPanel
       // 
+      this.ContentAreaPanel.Controls.Add(this.PreviewTableDataCheckBox);
       this.ContentAreaPanel.Controls.Add(this.ManageConnectionInfosButton);
       this.ContentAreaPanel.Controls.Add(this.panel1);
       this.ContentAreaPanel.Controls.Add(this.UseOptimisticUpdatesCheckBox);
@@ -101,14 +103,14 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.ConnectionTimeout1Label);
       this.ContentAreaPanel.Controls.Add(this.GlobalOptionsLabel);
       this.ContentAreaPanel.Controls.Add(this.ConnectionOptionsLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(504, 514);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(504, 531);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.ResetToDefaultsButton);
       this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 469);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 486);
       this.CommandAreaPanel.Size = new System.Drawing.Size(504, 45);
       // 
       // DialogAcceptButton
@@ -262,13 +264,13 @@ namespace MySQL.ForExcel.Forms
       // RestoreSavedEditSessionsCheckBox
       // 
       this.RestoreSavedEditSessionsCheckBox.AutoSize = true;
-      this.RestoreSavedEditSessionsCheckBox.Location = new System.Drawing.Point(53, 315);
+      this.RestoreSavedEditSessionsCheckBox.Location = new System.Drawing.Point(53, 338);
       this.RestoreSavedEditSessionsCheckBox.Name = "RestoreSavedEditSessionsCheckBox";
-      this.RestoreSavedEditSessionsCheckBox.Size = new System.Drawing.Size(323, 17);
-      this.RestoreSavedEditSessionsCheckBox.TabIndex = 12;
-      this.RestoreSavedEditSessionsCheckBox.Text = "Restore saved Edit sessions when opening an Excel workbook";
-      this.ExcelToolTip.SetToolTip(this.RestoreSavedEditSessionsCheckBox, "When checked Edit Data sessions that were active when an Excel workbook was saved" +
-        ", are restored when the workbook is opened again.");
+      this.RestoreSavedEditSessionsCheckBox.Size = new System.Drawing.Size(349, 17);
+      this.RestoreSavedEditSessionsCheckBox.TabIndex = 13;
+      this.RestoreSavedEditSessionsCheckBox.Text = "Restore saved Edit Data sessions when opening an Excel workbook";
+      this.ExcelToolTip.SetToolTip(this.RestoreSavedEditSessionsCheckBox, "When checked, Edit Data sessions that were active when an Excel workbook was save" +
+        "d, are restored when the workbook is opened again.");
       this.RestoreSavedEditSessionsCheckBox.UseVisualStyleBackColor = true;
       this.RestoreSavedEditSessionsCheckBox.CheckedChanged += new System.EventHandler(this.RestoreSavedEditSessionsCheckBox_CheckedChanged);
       // 
@@ -347,20 +349,20 @@ namespace MySQL.ForExcel.Forms
       // 
       this.panel1.Controls.Add(this.CreateNewWorksheetsRadioButton);
       this.panel1.Controls.Add(this.ReuseWorksheetsRadioButton);
-      this.panel1.Location = new System.Drawing.Point(21, 333);
+      this.panel1.Location = new System.Drawing.Point(21, 356);
       this.panel1.Name = "panel1";
       this.panel1.Size = new System.Drawing.Size(461, 51);
-      this.panel1.TabIndex = 13;
+      this.panel1.TabIndex = 14;
       // 
       // CreateNewWorksheetsRadioButton
       // 
       this.CreateNewWorksheetsRadioButton.AutoSize = true;
       this.CreateNewWorksheetsRadioButton.Location = new System.Drawing.Point(52, 28);
       this.CreateNewWorksheetsRadioButton.Name = "CreateNewWorksheetsRadioButton";
-      this.CreateNewWorksheetsRadioButton.Size = new System.Drawing.Size(303, 17);
+      this.CreateNewWorksheetsRadioButton.Size = new System.Drawing.Size(329, 17);
       this.CreateNewWorksheetsRadioButton.TabIndex = 1;
       this.CreateNewWorksheetsRadioButton.TabStop = true;
-      this.CreateNewWorksheetsRadioButton.Text = "Create new Excel worksheets for the restored Edit sessions";
+      this.CreateNewWorksheetsRadioButton.Text = "Create new Excel worksheets for the restored Edit Data sessions";
       this.ExcelToolTip.SetToolTip(this.CreateNewWorksheetsRadioButton, "When restoring Edit Data sessions the data will be imported on new worksheets.");
       this.CreateNewWorksheetsRadioButton.UseVisualStyleBackColor = true;
       // 
@@ -385,15 +387,27 @@ namespace MySQL.ForExcel.Forms
       // 
       // ManageConnectionInfosButton
       // 
-      this.ManageConnectionInfosButton.Location = new System.Drawing.Point(27, 404);
+      this.ManageConnectionInfosButton.Location = new System.Drawing.Point(27, 424);
       this.ManageConnectionInfosButton.Name = "ManageConnectionInfosButton";
       this.ManageConnectionInfosButton.Size = new System.Drawing.Size(276, 23);
-      this.ManageConnectionInfosButton.TabIndex = 14;
+      this.ManageConnectionInfosButton.TabIndex = 15;
       this.ManageConnectionInfosButton.Text = "Manage Stored Import and Edit Connection Information";
       this.ExcelToolTip.SetToolTip(this.ManageConnectionInfosButton, "Allows you to select from all stored Import and Edit connection information to be" +
         " deleted once you press Accept.");
       this.ManageConnectionInfosButton.UseVisualStyleBackColor = true;
       this.ManageConnectionInfosButton.Click += new System.EventHandler(this.ManageConnectionInfosButton_Click);
+      // 
+      // PreviewTableDataCheckBox
+      // 
+      this.PreviewTableDataCheckBox.AutoSize = true;
+      this.PreviewTableDataCheckBox.Location = new System.Drawing.Point(53, 315);
+      this.PreviewTableDataCheckBox.Name = "PreviewTableDataCheckBox";
+      this.PreviewTableDataCheckBox.Size = new System.Drawing.Size(337, 17);
+      this.PreviewTableDataCheckBox.TabIndex = 12;
+      this.PreviewTableDataCheckBox.Text = "Preview MySQL table data before an Edit Data session is opened.";
+      this.ExcelToolTip.SetToolTip(this.PreviewTableDataCheckBox, "When checked, the data of the selected MySQL table to edit is shown in a preview " +
+        "dialog before the Edit Data session is opened.");
+      this.PreviewTableDataCheckBox.UseVisualStyleBackColor = true;
       // 
       // ResetToDefaultsButton
       // 
@@ -411,7 +425,7 @@ namespace MySQL.ForExcel.Forms
       this.AcceptButton = this.DialogAcceptButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(504, 514);
+      this.ClientSize = new System.Drawing.Size(504, 531);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
@@ -457,5 +471,6 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.ToolTip ExcelToolTip;
     private System.Windows.Forms.Button ResetToDefaultsButton;
     private System.Windows.Forms.Button ManageConnectionInfosButton;
+    private System.Windows.Forms.CheckBox PreviewTableDataCheckBox;
   }
 }

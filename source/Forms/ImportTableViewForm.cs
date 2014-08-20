@@ -92,7 +92,7 @@ namespace MySQL.ForExcel.Forms
       Text = @"Import Data - " + importToWorksheetName;
       TableNameSubLabel.Text = importDbTableOrView.Name;
       FillPreviewGrid();
-      SetOptionsAvailability();
+      InitializeOptions();
     }
 
     #region Properties
@@ -264,6 +264,16 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
+    /// Sets the initial state of controls representing user options.
+    /// </summary>
+    private void InitializeOptions()
+    {
+      IncludeHeadersCheckBox.Checked = true;
+      LimitRowsCheckBox.Checked = false;
+      AddSummaryFieldsCheckBox.Enabled = Settings.Default.ImportCreateExcelTable;
+    }
+
+    /// <summary>
     /// Event delegate method fired when the <see cref="LimitRowsCheckBox"/> checked state changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -308,7 +318,7 @@ namespace MySQL.ForExcel.Forms
       try
       {
         var img = (byte[])(PreviewDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex]).Value;
-        using (MemoryStream ms = new MemoryStream(img))
+        using (var ms = new MemoryStream(img))
         {
           Image.FromStream(ms);
         }
@@ -377,26 +387,6 @@ namespace MySQL.ForExcel.Forms
       _dbTableOrView.ImportParameters.IncludeColumnNames = IncludeHeadersCheckBox.Checked;
       _dbTableOrView.ImportParameters.IntoNewWorksheet = false;
       _dbTableOrView.ImportParameters.RowsCount = rowsCount;
-    }
-
-    /// <summary>
-    /// Disables some import options when the form is called from an Edit Data operation.
-    /// </summary>
-    private void SetOptionsAvailability()
-    {
-      bool isEditOperation = _dbTableOrView.ImportParameters.ForEditDataOperation;
-      IncludeHeadersCheckBox.Checked = true;
-      IncludeHeadersCheckBox.Enabled = !isEditOperation;
-      PreviewDataGridView.DisableColumnsSelection = isEditOperation;
-      if (isEditOperation)
-      {
-        PreviewDataGridView.ContextMenuStrip = null;
-      }
-
-      LimitRowsCheckBox.Checked = false;
-      LimitRowsCheckBox.Enabled = !isEditOperation;
-      CreatePivotTableCheckBox.Enabled = !isEditOperation;
-      AddSummaryFieldsCheckBox.Enabled = !isEditOperation && Settings.Default.ImportCreateExcelTable;
     }
   }
 }

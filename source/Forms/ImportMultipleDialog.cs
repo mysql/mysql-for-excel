@@ -412,7 +412,7 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      using (var previewDialog = new PreviewTableViewDialog(previewTableOrView))
+      using (var previewDialog = new PreviewTableViewDialog(previewTableOrView, false))
       {
         previewDialog.ShowDialog();
       }

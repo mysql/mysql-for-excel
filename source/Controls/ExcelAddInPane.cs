@@ -246,11 +246,14 @@ namespace MySQL.ForExcel.Controls
     /// <param name="tableObject">Table to start an editing for.</param>
     /// <param name="fromSavedConnectionInfo">Flag indicating whether the <see cref="EditConnectionInfo"/> to be opened corresponds.</param>
     /// <param name="workbook">The workbook.</param>
-    /// <returns>
-    ///   <c>true</c> If the export/append action was executed, <c>false</c> otherwise.
-    /// </returns>
+    /// <returns><c>true</c> If the export/append action was executed, <c>false</c> otherwise.</returns>
     public bool EditTableData(DbTable tableObject, bool fromSavedConnectionInfo, ExcelInterop.Workbook workbook)
     {
+      if (tableObject == null)
+      {
+        return false;
+      }
+
       string schemaAndTableNames = WbConnection.Schema + "." + tableObject.Name;
 
       // Check if the current dbobject has an edit ongoing
@@ -259,6 +262,18 @@ namespace MySQL.ForExcel.Controls
         // Display an error since there is an ongoing Editing operation and return
         InfoDialog.ShowErrorDialog(Resources.TaskPaneEditingNotPossibleTitleText, string.Format(Resources.TableWithOperationOngoingError, schemaAndTableNames));
         return false;
+      }
+
+      // Preview the table's data in case the user option for that is on
+      if (!fromSavedConnectionInfo && Settings.Default.EditPreviewMySqlData)
+      {
+        using (var previewDataDialog = new PreviewTableViewDialog(tableObject, true))
+        {
+          if (previewDataDialog.ShowDialog() == DialogResult.Cancel)
+          {
+            return false;
+          }
+        }
       }
 
       // Check if selected Table has a Primary Key, it it does not we prompt an error and exit since Editing on such table is not permitted
@@ -271,18 +286,20 @@ namespace MySQL.ForExcel.Controls
       // Attempt to Import Data unless the user cancels the import operation
       string proposedWorksheetName = fromSavedConnectionInfo ? tableObject.Name : Globals.ThisAddIn.ActiveWorkbook.GetWorksheetNameAvoidingDuplicates(tableObject.Name);
       tableObject.ImportParameters.ForEditDataOperation = true;
-      ImportTableViewForm importForm = new ImportTableViewForm(tableObject, proposedWorksheetName);
-      DialogResult dr = fromSavedConnectionInfo ? importForm.ImportHidingDialog() : importForm.ShowDialog();
-      if (dr == DialogResult.Cancel)
+      MySqlDataTable mySqlTable;
+      using (var importForm = new ImportTableViewForm(tableObject, proposedWorksheetName))
       {
-        importForm.Dispose();
-        return false;
+        if (importForm.ImportHidingDialog() == DialogResult.Cancel)
+        {
+          return false;
+        }
+
+        mySqlTable = importForm.MySqlTable;
       }
 
-      if (importForm.MySqlTable == null || importForm.MySqlTable.Columns.Count == 0)
+      if (mySqlTable == null || mySqlTable.Columns.Count == 0)
       {
         MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, tableObject.Name));
-        importForm.Dispose();
         return false;
       }
 
@@ -296,13 +313,12 @@ namespace MySQL.ForExcel.Controls
       }
 
       // Create the new Excel Worksheet and import the editing data there
-      ExcelInterop.Workbook editWorkbook = fromSavedConnectionInfo && workbook != null ? workbook : Globals.ThisAddIn.ActiveWorkbook;
+      var editWorkbook = fromSavedConnectionInfo && workbook != null ? workbook : Globals.ThisAddIn.ActiveWorkbook;
       var currentWorksheet = fromSavedConnectionInfo && Settings.Default.EditSessionsReuseWorksheets
         ? editWorkbook.GetOrCreateWorksheet(proposedWorksheetName, true)
         : editWorkbook.CreateWorksheet(proposedWorksheetName, true);
       if (currentWorksheet == null)
       {
-        importForm.Dispose();
         return false;
       }
 
@@ -313,7 +329,7 @@ namespace MySQL.ForExcel.Controls
       }
 
       // Create and show the Edit Data Dialog
-      var editConnectionInfo = GetEditConnectionInfo(tableObject, importForm, currentWorksheet);
+      var editConnectionInfo = GetEditConnectionInfo(mySqlTable, currentWorksheet);
       ActiveEditDialog = editConnectionInfo.EditDialog;
       if (fromSavedConnectionInfo)
       {
@@ -332,7 +348,7 @@ namespace MySQL.ForExcel.Controls
         Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.Add(editConnectionInfo);
       }
 
-      importForm.Dispose();
+
       return true;
     }
 
@@ -458,25 +474,29 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Creates the <see cref="EditConnectionInfo"/> or restores the saved one.
     /// </summary>
-    /// <param name="tableObject">The table used on the current <see cref="EditConnectionInfo"/>.</param>
-    /// <param name="importForm">The import form used on the current <see cref="EditConnectionInfo"/>.</param>
+    /// <param name="mySqlTable">The <see cref="MySqlDataTable"/> used for the Edit Data session.</param>
     /// <param name="currentWorksheet">The current worksheet.</param>
     /// <returns>A new or restored <see cref="EditConnectionInfo"/> object.</returns>
-    private EditConnectionInfo GetEditConnectionInfo(DbObject tableObject, ImportTableViewForm importForm, ExcelInterop.Worksheet currentWorksheet)
+    private EditConnectionInfo GetEditConnectionInfo(MySqlDataTable mySqlTable, ExcelInterop.Worksheet currentWorksheet)
     {
+      if (mySqlTable == null || currentWorksheet == null)
+      {
+        return null;
+      }
+
       ExcelInterop.Range atCell = currentWorksheet.Range["A1", Type.Missing];
-      ExcelInterop.Range editingRange = importForm.MySqlTable.ImportDataIntoExcelRange(atCell);
+      ExcelInterop.Range editingRange = mySqlTable.ImportDataIntoExcelRange(atCell);
       EditConnectionInfo connectionInfo = null;
 
       if (Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.Count > 0)
       {
-        connectionInfo = Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.GetActiveEditConnectionInfo(Globals.ThisAddIn.ActiveWorkbook, tableObject.Name);
+        connectionInfo = Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.GetActiveEditConnectionInfo(Globals.ThisAddIn.ActiveWorkbook, mySqlTable.TableName);
       }
 
       // The EditConnectionInfo is new and has to be created from scratch.
       if (connectionInfo == null)
       {
-        connectionInfo = new EditConnectionInfo(ActiveWorkbookId, Globals.ThisAddIn.ActiveWorkbook.FullName, WbConnection.Id, WbConnection.Schema, tableObject.Name);
+        connectionInfo = new EditConnectionInfo(ActiveWorkbookId, Globals.ThisAddIn.ActiveWorkbook.FullName, WbConnection.Id, WbConnection.Schema, mySqlTable.TableName);
       }
 
       if (connectionInfo.EditDialog != null)
@@ -485,7 +505,7 @@ namespace MySQL.ForExcel.Controls
       }
 
       // The EditConnectionInfo is being either restored from the settings file or created for the newborn object.
-      connectionInfo.EditDialog = new EditDataDialog(this, new NativeWindowWrapper(Globals.ThisAddIn.Application.Hwnd), WbConnection, editingRange, importForm.MySqlTable, currentWorksheet);
+      connectionInfo.EditDialog = new EditDataDialog(this, new NativeWindowWrapper(Globals.ThisAddIn.Application.Hwnd), WbConnection, editingRange, mySqlTable, currentWorksheet);
       currentWorksheet.StoreProtectionKey(connectionInfo.EditDialog.WorksheetProtectionKey);
       return connectionInfo;
     }

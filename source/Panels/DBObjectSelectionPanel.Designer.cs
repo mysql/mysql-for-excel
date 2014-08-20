@@ -80,6 +80,7 @@ namespace MySQL.ForExcel.Panels
       this.DBObjectList = new MySQL.ForExcel.Controls.MySqlListView();
       this.DBObjectsContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.ImportRelatedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.PreviewDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.RefreshDatabaseObjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.AppendDataHotLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.EditDataHotLabel = new MySQL.ForExcel.Controls.HotLabel();
@@ -177,9 +178,10 @@ namespace MySQL.ForExcel.Panels
       // 
       this.DBObjectsContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ImportRelatedToolStripMenuItem,
+            this.PreviewDataToolStripMenuItem,
             this.RefreshDatabaseObjectsToolStripMenuItem});
       this.DBObjectsContextMenuStrip.Name = "contextMenuStrip";
-      this.DBObjectsContextMenuStrip.Size = new System.Drawing.Size(260, 70);
+      this.DBObjectsContextMenuStrip.Size = new System.Drawing.Size(260, 92);
       this.DBObjectsContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.DBObjectsContextMenuStrip_Opening);
       // 
       // ImportRelatedToolStripMenuItem
@@ -189,6 +191,14 @@ namespace MySQL.ForExcel.Panels
       this.ImportRelatedToolStripMenuItem.Size = new System.Drawing.Size(259, 22);
       this.ImportRelatedToolStripMenuItem.Text = "Import Selected and Related Tables";
       this.ImportRelatedToolStripMenuItem.Click += new System.EventHandler(this.ImportRelatedToolStripMenuItem_Click);
+      // 
+      // PreviewDataToolStripMenuItem
+      // 
+      this.PreviewDataToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
+      this.PreviewDataToolStripMenuItem.Name = "PreviewDataToolStripMenuItem";
+      this.PreviewDataToolStripMenuItem.Size = new System.Drawing.Size(259, 22);
+      this.PreviewDataToolStripMenuItem.Text = "Preview Data";
+      this.PreviewDataToolStripMenuItem.Click += new System.EventHandler(this.PreviewDataToolStripMenuItem_Click);
       // 
       // RefreshDatabaseObjectsToolStripMenuItem
       // 
@@ -528,5 +538,6 @@ namespace MySQL.ForExcel.Panels
     private System.Windows.Forms.Label SchemaLabel;
     private HotLabel ImportMultiHotLabel;
     private System.Windows.Forms.ToolStripMenuItem ImportRelatedToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem PreviewDataToolStripMenuItem;
   }
 }

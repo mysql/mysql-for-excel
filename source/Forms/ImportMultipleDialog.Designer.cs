@@ -235,7 +235,7 @@ namespace MySQL.ForExcel.Forms
             this.SelectAllToolStripMenuItem,
             this.SelectNoneToolStripMenuItem});
       this.TablesViewsContextMenuStrip.Name = "TablesViewsContextMenuStrip";
-      this.TablesViewsContextMenuStrip.Size = new System.Drawing.Size(176, 92);
+      this.TablesViewsContextMenuStrip.Size = new System.Drawing.Size(176, 114);
       this.TablesViewsContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.TablesViewsContextMenuStrip_Opening);
       // 
       // AddRelatedTablesToolStripMenuItem

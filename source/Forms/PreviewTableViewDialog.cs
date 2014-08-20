@@ -41,7 +41,7 @@ namespace MySQL.ForExcel.Forms
     private readonly DbView _previewTableOrView;
 
     /// <summary>
-    /// A <see cref="DataTable"/> object containing a subset of the whole data which is shown in the preview grid.
+    /// A <see cref="System.Data.DataTable"/> object containing a subset of the whole data which is shown in the preview grid.
     /// </summary>
     private DataTable _previewDataTable;
 
@@ -56,7 +56,8 @@ namespace MySQL.ForExcel.Forms
     /// Initializes a new instance of the <see cref="PreviewTableViewDialog"/> class.
     /// </summary>
     /// <param name="previewTableOrView">The type of DB object (MySQL table or view) to preview data for.</param>
-    public PreviewTableViewDialog(DbView previewTableOrView)
+    /// <param name="showCancelButton">Flag indicating whether the Cancel button is shown along with the OK one, or hidden.</param>
+    public PreviewTableViewDialog(DbView previewTableOrView, bool showCancelButton)
     {
       if (previewTableOrView == null)
       {
@@ -68,6 +69,7 @@ namespace MySQL.ForExcel.Forms
 
       InitializeComponent();
 
+      InitializeDialogButtons(showCancelButton);
       RowsNumericUpDown.Value = Settings.Default.ImportPreviewRowsQuantity;
       TableNameMainLabel.Text = previewTableOrView is DbTable ? "Table Name" : "View Name";
       TableNameSubLabel.Text = previewTableOrView.Name;
@@ -111,6 +113,23 @@ namespace MySQL.ForExcel.Forms
 
       PreviewDataGridView.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
       RowsNumericUpDown.Maximum = _totalRowsCount;
+    }
+
+    /// <summary>
+    /// Initializes the visibility and position of the dialog buttons.
+    /// </summary>
+    /// <param name="showCancelButton">Flag indicating whether the Cancel button is shown along with the OK one, or hidden.</param>
+    private void InitializeDialogButtons(bool showCancelButton)
+    {
+      if (showCancelButton)
+      {
+        return;
+      }
+
+      DialogCancelButton.Visible = false;
+      OkButton.Anchor = AnchorStyles.None;
+      OkButton.Location = DialogCancelButton.Location;
+      OkButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
     }
 
     /// <summary>

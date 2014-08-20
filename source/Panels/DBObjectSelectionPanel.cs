@@ -21,7 +21,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
-using Microsoft.Office.Interop.Excel;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Forms;
@@ -297,10 +296,13 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void DBObjectsContextMenuStrip_Opening(object sender, CancelEventArgs e)
     {
-      ImportRelatedToolStripMenuItem.Visible = DBObjectList.SelectedNodes.Count == 1
+      bool selectedNodeIsDbObject = DBObjectList.SelectedNodes.Count == 1
         && DBObjectList.SelectedNode != null
-        && DBObjectList.SelectedNode.Type == MySqlListViewNode.MySqlNodeType.DbObject
-        && DBObjectList.SelectedNode.DbObject is DbTable;
+        && DBObjectList.SelectedNode.Type == MySqlListViewNode.MySqlNodeType.DbObject;
+      bool selectedNodeIsDbTable = selectedNodeIsDbObject && DBObjectList.SelectedNode.DbObject is DbTable;
+      bool selectedNodeIsDbView = selectedNodeIsDbObject && DBObjectList.SelectedNode.DbObject is DbView;
+      ImportRelatedToolStripMenuItem.Visible = selectedNodeIsDbTable;
+      PreviewDataToolStripMenuItem.Visible = selectedNodeIsDbTable || selectedNodeIsDbView;
     }
 
     /// <summary>
@@ -594,6 +596,24 @@ namespace MySQL.ForExcel.Panels
         {
           excelAddInPane.RefreshWbConnectionTimeouts();
         }
+      }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when <see cref="PreviewDataToolStripMenuItem"/> is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void PreviewDataToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      if (DBObjectList.SelectedNodes.Count != 1 || DBObjectList.SelectedNode == null || !(DBObjectList.SelectedNode.DbObject is DbView))
+      {
+        return;
+      }
+
+      using (var previewDialog = new PreviewTableViewDialog(DBObjectList.SelectedNode.DbObject as DbView, false))
+      {
+        previewDialog.ShowDialog();
       }
     }
 

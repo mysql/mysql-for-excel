@@ -448,5 +448,18 @@ namespace MySQL.ForExcel.Properties {
                 this["SchemasDisplayCollations"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool EditPreviewMySqlData {
+            get {
+                return ((bool)(this["EditPreviewMySqlData"]));
+            }
+            set {
+                this["EditPreviewMySqlData"] = value;
+            }
+        }
     }
 }

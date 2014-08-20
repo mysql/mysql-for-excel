@@ -1,4 +1,8 @@
 1.3.2
+- Added a new global option called "Preview MySQL table data before an Edit Data session is opened" that when checked, the data of a selected MySQL table to be edited
+  is shown in a preview dialog before the Edit Data session is opened. If the option is unchecked, no preview takes place and the Edit Data session is opened directly.
+- Added a new context menu option called "Preview Data" available when right-clicking a MySQL table or view listed in the DB Objects selection panel. The option opens
+  the Preview Data dialog and shows by default the first 10 rows of the selected table or view.
 - Automatically set the focus (and select all contents if possible) on controls directly related to a checkbox or radio button in all dialogs. This change affected the
   following dialogs so when a checkbox or radio button is checked, its related control is set to have focus: Import Data, Import Multiple Data, Export Data, Global Options,
   Import Advanced Options.

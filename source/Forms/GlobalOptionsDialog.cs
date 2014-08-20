@@ -87,6 +87,7 @@ namespace MySQL.ForExcel.Forms
       Settings.Default.EditUseOptimisticUpdate = UseOptimisticUpdatesCheckBox.Checked;
       Settings.Default.GlobalSqlQueriesPreviewQueries = PreviewSqlQueriesRadioButton.Checked;
       Settings.Default.GlobalSqlQueriesShowQueriesWithResults = ShowExecutedSqlQueryRadioButton.Checked;
+      Settings.Default.EditPreviewMySqlData = PreviewTableDataCheckBox.Checked;
       Settings.Default.EditSessionsRestoreWhenOpeningWorkbook = RestoreSavedEditSessionsCheckBox.Checked;
       Settings.Default.EditSessionsReuseWorksheets = ReuseWorksheetsRadioButton.Checked;
       MiscUtilities.SaveSettings();
@@ -110,6 +111,7 @@ namespace MySQL.ForExcel.Forms
         ShowExecutedSqlQueryRadioButton.Checked = settings.GetPropertyDefaultValueByName<bool>("GlobalSqlQueriesShowQueriesWithResults");
         RestoreSavedEditSessionsCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("EditSessionsRestoreWhenOpeningWorkbook");
         ReuseWorksheetsRadioButton.Checked = settings.GetPropertyDefaultValueByName<bool>("EditSessionsReuseWorksheets");
+        PreviewTableDataCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("EditPreviewMySqlData");
       }
       else
       {
@@ -120,6 +122,7 @@ namespace MySQL.ForExcel.Forms
         ShowExecutedSqlQueryRadioButton.Checked = Settings.Default.GlobalSqlQueriesShowQueriesWithResults;
         RestoreSavedEditSessionsCheckBox.Checked = Settings.Default.EditSessionsRestoreWhenOpeningWorkbook;
         ReuseWorksheetsRadioButton.Checked = Settings.Default.EditSessionsReuseWorksheets;
+        PreviewTableDataCheckBox.Checked = Settings.Default.EditPreviewMySqlData;
       }
 
       NoSqlStatementsRadioButton.Checked = !PreviewSqlQueriesRadioButton.Checked && !ShowExecutedSqlQueryRadioButton.Checked;
