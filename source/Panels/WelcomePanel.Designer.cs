@@ -78,7 +78,10 @@ namespace MySQL.ForExcel.Panels
       this.LargeImagesList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("LargeImagesList.ImageStream")));
       this.LargeImagesList.TransparentColor = System.Drawing.Color.Transparent;
       this.LargeImagesList.Images.SetKeyName(0, "MySQLforExcel-WelcomePanel-ListItem-Connection-32x32.png");
-      this.LargeImagesList.Images.SetKeyName(1, "MySQLforExcel-WelcomePanel-Connection-Disabled-24x24.png");
+      this.LargeImagesList.Images.SetKeyName(1, "MySQLforExcel-WelcomePanel-ListItem-Connection-Disabled-32x32.png");
+      this.LargeImagesList.Images.SetKeyName(2, "MySQLforExcel-WelcomePanel-Connection-SSH.png");
+      this.LargeImagesList.Images.SetKeyName(3, "MySQLforExcel-WelcomePanel-Connection-SSH-Disabled.png");
+      this.LargeImagesList.Images.SetKeyName(4, "MySQLforExcel-WelcomePanel-Connection-Fabric.png");
       // 
       // ManageConnectionsHotLabel
       // 
@@ -133,6 +136,7 @@ namespace MySQL.ForExcel.Panels
       this.ConnectionsList.Indent = 18;
       this.ConnectionsList.ItemHeight = 20;
       this.ConnectionsList.Location = new System.Drawing.Point(9, 195);
+      this.ConnectionsList.MultiSelect = false;
       this.ConnectionsList.Name = "ConnectionsList";
       this.ConnectionsList.NodeHeightMultiple = 2;
       this.ConnectionsList.NodeImages = this.LargeImagesList;

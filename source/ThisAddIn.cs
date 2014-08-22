@@ -1105,7 +1105,7 @@ namespace MySQL.ForExcel
       string applicationDataFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
       MySqlWorkbench.ExternalApplicationName = AssemblyTitle;
       MySqlWorkbenchPasswordVault.ApplicationPasswordVaultFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\user_data.dat";
-      MySqlWorkbench.ExternalConnections.CreateDefaultConnections = !MySqlWorkbench.IsInstalled && !File.Exists(MySqlWorkbench.ConnectionsFilePath) && MySqlWorkbench.Connections.Count == 0;
+      MySqlWorkbench.ExternalConnections.CreateDefaultConnections = !File.Exists(MySqlWorkbench.ConnectionsFilePath) && MySqlWorkbench.Connections.Count == 0;
       MySqlWorkbench.ExternalApplicationConnectionsFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\connections.xml";
       MySqlSourceTrace.LogFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\MySQLForExcelInterop.log";
       MySqlSourceTrace.SourceTraceClass = "MySQLForExcel";

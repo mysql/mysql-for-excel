@@ -678,7 +678,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the connection uses SSL, <c>false</c> otherwise.</returns>
     public static bool IsSsl(this MySqlWorkbenchConnection connection)
     {
-      return connection.UseSsl == 1
+      return connection.UseSsl
         || !(string.IsNullOrWhiteSpace(connection.SslCa)
         && string.IsNullOrWhiteSpace(connection.SslCert)
         && string.IsNullOrWhiteSpace(connection.SslCipher)

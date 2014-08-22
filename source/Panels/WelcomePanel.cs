@@ -73,7 +73,7 @@ namespace MySQL.ForExcel.Panels
       }
 
       // Load connections just obtained from Workbench or locally created
-      foreach (MySqlWorkbenchConnection conn in MySqlWorkbench.Connections.OrderBy(conn => conn.Name))
+      foreach (var conn in MySqlWorkbench.Connections.Where(conn => conn.IsListable).OrderBy(conn => conn.Name))
       {
         conn.AllowZeroDateTimeValues = true;
         AddConnectionToList(conn);
@@ -115,8 +115,18 @@ namespace MySQL.ForExcel.Panels
       var isSsh = conn.DriverType == MySqlWorkbenchConnectionType.Ssh;
       var headerNode = ConnectionsList.HeaderNodes[conn.IsLocalConnection ? 0 : 1];
       var node = ConnectionsList.AddConnectionNode(headerNode, conn);
-      node.ImageIndex = isSsh ? 1 : 0;
       node.Enable = !isSsh;
+      switch (conn.DriverType)
+      {
+        case MySqlWorkbenchConnectionType.Tcp:
+        case MySqlWorkbenchConnectionType.NamedPipes:
+          node.ImageIndex = conn.IsFabricManaged ? 4 : (node.Enable ? 0 : 1);
+          break;
+
+        case MySqlWorkbenchConnectionType.Ssh:
+          node.ImageIndex = node.Enable ? 2 : 3;
+          break;
+      }
     }
 
     /// <summary>

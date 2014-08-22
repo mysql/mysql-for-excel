@@ -614,6 +614,10 @@
     <None Include="Resources\MySQLforExcel-ObjectPanel-MultiSelectObject-32x32.png" />
     <None Include="Resources\MySQLforExcel-SchemaPanel-ListItem-Schema-32x32.png" />
     <None Include="Resources\MySQLforExcel-SchemaPanel-SchemaInspect-32x32.png" />
+    <None Include="Resources\MySQLforExcel-WelcomePanel-Connection-SSH.png" />
+    <None Include="Resources\MySQLforExcel-WelcomePanel-Connection-SSH-Disabled.png" />
+    <None Include="Resources\MySQLforExcel-WelcomePanel-ListItem-Connection-Disabled-32x32.png" />
+    <None Include="Resources\MySQLforExcel-WelcomePanel-Connection-Fabric.png" />
     <Content Include="Resources\refresh_sidebar.png" />
     <None Include="Resources\remove_col_mapping.png" />
     <None Include="Resources\SplashScreenExcel.png" />
