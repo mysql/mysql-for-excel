@@ -222,7 +222,7 @@ namespace MySQL.ForExcel.Classes
     public MySqlDataTable(MySqlDataTable fromTemplate)
       : this(fromTemplate.WbConnection, fromTemplate.TableName)
     {
-      AddBufferToVarchar = fromTemplate.AddBufferToVarchar;
+      AddBufferToVarChar = fromTemplate.AddBufferToVarChar;
       AddPrimaryKeyColumn = fromTemplate.AddPrimaryKeyColumn;
       AutoAllowEmptyNonIndexColumns = fromTemplate.AutoAllowEmptyNonIndexColumns;
       AutoIndexIntColumns = fromTemplate.AutoIndexIntColumns;
