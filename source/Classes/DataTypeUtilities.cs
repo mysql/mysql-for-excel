@@ -351,7 +351,7 @@ namespace MySQL.ForExcel.Classes
       {
         int integerCount;
         int decimalCount;
-        if (rowsDataTypesList.Count(str => str == "Varchar") + rowsDataTypesList.Count(str => str == "Text") == rowsDataTypesList.Count)
+        if (rowsDataTypesList.Count(str => str == "VarChar") + rowsDataTypesList.Count(str => str == "Text") == rowsDataTypesList.Count)
         {
           typesConsistent = true;
           fullDataType = "Text";
@@ -388,9 +388,9 @@ namespace MySQL.ForExcel.Classes
       {
         switch (proposedStrippedDataType)
         {
-          case "Varchar":
+          case "VarChar":
             consistentStrippedDataType = proposedStrippedDataType;
-            fullDataType = string.Format("Varchar({0})", varCharMaxLen[0]);
+            fullDataType = string.Format("VarChar({0})", varCharMaxLen[0]);
             break;
 
           case "Decimal":
@@ -418,8 +418,8 @@ namespace MySQL.ForExcel.Classes
       {
         if (varCharMaxLen[1] <= MYSQL_VARCHAR_MAX_PROPOSED_LEN)
         {
-          consistentStrippedDataType = "Varchar";
-          fullDataType = string.Format("Varchar({0})", varCharMaxLen[1]);
+          consistentStrippedDataType = "VarChar";
+          fullDataType = string.Format("VarChar({0})", varCharMaxLen[1]);
         }
         else
         {
@@ -953,7 +953,7 @@ namespace MySQL.ForExcel.Classes
         case "System.String":
           foreach (int t in varCharApproxLen.Where(t => strLength <= t))
           {
-            return string.Format("Varchar({0})", t);
+            return string.Format("VarChar({0})", t);
           }
 
           return "Text";

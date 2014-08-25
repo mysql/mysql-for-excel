@@ -139,9 +139,9 @@ namespace MySQL.ForExcel.Classes
     /// <param name="datesAsMySqlDates">Flag indicating if the data type for dates will be stored as <see cref="MySql.Data.Types.MySqlDateTime"/>
     /// or <see cref="System.DateTime"/>.</param>
     /// <param name="allowNulls">Flag indicating if the column will accept null values.</param>
-    /// <param name="isPrimaryKey">Flag indicating if the column is part of the primary key.</param>
+    /// <param name="keyInfo">Information about the type of key this column belongs to.</param>
     /// <param name="extraInfo">Extra information related to the column's data type as stored by the MySQL server.</param>
-    public MySqlDataColumn(string columnName, string mySqlFullDataType, bool datesAsMySqlDates, bool allowNulls, bool isPrimaryKey, string extraInfo)
+    public MySqlDataColumn(string columnName, string mySqlFullDataType, bool datesAsMySqlDates, bool allowNulls, string keyInfo, string extraInfo)
       : this()
     {
       DisplayName = ColumnName = columnName;
@@ -150,11 +150,14 @@ namespace MySQL.ForExcel.Classes
       if (!string.IsNullOrEmpty(extraInfo))
       {
         AutoIncrement = extraInfo.Contains("auto_increment");
+        AutoPk = extraInfo.Contains("auto_pk");
+        ExcludeColumn = extraInfo.Contains("exclude");
       }
 
       MySqlDataType = mySqlFullDataType;
       DataType = DataTypeUtilities.NameToType(StrippedMySqlDataType, Unsigned, datesAsMySqlDates);
-      PrimaryKey = isPrimaryKey;
+      PrimaryKey = keyInfo == "PRI";
+      UniqueKey = keyInfo == "UNI";
     }
 
     /// <summary>
@@ -165,7 +168,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="datesAsMySqlDates">Flag indicating if the data type for dates will be stored as <see cref="MySql.Data.Types.MySqlDateTime"/>
     /// or <see cref="System.DateTime"/>.</param>
     public MySqlDataColumn(string columnName, string mySqlFullDataType, bool datesAsMySqlDates)
-      : this(columnName, mySqlFullDataType, datesAsMySqlDates, false, false, string.Empty)
+      : this(columnName, mySqlFullDataType, datesAsMySqlDates, false, string.Empty, string.Empty)
     {
     }
 
@@ -788,7 +791,7 @@ namespace MySQL.ForExcel.Classes
       int[] varCharMaxLen = { 0, 0 };           // 0 - All rows original datatype varcharmaxlen, 1 - All rows Varchar forced datatype maxlen
       int[] decimalMaxLenFirstRow = { 0, 0 };   // 0 - Integral part max length, 1 - decimal part max length
       int[] decimalMaxLen = { 0, 0 };           // 0 - Integral part max length, 1 - decimal part max length
-      bool addBufferToVarchar = ParentTable.AddBufferToVarchar;
+      bool addBufferToVarChar = ParentTable.AddBufferToVarChar;
       for (int rowPos = 1; rowPos <= columnRange.Rows.Count; rowPos++)
       {
         Excel.Range excelCell = columnRange.Cells[rowPos, 1];
@@ -804,18 +807,18 @@ namespace MySQL.ForExcel.Classes
         proposedType = DataTypeUtilities.GetMySqlExportDataType(valueAsString, out valueOverflow);
         if (proposedType == "Bool")
         {
-          proposedType = "Varchar(5)";
+          proposedType = "VarChar(5)";
         }
         else if (proposedType.StartsWith("Date"))
         {
-          proposedType = string.Format("Varchar({0})", valueAsString.Length);
+          proposedType = string.Format("VarChar({0})", valueAsString.Length);
         }
 
         int varCharValueLength;
         if (proposedType != "Text")
         {
           leftParensIndex = proposedType.IndexOf("(", StringComparison.Ordinal);
-          varCharValueLength = addBufferToVarchar ? int.Parse(proposedType.Substring(leftParensIndex + 1, proposedType.Length - leftParensIndex - 2)) : valueAsString.Length;
+          varCharValueLength = addBufferToVarChar ? int.Parse(proposedType.Substring(leftParensIndex + 1, proposedType.Length - leftParensIndex - 2)) : valueAsString.Length;
           varCharMaxLen[1] = Math.Max(varCharValueLength, varCharMaxLen[1]);
         }
 
@@ -825,8 +828,8 @@ namespace MySQL.ForExcel.Classes
         strippedType = leftParensIndex < 0 ? proposedType : proposedType.Substring(0, leftParensIndex);
         switch (strippedType)
         {
-          case "Varchar":
-            varCharValueLength = addBufferToVarchar ? int.Parse(proposedType.Substring(leftParensIndex + 1, proposedType.Length - leftParensIndex - 2)) : valueAsString.Length;
+          case "VarChar":
+            varCharValueLength = addBufferToVarChar ? int.Parse(proposedType.Substring(leftParensIndex + 1, proposedType.Length - leftParensIndex - 2)) : valueAsString.Length;
             varCharMaxLen[0] = Math.Max(varCharValueLength, varCharMaxLen[0]);
             break;
 
@@ -860,9 +863,9 @@ namespace MySQL.ForExcel.Classes
 
       if (string.IsNullOrEmpty(proposedType))
       {
-        proposedType = "Varchar(255)";
-        strippedType = "Varchar";
-        typesListForFirstAndRest.Add("Varchar");
+        proposedType = "VarChar(255)";
+        strippedType = "VarChar";
+        typesListForFirstAndRest.Add("VarChar");
         varCharMaxLen[0] = 255;
         varCharMaxLen[1] = 255;
       }
@@ -902,21 +905,15 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      var mySqlDataTable = Table as MySqlDataTable;
-      if (mySqlDataTable == null)
-      {
-        return null;
-      }
-
-      StringBuilder colDefinition = new StringBuilder();
-      colDefinition.AppendFormat("`{0}` {1}", DisplayName.Replace("`", "``"), MySqlDataType);
-      colDefinition.AppendFormat(" {0}null", AllowNull ? string.Empty : "not ");
+      var colDefinitionBuilder = new StringBuilder();
+      colDefinitionBuilder.AppendFormat("`{0}` {1}", DisplayName.Replace("`", "``"), MySqlDataType.ToLowerInvariant());
+      colDefinitionBuilder.AppendFormat(" {0}null", AllowNull ? string.Empty : "not ");
       if (AutoIncrement)
       {
-        colDefinition.Append(" auto_increment");
+        colDefinitionBuilder.Append(" auto_increment");
       }
 
-      return colDefinition.ToString();
+      return colDefinitionBuilder.ToString();
     }
 
     /// <summary>

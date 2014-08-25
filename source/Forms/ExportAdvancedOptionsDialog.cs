@@ -83,10 +83,10 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void DetectDatatypeCheckBox_CheckedChanged(object sender, EventArgs e)
     {
-      AddBufferToVarcharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
+      AddBufferToVarCharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
       if (!DetectDatatypeCheckBox.Checked)
       {
-        AddBufferToVarcharCheckBox.Checked = false;
+        AddBufferToVarCharCheckBox.Checked = false;
       }
 
       ExportDetectDatatypeChanged = Settings.Default.ExportDetectDatatype != DetectDatatypeCheckBox.Checked;
@@ -107,7 +107,7 @@ namespace MySQL.ForExcel.Forms
 
       Settings.Default.ExportLimitPreviewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
       Settings.Default.ExportDetectDatatype = DetectDatatypeCheckBox.Checked;
-      Settings.Default.ExportAddBufferToVarchar = AddBufferToVarcharCheckBox.Checked;
+      Settings.Default.ExportAddBufferToVarchar = AddBufferToVarCharCheckBox.Checked;
       Settings.Default.ExportAutoIndexIntColumns = AutoIndexIntColumnsCheckBox.Checked;
       Settings.Default.ExportAutoAllowEmptyNonIndexColumns = AutoAllowEmptyNonIndexColumnsCheckBox.Checked;
       Settings.Default.ExportUseFormattedValues = UseFormattedValuesCheckBox.Checked;
@@ -151,11 +151,11 @@ namespace MySQL.ForExcel.Forms
         var settings = Settings.Default;
         PreviewRowsQuantityNumericUpDown.Value = settings.GetPropertyDefaultValueByName<int>("ExportLimitPreviewRowsQuantity");
         DetectDatatypeCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportDetectDatatype");
-        AddBufferToVarcharCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportAddBufferToVarchar");
+        AddBufferToVarCharCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportAddBufferToVarchar");
         AutoIndexIntColumnsCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportAutoIndexIntColumns");
         AutoAllowEmptyNonIndexColumnsCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportAutoAllowEmptyNonIndexColumns");
         UseFormattedValuesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportUseFormattedValues");
-        AddBufferToVarcharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
+        AddBufferToVarCharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
         CreateTableIndexesLastCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportSqlQueriesCreateIndexesLast");
         ShowAllDataTypesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportShowAllMySqlDataTypes");
       }
@@ -166,11 +166,11 @@ namespace MySQL.ForExcel.Forms
         PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum,
           Settings.Default.ExportLimitPreviewRowsQuantity);
         DetectDatatypeCheckBox.Checked = Settings.Default.ExportDetectDatatype;
-        AddBufferToVarcharCheckBox.Checked = Settings.Default.ExportAddBufferToVarchar;
+        AddBufferToVarCharCheckBox.Checked = Settings.Default.ExportAddBufferToVarchar;
         AutoIndexIntColumnsCheckBox.Checked = Settings.Default.ExportAutoIndexIntColumns;
         AutoAllowEmptyNonIndexColumnsCheckBox.Checked = Settings.Default.ExportAutoAllowEmptyNonIndexColumns;
         UseFormattedValuesCheckBox.Checked = Settings.Default.ExportUseFormattedValues;
-        AddBufferToVarcharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
+        AddBufferToVarCharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
         CreateTableIndexesLastCheckBox.Checked = Settings.Default.ExportSqlQueriesCreateIndexesLast;
         ShowAllDataTypesCheckBox.Checked = Settings.Default.ExportShowAllMySqlDataTypes;
       }

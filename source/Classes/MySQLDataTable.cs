@@ -198,13 +198,13 @@ namespace MySQL.ForExcel.Classes
     /// <param name="addPrimaryKeyCol">Flag indicating if an auto-generated primary key column will be added as the first column in the table.</param>
     /// <param name="useFormattedValues">Flag indicating if the Excel excelData used to populate this table is formatted (numbers, dates, text) or not (numbers and text).</param>
     /// <param name="detectDataType">Flag indicating if the data type for each column is automatically detected when data is loaded by the <see cref="SetupColumnsWithData"/> method.</param>
-    /// <param name="addBufferToVarchar">Flag indicating if columns with an auto-detected varchar type will get a padding buffer for its size.</param>
+    /// <param name="addBufferToVarChar">Flag indicating if columns with an auto-detected varchar type will get a padding buffer for its size.</param>
     /// <param name="autoIndexIntColumns">Flag indicating if columns with an integer-based data-type will have their <see cref="MySqlDataColumn.CreateIndex"/> property value set to true.</param>
     /// <param name="autoAllowEmptyNonIndexColumns">Flag indicating if columns that have their <see cref="MySqlDataColumn.CreateIndex"/> property value set to <c>false</c> will automatically get their <see cref="MySqlDataColumn.AllowNull"/> property value set to <c>true</c>.</param>
-    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string proposedTableName, bool addPrimaryKeyCol, bool useFormattedValues, bool detectDataType, bool addBufferToVarchar, bool autoIndexIntColumns, bool autoAllowEmptyNonIndexColumns)
+    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string proposedTableName, bool addPrimaryKeyCol, bool useFormattedValues, bool detectDataType, bool addBufferToVarChar, bool autoIndexIntColumns, bool autoAllowEmptyNonIndexColumns)
       : this(wbConnection, proposedTableName)
     {
-      AddBufferToVarchar = addBufferToVarchar;
+      AddBufferToVarChar = addBufferToVarChar;
       AddPrimaryKeyColumn = addPrimaryKeyCol;
       AutoAllowEmptyNonIndexColumns = autoAllowEmptyNonIndexColumns;
       AutoIndexIntColumns = autoIndexIntColumns;
@@ -319,7 +319,7 @@ namespace MySQL.ForExcel.Classes
       _sqlBuilderForInsert = null;
       _sqlBuilderForUpdate = null;
       _useOptimisticUpdate = false;
-      AddBufferToVarchar = false;
+      AddBufferToVarChar = false;
       AddPrimaryKeyColumn = false;
       AutoAllowEmptyNonIndexColumns = false;
       AutoIndexIntColumns = false;
@@ -428,7 +428,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a value indicating whether columns with an auto-detected varchar type will get a padding buffer for its size.
     /// </summary>
-    public bool AddBufferToVarchar { get; private set; }
+    public bool AddBufferToVarChar { get; private set; }
 
     /// <summary>
     /// Gets a value indicating whether an auto-generated primary key column will be added as the first column in the table.
@@ -1152,7 +1152,7 @@ namespace MySQL.ForExcel.Classes
         createAutoPkColumn,
         IsFormatted,
         DetectDatatype,
-        AddBufferToVarchar,
+        AddBufferToVarChar,
         AutoIndexIntColumns,
         AutoAllowEmptyNonIndexColumns)
       {
@@ -2131,9 +2131,10 @@ namespace MySQL.ForExcel.Classes
         string colName = columnInfoRow["Field"].ToString();
         string dataType = columnInfoRow["Type"].ToString();
         bool allowNulls = columnInfoRow["Null"].ToString() == "YES";
-        bool isPrimaryKey = columnInfoRow["Key"].ToString() == "PRI";
+        string keyInfo = columnInfoRow["Key"].ToString();
         string extraInfo = columnInfoRow["Extra"].ToString();
-        MySqlDataColumn column = new MySqlDataColumn(colName, dataType, datesAsMySqlDates, allowNulls, isPrimaryKey, extraInfo);
+        var column = new MySqlDataColumn(colName, dataType, datesAsMySqlDates, allowNulls, keyInfo, extraInfo);
+        column.PropertyChanged += ColumnPropertyValueChanged;
         Columns.Add(column);
       }
     }

@@ -53,7 +53,7 @@ namespace MySQL.ForExcel.Forms
       this.FieldDataOptionsLabel = new System.Windows.Forms.Label();
       this.AutoAllowEmptyNonIndexColumnsCheckBox = new System.Windows.Forms.CheckBox();
       this.AutoIndexIntColumnsCheckBox = new System.Windows.Forms.CheckBox();
-      this.AddBufferToVarcharCheckBox = new System.Windows.Forms.CheckBox();
+      this.AddBufferToVarCharCheckBox = new System.Windows.Forms.CheckBox();
       this.DetectDatatypeCheckBox = new System.Windows.Forms.CheckBox();
       this.ColumnDatatypeOptionsLabel = new System.Windows.Forms.Label();
       this.AdvancedExportOptionsLabel = new System.Windows.Forms.Label();
@@ -93,7 +93,7 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.FieldDataOptionsLabel);
       this.ContentAreaPanel.Controls.Add(this.AutoAllowEmptyNonIndexColumnsCheckBox);
       this.ContentAreaPanel.Controls.Add(this.AutoIndexIntColumnsCheckBox);
-      this.ContentAreaPanel.Controls.Add(this.AddBufferToVarcharCheckBox);
+      this.ContentAreaPanel.Controls.Add(this.AddBufferToVarCharCheckBox);
       this.ContentAreaPanel.Controls.Add(this.DetectDatatypeCheckBox);
       this.ContentAreaPanel.Controls.Add(this.ColumnDatatypeOptionsLabel);
       this.ContentAreaPanel.Size = new System.Drawing.Size(584, 451);
@@ -186,16 +186,16 @@ namespace MySQL.ForExcel.Forms
       // 
       // AddBufferToVarcharCheckBox
       // 
-      this.AddBufferToVarcharCheckBox.AutoSize = true;
-      this.AddBufferToVarcharCheckBox.BackColor = System.Drawing.Color.Transparent;
-      this.AddBufferToVarcharCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.AddBufferToVarcharCheckBox.Location = new System.Drawing.Point(73, 135);
-      this.AddBufferToVarcharCheckBox.Name = "AddBufferToVarcharCheckBox";
-      this.AddBufferToVarcharCheckBox.Size = new System.Drawing.Size(417, 19);
-      this.AddBufferToVarcharCheckBox.TabIndex = 6;
-      this.AddBufferToVarcharCheckBox.Text = "Add additional buffer to Varchar length (round up to 12, 25, 45, 125, 255)";
-      this.HelpToolTip.SetToolTip(this.AddBufferToVarcharCheckBox, resources.GetString("AddBufferToVarcharCheckBox.ToolTip"));
-      this.AddBufferToVarcharCheckBox.UseVisualStyleBackColor = false;
+      this.AddBufferToVarCharCheckBox.AutoSize = true;
+      this.AddBufferToVarCharCheckBox.BackColor = System.Drawing.Color.Transparent;
+      this.AddBufferToVarCharCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.AddBufferToVarCharCheckBox.Location = new System.Drawing.Point(73, 135);
+      this.AddBufferToVarCharCheckBox.Name = "AddBufferToVarCharCheckBox";
+      this.AddBufferToVarCharCheckBox.Size = new System.Drawing.Size(417, 19);
+      this.AddBufferToVarCharCheckBox.TabIndex = 6;
+      this.AddBufferToVarCharCheckBox.Text = "Add additional buffer to Varchar length (round up to 12, 25, 45, 125, 255)";
+      this.HelpToolTip.SetToolTip(this.AddBufferToVarCharCheckBox, resources.GetString("AddBufferToVarcharCheckBox.ToolTip"));
+      this.AddBufferToVarCharCheckBox.UseVisualStyleBackColor = false;
       // 
       // DetectDatatypeCheckBox
       // 
@@ -389,7 +389,7 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.Label FieldDataOptionsLabel;
     private System.Windows.Forms.CheckBox AutoAllowEmptyNonIndexColumnsCheckBox;
     private System.Windows.Forms.CheckBox AutoIndexIntColumnsCheckBox;
-    private System.Windows.Forms.CheckBox AddBufferToVarcharCheckBox;
+    private System.Windows.Forms.CheckBox AddBufferToVarCharCheckBox;
     private System.Windows.Forms.CheckBox DetectDatatypeCheckBox;
     private System.Windows.Forms.Label ColumnDatatypeOptionsLabel;
     private System.Windows.Forms.Label AdvancedExportOptionsLabel;
