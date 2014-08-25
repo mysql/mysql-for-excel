@@ -872,18 +872,20 @@ namespace MySQL.ForExcel.Forms
     /// <param name="refreshFromDb">Flag indicating if instead of reverting the data back to the way it was when the editing session started, it is pulled to have the most recent version of it.</param>
     private void RevertDataChanges(bool refreshFromDb)
     {
-      if (!refreshFromDb)
+      try
       {
-        _mySqlTable.RejectChanges();
-      }
-      else
-      {
-        Exception exception;
-        _mySqlTable.RefreshData(out exception);
-        if (exception != null)
+        if (!refreshFromDb)
         {
-          MiscUtilities.ShowCustomizedErrorDialog(Resources.EditDataRefreshErrorText, exception.Message);
+          _mySqlTable.RejectChanges();
         }
+        else
+        {
+          _mySqlTable.RefreshData();
+        }
+      }
+      catch (Exception ex)
+      {
+        MiscUtilities.ShowCustomizedErrorDialog(Resources.EditDataRefreshErrorText, ex.Message);
       }
 
       Globals.ThisAddIn.SkipSelectedDataContentsDetection = true;

@@ -216,6 +216,67 @@ namespace MySQL.ForExcel.Classes
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MySqlDataTable"/> class.
+    /// This constructor is meant to be used by the <see cref="ExportDataForm"/> class.
+    /// </summary>
+    /// <param name="fromTemplate">Template <see cref="MySqlDataTable"/> from which to build a new one, the new table is a copy with the same data, but the schema is built from the template not cloned.</param>
+    public MySqlDataTable(MySqlDataTable fromTemplate)
+      : this(fromTemplate.WbConnection, fromTemplate.TableName)
+    {
+      AddBufferToVarchar = fromTemplate.AddBufferToVarchar;
+      AddPrimaryKeyColumn = fromTemplate.AddPrimaryKeyColumn;
+      AutoAllowEmptyNonIndexColumns = fromTemplate.AutoAllowEmptyNonIndexColumns;
+      AutoIndexIntColumns = fromTemplate.AutoIndexIntColumns;
+      DetectDatatype = false;
+      FirstRowContainsColumnNames = fromTemplate.FirstRowContainsColumnNames;
+      IsFormatted = fromTemplate.IsFormatted;
+      IsPreviewTable = false;
+      OperationType = fromTemplate.OperationType;
+      UseFirstColumnAsPk = fromTemplate.UseFirstColumnAsPk;
+      UseOptimisticUpdate = fromTemplate.UseOptimisticUpdate;
+
+      var schemaInfoTable = fromTemplate.GetColumnsSchemaInfo();
+      CreateTableSchema(schemaInfoTable, false);
+      for (int rowIndex = 0; rowIndex < fromTemplate.Rows.Count; rowIndex++)
+      {
+        if (FirstRowContainsColumnNames && rowIndex == 0)
+        {
+          continue;
+        }
+
+        var row = fromTemplate.Rows[rowIndex];
+        var rowValues = row.ItemArray;
+        for (int colIdx = 0; colIdx < fromTemplate.Columns.Count; colIdx++)
+        {
+          rowValues[colIdx] = DataTypeUtilities.GetImportingValueForDateType(rowValues[colIdx]);
+        }
+
+        LoadDataRow(rowValues, false);
+      }
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MySqlDataTable"/> class.
+    /// This constructor is meant to be used by the <see cref="AppendDataForm"/> class to fetch schema information from the corresponding MySQL table before copying its excelData.
+    /// </summary>
+    /// <param name="fromDbTable">The <see cref="DbTable"/> object from which the new <see cref="MySqlDataTable"/> will get its schema information and its data.</param>
+    /// <param name="useFormattedValues">Flag indicating if the Excel excelData used to populate this table is formatted (numbers, dates, text) or not (numbers and text).</param>
+    public MySqlDataTable(DbView fromDbTable, bool useFormattedValues)
+      : this(fromDbTable.Connection, fromDbTable.Name, true, false, useFormattedValues)
+    {
+      var dbTableData = fromDbTable.GetData();
+      foreach (object[] rowValues in from DataRow dr in dbTableData.Rows select dr.ItemArray)
+      {
+        for (int colIdx = 0; colIdx < dbTableData.Columns.Count; colIdx++)
+        {
+          rowValues[colIdx] = DataTypeUtilities.GetImportingValueForDateType(rowValues[colIdx]);
+        }
+
+        LoadDataRow(rowValues, true);
+      }
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MySqlDataTable"/> class.
     /// This constructor is meant to be used by the <see cref="AppendDataForm"/> class to fetch schema information from the corresponding MySQL table before copying its excelData.
     /// </summary>
     /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
@@ -1273,6 +1334,62 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets the schema information defined in the collection of <see cref="MySqlDataColumn"/> objects.
+    /// </summary>
+    /// <returns>Table with schema information regarding this <see cref="MySqlDataTable"/> columns.</returns>
+    public DataTable GetColumnsSchemaInfo()
+    {
+      var schemaInfoTable = new DataTable("SchemaInfo");
+      schemaInfoTable.Columns.Add("Field");
+      schemaInfoTable.Columns.Add("Type");
+      schemaInfoTable.Columns.Add("Null");
+      schemaInfoTable.Columns.Add("Key");
+      schemaInfoTable.Columns.Add("Default");
+      schemaInfoTable.Columns.Add("Extra");
+
+      var extraBuilder = new StringBuilder();
+      foreach (MySqlDataColumn column in Columns)
+      {
+        var newRow = schemaInfoTable.NewRow();
+        newRow["Field"] = column.DisplayName;
+        newRow["Type"] = column.MySqlDataType;
+        newRow["Null"] = column.AllowDBNull ? "YES" : "NO";
+        newRow["Key"] = column.PrimaryKey ? "PRI" : (column.UniqueKey ? "UNI" : string.Empty);
+        newRow["Default"] = column.DefaultValue != null ? column.DefaultValue.ToString() : string.Empty;
+        if (column.AutoIncrement)
+        {
+          extraBuilder.Append("auto_increment");
+        }
+
+        if (column.AutoPk)
+        {
+          if (extraBuilder.Length > 0)
+          {
+            extraBuilder.Append(" ");
+          }
+
+          extraBuilder.Append("auto_pk");
+        }
+
+        if (column.ExcludeColumn)
+        {
+          if (extraBuilder.Length > 0)
+          {
+            extraBuilder.Append(" ");
+          }
+
+          extraBuilder.Append("exclude");
+        }
+
+        newRow["Extra"] = extraBuilder.ToString();
+        schemaInfoTable.Rows.Add(newRow);
+        extraBuilder.Clear();
+      }
+
+      return schemaInfoTable;
+    }
+
+    /// <summary>
     /// Creates a SQL query to disable the foreign key constraints.
     /// </summary>
     /// <remarks>Only useful for InnoDB tables.</remarks>
@@ -1700,39 +1817,29 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Reverts any changes done to the table since the last data push operation or refreshes its data with a fresh copy of the data.
     /// </summary>
-    /// <param name="exception">Exception thrown back (if any) when trying to fetch data from the database to refresh the data for this table.</param>
-    public void RefreshData(out Exception exception)
+    /// <remarks>This method is designed so it throws an <see cref="Exception"/> if it occurs, any consumers must handle the thrown <see cref="Exception"/>.</remarks>
+    public void RefreshData()
     {
-      exception = null;
-
-      try
+      Clear();
+      var filledTable = WbConnection.GetDataFromSelectQuery(SelectQuery, OperationType == DataOperationType.ImportProcedure ? ProcedureResultSetIndex : 0);
+      if (OperationType == DataOperationType.ImportProcedure)
       {
-        Clear();
-        var filledTable = WbConnection.GetDataFromSelectQuery(SelectQuery, OperationType == DataOperationType.ImportProcedure ? ProcedureResultSetIndex : 0);
-        if (OperationType == DataOperationType.ImportProcedure)
+        CopyTableSchemaAndData(filledTable);
+        if (!TableName.EndsWith(DbProcedure.OUT_AND_RETURN_VALUES_TABLE_NAME))
         {
-          CopyTableSchemaAndData(filledTable);
-          if (!TableName.EndsWith(DbProcedure.OUT_AND_RETURN_VALUES_TABLE_NAME))
-          {
-            return;
-          }
-
-          foreach (var column in Columns.Cast<MySqlDataColumn>().Where(column => column.ColumnName.StartsWith("@")))
-          {
-            column.ColumnName = column.ColumnName.Substring(1);
-            column.SetDisplayName(column.ColumnName);
-          }
+          return;
         }
-        else
+
+        foreach (var column in Columns.Cast<MySqlDataColumn>().Where(column => column.ColumnName.StartsWith("@")))
         {
-          CreateTableSchema(TableName, true);
-          CopyTableData(filledTable);
+          column.ColumnName = column.ColumnName.Substring(1);
+          column.SetDisplayName(column.ColumnName);
         }
       }
-      catch (Exception ex)
+      else
       {
-        exception = ex;
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        CreateTableSchema(TableName, true);
+        CopyTableData(filledTable);
       }
     }
 

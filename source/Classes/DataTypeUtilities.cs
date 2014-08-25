@@ -377,10 +377,10 @@ namespace MySQL.ForExcel.Classes
           typesConsistent = true;
           fullDataType = "Double";
         }
-        else if (rowsDataTypesList.Count(str => str == "Datetime") + rowsDataTypesList.Count(str => str == "Date") + integerCount == rowsDataTypesList.Count)
+        else if (rowsDataTypesList.Count(str => str == "DateTime") + rowsDataTypesList.Count(str => str == "Date") + integerCount == rowsDataTypesList.Count)
         {
           typesConsistent = true;
-          fullDataType = "Datetime";
+          fullDataType = "DateTime";
         }
       }
 
@@ -692,90 +692,90 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The estimated maximum length of the data hold in a given MySQL data type when converted to a string representation.</returns>
     public static long GetMySqlDataTypeMaxLength(string strippedMySqlDataType, bool unsigned, bool realAsFloat)
     {
-      switch (strippedMySqlDataType.ToUpper(CultureInfo.InvariantCulture))
+      switch (strippedMySqlDataType.ToLowerInvariant())
       {
-        case "TINYINT":
-        case "YEAR":
+        case "tinyint":
+        case "year":
           return MYSQL_TINYINT_MAX_LENGTH;
 
-        case "BOOL":
-        case "BOOLEAN":
+        case "bool":
+        case "boolean":
           return MYSQL_TINYINT_MAX_LENGTH + 1;
 
-        case "BIT":
+        case "bit":
           return MYSQL_BIT_MAX_LENGTH;
 
-        case "SMALLINT":
+        case "smallint":
           return MYSQL_SMALLINT_MAX_LENGTH;
 
-        case "MEDIUMINT":
+        case "mediumint":
           return MYSQL_MEDIUMINT_MAX_LENGTH;
 
-        case "INT":
-        case "INTEGER":
+        case "int":
+        case "integer":
           return MYSQL_INT_MAX_LENGTH;
 
-        case "BIGINT":
-        case "SERIAL":
+        case "bigint":
+        case "serial":
           return MYSQL_BIGINT_MAX_LENGTH;
 
-        case "NUMERIC":
-        case "DECIMAL":
-        case "DEC":
-        case "FIXED":
+        case "numeric":
+        case "decimal":
+        case "dec":
+        case "fixed":
           return MYSQL_DECIMAL_MAX_LENGTH;
 
-        case "FLOAT":
+        case "float":
           return MYSQL_FLOAT_MAX_LENGTH;
 
-        case "DOUBLE":
+        case "double":
           return MYSQL_DOUBLE_MAX_LENGTH;
 
-        case "REAL":
+        case "real":
           return realAsFloat ? MYSQL_FLOAT_MAX_LENGTH : MYSQL_DOUBLE_MAX_LENGTH;
 
-        case "CHAR":
-        case "BINARY":
-        case "TINYTEXT":
-        case "TINYBLOB":
+        case "char":
+        case "binary":
+        case "tinytext":
+        case "tinyblob":
           return byte.MaxValue;
 
-        case "VARCHAR":
-        case "VARBINARY":
-        case "BLOB":
-        case "TEXT":
-        case "SET":
-        case "ENUM":
-        case "CURVE":
-        case "GEOMETRY":
-        case "GEOMETRYCOLLECTION":
-        case "LINESTRING":
-        case "MULTICURVE":
-        case "MULTILINESTRING":
-        case "MULTIPOINT":
-        case "MULTIPOLYGON":
-        case "MULTISURFACE":
-        case "POINT":
-        case "POLYGON":
-        case "SURFACE":
+        case "varchar":
+        case "varbinary":
+        case "blob":
+        case "text":
+        case "set":
+        case "enum":
+        case "curve":
+        case "geometry":
+        case "geometrycollection":
+        case "linestring":
+        case "multicurve":
+        case "multilinestring":
+        case "multipoint":
+        case "multipolygon":
+        case "multisurface":
+        case "point":
+        case "polygon":
+        case "surface":
           return ushort.MaxValue;
 
-        case "MEDIUMBLOB":
-        case "MEDIUMTEXT":
+        case "mediumblob":
+        case "mediumtext":
           return MYSQL_MEDIUMTEXT_MAX_LENGTH;
 
-        case "LONGBLOB":
-        case "LONGTEXT":
+        case "longblob":
+        case "longtext":
           return uint.MaxValue;
 
-        case "DATE":
+        case "date":
           return MYSQL_DATE_MAX_LENGTH;
 
-        case "DATETIME":
-        case "TIMESTAMP":
+        case "datetime":
+        case "timestamp":
           return MYSQL_DATETIME_MAX_LENGTH;
 
-        case "TIME":
+        case "time":
           return MYSQL_TIME_MAX_LENGTH;
       }
 
@@ -794,6 +794,7 @@ namespace MySQL.ForExcel.Classes
     public static MySqlDbType GetMySqlDbType(string mySqlType, bool unsigned, byte bitPrecision, out object defaultValue)
     {
       MySqlDbType dbType;
+      mySqlType = mySqlType.ToLowerInvariant();
       switch (mySqlType)
       {
         case "bit":
@@ -994,7 +995,7 @@ namespace MySQL.ForExcel.Classes
 
         case "System.DateTime":
         case "MySql.Data.Types.MySqlDateTime":
-          return strValue.Contains(":") ? "Datetime" : "Date";
+          return strValue.Contains(":") ? "DateTime" : "Date";
 
         case "System.TimeSpan":
           return "Time";
@@ -1230,107 +1231,107 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The Connector.NET data type object corresponding to the given MySQL data type.</returns>
     public static MySqlDbType NameToMySqlType(string strippedMySqlDataType, bool unsigned, bool realAsFloat)
     {
-      switch (strippedMySqlDataType.ToUpper(CultureInfo.InvariantCulture))
+      switch (strippedMySqlDataType.ToLowerInvariant())
       {
-        case "CHAR":
+        case "char":
           return MySqlDbType.String;
 
-        case "VARCHAR":
+        case "varchar":
           return MySqlDbType.VarChar;
 
-        case "DATE":
+        case "date":
           return MySqlDbType.Date;
 
-        case "DATETIME":
+        case "datetime":
           return MySqlDbType.DateTime;
 
-        case "NUMERIC":
-        case "DECIMAL":
-        case "DEC":
-        case "FIXED":
+        case "numeric":
+        case "decimal":
+        case "dec":
+        case "fixed":
           //if (connection.driver.Version.isAtLeast(5, 0, 3))
           //  return MySqlDbType.NewDecimal;
           //else
           return MySqlDbType.Decimal;
 
-        case "YEAR":
+        case "year":
           return MySqlDbType.Year;
 
-        case "TIME":
+        case "time":
           return MySqlDbType.Time;
 
-        case "TIMESTAMP":
+        case "timestamp":
           return MySqlDbType.Timestamp;
 
-        case "SET":
+        case "set":
           return MySqlDbType.Set;
 
-        case "ENUM":
+        case "enum":
           return MySqlDbType.Enum;
 
-        case "BIT":
+        case "bit":
           return MySqlDbType.Bit;
 
-        case "TINYINT":
+        case "tinyint":
           return unsigned ? MySqlDbType.UByte : MySqlDbType.Byte;
 
-        case "BOOL":
-        case "BOOLEAN":
+        case "bool":
+        case "boolean":
           return MySqlDbType.Byte;
 
-        case "SMALLINT":
+        case "smallint":
           return unsigned ? MySqlDbType.UInt16 : MySqlDbType.Int16;
 
-        case "MEDIUMINT":
+        case "mediumint":
           return unsigned ? MySqlDbType.UInt24 : MySqlDbType.Int24;
 
-        case "INT":
-        case "INTEGER":
+        case "int":
+        case "integer":
           return unsigned ? MySqlDbType.UInt32 : MySqlDbType.Int32;
 
-        case "SERIAL":
+        case "serial":
           return MySqlDbType.UInt64;
 
-        case "BIGINT":
+        case "bigint":
           return unsigned ? MySqlDbType.UInt64 : MySqlDbType.Int64;
 
-        case "FLOAT":
+        case "float":
           return MySqlDbType.Float;
 
-        case "DOUBLE":
+        case "double":
           return MySqlDbType.Double;
 
-        case "REAL":
+        case "real":
           return realAsFloat ? MySqlDbType.Float : MySqlDbType.Double;
 
-        case "TEXT":
+        case "text":
           return MySqlDbType.Text;
 
-        case "BLOB":
+        case "blob":
           return MySqlDbType.Blob;
 
-        case "LONGBLOB":
+        case "longblob":
           return MySqlDbType.LongBlob;
 
-        case "LONGTEXT":
+        case "longtext":
           return MySqlDbType.LongText;
 
-        case "MEDIUMBLOB":
+        case "mediumblob":
           return MySqlDbType.MediumBlob;
 
-        case "MEDIUMTEXT":
+        case "mediumtext":
           return MySqlDbType.MediumText;
 
-        case "TINYBLOB":
+        case "tinyblob":
           return MySqlDbType.TinyBlob;
 
-        case "TINYTEXT":
+        case "tinytext":
           return MySqlDbType.TinyText;
 
-        case "BINARY":
+        case "binary":
           return MySqlDbType.Binary;
 
-        case "VARBINARY":
+        case "varbinary":
           return MySqlDbType.VarBinary;
       }
 
@@ -1346,70 +1347,70 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The .NET type corresponding to the given MySQL data type.</returns>
     public static Type NameToType(string strippedMySqlDataType, bool unsigned, bool datesAsMySqlDates)
     {
-      string upperType = strippedMySqlDataType.ToUpper(CultureInfo.InvariantCulture);
-      switch (upperType)
+      strippedMySqlDataType = strippedMySqlDataType.ToLowerInvariant();
+      switch (strippedMySqlDataType)
       {
-        case "CHAR":
-        case "VARCHAR":
-        case "SET":
-        case "ENUM":
-        case "TEXT":
-        case "MEDIUMTEXT":
-        case "TINYTEXT":
-        case "LONGTEXT":
+        case "char":
+        case "varchar":
+        case "set":
+        case "enum":
+        case "text":
+        case "mediumtext":
+        case "tinytext":
+        case "longtext":
           return Type.GetType("System.String");
 
-        case "NUMERIC":
-        case "DECIMAL":
-        case "DEC":
-        case "FIXED":
+        case "numeric":
+        case "decimal":
+        case "dec":
+        case "fixed":
           return Type.GetType("System.Decimal");
 
-        case "INT":
-        case "INTEGER":
-        case "MEDIUMINT":
-        case "YEAR":
-          return !unsigned || upperType == "YEAR" ? Type.GetType("System.Int32") : Type.GetType("System.UInt32");
+        case "int":
+        case "integer":
+        case "mediumint":
+        case "year":
+          return !unsigned || strippedMySqlDataType == "year" ? Type.GetType("System.Int32") : Type.GetType("System.UInt32");
 
-        case "TINYINT":
+        case "tinyint":
           return Type.GetType("System.Byte");
 
-        case "SMALLINT":
+        case "smallint":
           return !unsigned ? Type.GetType("System.Int16") : Type.GetType("System.UInt16");
 
-        case "BIGINT":
+        case "bigint":
           return !unsigned ? Type.GetType("System.Int64") : Type.GetType("System.UInt64");
 
-        case "BOOL":
-        case "BOOLEAN":
-        case "BIT(1)":
+        case "bool":
+        case "boolean":
+        case "bit(1)":
           return Type.GetType("System.Boolean");
 
-        case "BIT":
-        case "SERIAL":
+        case "bit":
+        case "serial":
           return Type.GetType("System.UInt64");
 
-        case "FLOAT":
+        case "float":
           return Type.GetType("System.Single");
 
-        case "DOUBLE":
-        case "REAL":
+        case "double":
+        case "real":
           return Type.GetType("System.Double");
 
-        case "DATE":
-        case "DATETIME":
-        case "TIMESTAMP":
+        case "date":
+        case "datetime":
+        case "timestamp":
           return datesAsMySqlDates ? typeof(MySql.Data.Types.MySqlDateTime) : Type.GetType("System.DateTime");
 
-        case "TIME":
+        case "time":
           return Type.GetType("System.TimeSpan");
 
-        case "BLOB":
-        case "LONGBLOB":
-        case "MEDIUMBLOB":
-        case "TINYBLOB":
-        case "BINARY":
-        case "VARBINARY":
+        case "blob":
+        case "longblob":
+        case "mediumblob":
+        case "tinyblob":
+        case "binary":
+        case "varbinary":
           return Type.GetType("System.Object");
       }
 

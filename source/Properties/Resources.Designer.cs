@@ -1143,6 +1143,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error ocurred trying to bind MySQL data to Excel table {0}..
+        /// </summary>
+        internal static string ImportDataBindError {
+            get {
+                return ResourceManager.GetString("ImportDataBindError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error ocurred when trying to import the data..
         /// </summary>
         internal static string ImportDataErrorDetailText {
@@ -1157,6 +1166,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string ImportDataErrorTitle {
             get {
                 return ResourceManager.GetString("ImportDataErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error ocurred trying to refresh MySQL data in Excel table {0}..
+        /// </summary>
+        internal static string ImportDataRefreshError {
+            get {
+                return ResourceManager.GetString("ImportDataRefreshError", resourceCulture);
             }
         }
         
@@ -2163,15 +2181,6 @@ namespace MySQL.ForExcel.Properties {
             get {
                 object obj = ResourceManager.GetObject("refresh_sidebar", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An error ocurred trying to refresh MySQL data in Excel table {0}.
-        /// </summary>
-        internal static string RefreshDataError {
-            get {
-                return ResourceManager.GetString("RefreshDataError", resourceCulture);
             }
         }
         

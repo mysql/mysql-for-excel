@@ -116,6 +116,29 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets a formatted string with the messages in the given <see cref="Exception"/> and its <see cref="Exception.InnerException"/> if it exists.
+    /// </summary>
+    /// <param name="exception">An <see cref="Exception"/> object.</param>
+    /// <returns>A formatted string with the messages in the given <see cref="Exception"/> and its <see cref="Exception.InnerException"/> if it exists.</returns>
+    public static string GetFormattedMessage(this Exception exception)
+    {
+      if (exception == null)
+      {
+        return string.Empty;
+      }
+
+      var formattedMessagesBuilder = new StringBuilder(exception.Message);
+      if (exception.InnerException != null)
+      {
+        formattedMessagesBuilder.Append(Environment.NewLine);
+        formattedMessagesBuilder.Append(Environment.NewLine);
+        formattedMessagesBuilder.Append(exception.InnerException.Message);
+      }
+
+      return formattedMessagesBuilder.ToString();
+    }
+
+    /// <summary>
     /// Gets a linear array from a bidimensional one extracting the elements of the given dimension.
     /// </summary>
     /// <param name="biDimensionalArray">The bidimensional array.</param>

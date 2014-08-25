@@ -23,7 +23,9 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
+using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
+using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -252,6 +254,183 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
+    /// Assembles the informational messages to be displayed after the Export Data operation executed and shows it to the user.
+    /// </summary>
+    /// <param name="modifiedRowsList">A list of <see cref="IMySqlDataRow"/> objects result of a push data operation.</param>
+    /// <returns><c>true</c> if the overall result of the operation was successful (even if warnings were found), <c>false</c> if an error was thrown.</returns>
+    private bool AssembleAndShowOperationResults(List<IMySqlDataRow> modifiedRowsList)
+    {
+      int warningsCount = 0;
+      bool errorsFound = false;
+      bool warningsFound = false;
+      bool tableCreated = true;
+      string operationSummary;
+      bool warningDetailHeaderAppended = false;
+      var operationDetails = new StringBuilder();
+      var warningDetails = new StringBuilder();
+      var warningStatementDetails = new StringBuilder();
+
+      if (modifiedRowsList == null)
+      {
+        Cursor = Cursors.Default;
+        return false;
+      }
+
+      string statementsQuantityFormat = new string('0', modifiedRowsList.Count.StringSize());
+      string sqlQueriesFormat = "{0:" + statementsQuantityFormat + "}: {1}";
+      foreach (var statement in modifiedRowsList.Select(statementRow => statementRow.Statement))
+      {
+        // Create details text for the table creation.
+        if (statement.StatementType == MySqlStatement.SqlStatementType.CreateTable)
+        {
+          if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults)
+          {
+            operationDetails.AppendFormat(Resources.ExportDataTableExecutedQuery, _exportDataTable.TableName);
+            operationDetails.AddNewLine(2);
+            operationDetails.Append(statement.SqlQuery);
+            operationDetails.AddNewLine(2);
+          }
+
+          switch (statement.StatementResult)
+          {
+            case MySqlStatement.StatementResultType.Successful:
+              operationDetails.AppendFormat(Resources.ExportDataTableCreatedSuccessfullyText,
+                _exportDataTable.TableName);
+              break;
+
+            case MySqlStatement.StatementResultType.WarningsFound:
+              warningsFound = true;
+              operationDetails.AppendFormat(Resources.ExportDataTableCreatedWithWarningsText,
+                _exportDataTable.TableName, statement.WarningsQuantity);
+              operationDetails.AddNewLine();
+              operationDetails.Append(statement.ResultText);
+              break;
+
+            case MySqlStatement.StatementResultType.ErrorThrown:
+              errorsFound = true;
+              tableCreated = false;
+              operationDetails.AppendFormat(Resources.ExportDataErrorCreatingTableText, _exportDataTable.TableName);
+              operationDetails.AddNewLine();
+              operationDetails.Append(statement.ResultText);
+              break;
+          }
+
+          // If we are only creating the table without data then do not process other entries.
+          if (_exportDataTable.CreateTableWithoutData)
+          {
+            break;
+          }
+
+          operationDetails.AddNewLine(2, true);
+
+          // Create a title entry for the rows to be inserted if the creation was successful
+          if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults && !errorsFound)
+          {
+            operationDetails.AppendFormat(Resources.InsertedExcelDataWithQueryText, _exportDataTable.TableName);
+            operationDetails.AddNewLine();
+          }
+
+          continue;
+        }
+
+        // Create details text each row inserted in the new table.
+        if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults && statement.SqlQuery.Length > 0)
+        {
+          operationDetails.AddNewLine(1, true);
+          operationDetails.AppendFormat(sqlQueriesFormat, statement.ExecutionOrder - 1, statement.SqlQuery);
+        }
+
+        switch (statement.StatementResult)
+        {
+          case MySqlStatement.StatementResultType.WarningsFound:
+            if (Settings.Default.GlobalSqlQueriesPreviewQueries)
+            {
+              if (!warningDetailHeaderAppended)
+              {
+                warningDetailHeaderAppended = true;
+                warningStatementDetails.AddNewLine(1, true);
+                warningStatementDetails.Append(Resources.SqlStatementsProducingWarningsText);
+              }
+
+              if (statement.SqlQuery.Length > 0)
+              {
+                warningStatementDetails.AddNewLine(1, true);
+                warningStatementDetails.AppendFormat(sqlQueriesFormat, statement.ExecutionOrder, statement.SqlQuery);
+              }
+            }
+
+            warningsFound = true;
+            warningDetails.AddNewLine(1, true);
+            warningDetails.Append(statement.ResultText);
+            warningsCount += statement.WarningsQuantity;
+            break;
+
+          case MySqlStatement.StatementResultType.ErrorThrown:
+            errorsFound = true;
+            operationDetails.AddNewLine(2, true);
+            operationDetails.Append(Resources.ExportDataRowsInsertionErrorText);
+            operationDetails.AddNewLine();
+            operationDetails.Append(statement.ResultText);
+            break;
+        }
+
+        if (!errorsFound)
+        {
+          continue;
+        }
+
+        break;
+      }
+
+      InfoDialog.InfoType operationsType;
+      if (!errorsFound)
+      {
+        operationSummary = string.Format(_exportDataTable.CreateTableWithoutData ? Resources.ExportDataOperationSuccessNoDataText : Resources.ExportDataOperationSuccessWithDataText, _exportDataTable.TableName);
+        operationsType = warningsFound ? InfoDialog.InfoType.Warning : InfoDialog.InfoType.Success;
+        if (!_exportDataTable.CreateTableWithoutData)
+        {
+          int insertedCount = modifiedRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Insert);
+          int insertingCount = _exportDataTable.Rows.Count;
+          if (warningsFound)
+          {
+            operationDetails.AppendFormat(Resources.ExportDataRowsInsertedWithWarningsText, insertedCount, warningsCount);
+            if (insertingCount > insertedCount)
+            {
+              operationDetails.AddNewLine();
+              operationDetails.AppendFormat(Resources.ExportDataLessRowsThanExpectedInsertedText, insertingCount, insertedCount);
+            }
+
+            operationDetails.AddNewLine();
+            if (warningStatementDetails.Length > 0)
+            {
+              operationDetails.Append(warningStatementDetails);
+              operationDetails.AddNewLine();
+            }
+
+            operationDetails.Append(warningDetails);
+          }
+          else
+          {
+            operationDetails.AddNewLine();
+            operationDetails.AppendFormat(Resources.ExportDataRowsInsertedSuccessfullyText, insertedCount);
+          }
+        }
+      }
+      else
+      {
+        operationSummary = string.Format(tableCreated ? Resources.ExportDataOperationErrorNoRowsText : Resources.ExportDataOperationErrorNoTableText, _exportDataTable.TableName);
+        operationsType = InfoDialog.InfoType.Error;
+      }
+
+      Cursor = Cursors.Default;
+      MiscUtilities.ShowCustomizedInfoDialog(operationsType, operationSummary, operationDetails.ToString(), false);
+      operationDetails.Clear();
+      warningDetails.Clear();
+      warningStatementDetails.Clear();
+      return !errorsFound;
+    }
+
+    /// <summary>
     /// Event delegate method fired when the <see cref="ColumnNameTextBox"/> textbox's text changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -462,18 +641,21 @@ namespace MySQL.ForExcel.Forms
     private bool ExportData()
     {
       Cursor = Cursors.WaitCursor;
+      try
+      {
+        _exportDataTable = new MySqlDataTable(_previewDataTable);
+      }
+      catch (Exception ex)
+      {
+        _exportDataTable = null;
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.TableDataAdditionErrorTitle, "exporting"), ex.Message + Environment.NewLine + Environment.NewLine + ex.StackTrace);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
 
-      bool setupDataSuccessful = true;
+      Cursor = Cursors.Default;
       if (_exportDataTable == null)
       {
-        _exportDataTable = _previewDataTable.CloneSchema(false, true);
-        _exportDataTable.DetectDatatype = false;
-        _exportDataTable.IsPreviewTable = false;
-        setupDataSuccessful = _exportDataTable.SetupColumnsWithData(_exportDataRange, false, true);
-      }
-      else
-      {
-        _exportDataTable.SyncSchema(_previewDataTable);
+        return false;
       }
 
       if (CollationComboBox.SelectedItem is KeyValuePair<string, string[]>)
@@ -486,12 +668,6 @@ namespace MySQL.ForExcel.Forms
       {
         _exportDataTable.CharSet = string.Empty;
         _exportDataTable.Collation = string.Empty;
-      }
-
-      Cursor = Cursors.Default;
-      if (!setupDataSuccessful)
-      {
-        return false;
       }
 
       // Check if there is data to export, if there is not then ask the user if he wants to proceed with the table creation only.
@@ -512,172 +688,8 @@ namespace MySQL.ForExcel.Forms
       }
 
       Cursor = Cursors.WaitCursor;
-      int warningsCount = 0;
-      bool success = true;
-      bool warningsFound = false;
-      bool tableCreated = true;
-      string operationSummary;
       var modifiedRowsList = _exportDataTable.PushData(Settings.Default.GlobalSqlQueriesPreviewQueries);
-      if (modifiedRowsList == null)
-      {
-        Cursor = Cursors.Default;
-        return false;
-      }
-
-      bool warningDetailHeaderAppended = false;
-      string statementsQuantityFormat = new string('0', modifiedRowsList.Count.StringSize());
-      string sqlQueriesFormat = "{0:" + statementsQuantityFormat + "}: {1}";
-      var operationDetails = new StringBuilder();
-      var warningDetails = new StringBuilder();
-      var warningStatementDetails = new StringBuilder();
-      foreach (var statement in modifiedRowsList.Select(statementRow => statementRow.Statement))
-      {
-        // Create details text for the table creation.
-        if (statement.StatementType == MySqlStatement.SqlStatementType.CreateTable)
-        {
-          if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults)
-          {
-            operationDetails.AppendFormat(Resources.ExportDataTableExecutedQuery, _exportDataTable.TableName);
-            operationDetails.AddNewLine(2);
-            operationDetails.Append(statement.SqlQuery);
-            operationDetails.AddNewLine(2);
-          }
-
-          switch (statement.StatementResult)
-          {
-            case MySqlStatement.StatementResultType.Successful:
-              operationDetails.AppendFormat(Resources.ExportDataTableCreatedSuccessfullyText, _exportDataTable.TableName);
-              break;
-
-            case MySqlStatement.StatementResultType.WarningsFound:
-              warningsFound = true;
-              operationDetails.AppendFormat(Resources.ExportDataTableCreatedWithWarningsText, _exportDataTable.TableName, statement.WarningsQuantity);
-              operationDetails.AddNewLine();
-              operationDetails.Append(statement.ResultText);
-              break;
-
-            case MySqlStatement.StatementResultType.ErrorThrown:
-              success = false;
-              tableCreated = false;
-              operationDetails.AppendFormat(Resources.ExportDataErrorCreatingTableText, _exportDataTable.TableName);
-              operationDetails.AddNewLine();
-              operationDetails.Append(statement.ResultText);
-              break;
-          }
-
-          // If we are only creating the table without data then do not process other entries.
-          if (_exportDataTable.CreateTableWithoutData)
-          {
-            break;
-          }
-
-          operationDetails.AddNewLine(2, true);
-
-          // Create a title entry for the rows to be inserted if the creation was successful
-          if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults && success)
-          {
-            operationDetails.AppendFormat(Resources.InsertedExcelDataWithQueryText, _exportDataTable.TableName);
-            operationDetails.AddNewLine();
-          }
-
-          continue;
-        }
-
-        // Create details text each row inserted in the new table.
-        if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults && statement.SqlQuery.Length > 0)
-        {
-          operationDetails.AddNewLine(1, true);
-          operationDetails.AppendFormat(sqlQueriesFormat, statement.ExecutionOrder - 1, statement.SqlQuery);
-        }
-
-        switch (statement.StatementResult)
-        {
-          case MySqlStatement.StatementResultType.WarningsFound:
-            if (Settings.Default.GlobalSqlQueriesPreviewQueries)
-            {
-              if (!warningDetailHeaderAppended)
-              {
-                warningDetailHeaderAppended = true;
-                warningStatementDetails.AddNewLine(1, true);
-                warningStatementDetails.Append(Resources.SqlStatementsProducingWarningsText);
-              }
-
-              if (statement.SqlQuery.Length > 0)
-              {
-                warningStatementDetails.AddNewLine(1, true);
-                warningStatementDetails.AppendFormat(sqlQueriesFormat, statement.ExecutionOrder, statement.SqlQuery);
-              }
-            }
-
-            warningsFound = true;
-            warningDetails.AddNewLine(1, true);
-            warningDetails.Append(statement.ResultText);
-            warningsCount += statement.WarningsQuantity;
-            break;
-
-          case MySqlStatement.StatementResultType.ErrorThrown:
-            success = false;
-            operationDetails.AddNewLine(2, true);
-            operationDetails.Append(Resources.ExportDataRowsInsertionErrorText);
-            operationDetails.AddNewLine();
-            operationDetails.Append(statement.ResultText);
-            break;
-        }
-
-        if (success)
-        {
-          continue;
-        }
-
-        break;
-      }
-
-      InfoDialog.InfoType operationsType;
-      if (success)
-      {
-        operationSummary = string.Format(_exportDataTable.CreateTableWithoutData ? Resources.ExportDataOperationSuccessNoDataText : Resources.ExportDataOperationSuccessWithDataText, _exportDataTable.TableName);
-        operationsType = warningsFound ? InfoDialog.InfoType.Warning : InfoDialog.InfoType.Success;
-        if (!_exportDataTable.CreateTableWithoutData)
-        {
-          int insertedCount = modifiedRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Insert);
-          int insertingCount = _exportDataTable.Rows.Count;
-          if (warningsFound)
-          {
-            operationDetails.AppendFormat(Resources.ExportDataRowsInsertedWithWarningsText, insertedCount, warningsCount);
-            if (insertingCount > insertedCount)
-            {
-              operationDetails.AddNewLine();
-              operationDetails.AppendFormat(Resources.ExportDataLessRowsThanExpectedInsertedText, insertingCount, insertedCount);
-            }
-
-            operationDetails.AddNewLine();
-            if (warningStatementDetails.Length > 0)
-            {
-              operationDetails.Append(warningStatementDetails);
-              operationDetails.AddNewLine();
-            }
-
-            operationDetails.Append(warningDetails);
-          }
-          else
-          {
-            operationDetails.AddNewLine();
-            operationDetails.AppendFormat(Resources.ExportDataRowsInsertedSuccessfullyText, insertedCount);
-          }
-        }
-      }
-      else
-      {
-        operationSummary = string.Format(tableCreated ? Resources.ExportDataOperationErrorNoRowsText : Resources.ExportDataOperationErrorNoTableText, _exportDataTable.TableName);
-        operationsType = InfoDialog.InfoType.Error;
-      }
-
-      Cursor = Cursors.Default;
-      MiscUtilities.ShowCustomizedInfoDialog(operationsType, operationSummary, operationDetails.ToString(), false);
-      operationDetails.Clear();
-      warningDetails.Clear();
-      warningStatementDetails.Clear();
-      return success;
+      return AssembleAndShowOperationResults(modifiedRowsList);
     }
 
     /// <summary>

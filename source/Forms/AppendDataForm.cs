@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -26,6 +25,7 @@ using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
+using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Forms;
@@ -259,10 +259,6 @@ namespace MySQL.ForExcel.Forms
       }
 
       Cursor = Cursors.WaitCursor;
-      int warningsCount = 0;
-      bool errorsFound = false;
-      bool warningsFound = false;
-      string operationSummary;
       var targetMySqlFinalDataTable = _targetMySqlPreviewDataTable.CloneSchema(true, false);
       targetMySqlFinalDataTable.FirstRowContainsColumnNames = _sourceMySqlPreviewDataTable.FirstRowContainsColumnNames;
       var mappedIndexes = new List<int>(targetMySqlFinalDataTable.Columns.Count);
@@ -291,112 +287,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       var modifiedRowsList = targetMySqlFinalDataTable.PushData(Settings.Default.GlobalSqlQueriesPreviewQueries);
-      if (modifiedRowsList == null)
-      {
-        Cursor = Cursors.Default;
-        return false;
-      }
-
-      var operationDetails = new StringBuilder();
-      var warningDetails = new StringBuilder();
-      var warningStatementDetails = new StringBuilder();
-      if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults)
-      {
-        operationDetails.AppendFormat(Resources.InsertedExcelDataWithQueryText, targetMySqlFinalDataTable.TableName);
-        operationDetails.AddNewLine();
-      }
-
-      bool warningDetailHeaderAppended = false;
-      var statementsQuantityFormat = new string('0', modifiedRowsList.Count.StringSize());
-      string sqlQueriesFormat = "{0:" + statementsQuantityFormat + "}: {1}";
-      foreach (var statement in modifiedRowsList.Select(statementRow => statementRow.Statement))
-      {
-        // Create details text each row inserted in the new table.
-        if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults && statement.SqlQuery.Length > 0)
-        {
-          operationDetails.AddNewLine();
-          operationDetails.AppendFormat(sqlQueriesFormat, statement.ExecutionOrder, statement.SqlQuery);
-        }
-
-        switch (statement.StatementResult)
-        {
-          case MySqlStatement.StatementResultType.WarningsFound:
-            if (Settings.Default.GlobalSqlQueriesPreviewQueries)
-            {
-              if (!warningDetailHeaderAppended)
-              {
-                warningDetailHeaderAppended = true;
-                warningStatementDetails.AddNewLine(1, true);
-                warningStatementDetails.Append(Resources.SqlStatementsProducingWarningsText);
-              }
-
-              if (statement.SqlQuery.Length > 0)
-              {
-                warningStatementDetails.AddNewLine(1, true);
-                warningStatementDetails.AppendFormat(sqlQueriesFormat, statement.ExecutionOrder, statement.SqlQuery);
-              }
-            }
-
-            warningsFound = true;
-            warningDetails.AddNewLine(1, true);
-            warningDetails.Append(statement.ResultText);
-            warningsCount += statement.WarningsQuantity;
-            break;
-
-          case MySqlStatement.StatementResultType.ErrorThrown:
-            errorsFound = true;
-            operationDetails.AddNewLine(2, true);
-            operationDetails.Append(Resources.AppendDataRowsInsertionErrorText);
-            operationDetails.AddNewLine(2);
-            operationDetails.Append(statement.ResultText);
-            break;
-        }
-
-        if (!errorsFound)
-        {
-          continue;
-        }
-
-        break;
-      }
-
-      InfoDialog.InfoType operationsType;
-      if (errorsFound)
-      {
-        operationSummary = string.Format(Resources.AppendDataDetailsDoneErrorText, targetMySqlFinalDataTable.TableName);
-        operationsType = InfoDialog.InfoType.Error;
-      }
-      else
-      {
-        operationSummary = string.Format(warningsFound ? Resources.AppendDataDetailsDoneWarningsText : Resources.AppendDataDetailsDoneSuccessText, targetMySqlFinalDataTable.TableName);
-        operationsType = warningsFound ? InfoDialog.InfoType.Warning : InfoDialog.InfoType.Success;
-        int appendedCount = modifiedRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Insert);
-        if (warningsFound)
-        {
-          operationDetails.AddNewLine(2, true);
-          operationDetails.AppendFormat(Resources.AppendDataRowsAppendedWithWarningsText, appendedCount, warningsCount);
-          operationDetails.AddNewLine();
-          if (warningStatementDetails.Length > 0)
-          {
-            operationDetails.Append(warningStatementDetails);
-            operationDetails.AddNewLine();
-          }
-
-          operationDetails.Append(warningDetails);
-        }
-        else
-        {
-          operationDetails.AddNewLine(2, true);
-          operationDetails.AppendFormat(Resources.AppendDataRowsAppendedSuccessfullyText, appendedCount);
-        }
-      }
-
-      Cursor = Cursors.Default;
-      MiscUtilities.ShowCustomizedInfoDialog(operationsType, operationSummary, operationDetails.ToString(), false);
-      operationDetails.Clear();
-      warningDetails.Clear();
-      warningStatementDetails.Clear();
-      if (errorsFound)
+      if (!AssembleAndShowOperationResults(modifiedRowsList, targetMySqlFinalDataTable.TableName))
       {
         return false;
       }
@@ -492,6 +383,126 @@ namespace MySQL.ForExcel.Forms
       {
         ClearSourceColumnVisualWarnings(previouslyMappedFromIndex);
       }
+    }
+
+    /// <summary>
+    /// Assembles the informational messages to be displayed after the Export Data operation executed and shows it to the user.
+    /// </summary>
+    /// <param name="modifiedRowsList">A list of <see cref="IMySqlDataRow"/> objects result of a push data operation.</param>
+    /// <param name="targetMySqlTableName">The name of the MySQL table where the data is appended to.</param>
+    /// <returns><c>true</c> if the overall result of the operation was successful (even if warnings were found), <c>false</c> if an error was thrown.</returns>
+    private bool AssembleAndShowOperationResults(List<IMySqlDataRow> modifiedRowsList, string targetMySqlTableName)
+    {
+      if (modifiedRowsList == null)
+      {
+        Cursor = Cursors.Default;
+        return false;
+      }
+
+      int warningsCount = 0;
+      bool errorsFound = false;
+      bool warningsFound = false;
+      string operationSummary;
+      var operationDetails = new StringBuilder();
+      var warningDetails = new StringBuilder();
+      var warningStatementDetails = new StringBuilder();
+      if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults)
+      {
+        operationDetails.AppendFormat(Resources.InsertedExcelDataWithQueryText, targetMySqlTableName);
+        operationDetails.AddNewLine();
+      }
+
+      bool warningDetailHeaderAppended = false;
+      var statementsQuantityFormat = new string('0', modifiedRowsList.Count.StringSize());
+      string sqlQueriesFormat = "{0:" + statementsQuantityFormat + "}: {1}";
+      foreach (var statement in modifiedRowsList.Select(statementRow => statementRow.Statement))
+      {
+        // Create details text each row inserted in the new table.
+        if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults && statement.SqlQuery.Length > 0)
+        {
+          operationDetails.AddNewLine();
+          operationDetails.AppendFormat(sqlQueriesFormat, statement.ExecutionOrder, statement.SqlQuery);
+        }
+
+        switch (statement.StatementResult)
+        {
+          case MySqlStatement.StatementResultType.WarningsFound:
+            if (Settings.Default.GlobalSqlQueriesPreviewQueries)
+            {
+              if (!warningDetailHeaderAppended)
+              {
+                warningDetailHeaderAppended = true;
+                warningStatementDetails.AddNewLine(1, true);
+                warningStatementDetails.Append(Resources.SqlStatementsProducingWarningsText);
+              }
+
+              if (statement.SqlQuery.Length > 0)
+              {
+                warningStatementDetails.AddNewLine(1, true);
+                warningStatementDetails.AppendFormat(sqlQueriesFormat, statement.ExecutionOrder, statement.SqlQuery);
+              }
+            }
+
+            warningsFound = true;
+            warningDetails.AddNewLine(1, true);
+            warningDetails.Append(statement.ResultText);
+            warningsCount += statement.WarningsQuantity;
+            break;
+
+          case MySqlStatement.StatementResultType.ErrorThrown:
+            errorsFound = true;
+            operationDetails.AddNewLine(2, true);
+            operationDetails.Append(Resources.AppendDataRowsInsertionErrorText);
+            operationDetails.AddNewLine(2);
+            operationDetails.Append(statement.ResultText);
+            break;
+        }
+
+        if (!errorsFound)
+        {
+          continue;
+        }
+
+        break;
+      }
+
+      InfoDialog.InfoType operationsType;
+      if (errorsFound)
+      {
+        operationSummary = string.Format(Resources.AppendDataDetailsDoneErrorText, targetMySqlTableName);
+        operationsType = InfoDialog.InfoType.Error;
+      }
+      else
+      {
+        operationSummary = string.Format(warningsFound ? Resources.AppendDataDetailsDoneWarningsText : Resources.AppendDataDetailsDoneSuccessText, targetMySqlTableName);
+        operationsType = warningsFound ? InfoDialog.InfoType.Warning : InfoDialog.InfoType.Success;
+        int appendedCount = modifiedRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Insert);
+        if (warningsFound)
+        {
+          operationDetails.AddNewLine(2, true);
+          operationDetails.AppendFormat(Resources.AppendDataRowsAppendedWithWarningsText, appendedCount, warningsCount);
+          operationDetails.AddNewLine();
+          if (warningStatementDetails.Length > 0)
+          {
+            operationDetails.Append(warningStatementDetails);
+            operationDetails.AddNewLine();
+          }
+
+          operationDetails.Append(warningDetails);
+        }
+        else
+        {
+          operationDetails.AddNewLine(2, true);
+          operationDetails.AppendFormat(Resources.AppendDataRowsAppendedSuccessfullyText, appendedCount);
+        }
+      }
+
+      Cursor = Cursors.Default;
+      MiscUtilities.ShowCustomizedInfoDialog(operationsType, operationSummary, operationDetails.ToString(), false);
+      operationDetails.Clear();
+      warningDetails.Clear();
+      warningStatementDetails.Clear();
+      return !errorsFound;
     }
 
     /// <summary>
@@ -1055,25 +1066,8 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void InitializeTargetTableGrid()
     {
-      _targetMySqlPreviewDataTable = new MySqlDataTable(
-        _appendDbTable.Connection,
-        _appendDbTable.Name,
-        true,
-        false,
-        Settings.Default.AppendUseFormattedValues);
       SetPreviewParameterValues();
-      DataTable dt = _appendDbTable.GetData();
-      foreach (object[] rowValues in from DataRow dr in dt.Rows select dr.ItemArray)
-      {
-        for (int colIdx = 0; colIdx < dt.Columns.Count; colIdx++)
-        {
-          rowValues[colIdx] = DataTypeUtilities.GetImportingValueForDateType(rowValues[colIdx]);
-        }
-
-        _targetMySqlPreviewDataTable.LoadDataRow(rowValues, true);
-      }
-
-      _appendDbTable.GetRowsCount();
+      _targetMySqlPreviewDataTable = new MySqlDataTable(_appendDbTable, Settings.Default.AppendUseFormattedValues);
       TargetMySQLTableDataGridView.DataSource = _targetMySqlPreviewDataTable;
       foreach (DataGridViewColumn gridCol in TargetMySQLTableDataGridView.Columns)
       {

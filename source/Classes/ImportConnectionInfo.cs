@@ -17,7 +17,6 @@
 
 using System.Diagnostics;
 using System;
-using System.Text;
 using System.Xml.Serialization;
 using MySQL.ForExcel.Classes.Exceptions;
 using MySQL.ForExcel.Interfaces;
@@ -357,10 +356,9 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Refreshes the <see cref="ImportConnectionInfo" /> non serializable objects and specified cells on the excel table.
+    /// Unbinds the <see cref="ToolsExcelTable"/>, refreshes the data on the <see cref="MySqlTable"/> and binds it again to the <see cref="ToolsExcelTable"/>.
     /// </summary>
-    /// <param name="bindOnly">Flag indicating whether the actual data refresh is skipped and just the data binding for the <see cref="ExcelTools.ListObject"/> is done.</param>
-    public void Refresh(bool bindOnly = false)
+    public void Refresh()
     {
       if (MySqlTable == null || ToolsExcelTable == null)
       {
@@ -370,12 +368,14 @@ namespace MySQL.ForExcel.Classes
       // Test the connection before attempting the data refresh.
       if (!TestConnection())
       {
-        if (ConnectionInfoError == ConnectionInfoErrorType.WorkbenchConnectionDoesNotExist)
+        if (ConnectionInfoError != ConnectionInfoErrorType.WorkbenchConnectionDoesNotExist)
         {
-          MySqlSourceTrace.WriteToLog(string.Format(Resources.ImportConnectionInfoRemovedConnectionText, WorkbookName, WorksheetName, ExcelTableName), SourceLevels.Warning);
-          Globals.ThisAddIn.StoredImportConnectionInfos.Remove(this);
+          return;
         }
 
+        // If the Workbench connection does not exist anymore, log a message to the log, remove this object from the global connections collection and exit.
+        MySqlSourceTrace.WriteToLog(string.Format(Resources.ImportConnectionInfoRemovedConnectionText, WorkbookName, WorksheetName, ExcelTableName), SourceLevels.Warning);
+        Globals.ThisAddIn.StoredImportConnectionInfos.Remove(this);
         return;
       }
 
@@ -388,72 +388,14 @@ namespace MySQL.ForExcel.Classes
         }
 
         // Refresh the data on the MySqlDataTable and bind it so the Excel table is refreshed.
-        if (!bindOnly)
-        {
-          Exception ex;
-          MySqlTable.RefreshData(out ex);
-        }
+        MySqlTable.RefreshData();
 
-        // Resize the ExcelTools.ListObject by giving it an ExcelInterop.Range calculated with the refreshed MySqlDataTable dimensions.
-        // Detection of a collision with another Excel object must be performed first and if any then shift rows and columns to fix the collision.
-        const int headerRows = 1;
-        int summaryRows = ExcelTable.ShowTotals ? 1 : 0;
-        ExcelInterop.Range newRange = ToolsExcelTable.Range.Cells[1, 1];
-        newRange = newRange.Resize[MySqlTable.Rows.Count + headerRows + summaryRows, MySqlTable.Columns.Count];
-        var intersectingRange = newRange.GetIntersectingRangeWithAnyExcelObject(true, true, true, _excelTable.Comment);
-        if (intersectingRange != null && intersectingRange.CountLarge != 0)
-        {
-          ExcelInterop.Range bottomRightCell = newRange.Cells[newRange.Rows.Count, newRange.Columns.Count];
-
-          // Determine if the collision is avoided by inserting either new columns or new rows.
-          if (intersectingRange.Columns.Count < intersectingRange.Rows.Count)
-          {
-            for (int colIdx = 0; colIdx <= intersectingRange.Columns.Count; colIdx++)
-            {
-              bottomRightCell.EntireColumn.Insert(ExcelInterop.XlInsertShiftDirection.xlShiftToRight, Type.Missing);
-            }
-          }
-          else
-          {
-            for (int rowIdx = 0; rowIdx <= intersectingRange.Rows.Count; rowIdx++)
-            {
-              bottomRightCell.EntireRow.Insert(ExcelInterop.XlInsertShiftDirection.xlShiftDown, Type.Missing);
-            }
-          }
-
-          // Redimension the new range. This is needed since the new rows or columns inserted are not present in the previously calculated one.
-          newRange = ToolsExcelTable.Range.Cells[1, 1];
-          newRange = newRange.Resize[MySqlTable.Rows.Count + headerRows + summaryRows, MySqlTable.Columns.Count];
-        }
-
-        ToolsExcelTable.Resize(newRange);
-
-        // Bind the redimensioned ExcelTools.ListObject to the MySqlDataTable.
-        ToolsExcelTable.SetDataBinding(MySqlTable);
-        if (MySqlTable.ImportColumnNames)
-        {
-          foreach (MySqlDataColumn col in MySqlTable.Columns)
-          {
-            ToolsExcelTable.ListColumns[col.Ordinal + 1].Name = col.DisplayName;
-          }
-        }
-
-        ToolsExcelTable.Range.Columns.AutoFit();
-
-        // Disconnect the table so users can freely modify the data imported to the Excel table's range.
-        ToolsExcelTable.Disconnect();
+        // Bind the table again after it was refreshed.
+        BindMySqlDataTable();
       }
       catch (Exception ex)
       {
-        var moreInfoBuilder = new StringBuilder(ex.Message);
-        if (ex.InnerException != null)
-        {
-          moreInfoBuilder.Append(Environment.NewLine);
-          moreInfoBuilder.Append(Environment.NewLine);
-          moreInfoBuilder.Append(ex.InnerException.Message);
-        }
-
-        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.RefreshDataError, _excelTableName), moreInfoBuilder.ToString(), true);
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.ImportDataRefreshError, _excelTableName), ex.GetFormattedMessage(), true);
         MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
     }
@@ -557,42 +499,75 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Creates an Excel table starting at the given cell containing the data in a <see cref="MySqlDataTable"/> instance.
+    /// Binds the <see cref="MySqlTable"/> to the <see cref="ToolsExcelTable" /> so its data can be refreshed.
     /// </summary>
-    /// <param name="importDataAtCell">The top left Excel cell of the new <see cref="ExcelInterop.ListObject"/>.</param>
-    /// <param name="addSummaryRow">Flag indicating whether to include a row with summary fields at the end of the data rows.</param>
-    private void InitializeConnectionObjects(ExcelInterop.Range importDataAtCell, bool addSummaryRow)
+    public void BindMySqlDataTable()
     {
-      if (importDataAtCell == null)
+      if (MySqlTable == null || ToolsExcelTable == null)
       {
-        throw new ArgumentNullException("importDataAtCell");
+        return;
       }
 
-      var worksheet = Globals.Factory.GetVstoObject(importDataAtCell.Worksheet);
-      var workbook = worksheet.Parent as ExcelInterop.Workbook;
-      if (workbook == null)
-      {
-        throw new ParentWorkbookNullException(worksheet.Name);
-      }
-
-      string workbookGuid = workbook.GetOrCreateId();
       try
       {
-        // Create the Excel table needed to place the imported data into the Excel worksheet.
-        CreateExcelTableFromExternalSource(worksheet, importDataAtCell, addSummaryRow);
-
-        // Fetch the MySQL data and bind the MySqlDataTable object to the Excel table.
-        Refresh(OperationType == MySqlDataTable.DataOperationType.ImportProcedure);
-
-        // Add this instance of the ImportConnectionInfo class if not present already in the global collection.
-        if (!Globals.ThisAddIn.StoredImportConnectionInfos.Exists(connectionInfo => connectionInfo.WorkbookGuid == workbookGuid && connectionInfo.MySqlTable == MySqlTable && string.Equals(connectionInfo.ExcelTableName, ExcelTable.Name, StringComparison.InvariantCultureIgnoreCase)))
+        // In case the table is bound (it should not be) then disconnect it.
+        if (ToolsExcelTable.IsBinding)
         {
-          Globals.ThisAddIn.StoredImportConnectionInfos.Add(this);
+          ToolsExcelTable.Disconnect();
         }
+
+        // Resize the ExcelTools.ListObject by giving it an ExcelInterop.Range calculated with the refreshed MySqlDataTable dimensions.
+        // Detection of a collision with another Excel object must be performed first and if any then shift rows and columns to fix the collision.
+        const int headerRows = 1;
+        int summaryRows = ExcelTable.ShowTotals ? 1 : 0;
+        ExcelInterop.Range newRange = ToolsExcelTable.Range.Cells[1, 1];
+        newRange = newRange.Resize[MySqlTable.Rows.Count + headerRows + summaryRows, MySqlTable.Columns.Count];
+        var intersectingRange = newRange.GetIntersectingRangeWithAnyExcelObject(true, true, true, _excelTable.Comment);
+        if (intersectingRange != null && intersectingRange.CountLarge != 0)
+        {
+          ExcelInterop.Range bottomRightCell = newRange.Cells[newRange.Rows.Count, newRange.Columns.Count];
+
+          // Determine if the collision is avoided by inserting either new columns or new rows.
+          if (intersectingRange.Columns.Count < intersectingRange.Rows.Count)
+          {
+            for (int colIdx = 0; colIdx <= intersectingRange.Columns.Count; colIdx++)
+            {
+              bottomRightCell.EntireColumn.Insert(ExcelInterop.XlInsertShiftDirection.xlShiftToRight, Type.Missing);
+            }
+          }
+          else
+          {
+            for (int rowIdx = 0; rowIdx <= intersectingRange.Rows.Count; rowIdx++)
+            {
+              bottomRightCell.EntireRow.Insert(ExcelInterop.XlInsertShiftDirection.xlShiftDown, Type.Missing);
+            }
+          }
+
+          // Redimension the new range. This is needed since the new rows or columns inserted are not present in the previously calculated one.
+          newRange = ToolsExcelTable.Range.Cells[1, 1];
+          newRange = newRange.Resize[MySqlTable.Rows.Count + headerRows + summaryRows, MySqlTable.Columns.Count];
+        }
+
+        ToolsExcelTable.Resize(newRange);
+
+        // Bind the redimensioned ExcelTools.ListObject to the MySqlDataTable.
+        ToolsExcelTable.SetDataBinding(MySqlTable);
+        if (MySqlTable.ImportColumnNames)
+        {
+          foreach (MySqlDataColumn col in MySqlTable.Columns)
+          {
+            ToolsExcelTable.ListColumns[col.Ordinal + 1].Name = col.DisplayName;
+          }
+        }
+
+        ToolsExcelTable.Range.Columns.AutoFit();
+
+        // Disconnect the table so users can freely modify the data imported to the Excel table's range.
+        ToolsExcelTable.Disconnect();
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.ExcelTableCreationError, ExcelTable != null ? ExcelTable.Name : MySqlTable.ExcelTableName), ex.Message, true);
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.ImportDataBindError, _excelTableName), ex.GetFormattedMessage(), true);
         MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
     }
@@ -630,6 +605,47 @@ namespace MySQL.ForExcel.Classes
       }
 
       ExcelTable = excelTable;
+    }
+
+    /// <summary>
+    /// Creates an Excel table starting at the given cell containing the data in a <see cref="MySqlDataTable"/> instance.
+    /// </summary>
+    /// <param name="importDataAtCell">The top left Excel cell of the new <see cref="ExcelInterop.ListObject"/>.</param>
+    /// <param name="addSummaryRow">Flag indicating whether to include a row with summary fields at the end of the data rows.</param>
+    private void InitializeConnectionObjects(ExcelInterop.Range importDataAtCell, bool addSummaryRow)
+    {
+      if (importDataAtCell == null)
+      {
+        throw new ArgumentNullException("importDataAtCell");
+      }
+
+      var worksheet = Globals.Factory.GetVstoObject(importDataAtCell.Worksheet);
+      var workbook = worksheet.Parent as ExcelInterop.Workbook;
+      if (workbook == null)
+      {
+        throw new ParentWorkbookNullException(worksheet.Name);
+      }
+
+      string workbookGuid = workbook.GetOrCreateId();
+      try
+      {
+        // Create the Excel table needed to place the imported data into the Excel worksheet.
+        CreateExcelTableFromExternalSource(worksheet, importDataAtCell, addSummaryRow);
+
+        // Bind the MySqlDataTable already filled with data to the Excel table.
+        BindMySqlDataTable();
+
+        // Add this instance of the ImportConnectionInfo class if not present already in the global collection.
+        if (!Globals.ThisAddIn.StoredImportConnectionInfos.Exists(connectionInfo => connectionInfo.WorkbookGuid == workbookGuid && connectionInfo.MySqlTable == MySqlTable && string.Equals(connectionInfo.ExcelTableName, ExcelTable.Name, StringComparison.InvariantCultureIgnoreCase)))
+        {
+          Globals.ThisAddIn.StoredImportConnectionInfos.Add(this);
+        }
+      }
+      catch (Exception ex)
+      {
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.ExcelTableCreationError, ExcelTable != null ? ExcelTable.Name : MySqlTable.ExcelTableName), ex.Message, true);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
     }
   }
 }

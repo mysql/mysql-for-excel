@@ -1,4 +1,6 @@
 1.3.3
+- Fixed Export Data operations code to create a MySqlDataTable container for the data to be exported with the final data types before the operation takes place, this
+  automatically makes the decimal numbers conversion from any locale to an invariant one. (MySQL Bug #73293, Bug #19403063 - EXPORT AND DECIMAL DELIMITER)
 - Changed all references of the Varchar string to VarChar in the code for consistency with the renaming done in 1.3.0.
   (MySQL Bug #73712, Bug #19501346 - DATA TYPE INCONSISTENCIES BETWEEN VARCHAR (OLD) AND VARCHAR (NEW))
 
