@@ -938,6 +938,10 @@ namespace MySQL.ForExcel.Forms
       _isUserInput = false;
       switch (args.PropertyName)
       {
+        case "AllowNull":
+          AllowEmptyCheckBox.Checked = changedColumn.AllowNull;
+          break;
+
         case "CreateIndex":
           CreateIndexCheckBox.Checked = changedColumn.CreateIndex;
           break;

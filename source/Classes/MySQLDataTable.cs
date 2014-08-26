@@ -2557,7 +2557,6 @@ namespace MySQL.ForExcel.Classes
         MySqlDataColumn col = GetColumnAtIndex(i);
         col.SetDisplayName(_firstRowContainsColumnNames ? row[i].ToString().ToValidMySqlColumnName() : col.ColumnName);
         col.SetMySqlDataType(_firstRowContainsColumnNames ? col.RowsFromSecondDataType : col.RowsFromFirstDataType);
-        col.CreateIndex = AutoIndexIntColumns && col.IsInteger;
       }
 
       AdjustAutoPkValues();

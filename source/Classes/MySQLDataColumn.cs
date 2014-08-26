@@ -35,6 +35,11 @@ namespace MySQL.ForExcel.Classes
     #region Fields
 
     /// <summary>
+    /// Flag indicating whether the column will accept null values.
+    /// </summary>
+    public bool _allowNull;
+
+    /// <summary>
     /// The <see cref="DataColumn.ColumnName"/> escaping the back-tick character.
     /// </summary>
     private string _columnNameForSqlQueries;
@@ -86,6 +91,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public MySqlDataColumn()
     {
+      _allowNull = false;
       _columnNameForSqlQueries = null;
       _columnRequiresQuotes = null;
       _columnWarningTextsList = new List<string>(3);
@@ -197,7 +203,19 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets or sets a value indicating whether the column will accept null values.
     /// </summary>
-    public bool AllowNull { get; set; }
+    public bool AllowNull
+    {
+      get
+      {
+        return _allowNull;
+      }
+
+      set
+      {
+        _allowNull = value;
+        OnPropertyChanged("AllowNull");
+      }
+    }
 
     /// <summary>
     /// Gets a value indicating whether the column is used in an auto-generated primary key.
@@ -209,7 +227,10 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public new string ColumnName
     {
-      get { return base.ColumnName; }
+      get
+      {
+        return base.ColumnName;
+      }
 
       set
       {
@@ -228,7 +249,10 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public string ColumnNameForSqlQueries
     {
-      get { return _columnNameForSqlQueries ?? (_columnNameForSqlQueries = ColumnName.Replace("`", "``")); }
+      get
+      {
+        return _columnNameForSqlQueries ?? (_columnNameForSqlQueries = ColumnName.Replace("`", "``"));
+      }
     }
 
     /// <summary>
@@ -252,7 +276,10 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public bool CreateIndex
     {
-      get { return _createIndex; }
+      get
+      {
+        return _createIndex;
+      }
 
       set
       {
@@ -262,8 +289,7 @@ namespace MySQL.ForExcel.Classes
           return;
         }
 
-        var mySqlDataTable = Table as MySqlDataTable;
-        if (mySqlDataTable != null && (!_createIndex && mySqlDataTable.AutoAllowEmptyNonIndexColumns))
+        if (!PrimaryKey && ParentTable != null && (!_createIndex && ParentTable.AutoAllowEmptyNonIndexColumns))
         {
           AllowNull = true;
         }
@@ -887,11 +913,6 @@ namespace MySQL.ForExcel.Classes
       proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListForFirstAndRest, decimalMaxLen, varCharMaxLen);
       RowsFromFirstDataType = proposedType;
       SetMySqlDataType(ParentTable.FirstRowContainsColumnNames ? RowsFromSecondDataType : RowsFromFirstDataType);
-      CreateIndex = ParentTable.AutoIndexIntColumns && IsInteger;
-      if (ParentTable.AutoAllowEmptyNonIndexColumns)
-      {
-        AllowNull = !CreateIndex;
-      }
     }
 
     /// <summary>
@@ -985,45 +1006,48 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the type is a valid MySQL data type, <c>false</c> otherwise.</returns>
     public bool SetMySqlDataType(string dataType, bool validateType = false, bool testTypeOnData = false)
     {
+      bool warningsChanged = false;
       IsMySqlDataTypeValid = true;
       if (AutoPk)
       {
         MySqlDataType = "Integer";
         RowsFromFirstDataType = MySqlDataType;
         RowsFromSecondDataType = MySqlDataType;
-        return true;
       }
-
-      dataType = dataType.Trim();
-      MySqlDataType = dataType;
-
-      if (MySqlDataType.Length == 0)
+      else
       {
-        if (UpdateWarnings(true, Resources.ColumnDataTypeRequiredWarning))
+        dataType = dataType.Trim();
+        MySqlDataType = dataType;
+
+        if (MySqlDataType.Length == 0)
         {
-          OnColumnWarningsChanged();
+          if (UpdateWarnings(true, Resources.ColumnDataTypeRequiredWarning))
+          {
+            OnColumnWarningsChanged();
+          }
+
+          return IsMySqlDataTypeValid;
         }
 
-        return IsMySqlDataTypeValid;
-      }
+        warningsChanged = UpdateWarnings(false, Resources.ColumnDataTypeRequiredWarning);
+        if (validateType)
+        {
+          IsMySqlDataTypeValid = DataTypeUtilities.ValidateUserDataType(dataType);
+        }
 
-      bool warningsChanged = UpdateWarnings(false, Resources.ColumnDataTypeRequiredWarning);
-      if (validateType)
-      {
-        IsMySqlDataTypeValid = DataTypeUtilities.ValidateUserDataType(dataType);
-      }
-
-      warningsChanged = UpdateWarnings(!IsMySqlDataTypeValid, Resources.ExportDataTypeNotValidWarning) || warningsChanged;
-      if (IsMySqlDataTypeValid && testTypeOnData)
-      {
-        TestColumnDataTypeAgainstColumnData(MySqlDataType);
+        warningsChanged = UpdateWarnings(!IsMySqlDataTypeValid, Resources.ExportDataTypeNotValidWarning) || warningsChanged;
+        if (IsMySqlDataTypeValid && testTypeOnData)
+        {
+          TestColumnDataTypeAgainstColumnData(MySqlDataType);
+        }
       }
 
       if (ParentTable != null)
       {
-        if (!CreateIndex && IsInteger && ParentTable.AutoIndexIntColumns)
+        CreateIndex = ParentTable.AutoIndexIntColumns && IsInteger;
+        if (ParentTable.AutoAllowEmptyNonIndexColumns)
         {
-          CreateIndex = true;
+          AllowNull = !PrimaryKey && !CreateIndex;
         }
 
         if (!ParentTable.DetectDatatype)
