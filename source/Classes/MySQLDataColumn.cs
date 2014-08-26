@@ -150,9 +150,11 @@ namespace MySQL.ForExcel.Classes
     public MySqlDataColumn(string columnName, string mySqlFullDataType, bool datesAsMySqlDates, bool allowNulls, string keyInfo, string extraInfo)
       : this()
     {
+      keyInfo = keyInfo.ToUpperInvariant();
+      extraInfo = extraInfo.ToLowerInvariant();
       DisplayName = ColumnName = columnName;
       AllowNull = allowNulls;
-      Unsigned = mySqlFullDataType.Contains("unsigned");
+      Unsigned = mySqlFullDataType.ToLowerInvariant().Contains("unsigned");
       if (!string.IsNullOrEmpty(extraInfo))
       {
         AutoIncrement = extraInfo.Contains("auto_increment");
@@ -162,6 +164,7 @@ namespace MySQL.ForExcel.Classes
 
       MySqlDataType = mySqlFullDataType;
       DataType = DataTypeUtilities.NameToType(StrippedMySqlDataType, Unsigned, datesAsMySqlDates);
+      CreateIndex = keyInfo == "MUL";
       PrimaryKey = keyInfo == "PRI";
       UniqueKey = keyInfo == "UNI";
     }
@@ -213,6 +216,7 @@ namespace MySQL.ForExcel.Classes
       set
       {
         _allowNull = value;
+        AllowDBNull = _allowNull;
         OnPropertyChanged("AllowNull");
       }
     }
@@ -913,6 +917,64 @@ namespace MySQL.ForExcel.Classes
       proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListForFirstAndRest, decimalMaxLen, varCharMaxLen);
       RowsFromFirstDataType = proposedType;
       SetMySqlDataType(ParentTable.FirstRowContainsColumnNames ? RowsFromSecondDataType : RowsFromFirstDataType);
+    }
+
+    /// <summary>
+    /// Fills a given <see cref="DataRow"/> with schema information about this column.
+    /// </summary>
+    /// <param name="schemaInfoRow">A <see cref="DataRow"/> formatted to hold Field, Type, Null, Key, Default and Extra information.</param>
+    public void FillSchemaInfoRow(ref DataRow schemaInfoRow)
+    {
+      if (schemaInfoRow == null)
+      {
+        return;
+      }
+
+      var extraBuilder = new StringBuilder();
+      schemaInfoRow["Field"] = DisplayName;
+      schemaInfoRow["Type"] = MySqlDataType;
+      schemaInfoRow["Null"] = AllowNull ? "YES" : "NO";
+      if (PrimaryKey)
+      {
+        schemaInfoRow["Key"] = "PRI";
+      }
+      else if (UniqueKey)
+      {
+        schemaInfoRow["Key"] = "UNI";
+      }
+      else if (CreateIndex)
+      {
+        schemaInfoRow["Key"] = "MUL";
+      }
+
+      schemaInfoRow["Default"] = DefaultValue != null ? DefaultValue.ToString() : string.Empty;
+      if (AutoIncrement)
+      {
+        extraBuilder.Append("auto_increment");
+      }
+
+      if (AutoPk)
+      {
+        if (extraBuilder.Length > 0)
+        {
+          extraBuilder.Append(" ");
+        }
+
+        extraBuilder.Append("auto_pk");
+      }
+
+      if (ExcludeColumn)
+      {
+        if (extraBuilder.Length > 0)
+        {
+          extraBuilder.Append(" ");
+        }
+
+        extraBuilder.Append("exclude");
+      }
+
+      schemaInfoRow["Extra"] = extraBuilder.ToString();
+      extraBuilder.Clear();
     }
 
     /// <summary>

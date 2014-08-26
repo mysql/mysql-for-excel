@@ -1,4 +1,6 @@
 1.3.3
+- Fixed code that sets column properties on an Export Data operation so the properties are carried over to the generated SQL script.
+  (MySQL Bug #73646, Bug #19467535 - EXPORT DATA - ALLOW EMPTY COLUMN OPTION WORKS ONLY FIRST TIME SQL IS PREVIEWED)
 - Fixed code that sets columns properties dependant on their detected data types when an Export Data operation loads the Excel data.
   (MySQL Bug #73719, Bug #19503820 - EXPORT DATA - ALLOW EMPTY COLUMN OPTION NOT DEFAULTED CORRECTLY)
 - Changed the way null and zero dates are handled, in previous versions MySQL null values in date columns and zero dates ("0000-00-00 00:00:00") were imported in Excel

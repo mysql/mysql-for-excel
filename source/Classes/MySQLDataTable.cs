@@ -1334,43 +1334,11 @@ namespace MySQL.ForExcel.Classes
       schemaInfoTable.Columns.Add("Default");
       schemaInfoTable.Columns.Add("Extra");
 
-      var extraBuilder = new StringBuilder();
       foreach (MySqlDataColumn column in Columns)
       {
         var newRow = schemaInfoTable.NewRow();
-        newRow["Field"] = column.DisplayName;
-        newRow["Type"] = column.MySqlDataType;
-        newRow["Null"] = column.AllowDBNull ? "YES" : "NO";
-        newRow["Key"] = column.PrimaryKey ? "PRI" : (column.UniqueKey ? "UNI" : string.Empty);
-        newRow["Default"] = column.DefaultValue != null ? column.DefaultValue.ToString() : string.Empty;
-        if (column.AutoIncrement)
-        {
-          extraBuilder.Append("auto_increment");
-        }
-
-        if (column.AutoPk)
-        {
-          if (extraBuilder.Length > 0)
-          {
-            extraBuilder.Append(" ");
-          }
-
-          extraBuilder.Append("auto_pk");
-        }
-
-        if (column.ExcludeColumn)
-        {
-          if (extraBuilder.Length > 0)
-          {
-            extraBuilder.Append(" ");
-          }
-
-          extraBuilder.Append("exclude");
-        }
-
-        newRow["Extra"] = extraBuilder.ToString();
+        column.FillSchemaInfoRow(ref newRow);
         schemaInfoTable.Rows.Add(newRow);
-        extraBuilder.Clear();
       }
 
       return schemaInfoTable;
