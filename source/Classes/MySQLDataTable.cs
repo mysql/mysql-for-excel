@@ -235,23 +235,8 @@ namespace MySQL.ForExcel.Classes
       UseOptimisticUpdate = fromTemplate.UseOptimisticUpdate;
 
       var schemaInfoTable = fromTemplate.GetColumnsSchemaInfo();
-      CreateTableSchema(schemaInfoTable, false);
-      for (int rowIndex = 0; rowIndex < fromTemplate.Rows.Count; rowIndex++)
-      {
-        if (FirstRowContainsColumnNames && rowIndex == 0)
-        {
-          continue;
-        }
-
-        var row = fromTemplate.Rows[rowIndex];
-        var rowValues = row.ItemArray;
-        for (int colIdx = 0; colIdx < fromTemplate.Columns.Count; colIdx++)
-        {
-          rowValues[colIdx] = DataTypeUtilities.GetImportingValueForDateType(rowValues[colIdx]);
-        }
-
-        LoadDataRow(rowValues, false);
-      }
+      CreateTableSchema(schemaInfoTable);
+      CopyTableData(fromTemplate, true);
     }
 
     /// <summary>
@@ -261,18 +246,10 @@ namespace MySQL.ForExcel.Classes
     /// <param name="fromDbTable">The <see cref="DbTable"/> object from which the new <see cref="MySqlDataTable"/> will get its schema information and its data.</param>
     /// <param name="useFormattedValues">Flag indicating if the Excel excelData used to populate this table is formatted (numbers, dates, text) or not (numbers and text).</param>
     public MySqlDataTable(DbView fromDbTable, bool useFormattedValues)
-      : this(fromDbTable.Connection, fromDbTable.Name, true, false, useFormattedValues)
+      : this(fromDbTable.Connection, fromDbTable.Name, true, useFormattedValues)
     {
       var dbTableData = fromDbTable.GetData();
-      foreach (object[] rowValues in from DataRow dr in dbTableData.Rows select dr.ItemArray)
-      {
-        for (int colIdx = 0; colIdx < dbTableData.Columns.Count; colIdx++)
-        {
-          rowValues[colIdx] = DataTypeUtilities.GetImportingValueForDateType(rowValues[colIdx]);
-        }
-
-        LoadDataRow(rowValues, true);
-      }
+      CopyTableData(dbTableData, false);
     }
 
     /// <summary>
@@ -282,16 +259,15 @@ namespace MySQL.ForExcel.Classes
     /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="tableName">Name of the table.</param>
     /// <param name="fetchColumnsSchemaInfo">Flag indicating if the schema information from the corresponding MySQL table is fetched and recreated before any excelData is added to the table.</param>
-    /// <param name="datesAsMySqlDates">Flag indicating if the dates are stored in the table as <see cref="System.DateTime"/> or <see cref="MySql.Data.Types.MySqlDateTime"/> objects.</param>
     /// <param name="useFormattedValues">Flag indicating if the Excel excelData used to populate this table is formatted (numbers, dates, text) or not (numbers and text).</param>
-    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string tableName, bool fetchColumnsSchemaInfo, bool datesAsMySqlDates, bool useFormattedValues)
+    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string tableName, bool fetchColumnsSchemaInfo, bool useFormattedValues)
       : this(wbConnection, tableName)
     {
       IsFormatted = useFormattedValues;
       OperationType = DataOperationType.Append;
       if (fetchColumnsSchemaInfo)
       {
-        CreateTableSchema(tableName, datesAsMySqlDates);
+        CreateTableSchema(tableName);
       }
 
       _mysqlMaxAllowedPacket = WbConnection.GetMySqlServerMaxAllowedPacket();
@@ -306,9 +282,9 @@ namespace MySQL.ForExcel.Classes
     /// <param name="filledTable"><see cref="DataTable"/> object containing imported excelData from the MySQL table to be edited.</param>
     /// <param name="operationType">The <see cref="DataOperationType"/> intended for this object.</param>
     public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string tableName, DataTable filledTable, DataOperationType operationType)
-      : this(wbConnection, tableName, true, true, true)
+      : this(wbConnection, tableName, true, true)
     {
-      CopyTableData(filledTable);
+      CopyTableData(filledTable, false);
       OperationType = operationType;
     }
 
@@ -688,6 +664,17 @@ namespace MySQL.ForExcel.Classes
         }
 
         return _engine;
+      }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether any value loaded into this <see cref="MySqlDataTable"/> must be checked to escape a starting equals sign so Excel does not mistake it as a formula.
+    /// </summary>
+    public bool EscapeFormulaTexts
+    {
+      get
+      {
+        return (OperationType.IsForImport() || OperationType.IsForEdit()) && Settings.Default.ImportEscapeFormulaTextValues;
       }
     }
 
@@ -1634,25 +1621,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Imports data contained in the given <see cref="MySqlDataTable"/> object into a <see cref="ExcelInterop.ListObject"/>.
-    /// </summary>
-    /// <param name="createPivotTable">Flag indicating whether a <see cref="ExcelInterop.PivotTable"/> is created for the imported data.</param>
-    /// <param name="pivotPosition">The position where new <see cref="ExcelInterop.PivotTable"/> objects are placed relative to imported table's data.</param>
-    /// <param name="addSummaryFields">Indicates whether to include a row with summary fields at the end of the data rows.</param>
-    /// <returns>The <see cref="ExcelInterop.Range"/> or <see cref="ExcelInterop.ListObject"/> containing the cells with the imported data.</returns>
-    public object ImportDataIntoExcelTable(bool createPivotTable, ExcelUtilities.PivotTablePosition pivotPosition = ExcelUtilities.PivotTablePosition.Right, bool addSummaryFields = false)
-    {
-      var atCell = Globals.ThisAddIn.Application.ActiveCell;
-      var importedExcelTable = ImportDataIntoExcelTable(atCell, addSummaryFields);
-      if (createPivotTable)
-      {
-        ExcelUtilities.CreatePivotTable(importedExcelTable, pivotPosition, ExcelTableName);
-      }
-
-      return importedExcelTable;
-    }
-
-    /// <summary>
     /// Imports the table's data at the specified Excel cell into a plain <see cref="ExcelInterop.Range"/>.
     /// </summary>
     /// <param name="atCell">The starting Excel (left-most and top-most) cell where the imported data is placed.</param>
@@ -1675,7 +1643,6 @@ namespace MySQL.ForExcel.Classes
           ? Math.Min(rowsCount, UInt16.MaxValue - currentRow)
           : rowsCount;
         fillingRange = atCell.Resize[cappedNumRows, Columns.Count];
-        bool escapeFormulaTexts = Settings.Default.ImportEscapeFormulaTextValues;
         var fillingArray = new object[cappedNumRows, Columns.Count];
         if (ImportColumnNames)
         {
@@ -1697,20 +1664,7 @@ namespace MySQL.ForExcel.Classes
 
           for (int currCol = 0; currCol < Columns.Count; currCol++)
           {
-            var importingValue = DataTypeUtilities.GetImportingValueForDateType(mySqlRow[currCol]);
-            if (importingValue is string)
-            {
-              var importingValueText = importingValue as string;
-
-              // If the imported value is a text that starts with an equal sign Excel will treat it as a formula so it needs to be escaped
-              // prepending an apostrophe to it for Excel to treat it as standard text.
-              if (escapeFormulaTexts && importingValueText.StartsWith("="))
-              {
-                importingValue = "'" + importingValueText;
-              }
-            }
-
-            fillingArray[fillingRowIdx, currCol] = importingValue;
+            fillingArray[fillingRowIdx, currCol] = mySqlRow[currCol];
           }
 
           mySqlRow.ExcelRange = fillingRange.Rows[fillingRowIdx + 1] as ExcelInterop.Range;
@@ -1722,7 +1676,7 @@ namespace MySQL.ForExcel.Classes
         fillingRange.ClearFormats();
         fillingRange.Value = fillingArray;
 
-        // Create Named Table for the imported data
+        // Format column names for imported range
         if (ImportColumnNames)
         {
           fillingRange.SetHeaderStyle();
@@ -1744,6 +1698,25 @@ namespace MySQL.ForExcel.Classes
       }
 
       return fillingRange;
+    }
+
+    /// <summary>
+    /// Imports data contained in the given <see cref="MySqlDataTable"/> object into a <see cref="ExcelInterop.ListObject"/>.
+    /// </summary>
+    /// <param name="createPivotTable">Flag indicating whether a <see cref="ExcelInterop.PivotTable"/> is created for the imported data.</param>
+    /// <param name="pivotPosition">The position where new <see cref="ExcelInterop.PivotTable"/> objects are placed relative to imported table's data.</param>
+    /// <param name="addSummaryFields">Indicates whether to include a row with summary fields at the end of the data rows.</param>
+    /// <returns>The <see cref="ExcelInterop.Range"/> or <see cref="ExcelInterop.ListObject"/> containing the cells with the imported data.</returns>
+    public object ImportDataIntoExcelTable(bool createPivotTable, ExcelUtilities.PivotTablePosition pivotPosition = ExcelUtilities.PivotTablePosition.Right, bool addSummaryFields = false)
+    {
+      var atCell = Globals.ThisAddIn.Application.ActiveCell;
+      var importedExcelTable = ImportDataIntoExcelTable(atCell, addSummaryFields);
+      if (createPivotTable)
+      {
+        ExcelUtilities.CreatePivotTable(importedExcelTable, pivotPosition, ExcelTableName);
+      }
+
+      return importedExcelTable;
     }
 
     /// <summary>
@@ -1838,8 +1811,8 @@ namespace MySQL.ForExcel.Classes
       }
       else
       {
-        CreateTableSchema(TableName, true);
-        CopyTableData(filledTable);
+        CreateTableSchema(TableName);
+        CopyTableData(filledTable, false);
       }
     }
 
@@ -1893,10 +1866,16 @@ namespace MySQL.ForExcel.Classes
         return false;
       }
 
+      bool success = true;
       try
       {
+        // Save the value of the computed property in a variable to avoid recalculating it over and over in the loop below.
+        bool escapeFormulaTexts = EscapeFormulaTexts;
+
         int numRows = temporaryRange.Range.Rows.Count;
         int rowAdjustValue = _firstRowContainsColumnNames && !OperationType.IsForExport() ? 1 : 0;
+        _copyingTableData = true;
+        BeginLoadData();
         for (int row = 1 + rowAdjustValue; row <= numRows; row++)
         {
           var valuesArray = temporaryRange.Range.GetRowValuesAsLinearArray(row, IsFormatted);
@@ -1905,6 +1884,7 @@ namespace MySQL.ForExcel.Classes
             continue;
           }
 
+          PrepareCopyingItemArray(ref valuesArray, escapeFormulaTexts);
           LoadDataRow(valuesArray, IsPreviewTable);
         }
 
@@ -1918,10 +1898,15 @@ namespace MySQL.ForExcel.Classes
         MySqlSourceTrace.WriteAppErrorToLog(ex);
         string errorTitle = string.Format(Resources.TableDataAdditionErrorTitle, OperationType.IsForExport() ? "exporting" : "appending");
         MiscUtilities.ShowCustomizedErrorDialog(errorTitle, ex.Message + Environment.NewLine + Environment.NewLine + ex.StackTrace);
-        return false;
+        success = false;
+      }
+      finally
+      {
+        EndLoadData();
+        _copyingTableData = false;
       }
 
-      return true;
+      return success;
     }
 
     /// <summary>
@@ -2140,20 +2125,32 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Copies the data contents of the given <see cref="DataTable"/> object to this table.
     /// </summary>
-    /// <param name="filledTable"><see cref="DataTable"/> object containing previously retrieved data from a MySQL table.</param>
-    private void CopyTableData(DataTable filledTable)
+    /// <param name="fromSourceTable"><see cref="DataTable"/> object containing previously retrieved data from a MySQL table.</param>
+    /// <param name="preserveChanges">Flag indicating whether the <see cref="DataRow.RowState"/> is preserved from the source copied rows..</param>
+    private void CopyTableData(DataTable fromSourceTable, bool preserveChanges)
     {
-      if (filledTable == null)
+      if (fromSourceTable == null)
       {
         return;
       }
 
-      _copyingTableData = true;
       try
       {
-        foreach (DataRow dr in filledTable.Rows)
+        // Save the value of the computed property in a variable to avoid recalculating it over and over in the loop below.
+        bool escapeFormulaTexts = EscapeFormulaTexts;
+
+        _copyingTableData = true;
+        BeginLoadData();
+        for (int rowIndex = 0; rowIndex < fromSourceTable.Rows.Count; rowIndex++)
         {
-          ImportRow(dr);
+          if (FirstRowContainsColumnNames && rowIndex == 0)
+          {
+            continue;
+          }
+
+          var rowValues = fromSourceTable.Rows[rowIndex].ItemArray;
+          PrepareCopyingItemArray(ref rowValues, escapeFormulaTexts);
+          LoadDataRow(rowValues, !preserveChanges);
         }
       }
       catch (Exception ex)
@@ -2161,8 +2158,11 @@ namespace MySQL.ForExcel.Classes
         MiscUtilities.ShowCustomizedErrorDialog(Resources.TableDataCopyErrorTitle, ex.Message + Environment.NewLine + Environment.NewLine + ex.StackTrace, true);
         MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
-
-      _copyingTableData = false;
+      finally
+      {
+        EndLoadData();
+        _copyingTableData = false;
+      }
     }
 
     /// <summary>
@@ -2173,10 +2173,10 @@ namespace MySQL.ForExcel.Classes
     private void CopyTableSchemaAndData(DataTable filledTable, bool schemaOnly = false)
     {
       DataTable columnsInfoTable = filledTable.GetColumnsSchemaInfo();
-      CreateTableSchema(columnsInfoTable, true);
+      CreateTableSchema(columnsInfoTable);
       if (!schemaOnly)
       {
-        CopyTableData(filledTable);
+        CopyTableData(filledTable, false);
       }
     }
 
@@ -2213,19 +2213,17 @@ namespace MySQL.ForExcel.Classes
     /// Creates columns for this table using the information schema of a MySQL table with the given name to mirror their properties.
     /// </summary>
     /// <param name="tableName">Name of the table.</param>
-    /// <param name="datesAsMySqlDates">Flag indicating if the dates are stored in the table as <see cref="System.DateTime"/> or <see cref="MySql.Data.Types.MySqlDateTime"/> objects.</param>
-    private void CreateTableSchema(string tableName, bool datesAsMySqlDates)
+    private void CreateTableSchema(string tableName)
     {
       DataTable columnsInfoTable = WbConnection.GetSchemaCollection("Columns Short", null, WbConnection.Schema, tableName);
-      CreateTableSchema(columnsInfoTable, datesAsMySqlDates);
+      CreateTableSchema(columnsInfoTable);
     }
 
     /// <summary>
     /// Creates columns for this table using the information schema of a MySQL table with the given name to mirror their properties.
     /// </summary>
     /// <param name="schemaInfoTable">Table with schema information.</param>
-    /// <param name="datesAsMySqlDates">Flag indicating if the dates are stored in the table as <see cref="System.DateTime"/> or <see cref="MySql.Data.Types.MySqlDateTime"/> objects.</param>
-    private void CreateTableSchema(DataTable schemaInfoTable, bool datesAsMySqlDates)
+    private void CreateTableSchema(DataTable schemaInfoTable)
     {
       if (schemaInfoTable == null)
       {
@@ -2240,7 +2238,7 @@ namespace MySQL.ForExcel.Classes
         bool allowNulls = columnInfoRow["Null"].ToString() == "YES";
         string keyInfo = columnInfoRow["Key"].ToString();
         string extraInfo = columnInfoRow["Extra"].ToString();
-        var column = new MySqlDataColumn(colName, dataType, datesAsMySqlDates, allowNulls, keyInfo, extraInfo);
+        var column = new MySqlDataColumn(colName, dataType, false, allowNulls, keyInfo, extraInfo);
         column.PropertyChanged += ColumnPropertyValueChanged;
         Columns.Add(column);
       }
@@ -2381,6 +2379,31 @@ namespace MySQL.ForExcel.Classes
       if (PropertyChanged != null)
       {
         PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+      }
+    }
+
+    /// <summary>
+    /// Prepares the array of objects to be inserted to a new <see cref="DataRow"/> of this <see cref="MySqlDataTable"/> to format its values (dates and strings) properly.
+    /// </summary>
+    /// <param name="itemArray">An array of objects to be loaded in a single <see cref="DataRow"/> of this <see cref="MySqlDataTable"/>.</param>
+    /// <param name="escapeFormulaTexts">Flag indicating whether any value in the given item array must be checked to escape a starting equals sign so Excel does not mistake it as a formula.</param>
+    private void PrepareCopyingItemArray(ref object[] itemArray, bool escapeFormulaTexts)
+    {
+      if (itemArray == null || itemArray.Length != Columns.Count)
+      {
+        return;
+      }
+
+      for (int colIdx = 0; colIdx < Columns.Count; colIdx++)
+      {
+        var targetColumn = Columns[colIdx] as MySqlDataColumn;
+        var importingValue = DataTypeUtilities.GetInsertingValueForColumnType(itemArray[colIdx], targetColumn, false);
+        if (escapeFormulaTexts)
+        {
+          importingValue = importingValue.EscapeStartingEqualSign();
+        }
+
+        itemArray[colIdx] = importingValue;
       }
     }
 

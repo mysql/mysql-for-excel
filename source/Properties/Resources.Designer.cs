@@ -2725,11 +2725,11 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unrecognized value suitable for a bool column encountered..
+        ///   Looks up a localized string similar to Value &apos;{0}&apos; is not suitable to be converted to a {1} data type..
         /// </summary>
-        internal static string UnrecognizedBooleanValueError {
+        internal static string ValueNotSuitableForConversionError {
             get {
-                return ResourceManager.GetString("UnrecognizedBooleanValueError", resourceCulture);
+                return ResourceManager.GetString("ValueNotSuitableForConversionError", resourceCulture);
             }
         }
         

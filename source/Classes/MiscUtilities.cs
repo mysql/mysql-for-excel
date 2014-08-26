@@ -90,6 +90,37 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Escapes a text that starts with an equals sign so Excel does not treat it as a formula.
+    /// </summary>
+    /// <param name="text">A string.</param>
+    /// <returns>The text escaped with an apostrophe in case it starts with an equals sign.</returns>
+    public static string EscapeStartingEqualSign(this string text)
+    {
+      if (string.IsNullOrEmpty(text))
+      {
+        return text;
+      }
+
+      // If the text starts with an equals sign Excel will treat it as a formula so it needs to be escaped prepending an apostrophe to it for Excel to treat it as standard text.
+      return text.StartsWith("=") ? "'" + text : text;
+    }
+
+    /// <summary>
+    /// Escapes a boxed text that starts with an equals sign so Excel does not treat it as a formula.
+    /// </summary>
+    /// <param name="possibleBoxedText">An object, that if is a <see cref="string"/> then it is escaped, otherwise just returned.</param>
+    /// <returns>An object with text escaped with an apostrophe in case it starts with an equals sign.</returns>
+    public static object EscapeStartingEqualSign(this object possibleBoxedText)
+    {
+      if (!(possibleBoxedText is string))
+      {
+        return possibleBoxedText;
+      }
+
+      return (possibleBoxedText as string).EscapeStartingEqualSign();
+    }
+
+    /// <summary>
     /// Gets the active <see cref="EditConnectionInfo"/> related to a given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
     /// <param name="connectionInfosList">The <see cref="EditConnectionInfo"/> objects list.</param>

@@ -1,4 +1,9 @@
 1.3.3
+- Changed the way null and zero dates are handled, in previous versions MySQL null values in date columns and zero dates ("0000-00-00 00:00:00") were imported in Excel
+  as "1/0/1900  12:00:00 AM", if 0 was entered the value was converted to "12:00:00 AM" automatically. Now that Excel ListObjects are bound to refresh data a possible
+  bug in VSTO converts zero and null date values into text, not good since it messes up dates recognition in Excel. Now zero dates are always treated as null, so even 
+  typing a 0 in a date column translates to a null date. Logic that recognizes date values string or boxed objects was rewritten from scratch to fix also bugs with dates
+  in a locale different than US English. (MySQL Bug #73541, Bug #19423952 - EXPORT DATA - DATE TYPE NOT AUTO-DETECTED WHEN LOCALE IS DIFFERENT)
 - Fixed Export Data operations code to create a MySqlDataTable container for the data to be exported with the final data types before the operation takes place, this
   automatically makes the decimal numbers conversion from any locale to an invariant one. (MySQL Bug #73293, Bug #19403063 - EXPORT AND DECIMAL DELIMITER)
 - Changed all references of the Varchar string to VarChar in the code for consistency with the renaming done in 1.3.0.

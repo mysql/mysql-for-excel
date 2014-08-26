@@ -21,6 +21,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using MySql.Data.MySqlClient;
+using MySql.Data.Types;
 using MySQL.ForExcel.Classes.Exceptions;
 
 namespace MySQL.ForExcel.Classes
@@ -299,11 +300,11 @@ namespace MySQL.ForExcel.Classes
           break;
 
         case "MySql.Data.Types.MySqlDateTime":
-          MySql.Data.Types.MySqlDateTime mySqlDateTableValue = (MySql.Data.Types.MySqlDateTime)dataTableValue;
-          MySql.Data.Types.MySqlDateTime mySqlDateExcelValue;
+          var mySqlDateTableValue = (MySqlDateTime)dataTableValue;
+          MySqlDateTime mySqlDateExcelValue;
           try
           {
-            mySqlDateExcelValue = new MySql.Data.Types.MySqlDateTime(strExcelValue);
+            mySqlDateExcelValue = new MySqlDateTime(strExcelValue);
           }
           catch
           {
@@ -446,25 +447,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// An object where its data is converted to the proper date type if its of date origin.
-    /// </summary>
-    /// <param name="rawValue">Raw value.</param>
-    /// <returns>Objected converted to the proper date type.</returns>
-    public static object GetImportingValueForDateType(object rawValue)
-    {
-      object importingValue = rawValue;
-
-      if (!(rawValue is MySql.Data.Types.MySqlDateTime))
-      {
-        return importingValue;
-      }
-
-      MySql.Data.Types.MySqlDateTime mysqlDate = (MySql.Data.Types.MySqlDateTime)rawValue;
-      importingValue = mysqlDate.IsValidDateTime ? new DateTime(mysqlDate.Year, mysqlDate.Month, mysqlDate.Day, mysqlDate.Hour, mysqlDate.Minute, mysqlDate.Second) : DateTime.MinValue;
-      return importingValue;
-    }
-
-    /// <summary>
     /// Gets a string representation of a raw value formatted so the value can be inserted in a target column.
     /// </summary>
     /// <param name="rawValue">The raw value to be inserted in a target column.</param>
@@ -492,99 +474,26 @@ namespace MySQL.ForExcel.Classes
           return 0;
         }
 
-        if (againstTypeColumn.IsBool)
-        {
-          return false;
-        }
-
         if (!againstTypeColumn.IsDate)
         {
           return againstTypeColumn.ColumnRequiresQuotes ? string.Empty : rawValue;
         }
-
-        if (againstTypeColumn.DataType.Name == "DateTime")
-        {
-          return DateTime.MinValue;
-        }
-
-        return new MySql.Data.Types.MySqlDateTime(0, 0, 0, 0, 0, 0, 0);
       }
 
       // Return values for raw values with data
       if (againstTypeColumn.IsDate)
       {
-        DateTime dtValue;
-        if (rawValue is DateTime)
-        {
-          dtValue = (DateTime)rawValue;
-          if (againstTypeColumn.DataType.Name == "DateTime")
-          {
-            return dtValue;
-          }
-
-          return new MySql.Data.Types.MySqlDateTime(dtValue);
-        }
-
-        if (rawValue is MySql.Data.Types.MySqlDateTime)
-        {
-          MySql.Data.Types.MySqlDateTime mdtValue = (MySql.Data.Types.MySqlDateTime)rawValue;
-          if (againstTypeColumn.DataType.Name == "DateTime")
-          {
-            return !mdtValue.IsValidDateTime ? DateTime.MinValue : mdtValue.GetDateTime();
-          }
-
-          return mdtValue;
-        }
-
-        string rawValueAsString = rawValue.ToString();
-        if (rawValueAsString.IsMySqlZeroDateValue(true))
-        {
-          if (againstTypeColumn.DataType.Name == "DateTime")
-          {
-            return DateTime.MinValue;
-          }
-
-          return new MySql.Data.Types.MySqlDateTime(0, 0, 0, 0, 0, 0, 0);
-        }
-
-        if (!DateTime.TryParse(rawValueAsString, out dtValue))
-        {
-          return rawValue;
-        }
-
-        if (againstTypeColumn.DataType.Name == "DateTime")
-        {
-          return dtValue;
-        }
-
-        return new MySql.Data.Types.MySqlDateTime(dtValue);
+        return GetValueAsDateTime(rawValue);
       }
 
       if (againstTypeColumn.IsBool)
       {
-        string rawValueAsString = rawValue.ToString().ToLowerInvariant();
-        switch (rawValueAsString)
-        {
-          case "1":
-          case "true":
-          case "yes":
-          case "ja":
-            return true;
-
-          case "0":
-          case "false":
-          case "no":
-          case "nein":
-            return false;
-
-          default:
-            throw new UnrecognizedBooleanValueException();
-        }
+        return GetValueAsBoolean(rawValue);
       }
 
       if (againstTypeColumn.ColumnRequiresQuotes)
       {
-        return escapeStringForTextTypes ? rawValue.ToString().EscapeDataValueString() : rawValue.ToString();
+        return rawValue == null ? null : (escapeStringForTextTypes ? rawValue.ToString().EscapeDataValueString() : rawValue.ToString());
       }
 
       return rawValue;
@@ -943,7 +852,7 @@ namespace MySQL.ForExcel.Classes
         {
           strType = "System.Boolean";
         }
-        else if (strValue.IsMySqlZeroDateValue())
+        else if (strValue.IsMySqlZeroDateTimeValue())
         {
           strType = "MySql.Data.Types.MySqlDateTime";
         }
@@ -1111,9 +1020,9 @@ namespace MySQL.ForExcel.Classes
           valueToDb = dtValue.ToString(MYSQL_DATE_FORMAT);
         }
       }
-      else if (valueObject is MySql.Data.Types.MySqlDateTime)
+      else if (valueObject is MySqlDateTime)
       {
-        MySql.Data.Types.MySqlDateTime dtValue = (MySql.Data.Types.MySqlDateTime)valueObject;
+        var dtValue = (MySqlDateTime)valueObject;
         if (!dtValue.IsValidDateTime || dtValue.GetDateTime().Equals(DateTime.MinValue))
         {
           valueIsNull = againstTypeColumn.AllowNull;
@@ -1196,20 +1105,161 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets a boxed <see cref="bool"/> value from .
+    /// </summary>
+    /// <param name="rawValue">An object.</param>
+    /// <returns>A boxed <see cref="DateTime"/> object where its data is converted to a proper date value if it is of date origin, or the same object if not..</returns>
+    public static object GetValueAsBoolean(object rawValue)
+    {
+      if (rawValue == null || rawValue == DBNull.Value)
+      {
+        return false;
+      }
+
+      if (rawValue is bool)
+      {
+        return rawValue;
+      }
+
+      var rawValueAsString = rawValue.ToString().ToLowerInvariant();
+      switch (rawValueAsString)
+      {
+        case "1":
+        case "true":
+        case "yes":
+        case "ja":
+          return true;
+
+        case "0":
+        case "false":
+        case "no":
+        case "nein":
+          return false;
+
+        default:
+          throw new ValueNotSuitableForConversionException(rawValueAsString, "bool");
+      }
+    }
+
+    /// <summary>
+    /// Gets a boxed <see cref="DateTime"/> object where its data is converted to a proper date value if it is of date origin, or the same object if not.
+    /// </summary>
+    /// <param name="rawValue">An object.</param>
+    /// <returns>A boxed <see cref="DateTime"/> object where its data is converted to a proper date value if it is of date origin, or the same object if not..</returns>
+    public static object GetValueAsDateTime(object rawValue)
+    {
+      if (rawValue == null || rawValue == DBNull.Value)
+      {
+        return null;
+      }
+
+      if (rawValue is DateTime)
+      {
+        var dtValue = (DateTime) rawValue;
+        if (dtValue.CompareTo(DateTime.MinValue) == 0 || dtValue.CompareTo(DateTime.FromOADate(0)) == 0)
+        {
+          return null;
+        }
+
+        return dtValue;
+      }
+
+      if (rawValue is MySqlDateTime)
+      {
+        var mysqlDate = (MySqlDateTime)rawValue;
+        if (!mysqlDate.IsValidDateTime)
+        {
+          return null;
+        }
+
+        return GetValueAsDateTime(mysqlDate.GetDateTime());
+      }
+
+      if (rawValue is string)
+      {
+        var rawValueAsString = rawValue.ToString();
+        DateTime dtValue;
+        if (DateTime.TryParse(rawValueAsString, out dtValue))
+        {
+          return GetValueAsDateTime(dtValue);
+        }
+
+        if (rawValueAsString.IsMySqlZeroDateTimeValue(true))
+        {
+          return null;
+        }
+      }
+
+      throw new ValueNotSuitableForConversionException(rawValue.ToString(), "DateTime");
+    }
+
+    /// <summary>
+    /// Checks if the given string value can be parsed into a <see cref="MySqlDateTime"/> object.
+    /// </summary>
+    /// <param name="dateValueAsString">The string value representing a date.</param>
+    /// <param name="isZeroDateTime"></param>
+    /// <returns><c>true</c> if the given string value can be parsed into a <see cref="MySqlDateTime"/> object, <c>false</c> otherwise.</returns>
+    public static bool IsMySqlDateTimeValue(this string dateValueAsString, out bool isZeroDateTime)
+    {
+      isZeroDateTime = false;
+      if (string.IsNullOrEmpty(dateValueAsString))
+      {
+        return false;
+      }
+
+      // Step 1: Attempt to parse the string value into a regular DateTime, if it can be parsed then it can be stored in a MySqlDateTime, so return true.
+      DateTime parsedDateTime;
+      bool canBeParsedByDateTime = DateTime.TryParse(dateValueAsString, out parsedDateTime);
+      if (canBeParsedByDateTime)
+      {
+        return true;
+      }
+
+      // Step 2: Convert all 0s into 1s and see if that can be parsed into a regular DateTime, if it can't be parsed it can't be stored in a MySqlDateTime, so return false.
+      canBeParsedByDateTime = DateTime.TryParse(dateValueAsString.Replace("0", "1"), out parsedDateTime);
+      if (!canBeParsedByDateTime)
+      {
+        return false;
+      }
+
+      bool isMySqlDateTimeValue;
+      try
+      {
+        // Step 3: Convert back the 1s into 0s and store them in individual date/time components.
+        int year = int.Parse(parsedDateTime.Year.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
+        int month = int.Parse(parsedDateTime.Month.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
+        int day = int.Parse(parsedDateTime.Month.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
+        int hour = int.Parse(parsedDateTime.Hour.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
+        int minute = int.Parse(parsedDateTime.Minute.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
+        int second = int.Parse(parsedDateTime.Second.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
+        int millisecond = int.Parse(parsedDateTime.Millisecond.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
+
+        // Step 4: Create a new MySqlDateTime struct with the date/time components.
+        var mySqlDateObject = new MySqlDateTime(year, month, day, hour, minute, second, millisecond);
+        isMySqlDateTimeValue = true;
+        isZeroDateTime = !mySqlDateObject.IsValidDateTime;
+      }
+      catch (Exception)
+      {
+        isMySqlDateTimeValue = false;
+      }
+
+      return isMySqlDateTimeValue;
+    }
+
+    /// <summary>
     /// Checks if the string value representing a date is a MySQL zero date.
     /// </summary>
     /// <param name="dateValueAsString">The string value representing a date.</param>
     /// <param name="checkIfIntZero">Flag indicating whether a value of 0 should also be treated as a zero date.</param>
     /// <returns><c>true</c> if the passed string value is a MySQL zero date, <c>false</c> otherwise.</returns>
-    public static bool IsMySqlZeroDateValue(this string dateValueAsString, bool checkIfIntZero = false)
+    public static bool IsMySqlZeroDateTimeValue(this string dateValueAsString, bool checkIfIntZero = false)
     {
-      bool isZeroDate = dateValueAsString.StartsWith("0000-00-00") || dateValueAsString.StartsWith("00-00-00");
-      if (checkIfIntZero)
-      {
-        isZeroDate = isZeroDate || dateValueAsString.Equals("0");
-      }
-
-      return isZeroDate;
+      int zeroValue;
+      bool isDateValueZero = checkIfIntZero && int.TryParse(dateValueAsString, out zeroValue) && zeroValue == 0;
+      bool isDateValueAZeroDate;
+      dateValueAsString.IsMySqlDateTimeValue(out isDateValueAZeroDate);
+      return isDateValueZero || isDateValueAZeroDate;
     }
 
     /// <summary>
@@ -1400,7 +1450,7 @@ namespace MySQL.ForExcel.Classes
         case "date":
         case "datetime":
         case "timestamp":
-          return datesAsMySqlDates ? typeof(MySql.Data.Types.MySqlDateTime) : Type.GetType("System.DateTime");
+          return datesAsMySqlDates ? typeof(MySqlDateTime) : Type.GetType("System.DateTime");
 
         case "time":
           return Type.GetType("System.TimeSpan");
@@ -1546,7 +1596,7 @@ namespace MySQL.ForExcel.Classes
 
       if (mySqlDataType == "date" || mySqlDataType == "datetime" || mySqlDataType == "timestamp")
       {
-        if (strValue.IsMySqlZeroDateValue())
+        if (strValue.IsMySqlZeroDateTimeValue())
         {
           return true;
         }

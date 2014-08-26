@@ -567,7 +567,22 @@ namespace MySQL.ForExcel.Forms
                   insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(cell.Value, currCol, false);
                 }
 
-                _mySqlTable.Rows[absRow][absCol] = insertingValue;
+                if (insertingValue == null)
+                {
+                  _mySqlTable.Rows[absRow][absCol] = DBNull.Value;
+                  if (!(cell.Value is DateTime))
+                  {
+                    continue;
+                  }
+
+                  _undoingChanges = true;
+                  cell.Value = null;
+                  _undoingChanges = false;
+                }
+                else
+                {
+                  _mySqlTable.Rows[absRow][absCol] = insertingValue;
+                }
               }
             }
           }
