@@ -1,4 +1,8 @@
 1.3.3
+- Changed the way columns without any data that are inside the selected Excel range are treated during an Export or Append data operation, in version 1.2.1 we dismissed
+  any columns without data, now if the columns with no data exist between other columns that contain data they are considered as valid for Export or Append. Fixed a bug
+  in the code that prepares the data for Append when the mapped columns are less than the total number of columns in the target table.
+  (MySQL Bug #73175, Bug #19402572 - SOME COLUMN DATA IS SET TO NULL DURING DB APPEND, EVEN WHEN THE CELLS HAVE DATA)
 - Fixed code that sets column properties on an Export Data operation so the properties are carried over to the generated SQL script.
   (MySQL Bug #73646, Bug #19467535 - EXPORT DATA - ALLOW EMPTY COLUMN OPTION WORKS ONLY FIRST TIME SQL IS PREVIEWED)
 - Fixed code that sets columns properties dependant on their detected data types when an Export Data operation loads the Excel data.

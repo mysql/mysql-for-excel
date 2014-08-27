@@ -191,7 +191,7 @@ namespace MySQL.ForExcel.Classes
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MySqlDataTable"/> class.
-    /// This constructor is meant to be used by the <see cref="ExportDataForm"/> class.
+    /// This constructor is meant to be used by the <see cref="ExportDataForm"/> or <see cref="AppendDataForm"/> class.
     /// </summary>
     /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="proposedTableName">Proposed name for this new table.</param>
@@ -201,7 +201,8 @@ namespace MySQL.ForExcel.Classes
     /// <param name="addBufferToVarChar">Flag indicating if columns with an auto-detected varchar type will get a padding buffer for its size.</param>
     /// <param name="autoIndexIntColumns">Flag indicating if columns with an integer-based data-type will have their <see cref="MySqlDataColumn.CreateIndex"/> property value set to true.</param>
     /// <param name="autoAllowEmptyNonIndexColumns">Flag indicating if columns that have their <see cref="MySqlDataColumn.CreateIndex"/> property value set to <c>false</c> will automatically get their <see cref="MySqlDataColumn.AllowNull"/> property value set to <c>true</c>.</param>
-    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string proposedTableName, bool addPrimaryKeyCol, bool useFormattedValues, bool detectDataType, bool addBufferToVarChar, bool autoIndexIntColumns, bool autoAllowEmptyNonIndexColumns)
+    /// <param name="forExportOperation">Flag indicating if the table will be used on an Export operation, otherwise it is considered to be used on an Append one.</param>
+    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string proposedTableName, bool addPrimaryKeyCol, bool useFormattedValues, bool detectDataType, bool addBufferToVarChar, bool autoIndexIntColumns, bool autoAllowEmptyNonIndexColumns, bool forExportOperation = true)
       : this(wbConnection, proposedTableName)
     {
       AddBufferToVarChar = addBufferToVarChar;
@@ -210,7 +211,8 @@ namespace MySQL.ForExcel.Classes
       AutoIndexIntColumns = autoIndexIntColumns;
       DetectDatatype = detectDataType;
       IsFormatted = useFormattedValues;
-      OperationType = DataOperationType.Export;
+      IsPreviewTable = true;
+      OperationType = forExportOperation ? DataOperationType.Export : DataOperationType.Append;
       TableName = proposedTableName;
     }
 
@@ -1893,7 +1895,7 @@ namespace MySQL.ForExcel.Classes
       var dateColumnIndexes = new List<int>(Columns.Count);
       int dateColumnIndexAdjust = AddPrimaryKeyColumn ? 1 : 0;
       dateColumnIndexes.AddRange(from MySqlDataColumn column in Columns where column.IsDate select column.RangeColumnIndex - dateColumnIndexAdjust);
-      using (var temporaryRange = new TempRange(dataRange, true, true, true, _addPrimaryKeyColumn, _firstRowContainsColumnNames, dateColumnIndexes.ToArray(), limitRowsQuantity))
+      using (var temporaryRange = new TempRange(dataRange, true, false, true, _addPrimaryKeyColumn, _firstRowContainsColumnNames, dateColumnIndexes.ToArray(), limitRowsQuantity))
       {
         CreateColumns(temporaryRange, recreateColumnsFromData);
         bool success = AddExcelData(temporaryRange, false, asynchronous);

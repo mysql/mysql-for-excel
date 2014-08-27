@@ -84,11 +84,12 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="sourceRange">The original source <see cref="ExcelInterop.Range"/> whose data is copied to the temporary one.</param>
     /// <param name="cropToNonEmptyRange">Flag indicating whether the range is cropped to a subrange with only non-empty cells.</param>
+    /// <param name="skipEmptyColumns">Flag indicating whether empty columns are not copied to the target range.</param>
     /// <param name="hideWorksheet">Flag indicating whether the new temporary <see cref="ExcelInterop.Worksheet"/> will be hidden.</param>
     /// <param name="mappedIndexes">An array of indexes containing the source column from the <see cref="sourceRange"/> whose contents will be copied to the returned range.</param>
     /// <param name="disableScreenUpdating">Flag indicating whether screen updating will be disabled to speed up processing.</param>
-    public TempRange(ExcelInterop.Range sourceRange, bool cropToNonEmptyRange, bool hideWorksheet, IList<int> mappedIndexes, bool disableScreenUpdating = true)
-      : this(sourceRange, cropToNonEmptyRange, false, hideWorksheet, 0, disableScreenUpdating)
+    public TempRange(ExcelInterop.Range sourceRange, bool cropToNonEmptyRange, bool skipEmptyColumns, bool hideWorksheet, IList<int> mappedIndexes, bool disableScreenUpdating = true)
+      : this(sourceRange, cropToNonEmptyRange, skipEmptyColumns, hideWorksheet, 0, disableScreenUpdating)
     {
       RangeType = TempRangeType.MappedRange;
       CreateMappedTempRange(mappedIndexes);
@@ -331,11 +332,6 @@ namespace MySQL.ForExcel.Classes
       for (int arrayIndex = 0; arrayIndex < mappedIndexes.Count; arrayIndex++)
       {
         int excelColumnIndex = arrayIndex + 1;
-        if (excelColumnIndex > sourceCopyRange.Columns.Count)
-        {
-          break;
-        }
-
         int mappedIndex = mappedIndexes[arrayIndex];
         if (mappedIndex < 1)
         {

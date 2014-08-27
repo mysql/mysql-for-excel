@@ -37,7 +37,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Flag indicating whether the column will accept null values.
     /// </summary>
-    public bool _allowNull;
+    private bool _allowNull;
 
     /// <summary>
     /// The <see cref="DataColumn.ColumnName"/> escaping the back-tick character.
@@ -216,7 +216,6 @@ namespace MySQL.ForExcel.Classes
       set
       {
         _allowNull = value;
-        AllowDBNull = _allowNull;
         OnPropertyChanged("AllowNull");
       }
     }
@@ -891,7 +890,7 @@ namespace MySQL.ForExcel.Classes
       // Get the consistent DataType for all rows except first one.
       proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListFromSecondRow, decimalMaxLen, varCharMaxLen);
 
-      if (string.IsNullOrEmpty(proposedType))
+      if (string.IsNullOrEmpty(proposedType) && ParentTable.OperationType.IsForExport())
       {
         proposedType = "VarChar(255)";
         strippedType = "VarChar";
@@ -905,8 +904,9 @@ namespace MySQL.ForExcel.Classes
       // Get the consistent DataType between first columnInfoRow and the previously computed consistent DataType for the rest of the rows.
       if (typesListFromSecondRow.Count > 0)
       {
-        leftParensIndex = proposedType.IndexOf("(", StringComparison.Ordinal);
-        strippedType = leftParensIndex < 0 ? proposedType : proposedType.Substring(0, leftParensIndex);
+        bool emptyProposedType = string.IsNullOrEmpty(proposedType);
+        leftParensIndex = emptyProposedType ? -1 : proposedType.IndexOf("(", StringComparison.Ordinal);
+        strippedType = leftParensIndex < 0 || emptyProposedType ? proposedType : proposedType.Substring(0, leftParensIndex);
         typesListForFirstAndRest.Add(strippedType);
       }
 

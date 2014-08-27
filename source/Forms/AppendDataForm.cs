@@ -275,7 +275,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       bool addDataSuccessful;
-      using (var temporaryRange = new TempRange(_appendDataRange, true, true, mappedIndexes))
+      using (var temporaryRange = new TempRange(_appendDataRange, true, false, true, mappedIndexes))
       {
         addDataSuccessful = targetMySqlFinalDataTable.AddExcelData(temporaryRange, true, true);
       }
@@ -1045,10 +1045,8 @@ namespace MySQL.ForExcel.Forms
         true,
         false,
         false,
-        false)
-      {
-        IsPreviewTable = true
-      };
+        false,
+        false);
       int previewRowsQty = Math.Min(_appendDataRange.Rows.Count, Settings.Default.AppendLimitPreviewRowsQuantity);
       _sourceMySqlPreviewDataTable.SetupColumnsWithData(_appendDataRange, true, false, previewRowsQty);
       SourceExcelDataDataGridView.DataSource = _sourceMySqlPreviewDataTable;

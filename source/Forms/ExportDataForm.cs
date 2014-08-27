@@ -831,10 +831,7 @@ namespace MySQL.ForExcel.Forms
         Settings.Default.ExportDetectDatatype,
         Settings.Default.ExportAddBufferToVarchar,
         Settings.Default.ExportAutoIndexIntColumns,
-        Settings.Default.ExportAutoAllowEmptyNonIndexColumns)
-      {
-        IsPreviewTable = true
-      };
+        Settings.Default.ExportAutoAllowEmptyNonIndexColumns);
       _previewDataTable.TableColumnPropertyValueChanged += PreviewTableColumnPropertyValueChanged;
       _previewDataTable.TableWarningsChanged += PreviewTableWarningsChanged;
       int previewRowsQty = Math.Min(_exportDataRange.Rows.Count, Settings.Default.ExportLimitPreviewRowsQuantity);
