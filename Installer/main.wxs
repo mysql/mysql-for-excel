@@ -2,13 +2,13 @@
 <?define ProductName="MySQL For Excel $(var.Version)"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
-  <Product Name="$(var.ProductName)" Id ="*" Manufacturer="Oracle" Language="1033" Version="$(var.Version)" 
+  <Product Name="$(var.ProductName)" Id ="*" Manufacturer="Oracle" Language="1033" Version="$(var.Version)"
            UpgradeCode="30162E4E-2EED-48D1-BBC0-8D4A517DB004">
     <Package Id="*" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" InstallPrivileges="elevated"/>
 
     <Upgrade Id="30162E4E-2EED-48D1-BBC0-8D4A517DB004">
       <UpgradeVersion OnlyDetect="yes" Minimum="$(var.Version)" Property="NEWERVERSIONDETECTED" IncludeMinimum="no" />
-      <UpgradeVersion OnlyDetect="no" Maximum="$(var.Version)" Property="OLDERVERSIONBEINGUPGRADED" IncludeMaximum="no" />
+      <UpgradeVersion OnlyDetect="no" Maximum="$(var.Version)" Property="OLDERVERSIONBEINGUPGRADED" IncludeMaximum="yes" />
     </Upgrade>
 
     <!-- Do not install if a newer version is already installed. -->
