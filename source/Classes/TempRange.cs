@@ -303,7 +303,8 @@ namespace MySQL.ForExcel.Classes
         }
         else
         {
-          sourceColumnRange.Copy(targetColumnRange);
+          sourceColumnRange.Copy();
+          targetColumnRange.PasteSpecial(ExcelInterop.XlPasteType.xlPasteValuesAndNumberFormats, ExcelInterop.XlPasteSpecialOperation.xlPasteSpecialOperationNone, false, false);
         }
 
         firstTargetColumnIndex++;
@@ -341,7 +342,8 @@ namespace MySQL.ForExcel.Classes
         ExcelInterop.Range sourceColumnRange = sourceCopyRange.Columns[mappedIndex];
         ExcelInterop.Range targetColumnTopCell = TempWorksheet.Cells[1, excelColumnIndex];
         ExcelInterop.Range targetColumnRange = targetColumnTopCell.Resize[sourceCopyRange.Rows.Count, 1];
-        sourceColumnRange.Copy(targetColumnRange);
+        sourceColumnRange.Copy();
+        targetColumnRange.PasteSpecial(ExcelInterop.XlPasteType.xlPasteValuesAndNumberFormats, ExcelInterop.XlPasteSpecialOperation.xlPasteSpecialOperationNone, false, false);
       }
 
       Range = TempWorksheet.Cells[1, 1];

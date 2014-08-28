@@ -1,4 +1,6 @@
 1.3.3
+- Fixed the code that pre-processes data for Export or Append operations to copy the Excel range's values and number formats instead of copying their formulas into a
+  temporary hidden Excel worksheet. (MySQL Bug #73505, Bug #19389936 - CANNOT USE VALUES RETURNED BY EXCEL FORMULAS IN APPEND OR EXPORT DATA OPERATIONS)
 - Changed the way columns without any data that are inside the selected Excel range are treated during an Export or Append data operation, in version 1.2.1 we dismissed
   any columns without data, now if the columns with no data exist between other columns that contain data they are considered as valid for Export or Append. Fixed a bug
   in the code that prepares the data for Append when the mapped columns are less than the total number of columns in the target table.
