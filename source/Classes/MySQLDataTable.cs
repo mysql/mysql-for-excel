@@ -28,6 +28,7 @@ using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 using ExcelTools = Microsoft.Office.Tools.Excel;
+using System.Globalization;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -262,9 +263,15 @@ namespace MySQL.ForExcel.Classes
     /// <param name="tableName">Name of the table.</param>
     /// <param name="fetchColumnsSchemaInfo">Flag indicating if the schema information from the corresponding MySQL table is fetched and recreated before any excelData is added to the table.</param>
     /// <param name="useFormattedValues">Flag indicating if the Excel excelData used to populate this table is formatted (numbers, dates, text) or not (numbers and text).</param>
-    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string tableName, bool fetchColumnsSchemaInfo, bool useFormattedValues)
+    /// <param name="selectQuery">A SELECT query against a database object to fill the [MySqlDataTable] return object with.</param>
+    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string tableName, bool fetchColumnsSchemaInfo, bool useFormattedValues, string selectQuery = null)
       : this(wbConnection, tableName)
     {
+      if (!string.IsNullOrEmpty(selectQuery))
+      {
+        SelectQuery = selectQuery;
+      }
+
       IsFormatted = useFormattedValues;
       OperationType = DataOperationType.Append;
       if (fetchColumnsSchemaInfo)
@@ -283,8 +290,9 @@ namespace MySQL.ForExcel.Classes
     /// <param name="tableName">Name of the table.</param>
     /// <param name="filledTable"><see cref="DataTable"/> object containing imported excelData from the MySQL table to be edited.</param>
     /// <param name="operationType">The <see cref="DataOperationType"/> intended for this object.</param>
-    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string tableName, DataTable filledTable, DataOperationType operationType)
-      : this(wbConnection, tableName, true, true)
+    /// <param name="selectQuery">A SELECT query against a database object to fill the [MySqlDataTable] return object with.</param>
+    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string tableName, DataTable filledTable, DataOperationType operationType, string selectQuery)
+      : this(wbConnection, tableName, true, true, selectQuery)
     {
       CopyTableData(filledTable, false);
       OperationType = operationType;
@@ -2201,9 +2209,15 @@ namespace MySQL.ForExcel.Classes
       }
 
       Columns.Clear();
+      var columnsNames = SelectQuery.GetColumnNamesArrayFromSelectQuery();
       foreach (DataRow columnInfoRow in schemaInfoTable.Rows)
       {
         string colName = columnInfoRow["Field"].ToString();
+        if (columnsNames != null && columnsNames.All(c => string.Compare(c, colName, CultureInfo.InvariantCulture, CompareOptions.IgnoreCase) != 0))
+        {
+          continue;
+        }
+
         string dataType = columnInfoRow["Type"].ToString();
         bool allowNulls = columnInfoRow["Null"].ToString() == "YES";
         string keyInfo = columnInfoRow["Key"].ToString();

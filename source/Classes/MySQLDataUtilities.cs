@@ -68,7 +68,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="operationType">The <see cref="MySqlDataTable.DataOperationType"/> intended for the new <see cref="MySqlDataTable"/>.</param>
     /// <param name="tableOrViewName">The name of the MySQL table or view to import data from..</param>
     /// <param name="importColumnNames">Flag indicating if column names will be imported as the first row of imported data.</param>
-    /// <param name="selectQuery">a SELECT query against a database object to fill the [MySqlDataTable] return object with.</param>
+    /// <param name="selectQuery">A SELECT query against a database object to fill the [MySqlDataTable] return object with.</param>
     /// <param name="procedureResultSetIndex">The index of the result set of a stored procedure this table contains data for.</param>
     /// <returns>MySql Table created from the selectQuery.</returns>
     public static MySqlDataTable CreateImportMySqlTable(this MySqlWorkbenchConnection wbConnection, MySqlDataTable.DataOperationType operationType, string tableOrViewName, bool importColumnNames, string selectQuery, int procedureResultSetIndex = 0)
@@ -80,11 +80,10 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      var importMySqlDataTable = new MySqlDataTable(wbConnection, tableOrViewName, dt, operationType)
+      var importMySqlDataTable = new MySqlDataTable(wbConnection, tableOrViewName, dt, operationType, selectQuery)
       {
         ImportColumnNames = importColumnNames,
-        ProcedureResultSetIndex = procedureResultSetIndex,
-        SelectQuery = selectQuery
+        ProcedureResultSetIndex = procedureResultSetIndex
       };
 
       return importMySqlDataTable;
@@ -286,6 +285,53 @@ namespace MySQL.ForExcel.Classes
       }
 
       return collationsDictionary;
+    }
+
+    /// <summary>
+    /// Gets the array of column names from a given SelectQuery.
+    /// </summary>
+    /// <param name="selectQuery">The select query to get the array of column names from.</param>
+    /// <returns></returns>
+    public static string[] GetColumnNamesArrayFromSelectQuery(this string selectQuery)
+    {
+      if (string.IsNullOrEmpty(selectQuery))
+      {
+        return null;
+      }
+
+      // We calculate the index from the 'select' word to start parsing from.
+      var start = selectQuery.ToLower().IndexOf("select", StringComparison.InvariantCulture);
+
+      // We calculate the index from the 'from' word to finish parsing with.
+      var end = selectQuery.ToLower().LastIndexOf("from", StringComparison.InvariantCulture);
+
+      // If the words select and from are not contained in the selectQuery or the 'from' word is located 
+      // before 'select' in the selectQuery, it is not in the right format and we quit.
+      if (start == -1 || end == -1 || start > end)
+      {
+        return null;
+      }
+
+      // start points to the index where the words 'select' starts from, we need the index of the first character afterwards to begin parsing.
+      start += 6;
+
+      // We calculate the length bewteen start and end to parse only the part of selectQuery that contains the column names.
+      var lenght = end - start;
+      var queryToAnalyze = selectQuery.Substring(start, lenght);
+
+      //If all columns are listed, we don't need to enumerate them.
+      if (queryToAnalyze.Contains("*"))
+      {
+        return null;
+      }
+
+      var result = queryToAnalyze.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+      for (int i = 0; i < result.Length; i++)
+      {
+        result[i] = result[i].Trim(new[] { ' ', '`' });
+      }
+
+      return result;
     }
 
     /// <summary>
