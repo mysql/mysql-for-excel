@@ -342,11 +342,16 @@ namespace MySQL.ForExcel
       // Determine if this is the first run of the Add-In by checking if there are no Excel panes in the collection.
       // This must be done at this point of the code, before the lines below that create an Excel pane.
       bool firstRun = ExcelPanesList.Count == 0;
+      if (firstRun)
+      {
+        // Migrate all Workbench connections created with version 1.0.6 (in a local connections file) to the Workbench connections file.
+        MySqlWorkbench.MigrateExternalConnectionsToWorkbench();
+      }
 
       // Instantiate the Excel Add-In pane to attach it to the Excel's custom task pane.
       // Note that in Excel 2007 and 2010 a MDI model is used so only a single Excel pane is instantiated, whereas in Excel 2013 and greater
       //  a SDI model is used instead, so an Excel pane is instantiated for each custom task pane appearing in each Excel window.
-      ExcelAddInPane excelPane = new ExcelAddInPane { Dock = DockStyle.Fill };
+      var excelPane = new ExcelAddInPane { Dock = DockStyle.Fill };
       excelPane.SizeChanged += ExcelPane_SizeChanged;
       ExcelPanesList.Add(excelPane);
 
@@ -1070,9 +1075,6 @@ namespace MySQL.ForExcel
       _restoringExistingConnectionInfo = false;
       SkipSelectedDataContentsDetection = false;
 
-      // Migrate all Workbench connections created with version 1.0.6 (in a local connections file) to the Workbench connections file.
-      MySqlWorkbench.MigrateExternalConnectionsToWorkbench();
-
       // Subscribe to Excel events
       SetupExcelEvents(true);
 
@@ -1103,12 +1105,12 @@ namespace MySQL.ForExcel
     private void InitializeMySqlWorkbenchStaticSettings()
     {
       string applicationDataFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-      MySqlWorkbench.ExternalApplicationName = AssemblyTitle;
-      MySqlWorkbenchPasswordVault.ApplicationPasswordVaultFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\user_data.dat";
-      MySqlWorkbench.ExternalConnections.CreateDefaultConnections = !File.Exists(MySqlWorkbench.ConnectionsFilePath) && MySqlWorkbench.Connections.Count == 0;
-      MySqlWorkbench.ExternalApplicationConnectionsFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\connections.xml";
       MySqlSourceTrace.LogFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\MySQLForExcelInterop.log";
       MySqlSourceTrace.SourceTraceClass = "MySQLForExcel";
+      MySqlWorkbench.ExternalApplicationName = AssemblyTitle;
+      MySqlWorkbenchPasswordVault.ApplicationPasswordVaultFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\user_data.dat";
+      MySqlWorkbench.ExternalConnections.CreateDefaultConnections = !MySqlWorkbench.ConnectionsFileExists && MySqlWorkbench.Connections.Count == 0;
+      MySqlWorkbench.ExternalApplicationConnectionsFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\connections.xml";
     }
 
     /// <summary>
