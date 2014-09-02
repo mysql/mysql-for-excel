@@ -20,6 +20,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Forms;
+using MySQL.Utility.Classes.MySQLInstaller;
 
 namespace MySQL.ForExcel.Forms
 {
@@ -35,6 +36,11 @@ namespace MySQL.ForExcel.Forms
     {
       InitializeComponent();
       ExcelVersionLabel.Text = string.Format("{0} {1}.{2}.{3}", AssemblyInfo.AssemblyTitle, Version[0], Version[1], Version[2]);
+      if (MySqlInstaller.IsInstalled && !string.IsNullOrEmpty(MySqlInstaller.Version))
+      {
+        var installerVersion = MySqlInstaller.Version.Split('.');
+        InstallerVersionLabel.Text = string.Format("MySQL Installer {0}.{1}", installerVersion[0], installerVersion[1]);
+      }
     }
 
     /// <summary>

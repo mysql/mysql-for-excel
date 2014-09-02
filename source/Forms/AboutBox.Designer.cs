@@ -58,7 +58,7 @@ namespace MySQL.ForExcel.Forms
       this.InstallerVersionLabel.Name = "InstallerVersionLabel";
       this.InstallerVersionLabel.Size = new System.Drawing.Size(106, 13);
       this.InstallerVersionLabel.TabIndex = 5;
-      this.InstallerVersionLabel.Text = "MySQL Installer 1.3";
+      this.InstallerVersionLabel.Text = "MySQL Installer 1.4";
       this.InstallerVersionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
       // 
       // ExcelVersionLabel

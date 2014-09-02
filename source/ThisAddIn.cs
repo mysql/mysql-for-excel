@@ -28,6 +28,7 @@ using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQLInstaller;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
@@ -1645,6 +1646,7 @@ namespace MySQL.ForExcel
         System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
         CustomizeInfoDialog();
         InitializeMySqlWorkbenchStaticSettings();
+        MySqlInstaller.LoadData();
         AssemblyTitle = AssemblyInfo.AssemblyTitle;
         UsingTempWorksheet = false;
 
