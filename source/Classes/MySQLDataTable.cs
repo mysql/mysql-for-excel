@@ -1605,9 +1605,8 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The <see cref="ExcelInterop.Range"/> containing the cells with the imported data.</returns>
     public ExcelInterop.Range ImportDataIntoExcelRange(ExcelInterop.Range atCell)
     {
-      int startingRow = ImportColumnNames ? 1 : 0;
-      int rowsCount = Rows.Count + startingRow;
-      if (rowsCount == 0)
+      int rowsCount = Rows.Count;
+      if (rowsCount == 0 && !ImportColumnNames)
       {
         return null;
       }
@@ -1615,23 +1614,23 @@ namespace MySQL.ForExcel.Classes
       ExcelInterop.Range fillingRange;
       try
       {
-        int currentRow = atCell.Row - 1;
+        int currentRow = atCell.Row;
         var activeWorkbook = atCell.Worksheet.Parent as ExcelInterop.Workbook;
-        int cappedNumRows = activeWorkbook != null && activeWorkbook.Excel8CompatibilityMode
-          ? Math.Min(rowsCount, UInt16.MaxValue - currentRow)
-          : rowsCount;
+        var maxRowNumber = activeWorkbook.GetWorkbookMaxRowNumber();
+        var cappedNumRows = Math.Min(rowsCount, maxRowNumber + (ImportColumnNames ? 0 : 1) - currentRow);
         fillingRange = atCell.Resize[cappedNumRows, Columns.Count];
-        var fillingArray = new object[cappedNumRows, Columns.Count];
+        fillingRange.ClearFormats();
+
         if (ImportColumnNames)
         {
           for (int currCol = 0; currCol < Columns.Count; currCol++)
           {
-            fillingArray[0, currCol] = Columns[currCol].ColumnName;
+            fillingRange[1, currCol + 1] = Columns[currCol].ColumnName;
           }
         }
 
-        int fillingRowIdx = startingRow;
-        cappedNumRows -= startingRow;
+        var currentTimeFormat = CultureInfo.CurrentCulture.DateTimeFormat;
+        int fillingRowIdx = ImportColumnNames ? 2 : 1;
         for (int currRow = 0; currRow < cappedNumRows; currRow++)
         {
           var mySqlRow = Rows[currRow] as MySqlDataRow;
@@ -1642,17 +1641,28 @@ namespace MySQL.ForExcel.Classes
 
           for (int currCol = 0; currCol < Columns.Count; currCol++)
           {
-            fillingArray[fillingRowIdx, currCol] = mySqlRow[currCol];
+            if (mySqlRow[currCol] is TimeSpan)
+            {
+              ExcelInterop.Range cellRange = fillingRange[fillingRowIdx, currCol + 1];
+              cellRange[1, 1] = ((TimeSpan)mySqlRow[currCol]).TotalDays;
+              var shortTimePattern = currentTimeFormat.LongTimePattern;
+              cellRange.NumberFormat = shortTimePattern;
+              continue;
+            }
+
+            fillingRange[fillingRowIdx, currCol + 1] = mySqlRow[currCol];
           }
 
-          mySqlRow.ExcelRange = fillingRange.Rows[fillingRowIdx + 1] as ExcelInterop.Range;
+          if (currentRow + (fillingRowIdx - 1) < maxRowNumber)
+          {
+            mySqlRow.ExcelRange = fillingRange.Rows[fillingRowIdx] as ExcelInterop.Range;
+          }
+
           fillingRowIdx++;
         }
 
         Globals.ThisAddIn.SkipSelectedDataContentsDetection = true;
         Globals.ThisAddIn.Application.Goto(fillingRange, false);
-        fillingRange.ClearFormats();
-        fillingRange.Value = fillingArray;
 
         // Format column names for imported range
         if (ImportColumnNames)

@@ -1,4 +1,6 @@
 1.3.3
+- Added code to convert TimeSpan values from the database into Excel's time values to avoid type errors while importing to a range (when Create Excel Table option is not
+  selected in Advanced Options). (MySQL Bug #72504, Bug #18693067 - MYSQL FOR EXCEL NOT IMPORTING TIME COLUMNS)
 - Fixed the code that pre-processes data for Export or Append operations to copy the Excel range's values and number formats instead of copying their formulas into a
   temporary hidden Excel worksheet. (MySQL Bug #73505, Bug #19389936 - CANNOT USE VALUES RETURNED BY EXCEL FORMULAS IN APPEND OR EXPORT DATA OPERATIONS)
 - Changed the way columns without any data that are inside the selected Excel range are treated during an Export or Append data operation, in version 1.2.1 we dismissed

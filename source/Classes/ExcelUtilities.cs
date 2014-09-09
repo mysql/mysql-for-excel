@@ -87,6 +87,16 @@ namespace MySQL.ForExcel.Classes
     public const int EN_US_LOCALE_CODE = 1033;
 
     /// <summary>
+    /// The maximum number of rows that can exist in 2007 and newer versions of Excel;
+    /// </summary>
+    public const int MAXIMUM_WORKSHEET_ROWS_IN_LATEST_VERSION = 1048576;
+
+    /// <summary>
+    /// The maximum number of rows that can exist in 2003 and older versions of Excel;
+    /// </summary>
+    public const int MAXIMUM_WORKSHEET_ROWS_IN_COMPATIBILITY_MODE = UInt16.MaxValue + 1;
+
+    /// <summary>
     /// The default number of columns a <see cref="ExcelInterop.PivotTable"/> placeholder occupies.
     /// </summary>
     public const int PIVOT_TABLES_PLACEHOLDER_DEFAULT_COLUMNS_SIZE = 3;
@@ -896,6 +906,16 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets the maximum row number possible for the current configuration mode in the active workbook.
+    /// </summary>
+    /// <param name="activeWorkbook">The active workbook.</param>
+    /// <returns>The number of the maximum row index in the current configuration mode for the active workbook.</returns>
+    public static int GetWorkbookMaxRowNumber(this ExcelInterop.Workbook activeWorkbook)
+    {
+      return activeWorkbook == null ? 0 : activeWorkbook.Excel8CompatibilityMode ? MAXIMUM_WORKSHEET_ROWS_IN_COMPATIBILITY_MODE : MAXIMUM_WORKSHEET_ROWS_IN_LATEST_VERSION;
+    }
+
+    /// <summary>
     /// Gets a <see cref="ExcelInterop.Range"/> representing the top left cell where the next result set's data should be placed.
     /// </summary>
     /// <param name="currentResultSetRange">The <see cref="ExcelInterop.Range"/> of the current result set's data imported to Excel.</param>
@@ -917,7 +937,7 @@ namespace MySQL.ForExcel.Classes
       {
         case DbProcedure.ProcedureResultSetsImportType.AllResultSetsHorizontally:
           var pivotTablePlaceHolderColumns = withPivotTable ? PIVOT_TABLES_PLACEHOLDER_DEFAULT_COLUMNS_SIZE + spacing : 0;
-          columnsOffset = currentResultSetRange.Columns.Count + pivotTablePlaceHolderColumns +  spacing;
+          columnsOffset = currentResultSetRange.Columns.Count + pivotTablePlaceHolderColumns + spacing;
           break;
 
         case DbProcedure.ProcedureResultSetsImportType.AllResultSetsVertically:
