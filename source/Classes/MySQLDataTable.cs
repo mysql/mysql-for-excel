@@ -1618,7 +1618,7 @@ namespace MySQL.ForExcel.Classes
         var activeWorkbook = atCell.Worksheet.Parent as ExcelInterop.Workbook;
         var maxRowNumber = activeWorkbook.GetWorkbookMaxRowNumber();
         var cappedNumRows = Math.Min(rowsCount, maxRowNumber + (ImportColumnNames ? 0 : 1) - currentRow);
-        fillingRange = atCell.Resize[cappedNumRows, Columns.Count];
+        fillingRange = atCell.Resize[cappedNumRows + (ImportColumnNames ? 1 : 0), Columns.Count];
         fillingRange.ClearFormats();
 
         if (ImportColumnNames)
@@ -1629,7 +1629,6 @@ namespace MySQL.ForExcel.Classes
           }
         }
 
-        var currentTimeFormat = CultureInfo.CurrentCulture.DateTimeFormat;
         int fillingRowIdx = ImportColumnNames ? 2 : 1;
         for (int currRow = 0; currRow < cappedNumRows; currRow++)
         {
@@ -1645,8 +1644,7 @@ namespace MySQL.ForExcel.Classes
             {
               ExcelInterop.Range cellRange = fillingRange[fillingRowIdx, currCol + 1];
               cellRange[1, 1] = ((TimeSpan)mySqlRow[currCol]).TotalDays;
-              var shortTimePattern = currentTimeFormat.LongTimePattern;
-              cellRange.NumberFormat = shortTimePattern;
+              cellRange.NumberFormat = ExcelUtilities.LONG_TIME_FORMAT;
               continue;
             }
 

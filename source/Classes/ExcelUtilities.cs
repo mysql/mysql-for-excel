@@ -87,6 +87,11 @@ namespace MySQL.ForExcel.Classes
     public const int EN_US_LOCALE_CODE = 1033;
 
     /// <summary>
+    /// The universal long time format which includes hours minutes and seconds.
+    /// </summary>
+    public const string LONG_TIME_FORMAT = "hh:mm:ss";
+
+    /// <summary>
     /// The maximum number of rows that can exist in 2007 and newer versions of Excel;
     /// </summary>
     public const int MAXIMUM_WORKSHEET_ROWS_IN_LATEST_VERSION = 1048576;
