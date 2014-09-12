@@ -100,9 +100,19 @@ namespace MySQL.ForExcel.Forms
     private MySqlDataTable _mySqlTable;
 
     /// <summary>
+    /// The text showing original operations information reflected on the SQL script.
+    /// </summary>
+    private readonly string _operationsInfoText;
+
+    /// <summary>
     /// A list of SQL statements tied to a specific data row.
     /// </summary>
     private List<IMySqlDataRow> _originalStatementRowsList;
+
+    /// <summary>
+    /// Flag indicating whether rows data is refreshed after their push operation is executed.
+    /// </summary>
+    private bool _refreshRowsDataAfterPush;
 
     /// <summary>
     /// Flag indicating whether original operations from a <see cref="MySqlDataTable"/> are shown above the SQL statements.
@@ -118,11 +128,6 @@ namespace MySQL.ForExcel.Forms
     /// Flag indicating whether the user edited the original query so the <see cref="SqlScript"/> and <see cref="OriginalSqlScript"/> values may differ.
     /// </summary>
     private bool _userChangedOriginalQuery;
-
-    /// <summary>
-    /// The text showing original operations information reflected on the SQL script.
-    /// </summary>
-    private readonly string _operationsInfoText;
 
     /// <summary>
     /// MySQL Workbench connection to a MySQL server instance selected by users.
@@ -157,7 +162,8 @@ namespace MySQL.ForExcel.Forms
     /// Initializes a new instance of the <see cref="MySqlScriptDialog"/> class.
     /// </summary>
     /// <param name="mySqlTable">The <see cref="MySqlDataTable"/> object containing data changes to be committed to the database.</param>
-    public MySqlScriptDialog(MySqlDataTable mySqlTable)
+    /// <param name="refreshRowsDataAfterPush">Flag indicating whether rows data is refreshed after their push operation is executed.</param>
+    public MySqlScriptDialog(MySqlDataTable mySqlTable, bool refreshRowsDataAfterPush)
       : this()
     {
       if (mySqlTable != null)
@@ -182,9 +188,10 @@ namespace MySQL.ForExcel.Forms
         }
 
         _mySqlTable = mySqlTable;
-        _wbConnection = _mySqlTable.WbConnection;
-        _useOptimisticUpdate = _mySqlTable.UseOptimisticUpdate;
+        _refreshRowsDataAfterPush = refreshRowsDataAfterPush;
         _showOriginalOperationsInformation = true;
+        _useOptimisticUpdate = _mySqlTable.UseOptimisticUpdate;
+        _wbConnection = _mySqlTable.WbConnection;
         CreateOriginalStatementsList();
         SetOriginalOperationsInfoAvailability();
       }
@@ -205,6 +212,7 @@ namespace MySQL.ForExcel.Forms
       _mySqlMaxAllowedPacket = 0;
       _mySqlTable = null;
       _originalStatementRowsList = null;
+      _refreshRowsDataAfterPush = false;
       _showOriginalOperationsInformation = false;
       _useOptimisticUpdate = false;
       _userChangedOriginalQuery = false;
@@ -374,11 +382,11 @@ namespace MySQL.ForExcel.Forms
       }
 
       string connectionString = _wbConnection.GetConnectionStringBuilder().ConnectionString;
-      using (MySqlConnection conn = new MySqlConnection(connectionString))
+      using (var conn = new MySqlConnection(connectionString))
       {
         conn.Open();
         MySqlTransaction transaction = conn.BeginTransaction();
-        MySqlCommand command = new MySqlCommand(string.Empty, conn, transaction);
+        var command = new MySqlCommand(string.Empty, conn, transaction);
         uint executionOrder = 1;
         foreach (var mySqlRow in ActualStatementRowsList)
         {
@@ -416,49 +424,8 @@ namespace MySQL.ForExcel.Forms
           break;
         }
 
-        switch (ScriptResult)
-        {
-          case MySqlStatement.StatementResultType.ConnectionLost:
-            // Since the connection was lost the transaction can't be committed or rolled back, just errored out.
-            break;
-
-          case MySqlStatement.StatementResultType.NotApplied:
-          case MySqlStatement.StatementResultType.ErrorThrown:
-            transaction.Rollback();
-            if (_lockedTable)
-            {
-              _wbConnection.UnlockTablesInClientSession();
-            }
-
-            if (_createdTable)
-            {
-              _wbConnection.DropTableIfExists(_mySqlTable.TableNameForSqlQueries);
-            }
-            break;
-
-          case MySqlStatement.StatementResultType.WarningsFound:
-          case MySqlStatement.StatementResultType.Successful:
-            // After commiting the transaction, selectively commit the rows that did not result in errors.
-            transaction.Commit();
-            // Do not convert to LINQ, it will use a Where clause that will consume more time than just skipping the row.
-            foreach (var mySqlRow in ActualStatementRowsList)
-            {
-              if (!mySqlRow.Statement.StatementWasApplied)
-              {
-                continue;
-              }
-
-              if (mySqlRow.HasConcurrencyWarnings)
-              {
-                mySqlRow.ReflectError();
-                continue;
-              }
-
-              mySqlRow.AcceptChanges();
-              mySqlRow.ClearErrors();
-            }
-            break;
-        }
+        PostApplyScript(transaction);
+        transaction.Dispose();
       }
     }
 
@@ -603,6 +570,70 @@ namespace MySQL.ForExcel.Forms
 
       OriginalQueryButton.Enabled = false;
       SqlScript = OriginalSqlScript;
+    }
+
+    /// <summary>
+    /// Peforms operations after the script was applied against the database depending on the result of the queries execution.
+    /// </summary>
+    /// <param name="transaction">The <see cref="MySqlTransaction"/> used</param>
+    private void PostApplyScript(MySqlTransaction transaction)
+    {
+      if (transaction == null)
+      {
+        return;
+      }
+
+      switch (ScriptResult)
+      {
+        case MySqlStatement.StatementResultType.ConnectionLost:
+          // Since the connection was lost the transaction can't be committed or rolled back, just errored out.
+          break;
+
+        case MySqlStatement.StatementResultType.NotApplied:
+        case MySqlStatement.StatementResultType.ErrorThrown:
+          transaction.Rollback();
+          if (_lockedTable)
+          {
+            _wbConnection.UnlockTablesInClientSession();
+          }
+
+          if (_createdTable)
+          {
+            _wbConnection.DropTableIfExists(_mySqlTable.TableNameForSqlQueries);
+          }
+          break;
+
+        case MySqlStatement.StatementResultType.WarningsFound:
+        case MySqlStatement.StatementResultType.Successful:
+          // After commiting the transaction, process rows according to ther result.
+          transaction.Commit();
+          // Do not convert to LINQ, it will use a Where clause that will consume more time than just skipping the row.
+          foreach (var mySqlRow in ActualStatementRowsList)
+          {
+            if (!mySqlRow.Statement.StatementWasApplied)
+            {
+              continue;
+            }
+
+            if (mySqlRow.HasConcurrencyWarnings)
+            {
+              mySqlRow.ReflectError();
+              continue;
+            }
+
+            if (_refreshRowsDataAfterPush)
+            {
+              mySqlRow.RefreshData(true);
+            }
+            else
+            {
+              mySqlRow.AcceptChanges();
+            }
+
+            mySqlRow.ClearErrors();
+          }
+          break;
+      }
     }
 
     /// <summary>

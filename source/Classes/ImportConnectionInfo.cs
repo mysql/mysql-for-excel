@@ -516,6 +516,10 @@ namespace MySQL.ForExcel.Classes
           ToolsExcelTable.Disconnect();
         }
 
+        // Skip Worksheet events
+        Globals.ThisAddIn.SkipWorksheetChangeEvent = true;
+        Globals.ThisAddIn.SkipSelectedDataContentsDetection = true;
+
         // Resize the ExcelTools.ListObject by giving it an ExcelInterop.Range calculated with the refreshed MySqlDataTable dimensions.
         // Detection of a collision with another Excel object must be performed first and if any then shift rows and columns to fix the collision.
         const int headerRows = 1;
@@ -569,6 +573,11 @@ namespace MySQL.ForExcel.Classes
       {
         MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.ImportDataBindError, _excelTableName), ex.GetFormattedMessage(), true);
         MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
+      finally
+      {
+        Globals.ThisAddIn.SkipWorksheetChangeEvent = false;
+        Globals.ThisAddIn.SkipSelectedDataContentsDetection = false;
       }
     }
 

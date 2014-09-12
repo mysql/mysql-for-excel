@@ -96,11 +96,6 @@ namespace MySQL.ForExcel.Forms
     private IWin32Window _parentWindow;
 
     /// <summary>
-    /// Flag indicating whether the editing session is in process of undoing changes done
-    /// </summary>
-    private bool _undoingChanges;
-
-    /// <summary>
     /// Flag indicating whether this editing session is changing the value of the global Use Optimistic Update setting.
     /// </summary>
     private bool _updatingUSeOptimisticUpdateSetting;
@@ -130,7 +125,6 @@ namespace MySQL.ForExcel.Forms
     {
       _mouseDownPoint = Point.Empty;
       _neverBeenShown = true;
-      _undoingChanges = false;
       _updatingUSeOptimisticUpdateSetting = false;
 
       InitializeComponent();
@@ -460,7 +454,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="target"></param>
     private void EditingWorksheet_Change(ExcelInterop.Range target)
     {
-      if (_undoingChanges)
+      if (Globals.ThisAddIn.SkipWorksheetChangeEvent)
       {
         return;
       }
@@ -575,9 +569,9 @@ namespace MySQL.ForExcel.Forms
                     continue;
                   }
 
-                  _undoingChanges = true;
+                  Globals.ThisAddIn.SkipWorksheetChangeEvent = true;
                   cell.Value = null;
-                  _undoingChanges = false;
+                  Globals.ThisAddIn.SkipWorksheetChangeEvent = false;
                 }
                 else
                 {
@@ -967,7 +961,7 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void UndoChanges()
     {
-      _undoingChanges = true;
+      Globals.ThisAddIn.SkipWorksheetChangeEvent = true;
       try
       {
         EditingWorksheet.Application.Undo();
@@ -977,7 +971,7 @@ namespace MySQL.ForExcel.Forms
         MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
 
-      _undoingChanges = false;
+      Globals.ThisAddIn.SkipWorksheetChangeEvent = false;
     }
   }
 }

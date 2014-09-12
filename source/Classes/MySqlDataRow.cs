@@ -19,12 +19,13 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
 using MySQL.ForExcel.Classes.Exceptions;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
-using Excel = Microsoft.Office.Interop.Excel;
+using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -36,9 +37,24 @@ namespace MySQL.ForExcel.Classes
     #region Fields
 
     /// <summary>
+    /// The Excel range representing the whole data row.
+    /// </summary>
+    private ExcelInterop.Range _excelRange;
+
+    /// <summary>
+    /// An array containing the previous colors assigned to cells before the last refresh from the database.
+    /// </summary>
+    private int[] _excelRangePreviousColors;
+
+    /// <summary>
     /// Gets the parent <see cref="MySqlDataTable"/> for this row.
     /// </summary>
     private MySqlDataTable _mySqlTable;
+
+    /// <summary>
+    /// Flag indicating whether the row is refreshing its data after a push operation is made.
+    /// </summary>
+    private bool _refreshingData;
 
     /// <summary>
     /// The SQL query needed to commit changes contained in this row to the SQL server.
@@ -54,13 +70,14 @@ namespace MySQL.ForExcel.Classes
     /// <param name="builder">A <see cref="DataRowBuilder"/> to construct the row.</param>
     protected internal MySqlDataRow(DataRowBuilder builder) : base(builder)
     {
+      _excelRange = null;
       _mySqlTable = null;
+      _refreshingData = false;
       _sqlQuery = null;
       ChangedColumnNames = new List<string>(Table.Columns.Count);
-      ExcelRange = null;
       IsBeingDeleted = false;
       IsHeadersRow = false;
-      ExcelModifiedRangesList = new List<Excel.Range>(Table.Columns.Count);
+      ExcelModifiedRangesList = new List<ExcelInterop.Range>(Table.Columns.Count);
       Statement = new MySqlStatement(this);
     }
 
@@ -74,7 +91,22 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets or sets the Excel range representing the whole data row.
     /// </summary>
-    public Excel.Range ExcelRange { get; set; }
+    public ExcelInterop.Range ExcelRange
+    {
+      get
+      {
+        return _excelRange;
+      }
+
+      set
+      {
+        _excelRange = value;
+        if (_excelRange != null)
+        {
+          _excelRangePreviousColors = new int[_excelRange.Columns.Count];
+        }
+      }
+    }
 
     /// <summary>
     /// Gets the related Excel row number if any.
@@ -89,9 +121,9 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a list of <see cref="Excel.Range"/> objects representing cells with modified values.
+    /// Gets a list of <see cref="ExcelInterop.Range"/> objects representing cells with modified values.
     /// </summary>
-    public List<Excel.Range> ExcelModifiedRangesList { get; private set; }
+    public List<ExcelInterop.Range> ExcelModifiedRangesList { get; private set; }
 
     /// <summary>
     /// Gets a value indicating whether there are concurrency warnings in a row.
@@ -217,6 +249,85 @@ namespace MySQL.ForExcel.Classes
 
       var cellsColor = HasConcurrencyWarnings ? ExcelUtilities.WarningCellsOleColor : ExcelUtilities.ErroredCellsOleColor;
       ExcelModifiedRangesList.SetInteriorColor(cellsColor);
+      SaveCurrentColor(cellsColor);
+    }
+
+    /// <summary>
+    /// Refreshes the row's data and reflects the changes on the <see cref="ExcelRow"/>.
+    /// </summary>
+    /// <param name="acceptChanges">Flag indicating whether the refreshed data is committed immediately to the row.</param>
+    public void RefreshData(bool acceptChanges)
+    {
+      if (MySqlTable == null)
+      {
+        return;
+      }
+
+      var refreshQuery = GetSqlForRefreshingRow();
+      if ((RowState != DataRowState.Added && RowState != DataRowState.Modified) || string.IsNullOrEmpty(refreshQuery))
+      {
+        return;
+      }
+
+      bool refreshSuccessful = true;
+      try
+      {
+        var refreshTable = MySqlTable.WbConnection.GetDataFromSelectQuery(refreshQuery);
+        if (refreshTable == null || refreshTable.Rows.Count == 0)
+        {
+          return;
+        }
+
+        var refreshedRow = refreshTable.Rows[0];
+        var rowValues = refreshedRow.ItemArray;
+        MySqlTable.PrepareCopyingItemArray(ref rowValues, MySqlTable.EscapeFormulaTexts);
+        _refreshingData = true;
+        ItemArray = rowValues;
+
+        if (ExcelRange == null)
+        {
+          return;
+        }
+
+        Globals.ThisAddIn.SkipWorksheetChangeEvent = true;
+        for (int columnIndex = 1; columnIndex <= ExcelRange.Columns.Count; columnIndex++)
+        {
+          ExcelRange.Cells[1, columnIndex] = rowValues[columnIndex - 1];
+        }
+      }
+      catch (Exception ex)
+      {
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        refreshSuccessful = false;
+      }
+      finally
+      {
+        _refreshingData = false;
+        Globals.ThisAddIn.SkipWorksheetChangeEvent = false;
+      }
+
+      if (acceptChanges && refreshSuccessful)
+      {
+        AcceptChanges();
+      }
+    }
+
+    /// <summary>
+    /// Signals that the row has been just added to a <see cref="MySqlDataTable"/>.
+    /// </summary>
+    public void RowAdded()
+    {
+      if (_excelRangePreviousColors == null)
+      {
+        if (_excelRange != null)
+        {
+          _excelRangePreviousColors = new int[_excelRange.Columns.Count];
+        }
+      }
+      else
+      {
+        _excelRangePreviousColors.Initialize();
+      }
     }
 
     /// <summary>
@@ -225,6 +336,11 @@ namespace MySQL.ForExcel.Classes
     /// <param name="rowAction">An action performed on this row.</param>
     public void RowChanged(DataRowAction rowAction)
     {
+      if (_refreshingData)
+      {
+        return;
+      }
+
       _sqlQuery = null;
       switch (rowAction)
       {
@@ -300,21 +416,9 @@ namespace MySQL.ForExcel.Classes
 
       var sqlBuilderForDelete = MySqlTable.SqlBuilderForDelete;
       sqlBuilderForDelete.Clear();
-      string colsSeparator = string.Empty;
       sqlBuilderForDelete.Append(MySqlStatement.STATEMENT_DELETE);
-      sqlBuilderForDelete.AppendFormat(" `{0}`.`{1}` WHERE ", MySqlTable.SchemaName, MySqlTable.TableNameForSqlQueries);
-      foreach (MySqlDataColumn pkCol in MySqlTable.PrimaryKeyColumns)
-      {
-        bool pkValueIsNull;
-        string valueToDb = DataTypeUtilities.GetStringValueForColumn(this[pkCol.ColumnName, DataRowVersion.Original], pkCol, false, out pkValueIsNull);
-        sqlBuilderForDelete.AppendFormat(
-          "{0}`{1}`={2}{3}{2}",
-          colsSeparator,
-          pkCol.ColumnNameForSqlQueries,
-          pkCol.ColumnRequiresQuotes && !pkValueIsNull ? "'" : string.Empty,
-          valueToDb);
-        colsSeparator = " AND ";
-      }
+      sqlBuilderForDelete.AppendFormat(" `{0}`.`{1}`", MySqlTable.SchemaName, MySqlTable.TableNameForSqlQueries);
+      sqlBuilderForDelete.Append(GetWhereClauseFromPrimaryKey());
 
       return sqlBuilderForDelete.ToString();
     }
@@ -391,6 +495,52 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Returns a SELECT statement SQL query to refresh the row contents.
+    /// </summary>
+    /// <returns>The SELECT SQL query.</returns>
+    private string GetSqlForRefreshingRow()
+    {
+      if (MySqlTable == null || string.IsNullOrEmpty(MySqlTable.SelectQuery))
+      {
+        return string.Empty;
+      }
+
+      return MySqlTable.SelectQuery + GetWhereClauseFromPrimaryKey();
+    }
+
+    /// <summary>
+    /// Creates the WHERE clause part of a SQL statement based on the primary key columns.
+    /// </summary>
+    /// <returns>The WHERE clause part of a SQL statement.</returns>
+    private string GetWhereClauseFromPrimaryKey()
+    {
+      if (MySqlTable == null || MySqlTable.PrimaryKeyColumns == null)
+      {
+        return string.Empty;
+      }
+
+      // Reuse the smallest string builder from the MySqlTable
+      var sqlBuilderForSelect = MySqlTable.SqlBuilderForSelect;
+      sqlBuilderForSelect.Clear();
+      string colsSeparator = string.Empty;
+      sqlBuilderForSelect.Append(" WHERE ");
+      foreach (MySqlDataColumn pkCol in MySqlTable.PrimaryKeyColumns)
+      {
+        bool pkValueIsNull;
+        string valueToDb = DataTypeUtilities.GetStringValueForColumn(this[pkCol.ColumnName, DataRowVersion.Original], pkCol, false, out pkValueIsNull);
+        sqlBuilderForSelect.AppendFormat(
+          "{0}`{1}`={2}{3}{2}",
+          colsSeparator,
+          pkCol.ColumnNameForSqlQueries,
+          pkCol.ColumnRequiresQuotes && !pkValueIsNull ? "'" : string.Empty,
+          valueToDb);
+        colsSeparator = " AND ";
+      }
+
+      return sqlBuilderForSelect.ToString();
+    }
+
+    /// <summary>
     /// Event delegate method fired when a property value in the parent <see cref="MySqlTable"/> changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -428,6 +578,7 @@ namespace MySQL.ForExcel.Classes
       if (!IsBeingDeleted && ExcelRange != null)
       {
         ExcelModifiedRangesList.SetInteriorColor(ExcelUtilities.CommitedCellsOleColor);
+        SaveCurrentColor(ExcelUtilities.CommitedCellsOleColor);
         if (!HasErrors)
         {
           ExcelModifiedRangesList.Clear();
@@ -460,7 +611,7 @@ namespace MySQL.ForExcel.Classes
       // Check column by column for data changes, set related Excel cells color accordingly.
       for (int colIndex = 0; colIndex < Table.Columns.Count; colIndex++)
       {
-        Excel.Range columnCell = ExcelRange != null ? ExcelRange.Cells[1, colIndex + 1] : null;
+        ExcelInterop.Range columnCell = ExcelRange != null ? ExcelRange.Cells[1, colIndex + 1] : null;
         bool originalAndModifiedIdentical = this[colIndex].Equals(this[colIndex, DataRowVersion.Original]);
         if (!originalAndModifiedIdentical)
         {
@@ -472,11 +623,13 @@ namespace MySQL.ForExcel.Classes
           ChangedColumnNames.Add(Table.Columns[colIndex].ColumnName);
         }
 
-        if (columnCell != null)
+        if (columnCell == null)
         {
-          var cellColor = originalAndModifiedIdentical ? ExcelUtilities.EMPTY_CELLS_OLE_COLOR : ExcelUtilities.UncommittedCellsOleColor;
-          columnCell.SetInteriorColor(cellColor);
+          continue;
         }
+
+        var cellColor = originalAndModifiedIdentical ? _excelRangePreviousColors[colIndex] : ExcelUtilities.UncommittedCellsOleColor;
+        columnCell.SetInteriorColor(cellColor);
       }
 
       // If the row resulted with no modifications (maybe some values set back to their original values by the user) then undo changes.
@@ -493,12 +646,39 @@ namespace MySQL.ForExcel.Classes
     {
       if (!IsBeingDeleted)
       {
-        ExcelRange.SetInteriorColor(ExcelUtilities.EMPTY_CELLS_OLE_COLOR);
+        for (int colIndex = 0; colIndex < Table.Columns.Count; colIndex++)
+        {
+          ExcelInterop.Range columnCell = ExcelRange != null ? ExcelRange.Cells[1, colIndex + 1] : null;
+          if (columnCell == null)
+          {
+            continue;
+          }
+
+          columnCell.SetInteriorColor(_excelRangePreviousColors[colIndex]);
+        }
+
         ExcelModifiedRangesList.Clear();
       }
 
       ChangedColumnNames.Clear();
       IsBeingDeleted = false;
+    }
+
+    /// <summary>
+    /// Saves the given color in an array for the modified Excel cells related to the current row.
+    /// </summary>
+    /// <param name="oleColor">The new interior color for the Excel cells.</param>
+    private void SaveCurrentColor(int oleColor)
+    {
+      if (_excelRangePreviousColors == null)
+      {
+        return;
+      }
+
+      foreach (int colIndex in ExcelModifiedRangesList.Select(modifiedRange => modifiedRange.Column).Where(colIndex => colIndex <= _excelRangePreviousColors.Length))
+      {
+        _excelRangePreviousColors[colIndex - 1] = oleColor;
+      }
     }
 
     /// <summary>

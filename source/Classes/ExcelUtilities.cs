@@ -38,7 +38,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// The default interior color for Excel cells committed to the MySQL server during an Edit Data operation.
     /// </summary>
-    /// <remarks>Blue-ish.</remarks>
+    /// <remarks>Green-ish.</remarks>
     public const string DEFAULT_COMMITED_CELLS_HTML_COLOR = "#7CC576";
 
     /// <summary>
@@ -67,7 +67,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// The default interior color for Excel cells containing values that have been changed by the user but not yet committed during an Edit Data operation.
     /// </summary>
-    /// <remarks>Green-ish.</remarks>
+    /// <remarks>Blue-ish.</remarks>
     public const string DEFAULT_UNCOMMITTED_CELLS_HTML_COLOR = "#B8E5F7";
 
     /// <summary>
@@ -1667,8 +1667,6 @@ namespace MySQL.ForExcel.Classes
       {
         range.SetInteriorColor(oleColor);
       }
-
-      rangesList.Clear();
     }
 
     /// <summary>

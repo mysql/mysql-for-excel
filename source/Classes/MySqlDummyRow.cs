@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013-2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -121,6 +121,14 @@ namespace MySQL.ForExcel.Classes
     /// Reflects the error set to the row on its corresponding Excel range cells.
     /// </summary>
     public void ReflectError()
+    {
+    }
+
+    /// <summary>
+    /// Refreshes the row's data and reflects the changes on the <see cref="ExcelRow"/>.
+    /// </summary>
+    /// <param name="acceptChanges">Flag indicating whether the refreshed data is committed immediately to the row.</param>
+    public void RefreshData(bool acceptChanges)
     {
     }
   }

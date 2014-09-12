@@ -245,9 +245,15 @@ namespace MySQL.ForExcel
 
     /// <summary>
     /// Gets or sets a value indicating whether the detection of contents for a cell selection should be skipped.
-    /// Used mainly when a cells selection is being done programatically and not by the user.
     /// </summary>
+    /// <remarks>Used when a cell selection is being done programatically and not by the user.</remarks>
     public bool SkipSelectedDataContentsDetection { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the <see cref="ExcelInterop.Worksheet.Change"/> event should be skipped.
+    /// </summary>
+    /// <remarks>Used when a cell's value is being set programatically and not by the user.</remarks>
+    public bool SkipWorksheetChangeEvent { get; set; }
 
     /// <summary>
     /// Gets a list of <see cref="ImportConnectionInfo"/> objects saved to disk.
@@ -469,7 +475,7 @@ namespace MySQL.ForExcel
     /// <param name="targetRange">A selection of Excel cells.</param>
     private void Application_SheetChange(object workSheet, ExcelInterop.Range targetRange)
     {
-      if (ActiveExcelPane == null || UsingTempWorksheet)
+      if (ActiveExcelPane == null || SkipWorksheetChangeEvent || UsingTempWorksheet)
       {
         return;
       }
@@ -1075,6 +1081,7 @@ namespace MySQL.ForExcel
       _lastDeactivatedSheetName = string.Empty;
       _restoringExistingConnectionInfo = false;
       SkipSelectedDataContentsDetection = false;
+      SkipWorksheetChangeEvent = false;
 
       // Subscribe to Excel events
       SetupExcelEvents(true);
