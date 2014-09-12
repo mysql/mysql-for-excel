@@ -67,6 +67,7 @@ namespace MySQL.ForExcel.Classes
     /// Flag indicating whether an auto-generated primary key column will be added as the first column in the table.
     /// </summary>
     private bool _addPrimaryKeyColumn;
+
     /// <summary>
     /// Flag indicating if the column names where changed to use the first row of data.
     /// </summary>

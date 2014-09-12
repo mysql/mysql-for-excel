@@ -719,7 +719,7 @@ namespace MySQL.ForExcel.Forms
 
       Cursor = Cursors.WaitCursor;
       _mySqlTable.UseOptimisticUpdate = _useOptimisticUpdateForThisSession;
-      var modifiedRowsList = _mySqlTable.PushData(Settings.Default.GlobalSqlQueriesPreviewQueries);
+      var modifiedRowsList = _mySqlTable.PushData(!autoCommitOn && Settings.Default.GlobalSqlQueriesPreviewQueries);
       if (modifiedRowsList == null)
       {
         Cursor = Cursors.Default;
