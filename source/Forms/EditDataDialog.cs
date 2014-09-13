@@ -555,22 +555,23 @@ namespace MySQL.ForExcel.Forms
                 int absCol = startDataTableCol + colIdx - 1;
 
                 currCol = _mySqlTable.GetColumnAtIndex(absCol);
+                object cellValue = cell.GetCellPackedValue(true);
                 object insertingValue = DBNull.Value;
-                if (cell.Value != null)
+                if (cellValue != null)
                 {
-                  insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(cell.Value, currCol, false);
+                  insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(cellValue, currCol, false);
                 }
 
                 if (insertingValue == null)
                 {
                   _mySqlTable.Rows[absRow][absCol] = DBNull.Value;
-                  if (!(cell.Value is DateTime))
+                  if (!(cellValue is DateTime))
                   {
                     continue;
                   }
 
                   Globals.ThisAddIn.SkipWorksheetChangeEvent = true;
-                  cell.Value = null;
+                  cellValue = null;
                   Globals.ThisAddIn.SkipWorksheetChangeEvent = false;
                 }
                 else

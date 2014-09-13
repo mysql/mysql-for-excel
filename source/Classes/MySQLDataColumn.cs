@@ -267,7 +267,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_columnRequiresQuotes == null)
         {
-          _columnRequiresQuotes = IsCharOrText || IsDate || IsSetOrEnum;
+          _columnRequiresQuotes = IsCharOrText || IsDate || IsSetOrEnum || IsTime;
         }
 
         return (bool)_columnRequiresQuotes;
@@ -533,6 +533,17 @@ namespace MySQL.ForExcel.Classes
 
         string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
         return toLowerDataType.StartsWith("set") || toLowerDataType.StartsWith("enum");
+      }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether this column's data type is Time.
+    /// </summary>
+    public bool IsTime
+    {
+      get
+      {
+        return !string.IsNullOrEmpty(StrippedMySqlDataType) && StrippedMySqlDataType.Equals("time", StringComparison.InvariantCultureIgnoreCase);
       }
     }
 
@@ -811,6 +822,7 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
+      var useFormattedValues = ParentTable.IsFormatted;
       string proposedType;
       string strippedType = string.Empty;
       int leftParensIndex;
@@ -824,7 +836,7 @@ namespace MySQL.ForExcel.Classes
       for (int rowPos = 1; rowPos <= columnRange.Rows.Count; rowPos++)
       {
         Excel.Range excelCell = columnRange.Cells[rowPos, 1];
-        object rawValue = excelCell != null ? (ParentTable.IsFormatted ? excelCell.Value : excelCell.Value2) : null;
+        object rawValue = excelCell != null ? excelCell.GetCellPackedValue(useFormattedValues) : null;
         if (rawValue == null)
         {
           continue;

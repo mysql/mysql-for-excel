@@ -679,6 +679,40 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets the value of an Excel cell with the correct .NET type packed in an <see cref="object"/>.
+    /// </summary>
+    /// <param name="excelCell">A single Excel cell.</param>
+    /// <param name="useFormattedValue">Flag indicating whether the data is formatted (numbers, dates, text) or not (numbers and text).</param>
+    /// <returns>The value of an Excel cell with the correct .NET type packed in an <see cref="object"/>.</returns>
+    public static object GetCellPackedValue(this ExcelInterop.Range excelCell, bool useFormattedValue)
+    {
+      if (excelCell == null)
+      {
+        return null;
+      }
+
+      if (!useFormattedValue)
+      {
+        return excelCell.Value2;
+      }
+
+      object packedValue = excelCell.Value;
+      if (!(packedValue is double))
+      {
+        return packedValue;
+      }
+
+      // If the Excel value is a number then check if it is formatted as a Time, since Excel does not return it automatically as a TimeSpan object.
+      string cellNumberFormat = excelCell.NumberFormat;
+      if (string.IsNullOrEmpty(cellNumberFormat) || !cellNumberFormat.ToLowerInvariant().Contains("h:mm"))
+      {
+        return packedValue;
+      }
+
+      return TimeSpan.FromDays((double)packedValue);
+    }
+
+    /// <summary>
     /// Gets a collection of <see cref="ExcelInterop.PivotTable"/> objects in the given <see cref="ExcelInterop.Worksheet"/>.
     /// This is used instead of the <see cref="ExcelInterop.Worksheet.ChartObjects"/> method since it can return either a <see cref="ExcelInterop.ChartObject"/> or a <see cref="ExcelInterop.ChartObjects"/> object.
     /// </summary>
@@ -1280,9 +1314,9 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="range">A <see cref="ExcelInterop.Range"/> object.</param>
     /// <param name="rowIndex">The index of the row within the <see cref="ExcelInterop.Range"/> to get values from.</param>
-    /// <param name="formattedValues">Falg indicating whether the data is formatted (numbers, dates, text) or not (numbers and text).</param>
+    /// <param name="useFormattedValues">Flag indicating whether the data is formatted (numbers, dates, text) or not (numbers and text).</param>
     /// <returns>A linear array with the values of the cells of a single row within an <see cref="ExcelInterop.Range"/>.</returns>
-    public static object[] GetRowValuesAsLinearArray(this ExcelInterop.Range range, int rowIndex, bool formattedValues = true)
+    public static object[] GetRowValuesAsLinearArray(this ExcelInterop.Range range, int rowIndex, bool useFormattedValues = true)
     {
       if (range == null || rowIndex < 1 || rowIndex > range.Rows.Count)
       {
@@ -1290,11 +1324,15 @@ namespace MySQL.ForExcel.Classes
       }
 
       ExcelInterop.Range rowRange = range.Rows[rowIndex];
-      var rangeValues = formattedValues ? rowRange.Value : rowRange.Value2;
-      var valuesBidimensionalArray = rowRange.Columns.Count > 1
-        ? rangeValues as object[,]
-        : new object[,] { { rangeValues } };
-      return valuesBidimensionalArray.GetLinearArray(1, true).ToArray();
+      int columnsCount = rowRange.Columns.Count;
+      var linearArray = new object[columnsCount];
+      for (int columnIndex = 1; columnIndex <= columnsCount; columnIndex++)
+      {
+        var excelCell = rowRange.Cells[1, columnIndex] as ExcelInterop.Range;
+        linearArray[columnIndex - 1] = excelCell.GetCellPackedValue(useFormattedValues);
+      }
+
+      return linearArray;
     }
 
     /// <summary>

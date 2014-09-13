@@ -170,23 +170,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a linear array from a bidimensional one extracting the elements of the given dimension.
-    /// </summary>
-    /// <param name="biDimensionalArray">The bidimensional array.</param>
-    /// <param name="firstDimensionIndex">The index to extract elements from.</param>
-    /// <param name="shiftIndexes">Flag indicating whether the indexes are shifted +1 (for Excel arrays) or not.</param>
-    /// <returns>A linear array.</returns>
-    public static IEnumerable<object> GetLinearArray(this object[,] biDimensionalArray, int firstDimensionIndex, bool shiftIndexes = false)
-    {
-      int startingIndex = shiftIndexes ? 1 : 0;
-      int linearArrayLength = biDimensionalArray.GetLength(firstDimensionIndex) + startingIndex;
-      for (int i = startingIndex; i < linearArrayLength; i++)
-      {
-        yield return biDimensionalArray[firstDimensionIndex, i];
-      }
-    }
-
-    /// <summary>
     /// Gets the owner <see cref="ListView"/> of a <see cref="ContextMenuStrip"/> control.
     /// </summary>
     /// <param name="toolStripMenuControl">An boxed object containing a <see cref="ContextMenuStrip"/> or <see cref="ToolStripMenuItem"/> control.</param>
