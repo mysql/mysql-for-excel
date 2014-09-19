@@ -1715,8 +1715,8 @@ namespace MySQL.ForExcel.Classes
 
       var maxRowNumber = activeWorkbook.GetWorkbookMaxRowNumber();
       var maxColumnNumber = activeWorkbook.GetWorkbookMaxColumnNumber();
-      var totalRows = Math.Min(rows, maxRowNumber - currentRow);
-      var totalColumns = Math.Min(columns, (maxColumnNumber - currentColumn) + 1);
+      var totalRows = Math.Min(rows, maxRowNumber - currentRow + 1);
+      var totalColumns = Math.Min(columns, maxColumnNumber - currentColumn + 1);
       var result = range.Resize[totalRows, totalColumns];
       return result;
     }

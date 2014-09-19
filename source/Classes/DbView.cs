@@ -200,7 +200,7 @@ namespace MySQL.ForExcel.Classes
           }
           else
           {
-            //Check if the data being imported does not exceed the column available space
+            // Check if the data being imported does not exceed the column available space
             var exceedColumnsLimit = ExcelUtilities.CheckIfColumnsExceedWorksheetLimit(mySqlTable.Columns.Count);
             var collides = DetectDataForImportPossibleCollisions(mySqlTable);
             if (exceedColumnsLimit || collides)
