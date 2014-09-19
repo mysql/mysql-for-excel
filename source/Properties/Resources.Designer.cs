@@ -1179,6 +1179,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Importing data will be truncated since it exceeds the available Worksheet&apos;s space..
+        /// </summary>
+        internal static string ImportDataWillBeTruncatedWarning {
+            get {
+                return ResourceManager.GetString("ImportDataWillBeTruncatedWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Excel Model Relationships are not supported in Excel versions lower than 2013..
         /// </summary>
         internal static string ImportMultipleRelationshipsNotSupportedExcelVersionWarningText {
@@ -1217,6 +1226,33 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There isn&apos;t enough space to work with imports in the current position..
+        /// </summary>
+        internal static string ImportNotEnoughWorksheetSpaceErrorDetail {
+            get {
+                return ResourceManager.GetString("ImportNotEnoughWorksheetSpaceErrorDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move the cursor to an upper row and try again..
+        /// </summary>
+        internal static string ImportNotEnoughWorksheetSpaceErrorSubDetail {
+            get {
+                return ResourceManager.GetString("ImportNotEnoughWorksheetSpaceErrorSubDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not Enough Space to Import.
+        /// </summary>
+        internal static string ImportNotEnoughWorksheetSpaceErrorTitle {
+            get {
+                return ResourceManager.GetString("ImportNotEnoughWorksheetSpaceErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The importing data will overwrite cells belonging to an existing Excel object..
         /// </summary>
         internal static string ImportOverExcelObjectErrorDetail {
@@ -1240,6 +1276,33 @@ namespace MySQL.ForExcel.Properties {
         internal static string ImportOverExcelObjectErrorTitle {
             get {
                 return ResourceManager.GetString("ImportOverExcelObjectErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The importing data exceeds the available column space of the current Worksheet..
+        /// </summary>
+        internal static string ImportOverWorksheetColumnsLimitErrorDetail {
+            get {
+                return ResourceManager.GetString("ImportOverWorksheetColumnsLimitErrorDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you want to import the data in a new Worksheet?.
+        /// </summary>
+        internal static string ImportOverWorksheetColumnsLimitErrorSubDetail {
+            get {
+                return ResourceManager.GetString("ImportOverWorksheetColumnsLimitErrorSubDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot import data at current Worksheet&apos;s location.
+        /// </summary>
+        internal static string ImportOverWorksheetColumnsLimitErrorTitle {
+            get {
+                return ResourceManager.GetString("ImportOverWorksheetColumnsLimitErrorTitle", resourceCulture);
             }
         }
         
@@ -1298,7 +1361,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Rows in all result sets exceed the limit of 65,535 rows in Compatibility Mode, one or more Result Sets will be truncated..
+        ///   Looks up a localized string similar to Rows in all result sets exceed the limit of 65,536 rows in Compatibility Mode, one or more Result Sets will be truncated..
         /// </summary>
         internal static string ImportVerticallyExceedsMaxRowsDetailWarning {
             get {
@@ -2771,7 +2834,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Excel Workbook is in Compatibility Mode which has a row limit of 65,535 rows..
+        ///   Looks up a localized string similar to Excel Workbook is in Compatibility Mode which has a row limit of 65,536 rows..
         /// </summary>
         internal static string WorkbookInCompatibilityModeWarning {
             get {

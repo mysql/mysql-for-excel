@@ -187,6 +187,7 @@ namespace MySQL.ForExcel.Forms
       this.AddSummaryFieldsCheckBox.TabIndex = 8;
       this.AddSummaryFieldsCheckBox.Text = "Add Summary Fields";
       this.AddSummaryFieldsCheckBox.UseVisualStyleBackColor = true;
+      this.AddSummaryFieldsCheckBox.CheckedChanged += new System.EventHandler(this.AddSummaryFieldsCheckBox_CheckedChanged);
       // 
       // CreatePivotTableCheckBox
       // 
@@ -264,6 +265,7 @@ namespace MySQL.ForExcel.Forms
       this.IncludeHeadersCheckBox.TabIndex = 1;
       this.IncludeHeadersCheckBox.Text = "Include Column Names as Headers";
       this.IncludeHeadersCheckBox.UseVisualStyleBackColor = true;
+      this.IncludeHeadersCheckBox.CheckedChanged += new System.EventHandler(this.IncludeHeadersCheckBox_CheckedChanged);
       // 
       // OptionsWarningLabel
       // 

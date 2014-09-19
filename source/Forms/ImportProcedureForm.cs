@@ -94,7 +94,7 @@ namespace MySQL.ForExcel.Forms
 
       Text = @"Import Data - " + importToWorksheetName;
       ProcedureNameLabel.Text = dbProcedure.Name;
-      OptionsWarningLabel.Text = Resources.WorkbookInCompatibilityModeWarning;
+      OptionsWarningLabel.Text = Resources.ImportDataWillBeTruncatedWarning;
       ParametersPropertyGrid.SelectedObject = _procedureParamsProperties;
       AddSummaryFieldsCheckBox.Enabled = Settings.Default.ImportCreateExcelTable;
 

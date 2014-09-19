@@ -418,7 +418,7 @@ Please re-enter your password to try again.</value>
     <value>..\Resources\remove_col_mapping.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="WorkbookInCompatibilityModeWarning" xml:space="preserve">
-    <value>Excel Workbook is in Compatibility Mode which has a row limit of 65,535 rows.</value>
+    <value>Excel Workbook is in Compatibility Mode which has a row limit of 65,536 rows.</value>
   </data>
   <data name="ConnectSSLFailedDetailWarning" xml:space="preserve">
     <value>A possible fail reason could be that your user requires a SSL connection that is not currently supported by MySQL for Excel.
@@ -426,7 +426,7 @@ Please re-enter your password to try again.</value>
 Please check with the Administrator if you require a SSL Connection and if he can authorize your user to login without a SSL connection.</value>
   </data>
   <data name="ImportVerticallyExceedsMaxRowsDetailWarning" xml:space="preserve">
-    <value>Rows in all result sets exceed the limit of 65,535 rows in Compatibility Mode, one or more Result Sets will be truncated.</value>
+    <value>Rows in all result sets exceed the limit of 65,536 rows in Compatibility Mode, one or more Result Sets will be truncated.</value>
   </data>
   <data name="ImportVerticallyExceedsMaxRowsTitleWarning" xml:space="preserve">
     <value>Import Exceeds Compatibility Mode Limit</value>
@@ -1067,5 +1067,26 @@ Since Excel relationships cannot be created, a single PivotTable for the whole E
   </data>
   <data name="MySQLforExcel_WelcomePanel_ListItem_Connection_Disabled_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySQLforExcel-WelcomePanel-ListItem-Connection-Disabled-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ImportDataWillBeTruncatedWarning" xml:space="preserve">
+    <value>Importing data will be truncated since it exceeds the available Worksheet's space.</value>
+  </data>
+  <data name="ImportOverWorksheetColumnsLimitErrorDetail" xml:space="preserve">
+    <value>The importing data exceeds the available column space of the current Worksheet.</value>
+  </data>
+  <data name="ImportOverWorksheetColumnsLimitErrorSubDetail" xml:space="preserve">
+    <value>Do you want to import the data in a new Worksheet?</value>
+  </data>
+  <data name="ImportOverWorksheetColumnsLimitErrorTitle" xml:space="preserve">
+    <value>Cannot import data at current Worksheet's location</value>
+  </data>
+  <data name="ImportNotEnoughWorksheetSpaceErrorDetail" xml:space="preserve">
+    <value>There isn't enough space to work with imports in the current position.</value>
+  </data>
+  <data name="ImportNotEnoughWorksheetSpaceErrorSubDetail" xml:space="preserve">
+    <value>Move the cursor to an upper row and try again.</value>
+  </data>
+  <data name="ImportNotEnoughWorksheetSpaceErrorTitle" xml:space="preserve">
+    <value>Not Enough Space to Import</value>
   </data>
 </root>

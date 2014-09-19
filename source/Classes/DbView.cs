@@ -200,10 +200,17 @@ namespace MySQL.ForExcel.Classes
           }
           else
           {
-            // Check if the data being imported does not overlap with the data of an existing Excel table.
-            if (DetectDataForImportPossibleCollisions(mySqlTable))
+            //Check if the data being imported does not exceed the column available space
+            var exceedColumnsLimit = ExcelUtilities.CheckIfColumnsExceedWorksheetLimit(mySqlTable.Columns.Count);
+            var collides = DetectDataForImportPossibleCollisions(mySqlTable);
+            if (exceedColumnsLimit || collides)
             {
-              if (InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelObjectErrorTitle, Resources.ImportOverExcelObjectErrorDetail, Resources.ImportOverExcelObjectErrorSubDetail) == DialogResult.No)
+              if (exceedColumnsLimit && InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverWorksheetColumnsLimitErrorTitle, Resources.ImportOverWorksheetColumnsLimitErrorDetail, Resources.ImportOverWorksheetColumnsLimitErrorSubDetail) == DialogResult.No)
+              {
+                return null;
+              }
+
+              if (collides && InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelObjectErrorTitle, Resources.ImportOverExcelObjectErrorDetail, Resources.ImportOverExcelObjectErrorSubDetail) == DialogResult.No)
               {
                 return null;
               }

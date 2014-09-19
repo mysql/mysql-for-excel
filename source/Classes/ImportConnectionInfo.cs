@@ -525,7 +525,7 @@ namespace MySQL.ForExcel.Classes
         const int headerRows = 1;
         int summaryRows = ExcelTable.ShowTotals ? 1 : 0;
         ExcelInterop.Range newRange = ToolsExcelTable.Range.Cells[1, 1];
-        newRange = newRange.Resize[MySqlTable.Rows.Count + headerRows + summaryRows, MySqlTable.Columns.Count];
+        newRange = newRange.SafeResize(MySqlTable.Rows.Count + headerRows + summaryRows, MySqlTable.Columns.Count);
         var intersectingRange = newRange.GetIntersectingRangeWithAnyExcelObject(true, true, true, _excelTable.Comment);
         if (intersectingRange != null && intersectingRange.CountLarge != 0)
         {
@@ -549,7 +549,7 @@ namespace MySQL.ForExcel.Classes
 
           // Redimension the new range. This is needed since the new rows or columns inserted are not present in the previously calculated one.
           newRange = ToolsExcelTable.Range.Cells[1, 1];
-          newRange = newRange.Resize[MySqlTable.Rows.Count + headerRows + summaryRows, MySqlTable.Columns.Count];
+          newRange = newRange.SafeResize(MySqlTable.Rows.Count + headerRows + summaryRows, MySqlTable.Columns.Count);
         }
 
         ToolsExcelTable.Resize(newRange);

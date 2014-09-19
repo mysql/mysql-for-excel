@@ -92,6 +92,16 @@ namespace MySQL.ForExcel.Classes
     public const string LONG_TIME_FORMAT = "hh:mm:ss";
 
     /// <summary>
+    /// The maximum number of columns that can exist in 2003 and older versions of Excel;
+    /// </summary>
+    public const int MAXIMUM_WORKSHEET_COLUMNS_IN_COMPATIBILITY_MODE = 256;
+
+    /// <summary>
+    /// The maximum number of columns that can exist in 2007 and newer versions of Excel;
+    /// </summary>
+    public const int MAXIMUM_WORKSHEET_COLUMNS_IN_LATEST_VERSION = 16384;
+
+    /// <summary>
     /// The maximum number of rows that can exist in 2007 and newer versions of Excel;
     /// </summary>
     public const int MAXIMUM_WORKSHEET_ROWS_IN_LATEST_VERSION = 1048576;
@@ -153,6 +163,7 @@ namespace MySQL.ForExcel.Classes
     /// Gets the interior color for Excel cells committed to the MySQL server during an Edit Data operation.
     /// </summary>
     public static int CommitedCellsOleColor { get; private set; }
+
     /// <summary>
     /// Gets or sets the interior color for Excel cells that caused errors during a commit of an Edit Data operation.
     /// </summary>
@@ -173,6 +184,7 @@ namespace MySQL.ForExcel.Classes
     /// Gets the interior color for Excel cells that caused errors during a commit of an Edit Data operation.
     /// </summary>
     public static int ErroredCellsOleColor { get; private set; }
+
     /// <summary>
     /// Gets or sets the interior color for Excel cells locked during an Edit Data operation (like the headers containing column names).
     /// </summary>
@@ -193,6 +205,7 @@ namespace MySQL.ForExcel.Classes
     /// Gets the default interior color for Excel cells locked during an Edit Data operation (like the headers containing column names).
     /// </summary>
     public static int LockedCellsOleColor { get; private set; }
+
     /// <summary>
     /// Gets or sets the interior color for Excel cells accepting data from users to create a new row in the table during an Edit Data operation.
     /// </summary>
@@ -213,6 +226,7 @@ namespace MySQL.ForExcel.Classes
     /// Gets the interior color for Excel cells accepting data from users to create a new row in the table during an Edit Data operation.
     /// </summary>
     public static int NewRowCellsOleColor { get; private set; }
+
     /// <summary>
     /// Gets or sets the interior color for Excel cells containing values that have been changed by the user but not yet committed during an Edit Data operation.
     /// </summary>
@@ -233,6 +247,7 @@ namespace MySQL.ForExcel.Classes
     /// Gets the interior color for Excel cells containing values that have been changed by the user but not yet committed during an Edit Data operation.
     /// </summary>
     public static int UncommittedCellsOleColor { get; private set; }
+
     /// <summary>
     /// Gets or sets the interior color for Excel cells containing values that caused concurrency warnings during an Edit Data operation using optimistic updates.
     /// </summary>
@@ -335,7 +350,7 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      range = range.Resize[range.Rows.Count + 1, range.Columns.Count];
+      range = range.SafeResize(range.Rows.Count + 1, range.Columns.Count);
       newRowRange = range.Rows[range.Rows.Count] as ExcelInterop.Range;
       if (newRowRange != null)
       {
@@ -401,6 +416,31 @@ namespace MySQL.ForExcel.Classes
       }
 
       return Globals.ThisAddIn.Application.WorksheetFunction.CountA(range).CompareTo(0) != 0;
+    }
+
+    /// <summary>
+    /// Indicates whether a number of columns relative to the actual position exceeds the <see cref="ExcelInterop.Worksheet"/> columns limit.
+    /// </summary>
+    /// <param name="columns">The number of columns to the right of the actual position to evaluate.</param>
+    /// <returns><c>true</c> if number of columns to the right of the actual position exceeds the <see cref="ExcelInterop.Worksheet"/> columns limit, <c>false</c> otherwise.</returns>
+    public static bool CheckIfColumnsExceedWorksheetLimit(int columns)
+    {
+      var atCell = Globals.ThisAddIn.Application.ActiveCell;
+      if (atCell == null)
+      {
+        return false;
+      }
+
+      var currentColumn = atCell.Column;
+      var activeWorkbook = atCell.Worksheet.Parent as ExcelInterop.Workbook;
+      if (activeWorkbook == null)
+      {
+        return false;
+      }
+
+      var maxColumnNumber = activeWorkbook.GetWorkbookMaxColumnNumber();
+      var totalColumns = Math.Min(columns, (maxColumnNumber - currentColumn) + 1);
+      return columns > totalColumns;
     }
 
     /// <summary>
@@ -745,7 +785,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The Excel range with the first row cells corresponding to the column names</returns>
     public static ExcelInterop.Range GetColumnNamesRange(this ExcelInterop.Range mysqlDataRange)
     {
-      return mysqlDataRange == null ? null : mysqlDataRange.Resize[1, mysqlDataRange.Columns.Count];
+      return mysqlDataRange == null ? null : mysqlDataRange.SafeResize(1, mysqlDataRange.Columns.Count);
     }
 
     /// <summary>
@@ -942,6 +982,16 @@ namespace MySQL.ForExcel.Classes
       }
 
       return intersectingRange;
+    }
+
+    /// <summary>
+    /// Gets the maximum column number possible for the current configuration mode in the active workbook.
+    /// </summary>
+    /// <param name="activeWorkbook">The active workbook.</param>
+    /// <returns>The number of the maximum row index in the current configuration mode for the active workbook.</returns>
+    public static int GetWorkbookMaxColumnNumber(this ExcelInterop.Workbook activeWorkbook)
+    {
+      return activeWorkbook == null ? 0 : activeWorkbook.Excel8CompatibilityMode ? MAXIMUM_WORKSHEET_COLUMNS_IN_COMPATIBILITY_MODE : MAXIMUM_WORKSHEET_COLUMNS_IN_LATEST_VERSION;
     }
 
     /// <summary>
@@ -1481,7 +1531,7 @@ namespace MySQL.ForExcel.Classes
       if (mysqlDataRange != null)
       {
         ExcelInterop.Range extendedRange = mysqlDataRange.Range["A2"];
-        extendedRange = extendedRange.Resize[mysqlDataRange.Rows.Count - 1, worksheet.Columns.Count];
+        extendedRange = extendedRange.SafeResize(mysqlDataRange.Rows.Count - 1, worksheet.Columns.Count);
         extendedRange.Locked = false;
 
         // Column names range code
@@ -1614,6 +1664,61 @@ namespace MySQL.ForExcel.Classes
       {
         protectionKeyProperty.Delete();
       }
+    }
+
+    /// <summary>
+    /// Indicates whether a number of rows relative to the actual position exceeds the <see cref="ExcelInterop.Worksheet"/> rows limit.
+    /// </summary>
+    /// <param name="rows">The number of rows to the right of the actual position to evaluate.</param>
+    /// <returns><c>true</c> if number of rows to the right of the actual position exceeds the <see cref="ExcelInterop.Worksheet"/> rows limit, <c>false</c> otherwise.</returns>
+    public static bool CheckIfRowsExceedWorksheetLimit(long rows)
+    {
+      var atCell = Globals.ThisAddIn.Application.ActiveCell;
+      if (atCell == null)
+      {
+        return false;
+      }
+
+      var currentRow = atCell.Row;
+      var activeWorkbook = atCell.Worksheet.Parent as ExcelInterop.Workbook;
+      if (activeWorkbook == null)
+      {
+        return false;
+      }
+
+      var maxRowNumber = activeWorkbook.GetWorkbookMaxRowNumber();
+      var totalRows = Math.Min(rows, (maxRowNumber - currentRow) + 1);
+      return rows > totalRows;
+    }
+
+    /// <summary>
+    /// Returns a valid resized range to the given dimensions and sheet location.
+    /// </summary>
+    /// <param name="range">The range to be resized.</param>
+    /// /// <param name="rows">The number of rows the range will be resized to in case it doesn't exceed the available <see cref="ExcelInterop.Worksheet"/> space.</param>
+    /// /// <param name="columns">The number of columns the range will be resized to in case it doesn't exceed the available <see cref="ExcelInterop.Worksheet"/> space.</param>
+    /// <returns>A <see cref="ExcelInterop.Range"/> within the available <see cref="ExcelInterop.Worksheet"/> space </returns>
+    public static ExcelInterop.Range SafeResize(this ExcelInterop.Range range, long rows, long columns)
+    {
+      if (range == null)
+      {
+        return null;
+      }
+
+      var currentRow = range.Row;
+      var currentColumn = range.Column;
+      var activeWorkbook = range.Worksheet.Parent as ExcelInterop.Workbook;
+      if (activeWorkbook == null)
+      {
+        return null;
+      }
+
+      var maxRowNumber = activeWorkbook.GetWorkbookMaxRowNumber();
+      var maxColumnNumber = activeWorkbook.GetWorkbookMaxColumnNumber();
+      var totalRows = Math.Min(rows, maxRowNumber - currentRow);
+      var totalColumns = Math.Min(columns, (maxColumnNumber - currentColumn) + 1);
+      var result = range.Resize[totalRows, totalColumns];
+      return result;
     }
 
     /// <summary>

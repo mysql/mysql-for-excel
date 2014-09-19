@@ -1485,7 +1485,7 @@ namespace MySQL.ForExcel.Classes
 
       var ranges = new ExcelInterop.Range[withPivotTable ? 2 : 1];
       int rowsCount = Rows.Count + (ImportColumnNames || Settings.Default.ImportCreateExcelTable ? 1 : 0) + (withSummaryRow && Settings.Default.ImportCreateExcelTable ? 1 : 0);
-      ranges[0] = toLeftCell.Resize[rowsCount, Columns.Count];
+      ranges[0] = toLeftCell.SafeResize(rowsCount, Columns.Count);
       if (withPivotTable)
       {
         ranges[1] = ranges[0].GetPivotTableTopLeftCell(pivotPosition).Resize[ExcelUtilities.PIVOT_TABLES_PLACEHOLDER_DEFAULT_ROWS_SIZE, ExcelUtilities.PIVOT_TABLES_PLACEHOLDER_DEFAULT_COLUMNS_SIZE];
@@ -1682,11 +1682,11 @@ namespace MySQL.ForExcel.Classes
       ExcelInterop.Range fillingRange;
       try
       {
-        int currentRow = atCell.Row;
+        var currentRow = atCell.Row;
         var activeWorkbook = atCell.Worksheet.Parent as ExcelInterop.Workbook;
         var maxRowNumber = activeWorkbook.GetWorkbookMaxRowNumber();
         var cappedNumRows = Math.Min(rowsCount, maxRowNumber + (ImportColumnNames ? 0 : 1) - currentRow);
-        fillingRange = atCell.Resize[cappedNumRows + (ImportColumnNames ? 1 : 0), Columns.Count];
+        fillingRange = atCell.SafeResize(cappedNumRows + (ImportColumnNames ? 1 : 0), Columns.Count);
         fillingRange.ClearFormats();
 
         if (ImportColumnNames)

@@ -253,10 +253,10 @@ namespace MySQL.ForExcel.Classes
       ExcelInterop.Range firstColumn = TempWorksheet.Columns[1];
       firstColumn.Insert();
       firstColumn = TempWorksheet.Cells[1, 1];
-      firstColumn = firstColumn.Resize[rowsCount, 1];
+      firstColumn = firstColumn.SafeResize(rowsCount, 1);
       firstColumn.FormulaArray = string.Format("=ROW() - {0}", firstRowContainsColumnNames ? 1 : 0);
       firstColumn = TempWorksheet.Cells[1, 1];
-      Range = firstColumn.Resize[rowsCount, Range.Columns.Count + 1];
+      Range = firstColumn.SafeResize(rowsCount, Range.Columns.Count + 1);
     }
 
     /// <summary>
@@ -280,7 +280,7 @@ namespace MySQL.ForExcel.Classes
       int copiedRows = LimitRowsQuantity > 0 ? Math.Min(LimitRowsQuantity, sourceCopyRange.Rows.Count) : sourceCopyRange.Rows.Count;
       if (copiedRows < sourceCopyRange.Rows.Count)
       {
-        sourceCopyRange = sourceCopyRange.Resize[copiedRows, sourceCopyRange.Columns.Count];
+        sourceCopyRange = sourceCopyRange.SafeResize(copiedRows, sourceCopyRange.Columns.Count);
       }
 
       string sourceWorksheetName = sourceCopyRange.Worksheet.Name;
@@ -292,7 +292,7 @@ namespace MySQL.ForExcel.Classes
         }
 
         ExcelInterop.Range targetColumnRange = TempWorksheet.Cells[1, firstTargetColumnIndex];
-        targetColumnRange = targetColumnRange.Resize[copiedRows, 1];
+        targetColumnRange = targetColumnRange.SafeResize(copiedRows, 1);
         if (dateColumnIndexes != null && dateColumnIndexes.Contains(firstTargetColumnIndex))
         {
           string formula = string.Format("=IF({0}!{1}<>0,TEXT({0}!{1},LOCAL_MYSQL_DATE_FORMAT),\"{2}\")",
@@ -341,13 +341,13 @@ namespace MySQL.ForExcel.Classes
 
         ExcelInterop.Range sourceColumnRange = sourceCopyRange.Columns[mappedIndex];
         ExcelInterop.Range targetColumnTopCell = TempWorksheet.Cells[1, excelColumnIndex];
-        ExcelInterop.Range targetColumnRange = targetColumnTopCell.Resize[sourceCopyRange.Rows.Count, 1];
+        ExcelInterop.Range targetColumnRange = targetColumnTopCell.SafeResize(sourceCopyRange.Rows.Count, 1);
         sourceColumnRange.Copy();
         targetColumnRange.PasteSpecial(ExcelInterop.XlPasteType.xlPasteValuesAndNumberFormats, ExcelInterop.XlPasteSpecialOperation.xlPasteSpecialOperationNone, false, false);
       }
 
       Range = TempWorksheet.Cells[1, 1];
-      Range = Range.Resize[sourceCopyRange.Rows.Count, mappedIndexes.Count];
+      Range = Range.SafeResize(sourceCopyRange.Rows.Count, mappedIndexes.Count);
     }
 
     /// <summary>

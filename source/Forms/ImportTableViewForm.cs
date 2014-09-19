@@ -40,6 +40,16 @@ namespace MySQL.ForExcel.Forms
     #region Fields
 
     /// <summary>
+    ///  The active workbook's max row number.
+    /// </summary>
+    private readonly int _activeWorkbookMaxRowNumber;
+
+    /// <summary>
+    /// The current row we will attempt to import data to.
+    /// </summary>
+    private readonly int _atRow;
+
+    /// <summary>
     /// The type of DB object (MySQL table or view) from which to import data to the active Excel Worksheet.
     /// </summary>
     private readonly DbView _dbTableOrView;
@@ -50,6 +60,11 @@ namespace MySQL.ForExcel.Forms
     private List<string> _importColumns;
 
     /// <summary>
+    /// Indicates whether the number of rows being imported could be truncated since it exceeds the number of available rows in the Worksheet.
+    /// </summary>
+    private bool _importIsCappedByRows;
+
+    /// <summary>
     /// A <see cref="DataTable"/> object containing a subset of the whole data which is shown in the preview grid.
     /// </summary>
     private DataTable _previewDataTable;
@@ -58,11 +73,6 @@ namespace MySQL.ForExcel.Forms
     /// The total rows contained in the MySQL table or view selected for import.
     /// </summary>
     private long _totalRowsCount;
-
-    /// <summary>
-    /// A value indicating whether the Excel workbook where the data will be imported to is in Excel 2003 compatibility mode.
-    /// </summary>
-    private readonly bool _workbookInCompatibilityMode;
 
     #endregion Fields
 
@@ -81,14 +91,16 @@ namespace MySQL.ForExcel.Forms
       _dbTableOrView = importDbTableOrView;
       _importColumns = null;
       _previewDataTable = null;
-      _workbookInCompatibilityMode = Globals.ThisAddIn.ActiveWorkbook.Excel8CompatibilityMode;
       MySqlTable = null;
+      _activeWorkbookMaxRowNumber = Globals.ThisAddIn.ActiveWorkbook.GetWorkbookMaxRowNumber();
+      var atCell = Globals.ThisAddIn.Application.ActiveCell;
+      _atRow = atCell == null ? 1 : atCell.Row;
       InitializeComponent();
 
       PreviewDataGridView.DataError += PreviewDataGridView_DataError;
       TableNameMainLabel.Text = importDbTableOrView is DbTable ? "Table Name" : "View Name";
       PickColumnsSubLabel.Text = string.Format(Resources.ImportTableOrViewSubText, importDbTableOrView is DbTable ? "table" : "view");
-      OptionsWarningLabel.Text = Resources.WorkbookInCompatibilityModeWarning;
+      OptionsWarningLabel.Text = Resources.ImportDataWillBeTruncatedWarning;
       Text = @"Import Data - " + importToWorksheetName;
       TableNameSubLabel.Text = importDbTableOrView.Name;
       FillPreviewGrid();
@@ -139,7 +151,7 @@ namespace MySQL.ForExcel.Forms
       get
       {
         var rowCount = (int)RowsToReturnNumericUpDown.Value;
-        return (LimitRowsCheckBox.Checked) ? (_workbookInCompatibilityMode && rowCount > UInt16.MaxValue) ? UInt16.MaxValue : rowCount : -1;
+        return LimitRowsCheckBox.Checked ? rowCount > _activeWorkbookMaxRowNumber ? _activeWorkbookMaxRowNumber : rowCount : -1;
       }
     }
 
@@ -153,6 +165,16 @@ namespace MySQL.ForExcel.Forms
     {
       bool success = ImportData();
       return success ? DialogResult.OK : DialogResult.Cancel;
+    }
+
+    /// <summary>
+    /// Handles the CheckedChanged event of the AddSummaryFieldsCheckBox control.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+    private void AddSummaryFieldsCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+      RecalculateRowsToMaximum();
     }
 
     /// <summary>
@@ -172,6 +194,7 @@ namespace MySQL.ForExcel.Forms
 
         AddSummaryFieldsCheckBox.Checked = Settings.Default.ImportCreateExcelTable && AddSummaryFieldsCheckBox.Checked;
         AddSummaryFieldsCheckBox.Enabled = Settings.Default.ImportCreateExcelTable;
+        RecalculateRowsToMaximum();
       }
     }
 
@@ -203,10 +226,10 @@ namespace MySQL.ForExcel.Forms
       }
 
       PreviewDataGridView.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
-      bool cappingAtMaxCompatRows = _workbookInCompatibilityMode && _totalRowsCount > UInt16.MaxValue;
-      SetCompatibilityWarningControlsVisibility(cappingAtMaxCompatRows);
-      FromRowNumericUpDown.Maximum = cappingAtMaxCompatRows ? UInt16.MaxValue : _totalRowsCount;
-      RowsToReturnNumericUpDown.Maximum = FromRowNumericUpDown.Maximum - FromRowNumericUpDown.Value + 1;
+      FromRowNumericUpDown.Maximum = _totalRowsCount;
+      _importIsCappedByRows = ExcelUtilities.CheckIfRowsExceedWorksheetLimit(_totalRowsCount);
+      SetCompatibilityWarningControlsVisibility(_importIsCappedByRows);
+      RowsToReturnNumericUpDown.Maximum = Math.Min(FromRowNumericUpDown.Maximum, _activeWorkbookMaxRowNumber - _atRow - FromRowNumericUpDown.Value + 1);
     }
 
     /// <summary>
@@ -216,13 +239,13 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments</param>
     private void FromRowNumericUpDown_ValueChanged(object sender, EventArgs e)
     {
-      RowsToReturnNumericUpDown.Maximum = FromRowNumericUpDown.Maximum - FromRowNumericUpDown.Value + 1;
+      RecalculateRowsToMaximum();
     }
 
     /// <summary>
     /// Imports the selected MySQL table's data into the active Excel worksheet.
     /// </summary>
-    /// <returns><c>true</c> if the import is successful, <c>false</c> if errros were found during the import.</returns>
+    /// <returns><c>true</c> if the import is successful, <c>false</c> if errors were found during the import.</returns>
     private bool ImportData()
     {
       _importColumns = null;
@@ -241,8 +264,10 @@ namespace MySQL.ForExcel.Forms
 
       Cursor = Cursors.WaitCursor;
 
+      // If the importing data exceeds the number of available rows and no row limit was set we will force it for the Select Query.
+      SetImportParameterValues(Settings.Default.ImportCreateExcelTable && !LimitRowsCheckBox.Checked && _importIsCappedByRows ? (int)RowsToReturnNumericUpDown.Maximum : RowsTo);
+
       // Import data into Excel
-      SetImportParameterValues(RowsTo);
       var importTuple = _dbTableOrView.ImportData();
       MySqlTable = importTuple != null ? importTuple.Item1 : null;
 
@@ -274,6 +299,16 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
+    /// Handles the CheckedChanged event of the IncludeHeadersCheckBox control.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+    private void IncludeHeadersCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+      RecalculateRowsToMaximum();
+    }
+
+    /// <summary>
     /// Event delegate method fired when the <see cref="LimitRowsCheckBox"/> checked state changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -291,6 +326,7 @@ namespace MySQL.ForExcel.Forms
       // Give focus to the field related to the checkbox whose status changed.
       RowsToReturnNumericUpDown.Focus();
       RowsToReturnNumericUpDown.Select(0, RowsToReturnNumericUpDown.Text.Length);
+      AddSummaryFieldsCheckBox.Enabled = Settings.Default.ImportCreateExcelTable;
     }
 
     /// <summary>
@@ -342,6 +378,24 @@ namespace MySQL.ForExcel.Forms
     private void PreviewDataGridView_SelectionChanged(object sender, EventArgs e)
     {
       ImportButton.Enabled = PreviewDataGridView.SelectedColumns.Count > 0;
+    }
+
+    /// <summary>
+    /// Recalculates maximum allowed value for the RowsToReturnNumericUpDown control based on several contidions.
+    /// </summary>
+    private void RecalculateRowsToMaximum()
+    {
+      var maxAllowedRow = _activeWorkbookMaxRowNumber;
+      var maximum = Math.Min(
+        Math.Min(FromRowNumericUpDown.Maximum, maxAllowedRow - _atRow),
+        FromRowNumericUpDown.Maximum - FromRowNumericUpDown.Value + 1);
+
+      if (_importIsCappedByRows && !IncludeHeadersCheckBox.Checked && !Settings.Default.ImportCreateExcelTable)
+      {
+        maximum++;
+      }
+
+      RowsToReturnNumericUpDown.Maximum = maximum;
     }
 
     /// <summary>

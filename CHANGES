@@ -1,4 +1,6 @@
 1.3.3
+- Improved handling of Worksheet space to honor both row and column limits to avoid high severity errors while importing data into Excel.
+  (MySQL Bug #73866, Bug #19588933 - MYSQL FOR EXCEL ERROR WHILE IMPORTING AT WORKSHEET BOTTOM)
 - Added an explicit conversion for Excel cells containing time values (stored internally as decimal numbers formatted as a time) to TimeSpan objects in .NET so these
   values are recognized in the Export Data dialog as time values to be exported to TIME columns in a new MySQL table. Fixed the code that assembles the INSERT SQL
   queries used to push data to a MySQL DB to wrap time values in single quotes. (MySQL Bug #73899, Bug #19607195 - ERRORS EXPORTING DATA TO TIME COLUMNS IN A NEW TABLE)
