@@ -1,4 +1,6 @@
 1.3.3
+- Added logic to allow changes made by the user at Append Advanced Options dialog to be discarded if cancel is pressed.
+  (Bug #16501859 - APPEND DATA - STORED MAPPINGS ARE RENAMED OR DELETED EVEN WHEN CANCELLING)
 - Improved handling of Worksheet space to honor both row and column limits to avoid high severity errors while importing data into Excel.
   (MySQL Bug #73866, Bug #19588933 - MYSQL FOR EXCEL ERROR WHILE IMPORTING AT WORKSHEET BOTTOM)
 - Added an explicit conversion for Excel cells containing time values (stored internally as decimal numbers formatted as a time) to TimeSpan objects in .NET so these

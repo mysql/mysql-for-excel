@@ -16,6 +16,7 @@
 // 02110-1301  USA
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
@@ -31,14 +32,19 @@ namespace MySQL.ForExcel.Forms
   public partial class AppendAdvancedOptionsDialog : AutoStyleableBaseDialog
   {
     /// <summary>
-    /// List of column mappings for the current user.
+    /// <c>true</c> when at least one of the _mappings was changed.
     /// </summary>
-    private readonly MySqlColumnMappingList _mappings;
+    private bool _mappingsWereChanged;
 
     /// <summary>
     /// Specific column mapping currently selected by the user.
     /// </summary>
     private MySqlColumnMapping _selectedMapping;
+
+    /// <summary>
+    /// List of column mappings for the current user.
+    /// </summary>
+    public readonly List<MySqlColumnMapping> Mappings;
 
     /// <summary>
     /// Gets or sets a value indicating whether the data in the parent form needs to be reloaded on the grids.
@@ -51,12 +57,12 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Creates a new instance of the <see cref="AppendAdvancedOptionsDialog"/> class.
     /// </summary>
-    public AppendAdvancedOptionsDialog()
+    public AppendAdvancedOptionsDialog(List<MySqlColumnMapping> mappings)
     {
       ParentFormRequiresRefresh = false;
       InitializeComponent();
       RefreshControlValues();
-      _mappings = new MySqlColumnMappingList();
+      Mappings = mappings.Select(item => (MySqlColumnMapping)item.Clone()).ToList();
       RefreshMappingList();
     }
 
@@ -74,7 +80,8 @@ namespace MySQL.ForExcel.Forms
 
       var previewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
       ParentFormRequiresRefresh = Settings.Default.AppendUseFormattedValues != UseFormattedValuesCheckBox.Checked ||
-                                  Settings.Default.AppendLimitPreviewRowsQuantity != previewRowsQuantity;
+                                  Settings.Default.AppendLimitPreviewRowsQuantity != previewRowsQuantity ||
+                                  _mappingsWereChanged;
 
       Settings.Default.AppendPerformAutoMap = DoNotPerformAutoMapCheckBox.Checked;
       Settings.Default.AppendAutoStoreColumnMapping = AutoStoreColumnMappingCheckBox.Checked;
@@ -97,7 +104,8 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      _mappings.Remove(_selectedMapping);
+      _mappingsWereChanged = true;
+      Mappings.Remove(_selectedMapping);
       RefreshMappingList();
     }
 
@@ -147,7 +155,7 @@ namespace MySQL.ForExcel.Forms
     {
       MappingsListView.Items.Clear();
 
-      foreach (var item in _mappings.UserColumnMappingsList)
+      foreach (var item in Mappings)
       {
         ListViewItem itemList = new ListViewItem
         {
@@ -188,7 +196,7 @@ namespace MySQL.ForExcel.Forms
         proposedMappingName = _selectedMapping.TableName + "Mapping" + (indexForName > 1 ? indexForName.ToString(CultureInfo.InvariantCulture) : string.Empty);
         indexForName++;
       }
-      while (_mappings.UserColumnMappingsList.Any(mapping => mapping.Name == proposedMappingName));
+      while (Mappings.Any(mapping => mapping.Name == proposedMappingName));
 
       string newName;
       using (var newColumnMappingDialog = new AppendNewColumnMappingDialog(proposedMappingName))
@@ -198,18 +206,18 @@ namespace MySQL.ForExcel.Forms
         {
           return;
         }
-
+        _mappingsWereChanged = true;
         newName = newColumnMappingDialog.ColumnMappingName;
       }
 
       // Show error if name already exists
-      if (_mappings.UserColumnMappingsList.Count(t => t.Name.Equals(newName)) > 0)
+      if (Mappings.Count(t => string.Compare(t.Name, newName, StringComparison.InvariantCultureIgnoreCase) == 0) > 0)
       {
         MiscUtilities.ShowCustomizedErrorDialog(Resources.MappingNameAlreadyExistsTitle, Resources.MappingNameAlreadyExistsDetail);
         return;
       }
 
-      _mappings.Rename(_selectedMapping, newName);
+      _selectedMapping.Name = newName;
       RefreshMappingList();
       ListViewItem item = MappingsListView.FindItemWithText(string.Format("{0} ({1}.{2})", newName, _selectedMapping.SchemaName, _selectedMapping.TableName));
       if (item != null)

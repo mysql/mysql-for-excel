@@ -26,7 +26,7 @@ namespace MySQL.ForExcel.Classes
   /// Represents a structure with mappings between source Excel columns and a target MySQL table columns in a specific Schema.
   /// </summary>
   [Serializable]
-  public class MySqlColumnMapping
+  public class MySqlColumnMapping : ICloneable
   {
     /// <summary>
     /// Initializes a new instance of the <see cref="MySqlColumnMapping"/> class.
@@ -207,6 +207,27 @@ namespace MySQL.ForExcel.Classes
       {
         MappedSourceIndexes[i] = -1;
       }
+    }
+
+    /// <summary>
+    /// Creates a new object that is a copy of the current instance.
+    /// </summary>
+    /// <returns>
+    /// A new object that is a copy of this instance.
+    /// </returns>
+    public object Clone()
+    {
+      return new MySqlColumnMapping()
+      {
+        Name = Name,
+        ConnectionName = ConnectionName,
+        Port = Port,
+        SchemaName = SchemaName,
+        TableName = TableName,
+        SourceColumns = SourceColumns,
+        TargetColumns = TargetColumns,
+        MappedSourceIndexes = MappedSourceIndexes,
+      };
     }
 
     /// <summary>

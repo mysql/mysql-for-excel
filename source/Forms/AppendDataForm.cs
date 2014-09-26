@@ -43,7 +43,7 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// The list of column mappings saved in file.
     /// </summary>
-    private readonly MySqlColumnMappingList _columnsMappingInFileList;
+    private List<MySqlColumnMapping> _columnsMappings;
 
     /// <summary>
     /// The maximum number of columns that can be mapped based on the maximum number of columns between the source and the target tables.
@@ -58,7 +58,7 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// The <see cref="DbTable"/> to which to append data to.
     /// </summary>
-    private DbTable _appendDbTable;
+    private readonly DbTable _appendDbTable;
 
     /// <summary>
     /// The column mapping currently being used in the append session.
@@ -132,7 +132,7 @@ namespace MySQL.ForExcel.Forms
 
       _appendDataRange = appendDataRange;
       _appendDbTable = appendDbTable;
-      _columnsMappingInFileList = new MySqlColumnMappingList();
+      _columnsMappings = null;
       _sourceMySqlPreviewDataTable = null;
       _targetMySqlPreviewDataTable = null;
 
@@ -187,7 +187,7 @@ namespace MySQL.ForExcel.Forms
     {
       get
       {
-        return _columnsMappingInFileList.UserColumnMappingsList;
+        return _columnsMappings ?? (_columnsMappings = Settings.Default.StoredDataMappings ?? new List<MySqlColumnMapping>());
       }
     }
 
@@ -200,12 +200,21 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void AdvancedOptionsButton_Click(object sender, EventArgs e)
     {
-      using (var optionsDialog = new AppendAdvancedOptionsDialog())
+      using (var optionsDialog = new AppendAdvancedOptionsDialog(StoredColumnMappingsList))
       {
         optionsDialog.ShowDialog();
         if (!optionsDialog.ParentFormRequiresRefresh)
         {
           return;
+        }
+
+        Settings.Default.StoredDataMappings = optionsDialog.Mappings;
+        MiscUtilities.SaveSettings();
+        _columnsMappings = null;
+        RefreshMappingMethodCombo();
+        if (!SelectStoredMappingForTargetTable())
+        {
+          MappingMethodComboBox.SelectedIndex = Settings.Default.AppendPerformAutoMap ? 0 : 1;
         }
 
         InitializeSourceTableGrid();
@@ -1084,6 +1093,7 @@ namespace MySQL.ForExcel.Forms
     {
       switch (MappingMethodComboBox.SelectedIndex)
       {
+        case -1:
         case 0:
           _currentColumnMapping = CreateColumnMappingForAutomatic();
           ApplySelectedStoredColumnMapping();
@@ -1261,9 +1271,8 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      var userList = new MySqlColumnMappingList();
-      bool result = userList.Add(mapping);
-      if (result)
+      Settings.Default.StoredDataMappings.Add(mapping);
+      if (MiscUtilities.SaveSettings())
       {
         RefreshMappingMethodCombo();
       }
