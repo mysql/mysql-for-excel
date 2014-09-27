@@ -67,14 +67,14 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      var columnsInfoTable = Connection.GetSchemaCollection("Columns", null, Connection.Schema, Name);
+      var columnsInfoTable = Connection.GetColumnsInformationTable(null, Name);
       if (columnsInfoTable == null)
       {
         return null;
       }
 
       var columnsList = new List<string>(columnsInfoTable.Rows.Count);
-      columnsList.AddRange(from DataRow dr in columnsInfoTable.Rows select dr["COLUMN_NAME"].ToString());
+      columnsList.AddRange(from DataRow dr in columnsInfoTable.Rows select dr["Name"].ToString());
       return columnsList;
     }
 

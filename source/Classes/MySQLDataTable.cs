@@ -79,6 +79,18 @@ namespace MySQL.ForExcel.Classes
     private int _changedOrDeletedRows;
 
     /// <summary>
+    /// The character set used to store text data in this table.
+    /// </summary>
+    /// <remarks>If null or empty it means the schema character set is used.</remarks>
+    private string _charSet;
+
+    /// <summary>
+    /// The collation used with the character set to store text data in this table.
+    /// </summary>
+    /// <remarks>If null or empty it means the default collation is used.</remarks>
+    private string _collation;
+
+    /// <summary>
     /// The combined length of data representation as text for all columns.
     /// </summary>
     private long _columnsDataLength;
@@ -122,10 +134,11 @@ namespace MySQL.ForExcel.Classes
     /// An approximation for a maximum SQL query length.
     /// </summary>
     private int _maxQueryLength;
+
     /// <summary>
     /// Contains the value of the max_allowed_packet system variable of the MySQL Server currently connected to.
     /// </summary>
-    private ulong _mysqlMaxAllowedPacket;
+    private int _mysqlMaxAllowedPacket;
 
     /// <summary>
     /// The <see cref="StringBuilder"/> used to build pre-SQL query text.
@@ -232,6 +245,8 @@ namespace MySQL.ForExcel.Classes
       AddPrimaryKeyColumn = fromTemplate.AddPrimaryKeyColumn;
       AutoAllowEmptyNonIndexColumns = fromTemplate.AutoAllowEmptyNonIndexColumns;
       AutoIndexIntColumns = fromTemplate.AutoIndexIntColumns;
+      CharSet = fromTemplate.CharSet;
+      Collation = fromTemplate.Collation;
       DetectDatatype = false;
       FirstRowContainsColumnNames = fromTemplate.FirstRowContainsColumnNames;
       IsFormatted = fromTemplate.IsFormatted;
@@ -348,6 +363,8 @@ namespace MySQL.ForExcel.Classes
       _autoPkWarningTextsList = new List<string>(1);
       _changedColumnNamesWithFirstRowOfData = false;
       _changedOrDeletedRows = -1;
+      _charSet = null;
+      _collation = null;
       _columnsForInsertion = null;
       _columnsDataLength = 0;
       _copyingTableData = false;
@@ -374,8 +391,6 @@ namespace MySQL.ForExcel.Classes
       AddPrimaryKeyColumn = false;
       AutoAllowEmptyNonIndexColumns = false;
       AutoIndexIntColumns = false;
-      CharSet = null;
-      Collation = null;
       FirstRowContainsColumnNames = false;
       IsTableNameValid = !string.IsNullOrEmpty(TableName);
       IsFormatted = false;
@@ -477,6 +492,23 @@ namespace MySQL.ForExcel.Classes
     #region Properties
 
     /// <summary>
+    /// Gets the collation used to store text data in this table, looking up if not defined at this element.
+    /// </summary>
+    public string AbsoluteCollation
+    {
+      get
+      {
+        if (!string.IsNullOrEmpty(Collation))
+        {
+          return Collation;
+        }
+
+        var schemaCharSetAndCollation = WbConnection.GetSchemaCharSetAndCollation();
+        return schemaCharSetAndCollation == null ? null : schemaCharSetAndCollation[1];
+      }
+    }
+
+    /// <summary>
     /// Gets a value indicating whether columns with an auto-detected varchar type will get a padding buffer for its size.
     /// </summary>
     public bool AddBufferToVarChar { get; private set; }
@@ -550,15 +582,39 @@ namespace MySQL.ForExcel.Classes
 
     /// <summary>
     /// Gets or sets the character set used to store text data in this table.
-    /// If null or empty it means the default schema character set is used.
     /// </summary>
-    public string CharSet { get; set; }
+    /// <remarks>If null or empty it means the schema character set is used.</remarks>
+    public string CharSet
+    {
+      get
+      {
+        return _charSet;
+      }
+
+      set
+      {
+        _charSet = value;
+        OnPropertyChanged("CharSet");
+      }
+    }
 
     /// <summary>
     /// Gets or sets the collation used with the character set to store text data in this table.
-    /// If null or empty it means the default collation is used.
     /// </summary>
-    public string Collation { get; set; }
+    /// <remarks>If null or empty it means the default collation is used.</remarks>
+    public string Collation
+    {
+      get
+      {
+        return _collation;
+      }
+
+      set
+      {
+        _collation = value;
+        OnPropertyChanged("Collation");
+      }
+    }
 
     /// <summary>
     /// Gets the combined length of data representation as text for all columns.
@@ -855,7 +911,7 @@ namespace MySQL.ForExcel.Classes
         if (_maxQueryLength == 0)
         {
           long maxSize = ColumnsDataLength + (DataTypeUtilities.MYSQL_DB_OBJECTS_MAX_LENGTH * 3);
-          _maxQueryLength = (int)Math.Min(maxSize, int.MaxValue);
+          _maxQueryLength = (int)Math.Min(maxSize, MySqlMaxAllowedPacket);
           _sqlBuilderForInsert = null;
           _sqlBuilderForUpdate = null;
         }
@@ -867,7 +923,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the value of the max_allowed_packet system variable of the MySQL Server currently connected to.
     /// </summary>
-    public ulong MySqlMaxAllowedPacket
+    public int MySqlMaxAllowedPacket
     {
       get
       {
@@ -1199,6 +1255,7 @@ namespace MySQL.ForExcel.Classes
     /// Occurs when a property value on any of the columns in this table changes.
     /// </summary>
     public event PropertyChangedEventHandler TableColumnPropertyValueChanged;
+
     /// <summary>
     /// Occurs when the warnings associated to any of the columns in this table change.
     /// </summary>
@@ -1272,7 +1329,7 @@ namespace MySQL.ForExcel.Classes
     public MySqlDataTable CloneSchema(bool autoPkCreationOnlyIfFirstColumnIsPk, bool subscribePropertyChangedEvent)
     {
       bool createAutoPkColumn = autoPkCreationOnlyIfFirstColumnIsPk ? UseFirstColumnAsPk : AddPrimaryKeyColumn;
-      MySqlDataTable clonedTable = new MySqlDataTable(
+      var clonedTable = new MySqlDataTable(
         WbConnection,
         TableName,
         createAutoPkColumn,
@@ -1282,11 +1339,13 @@ namespace MySQL.ForExcel.Classes
         AutoIndexIntColumns,
         AutoAllowEmptyNonIndexColumns)
       {
-        UseFirstColumnAsPk = UseFirstColumnAsPk,
-        IsFormatted = IsFormatted,
+        CharSet = CharSet,
+        Collation = Collation,
         FirstRowContainsColumnNames = FirstRowContainsColumnNames,
+        IsFormatted = IsFormatted,
         IsPreviewTable = IsPreviewTable,
         OperationType = OperationType,
+        UseFirstColumnAsPk = UseFirstColumnAsPk,
         UseOptimisticUpdate = UseOptimisticUpdate
       };
 
@@ -1414,16 +1473,9 @@ namespace MySQL.ForExcel.Classes
     /// Gets the schema information defined in the collection of <see cref="MySqlDataColumn"/> objects.
     /// </summary>
     /// <returns>Table with schema information regarding this <see cref="MySqlDataTable"/> columns.</returns>
-    public DataTable GetColumnsSchemaInfo()
+    public MySqlColumnsInformationTable GetColumnsSchemaInfo()
     {
-      var schemaInfoTable = new DataTable("SchemaInfo");
-      schemaInfoTable.Columns.Add("Field");
-      schemaInfoTable.Columns.Add("Type");
-      schemaInfoTable.Columns.Add("Null");
-      schemaInfoTable.Columns.Add("Key");
-      schemaInfoTable.Columns.Add("Default");
-      schemaInfoTable.Columns.Add("Extra");
-
+      var schemaInfoTable = new MySqlColumnsInformationTable();
       foreach (MySqlDataColumn column in Columns)
       {
         var newRow = schemaInfoTable.NewRow();
@@ -1978,31 +2030,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Synchronizes the column properties of this table with the column properties of the given <see cref="MySqlDataTable"/> table.
-    /// </summary>
-    /// <param name="syncFromTable">A <see cref="MySqlDataTable"/> object from which columns will be synchronized.</param>
-    public void SyncSchema(MySqlDataTable syncFromTable)
-    {
-      if (!string.Equals(TableName, syncFromTable.TableName, StringComparison.InvariantCulture))
-      {
-        TableName = syncFromTable.TableName;
-      }
-
-      FirstRowContainsColumnNames = syncFromTable.FirstRowContainsColumnNames;
-      UseFirstColumnAsPk = syncFromTable.UseFirstColumnAsPk;
-      foreach (MySqlDataColumn syncFromColumn in syncFromTable.Columns)
-      {
-        var thisColumn = Columns[syncFromColumn.ColumnName] as MySqlDataColumn;
-        if (thisColumn == null)
-        {
-          continue;
-        }
-
-        thisColumn.SyncSchema(syncFromColumn);
-      }
-    }
-
-    /// <summary>
     /// Adds or removes warnings related to this table's auto-generated primary key.
     /// </summary>
     /// <param name="addWarning">true to add a new warning to the auto-generated primary key warnings collection, false to remove the given warning.</param>
@@ -2221,7 +2248,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="schemaOnly">Flag indicating whether only the schema is copied without data.</param>
     private void CopyTableSchemaAndData(DataTable filledTable, bool schemaOnly = false)
     {
-      DataTable columnsInfoTable = filledTable.GetColumnsSchemaInfo();
+      var columnsInfoTable = filledTable.GetColumnsInformationTable();
       CreateTableSchema(columnsInfoTable);
       if (!schemaOnly)
       {
@@ -2248,10 +2275,11 @@ namespace MySQL.ForExcel.Classes
       foreach (ExcelInterop.Range sourceColumnRange in temporaryRange.Range.Columns)
       {
         bool autoPk = isAutoPkRange && sourceColumnRange.Column == 1;
-        MySqlDataColumn column = new MySqlDataColumn(OperationType.IsForExport(), autoPk, "Column" + colIdx, sourceColumnRange.Column);
+        var column = new MySqlDataColumn(OperationType.IsForExport(), autoPk, "Column" + colIdx, sourceColumnRange.Column);
         column.ColumnWarningsChanged += ColumnWarningsChanged;
         column.PropertyChanged += ColumnPropertyValueChanged;
         Columns.Add(column);
+        column.SubscribeToParentTablePropertyChange();
         colIdx++;
       }
 
@@ -2264,15 +2292,23 @@ namespace MySQL.ForExcel.Classes
     /// <param name="tableName">Name of the table.</param>
     private void CreateTableSchema(string tableName)
     {
-      DataTable columnsInfoTable = WbConnection.GetSchemaCollection("Columns Short", null, WbConnection.Schema, tableName);
+      string tableCharSet;
+      string tableCollation = WbConnection.GetTableCollation(null, tableName, out tableCharSet);
+      if (!string.IsNullOrEmpty(tableCollation))
+      {
+        CharSet = tableCharSet;
+        Collation = tableCollation;
+      }
+
+      var columnsInfoTable = WbConnection.GetColumnsInformationTable(null, tableName);
       CreateTableSchema(columnsInfoTable);
     }
 
     /// <summary>
     /// Creates columns for this table using the information schema of a MySQL table with the given name to mirror their properties.
     /// </summary>
-    /// <param name="schemaInfoTable">Table with schema information.</param>
-    private void CreateTableSchema(DataTable schemaInfoTable)
+    /// <param name="schemaInfoTable">A <see cref="MySqlColumnsInformationTable"/>.</param>
+    private void CreateTableSchema(MySqlColumnsInformationTable schemaInfoTable)
     {
       if (schemaInfoTable == null)
       {
@@ -2283,7 +2319,7 @@ namespace MySQL.ForExcel.Classes
       var columnsNames = SelectQuery.GetColumnNamesArrayFromSelectQuery();
       foreach (DataRow columnInfoRow in schemaInfoTable.Rows)
       {
-        string colName = columnInfoRow["Field"].ToString();
+        string colName = columnInfoRow["Name"].ToString();
         if (columnsNames != null && columnsNames.All(c => string.Compare(c, colName, CultureInfo.InvariantCulture, CompareOptions.IgnoreCase) != 0))
         {
           continue;
@@ -2292,10 +2328,13 @@ namespace MySQL.ForExcel.Classes
         string dataType = columnInfoRow["Type"].ToString();
         bool allowNulls = columnInfoRow["Null"].ToString() == "YES";
         string keyInfo = columnInfoRow["Key"].ToString();
+        string charSet = columnInfoRow["CharSet"].ToString();
+        string collation = columnInfoRow["Collation"].ToString();
         string extraInfo = columnInfoRow["Extra"].ToString();
-        var column = new MySqlDataColumn(colName, dataType, false, allowNulls, keyInfo, extraInfo);
+        var column = new MySqlDataColumn(colName, dataType, charSet, collation, false, allowNulls, keyInfo, extraInfo);
         column.PropertyChanged += ColumnPropertyValueChanged;
         Columns.Add(column);
+        column.SubscribeToParentTablePropertyChange();
       }
     }
 

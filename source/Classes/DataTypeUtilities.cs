@@ -994,13 +994,12 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="rawValue">The raw value.</param>
     /// <param name="againstTypeColumn">The MySQL data column where the raw value would be stored.</param>
-    /// <param name="dataForInsertion">Flag indicating whether the data is meant to be inserted or read from the column.</param>
     /// <param name="valueIsNull">Output flag indicating whether the raw value is a null one.</param>
     /// <returns>The text representation of the raw value.</returns>
-    public static string GetStringValueForColumn(object rawValue, MySqlDataColumn againstTypeColumn, bool dataForInsertion, out bool valueIsNull)
+    public static string GetStringValueForColumn(object rawValue, MySqlDataColumn againstTypeColumn, out bool valueIsNull)
     {
       string valueToDb = @"null";
-      object valueObject = dataForInsertion ? GetInsertingValueForColumnType(rawValue, againstTypeColumn, true) : rawValue;
+      object valueObject = GetInsertingValueForColumnType(rawValue, againstTypeColumn, true);
       valueIsNull = valueObject == null || valueObject == DBNull.Value;
       if (valueIsNull)
       {
@@ -1039,19 +1038,6 @@ namespace MySQL.ForExcel.Classes
       }
 
       return valueToDb;
-    }
-
-    /// <summary>
-    /// Gets a text value from a raw value (object) converted to the data value of a specific target column.
-    /// </summary>
-    /// <param name="rawValue">The raw value.</param>
-    /// <param name="againstTypeColumn">The MySQL data column where the raw value would be stored.</param>
-    /// <param name="dataForInsertion">Flag indicating whether the data is meant to be inserted or read from the column.</param>
-    /// <returns>The text representation of the raw value.</returns>
-    public static string GetStringValueForColumn(object rawValue, MySqlDataColumn againstTypeColumn, bool dataForInsertion)
-    {
-      bool valueIsNull;
-      return GetStringValueForColumn(rawValue, againstTypeColumn, dataForInsertion, out valueIsNull);
     }
 
     /// <summary>

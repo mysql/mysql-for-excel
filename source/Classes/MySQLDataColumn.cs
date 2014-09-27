@@ -100,6 +100,8 @@ namespace MySQL.ForExcel.Classes
       _mySqlDataType = string.Empty;
       AutoIncrement = false;
       AutoPk = false;
+      CharSet = null;
+      Collation = null;
       DisplayName = string.Empty;
       InExportMode = false;
       IsDisplayNameDuplicate = false;
@@ -142,12 +144,14 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="columnName">Name of the column.</param>
     /// <param name="mySqlFullDataType">Data type for a table column supported by MySQL Server.</param>
+    /// <param name="charSet">The character set used to store text data in this column.</param>
+    /// <param name="collation">The collation used with the character set to store text data in this column.</param>
     /// <param name="datesAsMySqlDates">Flag indicating if the data type for dates will be stored as <see cref="MySql.Data.Types.MySqlDateTime"/>
     /// or <see cref="System.DateTime"/>.</param>
     /// <param name="allowNulls">Flag indicating if the column will accept null values.</param>
     /// <param name="keyInfo">Information about the type of key this column belongs to.</param>
     /// <param name="extraInfo">Extra information related to the column's data type as stored by the MySQL server.</param>
-    public MySqlDataColumn(string columnName, string mySqlFullDataType, bool datesAsMySqlDates, bool allowNulls, string keyInfo, string extraInfo)
+    public MySqlDataColumn(string columnName, string mySqlFullDataType, string charSet, string collation, bool datesAsMySqlDates, bool allowNulls, string keyInfo, string extraInfo)
       : this()
     {
       keyInfo = keyInfo.ToUpperInvariant();
@@ -162,6 +166,8 @@ namespace MySQL.ForExcel.Classes
         ExcludeColumn = extraInfo.Contains("exclude");
       }
 
+      CharSet = charSet;
+      Collation = collation;
       MySqlDataType = mySqlFullDataType;
       DataType = DataTypeUtilities.NameToType(StrippedMySqlDataType, Unsigned, datesAsMySqlDates);
       CreateIndex = keyInfo == "MUL";
@@ -177,7 +183,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="datesAsMySqlDates">Flag indicating if the data type for dates will be stored as <see cref="MySql.Data.Types.MySqlDateTime"/>
     /// or <see cref="System.DateTime"/>.</param>
     public MySqlDataColumn(string columnName, string mySqlFullDataType, bool datesAsMySqlDates)
-      : this(columnName, mySqlFullDataType, datesAsMySqlDates, false, string.Empty, string.Empty)
+      : this(columnName, mySqlFullDataType, null, null, datesAsMySqlDates, false, string.Empty, string.Empty)
     {
     }
 
@@ -204,6 +210,17 @@ namespace MySQL.ForExcel.Classes
     #region Properties
 
     /// <summary>
+    /// Gets the collation used to store text data in this column, looking up if not defined at this element.
+    /// </summary>
+    public string AbsoluteCollation
+    {
+      get
+      {
+        return string.IsNullOrEmpty(Collation) ? ParentTable.AbsoluteCollation : Collation;
+      }
+    }
+
+    /// <summary>
     /// Gets or sets a value indicating whether the column will accept null values.
     /// </summary>
     public bool AllowNull
@@ -224,6 +241,18 @@ namespace MySQL.ForExcel.Classes
     /// Gets a value indicating whether the column is used in an auto-generated primary key.
     /// </summary>
     public bool AutoPk { get; private set; }
+
+    /// <summary>
+    /// Gets or sets the character set used to store text data in this column.
+    /// </summary>
+    /// <remarks>If null or empty it means the parent table character set is used.</remarks>
+    public string CharSet { get; set; }
+
+    /// <summary>
+    /// Gets or sets the collation used with the character set to store text data in this column.
+    /// </summary>
+    /// <remarks>If null or empty it means the default collation is used.</remarks>
+    public string Collation { get; set; }
 
     /// <summary>
     /// Gets or sets the name of the column in the <see cref="DataColumnCollection"/>.
@@ -943,7 +972,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       var extraBuilder = new StringBuilder();
-      schemaInfoRow["Field"] = DisplayName;
+      schemaInfoRow["Name"] = DisplayName;
       schemaInfoRow["Type"] = MySqlDataType;
       schemaInfoRow["Null"] = AllowNull ? "YES" : "NO";
       if (PrimaryKey)
@@ -960,6 +989,8 @@ namespace MySQL.ForExcel.Classes
       }
 
       schemaInfoRow["Default"] = DefaultValue != null ? DefaultValue.ToString() : string.Empty;
+      schemaInfoRow["CharSet"] = CharSet;
+      schemaInfoRow["Collation"] = Collation;
       if (AutoIncrement)
       {
         extraBuilder.Append("auto_increment");
@@ -1140,6 +1171,20 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Subsribes this column to the event fired when a property value in the parent table changes.
+    /// </summary>
+    public void SubscribeToParentTablePropertyChange()
+    {
+      if (ParentTable == null)
+      {
+        return;
+      }
+
+      ParentTable.PropertyChanged -= ParentTable_PropertyChanged;
+      ParentTable.PropertyChanged += ParentTable_PropertyChanged;
+    }
+
+    /// <summary>
     /// Synchronizes this object properties copying the corresponding property values from another <see cref="MySqlDataColumn"/> object.
     /// </summary>
     /// <param name="fromColumn">The <see cref="MySqlDataColumn"/> object from which to copy property values.</param>
@@ -1156,12 +1201,14 @@ namespace MySQL.ForExcel.Classes
 
       // Set the rest of the properties.
       AllowNull = fromColumn.AllowNull;
-      PrimaryKey = fromColumn.PrimaryKey;
       AutoIncrement = fromColumn.AutoIncrement;
+      CharSet = fromColumn.CharSet;
+      Collation = fromColumn.Collation;
       CreateIndex = fromColumn.CreateIndex;
       ExcludeColumn = fromColumn.ExcludeColumn;
       MappedDataColName = fromColumn.MappedDataColName;
       MappedDataColOrdinal = fromColumn.MappedDataColOrdinal;
+      PrimaryKey = fromColumn.PrimaryKey;
       RangeColumnIndex = fromColumn.RangeColumnIndex;
       UniqueKey = fromColumn.UniqueKey;
       Unsigned = fromColumn.Unsigned;
@@ -1216,6 +1263,31 @@ namespace MySQL.ForExcel.Classes
     protected void OnPropertyChanged(string propertyName)
     {
       OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
+    }
+
+    /// <summary>
+    /// Event delegate method fired when a property value in the <see cref="ParentTable"/> changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ParentTable_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+      switch (e.PropertyName)
+      {
+        case "CharSet":
+          if (string.IsNullOrEmpty(CharSet))
+          {
+            CharSet = ParentTable.CharSet;
+          }
+          break;
+
+        case "Collation":
+          if (string.IsNullOrEmpty(Collation))
+          {
+            Collation = ParentTable.Collation;
+          }
+          break;
+      }
     }
 
     /// <summary>

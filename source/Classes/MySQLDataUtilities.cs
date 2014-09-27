@@ -40,11 +40,6 @@ namespace MySQL.ForExcel.Classes
     #region Constants
 
     /// <summary>
-    /// The text used on default collations for a specific character set.
-    /// </summary>
-    public const string DEFAULT_COLLATION_TEXT = "default collation";
-
-    /// <summary>
     /// The default name given to newly created schemas.
     /// </summary>
     public const string DEFAULT_NEW_SCHEMA_NAME = "new_schema";
@@ -178,10 +173,10 @@ namespace MySQL.ForExcel.Classes
     /// <param name="maxAllowedPacketValue">The value of the the MySQL Server's MAX_ALLOWED_PACKET variable.</param>
     /// <param name="safetyBytes">A safety value before reaching the MAX_ALLOWED_PACKET variable value.</param>
     /// <returns><c>true</c> if the length of the statement exceeds the vlaue of the server's MAX_ALLOWED_PACKET variable, <c>false</c> otherwise.</returns>
-    public static bool ExceedsMySqlMaxAllowedPacketValue(this string sqlStatement, ulong maxAllowedPacketValue, ulong safetyBytes = 0)
+    public static bool ExceedsMySqlMaxAllowedPacketValue(this string sqlStatement, int maxAllowedPacketValue, int safetyBytes = 0)
     {
-      ulong maxByteCount = maxAllowedPacketValue > 0 ? maxAllowedPacketValue - safetyBytes : 0;
-      ulong statementByteCount = (ulong)Encoding.ASCII.GetByteCount(sqlStatement);
+      var maxByteCount = maxAllowedPacketValue > 0 ? maxAllowedPacketValue - safetyBytes : 0;
+      var statementByteCount = Encoding.ASCII.GetByteCount(sqlStatement);
       return statementByteCount > maxByteCount;
     }
 
@@ -192,9 +187,9 @@ namespace MySQL.ForExcel.Classes
     /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="safetyBytes">A safety value before reaching the MAX_ALLOWED_PACKET variable value.</param>
     /// <returns><c>true</c> if the length of the statement exceeds the vlaue of the server's MAX_ALLOWED_PACKET variable, <c>false</c> otherwise.</returns>
-    public static bool ExceedsMySqlMaxAllowedPacketValue(this string sqlStatement, MySqlWorkbenchConnection wbConnection, ulong safetyBytes = 0)
+    public static bool ExceedsMySqlMaxAllowedPacketValue(this string sqlStatement, MySqlWorkbenchConnection wbConnection, int safetyBytes = 0)
     {
-      ulong maxAllowedPacketValue = wbConnection.GetMySqlServerMaxAllowedPacket();
+      var maxAllowedPacketValue = wbConnection.GetMySqlServerMaxAllowedPacket();
       return ExceedsMySqlMaxAllowedPacketValue(sqlStatement, maxAllowedPacketValue, safetyBytes);
     }
 
@@ -249,45 +244,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a list of all MySQL character sets along with their available collations.
-    /// </summary>
-    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <param name="firstElement">A custom string for the first element of the dictioary.</param>
-    /// <returns>A list of all MySQL character sets along with their available collations.</returns>
-    public static Dictionary<string, string[]> GetCollationsDictionary(this MySqlWorkbenchConnection connection, string firstElement = null)
-    {
-      if (connection == null)
-      {
-        return null;
-      }
-
-      var charSetsTable = connection.GetSchemaCollection("Collations", null);
-      if (charSetsTable == null)
-      {
-        return null;
-      }
-
-      var rowsByGroup = charSetsTable.Select(string.Empty, "Charset, Collation").GroupBy(r => r["Charset"].ToString());
-      var collationsDictionary = new Dictionary<string, string[]>(270);
-      if (!string.IsNullOrEmpty(firstElement))
-      {
-        collationsDictionary.Add(firstElement, new[] { string.Empty, string.Empty });
-      }
-
-      foreach (var rowsGroup in rowsByGroup)
-      {
-        var charset = rowsGroup.Key;
-        collationsDictionary.Add(string.Format("{0} - {1}", charset, DEFAULT_COLLATION_TEXT), new[] { charset, string.Empty });
-        foreach (var collation in rowsGroup.Select(row => row["Collation"].ToString()))
-        {
-          collationsDictionary.Add(string.Format("{0} - {1}", charset, collation), new[] { charset, collation });
-        }
-      }
-
-      return collationsDictionary;
-    }
-
-    /// <summary>
     /// Gets the array of column names from a given SelectQuery.
     /// </summary>
     /// <param name="selectQuery">The select query to get the array of column names from.</param>
@@ -332,6 +288,75 @@ namespace MySQL.ForExcel.Classes
       }
 
       return result;
+    }
+
+    /// <summary>
+    /// Returns a table containing schema information for columns contained in a MySQL table with the given name.
+    /// </summary>
+    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
+    /// <param name="schemaName">The schema the MySQL table belongs to.</param>
+    /// <param name="tableName">The name of a MySQL table.</param>
+    /// <returns>A table containing schema information for columns contained in a MySQL table with the given name.</returns>
+    public static MySqlColumnsInformationTable GetColumnsInformationTable(this MySqlWorkbenchConnection connection, string schemaName, string tableName)
+    {
+      if (connection == null)
+      {
+        return null;
+      }
+
+      schemaName = string.IsNullOrEmpty(schemaName) ? connection.Schema : schemaName;
+      var schemaTable = connection.GetSchemaCollection("Columns", null, schemaName, tableName);
+      if (schemaTable == null)
+      {
+        return null;
+      }
+
+      var columnsInfoTable = new MySqlColumnsInformationTable(schemaTable.TableName);
+      foreach (DataRow row in schemaTable.Rows)
+      {
+        var infoRow = columnsInfoTable.NewRow();
+        infoRow["Name"] = row["COLUMN_NAME"];
+        infoRow["Type"] = row["COLUMN_TYPE"];
+        infoRow["Null"] = row["IS_NULLABLE"];
+        infoRow["Key"] = row["COLUMN_KEY"];
+        infoRow["Default"] = row["COLUMN_DEFAULT"];
+        infoRow["CharSet"] = row["CHARACTER_SET_NAME"];
+        infoRow["Collation"] = row["COLLATION_NAME"];
+        infoRow["Extra"] = row["EXTRA"];
+        columnsInfoTable.Rows.Add(infoRow);
+      }
+
+      return columnsInfoTable;
+    }
+
+    /// <summary>
+    /// Gets the columns schema information for the given database table.
+    /// </summary>
+    /// <param name="dataTable">The data table to get the schema info for.</param>
+    /// <returns>Table with schema information regarding its columns.</returns>
+    public static MySqlColumnsInformationTable GetColumnsInformationTable(this DataTable dataTable)
+    {
+      if (dataTable == null)
+      {
+        return null;
+      }
+
+      var schemaInfoTable = new MySqlColumnsInformationTable();
+      foreach (DataColumn column in dataTable.Columns)
+      {
+        var newRow = schemaInfoTable.NewRow();
+        newRow["Name"] = column.ColumnName;
+        newRow["Type"] = column.DataType.GetMySqlDataType();
+        newRow["Null"] = column.AllowDBNull ? "YES" : "NO";
+        newRow["Key"] = dataTable.PrimaryKey.Any(indexCol => indexCol.ColumnName == column.ColumnName) ? "PRI" : string.Empty;
+        newRow["Default"] = column.DefaultValue != null ? column.DefaultValue.ToString() : string.Empty;
+        newRow["CharSet"] = null;
+        newRow["Collation"] = null;
+        newRow["Extra"] = column.AutoIncrement ? "auto_increment" : string.Empty;
+        schemaInfoTable.Rows.Add(newRow);
+      }
+
+      return schemaInfoTable;
     }
 
     /// <summary>
@@ -447,42 +472,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the value of the DEFAULT_STORAGE_ENGINE MySQL Server variable indicating the default DB engine used for new table creations.
-    /// </summary>
-    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <returns>The default DB engine used for new table creations.</returns>
-    public static string GetMySqlServerDefaultEngine(this MySqlWorkbenchConnection connection)
-    {
-      const string sql = "SELECT @@default_storage_engine";
-      object objEngine = connection != null ? MySqlHelper.ExecuteScalar(connection.GetConnectionStringBuilder().ConnectionString, sql) : null;
-      return objEngine != null ? objEngine.ToString() : string.Empty;
-    }
-
-    /// <summary>
-    /// Gets the value of the MAX_ALLOWED_PACKET MySQL Server variable indicating the max size in bytes of the packet returned by a single query.
-    /// </summary>
-    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <returns>The max size in bytes of the packet returned by a single query.</returns>
-    public static ulong GetMySqlServerMaxAllowedPacket(this MySqlWorkbenchConnection connection)
-    {
-      const string sql = "SELECT @@max_allowed_packet";
-      object objCount = connection != null ? MySqlHelper.ExecuteScalar(connection.GetConnectionStringBuilder().ConnectionString, sql) : null;
-      return objCount != null ? (ulong)objCount : 0;
-    }
-
-    /// <summary>
-    /// Gets the value of the MAX_ALLOWED_PACKET MySQL Server variable indicating the max size in bytes of the packet returned by a single query.
-    /// </summary>
-    /// <param name="connection">A MySQL connection.</param>
-    /// <returns>The max size in bytes of the packet returned by a single query.</returns>
-    public static ulong GetMySqlServerMaxAllowedPacket(this MySqlConnection connection)
-    {
-      const string sql = "SELECT @@max_allowed_packet";
-      object objCount = connection != null ? MySqlHelper.ExecuteScalar(connection, sql) : null;
-      return objCount != null ? (ulong)objCount : 0;
-    }
-
-    /// <summary>
     /// Gets the total count of affected rows within the given list of rows with statements of a given type.
     /// </summary>
     /// <param name="rowsList">The list of <see cref="IMySqlDataRow"/> objects holding <see cref="MySqlStatement"/>s.</param>
@@ -493,79 +482,6 @@ namespace MySQL.ForExcel.Classes
       return rowsList != null
           ? rowsList.Where(iMsqlRow => iMsqlRow.Statement.StatementType == statementType && iMsqlRow.Statement.AffectedRows > 0).Sum(iMsqlRow => iMsqlRow.Statement.AffectedRows)
           : 0;
-    }
-
-    /// <summary>
-    /// Gets the schema information ofr the given database collection.
-    /// </summary>
-    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <param name="collection">The type of database collection to return schema information for.</param>
-    /// <param name="restrictions">Specific parameters that vary among database collections.</param>
-    /// <returns>Schema information within a data table.</returns>
-    public static DataTable GetSchemaCollection(this MySqlWorkbenchConnection connection, string collection, params string[] restrictions)
-    {
-      if (connection == null)
-      {
-        return null;
-      }
-
-      string connectionString = connection.GetConnectionStringBuilder().ConnectionString;
-      DataTable dt;
-      try
-      {
-        using (var baseConnection = new MySqlConnection(connectionString))
-        {
-          baseConnection.Open();
-          MySqlDataAdapter mysqlAdapter;
-          switch (collection.ToUpperInvariant())
-          {
-            case "COLUMNS SHORT":
-              mysqlAdapter = new MySqlDataAdapter(string.Format("SHOW COLUMNS FROM `{0}`.`{1}`", restrictions[1], restrictions[2]), baseConnection);
-              dt = new DataTable();
-              mysqlAdapter.Fill(dt);
-              break;
-
-            case "ENGINES":
-              mysqlAdapter = new MySqlDataAdapter("SELECT * FROM information_schema.engines ORDER BY engine", baseConnection);
-              dt = new DataTable();
-              mysqlAdapter.Fill(dt);
-              break;
-
-            case "COLLATIONS":
-              string queryString;
-              if (restrictions != null && restrictions.Length > 0 && !string.IsNullOrEmpty(restrictions[0]))
-              {
-                queryString = string.Format("SHOW COLLATION WHERE charset = '{0}'", restrictions[0]);
-              }
-              else
-              {
-                queryString = "SHOW COLLATION";
-              }
-
-              mysqlAdapter = new MySqlDataAdapter(queryString, baseConnection);
-              dt = new DataTable();
-              mysqlAdapter.Fill(dt);
-              break;
-
-            case "CHARSETS":
-              mysqlAdapter = new MySqlDataAdapter("SHOW CHARSET", baseConnection);
-              dt = new DataTable();
-              mysqlAdapter.Fill(dt);
-              break;
-
-            default:
-              dt = baseConnection.GetSchema(collection, restrictions);
-              break;
-          }
-        }
-      }
-      catch (Exception ex)
-      {
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
-        throw;
-      }
-
-      return dt;
     }
 
     /// <summary>
@@ -624,41 +540,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the columns schema information for the given database table.
-    /// </summary>
-    /// <param name="dataTable">The data table to get the schema info for.</param>
-    /// <returns>Table with schema information regarding its columns.</returns>
-    public static DataTable GetColumnsSchemaInfo(this DataTable dataTable)
-    {
-      if (dataTable == null)
-      {
-        return null;
-      }
-
-      DataTable schemaInfoTable = new DataTable("SchemaInfo");
-      schemaInfoTable.Columns.Add("Field");
-      schemaInfoTable.Columns.Add("Type");
-      schemaInfoTable.Columns.Add("Null");
-      schemaInfoTable.Columns.Add("Key");
-      schemaInfoTable.Columns.Add("Default");
-      schemaInfoTable.Columns.Add("Extra");
-
-      foreach (DataColumn column in dataTable.Columns)
-      {
-        var newRow = schemaInfoTable.NewRow();
-        newRow["Field"] = column.ColumnName;
-        newRow["Type"] = column.DataType.GetMySqlDataType();
-        newRow["Null"] = column.AllowDBNull ? "YES" : "NO";
-        newRow["Key"] = dataTable.PrimaryKey.Any(indexCol => indexCol.ColumnName == column.ColumnName) ? "PRI" : string.Empty;
-        newRow["Default"] = column.DefaultValue != null ? column.DefaultValue.ToString() : string.Empty;
-        newRow["Extra"] = column.AutoIncrement ? "auto_increment" : string.Empty;
-        schemaInfoTable.Rows.Add(newRow);
-      }
-
-      return schemaInfoTable;
-    }
-
-    /// <summary>
     /// Checks if an index with the given name exists in the given schema and table.
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
@@ -668,12 +549,13 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the index exists, <c>false</c> otherwise.</returns>
     public static bool IndexExistsInSchema(this MySqlWorkbenchConnection connection, string schemaName, string tableName, string indexName)
     {
-      if (connection == null || string.IsNullOrEmpty(schemaName) || string.IsNullOrEmpty(indexName))
+      if (string.IsNullOrEmpty(indexName))
       {
         return false;
       }
 
-      DataTable dt = connection.GetSchemaCollection("Indexes", null, schemaName, tableName, indexName);
+      schemaName = string.IsNullOrEmpty(schemaName) ? connection.Schema : schemaName;
+      var dt = connection.GetSchemaCollection("Indexes", null, schemaName, tableName, indexName);
       return dt != null && dt.Rows.Count > 0;
     }
 
@@ -732,32 +614,24 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Sets the net_write_timeout and net_read_timeout MySQL server variables to the given value for the duration of the current client session.
+    /// Checks if a MySQL collation with the given name is a Unicode one.
     /// </summary>
-    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <param name="timeoutInSeconds">
-    /// The number of seconds to wait for more data from a connection before aborting the read or for a block to be written to a connection before aborting the write.
-    /// If the parameter is ommitted or a value of <c>0</c> is passed to it, the <see cref="MySqlWorkbenchConnection.DefaultCommandTimeout"/> property value is used.
-    /// </param>
-    public static void SetClientSessionReadWriteTimeouts(this MySqlWorkbenchConnection connection, uint timeoutInSeconds = 0)
+    /// <param name="charSetOrCollation">A MySQL character set or collation name.</param>
+    /// <returns><c>true</c> if a MySQL collation with the given name is a Unicode one, <c>false</c> otherwise.</returns>
+    public static bool IsUnicodeCharSetOrCollation(this string charSetOrCollation)
     {
-      if (connection == null)
+      if (string.IsNullOrEmpty(charSetOrCollation))
       {
-        return;
+        return false;
       }
 
-      if (timeoutInSeconds == 0)
-      {
-        timeoutInSeconds = connection.DefaultCommandTimeout;
-      }
-
-      if (timeoutInSeconds < 1)
-      {
-        return;
-      }
-
-      string sql = string.Format("SET SESSION net_write_timeout = {0}, SESSION net_read_timeout = {0}", timeoutInSeconds);
-      MySqlHelper.ExecuteNonQuery(connection.GetConnectionStringBuilder().ConnectionString, sql);
+      charSetOrCollation = charSetOrCollation.ToLowerInvariant();
+      return charSetOrCollation.StartsWith("ucs2")
+             || charSetOrCollation.StartsWith("utf8")
+             || charSetOrCollation.StartsWith("utf16")
+             || charSetOrCollation.StartsWith("utf16le")
+             || charSetOrCollation.StartsWith("utf32")
+             || charSetOrCollation.StartsWith("utf8mb4");
     }
 
     /// <summary>

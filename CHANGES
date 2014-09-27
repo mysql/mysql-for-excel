@@ -1,4 +1,9 @@
 1.3.3
+- Fixed some bugs related to the way SQL queries are assembled during an Edit Data session and to text values. One of the problems was related to memory allocation for
+  the query text overflowing when many TEXT columns were present in the table. Another problem was related to text values used in the WHERE clause of UPDATE queries were
+  not being properly escaped, this was only happening when optimistic updates were being used. Optimized the construction of WHERE clauses with optimistic updates and
+  TEXT columns to use user variables to store the old column values referenced in the WHERE clause to save query text space.
+  (MySQL Bug #73911, Bug #19639669 - SOME TABLES CAN NOT BE EDITED CORRECTLY)
 - Added logic to allow changes made by the user at Append Advanced Options dialog to be discarded if cancel is pressed.
   (Bug #16501859 - APPEND DATA - STORED MAPPINGS ARE RENAMED OR DELETED EVEN WHEN CANCELLING)
 - Improved handling of Worksheet space to honor both row and column limits to avoid high severity errors while importing data into Excel.

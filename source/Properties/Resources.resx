@@ -1089,4 +1089,7 @@ Since Excel relationships cannot be created, a single PivotTable for the whole E
   <data name="ImportNotEnoughWorksheetSpaceErrorTitle" xml:space="preserve">
     <value>Not Enough Space to Import</value>
   </data>
+  <data name="SqlScriptTooBigErrorDetail" xml:space="preserve">
+    <value>There is not enough contiguous memory segment that can hold the SQL text being generated.</value>
+  </data>
 </root>

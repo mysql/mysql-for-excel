@@ -2604,6 +2604,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There is not enough contiguous memory segment that can hold the SQL text being generated..
+        /// </summary>
+        internal static string SqlScriptTooBigErrorDetail {
+            get {
+                return ResourceManager.GetString("SqlScriptTooBigErrorDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The following SQL statements produced warnings:.
         /// </summary>
         internal static string SqlStatementsProducingWarningsText {

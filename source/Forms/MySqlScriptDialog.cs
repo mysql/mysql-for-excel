@@ -92,7 +92,7 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// The value of the MAX_ALLOWED_PACKET MySQL Server variable indicating the max size in bytes of the packet returned by a single query.
     /// </summary>
-    private ulong _mySqlMaxAllowedPacket;
+    private int _mySqlMaxAllowedPacket;
 
     /// <summary>
     /// A <see cref="MySqlDataTable"/> object containing data changes to be committed to the database.
@@ -328,7 +328,7 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets the value of the MAX_ALLOWED_PACKET MySQL Server variable indicating the max size in bytes of the packet returned by a single query.
     /// </summary>
-    private ulong MySqlMaxAllowedPacket
+    private int MySqlMaxAllowedPacket
     {
       get
       {
@@ -381,8 +381,9 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      string connectionString = _wbConnection.GetConnectionStringBuilder().ConnectionString;
-      using (var conn = new MySqlConnection(connectionString))
+      var connectionStringBuilder = _wbConnection.GetConnectionStringBuilder();
+      connectionStringBuilder.AllowUserVariables = true;
+      using (var conn = new MySqlConnection(connectionStringBuilder.ConnectionString))
       {
         conn.Open();
         MySqlTransaction transaction = conn.BeginTransaction();
@@ -479,66 +480,75 @@ namespace MySQL.ForExcel.Forms
           return;
         }
 
-        int builderLength = createTableOnly ? MiscUtilities.STRING_BUILDER_DEFAULT_CAPACITY : _mySqlTable.ChangedOrDeletedRows * _mySqlTable.MaxQueryLength;
-        StringBuilder sqlScript = new StringBuilder(builderLength);
-        IList<MySqlDummyRow> dummyRows;
-        bool createTableDummyRows = _mySqlTable.OperationType.IsForExport() || _mySqlTable.OperationType.IsForAppend();
-        if (createTableDummyRows)
+        try
         {
-          // Create optimization statements for INSERTS that disable key constraints and lock table.
-          // Also incluldes a CREATE statement if table on Export mode.
-          dummyRows = _mySqlTable.GetTableDummyRows(true);
-          if (dummyRows != null)
+          // Calculate the StringBuilder initial length to avoid its size to be internally doubled each time an Append to it is done to increase performance.
+          int builderLength = createTableOnly ? MiscUtilities.STRING_BUILDER_DEFAULT_CAPACITY : _mySqlTable.MaxQueryLength;
+          var sqlScript = new StringBuilder(builderLength);
+          IList<MySqlDummyRow> dummyRows;
+          bool createTableDummyRows = _mySqlTable.OperationType.IsForExport() || _mySqlTable.OperationType.IsForAppend();
+          if (createTableDummyRows)
           {
-            foreach (var dummyRow in dummyRows)
+            // Create optimization statements for INSERTS that disable key constraints and lock table.
+            // Also incluldes a CREATE statement if table on Export mode.
+            dummyRows = _mySqlTable.GetTableDummyRows(true);
+            if (dummyRows != null)
             {
-              if (dummyRow.Statement.StatementType == MySqlStatement.SqlStatementType.CreateTable)
+              foreach (var dummyRow in dummyRows)
               {
-                _createdTable = true;
-              }
+                if (dummyRow.Statement.StatementType == MySqlStatement.SqlStatementType.CreateTable)
+                {
+                  _createdTable = true;
+                }
 
-              if (dummyRow.Statement.StatementType == MySqlStatement.SqlStatementType.LockTables)
-              {
-                _lockedTable = true;
-              }
+                if (dummyRow.Statement.StatementType == MySqlStatement.SqlStatementType.LockTables)
+                {
+                  _lockedTable = true;
+                }
 
-              _originalStatementRowsList.Add(dummyRow);
-              sqlScript.AppendFormat("{0};{1}", dummyRow.Statement.SqlQuery, Environment.NewLine);
+                _originalStatementRowsList.Add(dummyRow);
+                sqlScript.AppendFormat("{0};{1}", dummyRow.Statement.SqlQuery, Environment.NewLine);
+              }
             }
           }
-        }
 
-        // Create DELETE, INSERT and UPDATE statements for table rows
-        // Do not change this code to get changed rows via the GetChanges method since the references to the MySqlDataTable and MySqlDataTable objects will be broken.
-        if (!createTableOnly)
-        {
-          DataRowState[] rowStatesWithChanges = { DataRowState.Deleted, DataRowState.Added, DataRowState.Modified };
-          foreach (MySqlDataRow mySqlRow in rowStatesWithChanges.SelectMany(rowState => _mySqlTable.Rows.Cast<MySqlDataRow>().Where(dr => !dr.IsHeadersRow && dr.RowState == rowState)))
+          // Create DELETE, INSERT and UPDATE statements for table rows
+          // Do not change this code to get changed rows via the GetChanges method since the references to the MySqlDataTable and MySqlDataTable objects will be broken.
+          if (!createTableOnly)
           {
-            _originalStatementRowsList.Add(mySqlRow);
-            sqlScript.AppendFormat("{0};{1}", mySqlRow.Statement.SqlQuery, Environment.NewLine);
-          }
-        }
-
-        // Create optimization statements for INSERTS that re-enable key constraints and unlock table.
-        if (createTableDummyRows)
-        {
-          dummyRows = _mySqlTable.GetTableDummyRows(false);
-          if (dummyRows != null)
-          {
-            foreach (var dummyRow in dummyRows)
+            DataRowState[] rowStatesWithChanges = { DataRowState.Deleted, DataRowState.Added, DataRowState.Modified };
+            foreach (var mySqlRow in rowStatesWithChanges.SelectMany(rowState => _mySqlTable.Rows.Cast<MySqlDataRow>().Where(dr => !dr.IsHeadersRow && dr.RowState == rowState)))
             {
-              _originalStatementRowsList.Add(dummyRow);
-              sqlScript.AppendFormat("{0};{1}", dummyRow.Statement.SqlQuery, Environment.NewLine);
+              _originalStatementRowsList.Add(mySqlRow);
+              sqlScript.AppendFormat("{0};{1}", mySqlRow.Statement.SqlQuery, Environment.NewLine);
             }
           }
-        }
 
-        OriginalSqlScript = sqlScript.ToString();
+          // Create optimization statements for INSERTS that re-enable key constraints and unlock table.
+          if (createTableDummyRows)
+          {
+            dummyRows = _mySqlTable.GetTableDummyRows(false);
+            if (dummyRows != null)
+            {
+              foreach (var dummyRow in dummyRows)
+              {
+                _originalStatementRowsList.Add(dummyRow);
+                sqlScript.AppendFormat("{0};{1}", dummyRow.Statement.SqlQuery, Environment.NewLine);
+              }
+            }
+          }
+
+          OriginalSqlScript = sqlScript.ToString();
+        }
+        catch (OutOfMemoryException oomEx)
+        {
+          MySqlSourceTrace.WriteAppErrorToLog(oomEx);
+          MiscUtilities.ShowCustomizedErrorDialog(Resources.SqlScriptTooBigErrorDetail, oomEx.Message, true);
+        }
       }
       else if (!string.IsNullOrEmpty(OriginalSqlScript) && _originalStatementRowsList.Count == 0)
       {
-        foreach (string sqlQuery in SqlScript.Split(';').Select(sqlStatement => sqlStatement.Trim()).Where(sqlQuery => sqlQuery.Length > 0))
+        foreach (var sqlQuery in SqlScript.Split(';').Select(sqlStatement => sqlStatement.Trim()).Where(sqlQuery => sqlQuery.Length > 0))
         {
           _originalStatementRowsList.Add(new MySqlDummyRow(sqlQuery));
         }

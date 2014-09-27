@@ -213,7 +213,9 @@ namespace MySQL.ForExcel.Classes
           break;
 
         case DataRowState.Modified:
-          _sqlQuery = GetSqlForModifiedRow();
+          _sqlQuery = MySqlTable.UseOptimisticUpdate
+            ? GetSqlForModifiedRowUsingOptimisticConcurrency()
+            : GetSqlForModifiedRow();
           MySqlTable.SqlBuilderForUpdate.Clear();
           break;
 
@@ -228,7 +230,7 @@ namespace MySQL.ForExcel.Classes
         return _sqlQuery;
       }
 
-      ulong queryStringByteCount = (ulong)Encoding.ASCII.GetByteCount(_sqlQuery);
+      var queryStringByteCount = Encoding.ASCII.GetByteCount(_sqlQuery);
       if (queryStringByteCount > MySqlTable.MySqlMaxAllowedPacket)
       {
         throw new QueryExceedsMaxAllowedPacketException();
@@ -378,24 +380,22 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The INSERT SQL query.</returns>
     private string GetSqlForAddedRow()
     {
-      if (MySqlTable == null || RowState != DataRowState.Added || MySqlTable.ColumnsForInsertion == null)
+      var parentTable = MySqlTable;
+      if (parentTable == null || RowState != DataRowState.Added || parentTable.ColumnsForInsertion == null)
       {
         return string.Empty;
       }
 
-      var sqlBuilderForInsert = MySqlTable.SqlBuilderForInsert;
+      var sqlBuilderForInsert = parentTable.SqlBuilderForInsert;
       sqlBuilderForInsert.Clear();
-      sqlBuilderForInsert.Append(MySqlTable.PreSqlForAddedRows);
+      sqlBuilderForInsert.Append(parentTable.PreSqlForAddedRows);
       string colsSeparator = string.Empty;
-      foreach (MySqlDataColumn column in MySqlTable.ColumnsForInsertion)
+      foreach (MySqlDataColumn column in parentTable.ColumnsForInsertion)
       {
         bool insertingValueIsNull;
-        string valueToDb = DataTypeUtilities.GetStringValueForColumn(this[column.ColumnName], column, true, out insertingValueIsNull);
-        sqlBuilderForInsert.AppendFormat(
-          "{0}{1}{2}{1}",
-          colsSeparator,
-          column.ColumnRequiresQuotes && !insertingValueIsNull ? "'" : string.Empty,
-          valueToDb);
+        string valueToDb = DataTypeUtilities.GetStringValueForColumn(this[column.ColumnName], column, out insertingValueIsNull);
+        string wrapValueCharacter = column.ColumnRequiresQuotes && !insertingValueIsNull ? "'" : string.Empty;
+        sqlBuilderForInsert.AppendFormat("{0}{1}{2}{1}", colsSeparator, wrapValueCharacter, valueToDb);
         colsSeparator = ",";
       }
 
@@ -409,88 +409,138 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The DELETE SQL query.</returns>
     private string GetSqlForDeletedRow()
     {
-      if (MySqlTable == null || RowState != DataRowState.Deleted || MySqlTable.PrimaryKeyColumns == null)
+      var parentTable = MySqlTable;
+      if (parentTable == null || RowState != DataRowState.Deleted || parentTable.PrimaryKeyColumns == null)
       {
         return string.Empty;
       }
 
-      var sqlBuilderForDelete = MySqlTable.SqlBuilderForDelete;
+      var sqlBuilderForDelete = parentTable.SqlBuilderForDelete;
       sqlBuilderForDelete.Clear();
       sqlBuilderForDelete.Append(MySqlStatement.STATEMENT_DELETE);
-      sqlBuilderForDelete.AppendFormat(" `{0}`.`{1}`", MySqlTable.SchemaName, MySqlTable.TableNameForSqlQueries);
+      sqlBuilderForDelete.AppendFormat(" `{0}`.`{1}`", parentTable.SchemaName, parentTable.TableNameForSqlQueries);
       sqlBuilderForDelete.Append(GetWhereClauseFromPrimaryKey());
 
       return sqlBuilderForDelete.ToString();
     }
 
     /// <summary>
-    /// Creates an UPDATE statement SQL query for a row being modified.
+    /// Creates an UPDATE statement SQL text for a row being modified.
     /// </summary>
     /// <returns>The UPDATE SQL query.</returns>
     private string GetSqlForModifiedRow()
     {
-      if (MySqlTable == null || RowState != DataRowState.Modified)
+      var parentTable = MySqlTable;
+      if (parentTable == null || RowState != DataRowState.Modified)
       {
         return string.Empty;
       }
 
-      // Reuse the builder we use for INSERT queries now for where clauses, instead of using a new one in order to save memory.
-      var wClauseBuilder = MySqlTable.SqlBuilderForInsert;
-      var sqlBuilderForUpdate = MySqlTable.SqlBuilderForUpdate;
-      wClauseBuilder.Clear();
+      var sqlBuilderForUpdate = parentTable.SqlBuilderForUpdate;
       sqlBuilderForUpdate.Clear();
       string colsSeparator = string.Empty;
-      wClauseBuilder.Append(" WHERE ");
-      string wClauseColsSeparator = string.Empty;
       sqlBuilderForUpdate.Append(MySqlStatement.STATEMENT_UPDATE);
-      sqlBuilderForUpdate.AppendFormat(" `{0}`.`{1}` SET ", MySqlTable.SchemaName, MySqlTable.TableNameForSqlQueries);
-      bool useOptimisticUpdates = MySqlTable.UseOptimisticUpdate;
-      foreach (MySqlDataColumn column in MySqlTable.Columns)
+      sqlBuilderForUpdate.AppendFormat(" `{0}`.`{1}` SET ", parentTable.SchemaName, parentTable.TableNameForSqlQueries);
+      foreach (var column in parentTable.Columns.Cast<MySqlDataColumn>().Where(col => ChangedColumnNames.Contains(col.ColumnName)))
       {
         bool updatingValueIsNull;
-        string valueToDb;
-        if (column.PrimaryKey || useOptimisticUpdates)
+        var valueToDb = DataTypeUtilities.GetStringValueForColumn(this[column.ColumnName], column, out updatingValueIsNull);
+        string wrapValueCharacter = column.ColumnRequiresQuotes && !updatingValueIsNull ? "'" : string.Empty;
+        sqlBuilderForUpdate.AppendFormat("{0}`{1}`={2}{3}{2}", colsSeparator, column.ColumnNameForSqlQueries, wrapValueCharacter, valueToDb);
+        colsSeparator = ",";
+      }
+
+      sqlBuilderForUpdate.Append(GetWhereClauseFromPrimaryKey());
+      return sqlBuilderForUpdate.ToString();
+    }
+
+    /// <summary>
+    /// Creates sET and UPDATE statements SQL text for a row being modified where an optimistic concurrency model is used.
+    /// </summary>
+    /// <returns>The UPDATE SQL query.</returns>
+    private string GetSqlForModifiedRowUsingOptimisticConcurrency()
+    {
+      var parentTable = MySqlTable;
+      if (parentTable == null || RowState != DataRowState.Modified)
+      {
+        return string.Empty;
+      }
+
+      // Reuse builders instead of using new ones in order to save memory.
+      var setVariablesBuilder = parentTable.SqlBuilderForDelete;
+      var wClauseBuilder = parentTable.SqlBuilderForInsert;
+      var sqlBuilderForUpdate = parentTable.SqlBuilderForUpdate;
+      setVariablesBuilder.Clear();
+      wClauseBuilder.Clear();
+      sqlBuilderForUpdate.Clear();
+
+      string serverCollation = parentTable.WbConnection.ServerCollation;
+      string setSeparator = "SET";
+      string colsSeparator = string.Empty;
+      string wClauseColsSeparator = string.Empty;
+      wClauseBuilder.Append(" WHERE ");
+      sqlBuilderForUpdate.Append(MySqlStatement.STATEMENT_UPDATE);
+      sqlBuilderForUpdate.AppendFormat(" `{0}`.`{1}` SET ", parentTable.SchemaName, parentTable.TableNameForSqlQueries);
+      foreach (MySqlDataColumn column in parentTable.Columns)
+      {
+        bool updatingValueIsNull;
+        bool columnRequiresQuotes = column.ColumnRequiresQuotes;
+        bool columnIsText = column.IsCharOrText || column.IsSetOrEnum;
+        string valueToDb = DataTypeUtilities.GetStringValueForColumn(this[column.ColumnName, DataRowVersion.Original], column, out updatingValueIsNull);
+        string wrapValueCharacter = columnRequiresQuotes && !updatingValueIsNull ? "'" : string.Empty;
+        if (column.AllowNull)
         {
-          valueToDb = DataTypeUtilities.GetStringValueForColumn(this[column.ColumnName, DataRowVersion.Original], column, false, out updatingValueIsNull);
-          if (useOptimisticUpdates && column.AllowNull)
+          string oldValueForClause;
+          var columnCollation = column.AbsoluteCollation;
+          bool needToCollateTextValue = columnIsText && !updatingValueIsNull
+                                        && serverCollation != null
+                                        && !serverCollation.Equals(columnCollation, StringComparison.InvariantCultureIgnoreCase)
+                                        && columnCollation.IsUnicodeCharSetOrCollation();
+
+          // If the length of the string value * 2 is greater than the string it requires to declare a variable for it, then declare the variable to save query space.
+          bool needToCreateVariable = (valueToDb.Length * 2) > (valueToDb.Length + 24 + (needToCollateTextValue ? columnCollation.Length + 9 : 0));
+          if (needToCreateVariable)
           {
-            wClauseBuilder.AppendFormat(
-              "{0}(({2}{3}{2} IS NULL AND `{1}` IS NULL) OR `{1}`={2}{3}{2})",
-              wClauseColsSeparator,
-              column.ColumnNameForSqlQueries,
-              column.ColumnRequiresQuotes && !updatingValueIsNull ? "'" : string.Empty,
-              valueToDb);
-            wClauseColsSeparator = " AND ";
+            oldValueForClause = "@OldCol" + (column.Ordinal + 1) + "Value";
+            setVariablesBuilder.AppendFormat("{0} {1} = {2}{3}{2}", setSeparator, oldValueForClause, wrapValueCharacter, valueToDb);
+            setSeparator = ",";
+            if (needToCollateTextValue)
+            {
+              setVariablesBuilder.Append(" COLLATE ");
+              setVariablesBuilder.Append(columnCollation);
+            }
           }
           else
           {
-            wClauseBuilder.AppendFormat(
-              "{0}`{1}`={2}{3}{2}",
-              wClauseColsSeparator,
-              column.ColumnNameForSqlQueries,
-              column.ColumnRequiresQuotes && !updatingValueIsNull ? "'" : string.Empty,
-              valueToDb);
-            wClauseColsSeparator = " AND ";
+            oldValueForClause = string.Format("{0}{1}{0}", wrapValueCharacter, valueToDb);
           }
+
+          wClauseBuilder.AppendFormat("{0}(({2} IS NULL AND `{1}` IS NULL) OR `{1}`={2})", wClauseColsSeparator, column.ColumnNameForSqlQueries, oldValueForClause);
+        }
+        else
+        {
+          wClauseBuilder.AppendFormat("{0}`{1}`={2}{3}{2}", wClauseColsSeparator, column.ColumnNameForSqlQueries, wrapValueCharacter, valueToDb);
         }
 
+        wClauseColsSeparator = " AND ";
         if (!ChangedColumnNames.Contains(column.ColumnName))
         {
           continue;
         }
 
-        valueToDb = DataTypeUtilities.GetStringValueForColumn(this[column.ColumnName], column, true, out updatingValueIsNull);
-        sqlBuilderForUpdate.AppendFormat(
-          "{0}`{1}`={2}{3}{2}",
-          colsSeparator,
-          column.ColumnNameForSqlQueries,
-          column.ColumnRequiresQuotes && !updatingValueIsNull ? "'" : string.Empty,
-          valueToDb);
+        valueToDb = DataTypeUtilities.GetStringValueForColumn(this[column.ColumnName], column, out updatingValueIsNull);
+        wrapValueCharacter = columnRequiresQuotes && !updatingValueIsNull ? "'" : string.Empty;
+        sqlBuilderForUpdate.AppendFormat("{0}`{1}`={2}{3}{2}", colsSeparator, column.ColumnNameForSqlQueries, wrapValueCharacter, valueToDb);
         colsSeparator = ",";
       }
 
+      if (setVariablesBuilder.Length > 0)
+      {
+        setVariablesBuilder.AppendLine(";");
+        sqlBuilderForUpdate.Insert(0, setVariablesBuilder.ToString());
+      }
+
       sqlBuilderForUpdate.Append(wClauseBuilder);
-      wClauseBuilder.Clear();
       return sqlBuilderForUpdate.ToString();
     }
 
@@ -500,12 +550,13 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The SELECT SQL query.</returns>
     private string GetSqlForRefreshingRow()
     {
-      if (MySqlTable == null || string.IsNullOrEmpty(MySqlTable.SelectQuery))
+      var parentTable = MySqlTable;
+      if (parentTable == null || string.IsNullOrEmpty(parentTable.SelectQuery))
       {
         return string.Empty;
       }
 
-      return MySqlTable.SelectQuery + GetWhereClauseFromPrimaryKey();
+      return parentTable.SelectQuery + GetWhereClauseFromPrimaryKey();
     }
 
     /// <summary>
@@ -514,30 +565,27 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The WHERE clause part of a SQL statement.</returns>
     private string GetWhereClauseFromPrimaryKey()
     {
-      if (MySqlTable == null || MySqlTable.PrimaryKeyColumns == null)
+      var parentTable = MySqlTable;
+      if (parentTable == null || parentTable.PrimaryKeyColumns == null)
       {
         return string.Empty;
       }
 
-      // Reuse the smallest string builder from the MySqlTable
-      var sqlBuilderForSelect = MySqlTable.SqlBuilderForSelect;
-      sqlBuilderForSelect.Clear();
+      // Reuse the builder we use for INSERT queries now for where clauses, instead of using a new one in order to save memory.
+      var wClauseBuilder = parentTable.SqlBuilderForInsert;
+      wClauseBuilder.Clear();
       string colsSeparator = string.Empty;
-      sqlBuilderForSelect.Append(" WHERE ");
-      foreach (MySqlDataColumn pkCol in MySqlTable.PrimaryKeyColumns)
+      wClauseBuilder.Append(" WHERE ");
+      foreach (MySqlDataColumn pkCol in parentTable.PrimaryKeyColumns)
       {
         bool pkValueIsNull;
-        string valueToDb = DataTypeUtilities.GetStringValueForColumn(this[pkCol.ColumnName, DataRowVersion.Original], pkCol, false, out pkValueIsNull);
-        sqlBuilderForSelect.AppendFormat(
-          "{0}`{1}`={2}{3}{2}",
-          colsSeparator,
-          pkCol.ColumnNameForSqlQueries,
-          pkCol.ColumnRequiresQuotes && !pkValueIsNull ? "'" : string.Empty,
-          valueToDb);
+        string valueToDb = DataTypeUtilities.GetStringValueForColumn(this[pkCol.ColumnName, DataRowVersion.Original], pkCol, out pkValueIsNull);
+        string wrapValueCharacter = pkCol.ColumnRequiresQuotes && !pkValueIsNull ? "'" : string.Empty;
+        wClauseBuilder.AppendFormat("{0}`{1}`={2}{3}{2}", colsSeparator, pkCol.ColumnNameForSqlQueries, wrapValueCharacter, valueToDb);
         colsSeparator = " AND ";
       }
 
-      return sqlBuilderForSelect.ToString();
+      return wClauseBuilder.ToString();
     }
 
     /// <summary>
