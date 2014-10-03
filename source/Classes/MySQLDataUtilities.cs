@@ -635,6 +635,22 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Splits the given text containing a SQL script into individual SQL statements.
+    /// </summary>
+    /// <param name="sqlScript">A string containing a SQL script.</param>
+    /// <returns>A list of individual SQL statements.</returns>
+    public static List<string> SplitInSqlStatements(this string sqlScript)
+    {
+      if (string.IsNullOrEmpty(sqlScript))
+      {
+        return null;
+      }
+
+      var tokenizer = new MySqlTokenizer(sqlScript.Trim());
+      return tokenizer.BreakIntoStatements();
+    }
+
+    /// <summary>
     /// Checks if a table with the given name exists in the given schema.
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>

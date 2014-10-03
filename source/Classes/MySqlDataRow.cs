@@ -57,6 +57,11 @@ namespace MySQL.ForExcel.Classes
     private bool _refreshingData;
 
     /// <summary>
+    /// An optional SET statement to initialize variables used in the returned SQL query.
+    /// </summary>
+    private string _setVariablesSql;
+
+    /// <summary>
     /// The SQL query needed to commit changes contained in this row to the SQL server.
     /// </summary>
     private string _sqlQuery;
@@ -73,6 +78,7 @@ namespace MySQL.ForExcel.Classes
       _excelRange = null;
       _mySqlTable = null;
       _refreshingData = false;
+      _setVariablesSql = null;
       _sqlQuery = null;
       ChangedColumnNames = new List<string>(Table.Columns.Count);
       IsBeingDeleted = false;
@@ -178,14 +184,17 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Returns a SQL query meant to push changes in this row to the database server.
     /// </summary>
+    /// <param name="setVariablesSql">An optional SET statement to initialize variables used in the returned SQL query.</param>
     /// <returns>A SQL query containing the data changes.</returns>
-    public string GetSql()
+    public string GetSql(out string setVariablesSql)
     {
+      setVariablesSql = _setVariablesSql;
       if (_sqlQuery != null)
       {
         return _sqlQuery;
       }
 
+      _setVariablesSql = null;
       if (RowState == DataRowState.Unchanged)
       {
         _sqlQuery = string.Empty;
@@ -216,6 +225,7 @@ namespace MySQL.ForExcel.Classes
           _sqlQuery = MySqlTable.UseOptimisticUpdate
             ? GetSqlForModifiedRowUsingOptimisticConcurrency()
             : GetSqlForModifiedRow();
+          setVariablesSql = _setVariablesSql;
           MySqlTable.SqlBuilderForUpdate.Clear();
           break;
 
@@ -536,8 +546,7 @@ namespace MySQL.ForExcel.Classes
 
       if (setVariablesBuilder.Length > 0)
       {
-        setVariablesBuilder.AppendLine(";");
-        sqlBuilderForUpdate.Insert(0, setVariablesBuilder.ToString());
+        _setVariablesSql = setVariablesBuilder.ToString();
       }
 
       sqlBuilderForUpdate.Append(wClauseBuilder);

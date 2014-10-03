@@ -1,4 +1,6 @@
 1.3.3
+- Fixed the way a previewed SQL script is split into individual SQL statements using a tokenizer that detects each type of token within the script text, so now the
+  delimiters for SQL statements are detected correctly. (MySQL Bug #74057, Bug #19680607 - SEMICOLONS USED IN VALUES CAUSE PROBLEMS IN QUERIES SENT TO MYSQL SERVER)
 - Fixed some bugs related to the way SQL queries are assembled during an Edit Data session and to text values. One of the problems was related to memory allocation for
   the query text overflowing when many TEXT columns were present in the table. Another problem was related to text values used in the WHERE clause of UPDATE queries were
   not being properly escaped, this was only happening when optimistic updates were being used. Optimized the construction of WHERE clauses with optimistic updates and

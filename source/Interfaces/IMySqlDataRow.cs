@@ -63,8 +63,9 @@ namespace MySQL.ForExcel.Interfaces
     /// <summary>
     /// Returns a SQL query meant to push changes in this row to the database server.
     /// </summary>
+    /// <param name="setVariablesSql">An optional SET statement to initialize variables used in the returned SQL query.</param>
     /// <returns>A SQL query containing the data changes.</returns>
-    string GetSql();
+    string GetSql(out string setVariablesSql);
 
     /// <summary>
     /// Reflects the error set to the row on its corresponding Excel range cells.

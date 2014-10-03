@@ -86,6 +86,16 @@ namespace MySQL.ForExcel.Classes
     public const string STATEMENT_LOCK_TABLES = "LOCK TABLES";
 
     /// <summary>
+    /// Key word used for a SET statement.
+    /// </summary>
+    public const string STATEMENT_SET = "SET";
+
+    /// <summary>
+    /// Key word used for a SET GLOBAL statement.
+    /// </summary>
+    public const string STATEMENT_SET_GLOBAL = "SET GLOBAL";
+
+    /// <summary>
     /// Key word used for a LOCK TABLES statement.
     /// </summary>
     public const string STATEMENT_UNLOCK_TABLES = "UNLOCK TABLES";
@@ -143,6 +153,7 @@ namespace MySQL.ForExcel.Classes
       AffectedRows = 0;
       ExecutionOrder = 0;
       ResultText = string.Empty;
+      SetVariablesSqlQuery = null;
       StatementResult = StatementResultType.NotApplied;
       StatementsQuantityFormat = STATEMENTS_QUANTITY_DEFAULT_FORMAT;
       WarningsQuantity = 0;
@@ -199,6 +210,16 @@ namespace MySQL.ForExcel.Classes
       /// Statement unrelated to the common operations in MySQL for Excel.
       /// </summary>
       Other,
+
+      /// <summary>
+      /// Statement to set user variables.
+      /// </summary>
+      Set,
+
+      /// <summary>
+      /// Statement to set system variables.
+      /// </summary>
+      SetGlobal,
 
       /// <summary>
       /// Statement to unlock database tables locked in this session.
@@ -262,13 +283,20 @@ namespace MySQL.ForExcel.Classes
     public string ResultText { get; private set; }
 
     /// <summary>
+    /// Gets an optional query text that sets values of user variables used in the main <see cref="SqlQuery"/>.
+    /// </summary>
+    public string SetVariablesSqlQuery { get; set; }
+
+    /// <summary>
     /// Gets the query text of this SQL statement to be applied against the database.
     /// </summary>
     public string SqlQuery
     {
       get
       {
-        string freshQuery = _mySqlRow != null ? _mySqlRow.GetSql() : string.Empty;
+        string setVariablesSqlQuery = null;
+        string freshQuery = _mySqlRow != null ? _mySqlRow.GetSql(out setVariablesSqlQuery) : string.Empty;
+        SetVariablesSqlQuery = setVariablesSqlQuery;
         if (!string.IsNullOrEmpty(freshQuery))
         {
           _sqlQuery = freshQuery;
@@ -366,6 +394,14 @@ namespace MySQL.ForExcel.Classes
       {
         statementType = SqlStatementType.Delete;
       }
+      else if (sqlStatement.StartsWith(STATEMENT_SET_GLOBAL))
+      {
+        statementType = SqlStatementType.SetGlobal;
+      }
+      else if (sqlStatement.StartsWith(STATEMENT_SET))
+      {
+        statementType = SqlStatementType.Set;
+      }
       else if (sqlStatement.StartsWith(STATEMENT_CREATE_TABLE))
       {
         statementType = SqlStatementType.CreateTable;
@@ -409,7 +445,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       StatementResult = StatementResultType.NotApplied;
-      if (_mySqlRow == null)
+      if (_mySqlRow == null || string.IsNullOrEmpty(SqlQuery))
       {
         return;
       }
@@ -424,11 +460,23 @@ namespace MySQL.ForExcel.Classes
 
       try
       {
+        // Initialize warnings related code.
         WarningsQuantity = 0;
-        mySqlCommand.CommandText = SqlQuery;
         mySqlCommand.Connection.InfoMessage -= FormatWarnings;
         mySqlCommand.Connection.InfoMessage += FormatWarnings;
+
+        // If the optional SET statement exists, execute it first.
+        if (!string.IsNullOrEmpty(SetVariablesSqlQuery))
+        {
+          mySqlCommand.CommandText = SetVariablesSqlQuery;
+          mySqlCommand.ExecuteNonQuery();
+        }
+
+        // Execute the main query.
+        mySqlCommand.CommandText = SqlQuery;
         AffectedRows = mySqlCommand.ExecuteNonQuery();
+
+        // Disable warnings event and process warnings.
         mySqlCommand.Connection.InfoMessage -= FormatWarnings;
         if (WarningsQuantity > 0 || (AffectedRows == 0 && StatementType.AffectsRowsOnServer()))
         {
@@ -446,14 +494,14 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        Exception baseException = ex.GetBaseException();
+        var baseException = ex.GetBaseException();
         StatementResult = StatementResultType.ErrorThrown;
         AffectedRows = 0;
         _mySqlRow.RowError = baseException.Message;
         MySqlSourceTrace.WriteAppErrorToLog(baseException);
         if (baseException is MySqlException)
         {
-          MySqlException mysqlEx = baseException as MySqlException;
+          var mysqlEx = baseException as MySqlException;
           ResultText = string.Format(Resources.ErrorMySQLText, mysqlEx.Number) + Environment.NewLine + mysqlEx.Message;
         }
         else

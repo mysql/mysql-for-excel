@@ -441,15 +441,46 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      if (_userChangedOriginalQuery &&
-          string.Compare(SqlScript, OriginalSqlScript, StringComparison.InvariantCultureIgnoreCase) != 0)
+      if (_userChangedOriginalQuery && string.Compare(SqlScript, OriginalSqlScript, StringComparison.InvariantCultureIgnoreCase) != 0)
       {
         // The user modified the original query and it is no longer the same as the original one, so the actual statements list is built from the modified SQL script text.
         ActualStatementRowsList = new List<IMySqlDataRow>(_originalStatementRowsList.Count);
-        foreach (string sqlQuery in SqlScript.Split(';').Select(sqlStatement => sqlStatement.Trim()).Where(sqlQuery => sqlQuery.Length > 0))
+        var statementsList = SqlScript.SplitInSqlStatements();
+        if (statementsList == null)
         {
-          var originalRow = _originalStatementRowsList.FirstOrDefault(iMySqlRow => iMySqlRow.Statement.SqlQuery == sqlQuery && !ActualStatementRowsList.Contains(iMySqlRow));
-          ActualStatementRowsList.Add(originalRow ?? new MySqlDummyRow(sqlQuery));
+          return;
+        }
+
+        foreach (var statementText in statementsList.Where(statementText => !string.IsNullOrEmpty(statementText)))
+        {
+          IMySqlDataRow rowToAdd;
+          if (MySqlStatement.GetSqlStatementType(statementText) == MySqlStatement.SqlStatementType.Set)
+          {
+            // If we find a SET statement then assign it to a new MySqlDummyRow since the Statement.SetVariablesSqlQuery will be set to null for non-SET statements.
+            // The reason for this is that we do not know what SET statements were changed by the user, there is no point into trying to find out which ones were
+            //  changed, it is faster to always assign them to MySqlDummyRow and not process them in the actual IMySqlDataRow.Statement.
+            rowToAdd = new MySqlDummyRow(statementText);
+          }
+          else
+          {
+            // Try to find the IMySqlDataRow whose Statement.SqlQuery matches the current one, if found it means the user did not change it so use that one.
+            // If not found it means the user changed it so we assign it to a new MySqlDummyRow.
+            var originalRow = _originalStatementRowsList.FirstOrDefault(iMySqlRow => iMySqlRow.Statement.SqlQuery.Equals(statementText, StringComparison.InvariantCultureIgnoreCase));
+            if (originalRow != null)
+            {
+              originalRow.Statement.SetVariablesSqlQuery = null;
+              rowToAdd = originalRow;
+            }
+            else
+            {
+              rowToAdd = new MySqlDummyRow(statementText);
+            }
+          }
+
+          if (!ActualStatementRowsList.Contains(rowToAdd))
+          {
+            ActualStatementRowsList.Add(rowToAdd);
+          }
         }
       }
       else
@@ -520,7 +551,13 @@ namespace MySQL.ForExcel.Forms
             foreach (var mySqlRow in rowStatesWithChanges.SelectMany(rowState => _mySqlTable.Rows.Cast<MySqlDataRow>().Where(dr => !dr.IsHeadersRow && dr.RowState == rowState)))
             {
               _originalStatementRowsList.Add(mySqlRow);
-              sqlScript.AppendFormat("{0};{1}", mySqlRow.Statement.SqlQuery, Environment.NewLine);
+              string mainSqlQuery = mySqlRow.Statement.SqlQuery;
+              if (!string.IsNullOrEmpty(mySqlRow.Statement.SetVariablesSqlQuery))
+              {
+                sqlScript.AppendFormat("{0};{1}", mySqlRow.Statement.SetVariablesSqlQuery, Environment.NewLine);
+              }
+
+              sqlScript.AppendFormat("{0};{1}", mainSqlQuery, Environment.NewLine);
             }
           }
 
@@ -548,9 +585,15 @@ namespace MySQL.ForExcel.Forms
       }
       else if (!string.IsNullOrEmpty(OriginalSqlScript) && _originalStatementRowsList.Count == 0)
       {
-        foreach (var sqlQuery in SqlScript.Split(';').Select(sqlStatement => sqlStatement.Trim()).Where(sqlQuery => sqlQuery.Length > 0))
+        var statementsList = SqlScript.SplitInSqlStatements();
+        if (statementsList == null)
         {
-          _originalStatementRowsList.Add(new MySqlDummyRow(sqlQuery));
+          return;
+        }
+
+        foreach (var statementText in statementsList.Where(statementText => !string.IsNullOrEmpty(statementText)))
+        {
+          _originalStatementRowsList.Add(new MySqlDummyRow(statementText));
         }
       }
     }
