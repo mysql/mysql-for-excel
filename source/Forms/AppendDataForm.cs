@@ -41,11 +41,6 @@ namespace MySQL.ForExcel.Forms
     #region Fields
 
     /// <summary>
-    /// The list of column mappings saved in file.
-    /// </summary>
-    private List<MySqlColumnMapping> _columnsMappings;
-
-    /// <summary>
     /// The maximum number of columns that can be mapped based on the maximum number of columns between the source and the target tables.
     /// </summary>
     private readonly int _maxMappingColumnsQuantity;
@@ -132,7 +127,6 @@ namespace MySQL.ForExcel.Forms
 
       _appendDataRange = appendDataRange;
       _appendDbTable = appendDbTable;
-      _columnsMappings = null;
       _sourceMySqlPreviewDataTable = null;
       _targetMySqlPreviewDataTable = null;
 
@@ -187,7 +181,7 @@ namespace MySQL.ForExcel.Forms
     {
       get
       {
-        return _columnsMappings ?? (_columnsMappings = Settings.Default.StoredDataMappings ?? new List<MySqlColumnMapping>());
+        return Settings.Default.StoredDataMappings ?? (Settings.Default.StoredDataMappings = new List<MySqlColumnMapping>());
       }
     }
 
@@ -208,9 +202,6 @@ namespace MySQL.ForExcel.Forms
           return;
         }
 
-        Settings.Default.StoredDataMappings = optionsDialog.Mappings;
-        MiscUtilities.SaveSettings();
-        _columnsMappings = null;
         RefreshMappingMethodCombo();
         if (!SelectStoredMappingForTargetTable())
         {
@@ -1271,7 +1262,7 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      Settings.Default.StoredDataMappings.Add(mapping);
+      StoredColumnMappingsList.Add(mapping);
       if (MiscUtilities.SaveSettings())
       {
         RefreshMappingMethodCombo();

@@ -89,6 +89,7 @@ namespace MySQL.ForExcel.Forms
       Settings.Default.AppendUseFormattedValues = UseFormattedValuesCheckBox.Checked;
       Settings.Default.AppendLimitPreviewRowsQuantity = previewRowsQuantity;
       Settings.Default.AppendSqlQueriesDisableIndexes = DisableTableIndexesCheckBox.Checked;
+      Settings.Default.StoredDataMappings = Mappings;
       MiscUtilities.SaveSettings();
     }
 
