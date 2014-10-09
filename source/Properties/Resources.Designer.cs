@@ -2128,6 +2128,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The DataRowVersion.Original does not exist for the current data row and must not be used to build a SQL query. Please report this as a bug..
+        /// </summary>
+        internal static string OriginalRowVersionNotFoundErrorText {
+            get {
+                return ResourceManager.GetString("OriginalRowVersionNotFoundErrorText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The parent workbook of worksheet {0} could not be obtained..
         /// </summary>
         internal static string ParentWorkbookNullError {

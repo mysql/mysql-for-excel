@@ -1092,4 +1092,7 @@ Since Excel relationships cannot be created, a single PivotTable for the whole E
   <data name="SqlScriptTooBigErrorDetail" xml:space="preserve">
     <value>There is not enough contiguous memory segment that can hold the SQL text being generated.</value>
   </data>
+  <data name="OriginalRowVersionNotFoundErrorText" xml:space="preserve">
+    <value>The DataRowVersion.Original does not exist for the current data row and must not be used to build a SQL query. Please report this as a bug.</value>
+  </data>
 </root>

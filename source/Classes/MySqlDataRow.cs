@@ -429,7 +429,7 @@ namespace MySQL.ForExcel.Classes
       sqlBuilderForDelete.Clear();
       sqlBuilderForDelete.Append(MySqlStatement.STATEMENT_DELETE);
       sqlBuilderForDelete.AppendFormat(" `{0}`.`{1}`", parentTable.SchemaName, parentTable.TableNameForSqlQueries);
-      sqlBuilderForDelete.Append(GetWhereClauseFromPrimaryKey());
+      sqlBuilderForDelete.Append(GetWhereClauseFromPrimaryKey(true));
 
       return sqlBuilderForDelete.ToString();
     }
@@ -460,7 +460,7 @@ namespace MySQL.ForExcel.Classes
         colsSeparator = ",";
       }
 
-      sqlBuilderForUpdate.Append(GetWhereClauseFromPrimaryKey());
+      sqlBuilderForUpdate.Append(GetWhereClauseFromPrimaryKey(true));
       return sqlBuilderForUpdate.ToString();
     }
 
@@ -565,15 +565,21 @@ namespace MySQL.ForExcel.Classes
         return string.Empty;
       }
 
-      return parentTable.SelectQuery + GetWhereClauseFromPrimaryKey();
+      return parentTable.SelectQuery + GetWhereClauseFromPrimaryKey(false);
     }
 
     /// <summary>
     /// Creates the WHERE clause part of a SQL statement based on the primary key columns.
     /// </summary>
+    /// <param name="useOriginalData">Flag indicating whether the version of the data to use to extract primary key values is <see cref="DataRowVersion.Original"/>, otherwise <see cref="DataRowVersion.Current"/> is used.</param>
     /// <returns>The WHERE clause part of a SQL statement.</returns>
-    private string GetWhereClauseFromPrimaryKey()
+    private string GetWhereClauseFromPrimaryKey(bool useOriginalData)
     {
+      if (useOriginalData && !HasVersion(DataRowVersion.Original))
+      {
+        throw new VersionNotFoundException(Resources.OriginalRowVersionNotFoundErrorText);
+      }
+
       var parentTable = MySqlTable;
       if (parentTable == null || parentTable.PrimaryKeyColumns == null)
       {
@@ -585,10 +591,11 @@ namespace MySQL.ForExcel.Classes
       wClauseBuilder.Clear();
       string colsSeparator = string.Empty;
       wClauseBuilder.Append(" WHERE ");
+      var dataRowVersion = useOriginalData ? DataRowVersion.Original : DataRowVersion.Current;
       foreach (MySqlDataColumn pkCol in parentTable.PrimaryKeyColumns)
       {
         bool pkValueIsNull;
-        string valueToDb = DataTypeUtilities.GetStringValueForColumn(this[pkCol.ColumnName, DataRowVersion.Original], pkCol, out pkValueIsNull);
+        string valueToDb = DataTypeUtilities.GetStringValueForColumn(this[pkCol.ColumnName, dataRowVersion], pkCol, out pkValueIsNull);
         string wrapValueCharacter = pkCol.ColumnRequiresQuotes && !pkValueIsNull ? "'" : string.Empty;
         wClauseBuilder.AppendFormat("{0}`{1}`={2}{3}{2}", colsSeparator, pkCol.ColumnNameForSqlQueries, wrapValueCharacter, valueToDb);
         colsSeparator = " AND ";
