@@ -98,14 +98,12 @@
 
     <InstallExecuteSequence>
       <RemoveExistingProducts After="InstallInitialize" />
-
-      <Custom Action="InstallAddIn32.SetProperty" Before="InstallAddIn32">NOT Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
-      <Custom Action="InstallAddIn32" Before="InstallFinalize">NOT Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
-      <Custom Action="InstallAddIn64.SetProperty" Before="InstallAddIn64">VersionNT64 AND NOT Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
-      <Custom Action="InstallAddIn64" After="InstallAddIn32">VersionNT64 AND NOT Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
-
-      <Custom Action="RemoveAddIn32" Before="InstallFinalize">REMOVE="ALL" AND NOT UPGRADINGPRODUCTCODE</Custom>
-      <Custom Action="RemoveAddIn64" After="RemoveAddIn32">VersionNT64 AND REMOVE="ALL" AND NOT UPGRADINGPRODUCTCODE</Custom>
+      <Custom Action="RemoveAddIn32" Before="InstallFinalize">REMOVE="ALL"</Custom>
+      <Custom Action="RemoveAddIn64" After="RemoveAddIn32">VersionNT64 AND REMOVE="ALL"</Custom>
+      <Custom Action="InstallAddIn32.SetProperty" Before="InstallAddIn32">NOT Installed</Custom>
+      <Custom Action="InstallAddIn32" After="RemoveAddIn64">NOT Installed</Custom>
+      <Custom Action="InstallAddIn64.SetProperty" Before="InstallAddIn64">VersionNT64 AND NOT Installed</Custom>
+      <Custom Action="InstallAddIn64" After="InstallAddIn32">VersionNT64 AND NOT Installed</Custom>
     </InstallExecuteSequence>
 
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />

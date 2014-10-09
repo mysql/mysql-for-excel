@@ -4,6 +4,7 @@ source/bin/
 source/obj/
 Installer/bin/
 Installer/obj/
+ExcelCustomActionTest/
 *.user
 **/thumbs.db
 **/bin/**

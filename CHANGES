@@ -1,4 +1,6 @@
 1.3.3
+- Fixed a problem in the MySQL for Excel MSI that was not replacing the registry keys on an upgrade (i.e. registry keys from previous versions remained and were not
+  upgraded) which caused the add-in to not work at all. (MySQL Bug #74286, Bug #19783949 - UPGRADING MYSQL FOR EXCEL FAILS FOR ALL VERSIONS SINCE 1.2.1)
 - Fixed the way a previewed SQL script is split into individual SQL statements using a tokenizer that detects each type of token within the script text, so now the
   delimiters for SQL statements are detected correctly. (MySQL Bug #74057, Bug #19680607 - SEMICOLONS USED IN VALUES CAUSE PROBLEMS IN QUERIES SENT TO MYSQL SERVER)
 - Fixed some bugs related to the way SQL queries are assembled during an Edit Data session and to text values. One of the problems was related to memory allocation for

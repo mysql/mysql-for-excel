@@ -15,6 +15,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
+using System.Linq;
+
 namespace ExcelCustomAction
 {
   using System;
@@ -199,7 +201,7 @@ namespace ExcelCustomAction
               if (excelKey != null)
               {
                 var addinsKey = excelKey.OpenSubKey("Addins", true);
-                if (addinsKey != null)
+                if (addinsKey != null && addinsKey.SubKeyCount > 0 && addinsKey.GetSubKeyNames().Contains("MySQL.ForExcel"))
                 {
                   addinsKey.DeleteSubKeyTree("MySQL.ForExcel");
                   if (addinsKey.SubKeyCount == 0 && addinsKey.ValueCount == 0)
