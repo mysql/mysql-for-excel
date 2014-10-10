@@ -275,8 +275,7 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      var refreshQuery = GetSqlForRefreshingRow();
-      if ((RowState != DataRowState.Added && RowState != DataRowState.Modified) || string.IsNullOrEmpty(refreshQuery))
+      if ((RowState != DataRowState.Added && RowState != DataRowState.Modified))
       {
         return;
       }
@@ -284,6 +283,12 @@ namespace MySQL.ForExcel.Classes
       bool refreshSuccessful = true;
       try
       {
+        var refreshQuery = GetSqlForRefreshingRow();
+        if (string.IsNullOrEmpty(refreshQuery))
+        {
+          return;
+        }
+
         var refreshTable = MySqlTable.WbConnection.GetDataFromSelectQuery(refreshQuery);
         if (refreshTable == null || refreshTable.Rows.Count == 0)
         {
