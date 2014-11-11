@@ -25,7 +25,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Custom actions for the MySQL for Excel installer.")]
 [assembly: AssemblyCompany("Oracle Corporation")]
 [assembly: AssemblyProduct("ExcelCustomAction")]
-[assembly: AssemblyCopyright("Copyright © 2013, Oracle and/or its affiliates. All rights reserved.")]
+[assembly: AssemblyCopyright("Copyright © 2013 - 2014, Oracle and/or its affiliates. All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
