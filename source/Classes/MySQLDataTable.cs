@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -21,6 +21,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Text;
+using MySQL.ForExcel.Classes.Exceptions;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
@@ -238,7 +239,8 @@ namespace MySQL.ForExcel.Classes
     /// This constructor is meant to be used by the <see cref="ExportDataForm"/> class.
     /// </summary>
     /// <param name="fromTemplate">Template <see cref="MySqlDataTable"/> from which to build a new one, the new table is a copy with the same data, but the schema is built from the template not cloned.</param>
-    public MySqlDataTable(MySqlDataTable fromTemplate)
+    /// <param name="dataRange">The <see cref="ExcelInterop.Range"/> containing the data to be fed to the new <see cref="MySqlDataTable"/>. If <c>null</c> the data is copied from the <seealso cref="fromTemplate"/> table.</param>
+    public MySqlDataTable(MySqlDataTable fromTemplate, ExcelInterop.Range dataRange)
       : this(fromTemplate.WbConnection, fromTemplate.TableName)
     {
       AddBufferToVarChar = fromTemplate.AddBufferToVarChar;
@@ -257,7 +259,14 @@ namespace MySQL.ForExcel.Classes
 
       var schemaInfoTable = fromTemplate.GetColumnsSchemaInfo();
       CreateTableSchema(schemaInfoTable);
-      CopyTableData(fromTemplate, true);
+      if (dataRange == null)
+      {
+        CopyTableData(fromTemplate, true);
+      }
+      else
+      {
+        SetupColumnsWithData(dataRange, false);
+      }
     }
 
     /// <summary>
@@ -391,6 +400,7 @@ namespace MySQL.ForExcel.Classes
       AddPrimaryKeyColumn = false;
       AutoAllowEmptyNonIndexColumns = false;
       AutoIndexIntColumns = false;
+      DataLoadException = null;
       FirstRowContainsColumnNames = false;
       IsTableNameValid = !string.IsNullOrEmpty(TableName);
       IsFormatted = false;
@@ -687,6 +697,11 @@ namespace MySQL.ForExcel.Classes
         return _tableWarningsTextList.Count > 0 ? _tableWarningsTextList.Last() : string.Empty;
       }
     }
+
+    /// <summary>
+    /// Gets a <see cref="MySqlDataLoadException"/> indicating an error during a data load.
+    /// </summary>
+    public MySqlDataLoadException DataLoadException { get; private set; }
 
     /// <summary>
     /// Gets the number of deleted rows meaning the number of pending DELETE operations in an Edit Data operation.
@@ -1267,11 +1282,10 @@ namespace MySQL.ForExcel.Classes
     /// Creates data rows in this table for data in the given Excel range.
     /// </summary>
     /// <param name="temporaryRange">Excel data range in a temporary Excel worksheet containing the data to fill the table.</param>
-    /// <param name="useMappedColumns">Flag indicating if the data is added to the mapped column instead of to the column with the same index as the Excel data.</param>
-    /// <param name="asynchronous">Flag indicating whether the operation should run asynchronously and show its progress.</param>
     /// <returns><c>true</c> if the data addition was successful, <c>false</c> otherwise.</returns>
-    public bool AddExcelData(TempRange temporaryRange, bool useMappedColumns, bool asynchronous)
+    public bool AddExcelData(TempRange temporaryRange)
     {
+      DataLoadException = null;
       if (temporaryRange == null || temporaryRange.Range == null)
       {
         return false;
@@ -1284,7 +1298,7 @@ namespace MySQL.ForExcel.Classes
         bool escapeFormulaTexts = EscapeFormulaTexts;
 
         int numRows = temporaryRange.Range.Rows.Count;
-        int rowAdjustValue = _firstRowContainsColumnNames && !OperationType.IsForExport() ? 1 : 0;
+        int rowAdjustValue = _firstRowContainsColumnNames && !IsPreviewTable ? 1 : 0;
         _copyingTableData = true;
         BeginLoadData();
         for (int row = 1 + rowAdjustValue; row <= numRows; row++)
@@ -1306,8 +1320,9 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
+        DataLoadException = new MySqlDataLoadException(ex);
         MySqlSourceTrace.WriteAppErrorToLog(ex);
-        string errorTitle = string.Format(Resources.TableDataAdditionErrorTitle, OperationType.IsForExport() ? "exporting" : "appending");
+        var errorTitle = string.Format(Resources.TableDataAdditionErrorTitle, OperationType.IsForExport() ? "exporting" : "appending");
         MiscUtilities.ShowCustomizedErrorDialog(errorTitle, ex.Message + Environment.NewLine + Environment.NewLine + ex.StackTrace);
         success = false;
       }
@@ -1999,10 +2014,9 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="dataRange">Excel data range containing the data to fill the table.</param>
     /// <param name="recreateColumnsFromData">Flag indicating if any existing columns in the table must be dropped and re-created based on the given data range.</param>
-    /// <param name="asynchronous">Flag indicating whether the call to <see cref="AddExcelData"/> should run asynchronously and show its progress.</param>
     /// <param name="limitRowsQuantity">Limit the number of loaded rows to this quantity. If less than 1 it means no limit is applied.</param>
     /// <return><c>true</c> if the columns setup is successful, <c>false</c> otherwise.</return>
-    public bool SetupColumnsWithData(ExcelInterop.Range dataRange, bool recreateColumnsFromData, bool asynchronous, int limitRowsQuantity = 0)
+    public bool SetupColumnsWithData(ExcelInterop.Range dataRange, bool recreateColumnsFromData, int limitRowsQuantity = 0)
     {
       Clear();
 
@@ -2013,7 +2027,7 @@ namespace MySQL.ForExcel.Classes
       using (var temporaryRange = new TempRange(dataRange, true, false, true, _addPrimaryKeyColumn, _firstRowContainsColumnNames, dateColumnIndexes.ToArray(), limitRowsQuantity))
       {
         CreateColumns(temporaryRange, recreateColumnsFromData);
-        bool success = AddExcelData(temporaryRange, false, asynchronous);
+        bool success = AddExcelData(temporaryRange);
         if (!success || !DetectDatatype)
         {
           return success;

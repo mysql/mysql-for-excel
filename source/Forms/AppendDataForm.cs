@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -277,7 +277,7 @@ namespace MySQL.ForExcel.Forms
       bool addDataSuccessful;
       using (var temporaryRange = new TempRange(_appendDataRange, true, false, true, mappedIndexes))
       {
-        addDataSuccessful = targetMySqlFinalDataTable.AddExcelData(temporaryRange, true, true);
+        addDataSuccessful = targetMySqlFinalDataTable.AddExcelData(temporaryRange);
       }
 
       if (!addDataSuccessful)
@@ -1048,7 +1048,7 @@ namespace MySQL.ForExcel.Forms
         false,
         false);
       int previewRowsQty = Math.Min(_appendDataRange.Rows.Count, Settings.Default.AppendLimitPreviewRowsQuantity);
-      _sourceMySqlPreviewDataTable.SetupColumnsWithData(_appendDataRange, true, false, previewRowsQty);
+      _sourceMySqlPreviewDataTable.SetupColumnsWithData(_appendDataRange, true, previewRowsQty);
       SourceExcelDataDataGridView.DataSource = _sourceMySqlPreviewDataTable;
       foreach (DataGridViewColumn gridCol in SourceExcelDataDataGridView.Columns)
       {

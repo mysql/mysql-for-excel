@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -643,7 +643,7 @@ namespace MySQL.ForExcel.Forms
       Cursor = Cursors.WaitCursor;
       try
       {
-        _exportDataTable = new MySqlDataTable(_previewDataTable);
+        _exportDataTable = new MySqlDataTable(_previewDataTable, _exportDataRange);
       }
       catch (Exception ex)
       {
@@ -653,7 +653,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       Cursor = Cursors.Default;
-      if (_exportDataTable == null)
+      if (_exportDataTable == null || _exportDataTable.DataLoadException != null)
       {
         return false;
       }
@@ -835,7 +835,7 @@ namespace MySQL.ForExcel.Forms
       _previewDataTable.TableColumnPropertyValueChanged += PreviewTableColumnPropertyValueChanged;
       _previewDataTable.TableWarningsChanged += PreviewTableWarningsChanged;
       int previewRowsQty = Math.Min(_exportDataRange.Rows.Count, Settings.Default.ExportLimitPreviewRowsQuantity);
-      _previewDataTable.SetupColumnsWithData(_exportDataRange, true, false, previewRowsQty);
+      _previewDataTable.SetupColumnsWithData(_exportDataRange, true, previewRowsQty);
       PreviewDataGridView.DataSource = _previewDataTable;
     }
 

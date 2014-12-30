@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -20,6 +20,9 @@ using MySQL.ForExcel.Properties;
 
 namespace MySQL.ForExcel.Classes.Exceptions
 {
+  /// <summary>
+  /// Represents an error of an attempt to get or set a parent <see cref="Microsoft.Office.Interop.Excel.Workbook"/> that is <c>null</c>.
+  /// </summary>
   class ParentWorkbookNullException : Exception
   {
     /// <summary>
