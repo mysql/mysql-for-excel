@@ -1,4 +1,8 @@
 1.3.4
+- Fixed a problem that was preventing connection information entries from being deleted. Added a couple of options, related to the deletion of connection information
+  entries, to the "Manage Import/Edit connection information maintenance" dialog accessed within the "Global Options" dialog. One is used to automatically remove stored
+  connection information related to Excel Workbooks that are no longer found where they were originally saved. The second option is used to select all connection
+  information entries that have not been used in the last XX days, so they can be deleted. (MySQL Bug #74304, Bug #19789907 - UNABLE TO DELETE CONNECTION INFORMATION)
 - Fixed a bug that occurred during the preparation of data to be exported to a new table, when the number of rows to be exported was higher than the number of previewed
   rows, the Export Data operation was restricted to the number of previewed rows. (MySQL Bug #74942, Bug #20077608 - EXPORT ROWS ARE LIMITED BY NUMBER OF REVIEW ROWS)
 

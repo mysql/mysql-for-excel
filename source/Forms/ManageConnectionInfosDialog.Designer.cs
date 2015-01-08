@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -53,12 +53,12 @@ namespace MySQL.ForExcel.Forms
     {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ManageConnectionInfosDialog));
-      System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("Workbook", System.Windows.Forms.HorizontalAlignment.Left);
+      System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Workbook", System.Windows.Forms.HorizontalAlignment.Left);
       this.FromImageList = new System.Windows.Forms.ImageList(this.components);
       this.ChooseConnectionInfosSubLabel = new System.Windows.Forms.Label();
       this.ChooseConnectionInfosMainLabel = new System.Windows.Forms.Label();
       this.ChooseConnectionInfosPictureBox = new System.Windows.Forms.PictureBox();
-      this.DeleteSelectedButton = new System.Windows.Forms.Button();
+      this.DialogAcceptButton = new System.Windows.Forms.Button();
       this.DialogCancelButton = new System.Windows.Forms.Button();
       this.ManageConnectionInformationTitleLabel = new System.Windows.Forms.Label();
       this.ConnectionInfosListView = new System.Windows.Forms.ListView();
@@ -67,19 +67,29 @@ namespace MySQL.ForExcel.Forms
       this.Reference = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.LastAccess = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.TablesViewsContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.SelectWorkbookNotFoundToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.SelectWorkbookConnectionInfosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.SelectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.SelectNoneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.ColorMapMappedPictureBox = new System.Windows.Forms.PictureBox();
       this.ColorMapMappedLabel = new System.Windows.Forms.Label();
       this.ColorMapUnmappedPictureBox = new System.Windows.Forms.PictureBox();
       this.ColorMapUnmappedLabel = new System.Windows.Forms.Label();
       this.ExcelToolTip = new System.Windows.Forms.ToolTip(this.components);
+      this.DeleteOrphanedInfosCheckBox = new System.Windows.Forms.CheckBox();
+      this.SelectConnectionInfosLinkLabel = new System.Windows.Forms.LinkLabel();
+      this.SelectionOptionsGroupBox = new System.Windows.Forms.GroupBox();
+      this.SelectConnectionInfosSub2Label = new System.Windows.Forms.Label();
+      this.SelectConnectionInfosNumericUpDown = new System.Windows.Forms.NumericUpDown();
+      this.SelectConnectionInfosSub1Label = new System.Windows.Forms.Label();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.ChooseConnectionInfosPictureBox)).BeginInit();
       this.TablesViewsContextMenuStrip.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.ColorMapMappedPictureBox)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.ColorMapUnmappedPictureBox)).BeginInit();
+      this.SelectionOptionsGroupBox.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.SelectConnectionInfosNumericUpDown)).BeginInit();
       this.SuspendLayout();
       // 
       // FootnoteAreaPanel
@@ -89,6 +99,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // ContentAreaPanel
       // 
+      this.ContentAreaPanel.Controls.Add(this.SelectionOptionsGroupBox);
       this.ContentAreaPanel.Controls.Add(this.ColorMapMappedPictureBox);
       this.ContentAreaPanel.Controls.Add(this.ColorMapMappedLabel);
       this.ContentAreaPanel.Controls.Add(this.ColorMapUnmappedPictureBox);
@@ -98,13 +109,13 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.ChooseConnectionInfosSubLabel);
       this.ContentAreaPanel.Controls.Add(this.ChooseConnectionInfosMainLabel);
       this.ContentAreaPanel.Controls.Add(this.ChooseConnectionInfosPictureBox);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(629, 461);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(629, 531);
       // 
       // CommandAreaPanel
       // 
-      this.CommandAreaPanel.Controls.Add(this.DeleteSelectedButton);
+      this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 416);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 486);
       this.CommandAreaPanel.Size = new System.Drawing.Size(629, 45);
       // 
       // FromImageList
@@ -149,18 +160,17 @@ namespace MySQL.ForExcel.Forms
       this.ChooseConnectionInfosPictureBox.TabIndex = 29;
       this.ChooseConnectionInfosPictureBox.TabStop = false;
       // 
-      // DeleteSelectedButton
+      // DialogAcceptButton
       // 
-      this.DeleteSelectedButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.DeleteSelectedButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.DeleteSelectedButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.DeleteSelectedButton.Location = new System.Drawing.Point(412, 11);
-      this.DeleteSelectedButton.Name = "DeleteSelectedButton";
-      this.DeleteSelectedButton.Size = new System.Drawing.Size(124, 23);
-      this.DeleteSelectedButton.TabIndex = 1;
-      this.DeleteSelectedButton.Text = "Delete Selected";
-      this.DeleteSelectedButton.UseVisualStyleBackColor = true;
-      this.DeleteSelectedButton.Click += new System.EventHandler(this.DeleteSelectedButton_Click);
+      this.DialogAcceptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.DialogAcceptButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+      this.DialogAcceptButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.DialogAcceptButton.Location = new System.Drawing.Point(461, 11);
+      this.DialogAcceptButton.Name = "DialogAcceptButton";
+      this.DialogAcceptButton.Size = new System.Drawing.Size(75, 23);
+      this.DialogAcceptButton.TabIndex = 1;
+      this.DialogAcceptButton.Text = "Accept";
+      this.DialogAcceptButton.UseVisualStyleBackColor = true;
       // 
       // DialogCancelButton
       // 
@@ -198,10 +208,10 @@ namespace MySQL.ForExcel.Forms
             this.LastAccess});
       this.ConnectionInfosListView.ContextMenuStrip = this.TablesViewsContextMenuStrip;
       this.ConnectionInfosListView.FullRowSelect = true;
-      listViewGroup1.Header = "Workbook";
-      listViewGroup1.Name = "Workbook";
+      listViewGroup2.Header = "Workbook";
+      listViewGroup2.Name = "Workbook";
       this.ConnectionInfosListView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1});
+            listViewGroup2});
       this.ConnectionInfosListView.HideSelection = false;
       this.ConnectionInfosListView.Location = new System.Drawing.Point(39, 91);
       this.ConnectionInfosListView.Name = "ConnectionInfosListView";
@@ -235,24 +245,43 @@ namespace MySQL.ForExcel.Forms
       // TablesViewsContextMenuStrip
       // 
       this.TablesViewsContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.SelectWorkbookNotFoundToolStripMenuItem,
             this.SelectWorkbookConnectionInfosToolStripMenuItem,
+            this.SelectAllToolStripMenuItem,
             this.SelectNoneToolStripMenuItem});
       this.TablesViewsContextMenuStrip.Name = "TablesViewsContextMenuStrip";
-      this.TablesViewsContextMenuStrip.Size = new System.Drawing.Size(357, 48);
+      this.TablesViewsContextMenuStrip.Size = new System.Drawing.Size(334, 92);
+      this.TablesViewsContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.TablesViewsContextMenuStrip_Opening);
+      // 
+      // SelectWorkbookNotFoundToolStripMenuItem
+      // 
+      this.SelectWorkbookNotFoundToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.select_all;
+      this.SelectWorkbookNotFoundToolStripMenuItem.Name = "SelectWorkbookNotFoundToolStripMenuItem";
+      this.SelectWorkbookNotFoundToolStripMenuItem.Size = new System.Drawing.Size(333, 22);
+      this.SelectWorkbookNotFoundToolStripMenuItem.Text = "Select all where Workbook is not found";
+      this.SelectWorkbookNotFoundToolStripMenuItem.Click += new System.EventHandler(this.SelectWorkbookNotFoundToolStripMenuItem_Click);
       // 
       // SelectWorkbookConnectionInfosToolStripMenuItem
       // 
       this.SelectWorkbookConnectionInfosToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.select_all;
       this.SelectWorkbookConnectionInfosToolStripMenuItem.Name = "SelectWorkbookConnectionInfosToolStripMenuItem";
-      this.SelectWorkbookConnectionInfosToolStripMenuItem.Size = new System.Drawing.Size(356, 22);
-      this.SelectWorkbookConnectionInfosToolStripMenuItem.Text = "Select Workbook Import/Edit connection information";
+      this.SelectWorkbookConnectionInfosToolStripMenuItem.Size = new System.Drawing.Size(333, 22);
+      this.SelectWorkbookConnectionInfosToolStripMenuItem.Text = "Select connections information within Workbook";
       this.SelectWorkbookConnectionInfosToolStripMenuItem.Click += new System.EventHandler(this.SelectWorkbookConnectionInfosToolStripMenuItem_Click);
+      // 
+      // SelectAllToolStripMenuItem
+      // 
+      this.SelectAllToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.select_all;
+      this.SelectAllToolStripMenuItem.Name = "SelectAllToolStripMenuItem";
+      this.SelectAllToolStripMenuItem.Size = new System.Drawing.Size(333, 22);
+      this.SelectAllToolStripMenuItem.Text = "Select All";
+      this.SelectAllToolStripMenuItem.Click += new System.EventHandler(this.SelectAllToolStripMenuItem_Click);
       // 
       // SelectNoneToolStripMenuItem
       // 
       this.SelectNoneToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.select_none;
       this.SelectNoneToolStripMenuItem.Name = "SelectNoneToolStripMenuItem";
-      this.SelectNoneToolStripMenuItem.Size = new System.Drawing.Size(356, 22);
+      this.SelectNoneToolStripMenuItem.Size = new System.Drawing.Size(333, 22);
       this.SelectNoneToolStripMenuItem.Text = "Select None";
       this.SelectNoneToolStripMenuItem.Click += new System.EventHandler(this.SelectNoneToolStripMenuItem_Click);
       // 
@@ -273,7 +302,7 @@ namespace MySQL.ForExcel.Forms
       this.ColorMapMappedLabel.AutoSize = true;
       this.ColorMapMappedLabel.BackColor = System.Drawing.Color.Transparent;
       this.ColorMapMappedLabel.ForeColor = System.Drawing.Color.Red;
-      this.ColorMapMappedLabel.Location = new System.Drawing.Point(201, 356);
+      this.ColorMapMappedLabel.Location = new System.Drawing.Point(201, 357);
       this.ColorMapMappedLabel.Name = "ColorMapMappedLabel";
       this.ColorMapMappedLabel.Size = new System.Drawing.Size(105, 13);
       this.ColorMapMappedLabel.TabIndex = 43;
@@ -299,7 +328,7 @@ namespace MySQL.ForExcel.Forms
       this.ColorMapUnmappedLabel.BackColor = System.Drawing.Color.Transparent;
       this.ColorMapUnmappedLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.ColorMapUnmappedLabel.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-      this.ColorMapUnmappedLabel.Location = new System.Drawing.Point(54, 356);
+      this.ColorMapUnmappedLabel.Location = new System.Drawing.Point(54, 357);
       this.ColorMapUnmappedLabel.Name = "ColorMapUnmappedLabel";
       this.ColorMapUnmappedLabel.Size = new System.Drawing.Size(110, 13);
       this.ColorMapUnmappedLabel.TabIndex = 42;
@@ -313,19 +342,105 @@ namespace MySQL.ForExcel.Forms
       this.ExcelToolTip.InitialDelay = 1000;
       this.ExcelToolTip.ReshowDelay = 100;
       // 
+      // DeleteOrphanedInfosCheckBox
+      // 
+      this.DeleteOrphanedInfosCheckBox.AutoSize = true;
+      this.DeleteOrphanedInfosCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.DeleteOrphanedInfosCheckBox.Location = new System.Drawing.Point(6, 19);
+      this.DeleteOrphanedInfosCheckBox.Name = "DeleteOrphanedInfosCheckBox";
+      this.DeleteOrphanedInfosCheckBox.Size = new System.Drawing.Size(459, 19);
+      this.DeleteOrphanedInfosCheckBox.TabIndex = 46;
+      this.DeleteOrphanedInfosCheckBox.Text = "Delete automatically connection information where Workbook is no longer found.";
+      this.ExcelToolTip.SetToolTip(this.DeleteOrphanedInfosCheckBox, "Deletes upon startup all connection information related to Excel Workbooks that c" +
+        "an\'t be located anymore.");
+      this.DeleteOrphanedInfosCheckBox.UseVisualStyleBackColor = true;
+      // 
+      // SelectConnectionInfosLinkLabel
+      // 
+      this.SelectConnectionInfosLinkLabel.AutoSize = true;
+      this.SelectConnectionInfosLinkLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.SelectConnectionInfosLinkLabel.Location = new System.Drawing.Point(6, 41);
+      this.SelectConnectionInfosLinkLabel.Name = "SelectConnectionInfosLinkLabel";
+      this.SelectConnectionInfosLinkLabel.Size = new System.Drawing.Size(205, 15);
+      this.SelectConnectionInfosLinkLabel.TabIndex = 47;
+      this.SelectConnectionInfosLinkLabel.TabStop = true;
+      this.SelectConnectionInfosLinkLabel.Text = "Select connection information entries";
+      this.ExcelToolTip.SetToolTip(this.SelectConnectionInfosLinkLabel, "Selects all saved connection information related to Excel Workbooks that have not" +
+        " been accessed in the specified number of days.");
+      this.SelectConnectionInfosLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.SelectConnectionInfosLinkLabel_LinkClicked);
+      // 
+      // SelectionOptionsGroupBox
+      // 
+      this.SelectionOptionsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.SelectionOptionsGroupBox.Controls.Add(this.SelectConnectionInfosSub2Label);
+      this.SelectionOptionsGroupBox.Controls.Add(this.SelectConnectionInfosNumericUpDown);
+      this.SelectionOptionsGroupBox.Controls.Add(this.SelectConnectionInfosSub1Label);
+      this.SelectionOptionsGroupBox.Controls.Add(this.SelectConnectionInfosLinkLabel);
+      this.SelectionOptionsGroupBox.Controls.Add(this.DeleteOrphanedInfosCheckBox);
+      this.SelectionOptionsGroupBox.Location = new System.Drawing.Point(39, 377);
+      this.SelectionOptionsGroupBox.Name = "SelectionOptionsGroupBox";
+      this.SelectionOptionsGroupBox.Size = new System.Drawing.Size(548, 72);
+      this.SelectionOptionsGroupBox.TabIndex = 47;
+      this.SelectionOptionsGroupBox.TabStop = false;
+      // 
+      // SelectConnectionInfosSub2Label
+      // 
+      this.SelectConnectionInfosSub2Label.AutoSize = true;
+      this.SelectConnectionInfosSub2Label.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.SelectConnectionInfosSub2Label.Location = new System.Drawing.Point(463, 41);
+      this.SelectConnectionInfosSub2Label.Name = "SelectConnectionInfosSub2Label";
+      this.SelectConnectionInfosSub2Label.Size = new System.Drawing.Size(34, 15);
+      this.SelectConnectionInfosSub2Label.TabIndex = 50;
+      this.SelectConnectionInfosSub2Label.Text = "days.";
+      // 
+      // SelectConnectionInfosNumericUpDown
+      // 
+      this.SelectConnectionInfosNumericUpDown.Location = new System.Drawing.Point(421, 40);
+      this.SelectConnectionInfosNumericUpDown.Maximum = new decimal(new int[] {
+            999,
+            0,
+            0,
+            0});
+      this.SelectConnectionInfosNumericUpDown.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+      this.SelectConnectionInfosNumericUpDown.Name = "SelectConnectionInfosNumericUpDown";
+      this.SelectConnectionInfosNumericUpDown.Size = new System.Drawing.Size(40, 20);
+      this.SelectConnectionInfosNumericUpDown.TabIndex = 49;
+      this.SelectConnectionInfosNumericUpDown.Value = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
+      // 
+      // SelectConnectionInfosSub1Label
+      // 
+      this.SelectConnectionInfosSub1Label.AutoSize = true;
+      this.SelectConnectionInfosSub1Label.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.SelectConnectionInfosSub1Label.Location = new System.Drawing.Point(208, 41);
+      this.SelectConnectionInfosSub1Label.Name = "SelectConnectionInfosSub1Label";
+      this.SelectConnectionInfosSub1Label.Size = new System.Drawing.Size(210, 15);
+      this.SelectConnectionInfosSub1Label.TabIndex = 48;
+      this.SelectConnectionInfosSub1Label.Text = "that have not been accessed in the last";
+      // 
       // ManageConnectionInfosDialog
       // 
-      this.AcceptButton = this.DeleteSelectedButton;
+      this.AcceptButton = this.DialogAcceptButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(629, 461);
+      this.ClientSize = new System.Drawing.Size(629, 531);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
       this.MainInstructionLocation = new System.Drawing.Point(10, 14);
-      this.MinimumSize = new System.Drawing.Size(645, 500);
+      this.MinimumSize = new System.Drawing.Size(645, 570);
       this.Name = "ManageConnectionInfosDialog";
       this.Text = "Manage Import/Edit Connections Information";
+      this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ManageConnectionInfosDialog_FormClosing);
+      this.Shown += new System.EventHandler(this.ManageConnectionInfosDialog_Shown);
       this.Controls.SetChildIndex(this.FootnoteAreaPanel, 0);
       this.Controls.SetChildIndex(this.ContentAreaPanel, 0);
       this.Controls.SetChildIndex(this.CommandAreaPanel, 0);
@@ -336,6 +451,9 @@ namespace MySQL.ForExcel.Forms
       this.TablesViewsContextMenuStrip.ResumeLayout(false);
       ((System.ComponentModel.ISupportInitialize)(this.ColorMapMappedPictureBox)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.ColorMapUnmappedPictureBox)).EndInit();
+      this.SelectionOptionsGroupBox.ResumeLayout(false);
+      this.SelectionOptionsGroupBox.PerformLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.SelectConnectionInfosNumericUpDown)).EndInit();
       this.ResumeLayout(false);
 
     }
@@ -346,7 +464,7 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.Label ChooseConnectionInfosSubLabel;
     private System.Windows.Forms.Label ChooseConnectionInfosMainLabel;
     private System.Windows.Forms.PictureBox ChooseConnectionInfosPictureBox;
-    private System.Windows.Forms.Button DeleteSelectedButton;
+    private System.Windows.Forms.Button DialogAcceptButton;
     private System.Windows.Forms.Button DialogCancelButton;
     private System.Windows.Forms.Label ManageConnectionInformationTitleLabel;
     private System.Windows.Forms.ListView ConnectionInfosListView;
@@ -362,6 +480,14 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.ContextMenuStrip TablesViewsContextMenuStrip;
     private System.Windows.Forms.ToolStripMenuItem SelectWorkbookConnectionInfosToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem SelectNoneToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem SelectAllToolStripMenuItem;
+    private System.Windows.Forms.CheckBox DeleteOrphanedInfosCheckBox;
+    private System.Windows.Forms.ToolStripMenuItem SelectWorkbookNotFoundToolStripMenuItem;
+    private System.Windows.Forms.GroupBox SelectionOptionsGroupBox;
+    private System.Windows.Forms.Label SelectConnectionInfosSub2Label;
+    private System.Windows.Forms.NumericUpDown SelectConnectionInfosNumericUpDown;
+    private System.Windows.Forms.Label SelectConnectionInfosSub1Label;
+    private System.Windows.Forms.LinkLabel SelectConnectionInfosLinkLabel;
 
   }
 }

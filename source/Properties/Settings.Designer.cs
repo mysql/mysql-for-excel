@@ -461,5 +461,31 @@ namespace MySQL.ForExcel.Properties {
                 this["EditPreviewMySqlData"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
+        public int ConnectionInfosLastAccessDays {
+            get {
+                return ((int)(this["ConnectionInfosLastAccessDays"]));
+            }
+            set {
+                this["ConnectionInfosLastAccessDays"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool DeleteAutomaticallyOrphanedConnectionInfos {
+            get {
+                return ((bool)(this["DeleteAutomaticallyOrphanedConnectionInfos"]));
+            }
+            set {
+                this["DeleteAutomaticallyOrphanedConnectionInfos"] = value;
+            }
+        }
     }
 }

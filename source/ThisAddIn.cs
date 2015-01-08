@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -1014,6 +1014,43 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Deletes automatically saved connection information entries with non-existent Excel Workbooks.
+    /// </summary>
+    /// <param name="logOperation">Flag indicating whether this operation is written in the application log.</param>
+    private void DeleteConnectionInfosWithNonExistentWorkbook(bool logOperation)
+    {
+      if (!Settings.Default.DeleteAutomaticallyOrphanedConnectionInfos)
+      {
+        return;
+      }
+
+      var orphanedConnectionInfos = ManageConnectionInfosDialog.GetConnectionInfosWithNonExistentWorkbook();
+      if (orphanedConnectionInfos == null)
+      {
+        return;
+      }
+
+      if (logOperation)
+      {
+        MySqlSourceTrace.WriteToLog(Resources.DeletingConnectionInfosWithNonExistentWorkbook, SourceLevels.Information);
+      }
+
+      foreach (var connectionInfo in orphanedConnectionInfos)
+      {
+        if (connectionInfo.GetType() == typeof(EditConnectionInfo))
+        {
+          Globals.ThisAddIn.EditConnectionInfos.Remove(connectionInfo as EditConnectionInfo);
+        }
+        else
+        {
+          Globals.ThisAddIn.StoredImportConnectionInfos.Remove(connectionInfo as ImportConnectionInfo);
+        }
+      }
+
+      MiscUtilities.SaveSettings();
+    }
+
+    /// <summary>
     /// Delete the closed workbook's <see cref="EditConnectionInfo"/> objects from the settings file.
     /// </summary>
     private void DeleteCurrentWorkbookEditConnectionInfos(ExcelInterop.Workbook workbook)
@@ -1088,6 +1125,9 @@ namespace MySQL.ForExcel
 
       // Create custom MySQL Excel table style and localized date format strings in the active workbook if it exists.
       InitializeWorkbook(ActiveWorkbook);
+
+      // Automatically delete ConnectionInfos that have a non-existent Excel Workbook.
+      DeleteConnectionInfosWithNonExistentWorkbook(true);
 
       // Restore EditConnectionInfos
       ShowOpenEditConnectionInfosDialog(ActiveWorkbook);

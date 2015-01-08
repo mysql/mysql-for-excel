@@ -535,6 +535,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Deleting automatically saved connection information entries with non-existent Excel Workbooks..
+        /// </summary>
+        internal static string DeletingConnectionInfosWithNonExistentWorkbook {
+            get {
+                return ResourceManager.GetString("DeletingConnectionInfosWithNonExistentWorkbook", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap edit {

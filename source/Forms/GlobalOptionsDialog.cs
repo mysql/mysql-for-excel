@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -16,7 +16,7 @@
 // 02110-1301  USA
 
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Interfaces;
@@ -30,17 +30,21 @@ namespace MySQL.ForExcel.Forms
   /// </summary>
   public partial class GlobalOptionsDialog : AutoStyleableBaseDialog
   {
+    #region Fields
+
     /// <summary>
-    /// Gets or sets the sessions to be deleted.
+    /// Dialog showing saved <see cref="IConnectionInfo"/> entries that should be deleted.
     /// </summary>
-    private List<IConnectionInfo> _connectionInfosToDelete;
+    private ManageConnectionInfosDialog _manageConnectionInfosDialog;
+
+    #endregion Fields
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GlobalOptionsDialog"/> class.
     /// </summary>
     public GlobalOptionsDialog()
     {
-      _connectionInfosToDelete = new List<IConnectionInfo>();
+      _manageConnectionInfosDialog = null;
       InitializeComponent();
       ConnectionTimeoutNumericUpDown.Maximum = Int32.MaxValue / 1000;
       RefreshControlValues();
@@ -52,9 +56,19 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void DeleteConnectionInfos()
     {
-      foreach (var connectionInfo in _connectionInfosToDelete)
+      if (_manageConnectionInfosDialog == null || _manageConnectionInfosDialog.ConnectionInfosToDelete == null)
       {
-        if (connectionInfo != null && connectionInfo.GetType() == typeof(EditConnectionInfo))
+        return;
+      }
+
+      foreach (var connectionInfo in _manageConnectionInfosDialog.ConnectionInfosToDelete)
+      {
+        if (connectionInfo == null)
+        {
+          continue;
+        }
+
+        if (connectionInfo.GetType() == typeof(EditConnectionInfo))
         {
           Globals.ThisAddIn.EditConnectionInfos.Remove(connectionInfo as EditConnectionInfo);
         }
@@ -77,20 +91,38 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      if (_connectionInfosToDelete.Count > 0)
+      var settings = Settings.Default;
+      DeleteConnectionInfos();
+      settings.GlobalConnectionConnectionTimeout = (uint)ConnectionTimeoutNumericUpDown.Value;
+      settings.GlobalConnectionCommandTimeout = (uint)QueryTimeoutNumericUpDown.Value;
+      settings.EditUseOptimisticUpdate = UseOptimisticUpdatesCheckBox.Checked;
+      settings.GlobalSqlQueriesPreviewQueries = PreviewSqlQueriesRadioButton.Checked;
+      settings.GlobalSqlQueriesShowQueriesWithResults = ShowExecutedSqlQueryRadioButton.Checked;
+      settings.EditPreviewMySqlData = PreviewTableDataCheckBox.Checked;
+      settings.EditSessionsRestoreWhenOpeningWorkbook = RestoreSavedEditSessionsCheckBox.Checked;
+      settings.EditSessionsReuseWorksheets = ReuseWorksheetsRadioButton.Checked;
+      if (_manageConnectionInfosDialog != null)
       {
-        DeleteConnectionInfos();
+        settings.ConnectionInfosLastAccessDays = _manageConnectionInfosDialog.ConnectionInfosLastAccessDays;
+        settings.DeleteAutomaticallyOrphanedConnectionInfos = _manageConnectionInfosDialog.DeleteAutomaticallyOrphanedConnectionInfos;
       }
 
-      Settings.Default.GlobalConnectionConnectionTimeout = (uint)ConnectionTimeoutNumericUpDown.Value;
-      Settings.Default.GlobalConnectionCommandTimeout = (uint)QueryTimeoutNumericUpDown.Value;
-      Settings.Default.EditUseOptimisticUpdate = UseOptimisticUpdatesCheckBox.Checked;
-      Settings.Default.GlobalSqlQueriesPreviewQueries = PreviewSqlQueriesRadioButton.Checked;
-      Settings.Default.GlobalSqlQueriesShowQueriesWithResults = ShowExecutedSqlQueryRadioButton.Checked;
-      Settings.Default.EditPreviewMySqlData = PreviewTableDataCheckBox.Checked;
-      Settings.Default.EditSessionsRestoreWhenOpeningWorkbook = RestoreSavedEditSessionsCheckBox.Checked;
-      Settings.Default.EditSessionsReuseWorksheets = ReuseWorksheetsRadioButton.Checked;
       MiscUtilities.SaveSettings();
+    }
+
+    /// <summary>
+    /// Handles the Click event of the ManageConnectionInfosButton control.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+    private void ManageConnectionInfosButton_Click(object sender, EventArgs e)
+    {
+      if (_manageConnectionInfosDialog == null)
+      {
+        _manageConnectionInfosDialog = new ManageConnectionInfosDialog();
+      }
+
+      _manageConnectionInfosDialog.ShowDialog();
     }
 
     /// <summary>
@@ -99,11 +131,10 @@ namespace MySQL.ForExcel.Forms
     /// <param name="useDefaultValues">Controls are set to their default values if <c>true</c>. Current stored values in application settings are used otherwise.</param>
     private void RefreshControlValues(bool useDefaultValues = false)
     {
+      var settings = Settings.Default;
       QueryTimeoutNumericUpDown.Maximum = ConnectionTimeoutNumericUpDown.Maximum;
-
       if (useDefaultValues)
       {
-        var settings = Settings.Default;
         ConnectionTimeoutNumericUpDown.Value = Math.Min(ConnectionTimeoutNumericUpDown.Maximum, settings.GetPropertyDefaultValueByName<uint>("GlobalConnectionConnectionTimeout"));
         QueryTimeoutNumericUpDown.Value = settings.GetPropertyDefaultValueByName<uint>("GlobalConnectionCommandTimeout");
         UseOptimisticUpdatesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("EditUseOptimisticUpdate");
@@ -115,18 +146,22 @@ namespace MySQL.ForExcel.Forms
       }
       else
       {
-        ConnectionTimeoutNumericUpDown.Value = Math.Min(ConnectionTimeoutNumericUpDown.Maximum, Settings.Default.GlobalConnectionConnectionTimeout);
-        QueryTimeoutNumericUpDown.Value = Settings.Default.GlobalConnectionCommandTimeout;
-        UseOptimisticUpdatesCheckBox.Checked = Settings.Default.EditUseOptimisticUpdate;
-        PreviewSqlQueriesRadioButton.Checked = Settings.Default.GlobalSqlQueriesPreviewQueries;
-        ShowExecutedSqlQueryRadioButton.Checked = Settings.Default.GlobalSqlQueriesShowQueriesWithResults;
-        RestoreSavedEditSessionsCheckBox.Checked = Settings.Default.EditSessionsRestoreWhenOpeningWorkbook;
-        ReuseWorksheetsRadioButton.Checked = Settings.Default.EditSessionsReuseWorksheets;
-        PreviewTableDataCheckBox.Checked = Settings.Default.EditPreviewMySqlData;
+        ConnectionTimeoutNumericUpDown.Value = Math.Min(ConnectionTimeoutNumericUpDown.Maximum, settings.GlobalConnectionConnectionTimeout);
+        QueryTimeoutNumericUpDown.Value = settings.GlobalConnectionCommandTimeout;
+        UseOptimisticUpdatesCheckBox.Checked = settings.EditUseOptimisticUpdate;
+        PreviewSqlQueriesRadioButton.Checked = settings.GlobalSqlQueriesPreviewQueries;
+        ShowExecutedSqlQueryRadioButton.Checked = settings.GlobalSqlQueriesShowQueriesWithResults;
+        RestoreSavedEditSessionsCheckBox.Checked = settings.EditSessionsRestoreWhenOpeningWorkbook;
+        ReuseWorksheetsRadioButton.Checked = settings.EditSessionsReuseWorksheets;
+        PreviewTableDataCheckBox.Checked = settings.EditPreviewMySqlData;
       }
 
       NoSqlStatementsRadioButton.Checked = !PreviewSqlQueriesRadioButton.Checked && !ShowExecutedSqlQueryRadioButton.Checked;
       CreateNewWorksheetsRadioButton.Checked = !ReuseWorksheetsRadioButton.Checked;
+      if (_manageConnectionInfosDialog != null)
+      {
+        _manageConnectionInfosDialog.RefreshControlValues(useDefaultValues);
+      }
     }
 
     /// <summary>
@@ -164,24 +199,6 @@ namespace MySQL.ForExcel.Forms
     {
       ReuseWorksheetsRadioButton.Enabled = RestoreSavedEditSessionsCheckBox.Checked;
       CreateNewWorksheetsRadioButton.Enabled = RestoreSavedEditSessionsCheckBox.Checked;
-    }
-
-    /// <summary>
-    /// Handles the Click event of the ManageConnectionInfosButton control.
-    /// </summary>
-    /// <param name="sender">The source of the event.</param>
-    /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-    private void ManageConnectionInfosButton_Click(object sender, EventArgs e)
-    {
-      using (var manageConnectionInfosDialog = new ManageConnectionInfosDialog())
-      {
-        _connectionInfosToDelete.Clear();
-        manageConnectionInfosDialog.ShowDialog();
-        if (manageConnectionInfosDialog.DialogResult != DialogResult.Cancel)
-        {
-          _connectionInfosToDelete = manageConnectionInfosDialog.ConnectionInfosToDelete;
-        }
-      }
     }
   }
 }
