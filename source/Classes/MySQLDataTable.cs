@@ -840,15 +840,14 @@ namespace MySQL.ForExcel.Classes
     public bool ImportColumnNames { get; set; }
 
     /// <summary>
-    /// Gets the number of added rows meaning the number of pending INSERT operations in an Edit Data operation.
+    /// Gets the number of added rows meaning the number of pending INSERT operations in an Append, Edit or Export Data operation.
     /// </summary>
     public int InsertingOperations
     {
       get
       {
         DataTable changesDt = GetChanges(DataRowState.Added);
-        var adjustOperationsValue = _firstRowContainsColumnNames && OperationType.IsForExport() ? 1 : 0;
-        return changesDt != null ? changesDt.Rows.Count - adjustOperationsValue : 0;
+        return changesDt != null ? changesDt.Rows.Count : 0;
       }
     }
 
