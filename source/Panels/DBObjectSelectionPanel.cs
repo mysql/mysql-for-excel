@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -263,7 +263,7 @@ namespace MySQL.ForExcel.Panels
     private void DBObjectList_AfterSelect(object sender, TreeViewEventArgs e)
     {
       var listControl = sender as MySqlListView;
-      if (listControl == null || listControl.SelectedNode == null || listControl.SelectedNodes.Count == 0)
+      if (listControl == null || listControl.SelectedNode == null)
       {
         return;
       }
@@ -282,9 +282,14 @@ namespace MySQL.ForExcel.Panels
       }
       else
       {
-        // Refresh the enabled/disabled status of actions related to the selected DbObject related node.
-        var addInPane = Parent as ExcelAddInPane;
-        var editActive = addInPane != null && addInPane.TableHasEditOnGoing(listControl.SelectedNode.DbObject.Name);
+        // Refresh the enabled/disabled status of actions related to the single selected DbObject related node.
+        var editActive = false;
+        if (listControl.SelectedNodes.Count == 1)
+        {
+          var addInPane = Parent as ExcelAddInPane;
+          editActive = addInPane != null && addInPane.TableHasEditOnGoing(listControl.SelectedNode.DbObject.Name);
+        }
+
         RefreshActionLabelsEnabledStatus(null, editActive);
       }
     }

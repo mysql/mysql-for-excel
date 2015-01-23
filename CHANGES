@@ -1,4 +1,7 @@
 1.3.4
+- Fixed the detection of a preliminary cells selection in the active Excel Worksheet before MySQL for Excel is opened, in order to enable the Export Data action in this
+  scenario. Fixed the disabling of Import, Edit and Append Data actions when the Tables, Views or Procedures titles in the database objects list is selected, which
+  actually clears the current database objects selection. (Bug #18323840 - ACTION LABELS IN DB OBJECT SELECTION PANEL ARE NOT ENABLED/DISABLED PROPERLY)
 - Fixed the informational label displaying the number of "inserting" rows during an Export Data operation. Before the fix the number was off by 1, only when the "First
   row contains column names" option was checked. (MySQL Bug #75342, Bug #20286897 - EXPORT DATA - WRONG NUMBER OF EXPORTING ROWS IN SQL SCRIPT DIALOG)
 - Fixed a problem that was preventing connection information entries from being deleted. Added a couple of options, related to the deletion of connection information
