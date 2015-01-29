@@ -1158,15 +1158,38 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      var values = string.Join(",",
-        ParentTable.Rows.Cast<MySqlDataRow>()
-          .Select(row => string.Format("'{0}'", row[Ordinal].ToString().Replace("'", "''")))
-          .Distinct()
-          .ToArray());
-      RowsFromFirstDataType = string.Format("{0}({1})", type, values);
-      int commaIndex = values.IndexOf(",", StringComparison.InvariantCultureIgnoreCase);
-      values = commaIndex < 0 ? string.Empty : values.Substring(commaIndex + 1);
+      var collectionElements = new List<string>(ParentTable.Rows.Count);
+      switch (type)
+      {
+        case CollectionDataType.Enum:
+          // For the ENUM we need to consider each value as a single element, then remove the duplicates
+          collectionElements.AddRange(
+            ParentTable.Rows.Cast<MySqlDataRow>()
+              .Select(row => string.Format("'{0}'", row[Ordinal].ToString().Replace("'", "''"))));
+          break;
+
+        case CollectionDataType.Set:
+          // For the SET we need to break up each value in sub-tokens using the comma as a delimiter, then remove the duplicates.
+          collectionElements.AddRange(
+            ParentTable.Rows.Cast<MySqlDataRow>()
+              .SelectMany(row => row[Ordinal].ToString().Replace("'", "''").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(element => string.Format("'{0}'", element))));
+          break;
+      }
+
+      // Remove duplicates and sort the list for easier reading
+      var firstRowElement = collectionElements.FirstOrDefault();
+      collectionElements = collectionElements.Skip(1).Distinct().ToList();
+      collectionElements.Sort();
+
+      // Join the resulting list of elements into a list delimited by commas.
+      var values = string.Join(",", collectionElements.ToArray());
       RowsFromSecondDataType = string.Format("{0}({1})", type, values);
+      if (!collectionElements.Contains(firstRowElement))
+      {
+        values = firstRowElement + "," + values;
+      }
+
+      RowsFromFirstDataType = string.Format("{0}({1})", type, values);
       MySqlDataType = ParentTable.FirstRowContainsColumnNames ? RowsFromSecondDataType : RowsFromFirstDataType;
     }
 

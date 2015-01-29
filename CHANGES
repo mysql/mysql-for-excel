@@ -1,4 +1,6 @@
 1.3.4
+- Fixed the way a SET declaration is assembled automatically from the column's data during an Export Data operation to split elements by commas within each row's value.
+  (MySQL Bug #75660, Bug #20426374 - EXPORT DATA - SET DECLARATION CREATED INCORRECTLY)
 - Added an additional validation for enum and set declarations to the Data Type combo-box in the Export Data dialog's Column Options section. The new validation checks
   that each enum or set element is wrapped in single quotes and that any other single quote found in the element's text is correctly escaped by using a preceding single
   quote. If such an incorrect element is found, a proper warning indicating there is an error in that element is shown so it is easier to locate the error.

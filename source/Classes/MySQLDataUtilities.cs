@@ -635,69 +635,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Splits the given text containing a SQL script into individual SQL statements.
-    /// </summary>
-    /// <param name="sqlScript">A string containing a SQL script.</param>
-    /// <returns>A list of individual SQL statements.</returns>
-    public static List<string> SplitInSqlStatements(this string sqlScript)
-    {
-      if (string.IsNullOrEmpty(sqlScript))
-      {
-        return null;
-      }
-
-      var tokenizer = new MySqlTokenizer(sqlScript.Trim());
-      return tokenizer.BreakIntoStatements();
-    }
-
-    /// <summary>
-    /// Splits the given text containing a SQL script into individual SQL statements.
-    /// </summary>
-    /// <param name="sqlScript">A string containing a SQL script.</param>
-    /// <param name="tokenDelimiter">A delimiter to split the text into tokens.</param>
-    /// <returns>A list of individual SQL tokens.</returns>
-    public static List<string> SplitInTokens(this string sqlScript, string tokenDelimiter = ",")
-    {
-      if (string.IsNullOrEmpty(sqlScript))
-      {
-        return null;
-      }
-
-      var tokenizer = new MySqlTokenizer(sqlScript.Trim());
-      var allTokens = tokenizer.GetAllTokens();
-      if (allTokens == null || allTokens.Count == 0)
-      {
-        return null;
-      }
-
-      var tokensList = new List<string>(allTokens.Count);
-      var elementBuilder = new StringBuilder(sqlScript.Length);
-      int lastIndex = allTokens.Count - 1;
-      for (int tokenIndex = 0; tokenIndex < allTokens.Count; tokenIndex++)
-      {
-        var token = allTokens[tokenIndex];
-        bool currentTokenIsDelimiter = string.Equals(token, tokenDelimiter, StringComparison.InvariantCulture);
-
-        // If the curren token is not the delimiter append it to the current element's text.
-        if (!currentTokenIsDelimiter)
-        {
-          elementBuilder.Append(token);
-        }
-
-        // Skip to the next token without adding the current one to the list if the current token is the delimiter or the current token is NOT the last one.
-        if ((!currentTokenIsDelimiter && tokenIndex != lastIndex) || elementBuilder.Length <= 0)
-        {
-          continue;
-        }
-
-        tokensList.Add(elementBuilder.ToString());
-        elementBuilder.Clear();
-      }
-
-      return tokensList;
-    }
-
-    /// <summary>
     /// Checks if a table with the given name exists in the given schema.
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
