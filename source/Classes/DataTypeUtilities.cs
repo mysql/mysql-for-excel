@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -1619,8 +1619,7 @@ namespace MySQL.ForExcel.Classes
         if (lParensIndex >= 0 && rParensIndex >= 0 && lParensIndex < rParensIndex)
         {
           string membersString = mySqlDataType.Substring(lParensIndex + 1, rParensIndex - lParensIndex - 1);
-          string[] setMembersArray = membersString.Split(new[] { ',' });
-          setOrEnumMembers.AddRange(setMembersArray.Select(s => s.Trim(new[] {'"', '\''})));
+          setOrEnumMembers.AddRange(membersString.SplitInTokens().Select(s => s.Trim(new[] {'\''})));
         }
 
         if (isEnum)
@@ -1793,9 +1792,12 @@ namespace MySQL.ForExcel.Classes
     /// A blank data type is considered valid.
     /// </summary>
     /// <param name="proposedUserType">A MySQL data type as specified for new columns in a CREATE TABLE statement.</param>
+    /// <param name="invalidEnumOrSetElement">The string of a set or enum element not wrapped correctly in single quotes or not escaping them properly.</param>
     /// <returns><c>true</c> if the type is a valid MySQL data type, <c>false</c> otherwise.</returns>
-    public static bool ValidateUserDataType(string proposedUserType)
+    public static bool ValidateUserDataType(string proposedUserType, out string invalidEnumOrSetElement)
     {
+      invalidEnumOrSetElement = null;
+
       // If the proposed type is blank return true since a blank data type is considered valid.
       if (proposedUserType.Length == 0)
       {
@@ -1835,10 +1837,10 @@ namespace MySQL.ForExcel.Classes
 
       // Check if the number of parameters is valid for the proposed MySQL data type
       string parametersText = proposedUserType.Substring(leftParenthesisIndex + 1, rightParenthesisIndex - leftParenthesisIndex - 1).Trim();
-      string[] parameterValues = string.IsNullOrEmpty(parametersText) ? null : parametersText.Split(',');
-      int parametersCount = parameterValues == null ? 0 : parameterValues.Length;
+      List<string> parameterValues = parametersText.SplitInTokens();
+      int parametersCount = parameterValues == null ? 0 : parameterValues.Count;
 
-      // If there are no parameters but parenthesis were provided the data type is invalid.
+      // If there are no parameters but parenthesis were provided the data type is invalid (parenthesis were already checked above).
       if (parametersCount == 0)
       {
         return false;
@@ -1851,17 +1853,25 @@ namespace MySQL.ForExcel.Classes
         return false;
       }
 
-      // Check if the paremeter values are valid integers for data types with 1 or 2 parameters (varchar and numeric types).
+      // If an enum or set, check that the values specified within the declaration are correctly wrapped in single quotes, otherwise the declaration is wrong.
       if (enumOrSet)
       {
-        return true;
+        if (parameterValues == null)
+        {
+          return false;
+        }
+
+        invalidEnumOrSetElement = parameterValues.CheckForCorrectSingleQuoting();
+        return string.IsNullOrEmpty(invalidEnumOrSetElement);
       }
 
+      // At this point if there are no parameters, the data type is OK.
       if (parameterValues == null)
       {
         return true;
       }
 
+      // Check if the paremeter values are valid integers for data types with 1 or 2 parameters (varchar and numeric types).
       foreach (string paramValue in parameterValues)
       {
         int convertedValue;

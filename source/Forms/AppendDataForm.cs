@@ -1194,7 +1194,9 @@ namespace MySQL.ForExcel.Forms
     /// <param name="mysqlCol">The <see cref="MySqlDataColumn"/> bound to the grid column.</param>
     private void SetGridColumnColor(DataGridViewColumn gridCol, MySqlDataColumn mysqlCol)
     {
-      gridCol.DefaultCellStyle.BackColor = mysqlCol.WarningsQuantity > 0 ? Color.OrangeRed : gridCol.DataGridView.DefaultCellStyle.BackColor;
+      gridCol.DefaultCellStyle.BackColor = string.IsNullOrEmpty(mysqlCol.CurrentWarningText) 
+        ? gridCol.DataGridView.DefaultCellStyle.BackColor
+        : Color.OrangeRed;
     }
 
     /// <summary>
@@ -1209,7 +1211,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       MySqlDataColumn mysqlCol = _sourceMySqlPreviewDataTable.GetColumnAtIndex(gridCol.Index);
-      bool showWarning = mysqlCol.WarningsQuantity > 0;
+      bool showWarning = !string.IsNullOrEmpty(mysqlCol.CurrentWarningText);
       ColumnWarningPictureBox.Visible = showWarning;
       ColumnWarningLabel.Visible = showWarning;
     }

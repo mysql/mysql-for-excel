@@ -21,6 +21,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Text;
+using MySQL.ForExcel.Classes.EventArguments;
 using MySQL.ForExcel.Classes.Exceptions;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Interfaces;
@@ -41,6 +42,26 @@ namespace MySQL.ForExcel.Classes
     #region Constants
 
     /// <summary>
+    /// Key used to represent a warning about the primary key column's name being a duplicate of another column's name.
+    /// </summary>
+    private const string DUPLICATE_PK_NAME_WARNING_KEY = "DUPLICATE_PK_NAME";
+
+    /// <summary>
+    /// Key used to represent a warning about the table's name being a duplicate of another table in the same schema.
+    /// </summary>
+    private const string DUPLICATE_TABLE_NAME_WARNING_KEY = "DUPLICATE_TABLE_NAME";
+
+    /// <summary>
+    /// Key used to represent a warning about the table's name being null or empty.
+    /// </summary>
+    private const string EMPTY_TABLE_NAME_WARNING_KEY = "EMPTY_TABLE_NAME";
+
+    /// <summary>
+    /// Key used to represent a warning about the table's name having spaces or upper case letters.
+    /// </summary>
+    private const string NON_STANDARD_TABLE_NAME_WARNING_KEY = "NON_STANDARD_TABLE_NAME";
+
+    /// <summary>
     /// Number of characters that the static part of a SQL query may occupy.
     /// </summary>
     public const int PRE_SQL_PADDING_LENGTH = 20;
@@ -55,19 +76,14 @@ namespace MySQL.ForExcel.Classes
     #region Fields
 
     /// <summary>
-    /// List of text strings containing warnings for users about the auto-generated primary key.
-    /// </summary>
-    private readonly List<string> _autoPkWarningTextsList;
-
-    /// <summary>
-    /// List of text strings containing warnings for users about the table properties that could cause errors when creating this table in the database.
-    /// </summary>
-    private readonly List<string> _tableWarningsTextList;
-
-    /// <summary>
     /// Flag indicating whether an auto-generated primary key column will be added as the first column in the table.
     /// </summary>
     private bool _addPrimaryKeyColumn;
+
+    /// <summary>
+    /// Container with warnings for users about the auto-generated primary key.
+    /// </summary>
+    private WarningsContainer _autoPkWarnings;
 
     /// <summary>
     /// Flag indicating if the column names where changed to use the first row of data.
@@ -195,6 +211,12 @@ namespace MySQL.ForExcel.Classes
     /// Flag indicating whether there is a MySQL table in the connected schema with the same name as in <see cref="TableName"/>.
     /// </summary>
     private bool? _tableExistsInSchema;
+
+    /// <summary>
+    /// Container with warnings for users about the table properties that could cause errors when creating this table in the database.
+    /// </summary>
+    private WarningsContainer _tableWarnings;
+
     /// <summary>
     /// Flag indicating if the first column in the Excel region to be exported will be used to create the MySQL table's primary key.
     /// </summary>
@@ -369,7 +391,6 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public MySqlDataTable()
     {
-      _autoPkWarningTextsList = new List<string>(1);
       _changedColumnNamesWithFirstRowOfData = false;
       _changedOrDeletedRows = -1;
       _charSet = null;
@@ -389,7 +410,6 @@ namespace MySQL.ForExcel.Classes
       _primaryKeyColumns = null;
       _primaryKeyColumnsDataLength = 0;
       _tableExistsInSchema = null;
-      _tableWarningsTextList = new List<string>(3);
       _selectQuery = string.Format("SELECT * FROM `{0}`", TableNameForSqlQueries);
       _sqlBuilderForDelete = null;
       _sqlBuilderForInsert = null;
@@ -410,6 +430,7 @@ namespace MySQL.ForExcel.Classes
       SchemaName = string.Empty;
       UseFirstColumnAsPk = false;
       WbConnection = null;
+      SetupWarnings();
     }
 
     #region Enums
@@ -563,17 +584,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the number of warnings associated to the auto-generated primary key.
-    /// </summary>
-    public int AutoPkWarningsQuantity
-    {
-      get
-      {
-        return _autoPkWarningTextsList != null ? _autoPkWarningTextsList.Count : 0;
-      }
-    }
-
-    /// <summary>
     /// Gets the number of changed or deleted rows in this table.
     /// </summary>
     public int ChangedOrDeletedRows
@@ -683,7 +693,7 @@ namespace MySQL.ForExcel.Classes
     {
       get
       {
-        return _autoPkWarningTextsList.Count > 0 ? _autoPkWarningTextsList.Last() : string.Empty;
+        return _autoPkWarnings.CurrentWarningText;
       }
     }
 
@@ -694,7 +704,7 @@ namespace MySQL.ForExcel.Classes
     {
       get
       {
-        return _tableWarningsTextList.Count > 0 ? _tableWarningsTextList.Last() : string.Empty;
+        return _tableWarnings.CurrentWarningText;
       }
     }
 
@@ -1135,17 +1145,6 @@ namespace MySQL.ForExcel.Classes
       get
       {
         return TableName.Replace("`", "``");
-      }
-    }
-
-    /// <summary>
-    /// Gets the number of warnings associated to the table.
-    /// </summary>
-    public int TableWarningsQuantity
-    {
-      get
-      {
-        return _tableWarningsTextList != null ? _tableWarningsTextList.Count : 0;
       }
     }
 
@@ -2045,11 +2044,10 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Adds or removes warnings related to this table's auto-generated primary key.
     /// </summary>
-    /// <param name="addWarning">true to add a new warning to the auto-generated primary key warnings collection, false to remove the given warning.</param>
-    /// <param name="warningResourceText">Warning text to display to users.</param>
-    public void UpdateAutoPkWarnings(bool addWarning, string warningResourceText)
+    /// <param name="show">Flag indicating whether the warning is to be shown or hidden.</param>
+    public void UpdateAutoPkWarning(bool show)
     {
-      if (UpdateWarnings(addWarning, warningResourceText, true))
+      if (_autoPkWarnings.SetVisibility(DUPLICATE_PK_NAME_WARNING_KEY, show))
       {
         OnTableWarningsChanged(true);
       }
@@ -2539,27 +2537,41 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Initializes the warnings container for this column.
+    /// </summary>
+    private void SetupWarnings()
+    {
+      _autoPkWarnings = new WarningsContainer(WarningsContainer.CurrentWarningChangedMethodType.OnShowIfWarningNotPresent, 1);
+      _autoPkWarnings.Add(DUPLICATE_PK_NAME_WARNING_KEY, Resources.PrimaryKeyColumnExistsWarning);
+
+      _tableWarnings = new WarningsContainer(WarningsContainer.CurrentWarningChangedMethodType.OnShowIfWarningNotPresent, 3);
+      _tableWarnings.Add(EMPTY_TABLE_NAME_WARNING_KEY, Resources.TableNameRequiredWarning);
+      _tableWarnings.Add(DUPLICATE_TABLE_NAME_WARNING_KEY, Resources.TableNameExistsWarning);
+      _tableWarnings.Add(NON_STANDARD_TABLE_NAME_WARNING_KEY, Resources.NamesWarning);
+    }
+
+    /// <summary>
     /// Updates the warnings related to the table name and the select query used to retrieve data based on the <see cref="TableName"/> property's value.
     /// </summary>
     private void UpdateTableNameWarningsAndSelectQuery()
     {
       // Update warning stating the table name cannot be empty
       bool emptyTableName = string.IsNullOrWhiteSpace(TableName);
-      bool warningsChanged = UpdateWarnings(emptyTableName, Resources.TableNameRequiredWarning);
+      bool warningsChanged = _tableWarnings.SetVisibility(EMPTY_TABLE_NAME_WARNING_KEY, emptyTableName);
       IsTableNameValid = !emptyTableName;
 
       // Update warning stating a table with the given name already exists in the database
       if (IsTableNameValid && WbConnection != null)
       {
-        warningsChanged = UpdateWarnings(TableExistsInSchema, Resources.TableNameExistsWarning) || warningsChanged;
+        warningsChanged = _tableWarnings.SetVisibility(DUPLICATE_TABLE_NAME_WARNING_KEY, TableExistsInSchema) || warningsChanged;
         IsTableNameValid = !TableExistsInSchema;
       }
 
-      // Update warning stating the table name cannot be empty
+      // Update warning stating the table name should not contain spaces or upper-case letters
       if (IsTableNameValid)
       {
         bool nonStandardTableName = TableName.Contains(" ") || TableName.Any(char.IsUpper);
-        warningsChanged = UpdateWarnings(nonStandardTableName, Resources.NamesWarning) || warningsChanged;
+        warningsChanged = _tableWarnings.SetVisibility(NON_STANDARD_TABLE_NAME_WARNING_KEY, nonStandardTableName) || warningsChanged;
       }
 
       // Fire the TableWarningsChanged event.
@@ -2576,42 +2588,6 @@ namespace MySQL.ForExcel.Classes
     {
       string schemaPiece = !string.IsNullOrEmpty(SchemaName) ? string.Format("`{0}`.", SchemaName) : string.Empty;
       SelectQuery = string.Format("SELECT * FROM {0}`{1}`", schemaPiece, TableNameForSqlQueries);
-    }
-
-    /// <summary>
-    /// Adds or removes warnings related to this table's creation.
-    /// </summary>
-    /// <param name="addWarning">true to add a new warning to the corresponding warnings collection, false to remove the given warning.</param>
-    /// <param name="warningResourceText">Warning text to display to users.</param>
-    /// <param name="autoPkWarning">Flag indicating if the warning is to be added to the collection related to auto-generated primary keys or the table's one.</param>
-    /// <returns><c>true</c> if a warning was added or removed, <c>false</c> otherwise.</returns>
-    private bool UpdateWarnings(bool addWarning, string warningResourceText, bool autoPkWarning = false)
-    {
-      bool warningsChanged = false;
-
-      List<string> warningsList = autoPkWarning ? _autoPkWarningTextsList : _tableWarningsTextList;
-      if (addWarning)
-      {
-        // Only add the warning text if it is not empty and not already added to the warnings list
-        if (string.IsNullOrEmpty(warningResourceText) || warningsList.Contains(warningResourceText))
-        {
-          return false;
-        }
-
-        warningsList.Add(warningResourceText);
-        warningsChanged = true;
-      }
-      else
-      {
-        // We do not want to show a warning or we want to remove a warning if warningResourceText != null
-        if (!string.IsNullOrEmpty(warningResourceText))
-        {
-          // Remove the warning and check if there is an stored warning, if so we want to pull it and show it
-          warningsChanged = warningsList.Remove(warningResourceText);
-        }
-      }
-
-      return warningsChanged;
     }
 
     /// <summary>
@@ -2645,70 +2621,5 @@ namespace MySQL.ForExcel.Classes
       ResetFirstRowIsHeaderValue();
       _changedColumnNamesWithFirstRowOfData = true;
     }
-  }
-
-  /// <summary>
-  /// Event arguments for the TableWarningsChanged event.
-  /// </summary>
-  public class TableWarningsChangedArgs : EventArgs
-  {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TableWarningsChangedArgs"/> class.
-    /// </summary>
-    /// <param name="column">The <see cref="MySqlDataColumn"/> object that contains changes in its warning texts.</param>
-    public TableWarningsChangedArgs(MySqlDataColumn column)
-    {
-      CurrentWarning = column.CurrentColumnWarningText;
-      WarningsType = TableWarningsType.ColumnWarnings;
-      WarningsQuantity = column.WarningsQuantity;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TableWarningsChangedArgs"/> class.
-    /// </summary>
-    /// <param name="table">The <see cref="MySqlDataTable"/> object that contains changes in its warning texts.</param>
-    /// <param name="autoPkWarning">Flag indicating if the warning is related to the auto-generated primary key or to the table.</param>
-    public TableWarningsChangedArgs(MySqlDataTable table, bool autoPkWarning)
-    {
-      CurrentWarning = autoPkWarning ? table.CurrentAutoPkWarningText : table.CurrentTableWarningText;
-      WarningsType = autoPkWarning ? TableWarningsType.AutoPrimaryKeyWarnings : TableWarningsType.TableNameWarnings;
-      WarningsQuantity = autoPkWarning ? table.AutoPkWarningsQuantity : table.TableWarningsQuantity;
-    }
-
-    /// <summary>
-    /// Specifies identifiers to indicate the type of warnings that were updated.
-    /// </summary>
-    public enum TableWarningsType
-    {
-      /// <summary>
-      /// Warnings belong to a table column.
-      /// </summary>
-      ColumnWarnings,
-
-      /// <summary>
-      /// Warnings belong to the table's auto-generated primary key.
-      /// </summary>
-      AutoPrimaryKeyWarnings,
-
-      /// <summary>
-      /// Warnings belong to the table name.
-      /// </summary>
-      TableNameWarnings
-    }
-
-    /// <summary>
-    /// Gets the last warning text in the warnings collection.
-    /// </summary>
-    public string CurrentWarning { get; private set; }
-
-    /// <summary>
-    /// Gets the number of warnings currenlty in the warnings collection.
-    /// </summary>
-    public int WarningsQuantity { get; private set; }
-
-    /// <summary>
-    /// Gets the type of warnings that were updated.
-    /// </summary>
-    public TableWarningsType WarningsType { get; set; }
   }
 }

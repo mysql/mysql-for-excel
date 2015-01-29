@@ -1,4 +1,8 @@
 1.3.4
+- Added an additional validation for enum and set declarations to the Data Type combo-box in the Export Data dialog's Column Options section. The new validation checks
+  that each enum or set element is wrapped in single quotes and that any other single quote found in the element's text is correctly escaped by using a preceding single
+  quote. If such an incorrect element is found, a proper warning indicating there is an error in that element is shown so it is easier to locate the error.
+  (Bug #18298155 - EXPORT DATA - ENUM AND SET DATA TYPE VALIDATION IS INCORRECT)
 - Fixed the detection of a preliminary cells selection in the active Excel Worksheet before MySQL for Excel is opened, in order to enable the Export Data action in this
   scenario. Fixed the disabling of Import, Edit and Append Data actions when the Tables, Views or Procedures titles in the database objects list is selected, which
   actually clears the current database objects selection. (Bug #18323840 - ACTION LABELS IN DB OBJECT SELECTION PANEL ARE NOT ENABLED/DISABLED PROPERLY)

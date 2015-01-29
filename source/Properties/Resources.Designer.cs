@@ -226,6 +226,24 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Entered Set or Enum declaration contains an error in element: .
+        /// </summary>
+        internal static string ColumnDataSetOrEnumNotValidWarning {
+            get {
+                return ResourceManager.GetString("ColumnDataSetOrEnumNotValidWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entered Data Type is not a MySQL valid data type..
+        /// </summary>
+        internal static string ColumnDataTypeNotValidWarning {
+            get {
+                return ResourceManager.GetString("ColumnDataTypeNotValidWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Column DataType is required..
         /// </summary>
         internal static string ColumnDataTypeRequiredWarning {
@@ -1085,15 +1103,6 @@ namespace MySQL.ForExcel.Properties {
         internal static string ExportDataTypeNotSuitableWarning {
             get {
                 return ResourceManager.GetString("ExportDataTypeNotSuitableWarning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Entered Data Type is not a MySQL valid data type..
-        /// </summary>
-        internal static string ExportDataTypeNotValidWarning {
-            get {
-                return ResourceManager.GetString("ExportDataTypeNotValidWarning", resourceCulture);
             }
         }
         

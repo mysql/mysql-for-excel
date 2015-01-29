@@ -235,6 +235,8 @@
     <Compile Include="Classes\DbSchema.cs" />
     <Compile Include="Classes\DbTable.cs" />
     <Compile Include="Classes\DbView.cs" />
+    <Compile Include="Classes\EventArguments\ColumnWarningsChangedArgs.cs" />
+    <Compile Include="Classes\EventArguments\TableWarningsChangedArgs.cs" />
     <Compile Include="Classes\Exceptions\MySqlDataLoadException.cs" />
     <Compile Include="Classes\Exceptions\ParentWorkbookNullException.cs" />
     <Compile Include="Classes\Exceptions\ValueNotSuitableForConversionException.cs" />
@@ -267,6 +269,7 @@
     <Compile Include="Classes\MySqlColumnsInformationTable.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Classes\WarningsContainer.cs" />
     <Compile Include="Classes\TempRange.cs" />
     <Compile Include="Controls\ExcelAddInPane.cs">
       <SubType>UserControl</SubType>

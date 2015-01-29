@@ -23,6 +23,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
+using MySQL.ForExcel.Classes.EventArguments;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
@@ -966,25 +967,27 @@ namespace MySQL.ForExcel.Forms
     /// <param name="args">Event arguments.</param>
     private void PreviewTableWarningsChanged(object sender, TableWarningsChangedArgs args)
     {
+      bool showWarning = !string.IsNullOrEmpty(args.CurrentWarning);
       switch (args.WarningsType)
       {
         case TableWarningsChangedArgs.TableWarningsType.AutoPrimaryKeyWarnings:
-          ShowValidationWarning("PrimaryKeyWarning", args.WarningsQuantity > 0, Resources.PrimaryKeyColumnExistsWarning);
+          ShowValidationWarning("PrimaryKeyWarning", showWarning, args.CurrentWarning);
           break;
 
         case TableWarningsChangedArgs.TableWarningsType.ColumnWarnings:
-          MySqlDataColumn column = sender as MySqlDataColumn;
+          var column = sender as MySqlDataColumn;
           if (column != null)
           {
             DataGridViewColumn gridCol = PreviewDataGridView.Columns[column.Ordinal];
-            bool showWarning = args.WarningsQuantity > 0;
             ShowValidationWarning("ColumnOptionsWarning", showWarning, args.CurrentWarning);
-            gridCol.DefaultCellStyle.BackColor = column.ExcludeColumn ? Color.LightGray : (showWarning ? Color.OrangeRed : PreviewDataGridView.DefaultCellStyle.BackColor);
+            gridCol.DefaultCellStyle.BackColor = column.ExcludeColumn
+              ? Color.LightGray
+              : (showWarning ? Color.OrangeRed : PreviewDataGridView.DefaultCellStyle.BackColor);
           }
           break;
 
         case TableWarningsChangedArgs.TableWarningsType.TableNameWarnings:
-          ShowValidationWarning("TableNameWarning", args.WarningsQuantity > 0, args.CurrentWarning);
+          ShowValidationWarning("TableNameWarning", showWarning, args.CurrentWarning);
           break;
       }
 
@@ -1164,7 +1167,9 @@ namespace MySQL.ForExcel.Forms
       }
 
       DataGridViewColumn gridCol = PreviewDataGridView.SelectedColumns[0];
-      gridCol.DefaultCellStyle.BackColor = mysqlCol.ExcludeColumn ? Color.LightGray : (mysqlCol.WarningsQuantity > 0 ? Color.OrangeRed : PreviewDataGridView.DefaultCellStyle.BackColor);
+      gridCol.DefaultCellStyle.BackColor = mysqlCol.ExcludeColumn
+        ? Color.LightGray
+        : (string.IsNullOrEmpty(mysqlCol.CurrentWarningText) ? PreviewDataGridView.DefaultCellStyle.BackColor : Color.OrangeRed);
     }
 
     /// <summary>
@@ -1173,8 +1178,8 @@ namespace MySQL.ForExcel.Forms
     /// <param name="column">Column to refresh warnings for.</param>
     private void RefreshColumnWarnings(MySqlDataColumn column)
     {
-      bool showWarning = !string.IsNullOrEmpty(column.CurrentColumnWarningText);
-      ShowValidationWarning("ColumnOptionsWarning", showWarning, column.CurrentColumnWarningText);
+      bool showWarning = !string.IsNullOrEmpty(column.CurrentWarningText);
+      ShowValidationWarning("ColumnOptionsWarning", showWarning, column.CurrentWarningText);
     }
 
     /// <summary>

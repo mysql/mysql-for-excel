@@ -298,7 +298,7 @@
   <data name="MySQLforExcel_Input_64x64" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySQLforExcel-Input-64x64.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ExportDataTypeNotValidWarning" xml:space="preserve">
+  <data name="ColumnDataTypeNotValidWarning" xml:space="preserve">
     <value>Entered Data Type is not a MySQL valid data type.</value>
   </data>
   <data name="MySQLforExcel_Cursor_Dragging_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -1097,5 +1097,8 @@ Since Excel relationships cannot be created, a single PivotTable for the whole E
   </data>
   <data name="DeletingConnectionInfosWithNonExistentWorkbook" xml:space="preserve">
     <value>Deleting automatically saved connection information entries with non-existent Excel Workbooks.</value>
+  </data>
+  <data name="ColumnDataSetOrEnumNotValidWarning" xml:space="preserve">
+    <value>Entered Set or Enum declaration contains an error in element: </value>
   </data>
 </root>

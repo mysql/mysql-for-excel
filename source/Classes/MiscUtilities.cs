@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -87,6 +87,63 @@ namespace MySQL.ForExcel.Classes
       }
 
       stringBuilder.Append(separator);
+    }
+
+    /// <summary>
+    /// Checks that the given string is correctly wrapped in single quotes and that other single quotes inside are properly escaped in MySQL notation.
+    /// </summary>
+    /// <param name="element">An array of strings.</param>
+    /// <returns><c>false</c> if the element has an incorrect escaping of single quotes or not wrapped in single quotes correctly, <c>true</c> if correct.</returns>
+    public static bool CheckForCorrectSingleQuoting(this string element)
+    {
+      if (string.IsNullOrEmpty(element))
+      {
+        return false;
+      }
+
+      // Check for wrapping single quotes.
+      if (!element.StartsWith("'") || !element.EndsWith("'"))
+      {
+        return false;
+      }
+
+      // Strip the element from its wrapping quotes.
+      element = element.Trim(new[] { '\'' });
+
+      // Check that each found single quote is properly wrapped in MySQL notation, i.e. that 2 consecutive single quotes appear where a single quote is expected to be in the text.
+      int currentQuotePos;
+      int previousQuotePos = 0;
+      bool nonEscapedQuoteFound = false;
+      while ((currentQuotePos = element.IndexOf('\'', previousQuotePos + 1)) >= 0)
+      {
+        // If a single quote was previously found, check if this new one is just next to it (meaning the previous one is escaping the current one)
+        // and if not break since a new single quote was found but not next to the previous one, meaning none of them are escaped.
+        if (nonEscapedQuoteFound && currentQuotePos > previousQuotePos + 1)
+        {
+          break;
+        }
+
+        // Update the flag and position. We can just flip the flag, if the code did not break above it means the current quote is just next to the previous one, meaning a correct escape.
+        nonEscapedQuoteFound = !nonEscapedQuoteFound;
+        previousQuotePos = currentQuotePos;
+      }
+
+      return !nonEscapedQuoteFound;
+    }
+
+    /// <summary>
+    /// Checks that each element of a list of strings is correctly wrapped in single quotes and that other single quotes inside are properly escaped in MySQL notation.
+    /// </summary>
+    /// <param name="elementsList">A list of strings.</param>
+    /// <returns>The element of the list with an incorrect escaping of single quotes, or not wrapped in single quotes correctly.</returns>
+    public static string CheckForCorrectSingleQuoting(this List<string> elementsList)
+    {
+      if (elementsList == null || elementsList.Count == 0)
+      {
+        return null;
+      }
+
+      return elementsList.FirstOrDefault(element => !element.CheckForCorrectSingleQuoting());
     }
 
     /// <summary>

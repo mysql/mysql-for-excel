@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -22,6 +22,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using MySql.Data.MySqlClient;
+using MySQL.ForExcel.Classes.EventArguments;
 using MySQL.ForExcel.Properties;
 using Excel = Microsoft.Office.Interop.Excel;
 
@@ -32,6 +33,50 @@ namespace MySQL.ForExcel.Classes
   /// </summary>
   public class MySqlDataColumn : DataColumn, INotifyPropertyChanged
   {
+    #region Constants
+
+    /// <summary>
+    /// Key used to represent a warning about the column's data not being suitable for the data type in the Append Data dialog.
+    /// </summary>
+    private const string DATA_NOT_SUITABLE_APPEND_WARNING_KEY = "DATA_NOT_SUITABLE_APPEND";
+
+    /// <summary>
+    /// Key used to represent a warning about the column's data not being suitable for the data type in the Export Data dialog.
+    /// </summary>
+    private const string DATA_NOT_SUITABLE_EXPORT_WARNING_KEY = "DATA_NOT_SUITABLE_EXPORT";
+
+    /// <summary>
+    /// Key used to represent a warning about the column's data not being unique.
+    /// </summary>
+    private const string DATA_NOT_UNIQUE_WARNING_KEY = "DATA_NOT_UNIQUE";
+
+    /// <summary>
+    /// Key used to represent a warning about the column's name being a duplicate of one in another column.
+    /// </summary>
+    private const string DUPLICATE_NAME_WARNING_KEY = "DUPLICATE_NAME";
+
+    /// <summary>
+    /// Key used to represent a warning about the column's name being null or empty.
+    /// </summary>
+    private const string EMPTY_NAME_WARNING_KEY = "EMPTY_NAME";
+
+    /// <summary>
+    /// Key used to represent a warning about the column's data type being a MySQL invalid one.
+    /// </summary>
+    private const string INVALID_DATA_TYPE_WARNING_KEY = "INVALID_DATA_TYPE";
+
+    /// <summary>
+    /// Key used to represent a warning about the column's data type declaraton for an ENUM or SET being incorrect due to a specific element.
+    /// </summary>
+    private const string INVALID_SET_ENUM_WARNING_KEY = "INVALID_SET_ENUM";
+
+    /// <summary>
+    /// Key used to represent a warning about the column's data type being null or empty.
+    /// </summary>
+    private const string NO_DATA_TYPE_WARNING_KEY = "NO_DATA_TYPE";
+
+    #endregion Constants
+
     #region Fields
 
     /// <summary>
@@ -50,11 +95,6 @@ namespace MySQL.ForExcel.Classes
     private bool? _columnRequiresQuotes;
 
     /// <summary>
-    /// List of text strings containing warnings for users about the column properties that could cause errors when creating this column in a database table.
-    /// </summary>
-    private readonly List<string> _columnWarningTextsList;
-
-    /// <summary>
     /// Flag indicating whether this column has an index automatically created for it.
     /// </summary>
     private bool _createIndex;
@@ -63,6 +103,11 @@ namespace MySQL.ForExcel.Classes
     /// Flag indicating whether this column will be excluded from the list of columns to be created on a new table's creation.
     /// </summary>
     private bool _excludeColumn;
+
+    /// <summary>
+    /// The element of an ENUM or SET declaration that makes it invalid.
+    /// </summary>
+    private string _invalidEnumOrSetElement;
 
     /// <summary>
     /// The ordinal index of the column in a source <see cref="MySqlDataTable"/> from which data will be appended from.
@@ -84,6 +129,11 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     private bool _uniqueKey;
 
+    /// <summary>
+    /// Container with warnings for users about the column properties that could cause errors when creating this column in a database table.
+    /// </summary>
+    private WarningsContainer _warnings;
+
     #endregion Fields
 
     /// <summary>
@@ -94,8 +144,8 @@ namespace MySQL.ForExcel.Classes
       _allowNull = false;
       _columnNameForSqlQueries = null;
       _columnRequiresQuotes = null;
-      _columnWarningTextsList = new List<string>(3);
       _excludeColumn = false;
+      _invalidEnumOrSetElement = null;
       _mappedDataColOrdinal = -1;
       _mySqlDataType = string.Empty;
       AutoIncrement = false;
@@ -113,6 +163,7 @@ namespace MySQL.ForExcel.Classes
       RowsFromSecondDataType = string.Empty;
       StrippedMySqlDataType = string.Empty;
       Unsigned = false;
+      SetupWarnings();
     }
 
     /// <summary>
@@ -333,12 +384,13 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the last warning text associated to this column.
     /// </summary>
-    public string CurrentColumnWarningText
+    public string CurrentWarningText
     {
       get
       {
-        return _columnWarningTextsList != null && _columnWarningTextsList.Count > 0 && !ExcludeColumn
-          ? _columnWarningTextsList.Last()
+        string currentWarningText = _warnings.CurrentWarningText;
+        return !ExcludeColumn && !string.IsNullOrEmpty(currentWarningText)
+          ? currentWarningText + (_warnings.CurrentWarningKey.Equals(INVALID_SET_ENUM_WARNING_KEY) && !string.IsNullOrEmpty(_invalidEnumOrSetElement) ? _invalidEnumOrSetElement : string.Empty)
           : string.Empty;
       }
     }
@@ -383,7 +435,7 @@ namespace MySQL.ForExcel.Classes
           PrimaryKey = false;
         }
 
-        if (UpdateWarnings(!_excludeColumn, null))
+        if (!_excludeColumn && _warnings.ShownQuantity > 0)
         {
           OnColumnWarningsChanged();
         }
@@ -572,7 +624,8 @@ namespace MySQL.ForExcel.Classes
     {
       get
       {
-        return !string.IsNullOrEmpty(StrippedMySqlDataType) && StrippedMySqlDataType.Equals("time", StringComparison.InvariantCultureIgnoreCase);
+        return !string.IsNullOrEmpty(StrippedMySqlDataType) &&
+               StrippedMySqlDataType.Equals("time", StringComparison.InvariantCultureIgnoreCase);
       }
     }
 
@@ -632,7 +685,9 @@ namespace MySQL.ForExcel.Classes
       get
       {
         string strippedType = StrippedMySqlDataType;
-        return !string.IsNullOrEmpty(strippedType) ? DataTypeUtilities.NameToMySqlType(strippedType, Unsigned, false) : MySqlDbType.VarChar;
+        return !string.IsNullOrEmpty(strippedType)
+          ? DataTypeUtilities.NameToMySqlType(strippedType, Unsigned, false)
+          : MySqlDbType.VarChar;
       }
     }
 
@@ -730,7 +785,8 @@ namespace MySQL.ForExcel.Classes
           columnValuesAreUnique = false;
         }
 
-        if (UpdateWarnings(!columnValuesAreUnique, Resources.ColumnDataNotUniqueWarning))
+        // Update warning stating the column's data is not unique
+        if (_warnings.SetVisibility(DATA_NOT_UNIQUE_WARNING_KEY, !columnValuesAreUnique))
         {
           OnColumnWarningsChanged();
         }
@@ -744,18 +800,9 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public bool Unsigned { get; set; }
 
-    /// <summary>
-    /// Gets the number of warnings associated to this column.
-    /// </summary>
-    public int WarningsQuantity
-    {
-      get
-      {
-        return _columnWarningTextsList != null ? _columnWarningTextsList.Count : 0;
-      }
-    }
-
     #endregion Properties
+
+    #region Events
 
     /// <summary>
     /// Delegate handler for the <see cref="ColumnWarningsChanged"/> event.
@@ -774,6 +821,8 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public event PropertyChangedEventHandler PropertyChanged;
 
+    #endregion Events
+
     /// <summary>
     /// Checks if the data stored in this column would fit within the given data type.
     /// </summary>
@@ -790,7 +839,12 @@ namespace MySQL.ForExcel.Classes
         return true;
       }
 
-      foreach (string strValueFromArray in parentTable.Rows.Cast<DataRow>().Where(dr => !parentTable.FirstRowContainsColumnNames || rowIdx++ != 0).Select(dr => dr[Ordinal].ToString()).Where(strValueFromArray => strValueFromArray.Length != 0))
+      foreach (
+        string strValueFromArray in
+          parentTable.Rows.Cast<DataRow>()
+            .Where(dr => !parentTable.FirstRowContainsColumnNames || rowIdx++ != 0)
+            .Select(dr => dr[Ordinal].ToString())
+            .Where(strValueFromArray => strValueFromArray.Length != 0))
       {
         result = DataTypeUtilities.StringValueCanBeStoredWithMySqlType(strValueFromArray, mySqlDataType);
 
@@ -809,7 +863,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public void ClearWarnings()
     {
-      _columnWarningTextsList.Clear();
+      _warnings.Clear();
     }
 
     /// <summary>
@@ -888,7 +942,9 @@ namespace MySQL.ForExcel.Classes
         if (proposedType != "Text")
         {
           leftParensIndex = proposedType.IndexOf("(", StringComparison.Ordinal);
-          varCharValueLength = addBufferToVarChar ? int.Parse(proposedType.Substring(leftParensIndex + 1, proposedType.Length - leftParensIndex - 2)) : valueAsString.Length;
+          varCharValueLength = addBufferToVarChar
+            ? int.Parse(proposedType.Substring(leftParensIndex + 1, proposedType.Length - leftParensIndex - 2))
+            : valueAsString.Length;
           varCharMaxLen[1] = Math.Max(varCharValueLength, varCharMaxLen[1]);
         }
 
@@ -899,7 +955,9 @@ namespace MySQL.ForExcel.Classes
         switch (strippedType)
         {
           case "VarChar":
-            varCharValueLength = addBufferToVarChar ? int.Parse(proposedType.Substring(leftParensIndex + 1, proposedType.Length - leftParensIndex - 2)) : valueAsString.Length;
+            varCharValueLength = addBufferToVarChar
+              ? int.Parse(proposedType.Substring(leftParensIndex + 1, proposedType.Length - leftParensIndex - 2))
+              : valueAsString.Length;
             varCharMaxLen[0] = Math.Max(varCharValueLength, varCharMaxLen[0]);
             break;
 
@@ -947,7 +1005,9 @@ namespace MySQL.ForExcel.Classes
       {
         bool emptyProposedType = string.IsNullOrEmpty(proposedType);
         leftParensIndex = emptyProposedType ? -1 : proposedType.IndexOf("(", StringComparison.Ordinal);
-        strippedType = leftParensIndex < 0 || emptyProposedType ? proposedType : proposedType.Substring(0, leftParensIndex);
+        strippedType = leftParensIndex < 0 || emptyProposedType
+          ? proposedType
+          : proposedType.Substring(0, leftParensIndex);
         typesListForFirstAndRest.Add(strippedType);
       }
 
@@ -1056,7 +1116,9 @@ namespace MySQL.ForExcel.Classes
 
       bool colNameEmpty = displayName.Length == 0;
       string nonDuplicateDisplayName = displayName;
-      if (UpdateWarnings(colNameEmpty, Resources.ColumnNameRequiredWarning))
+
+      // Update warning stating the column name cannot be empty
+      if (_warnings.SetVisibility(EMPTY_NAME_WARNING_KEY, colNameEmpty))
       {
         OnColumnWarningsChanged();
       }
@@ -1069,11 +1131,13 @@ namespace MySQL.ForExcel.Classes
       IsDisplayNameDuplicate = !addSuffixIfDuplicate && displayName != nonDuplicateDisplayName;
       if (AutoPk)
       {
-        ParentTable.UpdateAutoPkWarnings(IsDisplayNameDuplicate, Resources.PrimaryKeyColumnExistsWarning);
+        // Update warning on the parent table regarding the AutoPK column name being a duplicate of another existing column's name
+        ParentTable.UpdateAutoPkWarning(IsDisplayNameDuplicate);
       }
       else
       {
-        if (UpdateWarnings(IsDisplayNameDuplicate, Resources.ColumnExistsWarning))
+        // Update warning stating the column name is a duplicate of another existing column's name
+        if (_warnings.SetVisibility(DUPLICATE_NAME_WARNING_KEY, IsDisplayNameDuplicate))
         {
           OnColumnWarningsChanged();
         }
@@ -1094,7 +1158,11 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      var values = string.Join(",", ParentTable.Rows.Cast<MySqlDataRow>().Select(row => string.Format("'{0}'", row[Ordinal].ToString().Replace("'", "''"))).Distinct().ToArray());
+      var values = string.Join(",",
+        ParentTable.Rows.Cast<MySqlDataRow>()
+          .Select(row => string.Format("'{0}'", row[Ordinal].ToString().Replace("'", "''")))
+          .Distinct()
+          .ToArray());
       RowsFromFirstDataType = string.Format("{0}({1})", type, values);
       int commaIndex = values.IndexOf(",", StringComparison.InvariantCultureIgnoreCase);
       values = commaIndex < 0 ? string.Empty : values.Substring(commaIndex + 1);
@@ -1126,7 +1194,8 @@ namespace MySQL.ForExcel.Classes
 
         if (MySqlDataType.Length == 0)
         {
-          if (UpdateWarnings(true, Resources.ColumnDataTypeRequiredWarning))
+          // Show warning stating the column data type cannot be empty
+          if (_warnings.Show(NO_DATA_TYPE_WARNING_KEY))
           {
             OnColumnWarningsChanged();
           }
@@ -1134,13 +1203,20 @@ namespace MySQL.ForExcel.Classes
           return IsMySqlDataTypeValid;
         }
 
-        warningsChanged = UpdateWarnings(false, Resources.ColumnDataTypeRequiredWarning);
+        // Hide warning stating the column data type cannot be empty
+        warningsChanged = _warnings.Hide(NO_DATA_TYPE_WARNING_KEY);
+        _invalidEnumOrSetElement = null;
         if (validateType)
         {
-          IsMySqlDataTypeValid = DataTypeUtilities.ValidateUserDataType(dataType);
+          IsMySqlDataTypeValid = DataTypeUtilities.ValidateUserDataType(dataType, out _invalidEnumOrSetElement);
         }
 
-        warningsChanged = UpdateWarnings(!IsMySqlDataTypeValid, Resources.ExportDataTypeNotValidWarning) || warningsChanged;
+        // Update warning stating the column's data type is not a valid MySQL data type
+        warningsChanged = _warnings.SetVisibility(INVALID_DATA_TYPE_WARNING_KEY, !IsMySqlDataTypeValid) || warningsChanged;
+
+        // Update warning stating a SET or ENUM declaration is invalid because of an error in a specific element
+        warningsChanged = _warnings.SetVisibility(INVALID_SET_ENUM_WARNING_KEY, !string.IsNullOrEmpty(_invalidEnumOrSetElement)) || warningsChanged;
+
         if (IsMySqlDataTypeValid && testTypeOnData)
         {
           TestColumnDataTypeAgainstColumnData(MySqlDataType);
@@ -1221,11 +1297,13 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the column's data fits the data type, <c>false</c> otherwise.</returns>
     public bool TestColumnDataTypeAgainstColumnData(string mySqlDataType)
     {
+      // Update warning stating the column's data type is not suitable for all of its data (in the preview table)
+      // either for the Append or Export Data operation.
       bool dataFitsIntoType = mySqlDataType.Length > 0 && CanBeOfMySqlDataType(mySqlDataType);
-      string warningText = ParentTable != null && ParentTable.OperationType.IsForAppend()
-        ? Resources.AppendDataNotSuitableForColumnTypeWarning
-        : Resources.ExportDataTypeNotSuitableWarning;
-      if (UpdateWarnings(!dataFitsIntoType, warningText))
+      string warningKey = ParentTable != null && ParentTable.OperationType.IsForAppend()
+        ? DATA_NOT_SUITABLE_APPEND_WARNING_KEY
+        : DATA_NOT_SUITABLE_EXPORT_WARNING_KEY;
+      if (_warnings.SetVisibility(warningKey, !dataFitsIntoType))
       {
         OnColumnWarningsChanged();
       }
@@ -1291,63 +1369,19 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Adds or removes warnings related to this column's creation.
+    /// Initializes the warnings container for this column.
     /// </summary>
-    /// <param name="addWarning">true to add a new warning to the column's warnings collection, false to remove the given warning and display another existing warning.</param>
-    /// <param name="warningResourceText">Warning text to display to users.</param>
-    /// <returns><c>true</c> if a warning was added or removed, <c>false</c> otherwise.</returns>
-    private bool UpdateWarnings(bool addWarning, string warningResourceText)
+    private void SetupWarnings()
     {
-      bool warningsChanged = false;
-
-      if (addWarning)
-      {
-        // Only add the warning text if it is not empty and not already added to the warnings list
-        if (string.IsNullOrEmpty(warningResourceText) || _columnWarningTextsList.Contains(warningResourceText))
-        {
-          return false;
-        }
-
-        _columnWarningTextsList.Add(warningResourceText);
-        warningsChanged = true;
-      }
-      else
-      {
-        // We do not want to show a warning or we want to remove a warning if warningResourceText != null
-        if (!string.IsNullOrEmpty(warningResourceText))
-        {
-          // Remove the warning and check if there is an stored warning, if so we want to pull it and show it
-          warningsChanged = _columnWarningTextsList.Remove(warningResourceText);
-        }
-      }
-
-      return warningsChanged;
+      _warnings = new WarningsContainer(WarningsContainer.CurrentWarningChangedMethodType.OnShowIfWarningNotPresent, 8);
+      _warnings.Add(DATA_NOT_UNIQUE_WARNING_KEY, Resources.ColumnDataNotUniqueWarning);
+      _warnings.Add(EMPTY_NAME_WARNING_KEY, Resources.ColumnNameRequiredWarning);
+      _warnings.Add(DUPLICATE_NAME_WARNING_KEY, Resources.ColumnExistsWarning);
+      _warnings.Add(NO_DATA_TYPE_WARNING_KEY, Resources.ColumnDataTypeRequiredWarning);
+      _warnings.Add(INVALID_DATA_TYPE_WARNING_KEY, Resources.ColumnDataTypeNotValidWarning);
+      _warnings.Add(INVALID_SET_ENUM_WARNING_KEY, Resources.ColumnDataSetOrEnumNotValidWarning);
+      _warnings.Add(DATA_NOT_SUITABLE_APPEND_WARNING_KEY, Resources.AppendDataNotSuitableForColumnTypeWarning);
+      _warnings.Add(DATA_NOT_SUITABLE_EXPORT_WARNING_KEY, Resources.ExportDataTypeNotSuitableWarning);
     }
-  }
-
-  /// <summary>
-  /// Event arguments for the ColumnWarningsChanged event.
-  /// </summary>
-  public class ColumnWarningsChangedArgs : EventArgs
-  {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ColumnWarningsChangedArgs"/> class.
-    /// </summary>
-    /// <param name="column">The column that warnings are related to.</param>
-    public ColumnWarningsChangedArgs(MySqlDataColumn column)
-    {
-      CurrentWarningText = column.CurrentColumnWarningText;
-      WarningsQuantity = column.WarningsQuantity;
-    }
-
-    /// <summary>
-    /// Gets the last warning text associated to this column.
-    /// </summary>
-    public string CurrentWarningText { get; private set; }
-
-    /// <summary>
-    /// Gets the number of warnings associated to this column.
-    /// </summary>
-    public int WarningsQuantity { get; private set; }
   }
 }
