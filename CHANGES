@@ -1,4 +1,9 @@
 1.3.4
+- Fixed the way column name duplicates are analyzed, previously at the time a column name was assigned it was checked against other columns to warn in case another
+  column had the same name, this analysis is fine when the user types in a column name, but not when column names are loaded from Excel data. Now the column names are
+  loaded from Excel data and then all columns are analyzed for duplicates. Now columns flagged as Excluded are correctly taken into account in the duplicates check.
+  Fixed a bug also where the name of an automatically added PK was being changed whenever any column name was changed by the user.
+  (Bug #18270044 - EXPORT DATA - WARNING SHOWS COLUMN NAME AS REPEATED WHEN ITS NOT)
 - Fixed the way a SET declaration is assembled automatically from the column's data during an Export Data operation to split elements by commas within each row's value.
   (MySQL Bug #75660, Bug #20426374 - EXPORT DATA - SET DECLARATION CREATED INCORRECTLY)
 - Added an additional validation for enum and set declarations to the Data Type combo-box in the Export Data dialog's Column Options section. The new validation checks

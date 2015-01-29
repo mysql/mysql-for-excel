@@ -1334,6 +1334,17 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Checks that every <see cref="MySqlDataColumn"/> does not have a duplicate <see cref="MySqlDataColumn.DisplayName"/> and updates their corresponding warnings.
+    /// </summary>
+    public void CheckForDuplicatedColumnDisplayNames()
+    {
+      foreach (var mySqlCol in Columns.Cast<MySqlDataColumn>().Where(col => !col.ExcludeColumn))
+      {
+        mySqlCol.CheckForDuplicatedDisplayName();
+      }
+    }
+
+    /// <summary>
     /// Creates a new <see cref="MySqlDataTable"/> object with its schema cloned from this table but no data.
     /// </summary>
     /// <param name="autoPkCreationOnlyIfFirstColumnIsPk">Flag indicating whether an Auto PK column is prepended only if the value of the <see cref="UseFirstColumnAsPk"/> property is <c>strue</c>.</param>
@@ -1407,37 +1418,18 @@ namespace MySQL.ForExcel.Classes
     /// Gets the ordinal index within the columns collection of the column with the given name.
     /// </summary>
     /// <param name="columnName">Column name.</param>
-    /// <param name="useDisplayName">Flag indicating whether the <see cref="MySqlDataColumn.DisplayName"/> or the <see cref="MySqlDataColumn.ColumnName"/>
-    /// property must be used for the name comparison.</param>
+    /// <param name="useDisplayName">Flag indicating whether the <see cref="MySqlDataColumn.DisplayName"/> or the <see cref="MySqlDataColumn.ColumnName"/> property must be used for the name comparison.</param>
     /// <param name="caseSensitive">Flag indicating if a case sensitive comparison against the column name should be done.</param>
+    /// <param name="skipExcludedColumns">Flag indicating whether <see cref="MySqlDataColumn"/>s where <see cref="MySqlDataColumn.ExcludeColumn"/> is <c>true</c> should be skipped from the search.</param>
+    /// <param name="exceptAtIndex">Index of a column to exclude from the name search.</param>
     /// <returns>The ordinal index within the columns collection.</returns>
-    public int GetColumnIndex(string columnName, bool useDisplayName, bool caseSensitive)
+    public int GetColumnIndex(string columnName, bool useDisplayName, bool caseSensitive, bool skipExcludedColumns, int exceptAtIndex = -1)
     {
-      int index = -1;
-
-      if (!caseSensitive)
-      {
-        columnName = columnName.ToLowerInvariant();
-      }
-
-      foreach (MySqlDataColumn col in Columns)
-      {
-        string localColumnName = useDisplayName ? col.DisplayName : col.ColumnName;
-        if (!caseSensitive)
-        {
-          localColumnName = localColumnName.ToLowerInvariant();
-        }
-
-        if (localColumnName != columnName)
-        {
-          continue;
-        }
-
-        index = col.Ordinal;
-        break;
-      }
-
-      return index;
+      var comparisonMethod = caseSensitive
+        ? StringComparison.InvariantCulture
+        : StringComparison.InvariantCultureIgnoreCase;
+      var mySqlCol = Columns.Cast<MySqlDataColumn>().FirstOrDefault(col => !skipExcludedColumns || !col.ExcludeColumn && col.Ordinal != exceptAtIndex && string.Equals(useDisplayName ? col.DisplayName : col.ColumnName, columnName, comparisonMethod));
+      return mySqlCol != null ? mySqlCol.Ordinal : -1;
     }
 
     /// <summary>
@@ -1445,10 +1437,11 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="columnName">Column name.</param>
     /// <param name="useDisplayName">Flag indicating whether the <see cref="MySqlDataColumn.DisplayName"/> or the <see cref="DataColumn.ColumnName"/> property must be used for the name comparison.</param>
+    /// <param name="skipExcludedColumns">Flag indicating whether <see cref="MySqlDataColumn"/>s where <see cref="MySqlDataColumn.ExcludeColumn"/> is <c>true</c> should be skipped from the search.</param>
     /// <returns>The ordinal index within the columns collection.</returns>
-    public int GetColumnIndex(string columnName, bool useDisplayName)
+    public int GetColumnIndex(string columnName, bool useDisplayName, bool skipExcludedColumns)
     {
-      return GetColumnIndex(columnName, useDisplayName, true);
+      return GetColumnIndex(columnName, useDisplayName, true, skipExcludedColumns);
     }
 
     /// <summary>
@@ -1961,7 +1954,7 @@ namespace MySQL.ForExcel.Classes
         foreach (var column in Columns.Cast<MySqlDataColumn>().Where(column => column.ColumnName.StartsWith("@")))
         {
           column.ColumnName = column.ColumnName.Substring(1);
-          column.SetDisplayName(column.ColumnName);
+          column.SetDisplayName(column.ColumnName, false);
         }
       }
       else
@@ -2500,7 +2493,7 @@ namespace MySQL.ForExcel.Classes
       MySqlDataColumn autoPKcolumn = GetColumnAtIndex(0);
       string tableIdName = TableName + (TableName.Length > 0 ? "_" : string.Empty) + "id";
       string autoPkName = GetNonDuplicateColumnName(tableIdName);
-      autoPKcolumn.SetDisplayName(autoPkName);
+      autoPKcolumn.SetDisplayName(autoPkName, true);
     }
 
     /// <summary>
@@ -2606,15 +2599,22 @@ namespace MySQL.ForExcel.Classes
         MySqlDataColumn autoPkCol = GetColumnAtIndex(0);
         string autoPkName = autoPkCol.DisplayName;
         autoPkName = row.ItemArray.Skip(1).Select(obj => obj.ToString()).ToList().GetNonDuplicateText(autoPkName);
-        autoPkCol.SetDisplayName(autoPkName);
+        autoPkCol.SetDisplayName(autoPkName, true);
       }
 
-      int startCol = AddPrimaryKeyColumn ? 1 : 0;
-      for (int i = startCol; i < Columns.Count; i++)
+      // Set all column names first without warning for any duplicates, since at this stage duplicates may be found if the names given to columns
+      // look like "Column1", "Column2", etc. because that naming convention is the one used for columns when they are created.
+      var mySqlColumns = Columns.Cast<MySqlDataColumn>().Skip(AddPrimaryKeyColumn ? 1 : 0).ToList();
+      foreach (var mySqlCol in mySqlColumns)
       {
-        MySqlDataColumn col = GetColumnAtIndex(i);
-        col.SetDisplayName(_firstRowContainsColumnNames ? row[i].ToString().ToValidMySqlColumnName() : col.ColumnName);
-        col.SetMySqlDataType(_firstRowContainsColumnNames ? col.RowsFromSecondDataType : col.RowsFromFirstDataType);
+        mySqlCol.SetDisplayName(_firstRowContainsColumnNames ? row[mySqlCol.Ordinal].ToString().ToValidMySqlColumnName() : mySqlCol.ColumnName, false);
+        mySqlCol.SetMySqlDataType(_firstRowContainsColumnNames ? mySqlCol.RowsFromSecondDataType : mySqlCol.RowsFromFirstDataType);
+      }
+
+      // Check about duplicate column names now that all column names were set to the ones given by the user.
+      foreach (var mySqlCol in mySqlColumns)
+      {
+        mySqlCol.CheckForDuplicatedDisplayName();
       }
 
       AdjustAutoPkValues();

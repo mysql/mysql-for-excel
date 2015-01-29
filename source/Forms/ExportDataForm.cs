@@ -141,13 +141,13 @@ namespace MySQL.ForExcel.Forms
       }
 
       PreviewDataGridView.Columns[0].Visible = true;
-      PreviewDataGridView.Columns[0].Selected = true;
       PreviewDataGridView.FirstDisplayedScrollingColumnIndex = 0;
       PrimaryKeyColumnsComboBox.Text = string.Empty;
       PrimaryKeyColumnsComboBox.SelectedIndex = -1;
       PrimaryKeyColumnsComboBox.Enabled = false;
       AddPrimaryKeyTextBox.Enabled = true;
       _previewDataTable.UseFirstColumnAsPk = true;
+      PreviewDataGridView.Columns[0].Selected = true;
       if (!AddPrimaryKeyTextBox.CanFocus)
       {
         return;
@@ -183,7 +183,7 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      pkColumn.SetDisplayName(AddPrimaryKeyTextBox.Text);
+      pkColumn.SetDisplayName(AddPrimaryKeyTextBox.Text, true);
       PreviewDataGridView.Columns[0].HeaderText = pkColumn.DisplayName;
       MySqlDataColumn currentColumn = GetCurrentMySqlDataColumn();
       if (currentColumn != null && currentColumn.Ordinal == 0)
@@ -456,12 +456,17 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      column.SetDisplayName(newColumnName, true);
+      column.SetDisplayName(newColumnName, true, true);
       PreviewDataGridView.Columns[column.Ordinal].HeaderText = column.DisplayName;
-      SetControlTextValue(AddPrimaryKeyTextBox, column.DisplayName);
       if (ColumnNameTextBox.Text != column.DisplayName)
       {
         SetControlTextValue(ColumnNameTextBox, column.DisplayName);
+      }
+
+      // Update the AddPrimaryTextBox value with the column name being modified in the ColumnNameTextBox if the currently selected column is the AutoPK one.
+      if (column.AutoPk)
+      {
+        SetControlTextValue(AddPrimaryKeyTextBox, column.DisplayName);
       }
 
       if (PrimaryKeyColumnsComboBox.Items.Count <= 0)
@@ -630,7 +635,6 @@ namespace MySQL.ForExcel.Forms
       }
 
       currentCol.ExcludeColumn = ExcludeColumnCheckBox.Checked;
-      RefreshColumnWarnings(currentCol);
       RefreshColumnControlsEnabledStatus(true);
       RefreshPrimaryKeyColumnsCombo(false);
     }
@@ -978,11 +982,11 @@ namespace MySQL.ForExcel.Forms
           var column = sender as MySqlDataColumn;
           if (column != null)
           {
-            DataGridViewColumn gridCol = PreviewDataGridView.Columns[column.Ordinal];
-            ShowValidationWarning("ColumnOptionsWarning", showWarning, args.CurrentWarning);
-            gridCol.DefaultCellStyle.BackColor = column.ExcludeColumn
-              ? Color.LightGray
-              : (showWarning ? Color.OrangeRed : PreviewDataGridView.DefaultCellStyle.BackColor);
+            SetGridColumnBackgroundColor(column);
+            if (column == GetCurrentMySqlDataColumn())
+            {
+              RefreshColumnWarnings(column);
+            }
           }
           break;
 
@@ -1166,10 +1170,7 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      DataGridViewColumn gridCol = PreviewDataGridView.SelectedColumns[0];
-      gridCol.DefaultCellStyle.BackColor = mysqlCol.ExcludeColumn
-        ? Color.LightGray
-        : (string.IsNullOrEmpty(mysqlCol.CurrentWarningText) ? PreviewDataGridView.DefaultCellStyle.BackColor : Color.OrangeRed);
+      SetGridColumnBackgroundColor(mysqlCol);
     }
 
     /// <summary>
@@ -1289,6 +1290,18 @@ namespace MySQL.ForExcel.Forms
       {
         AddPrimaryKeyRadioButton.Checked = true;
       }
+    }
+
+    /// <summary>
+    /// Sets the background color of the <see cref="DataGridViewColumn"/> related to the given <see cref="MySqlDataColumn"/>.
+    /// </summary>
+    /// <param name="mySqlColumn">A <see cref="MySqlDataColumn"/>.</param>
+    private void SetGridColumnBackgroundColor(MySqlDataColumn mySqlColumn)
+    {
+      DataGridViewColumn gridCol = PreviewDataGridView.Columns[mySqlColumn.Ordinal];
+      gridCol.DefaultCellStyle.BackColor = mySqlColumn.ExcludeColumn
+        ? Color.LightGray
+        : (string.IsNullOrEmpty(mySqlColumn.CurrentWarningText) ? PreviewDataGridView.DefaultCellStyle.BackColor : Color.OrangeRed);
     }
 
     /// <summary>

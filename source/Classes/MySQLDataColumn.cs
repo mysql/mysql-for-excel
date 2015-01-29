@@ -435,12 +435,15 @@ namespace MySQL.ForExcel.Classes
           PrimaryKey = false;
         }
 
-        if (!_excludeColumn && _warnings.ShownQuantity > 0)
-        {
-          OnColumnWarningsChanged();
-        }
-
+        OnColumnWarningsChanged();
         OnPropertyChanged("ExcludeColumn");
+
+        // Fire a duplicates check on all columns to update those warnings, since now that this column is
+        // being excluded it should not be considered a duplicate of others.
+        if (Table is MySqlDataTable)
+        {
+          ParentTable.CheckForDuplicatedColumnDisplayNames();
+        }
       }
     }
 
@@ -859,6 +862,32 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Checks whether another column in the <see cref="ParentTable"/> has the same <see cref="DisplayName"/> as this column.
+    /// </summary>
+    public void CheckForDuplicatedDisplayName()
+    {
+      if (!(Table is MySqlDataTable))
+      {
+        return;
+      }
+
+      IsDisplayNameDuplicate = ParentTable.GetColumnIndex(DisplayName, true, false, true, Ordinal) > -1;
+      if (AutoPk)
+      {
+        // Update warning on the parent table regarding the AutoPK column name being a duplicate of another existing column's name
+        ParentTable.UpdateAutoPkWarning(IsDisplayNameDuplicate);
+      }
+      else
+      {
+        // Update warning stating the column name is a duplicate of another existing column's name
+        if (_warnings.SetVisibility(DUPLICATE_NAME_WARNING_KEY, IsDisplayNameDuplicate))
+        {
+          OnColumnWarningsChanged();
+        }
+      }
+    }
+
+    /// <summary>
     /// Clears all warnings from this column.
     /// </summary>
     public void ClearWarnings()
@@ -1106,44 +1135,32 @@ namespace MySQL.ForExcel.Classes
     /// Sets the <see cref="DisplayName"/> property to the given display name.
     /// </summary>
     /// <param name="displayName">Display name.</param>
+    /// <param name="checkForDuplicates">Flag indicating whether a check for duplicate display names should be done on this and other columns.</param>
     /// <param name="addSuffixIfDuplicate">Flag indicating if a suffix is added to the display name if an existing column with the same name is found.</param>
-    public void SetDisplayName(string displayName, bool addSuffixIfDuplicate = false)
+    public void SetDisplayName(string displayName, bool checkForDuplicates, bool addSuffixIfDuplicate = false)
     {
       if (DisplayName == displayName)
       {
         return;
       }
 
-      bool colNameEmpty = displayName.Length == 0;
-      string nonDuplicateDisplayName = displayName;
-
       // Update warning stating the column name cannot be empty
-      if (_warnings.SetVisibility(EMPTY_NAME_WARNING_KEY, colNameEmpty))
+      if (_warnings.SetVisibility(EMPTY_NAME_WARNING_KEY, displayName.Length == 0))
       {
         OnColumnWarningsChanged();
       }
 
-      if (!colNameEmpty && Table is MySqlDataTable)
+      DisplayName = addSuffixIfDuplicate && Table is MySqlDataTable
+          ? ParentTable.GetNonDuplicateColumnName(displayName, Ordinal)
+          : displayName;
+
+      // If addSuffixIfDuplicate = true, we already made sure above to assign to this column a DisplayName that will not be a duplicate,
+      // so we need to fire a duplicates check on all columns to update those warnings if needed.
+      if ((addSuffixIfDuplicate || checkForDuplicates) && Table is MySqlDataTable)
       {
-        nonDuplicateDisplayName = ParentTable.GetNonDuplicateColumnName(displayName, Ordinal);
+        ParentTable.CheckForDuplicatedColumnDisplayNames();
       }
 
-      IsDisplayNameDuplicate = !addSuffixIfDuplicate && displayName != nonDuplicateDisplayName;
-      if (AutoPk)
-      {
-        // Update warning on the parent table regarding the AutoPK column name being a duplicate of another existing column's name
-        ParentTable.UpdateAutoPkWarning(IsDisplayNameDuplicate);
-      }
-      else
-      {
-        // Update warning stating the column name is a duplicate of another existing column's name
-        if (_warnings.SetVisibility(DUPLICATE_NAME_WARNING_KEY, IsDisplayNameDuplicate))
-        {
-          OnColumnWarningsChanged();
-        }
-      }
-
-      DisplayName = addSuffixIfDuplicate ? nonDuplicateDisplayName : displayName;
       OnPropertyChanged("DisplayName");
     }
 
@@ -1290,7 +1307,7 @@ namespace MySQL.ForExcel.Classes
     public void SyncSchema(MySqlDataColumn fromColumn)
     {
       // Set first some properties that need to be set before all others because of dependencies among them.
-      SetDisplayName(fromColumn.DisplayName);
+      SetDisplayName(fromColumn.DisplayName, false);
       DataType = fromColumn.DataType;
       SetMySqlDataType(fromColumn.MySqlDataType);
       RowsFromFirstDataType = fromColumn.RowsFromFirstDataType;

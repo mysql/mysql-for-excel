@@ -793,7 +793,7 @@ namespace MySQL.ForExcel.Forms
         // Check if mapped source column from Stored Mapping matches a Source Column in current "From Table"
         //  and if its data type matches its corresponding target column's data type, if so we are good to map it
         string mappedSourceColName = _currentColumnMapping.SourceColumns[proposedSourceMapping];
-        int sourceColFoundInFromTableIdx = _sourceMySqlPreviewDataTable.GetColumnIndex(mappedSourceColName, true);
+        int sourceColFoundInFromTableIdx = _sourceMySqlPreviewDataTable.GetColumnIndex(mappedSourceColName, true, false);
         if (sourceColFoundInFromTableIdx >= 0)
         {
           MySqlDataColumn sourceColumn = _sourceMySqlPreviewDataTable.GetColumnAtIndex(sourceColFoundInFromTableIdx);
