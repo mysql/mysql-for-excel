@@ -25,6 +25,7 @@ using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Panels;
 using MySQL.ForExcel.Properties;
 using MySQL.ForExcel.Structs;
+using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
@@ -173,7 +174,7 @@ namespace MySQL.ForExcel.Controls
 
       if (exportRange.Areas.Count > 1)
       {
-        InfoDialog.ShowWarningDialog(Resources.MultipleAreasNotSupportedWarningTitle, Resources.MultipleAreasNotSupportedWarningDetail);
+        InfoDialog.ShowDialog(InfoDialogProperties.GetWarningDialogProperties(Resources.MultipleAreasNotSupportedWarningTitle, Resources.MultipleAreasNotSupportedWarningDetail));
         return false;
       }
 
@@ -260,7 +261,7 @@ namespace MySQL.ForExcel.Controls
       if (TableHasEditOnGoing(tableObject.Name))
       {
         // Display an error since there is an ongoing Editing operation and return
-        InfoDialog.ShowErrorDialog(Resources.TaskPaneEditingNotPossibleTitleText, string.Format(Resources.TableWithOperationOngoingError, schemaAndTableNames));
+        InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties(Resources.TaskPaneEditingNotPossibleTitleText, string.Format(Resources.TableWithOperationOngoingError, schemaAndTableNames)));
         return false;
       }
 
@@ -279,7 +280,7 @@ namespace MySQL.ForExcel.Controls
       // Check if selected Table has a Primary Key, it it does not we prompt an error and exit since Editing on such table is not permitted
       if (!WbConnection.TableHasPrimaryKey(tableObject.Name))
       {
-        InfoDialog.ShowErrorDialog(Resources.EditOpenSatusError, Resources.EditOpenSummaryError, Resources.EditOpenDetailsError);
+        InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties(Resources.EditOpenSatusError, Resources.EditOpenSummaryError, Resources.EditOpenDetailsError));
         return false;
       }
 

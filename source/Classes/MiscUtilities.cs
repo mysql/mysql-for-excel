@@ -502,7 +502,7 @@ namespace MySQL.ForExcel.Classes
     public static DialogResult ShowCustomizedInfoDialog(InfoDialog.InfoType infoType, string detail, string moreInformation = null, bool wordWrapMoreInfo = true)
     {
       string title = string.Empty;
-      InfoDialog.DialogType dialogType = InfoDialog.DialogType.OkOnly;
+      var layoutType = InfoButtonsProperties.ButtonsLayoutType.OkOnly;
       switch (infoType)
       {
         case InfoDialog.InfoType.Success:
@@ -515,7 +515,7 @@ namespace MySQL.ForExcel.Classes
 
         case InfoDialog.InfoType.Error:
           title = Resources.OperationErrorTitle;
-          dialogType = InfoDialog.DialogType.BackOnly;
+          layoutType = InfoButtonsProperties.ButtonsLayoutType.BackOnly;
           break;
 
         case InfoDialog.InfoType.Info:
@@ -524,7 +524,17 @@ namespace MySQL.ForExcel.Classes
       }
 
       string subDetailText = string.Format(Resources.OperationSubDetailText, infoType == InfoDialog.InfoType.Error ? "Back" : "OK");
-      return InfoDialog.ShowDialog(dialogType, infoType, title, detail, subDetailText, moreInformation, wordWrapMoreInfo);
+      var infoProperties = new InfoDialogProperties
+      {
+        ButtonsProperties = new InfoButtonsProperties(layoutType),
+        InfoType = infoType,
+        TitleText =  title,
+        DetailText = detail,
+        DetailSubText = subDetailText,
+        MoreInfoText = moreInformation,
+        WordWrapMoreInfo = wordWrapMoreInfo
+      };
+      return InfoDialog.ShowDialog(infoProperties).DialogResult;
     }
 
     /// <summary>
@@ -535,7 +545,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>A dialog result with the user's selection.</returns>
     public static DialogResult ShowCustomizedWarningDialog(string title, string detail)
     {
-      return InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, title, detail);
+      return InfoDialog.ShowDialog(InfoDialogProperties.GetYesNoDialogProperties(InfoDialog.InfoType.Warning, title, detail)).DialogResult;
     }
 
     /// <summary>

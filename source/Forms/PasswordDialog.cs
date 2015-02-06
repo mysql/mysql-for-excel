@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -199,7 +199,7 @@ namespace MySQL.ForExcel.Forms
         // Check if the new password and its confirmation match, otherwise notify the user and exit.
         if (NewPasswordTextBox.Text != ConfirmTextBox.Text)
         {
-          InfoDialog.ShowErrorDialog(Properties.Resources.PasswordResetErrorTitleText, Properties.Resources.PasswordsMismatchErrorText);
+          InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties(Properties.Resources.PasswordResetErrorTitleText, Properties.Resources.PasswordsMismatchErrorText));
           e.Cancel = true;
           return;
         }
@@ -213,7 +213,7 @@ namespace MySQL.ForExcel.Forms
         catch (Exception ex)
         {
           MySqlSourceTrace.WriteAppErrorToLog(ex);
-          InfoDialog.ShowErrorDialog(Properties.Resources.PasswordResetErrorTitleText, Properties.Resources.PasswordResetErrorDetailText);
+          InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties(Properties.Resources.PasswordResetErrorTitleText, Properties.Resources.PasswordResetErrorDetailText));
           _passwordFlags.Cancelled = true;
           return;
         }

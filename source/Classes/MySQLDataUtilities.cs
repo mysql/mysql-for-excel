@@ -747,7 +747,11 @@ namespace MySQL.ForExcel.Classes
           // Connection could not be made.
           case MySqlWorkbenchConnection.MYSQL_EXCEPTION_NUMBER_SERVER_UNREACHABLE:
             connectionResult = TestConnectionResult.HostUnreachable;
-            InfoDialog.ShowErrorDialog(Resources.ConnectFailedWarningTitle, mySqlException.Message, null, mySqlException.InnerException != null ? mySqlException.InnerException.Message : null);
+            InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties(
+              Resources.ConnectFailedWarningTitle,
+              mySqlException.Message,
+              null,
+              mySqlException.InnerException != null ? mySqlException.InnerException.Message : null));
             break;
 
           // Wrong password.
@@ -755,8 +759,11 @@ namespace MySQL.ForExcel.Classes
             connectionResult = TestConnectionResult.WrongPassword;
             if (!string.IsNullOrEmpty(connection.Password) || displayErrorOnEmptyPassword)
             {
-              string moreInfoText = connection.IsSsl() ? Resources.ConnectSSLFailedDetailWarning : null;
-              InfoDialog.ShowWarningDialog(Resources.ConnectFailedWarningTitle, mySqlException.Message, null, moreInfoText);
+              InfoDialog.ShowDialog(InfoDialogProperties.GetWarningDialogProperties(
+                Resources.ConnectFailedWarningTitle,
+                mySqlException.Message,
+                null,
+                connection.IsSsl() ? Resources.ConnectSSLFailedDetailWarning : null));
             }
             break;
 
@@ -773,13 +780,21 @@ namespace MySQL.ForExcel.Classes
 
           // Any other exception.
           default:
-            InfoDialog.ShowErrorDialog(Resources.ConnectFailedWarningTitle, string.Format(Resources.GenericConnectionErrorText, mySqlException.Number, mySqlException.Message), null, mySqlException.InnerException != null ? mySqlException.InnerException.Message : null);
+            InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties(
+              Resources.ConnectFailedWarningTitle,
+              string.Format(Resources.GenericConnectionErrorText, mySqlException.Number, mySqlException.Message),
+              null,
+              mySqlException.InnerException != null ? mySqlException.InnerException.Message : null));
             break;
         }
       }
       else
       {
-        InfoDialog.ShowErrorDialog(Resources.ConnectFailedWarningTitle, connectionException.Message, null, connectionException.InnerException != null ? connectionException.InnerException.Message : null);
+        InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties(
+          Resources.ConnectFailedWarningTitle,
+          connectionException.Message,
+          null,
+          connectionException.InnerException != null ? connectionException.InnerException.Message : null));
       }
 
       Globals.ThisAddIn.Application.Cursor = ExcelInterop.XlMousePointer.xlDefault;

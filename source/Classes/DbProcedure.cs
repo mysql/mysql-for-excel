@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -232,7 +232,12 @@ namespace MySQL.ForExcel.Classes
         // Check if the data being imported does not overlap with the data of an existing Excel table.
         if (DetectDataForImportPossibleCollisions(importType, selectedResultSetIndex, resultSetsDataSet))
         {
-          if (InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelObjectErrorTitle, Resources.ImportOverExcelObjectErrorDetail, Resources.ImportOverExcelObjectErrorSubDetail) == DialogResult.No)
+          var infoProperties = InfoDialogProperties.GetYesNoDialogProperties(
+            InfoDialog.InfoType.Warning,
+            Resources.ImportOverExcelObjectErrorTitle,
+            Resources.ImportOverExcelObjectErrorDetail,
+            Resources.ImportOverExcelObjectErrorSubDetail);
+          if (InfoDialog.ShowDialog(infoProperties).DialogResult == DialogResult.No)
           {
             return false;
           }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -266,7 +266,9 @@ namespace MySQL.ForExcel.Forms
 
       if (_sumOfResultSetsExceedsMaxCompatibilityRows && ProcedureResultSetsImportType == DbProcedure.ProcedureResultSetsImportType.AllResultSetsVertically && _importDataSet.Tables.Count > 1)
       {
-        InfoDialog.ShowWarningDialog(Resources.ImportVerticallyExceedsMaxRowsTitleWarning, Resources.ImportVerticallyExceedsMaxRowsDetailWarning);
+        InfoDialog.ShowDialog(InfoDialogProperties.GetWarningDialogProperties(
+          Resources.ImportVerticallyExceedsMaxRowsTitleWarning,
+          Resources.ImportVerticallyExceedsMaxRowsDetailWarning));
       }
 
       Cursor = Cursors.WaitCursor;

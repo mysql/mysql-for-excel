@@ -1313,7 +1313,7 @@ namespace MySQL.ForExcel
         return true;
       }
 
-      InfoDialog.ShowWarningDialog(Resources.RestoreConnectionInfosOpenConnectionErrorTitle, Resources.RestoreConnectionInfosOpenConnectionErrorDetail);
+      InfoDialog.ShowDialog(InfoDialogProperties.GetWarningDialogProperties(Resources.RestoreConnectionInfosOpenConnectionErrorTitle, Resources.RestoreConnectionInfosOpenConnectionErrorDetail));
       return false;
     }
 
@@ -1358,13 +1358,13 @@ namespace MySQL.ForExcel
         // If the stored connection points to a different host as the current connection, ask the user if he wants to open a new connection only if there are active Edit dialogs.
         if (_editConnectionInfosByWorkbook.Count > 1)
         {
-          dialogResult = InfoDialog.ShowYesNoDialog(
+          var dialogProperties = InfoDialogProperties.GetYesNoDialogProperties(
             InfoDialog.InfoType.Warning,
             Resources.RestoreConnectionInfosTitle,
             Resources.RestoreConnectionInfosOpenConnectionCloseEditDialogsDetail,
             null,
             Resources.RestoreConnectionInfosOpenConnectionCloseEditDialogsMoreInfo);
-          if (dialogResult == DialogResult.No)
+          if (InfoDialog.ShowDialog(dialogProperties).DialogResult == DialogResult.No)
           {
             return null;
           }
@@ -1405,19 +1405,33 @@ namespace MySQL.ForExcel
         stringBuilder.Append(missingHostId);
       }
 
-      var buttonsProperties = new InfoButtonsProperties(Resources.CreateButtonText, DialogResult.OK, Resources.DeleteAllButtonText, DialogResult.Cancel, Resources.WorkOfflineButtonText, DialogResult.Abort);
-      DialogResult dialogResult = InfoDialog.ShowDialog(InfoDialog.DialogType.Generic3Buttons, InfoDialog.InfoType.Warning,
-        Resources.ImportConnectionInfosMissingConnectionsTitle, Resources.ImportConnectionInfosMissingConnectionsDetail, null,
-        stringBuilder.ToString(), false, buttonsProperties);
-
-      switch (dialogResult)
+      var dialogProperties = InfoDialogProperties.GetWarningDialogProperties(
+        Resources.ImportConnectionInfosMissingConnectionsTitle,
+        Resources.ImportConnectionInfosMissingConnectionsDetail,
+        null,
+        stringBuilder.ToString());
+      dialogProperties.ButtonsProperties = new InfoButtonsProperties(InfoButtonsProperties.ButtonsLayoutType.Generic3Buttons)
+      {
+        Button1Text = Resources.CreateButtonText,
+        Button1DialogResult = DialogResult.OK,
+        Button2Text = Resources.DeleteAllButtonText,
+        Button2DialogResult = DialogResult.Cancel,
+        Button3Text = Resources.WorkOfflineButtonText,
+        Button3DialogResult = DialogResult.Abort
+      };
+      dialogProperties.WordWrapMoreInfo = false;
+      switch (InfoDialog.ShowDialog(dialogProperties).DialogResult)
       {
         case DialogResult.OK:
           // If Workbench is running we can't add new connections, so we ask the user to close it. if he still decides not to do so we disconnect all excel tables to work offline.
           var workbenchWarningDialogResult = DialogResult.None;
           while (MySqlWorkbench.IsRunning && workbenchWarningDialogResult != DialogResult.Cancel)
           {
-            workbenchWarningDialogResult = InfoDialog.ShowErrorDialog(Resources.OperationErrorTitle, Resources.UnableToAddConnectionsWhenWBRunning, Resources.CloseWBAdviceToAdd, Resources.CloseWBAdviceToAdd);
+            workbenchWarningDialogResult = InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties(
+              Resources.OperationErrorTitle,
+              Resources.UnableToAddConnectionsWhenWBRunning,
+              Resources.CloseWBAdviceToAdd,
+              Resources.CloseWBAdviceToAdd)).DialogResult;
           }
 
           if (workbenchWarningDialogResult == DialogResult.Cancel)
@@ -1631,9 +1645,17 @@ namespace MySQL.ForExcel
         return;
       }
 
-      var buttonsProperties = new InfoButtonsProperties(Resources.RestoreButtonText, DialogResult.Yes, Resources.WorkOfflineButtonText, DialogResult.Cancel, Resources.DeleteButtonText, DialogResult.Abort);
-      var dialogResult = InfoDialog.ShowDialog(InfoDialog.DialogType.Generic3Buttons, InfoDialog.InfoType.Warning, Resources.RestoreEditConnectionInfoTitle, Resources.RestoreEditConnectionInfoDetail, null, null, false, buttonsProperties);
-      switch (dialogResult)
+      var infoProperties = InfoDialogProperties.GetWarningDialogProperties(Resources.RestoreEditConnectionInfoTitle, Resources.RestoreEditConnectionInfoDetail);
+      infoProperties.ButtonsProperties.LayoutType = InfoButtonsProperties.ButtonsLayoutType.Generic3Buttons;
+      infoProperties.ButtonsProperties.Button1Text = Resources.RestoreButtonText;
+      infoProperties.ButtonsProperties.Button1DialogResult = DialogResult.Yes;
+      infoProperties.ButtonsProperties.Button2Text = Resources.WorkOfflineButtonText;
+      infoProperties.ButtonsProperties.Button2DialogResult = DialogResult.Cancel;
+      infoProperties.ButtonsProperties.Button3Text = Resources.DeleteButtonText;
+      infoProperties.ButtonsProperties.Button3DialogResult = DialogResult.Abort;
+      infoProperties.WordWrapMoreInfo = false;
+      var infoResult = InfoDialog.ShowDialog(infoProperties);
+      switch (infoResult.DialogResult)
       {
         case DialogResult.Abort:
           // Discard: Do not open any and delete all saved EditConnectionInfo objects for the current workbook.

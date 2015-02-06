@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -23,6 +23,7 @@ using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Properties;
+using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
 
@@ -230,13 +231,13 @@ namespace MySQL.ForExcel.Panels
       if (MySqlWorkbench.IsRunning)
       {
         // If Workbench is running we can't allow adding new connections
-        InfoDialog.ShowErrorDialog(Resources.OperationErrorTitle, Resources.UnableToAddConnectionsWhenWBRunning, Resources.CloseWBAdviceToAdd);
+        InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties(Resources.OperationErrorTitle, Resources.UnableToAddConnectionsWhenWBRunning, Resources.CloseWBAdviceToAdd));
         return;
       }
 
-      using (MySqlWorkbenchConnectionDialog newConnectionDialog = new MySqlWorkbenchConnectionDialog(null))
+      using (var newConnectionDialog = new MySqlWorkbenchConnectionDialog(null))
       {
-        DialogResult result = newConnectionDialog.ShowDialog();
+        var result = newConnectionDialog.ShowDialog();
         if (result == DialogResult.OK)
         {
           LoadConnections(false);

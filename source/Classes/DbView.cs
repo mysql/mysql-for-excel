@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -205,12 +205,20 @@ namespace MySQL.ForExcel.Classes
             var collides = DetectDataForImportPossibleCollisions(mySqlTable);
             if (exceedColumnsLimit || collides)
             {
-              if (exceedColumnsLimit && InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverWorksheetColumnsLimitErrorTitle, Resources.ImportOverWorksheetColumnsLimitErrorDetail, Resources.ImportOverWorksheetColumnsLimitErrorSubDetail) == DialogResult.No)
+              var infoProperties = InfoDialogProperties.GetYesNoDialogProperties(
+                  InfoDialog.InfoType.Warning,
+                  Resources.ImportOverWorksheetColumnsLimitErrorTitle,
+                  Resources.ImportOverWorksheetColumnsLimitErrorDetail,
+                  Resources.ImportOverWorksheetColumnsLimitErrorSubDetail);
+              if (exceedColumnsLimit && InfoDialog.ShowDialog(infoProperties).DialogResult == DialogResult.No)
               {
                 return null;
               }
 
-              if (collides && InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ImportOverExcelObjectErrorTitle, Resources.ImportOverExcelObjectErrorDetail, Resources.ImportOverExcelObjectErrorSubDetail) == DialogResult.No)
+              infoProperties.TitleText = Resources.ImportOverExcelObjectErrorTitle;
+              infoProperties.DetailText = Resources.ImportOverExcelObjectErrorDetail;
+              infoProperties.DetailSubText = Resources.ImportOverExcelObjectErrorSubDetail;
+              if (collides && InfoDialog.ShowDialog(infoProperties).DialogResult == DialogResult.No)
               {
                 return null;
               }

@@ -253,7 +253,7 @@ namespace MySQL.ForExcel.Forms
     {
       // If not all columns where mapped between the source and target tables ask the user if he still wants to proceed with the append operation.
       if (_targetMySqlPreviewDataTable.MappedColumnsQuantity < _maxMappingColumnsQuantity
-        && InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ColumnMappingIncompleteTitleWarning, Resources.ColumnMappingIncompleteDetailWarning) == DialogResult.No)
+        && InfoDialog.ShowDialog(InfoDialogProperties.GetYesNoDialogProperties(InfoDialog.InfoType.Warning, Resources.ColumnMappingIncompleteTitleWarning, Resources.ColumnMappingIncompleteDetailWarning)).DialogResult == DialogResult.No)
       {
         return false;
       }
@@ -1382,7 +1382,7 @@ namespace MySQL.ForExcel.Forms
                 DialogResult dr = DialogResult.No;
                 if (!isIdenticalMapping)
                 {
-                  dr = InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ColumnMappedOverwriteTitleWarning, Resources.ColumnMappedOverwriteDetailWarning);
+                  dr = InfoDialog.ShowDialog(InfoDialogProperties.GetYesNoDialogProperties(InfoDialog.InfoType.Warning, Resources.ColumnMappedOverwriteTitleWarning, Resources.ColumnMappedOverwriteDetailWarning)).DialogResult;
                 }
 
                 if (dr == DialogResult.Yes)
@@ -1414,7 +1414,7 @@ namespace MySQL.ForExcel.Forms
                 DialogResult dr = DialogResult.No;
                 if (!isIdenticalMapping)
                 {
-                  dr = InfoDialog.ShowYesNoDialog(InfoDialog.InfoType.Warning, Resources.ColumnMappedOverwriteTitleWarning, Resources.ColumnMappedExchangeDetailWarning);
+                  dr = InfoDialog.ShowDialog(InfoDialogProperties.GetYesNoDialogProperties(InfoDialog.InfoType.Warning, Resources.ColumnMappedOverwriteTitleWarning, Resources.ColumnMappedExchangeDetailWarning)).DialogResult;
                 }
 
                 if (dr == DialogResult.No)

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -23,6 +23,7 @@ using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Properties;
+using MySQL.Utility.Classes;
 using MySQL.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 
@@ -259,7 +260,7 @@ namespace MySQL.ForExcel.Forms
 
       if (relationshipsCreationErrorBuilder.Length > 0)
       {
-        InfoDialog.ShowErrorDialog(Resources.ExcelRelationshipsCreationErrorTitle, Resources.ExcelRelationshipsCreationErrorDetail, null, relationshipsCreationErrorBuilder.ToString());
+        InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties(Resources.ExcelRelationshipsCreationErrorTitle, Resources.ExcelRelationshipsCreationErrorDetail, null, relationshipsCreationErrorBuilder.ToString()));
         relationshipsCreationErrorBuilder.Clear();
       }
 
@@ -551,15 +552,13 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void WhyDisabledLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
-      InfoDialog.ShowDialog(
-        InfoDialog.DialogType.OkOnly,
-        InfoDialog.InfoType.Info,
+      InfoDialog.ShowDialog(InfoDialogProperties.GetInformationDialogProperties(
         Resources.ImportMultipleRelationshipsNotSupportedTitleText,
         Excel2010OrLower
           ? Resources.ImportMultipleRelationshipsNotSupportedExcelVersionWarningText
           : Resources.ImportMultipleRelationshipsNotSupportedNoExcelTablesWarningText,
         null,
-        Resources.ImportMultipleSinglePivotTableNotSupportedText);
+        Resources.ImportMultipleSinglePivotTableNotSupportedText));
     }
   }
 }
