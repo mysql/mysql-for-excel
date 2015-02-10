@@ -41,6 +41,11 @@ namespace MySQL.ForExcel.Forms
     #region Fields
 
     /// <summary>
+    /// Tuple containing a title and description texts, of additional information related to the <see cref="MySqlDataColumn.CurrentWarningText"/>.
+    /// </summary>
+    private Tuple<string, string> _columnOptionsWarningMoreInfo;
+
+    /// <summary>
     /// The Excel cells range containing the data being exported to a new MySQL table.
     /// </summary>
     private Excel.Range _exportDataRange;
@@ -80,6 +85,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="exportingWorksheetName">Name of the Excel worksheet containing the data to export.</param>
     public ExportDataForm(MySqlWorkbenchConnection wbConnection, Excel.Range exportDataRange, string exportingWorksheetName)
     {
+      _columnOptionsWarningMoreInfo = null;
       _isUserInput = true;
       _wbConnection = wbConnection;
       _exportDataRange = exportDataRange;
@@ -845,6 +851,29 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
+    /// Event delegate method fired when the <see cref="MoreInfoLinkLabel"/> link is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void MoreInfoLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+      if (_columnOptionsWarningMoreInfo == null)
+      {
+        return;
+      }
+
+      var currentColumn = GetCurrentMySqlDataColumn();
+      var infoProperties = InfoDialogProperties.GetWarningDialogProperties(
+        currentColumn != null ? currentColumn.CurrentWarningText : Resources.ExportDataText,
+        _columnOptionsWarningMoreInfo.Item1,
+        null,
+        _columnOptionsWarningMoreInfo.Item2);
+      infoProperties.WordWrapMoreInfo = false;
+      infoProperties.IsExpanded = true;
+      InfoDialog.ShowDialog(infoProperties);
+    }
+
+    /// <summary>
     /// Event delegate method fired when the <see cref="PreviewDataGridView"/> grid cells will display a tooltip.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -1180,7 +1209,8 @@ namespace MySQL.ForExcel.Forms
     private void RefreshColumnWarnings(MySqlDataColumn column)
     {
       bool showWarning = !string.IsNullOrEmpty(column.CurrentWarningText);
-      ShowValidationWarning("ColumnOptionsWarning", showWarning, column.CurrentWarningText);
+      _columnOptionsWarningMoreInfo = column.CurrentWarningMoreInfo;
+      ShowValidationWarning("ColumnOptionsWarning", showWarning, column.CurrentWarningText, column.CurrentWarningMoreInfo != null);
     }
 
     /// <summary>
@@ -1307,31 +1337,31 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Shows or hides the visual controls to display warnings for columns or table name.
     /// </summary>
-    /// <param name="warningControlPrefix">Prefix of the warning control names.</param>
-    /// <param name="show">true to show the warnings, false to hide them.</param>
+    /// <param name="warningControlsPrefix">Prefix of the warning control names.</param>
+    /// <param name="showWarningControls"><c>true</c> to show the warning controls, <c>false</c> to hide them.</param>
     /// <param name="text">Warning text to display.</param>
-    private void ShowValidationWarning(string warningControlPrefix, bool show, string text)
+    /// <param name="showMoreInfoLink"><c>true</c> to show a "More Information" link that</param>
+    private void ShowValidationWarning(string warningControlsPrefix, bool showWarningControls, string text, bool showMoreInfoLink = false)
     {
-      show = show && !string.IsNullOrEmpty(text);
-      string pictureBoxControlName = warningControlPrefix + "PictureBox";
-      string labelControlName = warningControlPrefix + "Label";
+      showWarningControls = showWarningControls && !string.IsNullOrEmpty(text);
+      string pictureBoxControlName = warningControlsPrefix + "PictureBox";
+      string labelControlName = warningControlsPrefix + "Label";
 
       if (ContentAreaPanel.Controls.ContainsKey(pictureBoxControlName) && ContentAreaPanel.Controls.ContainsKey(labelControlName))
       {
-        ContentAreaPanel.Controls[pictureBoxControlName].Visible = show;
+        ContentAreaPanel.Controls[pictureBoxControlName].Visible = showWarningControls;
         ContentAreaPanel.Controls[labelControlName].Text = string.IsNullOrEmpty(text) ? string.Empty : text;
-        ContentAreaPanel.Controls[labelControlName].Visible = show;
-        return;
+        ContentAreaPanel.Controls[labelControlName].Visible = showWarningControls;
       }
-
-      if (!ColumnOptionsGroupBox.Controls.ContainsKey(pictureBoxControlName) || !ColumnOptionsGroupBox.Controls.ContainsKey(labelControlName))
+      else if (ColumnOptionsGroupBox.Controls.ContainsKey(pictureBoxControlName) && ColumnOptionsGroupBox.Controls.ContainsKey(labelControlName))
       {
-        return;
+        ColumnOptionsGroupBox.Controls[pictureBoxControlName].Visible = showWarningControls;
+        ColumnOptionsGroupBox.Controls[labelControlName].Text = string.IsNullOrEmpty(text) ? string.Empty : text;
+        ColumnOptionsGroupBox.Controls[labelControlName].Visible = showWarningControls;
       }
 
-      ColumnOptionsGroupBox.Controls[pictureBoxControlName].Visible = show;
-      ColumnOptionsGroupBox.Controls[labelControlName].Text = string.IsNullOrEmpty(text) ? string.Empty : text;
-      ColumnOptionsGroupBox.Controls[labelControlName].Visible = show;
+      MoreInfoLinkLabel.Visible = showMoreInfoLink;
+      MoreInfoLinkLabel.Location = new Point(ColumnOptionsWarningLabel.Location.X + ColumnOptionsWarningLabel.Width, ColumnOptionsWarningLabel.Location.Y);
     }
 
     /// <summary>

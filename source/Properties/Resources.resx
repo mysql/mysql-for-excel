@@ -209,7 +209,7 @@
     <value>Primary Key column cannot be created because another column has the same name.</value>
   </data>
   <data name="ColumnDataNotUniqueWarning" xml:space="preserve">
-    <value>Data in the current column is not unique.</value>
+    <value>Data in column is not unique.</value>
   </data>
   <data name="ExportColumnsGridToolTipCaption" xml:space="preserve">
     <value>Use &lt;Alt + N&gt; to move to the next column and &lt;Alt + P&gt; to move to the previous one.</value>
@@ -1099,6 +1099,12 @@ Since Excel relationships cannot be created, a single PivotTable for the whole E
     <value>Deleting automatically saved connection information entries with non-existent Excel Workbooks.</value>
   </data>
   <data name="ColumnDataSetOrEnumNotValidWarning" xml:space="preserve">
-    <value>Entered Set or Enum declaration contains an error in element: </value>
+    <value>Entered Set or Enum declaration contains an error. </value>
+  </data>
+  <data name="ColumnDataNotUniqueMoreInfoTitle" xml:space="preserve">
+    <value>The following duplicate groups and number of occurrences were found:</value>
+  </data>
+  <data name="ColumnDataSetOrEnumNotValidMoreInfoTitle" xml:space="preserve">
+    <value>The following element within the Enum or Set declaration is not using single quotes correctly:</value>
   </data>
 </root>

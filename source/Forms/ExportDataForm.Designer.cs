@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -76,6 +76,7 @@ namespace MySQL.ForExcel.Forms
       this.PrimaryKeyWarningLabel = new System.Windows.Forms.Label();
       this.PrimaryKeyWarningPictureBox = new System.Windows.Forms.PictureBox();
       this.ColumnOptionsGroupBox = new System.Windows.Forms.GroupBox();
+      this.MoreInfoLinkLabel = new System.Windows.Forms.LinkLabel();
       this.DataTypeComboBox = new System.Windows.Forms.ComboBox();
       this.ExcludeColumnCheckBox = new System.Windows.Forms.CheckBox();
       this.AllowEmptyCheckBox = new System.Windows.Forms.CheckBox();
@@ -136,6 +137,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // ContentAreaPanel
       // 
+      this.ContentAreaPanel.Controls.Add(this.MoreInfoLinkLabel);
       this.ContentAreaPanel.Controls.Add(this.CollationComboBox);
       this.ContentAreaPanel.Controls.Add(this.CollationLabel);
       this.ContentAreaPanel.Controls.Add(this.SubSetOfDataLabel);
@@ -258,6 +260,19 @@ namespace MySQL.ForExcel.Forms
       this.ColumnOptionsGroupBox.TabIndex = 20;
       this.ColumnOptionsGroupBox.TabStop = false;
       this.ColumnOptionsGroupBox.Text = "Column Options";
+      // 
+      // MoreInfoLinkLabel
+      // 
+      this.MoreInfoLinkLabel.AutoSize = true;
+      this.MoreInfoLinkLabel.BackColor = System.Drawing.SystemColors.Window;
+      this.MoreInfoLinkLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F);
+      this.MoreInfoLinkLabel.Location = new System.Drawing.Point(434, 446);
+      this.MoreInfoLinkLabel.Name = "MoreInfoLinkLabel";
+      this.MoreInfoLinkLabel.Size = new System.Drawing.Size(84, 12);
+      this.MoreInfoLinkLabel.TabIndex = 9;
+      this.MoreInfoLinkLabel.TabStop = true;
+      this.MoreInfoLinkLabel.Text = " (More Information) ";
+      this.MoreInfoLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.MoreInfoLinkLabel_LinkClicked);
       // 
       // DataTypeComboBox
       // 
@@ -809,5 +824,6 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.ComboBox CollationComboBox;
     private System.Windows.Forms.Label CollationLabel;
     private System.Windows.Forms.BindingSource DataTypeBindingSource;
+    private System.Windows.Forms.LinkLabel MoreInfoLinkLabel;
   }
 }

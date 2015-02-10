@@ -105,11 +105,6 @@ namespace MySQL.ForExcel.Classes
     private bool _excludeColumn;
 
     /// <summary>
-    /// The element of an ENUM or SET declaration that makes it invalid.
-    /// </summary>
-    private string _invalidEnumOrSetElement;
-
-    /// <summary>
     /// The ordinal index of the column in a source <see cref="MySqlDataTable"/> from which data will be appended from.
     /// </summary>
     private int _mappedDataColOrdinal;
@@ -134,6 +129,11 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     private WarningsContainer _warnings;
 
+    /// <summary>
+    /// Dictionary with additional information related to specific warnings.
+    /// </summary>
+    private Dictionary<string, Tuple<string, string>> _warningsMoreInfosDictionary;
+
     #endregion Fields
 
     /// <summary>
@@ -145,7 +145,6 @@ namespace MySQL.ForExcel.Classes
       _columnNameForSqlQueries = null;
       _columnRequiresQuotes = null;
       _excludeColumn = false;
-      _invalidEnumOrSetElement = null;
       _mappedDataColOrdinal = -1;
       _mySqlDataType = string.Empty;
       AutoIncrement = false;
@@ -153,6 +152,7 @@ namespace MySQL.ForExcel.Classes
       CharSet = null;
       Collation = null;
       DisplayName = string.Empty;
+      DuplicateGroupsFound = 0;
       InExportMode = false;
       IsDisplayNameDuplicate = false;
       IsMySqlDataTypeValid = true;
@@ -285,6 +285,10 @@ namespace MySQL.ForExcel.Classes
       {
         _allowNull = value;
         OnPropertyChanged("AllowNull");
+        if (_uniqueKey)
+        {
+          UpdateDataUniquenessWarnings();
+        }
       }
     }
 
@@ -389,9 +393,22 @@ namespace MySQL.ForExcel.Classes
       get
       {
         string currentWarningText = _warnings.CurrentWarningText;
-        return !ExcludeColumn && !string.IsNullOrEmpty(currentWarningText)
-          ? currentWarningText + (_warnings.CurrentWarningKey.Equals(INVALID_SET_ENUM_WARNING_KEY) && !string.IsNullOrEmpty(_invalidEnumOrSetElement) ? _invalidEnumOrSetElement : string.Empty)
-          : string.Empty;
+        return ExcludeColumn || string.IsNullOrEmpty(currentWarningText)
+          ? string.Empty
+          : currentWarningText;
+      }
+    }
+
+    /// <summary>
+    /// Gets a tuple containing a title and description texts, of additional information related to the <see cref="CurrentWarningText"/>.
+    /// </summary>
+    public Tuple<string, string> CurrentWarningMoreInfo
+    {
+      get
+      {
+        return ExcludeColumn || string.IsNullOrEmpty(_warnings.CurrentWarningKey) || !_warningsMoreInfosDictionary.ContainsKey(_warnings.CurrentWarningKey)
+          ? null
+          : _warningsMoreInfosDictionary[_warnings.CurrentWarningKey];
       }
     }
 
@@ -411,6 +428,11 @@ namespace MySQL.ForExcel.Classes
         return DisplayName.Replace("`", "``");
       }
     }
+
+    /// <summary>
+    /// Gets the number of duplicate groups found when doing a unique data check.
+    /// </summary>
+    public int DuplicateGroupsFound { get; private set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether this column will be excluded from the list of columns to be created on a new table's creation.
@@ -778,22 +800,7 @@ namespace MySQL.ForExcel.Classes
           PrimaryKey = false;
         }
 
-        bool columnValuesAreUnique = true;
-        try
-        {
-          Unique = _uniqueKey;
-        }
-        catch (InvalidConstraintException)
-        {
-          columnValuesAreUnique = false;
-        }
-
-        // Update warning stating the column's data is not unique
-        if (_warnings.SetVisibility(DATA_NOT_UNIQUE_WARNING_KEY, !columnValuesAreUnique))
-        {
-          OnColumnWarningsChanged();
-        }
-
+        UpdateDataUniquenessWarnings();
         OnPropertyChanged("UniqueKey");
       }
     }
@@ -885,6 +892,42 @@ namespace MySQL.ForExcel.Classes
           OnColumnWarningsChanged();
         }
       }
+    }
+
+    /// <summary>
+    /// Runs a check on the column's data to determine if it is unique (i.e. there are no data duplicates).
+    /// </summary>
+    /// <remarks>If the <see cref="AllowNull"/> value is <c>true</c> then nulls are considered as allowed duplicate values in MySQL, so uniqueness is checked only for non null values.</remarks>
+    /// <returns><c>true</c> if the data in the column is unique, <c>false</c> otherwise.</returns>
+    public bool CheckForDataUniqueness()
+    {
+      var duplicates = GetDuplicateValuesInColumn();
+      if (duplicates == null)
+      {
+        DuplicateGroupsFound = 0;
+        _warningsMoreInfosDictionary.Remove(DATA_NOT_UNIQUE_WARNING_KEY);
+      }
+      else
+      {
+        DuplicateGroupsFound = duplicates.Count;
+        var moreInfoTextBuilder = new StringBuilder(DuplicateGroupsFound * byte.MaxValue);
+        foreach (var dictPair in duplicates)
+        {
+          moreInfoTextBuilder.AppendLine(string.Format("{0} ({1})", dictPair.Key, dictPair.Value));
+        }
+
+        var moreInfoTuple = new Tuple<string, string>(Resources.ColumnDataNotUniqueMoreInfoTitle, moreInfoTextBuilder.ToString());
+        if (_warningsMoreInfosDictionary.ContainsKey(DATA_NOT_UNIQUE_WARNING_KEY))
+        {
+          _warningsMoreInfosDictionary[DATA_NOT_UNIQUE_WARNING_KEY] = moreInfoTuple;
+        }
+        else
+        {
+          _warningsMoreInfosDictionary.Add(DATA_NOT_UNIQUE_WARNING_KEY, moreInfoTuple);
+        }
+      }
+
+      return DuplicateGroupsFound == 0;
     }
 
     /// <summary>
@@ -1110,6 +1153,33 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets a dictionary of duplicate values within the column's rows and the count of each duplicate value.
+    /// </summary>
+    /// <remarks>If the <see cref="AllowNull"/> value is <c>true</c> then nulls are considered as allowed duplicate values in MySQL, so uniqueness is checked only for non null values.</remarks>
+    /// <returns>A dictionary of duplicate values within the column's rows and the count of each duplicate value.</returns>
+    public Dictionary<object, int> GetDuplicateValuesInColumn()
+    {
+      if (Table == null || Table.Rows.Count == 0)
+      {
+        return null;
+      }
+
+      var duplicates = new Dictionary<object, int>(Table.Rows.Count);
+      foreach (
+        var group in
+          Table.Rows.Cast<DataRow>()
+            .Select(row => row[Ordinal])
+            .GroupBy(value => value)
+            .Where(group => group.Count() > 1)
+            .Where(group => !_allowNull || group.Key != DBNull.Value))
+      {
+        duplicates.Add(group.Key, group.Count());
+      }
+
+      return duplicates;
+    }
+
+    /// <summary>
     /// Creates a SQL query fragment meant to be used within a CREATE TABLE statement to create a column with this column's schema.
     /// </summary>
     /// <returns>A SQL query fragment describing this column's schema.</returns>
@@ -1245,17 +1315,36 @@ namespace MySQL.ForExcel.Classes
 
         // Hide warning stating the column data type cannot be empty
         warningsChanged = _warnings.Hide(NO_DATA_TYPE_WARNING_KEY);
-        _invalidEnumOrSetElement = null;
+        bool showInvalidSetOrEnumWarning = false;
+        Tuple<string, string> moreInfoTuple = null;
         if (validateType)
         {
-          IsMySqlDataTypeValid = DataTypeUtilities.ValidateUserDataType(dataType, out _invalidEnumOrSetElement);
+          string invalidEnumOrSetElement;
+          IsMySqlDataTypeValid = DataTypeUtilities.ValidateUserDataType(dataType, out invalidEnumOrSetElement);
+          showInvalidSetOrEnumWarning = !string.IsNullOrEmpty(invalidEnumOrSetElement);
+          if (showInvalidSetOrEnumWarning)
+          {
+            moreInfoTuple = new Tuple<string, string>(Resources.ColumnDataSetOrEnumNotValidMoreInfoTitle, invalidEnumOrSetElement);
+            if (_warningsMoreInfosDictionary.ContainsKey(INVALID_SET_ENUM_WARNING_KEY))
+            {
+              _warningsMoreInfosDictionary[INVALID_SET_ENUM_WARNING_KEY] = moreInfoTuple;
+            }
+            else
+            {
+              _warningsMoreInfosDictionary.Add(INVALID_SET_ENUM_WARNING_KEY, moreInfoTuple);
+            }
+          }
         }
 
         // Update warning stating the column's data type is not a valid MySQL data type
         warningsChanged = _warnings.SetVisibility(INVALID_DATA_TYPE_WARNING_KEY, !IsMySqlDataTypeValid) || warningsChanged;
 
         // Update warning stating a SET or ENUM declaration is invalid because of an error in a specific element
-        warningsChanged = _warnings.SetVisibility(INVALID_SET_ENUM_WARNING_KEY, !string.IsNullOrEmpty(_invalidEnumOrSetElement)) || warningsChanged;
+        warningsChanged = _warnings.SetVisibility(INVALID_SET_ENUM_WARNING_KEY, showInvalidSetOrEnumWarning) || warningsChanged;
+        if (moreInfoTuple == null)
+        {
+          _warningsMoreInfosDictionary.Remove(INVALID_SET_ENUM_WARNING_KEY);
+        }
 
         if (IsMySqlDataTypeValid && testTypeOnData)
         {
@@ -1422,6 +1511,23 @@ namespace MySQL.ForExcel.Classes
       _warnings.Add(INVALID_SET_ENUM_WARNING_KEY, Resources.ColumnDataSetOrEnumNotValidWarning);
       _warnings.Add(DATA_NOT_SUITABLE_APPEND_WARNING_KEY, Resources.AppendDataNotSuitableForColumnTypeWarning);
       _warnings.Add(DATA_NOT_SUITABLE_EXPORT_WARNING_KEY, Resources.ExportDataTypeNotSuitableWarning);
+      _warningsMoreInfosDictionary = new Dictionary<string, Tuple<string, string>>(_warnings.DefinedQuantity);
+    }
+
+    /// <summary>
+    /// Updates warning stating the column's data is not unique.
+    /// </summary>
+    private void UpdateDataUniquenessWarnings()
+    {
+      // Storing the value in a variable since it is easier to debug.
+      var currentDuplicateGroupsCount = DuplicateGroupsFound;
+      bool dataIsUnique = !_uniqueKey || CheckForDataUniqueness();
+      bool duplicateGroupsCountChanged = DuplicateGroupsFound > 0 &&
+                                         DuplicateGroupsFound != currentDuplicateGroupsCount;
+      if (_warnings.SetVisibility(DATA_NOT_UNIQUE_WARNING_KEY, !dataIsUnique) || duplicateGroupsCountChanged)
+      {
+        OnColumnWarningsChanged();
+      }
     }
   }
 }

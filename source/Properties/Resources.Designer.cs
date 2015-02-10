@@ -217,7 +217,16 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Data in the current column is not unique..
+        ///   Looks up a localized string similar to The following duplicate groups and number of occurrences were found:.
+        /// </summary>
+        internal static string ColumnDataNotUniqueMoreInfoTitle {
+            get {
+                return ResourceManager.GetString("ColumnDataNotUniqueMoreInfoTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Data in column is not unique..
         /// </summary>
         internal static string ColumnDataNotUniqueWarning {
             get {
@@ -226,7 +235,16 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Entered Set or Enum declaration contains an error in element: .
+        ///   Looks up a localized string similar to The following element within the Enum or Set declaration is not using single quotes correctly:.
+        /// </summary>
+        internal static string ColumnDataSetOrEnumNotValidMoreInfoTitle {
+            get {
+                return ResourceManager.GetString("ColumnDataSetOrEnumNotValidMoreInfoTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Entered Set or Enum declaration contains an error. .
         /// </summary>
         internal static string ColumnDataSetOrEnumNotValidWarning {
             get {
