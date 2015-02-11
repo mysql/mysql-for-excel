@@ -1336,9 +1336,12 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Checks that every <see cref="MySqlDataColumn"/> does not have a duplicate <see cref="MySqlDataColumn.DisplayName"/> and updates their corresponding warnings.
     /// </summary>
-    public void CheckForDuplicatedColumnDisplayNames()
+    /// <param name="excludeColumnsWithEmptyName">Flag indicating whether columns with an empty name should be excluded from the check.</param>
+    public void CheckForDuplicatedColumnDisplayNames(bool excludeColumnsWithEmptyName = true)
     {
-      foreach (var mySqlCol in Columns.Cast<MySqlDataColumn>().Where(col => !col.ExcludeColumn))
+      foreach (var mySqlCol in
+        Columns.Cast<MySqlDataColumn>()
+          .Where(mySqlCol => !mySqlCol.ExcludeColumn && (!excludeColumnsWithEmptyName || !string.IsNullOrEmpty(mySqlCol.DisplayName))))
       {
         mySqlCol.CheckForDuplicatedDisplayName();
       }
@@ -2612,10 +2615,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Check about duplicate column names now that all column names were set to the ones given by the user.
-      foreach (var mySqlCol in mySqlColumns)
-      {
-        mySqlCol.CheckForDuplicatedDisplayName();
-      }
+      CheckForDuplicatedColumnDisplayNames();
 
       AdjustAutoPkValues();
       ResetFirstRowIsHeaderValue();

@@ -135,15 +135,26 @@ namespace MySQL.ForExcel.Classes
     /// Checks that each element of a list of strings is correctly wrapped in single quotes and that other single quotes inside are properly escaped in MySQL notation.
     /// </summary>
     /// <param name="elementsList">A list of strings.</param>
-    /// <returns>The element of the list with an incorrect escaping of single quotes, or not wrapped in single quotes correctly.</returns>
-    public static string CheckForCorrectSingleQuoting(this List<string> elementsList)
+    /// <returns>The indexes of the elements of the list with an incorrect escaping of single quotes, or not wrapped in single quotes correctly.</returns>
+    public static List<int> CheckForCorrectSingleQuoting(this List<string> elementsList)
     {
       if (elementsList == null || elementsList.Count == 0)
       {
         return null;
       }
 
-      return elementsList.FirstOrDefault(element => !element.CheckForCorrectSingleQuoting());
+      var indexesList = new List<int>(elementsList.Count);
+      for (int elementIndex = 0; elementIndex < elementsList.Count; elementIndex++)
+      {
+        if (elementsList[elementIndex].CheckForCorrectSingleQuoting())
+        {
+          continue;
+        }
+
+        indexesList.Add(elementIndex);
+      }
+
+      return indexesList;
     }
 
     /// <summary>
@@ -562,53 +573,6 @@ namespace MySQL.ForExcel.Classes
 
       var tokenizer = new MySqlTokenizer(sqlScript.Trim());
       return tokenizer.BreakIntoStatements();
-    }
-
-    /// <summary>
-    /// Splits the given text containing a SQL script into individual SQL statements.
-    /// </summary>
-    /// <param name="sqlScript">A string containing a SQL script.</param>
-    /// <param name="tokenDelimiter">A delimiter to split the text into tokens.</param>
-    /// <returns>A list of individual SQL tokens.</returns>
-    public static List<string> SplitInTokens(this string sqlScript, string tokenDelimiter = ",")
-    {
-      if (string.IsNullOrEmpty(sqlScript))
-      {
-        return null;
-      }
-
-      var tokenizer = new MySqlTokenizer(sqlScript.Trim());
-      var allTokens = tokenizer.GetAllTokens();
-      if (allTokens == null || allTokens.Count == 0)
-      {
-        return null;
-      }
-
-      var tokensList = new List<string>(allTokens.Count);
-      var elementBuilder = new StringBuilder(sqlScript.Length);
-      int lastIndex = allTokens.Count - 1;
-      for (int tokenIndex = 0; tokenIndex < allTokens.Count; tokenIndex++)
-      {
-        var token = allTokens[tokenIndex];
-        bool currentTokenIsDelimiter = string.Equals(token, tokenDelimiter, StringComparison.InvariantCulture);
-
-        // If the curren token is not the delimiter append it to the current element's text.
-        if (!currentTokenIsDelimiter)
-        {
-          elementBuilder.Append(token);
-        }
-
-        // Skip to the next token without adding the current one to the list if the current token is the delimiter or the current token is NOT the last one.
-        if ((!currentTokenIsDelimiter && tokenIndex != lastIndex) || elementBuilder.Length <= 0)
-        {
-          continue;
-        }
-
-        tokensList.Add(elementBuilder.ToString());
-        elementBuilder.Clear();
-      }
-
-      return tokensList;
     }
 
     /// <summary>
