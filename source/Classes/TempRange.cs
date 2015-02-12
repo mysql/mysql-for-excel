@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -45,11 +45,6 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     private readonly bool _previousScreenUpdatingValue;
 
-    /// <summary>
-    /// The original source <see cref="ExcelInterop.Range"/> cropped to a subrange with only non-empty cells.
-    /// </summary>
-    private ExcelInterop.Range _sourceCroppedRange;
-
     #endregion Fields
 
     /// <summary>
@@ -58,14 +53,14 @@ namespace MySQL.ForExcel.Classes
     /// <param name="sourceRange">The original source <see cref="ExcelInterop.Range"/> whose data is copied to the temporary one.</param>
     /// <param name="cropToNonEmptyRange">Flag indicating whether the range is cropped to a subrange with only non-empty cells.</param>
     /// <param name="skipEmptyColumns">Flag indicating whether empty columns are not copied to the target range.</param>
-    /// <param name="hideWorksheet">Flag indicating whether the new temporary <see cref="ExcelInterop.Worksheet"/> will be hidden.</param>
+    /// <param name="hideAndDeleteWorksheet">Flag indicating whether the new temporary <see cref="ExcelInterop.Worksheet"/> will be hidden and deleted when the <see cref="TempRange"/> is disposed.</param>
     /// <param name="createAutoPkRange">Flag indicating whether a sequential numbered column is prepended to the range to represent the values for an AutoPK column.</param>
     /// <param name="firstRowContainsColumnNames">Flag indicating whether the the first row of excelData contains the column names for a new table.</param>
     /// <param name="dateColumnIndexes">Array of indexes of columns that will populate a date MySQL column.</param>
     /// <param name="limitRowsQuantity">Gets a limit on the number of rows copied from the source range to the temporary range. If less than 1 it means there is no limit.</param>
     /// <param name="disableScreenUpdating">Flag indicating whether screen updating will be disabled to speed up processing.</param>
-    public TempRange(ExcelInterop.Range sourceRange, bool cropToNonEmptyRange, bool skipEmptyColumns, bool hideWorksheet, bool createAutoPkRange, bool firstRowContainsColumnNames = false, int[] dateColumnIndexes = null, int limitRowsQuantity = 0, bool disableScreenUpdating = true)
-      : this(sourceRange, cropToNonEmptyRange, skipEmptyColumns, hideWorksheet, limitRowsQuantity, disableScreenUpdating)
+    public TempRange(ExcelInterop.Range sourceRange, bool cropToNonEmptyRange, bool skipEmptyColumns, bool hideAndDeleteWorksheet, bool createAutoPkRange, bool firstRowContainsColumnNames = false, int[] dateColumnIndexes = null, int limitRowsQuantity = 0, bool disableScreenUpdating = true)
+      : this(sourceRange, cropToNonEmptyRange, skipEmptyColumns, hideAndDeleteWorksheet, limitRowsQuantity, disableScreenUpdating)
     {
       if (createAutoPkRange)
       {
@@ -85,11 +80,11 @@ namespace MySQL.ForExcel.Classes
     /// <param name="sourceRange">The original source <see cref="ExcelInterop.Range"/> whose data is copied to the temporary one.</param>
     /// <param name="cropToNonEmptyRange">Flag indicating whether the range is cropped to a subrange with only non-empty cells.</param>
     /// <param name="skipEmptyColumns">Flag indicating whether empty columns are not copied to the target range.</param>
-    /// <param name="hideWorksheet">Flag indicating whether the new temporary <see cref="ExcelInterop.Worksheet"/> will be hidden.</param>
+    /// <param name="hideAndDeleteWorksheet">Flag indicating whether the new temporary <see cref="ExcelInterop.Worksheet"/> will be hidden and deleted when the <see cref="TempRange"/> is disposed.</param>
     /// <param name="mappedIndexes">An array of indexes containing the source column from the <see cref="sourceRange"/> whose contents will be copied to the returned range.</param>
     /// <param name="disableScreenUpdating">Flag indicating whether screen updating will be disabled to speed up processing.</param>
-    public TempRange(ExcelInterop.Range sourceRange, bool cropToNonEmptyRange, bool skipEmptyColumns, bool hideWorksheet, IList<int> mappedIndexes, bool disableScreenUpdating = true)
-      : this(sourceRange, cropToNonEmptyRange, skipEmptyColumns, hideWorksheet, 0, disableScreenUpdating)
+    public TempRange(ExcelInterop.Range sourceRange, bool cropToNonEmptyRange, bool skipEmptyColumns, bool hideAndDeleteWorksheet, IList<int> mappedIndexes, bool disableScreenUpdating = true)
+      : this(sourceRange, cropToNonEmptyRange, skipEmptyColumns, hideAndDeleteWorksheet, 0, disableScreenUpdating)
     {
       RangeType = TempRangeType.MappedRange;
       CreateMappedTempRange(mappedIndexes);
@@ -101,15 +96,14 @@ namespace MySQL.ForExcel.Classes
     /// <param name="sourceRange">The original source <see cref="ExcelInterop.Range"/> whose data is copied to the temporary one.</param>
     /// <param name="cropToNonEmptyRange">Flag indicating whether the range is cropped to a subrange with only non-empty cells.</param>
     /// <param name="skipEmptyColumns">Flag indicating whether empty columns are not copied to the target range.</param>
-    /// <param name="hideWorksheet">Flag indicating whether the new temporary <see cref="ExcelInterop.Worksheet"/> will be hidden.</param>
+    /// <param name="hideAndDeleteWorksheet">Flag indicating whether the new temporary <see cref="ExcelInterop.Worksheet"/> will be hidden and deleted when the <see cref="TempRange"/> is disposed.</param>
     /// <param name="limitRowsQuantity">Gets a limit on the number of rows copied from the source range to the temporary range. If less than 1 it means there is no limit.</param>
     /// <param name="disableScreenUpdating">Flag indicating whether screen updating will be disabled to speed up processing.</param>
-    private TempRange(ExcelInterop.Range sourceRange, bool cropToNonEmptyRange, bool skipEmptyColumns, bool hideWorksheet, int limitRowsQuantity = 0, bool disableScreenUpdating = true)
+    private TempRange(ExcelInterop.Range sourceRange, bool cropToNonEmptyRange, bool skipEmptyColumns, bool hideAndDeleteWorksheet, int limitRowsQuantity = 0, bool disableScreenUpdating = true)
     {
       _disableScreenUpdating = disableScreenUpdating;
       _disposed = false;
       _previousScreenUpdatingValue = false;
-      _sourceCroppedRange = null;
       if (_disableScreenUpdating)
       {
         _previousScreenUpdatingValue = Globals.ThisAddIn.Application.ScreenUpdating;
@@ -118,11 +112,17 @@ namespace MySQL.ForExcel.Classes
 
       Globals.ThisAddIn.UsingTempWorksheet = true;
       CropToNonEmptyRange = cropToNonEmptyRange;
+      HideAndDeleteWorksheet = hideAndDeleteWorksheet;
       LimitRowsQuantity = limitRowsQuantity;
       SkipEmptyColumns = skipEmptyColumns;
-      SourceRange = sourceRange;
-      CreateTempWorksheet(hideWorksheet);
+      OriginalSourceRange = sourceRange;
+      SourceRange = CropToNonEmptyRange
+        ? OriginalSourceRange.GetNonEmptyRectangularAreaRange()
+        : OriginalSourceRange;
+      CreateTempWorksheet();
     }
+
+    #region Enumerations
 
     /// <summary>
     /// Describes the type of temporary range created.
@@ -145,6 +145,8 @@ namespace MySQL.ForExcel.Classes
       MappedRange,
     }
 
+    #endregion Enumeration
+
     #region Properties
 
     /// <summary>
@@ -153,10 +155,20 @@ namespace MySQL.ForExcel.Classes
     public bool CropToNonEmptyRange { get; private set; }
 
     /// <summary>
+    /// Gets a value indicating whether the new temporary <see cref="ExcelInterop.Worksheet"/> will be hidden and deleted when the <see cref="TempRange"/> is disposed.
+    /// </summary>
+    public bool HideAndDeleteWorksheet { get; private set; }
+
+    /// <summary>
     /// Gets a limit on the number of rows copied from the source range to the temporary range.
     /// If less than 1 it means there is no limit.
     /// </summary>
     public int LimitRowsQuantity { get; private set; }
+
+    /// <summary>
+    /// Gets the original source <see cref="ExcelInterop.Range"/> whose data is copied to the temporary one.
+    /// </summary>
+    public ExcelInterop.Range OriginalSourceRange { get; private set; }
 
     /// <summary>
     /// Gets the temporary <see cref="ExcelInterop.Range"/>.
@@ -174,7 +186,7 @@ namespace MySQL.ForExcel.Classes
     public bool SkipEmptyColumns { get; private set; }
 
     /// <summary>
-    /// Gets the original source <see cref="ExcelInterop.Range"/> whose data is copied to the temporary one.
+    /// Gets the source <see cref="ExcelInterop.Range"/> that might be cropped depending on the <see cref="CropToNonEmptyRange"/> value.
     /// </summary>
     public ExcelInterop.Range SourceRange { get; private set; }
 
@@ -182,6 +194,17 @@ namespace MySQL.ForExcel.Classes
     /// Gets the temporary <see cref="ExcelInterop.Worksheet"/> that will contain the temporary <see cref="ExcelInterop.Range"/>.
     /// </summary>
     public ExcelInterop.Worksheet TempWorksheet { get; private set; }
+
+    /// <summary>
+    /// Gets the count of visible rows within the <see cref="SourceRange"/>.
+    /// </summary>
+    public int VisibleRowsCount
+    {
+      get
+      {
+        return SourceRange.Rows.Cast<ExcelInterop.Range>().Count(row => !row.Hidden);
+      }
+    }
 
     #endregion Properties
 
@@ -212,13 +235,17 @@ namespace MySQL.ForExcel.Classes
         Globals.ThisAddIn.Application.DisplayAlerts = false;
 
         // If the TempWorksheeet has been hidden, lower the hidden strength from VeryHidden to Hidden to avoid an error while attempting to delete it.
-        if (TempWorksheet.Visible != ExcelInterop.XlSheetVisibility.xlSheetVisible)
+        if (HideAndDeleteWorksheet)
         {
           TempWorksheet.Visible = ExcelInterop.XlSheetVisibility.xlSheetHidden;
+          TempWorksheet.Delete();
+          TempWorksheet = null;
+        }
+        else
+        {
+          OriginalSourceRange.Worksheet.Activate();
         }
 
-        TempWorksheet.Delete();
-        TempWorksheet = null;
         Globals.ThisAddIn.Application.DisplayAlerts = previousDisplayAlertsValue;
         if (_disableScreenUpdating)
         {
@@ -226,7 +253,8 @@ namespace MySQL.ForExcel.Classes
         }
 
         Globals.ThisAddIn.UsingTempWorksheet = false;
-        SourceRange.Select();
+        OriginalSourceRange.Select();
+        OriginalSourceRange = null;
         SourceRange = null;
         Range = null;
       }
@@ -270,21 +298,16 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      if (CropToNonEmptyRange)
-      {
-        _sourceCroppedRange = SourceRange.GetNonEmptyRectangularAreaRange();
-      }
-
       int firstTargetColumnIndex = 1;
-      var sourceCopyRange = CropToNonEmptyRange ? _sourceCroppedRange : SourceRange;
-      int copiedRows = LimitRowsQuantity > 0 ? Math.Min(LimitRowsQuantity, sourceCopyRange.Rows.Count) : sourceCopyRange.Rows.Count;
-      if (copiedRows < sourceCopyRange.Rows.Count)
+      var visibleRowsCount = VisibleRowsCount;
+      int copiedRows = LimitRowsQuantity > 0 ? Math.Min(LimitRowsQuantity, visibleRowsCount) : visibleRowsCount;
+      if (copiedRows < visibleRowsCount)
       {
-        sourceCopyRange = sourceCopyRange.SafeResize(copiedRows, sourceCopyRange.Columns.Count);
+        SourceRange = SourceRange.SafeResize(copiedRows, SourceRange.Columns.Count);
       }
 
-      string sourceWorksheetName = sourceCopyRange.Worksheet.Name;
-      foreach (ExcelInterop.Range sourceColumnRange in sourceCopyRange.Columns)
+      string sourceWorksheetName = SourceRange.Worksheet.Name;
+      foreach (ExcelInterop.Range sourceColumnRange in SourceRange.Columns)
       {
         if (SkipEmptyColumns && !sourceColumnRange.ContainsAnyData())
         {
@@ -324,12 +347,7 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      if (CropToNonEmptyRange)
-      {
-        _sourceCroppedRange = SourceRange.GetNonEmptyRectangularAreaRange();
-      }
-
-      var sourceCopyRange = CropToNonEmptyRange ? _sourceCroppedRange : SourceRange;
+      var visibleRowsCount = VisibleRowsCount;
       for (int arrayIndex = 0; arrayIndex < mappedIndexes.Count; arrayIndex++)
       {
         int excelColumnIndex = arrayIndex + 1;
@@ -339,22 +357,21 @@ namespace MySQL.ForExcel.Classes
           continue;
         }
 
-        ExcelInterop.Range sourceColumnRange = sourceCopyRange.Columns[mappedIndex];
+        ExcelInterop.Range sourceColumnRange = SourceRange.Columns[mappedIndex];
         ExcelInterop.Range targetColumnTopCell = TempWorksheet.Cells[1, excelColumnIndex];
-        ExcelInterop.Range targetColumnRange = targetColumnTopCell.SafeResize(sourceCopyRange.Rows.Count, 1);
+        ExcelInterop.Range targetColumnRange = targetColumnTopCell.SafeResize(visibleRowsCount, 1);
         sourceColumnRange.Copy();
         targetColumnRange.PasteSpecial(ExcelInterop.XlPasteType.xlPasteValuesAndNumberFormats, ExcelInterop.XlPasteSpecialOperation.xlPasteSpecialOperationNone, false, false);
       }
 
       Range = TempWorksheet.Cells[1, 1];
-      Range = Range.SafeResize(sourceCopyRange.Rows.Count, mappedIndexes.Count);
+      Range = Range.SafeResize(visibleRowsCount, mappedIndexes.Count);
     }
 
     /// <summary>
     /// Creates the temporary <see cref="ExcelInterop.Worksheet"/> that will contain the temporary <see cref="ExcelInterop.Range"/>.
     /// </summary>
-    /// <param name="hideWorksheet">Flag indicating whether the new temporary <see cref="ExcelInterop.Worksheet"/> will be hidden.</param>
-    private void CreateTempWorksheet(bool hideWorksheet)
+    private void CreateTempWorksheet()
     {
       if (SourceRange == null)
       {
@@ -370,7 +387,7 @@ namespace MySQL.ForExcel.Classes
         }
 
         TempWorksheet = parentWorkbook.Worksheets.Add();
-        TempWorksheet.Visible = hideWorksheet
+        TempWorksheet.Visible = HideAndDeleteWorksheet
           ? ExcelInterop.XlSheetVisibility.xlSheetVeryHidden
           : ExcelInterop.XlSheetVisibility.xlSheetVisible;
         TempWorksheet.Name = parentWorkbook.GetWorksheetNameAvoidingDuplicates("TEMP_SHEET");
