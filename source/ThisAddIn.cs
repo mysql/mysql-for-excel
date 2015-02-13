@@ -666,24 +666,23 @@ namespace MySQL.ForExcel
     {
       Application.EnableEvents = false; //Stops beforesave event from re-running
       bool triggerAfterSave = true;
-      if (saveAsUi)
-      {
-        // GetSaveAsFilename returns a dynamic type, which is a boolean type with false value when the dialog was canceled.
-        dynamic cFile = Application.GetSaveAsFilename(workbook.Name, Resources.ExcelDefaultFileExtensionText);
 
-        //If the save as dialog was canceled we need to skip the after save method.
-        if (cFile is bool && !cFile)
+      try
+      {
+        if (saveAsUi)
         {
-          triggerAfterSave = false;
+          var saveAsDialog = Application.Dialogs[ExcelInterop.XlBuiltInDialog.xlDialogSaveAs];
+          triggerAfterSave = saveAsDialog.Show(workbook.Name, Application.DefaultSaveFormat, null, true, null, false);
         }
         else
         {
-          workbook.SaveAs(cFile);
+          workbook.Save();
         }
       }
-      else
+      catch (Exception ex)
       {
-        workbook.Save();
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        triggerAfterSave = false;
       }
 
       Application.EnableEvents = true;

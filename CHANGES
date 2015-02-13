@@ -1,4 +1,6 @@
 1.3.4
+- Changed the method to display a custom Save As dialog when a Workbook is saved in Excel 2007 to one that supports showing all Excel supported file filters.
+  (MySQL Bug #75389, Bug #20296618 - EXCEL SAVE FILE FORMATS GONE AFTER MYSQL-FOR-EXCEL STARTED. ONLY .XLS AVAILABLE)
 - Fixed the code involved in Edit Data oeprations that colors Excel cells based on their modifications, so that pasted values on newly added Excel rows are re-colored
   properly using the color to denote modified values. (MySQL Bug #74285, Bug #19783737 - EDIT DATA - COPYING & PASTING DATA ON NEWLY ADDED ROW CLEARS STATUS COLOR)
 - Fixed the custom Refresh All functionality overriden by MySQL for Excel to fire a refresh not only to Excel tables (ListObjects) but also to Pivot Tables.

@@ -907,15 +907,6 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Excel 97-2003 Workbook (*.xls),*.xls.
-        /// </summary>
-        internal static string ExcelDefaultFileExtensionText {
-            get {
-                return ResourceManager.GetString("ExcelDefaultFileExtensionText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Some Excel Model Relationships could not be created because errors were found..
         /// </summary>
         internal static string ExcelRelationshipsCreationErrorDetail {
