@@ -1,4 +1,6 @@
 1.3.4
+- Fixed the custom Refresh All functionality overriden by MySQL for Excel to fire a refresh not only to Excel tables (ListObjects) but also to Pivot Tables.
+  (MySQL Bug #75565, Bug #20524883 - PIVOT TABLE REFRESH ALL NOT WORKING)
 - Fixed code used to temporarily store the selected Excel range used for an Export or Append Data operation so that it copies only visible rows (i.e. rows that have
   not been filtered out by an Excel Auto-Filter). (MySQL Bug #75635, Bug #20433602 - MYSQL FOR EXCEL APPEND FUNCTION DOES NOT SKIP ROWS FILTERED IN EXCEL)
 - Changed the way data uniqueness within a column is checked during an Export Data operation. Before MySQL for Excel relied in ADO.NET's way to determine if the data

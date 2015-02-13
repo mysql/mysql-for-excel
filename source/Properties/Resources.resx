@@ -1107,4 +1107,16 @@ Since Excel relationships cannot be created, a single PivotTable for the whole E
   <data name="ColumnDataSetOrEnumNotValidMoreInfoTitle" xml:space="preserve">
     <value>The following element within the Enum or Set declaration is not using single quotes correctly:</value>
   </data>
+  <data name="ContinueRefreshingExcelTablesQuestionText" xml:space="preserve">
+    <value>Do you want to continue loading the remaining Excel tables?</value>
+  </data>
+  <data name="ContinueRefreshingPivotTablesQuestionText" xml:space="preserve">
+    <value>Do you want to continue loading the remaining Pivot Tables?</value>
+  </data>
+  <data name="StandardListObjectRefreshError" xml:space="preserve">
+    <value>An error ocurred trying to refresh data in Excel table {0}.</value>
+  </data>
+  <data name="StandardPivotTableRefreshError" xml:space="preserve">
+    <value>An error ocurred trying to refresh data in Pivot Table {0}.</value>
+  </data>
 </root>

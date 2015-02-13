@@ -380,23 +380,26 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Loops all <see cref="ExcelInterop.ListObject"/> objects in the active <see cref="ExcelInterop.Workbook"/> and calls custom refresh functionality
-    /// if tied to a <see cref="ImportConnectionInfo"/> object, calls native refresh functionality otherwise.
+    /// Refreshes the data in all <see cref="ExcelInterop.ListObject"/> and <see cref="ExcelInterop.PivotTable"/> objects in every <see cref="ExcelInterop.Worksheet"/> of the active <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
-    /// <return><c>true</c> if the custom functionality was executed, <c>false</c> otherwise.</return>
-    public bool RefreshAllCustomFunctionality()
+    public void RefreshAllCustomFunctionality()
     {
       foreach (ExcelInterop.Worksheet worksheet in ActiveWorkbook.Worksheets)
       {
-        worksheet.RefreshAllListObjects();
-      }
+        if (!worksheet.RefreshAllListObjects())
+        {
+          break;
+        }
 
-      return true;
+        if (!worksheet.RefreshAllPivotTables())
+        {
+          break;
+        }
+      }
     }
 
     /// <summary>
-    /// Loops all <see cref="ExcelInterop.ListObject"/> objects in the active <see cref="ExcelInterop.Worksheet"/> and calls custom refresh functionality
-    /// if tied to a <see cref="ImportConnectionInfo"/> object, calls native refresh functionality otherwise.
+    /// Attempts to refresh the MySQL data tied to the <see cref="ExcelInterop.ListObject"/> of the active Excell cell.
     /// </summary>
     /// <returns><c>true</c> if the active <see cref="ExcelInterop.ListObject"/> has a related <see cref="ImportConnectionInfo"/> and was refreshed, <c>false</c> otherwise.</returns>
     public bool RefreshDataCustomFunctionality()

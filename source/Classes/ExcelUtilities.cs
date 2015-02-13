@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -20,9 +20,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using Microsoft.Office.Core;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
+using MySQL.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 using ExcelTools = Microsoft.Office.Tools.Excel;
 
@@ -1562,22 +1564,85 @@ namespace MySQL.ForExcel.Classes
     /// If a <see cref="ExcelInterop.ListObject"/> is related to a <see cref="ImportConnectionInfo"/> object then its custom refresh functionality is performed, otherwise the native one is.
     /// </summary>
     /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/>.</param>
-    public static void RefreshAllListObjects(this ExcelInterop.Worksheet worksheet)
+    /// <returns><c>true</c> if <see cref="ExcelInterop.ListObject"/>s in other <see cref="ExcelInterop.Worksheet"/>s should be refreshed as well, <c>false</c> to stop refreshing.</returns>
+    public static bool RefreshAllListObjects(this ExcelInterop.Worksheet worksheet)
     {
       if (worksheet == null)
       {
-        return;
+        return true;
       }
 
-      foreach (ExcelInterop.ListObject listObject in worksheet.ListObjects)
+      // If the ExcelInterop.ListObject is tied to MySQL data, then it will be refreshed and skip to the next one.
+      // Otherwise the standard ExcelInterop.ListObject.Refresh is called.
+      bool continueLoading = true;
+      foreach (var listObject in worksheet.ListObjects.Cast<ExcelInterop.ListObject>().Where(listObject => !listObject.RefreshMySqlData()))
       {
-        if (listObject.RefreshMySqlData())
+        try
         {
-          continue;
+          listObject.Refresh();
         }
-
-        listObject.Refresh();
+        catch (Exception ex)
+        {
+          MySqlSourceTrace.WriteAppErrorToLog(ex);
+          var infoProperties = InfoDialogProperties.GetYesNoDialogProperties(
+            InfoDialog.InfoType.Error,
+            Resources.OperationErrorTitle,
+            string.Format(Resources.StandardListObjectRefreshError, listObject.DisplayName),
+            Resources.ContinueRefreshingExcelTablesQuestionText,
+            ex.GetFormattedMessage());
+          infoProperties.WordWrapMoreInfo = true;
+          if (InfoDialog.ShowDialog(infoProperties).DialogResult != DialogResult.Yes)
+          {
+            continueLoading = false;
+            break;
+          }
+        }
       }
+
+      return continueLoading;
+    }
+
+    /// <summary>
+    /// Refreshes all <see cref="ExcelInterop.PivotTable"/> objects in the given <see cref="ExcelInterop.Worksheet"/>.
+    /// </summary>
+    /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/>.</param>
+    /// <returns><c>true</c> if <see cref="ExcelInterop.ListObject"/>s in other <see cref="ExcelInterop.Worksheet"/>s should be refreshed as well, <c>false</c> to stop refreshing.</returns>
+    public static bool RefreshAllPivotTables(this ExcelInterop.Worksheet worksheet)
+    {
+      if (worksheet == null)
+      {
+        return true;
+      }
+
+      bool continueLoading = true;
+      foreach (var pivotTable in worksheet.GetPivotTables())
+      {
+        try
+        {
+          if (pivotTable.RefreshTable())
+          {
+            pivotTable.Update();
+          }
+        }
+        catch (Exception ex)
+        {
+          MySqlSourceTrace.WriteAppErrorToLog(ex);
+          var infoProperties = InfoDialogProperties.GetYesNoDialogProperties(
+            InfoDialog.InfoType.Error,
+            Resources.OperationErrorTitle,
+            string.Format(Resources.StandardPivotTableRefreshError, pivotTable.Name),
+            Resources.ContinueRefreshingPivotTablesQuestionText,
+            ex.GetFormattedMessage());
+          infoProperties.WordWrapMoreInfo = true;
+          if (InfoDialog.ShowDialog(infoProperties).DialogResult != DialogResult.Yes)
+          {
+            continueLoading = false;
+            break;
+          }
+        }
+      }
+
+      return continueLoading;
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -127,6 +127,7 @@ namespace MySQL.ForExcel.Controls
     {
       if (!Globals.ThisAddIn.RefreshDataCustomFunctionality())
       {
+        // Set the cancelDefault to false if the active Excel object is not ListObject tied to MySQL data so the standard refresh functionality is automatically called.
         cancelDefault = false;
       }
     }
@@ -138,10 +139,7 @@ namespace MySQL.ForExcel.Controls
     /// <param name="cancelDefault">Flag indicating whether the native functionality is cancelled, by default its value is <c>true</c>.</param>
     public void OnCustomRefreshAll(OfficeCore.IRibbonControl control, ref bool cancelDefault)
     {
-      if (!Globals.ThisAddIn.RefreshAllCustomFunctionality())
-      {
-        cancelDefault = false;
-      }
+      Globals.ThisAddIn.RefreshAllCustomFunctionality();
     }
 
     /// <summary>

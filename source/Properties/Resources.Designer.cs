@@ -480,6 +480,24 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Do you want to continue loading the remaining Excel tables?.
+        /// </summary>
+        internal static string ContinueRefreshingExcelTablesQuestionText {
+            get {
+                return ResourceManager.GetString("ContinueRefreshingExcelTablesQuestionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you want to continue loading the remaining Pivot Tables?.
+        /// </summary>
+        internal static string ContinueRefreshingPivotTablesQuestionText {
+            get {
+                return ResourceManager.GetString("ContinueRefreshingPivotTablesQuestionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create.
         /// </summary>
         internal static string CreateButtonText {
@@ -2663,6 +2681,24 @@ namespace MySQL.ForExcel.Properties {
         internal static string SqlStatementsProducingWarningsText {
             get {
                 return ResourceManager.GetString("SqlStatementsProducingWarningsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error ocurred trying to refresh data in Excel table {0}..
+        /// </summary>
+        internal static string StandardListObjectRefreshError {
+            get {
+                return ResourceManager.GetString("StandardListObjectRefreshError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error ocurred trying to refresh data in Pivot Table {0}..
+        /// </summary>
+        internal static string StandardPivotTableRefreshError {
+            get {
+                return ResourceManager.GetString("StandardPivotTableRefreshError", resourceCulture);
             }
         }
         
