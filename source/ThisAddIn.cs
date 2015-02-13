@@ -819,15 +819,15 @@ namespace MySQL.ForExcel
         activeEditConnectionInfo.EditDialog.UnprotectWorksheet();
       }
 
+      // Remove the localized date format strings from this workbook, since they can't be saved in a macro-free (normal) workbook.
+      workbook.RemoveLocalizedDateFormatNames();
+
       //The WorkbookAfterSave event in Excel 2007 does not exist so we need to sligthly alter the program flow to overcome this limitation.
       if (ExcelVersionNumber <= EXCEL_2007_VERSION_NUMBER)
       {
         cancel = true; //Cancels the users original save command request in order to execute the following code override.
         Application_WorkbookAfterSave2007(workbook, saveAsUi);
       }
-
-      // Remove the localized date format strings from this workbook, since they can't be saved in a macro-free (normal) workbook.
-      workbook.RemoveLocalizedDateFormatNames();
     }
 
     /// <summary>
