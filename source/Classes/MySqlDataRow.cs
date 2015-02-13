@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -665,6 +665,12 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     private void ReflectChangesForModifiedRow()
     {
+      if (RowState == DataRowState.Added && ExcelRange != null)
+      {
+        // A recently added row's value is being modified, we just need to re-paint the whole "added" row.
+        ExcelRange.SetInteriorColor(ExcelUtilities.UncommittedCellsOleColor);
+      }
+
       if (RowState != DataRowState.Modified)
       {
         return;
