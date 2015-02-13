@@ -1751,6 +1751,7 @@ namespace MySQL.ForExcel.Classes
         var cappedNumRowsWithHeaderRow = cappedNumRows + headerRowModifier;
         fillingRange = atCell.SafeResize(cappedNumRowsWithHeaderRow, Columns.Count);
         var fillingArray = new object[cappedNumRowsWithHeaderRow, Columns.Count];
+        var excelMinDate = new DateTime(1900, 1, 1);
 
         // Fill the values of the column names if they are flagged to be imported
         if (ImportColumnNames)
@@ -1778,9 +1779,21 @@ namespace MySQL.ForExcel.Classes
           for (int currCol = 0; currCol < Columns.Count; currCol++)
           {
             var cellValue = mySqlRow[currCol];
+
             if (cellValue is TimeSpan)
             {
+              // Convert TimeSpan data to a format Excel recognizes as native time.
               cellValue = ((TimeSpan)mySqlRow[currCol]).TotalDays;
+            }
+            else if (cellValue is DateTime)
+            {
+              var dateValue = (DateTime)cellValue;
+
+              // Convert DateTime values before the Excel minimum date of "1/1/1900" to text, otherwise Excel will throw an error
+              if (dateValue < excelMinDate)
+              {
+                cellValue = dateValue.ToString(CultureInfo.CurrentCulture);
+              }
             }
 
             fillingArray[absRowIndex, currCol] = cellValue;
