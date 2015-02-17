@@ -1,3 +1,39 @@
+MySQL for Excel 1.3.4 Release Notes
+------------------------------------
+
+Welcome to the release notes for MySQL for Excel 1.3.4
+
+* Fixed a bug that occurred during the preparation of data to be exported to a new table, when the number of
+  rows to be exported was higher than the number of previewed rows, the Export Data operation was restricted
+  to the number of previewed rows.
+* Fixed the import of MySQL data into an Excel range to convert any dates before the Excel minimum date
+  (January 1, 1900) to text so Excel does not throw a COM Exception. Verified that these dates can be changed
+  on Edit Data operations and saved back to MySQL without any errors.
+* Changed the method to display a custom Save As dialog when a Workbook is saved in Excel 2007 to one that
+  supports showing all Excel supported file filters.
+* Fixed the custom Refresh All functionality overriden by MySQL for Excel to fire a refresh not only to Excel
+  tables (ListObjects) but also to Pivot Tables.
+* Fixed code used to temporarily store the selected Excel range used for an Export or Append Data operation so
+  that it copies only visible rows (i.e. rows that have not been filtered out by an Excel Auto-Filter).
+* Changed the way data uniqueness within a column is checked during an Export Data operation. Before MySQL for
+  Excel relied in ADO.NET's way to determine if the data in a DataColumn is unique (by creating a Unique
+  constraint in it), which uses SQL Server's rules and regards nulls values as duplicates even when the column
+  is set to allow null data. MySQL allows to have duplicate null values in a column that is set to allow null
+  data. Now MySQL for Excel follows the MySQL rules, so if a column is set to allow null data, those values are
+  not considered in the uniqueness check, otherwise they do. Now if duplicate values are found when flagging a
+  column as Unique, a dialog containing the sets of duplicate values along with the count of those sets can be
+  displayed by clicking the More Information link shown within the column warning.
+* Other bug fixes (for a complete list refer to the CHANGES file).
+
+
+Known Issues
+--------------------
+* Upgrading from versions 1.3.2 and lower is not possible due to a bug fixed in this version (1.3.3).
+  In that scenario the version (1.3.2 or lower) must be uninstalled first. Upgrading from 1.3.3 will work
+  as expected.
+  
+  
+
 MySQL for Excel 1.3.3 Release Notes
 ------------------------------------
 
