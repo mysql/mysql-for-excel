@@ -339,14 +339,13 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The consistent MySQL data type for all values, specifying the length for the data.</returns>
     public static string GetConsistentDataTypeOnAllRows(string proposedStrippedDataType, List<string> rowsDataTypesList, int[] decimalMaxLen, int[] varCharMaxLen, out string consistentStrippedDataType)
     {
-      string fullDataType = proposedStrippedDataType;
-
-      if (rowsDataTypesList.Count == 0)
+      if (rowsDataTypesList == null || rowsDataTypesList.Count == 0 || string.IsNullOrEmpty(proposedStrippedDataType))
       {
         consistentStrippedDataType = string.Empty;
         return string.Empty;
       }
 
+      string fullDataType = proposedStrippedDataType;
       bool typesConsistent = rowsDataTypesList.All(str => str == proposedStrippedDataType);
       if (!typesConsistent)
       {

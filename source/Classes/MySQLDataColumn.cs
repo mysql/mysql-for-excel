@@ -1073,35 +1073,27 @@ namespace MySQL.ForExcel.Classes
 
       // Get the consistent DataType for all rows except first one.
       proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListFromSecondRow, decimalMaxLen, varCharMaxLen);
-
-      if (string.IsNullOrEmpty(proposedType) && ParentTable.OperationType.IsForExport())
+      RowsFromSecondDataType = string.IsNullOrEmpty(proposedType)
+        ? "VarChar(255)"
+        : proposedType;
+      if (!string.IsNullOrEmpty(proposedType))
       {
-        proposedType = "VarChar(255)";
-        strippedType = "VarChar";
-        typesListForFirstAndRest.Add("VarChar");
-        varCharMaxLen[0] = 255;
-        varCharMaxLen[1] = 255;
-      }
-
-      RowsFromSecondDataType = proposedType;
-
-      // Get the consistent DataType between first columnInfoRow and the previously computed consistent DataType for the rest of the rows.
-      if (typesListFromSecondRow.Count > 0)
-      {
-        bool emptyProposedType = string.IsNullOrEmpty(proposedType);
-        leftParensIndex = emptyProposedType ? -1 : proposedType.IndexOf("(", StringComparison.Ordinal);
-        strippedType = leftParensIndex < 0 || emptyProposedType
+        leftParensIndex = proposedType.IndexOf("(", StringComparison.Ordinal);
+        strippedType = leftParensIndex < 0
           ? proposedType
           : proposedType.Substring(0, leftParensIndex);
-        typesListForFirstAndRest.Add(strippedType);
+        typesListForFirstAndRest.Add(proposedType);
       }
 
+      // Get the consistent DataType between first row and the previously computed consistent DataType for the rest of the rows.
       varCharMaxLen[0] = Math.Max(varCharMaxLen[0], varCharLengthsFirstRow[0]);
       varCharMaxLen[1] = Math.Max(varCharMaxLen[1], varCharLengthsFirstRow[1]);
       decimalMaxLen[0] = Math.Max(decimalMaxLen[0], decimalMaxLenFirstRow[0]);
       decimalMaxLen[1] = Math.Max(decimalMaxLen[1], decimalMaxLenFirstRow[1]);
       proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListForFirstAndRest, decimalMaxLen, varCharMaxLen);
       RowsFromFirstDataType = proposedType;
+
+      // Set the DataType in the column depending on the setting to treat the first row of data as the names of the columns
       SetMySqlDataType(ParentTable.FirstRowContainsColumnNames ? RowsFromSecondDataType : RowsFromFirstDataType);
     }
 
