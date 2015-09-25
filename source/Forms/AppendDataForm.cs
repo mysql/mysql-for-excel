@@ -24,7 +24,6 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
-using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
@@ -350,9 +349,9 @@ namespace MySQL.ForExcel.Forms
       DataGridViewCellStyle newStyle;
 
       // Change text and style of target table column
-      MultiHeaderColumn multiHeaderCol = TargetMySQLTableDataGridView.MultiHeaderColumnList[targetColumnIndex];
-      multiHeaderCol.HeaderText = mapping ? mappedColName : string.Empty;
-      multiHeaderCol.BackgroundColor = mapping ? Color.LightGreen : Color.OrangeRed;
+      var headerColumn = TargetMySQLTableDataGridView.MultiHeaderRowsCollection[0][targetColumnIndex];
+      headerColumn.Text = mapping ? mappedColName : string.Empty;
+      headerColumn.Style.BackColor = mapping ? Color.LightGreen : Color.OrangeRed;
 
       // Change style of source table column being mapped or unmapped
       if (mapping)
@@ -543,20 +542,12 @@ namespace MySQL.ForExcel.Forms
     /// <param name="onlyGrids">Flag indicating whether only the grids are cleared but not the mapping in memory.</param>
     private void ClearMappings(bool onlyGrids)
     {
-      bool newMappings = TargetMySQLTableDataGridView.MultiHeaderColumnList.Count == 0;
       for (int colIdx = 0; colIdx < TargetMySQLTableDataGridView.Columns.Count; colIdx++)
       {
-        if (newMappings)
-        {
-          TargetMySQLTableDataGridView.MultiHeaderColumnList.Add(new MultiHeaderColumn(string.Empty, colIdx, colIdx));
-        }
-        else
-        {
-          TargetMySQLTableDataGridView.MultiHeaderColumnList[colIdx].HeaderText = string.Empty;
-        }
-
-        TargetMySQLTableDataGridView.MultiHeaderColumnList[colIdx].BackgroundColor = Color.OrangeRed;
-        MySqlDataColumn toCol = _targetMySqlPreviewDataTable.Columns[colIdx] as MySqlDataColumn;
+        var headerColumn = TargetMySQLTableDataGridView.MultiHeaderRowsCollection[0][colIdx];
+        headerColumn.Text = string.Empty;
+        headerColumn.Style.BackColor = Color.OrangeRed;
+        var toCol = _targetMySqlPreviewDataTable.Columns[colIdx] as MySqlDataColumn;
         if (toCol != null)
         {
           toCol.MappedDataColName = null;
@@ -1008,18 +999,18 @@ namespace MySQL.ForExcel.Forms
       }
 
       // Refresh the mapped columns in the "To" Grid
-      for (int colIdx = 0; colIdx < TargetMySQLTableDataGridView.MultiHeaderColumnList.Count; colIdx++)
+      for (int colIdx = 0; colIdx < TargetMySQLTableDataGridView.Columns.Count; colIdx++)
       {
-        MultiHeaderColumn multiHeaderCol = TargetMySQLTableDataGridView.MultiHeaderColumnList[colIdx];
+        var headerColumn = TargetMySQLTableDataGridView.MultiHeaderRowsCollection[0][colIdx];
         if (_currentColumnMapping == null)
         {
           continue;
         }
 
         int mappedSourceIndex = _currentColumnMapping.MappedSourceIndexes[colIdx];
-        if (!string.IsNullOrEmpty(multiHeaderCol.HeaderText) && mappedSourceIndex >= 0)
+        if (!string.IsNullOrEmpty(headerColumn.Text) && mappedSourceIndex >= 0)
         {
-          multiHeaderCol.HeaderText = SourceExcelDataDataGridView.Columns[mappedSourceIndex].HeaderText;
+          headerColumn.Text = SourceExcelDataDataGridView.Columns[mappedSourceIndex].HeaderText;
         }
       }
 
@@ -1340,9 +1331,9 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      string mapping1ColName = TargetMySQLTableDataGridView.MultiHeaderColumnList[mappingSourceIndex1].HeaderText;
+      string mapping1ColName = TargetMySQLTableDataGridView.MultiHeaderRowsCollection[0][mappingSourceIndex1].Text;
       int mapping1Index = _currentColumnMapping.MappedSourceIndexes[mappingSourceIndex1];
-      string mapping2ColName = TargetMySQLTableDataGridView.MultiHeaderColumnList[mappingSourceIndex2].HeaderText;
+      string mapping2ColName = TargetMySQLTableDataGridView.MultiHeaderRowsCollection[0][mappingSourceIndex2].Text;
       int mapping2Index = _currentColumnMapping.MappedSourceIndexes[mappingSourceIndex2];
 
       ApplySingleMapping(mapping1Index, mappingSourceIndex2, mapping1ColName);

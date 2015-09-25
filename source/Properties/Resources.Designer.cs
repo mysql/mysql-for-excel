@@ -2869,6 +2869,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Value must be greater or equal to 0..
+        /// </summary>
+        internal static string ValueLessThanZeroError {
+            get {
+                return ResourceManager.GetString("ValueLessThanZeroError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Value &apos;{0}&apos; is not suitable to be converted to a {1} data type..
         /// </summary>
         internal static string ValueNotSuitableForConversionError {

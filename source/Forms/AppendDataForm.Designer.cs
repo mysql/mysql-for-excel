@@ -464,7 +464,6 @@ namespace MySQL.ForExcel.Forms
       dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
       dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
       this.TargetMySQLTableDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-      this.TargetMySQLTableDataGridView.ColumnHeadersHeight = 46;
       this.TargetMySQLTableDataGridView.ColumnsMaximumWidth = 200;
       this.TargetMySQLTableDataGridView.ContextMenuStrip = this.AppendContextMenu;
       dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;

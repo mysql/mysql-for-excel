@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@ namespace MySQL.ForExcel.Controls
   /// <summary>
   /// Displays data in a read-only grid for preview purposes only.
   /// </summary>
-  internal class PreviewDataGridView : DataGridView
+  public class PreviewDataGridView : DataGridView
   {
     /// <summary>
     /// Flag indicating if recalculation of column width is not necessary so it must be skipped.
