@@ -1,4 +1,7 @@
 1.3.5
+- Added an option to the Advanced Options dialog for Append Data operations, called "Show column data types above column names", that when checked data type
+  information for columns on source and target grids of the Append Data dialog is shown. Showing the data types can sometimes aid users when doing manual
+  mapping of columns.
 - Fixed the data type detection logic for a column's data that was failing when only the first row of data contained data but the rest of the rows were empty.
   (MySQL Bug #78358, Bug #21799680 - EXPORT DATA - DATA TYPE NOT DETECTED CORRECTLY WHEN ONLY FIRST ROW CONTAINS DATA)
 

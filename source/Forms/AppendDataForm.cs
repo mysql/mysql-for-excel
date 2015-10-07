@@ -24,6 +24,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
+using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
@@ -139,8 +140,6 @@ namespace MySQL.ForExcel.Forms
 
       InitializeComponent();
 
-      SourceExcelDataDataGridView.EnableHeadersVisualStyles = false;
-
       InitializeSourceTableGrid();
       InitializeTargetTableGrid();
 
@@ -196,30 +195,40 @@ namespace MySQL.ForExcel.Forms
       using (var optionsDialog = new AppendAdvancedOptionsDialog(StoredColumnMappingsList))
       {
         optionsDialog.ShowDialog();
-        if (!optionsDialog.ParentFormRequiresRefresh)
+        if (optionsDialog.MappingsChanged)
         {
-          return;
-        }
-
-        RefreshMappingMethodCombo();
-        if (!SelectStoredMappingForTargetTable())
-        {
-          MappingMethodComboBox.SelectedIndex = Settings.Default.AppendPerformAutoMap ? 0 : 1;
-        }
-
-        InitializeSourceTableGrid();
-        InitializeTargetTableGrid();
-        for (int targetColumnIndex = 0; targetColumnIndex < _currentColumnMapping.MappedSourceIndexes.Length; targetColumnIndex++)
-        {
-          int mappedSourceColumnIndex = _currentColumnMapping.MappedSourceIndexes[targetColumnIndex];
-          if (mappedSourceColumnIndex < 0)
+          // A stored mapping was renamed or deleted, so we need to refresh the combobox that shows stored mappings and re-select the mapping that matches the current table
+          //  or apply an automatic mapping. Either of these 2 options re-applies the mappings to the target grid so the mapping is shown on the additional column headers.
+          RefreshMappingMethodCombo();
+          if (!SelectStoredMappingForTargetTable())
           {
-            continue;
+            MappingMethodComboBox.SelectedIndex = Settings.Default.AppendPerformAutoMap ? 0 : 1;
           }
+        }
 
-          var sourceColumn = _sourceMySqlPreviewDataTable.GetColumnAtIndex(mappedSourceColumnIndex);
-          var targetColumn = _targetMySqlPreviewDataTable.GetColumnAtIndex(targetColumnIndex);
-          CheckIfSourceDataAgainstMappedTargetColumn(sourceColumn, targetColumn);
+        // The following code may look like it can be refactored (looks repetitive), it is written like this so code only runs when needed depending on changed values.
+        // If refactored (or left as it was before) some code runs unnecessarily.
+        if (optionsDialog.UseFormattedValuesChanged || optionsDialog.LimitPreviewRowsQuantityChanged)
+        {
+          // Values that affect how data types are detected for the target table changed, so we need to re-create the data sources of the grids and refresh the grids completely.
+          // The current mapping needs to be re-applied only if it was not re-applied in the code above.
+          InitializeSourceTableGrid();
+          InitializeTargetTableGrid();
+          if (!optionsDialog.MappingsChanged)
+          {
+            ApplySelectedStoredColumnMapping();
+          }
+        }
+        else if (optionsDialog.ShowDataTypesChanged)
+        {
+          // Only the checkbox to show/hide data types changed. Note this is on an "else if" clause because this same code runs in the previous if block within the Initialize methods.
+          // The current mapping needs to be re-applied only if it was not re-applied in the code above.
+          RefreshAdditionalColumnHeaderRows(SourceExcelDataDataGridView);
+          RefreshAdditionalColumnHeaderRows(TargetMySQLTableDataGridView);
+          if (!optionsDialog.MappingsChanged)
+          {
+            ApplySelectedStoredColumnMapping();
+          }
         }
       }
     }
@@ -1041,13 +1050,9 @@ namespace MySQL.ForExcel.Forms
       int previewRowsQty = Math.Min(_appendDataRange.Rows.Count, Settings.Default.AppendLimitPreviewRowsQuantity);
       _sourceMySqlPreviewDataTable.SetupColumnsWithData(_appendDataRange, true, previewRowsQty);
       SourceExcelDataDataGridView.DataSource = _sourceMySqlPreviewDataTable;
-      foreach (DataGridViewColumn gridCol in SourceExcelDataDataGridView.Columns)
-      {
-        gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
-      }
-
       SourceExcelDataDataGridView.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
       FirstRowHeadersCheckBox_CheckedChanged(FirstRowHeadersCheckBox, EventArgs.Empty);
+      RefreshAdditionalColumnHeaderRows(SourceExcelDataDataGridView);
     }
 
     /// <summary>
@@ -1058,12 +1063,8 @@ namespace MySQL.ForExcel.Forms
       SetPreviewParameterValues();
       _targetMySqlPreviewDataTable = new MySqlDataTable(_appendDbTable, Settings.Default.AppendUseFormattedValues);
       TargetMySQLTableDataGridView.DataSource = _targetMySqlPreviewDataTable;
-      foreach (DataGridViewColumn gridCol in TargetMySQLTableDataGridView.Columns)
-      {
-        gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
-      }
-
       TargetMySQLTableDataGridView.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
+      RefreshAdditionalColumnHeaderRows(TargetMySQLTableDataGridView);
     }
 
     /// <summary>
@@ -1111,6 +1112,49 @@ namespace MySQL.ForExcel.Forms
       TargetMySQLTableDataGridView.Refresh();
       SourceExcelDataDataGridView.Refresh();
       StoreMappingButton.Enabled = _currentColumnMapping.MappedQuantity > 0;
+    }
+
+    /// <summary>
+    /// Sets the tooltip text shown on column headers, containing the data type of each column.
+    /// </summary>
+    /// <param name="grid">The <see cref="DataGridView"/> which column header tooltips need to be refreshed.</param>
+    private void RefreshColumnHeaderDataTypeToolTips(DataGridView grid)
+    {
+      if (grid == null)
+      {
+        return;
+      }
+
+      bool showDataTypes = Settings.Default.AppendShowDataTypes;
+      var mySqlTable = grid.DataSource as MySqlDataTable;
+      foreach (DataGridViewColumn gridColumn in grid.Columns)
+      {
+        if (mySqlTable != null)
+        {
+          var mySqlColumn = mySqlTable.Columns[gridColumn.Index] as MySqlDataColumn;
+          if (mySqlColumn != null)
+          {
+            gridColumn.Tag = mySqlColumn.StrippedMySqlDataType;
+          }
+        }
+
+        gridColumn.ToolTipText = showDataTypes ? string.Empty : gridColumn.Tag.ToString();
+      }
+    }
+
+    /// <summary>
+    /// Rebuilds the rows of additional column headers and their column header tooltips.
+    /// </summary>
+    /// <param name="multiHeaderGrid">The <see cref="MultiHeaderDataGridView"/> object to refresh.</param>
+    private void RefreshAdditionalColumnHeaderRows(MultiHeaderDataGridView multiHeaderGrid)
+    {
+      if (multiHeaderGrid == null)
+      {
+        return;
+      }
+
+      RefreshColumnHeaderDataTypeToolTips(multiHeaderGrid);
+      SetupAdditionalHeaderRows(multiHeaderGrid, multiHeaderGrid.Name == "TargetMySQLTableDataGridView");
     }
 
     /// <summary>
@@ -1219,13 +1263,37 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="SourceExcelDataDataGridView"/> data binding is complete.
+    /// Creates additional header rows in the given <see cref="MultiHeaderDataGridView"/> to show column data types and column mappings.
     /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void SourceExcelDataDataGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+    /// <param name="multiHeaderGrid">The <see cref="MultiHeaderDataGridView"/> object where additional header rows will be created.</param>
+    /// <param name="addMappingsHeader">Flag indicating whether an extra header row should be added to show column mappings.</param>
+    private void SetupAdditionalHeaderRows(MultiHeaderDataGridView multiHeaderGrid, bool addMappingsHeader)
     {
-      SourceExcelDataDataGridView.ClearSelection();
+      if (multiHeaderGrid == null)
+      {
+        return;
+      }
+
+      multiHeaderGrid.ClearHeadersRows();
+      bool showDataTypes = Settings.Default.AppendShowDataTypes;
+      int mappingsRowsQuantity = addMappingsHeader ? 1 : 0;
+      int additionalHeaderRowsQuantity = (showDataTypes ? 1 : 0) + mappingsRowsQuantity;
+      for (int additionalRowIndex = 0; additionalRowIndex < additionalHeaderRowsQuantity; additionalRowIndex++)
+      {
+        multiHeaderGrid.AddHeadersRow(false);
+      }
+
+      if (!showDataTypes)
+      {
+        return;
+      }
+
+      foreach (var headerColumn in multiHeaderGrid.MultiHeaderRowsCollection[mappingsRowsQuantity])
+      {
+        var gridColumn = multiHeaderGrid.Columns[headerColumn.ColumnIndex];
+        headerColumn.Text = gridColumn.Tag != null ? gridColumn.Tag.ToString() : string.Empty;
+        headerColumn.Style.Font = new Font(multiHeaderGrid.ColumnHeadersDefaultCellStyle.Font, FontStyle.Italic);
+      }
     }
 
     /// <summary>

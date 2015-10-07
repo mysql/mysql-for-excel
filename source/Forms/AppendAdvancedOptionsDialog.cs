@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -31,40 +31,58 @@ namespace MySQL.ForExcel.Forms
   /// </summary>
   public partial class AppendAdvancedOptionsDialog : AutoStyleableBaseDialog
   {
-    /// <summary>
-    /// <c>true</c> when at least one of the _mappings was changed.
-    /// </summary>
-    private bool _mappingsWereChanged;
+    #region Fields
 
     /// <summary>
     /// Specific column mapping currently selected by the user.
     /// </summary>
     private MySqlColumnMapping _selectedMapping;
 
-    /// <summary>
-    /// List of column mappings for the current user.
-    /// </summary>
-    public readonly List<MySqlColumnMapping> Mappings;
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the data in the parent form needs to be reloaded on the grids.
-    /// </summary>
-    /// <value>
-    ///   <c>true</c> if requires refreshing; otherwise, <c>false</c>.
-    /// </value>
-    public bool ParentFormRequiresRefresh { get; private set; }
+    #endregion Fields
 
     /// <summary>
     /// Creates a new instance of the <see cref="AppendAdvancedOptionsDialog"/> class.
     /// </summary>
-    public AppendAdvancedOptionsDialog(List<MySqlColumnMapping> mappings)
+    public AppendAdvancedOptionsDialog(IEnumerable<MySqlColumnMapping> mappings)
     {
-      ParentFormRequiresRefresh = false;
+      LimitPreviewRowsQuantityChanged = false;
+      MappingsChanged = false;
+      ShowDataTypesChanged = false;
+      UseFormattedValuesChanged = false;
       InitializeComponent();
       RefreshControlValues();
       Mappings = mappings.Select(item => (MySqlColumnMapping)item.Clone()).ToList();
       RefreshMappingList();
     }
+
+    #region Properties
+
+    /// <summary>
+    /// Gets a value indicating whether the number of preview rows changed.
+    /// </summary>
+    public bool LimitPreviewRowsQuantityChanged { get; private set; }
+
+    /// <summary>
+    /// List of column mappings for the current user.
+    /// </summary>
+    public List<MySqlColumnMapping> Mappings { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicatng whether mappings were renamed or deleted.
+    /// </summary>
+    public bool MappingsChanged { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicating whether the setting to show data types above column names changed.
+    /// </summary>
+    public bool ShowDataTypesChanged { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicating whether the setting to use formatted values changed.
+    /// </summary>
+    public bool UseFormattedValuesChanged { get; private set; }
+
+    #endregion Properties
 
     /// <summary>
     /// Event delegate method fired when the <see cref="ImportAdvancedOptionsDialog"/> is being closed.
@@ -79,14 +97,14 @@ namespace MySQL.ForExcel.Forms
       }
 
       var previewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
-      ParentFormRequiresRefresh = Settings.Default.AppendUseFormattedValues != UseFormattedValuesCheckBox.Checked ||
-                                  Settings.Default.AppendLimitPreviewRowsQuantity != previewRowsQuantity ||
-                                  _mappingsWereChanged;
-
+      LimitPreviewRowsQuantityChanged = Settings.Default.AppendLimitPreviewRowsQuantity != previewRowsQuantity;
+      ShowDataTypesChanged = Settings.Default.AppendShowDataTypes != ShowDataTypesCheckBox.Checked;
+      UseFormattedValuesChanged = Settings.Default.AppendUseFormattedValues != UseFormattedValuesCheckBox.Checked;
       Settings.Default.AppendPerformAutoMap = DoNotPerformAutoMapCheckBox.Checked;
       Settings.Default.AppendAutoStoreColumnMapping = AutoStoreColumnMappingCheckBox.Checked;
       Settings.Default.AppendReloadColumnMapping = ReloadColumnMappingCheckBox.Checked;
       Settings.Default.AppendUseFormattedValues = UseFormattedValuesCheckBox.Checked;
+      Settings.Default.AppendShowDataTypes = ShowDataTypesCheckBox.Checked;
       Settings.Default.AppendLimitPreviewRowsQuantity = previewRowsQuantity;
       Settings.Default.AppendSqlQueriesDisableIndexes = DisableTableIndexesCheckBox.Checked;
       Settings.Default.StoredDataMappings = Mappings;
@@ -105,7 +123,7 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      _mappingsWereChanged = true;
+      MappingsChanged = true;
       Mappings.Remove(_selectedMapping);
       RefreshMappingList();
     }
@@ -135,6 +153,7 @@ namespace MySQL.ForExcel.Forms
         AutoStoreColumnMappingCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendAutoStoreColumnMapping");
         ReloadColumnMappingCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendReloadColumnMapping");
         UseFormattedValuesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendUseFormattedValues");
+        ShowDataTypesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendShowDataTypes");
         PreviewRowsQuantityNumericUpDown.Value = settings.GetPropertyDefaultValueByName<int>("AppendLimitPreviewRowsQuantity");
         DisableTableIndexesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendSqlQueriesDisableIndexes");
       }
@@ -144,6 +163,7 @@ namespace MySQL.ForExcel.Forms
         AutoStoreColumnMappingCheckBox.Checked = Settings.Default.AppendAutoStoreColumnMapping;
         ReloadColumnMappingCheckBox.Checked = Settings.Default.AppendReloadColumnMapping;
         UseFormattedValuesCheckBox.Checked = Settings.Default.AppendUseFormattedValues;
+        ShowDataTypesCheckBox.Checked = Settings.Default.AppendShowDataTypes;
         PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.AppendLimitPreviewRowsQuantity);
         DisableTableIndexesCheckBox.Checked = Settings.Default.AppendSqlQueriesDisableIndexes;
       }
@@ -207,7 +227,8 @@ namespace MySQL.ForExcel.Forms
         {
           return;
         }
-        _mappingsWereChanged = true;
+
+        MappingsChanged = true;
         newName = newColumnMappingDialog.ColumnMappingName;
       }
 
