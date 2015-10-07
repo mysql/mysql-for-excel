@@ -1,3 +1,4 @@
+.gitattributes
 .reviewboardrc
 thumbs.db
 source/bin/
@@ -5,6 +6,7 @@ source/obj/
 Installer/bin/
 Installer/obj/
 ExcelCustomActionTest/
+VisualControlsTests/
 *.user
 **/thumbs.db
 **/bin/**
