@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -28,7 +28,7 @@ namespace MySQL.ForExcel.Controls
   /// <summary>
   /// Provides a label control with a variable text color opacity.
   /// </summary>
-  internal sealed class TransparentLabel : UserControl
+  public sealed class TransparentLabel : UserControl
   {
     #region Fields
 
@@ -100,55 +100,55 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets or sets a valie indicating whether anti-aliasing is applied when rendering the text.
     /// </summary>
-    [Category("Appearance"), DefaultValue(false), Description("Applies anti-aliasing when rendering the text.")]
+    [Category("MySQL Custom"), DefaultValue(false), Description("Applies anti-aliasing when rendering the text.")]
     public bool ApplyAntiAlias { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the automatic handling of text that extends beyond the width of the label control is enabled.
     /// </summary>
-    [Category("Behavior"), DefaultValue(false), Description("Enables the automatic handling of text that extends beyond the width of the label control.")]
+    [Category("MySQL Custom"), DefaultValue(false), Description("Enables the automatic handling of text that extends beyond the width of the label control.")]
     public bool AutoEllipsis { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether a copy of the text with an offset to emulate a shadow is drawn.
     /// </summary>
-    [Category("Appearance"), DefaultValue(false), Description("Draws a copy of the text with an offset to emulate a shadow.")]
+    [Category("MySQL Custom"), DefaultValue(false), Description("Draws a copy of the text with an offset to emulate a shadow.")]
     public bool DrawShadow { get; set; }
 
     /// <summary>
     /// Gets or sets the pixels to add as a vertical spacing between lines to adjust spacing.
     /// </summary>
-    [Category("Appearance"), DefaultValue(0), Description("Pixels to add as a vertical spacing between lines to adjust spacing.")]
+    [Category("MySQL Custom"), DefaultValue(0), Description("Pixels to add as a vertical spacing between lines to adjust spacing.")]
     public int PixelsSpacingAdjustment { get; set; }
 
     /// <summary>
     /// Gets or sets the color of the shadow text.
     /// </summary>
-    [Category("Appearance"), Description("Color of the shadow text.")]
+    [Category("MySQL Custom"), Description("Color of the shadow text.")]
     public Color ShadowColor { get; set; }
 
     /// <summary>
     /// Gets or sets the opacity factor of the shadow ranging from 0 to 1.
     /// </summary>
-    [Category("Appearance"), DefaultValue(0.5), Description("Opacity factor of the shadow ranging from 0 to 1.")]
+    [Category("MySQL Custom"), DefaultValue(0.5), Description("Opacity factor of the shadow ranging from 0 to 1.")]
     public double ShadowOpacity { get; set; }
 
     /// <summary>
     /// Gets or sets the horizontal offset for the shadow text given in pixels.
     /// </summary>
-    [Category("Appearance"), DefaultValue(1), Description("Horizontal offset for the shadow text given in pixels.")]
+    [Category("MySQL Custom"), DefaultValue(1), Description("Horizontal offset for the shadow text given in pixels.")]
     public int ShadowPixelsXOffset { get; set; }
 
     /// <summary>
     /// Gets or sets the vertical offset for the shadow text given in pixels.
     /// </summary>
-    [Category("Appearance"), DefaultValue(1), Description("Vertical offset for the shadow text given in pixels.")]
+    [Category("MySQL Custom"), DefaultValue(1), Description("Vertical offset for the shadow text given in pixels.")]
     public int ShadowPixelsYOffset { get; set; }
 
     /// <summary>
     /// Gets or sets a <see cref="ContentAlignment"/> determining the position of the text within the label.
     /// </summary>
-    [Category("Appearance"), DefaultValue(ContentAlignment.TopLeft), Description("Determines the position of the text within the label.")]
+    [Category("MySQL Custom"), DefaultValue(ContentAlignment.TopLeft), Description("Determines the position of the text within the label.")]
     public ContentAlignment TextAlign
     {
       get
@@ -170,13 +170,13 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets pr sets the opacity factor of the text ranging from 0 to 1.
     /// </summary>
-    [Category("Appearance"), DefaultValue(1.0), Description("Opacity factor of the text ranging from 0 to 1.")]
+    [Category("MySQL Custom"), DefaultValue(1.0), Description("Opacity factor of the text ranging from 0 to 1.")]
     public double TextOpacity { get; set; }
 
     /// <summary>
     /// Gets or sets the text to display in the control.
     /// </summary>
-    [Category("Appearance"), DefaultValue(""), Description("The text to display in the control.")]
+    [Category("MySQL Custom"), DefaultValue(""), Description("The text to display in the control.")]
     public string TransparentText
     {
       get

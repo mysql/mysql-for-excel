@@ -270,14 +270,7 @@ namespace MySQL.ForExcel.Panels
 
       if (listControl.SelectedNodes.Count > 1)
       {
-        // Check if procedures are among the multiple selection, if so cancel the multi-selection since procedures are not allowed in it.
-        var proceduresInSelection = listControl.SelectedNodes.Any(node => node.DbObject is DbProcedure);
-        if (proceduresInSelection)
-        {
-          listControl.SelectedNode = e.Node as MySqlListViewNode;
-          return;
-        }
-
+        // Refresh the actions related to a multiple selection of tables / views.
         RefreshActionLabelsEnabledStatus(null, false);
       }
       else
@@ -311,18 +304,19 @@ namespace MySQL.ForExcel.Panels
     }
 
     /// <summary>
-    /// Event delegate method fired when a key is pressed within the <see cref="DBObjectsFilter"/> control.
+    /// Event delegate method fired when a key is pressed that triggers the search.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void DBObjectsFilter_KeyDown(object sender, KeyEventArgs e)
+    private void DBObjectsFilter_SearchFired(object sender, EventArgs e)
     {
-      if (e.KeyCode != Keys.Enter)
+      var searchBox = sender as SearchEdit;
+      if (searchBox == null)
       {
         return;
       }
 
-      Filter = DBObjectsFilter.Text.Trim().ToUpper();
+      Filter = DBObjectsFilter.Text.ToUpper();
       try
       {
         RefreshDbObjectsList(false);

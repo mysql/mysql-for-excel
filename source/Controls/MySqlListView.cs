@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -19,7 +19,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -45,19 +44,19 @@ namespace MySQL.ForExcel.Controls
     public const double DEFAULT_DESCRIPTION_COLOR_OPACITY = 0.6;
 
     /// <summary>
-    /// The vertical offset in pixels for the description text.
+    /// The vertical offset, in pixels, for the description text.
     /// </summary>
     public const int DEFAULT_DESCRIPTION_TEXT_VERTICAL_PIXELS_OFFSET = 0;
 
     /// <summary>
-    /// The default horizontal offset in pixels for the node image.
+    /// The default horizontal offset, in pixels, for the node image.
     /// </summary>
     public const int DEFAULT_IMAGE_HORIZONTAL_PIXELS_OFFSET = 5;
 
     /// <summary>
-    /// The default horizontal offset in pixels for the node text relative to the node image.
+    /// The default horizontal offset, in pixels, for the node text relative to the node image or to the left bounds if no image is used.
     /// </summary>
-    public const int DEFAULT_IMAGE_TO_TEXT_HORIZONTAL_PIXELS_OFFSET = 5;
+    public const int DEFAULT_TEXT_HORIZONTAL_PIXELS_OFFSET = 5;
 
     /// <summary>
     /// The default multiple number for the height of tree nodes.
@@ -126,7 +125,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Collection of selected nodes.
     /// </summary>
-    private List<MySqlListViewNode> _selectedNodes;
+    private readonly List<MySqlListViewNode> _selectedNodes;
 
     #endregion Fields
 
@@ -141,14 +140,17 @@ namespace MySQL.ForExcel.Controls
       HeaderNodes = new List<MySqlListViewNode>();
       MultiSelect = false;
       NodeHeightMultiple = DEFAULT_NODE_HEIGH_TMULTIPLE;
+      DisplayImagesOfDisabledNodesInGrayScale = true;
       DoubleBuffered = true;
       DrawMode = TreeViewDrawMode.OwnerDrawAll;
-      ImageHorizontalPixelsOffset = DEFAULT_IMAGE_HORIZONTAL_PIXELS_OFFSET;
-      ImageToTextHorizontalPixelsOffset = DEFAULT_IMAGE_TO_TEXT_HORIZONTAL_PIXELS_OFFSET;
+      ImageHorizontalOffset = DEFAULT_IMAGE_HORIZONTAL_PIXELS_OFFSET;
+      TextHorizontalOffset = DEFAULT_TEXT_HORIZONTAL_PIXELS_OFFSET;
       TitleColorOpacity = DEFAULT_TITLE_COLOR_OPACITY;
       DescriptionColorOpacity = DEFAULT_DESCRIPTION_COLOR_OPACITY;
-      TitleTextVerticalPixelsOffset = DEFAULT_TITLE_TEXT_VERTICAL_PIXELS_OFFSET;
-      DescriptionTextVerticalPixelsOffset = DEFAULT_DESCRIPTION_TEXT_VERTICAL_PIXELS_OFFSET;
+      TitleTextVerticalOffset = DEFAULT_TITLE_TEXT_VERTICAL_PIXELS_OFFSET;
+      DescriptionTextVerticalOffset = DEFAULT_DESCRIPTION_TEXT_VERTICAL_PIXELS_OFFSET;
+      ScaleImages = false;
+      ScaledImagesVerticalSpacing = 1;
       Scrollable = true;
       ShowLines = false;
       base.ShowLines = false;
@@ -202,62 +204,90 @@ namespace MySQL.ForExcel.Controls
     /// Gets or sets a value indicating whether check boxes are displayed next to list view items.
     /// </summary>
     /// <remarks>Overriding this property so it does not affect the control refresh.</remarks>
+    [Category("MySQL Custom"), Description("A value indicating whether check boxes are displayed next to list view items.")]
     public new bool CheckBoxes { get; set; }
 
     /// <summary>
     /// Gets or sets the image to be used for collapsed tree nodes.
     /// </summary>
+    [Category("MySQL Custom"), Description("The image to be used for collapsed tree nodes.")]
     public Image CollapsedIcon { get; set; }
 
     /// <summary>
     /// Gets or sets the color used for the nodes sub-text or description.
     /// </summary>
+    [Category("MySQL Custom"), Description("The color used for the nodes sub-text or description.")]
     public Color DescriptionColor { get; set; }
 
     /// <summary>
     /// Gets or sets the color opacity factor used for the description text.
     /// </summary>
+    [Category("MySQL Custom"), Description("The color opacity factor used for the description text.")]
     public double DescriptionColorOpacity { get; set; }
 
     /// <summary>
     /// Gets or sets the font used for the description text.
     /// </summary>
+    [Category("MySQL Custom"), Description("The font used for the description text.")]
     public Font DescriptionFont { get; set; }
 
     /// <summary>
     /// Gets or sets the vertical offset in pixels for the description text.
     /// </summary>
-    public int DescriptionTextVerticalPixelsOffset { get; set; }
+    [Category("MySQL Custom"), Description("The vertical offset in pixels for the description text.")]
+    public int DescriptionTextVerticalOffset { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether images for disabled nodes are converted to a grayscale representation automatically.
+    /// </summary>
+    [Category("MySQL Custom"), Description("A value indicating whether images for disabled nodes are converted to a grayscale representation automatically.")]
+    public bool DisplayImagesOfDisabledNodesInGrayScale { get; set; }
+
+    /// <summary>
+    /// Gets or sets the mode in which the control is drawn.
+    /// </summary>
+    [Category("MySQL Custom"), Description("The mode in which the control is drawn.")]
+    public new TreeViewDrawMode DrawMode
+    {
+      get
+      {
+        return base.DrawMode;
+      }
+
+      private set
+      {
+        base.DrawMode = value;
+      }
+    }
 
     /// <summary>
     /// Gets or sets the image to be used for expanded tree nodes.
     /// </summary>
+    [Category("MySQL Custom"), Description("The image to be used for expanded tree nodes.")]
     public Image ExpandedIcon { get; set; }
 
     /// <summary>
     /// Gets the list of header nodes containing sub-nodes.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<MySqlListViewNode> HeaderNodes { get; private set; }
 
     /// <summary>
-    /// Gets or sets the horizontal offset in pixels for the node image.
+    /// Gets or sets the horizontal offset, in pixels, for the node image.
     /// </summary>
-    public int ImageHorizontalPixelsOffset { get; set; }
-
-    /// <summary>
-    /// Gets or sets the horizontal offset in pixels for the node text relative to the node image.
-    /// </summary>
-    public int ImageToTextHorizontalPixelsOffset { get; set; }
+    [Category("MySQL Custom"), Description("The horizontal offset, in pixels, for the node image.")]
+    public int ImageHorizontalOffset { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the control allows the selection of multiple nodes.
     /// </summary>
+    [Category("MySQL Custom"), Description("A value indicating whether the control allows the selection of multiple nodes.")]
     public bool MultiSelect { get; set; }
 
     /// <summary>
     /// Gets or sets the multiple number for the height of tree nodes.
     /// </summary>
+    [Category("MySQL Custom"), Description("The multiple number for the height of tree nodes.")]
     public int NodeHeightMultiple
     {
       get
@@ -277,15 +307,28 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Gets or sets the list of images to be used by the tree view nodes.
+    /// Gets or sets the <see cref="ImageList"/> with the images to be used by the tree view nodes.
     /// </summary>
+    [Category("MySQL Custom"), Description("The ImageList with the images to be used by the tree view nodes.")]
     public ImageList NodeImages { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether images for nodes are scaled to fit the height of the node or drawn using their original size.
+    /// </summary>
+    [Category("MySQL Custom"), Description("A value indicating whether images for nodes are scaled to fit the height of the node or drawn using their original size.")]
+    public bool ScaleImages { get; set; }
+
+    /// <summary>
+    /// Gets or sets the spacing, in pixels, used only when <see cref="ScaleImages"/> is <c>true</c>, to leave it above and below the image relative to the node bounds rectangle.
+    /// </summary>
+    [Category("MySQL Custom"), Description("The spacing, in pixels, used only when ScaleImages is true, to leave it above and below the image relative to the node bounds rectangle.")]
+    public int ScaledImagesVerticalSpacing { get; set; }
 
     /// <summary>
     /// Gets or sets the node that is currently selected.
     /// </summary>
     /// <remarks>Overriding this property to implement own selection method.</remarks>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new MySqlListViewNode SelectedNode
     {
       get
@@ -306,7 +349,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets or sets the collection of selected nodes.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<MySqlListViewNode> SelectedNodes
     {
       get
@@ -340,23 +383,31 @@ namespace MySQL.ForExcel.Controls
     /// Gets a value indicating whether lines are drawn between tree nodes in the tree view control.
     /// </summary>
     /// <remarks>Replaces base functionality to fix ShowLines/FullRowSelect issues in base.</remarks>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool ShowLines { get; private set; }
+
+    /// <summary>
+    /// Gets or sets the horizontal offset, in pixels, for the node text relative to the node image or to the left bounds if no image is used.
+    /// </summary>
+    [Category("MySQL Custom"), Description("The horizontal offset, in pixels, for the node text relative to the node image or to the left bounds if no image is used.")]
+    public int TextHorizontalOffset { get; set; }
 
     /// <summary>
     /// Gets or sets the tree view title color opacity factor.
     /// </summary>
+    [Category("MySQL Custom"), Description("The tree view title color opacity factor.")]
     public double TitleColorOpacity { get; set; }
 
     /// <summary>
-    /// Gets or sets the vertical offset in pixels for the tree view title.
+    /// Gets or sets the vertical offset, in pixels, for the tree view title.
     /// </summary>
-    public int TitleTextVerticalPixelsOffset { get; set; }
+    [Category("MySQL Custom"), Description("The vertical offset, in pixels, for the tree view title.")]
+    public int TitleTextVerticalOffset { get; set; }
 
     /// <summary>
     /// Overriden property to hide the horizontal scrollbar.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     protected override CreateParams CreateParams
     {
       get
@@ -376,6 +427,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets or sets a value indicating whether the control should redraw its surface using a secondary buffer.
     /// </summary>
+    [Category("MySQL Custom"), Description("A value indicating whether the control should redraw its surface using a secondary buffer.")]
     protected override sealed bool DoubleBuffered
     {
       get
@@ -392,6 +444,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets the collection of tree nodes that are assigned to the control.
     /// </summary>
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     private new TreeNodeCollection Nodes
     {
       get
@@ -401,6 +454,17 @@ namespace MySQL.ForExcel.Controls
     }
 
     #endregion Properties
+
+    /// <summary>
+    /// Adds a <see cref="MySqlListViewNode"/> as a child of the given parent <see cref="MySqlListViewNode"/>.
+    /// </summary>
+    /// <param name="parentNode">The parent node under which to add the new node.</param>
+    /// <param name="childNode">The child node to be added.</param>
+    public void AddChildNode(MySqlListViewNode parentNode, MySqlListViewNode childNode)
+    {
+      parentNode.Nodes.Add(childNode);
+      SetNodeHeight(childNode, NodeHeightMultiple);
+    }
 
     /// <summary>
     /// Creates a new header node that holds connection information.
@@ -435,7 +499,7 @@ namespace MySQL.ForExcel.Controls
     /// <returns>The newly created <see cref="MySqlListViewNode"/> object.</returns>
     public MySqlListViewNode AddHeaderNode(string title)
     {
-      var node = new MySqlListViewNode(title);
+      var node = new MySqlListViewNode(title, MySqlListViewNode.MySqlNodeType.Header);
       Nodes.Add(node);
       HeaderNodes.Add(node);
       SetNodeHeight(node, NodeHeightMultiple - 1);
@@ -471,13 +535,13 @@ namespace MySQL.ForExcel.Controls
     /// <param name="titleInBold">Flag indicating whether the title text is drawn with a bold style.</param>
     public void SetItemsAppearance(bool bigIcons, bool titleInBold = true)
     {
-      DescriptionTextVerticalPixelsOffset = bigIcons ? -3 : 0;
+      DescriptionTextVerticalOffset = bigIcons ? -3 : 0;
       Font = new Font("Segoe UI", 9.75F, bigIcons && titleInBold ? FontStyle.Bold : FontStyle.Regular, GraphicsUnit.Point, 0);
-      ImageHorizontalPixelsOffset = bigIcons ? 4 : 14;
-      ImageToTextHorizontalPixelsOffset = bigIcons ? 4 : 3;
+      ImageHorizontalOffset = bigIcons ? 4 : 14;
+      TextHorizontalOffset = bigIcons ? 4 : 3;
       ItemHeight = bigIcons ? 20 : 10;
       NodeHeightMultiple = bigIcons ? 2 : 3;
-      TitleTextVerticalPixelsOffset = bigIcons ? 2 : 0;
+      TitleTextVerticalOffset = bigIcons ? 2 : 0;
     }
 
     /// <summary>
@@ -854,17 +918,6 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Adds a <see cref="MySqlListViewNode"/> as a child of the given parent <see cref="MySqlListViewNode"/>.
-    /// </summary>
-    /// <param name="parentNode">The parent node under which to add the new node.</param>
-    /// <param name="childNode">The child node to be added.</param>
-    private void AddChildNode(MySqlListViewNode parentNode, MySqlListViewNode childNode)
-    {
-      parentNode.Nodes.Add(childNode);
-      SetNodeHeight(childNode, NodeHeightMultiple);
-    }
-
-    /// <summary>
     /// Gets the first node that is not a header node starting the search from the top of the given <see cref="MySqlListViewNode"/>.
     /// </summary>
     /// <param name="parentNode">Node containing child nodes to traverse. If <c>null</c> it means we start at the very top root node.</param>
@@ -931,8 +984,13 @@ namespace MySQL.ForExcel.Controls
       Point pt = e.Bounds.Location;
       SizeF titleStringSize = e.Graphics.MeasureString(node.Title, Font);
       SizeF descriptionStringSize = e.Graphics.MeasureString(node.Subtitle, DescriptionFont);
-      Image img = NodeImages != null && NodeImages.Images.Count > 0 && node.ImageIndex >= 0 && node.ImageIndex < NodeImages.Images.Count ? NodeImages.Images[node.ImageIndex] : null;
-      int textInitialY = node.Subtitle == null ? ((e.Bounds.Height - Convert.ToInt32(titleStringSize.Height) + Convert.ToInt32(descriptionStringSize.Height)) / 2) : 0;
+      Image nodeImage = NodeImages != null && NodeImages.Images.Count > 0 && node.ImageIndex >= 0 && node.ImageIndex < NodeImages.Images.Count ? NodeImages.Images[node.ImageIndex] : null;
+      if (nodeImage != null && disabled && DisplayImagesOfDisabledNodesInGrayScale)
+      {
+        nodeImage = new Bitmap(nodeImage).MakeGrayscale();
+      }
+
+      int textInitialY = string.IsNullOrEmpty(node.Subtitle) ? ((e.Bounds.Height - Convert.ToInt32(titleStringSize.Height) + Convert.ToInt32(descriptionStringSize.Height)) / 2) : 0;
       node.ToolTipText = string.Empty;
 
       // Paint background
@@ -940,16 +998,28 @@ namespace MySQL.ForExcel.Controls
       e.Graphics.FillRectangle(bkBrush, e.Bounds);
 
       // Paint node Image
-      if (img != null)
+      if (nodeImage != null)
       {
-        pt.X += ImageHorizontalPixelsOffset;
-        int y = pt.Y + ((e.Bounds.Height - img.Height) / 2);
-        e.Graphics.DrawImage(img, pt.X, y, img.Width, img.Height);
-        pt.X += img.Width;
+        pt.X += ImageHorizontalOffset;
+        int drawnImageWidth = nodeImage.Width;
+        if (ScaleImages)
+        {
+          int y = pt.Y + ScaledImagesVerticalSpacing;
+          int scaledHeight = e.Bounds.Height - (ScaledImagesVerticalSpacing * 2);
+          drawnImageWidth = nodeImage.Width * scaledHeight / nodeImage.Height;
+          e.Graphics.DrawImage(nodeImage, pt.X, y, drawnImageWidth, scaledHeight);
+        }
+        else
+        {
+          int y = pt.Y + ((e.Bounds.Height - nodeImage.Height) / 2);
+          e.Graphics.DrawImageUnscaled(nodeImage, pt.X, y);
+        }
+
+        pt.X += drawnImageWidth;
       }
 
-      pt.X += ImageToTextHorizontalPixelsOffset;
-      pt.Y += textInitialY + TitleTextVerticalPixelsOffset;
+      pt.X += TextHorizontalOffset;
+      pt.Y += textInitialY + TitleTextVerticalOffset;
 
       // Draw the title if we have one
       var titleBrush = disabled ? new SolidBrush(Color.FromArgb(80, 0, 0, 0)) : new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), ForeColor));
@@ -958,7 +1028,7 @@ namespace MySQL.ForExcel.Controls
         SizeF stringSize = e.Graphics.MeasureString(node.Title, Font);
         truncatedText = node.GetTruncatedTitle(node.TreeView.ClientRectangle.Width - pt.X, e.Graphics, Font);
         e.Graphics.DrawString(truncatedText, Font, titleBrush, pt.X, pt.Y);
-        pt.Y += (int)(stringSize.Height) + DescriptionTextVerticalPixelsOffset;
+        pt.Y += (int)(stringSize.Height) + DescriptionTextVerticalOffset;
         if (truncatedText != node.Title)
         {
           node.ToolTipText = node.Title;
@@ -977,7 +1047,6 @@ namespace MySQL.ForExcel.Controls
         }
       }
 
-      Debug.Print("Drawing child node:" + node.Title + " - " + Font);
       bkBrush.Dispose();
       titleBrush.Dispose();
       descBrush.Dispose();
@@ -989,28 +1058,45 @@ namespace MySQL.ForExcel.Controls
     /// <param name="e">Event arguments containing a group node.</param>
     private void DrawHeaderNode(DrawTreeNodeEventArgs e)
     {
-      Graphics g = e.Graphics;
-      SolidBrush nodeBackbrush = new SolidBrush(e.Node.BackColor);
-      g.FillRectangle(nodeBackbrush, e.Bounds);
+      var graphics = e.Graphics;
+      var nodeBackbrush = new SolidBrush(e.Node.BackColor);
+      graphics.FillRectangle(nodeBackbrush, e.Bounds);
 
       Point pt = e.Bounds.Location;
 
-      // Draw icon centered
-      Image i = e.Node.IsExpanded ? ExpandedIcon : CollapsedIcon;
-      pt.Y += (e.Bounds.Height - i.Height) / 2;
-      e.Graphics.DrawImageUnscaled(i, pt.X, pt.Y, i.Width, i.Height);
-
-      SolidBrush textBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), e.Node.ForeColor));
-      Font f = e.Node.NodeFont ?? Font;
-      if (!f.Bold)
+      // Draw header image centered
+      var headerImage = e.Node.IsExpanded ? ExpandedIcon : CollapsedIcon;
+      if (headerImage != null)
       {
-        f = new Font(f.FontFamily, f.Size, FontStyle.Bold);
+        int drawnImageWidth = headerImage.Width;
+        if (ScaleImages)
+        {
+          pt.Y += ScaledImagesVerticalSpacing;
+          int scaledHeight = e.Bounds.Height - (ScaledImagesVerticalSpacing * 2);
+          drawnImageWidth = headerImage.Width * scaledHeight / headerImage.Height;
+          e.Graphics.DrawImage(headerImage, pt.X, pt.Y, drawnImageWidth, scaledHeight);
+        }
+        else
+        {
+          pt.Y += (e.Bounds.Height - headerImage.Height) / 2;
+          e.Graphics.DrawImageUnscaled(headerImage, pt.X, pt.Y);
+        }
+
+        pt.X += drawnImageWidth;
       }
 
-      SizeF size = g.MeasureString(e.Node.Text, f);
-      pt.X += (ImageToTextHorizontalPixelsOffset + i.Width);
-      pt.Y = e.Bounds.Top + ((e.Bounds.Height - (int)size.Height) / 2);
-      g.DrawString(e.Node.Text, f, textBrush, pt.X, pt.Y);
+      // Draw header text
+      var textBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), e.Node.ForeColor));
+      var headerFont = e.Node.NodeFont ?? Font;
+      if (!headerFont.Bold)
+      {
+        headerFont = new Font(headerFont.FontFamily, headerFont.Size, FontStyle.Bold);
+      }
+
+      var headerTextSize = graphics.MeasureString(e.Node.Text, headerFont);
+      pt.X += TextHorizontalOffset;
+      pt.Y = e.Bounds.Top + ((e.Bounds.Height - (int)headerTextSize.Height) / 2);
+      graphics.DrawString(e.Node.Text, headerFont, textBrush, pt.X, pt.Y);
 
       nodeBackbrush.Dispose();
       textBrush.Dispose();
@@ -1134,6 +1220,11 @@ namespace MySQL.ForExcel.Controls
           if (_selectedNode == null || ModifierKeys == Keys.Control)
           {
             // Ctrl+Click selects an unselected node, or unselects a selected node.
+            if (node.ExcludeFromMultiSelection)
+            {
+              return;
+            }
+
             bool isSelected = _selectedNodes.Contains(node);
             MarkNodeAsSelected(node, !isSelected);
           }
@@ -1195,14 +1286,12 @@ namespace MySQL.ForExcel.Controls
               }
               else if (ndStartP.Index == ndEndP.Index)
               {
-                if (ndStart.Level < ndEnd.Level)
-                {
-                  MarkNodesRangeAsSelected(ndStart, ndEnd, NodesTraversingDirection.Forward);
-                }
-                else
-                {
-                  MarkNodesRangeAsSelected(ndStart, ndEnd, NodesTraversingDirection.Backward);
-                }
+                MarkNodesRangeAsSelected(
+                  ndStart,
+                  ndEnd,
+                  ndStart.Level < ndEnd.Level
+                    ? NodesTraversingDirection.Forward
+                    : NodesTraversingDirection.Backward);
               }
               else
               {

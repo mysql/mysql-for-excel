@@ -93,8 +93,8 @@ namespace MySQL.ForExcel.Panels
       this.ManageConnectionsHotLabel.DescriptionColorOpacity = 0.6D;
       this.ManageConnectionsHotLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.ManageConnectionsHotLabel.DescriptionShadowOpacity = 0.4D;
-      this.ManageConnectionsHotLabel.DescriptionShadowPixelsXOffset = 0;
-      this.ManageConnectionsHotLabel.DescriptionShadowPixelsYOffset = 1;
+      this.ManageConnectionsHotLabel.DescriptionShadowXOffset = 0;
+      this.ManageConnectionsHotLabel.DescriptionShadowYOffset = 1;
       this.ManageConnectionsHotLabel.DisabledImage = null;
       this.ManageConnectionsHotLabel.DrawShadow = true;
       this.ManageConnectionsHotLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -110,11 +110,11 @@ namespace MySQL.ForExcel.Panels
       this.ManageConnectionsHotLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.ManageConnectionsHotLabel.TitleColorOpacity = 0.95D;
       this.ManageConnectionsHotLabel.TitleDescriptionPixelsSpacing = 0;
-      this.ManageConnectionsHotLabel.TitlePixelsXOffset = 3;
-      this.ManageConnectionsHotLabel.TitlePixelsYOffset = -2;
+      this.ManageConnectionsHotLabel.TitleXOffset = 3;
+      this.ManageConnectionsHotLabel.TitleYOffset = -2;
       this.ManageConnectionsHotLabel.TitleShadowOpacity = 0.2D;
-      this.ManageConnectionsHotLabel.TitleShadowPixelsXOffset = 0;
-      this.ManageConnectionsHotLabel.TitleShadowPixelsYOffset = 1;
+      this.ManageConnectionsHotLabel.TitleShadowXOffset = 0;
+      this.ManageConnectionsHotLabel.TitleShadowYOffset = 1;
       this.ManageConnectionsHotLabel.Click += new System.EventHandler(this.ManageConnectionsHotLabel_Click);
       // 
       // ConnectionsList
@@ -127,12 +127,11 @@ namespace MySQL.ForExcel.Panels
       this.ConnectionsList.DescriptionColor = System.Drawing.Color.Silver;
       this.ConnectionsList.DescriptionColorOpacity = 1D;
       this.ConnectionsList.DescriptionFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.ConnectionsList.DescriptionTextVerticalPixelsOffset = -3;
-      this.ConnectionsList.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawAll;
+      this.ConnectionsList.DescriptionTextVerticalOffset = -3;
+      this.ConnectionsList.DisplayImagesOfDisabledNodesInGrayScale = false;
       this.ConnectionsList.ExpandedIcon = global::MySQL.ForExcel.Properties.Resources.ArrowDown;
       this.ConnectionsList.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.ConnectionsList.ImageHorizontalPixelsOffset = 4;
-      this.ConnectionsList.ImageToTextHorizontalPixelsOffset = 4;
+      this.ConnectionsList.ImageHorizontalOffset = 4;
       this.ConnectionsList.Indent = 18;
       this.ConnectionsList.ItemHeight = 20;
       this.ConnectionsList.Location = new System.Drawing.Point(9, 195);
@@ -143,8 +142,9 @@ namespace MySQL.ForExcel.Panels
       this.ConnectionsList.ShowNodeToolTips = true;
       this.ConnectionsList.Size = new System.Drawing.Size(242, 315);
       this.ConnectionsList.TabIndex = 22;
+      this.ConnectionsList.TextHorizontalOffset = 4;
       this.ConnectionsList.TitleColorOpacity = 0.8D;
-      this.ConnectionsList.TitleTextVerticalPixelsOffset = 2;
+      this.ConnectionsList.TitleTextVerticalOffset = 2;
       this.ConnectionsList.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.ConnectionsList_NodeMouseDoubleClick);
       // 
       // ConnectionsContextMenuStrip
@@ -192,8 +192,8 @@ namespace MySQL.ForExcel.Panels
       this.NewConnectionHotLabel.DescriptionColorOpacity = 0.6D;
       this.NewConnectionHotLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.NewConnectionHotLabel.DescriptionShadowOpacity = 0.4D;
-      this.NewConnectionHotLabel.DescriptionShadowPixelsXOffset = 0;
-      this.NewConnectionHotLabel.DescriptionShadowPixelsYOffset = 1;
+      this.NewConnectionHotLabel.DescriptionShadowXOffset = 0;
+      this.NewConnectionHotLabel.DescriptionShadowYOffset = 1;
       this.NewConnectionHotLabel.DisabledImage = null;
       this.NewConnectionHotLabel.DrawShadow = true;
       this.NewConnectionHotLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -209,11 +209,11 @@ namespace MySQL.ForExcel.Panels
       this.NewConnectionHotLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.NewConnectionHotLabel.TitleColorOpacity = 0.95D;
       this.NewConnectionHotLabel.TitleDescriptionPixelsSpacing = 0;
-      this.NewConnectionHotLabel.TitlePixelsXOffset = 3;
-      this.NewConnectionHotLabel.TitlePixelsYOffset = 0;
+      this.NewConnectionHotLabel.TitleXOffset = 3;
+      this.NewConnectionHotLabel.TitleYOffset = 0;
       this.NewConnectionHotLabel.TitleShadowOpacity = 0.2D;
-      this.NewConnectionHotLabel.TitleShadowPixelsXOffset = 0;
-      this.NewConnectionHotLabel.TitleShadowPixelsYOffset = 1;
+      this.NewConnectionHotLabel.TitleShadowXOffset = 0;
+      this.NewConnectionHotLabel.TitleShadowYOffset = 1;
       this.NewConnectionHotLabel.Click += new System.EventHandler(this.NewConnectionHotLabel_Click);
       // 
       // UpperPanel
@@ -232,7 +232,6 @@ namespace MySQL.ForExcel.Panels
       // 
       // SeparatorImage
       // 
-      this.SeparatorImage.BackColor = System.Drawing.Color.Transparent;
       this.SeparatorImage.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Separator;
       this.SeparatorImage.Location = new System.Drawing.Point(9, 135);
       this.SeparatorImage.Name = "SeparatorImage";
@@ -283,8 +282,8 @@ namespace MySQL.ForExcel.Panels
       this.OpenConnectionHotLabel.DescriptionColorOpacity = 0.6D;
       this.OpenConnectionHotLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.OpenConnectionHotLabel.DescriptionShadowOpacity = 0.4D;
-      this.OpenConnectionHotLabel.DescriptionShadowPixelsXOffset = 0;
-      this.OpenConnectionHotLabel.DescriptionShadowPixelsYOffset = 1;
+      this.OpenConnectionHotLabel.DescriptionShadowXOffset = 0;
+      this.OpenConnectionHotLabel.DescriptionShadowYOffset = 1;
       this.OpenConnectionHotLabel.DisabledImage = null;
       this.OpenConnectionHotLabel.DrawShadow = true;
       this.OpenConnectionHotLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -300,11 +299,11 @@ namespace MySQL.ForExcel.Panels
       this.OpenConnectionHotLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.OpenConnectionHotLabel.TitleColorOpacity = 0.95D;
       this.OpenConnectionHotLabel.TitleDescriptionPixelsSpacing = 0;
-      this.OpenConnectionHotLabel.TitlePixelsXOffset = 3;
-      this.OpenConnectionHotLabel.TitlePixelsYOffset = -3;
+      this.OpenConnectionHotLabel.TitleXOffset = 3;
+      this.OpenConnectionHotLabel.TitleYOffset = -3;
       this.OpenConnectionHotLabel.TitleShadowOpacity = 0.2D;
-      this.OpenConnectionHotLabel.TitleShadowPixelsXOffset = 0;
-      this.OpenConnectionHotLabel.TitleShadowPixelsYOffset = 1;
+      this.OpenConnectionHotLabel.TitleShadowXOffset = 0;
+      this.OpenConnectionHotLabel.TitleShadowYOffset = 1;
       // 
       // AboutHotLabel
       // 
@@ -316,8 +315,8 @@ namespace MySQL.ForExcel.Panels
       this.AboutHotLabel.DescriptionColorOpacity = 0.6D;
       this.AboutHotLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.AboutHotLabel.DescriptionShadowOpacity = 0.4D;
-      this.AboutHotLabel.DescriptionShadowPixelsXOffset = 0;
-      this.AboutHotLabel.DescriptionShadowPixelsYOffset = 1;
+      this.AboutHotLabel.DescriptionShadowXOffset = 0;
+      this.AboutHotLabel.DescriptionShadowYOffset = 1;
       this.AboutHotLabel.DisabledImage = null;
       this.AboutHotLabel.DrawShadow = true;
       this.AboutHotLabel.Font = new System.Drawing.Font("Tahoma", 7F);
@@ -333,11 +332,11 @@ namespace MySQL.ForExcel.Panels
       this.AboutHotLabel.TitleColor = System.Drawing.SystemColors.GrayText;
       this.AboutHotLabel.TitleColorOpacity = 0.95D;
       this.AboutHotLabel.TitleDescriptionPixelsSpacing = 0;
-      this.AboutHotLabel.TitlePixelsXOffset = 3;
-      this.AboutHotLabel.TitlePixelsYOffset = 0;
+      this.AboutHotLabel.TitleXOffset = 3;
+      this.AboutHotLabel.TitleYOffset = 0;
       this.AboutHotLabel.TitleShadowOpacity = 0.2D;
-      this.AboutHotLabel.TitleShadowPixelsXOffset = 0;
-      this.AboutHotLabel.TitleShadowPixelsYOffset = 1;
+      this.AboutHotLabel.TitleShadowXOffset = 0;
+      this.AboutHotLabel.TitleShadowYOffset = 1;
       this.AboutHotLabel.Click += new System.EventHandler(this.AboutHotLabel_Click);
       // 
       // WelcomePanel

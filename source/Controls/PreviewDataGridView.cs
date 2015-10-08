@@ -25,16 +25,26 @@ namespace MySQL.ForExcel.Controls
   /// </summary>
   public class PreviewDataGridView : DataGridView
   {
+    #region Fields
+
+    /// <summary>
+    /// The maximum column width, in pixels, of all columns in the grid.
+    /// </summary>
+    private int _columnsMaximumWidth;
+
     /// <summary>
     /// Flag indicating if recalculation of column width is not necessary so it must be skipped.
     /// </summary>
     private bool _skipWidthRecalculation;
+
+    #endregion Fields
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PreviewDataGridView"/> class.
     /// </summary>
     public PreviewDataGridView()
     {
+      _columnsMaximumWidth = 0;
       RowHeadersVisible = false;
       ShowCellErrors = false;
       ShowEditingIcon = false;
@@ -48,7 +58,6 @@ namespace MySQL.ForExcel.Controls
       ReadOnly = true;
       RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
       AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-      ColumnsMaximumWidth = 0;
       DisableColumnsSelection = false;
     }
 
@@ -57,7 +66,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets a value indicating whether the option to add rows is displayed to the user.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool AllowUserToAddRows
     {
       get
@@ -74,7 +83,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets a value indicating whether the user is allowed to delete rows from the DataGridView.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool AllowUserToDeleteRows
     {
       get
@@ -91,7 +100,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets a value indicating whether manual column repositioning is enabled.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool AllowUserToOrderColumns
     {
       get
@@ -108,7 +117,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets a value indicating whether users can resize columns.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool AllowUserToResizeColumns
     {
       get
@@ -125,7 +134,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets a value indicating whether users can resize rows.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool AllowUserToResizeRows
     {
       get
@@ -142,7 +151,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets a value indicating how column widths are determined.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new DataGridViewAutoSizeColumnsMode AutoSizeColumnsMode
     {
       get
@@ -159,7 +168,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets a value indicating whether the height of the column headers is adjustable and whether it can be adjusted by the user or is automatically adjusted to fit the contents of the headers.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new DataGridViewColumnHeadersHeightSizeMode ColumnHeadersHeightSizeMode
     {
       get
@@ -176,19 +185,34 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets or sets the maximum column width, in pixels, of all columns in the grid.
     /// </summary>
-    [Category("Appearance"), DefaultValue(0), Description("Gets or sets the maximum column width, in pixels, of all columns in the grid.")]
-    public int ColumnsMaximumWidth { get; set; }
+    [Category("MySQL Custom"), DefaultValue(0), Description("The maximum column width, in pixels, of all columns in the grid. If 0 the column is automatically sized to fit its contents.")]
+    public int ColumnsMaximumWidth
+    {
+      get
+      {
+        return _columnsMaximumWidth;
+      }
+
+      set
+      {
+        _columnsMaximumWidth = value;
+        foreach (DataGridViewColumn col in Columns)
+        {
+          OnColumnWidthChanged(new DataGridViewColumnEventArgs(col));
+        }
+      }
+    }
 
     /// <summary>
     /// Gets or sets a value indicating if column selection is disabled for users.
     /// </summary>
-    [Category("Behavior"), DefaultValue(false), Description("Gets or sets a value indicating if column selection is disabled for users.")]
+    [Category("MySQL Custom"), DefaultValue(false), Description("A value indicating if column selection is disabled for users.")]
     public bool DisableColumnsSelection { get; set; }
 
     /// <summary>
     /// Gets a value indicating whether the user can edit the cells of the DataGridView control.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool ReadOnly
     {
       get
@@ -205,7 +229,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets a value indicating whether the column that contains row headers is displayed.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool RowHeadersVisible
     {
       get
@@ -222,7 +246,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets a value indicating whether the width of the row headers is adjustable and whether it can be adjusted by the user or is automatically adjusted to fit the contents of the headers.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new DataGridViewRowHeadersWidthSizeMode RowHeadersWidthSizeMode
     {
       get
@@ -239,7 +263,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets a value indicating whether to show cell errors.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool ShowCellErrors
     {
       get
@@ -256,7 +280,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets a value indicating whether or not the editing glyph is visible in the row header of the cell being edited.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool ShowEditingIcon
     {
       get
@@ -273,7 +297,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets a value indicating whether row headers will display error glyphs for each row that contains a data entry error.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool ShowRowErrors
     {
       get
@@ -333,12 +357,12 @@ namespace MySQL.ForExcel.Controls
       }
 
       base.OnColumnWidthChanged(e);
-      if (ColumnsMaximumWidth > 0 && e.Column.Width > ColumnsMaximumWidth && ColumnsMaximumWidth > e.Column.MinimumWidth)
+      if (_columnsMaximumWidth > 0 && e.Column.Width > _columnsMaximumWidth && _columnsMaximumWidth > e.Column.MinimumWidth)
       {
         _skipWidthRecalculation = true;
         e.Column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
         e.Column.HeaderCell.Style.WrapMode = DataGridViewTriState.False;
-        e.Column.Width = ColumnsMaximumWidth;
+        e.Column.Width = _columnsMaximumWidth;
         _skipWidthRecalculation = false;
       }
       else

@@ -96,6 +96,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets a value indicating whether row and column headers use the visual styles of the user's current theme if visual styles are enabled for the application.
     /// </summary>
+    [Category("MySQL Custom")]
     public bool AllowChangingHeaderCellsColors
     {
       get
@@ -113,18 +114,19 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets or sets a value indicating whether the height of a column headers row is computed based on their fonts or the <seealso cref="FixedColumnHeadersHeight"/> value is used.
     /// </summary>
+    [Category("MySQL Custom")]
     public bool AutoAdjustColumnHeadersHeight { get; set; }
 
     /// <summary>
     /// Gets or sets the horizontal alignment of the base column headers text.
     /// </summary>
+    [Category("MySQL Custom")]
     public HorizontalAlignment BaseColumnHeadersTextAlignment { get; set; }
 
     /// <summary>
     /// Gets the height, in pixels, of the column headers row(s).
     /// </summary>
-    [Browsable(false)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new int ColumnHeadersHeight
     {
       get
@@ -141,8 +143,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets a value indicating whether the height of the column headers is adjustable and whether it can be adjusted by the user or is automatically adjusted to fit the contents of the headers.
     /// </summary>
-    [Browsable(false)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new DataGridViewColumnHeadersHeightSizeMode ColumnHeadersHeightSizeMode
     {
       get
@@ -160,26 +161,27 @@ namespace MySQL.ForExcel.Controls
     /// Gets or sets the <see cref="Color"/> of the column headers separators.
     /// </summary>
     /// <remarks>This color is only applied when <seealso cref="AllowChangingHeaderCellsColors"/> is true (so <seealso cref="EnableHeadersVisualStyles"/> is false).</remarks>
+    [Category("MySQL Custom")]
     public Color ColumnHeadersSeparatorColor { get; set; }
 
     /// <summary>
     /// Gets or sets the width, in pixels, of the column header separators.
     /// </summary>
+    [Category("MySQL Custom")]
     public int ColumnHeadersSeparatorWidth { get; set; }
 
     /// <summary>
     /// Gets a value indicating whether this control should redraw its surface using a secondary buffer to reduce or prevent flicker.
     /// </summary>
-    [Browsable(false)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public new bool DoubleBuffered
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    protected override bool DoubleBuffered
     {
       get
       {
         return base.DoubleBuffered;
       }
 
-      private set
+      set
       {
         base.DoubleBuffered = value;
       }
@@ -188,8 +190,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets a value indicating whether row and column headers use the visual styles of the user's current theme if visual styles are enabled for the application.
     /// </summary>
-    [Browsable(false)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool EnableHeadersVisualStyles
     {
       get
@@ -206,13 +207,13 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets or sets a fixed height, in pixels, for each column headers row.
     /// </summary>
+    [Category("MySQL Custom")]
     public int FixedColumnHeadersHeight { get; set; }
 
     /// <summary>
     /// Gets a read-only collection of header rows each containing <see cref="MultiHeaderColumn"/> objects.
     /// </summary>
-    [Browsable(false)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ReadOnlyCollection<MultiHeaderRow> MultiHeaderRowsCollection
     {
       get
@@ -225,11 +226,13 @@ namespace MySQL.ForExcel.Controls
     /// Gets or sets a value indicating whether the additional header rows defined in the <seealso cref="MultiHeaderRowsCollection"/> is reversed.
     /// </summary>
     /// <remarks>If <c>true</c> the order of rows is from the original header row up, if <c>false</c> the order is from the top of the grid down.</remarks>
+    [Category("MySQL Custom")]
     public bool ReverseMultiHeaderRowOrder { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the height of a column headers row is computed based on their fonts or the <seealso cref="FixedColumnHeadersHeight"/> value is used.
     /// </summary>
+    [Category("MySQL Custom")]
     public bool UseColumnPaddings { get; set; }
 
     #endregion Properties

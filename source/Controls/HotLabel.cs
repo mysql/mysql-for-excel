@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -59,15 +59,15 @@ namespace MySQL.ForExcel.Controls
       DescriptionColorOpacity = 0.7;
       TitleShadowOpacity = 0.3;
       DescriptionShadowOpacity = 0.3;
-      TitleShadowPixelsXOffset = 0;
-      TitleShadowPixelsYOffset = 1;
-      DescriptionShadowPixelsXOffset = 0;
-      DescriptionShadowPixelsYOffset = 1;
+      TitleShadowXOffset = 0;
+      TitleShadowYOffset = 1;
+      DescriptionShadowXOffset = 0;
+      DescriptionShadowYOffset = 1;
       TitleDescriptionPixelsSpacing = 4;
       ImagePixelsXOffset = 0;
       ImagePixelsYOffset = 0;
-      TitlePixelsXOffset = 0;
-      TitlePixelsYOffset = 3;
+      TitleXOffset = 0;
+      TitleYOffset = 3;
 
       FontFamily family = Parent != null ? Parent.Font.FontFamily : FontFamily.GenericSansSerif;
       float size = Parent != null ? Parent.Font.Size : 8.25f;
@@ -105,123 +105,163 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets or sets the type of behavior of the <see cref="HotLabel"/> control.
     /// </summary>
+    [Category("MySQL Custom"), Description("The type of behavior of the HotLabel control.")]
     public BehaviorType Behavior { get; set; }
 
     /// <summary>
     /// Gets or sets the image used when the state of the control is checked.
     /// </summary>
+    [Category("MySQL Custom"), Description("The image used when the state of the control is checked.")]
     public Image CheckedImage { get; set; }
 
     /// <summary>
     /// Gets the state of the control, that can be checked, unchecked or set to an indeterminate state.
     /// </summary>
-    [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public CheckState CheckedState { get; private set; }
 
     /// <summary>
     /// Gets or sets the description text appearing below the title.
     /// </summary>
+    [Category("MySQL Custom"), Description("The description text appearing below the title.")]
     public string Description { get; set; }
 
     /// <summary>
     /// Gets or sets the color used to paint the description text.
     /// </summary>
+    [Category("MySQL Custom"), Description("The color used to paint the description text.")]
     public Color DescriptionColor { get; set; }
 
     /// <summary>
     /// Gets or sets the opacity factor for the color used to paint the description text.
     /// </summary>
+    [Category("MySQL Custom"), Description("The opacity factor for the color used to paint the description text.")]
     public double DescriptionColorOpacity { get; set; }
 
     /// <summary>
     /// Gets or sets the font used to paint the description text.
     /// </summary>
+    [Category("MySQL Custom"), Description("The font used to paint the description text.")]
     public Font DescriptionFont { get; set; }
 
     /// <summary>
     /// Gets or sets the opacity factor for the shadow of the description text.
     /// </summary>
+    [Category("MySQL Custom"), Description("The opacity factor for the shadow of the description text.")]
     public double DescriptionShadowOpacity { get; set; }
 
     /// <summary>
-    /// Gets or sets the horizontal offset for the shadow of the description text.
+    /// Gets or sets the horizontal offset, in pixels, for the shadow of the description text.
     /// </summary>
-    public int DescriptionShadowPixelsXOffset { get; set; }
+    [Category("MySQL Custom"), Description("The horizontal offset, in pixels, for the shadow of the description text.")]
+    public int DescriptionShadowXOffset { get; set; }
 
     /// <summary>
     /// Gets or sets the vertical offset for the shadow of the description text.
     /// </summary>
-    public int DescriptionShadowPixelsYOffset { get; set; }
+    [Category("MySQL Custom"), Description("The vertical offset for the shadow of the description text.")]
+    public int DescriptionShadowYOffset { get; set; }
 
     /// <summary>
     /// Gets or sets the image used when the control is not enabled.
     /// </summary>
+    [Category("MySQL Custom"), Description("The image used when the control is not enabled.")]
     public Image DisabledImage { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether a shadow is drawn beneath the text.
     /// </summary>
+    [Category("MySQL Custom"), Description("A value indicating whether a shadow is drawn beneath the text.")]
     public bool DrawShadow { get; set; }
 
     /// <summary>
     /// Gets or sets the image displayed at the left side of the label.
     /// </summary>
+    [Category("MySQL Custom"), Description("The image displayed at the left side of the label.")]
     public Image Image { get; set; }
 
     /// <summary>
-    /// Gets or sets the horizontal offset from the upper-left corner of the label.
+    /// Gets or sets the horizontal offset, in pixels, from the upper-left corner of the label.
     /// </summary>
+    [Category("MySQL Custom"), Description("The horizontal offset, in pixels, from the upper-left corner of the label.")]
     public int ImagePixelsXOffset { get; set; }
 
     /// <summary>
-    /// Gets or sets the vertical offset from the upper-left corner of the label.
+    /// Gets or sets the vertical offset, in pixels, from the upper-left corner of the label.
     /// </summary>
+    [Category("MySQL Custom"), Description("The vertical offset, in pixels, from the upper-left corner of the label.")]
     public int ImagePixelsYOffset { get; set; }
 
     /// <summary>
     /// Gets or sets the title text.
     /// </summary>
+    [Category("MySQL Custom"), Description("The title text.")]
     public string Title { get; set; }
 
     /// <summary>
     /// Gets or sets the color used to paint the title text.
     /// </summary>
+    [Category("MySQL Custom"), Description("The color used to paint the title text.")]
     public Color TitleColor { get; set; }
 
     /// <summary>
     /// Gets or sets the opacity factor for the color used to paint the title text.
     /// </summary>
+    [Category("MySQL Custom"), Description("The opacity factor for the color used to paint the title text.")]
     public double TitleColorOpacity { get; set; }
 
     /// <summary>
-    /// Gets por sets a spacing in pixels between the title and its description.
+    /// Gets or sets a spacing, in pixels, between the title and its description.
     /// </summary>
+    [Category("MySQL Custom"), Description("The spacing, in pixels, between the title and its description.")]
     public int TitleDescriptionPixelsSpacing { get; set; }
 
     /// <summary>
-    /// Gets or sets the horizontal offset for the title text.
+    /// Gets or sets the horizontal offset, in pixels, for the title text.
     /// </summary>
-    public int TitlePixelsXOffset { get; set; }
+    [Category("MySQL Custom"), Description("The horizontal offset, in pixels, for the title text.")]
+    public int TitleXOffset { get; set; }
 
     /// <summary>
-    /// Gets or sets the vertical offset for the title text.
+    /// Gets or sets the vertical offset, in pixels, for the title text.
     /// </summary>
-    public int TitlePixelsYOffset { get; set; }
+    [Category("MySQL Custom"), Description("The vertical offset, in pixels, for the title text.")]
+    public int TitleYOffset { get; set; }
 
     /// <summary>
     /// Gets or sets the opacity factor for the shadow of the title text.
     /// </summary>
+    [Category("MySQL Custom"), Description("The opacity factor for the shadow of the title text.")]
     public double TitleShadowOpacity { get; set; }
 
     /// <summary>
-    /// Gets or sets the horizontal offset for the shadow of the title text.
+    /// Gets or sets the horizontal offset, in pixels, for the shadow of the title text.
     /// </summary>
-    public int TitleShadowPixelsXOffset { get; set; }
+    [Category("MySQL Custom"), Description("The horizontal offset, in pixels, for the shadow of the title text.")]
+    public int TitleShadowXOffset { get; set; }
 
     /// <summary>
-    /// Gets or sets the vertical offset for the shadow of the title text.
+    /// Gets or sets the vertical offset, in pixels, for the shadow of the title text.
     /// </summary>
-    public int TitleShadowPixelsYOffset { get; set; }
+    [Category("MySQL Custom"), Description("The vertical offset, in pixels, for the shadow of the title text.")]
+    public int TitleShadowYOffset { get; set; }
+
+    /// <summary>
+    /// Gets a value indicating whether this control should redraw its surface using a secondary buffer to reduce or prevent flicker.
+    /// </summary>
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    protected override bool DoubleBuffered
+    {
+      get
+      {
+        return base.DoubleBuffered;
+      }
+
+      set
+      {
+        base.DoubleBuffered = value;
+      }
+    }
 
     #endregion Properties
 
@@ -308,7 +348,7 @@ namespace MySQL.ForExcel.Controls
         e.Graphics.DrawImage(i, ImagePixelsXOffset, y + ImagePixelsYOffset, imageSize.Width, imageSize.Height);
       }
 
-      Point pt = new Point(imageSize.Width + TitlePixelsXOffset, TitlePixelsYOffset);
+      Point pt = new Point(imageSize.Width + TitleXOffset, TitleYOffset);
       if (!string.IsNullOrEmpty(Title))
       {
         Color currentTitleColor = _tracking ? SystemColors.HotTrack : TitleColor;
@@ -316,7 +356,7 @@ namespace MySQL.ForExcel.Controls
         {
           using (var titleShadowBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleShadowOpacity * 255), TitleColor)))
           {
-            e.Graphics.DrawString(Title, Font, titleShadowBrush, pt.X + TitleShadowPixelsXOffset, pt.Y + TitleShadowPixelsYOffset);
+            e.Graphics.DrawString(Title, Font, titleShadowBrush, pt.X + TitleShadowXOffset, pt.Y + TitleShadowYOffset);
           }
         }
 
@@ -341,7 +381,7 @@ namespace MySQL.ForExcel.Controls
         using (var descriptionShadowBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(DescriptionShadowOpacity*255), Color.White)))
         {
           e.Graphics.DrawString(Description, DescriptionFont, descriptionShadowBrush,
-            pt.X + DescriptionShadowPixelsXOffset, pt.Y + DescriptionShadowPixelsYOffset);
+            pt.X + DescriptionShadowXOffset, pt.Y + DescriptionShadowYOffset);
         }
       }
 

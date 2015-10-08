@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -16,6 +16,7 @@
 // 02110-1301  USA
 
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
@@ -30,14 +31,29 @@ namespace MySQL.ForExcel.Controls
     #region Fields
 
     /// <summary>
+    /// The image that is displayed by <see cref="TransparentPictureBox"/>.
+    /// </summary>
+    private Image _image;
+
+    /// <summary>
+    /// Flag indicating whether the scaled image size is calculated to maintain its original aspect ratio.
+    /// </summary>
+    private bool _maintainAspectRatio;
+
+    /// <summary>
     /// The opacity factor of the picture ranging from 0 to 1.
     /// </summary>
     private float _opacity;
 
     /// <summary>
-    /// The attributes used to manipulate the bitmap on rendering. 
+    /// The attributes used to manipulate the bitmap on rendering.
     /// </summary>
     private ImageAttributes _imageAttributes;
+
+    /// <summary>
+    /// A value indicating whether the <see cref="Image"/> is scaled to fit the size of this control.
+    /// </summary>
+    private bool _scaleImage;
 
     #endregion Fields
 
@@ -46,21 +62,94 @@ namespace MySQL.ForExcel.Controls
     /// </summary>
     public TransparentPictureBox()
     {
+      _image = null;
       _opacity = 0;
+      _maintainAspectRatio = true;
+      _scaleImage = false;
       SetStyle(ControlStyles.SupportsTransparentBackColor, true);
       BackColor = Color.Transparent;
+
+      // Do not change, the Image is not drawn correctly if DoubleBuffered is true.
+      DoubleBuffered = false;
     }
 
     #region Properties
 
     /// <summary>
+    /// Gets or sets the background color of the control.
+    /// </summary>
+    [Category("MySQL Custom"), Description("The background color of the control.")]
+    public new Color BackColor
+    {
+      get
+      {
+        return base.BackColor;
+      }
+
+      protected set
+      {
+        base.BackColor = value;
+      }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether this control should redraw its surface using a secondary buffer to reduce or prevent flicker.
+    /// </summary>
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    protected override bool DoubleBuffered
+    {
+      get
+      {
+        return base.DoubleBuffered;
+      }
+
+      set
+      {
+        base.DoubleBuffered = value;
+      }
+    }
+
+    /// <summary>
     /// Gets or sets the image that is displayed by <see cref="TransparentPictureBox"/>.
     /// </summary>
-    public Image Image { set; get; }
+    [Category("MySQL Custom"), Description("The image that is displayed by this control.")]
+    public Image Image
+    {
+      get
+      {
+        return _image;
+      }
+
+      set
+      {
+        _image = value;
+        Invalidate();
+      }
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the image size is calculated to maintain its original aspect ratio.
+    /// </summary>
+    /// <remarks>This setting only applies when <see cref="ScaleImage"/> is <c>true</c>.</remarks>
+    [Category("MySQL Custom"), Description("Indicates whether the image size is calculated to maintain its original aspect ratio when the image is scaled.")]
+    public bool MaintainAspectRatio
+    {
+      get
+      {
+        return _maintainAspectRatio;
+      }
+
+      set
+      {
+        _maintainAspectRatio = value;
+        Invalidate();
+      }
+    }
 
     /// <summary>
     /// Gets or sets the opacity factor of the picture ranging from 0 to 1.
     /// </summary>
+    [Category("MySQL Custom"), Description("The opacity factor of the picture ranging from 0 to 1.")]
     public float Opacity
     {
       get
@@ -70,7 +159,7 @@ namespace MySQL.ForExcel.Controls
 
       set
       {
-        if (!(value <= 1 && value >= 0))
+        if (value < 0 || value > 1)
         {
           throw new IndexOutOfRangeException("Value is out of range");
         }
@@ -81,12 +170,33 @@ namespace MySQL.ForExcel.Controls
         cm.Matrix33 = _opacity;
         _imageAttributes = new ImageAttributes();
         _imageAttributes.SetColorMatrix(cm);
+        Invalidate();
+      }
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the <see cref="Image"/> is scaled to fit the size of this control.
+    /// </summary>
+    [Category("MySQL Custom"), Description("Value indicating whether the Image is scaled to fit the size of this control.")]
+    public bool ScaleImage
+    {
+      get
+      {
+        return _scaleImage;
+      }
+
+      set
+      {
+        _scaleImage = value;
+        Invalidate();
+        Update();
       }
     }
 
     /// <summary>
     /// Gets the required creation parameters when the control handle is created.
     /// </summary>
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     protected override CreateParams CreateParams
     {
       get
@@ -123,19 +233,43 @@ namespace MySQL.ForExcel.Controls
     protected override void OnPaint(PaintEventArgs e)
     {
       base.OnPaint(e);
-      if (Image != null)
+      if (_image == null)
       {
-        e.Graphics.DrawImage(Image, new Rectangle(0, 0, Image.Width, Image.Height), 0, 0, Image.Width, Image.Height, GraphicsUnit.Pixel, _imageAttributes);
+        return;
       }
-    }
 
-    /// <summary>
-    /// Paints the background of the control.
-    /// </summary>
-    /// <param name="e">A <see cref="PaintEventArgs"/> that contains the event data.</param>
-    protected override void OnPaintBackground(PaintEventArgs e)
-    {
-      //// Don't paint background so we can keep transparency
+      Rectangle drawRectangle;
+      Size sourceImageSize = Size.Empty;
+      int clipWidth = e.ClipRectangle.Width;
+      int clipHeight = e.ClipRectangle.Height;
+      if (ScaleImage)
+      {
+        Size drawImageSize;
+        if (_maintainAspectRatio)
+        {
+          int deltaHeight = clipHeight - _image.Height;
+          int deltaWidth = clipWidth - _image.Width;
+          drawImageSize = deltaHeight > deltaWidth
+            ? new Size(clipWidth, _image.Height * clipWidth / _image.Width)
+            : new Size(_image.Width * clipHeight / _image.Height, clipHeight);
+        }
+        else
+        {
+          drawImageSize = new Size(clipWidth, clipHeight);
+        }
+
+        drawRectangle = new Rectangle(0, 0, drawImageSize.Width, drawImageSize.Height);
+        sourceImageSize.Width = _image.Width;
+        sourceImageSize.Height = _image.Height;
+      }
+      else
+      {
+        drawRectangle = new Rectangle(0, 0, Math.Min(clipWidth, _image.Width), Math.Min(clipHeight, _image.Height));
+        sourceImageSize.Width = Math.Min(clipWidth, _image.Width);
+        sourceImageSize.Height = Math.Min(clipHeight, _image.Height);
+      }
+
+      e.Graphics.DrawImage(Image, drawRectangle, 0, 0, sourceImageSize.Width, sourceImageSize.Height, GraphicsUnit.Pixel, _imageAttributes);
     }
   }
 }
