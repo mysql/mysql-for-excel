@@ -9,7 +9,6 @@ Installer/obj/
 **/thumbs.db
 **/bin/**
 **/obj/**
-**/ExcelCustomActionTest/**
 **/ExcelCustomActionTest/*.suo
 **/ExcelCustomActionTest/bin/**
 **/ExcelCustomActionTest/obj/**
