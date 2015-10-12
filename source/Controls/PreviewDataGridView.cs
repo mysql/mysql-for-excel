@@ -15,6 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
+using System;
 using System.ComponentModel;
 using System.Windows.Forms;
 
@@ -25,12 +26,26 @@ namespace MySQL.ForExcel.Controls
   /// </summary>
   public class PreviewDataGridView : DataGridView
   {
+    #region Constants
+
+    /// <summary>
+    /// The default minimum column width, in pixels, of all columns in the grid.
+    /// </summary>
+    public const int DEFAULT_COLUMNS_MINIMUM_WIDTH = 5;
+
+    #endregion Constants
+
     #region Fields
 
     /// <summary>
     /// The maximum column width, in pixels, of all columns in the grid.
     /// </summary>
     private int _columnsMaximumWidth;
+
+    /// <summary>
+    /// The minimum column width, in pixels, of all columns in the grid.
+    /// </summary>
+    private int _columnsMinimumWidth;
 
     /// <summary>
     /// Flag indicating if recalculation of column width is not necessary so it must be skipped.
@@ -45,6 +60,7 @@ namespace MySQL.ForExcel.Controls
     public PreviewDataGridView()
     {
       _columnsMaximumWidth = 0;
+      _columnsMinimumWidth = DEFAULT_COLUMNS_MINIMUM_WIDTH;
       RowHeadersVisible = false;
       ShowCellErrors = false;
       ShowEditingIcon = false;
@@ -195,9 +211,31 @@ namespace MySQL.ForExcel.Controls
 
       set
       {
-        _columnsMaximumWidth = value;
+        _columnsMaximumWidth = value == 0 ? 0 : Math.Max(_columnsMinimumWidth, value);
         foreach (DataGridViewColumn col in Columns)
         {
+          OnColumnWidthChanged(new DataGridViewColumnEventArgs(col));
+        }
+      }
+    }
+
+    /// <summary>
+    /// Gets or sets the minimum column width, in pixels, of all columns in the grid.
+    /// </summary>
+    [Category("MySQL Custom"), DefaultValue(0), Description("The minimum column width, in pixels, of all columns in the grid. If 0 the column is automatically sized to fit its contents.")]
+    public int ColumnsMinimumWidth
+    {
+      get
+      {
+        return _columnsMinimumWidth;
+      }
+
+      set
+      {
+        _columnsMinimumWidth = _columnsMaximumWidth > 0 ?  Math.Min(_columnsMaximumWidth, value) : value;
+        foreach (DataGridViewColumn col in Columns)
+        {
+          col.MinimumWidth = _columnsMinimumWidth;
           OnColumnWidthChanged(new DataGridViewColumnEventArgs(col));
         }
       }
@@ -346,9 +384,19 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
+    /// Raises the <see cref="DataGridView.ColumnAdded"/> event.
+    /// </summary>
+    /// <param name="e">A <see cref="DataGridViewColumnEventArgs"/> that contains the event data.</param>
+    protected override void OnColumnAdded(DataGridViewColumnEventArgs e)
+    {
+      base.OnColumnAdded(e);
+      e.Column.MinimumWidth = _columnsMinimumWidth;
+    }
+
+    /// <summary>
     /// Raises the <see cref="DataGridView.ColumnWidthChanged"/> event.
     /// </summary>
-    /// <param name="e">A DataGridViewColumnEventArgs that contains the event data.</param>
+    /// <param name="e">A <see cref="DataGridViewColumnEventArgs"/> that contains the event data.</param>
     protected override void OnColumnWidthChanged(DataGridViewColumnEventArgs e)
     {
       if (_skipWidthRecalculation)
@@ -357,17 +405,34 @@ namespace MySQL.ForExcel.Controls
       }
 
       base.OnColumnWidthChanged(e);
-      if (_columnsMaximumWidth > 0 && e.Column.Width > _columnsMaximumWidth && _columnsMaximumWidth > e.Column.MinimumWidth)
+      PerformColumnWidthRecalculation(e.Column);
+    }
+
+    /// <summary>
+    /// Recalculates the given <see cref="DataGridViewColumn"/> width comparing it to the <see cref="ColumnsMaximumWidth"/> value.
+    /// </summary>
+    /// <param name="column">A <see cref="DataGridViewColumn"/>.</param>
+    protected void PerformColumnWidthRecalculation(DataGridViewColumn column)
+    {
+      bool wrapText = false;
+      int cappedWidth = column.Width;
+      if (column.Width > _columnsMaximumWidth && _columnsMaximumWidth > 0)
+      {
+        cappedWidth = _columnsMaximumWidth;
+        wrapText = true;
+      }
+      else if (column.Width < column.MinimumWidth)
+      {
+        cappedWidth = column.MinimumWidth;
+      }
+
+      if (column.Width != cappedWidth)
       {
         _skipWidthRecalculation = true;
-        e.Column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-        e.Column.HeaderCell.Style.WrapMode = DataGridViewTriState.False;
-        e.Column.Width = _columnsMaximumWidth;
+        column.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+        column.HeaderCell.Style.WrapMode = wrapText ? DataGridViewTriState.True : DataGridViewTriState.False;
+        column.Width = cappedWidth;
         _skipWidthRecalculation = false;
-      }
-      else
-      {
-        e.Column.HeaderCell.Style.WrapMode = DataGridViewTriState.True;
       }
     }
   }

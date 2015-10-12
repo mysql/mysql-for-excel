@@ -1093,9 +1093,10 @@ namespace MySQL.ForExcel.Controls
         headerFont = new Font(headerFont.FontFamily, headerFont.Size, FontStyle.Bold);
       }
 
-      var headerTextSize = graphics.MeasureString(e.Node.Text, headerFont);
+      // Measure the text size using the TextRenderer (GDI) since the add-in is NOT using a compatible text renderer.
+      var headerTextSize = TextRenderer.MeasureText(e.Node.Text, headerFont);
       pt.X += TextHorizontalOffset;
-      pt.Y = e.Bounds.Top + ((e.Bounds.Height - (int)headerTextSize.Height) / 2);
+      pt.Y = e.Bounds.Top + ((e.Bounds.Height - headerTextSize.Height) / 2);
       graphics.DrawString(e.Node.Text, headerFont, textBrush, pt.X, pt.Y);
 
       nodeBackbrush.Dispose();

@@ -20,8 +20,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
+using MySQL.ForExcel.Classes.EventArguments;
 
 namespace MySQL.ForExcel.Controls
 {
@@ -67,9 +69,51 @@ namespace MySQL.ForExcel.Controls
     private bool _allowChangingHeaderCellsColors;
 
     /// <summary>
-    /// A list of header rows each containing <see cref="MultiHeaderColumn"/> objects.
+    /// The horizontal alignment of the base column headers text.
+    /// </summary>
+    private HorizontalAlignment _baseColumnHeadersTextAlignment;
+
+    /// <summary>
+    /// The height, in pixels, of the base grid header row taking into account header text and the top and bottom paddings.
+    /// </summary>
+    private int _baseHeadersRowHeight;
+
+    /// <summary>
+    /// The <see cref="Color"/> of the column headers separators.
+    /// </summary>
+    /// <remarks>This color is only applied when <seealso cref="AllowChangingHeaderCellsColors"/> is true (so <seealso cref="EnableHeadersVisualStyles"/> is false).</remarks>
+    private Color _columnHeadersSeparatorColor;
+
+    /// <summary>
+    /// The width, in pixels, of the column header separators.
+    /// </summary>
+    private int _columnHeadersSeparatorWidth;
+
+    /// <summary>
+    /// A list of header rows each containing <see cref="MultiHeaderCell"/> objects.
     /// </summary>
     private readonly List<MultiHeaderRow> _multiHeaderRowsList;
+
+    /// <summary>
+    /// A value indicating whether the additional header rows defined in the <seealso cref="MultiHeaderRowsCollection"/> is reversed.
+    /// </summary>
+    /// <remarks>If <c>true</c> the order of rows is from the original header row up, if <c>false</c> the order is from the top of the grid down.</remarks>
+    private bool _reverseMultiHeaderRowOrder;
+
+    /// <summary>
+    /// Flag indicating whether the the call to <see cref="AdjustColumnsWidth"/> in the <see cref="OnColumnWidthChanged"/> event should be skipped.
+    /// </summary>
+    private bool _skipColumnWidthsAdjustment;
+
+    /// <summary>
+    /// Flag indicating whether the size of a header column cell is calculated adding the padding size on top of the text size.
+    /// </summary>
+    private bool _useColumnPaddings;
+
+    /// <summary>
+    /// Flag indicating whether the height of a column headers row is set to the value of <seealso cref="FixedColumnHeadersHeight"/> or computed based on their contents.
+    /// </summary>
+    private bool _useFixedColumnHeadersHeight;
 
     #endregion Fields
 
@@ -78,17 +122,21 @@ namespace MySQL.ForExcel.Controls
     /// </summary>
     public MultiHeaderDataGridView()
     {
+      _baseColumnHeadersTextAlignment = HorizontalAlignment.Center;
+      _baseHeadersRowHeight = 0;
+      _columnHeadersSeparatorColor = SystemColors.ControlDark;
       _multiHeaderRowsList = new List<MultiHeaderRow>(INITIAL_ROWS_QUANTITY);
+      _reverseMultiHeaderRowOrder = false;
+      _skipColumnWidthsAdjustment = false;
+      _useColumnPaddings = true;
+      _useFixedColumnHeadersHeight = false;
       AllowChangingHeaderCellsColors = true;
       AllowDrop = true;
-      AutoAdjustColumnHeadersHeight = true;
-      BaseColumnHeadersTextAlignment = HorizontalAlignment.Center;
-      ColumnHeadersSeparatorColor = SystemColors.ControlDark;
+      AutoSizeColumnsBasedOnAdditionalHeadersContent = true;
+      ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
       ColumnHeadersSeparatorWidth = DEFAULT_HEADERS_SEPARATOR_WIDTH;
       DoubleBuffered = true;
       FixedColumnHeadersHeight = DEFAULT_COLUMN_HEADERS_HEIGHT;
-      ReverseMultiHeaderRowOrder = false;
-      UseColumnPaddings = true;
     }
 
     #region Properties
@@ -96,7 +144,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets a value indicating whether row and column headers use the visual styles of the user's current theme if visual styles are enabled for the application.
     /// </summary>
-    [Category("MySQL Custom")]
+    [Category("MySQL Custom"), Description("Flag indicating whether row and column headers use the visual styles of the user's current theme if visual styles are enabled for the application.")]
     public bool AllowChangingHeaderCellsColors
     {
       get
@@ -112,16 +160,29 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the height of a column headers row is computed based on their fonts or the <seealso cref="FixedColumnHeadersHeight"/> value is used.
+    /// Gets or sets a value indicating whether the widths of columns are automatically resized taking in consideration the contents of the additional header cells.
     /// </summary>
-    [Category("MySQL Custom")]
-    public bool AutoAdjustColumnHeadersHeight { get; set; }
+    /// <remarks>This property only has effect if the value of <see cref="DataGridView.AutoSizeColumnsMode"/> is different to <see cref="DataGridViewAutoSizeColumnsMode.None"/></remarks>
+    [Category("MySQL Custom"), Description("Flag indicating whether the widths of columns are automatically resized taking in consideration the contents of the additional header cells.")]
+    public bool AutoSizeColumnsBasedOnAdditionalHeadersContent { get; set; }
 
     /// <summary>
     /// Gets or sets the horizontal alignment of the base column headers text.
     /// </summary>
-    [Category("MySQL Custom")]
-    public HorizontalAlignment BaseColumnHeadersTextAlignment { get; set; }
+    [Category("MySQL Custom"), Description("The horizontal alignment of the base column headers text.")]
+    public HorizontalAlignment BaseColumnHeadersTextAlignment
+    {
+      get
+      {
+        return _baseColumnHeadersTextAlignment;
+      }
+
+      set
+      {
+        _baseColumnHeadersTextAlignment = value;
+        InvalidateHeadersVisibleArea();
+      }
+    }
 
     /// <summary>
     /// Gets the height, in pixels, of the column headers row(s).
@@ -161,14 +222,38 @@ namespace MySQL.ForExcel.Controls
     /// Gets or sets the <see cref="Color"/> of the column headers separators.
     /// </summary>
     /// <remarks>This color is only applied when <seealso cref="AllowChangingHeaderCellsColors"/> is true (so <seealso cref="EnableHeadersVisualStyles"/> is false).</remarks>
-    [Category("MySQL Custom")]
-    public Color ColumnHeadersSeparatorColor { get; set; }
+    [Category("MySQL Custom"), Description("The color of the column headers separators (only applied when AllowChangingHeaderCellsColors is true).")]
+    public Color ColumnHeadersSeparatorColor
+    {
+      get
+      {
+        return _columnHeadersSeparatorColor;
+      }
+
+      set
+      {
+        _columnHeadersSeparatorColor = value;
+        InvalidateHeadersVisibleArea();
+      }
+    }
 
     /// <summary>
     /// Gets or sets the width, in pixels, of the column header separators.
     /// </summary>
-    [Category("MySQL Custom")]
-    public int ColumnHeadersSeparatorWidth { get; set; }
+    [Category("MySQL Custom"), Description("The width, in pixels, of the column header separators.")]
+    public int ColumnHeadersSeparatorWidth
+    {
+      get
+      {
+        return _columnHeadersSeparatorWidth;
+      }
+
+      set
+      {
+        _columnHeadersSeparatorWidth = value;
+        RecalculateHeaderRowsSizes();
+      }
+    }
 
     /// <summary>
     /// Gets a value indicating whether this control should redraw its surface using a secondary buffer to reduce or prevent flicker.
@@ -207,11 +292,11 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// Gets or sets a fixed height, in pixels, for each column headers row.
     /// </summary>
-    [Category("MySQL Custom")]
+    [Category("MySQL Custom"), Description("A fixed height, in pixels, for each column headers row.")]
     public int FixedColumnHeadersHeight { get; set; }
 
     /// <summary>
-    /// Gets a read-only collection of header rows each containing <see cref="MultiHeaderColumn"/> objects.
+    /// Gets a read-only collection of header rows each containing <see cref="MultiHeaderCell"/> objects.
     /// </summary>
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ReadOnlyCollection<MultiHeaderRow> MultiHeaderRowsCollection
@@ -226,14 +311,56 @@ namespace MySQL.ForExcel.Controls
     /// Gets or sets a value indicating whether the additional header rows defined in the <seealso cref="MultiHeaderRowsCollection"/> is reversed.
     /// </summary>
     /// <remarks>If <c>true</c> the order of rows is from the original header row up, if <c>false</c> the order is from the top of the grid down.</remarks>
-    [Category("MySQL Custom")]
-    public bool ReverseMultiHeaderRowOrder { get; set; }
+    [Category("MySQL Custom"), Description("Flag indicating whether the additional header rows defined in the MultiHeaderRowsCollection is reversed.")]
+    public bool ReverseMultiHeaderRowOrder
+    {
+      get
+      {
+        return _reverseMultiHeaderRowOrder;
+      }
+
+      set
+      {
+        _reverseMultiHeaderRowOrder = value;
+        InvalidateHeadersVisibleArea();
+      }
+    }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the height of a column headers row is computed based on their fonts or the <seealso cref="FixedColumnHeadersHeight"/> value is used.
+    /// Gets or sets a value indicating whether the size of a header column cell is calculated adding the padding size on top of the text size.
     /// </summary>
-    [Category("MySQL Custom")]
-    public bool UseColumnPaddings { get; set; }
+    [Category("MySQL Custom"), Description("Flag indicating whether the size of a header column cell is calculated adding the padding size on top of the text size.")]
+    public bool UseColumnPaddings
+    {
+      get
+      {
+        return _useColumnPaddings;
+      }
+
+      set
+      {
+        _useColumnPaddings = value;
+        RecalculateHeaderRowsSizes();
+      }
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the height of a column headers row is set to the value of <seealso cref="FixedColumnHeadersHeight"/> or computed based on their contents.
+    /// </summary>
+    [Category("MySQL Custom"), Description("Flag indicating whether the height of a column headers row is set to the value of FixedColumnHeadersHeight or computed based on their contents.")]
+    public bool UseFixedColumnHeadersHeight
+    {
+      get
+      {
+        return _useFixedColumnHeadersHeight;
+      }
+
+      set
+      {
+        _useFixedColumnHeadersHeight = value;
+        RecalculateBaseHeadersRowHeight();
+      }
+    }
 
     #endregion Properties
 
@@ -251,7 +378,7 @@ namespace MySQL.ForExcel.Controls
         return;
       }
 
-      var headersRow = new MultiHeaderRow(FixedColumnHeadersHeight, columnsCount);
+      var headersRow = new MultiHeaderRow(columnsCount);
       for (int columnIndex = 0; columnIndex < Columns.Count; columnIndex++)
       {
         string headerText = autoGenerateHeaderText
@@ -259,14 +386,15 @@ namespace MySQL.ForExcel.Controls
           : string.Empty;
         var column = Columns[columnIndex];
         var style = CreateColumnHeaderCellStyle(copyStyleFromColumnHeader ? column.HeaderCell : null);
-        //style.Padding = new Padding(DEFAULT_HEADERS_HORIZONTAL_PADDING, DEFAULT_HEADERS_VERTICAL_PADDING, DEFAULT_HEADERS_HORIZONTAL_PADDING, DEFAULT_HEADERS_VERTICAL_PADDING);
-        var headerColumn = new MultiHeaderColumn(headerText, columnIndex, 1, style);
-        headersRow.Add(headerColumn);
+        headersRow.Add(headersRow.NewHeaderCell(headerText, style));
       }
 
+      headersRow.HeaderCellColumnSpanChanged += HeaderCellColumnSpanChanged;
+      headersRow.HeaderCellTextChanged += HeaderCellTextChanged;
       _multiHeaderRowsList.Add(headersRow);
+      RecalculateHeaderRowsSizes();
+      Invalidate();
     }
-
 
     /// <summary>
     /// Clears the header rows collection.
@@ -279,6 +407,25 @@ namespace MySQL.ForExcel.Controls
       }
 
       _multiHeaderRowsList.Clear();
+      RecalculateHeaderRowsSizes();
+    }
+
+    /// <summary>
+    /// Calculates the sizes, in pixels, of all header rows in this grid taking text heights and paddings into account.
+    /// </summary>
+    public void RecalculateHeaderRowsSizes()
+    {
+      RecalculateBaseHeadersRowHeight();
+      foreach (var headersRow in _multiHeaderRowsList)
+      {
+        headersRow.RecalculateCellSizes();
+        foreach (var headerCell in headersRow)
+        {
+          AdjustColumnsWidth(headerCell);
+        }
+      }
+
+      Invalidate();
     }
 
     /// <summary>
@@ -293,6 +440,20 @@ namespace MySQL.ForExcel.Controls
       }
 
       _multiHeaderRowsList.RemoveAt(rowIndex);
+    }
+
+    /// <summary>
+    /// Raises the <see cref="DataGridView.CellValueChanged"/> event.
+    /// </summary>
+    /// <param name="e">A DataGridViewCellEventArgs that contains the event data.</param>
+    protected override void OnCellValueChanged(DataGridViewCellEventArgs e)
+    {
+      base.OnCellValueChanged(e);
+      if (e.RowIndex == 0)
+      {
+        // Recalculate the _baseHeadersRowHeight since a header column text changed.
+        RecalculateBaseHeadersRowHeight(Columns[e.ColumnIndex]);
+      }
     }
 
     /// <summary>
@@ -313,10 +474,17 @@ namespace MySQL.ForExcel.Controls
     /// <param name="e">A <see cref="DataGridViewColumnEventArgs"/> that contains the event data.</param>
     protected override void OnColumnWidthChanged(DataGridViewColumnEventArgs e)
     {
+      if (!_skipColumnWidthsAdjustment)
+      {
+        // Go through the additional header cells relative to the column changing widths to recalculate column width if needed
+        foreach (var headerCell in _multiHeaderRowsList.Select(headerRow => headerRow.FirstOrDefault(hCell => hCell.ColumnIndex == e.Column.Index)).Where(headerCell => headerCell != null))
+        {
+          AdjustColumnsWidth(headerCell);
+        }
+      }
+
       base.OnColumnWidthChanged(e);
-      var headerRectangle = DisplayRectangle;
-      headerRectangle.Height = ColumnHeadersHeight;
-      Invalidate(headerRectangle);
+      InvalidateHeadersVisibleArea();
     }
 
     /// <summary>
@@ -336,62 +504,36 @@ namespace MySQL.ForExcel.Controls
     protected override void OnPaint(PaintEventArgs e)
     {
       base.OnPaint(e);
+
+      // Enforce that the alignment of the original header text is at the bottom, so the other header rows can be drawn correctly.
+      ColumnHeadersDefaultCellStyle.Alignment = BaseColumnHeadersTextAlignment.ToBottomAlignment();
+
+      // Get the total height for header rows
+      ColumnHeadersHeight = GetTotalHeaderRowsHeight();
+
       if (_multiHeaderRowsList == null || _multiHeaderRowsList.Count == 0)
       {
         return;
       }
 
-      // Enforce that the alignment of the original header text is at the bottom, so the other header rows can be drawn correctly.
-      ColumnHeadersDefaultCellStyle.Alignment = BaseColumnHeadersTextAlignment.ToBottomAlignment();
-
-      // Compute the  height of the original header plus all additional header rows
-      ColumnHeadersHeight = GetCumulativeColumnHeaderRowsHeight(e.Graphics);
-
       // Set other properties and process each additional row.
-      ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
       var rowsQuantity = _multiHeaderRowsList.Count;
       var foregroundBrush = new SolidBrush(ColumnHeadersDefaultCellStyle.ForeColor);
       var backgroundBrush = new SolidBrush(ColumnHeadersDefaultCellStyle.BackColor);
-      int columnsQuantity = Columns.Count;
       int accumulatedRowHeights = 0;
       for (int rowIndex = 0; rowIndex < rowsQuantity; rowIndex++)
       {
         int reversedRowIndex = ReverseMultiHeaderRowOrder ? rowsQuantity - rowIndex - 1 : rowIndex;
         var headerRow = _multiHeaderRowsList[reversedRowIndex];
-        var previousColumnSpan = 0;
-        for (int columnIndex = 0; columnIndex < columnsQuantity; columnIndex++)
+        var headerRowHeight = UseFixedColumnHeadersHeight ? FixedColumnHeadersHeight : headerRow.Height;
+        foreach (var headerCell in headerRow.Where(headerCell => !headerCell.InSpan))
         {
-          // If the current column is part of a span, skip it.
-          if (previousColumnSpan > 1)
-          {
-            previousColumnSpan--;
-            continue;
-          }
-
-          var headerColumn = headerRow[columnIndex];
-
-          // In case the column span goes beyond the number of columns, then set the last index using the last column of the grid control.
-          int lastColumnIndex = columnIndex + headerColumn.ColumnSpan - 1;
-          if (lastColumnIndex >= columnsQuantity)
-          {
-            lastColumnIndex = columnsQuantity - 1;
-          }
-
-          // Compute the length of the currently processed header since it could be spanning more than one grid column, in which case add columns to skip to the collection.
-          int multiWidth = 0;
-          int lastSpanningColumnDividerWidth = Columns[lastColumnIndex].DividerWidth;
-          for (int idx = columnIndex; idx <= lastColumnIndex; idx++)
-          {
-            DataGridViewColumn spanningColumn = Columns[idx];
-            multiWidth += spanningColumn.Width;
-            if (idx < lastColumnIndex)
-            {
-              multiWidth += spanningColumn.DividerWidth;
-            }
-          }
+          // Calculate the header cell's width, in pixels, considering the columns it spans.
+          int lastSpanningColumnDividerWidth;
+          int headerCellSpanningWidth = GetHeaderCellSpanningColumnWidths(headerCell, out lastSpanningColumnDividerWidth);
 
           // Get the rectangle space corresponding to the grid column header, which is the area where all multiple headers will be manually drawn
-          var baseHeaderAreaRectangle = GetCellDisplayRectangle(columnIndex, -1, true);
+          var baseHeaderAreaRectangle = GetCellDisplayRectangle(headerCell.ColumnIndex, -1, true);
 
           // If the rectangle is empty it means the column is non in the visible scrolling area.
           if (baseHeaderAreaRectangle.IsEmpty)
@@ -403,17 +545,17 @@ namespace MySQL.ForExcel.Controls
           var headerAreaWithSeparatorsRectangle = new Rectangle(
             baseHeaderAreaRectangle.Left,
             baseHeaderAreaRectangle.Top + accumulatedRowHeights,
-            multiWidth,
-            headerRow.Height);
+            headerCellSpanningWidth,
+            headerRowHeight);
           var headerDrawableAreaRectangle = new Rectangle(
             headerAreaWithSeparatorsRectangle.Left,
             headerAreaWithSeparatorsRectangle.Top,
             headerAreaWithSeparatorsRectangle.Width - Math.Max(ColumnHeadersSeparatorWidth, lastSpanningColumnDividerWidth + 1),
             headerAreaWithSeparatorsRectangle.Height - ColumnHeadersSeparatorWidth);
-          var topPadding = UseColumnPaddings ? headerColumn.Style.Padding.Top : 0;
-          var bottomPadding = UseColumnPaddings ? headerColumn.Style.Padding.Bottom : 0;
-          var leftPadding = UseColumnPaddings ? headerColumn.Style.Padding.Left : 0;
-          var rightPadding = UseColumnPaddings ? headerColumn.Style.Padding.Right : 0;
+          var topPadding = UseColumnPaddings ? headerCell.Style.Padding.Top : 0;
+          var bottomPadding = UseColumnPaddings ? headerCell.Style.Padding.Bottom : 0;
+          var leftPadding = UseColumnPaddings ? headerCell.Style.Padding.Left : 0;
+          var rightPadding = UseColumnPaddings ? headerCell.Style.Padding.Right : 0;
           var textAreaRectangle = new Rectangle(
             headerDrawableAreaRectangle.Left + leftPadding,
             headerDrawableAreaRectangle.Top + topPadding,
@@ -425,21 +567,18 @@ namespace MySQL.ForExcel.Controls
           e.Graphics.FillRectangle(backgroundBrush, headerAreaWithSeparatorsRectangle);
 
           // Draw header area with its background color on top of the area with separators to emulate the separators
-          backgroundBrush.Color = headerColumn.Style.BackColor;
+          backgroundBrush.Color = headerCell.Style.BackColor;
           e.Graphics.FillRectangle(backgroundBrush, headerDrawableAreaRectangle);
 
           // Draw the header text
-          foregroundBrush.Color = headerColumn.Style.ForeColor.IsEmpty
+          foregroundBrush.Color = headerCell.Style.ForeColor.IsEmpty
             ? ColumnHeadersDefaultCellStyle.ForeColor
-            : headerColumn.Style.ForeColor;
-          var headerFont = headerColumn.Style.Font ?? ColumnHeadersDefaultCellStyle.Font;
-          e.Graphics.DrawString(headerColumn.Text, headerFont, foregroundBrush, textAreaRectangle, headerColumn.Style.Alignment.ToStringFormat());
-
-          // Set the column span for the next iteration.
-          previousColumnSpan = headerColumn.ColumnSpan;
+            : headerCell.Style.ForeColor;
+          var headerFont = headerCell.Style.Font ?? ColumnHeadersDefaultCellStyle.Font;
+          e.Graphics.DrawString(headerCell.Text, headerFont, foregroundBrush, textAreaRectangle, headerCell.Style.Alignment.ToStringFormat());
         }
 
-        accumulatedRowHeights += headerRow.Height;
+        accumulatedRowHeights += headerRowHeight;
       }
 
       foregroundBrush.Dispose();
@@ -458,9 +597,45 @@ namespace MySQL.ForExcel.Controls
         return;
       }
 
-      Rectangle rtHeader = DisplayRectangle;
-      rtHeader.Height = ColumnHeadersHeight;
-      Invalidate(rtHeader);
+      InvalidateHeadersVisibleArea();
+    }
+
+    /// <summary>
+    /// Adjusts the column width relative to the given <see cref="MultiHeaderCell"/> based on its width.
+    /// </summary>
+    /// <param name="headerCell">A <see cref="MultiHeaderCell"/> object.</param>
+    private void AdjustColumnsWidth(MultiHeaderCell headerCell)
+    {
+      if (headerCell == null || !AutoSizeColumnsBasedOnAdditionalHeadersContent || AutoSizeColumnsMode == DataGridViewAutoSizeColumnsMode.None)
+      {
+        return;
+      }
+
+      // Calculate the total width of the base columns the headerCell spans
+      int lastColumnDividerWidth;
+      var spannedWidth = GetHeaderCellSpanningColumnWidths(headerCell, out lastColumnDividerWidth);
+
+      // Adjust column widths if needed by comparing the width of the spanned columns with the calculated additional header cell's width
+      if (headerCell.CellSize.Width > spannedWidth)
+      {
+        int remainder;
+        int proportionalWidthToIncrease = Math.DivRem(headerCell.CellSize.Width - spannedWidth, headerCell.ColumnSpan, out remainder);
+        if (remainder > 0)
+        {
+          proportionalWidthToIncrease++;
+        }
+
+        int lastColumnIndex = headerCell.GetLastBaseColumnIndexFromSpan(Columns.Count);
+        for (int idx = headerCell.ColumnIndex; idx <= lastColumnIndex; idx++)
+        {
+          DataGridViewColumn spanningColumn = Columns[idx];
+          int newWidth = spanningColumn.Width + proportionalWidthToIncrease;
+          _skipColumnWidthsAdjustment = true;
+          spanningColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+          spanningColumn.Width = newWidth;
+          _skipColumnWidthsAdjustment = false;
+        }
+      }
     }
 
     /// <summary>
@@ -482,8 +657,14 @@ namespace MySQL.ForExcel.Controls
     private DataGridViewCellStyle CreateColumnHeaderCellStyle(DataGridViewCellStyle fromStyle)
     {
       var newCellStyle = new DataGridViewCellStyle();
-      DataGridViewCellStyle columnHeadersStyle = ColumnHeadersDefaultCellStyle;
-      DataGridViewCellStyle dataGridViewStyle = DefaultCellStyle;
+      var columnHeadersStyle = ColumnHeadersDefaultCellStyle;
+      var dataGridViewStyle = DefaultCellStyle;
+      newCellStyle.BackColor = fromStyle != null && !fromStyle.BackColor.IsEmpty
+        ? fromStyle.BackColor
+        : !columnHeadersStyle.BackColor.IsEmpty
+          ? columnHeadersStyle.BackColor
+          : dataGridViewStyle.BackColor;
+
       if (fromStyle != null && !fromStyle.BackColor.IsEmpty)
       {
         newCellStyle.BackColor = fromStyle.BackColor;
@@ -657,53 +838,145 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Gets the accumulated heights, in pixels, of all header rows in this grid taking text heights and paddings into account.
+    /// Event delegate method fired when the <see cref="MultiHeaderCell.ColumnSpan"/> of a cell in one of the <see cref="MultiHeaderRow"/> objects in this grid changes value.
     /// </summary>
-    /// <param name="graphics">The <see cref="Graphics"/> instance used to draw the text.</param>
-    /// <returns>The accumulated heights of all header rows.</returns>
-    private int GetCumulativeColumnHeaderRowsHeight(Graphics graphics)
+    /// <param name="sender">A <see cref="MultiHeaderRow"/> in this grid.</param>
+    /// <param name="args">The <see cref="HeaderCellColumnSpanChangedArgs"/> related to the event.</param>
+    private void HeaderCellColumnSpanChanged(object sender, HeaderCellColumnSpanChangedArgs args)
     {
-      if (!AutoAdjustColumnHeadersHeight)
+      var headerRow = sender as MultiHeaderRow;
+      if (headerRow == null)
       {
-        return FixedColumnHeadersHeight * (_multiHeaderRowsList.Count + 1);
+        return;
       }
 
-      int cumulativeHeight = GetMaxHeadersHeight(graphics);
-      foreach (var headersRow in _multiHeaderRowsList)
-      {
-        headersRow.ComputeHeight(graphics, UseColumnPaddings, ColumnHeadersSeparatorWidth);
-        cumulativeHeight += headersRow.Height;
-      }
-
-      return cumulativeHeight;
+      AdjustColumnsWidth(args.HeaderCell);
     }
 
     /// <summary>
-    /// Gets the maximum height, in pixels, of the header cells taking into account header text and the top and bottom paddings.
+    /// Event delegate method fired when the <see cref="MultiHeaderCell.ColumnSpan"/> of a cell in one of the <see cref="MultiHeaderRow"/> objects in this grid changes value.
     /// </summary>
-    /// <param name="graphics">The <see cref="Graphics"/> instance used to draw the text.</param>
-    /// <returns>The maximum height of the header cells.</returns>
-    private int GetMaxHeadersHeight(Graphics graphics)
+    /// <param name="sender">A <see cref="MultiHeaderRow"/> in this grid.</param>
+    /// <param name="args">The <see cref="HeaderCellColumnSpanChangedArgs"/> related to the event.</param>
+    private void HeaderCellTextChanged(object sender, HeaderCellTextChangedArgs args)
     {
-      if (graphics == null)
+      var headerRow = sender as MultiHeaderRow;
+      if (headerRow == null)
+      {
+        return;
+      }
+
+      AdjustColumnsWidth(args.HeaderCell);
+    }
+
+    /// <summary>
+    /// Invalidates the headers visible area so it is repainted.
+    /// </summary>
+    private void InvalidateHeadersVisibleArea()
+    {
+      var headerRectangle = DisplayRectangle;
+      headerRectangle.Height = ColumnHeadersHeight;
+      Invalidate(headerRectangle);
+    }
+
+    /// <summary>
+    /// Calculates the total width, in pixels, of an additional header cell based on the corresponding grid column widths the header cell spans.
+    /// </summary>
+    /// <param name="headerCell">A <see cref="MultiHeaderCell"/> object.</param>
+    /// <param name="lastSpanningColumnDividerWidth">The <see cref="DataGridViewColumn.DividerWidth"/> of the last column the header cell spans.</param>
+    /// <returns>The total width, in pixels, of the given additional header cell.</returns>
+    private int GetHeaderCellSpanningColumnWidths(MultiHeaderCell headerCell, out int lastSpanningColumnDividerWidth)
+    {
+      lastSpanningColumnDividerWidth = 0;
+      if (headerCell == null)
       {
         return 0;
       }
 
-      int maxHeight = 0;
-      int separators = ColumnHeadersSeparatorWidth * 2;
-      foreach (DataGridViewColumn column in Columns)
+      // In case the column span goes beyond the number of columns, then set the last index using the last column of the grid control.
+      int lastColumnIndex = headerCell.GetLastBaseColumnIndexFromSpan(Columns.Count);
+
+      // Compute the length of the currently processed header since it could be spanning more than one grid column, in which case add columns to skip to the collection.
+      lastSpanningColumnDividerWidth = Columns[lastColumnIndex].DividerWidth;
+      int multiWidth = 0;
+      for (int idx = headerCell.ColumnIndex; idx <= lastColumnIndex; idx++)
       {
-        var style = CreateColumnHeaderCellStyle(column.HeaderCell);
-        var text = string.IsNullOrEmpty(column.HeaderText) ? "Text" : column.HeaderText;
-        var textHeight = Convert.ToInt32(graphics.MeasureString(text, style.Font).Height);
-        var paddings = UseColumnPaddings
-          ? column.HeaderCell.Style.Padding.Top + column.HeaderCell.Style.Padding.Bottom
-          : 0;
-        maxHeight = Math.Max(maxHeight, textHeight + paddings + separators);
+        DataGridViewColumn spanningColumn = Columns[idx];
+        multiWidth += spanningColumn.Width;
+        if (idx < lastColumnIndex)
+        {
+          multiWidth += spanningColumn.DividerWidth;
+        }
       }
 
-      return maxHeight;
+      return multiWidth;
+    }
+
+    /// <summary>
+    /// Gets the accumulated heights, in pixels, of the base header row and all additional header rows in this grid.
+    /// </summary>
+    /// <returns>The accumulated header row heights, in pixels.</returns>
+    private int GetTotalHeaderRowsHeight()
+    {
+      if (UseFixedColumnHeadersHeight)
+      {
+        return FixedColumnHeadersHeight * (_multiHeaderRowsList.Count + 1);
+      }
+
+      // If the height is 0, it means the texts for this base header row have not been calculated yet, so force the calculation.
+      if (_baseHeadersRowHeight == 0)
+      {
+        RecalculateBaseHeadersRowHeight();
+      }
+
+      var totalHeight = _baseHeadersRowHeight + _multiHeaderRowsList.Sum(headerRow => headerRow.Height);
+
+      // If the height is still 0 (which is an invalid value), set it then to the FixedColumnHeadersHeight
+      if (totalHeight == 0)
+      {
+        totalHeight = FixedColumnHeadersHeight;
+      }
+
+      return totalHeight;
+    }
+
+    /// <summary>
+    /// Recalculates the <see cref="_baseHeadersRowHeight"/> based on the contents of a given <see cref="DataGridViewColumn"/> header cell.
+    /// </summary>
+    /// <param name="column">A <see cref="DataGridViewColumn"/> that had a text change.</param>
+    private void RecalculateBaseHeadersRowHeight(DataGridViewColumn column)
+    {
+      if (column == null)
+      {
+        return;
+      }
+
+      // No need to recalculate, use the fixed headers height
+      if (UseFixedColumnHeadersHeight)
+      {
+        _baseHeadersRowHeight = FixedColumnHeadersHeight;
+        return;
+      }
+
+      // Recalculate base header row height based on text sizes, paddings and separators width
+      int separators = ColumnHeadersSeparatorWidth * 2;
+      var style = CreateColumnHeaderCellStyle(column.HeaderCell);
+      var text = string.IsNullOrEmpty(column.HeaderText) ? "Text" : column.HeaderText;
+      var textHeight = TextRenderer.MeasureText(text, style.Font).Height;
+      var paddings = UseColumnPaddings ? style.Padding.Top + style.Padding.Bottom : 0;
+      _baseHeadersRowHeight = Math.Max(_baseHeadersRowHeight, textHeight + paddings + separators);
+    }
+
+    /// <summary>
+    /// Recalculates the <see cref="_baseHeadersRowHeight"/> based on the contents of header cells for all <see cref="DataGridViewColumn"/>s.
+    /// </summary>
+    private void RecalculateBaseHeadersRowHeight()
+    {
+      for (int colIndex = 0; colIndex < (_useFixedColumnHeadersHeight ? 0 : Columns.Count); colIndex++)
+      {
+        var column = Columns[colIndex];
+        RecalculateBaseHeadersRowHeight(column);
+      }
     }
   }
 }

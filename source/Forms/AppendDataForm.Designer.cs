@@ -447,21 +447,26 @@ namespace MySQL.ForExcel.Forms
       // 
       // TargetMySQLTableDataGridView
       // 
+      this.TargetMySQLTableDataGridView.AllowChangingHeaderCellsColors = true;
       this.TargetMySQLTableDataGridView.AllowDrop = true;
       this.TargetMySQLTableDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.TargetMySQLTableDataGridView.AutoAdjustColumnHeadersHeight = true;
+      this.TargetMySQLTableDataGridView.AutoSizeColumnsBasedOnAdditionalHeadersContent = true;
       this.TargetMySQLTableDataGridView.BaseColumnHeadersTextAlignment = System.Windows.Forms.HorizontalAlignment.Center;
       dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomCenter;
       dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.InactiveCaption;
-      dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 8.25F);
       dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
+      dataGridViewCellStyle1.Padding = new System.Windows.Forms.Padding(3, 3, 1, 1);
       dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Control;
       dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.ControlText;
       dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
       this.TargetMySQLTableDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+      this.TargetMySQLTableDataGridView.ColumnHeadersSeparatorColor = System.Drawing.SystemColors.ControlDark;
+      this.TargetMySQLTableDataGridView.ColumnHeadersSeparatorWidth = 1;
       this.TargetMySQLTableDataGridView.ColumnsMaximumWidth = 200;
+      this.TargetMySQLTableDataGridView.ColumnsMinimumWidth = 50;
       this.TargetMySQLTableDataGridView.ContextMenuStrip = this.AppendContextMenu;
       dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
@@ -487,6 +492,7 @@ namespace MySQL.ForExcel.Forms
       this.TargetMySQLTableDataGridView.Size = new System.Drawing.Size(686, 150);
       this.TargetMySQLTableDataGridView.TabIndex = 10;
       this.TargetMySQLTableDataGridView.UseColumnPaddings = true;
+      this.TargetMySQLTableDataGridView.UseFixedColumnHeadersHeight = false;
       this.TargetMySQLTableDataGridView.DragDrop += new System.Windows.Forms.DragEventHandler(this.TargetMySQLTableDataGridView_DragDrop);
       this.TargetMySQLTableDataGridView.DragOver += new System.Windows.Forms.DragEventHandler(this.TargetMySQLTableDataGridView_DragOver);
       this.TargetMySQLTableDataGridView.GiveFeedback += new System.Windows.Forms.GiveFeedbackEventHandler(this.DataGridView_GiveFeedback);
@@ -497,20 +503,25 @@ namespace MySQL.ForExcel.Forms
       // 
       // SourceExcelDataDataGridView
       // 
+      this.SourceExcelDataDataGridView.AllowChangingHeaderCellsColors = true;
       this.SourceExcelDataDataGridView.AllowDrop = true;
       this.SourceExcelDataDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.SourceExcelDataDataGridView.AutoAdjustColumnHeadersHeight = true;
+      this.SourceExcelDataDataGridView.AutoSizeColumnsBasedOnAdditionalHeadersContent = true;
       this.SourceExcelDataDataGridView.BaseColumnHeadersTextAlignment = System.Windows.Forms.HorizontalAlignment.Center;
-      dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+      dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.BottomCenter;
       dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.InactiveCaption;
       dataGridViewCellStyle4.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
+      dataGridViewCellStyle4.Padding = new System.Windows.Forms.Padding(3, 3, 1, 1);
       dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Control;
       dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.ControlText;
       dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
       this.SourceExcelDataDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+      this.SourceExcelDataDataGridView.ColumnHeadersSeparatorColor = System.Drawing.SystemColors.ControlDark;
+      this.SourceExcelDataDataGridView.ColumnHeadersSeparatorWidth = 1;
       this.SourceExcelDataDataGridView.ColumnsMaximumWidth = 200;
+      this.SourceExcelDataDataGridView.ColumnsMinimumWidth = 50;
       this.SourceExcelDataDataGridView.ContextMenuStrip = this.AppendContextMenu;
       dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
@@ -522,6 +533,7 @@ namespace MySQL.ForExcel.Forms
       this.SourceExcelDataDataGridView.DefaultCellStyle = dataGridViewCellStyle5;
       this.SourceExcelDataDataGridView.FixedColumnHeadersHeight = 23;
       this.SourceExcelDataDataGridView.Location = new System.Drawing.Point(82, 182);
+      this.SourceExcelDataDataGridView.MultiSelect = false;
       this.SourceExcelDataDataGridView.Name = "SourceExcelDataDataGridView";
       this.SourceExcelDataDataGridView.ReverseMultiHeaderRowOrder = false;
       dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -535,6 +547,7 @@ namespace MySQL.ForExcel.Forms
       this.SourceExcelDataDataGridView.Size = new System.Drawing.Size(686, 150);
       this.SourceExcelDataDataGridView.TabIndex = 9;
       this.SourceExcelDataDataGridView.UseColumnPaddings = true;
+      this.SourceExcelDataDataGridView.UseFixedColumnHeadersHeight = false;
       this.SourceExcelDataDataGridView.SelectionChanged += new System.EventHandler(this.SourceExcelDataDataGridView_SelectionChanged);
       this.SourceExcelDataDataGridView.GiveFeedback += new System.Windows.Forms.GiveFeedbackEventHandler(this.DataGridView_GiveFeedback);
       this.SourceExcelDataDataGridView.QueryContinueDrag += new System.Windows.Forms.QueryContinueDragEventHandler(this.DataGridView_QueryContinueDrag);

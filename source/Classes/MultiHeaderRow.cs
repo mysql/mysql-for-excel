@@ -18,7 +18,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Linq;
+using System.Windows.Forms;
+using MySQL.ForExcel.Classes.EventArguments;
 using MySQL.ForExcel.Controls;
 
 namespace MySQL.ForExcel.Classes
@@ -26,34 +28,49 @@ namespace MySQL.ForExcel.Classes
   /// <summary>
   /// Represents a header row that contains header columns used in a <see cref="MultiHeaderDataGridView"/> control.
   /// </summary>
-  public class MultiHeaderRow : IList<MultiHeaderColumn>
+  public class MultiHeaderRow : IList<MultiHeaderCell>
   {
     #region Fields
 
     /// <summary>
-    /// Gets a list of <see cref="MultiHeaderColumn"/> objects contained in the current header row.
+    /// List of <see cref="MultiHeaderCell"/> objects contained in the current header row.
     /// </summary>
-    private readonly List<MultiHeaderColumn> _headerColumns;
+    private readonly List<MultiHeaderCell> _headerCells;
+
+    /// <summary>
+    /// The height of this header row, in pixels, calculated by using the maximum height of the contained <see cref="MultiHeaderCell"/> objects in this row.
+    /// </summary>
+    private int _height;
 
     #endregion Fields
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MultiHeaderRow"/> class.
     /// </summary>
-    /// <param name="defaultHeight">Default headers row height in pixels.</param>
     /// <param name="initialColumnsCapacity">The initial capacity of the colletion.</param>
-    public MultiHeaderRow(int defaultHeight, int initialColumnsCapacity = 0)
+    public MultiHeaderRow(int initialColumnsCapacity = 0)
     {
-      _headerColumns = new List<MultiHeaderColumn>(initialColumnsCapacity);
-      Height = defaultHeight;
+      _height = 0;
+      _headerCells = new List<MultiHeaderCell>(initialColumnsCapacity);
     }
 
     #region Properties
 
     /// <summary>
-    /// The height in pixels of this header row.
+    /// Gets the height of this header row, in pixels, calculated by using the maximum height of the contained <see cref="MultiHeaderCell"/> objects in this row.
     /// </summary>
-    public int Height { get; private set; }
+    public int Height
+    {
+      get
+      {
+        if (_height == 0)
+        {
+          _height = _headerCells.Select(headerCell => headerCell.CellSize.Height).Concat(new[] { 0 }).Max();
+        }
+
+        return _height;
+      }
+    }
 
     #region IList implementation
 
@@ -64,7 +81,7 @@ namespace MySQL.ForExcel.Classes
     {
       get
       {
-        return _headerColumns.Count;
+        return _headerCells.Count;
       }
     }
 
@@ -84,16 +101,16 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="index">The zero-based index of the element to get or set.</param>
     /// <returns>The element at the specified index.</returns>
-    public MultiHeaderColumn this[int index]
+    public MultiHeaderCell this[int index]
     {
       get
       {
-        return _headerColumns[index];
+        return _headerCells[index];
       }
 
       set
       {
-        _headerColumns[index] = value;
+        _headerCells[index] = value;
       }
     }
 
@@ -101,15 +118,34 @@ namespace MySQL.ForExcel.Classes
 
     #endregion Properties
 
+    #region Events
+
+    /// <summary>
+    /// Occurs when the value of <see cref="MultiHeaderCell.ColumnSpan"/> changes.
+    /// </summary>
+    public event MultiHeaderCell.HeaderCellColumnSpanChangedHandler HeaderCellColumnSpanChanged;
+
+    /// <summary>
+    /// Occurs when the value of <see cref="MultiHeaderCell.Text"/> changes.
+    /// </summary>
+    public event MultiHeaderCell.HeaderCellTextChangedHandler HeaderCellTextChanged;
+
+    #endregion Events
+
     #region IList implementation
 
     /// <summary>
     /// Adds an item to this header columns collection.
     /// </summary>
-    /// <param name="headerColumn">A <see cref="MultiHeaderColumn"/> to add.</param>
-    public void Add(MultiHeaderColumn headerColumn)
+    /// <param name="headerCell">A <see cref="MultiHeaderCell"/> to add.</param>
+    public void Add(MultiHeaderCell headerCell)
     {
-      _headerColumns.Add(headerColumn);
+      headerCell.HeaderCellColumnSpanChanged += HeaderCellColumnSpanChangedAction;
+      headerCell.HeaderCellTextChanged += HeaderCellTextChangedAction;
+      _headerCells.Add(headerCell);
+
+      // Invalidate Height so it gets recalculated
+      _height = 0;
     }
 
     /// <summary>
@@ -117,17 +153,20 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public void Clear()
     {
-      _headerColumns.Clear();
+      _headerCells.Clear();
+
+      // Invalidate Height so it gets recalculated
+      _height = 0;
     }
 
     /// <summary>
     /// Determines whether this header columns collection contains a specific value.
     /// </summary>
-    /// <param name="headerColumn">A <see cref="MultiHeaderColumn"/>.</param>
+    /// <param name="headerCell">A <see cref="MultiHeaderCell"/>.</param>
     /// <returns><c>true</c> if the header column exists in the collection, <c>false</c> otherwise.</returns>
-    public bool Contains(MultiHeaderColumn headerColumn)
+    public bool Contains(MultiHeaderCell headerCell)
     {
-      return _headerColumns.Contains(headerColumn);
+      return _headerCells.Contains(headerCell);
     }
 
     /// <summary>
@@ -135,18 +174,18 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="array">The one-dimensional <see cref="Array"/> that is the destination of the elements copied from this header columns collection. The <see cref="Array"/> must have zero-based indexing.</param>
     /// <param name="arrayIndex">The zero-based index in <seealso cref="array"/> at which copying begins.</param>
-    public void CopyTo(MultiHeaderColumn[] array, int arrayIndex)
+    public void CopyTo(MultiHeaderCell[] array, int arrayIndex)
     {
-      _headerColumns.CopyTo(array, arrayIndex);
+      _headerCells.CopyTo(array, arrayIndex);
     }
 
     /// <summary>
     /// Returns an enumerator that iterates through this header columns collection.
     /// </summary>
     /// <returns>An enumerator that can be used to iterate through this header columns collection.</returns>
-    public IEnumerator<MultiHeaderColumn> GetEnumerator()
+    public IEnumerator<MultiHeaderCell> GetEnumerator()
     {
-      return _headerColumns.GetEnumerator();
+      return _headerCells.GetEnumerator();
     }
 
     /// <summary>
@@ -161,71 +200,154 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Determines the index of a specific item in this header columns collection.
     /// </summary>
-    /// <param name="headerColumn">A <see cref="MultiHeaderColumn"/>.</param>
+    /// <param name="headerCell">A <see cref="MultiHeaderCell"/>.</param>
     /// <returns></returns>
-    public int IndexOf(MultiHeaderColumn headerColumn)
+    public int IndexOf(MultiHeaderCell headerCell)
     {
-      return _headerColumns.IndexOf(headerColumn);
+      return _headerCells.IndexOf(headerCell);
     }
 
     /// <summary>
     /// Inserts an item to this header columns collection at the specified index.
     /// </summary>
-    /// <param name="index">The zero-based index at which <seealso cref="headerColumn"/> should be inserted.</param>
-    /// <param name="headerColumn">A <see cref="MultiHeaderColumn"/> to insert to this header columns collection.</param>
-    public void Insert(int index, MultiHeaderColumn headerColumn)
+    /// <param name="index">The zero-based index at which <seealso cref="headerCell"/> should be inserted.</param>
+    /// <param name="headerCell">A <see cref="MultiHeaderCell"/> to insert to this header columns collection.</param>
+    public void Insert(int index, MultiHeaderCell headerCell)
     {
-      _headerColumns.Insert(index, headerColumn);
+      _headerCells.Insert(index, headerCell);
+
+      // Invalidate Height so it gets recalculated
+      _height = 0;
     }
 
     /// <summary>
     /// Removes the first occurrence of a specific object from this header columns collection.
     /// </summary>
-    /// <param name="headerColumn">A <see cref="MultiHeaderColumn"/>.</param>
+    /// <param name="headerCell">A <see cref="MultiHeaderCell"/>.</param>
     /// <returns>
-    /// <c>true</c> if <seealso cref="headerColumn"/> was successfully removed from this header columns collection, <c>false</c> otherwise.
-    /// This method also returns <c>false</c> if <seealso cref="headerColumn"/> is not found in this header columns collection.
+    /// <c>true</c> if <seealso cref="headerCell"/> was successfully removed from this header columns collection, <c>false</c> otherwise.
+    /// This method also returns <c>false</c> if <seealso cref="headerCell"/> is not found in this header columns collection.
     /// </returns>
-    public bool Remove(MultiHeaderColumn headerColumn)
+    public bool Remove(MultiHeaderCell headerCell)
     {
-      return _headerColumns.Remove(headerColumn);
+      // Invalidate Height so it gets recalculated
+      _height = 0;
+
+      return _headerCells.Remove(headerCell);
     }
 
     /// <summary>
-    /// Removes a <see cref="MultiHeaderColumn"/> from this header columns collection at the specified index.
+    /// Removes a <see cref="MultiHeaderCell"/> from this header columns collection at the specified index.
     /// </summary>
-    /// <param name="index">The zero-based index of the <see cref="MultiHeaderColumn"/> to remove.</param>
+    /// <param name="index">The zero-based index of the <see cref="MultiHeaderCell"/> to remove.</param>
     public void RemoveAt(int index)
     {
-      _headerColumns.RemoveAt(index);
+      _headerCells.RemoveAt(index);
+
+      // Invalidate Height so it gets recalculated
+      _height = 0;
     }
 
     #endregion IList implementation
 
     /// <summary>
-    /// Gets the maximum height, in pixels, of the text used on the <see cref="MultiHeaderColumn"/> objects in this row.
+    /// Creates a new <see cref="MultiHeaderCell"/> object with the next consecutive column index from the last one in the collection.
     /// </summary>
-    /// <param name="graphics">The <see cref="Graphics"/> instance used to draw the text.</param>
-    /// <param name="usePaddings">Flag indicating whether paddings are used to compute the height.</param>
-    /// <param name="separatorsWidth">The width, in pixels, of the column header separators.</param>
-    /// <returns>The maximum height of the text used on the <see cref="MultiHeaderColumn"/> objects in this row.</returns>
-    public void ComputeHeight(Graphics graphics, bool usePaddings, int separatorsWidth)
+    /// <param name="text">The text used in the top header of the grid column.</param>
+    /// <param name="style">The <see cref="DataGridViewCellStyle"/> containing formatting and style of the header cell.</param>
+    /// <returns>A new <see cref="MultiHeaderCell"/> object with the next consecutive column index from the last one in the collection.</returns>
+    public MultiHeaderCell NewHeaderCell(string text, DataGridViewCellStyle style)
     {
-      if (graphics == null)
+      return new MultiHeaderCell(text, _headerCells.Count, style);
+    }
+
+    /// <summary>
+    /// Recalculates the header cell size for each <see cref="MultiHeaderCell"/> objects in this row.
+    /// </summary>
+    public void RecalculateCellSizes()
+    {
+      foreach (var headerCell in _headerCells.Where(headerCell => !headerCell.InSpan))
+      {
+        headerCell.CalculateCellSize();
+      }
+
+      // Invalidate Height so it gets recalculated
+      _height = 0;
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="MultiHeaderCell.ColumnSpan"/> value changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="args">Event arguments.</param>
+    private void HeaderCellColumnSpanChangedAction(object sender, HeaderCellColumnSpanChangedArgs args)
+    {
+      var headerCell = args.HeaderCell;
+      if (headerCell == null)
       {
         return;
       }
 
-      int maxHeight = 0;
-      foreach (var headerColumn in _headerColumns)
+      if (headerCell.ColumnIndex + args.NewColumnSpan > _headerCells.Count)
       {
-        var text = string.IsNullOrEmpty(headerColumn.Text) ? "Text" : headerColumn.Text;
-        var textHeight = Convert.ToInt32(graphics.MeasureString(text, headerColumn.Style.Font).Height);
-        int paddingsHeight = usePaddings ? headerColumn.Style.Padding.Top + headerColumn.Style.Padding.Bottom : 0;
-        maxHeight = Math.Max(maxHeight, textHeight + paddingsHeight + separatorsWidth);
+        // If column span was incorrectly set to span more columns than the ones in the collection, reset it to the largest possible span.
+        headerCell.ColumnSpan = _headerCells.Count - headerCell.ColumnIndex;
+        return;
       }
 
-      Height = maxHeight;
+      ResetHeaderCellsInSpan(headerCell.ColumnIndex, args.OldColumnSpan, false);
+      ResetHeaderCellsInSpan(headerCell.ColumnIndex, args.NewColumnSpan, true);
+
+      // Invalidate Height so it gets recalculated
+      _height = 0;
+
+      // Fire corresponding event
+      if (HeaderCellColumnSpanChanged != null)
+      {
+        HeaderCellColumnSpanChanged(this, args);
+      }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="MultiHeaderCell.Text"/> value changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="args">Event arguments.</param>
+    private void HeaderCellTextChangedAction(object sender, HeaderCellTextChangedArgs args)
+    {
+      // Invalidate Height so it gets recalculated
+      _height = 0;
+
+      // Fire corresponding event
+      if (HeaderCellTextChanged != null)
+      {
+        HeaderCellTextChanged(this, args);
+      }
+    }
+
+    /// <summary>
+    /// Resets the <see cref="MultiHeaderCell.InSpan"/> and <see cref="MultiHeaderCell.ColumnSpan"/> values of adjacent header cells in this row.
+    /// </summary>
+    /// <param name="columnIndex">The index of the column header with a column span being set.</param>
+    /// <param name="columnSpan">The column span of the column header.</param>
+    /// <param name="inSpan">Flag indicating if the adjacent columns should be in the span or not.</param>
+    private void ResetHeaderCellsInSpan(int columnIndex, int columnSpan, bool inSpan)
+    {
+      for (int cellIndex = columnIndex + 1; cellIndex < columnIndex + columnSpan; cellIndex++)
+      {
+        var headerCell = _headerCells.FirstOrDefault(hc => hc.ColumnIndex == cellIndex);
+        if (headerCell == null)
+        {
+          continue;
+        }
+
+        if (inSpan && headerCell.ColumnSpan > 1)
+        {
+          headerCell.ColumnSpan = 1;
+        }
+
+        headerCell.InSpan = inSpan;
+      }
     }
   }
 }

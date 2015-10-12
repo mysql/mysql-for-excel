@@ -2,6 +2,9 @@
 - Added an option to the Advanced Options dialog for Append Data operations, called "Show column data types above column names", that when checked data type
   information for columns on source and target grids of the Append Data dialog is shown. Showing the data types can sometimes aid users when doing manual
   mapping of columns.
+- Enhanced the custom grid view control used in the Append Data dialog to automatically adjust the width of the grid columns considering not only the grid's cell
+  contents and the base column header texts, but also the contents of the additional header rows.
+  (Bug #16237502 - APPEND DATA HAS BAD COLUMN SIZING WITH VERY SMALL TARGET COLUMN NAMES)
 - Fixed the data type detection logic for a column's data that was failing when only the first row of data contained data but the rest of the rows were empty.
   (MySQL Bug #78358, Bug #21799680 - EXPORT DATA - DATA TYPE NOT DETECTED CORRECTLY WHEN ONLY FIRST ROW CONTAINS DATA)
 
