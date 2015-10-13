@@ -331,20 +331,20 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a MySQL data type that can be used to store all values in a column, doing a best match from the list of detected data types on all rows of the column.
     /// </summary>
-    /// <param name="proposedStrippedDataType">The proposed MySQL data type to store all values, without specifying length or size.</param>
     /// <param name="rowsDataTypesList">The list of detected data types on all rows of the column.</param>
     /// <param name="decimalMaxLen">The maximum length detected for the integral and decimal parts in case the column is of decimal origin.</param>
     /// <param name="varCharMaxLen">The maximum length detected for the text in case the column is of text origin.</param>
     /// <param name="consistentStrippedDataType">Output MySQL data type for all values, without the length of the data.</param>
     /// <returns>The consistent MySQL data type for all values, specifying the length for the data.</returns>
-    public static string GetConsistentDataTypeOnAllRows(string proposedStrippedDataType, List<string> rowsDataTypesList, int[] decimalMaxLen, int[] varCharMaxLen, out string consistentStrippedDataType)
+    public static string GetConsistentDataTypeOnAllRows(List<string> rowsDataTypesList, int[] decimalMaxLen, int[] varCharMaxLen, out string consistentStrippedDataType)
     {
-      if (rowsDataTypesList == null || rowsDataTypesList.Count == 0 || string.IsNullOrEmpty(proposedStrippedDataType))
+      if (rowsDataTypesList == null || rowsDataTypesList.Count == 0)
       {
         consistentStrippedDataType = string.Empty;
         return string.Empty;
       }
 
+      string proposedStrippedDataType = rowsDataTypesList.First();
       string fullDataType = proposedStrippedDataType;
       bool typesConsistent = rowsDataTypesList.All(str => str == proposedStrippedDataType);
       if (!typesConsistent)
@@ -434,15 +434,14 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a MySQL data type that can be used to store all values in a column, doing a best match from the list of detected data types on all rows of the column.
     /// </summary>
-    /// <param name="proposedStrippedDataType">The proposed MySQL data type to store all values, without specifying length or size.</param>
     /// <param name="rowsDataTypesList">The list of detected data types on all rows of the column.</param>
     /// <param name="decimalMaxLen">The maximum length detected for the integral and decimal parts in case the column is of decimal origin.</param>
     /// <param name="varCharMaxLen">The maximum length detected for the text in case the column is of text origin.</param>
     /// <returns>The consistent MySQL data type for all values, specifying the length for the data.</returns>
-    public static string GetConsistentDataTypeOnAllRows(string proposedStrippedDataType, List<string> rowsDataTypesList, int[] decimalMaxLen, int[] varCharMaxLen)
+    public static string GetConsistentDataTypeOnAllRows(List<string> rowsDataTypesList, int[] decimalMaxLen, int[] varCharMaxLen)
     {
       string outConsistentStrippedType;
-      return GetConsistentDataTypeOnAllRows(proposedStrippedDataType, rowsDataTypesList, decimalMaxLen, varCharMaxLen, out outConsistentStrippedType);
+      return GetConsistentDataTypeOnAllRows(rowsDataTypesList, decimalMaxLen, varCharMaxLen, out outConsistentStrippedType);
     }
 
     /// <summary>

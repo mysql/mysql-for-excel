@@ -51,6 +51,11 @@ namespace MySQL.ForExcel.Classes
     private const string DATA_NOT_UNIQUE_WARNING_KEY = "DATA_NOT_UNIQUE";
 
     /// <summary>
+    /// The data type used for columns with no data.
+    /// </summary>
+    private const string DEFAULT_FULL_DATA_TYPE_FOR_EMPTY_COLUMNS = "VarChar(255)";
+
+    /// <summary>
     /// Key used to represent a warning about the column's name being a duplicate of one in another column.
     /// </summary>
     private const string DUPLICATE_NAME_WARNING_KEY = "DUPLICATE_NAME";
@@ -125,6 +130,16 @@ namespace MySQL.ForExcel.Classes
     private bool _primaryKey;
 
     /// <summary>
+    /// The consistent data type that can hold the data for all rows starting from the first row.
+    /// </summary>
+    private string _rowsFromFirstDataType;
+
+    /// <summary>
+    /// The consistent data type that can hold the data for all rows starting from the second row.
+    /// </summary>
+    private string _rowsFromSecondDataType;
+
+    /// <summary>
     /// List of elements included in a SET or ENUM declaration.
     /// </summary>
     private List<string> _setOrEnumElements;
@@ -158,6 +173,8 @@ namespace MySQL.ForExcel.Classes
       _invalidSetOrEnumElementsIndexes = null;
       _mappedDataColOrdinal = -1;
       _mySqlDataType = string.Empty;
+      _rowsFromFirstDataType = string.Empty;
+      _rowsFromSecondDataType = string.Empty;
       _setOrEnumElements = null;
       AutoIncrement = false;
       AutoPk = false;
@@ -171,8 +188,6 @@ namespace MySQL.ForExcel.Classes
       MappedDataColName = null;
       PrimaryKey = false;
       RangeColumnIndex = 0;
-      RowsFromFirstDataType = string.Empty;
-      RowsFromSecondDataType = string.Empty;
       StrippedMySqlDataType = string.Empty;
       Unsigned = false;
       SetupWarnings();
@@ -777,12 +792,38 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the consistent data type that can hold the data for all rows starting from the first row.
     /// </summary>
-    public string RowsFromFirstDataType { get; set; }
+    public string RowsFromFirstDataType
+    {
+      get
+      {
+        return _rowsFromFirstDataType;
+      }
+
+      set
+      {
+        _rowsFromFirstDataType = string.IsNullOrEmpty(value)
+          ? DEFAULT_FULL_DATA_TYPE_FOR_EMPTY_COLUMNS
+          : value;
+      }
+    }
 
     /// <summary>
     /// Gets the consistent data type that can hold the data for all rows starting from the second row.
     /// </summary>
-    public string RowsFromSecondDataType { get; set; }
+    public string RowsFromSecondDataType
+    {
+      get
+      {
+        return _rowsFromSecondDataType;
+      }
+
+      set
+      {
+        _rowsFromSecondDataType = string.IsNullOrEmpty(value)
+          ? DEFAULT_FULL_DATA_TYPE_FOR_EMPTY_COLUMNS
+          : value;
+      }
+    }
 
     /// <summary>
     /// Gets the MySQL data type descriptor without any options wrapped by parenthesis.
@@ -991,9 +1032,6 @@ namespace MySQL.ForExcel.Classes
       }
 
       var useFormattedValues = ParentTable.IsFormatted;
-      string proposedType;
-      string strippedType = string.Empty;
-      int leftParensIndex;
       var typesListForFirstAndRest = new List<string>(2);
       var typesListFromSecondRow = new List<string>(Table.Rows.Count);
       int[] varCharLengthsFirstRow = { 0, 0 };  // 0 - All rows original datatype varcharmaxlen, 1 - All rows Varchar forced datatype maxlen
@@ -1013,7 +1051,7 @@ namespace MySQL.ForExcel.Classes
         // Treat always as a Varchar value first in case all rows do not have a consistent datatype just to see the varchar len calculated by GetMySQLExportDataType
         string valueAsString = rawValue.ToString();
         bool valueOverflow;
-        proposedType = DataTypeUtilities.GetMySqlExportDataType(valueAsString, out valueOverflow);
+        string proposedType = DataTypeUtilities.GetMySqlExportDataType(valueAsString, out valueOverflow);
         if (proposedType == "Bool")
         {
           proposedType = "VarChar(5)";
@@ -1024,6 +1062,7 @@ namespace MySQL.ForExcel.Classes
         }
 
         int varCharValueLength;
+        int leftParensIndex;
         if (proposedType != "Text")
         {
           leftParensIndex = proposedType.IndexOf("(", StringComparison.Ordinal);
@@ -1036,7 +1075,7 @@ namespace MySQL.ForExcel.Classes
         // Normal datatype detection
         proposedType = DataTypeUtilities.GetMySqlExportDataType(rawValue, out valueOverflow);
         leftParensIndex = proposedType.IndexOf("(", StringComparison.Ordinal);
-        strippedType = leftParensIndex < 0 ? proposedType : proposedType.Substring(0, leftParensIndex);
+        string strippedType = leftParensIndex < 0 ? proposedType : proposedType.Substring(0, leftParensIndex);
         switch (strippedType)
         {
           case "VarChar":
@@ -1071,27 +1110,29 @@ namespace MySQL.ForExcel.Classes
         }
       }
 
-      // Get the consistent DataType for all rows except first one.
-      proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListFromSecondRow, decimalMaxLen, varCharMaxLen);
-      RowsFromSecondDataType = string.IsNullOrEmpty(proposedType)
-        ? "VarChar(255)"
-        : proposedType;
-      if (!string.IsNullOrEmpty(proposedType))
+      if (typesListFromSecondRow.Count + typesListForFirstAndRest.Count == 0)
       {
-        leftParensIndex = proposedType.IndexOf("(", StringComparison.Ordinal);
-        strippedType = leftParensIndex < 0
-          ? proposedType
-          : proposedType.Substring(0, leftParensIndex);
-        typesListForFirstAndRest.Add(proposedType);
+        // There is no data on the column, so set the data types to the default for empty columns.
+        RowsFromFirstDataType = DEFAULT_FULL_DATA_TYPE_FOR_EMPTY_COLUMNS;
+        RowsFromSecondDataType = DEFAULT_FULL_DATA_TYPE_FOR_EMPTY_COLUMNS;
       }
+      else
+      {
+        // Get the consistent DataType for all rows except first one.
+        RowsFromSecondDataType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(typesListFromSecondRow, decimalMaxLen, varCharMaxLen);
+        if (typesListFromSecondRow.Count > 0)
+        {
+          long dummyLength;
+          typesListForFirstAndRest.Add(DataTypeUtilities.GetStrippedMySqlDataType(_rowsFromSecondDataType, false, out dummyLength));
+        }
 
-      // Get the consistent DataType between first row and the previously computed consistent DataType for the rest of the rows.
-      varCharMaxLen[0] = Math.Max(varCharMaxLen[0], varCharLengthsFirstRow[0]);
-      varCharMaxLen[1] = Math.Max(varCharMaxLen[1], varCharLengthsFirstRow[1]);
-      decimalMaxLen[0] = Math.Max(decimalMaxLen[0], decimalMaxLenFirstRow[0]);
-      decimalMaxLen[1] = Math.Max(decimalMaxLen[1], decimalMaxLenFirstRow[1]);
-      proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListForFirstAndRest, decimalMaxLen, varCharMaxLen);
-      RowsFromFirstDataType = proposedType;
+        // Get the consistent DataType between first row and the previously computed consistent DataType for the rest of the rows.
+        varCharMaxLen[0] = Math.Max(varCharMaxLen[0], varCharLengthsFirstRow[0]);
+        varCharMaxLen[1] = Math.Max(varCharMaxLen[1], varCharLengthsFirstRow[1]);
+        decimalMaxLen[0] = Math.Max(decimalMaxLen[0], decimalMaxLenFirstRow[0]);
+        decimalMaxLen[1] = Math.Max(decimalMaxLen[1], decimalMaxLenFirstRow[1]);
+        RowsFromFirstDataType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(typesListForFirstAndRest, decimalMaxLen, varCharMaxLen);
+      }
 
       // Set the DataType in the column depending on the setting to treat the first row of data as the names of the columns
       SetMySqlDataType(ParentTable.FirstRowContainsColumnNames ? RowsFromSecondDataType : RowsFromFirstDataType);

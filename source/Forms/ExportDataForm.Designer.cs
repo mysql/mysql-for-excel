@@ -76,7 +76,6 @@ namespace MySQL.ForExcel.Forms
       this.PrimaryKeyWarningLabel = new System.Windows.Forms.Label();
       this.PrimaryKeyWarningPictureBox = new System.Windows.Forms.PictureBox();
       this.ColumnOptionsGroupBox = new System.Windows.Forms.GroupBox();
-      this.MoreInfoLinkLabel = new System.Windows.Forms.LinkLabel();
       this.DataTypeComboBox = new System.Windows.Forms.ComboBox();
       this.ExcludeColumnCheckBox = new System.Windows.Forms.CheckBox();
       this.AllowEmptyCheckBox = new System.Windows.Forms.CheckBox();
@@ -86,6 +85,7 @@ namespace MySQL.ForExcel.Forms
       this.DatatypeLabel = new System.Windows.Forms.Label();
       this.ColumnNameTextBox = new System.Windows.Forms.TextBox();
       this.ColumnNameLabel = new System.Windows.Forms.Label();
+      this.MoreInfoLinkLabel = new System.Windows.Forms.LinkLabel();
       this.ColumnOptionsWarningLabel = new System.Windows.Forms.Label();
       this.ColumnOptionsWarningPictureBox = new System.Windows.Forms.PictureBox();
       this.FirstRowHeadersCheckBox = new System.Windows.Forms.CheckBox();
@@ -261,19 +261,6 @@ namespace MySQL.ForExcel.Forms
       this.ColumnOptionsGroupBox.TabStop = false;
       this.ColumnOptionsGroupBox.Text = "Column Options";
       // 
-      // MoreInfoLinkLabel
-      // 
-      this.MoreInfoLinkLabel.AutoSize = true;
-      this.MoreInfoLinkLabel.BackColor = System.Drawing.SystemColors.Window;
-      this.MoreInfoLinkLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F);
-      this.MoreInfoLinkLabel.Location = new System.Drawing.Point(434, 446);
-      this.MoreInfoLinkLabel.Name = "MoreInfoLinkLabel";
-      this.MoreInfoLinkLabel.Size = new System.Drawing.Size(84, 12);
-      this.MoreInfoLinkLabel.TabIndex = 9;
-      this.MoreInfoLinkLabel.TabStop = true;
-      this.MoreInfoLinkLabel.Text = " (More Information) ";
-      this.MoreInfoLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.MoreInfoLinkLabel_LinkClicked);
-      // 
       // DataTypeComboBox
       // 
       this.DataTypeComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
@@ -371,6 +358,19 @@ namespace MySQL.ForExcel.Forms
       this.ColumnNameLabel.Size = new System.Drawing.Size(88, 15);
       this.ColumnNameLabel.TabIndex = 0;
       this.ColumnNameLabel.Text = "Column Name:";
+      // 
+      // MoreInfoLinkLabel
+      // 
+      this.MoreInfoLinkLabel.AutoSize = true;
+      this.MoreInfoLinkLabel.BackColor = System.Drawing.SystemColors.Window;
+      this.MoreInfoLinkLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F);
+      this.MoreInfoLinkLabel.Location = new System.Drawing.Point(434, 446);
+      this.MoreInfoLinkLabel.Name = "MoreInfoLinkLabel";
+      this.MoreInfoLinkLabel.Size = new System.Drawing.Size(84, 12);
+      this.MoreInfoLinkLabel.TabIndex = 9;
+      this.MoreInfoLinkLabel.TabStop = true;
+      this.MoreInfoLinkLabel.Text = " (More Information) ";
+      this.MoreInfoLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.MoreInfoLinkLabel_LinkClicked);
       // 
       // ColumnOptionsWarningLabel
       // 
@@ -714,6 +714,7 @@ namespace MySQL.ForExcel.Forms
       dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
       this.PreviewDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
       this.PreviewDataGridView.ColumnsMaximumWidth = 200;
+      this.PreviewDataGridView.ColumnsMinimumWidth = 50;
       dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
       dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
