@@ -888,38 +888,223 @@ namespace MySQL.ForExcel.Classes
     #endregion Events
 
     /// <summary>
-    /// Checks if the data stored in this column would fit within the given data type.
+    /// Checks if the current data in this column could be stored in the target column.
     /// </summary>
-    /// <param name="mySqlDataType">Data type for a table column supported by MySQL Server.</param>
-    /// <returns><c>true</c> if the data stored in this column would fit, <c>false</c> otherwise.</returns>
-    public bool CanBeOfMySqlDataType(string mySqlDataType)
+    /// <param name="targetColumn">A target <see cref="MySqlDataColumn"/> where the data on this column would be stored.</param>
+    /// <returns><c>true</c> if the current data in this column could be stored in the target column, <c>false</c> otherwise.</returns>
+    public bool CanDataBeStoredInGivenColumn(MySqlDataColumn targetColumn)
     {
-      bool result = true;
+      if (targetColumn == null)
+      {
+        return false;
+      }
 
+      // Test the data on each row of the parent table in this specific column to check if it could be stored in the target column
+      bool dataFitsIntoType = true;
       MySqlDataTable parentTable = Table as MySqlDataTable;
       int rowIdx = 0;
-      if (parentTable == null)
+      if (parentTable != null)
+      {
+        foreach (string strValueFromArray in parentTable.Rows.Cast<DataRow>()
+            .Where(dr => !parentTable.FirstRowContainsColumnNames || rowIdx++ != 0)
+            .Select(dr => dr[Ordinal].ToString())
+            .Where(strValueFromArray => strValueFromArray.Length != 0))
+        {
+          dataFitsIntoType = targetColumn.CanStoreValue(strValueFromArray);
+
+          // If found a value where the data type is not good for it break since there is no need testing more values.
+          if (!dataFitsIntoType)
+          {
+            break;
+          }
+        }
+      }
+
+      // Update warning stating the column's data type is not suitable for all of its data (in the preview table)
+      // either for the Append or Export Data operation.
+      string warningKey = ParentTable != null && ParentTable.OperationType.IsForAppend()
+        ? DATA_NOT_SUITABLE_APPEND_WARNING_KEY
+        : DATA_NOT_SUITABLE_EXPORT_WARNING_KEY;
+      if (_warnings.SetVisibility(warningKey, !dataFitsIntoType))
+      {
+        OnColumnWarningsChanged();
+      }
+
+      return dataFitsIntoType;
+    }
+
+    /// <summary>
+    /// Checks whether a given string value can be converted and stored in this column.
+    /// </summary>
+    /// <param name="strValue">The value as a string representation to store in this column.</param>
+    /// <returns><c>true</c> if the string value can be stored in this column, <c>false</c> otherwise.</returns>
+    public bool CanStoreValue(string strValue)
+    {
+      // If the value is null, treat it as an empty string.
+      if (strValue == null)
+      {
+        strValue = string.Empty;
+      }
+
+      var mySqlDataType = MySqlDataType.ToLowerInvariant();
+
+      // Return immediately for big data types.
+      if (mySqlDataType.Contains("text") || mySqlDataType == "blob" || mySqlDataType == "tinyblob" || mySqlDataType == "mediumblob" || mySqlDataType == "longblob" || mySqlDataType == "binary" || mySqlDataType == "varbinary")
       {
         return true;
       }
 
-      foreach (
-        string strValueFromArray in
-          parentTable.Rows.Cast<DataRow>()
-            .Where(dr => !parentTable.FirstRowContainsColumnNames || rowIdx++ != 0)
-            .Select(dr => dr[Ordinal].ToString())
-            .Where(strValueFromArray => strValueFromArray.Length != 0))
+      // Return immediately for spatial data types since values for them can be created in a wide variety of ways
+      // (using WKT, WKB or MySQL spatial functions that return spatial objects), so leave the validation to the MySQL Server.
+      if (mySqlDataType.Contains("curve") || mySqlDataType.Contains("geometry") || mySqlDataType.Contains("line") || mySqlDataType.Contains("curve") || mySqlDataType.Contains("point") || mySqlDataType.Contains("polygon") || mySqlDataType.Contains("surface"))
       {
-        result = StringValueCanBeStoredWithMySqlType(strValueFromArray);
+        return true;
+      }
 
-        // If found a value where the data type is not good for it break since there is no need testing more values.
-        if (!result)
+      // Check for boolean
+      if (mySqlDataType.StartsWith("bool") || mySqlDataType == "bit" || mySqlDataType == "bit(1)")
+      {
+        strValue = strValue.ToLowerInvariant();
+        return (strValue == "true" || strValue == "false" || strValue == "0" || strValue == "1" || strValue == "yes" || strValue == "no" || strValue == "ja" || strValue == "nein");
+      }
+
+      // Check for integer values
+      if (mySqlDataType.StartsWith("int") || mySqlDataType.StartsWith("mediumint"))
+      {
+        int tryIntValue;
+        return Int32.TryParse(strValue, out tryIntValue);
+      }
+
+      if (mySqlDataType.StartsWith("year"))
+      {
+        int tryYearValue;
+        return Int32.TryParse(strValue, out tryYearValue) && (tryYearValue >= 0 && tryYearValue < 100) || (tryYearValue > 1900 && tryYearValue < 2156);
+      }
+
+      if (mySqlDataType.StartsWith("tinyint"))
+      {
+        byte tryByteValue;
+        return Byte.TryParse(strValue, out tryByteValue);
+      }
+
+      if (mySqlDataType.StartsWith("smallint"))
+      {
+        short trySmallIntValue;
+        return Int16.TryParse(strValue, out trySmallIntValue);
+      }
+
+      if (mySqlDataType.StartsWith("bigint"))
+      {
+        long tryBigIntValue;
+        return Int64.TryParse(strValue, out tryBigIntValue);
+      }
+
+      if (mySqlDataType.StartsWith("bit"))
+      {
+        ulong tryBitValue;
+        return UInt64.TryParse(strValue, out tryBitValue);
+      }
+
+      // Check for big numeric values
+      if (mySqlDataType.StartsWith("float"))
+      {
+        float tryFloatValue;
+        return Single.TryParse(strValue, out tryFloatValue);
+      }
+
+      if (mySqlDataType.StartsWith("double") || mySqlDataType.StartsWith("real"))
+      {
+        double tryDoubleValue;
+        return Double.TryParse(strValue, out tryDoubleValue);
+      }
+
+      // Check for date and time values.
+      if (mySqlDataType == "time")
+      {
+        TimeSpan tryTimeSpanValue;
+        return TimeSpan.TryParse(strValue, out tryTimeSpanValue);
+      }
+
+      if (mySqlDataType == "date" || mySqlDataType == "datetime" || mySqlDataType == "timestamp")
+      {
+        if (strValue.IsMySqlZeroDateTimeValue())
         {
-          break;
+          return true;
+        }
+
+        DateTime tryDateTimeValue;
+        return DateTime.TryParse(strValue, out tryDateTimeValue);
+      }
+
+      // Check of char or varchar.
+      int lParensIndex = mySqlDataType.IndexOf("(", StringComparison.Ordinal);
+      int rParensIndex = mySqlDataType.IndexOf(")", StringComparison.Ordinal);
+      if (mySqlDataType.StartsWith("varchar") || mySqlDataType.StartsWith("char"))
+      {
+        int characterLen;
+        if (lParensIndex >= 0)
+        {
+          string paramValue = mySqlDataType.Substring(lParensIndex + 1, mySqlDataType.Length - lParensIndex - 2);
+          int.TryParse(paramValue, out characterLen);
+        }
+        else
+        {
+          characterLen = 1;
+        }
+
+        return strValue.Length <= characterLen;
+      }
+
+      // Check if enum or set.
+      bool isEnum = mySqlDataType.StartsWith("enum");
+      bool isSet = mySqlDataType.StartsWith("set");
+      if (isSet || isEnum)
+      {
+        if (_setOrEnumElements == null)
+        {
+          return false;
+        }
+
+        strValue = strValue.ToLowerInvariant();
+        var superSet = new HashSet<string>(_setOrEnumElements.Select(el => el.ToLowerInvariant().Trim(new[] { '\'' })));
+        if (isEnum)
+        {
+          return superSet.Contains(strValue);
+        }
+
+        string[] valueSet = strValue.Split(new[] { ',' });
+        return superSet.IsSupersetOf(valueSet);
+      }
+
+      // Check for decimal values which is the more complex.
+      bool mayContainFloatingPoint = mySqlDataType.StartsWith("decimal") || mySqlDataType.StartsWith("numeric") || mySqlDataType.StartsWith("double") || mySqlDataType.StartsWith("float") || mySqlDataType.StartsWith("real");
+      int commaPos = mySqlDataType.IndexOf(",", StringComparison.Ordinal);
+      int[] decimalLen = { -1, -1 };
+      if (mayContainFloatingPoint && lParensIndex >= 0 && rParensIndex >= 0 && lParensIndex < rParensIndex)
+      {
+        decimalLen[0] = Int32.Parse(mySqlDataType.Substring(lParensIndex + 1, (commaPos >= 0 ? commaPos : rParensIndex) - lParensIndex - 1));
+        if (commaPos >= 0)
+        {
+          decimalLen[1] = Int32.Parse(mySqlDataType.Substring(commaPos + 1, rParensIndex - commaPos - 1));
         }
       }
 
-      return result;
+      int floatingPointPos = strValue.IndexOf(".", StringComparison.Ordinal);
+      bool floatingPointCompliant = true;
+      if (floatingPointPos >= 0)
+      {
+        bool lengthCompliant = strValue.Substring(0, floatingPointPos).Length <= decimalLen[0];
+        bool decimalPlacesCompliant = decimalLen[1] < 0 || strValue.Substring(floatingPointPos + 1, strValue.Length - floatingPointPos - 1).Length <= decimalLen[1];
+        floatingPointCompliant = lengthCompliant && decimalPlacesCompliant;
+      }
+
+      if (!mySqlDataType.StartsWith("decimal") && !mySqlDataType.StartsWith("numeric"))
+      {
+        return false;
+      }
+
+      decimal tryDecimalValue;
+      return Decimal.TryParse(strValue, out tryDecimalValue) && floatingPointCompliant;
     }
 
     /// <summary>
@@ -1399,7 +1584,7 @@ namespace MySQL.ForExcel.Classes
 
         if (IsMySqlDataTypeValid && testTypeOnData)
         {
-          TestColumnDataTypeAgainstColumnData(MySqlDataType);
+          CanDataBeStoredInGivenColumn(this);
         }
       }
 
@@ -1424,174 +1609,6 @@ namespace MySQL.ForExcel.Classes
       }
 
       return IsMySqlDataTypeValid;
-    }
-
-    /// <summary>
-    /// Checks whether a given string value can be converted and stored in a column with the given MySQL data type.
-    /// </summary>
-    /// <param name="strValue">String value to convert and store.</param>
-    /// <returns><c>true</c> if the string value can be stored using the given MySQL data type, <c>false</c> otherwise.</returns>
-    private bool StringValueCanBeStoredWithMySqlType(string strValue)
-    {
-      var mySqlDataType = MySqlDataType.ToLowerInvariant();
-
-      // Return immediately for big data types.
-      if (mySqlDataType.Contains("text") || mySqlDataType == "blob" || mySqlDataType == "tinyblob" || mySqlDataType == "mediumblob" || mySqlDataType == "longblob" || mySqlDataType == "binary" || mySqlDataType == "varbinary")
-      {
-        return true;
-      }
-
-      // Return immediately for spatial data types since values for them can be created in a wide variety of ways
-      // (using WKT, WKB or MySQL spatial functions that return spatial objects), so leave the validation to the MySQL Server.
-      if (mySqlDataType.Contains("curve") || mySqlDataType.Contains("geometry") || mySqlDataType.Contains("line") || mySqlDataType.Contains("curve") || mySqlDataType.Contains("point") || mySqlDataType.Contains("polygon") || mySqlDataType.Contains("surface"))
-      {
-        return true;
-      }
-
-      // Check for boolean
-      if (mySqlDataType.StartsWith("bool") || mySqlDataType == "bit" || mySqlDataType == "bit(1)")
-      {
-        strValue = strValue.ToLowerInvariant();
-        return (strValue == "true" || strValue == "false" || strValue == "0" || strValue == "1" || strValue == "yes" || strValue == "no" || strValue == "ja" || strValue == "nein");
-      }
-
-      // Check for integer values
-      if (mySqlDataType.StartsWith("int") || mySqlDataType.StartsWith("mediumint"))
-      {
-        int tryIntValue;
-        return Int32.TryParse(strValue, out tryIntValue);
-      }
-
-      if (mySqlDataType.StartsWith("year"))
-      {
-        int tryYearValue;
-        return Int32.TryParse(strValue, out tryYearValue) && (tryYearValue >= 0 && tryYearValue < 100) || (tryYearValue > 1900 && tryYearValue < 2156);
-      }
-
-      if (mySqlDataType.StartsWith("tinyint"))
-      {
-        byte tryByteValue;
-        return Byte.TryParse(strValue, out tryByteValue);
-      }
-
-      if (mySqlDataType.StartsWith("smallint"))
-      {
-        short trySmallIntValue;
-        return Int16.TryParse(strValue, out trySmallIntValue);
-      }
-
-      if (mySqlDataType.StartsWith("bigint"))
-      {
-        long tryBigIntValue;
-        return Int64.TryParse(strValue, out tryBigIntValue);
-      }
-
-      if (mySqlDataType.StartsWith("bit"))
-      {
-        ulong tryBitValue;
-        return UInt64.TryParse(strValue, out tryBitValue);
-      }
-
-      // Check for big numeric values
-      if (mySqlDataType.StartsWith("float"))
-      {
-        float tryFloatValue;
-        return Single.TryParse(strValue, out tryFloatValue);
-      }
-
-      if (mySqlDataType.StartsWith("double") || mySqlDataType.StartsWith("real"))
-      {
-        double tryDoubleValue;
-        return Double.TryParse(strValue, out tryDoubleValue);
-      }
-
-      // Check for date and time values.
-      if (mySqlDataType == "time")
-      {
-        TimeSpan tryTimeSpanValue;
-        return TimeSpan.TryParse(strValue, out tryTimeSpanValue);
-      }
-
-      if (mySqlDataType == "date" || mySqlDataType == "datetime" || mySqlDataType == "timestamp")
-      {
-        if (strValue.IsMySqlZeroDateTimeValue())
-        {
-          return true;
-        }
-
-        DateTime tryDateTimeValue;
-        return DateTime.TryParse(strValue, out tryDateTimeValue);
-      }
-
-      // Check of char or varchar.
-      int lParensIndex = mySqlDataType.IndexOf("(", StringComparison.Ordinal);
-      int rParensIndex = mySqlDataType.IndexOf(")", StringComparison.Ordinal);
-      if (mySqlDataType.StartsWith("varchar") || mySqlDataType.StartsWith("char"))
-      {
-        int characterLen;
-        if (lParensIndex >= 0)
-        {
-          string paramValue = mySqlDataType.Substring(lParensIndex + 1, mySqlDataType.Length - lParensIndex - 2);
-          int.TryParse(paramValue, out characterLen);
-        }
-        else
-        {
-          characterLen = 1;
-        }
-
-        return strValue.Length <= characterLen;
-      }
-
-      // Check if enum or set.
-      bool isEnum = mySqlDataType.StartsWith("enum");
-      bool isSet = mySqlDataType.StartsWith("set");
-      if (isSet || isEnum)
-      {
-        if (_setOrEnumElements == null)
-        {
-          return false;
-        }
-
-        strValue = strValue.ToLowerInvariant();
-        var superSet = new HashSet<string>(_setOrEnumElements.Select(el => el.ToLowerInvariant().Trim(new[] {'\''})));
-        if (isEnum)
-        {
-          return superSet.Contains(strValue);
-        }
-
-        string[] valueSet = strValue.Split(new[] { ',' });
-        return superSet.IsSupersetOf(valueSet);
-      }
-
-      // Check for decimal values which is the more complex.
-      bool mayContainFloatingPoint = mySqlDataType.StartsWith("decimal") || mySqlDataType.StartsWith("numeric") || mySqlDataType.StartsWith("double") || mySqlDataType.StartsWith("float") || mySqlDataType.StartsWith("real");
-      int commaPos = mySqlDataType.IndexOf(",", StringComparison.Ordinal);
-      int[] decimalLen = { -1, -1 };
-      if (mayContainFloatingPoint && lParensIndex >= 0 && rParensIndex >= 0 && lParensIndex < rParensIndex)
-      {
-        decimalLen[0] = Int32.Parse(mySqlDataType.Substring(lParensIndex + 1, (commaPos >= 0 ? commaPos : rParensIndex) - lParensIndex - 1));
-        if (commaPos >= 0)
-        {
-          decimalLen[1] = Int32.Parse(mySqlDataType.Substring(commaPos + 1, rParensIndex - commaPos - 1));
-        }
-      }
-
-      int floatingPointPos = strValue.IndexOf(".", StringComparison.Ordinal);
-      bool floatingPointCompliant = true;
-      if (floatingPointPos >= 0)
-      {
-        bool lengthCompliant = strValue.Substring(0, floatingPointPos).Length <= decimalLen[0];
-        bool decimalPlacesCompliant = decimalLen[1] < 0 || strValue.Substring(floatingPointPos + 1, strValue.Length - floatingPointPos - 1).Length <= decimalLen[1];
-        floatingPointCompliant = lengthCompliant && decimalPlacesCompliant;
-      }
-
-      if (!mySqlDataType.StartsWith("decimal") && !mySqlDataType.StartsWith("numeric"))
-      {
-        return false;
-      }
-
-      decimal tryDecimalValue;
-      return Decimal.TryParse(strValue, out tryDecimalValue) && floatingPointCompliant;
     }
 
     /// <summary>
@@ -1636,27 +1653,6 @@ namespace MySQL.ForExcel.Classes
       RangeColumnIndex = fromColumn.RangeColumnIndex;
       UniqueKey = fromColumn.UniqueKey;
       Unsigned = fromColumn.Unsigned;
-    }
-
-    /// <summary>
-    /// Checks if this column's data type is right for the data currently stored in the column.
-    /// </summary>
-    /// <param name="mySqlDataType">The MySQL data type to test the column's data with.</param>
-    /// <returns><c>true</c> if the column's data fits the data type, <c>false</c> otherwise.</returns>
-    public bool TestColumnDataTypeAgainstColumnData(string mySqlDataType)
-    {
-      // Update warning stating the column's data type is not suitable for all of its data (in the preview table)
-      // either for the Append or Export Data operation.
-      bool dataFitsIntoType = mySqlDataType.Length > 0 && CanBeOfMySqlDataType(mySqlDataType);
-      string warningKey = ParentTable != null && ParentTable.OperationType.IsForAppend()
-        ? DATA_NOT_SUITABLE_APPEND_WARNING_KEY
-        : DATA_NOT_SUITABLE_EXPORT_WARNING_KEY;
-      if (_warnings.SetVisibility(warningKey, !dataFitsIntoType))
-      {
-        OnColumnWarningsChanged();
-      }
-
-      return dataFitsIntoType;
     }
 
     /// <summary>

@@ -394,7 +394,7 @@ namespace MySQL.ForExcel.Forms
       _currentColumnMapping.MappedSourceIndexes[targetColumnIndex] = sourceColumnIndex;
       if (mapping)
       {
-        CheckIfSourceDataAgainstMappedTargetColumn(sourceColumn, targetColumn);
+        CheckSourceDataAgainstMappedTargetColumn(sourceColumn, targetColumn);
       }
       else
       {
@@ -527,14 +527,14 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     /// <param name="sourceColumn">Source data column.</param>
     /// <param name="targetColumn">Target column.</param>
-    private void CheckIfSourceDataAgainstMappedTargetColumn(MySqlDataColumn sourceColumn, MySqlDataColumn targetColumn)
+    private void CheckSourceDataAgainstMappedTargetColumn(MySqlDataColumn sourceColumn, MySqlDataColumn targetColumn)
     {
       if (sourceColumn == null || targetColumn == null)
       {
         return;
       }
 
-      sourceColumn.TestColumnDataTypeAgainstColumnData(targetColumn.MySqlDataType);
+      sourceColumn.CanDataBeStoredInGivenColumn(targetColumn);
       var gridCol = SourceExcelDataDataGridView.Columns[sourceColumn.Ordinal];
       SetGridColumnColor(gridCol, sourceColumn);
       SetGridColumnWarningVisibility(gridCol);
