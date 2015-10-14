@@ -296,8 +296,9 @@ namespace MySQL.ForExcel.Classes
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="schemaName">The schema the MySQL table belongs to.</param>
     /// <param name="tableName">The name of a MySQL table.</param>
+    /// <param name="beautifyDataTypes">Flag indicating whether the data types are camel cased as shown in the Export Data data type combo box.</param>
     /// <returns>A table containing schema information for columns contained in a MySQL table with the given name.</returns>
-    public static MySqlColumnsInformationTable GetColumnsInformationTable(this MySqlWorkbenchConnection connection, string schemaName, string tableName)
+    public static MySqlColumnsInformationTable GetColumnsInformationTable(this MySqlWorkbenchConnection connection, string schemaName, string tableName, bool beautifyDataTypes = false)
     {
       if (connection == null)
       {
@@ -314,9 +315,16 @@ namespace MySQL.ForExcel.Classes
       var columnsInfoTable = new MySqlColumnsInformationTable(schemaTable.TableName);
       foreach (DataRow row in schemaTable.Rows)
       {
+        string dataType = row["COLUMN_TYPE"].ToString();
+        if (beautifyDataTypes)
+        {
+          bool isValidMySqlType;
+          dataType = DataTypeUtilities.BeautifyMySqlDataType(dataType, false, out isValidMySqlType);
+        }
+
         var infoRow = columnsInfoTable.NewRow();
         infoRow["Name"] = row["COLUMN_NAME"];
-        infoRow["Type"] = row["COLUMN_TYPE"];
+        infoRow["Type"] = dataType;
         infoRow["Null"] = row["IS_NULLABLE"];
         infoRow["Key"] = row["COLUMN_KEY"];
         infoRow["Default"] = row["COLUMN_DEFAULT"];

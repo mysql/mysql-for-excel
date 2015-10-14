@@ -115,6 +115,35 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There are no rows to append to the `{0}` table, please make sure there is data in the source table..
+        /// </summary>
+        internal static string AppendDataNoDataToAppendDetailWarning {
+            get {
+                return ResourceManager.GetString("AppendDataNoDataToAppendDetailWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no data rows in the source table to proceed with the append data operation.
+        ///
+        ///This is most likely caused because a single Excel row was selected and then &quot;First Row Contains Column Names&quot; was checked, causing the single data row to be treated as the column names for the source table, thus leaving the source table with no data rows to append..
+        /// </summary>
+        internal static string AppendDataNoDataToAppendMoreInfo {
+            get {
+                return ResourceManager.GetString("AppendDataNoDataToAppendMoreInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Data to Append.
+        /// </summary>
+        internal static string AppendDataNoDataToAppendTitleWarning {
+            get {
+                return ResourceManager.GetString("AppendDataNoDataToAppendTitleWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Appending data is not suitable for the mapped target column&apos;s data type..
         /// </summary>
         internal static string AppendDataNotSuitableForColumnTypeWarning {

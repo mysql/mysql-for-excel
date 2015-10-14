@@ -19,7 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -259,6 +258,19 @@ namespace MySQL.ForExcel.Forms
     /// <returns><c>true</c> if the append operation is successful, <c>false</c> otherwise.</returns>
     private bool AppendData()
     {
+      // If there are no data rows to be appended, show a warning message and abort the operation
+      if (_sourceMySqlPreviewDataTable.Rows.Count == 0
+        || (_sourceMySqlPreviewDataTable.Rows.Count == 1 && _sourceMySqlPreviewDataTable.FirstRowContainsColumnNames))
+      {
+        InfoDialog.ShowDialog(InfoDialogProperties.GetWarningDialogProperties(
+          Resources.AppendDataNoDataToAppendTitleWarning,
+          string.Format(Resources.AppendDataNoDataToAppendDetailWarning,
+          _targetMySqlPreviewDataTable.TableName),
+          null,
+          Resources.AppendDataNoDataToAppendMoreInfo));
+        return false;
+      }
+
       // If not all columns where mapped between the source and target tables ask the user if he still wants to proceed with the append operation.
       if (_targetMySqlPreviewDataTable.MappedColumnsQuantity < _maxMappingColumnsQuantity
         && InfoDialog.ShowDialog(InfoDialogProperties.GetYesNoDialogProperties(InfoDialog.InfoType.Warning, Resources.ColumnMappingIncompleteTitleWarning, Resources.ColumnMappingIncompleteDetailWarning)).DialogResult == DialogResult.No)
@@ -354,26 +366,23 @@ namespace MySQL.ForExcel.Forms
     private void ApplySingleMapping(int sourceColumnIndex, int targetColumnIndex, string mappedColName)
     {
       int previouslyMappedFromIndex = _currentColumnMapping.MappedSourceIndexes[targetColumnIndex];
-      bool mapping = !string.IsNullOrEmpty(mappedColName) && sourceColumnIndex >= 0;
-      DataGridViewCellStyle newStyle;
+      bool mapping = mappedColName != null && sourceColumnIndex >= 0;
 
       // Change text and style of target table column
-      var headerColumn = TargetMySQLTableDataGridView.MultiHeaderRowsCollection[0][targetColumnIndex];
-      headerColumn.Text = mapping ? mappedColName : string.Empty;
-      headerColumn.Style.BackColor = mapping ? Color.LightGreen : Color.OrangeRed;
+      var headerCell = TargetMySQLTableDataGridView.MultiHeaderRowsCollection[0][targetColumnIndex];
+      headerCell.Text = mapping ? mappedColName : string.Empty;
+      headerCell.Style.BackColor = mapping ? Color.LightGreen : Color.OrangeRed;
 
       // Change style of source table column being mapped or unmapped
       if (mapping)
       {
-        newStyle = new DataGridViewCellStyle(SourceExcelDataDataGridView.Columns[sourceColumnIndex].HeaderCell.Style);
-        newStyle.SelectionBackColor = newStyle.BackColor = Color.LightGreen;
-        SourceExcelDataDataGridView.Columns[sourceColumnIndex].HeaderCell.Style = newStyle;
+        var sourceColumnStyle = SourceExcelDataDataGridView.Columns[sourceColumnIndex].HeaderCell.Style;
+        sourceColumnStyle.SelectionBackColor = sourceColumnStyle.BackColor = Color.LightGreen;
       }
       else if (previouslyMappedFromIndex >= 0 && _currentColumnMapping.MappedSourceIndexes.Count(sourceIdx => sourceIdx == previouslyMappedFromIndex) <= 1)
       {
-        newStyle = new DataGridViewCellStyle(SourceExcelDataDataGridView.Columns[previouslyMappedFromIndex].HeaderCell.Style);
-        newStyle.SelectionBackColor = newStyle.BackColor = SystemColors.Control;
-        SourceExcelDataDataGridView.Columns[previouslyMappedFromIndex].HeaderCell.Style = newStyle;
+        var sourceColumnStyle = SourceExcelDataDataGridView.Columns[previouslyMappedFromIndex].HeaderCell.Style;
+        sourceColumnStyle.SelectionBackColor = sourceColumnStyle.BackColor = SystemColors.Control;
       }
 
       // Store the actual mapping
@@ -553,9 +562,9 @@ namespace MySQL.ForExcel.Forms
     {
       for (int colIdx = 0; colIdx < TargetMySQLTableDataGridView.Columns.Count; colIdx++)
       {
-        var headerColumn = TargetMySQLTableDataGridView.MultiHeaderRowsCollection[0][colIdx];
-        headerColumn.Text = string.Empty;
-        headerColumn.Style.BackColor = Color.OrangeRed;
+        var headerCell = TargetMySQLTableDataGridView.MultiHeaderRowsCollection[0][colIdx];
+        headerCell.Text = string.Empty;
+        headerCell.Style.BackColor = Color.OrangeRed;
         var toCol = _targetMySqlPreviewDataTable.Columns[colIdx] as MySqlDataColumn;
         if (toCol != null)
         {
@@ -705,12 +714,12 @@ namespace MySQL.ForExcel.Forms
         }
       }
 
-      // Auto-map 1-1 if just data types match
       if (autoMappedColumns != 0)
       {
         return autoMapping;
       }
 
+      // Auto-map 1-1 if just data types match
       autoMapping.ClearMappings();
       for (int columnIndex = 0; columnIndex < _targetMySqlPreviewDataTable.Columns.Count; columnIndex++)
       {
@@ -986,8 +995,11 @@ namespace MySQL.ForExcel.Forms
 
       bool firstRowColNames = FirstRowHeadersCheckBox.Checked;
 
-      // Flag the property in the "From" table
+      // Update the value of the first row being used for column names in the "From" table
       _sourceMySqlPreviewDataTable.FirstRowContainsColumnNames = firstRowColNames;
+
+      // Refresh the header rows in the source grid since data types might have changed after changing the FirstRowContainsColumnNames property value
+      RefreshAdditionalColumnHeaderRows(SourceExcelDataDataGridView);
 
       // Refresh the "From"/"Source" Grid and "From"/"Source" toColumn names in the current mapping
       SourceExcelDataDataGridView.CurrentCell = null;
@@ -1010,20 +1022,18 @@ namespace MySQL.ForExcel.Forms
       // Refresh the mapped columns in the "To" Grid
       for (int colIdx = 0; colIdx < TargetMySQLTableDataGridView.Columns.Count; colIdx++)
       {
-        var headerColumn = TargetMySQLTableDataGridView.MultiHeaderRowsCollection[0][colIdx];
+        var headerCell = TargetMySQLTableDataGridView.MultiHeaderRowsCollection[0][colIdx];
         if (_currentColumnMapping == null)
         {
           continue;
         }
 
         int mappedSourceIndex = _currentColumnMapping.MappedSourceIndexes[colIdx];
-        if (!string.IsNullOrEmpty(headerColumn.Text) && mappedSourceIndex >= 0)
+        if (!string.IsNullOrEmpty(headerCell.Text) && mappedSourceIndex >= 0)
         {
-          headerColumn.Text = SourceExcelDataDataGridView.Columns[mappedSourceIndex].HeaderText;
+          headerCell.Text = SourceExcelDataDataGridView.Columns[mappedSourceIndex].HeaderText;
         }
       }
-
-      TargetMySQLTableDataGridView.Refresh();
 
       // Re-do the Currently Selected mapping (unless we are on Manual) since now columns may match
       if (_currentColumnMapping != null && _currentColumnMapping.Name != "Manual")
@@ -1039,7 +1049,7 @@ namespace MySQL.ForExcel.Forms
     {
       _sourceMySqlPreviewDataTable = new MySqlDataTable(
         _appendDbTable.Connection,
-        _appendDbTable.Name,
+        "Source Excel Range",
         false,
         Settings.Default.AppendUseFormattedValues,
         true,
@@ -1052,7 +1062,6 @@ namespace MySQL.ForExcel.Forms
       SourceExcelDataDataGridView.DataSource = _sourceMySqlPreviewDataTable;
       SourceExcelDataDataGridView.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
       FirstRowHeadersCheckBox_CheckedChanged(FirstRowHeadersCheckBox, EventArgs.Empty);
-      RefreshAdditionalColumnHeaderRows(SourceExcelDataDataGridView);
     }
 
     /// <summary>
@@ -1064,6 +1073,11 @@ namespace MySQL.ForExcel.Forms
       _targetMySqlPreviewDataTable = new MySqlDataTable(_appendDbTable, Settings.Default.AppendUseFormattedValues);
       TargetMySQLTableDataGridView.DataSource = _targetMySqlPreviewDataTable;
       TargetMySQLTableDataGridView.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
+      foreach (DataGridViewColumn column in TargetMySQLTableDataGridView.Columns)
+      {
+        column.HeaderCell.Style.BackColor = SystemColors.Control;
+      }
+
       RefreshAdditionalColumnHeaderRows(TargetMySQLTableDataGridView);
     }
 
@@ -1288,11 +1302,11 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      foreach (var headerColumn in multiHeaderGrid.MultiHeaderRowsCollection[mappingsRowsQuantity])
+      foreach (var headerCell in multiHeaderGrid.MultiHeaderRowsCollection[mappingsRowsQuantity])
       {
-        var gridColumn = multiHeaderGrid.Columns[headerColumn.ColumnIndex];
-        headerColumn.Text = gridColumn.Tag != null ? gridColumn.Tag.ToString() : string.Empty;
-        headerColumn.Style.Font = new Font(multiHeaderGrid.ColumnHeadersDefaultCellStyle.Font, FontStyle.Italic);
+        var gridColumn = multiHeaderGrid.Columns[headerCell.ColumnIndex];
+        headerCell.Style.Font = new Font(multiHeaderGrid.ColumnHeadersDefaultCellStyle.Font, FontStyle.Italic);
+        headerCell.Text = gridColumn.Tag != null ? gridColumn.Tag.ToString() : string.Empty;
       }
     }
 
@@ -1340,10 +1354,11 @@ namespace MySQL.ForExcel.Forms
       var proposedMappingName = new[] { string.Empty };
       do
       {
-        proposedMappingName[0] = string.Format("{0}Mapping{1}", _targetMySqlPreviewDataTable.TableName, numericSuffix > 1 ? numericSuffix.ToString(CultureInfo.InvariantCulture) : string.Empty);
+        var suffix = numericSuffix > 1 ? string.Format("_{0}", numericSuffix) : string.Empty;
+        proposedMappingName[0] = string.Format("{0}_mapping{1}", _targetMySqlPreviewDataTable.TableName, suffix);
         numericSuffix++;
       }
-      while (StoredColumnMappingsList.Any(mapping => mapping.Name == proposedMappingName[0]));
+      while (StoredColumnMappingsList.Any(mapping => string.Equals(mapping.Name, proposedMappingName[0], StringComparison.InvariantCultureIgnoreCase)));
 
       if (showNewColumnMappingDialog)
       {

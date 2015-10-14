@@ -121,6 +121,35 @@ namespace MySQL.ForExcel.Classes
     #endregion Constants
 
     /// <summary>
+    /// Returns a MySQL data type in camel case, as displayed to users in MySQL for Excel.
+    /// </summary>
+    /// <param name="mySqlDataType">The full MySQL data type.</param>
+    /// <param name="stripParametersAndFormat">If <c>true</c> the returned data type is stripped from parameters and format information, otherwise </param>
+    /// <param name="isValid">Flag indicating whether the given data type is a valid MySQL one.</param>
+    /// <returns>The same MySQL data type in camel case, as displayed to users in MySQL for Excel.</returns>
+    public static string BeautifyMySqlDataType(string mySqlDataType, bool stripParametersAndFormat, out bool isValid)
+    {
+      isValid = false;
+      if (string.IsNullOrEmpty(mySqlDataType))
+      {
+        return mySqlDataType;
+      }
+
+      string parameters;
+      string formatInfo;
+      string strippedDataType = GetStrippedMySqlDataType(mySqlDataType, out parameters, out formatInfo);
+      var mySqlType = MySqlDataType.DataTypesList.FirstOrDefault(mType => mType.IsBaseType && mType.Name.StartsWith(strippedDataType, StringComparison.InvariantCultureIgnoreCase));
+      if (mySqlType == null)
+      {
+        string notRecognizedType = stripParametersAndFormat ? strippedDataType : mySqlDataType;
+        return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(notRecognizedType);
+      }
+
+      isValid = true;
+      return stripParametersAndFormat ? mySqlType.Name : mySqlType.Name + parameters + formatInfo;
+    }
+
+    /// <summary>
     /// Compares the values in a data table row-column and its corresponding Excel cell value.
     /// </summary>
     /// <param name="dataTableValue">The value stored in a <see cref="System.Data.DataTable"/> row and column.</param>
@@ -1042,23 +1071,24 @@ namespace MySQL.ForExcel.Classes
     /// Gets the MySQL data type name stripped of formatting and modifiers.
     /// </summary>
     /// <param name="mySqlDataType">The full MySQL data type.</param>
-    /// <param name="maxLenIfNotSpecified">Flag indicating whether the maximum length of the data type should be returned if not specified within the full data type.</param>
-    /// <param name="length">The length declared for this data type.</param>
+    /// <param name="parameters">The parameters piece with parentheses.</param>
+    /// <param name="formatInformation">The formatting information of the data type, if any.</param>
     /// <returns>The MySQL data type name stripped of formatting and modifiers.</returns>
-    public static string GetStrippedMySqlDataType(string mySqlDataType, bool maxLenIfNotSpecified, out long length)
+    public static string GetStrippedMySqlDataType(string mySqlDataType, out string parameters, out string formatInformation)
     {
       mySqlDataType = mySqlDataType.Trim();
       string strippedType = string.Empty;
-      length = 0;
+      parameters = null;
+      formatInformation = null;
       if (string.IsNullOrEmpty(mySqlDataType))
       {
         return strippedType;
       }
 
-      bool unsigned = mySqlDataType.ToLowerInvariant().Contains("unsigned");
       int spaceIndex = mySqlDataType.IndexOf(' ');
       if (spaceIndex > 0)
       {
+        formatInformation = mySqlDataType.Substring(spaceIndex);
         mySqlDataType = mySqlDataType.Substring(0, spaceIndex);
       }
 
@@ -1070,14 +1100,49 @@ namespace MySQL.ForExcel.Classes
       else
       {
         strippedType = mySqlDataType.Substring(0, lParensIndex);
-        int commaIndex = mySqlDataType.IndexOf(',');
-        int rParensIndex = mySqlDataType.IndexOf(')');
-        int rPos = commaIndex < 0 ? rParensIndex : commaIndex;
-        if (rPos >= 0)
-        {
-          string lengthStr = mySqlDataType.Substring(lParensIndex + 1, rPos - lParensIndex - 1);
-          long.TryParse(lengthStr, out length);
-        }
+        parameters = mySqlDataType.Substring(lParensIndex);
+      }
+
+      return strippedType;
+    }
+
+    /// <summary>
+    /// Gets the MySQL data type name stripped of formatting and modifiers.
+    /// </summary>
+    /// <param name="mySqlDataType">The full MySQL data type.</param>
+    /// <param name="parameters">The parameters piece with parentheses.</param>
+    /// <returns>The MySQL data type name stripped of formatting and modifiers.</returns>
+    public static string GetStrippedMySqlDataType(string mySqlDataType, out string parameters)
+    {
+      string formatInformation;
+      return GetStrippedMySqlDataType(mySqlDataType, out parameters, out formatInformation);
+    }
+
+    /// <summary>
+    /// Gets the MySQL data type name stripped of formatting and modifiers.
+    /// </summary>
+    /// <param name="mySqlDataType">The full MySQL data type.</param>
+    /// <param name="maxLenIfNotSpecified">Flag indicating whether the maximum length of the data type should be returned if not specified within the full data type.</param>
+    /// <param name="length">The length declared for this data type.</param>
+    /// <returns>The MySQL data type name stripped of formatting and modifiers.</returns>
+    public static string GetStrippedMySqlDataType(string mySqlDataType, bool maxLenIfNotSpecified, out long length)
+    {
+      string parameters;
+      string strippedType = GetStrippedMySqlDataType(mySqlDataType, out parameters);
+      length = 0;
+      if (string.IsNullOrEmpty(parameters))
+      {
+        return strippedType;
+      }
+
+      bool unsigned = mySqlDataType.ToLowerInvariant().Contains("unsigned");
+      int commaIndex = parameters.IndexOf(',');
+      int rParensIndex = parameters.IndexOf(')');
+      int rPos = commaIndex < 0 ? rParensIndex : commaIndex;
+      if (rPos >= 0)
+      {
+        string lengthStr = parameters.Substring(1, rPos - 1);
+        long.TryParse(lengthStr, out length);
       }
 
       if (length == 0 && maxLenIfNotSpecified)

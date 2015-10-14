@@ -2,6 +2,9 @@
 - Added an option to the Advanced Options dialog for Append Data operations, called "Show column data types above column names", that when checked data type
   information for columns on source and target grids of the Append Data dialog is shown. Showing the data types can sometimes aid users when doing manual
   mapping of columns.
+- Fixed code in the Append Data dialog that was incorrectly mapping columns when only a single row of Excel data was selected to append. Additionally validated
+  that if a single row of Excel data is selected and then on the Append Data dialog "First Row Contains Column Names" is checked, a warning is displayed stating
+  no rows are available to complete the append operation. (MySQL Bug #76517, Bug #21799500 - WRONG AUTOMATIC COLUMN MAPPING WHEN FIRST ROW CONTAINS COLUMN NAMES)
 - Enhanced the custom grid view control used in the Append Data dialog to automatically adjust the width of the grid columns considering not only the grid's cell
   contents and the base column header texts, but also the contents of the additional header rows.
   (Bug #16237502 - APPEND DATA HAS BAD COLUMN SIZING WITH VERY SMALL TARGET COLUMN NAMES)

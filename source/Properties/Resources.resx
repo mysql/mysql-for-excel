@@ -1119,4 +1119,15 @@ Since Excel relationships cannot be created, a single PivotTable for the whole E
   <data name="ValueLessThanZeroError" xml:space="preserve">
     <value>Value must be greater or equal to 0.</value>
   </data>
+  <data name="AppendDataNoDataToAppendDetailWarning" xml:space="preserve">
+    <value>There are no rows to append to the `{0}` table, please make sure there is data in the source table.</value>
+  </data>
+  <data name="AppendDataNoDataToAppendMoreInfo" xml:space="preserve">
+    <value>There are no data rows in the source table to proceed with the append data operation.
+
+This is most likely caused because a single Excel row was selected and then "First Row Contains Column Names" was checked, causing the single data row to be treated as the column names for the source table, thus leaving the source table with no data rows to append.</value>
+  </data>
+  <data name="AppendDataNoDataToAppendTitleWarning" xml:space="preserve">
+    <value>No Data to Append</value>
+  </data>
 </root>

@@ -325,7 +325,7 @@ namespace MySQL.ForExcel.Classes
       OperationType = DataOperationType.Append;
       if (fetchColumnsSchemaInfo)
       {
-        CreateTableSchema(tableName);
+        CreateTableSchema(tableName, true);
       }
 
       _mysqlMaxAllowedPacket = WbConnection.GetMySqlServerMaxAllowedPacket();
@@ -1431,7 +1431,20 @@ namespace MySQL.ForExcel.Classes
       var comparisonMethod = caseSensitive
         ? StringComparison.InvariantCulture
         : StringComparison.InvariantCultureIgnoreCase;
-      var mySqlCol = Columns.Cast<MySqlDataColumn>().FirstOrDefault(col => !skipExcludedColumns || !col.ExcludeColumn && col.Ordinal != exceptAtIndex && string.Equals(useDisplayName ? col.DisplayName : col.ColumnName, columnName, comparisonMethod));
+      MySqlDataColumn mySqlCol = null;
+      foreach (MySqlDataColumn col in Columns)
+      {
+        if ((col.ExcludeColumn && skipExcludedColumns)
+            || col.Ordinal == exceptAtIndex
+            || !string.Equals(useDisplayName ? col.DisplayName : col.ColumnName, columnName, comparisonMethod))
+        {
+          continue;
+        }
+
+        mySqlCol = col;
+        break;
+      }
+
       return mySqlCol != null ? mySqlCol.Ordinal : -1;
     }
 
@@ -2310,7 +2323,8 @@ namespace MySQL.ForExcel.Classes
     /// Creates columns for this table using the information schema of a MySQL table with the given name to mirror their properties.
     /// </summary>
     /// <param name="tableName">Name of the table.</param>
-    private void CreateTableSchema(string tableName)
+    /// <param name="beautifyDataTypes">Flag indicating whether the data types are camel cased as shown in the Export Data data type combo box.</param>
+    private void CreateTableSchema(string tableName, bool beautifyDataTypes = false)
     {
       string tableCharSet;
       string tableCollation = WbConnection.GetTableCollation(null, tableName, out tableCharSet);
@@ -2320,7 +2334,7 @@ namespace MySQL.ForExcel.Classes
         Collation = tableCollation;
       }
 
-      var columnsInfoTable = WbConnection.GetColumnsInformationTable(null, tableName);
+      var columnsInfoTable = WbConnection.GetColumnsInformationTable(null, tableName, beautifyDataTypes);
       CreateTableSchema(columnsInfoTable);
     }
 

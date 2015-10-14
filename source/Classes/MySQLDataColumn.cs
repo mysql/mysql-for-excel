@@ -1122,8 +1122,8 @@ namespace MySQL.ForExcel.Classes
         RowsFromSecondDataType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(typesListFromSecondRow, decimalMaxLen, varCharMaxLen);
         if (typesListFromSecondRow.Count > 0)
         {
-          long dummyLength;
-          typesListForFirstAndRest.Add(DataTypeUtilities.GetStrippedMySqlDataType(_rowsFromSecondDataType, false, out dummyLength));
+          string parameters;
+          typesListForFirstAndRest.Add(DataTypeUtilities.GetStrippedMySqlDataType(_rowsFromSecondDataType, out parameters));
         }
 
         // Get the consistent DataType between first row and the previously computed consistent DataType for the rest of the rows.
