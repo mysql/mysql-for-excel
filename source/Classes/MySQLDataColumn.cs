@@ -922,12 +922,12 @@ namespace MySQL.ForExcel.Classes
 
       // Update warning stating the column's data type is not suitable for all of its data (in the preview table)
       // either for the Append or Export Data operation.
-      string warningKey = ParentTable != null && ParentTable.OperationType.IsForAppend()
+      string warningKey = targetColumn.ParentTable != null && targetColumn.ParentTable.OperationType.IsForAppend()
         ? DATA_NOT_SUITABLE_APPEND_WARNING_KEY
         : DATA_NOT_SUITABLE_EXPORT_WARNING_KEY;
-      if (_warnings.SetVisibility(warningKey, !dataFitsIntoType))
+      if (targetColumn._warnings.SetVisibility(warningKey, !dataFitsIntoType))
       {
-        OnColumnWarningsChanged();
+        targetColumn.OnColumnWarningsChanged();
       }
 
       return dataFitsIntoType;

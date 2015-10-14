@@ -493,6 +493,7 @@ namespace MySQL.ForExcel.Forms
       this.TargetMySQLTableDataGridView.TabIndex = 10;
       this.TargetMySQLTableDataGridView.UseColumnPaddings = true;
       this.TargetMySQLTableDataGridView.UseFixedColumnHeadersHeight = false;
+      this.TargetMySQLTableDataGridView.SelectionChanged += new System.EventHandler(this.TargetMySQLTableDataGridView_SelectionChanged);
       this.TargetMySQLTableDataGridView.DragDrop += new System.Windows.Forms.DragEventHandler(this.TargetMySQLTableDataGridView_DragDrop);
       this.TargetMySQLTableDataGridView.DragOver += new System.Windows.Forms.DragEventHandler(this.TargetMySQLTableDataGridView_DragOver);
       this.TargetMySQLTableDataGridView.GiveFeedback += new System.Windows.Forms.GiveFeedbackEventHandler(this.DataGridView_GiveFeedback);
@@ -548,7 +549,6 @@ namespace MySQL.ForExcel.Forms
       this.SourceExcelDataDataGridView.TabIndex = 9;
       this.SourceExcelDataDataGridView.UseColumnPaddings = true;
       this.SourceExcelDataDataGridView.UseFixedColumnHeadersHeight = false;
-      this.SourceExcelDataDataGridView.SelectionChanged += new System.EventHandler(this.SourceExcelDataDataGridView_SelectionChanged);
       this.SourceExcelDataDataGridView.GiveFeedback += new System.Windows.Forms.GiveFeedbackEventHandler(this.DataGridView_GiveFeedback);
       this.SourceExcelDataDataGridView.QueryContinueDrag += new System.Windows.Forms.QueryContinueDragEventHandler(this.DataGridView_QueryContinueDrag);
       this.SourceExcelDataDataGridView.MouseDown += new System.Windows.Forms.MouseEventHandler(this.DataGridView_MouseDown);

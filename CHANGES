@@ -2,6 +2,9 @@
 - Added an option to the Advanced Options dialog for Append Data operations, called "Show column data types above column names", that when checked data type
   information for columns on source and target grids of the Append Data dialog is shown. Showing the data types can sometimes aid users when doing manual
   mapping of columns.
+- Changed the way data type related warnings are linked to grid columns in the Append Data dialog. Now the warnings are linked to the target (lower) grid view
+  columns, which makes perfect sense since a single source column can be mapped to multiple target columns and the warnings are about source data not being suitable
+  for the target column's data type. (MySQL Bug# 78549, Bug #21898678 - APPEND DATA - INCOMPATIBLE DATA TYPES WARNINGS NOT LINKED CORRECTLY)
 - Fixed code that checks if data can be stored in a single column of a table with the current column's data type, so warnings about incompatible data type for a
   column's data can be shown. (MySQL Bug# 78550, Bug #21898699 - APPEND DATA - WARNINGS ABOUT INCOMPATIBLE DATA TYPES DO NOT APPEAR ANYMORE)
 - Fixed code in the Append Data dialog that was incorrectly mapping columns when only a single row of Excel data was selected to append. Additionally validated
