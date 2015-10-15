@@ -2,6 +2,9 @@
 - Added an option to the Advanced Options dialog for Append Data operations, called "Show column data types above column names", that when checked data type
   information for columns on source and target grids of the Append Data dialog is shown. Showing the data types can sometimes aid users when doing manual
   mapping of columns.
+- Fixed a bug where connection information objects were being cleaned up from memory when an Excel Workbook was being closed, but the cleanup was happening
+  before the Workbook was saved causing that no connection information created after the last save was found to write to disk. Now the cleanup happens correctly
+  after the Workbook is actually saved. (MySQL Bug #76475, Bug #21172751 - CHANGES IN WORKBOOK NOT SAVED WHEN CLOSING EXCEL WINDOW)
 - Added a validation to the cases when the connection information of an Excel table (ListObject) being refreshed is not found, if that ListObject was likely
   created by MySQL for Excel then a friendly message is displayed stating the reason for this problem and a solution for it. When this happens the ListObject
   being refreshed has already a broken link to its related information to connect back to the MySQL server and fetch data again, so that ListObject needs to be

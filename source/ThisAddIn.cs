@@ -744,13 +744,6 @@ namespace MySQL.ForExcel
       bool wasAlreadySaved = workbook.Saved;
       if (!wasAlreadySaved)
       {
-        // Cleanup and close ImportConnectionInfo objects from the closing workbook.
-        RemoveInvalidImportConnectionInformation();
-        foreach (var importConnectionInfo in ActiveWorkbookImportConnectionInfos)
-        {
-          importConnectionInfo.Dispose();
-        }
-
         switch (MessageBox.Show(string.Format(Resources.WorkbookSavingDetailText, workbook.Name), Application.Name, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1))
         {
           case DialogResult.Yes:
@@ -793,14 +786,21 @@ namespace MySQL.ForExcel
         }
       }
 
+      // Cleanup and close EditConnectionInfo and ImportConnectionInfo objects from the closing workbook.
       CloseWorkbookEditConnectionInfos(workbook);
-      if (wasAlreadySaved)
+      RemoveInvalidImportConnectionInformation();
+      foreach (var importConnectionInfo in ActiveWorkbookImportConnectionInfos)
       {
-        workbook.Saved = true;
+        importConnectionInfo.Dispose();
       }
 
       // Remove the EditConnectionInfo objects for the workbook being closed from the dictionary.
       _editConnectionInfosByWorkbook.Remove(workbook.GetOrCreateId());
+
+      if (wasAlreadySaved)
+      {
+        workbook.Saved = true;
+      }
     }
 
     /// <summary>
