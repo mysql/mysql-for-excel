@@ -449,10 +449,15 @@ namespace MySQL.ForExcel.Controls
     protected override void OnCellValueChanged(DataGridViewCellEventArgs e)
     {
       base.OnCellValueChanged(e);
+      var baseColumn = Columns[e.ColumnIndex];
       if (e.RowIndex == 0)
       {
         // Recalculate the _baseHeadersRowHeight since a header column text changed.
-        RecalculateBaseHeadersRowHeight(Columns[e.ColumnIndex]);
+        RecalculateBaseHeadersRowHeight(baseColumn);
+      }
+      else
+      {
+        baseColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
       }
     }
 
@@ -528,29 +533,26 @@ namespace MySQL.ForExcel.Controls
         var headerRowHeight = UseFixedColumnHeadersHeight ? FixedColumnHeadersHeight : headerRow.Height;
         foreach (var headerCell in headerRow.Where(headerCell => !headerCell.InSpan))
         {
-          // Calculate the header cell's width, in pixels, considering the columns it spans.
-          int lastSpanningColumnDividerWidth;
-          int headerCellSpanningWidth = GetHeaderCellSpanningColumnWidths(headerCell, out lastSpanningColumnDividerWidth);
+          // Calculate the information for the cells being spanned by the currently processed headerCell.
+          var spanningInfo = MultiHeaderCellsSpanningInfo.GetHeaderCellSpanningInfo(this, headerCell);
 
-          // Get the rectangle space corresponding to the grid column header, which is the area where all multiple headers will be manually drawn
-          var baseHeaderAreaRectangle = GetCellDisplayRectangle(headerCell.ColumnIndex, -1, true);
-
-          // If the rectangle is empty it means the column is non in the visible scrolling area.
-          if (baseHeaderAreaRectangle.IsEmpty)
+          // If the spanning columns are not fully visible, then skip.
+          if (spanningInfo.VisibleArea == Rectangle.Empty)
           {
             continue;
           }
 
           // Compute the rectangle areas to manually draw the additional header
           var headerAreaWithSeparatorsRectangle = new Rectangle(
-            baseHeaderAreaRectangle.Left,
-            baseHeaderAreaRectangle.Top + accumulatedRowHeights,
-            headerCellSpanningWidth,
+            spanningInfo.VisibleArea.Left,
+            spanningInfo.VisibleArea.Top + accumulatedRowHeights,
+            spanningInfo.VisibleWidth,
             headerRowHeight);
+          e.Graphics.SetClip(headerAreaWithSeparatorsRectangle);
           var headerDrawableAreaRectangle = new Rectangle(
-            headerAreaWithSeparatorsRectangle.Left,
+            headerAreaWithSeparatorsRectangle.Left - spanningInfo.LeftOverflowingWidth,
             headerAreaWithSeparatorsRectangle.Top,
-            headerAreaWithSeparatorsRectangle.Width - Math.Max(ColumnHeadersSeparatorWidth, lastSpanningColumnDividerWidth + 1),
+            spanningInfo.TotalSpanningWidth - Math.Max(ColumnHeadersSeparatorWidth, spanningInfo.RightDividerWidth + 1),
             headerAreaWithSeparatorsRectangle.Height - ColumnHeadersSeparatorWidth);
           var topPadding = UseColumnPaddings ? headerCell.Style.Padding.Top : 0;
           var bottomPadding = UseColumnPaddings ? headerCell.Style.Padding.Bottom : 0;
@@ -612,29 +614,31 @@ namespace MySQL.ForExcel.Controls
       }
 
       // Calculate the total width of the base columns the headerCell spans
-      int lastColumnDividerWidth;
-      var spannedWidth = GetHeaderCellSpanningColumnWidths(headerCell, out lastColumnDividerWidth);
+      var spanningInfo = MultiHeaderCellsSpanningInfo.GetHeaderCellSpanningInfo(this, headerCell);
 
-      // Adjust column widths if needed by comparing the width of the spanned columns with the calculated additional header cell's width
-      if (headerCell.CellSize.Width > spannedWidth)
+      // Nothing to do if the spanning columns width already accomodates space for the computed headerCell's width
+      if (spanningInfo.TotalSpanningWidth >= headerCell.CellSize.Width)
       {
-        int remainder;
-        int proportionalWidthToIncrease = Math.DivRem(headerCell.CellSize.Width - spannedWidth, headerCell.ColumnSpan, out remainder);
-        if (remainder > 0)
-        {
-          proportionalWidthToIncrease++;
-        }
+        return;
+      }
 
-        int lastColumnIndex = headerCell.GetLastBaseColumnIndexFromSpan(Columns.Count);
-        for (int idx = headerCell.ColumnIndex; idx <= lastColumnIndex; idx++)
-        {
-          DataGridViewColumn spanningColumn = Columns[idx];
-          int newWidth = spanningColumn.Width + proportionalWidthToIncrease;
-          _skipColumnWidthsAdjustment = true;
-          spanningColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
-          spanningColumn.Width = newWidth;
-          _skipColumnWidthsAdjustment = false;
-        }
+      // Re-adjust grid's columns widths spanned by the headerCell
+      int remainder;
+      int proportionalWidthToIncrease = Math.DivRem(headerCell.CellSize.Width - spanningInfo.VisibleWidth, headerCell.ColumnSpan, out remainder);
+      if (remainder > 0)
+      {
+        proportionalWidthToIncrease++;
+      }
+
+      int lastColumnIndex = headerCell.GetLastBaseColumnIndexFromSpan(Columns.Count);
+      for (int idx = headerCell.ColumnIndex; idx <= lastColumnIndex; idx++)
+      {
+        DataGridViewColumn spanningColumn = Columns[idx];
+        int newWidth = spanningColumn.Width + proportionalWidthToIncrease;
+        _skipColumnWidthsAdjustment = true;
+        spanningColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.None;
+        spanningColumn.Width = newWidth;
+        _skipColumnWidthsAdjustment = false;
       }
     }
 
@@ -877,39 +881,6 @@ namespace MySQL.ForExcel.Controls
       var headerRectangle = DisplayRectangle;
       headerRectangle.Height = ColumnHeadersHeight;
       Invalidate(headerRectangle);
-    }
-
-    /// <summary>
-    /// Calculates the total width, in pixels, of an additional header cell based on the corresponding grid column widths the header cell spans.
-    /// </summary>
-    /// <param name="headerCell">A <see cref="MultiHeaderCell"/> object.</param>
-    /// <param name="lastSpanningColumnDividerWidth">The <see cref="DataGridViewColumn.DividerWidth"/> of the last column the header cell spans.</param>
-    /// <returns>The total width, in pixels, of the given additional header cell.</returns>
-    private int GetHeaderCellSpanningColumnWidths(MultiHeaderCell headerCell, out int lastSpanningColumnDividerWidth)
-    {
-      lastSpanningColumnDividerWidth = 0;
-      if (headerCell == null)
-      {
-        return 0;
-      }
-
-      // In case the column span goes beyond the number of columns, then set the last index using the last column of the grid control.
-      int lastColumnIndex = headerCell.GetLastBaseColumnIndexFromSpan(Columns.Count);
-
-      // Compute the length of the currently processed header since it could be spanning more than one grid column, in which case add columns to skip to the collection.
-      lastSpanningColumnDividerWidth = Columns[lastColumnIndex].DividerWidth;
-      int multiWidth = 0;
-      for (int idx = headerCell.ColumnIndex; idx <= lastColumnIndex; idx++)
-      {
-        DataGridViewColumn spanningColumn = Columns[idx];
-        multiWidth += spanningColumn.Width;
-        if (idx < lastColumnIndex)
-        {
-          multiWidth += spanningColumn.DividerWidth;
-        }
-      }
-
-      return multiWidth;
     }
 
     /// <summary>

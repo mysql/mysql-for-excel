@@ -2,6 +2,8 @@
 - Added an option to the Advanced Options dialog for Append Data operations, called "Show column data types above column names", that when checked data type
   information for columns on source and target grids of the Append Data dialog is shown. Showing the data types can sometimes aid users when doing manual
   mapping of columns.
+- Rewrote the logic that calculates areas for spanning columns to clip and paint visible areas of additional headers correctly.
+  (MySQL Bug #78548, Bug #21898210 - APPEND DATA - PROBLEMS WHEN SCROLLING TARGET TABLE GRID)
 - Added a new advanced option for Append Data operations called "Confirm column mapping overwriting", that if checked every time a source column is dragged and
   dropped over a target column that was already mapped before (i.e. it already contains a mapped source column), a confirmation dialog asking if the overwriting
   should take place is displayed. By default the option is unchecked so that the confirmation is not appearing every time mappings are overwritten during a manual

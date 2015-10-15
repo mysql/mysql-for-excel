@@ -251,6 +251,7 @@
     <Compile Include="Classes\ListViewColumnSorter.cs" />
     <Compile Include="Classes\MiscUtilities.cs" />
     <Compile Include="Classes\MultiHeaderCell.cs" />
+    <Compile Include="Classes\MultiHeaderCellsSpanningInfo.cs" />
     <Compile Include="Classes\MultiHeaderRow.cs" />
     <Compile Include="Classes\MySqlColumnMapping.cs" />
     <Compile Include="Classes\MySqlDataColumn.cs">
