@@ -103,6 +103,7 @@ namespace MySQL.ForExcel.Forms
       Settings.Default.AppendPerformAutoMap = DoNotPerformAutoMapCheckBox.Checked;
       Settings.Default.AppendAutoStoreColumnMapping = AutoStoreColumnMappingCheckBox.Checked;
       Settings.Default.AppendReloadColumnMapping = ReloadColumnMappingCheckBox.Checked;
+      Settings.Default.AppendConfirmColumnMappingOverwriting = ConfirmMappingOverwritingCheckBox.Checked;
       Settings.Default.AppendUseFormattedValues = UseFormattedValuesCheckBox.Checked;
       Settings.Default.AppendShowDataTypes = ShowDataTypesCheckBox.Checked;
       Settings.Default.AppendLimitPreviewRowsQuantity = previewRowsQuantity;
@@ -152,6 +153,7 @@ namespace MySQL.ForExcel.Forms
         DoNotPerformAutoMapCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendPerformAutoMap");
         AutoStoreColumnMappingCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendAutoStoreColumnMapping");
         ReloadColumnMappingCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendReloadColumnMapping");
+        ConfirmMappingOverwritingCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendConfirmColumnMappingOverwriting");
         UseFormattedValuesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendUseFormattedValues");
         ShowDataTypesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendShowDataTypes");
         PreviewRowsQuantityNumericUpDown.Value = settings.GetPropertyDefaultValueByName<int>("AppendLimitPreviewRowsQuantity");
@@ -162,6 +164,7 @@ namespace MySQL.ForExcel.Forms
         DoNotPerformAutoMapCheckBox.Checked = Settings.Default.AppendPerformAutoMap;
         AutoStoreColumnMappingCheckBox.Checked = Settings.Default.AppendAutoStoreColumnMapping;
         ReloadColumnMappingCheckBox.Checked = Settings.Default.AppendReloadColumnMapping;
+        ConfirmMappingOverwritingCheckBox.Checked = Settings.Default.AppendConfirmColumnMappingOverwriting;
         UseFormattedValuesCheckBox.Checked = Settings.Default.AppendUseFormattedValues;
         ShowDataTypesCheckBox.Checked = Settings.Default.AppendShowDataTypes;
         PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.AppendLimitPreviewRowsQuantity);

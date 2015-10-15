@@ -110,7 +110,10 @@
     <Setting Name="DeleteAutomaticallyOrphanedConnectionInfos" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="AppendShowDataTypes" Type="System.Boolean" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Scope="User">
+    <Setting Name="AppendShowDataTypes" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="AppendConfirmColumnMappingOverwriting" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>

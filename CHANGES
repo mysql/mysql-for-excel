@@ -2,6 +2,10 @@
 - Added an option to the Advanced Options dialog for Append Data operations, called "Show column data types above column names", that when checked data type
   information for columns on source and target grids of the Append Data dialog is shown. Showing the data types can sometimes aid users when doing manual
   mapping of columns.
+- Added a new advanced option for Append Data operations called "Confirm column mapping overwriting", that if checked every time a source column is dragged and
+  dropped over a target column that was already mapped before (i.e. it already contains a mapped source column), a confirmation dialog asking if the overwriting
+  should take place is displayed. By default the option is unchecked so that the confirmation is not appearing every time mappings are overwritten during a manual
+  mapping, which may be annoying. (Bug #16239058 - APPEND DATA - DISABLE WARNINGS FOR COLUMN MAPPING OVERWRITING)
 - Changed the way data type related warnings are linked to grid columns in the Append Data dialog. Now the warnings are linked to the target (lower) grid view
   columns, which makes perfect sense since a single source column can be mapped to multiple target columns and the warnings are about source data not being suitable
   for the target column's data type. (MySQL Bug# 78549, Bug #21898678 - APPEND DATA - INCOMPATIBLE DATA TYPES WARNINGS NOT LINKED CORRECTLY)

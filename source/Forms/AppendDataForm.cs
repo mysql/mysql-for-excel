@@ -1479,13 +1479,16 @@ namespace MySQL.ForExcel.Forms
               if (!string.IsNullOrEmpty(toCol.MappedDataColName))
               {
                 bool isIdenticalMapping = toCol.MappedDataColName == draggedColumnName;
-                DialogResult dr = DialogResult.No;
-                if (!isIdenticalMapping)
+                bool proceedWithMappingOverwriting = true;
+                if (!isIdenticalMapping && Settings.Default.AppendConfirmColumnMappingOverwriting)
                 {
-                  dr = InfoDialog.ShowDialog(InfoDialogProperties.GetYesNoDialogProperties(InfoDialog.InfoType.Warning, Resources.ColumnMappedOverwriteTitleWarning, Resources.ColumnMappedOverwriteDetailWarning)).DialogResult;
+                  proceedWithMappingOverwriting = InfoDialog.ShowDialog(
+                    InfoDialogProperties.GetYesNoDialogProperties(InfoDialog.InfoType.Warning,
+                      Resources.ColumnMappedOverwriteTitleWarning, Resources.ColumnMappedOverwriteDetailWarning))
+                    .DialogResult == DialogResult.Yes;
                 }
 
-                if (dr == DialogResult.Yes)
+                if (proceedWithMappingOverwriting)
                 {
                   PerformManualSingleColumnMapping(-1, _gridTargetTableColumnIndexToDrop, null);
                 }
