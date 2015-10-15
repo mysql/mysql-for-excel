@@ -1130,4 +1130,9 @@ This is most likely caused because a single Excel row was selected and then "Fir
   <data name="AppendDataNoDataToAppendTitleWarning" xml:space="preserve">
     <value>No Data to Append</value>
   </data>
+  <data name="StandardListObjectRefreshMoreInfo" xml:space="preserve">
+    <value>This error is most likely happening because data was imported from a MySQL table or view, and when the Excel Workbook was saved MySQL for Excel could not store the connection information necessary to refresh the data of the Excel table (ListObject).
+
+In order to avoid receiving this error message each time the Excel table is refreshed, please delete the Excel table and import the data again before saving the Excel Workbook.</value>
+  </data>
 </root>

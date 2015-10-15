@@ -861,7 +861,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>A <see cref="ImportConnectionInfo"/> object related to the given <see cref="ExcelInterop.ListObject"/>.</returns>
     public static ImportConnectionInfo GetImportConnectionInfo(this ExcelInterop.ListObject excelTable)
     {
-      if (excelTable == null)
+      if (excelTable == null || !excelTable.Comment.IsGuid())
       {
         return null;
       }
@@ -1589,7 +1589,7 @@ namespace MySQL.ForExcel.Classes
             Resources.OperationErrorTitle,
             string.Format(Resources.StandardListObjectRefreshError, listObject.DisplayName),
             Resources.ContinueRefreshingExcelTablesQuestionText,
-            ex.GetFormattedMessage());
+            listObject.Comment.IsGuid() ? Resources.StandardListObjectRefreshMoreInfo : ex.GetFormattedMessage());
           infoProperties.WordWrapMoreInfo = true;
           if (InfoDialog.ShowDialog(infoProperties).DialogResult != DialogResult.Yes)
           {
@@ -1649,24 +1649,28 @@ namespace MySQL.ForExcel.Classes
     /// Checks if the given <see cref="ExcelInterop.ListObject"/> object is related to a <see cref="ImportConnectionInfo"/> object in order to perform its custom refresh functionality.
     /// </summary>
     /// <param name="excelTable">A <see cref="ExcelInterop.ListObject"/>.</param>
-    /// <returns><c>true</c> if the <see cref="ExcelInterop.ListObject"/> has a related <see cref="ImportConnectionInfo"/> and was refreshed, <c>false</c> otherwise.</returns>
+    /// <returns><c>true</c> if the <see cref="ExcelInterop.ListObject"/> has a related <see cref="ImportConnectionInfo"/>, <c>false</c> otherwise.</returns>
     public static bool RefreshMySqlData(this ExcelInterop.ListObject excelTable)
     {
-      bool refreshedMySqlData = false;
-
-      // Do not return from the method unless the overriden refresh code happens, to avoid skipping the default refresh functionality.
-      // Meaning DO NOT use the 'return' statement under any circumstance to return right away in the scope of this method.
-      if (excelTable != null && excelTable.Comment != null)
+      var importConnectionInfo = excelTable.GetImportConnectionInfo();
+      bool hasImportConnectionInfo = importConnectionInfo != null;
+      if (hasImportConnectionInfo)
       {
-        var importConnectionInfo = excelTable.GetImportConnectionInfo();
-        if (importConnectionInfo != null)
-        {
-          refreshedMySqlData = true;
-          importConnectionInfo.Refresh();
-        }
+        importConnectionInfo.Refresh();
+      }
+      else if (excelTable != null && excelTable.Comment.IsGuid())
+      {
+        // Display an error to users since the ListObject has a comment with a GUID in it that most probably
+        // was added by MySQL for Excel, but its corresponding information was not found in the settings file
+        hasImportConnectionInfo = true;
+        InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties(
+            Resources.OperationErrorTitle,
+            string.Format(Resources.StandardListObjectRefreshError, excelTable.DisplayName),
+            null,
+            Resources.StandardListObjectRefreshMoreInfo));
       }
 
-      return refreshedMySqlData;
+      return hasImportConnectionInfo;
     }
 
     /// <summary>

@@ -401,7 +401,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Attempts to refresh the MySQL data tied to the <see cref="ExcelInterop.ListObject"/> of the active Excell cell.
     /// </summary>
-    /// <returns><c>true</c> if the active <see cref="ExcelInterop.ListObject"/> has a related <see cref="ImportConnectionInfo"/> and was refreshed, <c>false</c> otherwise.</returns>
+    /// <returns><c>true</c> if the active <see cref="ExcelInterop.ListObject"/> has a related <see cref="ImportConnectionInfo"/>, <c>false</c> otherwise.</returns>
     public bool RefreshDataCustomFunctionality()
     {
       var listObject = Application.ActiveCell.ListObject;

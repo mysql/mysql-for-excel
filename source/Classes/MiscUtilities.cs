@@ -453,6 +453,22 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Checks if the given string value contains a guid in string representation.
+    /// </summary>
+    /// <param name="value">A <see cref="string"/> value.</param>
+    /// <returns><c>true</c> if the given string value contains a guid in string representation, <c>false</c> otherwise.</returns>
+    public static bool IsGuid(this string value)
+    {
+      if (string.IsNullOrEmpty(value))
+      {
+        return false;
+      }
+
+      Guid guid;
+      return Guid.TryParse(value, out guid);
+    }
+
+    /// <summary>
     /// Resets the settings that correspond to the defined section to its default values.
     /// </summary>
     /// <param name="settings">The application defualt settings (extension method)</param>

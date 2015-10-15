@@ -2714,6 +2714,17 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This error is most likely happening because data was imported from a MySQL table or view, and when the Excel Workbook was saved MySQL for Excel could not store the connection information necessary to refresh the data of the Excel table (ListObject).
+        ///
+        ///In order to avoid receiving this error message each time the Excel table is refreshed, please delete the Excel table and import the data again before saving the Excel Workbook..
+        /// </summary>
+        internal static string StandardListObjectRefreshMoreInfo {
+            get {
+                return ResourceManager.GetString("StandardListObjectRefreshMoreInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error ocurred trying to refresh data in Pivot Table {0}..
         /// </summary>
         internal static string StandardPivotTableRefreshError {
