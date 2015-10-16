@@ -2,6 +2,9 @@
 - Added an option to the Advanced Options dialog for Append Data operations, called "Show column data types above column names", that when checked data type
   information for columns on source and target grids of the Append Data dialog is shown. Showing the data types can sometimes aid users when doing manual
   mapping of columns.
+- Stopped using some hidden defined names to store formulas to transform date values into a the date format used by MySQL. These defined names were being
+  detected by Excel as macros or user functions that could not be saved in macro-free workbooks, thus generating an annoying warning every time a Workbook was
+  saved, if the add-in was active. (MySQL Bug #7346, Bug #19358961 - WARNING ABOUT MACRO-FREE WORKBOOKS WHEN CLOSING & SAVING AN EXCEL WORKBOOK)
 - Fixed a bug where connection information objects were being cleaned up from memory when an Excel Workbook was being closed, but the cleanup was happening
   before the Workbook was saved causing that no connection information created after the last save was found to write to disk. Now the cleanup happens correctly
   after the Workbook is actually saved. (MySQL Bug #76475, Bug #21172751 - CHANGES IN WORKBOOK NOT SAVED WHEN CLOSING EXCEL WINDOW)

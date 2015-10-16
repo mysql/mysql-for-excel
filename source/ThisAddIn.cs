@@ -628,9 +628,6 @@ namespace MySQL.ForExcel
         }
       }
 
-      // Add back the localized date format strings to this workbook.
-      workbook.AddLocalizedDateFormatStringsAsNames();
-
       if (!success)
       {
         workbook.Saved = false;
@@ -818,9 +815,6 @@ namespace MySQL.ForExcel
       {
         activeEditConnectionInfo.EditDialog.UnprotectWorksheet();
       }
-
-      // Remove the localized date format strings from this workbook, since they can't be saved in a macro-free (normal) workbook.
-      workbook.RemoveLocalizedDateFormatNames();
 
       //The WorkbookAfterSave event in Excel 2007 does not exist so we need to sligthly alter the program flow to overcome this limitation.
       if (ExcelVersionNumber <= EXCEL_2007_VERSION_NUMBER)
@@ -1125,8 +1119,20 @@ namespace MySQL.ForExcel
       // Subscribe to Excel events
       SetupExcelEvents(true);
 
-      // Create custom MySQL Excel table style and localized date format strings in the active workbook if it exists.
-      InitializeWorkbook(ActiveWorkbook);
+      // Create custom MySQL Excel table style in the active workbook(s).
+      if (ExcelVersionNumber <= EXCEL_2007_VERSION_NUMBER)
+      {
+        // Note that in Excel 2007 and 2010 a MDI model is used so only a single Excel pane is instantiated containing all Workbooks,
+        // in which case all workbooks need to be initialized, not only the active one.
+        foreach (ExcelInterop.Workbook workbook in Application.Workbooks)
+        {
+          InitializeWorkbook(workbook);
+        }
+      }
+      else
+      {
+        InitializeWorkbook(ActiveWorkbook);
+      }
 
       // Automatically delete ConnectionInfos that have a non-existent Excel Workbook.
       DeleteConnectionInfosWithNonExistentWorkbook(true);
@@ -1174,9 +1180,8 @@ namespace MySQL.ForExcel
         return;
       }
 
-      // Add the custom MySQL table style (for Excel tables) and localized date format strings to this workbook.
+      // Add the custom MySQL table style (for Excel tables) to this workbook.
       workbook.CreateMySqlTableStyle();
-      workbook.AddLocalizedDateFormatStringsAsNames();
 
       // When it is a new workbook it won't have any IConnectionInfo object related to it, so we could skip the rest of the method altogether.
       if (workbook.IsNew())

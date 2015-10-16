@@ -1410,6 +1410,18 @@ namespace MySQL.ForExcel.Classes
       return duplicates;
     }
 
+
+    /// <summary>
+    /// Gets a string representation for null date values.
+    /// </summary>
+    /// <param name="allowsNull">Flag indicating if the column allows null values.</param>
+    /// <returns>A string representation for null date values.</returns>
+    public string GetNullDateValueAsString(out bool allowsNull)
+    {
+      allowsNull = AllowNull;
+      return allowsNull ? "null" : DataTypeUtilities.MYSQL_EMPTY_DATE;
+    }
+
     /// <summary>
     /// Creates a SQL query fragment meant to be used within a CREATE TABLE statement to create a column with this column's schema.
     /// </summary>

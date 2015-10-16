@@ -1030,34 +1030,24 @@ namespace MySQL.ForExcel.Classes
       valueIsNull = valueObject == null || valueObject == DBNull.Value;
       if (valueIsNull)
       {
-        return valueToDb;
+        return againstTypeColumn.IsDate
+          ? againstTypeColumn.GetNullDateValueAsString(out valueIsNull)
+          : valueToDb;
       }
 
       if (valueObject is DateTime)
       {
-        DateTime dtValue = (DateTime)valueObject;
-        if (dtValue.Equals(DateTime.MinValue))
-        {
-          valueIsNull = againstTypeColumn.AllowNull;
-          valueToDb = valueIsNull ? @"null" : MYSQL_EMPTY_DATE;
-        }
-        else
-        {
-          valueToDb = dtValue.ToString(MYSQL_DATE_FORMAT);
-        }
+        var dtValue = (DateTime)valueObject;
+        valueToDb = dtValue.Equals(DateTime.MinValue)
+          ? againstTypeColumn.GetNullDateValueAsString(out valueIsNull)
+          : dtValue.ToString(MYSQL_DATE_FORMAT);
       }
       else if (valueObject is MySqlDateTime)
       {
         var dtValue = (MySqlDateTime)valueObject;
-        if (!dtValue.IsValidDateTime || dtValue.GetDateTime().Equals(DateTime.MinValue))
-        {
-          valueIsNull = againstTypeColumn.AllowNull;
-          valueToDb = valueIsNull ? @"null" : MYSQL_EMPTY_DATE;
-        }
-        else
-        {
-          valueToDb = dtValue.GetDateTime().ToString(MYSQL_DATE_FORMAT);
-        }
+        valueToDb = !dtValue.IsValidDateTime || dtValue.GetDateTime().Equals(DateTime.MinValue)
+          ? againstTypeColumn.GetNullDateValueAsString(out valueIsNull)
+          : dtValue.GetDateTime().ToString(MYSQL_DATE_FORMAT);
       }
       else
       {

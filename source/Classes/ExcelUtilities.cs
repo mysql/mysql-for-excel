@@ -290,54 +290,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Adds names to the whole application related to localized date format strings.
-    /// </summary>
-    /// <param name="workbook">The workbook where the new <see cref="ExcelInterop.Style"/> is added to.</param>
-    /// <remarks>This method relies on the value of the setting HideLocalizedDateFormatNames.</remarks>
-    public static void AddLocalizedDateFormatStringsAsNames(this ExcelInterop.Workbook workbook)
-    {
-      if (workbook == null)
-      {
-        return;
-      }
-
-      bool hideNames = Settings.Default.HideLocalizedDateFormatNames;
-      workbook.AddNameWithInternationalFormula("LOCAL_DATE_SEPARATOR", "=INDEX(GET.WORKSPACE(37),17)", hideNames);
-      workbook.AddNameWithInternationalFormula("LOCAL_TIME_SEPARATOR", "=INDEX(GET.WORKSPACE(37),18)", hideNames);
-      workbook.AddNameWithInternationalFormula("LOCAL_YEAR_FORMAT", "=INDEX(GET.WORKSPACE(37),19)", hideNames);
-      workbook.AddNameWithInternationalFormula("LOCAL_MONTH_FORMAT", "=INDEX(GET.WORKSPACE(37),20)", hideNames);
-      workbook.AddNameWithInternationalFormula("LOCAL_DAY_FORMAT", "=INDEX(GET.WORKSPACE(37),21)", hideNames);
-      workbook.AddNameWithInternationalFormula("LOCAL_HOUR_FORMAT", "=INDEX(GET.WORKSPACE(37),22)", hideNames);
-      workbook.AddNameWithInternationalFormula("LOCAL_MINUTE_FORMAT", "=INDEX(GET.WORKSPACE(37),23)", hideNames);
-      workbook.AddNameWithInternationalFormula("LOCAL_SECOND_FORMAT", "=INDEX(GET.WORKSPACE(37),24)", hideNames);
-      workbook.AddNameWithInternationalFormula("LOCAL_MYSQL_DATE_FORMAT", "=REPT(LOCAL_YEAR_FORMAT,4)&LOCAL_DATE_SEPARATOR&REPT(LOCAL_MONTH_FORMAT,2)&LOCAL_DATE_SEPARATOR&REPT(LOCAL_DAY_FORMAT,2)&\" \"&REPT(LOCAL_HOUR_FORMAT,2)&LOCAL_TIME_SEPARATOR&REPT(LOCAL_MINUTE_FORMAT,2)&LOCAL_TIME_SEPARATOR&REPT(LOCAL_SECOND_FORMAT,2)", hideNames);
-    }
-
-    /// <summary>
-    /// Adds a <see cref="ExcelInterop.Name"/> object to the collection of names (if it does not exist already) of the given <see cref="ExcelInterop.Workbook"/> with a formula in English that is translated to the current locale.
-    /// </summary>
-    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
-    /// <param name="name">The name of the <see cref="ExcelInterop.Name"/> object.</param>
-    /// <param name="internationalFormula">The tied formula expressed in English.</param>
-    /// <param name="hidden">Flag indicating whether the name is hidden from the user.</param>
-    public static void AddNameWithInternationalFormula(this ExcelInterop.Workbook workbook, string name, string internationalFormula, bool hidden)
-    {
-      if (workbook == null || string.IsNullOrEmpty(name) || string.IsNullOrEmpty(internationalFormula))
-      {
-        return;
-      }
-
-      if (workbook.Names.Cast<ExcelInterop.Name>().Any(n => n.Name == name))
-      {
-        return;
-      }
-
-      var excelName = workbook.Names.Add(name, " ", !hidden);
-      // The property is not set in the Add method above but below with the US locale.
-      SetPropertyInternational(excelName, "RefersTo", internationalFormula);
-    }
-
-    /// <summary>
     /// Adds a new row at the bottom of the given Excel range.
     /// </summary>
     /// <param name="range">The Excel range to add a new row to the end of it.</param>
@@ -1323,23 +1275,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a property from the given target object returned in an English locale after transformed from the native Excel locale.
-    /// </summary>
-    /// <param name="target">The Excel object from which a property value is to be extracted.</param>
-    /// <param name="name">The name of the property.</param>
-    /// <returns>The value of the property returned in an English locale.</returns>
-    public static object GetPropertyInternational(object target, string name)
-    {
-      return target.GetType().InvokeMember(
-        name,
-        System.Reflection.BindingFlags.GetProperty | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
-        null,
-        target,
-        null,
-        new System.Globalization.CultureInfo(EN_US_LOCALE_CODE));
-    }
-
-    /// <summary>
     /// Gets the a protection key for the provided worksheet if exists.
     /// </summary>
     /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
@@ -1674,50 +1609,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Adds names to the whole application related to localized date format strings.
-    /// </summary>
-    /// <param name="workbook">The workbook where the new <see cref="ExcelInterop.Style"/> is added to.</param>
-    /// <remarks>This method relies on the value of the setting HideLocalizedDateFormatNames.</remarks>
-    public static void RemoveLocalizedDateFormatNames(this ExcelInterop.Workbook workbook)
-    {
-      if (workbook == null)
-      {
-        return;
-      }
-
-      workbook.RemoveName("LOCAL_DATE_SEPARATOR");
-      workbook.RemoveName("LOCAL_TIME_SEPARATOR");
-      workbook.RemoveName("LOCAL_YEAR_FORMAT");
-      workbook.RemoveName("LOCAL_MONTH_FORMAT");
-      workbook.RemoveName("LOCAL_DAY_FORMAT");
-      workbook.RemoveName("LOCAL_HOUR_FORMAT");
-      workbook.RemoveName("LOCAL_MINUTE_FORMAT");
-      workbook.RemoveName("LOCAL_SECOND_FORMAT");
-      workbook.RemoveName("LOCAL_MYSQL_DATE_FORMAT");
-    }
-
-    /// <summary>
-    /// Removes a <see cref="ExcelInterop.Name"/> object from the collection of names of the given <see cref="ExcelInterop.Workbook"/>.
-    /// </summary>
-    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
-    /// <param name="name">The name of the <see cref="ExcelInterop.Name"/> object.</param>
-    public static void RemoveName(this ExcelInterop.Workbook workbook, string name)
-    {
-      if (workbook == null || string.IsNullOrEmpty(name))
-      {
-        return;
-      }
-
-      var removingName = workbook.Names.Cast<ExcelInterop.Name>().FirstOrDefault(n => n.Name == name);
-      if (removingName == null)
-      {
-        return;
-      }
-
-      removingName.Delete();
-    }
-
-    /// <summary>
     /// Removes the protectionKey property (if exists) for the current worksheet.
     /// </summary>
     /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
@@ -1879,23 +1770,6 @@ namespace MySQL.ForExcel.Classes
       {
         range.SetInteriorColor(oleColor);
       }
-    }
-
-    /// <summary>
-    /// Sets a property value for the given target object given in an English locale to be transformed to the native Excel locale.
-    /// </summary>
-    /// <param name="target">The Excel object for which a property value is to be set.</param>
-    /// <param name="name">The name of the property.</param>
-    /// <param name="args">The property value in the English locale.</param>
-    public static void SetPropertyInternational(object target, string name, params object[] args)
-    {
-      target.GetType().InvokeMember(
-        name,
-        System.Reflection.BindingFlags.SetProperty | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
-        null,
-        target,
-        args,
-        new System.Globalization.CultureInfo(EN_US_LOCALE_CODE));
     }
 
     /// <summary>

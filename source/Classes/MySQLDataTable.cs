@@ -726,7 +726,7 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a value indicating whether data type for each column is automatically detected when data is loaded by the <see cref="SetupColumnsWithData"/> method.
+    /// Gets or sets a value indicating whether data type for each column is automatically detected when data is loaded by the <see cref="SetupColumnsWithData"/> method.
     /// </summary>
     public bool DetectDatatype
     {
@@ -2041,10 +2041,7 @@ namespace MySQL.ForExcel.Classes
       Clear();
 
       // Add the Excel data to rows in this table.
-      var dateColumnIndexes = new List<int>(Columns.Count);
-      int dateColumnIndexAdjust = AddPrimaryKeyColumn ? 1 : 0;
-      dateColumnIndexes.AddRange(from MySqlDataColumn column in Columns where column.IsDate select column.RangeColumnIndex - dateColumnIndexAdjust);
-      using (var temporaryRange = new TempRange(dataRange, true, false, true, _addPrimaryKeyColumn, _firstRowContainsColumnNames, dateColumnIndexes.ToArray(), limitRowsQuantity))
+      using (var temporaryRange = new TempRange(dataRange, true, false, true, _addPrimaryKeyColumn, _firstRowContainsColumnNames, limitRowsQuantity))
       {
         CreateColumns(temporaryRange, recreateColumnsFromData);
         bool success = AddExcelData(temporaryRange);
