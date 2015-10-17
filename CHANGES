@@ -4,6 +4,8 @@
 - Added an option to the Advanced Options dialog for Append Data operations, called "Show column data types above column names", that when checked data type
   information for columns on source and target grids of the Append Data dialog is shown. Showing the data types can sometimes aid users when doing manual
   mapping of columns.
+- Updated the data connection library (Connector/NET) to version 6.9.8, which fixes the problem of accessing a schema containing unicode (non-ascii) characters
+  in its name. (Bug #17409832 - PROBLEMS WITH NON ASCII CHARACTERS)
 - Stopped using some hidden defined names to store formulas to transform date values into a the date format used by MySQL. These defined names were being
   detected by Excel as macros or user functions that could not be saved in macro-free workbooks, thus generating an annoying warning every time a Workbook was
   saved, if the add-in was active. (MySQL Bug #7346, Bug #19358961 - WARNING ABOUT MACRO-FREE WORKBOOKS WHEN CLOSING & SAVING AN EXCEL WORKBOOK)
