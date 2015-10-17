@@ -66,9 +66,9 @@ namespace MySQL.ForExcel.Forms
     private void InitializeComponent()
     {
       this.components = new System.ComponentModel.Container();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
       this.TextChangedTimer = new System.Windows.Forms.Timer(this.components);
       this.AdvancedOptionsButton = new System.Windows.Forms.Button();
       this.ExportButton = new System.Windows.Forms.Button();
@@ -218,6 +218,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // PrimaryKeyWarningLabel
       // 
+      this.PrimaryKeyWarningLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.PrimaryKeyWarningLabel.AutoSize = true;
       this.PrimaryKeyWarningLabel.BackColor = System.Drawing.Color.Transparent;
       this.PrimaryKeyWarningLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -231,6 +232,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // PrimaryKeyWarningPictureBox
       // 
+      this.PrimaryKeyWarningPictureBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.PrimaryKeyWarningPictureBox.BackColor = System.Drawing.Color.Transparent;
       this.PrimaryKeyWarningPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
       this.PrimaryKeyWarningPictureBox.Location = new System.Drawing.Point(462, 171);
@@ -242,7 +244,8 @@ namespace MySQL.ForExcel.Forms
       // 
       // ColumnOptionsGroupBox
       // 
-      this.ColumnOptionsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.ColumnOptionsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.ColumnOptionsGroupBox.BackColor = System.Drawing.Color.Transparent;
       this.ColumnOptionsGroupBox.Controls.Add(this.DataTypeComboBox);
       this.ColumnOptionsGroupBox.Controls.Add(this.ExcludeColumnCheckBox);
@@ -263,6 +266,8 @@ namespace MySQL.ForExcel.Forms
       // 
       // DataTypeComboBox
       // 
+      this.DataTypeComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.DataTypeComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
       this.DataTypeComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
       this.DataTypeComboBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
@@ -279,6 +284,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // ExcludeColumnCheckBox
       // 
+      this.ExcludeColumnCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.ExcludeColumnCheckBox.AutoSize = true;
       this.ExcludeColumnCheckBox.Location = new System.Drawing.Point(529, 21);
       this.ExcludeColumnCheckBox.Name = "ExcludeColumnCheckBox";
@@ -290,6 +296,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // AllowEmptyCheckBox
       // 
+      this.AllowEmptyCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.AllowEmptyCheckBox.AutoSize = true;
       this.AllowEmptyCheckBox.Location = new System.Drawing.Point(407, 53);
       this.AllowEmptyCheckBox.Name = "AllowEmptyCheckBox";
@@ -301,6 +308,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // PrimaryKeyCheckBox
       // 
+      this.PrimaryKeyCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.PrimaryKeyCheckBox.AutoSize = true;
       this.PrimaryKeyCheckBox.Location = new System.Drawing.Point(407, 21);
       this.PrimaryKeyCheckBox.Name = "PrimaryKeyCheckBox";
@@ -312,6 +320,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // UniqueIndexCheckBox
       // 
+      this.UniqueIndexCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.UniqueIndexCheckBox.AutoSize = true;
       this.UniqueIndexCheckBox.Location = new System.Drawing.Point(283, 53);
       this.UniqueIndexCheckBox.Name = "UniqueIndexCheckBox";
@@ -323,6 +332,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // CreateIndexCheckBox
       // 
+      this.CreateIndexCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.CreateIndexCheckBox.AutoSize = true;
       this.CreateIndexCheckBox.Location = new System.Drawing.Point(283, 21);
       this.CreateIndexCheckBox.Name = "CreateIndexCheckBox";
@@ -343,6 +353,8 @@ namespace MySQL.ForExcel.Forms
       // 
       // ColumnNameTextBox
       // 
+      this.ColumnNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.ColumnNameTextBox.Location = new System.Drawing.Point(122, 22);
       this.ColumnNameTextBox.Name = "ColumnNameTextBox";
       this.ColumnNameTextBox.Size = new System.Drawing.Size(135, 23);
@@ -471,6 +483,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // PrimaryKeyColumnsComboBox
       // 
+      this.PrimaryKeyColumnsComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.PrimaryKeyColumnsComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
       this.PrimaryKeyColumnsComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
       this.PrimaryKeyColumnsComboBox.DisplayMember = "DisplayName";
@@ -486,6 +499,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // UseExistingColumnRadioButton
       // 
+      this.UseExistingColumnRadioButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.UseExistingColumnRadioButton.AutoSize = true;
       this.UseExistingColumnRadioButton.BackColor = System.Drawing.Color.Transparent;
       this.UseExistingColumnRadioButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -500,6 +514,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // AddPrimaryKeyTextBox
       // 
+      this.AddPrimaryKeyTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.AddPrimaryKeyTextBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.AddPrimaryKeyTextBox.Location = new System.Drawing.Point(637, 116);
       this.AddPrimaryKeyTextBox.Name = "AddPrimaryKeyTextBox";
@@ -510,6 +525,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // AddPrimaryKeyRadioButton
       // 
+      this.AddPrimaryKeyRadioButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.AddPrimaryKeyRadioButton.AutoSize = true;
       this.AddPrimaryKeyRadioButton.BackColor = System.Drawing.Color.Transparent;
       this.AddPrimaryKeyRadioButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -524,6 +540,8 @@ namespace MySQL.ForExcel.Forms
       // 
       // TableNameInputTextBox
       // 
+      this.TableNameInputTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.TableNameInputTextBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.TableNameInputTextBox.Location = new System.Drawing.Point(127, 118);
       this.TableNameInputTextBox.Name = "TableNameInputTextBox";
@@ -546,6 +564,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // PrimaryKeySubLabel
       // 
+      this.PrimaryKeySubLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.PrimaryKeySubLabel.AutoSize = true;
       this.PrimaryKeySubLabel.BackColor = System.Drawing.Color.Transparent;
       this.PrimaryKeySubLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -558,6 +577,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // PrimaryKeyMainLabel
       // 
+      this.PrimaryKeyMainLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.PrimaryKeyMainLabel.AutoSize = true;
       this.PrimaryKeyMainLabel.BackColor = System.Drawing.Color.Transparent;
       this.PrimaryKeyMainLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -570,6 +590,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // PrimaryKeyPictureBox
       // 
+      this.PrimaryKeyPictureBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.PrimaryKeyPictureBox.BackColor = System.Drawing.Color.Transparent;
       this.PrimaryKeyPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_PrimaryKey_32x32;
       this.PrimaryKeyPictureBox.Location = new System.Drawing.Point(421, 57);
@@ -646,7 +667,7 @@ namespace MySQL.ForExcel.Forms
       this.DropDownButton.Location = new System.Drawing.Point(737, 15);
       this.DropDownButton.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
       this.DropDownButton.Name = "DropDownButton";
-      this.DropDownButton.Size = new System.Drawing.Size(12, 18);
+      this.DropDownButton.Size = new System.Drawing.Size(12, 17);
       this.DropDownButton.TabIndex = 2;
       this.DropDownButton.Text = "▼";
       this.DropDownButton.UseVisualStyleBackColor = true;
@@ -680,6 +701,8 @@ namespace MySQL.ForExcel.Forms
       // 
       // CollationComboBox
       // 
+      this.CollationComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.CollationComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
       this.CollationComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
       this.CollationComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -705,35 +728,35 @@ namespace MySQL.ForExcel.Forms
       this.PreviewDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-      dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-      dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.PreviewDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+      dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+      dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.PreviewDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
       this.PreviewDataGridView.ColumnsMaximumWidth = 200;
       this.PreviewDataGridView.ColumnsMinimumWidth = 50;
-      dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-      dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.PreviewDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
+      dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
+      dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.PreviewDataGridView.DefaultCellStyle = dataGridViewCellStyle5;
       this.PreviewDataGridView.Location = new System.Drawing.Point(82, 277);
       this.PreviewDataGridView.MultiSelect = false;
       this.PreviewDataGridView.Name = "PreviewDataGridView";
-      dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-      dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-      dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-      dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-      this.PreviewDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+      dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
+      dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+      dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+      dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+      this.PreviewDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
       this.PreviewDataGridView.Size = new System.Drawing.Size(677, 157);
       this.PreviewDataGridView.TabIndex = 19;
       this.PreviewDataGridView.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.PreviewDataGridView_CellToolTipTextNeeded);

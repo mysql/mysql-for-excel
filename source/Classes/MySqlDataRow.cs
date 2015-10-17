@@ -500,12 +500,13 @@ namespace MySQL.ForExcel.Classes
       {
         bool updatingValueIsNull;
         bool columnRequiresQuotes = column.ColumnRequiresQuotes;
-        bool columnIsText = column.IsCharOrText || column.IsSetOrEnum;
+        bool columnIsText = column.StrippedMySqlDataType.IsMySqlDataTypeCharOrText() || column.StrippedMySqlDataType.IsMySqlDataTypeSetOrEnum();
+        bool columnIsJson = column.StrippedMySqlDataType.IsMySqlDataTypeJson();
         string valueToDb = DataTypeUtilities.GetStringValueForColumn(this[column.ColumnName, DataRowVersion.Original], column, out updatingValueIsNull);
         string wrapValueCharacter = columnRequiresQuotes && !updatingValueIsNull ? "'" : string.Empty;
+        string valueForClause;
         if (column.AllowNull)
         {
-          string oldValueForClause;
           var columnCollation = column.AbsoluteCollation;
           bool needToCollateTextValue = columnIsText && !updatingValueIsNull
                                         && serverCollation != null
@@ -516,8 +517,8 @@ namespace MySQL.ForExcel.Classes
           bool needToCreateVariable = (valueToDb.Length * 2) > (valueToDb.Length + 24 + (needToCollateTextValue ? columnCollation.Length + 9 : 0));
           if (needToCreateVariable)
           {
-            oldValueForClause = "@OldCol" + (column.Ordinal + 1) + "Value";
-            setVariablesBuilder.AppendFormat("{0} {1} = {2}{3}{2}", setSeparator, oldValueForClause, wrapValueCharacter, valueToDb);
+            valueForClause = "@OldCol" + (column.Ordinal + 1) + "Value";
+            setVariablesBuilder.AppendFormat("{0} {1} = {2}{3}{2}", setSeparator, valueForClause, wrapValueCharacter, valueToDb);
             setSeparator = ",";
             if (needToCollateTextValue)
             {
@@ -527,14 +528,15 @@ namespace MySQL.ForExcel.Classes
           }
           else
           {
-            oldValueForClause = string.Format("{0}{1}{0}", wrapValueCharacter, valueToDb);
+            valueForClause = string.Format("{0}{1}{0}", wrapValueCharacter, valueToDb);
           }
 
-          wClauseBuilder.AppendFormat("{0}(({2} IS NULL AND `{1}` IS NULL) OR `{1}`={2})", wClauseColsSeparator, column.ColumnNameForSqlQueries, oldValueForClause);
+          wClauseBuilder.AppendFormat("{0}(({2} IS NULL AND `{1}` IS NULL) ", wClauseColsSeparator, column.ColumnNameForSqlQueries, valueForClause);
+          wClauseBuilder.AppendFormat(columnIsJson && !updatingValueIsNull ? "OR `{0}`=CAST({1} AS JSON))" : "OR `{0}`={1})", column.ColumnNameForSqlQueries, valueForClause);
         }
         else
         {
-          wClauseBuilder.AppendFormat("{0}`{1}`={2}{3}{2}", wClauseColsSeparator, column.ColumnNameForSqlQueries, wrapValueCharacter, valueToDb);
+          wClauseBuilder.AppendFormat(columnIsJson && !updatingValueIsNull ? "{0}`{1}`=CAST({2}{3}{2} AS JSON)" : "{0}`{1}`={2}{3}{2}", wClauseColsSeparator, column.ColumnNameForSqlQueries, wrapValueCharacter, valueToDb);
         }
 
         wClauseColsSeparator = " AND ";

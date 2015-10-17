@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -147,6 +147,182 @@ namespace MySQL.ForExcel.Classes
 
       isValid = true;
       return stripParametersAndFormat ? mySqlType.Name : mySqlType.Name + parameters + formatInfo;
+    }
+
+    /// <summary>
+    /// Checks whether a given string value can be converted and stored in this column.
+    /// </summary>
+    /// <param name="fullMySqlDataType">The full MySQL data type.</param>
+    /// <param name="strValue">The value as a string representation to store in this column.</param>
+    /// <param name="setOrEnumElements">List of elements included in a SET or ENUM declaration.</param>
+    /// <returns><c>true</c> if the string value can be stored in this column, <c>false</c> otherwise.</returns>
+    public static bool CanMySqlDataTypeStoreValue(this string fullMySqlDataType, string strValue, List<string> setOrEnumElements = null)
+    {
+      // If the value is null, treat it as an empty string.
+      if (strValue == null)
+      {
+        strValue = string.Empty;
+      }
+
+      var mySqlDataType = fullMySqlDataType.ToLowerInvariant();
+
+      // Return immediately for big data types.
+      if (mySqlDataType.Contains("text") || mySqlDataType == "json" || mySqlDataType == "blob" || mySqlDataType == "tinyblob" || mySqlDataType == "mediumblob" || mySqlDataType == "longblob" || mySqlDataType == "binary" || mySqlDataType == "varbinary")
+      {
+        return true;
+      }
+
+      // Return immediately for spatial data types since values for them can be created in a wide variety of ways
+      // (using WKT, WKB or MySQL spatial functions that return spatial objects), so leave the validation to the MySQL Server.
+      if (mySqlDataType.Contains("curve") || mySqlDataType.Contains("geometry") || mySqlDataType.Contains("line") || mySqlDataType.Contains("curve") || mySqlDataType.Contains("point") || mySqlDataType.Contains("polygon") || mySqlDataType.Contains("surface"))
+      {
+        return true;
+      }
+
+      // Check for boolean
+      if (mySqlDataType.StartsWith("bool") || mySqlDataType == "bit" || mySqlDataType == "bit(1)")
+      {
+        strValue = strValue.ToLowerInvariant();
+        return (strValue == "true" || strValue == "false" || strValue == "0" || strValue == "1" || strValue == "yes" || strValue == "no" || strValue == "ja" || strValue == "nein");
+      }
+
+      // Check for integer values
+      if (mySqlDataType.StartsWith("int") || mySqlDataType.StartsWith("mediumint"))
+      {
+        int tryIntValue;
+        return Int32.TryParse(strValue, out tryIntValue);
+      }
+
+      if (mySqlDataType.StartsWith("year"))
+      {
+        int tryYearValue;
+        return Int32.TryParse(strValue, out tryYearValue) && (tryYearValue >= 0 && tryYearValue < 100) || (tryYearValue > 1900 && tryYearValue < 2156);
+      }
+
+      if (mySqlDataType.StartsWith("tinyint"))
+      {
+        byte tryByteValue;
+        return Byte.TryParse(strValue, out tryByteValue);
+      }
+
+      if (mySqlDataType.StartsWith("smallint"))
+      {
+        short trySmallIntValue;
+        return Int16.TryParse(strValue, out trySmallIntValue);
+      }
+
+      if (mySqlDataType.StartsWith("bigint"))
+      {
+        long tryBigIntValue;
+        return Int64.TryParse(strValue, out tryBigIntValue);
+      }
+
+      if (mySqlDataType.StartsWith("bit"))
+      {
+        ulong tryBitValue;
+        return UInt64.TryParse(strValue, out tryBitValue);
+      }
+
+      // Check for big numeric values
+      if (mySqlDataType.StartsWith("float"))
+      {
+        float tryFloatValue;
+        return Single.TryParse(strValue, out tryFloatValue);
+      }
+
+      if (mySqlDataType.StartsWith("double") || mySqlDataType.StartsWith("real"))
+      {
+        double tryDoubleValue;
+        return Double.TryParse(strValue, out tryDoubleValue);
+      }
+
+      // Check for date and time values.
+      if (mySqlDataType == "time")
+      {
+        TimeSpan tryTimeSpanValue;
+        return TimeSpan.TryParse(strValue, out tryTimeSpanValue);
+      }
+
+      if (mySqlDataType == "date" || mySqlDataType == "datetime" || mySqlDataType == "timestamp")
+      {
+        if (strValue.IsMySqlZeroDateTimeValue())
+        {
+          return true;
+        }
+
+        DateTime tryDateTimeValue;
+        return DateTime.TryParse(strValue, out tryDateTimeValue);
+      }
+
+      // Check of char or varchar.
+      int lParensIndex = mySqlDataType.IndexOf("(", StringComparison.Ordinal);
+      int rParensIndex = mySqlDataType.IndexOf(")", StringComparison.Ordinal);
+      if (mySqlDataType.StartsWith("varchar") || mySqlDataType.StartsWith("char"))
+      {
+        int characterLen;
+        if (lParensIndex >= 0)
+        {
+          string paramValue = mySqlDataType.Substring(lParensIndex + 1, mySqlDataType.Length - lParensIndex - 2);
+          int.TryParse(paramValue, out characterLen);
+        }
+        else
+        {
+          characterLen = 1;
+        }
+
+        return strValue.Length <= characterLen;
+      }
+
+      // Check if enum or set.
+      bool isEnum = mySqlDataType.StartsWith("enum");
+      bool isSet = mySqlDataType.StartsWith("set");
+      if (isSet || isEnum)
+      {
+        if (setOrEnumElements == null)
+        {
+          return false;
+        }
+
+        strValue = strValue.ToLowerInvariant();
+        var superSet = new HashSet<string>(setOrEnumElements.Select(el => el.ToLowerInvariant().Trim(new[] { '\'' })));
+        if (isEnum)
+        {
+          return superSet.Contains(strValue);
+        }
+
+        string[] valueSet = strValue.Split(new[] { ',' });
+        return superSet.IsSupersetOf(valueSet);
+      }
+
+      // Check for decimal values which is the more complex.
+      bool mayContainFloatingPoint = mySqlDataType.StartsWith("decimal") || mySqlDataType.StartsWith("numeric") || mySqlDataType.StartsWith("double") || mySqlDataType.StartsWith("float") || mySqlDataType.StartsWith("real");
+      int commaPos = mySqlDataType.IndexOf(",", StringComparison.Ordinal);
+      int[] decimalLen = { -1, -1 };
+      if (mayContainFloatingPoint && lParensIndex >= 0 && rParensIndex >= 0 && lParensIndex < rParensIndex)
+      {
+        decimalLen[0] = Int32.Parse(mySqlDataType.Substring(lParensIndex + 1, (commaPos >= 0 ? commaPos : rParensIndex) - lParensIndex - 1));
+        if (commaPos >= 0)
+        {
+          decimalLen[1] = Int32.Parse(mySqlDataType.Substring(commaPos + 1, rParensIndex - commaPos - 1));
+        }
+      }
+
+      int floatingPointPos = strValue.IndexOf(".", StringComparison.Ordinal);
+      bool floatingPointCompliant = true;
+      if (floatingPointPos >= 0)
+      {
+        bool lengthCompliant = strValue.Substring(0, floatingPointPos).Length <= decimalLen[0];
+        bool decimalPlacesCompliant = decimalLen[1] < 0 || strValue.Substring(floatingPointPos + 1, strValue.Length - floatingPointPos - 1).Length <= decimalLen[1];
+        floatingPointCompliant = lengthCompliant && decimalPlacesCompliant;
+      }
+
+      if (!mySqlDataType.StartsWith("decimal") && !mySqlDataType.StartsWith("numeric"))
+      {
+        return false;
+      }
+
+      decimal tryDecimalValue;
+      return Decimal.TryParse(strValue, out tryDecimalValue) && floatingPointCompliant;
     }
 
     /// <summary>
@@ -487,6 +663,8 @@ namespace MySQL.ForExcel.Classes
         return rawValue;
       }
 
+      var againstStrippedType = againstTypeColumn.StrippedMySqlDataType;
+
       // Return values for empty raw values
       bool nullRawValue = rawValue == null || rawValue == DBNull.Value;
       if (nullRawValue)
@@ -496,24 +674,24 @@ namespace MySQL.ForExcel.Classes
           return DBNull.Value;
         }
 
-        if (againstTypeColumn.IsNumeric || againstTypeColumn.IsBinary)
+        if (againstStrippedType.IsMySqlDataTypeNumeric() || againstStrippedType.IsMySqlDataTypeBinary())
         {
           return 0;
         }
 
-        if (!againstTypeColumn.IsDate)
+        if (!againstStrippedType.IsMySqlDataTypeDate())
         {
           return againstTypeColumn.ColumnRequiresQuotes ? string.Empty : rawValue;
         }
       }
 
       // Return values for raw values with data
-      if (againstTypeColumn.IsDate)
+      if (againstStrippedType.IsMySqlDataTypeDate())
       {
         return GetValueAsDateTime(rawValue);
       }
 
-      if (againstTypeColumn.IsBool)
+      if (againstStrippedType.IsMySqlDataTypeBool())
       {
         return GetValueAsBoolean(rawValue);
       }
@@ -682,6 +860,7 @@ namespace MySQL.ForExcel.Classes
         case "text":
         case "set":
         case "enum":
+        case "json":
         case "curve":
         case "geometry":
         case "geometrycollection":
@@ -726,28 +905,34 @@ namespace MySQL.ForExcel.Classes
     /// <param name="unsigned">Flag indicating whether the type is unsigned.</param>
     /// <param name="bitPrecision">The precision for a bit data type to determine if it represents a boolean value or a number.</param>
     /// <param name="defaultValue">The default value of the data type.</param>
+    /// <param name="realAsFloat">Flag indicating if real is translated to float or to double.</param>
     /// <returns>The <see cref="MySqlDbType"/> corresponding to the given MySQL data type.</returns>
-    public static MySqlDbType GetMySqlDbType(string mySqlType, bool unsigned, byte bitPrecision, out object defaultValue)
+    public static MySqlDbType GetMySqlDbType(string mySqlType, bool unsigned, byte bitPrecision, out object defaultValue, bool realAsFloat = false)
     {
+      if (string.IsNullOrEmpty(mySqlType))
+      {
+        throw new UnhandledMySqlTypeException();
+      }
+
       MySqlDbType dbType;
       mySqlType = mySqlType.ToLowerInvariant();
       switch (mySqlType)
       {
         case "bit":
           dbType = MySqlDbType.Bit;
-          if (bitPrecision > 1)
+          if (bitPrecision == 1)
           {
-            defaultValue = 0;
+            defaultValue = false;
           }
           else
           {
-            defaultValue = false;
+            defaultValue = 0;
           }
           break;
 
         case "int":
         case "integer":
-          dbType = MySqlDbType.Int32;
+          dbType = unsigned ? MySqlDbType.UInt32 : MySqlDbType.Int32;
           defaultValue = 0;
           break;
 
@@ -766,17 +951,33 @@ namespace MySQL.ForExcel.Classes
           defaultValue = 0;
           break;
 
+        case "serial":
         case "bigint":
-          dbType = unsigned ? MySqlDbType.UInt64 : MySqlDbType.Int64;
+          dbType =  mySqlType == "serial" || unsigned ? MySqlDbType.UInt64 : MySqlDbType.Int64;
           defaultValue = (Int64)0;
           break;
 
-        case "numeric":
-        case "decimal":
         case "float":
+          dbType =  MySqlDbType.Float;
+          defaultValue = (Double)0;
+          break;
+
         case "double":
+          dbType =  MySqlDbType.Double;
+          defaultValue = (Double)0;
+          break;
+
         case "real":
-          dbType = mySqlType == "float" ? MySqlDbType.Float : (mySqlType == "double" || mySqlType == "real" ? MySqlDbType.Double : MySqlDbType.Decimal);
+          dbType =  realAsFloat ? MySqlDbType.Float : MySqlDbType.Double;
+          defaultValue = (Double)0;
+          break;
+
+        case "numeric":
+        case "dec":
+        case "decimal":
+        case "fixed":
+          // Check with Connector/NET team if dbType = MySqlDbType.NewDecimal if connection.driver.Version.isAtLeast(5, 0, 3)
+          dbType = MySqlDbType.Decimal;
           defaultValue = (Double)0;
           break;
 
@@ -787,29 +988,23 @@ namespace MySQL.ForExcel.Classes
           break;
 
         case "binary":
+          dbType = MySqlDbType.Binary;
+          defaultValue = null;
+          break;
+
         case "varbinary":
-          dbType = mySqlType.StartsWith("var") ? MySqlDbType.VarBinary : MySqlDbType.Binary;
+          dbType = MySqlDbType.VarBinary;
+          defaultValue = null;
+          break;
+
+        case "set":
+          dbType =  MySqlDbType.Set;
           defaultValue = string.Empty;
           break;
 
-        case "text":
-        case "tinytext":
-        case "mediumtext":
-        case "longtext":
-          dbType = mySqlType.StartsWith("var") ? MySqlDbType.VarBinary : MySqlDbType.Binary;
+        case "enum":
+          dbType =  MySqlDbType.Enum;
           defaultValue = string.Empty;
-          break;
-
-        case "date":
-        case "datetime":
-        case "timestamp":
-          dbType = mySqlType == "date" ? MySqlDbType.Date : MySqlDbType.DateTime;
-          defaultValue = DateTime.Today;
-          break;
-
-        case "time":
-          dbType = MySqlDbType.Time;
-          defaultValue = TimeSpan.Zero;
           break;
 
         case "blob":
@@ -817,10 +1012,89 @@ namespace MySQL.ForExcel.Classes
           defaultValue = null;
           break;
 
-        default:
-          dbType = MySqlDbType.Guid;
+        case "text":
+          dbType = MySqlDbType.Text;
+          defaultValue = string.Empty;
+          break;
+
+        case "longblob":
+          dbType = MySqlDbType.LongBlob;
           defaultValue = null;
           break;
+
+        case "longtext":
+          dbType = MySqlDbType.LongText;
+          defaultValue = string.Empty;
+          break;
+
+        case "mediumblob":
+          dbType =  MySqlDbType.MediumBlob;
+          defaultValue = null;
+          break;
+
+        case "mediumtext":
+          dbType =  MySqlDbType.MediumText;
+          defaultValue = string.Empty;
+          break;
+
+        case "tinyblob":
+          dbType =  MySqlDbType.TinyBlob;
+          defaultValue = null;
+          break;
+
+        case "tinytext":
+          dbType =  MySqlDbType.TinyText;
+          defaultValue = string.Empty;
+          break;
+
+        case "date":
+          dbType = MySqlDbType.Date;
+          defaultValue = DateTime.Today;
+          break;
+
+        case "datetime":
+          dbType = MySqlDbType.DateTime;
+          defaultValue = DateTime.Now;
+          break;
+
+        case "timestamp":
+          dbType = MySqlDbType.Timestamp;
+          defaultValue = DateTime.Now;
+          break;
+
+        case "time":
+          dbType = MySqlDbType.Time;
+          defaultValue = TimeSpan.Zero;
+          break;
+
+        case "year":
+          dbType = MySqlDbType.Year;
+          defaultValue = DateTime.Today.Year;
+          break;
+
+        case "json":
+          dbType = MySqlDbType.JSON;
+          defaultValue = string.Empty;
+          break;
+
+        case "geometry":
+        case "curve":
+        case "geometrycollection":
+        case "linestring":
+        case "multicurve":
+        case "multilinestring":
+        case "multipoint":
+        case "multipolygon":
+        case "multisurface":
+        case "point":
+        case "polygon":
+        case "surface":
+          dbType = MySqlDbType.Geometry;
+          defaultValue = null;
+          break;
+
+        default:
+          throw new UnhandledMySqlTypeException();
       }
 
       return dbType;
@@ -1025,12 +1299,12 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The text representation of the raw value.</returns>
     public static string GetStringValueForColumn(object rawValue, MySqlDataColumn againstTypeColumn, out bool valueIsNull)
     {
-      string valueToDb = @"null";
+      string valueToDb = "null";
       object valueObject = GetInsertingValueForColumnType(rawValue, againstTypeColumn, true);
       valueIsNull = valueObject == null || valueObject == DBNull.Value;
       if (valueIsNull)
       {
-        return againstTypeColumn.IsDate
+        return againstTypeColumn.StrippedMySqlDataType.IsMySqlDataTypeDate()
           ? againstTypeColumn.GetNullDateValueAsString(out valueIsNull)
           : valueToDb;
       }
@@ -1060,37 +1334,37 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the MySQL data type name stripped of formatting and modifiers.
     /// </summary>
-    /// <param name="mySqlDataType">The full MySQL data type.</param>
+    /// <param name="fullMySqlDataType">The full MySQL data type.</param>
     /// <param name="parameters">The parameters piece with parentheses.</param>
     /// <param name="formatInformation">The formatting information of the data type, if any.</param>
     /// <returns>The MySQL data type name stripped of formatting and modifiers.</returns>
-    public static string GetStrippedMySqlDataType(string mySqlDataType, out string parameters, out string formatInformation)
+    public static string GetStrippedMySqlDataType(string fullMySqlDataType, out string parameters, out string formatInformation)
     {
-      mySqlDataType = mySqlDataType.Trim();
+      fullMySqlDataType = fullMySqlDataType.Trim();
       string strippedType = string.Empty;
       parameters = null;
       formatInformation = null;
-      if (string.IsNullOrEmpty(mySqlDataType))
+      if (string.IsNullOrEmpty(fullMySqlDataType))
       {
         return strippedType;
       }
 
-      int spaceIndex = mySqlDataType.IndexOf(' ');
+      int spaceIndex = fullMySqlDataType.IndexOf(' ');
       if (spaceIndex > 0)
       {
-        formatInformation = mySqlDataType.Substring(spaceIndex);
-        mySqlDataType = mySqlDataType.Substring(0, spaceIndex);
+        formatInformation = fullMySqlDataType.Substring(spaceIndex);
+        fullMySqlDataType = fullMySqlDataType.Substring(0, spaceIndex);
       }
 
-      int lParensIndex = mySqlDataType.IndexOf('(');
+      int lParensIndex = fullMySqlDataType.IndexOf('(');
       if (lParensIndex < 0)
       {
-        strippedType = mySqlDataType;
+        strippedType = fullMySqlDataType;
       }
       else
       {
-        strippedType = mySqlDataType.Substring(0, lParensIndex);
-        parameters = mySqlDataType.Substring(lParensIndex);
+        strippedType = fullMySqlDataType.Substring(0, lParensIndex);
+        parameters = fullMySqlDataType.Substring(lParensIndex);
       }
 
       return strippedType;
@@ -1099,33 +1373,33 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the MySQL data type name stripped of formatting and modifiers.
     /// </summary>
-    /// <param name="mySqlDataType">The full MySQL data type.</param>
+    /// <param name="fullMySqlDataType">The full MySQL data type.</param>
     /// <param name="parameters">The parameters piece with parentheses.</param>
     /// <returns>The MySQL data type name stripped of formatting and modifiers.</returns>
-    public static string GetStrippedMySqlDataType(string mySqlDataType, out string parameters)
+    public static string GetStrippedMySqlDataType(string fullMySqlDataType, out string parameters)
     {
       string formatInformation;
-      return GetStrippedMySqlDataType(mySqlDataType, out parameters, out formatInformation);
+      return GetStrippedMySqlDataType(fullMySqlDataType, out parameters, out formatInformation);
     }
 
     /// <summary>
     /// Gets the MySQL data type name stripped of formatting and modifiers.
     /// </summary>
-    /// <param name="mySqlDataType">The full MySQL data type.</param>
+    /// <param name="fullMySqlDataType">The full MySQL data type.</param>
     /// <param name="maxLenIfNotSpecified">Flag indicating whether the maximum length of the data type should be returned if not specified within the full data type.</param>
     /// <param name="length">The length declared for this data type.</param>
     /// <returns>The MySQL data type name stripped of formatting and modifiers.</returns>
-    public static string GetStrippedMySqlDataType(string mySqlDataType, bool maxLenIfNotSpecified, out long length)
+    public static string GetStrippedMySqlDataType(string fullMySqlDataType, bool maxLenIfNotSpecified, out long length)
     {
       string parameters;
-      string strippedType = GetStrippedMySqlDataType(mySqlDataType, out parameters);
+      string strippedType = GetStrippedMySqlDataType(fullMySqlDataType, out parameters);
       length = 0;
       if (string.IsNullOrEmpty(parameters))
       {
         return strippedType;
       }
 
-      bool unsigned = mySqlDataType.ToLowerInvariant().Contains("unsigned");
+      bool unsigned = fullMySqlDataType.ToLowerInvariant().Contains("unsigned");
       int commaIndex = parameters.IndexOf(',');
       int rParensIndex = parameters.IndexOf(')');
       int rPos = commaIndex < 0 ? rParensIndex : commaIndex;
@@ -1233,6 +1507,133 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Checks whether this column's data type is of binary nature.
+    /// </summary>
+    public static bool IsMySqlDataTypeBinary(this string strippedMySqlDataType)
+    {
+      return !string.IsNullOrEmpty(strippedMySqlDataType) && strippedMySqlDataType.ToLowerInvariant().Contains("binary");
+    }
+
+    /// <summary>
+    /// Checks whether this column's data type can hold boolean values.
+    /// </summary>
+    public static bool IsMySqlDataTypeBool(this string strippedMySqlDataType)
+    {
+      if (string.IsNullOrEmpty(strippedMySqlDataType))
+      {
+        return false;
+      }
+
+      return strippedMySqlDataType.StartsWith("bool", StringComparison.InvariantCultureIgnoreCase)
+              || strippedMySqlDataType.Equals("tinyint(1)", StringComparison.InvariantCultureIgnoreCase)
+              || strippedMySqlDataType.Equals("bit(1)", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks whether this column's data type is fixed or variable sized character-based.
+    /// </summary>
+    public static bool IsMySqlDataTypeChar(this string strippedMySqlDataType)
+    {
+      if (string.IsNullOrEmpty(strippedMySqlDataType))
+      {
+        return false;
+      }
+
+      string toLowerDataType = strippedMySqlDataType.ToLowerInvariant();
+      return toLowerDataType.Contains("char");
+    }
+
+    /// <summary>
+    /// Checks whether this column's data type stores any kind of text.
+    /// </summary>
+    public static bool IsMySqlDataTypeCharOrText(this string strippedMySqlDataType)
+    {
+      if (string.IsNullOrEmpty(strippedMySqlDataType))
+      {
+        return false;
+      }
+
+      return strippedMySqlDataType.IsMySqlDataTypeChar() || strippedMySqlDataType.ToLowerInvariant().Contains("text");
+    }
+
+    /// <summary>
+    /// Checks whether this column's data type is used for dates.
+    /// </summary>
+    public static bool IsMySqlDataTypeDate(this string strippedMySqlDataType)
+    {
+      if (string.IsNullOrEmpty(strippedMySqlDataType))
+      {
+        return false;
+      }
+
+      string toLowerDataType = strippedMySqlDataType.ToLowerInvariant();
+      return toLowerDataType.Contains("date") || toLowerDataType == "timestamp";
+    }
+
+    /// <summary>
+    /// Checks whether the given stripped data type is of floating-point nature.
+    /// </summary>
+    public static bool IsMySqlDataTypeDecimal(this string strippedMySqlDataType)
+    {
+      if (string.IsNullOrEmpty(strippedMySqlDataType))
+      {
+        return false;
+      }
+
+      return strippedMySqlDataType.Equals("real", StringComparison.InvariantCultureIgnoreCase)
+             || strippedMySqlDataType.Equals("double", StringComparison.InvariantCultureIgnoreCase)
+             || strippedMySqlDataType.Equals("float", StringComparison.InvariantCultureIgnoreCase)
+             || strippedMySqlDataType.Equals("decimal", StringComparison.InvariantCultureIgnoreCase)
+             || strippedMySqlDataType.Equals("numeric", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks whether the given stripped data type is integer-based.
+    /// </summary>
+    public static bool IsMySqlDataTypeInteger(this string strippedMySqlDataType)
+    {
+      return !string.IsNullOrEmpty(strippedMySqlDataType) && strippedMySqlDataType.ToLowerInvariant().Contains("int");
+    }
+
+    /// <summary>
+    /// Checks whether this column's data type is a JSON type.
+    /// </summary>
+    public static bool IsMySqlDataTypeJson(this string strippedMySqlDataType)
+    {
+      return !string.IsNullOrEmpty(strippedMySqlDataType) && strippedMySqlDataType.Equals("json", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks whether the given stripped data type is numeric.
+    /// </summary>
+    public static bool IsMySqlDataTypeNumeric(this string strippedMySqlDataType)
+    {
+      return strippedMySqlDataType.IsMySqlDataTypeDecimal() || strippedMySqlDataType.IsMySqlDataTypeInteger();
+    }
+
+    /// <summary>
+    /// Checks whether the given stripped data type is Set or Enumeration.
+    /// </summary>
+    public static bool IsMySqlDataTypeSetOrEnum(this string strippedMySqlDataType)
+    {
+      if (string.IsNullOrEmpty(strippedMySqlDataType))
+      {
+        return false;
+      }
+
+      return strippedMySqlDataType.StartsWith("set", StringComparison.InvariantCultureIgnoreCase) || strippedMySqlDataType.StartsWith("enum", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks whether the given stripped data type is Time.
+    /// </summary>
+    public static bool IsMySqlDataTypeTime(this string strippedMySqlDataType)
+    {
+      return !string.IsNullOrEmpty(strippedMySqlDataType)
+              && strippedMySqlDataType.Equals("time", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
     /// Checks if the given string value can be parsed into a <see cref="MySqlDateTime"/> object.
     /// </summary>
     /// <param name="dateValueAsString">The string value representing a date.</param>
@@ -1318,113 +1719,10 @@ namespace MySQL.ForExcel.Classes
     /// <param name="unsigned">Flag indicating whether integer data types are unsigned.</param>
     /// <param name="realAsFloat">Flag indicating if real is translated to float or to double.</param>
     /// <returns>The Connector.NET data type object corresponding to the given MySQL data type.</returns>
-    public static MySqlDbType NameToMySqlType(string strippedMySqlDataType, bool unsigned, bool realAsFloat)
+    public static MySqlDbType NameToMySqlType(string strippedMySqlDataType, bool unsigned, bool realAsFloat = false)
     {
-      switch (strippedMySqlDataType.ToLowerInvariant())
-      {
-        case "char":
-          return MySqlDbType.String;
-
-        case "varchar":
-          return MySqlDbType.VarChar;
-
-        case "date":
-          return MySqlDbType.Date;
-
-        case "datetime":
-          return MySqlDbType.DateTime;
-
-        case "numeric":
-        case "decimal":
-        case "dec":
-        case "fixed":
-          //if (connection.driver.Version.isAtLeast(5, 0, 3))
-          //  return MySqlDbType.NewDecimal;
-          //else
-          return MySqlDbType.Decimal;
-
-        case "year":
-          return MySqlDbType.Year;
-
-        case "time":
-          return MySqlDbType.Time;
-
-        case "timestamp":
-          return MySqlDbType.Timestamp;
-
-        case "set":
-          return MySqlDbType.Set;
-
-        case "enum":
-          return MySqlDbType.Enum;
-
-        case "bit":
-          return MySqlDbType.Bit;
-
-        case "tinyint":
-          return unsigned ? MySqlDbType.UByte : MySqlDbType.Byte;
-
-        case "bool":
-        case "boolean":
-          return MySqlDbType.Byte;
-
-        case "smallint":
-          return unsigned ? MySqlDbType.UInt16 : MySqlDbType.Int16;
-
-        case "mediumint":
-          return unsigned ? MySqlDbType.UInt24 : MySqlDbType.Int24;
-
-        case "int":
-        case "integer":
-          return unsigned ? MySqlDbType.UInt32 : MySqlDbType.Int32;
-
-        case "serial":
-          return MySqlDbType.UInt64;
-
-        case "bigint":
-          return unsigned ? MySqlDbType.UInt64 : MySqlDbType.Int64;
-
-        case "float":
-          return MySqlDbType.Float;
-
-        case "double":
-          return MySqlDbType.Double;
-
-        case "real":
-          return realAsFloat ? MySqlDbType.Float : MySqlDbType.Double;
-
-        case "text":
-          return MySqlDbType.Text;
-
-        case "blob":
-          return MySqlDbType.Blob;
-
-        case "longblob":
-          return MySqlDbType.LongBlob;
-
-        case "longtext":
-          return MySqlDbType.LongText;
-
-        case "mediumblob":
-          return MySqlDbType.MediumBlob;
-
-        case "mediumtext":
-          return MySqlDbType.MediumText;
-
-        case "tinyblob":
-          return MySqlDbType.TinyBlob;
-
-        case "tinytext":
-          return MySqlDbType.TinyText;
-
-        case "binary":
-          return MySqlDbType.Binary;
-
-        case "varbinary":
-          return MySqlDbType.VarBinary;
-      }
-
-      throw new UnhandledMySqlTypeException();
+      object defaultValue;
+      return GetMySqlDbType(strippedMySqlDataType, unsigned, 0, out defaultValue, realAsFloat);
     }
 
     /// <summary>
@@ -1447,6 +1745,7 @@ namespace MySQL.ForExcel.Classes
         case "mediumtext":
         case "tinytext":
         case "longtext":
+        case "json":
           return Type.GetType("System.String");
 
         case "numeric":
@@ -1501,6 +1800,20 @@ namespace MySQL.ForExcel.Classes
         case "binary":
         case "varbinary":
           return Type.GetType("System.Object");
+
+        case "geometry":
+        case "curve":
+        case "geometrycollection":
+        case "linestring":
+        case "multicurve":
+        case "multilinestring":
+        case "multipoint":
+        case "multipolygon":
+        case "multisurface":
+        case "point":
+        case "polygon":
+        case "surface":
+          return typeof(MySqlGeometry);
       }
 
       throw new UnhandledMySqlTypeException();
@@ -1543,7 +1856,8 @@ namespace MySQL.ForExcel.Classes
              || mySqlDbType == MySqlDbType.Timestamp
              || mySqlDbType == MySqlDbType.TinyText
              || mySqlDbType == MySqlDbType.VarChar
-             || mySqlDbType == MySqlDbType.VarString;
+             || mySqlDbType == MySqlDbType.VarString
+             || mySqlDbType == MySqlDbType.JSON;
     }
 
     /// <summary>
@@ -1577,7 +1891,7 @@ namespace MySQL.ForExcel.Classes
         return true;
       }
 
-      if (strippedType2.Contains("char") || strippedType2.Contains("text") || strippedType2.Contains("enum") || strippedType2.Contains("set"))
+      if (strippedType2.Contains("char") || strippedType2.Contains("text") || strippedType2.Contains("enum") || strippedType2.Contains("set") || strippedType2 == "json")
       {
         return true;
       }

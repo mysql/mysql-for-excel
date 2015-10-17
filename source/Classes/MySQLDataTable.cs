@@ -1826,7 +1826,7 @@ namespace MySQL.ForExcel.Classes
         }
 
         // Format columns that have a MySQL TIME data type
-        foreach (var col in Columns.Cast<MySqlDataColumn>().Where(col => col.IsTime))
+        foreach (var col in Columns.Cast<MySqlDataColumn>().Where(col => col.StrippedMySqlDataType.IsMySqlDataTypeTime()))
         {
           ExcelInterop.Range firstColumnDataCell = fillingRange.Cells[headerRowModifier + 1, col.Ordinal + 1];
           var dataColumnRange = firstColumnDataCell.Resize[cappedNumRows, 1];

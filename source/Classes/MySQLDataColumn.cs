@@ -95,11 +95,6 @@ namespace MySQL.ForExcel.Classes
     private string _columnNameForSqlQueries;
 
     /// <summary>
-    /// Flag indicating whether the column's data must be wrapped with quotes to be used in queries.
-    /// </summary>
-    private bool? _columnRequiresQuotes;
-
-    /// <summary>
     /// Flag indicating whether this column has an index automatically created for it.
     /// </summary>
     private bool _createIndex;
@@ -168,7 +163,6 @@ namespace MySQL.ForExcel.Classes
     {
       _allowNull = false;
       _columnNameForSqlQueries = null;
-      _columnRequiresQuotes = null;
       _excludeColumn = false;
       _invalidSetOrEnumElementsIndexes = null;
       _mappedDataColOrdinal = -1;
@@ -376,12 +370,7 @@ namespace MySQL.ForExcel.Classes
     {
       get
       {
-        if (_columnRequiresQuotes == null)
-        {
-          _columnRequiresQuotes = IsCharOrText || IsDate || IsSetOrEnum || IsTime;
-        }
-
-        return (bool)_columnRequiresQuotes;
+        return MySqlDbType.RequiresQuotesForValue();
       }
     }
 
@@ -514,173 +503,15 @@ namespace MySQL.ForExcel.Classes
     public bool InExportMode { get; private set; }
 
     /// <summary>
-    /// Gets a value indicating whether this column's data type is of binary nature.
-    /// </summary>
-    public bool IsBinary
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(StrippedMySqlDataType))
-        {
-          return false;
-        }
-
-        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
-        return toLowerDataType.Contains("binary");
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether this column's data type can hold boolean values.
-    /// </summary>
-    public bool IsBool
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(StrippedMySqlDataType))
-        {
-          return false;
-        }
-
-        string toLowerDataType = MySqlDataType.ToLowerInvariant();
-        return toLowerDataType.StartsWith("bool") || toLowerDataType == "tinyint(1)" || toLowerDataType == "bit(1)";
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether this column's data type is fixed or variable sized character-based.
-    /// </summary>
-    public bool IsChar
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(StrippedMySqlDataType))
-        {
-          return false;
-        }
-
-        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
-        return toLowerDataType.Contains("char");
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether this column's data type stores any kind of text.
-    /// </summary>
-    public bool IsCharOrText
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(StrippedMySqlDataType))
-        {
-          return false;
-        }
-
-        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
-        return toLowerDataType.Contains("char") || toLowerDataType.Contains("text");
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether this column's data type is used for dates.
-    /// </summary>
-    public bool IsDate
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(StrippedMySqlDataType))
-        {
-          return false;
-        }
-
-        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
-        return toLowerDataType.Contains("date") || toLowerDataType == "timestamp";
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether this column's data type is of floating-point nature.
-    /// </summary>
-    public bool IsDecimal
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(StrippedMySqlDataType))
-        {
-          return false;
-        }
-
-        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
-        return toLowerDataType == "real" || toLowerDataType == "double" || toLowerDataType == "float" || toLowerDataType == "decimal" || toLowerDataType == "numeric";
-      }
-    }
-
-    /// <summary>
     /// Gets a value indicating if the <see cref="DisplayName"/> property value is not a duplicate of the one in another column.
     /// </summary>
     public bool IsDisplayNameDuplicate { get; private set; }
-
-    /// <summary>
-    /// Gets a value indicating whether this column's data type is integer-based.
-    /// </summary>
-    public bool IsInteger
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(StrippedMySqlDataType))
-        {
-          return false;
-        }
-
-        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
-        return toLowerDataType.Contains("int");
-      }
-    }
 
     /// <summary>
     /// Gets a value indicating whether the column's data type is a valid MySQL data type.
     /// </summary>
     public bool IsMySqlDataTypeValid { get; private set; }
 
-    /// <summary>
-    /// Gets a value indicating whether this column's data type is numeric.
-    /// </summary>
-    public bool IsNumeric
-    {
-      get
-      {
-        return IsDecimal || IsInteger;
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether this column's data type is Set or Enumeration.
-    /// </summary>
-    public bool IsSetOrEnum
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(StrippedMySqlDataType))
-        {
-          return false;
-        }
-
-        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
-        return toLowerDataType.StartsWith("set") || toLowerDataType.StartsWith("enum");
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether this column's data type is Time.
-    /// </summary>
-    public bool IsTime
-    {
-      get
-      {
-        return !string.IsNullOrEmpty(StrippedMySqlDataType) &&
-               StrippedMySqlDataType.Equals("time", StringComparison.InvariantCultureIgnoreCase);
-      }
-    }
 
     /// <summary>
     /// Gets or sets the name of the column in a source <see cref="MySqlDataTable"/> from which data will be appended from.
@@ -717,9 +548,9 @@ namespace MySQL.ForExcel.Classes
       private set
       {
         _mySqlDataType = value;
-        _columnRequiresQuotes = null;
         long dataTypeLength;
         StrippedMySqlDataType = DataTypeUtilities.GetStrippedMySqlDataType(_mySqlDataType, true, out dataTypeLength);
+        MySqlDbType = DataTypeUtilities.NameToMySqlType(StrippedMySqlDataType, Unsigned);
         MySqlDataTypeLength = dataTypeLength;
         OnPropertyChanged("MySqlDataType");
       }
@@ -733,16 +564,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a <see cref="MySql.Data.MySqlClient.MySqlDbType"/> object corresponding to this column's data type.
     /// </summary>
-    public MySqlDbType MySqlDbType
-    {
-      get
-      {
-        string strippedType = StrippedMySqlDataType;
-        return !string.IsNullOrEmpty(strippedType)
-          ? DataTypeUtilities.NameToMySqlType(strippedType, Unsigned, false)
-          : MySqlDbType.VarChar;
-      }
-    }
+    public MySqlDbType MySqlDbType { get; private set; }
 
     /// <summary>
     /// Gets the parent table of this column as a <see cref="MySqlDataTable"/> object.
@@ -940,171 +762,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the string value can be stored in this column, <c>false</c> otherwise.</returns>
     public bool CanStoreValue(string strValue)
     {
-      // If the value is null, treat it as an empty string.
-      if (strValue == null)
-      {
-        strValue = string.Empty;
-      }
-
-      var mySqlDataType = MySqlDataType.ToLowerInvariant();
-
-      // Return immediately for big data types.
-      if (mySqlDataType.Contains("text") || mySqlDataType == "blob" || mySqlDataType == "tinyblob" || mySqlDataType == "mediumblob" || mySqlDataType == "longblob" || mySqlDataType == "binary" || mySqlDataType == "varbinary")
-      {
-        return true;
-      }
-
-      // Return immediately for spatial data types since values for them can be created in a wide variety of ways
-      // (using WKT, WKB or MySQL spatial functions that return spatial objects), so leave the validation to the MySQL Server.
-      if (mySqlDataType.Contains("curve") || mySqlDataType.Contains("geometry") || mySqlDataType.Contains("line") || mySqlDataType.Contains("curve") || mySqlDataType.Contains("point") || mySqlDataType.Contains("polygon") || mySqlDataType.Contains("surface"))
-      {
-        return true;
-      }
-
-      // Check for boolean
-      if (mySqlDataType.StartsWith("bool") || mySqlDataType == "bit" || mySqlDataType == "bit(1)")
-      {
-        strValue = strValue.ToLowerInvariant();
-        return (strValue == "true" || strValue == "false" || strValue == "0" || strValue == "1" || strValue == "yes" || strValue == "no" || strValue == "ja" || strValue == "nein");
-      }
-
-      // Check for integer values
-      if (mySqlDataType.StartsWith("int") || mySqlDataType.StartsWith("mediumint"))
-      {
-        int tryIntValue;
-        return Int32.TryParse(strValue, out tryIntValue);
-      }
-
-      if (mySqlDataType.StartsWith("year"))
-      {
-        int tryYearValue;
-        return Int32.TryParse(strValue, out tryYearValue) && (tryYearValue >= 0 && tryYearValue < 100) || (tryYearValue > 1900 && tryYearValue < 2156);
-      }
-
-      if (mySqlDataType.StartsWith("tinyint"))
-      {
-        byte tryByteValue;
-        return Byte.TryParse(strValue, out tryByteValue);
-      }
-
-      if (mySqlDataType.StartsWith("smallint"))
-      {
-        short trySmallIntValue;
-        return Int16.TryParse(strValue, out trySmallIntValue);
-      }
-
-      if (mySqlDataType.StartsWith("bigint"))
-      {
-        long tryBigIntValue;
-        return Int64.TryParse(strValue, out tryBigIntValue);
-      }
-
-      if (mySqlDataType.StartsWith("bit"))
-      {
-        ulong tryBitValue;
-        return UInt64.TryParse(strValue, out tryBitValue);
-      }
-
-      // Check for big numeric values
-      if (mySqlDataType.StartsWith("float"))
-      {
-        float tryFloatValue;
-        return Single.TryParse(strValue, out tryFloatValue);
-      }
-
-      if (mySqlDataType.StartsWith("double") || mySqlDataType.StartsWith("real"))
-      {
-        double tryDoubleValue;
-        return Double.TryParse(strValue, out tryDoubleValue);
-      }
-
-      // Check for date and time values.
-      if (mySqlDataType == "time")
-      {
-        TimeSpan tryTimeSpanValue;
-        return TimeSpan.TryParse(strValue, out tryTimeSpanValue);
-      }
-
-      if (mySqlDataType == "date" || mySqlDataType == "datetime" || mySqlDataType == "timestamp")
-      {
-        if (strValue.IsMySqlZeroDateTimeValue())
-        {
-          return true;
-        }
-
-        DateTime tryDateTimeValue;
-        return DateTime.TryParse(strValue, out tryDateTimeValue);
-      }
-
-      // Check of char or varchar.
-      int lParensIndex = mySqlDataType.IndexOf("(", StringComparison.Ordinal);
-      int rParensIndex = mySqlDataType.IndexOf(")", StringComparison.Ordinal);
-      if (mySqlDataType.StartsWith("varchar") || mySqlDataType.StartsWith("char"))
-      {
-        int characterLen;
-        if (lParensIndex >= 0)
-        {
-          string paramValue = mySqlDataType.Substring(lParensIndex + 1, mySqlDataType.Length - lParensIndex - 2);
-          int.TryParse(paramValue, out characterLen);
-        }
-        else
-        {
-          characterLen = 1;
-        }
-
-        return strValue.Length <= characterLen;
-      }
-
-      // Check if enum or set.
-      bool isEnum = mySqlDataType.StartsWith("enum");
-      bool isSet = mySqlDataType.StartsWith("set");
-      if (isSet || isEnum)
-      {
-        if (_setOrEnumElements == null)
-        {
-          return false;
-        }
-
-        strValue = strValue.ToLowerInvariant();
-        var superSet = new HashSet<string>(_setOrEnumElements.Select(el => el.ToLowerInvariant().Trim(new[] { '\'' })));
-        if (isEnum)
-        {
-          return superSet.Contains(strValue);
-        }
-
-        string[] valueSet = strValue.Split(new[] { ',' });
-        return superSet.IsSupersetOf(valueSet);
-      }
-
-      // Check for decimal values which is the more complex.
-      bool mayContainFloatingPoint = mySqlDataType.StartsWith("decimal") || mySqlDataType.StartsWith("numeric") || mySqlDataType.StartsWith("double") || mySqlDataType.StartsWith("float") || mySqlDataType.StartsWith("real");
-      int commaPos = mySqlDataType.IndexOf(",", StringComparison.Ordinal);
-      int[] decimalLen = { -1, -1 };
-      if (mayContainFloatingPoint && lParensIndex >= 0 && rParensIndex >= 0 && lParensIndex < rParensIndex)
-      {
-        decimalLen[0] = Int32.Parse(mySqlDataType.Substring(lParensIndex + 1, (commaPos >= 0 ? commaPos : rParensIndex) - lParensIndex - 1));
-        if (commaPos >= 0)
-        {
-          decimalLen[1] = Int32.Parse(mySqlDataType.Substring(commaPos + 1, rParensIndex - commaPos - 1));
-        }
-      }
-
-      int floatingPointPos = strValue.IndexOf(".", StringComparison.Ordinal);
-      bool floatingPointCompliant = true;
-      if (floatingPointPos >= 0)
-      {
-        bool lengthCompliant = strValue.Substring(0, floatingPointPos).Length <= decimalLen[0];
-        bool decimalPlacesCompliant = decimalLen[1] < 0 || strValue.Substring(floatingPointPos + 1, strValue.Length - floatingPointPos - 1).Length <= decimalLen[1];
-        floatingPointCompliant = lengthCompliant && decimalPlacesCompliant;
-      }
-
-      if (!mySqlDataType.StartsWith("decimal") && !mySqlDataType.StartsWith("numeric"))
-      {
-        return false;
-      }
-
-      decimal tryDecimalValue;
-      return Decimal.TryParse(strValue, out tryDecimalValue) && floatingPointCompliant;
+      return MySqlDataType.CanMySqlDataTypeStoreValue(strValue, _setOrEnumElements);
     }
 
     /// <summary>
@@ -1602,7 +1260,7 @@ namespace MySQL.ForExcel.Classes
 
       if (ParentTable != null)
       {
-        CreateIndex = ParentTable.AutoIndexIntColumns && IsInteger;
+        CreateIndex = ParentTable.AutoIndexIntColumns && StrippedMySqlDataType.IsMySqlDataTypeInteger();
         if (ParentTable.AutoAllowEmptyNonIndexColumns)
         {
           AllowNull = !PrimaryKey && !CreateIndex;

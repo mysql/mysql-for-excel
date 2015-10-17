@@ -79,7 +79,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Excel data could not be appended to MySQL Table &quot;{0}&quot;..
+        ///   Looks up a localized string similar to Excel data could not be appended to MySQL Table `{0}`..
         /// </summary>
         internal static string AppendDataDetailsDoneErrorText {
             get {
@@ -88,7 +88,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Appended Excel data successfully to MySQL Table &quot;{0}&quot;..
+        ///   Looks up a localized string similar to Appended Excel data successfully to MySQL Table `{0}`..
         /// </summary>
         internal static string AppendDataDetailsDoneSuccessText {
             get {
@@ -97,7 +97,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Appended Excel data with warnings to MySQL Table &quot;{0}&quot;..
+        ///   Looks up a localized string similar to Appended Excel data with warnings to MySQL Table `{0}`..
         /// </summary>
         internal static string AppendDataDetailsDoneWarningsText {
             get {
@@ -655,7 +655,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Edited data for Table {0} could not be committed to MySQL..
+        ///   Looks up a localized string similar to Edited data for Table `{0}` could not be committed to MySQL..
         /// </summary>
         internal static string EditCommitSummaryError {
             get {
@@ -664,7 +664,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Edited data for Table {0} was committed to MySQL successfully..
+        ///   Looks up a localized string similar to Edited data for Table `{0}` was committed to MySQL successfully..
         /// </summary>
         internal static string EditCommitSummarySuccessful {
             get {
@@ -954,7 +954,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error ocurred trying to create the Excel table {0}.
+        ///   Looks up a localized string similar to An error ocurred trying to create the Excel table `{0}`.
         /// </summary>
         internal static string ExcelTableCreationError {
             get {
@@ -1001,7 +1001,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The MySQL Table &quot;{0}&quot; could not be created because of the following error(s):.
+        ///   Looks up a localized string similar to The MySQL Table `{0}` could not be created because of the following error(s):.
         /// </summary>
         internal static string ExportDataErrorCreatingTableText {
             get {
@@ -1010,7 +1010,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Errors found while trying to export data to MySQLTable &quot;{0}&quot;..
+        ///   Looks up a localized string similar to Errors found while trying to export data to MySQLTable `{0}`..
         /// </summary>
         internal static string ExportDataGenericErrorText {
             get {
@@ -1055,7 +1055,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The MySQL Table &quot;{0}&quot; was not created due errors on rows insertion..
+        ///   Looks up a localized string similar to The MySQL Table `{0}` was not created due errors on rows insertion..
         /// </summary>
         internal static string ExportDataOperationErrorNoRowsText {
             get {
@@ -1064,7 +1064,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The MySQL Table &quot;{0}&quot; could not be created..
+        ///   Looks up a localized string similar to The MySQL Table `{0}` could not be created..
         /// </summary>
         internal static string ExportDataOperationErrorNoTableText {
             get {
@@ -1073,7 +1073,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Created the MySQL Table &quot;{0}&quot; with no data..
+        ///   Looks up a localized string similar to Created the MySQL Table `{0}` with no data..
         /// </summary>
         internal static string ExportDataOperationSuccessNoDataText {
             get {
@@ -1082,7 +1082,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Created the MySQL Table &quot;{0}&quot; with data..
+        ///   Looks up a localized string similar to Created the MySQL Table `{0}` with data..
         /// </summary>
         internal static string ExportDataOperationSuccessWithDataText {
             get {
@@ -1118,7 +1118,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Created the MySQL Table &quot;{0}&quot; successfully..
+        ///   Looks up a localized string similar to Created the MySQL Table `{0}` successfully..
         /// </summary>
         internal static string ExportDataTableCreatedSuccessfullyText {
             get {
@@ -1127,7 +1127,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Created the MySQL Table &quot;{0}&quot; with {1} warning(s):.
+        ///   Looks up a localized string similar to Created the MySQL Table `{0}` with {1} warning(s):.
         /// </summary>
         internal static string ExportDataTableCreatedWithWarningsText {
             get {
@@ -1136,7 +1136,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Executed the following statement to create MySQL Table &quot;{0}&quot;:.
+        ///   Looks up a localized string similar to Executed the following statement to create MySQL Table `{0}`:.
         /// </summary>
         internal static string ExportDataTableExecutedQuery {
             get {
@@ -1217,7 +1217,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error ocurred trying to bind MySQL data to Excel table {0}..
+        ///   Looks up a localized string similar to An error ocurred trying to bind MySQL data to Excel table &quot;{0}&quot;..
         /// </summary>
         internal static string ImportDataBindError {
             get {
@@ -1244,7 +1244,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error ocurred trying to refresh MySQL data in Excel table {0}..
+        ///   Looks up a localized string similar to An error ocurred trying to refresh MySQL data in Excel table &quot;{0}&quot;..
         /// </summary>
         internal static string ImportDataRefreshError {
             get {
@@ -1453,7 +1453,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Inserted Excel data in MySQL Table &quot;{0}&quot; with the following statements:.
+        ///   Looks up a localized string similar to Inserted Excel data in MySQL Table `{0}` with the following statements:.
         /// </summary>
         internal static string InsertedExcelDataWithQueryText {
             get {
@@ -2084,7 +2084,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Created the MySQL Schema &quot;{0}&quot; successfully..
+        ///   Looks up a localized string similar to Created the MySQL Schema `{0}` successfully..
         /// </summary>
         internal static string NewSchemaCreatedSuccessfullyText {
             get {
@@ -2093,7 +2093,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Created the MySQL Schema &quot;{0}&quot; with {1} warning(s):.
+        ///   Looks up a localized string similar to Created the MySQL Schema `{0}` with {1} warning(s):.
         /// </summary>
         internal static string NewSchemaCreatedWithWarningsText {
             get {
@@ -2102,7 +2102,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The MySQL Schema &quot;{0}&quot; could not be created because of the following error(s):.
+        ///   Looks up a localized string similar to The MySQL Schema `{0}` could not be created because of the following error(s):.
         /// </summary>
         internal static string NewSchemaCreationErrorText {
             get {
@@ -2111,7 +2111,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Executed the following statement to create MySQL Schema &quot;{0}&quot;:.
+        ///   Looks up a localized string similar to Executed the following statement to create MySQL Schema `{0}`:.
         /// </summary>
         internal static string NewSchemaExecutedQuery {
             get {
@@ -2120,7 +2120,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MySQL Schema &quot;{0}&quot; could not be created..
+        ///   Looks up a localized string similar to MySQL Schema `{0}` could not be created..
         /// </summary>
         internal static string NewSchemaOperationErrorSummaryText {
             get {
@@ -2129,7 +2129,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MySQL Schema &quot;{0}&quot; has been created..
+        ///   Looks up a localized string similar to MySQL Schema `{0}` has been created..
         /// </summary>
         internal static string NewSchemaOperationSuccessSummaryText {
             get {
@@ -2211,7 +2211,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The parent workbook of worksheet {0} could not be obtained..
+        ///   Looks up a localized string similar to The parent workbook of worksheet &quot;{0}&quot; could not be obtained..
         /// </summary>
         internal static string ParentWorkbookNullError {
             get {
@@ -2267,7 +2267,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error ocurred trying to create the PivotTable {0}.
+        ///   Looks up a localized string similar to An error ocurred trying to create the PivotTable &quot;{0}&quot;.
         /// </summary>
         internal static string PivotTableCreationError {
             get {
@@ -2513,7 +2513,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Creating Schema &apos;{0}&apos;.
+        ///   Looks up a localized string similar to Creating Schema `{0}`.
         /// </summary>
         internal static string ScriptCreatingSchemaText {
             get {
@@ -2522,7 +2522,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Creating Table &apos;{0}&apos;.
+        ///   Looks up a localized string similar to Creating Table `{0}`.
         /// </summary>
         internal static string ScriptCreatingTableText {
             get {
@@ -2705,7 +2705,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error ocurred trying to refresh data in Excel table {0}..
+        ///   Looks up a localized string similar to An error ocurred trying to refresh data in Excel table &quot;{0}&quot;..
         /// </summary>
         internal static string StandardListObjectRefreshError {
             get {
@@ -2725,7 +2725,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error ocurred trying to refresh data in Pivot Table {0}..
+        ///   Looks up a localized string similar to An error ocurred trying to refresh data in Pivot Table &quot;{0}&quot;..
         /// </summary>
         internal static string StandardPivotTableRefreshError {
             get {
@@ -2752,7 +2752,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error adding data to {0} table..
+        ///   Looks up a localized string similar to Error adding data to `{0}` table..
         /// </summary>
         internal static string TableDataAdditionErrorTitle {
             get {
@@ -2797,7 +2797,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Table {0} already has an Edit operation ongoing..
+        ///   Looks up a localized string similar to Table `{0}` already has an Edit operation ongoing..
         /// </summary>
         internal static string TableWithOperationOngoingError {
             get {
@@ -2851,6 +2851,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable to drop table `{0}`..
+        /// </summary>
+        internal static string UnableToDropTableError {
+            get {
+                return ResourceManager.GetString("UnableToDropTableError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to load databases for the given connection..
         /// </summary>
         internal static string UnableToLoadDatabases {
@@ -2882,7 +2891,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to retrieve data from {0} &apos;{1}&apos;..
+        ///   Looks up a localized string similar to Unable to retrieve data from {0} `{1}`..
         /// </summary>
         internal static string UnableToRetrieveData {
             get {
@@ -2896,6 +2905,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string UnableToSaveConnectionsFileError {
             get {
                 return ResourceManager.GetString("UnableToSaveConnectionsFileError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to unlock tables..
+        /// </summary>
+        internal static string UnableToUnlockTablesError {
+            get {
+                return ResourceManager.GetString("UnableToUnlockTablesError", resourceCulture);
             }
         }
         

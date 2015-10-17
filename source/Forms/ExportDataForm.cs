@@ -824,6 +824,10 @@ namespace MySQL.ForExcel.Forms
       DataTypeComboBox.DataSource = DataTypeBindingSource;
       DataTypeComboBox.DisplayMember = "Key";
       DataTypeComboBox.ValueMember = "Key";
+      DataTypeComboBox.DropDownWidth = MySqlDataType.GetCommonDataTypesLongestDescriptionLength(
+        !Settings.Default.ExportShowAllMySqlDataTypes,
+        DataTypeComboBox.Font,
+        (SystemInformation.VerticalScrollBarWidth * 2) + 2);
       _isUserInput = true;
     }
 

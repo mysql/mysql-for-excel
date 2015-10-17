@@ -121,7 +121,7 @@
     <value>Empty or null DB Schema used for this action.  A valid Schema must be used.</value>
   </data>
   <data name="UnableToRetrieveData" xml:space="preserve">
-    <value>Unable to retrieve data from {0} '{1}'.</value>
+    <value>Unable to retrieve data from {0} `{1}`.</value>
   </data>
   <data name="ConnectionsFileNotFound" xml:space="preserve">
     <value>Workbench connections.xml file not found</value>
@@ -329,16 +329,16 @@
     <value>Updating data rows...{0}{0}</value>
   </data>
   <data name="EditCommitSummaryError" xml:space="preserve">
-    <value>Edited data for Table {0} could not be committed to MySQL.</value>
+    <value>Edited data for Table `{0}` could not be committed to MySQL.</value>
   </data>
   <data name="EditCommitSummarySuccessful" xml:space="preserve">
-    <value>Edited data for Table {0} was committed to MySQL successfully.</value>
+    <value>Edited data for Table `{0}` was committed to MySQL successfully.</value>
   </data>
   <data name="GenericMySQLError" xml:space="preserve">
     <value>MySQL Error {0}:{1}</value>
   </data>
   <data name="TableWithOperationOngoingError" xml:space="preserve">
-    <value>Table {0} already has an Edit operation ongoing.</value>
+    <value>Table `{0}` already has an Edit operation ongoing.</value>
   </data>
   <data name="EditOpenDetailsError" xml:space="preserve">
     <value>In order to perform an UPDATE operation on the table data a primary key is needed. Without a primary key MySQL cannot guarantee that the correct rows in the table will be updated.
@@ -619,13 +619,13 @@ To be able to make modifications on cells not related to MySQL data please exit 
     <value>Local database connections could not be migrated.</value>
   </data>
   <data name="AppendDataDetailsDoneErrorText" xml:space="preserve">
-    <value>Excel data could not be appended to MySQL Table "{0}".</value>
+    <value>Excel data could not be appended to MySQL Table `{0}`.</value>
   </data>
   <data name="AppendDataDetailsDoneSuccessText" xml:space="preserve">
-    <value>Appended Excel data successfully to MySQL Table "{0}".</value>
+    <value>Appended Excel data successfully to MySQL Table `{0}`.</value>
   </data>
   <data name="AppendDataDetailsDoneWarningsText" xml:space="preserve">
-    <value>Appended Excel data with warnings to MySQL Table "{0}".</value>
+    <value>Appended Excel data with warnings to MySQL Table `{0}`.</value>
   </data>
   <data name="ErrorAdoNetText" xml:space="preserve">
     <value>ADO.NET Error:</value>
@@ -637,7 +637,7 @@ To be able to make modifications on cells not related to MySQL data please exit 
     <value>Error while appending rows...</value>
   </data>
   <data name="InsertedExcelDataWithQueryText" xml:space="preserve">
-    <value>Inserted Excel data in MySQL Table "{0}" with the following statements:</value>
+    <value>Inserted Excel data in MySQL Table `{0}` with the following statements:</value>
   </data>
   <data name="WarningSingleText" xml:space="preserve">
     <value>Code {0} - {1}</value>
@@ -673,7 +673,7 @@ To be able to make modifications on cells not related to MySQL data please exit 
     <value>Appended {0} row(s) with {1} warning(s):</value>
   </data>
   <data name="ExportDataTableExecutedQuery" xml:space="preserve">
-    <value>Executed the following statement to create MySQL Table "{0}":</value>
+    <value>Executed the following statement to create MySQL Table `{0}`:</value>
   </data>
   <data name="ExportDataLessRowsThanExpectedInsertedText" xml:space="preserve">
     <value>Attempted to insert {0} row(s), but only {1} row(s) were inserted with no further errors. Please check the MySQL Server log for more information.</value>
@@ -682,13 +682,13 @@ To be able to make modifications on cells not related to MySQL data please exit 
     <value>&lt;Multiple Items&gt;</value>
   </data>
   <data name="ExportDataOperationErrorNoTableText" xml:space="preserve">
-    <value>The MySQL Table "{0}" could not be created.</value>
+    <value>The MySQL Table `{0}` could not be created.</value>
   </data>
   <data name="ExportDataOperationSuccessNoDataText" xml:space="preserve">
-    <value>Created the MySQL Table "{0}" with no data.</value>
+    <value>Created the MySQL Table `{0}` with no data.</value>
   </data>
   <data name="ExportDataOperationSuccessWithDataText" xml:space="preserve">
-    <value>Created the MySQL Table "{0}" with data.</value>
+    <value>Created the MySQL Table `{0}` with data.</value>
   </data>
   <data name="ExportDataRowsInsertedSuccessfullyText" xml:space="preserve">
     <value>Inserted {0} row(s) successfully.</value>
@@ -700,10 +700,10 @@ To be able to make modifications on cells not related to MySQL data please exit 
     <value>Error while inserting rows...</value>
   </data>
   <data name="ExportDataTableCreatedSuccessfullyText" xml:space="preserve">
-    <value>Created the MySQL Table "{0}" successfully.</value>
+    <value>Created the MySQL Table `{0}` successfully.</value>
   </data>
   <data name="ExportDataTableCreatedWithWarningsText" xml:space="preserve">
-    <value>Created the MySQL Table "{0}" with {1} warning(s):</value>
+    <value>Created the MySQL Table `{0}` with {1} warning(s):</value>
   </data>
   <data name="ImportProcedureAllResultSetsHorizontally" xml:space="preserve">
     <value>All Result Sets - Arranged Horizontally</value>
@@ -823,7 +823,7 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
     <value>The following SQL statements produced warnings:</value>
   </data>
   <data name="ScriptCreatingTableText" xml:space="preserve">
-    <value>Creating Table '{0}'</value>
+    <value>Creating Table `{0}`</value>
   </data>
   <data name="ScriptDeletingRowsText" xml:space="preserve">
     <value>Deleting {0}</value>
@@ -871,16 +871,16 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
     <value>Restoring Edit Connection Information</value>
   </data>
   <data name="ExportDataErrorCreatingTableText" xml:space="preserve">
-    <value>The MySQL Table "{0}" could not be created because of the following error(s):</value>
+    <value>The MySQL Table `{0}` could not be created because of the following error(s):</value>
   </data>
   <data name="ExportDataGenericErrorText" xml:space="preserve">
-    <value>Errors found while trying to export data to MySQLTable "{0}".</value>
+    <value>Errors found while trying to export data to MySQLTable `{0}`.</value>
   </data>
   <data name="ExportDataOperationErrorNoRowsText" xml:space="preserve">
-    <value>The MySQL Table "{0}" was not created due errors on rows insertion.</value>
+    <value>The MySQL Table `{0}` was not created due errors on rows insertion.</value>
   </data>
   <data name="TableDataAdditionErrorTitle" xml:space="preserve">
-    <value>Error adding data to {0} table.</value>
+    <value>Error adding data to `{0}` table.</value>
   </data>
   <data name="AppendDataNotSuitableForColumnTypeWarning" xml:space="preserve">
     <value>Appending data is not suitable for the mapped target column's data type.</value>
@@ -934,28 +934,28 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
     <value>The advanced option to create Excel tables for imported data is turned off so relationships cannot be created.</value>
   </data>
   <data name="ScriptCreatingSchemaText" xml:space="preserve">
-    <value>Creating Schema '{0}'</value>
+    <value>Creating Schema `{0}`</value>
   </data>
   <data name="SelectQueryReturnedNothing" xml:space="preserve">
     <value>Select query returned nothing. {0}</value>
   </data>
   <data name="NewSchemaCreatedSuccessfullyText" xml:space="preserve">
-    <value>Created the MySQL Schema "{0}" successfully.</value>
+    <value>Created the MySQL Schema `{0}` successfully.</value>
   </data>
   <data name="NewSchemaCreatedWithWarningsText" xml:space="preserve">
-    <value>Created the MySQL Schema "{0}" with {1} warning(s):</value>
+    <value>Created the MySQL Schema `{0}` with {1} warning(s):</value>
   </data>
   <data name="NewSchemaCreationErrorText" xml:space="preserve">
-    <value>The MySQL Schema "{0}" could not be created because of the following error(s):</value>
+    <value>The MySQL Schema `{0}` could not be created because of the following error(s):</value>
   </data>
   <data name="NewSchemaExecutedQuery" xml:space="preserve">
-    <value>Executed the following statement to create MySQL Schema "{0}":</value>
+    <value>Executed the following statement to create MySQL Schema `{0}`:</value>
   </data>
   <data name="NewSchemaOperationErrorSummaryText" xml:space="preserve">
-    <value>MySQL Schema "{0}" could not be created.</value>
+    <value>MySQL Schema `{0}` could not be created.</value>
   </data>
   <data name="NewSchemaOperationSuccessSummaryText" xml:space="preserve">
-    <value>MySQL Schema "{0}" has been created.</value>
+    <value>MySQL Schema `{0}` has been created.</value>
   </data>
   <data name="ImportMultipleRelationshipsNotSupportedTitleText" xml:space="preserve">
     <value>Excel Relationships cannot be created.</value>
@@ -964,16 +964,16 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
     <value>Selected related Tables: </value>
   </data>
   <data name="ParentWorkbookNullError" xml:space="preserve">
-    <value>The parent workbook of worksheet {0} could not be obtained.</value>
+    <value>The parent workbook of worksheet "{0}" could not be obtained.</value>
   </data>
   <data name="ExcelTableCreationError" xml:space="preserve">
-    <value>An error ocurred trying to create the Excel table {0}</value>
+    <value>An error ocurred trying to create the Excel table `{0}`</value>
   </data>
   <data name="PivotTableCreationError" xml:space="preserve">
-    <value>An error ocurred trying to create the PivotTable {0}</value>
+    <value>An error ocurred trying to create the PivotTable "{0}"</value>
   </data>
   <data name="ImportDataRefreshError" xml:space="preserve">
-    <value>An error ocurred trying to refresh MySQL data in Excel table {0}.</value>
+    <value>An error ocurred trying to refresh MySQL data in Excel table "{0}".</value>
   </data>
   <data name="ImportConnectionInfosMissingConnectionsDetail" xml:space="preserve">
     <value>Some Excel tables could not be reconnected to their corresponding MySQL databases because the connections could not be located.</value>
@@ -1051,7 +1051,7 @@ Since Excel relationships cannot be created, a single PivotTable for the whole E
     <value>There was an error saving the Excel workbook, please try again.</value>
   </data>
   <data name="ImportDataBindError" xml:space="preserve">
-    <value>An error ocurred trying to bind MySQL data to Excel table {0}.</value>
+    <value>An error ocurred trying to bind MySQL data to Excel table "{0}".</value>
   </data>
   <data name="MySQLforExcel_WelcomePanel_Connection_Fabric" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySQLforExcel-WelcomePanel-Connection-Fabric.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -1111,10 +1111,10 @@ Since Excel relationships cannot be created, a single PivotTable for the whole E
     <value>Do you want to continue loading the remaining Pivot Tables?</value>
   </data>
   <data name="StandardListObjectRefreshError" xml:space="preserve">
-    <value>An error ocurred trying to refresh data in Excel table {0}.</value>
+    <value>An error ocurred trying to refresh data in Excel table "{0}".</value>
   </data>
   <data name="StandardPivotTableRefreshError" xml:space="preserve">
-    <value>An error ocurred trying to refresh data in Pivot Table {0}.</value>
+    <value>An error ocurred trying to refresh data in Pivot Table "{0}".</value>
   </data>
   <data name="ValueLessThanZeroError" xml:space="preserve">
     <value>Value must be greater or equal to 0.</value>
@@ -1134,5 +1134,11 @@ This is most likely caused because a single Excel row was selected and then "Fir
     <value>This error is most likely happening because data was imported from a MySQL table or view, and when the Excel Workbook was saved MySQL for Excel could not store the connection information necessary to refresh the data of the Excel table (ListObject).
 
 In order to avoid receiving this error message each time the Excel table is refreshed, please delete the Excel table and import the data again before saving the Excel Workbook.</value>
+  </data>
+  <data name="UnableToDropTableError" xml:space="preserve">
+    <value>Unable to drop table `{0}`.</value>
+  </data>
+  <data name="UnableToUnlockTablesError" xml:space="preserve">
+    <value>Unable to unlock tables.</value>
   </data>
 </root>
