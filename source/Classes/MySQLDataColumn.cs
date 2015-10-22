@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -51,6 +51,11 @@ namespace MySQL.ForExcel.Classes
     private const string DATA_NOT_UNIQUE_WARNING_KEY = "DATA_NOT_UNIQUE";
 
     /// <summary>
+    /// The data type used for columns with no data.
+    /// </summary>
+    private const string DEFAULT_FULL_DATA_TYPE_FOR_EMPTY_COLUMNS = "VarChar(255)";
+
+    /// <summary>
     /// Key used to represent a warning about the column's name being a duplicate of one in another column.
     /// </summary>
     private const string DUPLICATE_NAME_WARNING_KEY = "DUPLICATE_NAME";
@@ -90,11 +95,6 @@ namespace MySQL.ForExcel.Classes
     private string _columnNameForSqlQueries;
 
     /// <summary>
-    /// Flag indicating whether the column's data must be wrapped with quotes to be used in queries.
-    /// </summary>
-    private bool? _columnRequiresQuotes;
-
-    /// <summary>
     /// Flag indicating whether this column has an index automatically created for it.
     /// </summary>
     private bool _createIndex;
@@ -125,6 +125,16 @@ namespace MySQL.ForExcel.Classes
     private bool _primaryKey;
 
     /// <summary>
+    /// The consistent data type that can hold the data for all rows starting from the first row.
+    /// </summary>
+    private string _rowsFromFirstDataType;
+
+    /// <summary>
+    /// The consistent data type that can hold the data for all rows starting from the second row.
+    /// </summary>
+    private string _rowsFromSecondDataType;
+
+    /// <summary>
     /// List of elements included in a SET or ENUM declaration.
     /// </summary>
     private List<string> _setOrEnumElements;
@@ -153,11 +163,12 @@ namespace MySQL.ForExcel.Classes
     {
       _allowNull = false;
       _columnNameForSqlQueries = null;
-      _columnRequiresQuotes = null;
       _excludeColumn = false;
       _invalidSetOrEnumElementsIndexes = null;
       _mappedDataColOrdinal = -1;
       _mySqlDataType = string.Empty;
+      _rowsFromFirstDataType = string.Empty;
+      _rowsFromSecondDataType = string.Empty;
       _setOrEnumElements = null;
       AutoIncrement = false;
       AutoPk = false;
@@ -171,8 +182,6 @@ namespace MySQL.ForExcel.Classes
       MappedDataColName = null;
       PrimaryKey = false;
       RangeColumnIndex = 0;
-      RowsFromFirstDataType = string.Empty;
-      RowsFromSecondDataType = string.Empty;
       StrippedMySqlDataType = string.Empty;
       Unsigned = false;
       SetupWarnings();
@@ -361,12 +370,7 @@ namespace MySQL.ForExcel.Classes
     {
       get
       {
-        if (_columnRequiresQuotes == null)
-        {
-          _columnRequiresQuotes = IsCharOrText || IsDate || IsSetOrEnum || IsTime;
-        }
-
-        return (bool)_columnRequiresQuotes;
+        return MySqlDbType.RequiresQuotesForValue();
       }
     }
 
@@ -499,173 +503,15 @@ namespace MySQL.ForExcel.Classes
     public bool InExportMode { get; private set; }
 
     /// <summary>
-    /// Gets a value indicating whether this column's data type is of binary nature.
-    /// </summary>
-    public bool IsBinary
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(StrippedMySqlDataType))
-        {
-          return false;
-        }
-
-        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
-        return toLowerDataType.Contains("binary");
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether this column's data type can hold boolean values.
-    /// </summary>
-    public bool IsBool
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(StrippedMySqlDataType))
-        {
-          return false;
-        }
-
-        string toLowerDataType = MySqlDataType.ToLowerInvariant();
-        return toLowerDataType.StartsWith("bool") || toLowerDataType == "tinyint(1)" || toLowerDataType == "bit(1)";
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether this column's data type is fixed or variable sized character-based.
-    /// </summary>
-    public bool IsChar
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(StrippedMySqlDataType))
-        {
-          return false;
-        }
-
-        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
-        return toLowerDataType.Contains("char");
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether this column's data type stores any kind of text.
-    /// </summary>
-    public bool IsCharOrText
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(StrippedMySqlDataType))
-        {
-          return false;
-        }
-
-        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
-        return toLowerDataType.Contains("char") || toLowerDataType.Contains("text");
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether this column's data type is used for dates.
-    /// </summary>
-    public bool IsDate
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(StrippedMySqlDataType))
-        {
-          return false;
-        }
-
-        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
-        return toLowerDataType.Contains("date") || toLowerDataType == "timestamp";
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether this column's data type is of floating-point nature.
-    /// </summary>
-    public bool IsDecimal
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(StrippedMySqlDataType))
-        {
-          return false;
-        }
-
-        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
-        return toLowerDataType == "real" || toLowerDataType == "double" || toLowerDataType == "float" || toLowerDataType == "decimal" || toLowerDataType == "numeric";
-      }
-    }
-
-    /// <summary>
     /// Gets a value indicating if the <see cref="DisplayName"/> property value is not a duplicate of the one in another column.
     /// </summary>
     public bool IsDisplayNameDuplicate { get; private set; }
-
-    /// <summary>
-    /// Gets a value indicating whether this column's data type is integer-based.
-    /// </summary>
-    public bool IsInteger
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(StrippedMySqlDataType))
-        {
-          return false;
-        }
-
-        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
-        return toLowerDataType.Contains("int");
-      }
-    }
 
     /// <summary>
     /// Gets a value indicating whether the column's data type is a valid MySQL data type.
     /// </summary>
     public bool IsMySqlDataTypeValid { get; private set; }
 
-    /// <summary>
-    /// Gets a value indicating whether this column's data type is numeric.
-    /// </summary>
-    public bool IsNumeric
-    {
-      get
-      {
-        return IsDecimal || IsInteger;
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether this column's data type is Set or Enumeration.
-    /// </summary>
-    public bool IsSetOrEnum
-    {
-      get
-      {
-        if (string.IsNullOrEmpty(StrippedMySqlDataType))
-        {
-          return false;
-        }
-
-        string toLowerDataType = StrippedMySqlDataType.ToLowerInvariant();
-        return toLowerDataType.StartsWith("set") || toLowerDataType.StartsWith("enum");
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether this column's data type is Time.
-    /// </summary>
-    public bool IsTime
-    {
-      get
-      {
-        return !string.IsNullOrEmpty(StrippedMySqlDataType) &&
-               StrippedMySqlDataType.Equals("time", StringComparison.InvariantCultureIgnoreCase);
-      }
-    }
 
     /// <summary>
     /// Gets or sets the name of the column in a source <see cref="MySqlDataTable"/> from which data will be appended from.
@@ -702,9 +548,9 @@ namespace MySQL.ForExcel.Classes
       private set
       {
         _mySqlDataType = value;
-        _columnRequiresQuotes = null;
         long dataTypeLength;
         StrippedMySqlDataType = DataTypeUtilities.GetStrippedMySqlDataType(_mySqlDataType, true, out dataTypeLength);
+        MySqlDbType = DataTypeUtilities.NameToMySqlType(StrippedMySqlDataType, Unsigned);
         MySqlDataTypeLength = dataTypeLength;
         OnPropertyChanged("MySqlDataType");
       }
@@ -718,16 +564,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a <see cref="MySql.Data.MySqlClient.MySqlDbType"/> object corresponding to this column's data type.
     /// </summary>
-    public MySqlDbType MySqlDbType
-    {
-      get
-      {
-        string strippedType = StrippedMySqlDataType;
-        return !string.IsNullOrEmpty(strippedType)
-          ? DataTypeUtilities.NameToMySqlType(strippedType, Unsigned, false)
-          : MySqlDbType.VarChar;
-      }
-    }
+    public MySqlDbType MySqlDbType { get; private set; }
 
     /// <summary>
     /// Gets the parent table of this column as a <see cref="MySqlDataTable"/> object.
@@ -777,12 +614,38 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the consistent data type that can hold the data for all rows starting from the first row.
     /// </summary>
-    public string RowsFromFirstDataType { get; set; }
+    public string RowsFromFirstDataType
+    {
+      get
+      {
+        return _rowsFromFirstDataType;
+      }
+
+      set
+      {
+        _rowsFromFirstDataType = string.IsNullOrEmpty(value)
+          ? DEFAULT_FULL_DATA_TYPE_FOR_EMPTY_COLUMNS
+          : value;
+      }
+    }
 
     /// <summary>
     /// Gets the consistent data type that can hold the data for all rows starting from the second row.
     /// </summary>
-    public string RowsFromSecondDataType { get; set; }
+    public string RowsFromSecondDataType
+    {
+      get
+      {
+        return _rowsFromSecondDataType;
+      }
+
+      set
+      {
+        _rowsFromSecondDataType = string.IsNullOrEmpty(value)
+          ? DEFAULT_FULL_DATA_TYPE_FOR_EMPTY_COLUMNS
+          : value;
+      }
+    }
 
     /// <summary>
     /// Gets the MySQL data type descriptor without any options wrapped by parenthesis.
@@ -847,38 +710,59 @@ namespace MySQL.ForExcel.Classes
     #endregion Events
 
     /// <summary>
-    /// Checks if the data stored in this column would fit within the given data type.
+    /// Checks if the current data in this column could be stored in the target column.
     /// </summary>
-    /// <param name="mySqlDataType">Data type for a table column supported by MySQL Server.</param>
-    /// <returns><c>true</c> if the data stored in this column would fit, <c>false</c> otherwise.</returns>
-    public bool CanBeOfMySqlDataType(string mySqlDataType)
+    /// <param name="targetColumn">A target <see cref="MySqlDataColumn"/> where the data on this column would be stored.</param>
+    /// <returns><c>true</c> if the current data in this column could be stored in the target column, <c>false</c> otherwise.</returns>
+    public bool CanDataBeStoredInGivenColumn(MySqlDataColumn targetColumn)
     {
-      bool result = true;
-
-      MySqlDataTable parentTable = Table as MySqlDataTable;
-      int rowIdx = 0;
-      if (parentTable == null)
+      if (targetColumn == null)
       {
-        return true;
+        return false;
       }
 
-      foreach (
-        string strValueFromArray in
-          parentTable.Rows.Cast<DataRow>()
+      // Test the data on each row of the parent table in this specific column to check if it could be stored in the target column
+      bool dataFitsIntoType = true;
+      MySqlDataTable parentTable = Table as MySqlDataTable;
+      int rowIdx = 0;
+      if (parentTable != null)
+      {
+        foreach (string strValueFromArray in parentTable.Rows.Cast<DataRow>()
             .Where(dr => !parentTable.FirstRowContainsColumnNames || rowIdx++ != 0)
             .Select(dr => dr[Ordinal].ToString())
             .Where(strValueFromArray => strValueFromArray.Length != 0))
-      {
-        result = StringValueCanBeStoredWithMySqlType(strValueFromArray);
-
-        // If found a value where the data type is not good for it break since there is no need testing more values.
-        if (!result)
         {
-          break;
+          dataFitsIntoType = targetColumn.CanStoreValue(strValueFromArray);
+
+          // If found a value where the data type is not good for it break since there is no need testing more values.
+          if (!dataFitsIntoType)
+          {
+            break;
+          }
         }
       }
 
-      return result;
+      // Update warning stating the column's data type is not suitable for all of its data (in the preview table)
+      // either for the Append or Export Data operation.
+      string warningKey = targetColumn.ParentTable != null && targetColumn.ParentTable.OperationType.IsForAppend()
+        ? DATA_NOT_SUITABLE_APPEND_WARNING_KEY
+        : DATA_NOT_SUITABLE_EXPORT_WARNING_KEY;
+      if (targetColumn._warnings.SetVisibility(warningKey, !dataFitsIntoType))
+      {
+        targetColumn.OnColumnWarningsChanged();
+      }
+
+      return dataFitsIntoType;
+    }
+
+    /// <summary>
+    /// Checks whether a given string value can be converted and stored in this column.
+    /// </summary>
+    /// <param name="strValue">The value as a string representation to store in this column.</param>
+    /// <returns><c>true</c> if the string value can be stored in this column, <c>false</c> otherwise.</returns>
+    public bool CanStoreValue(string strValue)
+    {
+      return MySqlDataType.CanMySqlDataTypeStoreValue(strValue, _setOrEnumElements);
     }
 
     /// <summary>
@@ -991,9 +875,6 @@ namespace MySQL.ForExcel.Classes
       }
 
       var useFormattedValues = ParentTable.IsFormatted;
-      string proposedType;
-      string strippedType = string.Empty;
-      int leftParensIndex;
       var typesListForFirstAndRest = new List<string>(2);
       var typesListFromSecondRow = new List<string>(Table.Rows.Count);
       int[] varCharLengthsFirstRow = { 0, 0 };  // 0 - All rows original datatype varcharmaxlen, 1 - All rows Varchar forced datatype maxlen
@@ -1013,7 +894,7 @@ namespace MySQL.ForExcel.Classes
         // Treat always as a Varchar value first in case all rows do not have a consistent datatype just to see the varchar len calculated by GetMySQLExportDataType
         string valueAsString = rawValue.ToString();
         bool valueOverflow;
-        proposedType = DataTypeUtilities.GetMySqlExportDataType(valueAsString, out valueOverflow);
+        string proposedType = DataTypeUtilities.GetMySqlExportDataType(valueAsString, out valueOverflow);
         if (proposedType == "Bool")
         {
           proposedType = "VarChar(5)";
@@ -1024,6 +905,7 @@ namespace MySQL.ForExcel.Classes
         }
 
         int varCharValueLength;
+        int leftParensIndex;
         if (proposedType != "Text")
         {
           leftParensIndex = proposedType.IndexOf("(", StringComparison.Ordinal);
@@ -1036,7 +918,7 @@ namespace MySQL.ForExcel.Classes
         // Normal datatype detection
         proposedType = DataTypeUtilities.GetMySqlExportDataType(rawValue, out valueOverflow);
         leftParensIndex = proposedType.IndexOf("(", StringComparison.Ordinal);
-        strippedType = leftParensIndex < 0 ? proposedType : proposedType.Substring(0, leftParensIndex);
+        string strippedType = leftParensIndex < 0 ? proposedType : proposedType.Substring(0, leftParensIndex);
         switch (strippedType)
         {
           case "VarChar":
@@ -1071,37 +953,31 @@ namespace MySQL.ForExcel.Classes
         }
       }
 
-      // Get the consistent DataType for all rows except first one.
-      proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListFromSecondRow, decimalMaxLen, varCharMaxLen);
-
-      if (string.IsNullOrEmpty(proposedType) && ParentTable.OperationType.IsForExport())
+      if (typesListFromSecondRow.Count + typesListForFirstAndRest.Count == 0)
       {
-        proposedType = "VarChar(255)";
-        strippedType = "VarChar";
-        typesListForFirstAndRest.Add("VarChar");
-        varCharMaxLen[0] = 255;
-        varCharMaxLen[1] = 255;
+        // There is no data on the column, so set the data types to the default for empty columns.
+        RowsFromFirstDataType = DEFAULT_FULL_DATA_TYPE_FOR_EMPTY_COLUMNS;
+        RowsFromSecondDataType = DEFAULT_FULL_DATA_TYPE_FOR_EMPTY_COLUMNS;
+      }
+      else
+      {
+        // Get the consistent DataType for all rows except first one.
+        RowsFromSecondDataType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(typesListFromSecondRow, decimalMaxLen, varCharMaxLen);
+        if (typesListFromSecondRow.Count > 0)
+        {
+          string parameters;
+          typesListForFirstAndRest.Add(DataTypeUtilities.GetStrippedMySqlDataType(_rowsFromSecondDataType, out parameters));
+        }
+
+        // Get the consistent DataType between first row and the previously computed consistent DataType for the rest of the rows.
+        varCharMaxLen[0] = Math.Max(varCharMaxLen[0], varCharLengthsFirstRow[0]);
+        varCharMaxLen[1] = Math.Max(varCharMaxLen[1], varCharLengthsFirstRow[1]);
+        decimalMaxLen[0] = Math.Max(decimalMaxLen[0], decimalMaxLenFirstRow[0]);
+        decimalMaxLen[1] = Math.Max(decimalMaxLen[1], decimalMaxLenFirstRow[1]);
+        RowsFromFirstDataType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(typesListForFirstAndRest, decimalMaxLen, varCharMaxLen);
       }
 
-      RowsFromSecondDataType = proposedType;
-
-      // Get the consistent DataType between first columnInfoRow and the previously computed consistent DataType for the rest of the rows.
-      if (typesListFromSecondRow.Count > 0)
-      {
-        bool emptyProposedType = string.IsNullOrEmpty(proposedType);
-        leftParensIndex = emptyProposedType ? -1 : proposedType.IndexOf("(", StringComparison.Ordinal);
-        strippedType = leftParensIndex < 0 || emptyProposedType
-          ? proposedType
-          : proposedType.Substring(0, leftParensIndex);
-        typesListForFirstAndRest.Add(strippedType);
-      }
-
-      varCharMaxLen[0] = Math.Max(varCharMaxLen[0], varCharLengthsFirstRow[0]);
-      varCharMaxLen[1] = Math.Max(varCharMaxLen[1], varCharLengthsFirstRow[1]);
-      decimalMaxLen[0] = Math.Max(decimalMaxLen[0], decimalMaxLenFirstRow[0]);
-      decimalMaxLen[1] = Math.Max(decimalMaxLen[1], decimalMaxLenFirstRow[1]);
-      proposedType = DataTypeUtilities.GetConsistentDataTypeOnAllRows(strippedType, typesListForFirstAndRest, decimalMaxLen, varCharMaxLen);
-      RowsFromFirstDataType = proposedType;
+      // Set the DataType in the column depending on the setting to treat the first row of data as the names of the columns
       SetMySqlDataType(ParentTable.FirstRowContainsColumnNames ? RowsFromSecondDataType : RowsFromFirstDataType);
     }
 
@@ -1190,6 +1066,18 @@ namespace MySQL.ForExcel.Classes
       }
 
       return duplicates;
+    }
+
+
+    /// <summary>
+    /// Gets a string representation for null date values.
+    /// </summary>
+    /// <param name="allowsNull">Flag indicating if the column allows null values.</param>
+    /// <returns>A string representation for null date values.</returns>
+    public string GetNullDateValueAsString(out bool allowsNull)
+    {
+      allowsNull = AllowNull;
+      return allowsNull ? "null" : DataTypeUtilities.MYSQL_EMPTY_DATE;
     }
 
     /// <summary>
@@ -1366,13 +1254,13 @@ namespace MySQL.ForExcel.Classes
 
         if (IsMySqlDataTypeValid && testTypeOnData)
         {
-          TestColumnDataTypeAgainstColumnData(MySqlDataType);
+          CanDataBeStoredInGivenColumn(this);
         }
       }
 
       if (ParentTable != null)
       {
-        CreateIndex = ParentTable.AutoIndexIntColumns && IsInteger;
+        CreateIndex = ParentTable.AutoIndexIntColumns && StrippedMySqlDataType.IsMySqlDataTypeInteger();
         if (ParentTable.AutoAllowEmptyNonIndexColumns)
         {
           AllowNull = !PrimaryKey && !CreateIndex;
@@ -1391,174 +1279,6 @@ namespace MySQL.ForExcel.Classes
       }
 
       return IsMySqlDataTypeValid;
-    }
-
-    /// <summary>
-    /// Checks whether a given string value can be converted and stored in a column with the given MySQL data type.
-    /// </summary>
-    /// <param name="strValue">String value to convert and store.</param>
-    /// <returns><c>true</c> if the string value can be stored using the given MySQL data type, <c>false</c> otherwise.</returns>
-    private bool StringValueCanBeStoredWithMySqlType(string strValue)
-    {
-      var mySqlDataType = MySqlDataType.ToLowerInvariant();
-
-      // Return immediately for big data types.
-      if (mySqlDataType.Contains("text") || mySqlDataType == "blob" || mySqlDataType == "tinyblob" || mySqlDataType == "mediumblob" || mySqlDataType == "longblob" || mySqlDataType == "binary" || mySqlDataType == "varbinary")
-      {
-        return true;
-      }
-
-      // Return immediately for spatial data types since values for them can be created in a wide variety of ways
-      // (using WKT, WKB or MySQL spatial functions that return spatial objects), so leave the validation to the MySQL Server.
-      if (mySqlDataType.Contains("curve") || mySqlDataType.Contains("geometry") || mySqlDataType.Contains("line") || mySqlDataType.Contains("curve") || mySqlDataType.Contains("point") || mySqlDataType.Contains("polygon") || mySqlDataType.Contains("surface"))
-      {
-        return true;
-      }
-
-      // Check for boolean
-      if (mySqlDataType.StartsWith("bool") || mySqlDataType == "bit" || mySqlDataType == "bit(1)")
-      {
-        strValue = strValue.ToLowerInvariant();
-        return (strValue == "true" || strValue == "false" || strValue == "0" || strValue == "1" || strValue == "yes" || strValue == "no" || strValue == "ja" || strValue == "nein");
-      }
-
-      // Check for integer values
-      if (mySqlDataType.StartsWith("int") || mySqlDataType.StartsWith("mediumint"))
-      {
-        int tryIntValue;
-        return Int32.TryParse(strValue, out tryIntValue);
-      }
-
-      if (mySqlDataType.StartsWith("year"))
-      {
-        int tryYearValue;
-        return Int32.TryParse(strValue, out tryYearValue) && (tryYearValue >= 0 && tryYearValue < 100) || (tryYearValue > 1900 && tryYearValue < 2156);
-      }
-
-      if (mySqlDataType.StartsWith("tinyint"))
-      {
-        byte tryByteValue;
-        return Byte.TryParse(strValue, out tryByteValue);
-      }
-
-      if (mySqlDataType.StartsWith("smallint"))
-      {
-        short trySmallIntValue;
-        return Int16.TryParse(strValue, out trySmallIntValue);
-      }
-
-      if (mySqlDataType.StartsWith("bigint"))
-      {
-        long tryBigIntValue;
-        return Int64.TryParse(strValue, out tryBigIntValue);
-      }
-
-      if (mySqlDataType.StartsWith("bit"))
-      {
-        ulong tryBitValue;
-        return UInt64.TryParse(strValue, out tryBitValue);
-      }
-
-      // Check for big numeric values
-      if (mySqlDataType.StartsWith("float"))
-      {
-        float tryFloatValue;
-        return Single.TryParse(strValue, out tryFloatValue);
-      }
-
-      if (mySqlDataType.StartsWith("double") || mySqlDataType.StartsWith("real"))
-      {
-        double tryDoubleValue;
-        return Double.TryParse(strValue, out tryDoubleValue);
-      }
-
-      // Check for date and time values.
-      if (mySqlDataType == "time")
-      {
-        TimeSpan tryTimeSpanValue;
-        return TimeSpan.TryParse(strValue, out tryTimeSpanValue);
-      }
-
-      if (mySqlDataType == "date" || mySqlDataType == "datetime" || mySqlDataType == "timestamp")
-      {
-        if (strValue.IsMySqlZeroDateTimeValue())
-        {
-          return true;
-        }
-
-        DateTime tryDateTimeValue;
-        return DateTime.TryParse(strValue, out tryDateTimeValue);
-      }
-
-      // Check of char or varchar.
-      int lParensIndex = mySqlDataType.IndexOf("(", StringComparison.Ordinal);
-      int rParensIndex = mySqlDataType.IndexOf(")", StringComparison.Ordinal);
-      if (mySqlDataType.StartsWith("varchar") || mySqlDataType.StartsWith("char"))
-      {
-        int characterLen;
-        if (lParensIndex >= 0)
-        {
-          string paramValue = mySqlDataType.Substring(lParensIndex + 1, mySqlDataType.Length - lParensIndex - 2);
-          int.TryParse(paramValue, out characterLen);
-        }
-        else
-        {
-          characterLen = 1;
-        }
-
-        return strValue.Length <= characterLen;
-      }
-
-      // Check if enum or set.
-      bool isEnum = mySqlDataType.StartsWith("enum");
-      bool isSet = mySqlDataType.StartsWith("set");
-      if (isSet || isEnum)
-      {
-        if (_setOrEnumElements == null)
-        {
-          return false;
-        }
-
-        strValue = strValue.ToLowerInvariant();
-        var superSet = new HashSet<string>(_setOrEnumElements.Select(el => el.ToLowerInvariant().Trim(new[] {'\''})));
-        if (isEnum)
-        {
-          return superSet.Contains(strValue);
-        }
-
-        string[] valueSet = strValue.Split(new[] { ',' });
-        return superSet.IsSupersetOf(valueSet);
-      }
-
-      // Check for decimal values which is the more complex.
-      bool mayContainFloatingPoint = mySqlDataType.StartsWith("decimal") || mySqlDataType.StartsWith("numeric") || mySqlDataType.StartsWith("double") || mySqlDataType.StartsWith("float") || mySqlDataType.StartsWith("real");
-      int commaPos = mySqlDataType.IndexOf(",", StringComparison.Ordinal);
-      int[] decimalLen = { -1, -1 };
-      if (mayContainFloatingPoint && lParensIndex >= 0 && rParensIndex >= 0 && lParensIndex < rParensIndex)
-      {
-        decimalLen[0] = Int32.Parse(mySqlDataType.Substring(lParensIndex + 1, (commaPos >= 0 ? commaPos : rParensIndex) - lParensIndex - 1));
-        if (commaPos >= 0)
-        {
-          decimalLen[1] = Int32.Parse(mySqlDataType.Substring(commaPos + 1, rParensIndex - commaPos - 1));
-        }
-      }
-
-      int floatingPointPos = strValue.IndexOf(".", StringComparison.Ordinal);
-      bool floatingPointCompliant = true;
-      if (floatingPointPos >= 0)
-      {
-        bool lengthCompliant = strValue.Substring(0, floatingPointPos).Length <= decimalLen[0];
-        bool decimalPlacesCompliant = decimalLen[1] < 0 || strValue.Substring(floatingPointPos + 1, strValue.Length - floatingPointPos - 1).Length <= decimalLen[1];
-        floatingPointCompliant = lengthCompliant && decimalPlacesCompliant;
-      }
-
-      if (!mySqlDataType.StartsWith("decimal") && !mySqlDataType.StartsWith("numeric"))
-      {
-        return false;
-      }
-
-      decimal tryDecimalValue;
-      return Decimal.TryParse(strValue, out tryDecimalValue) && floatingPointCompliant;
     }
 
     /// <summary>
@@ -1603,27 +1323,6 @@ namespace MySQL.ForExcel.Classes
       RangeColumnIndex = fromColumn.RangeColumnIndex;
       UniqueKey = fromColumn.UniqueKey;
       Unsigned = fromColumn.Unsigned;
-    }
-
-    /// <summary>
-    /// Checks if this column's data type is right for the data currently stored in the column.
-    /// </summary>
-    /// <param name="mySqlDataType">The MySQL data type to test the column's data with.</param>
-    /// <returns><c>true</c> if the column's data fits the data type, <c>false</c> otherwise.</returns>
-    public bool TestColumnDataTypeAgainstColumnData(string mySqlDataType)
-    {
-      // Update warning stating the column's data type is not suitable for all of its data (in the preview table)
-      // either for the Append or Export Data operation.
-      bool dataFitsIntoType = mySqlDataType.Length > 0 && CanBeOfMySqlDataType(mySqlDataType);
-      string warningKey = ParentTable != null && ParentTable.OperationType.IsForAppend()
-        ? DATA_NOT_SUITABLE_APPEND_WARNING_KEY
-        : DATA_NOT_SUITABLE_EXPORT_WARNING_KEY;
-      if (_warnings.SetVisibility(warningKey, !dataFitsIntoType))
-      {
-        OnColumnWarningsChanged();
-      }
-
-      return dataFitsIntoType;
     }
 
     /// <summary>

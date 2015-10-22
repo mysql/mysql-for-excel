@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -17,10 +17,12 @@
 
 using System;
 using System.Configuration;
+using System.Drawing;
 using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Interfaces;
@@ -186,6 +188,60 @@ namespace MySQL.ForExcel.Classes
       }
 
       return (possibleBoxedText as string).EscapeStartingEqualSign();
+    }
+
+    /// <summary>
+    /// Generates a random string that is cryptographically sound.
+    /// </summary>
+    /// <param name="size">The size of the string.</param>
+    /// <param name="alphaOnly">Flag indicating whether only alpha characters or alphanumeric ones are used.</param>
+    /// <returns>A random string that is cryptographically sound.</returns>
+    public static string GenerateCryptographicRandomString(int size, bool alphaOnly)
+    {
+      if (size <= 0)
+      {
+        return string.Empty;
+      }
+
+      string chars = alphaOnly ? "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" : "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+      int charsLenght = chars.Length;
+      byte[] data;
+      using (var crypto = new RNGCryptoServiceProvider())
+      {
+        data = new byte[size];
+        crypto.GetBytes(data);
+      }
+
+      var result = new StringBuilder(size);
+      foreach (byte b in data)
+      {
+        var randomIndex = b % charsLenght;
+        result.Append(chars[randomIndex]);
+      }
+
+      return result.ToString();
+    }
+
+    /// <summary>
+    /// Generates a random string that can be used for a password, the first character being non-numeric.
+    /// </summary>
+    /// <param name="size">The size of the password string.</param>
+    /// <returns>A random string that can be used for a password.</returns>
+    public static string GeneratePassword(int size)
+    {
+      return GenerateCryptographicRandomString(1, true) + GenerateCryptographicRandomString(size - 1, false);
+    }
+
+    /// <summary>
+    /// Generates a random string of random size that can be used for a password, the first character being non-numeric.
+    /// </summary>
+    /// <param name="minSize">The minimum size of the password string.</param>
+    /// <param name="maxSize">The maximum size of the password string.</param>
+    /// <returns>A random string of random size that can be used for a password.</returns>
+    public static string GeneratePasswordOfRandomLength(int minSize = 8, int maxSize = 255)
+    {
+      var random = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
+      return GeneratePassword(random.Next(minSize, maxSize));
     }
 
     /// <summary>
@@ -397,6 +453,22 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Checks if the given string value contains a guid in string representation.
+    /// </summary>
+    /// <param name="value">A <see cref="string"/> value.</param>
+    /// <returns><c>true</c> if the given string value contains a guid in string representation, <c>false</c> otherwise.</returns>
+    public static bool IsGuid(this string value)
+    {
+      if (string.IsNullOrEmpty(value))
+      {
+        return false;
+      }
+
+      Guid guid;
+      return Guid.TryParse(value, out guid);
+    }
+
+    /// <summary>
     /// Resets the settings that correspond to the defined section to its default values.
     /// </summary>
     /// <param name="settings">The application defualt settings (extension method)</param>
@@ -589,6 +661,169 @@ namespace MySQL.ForExcel.Classes
       }
 
       return number == 0 ? 0 : number.ToString(CultureInfo.InvariantCulture).Length;
+    }
+
+
+    /// <summary>
+    /// Converts a given <see cref="HorizontalAlignment"/> value into a <see cref="DataGridViewContentAlignment"/> forced to the bottom.
+    /// </summary>
+    /// <param name="horizontalAlignment">A <see cref="HorizontalAlignment"/> value.</param>
+    /// <returns>A <see cref="DataGridViewContentAlignment"/> forced to the bottom.</returns>
+    public static DataGridViewContentAlignment ToBottomAlignment(this HorizontalAlignment horizontalAlignment)
+    {
+      switch (horizontalAlignment)
+      {
+        case HorizontalAlignment.Center:
+          return DataGridViewContentAlignment.BottomCenter;
+
+        case HorizontalAlignment.Left:
+          return DataGridViewContentAlignment.BottomLeft;
+
+        case HorizontalAlignment.Right:
+          return DataGridViewContentAlignment.BottomRight;
+      }
+
+      return DataGridViewContentAlignment.NotSet;
+    }
+
+    /// <summary>
+    /// Converts a <see cref="DataGridViewContentAlignment"/> value into a <see cref="ContentAlignment"/> one.
+    /// </summary>
+    /// <param name="alignment">A <see cref="DataGridViewContentAlignment"/> value.</param>
+    /// <returns>A <see cref="ContentAlignment"/> value.</returns>
+    public static ContentAlignment ToContentAlignment(this DataGridViewContentAlignment alignment)
+    {
+      switch (alignment)
+      {
+        case DataGridViewContentAlignment.BottomCenter:
+          return ContentAlignment.BottomCenter;
+
+        case DataGridViewContentAlignment.BottomLeft:
+          return ContentAlignment.BottomLeft;
+
+        case DataGridViewContentAlignment.BottomRight:
+          return ContentAlignment.BottomRight;
+
+        case DataGridViewContentAlignment.MiddleCenter:
+          return ContentAlignment.MiddleCenter;
+
+        case DataGridViewContentAlignment.MiddleLeft:
+          return ContentAlignment.MiddleLeft;
+
+        case DataGridViewContentAlignment.MiddleRight:
+          return ContentAlignment.MiddleRight;
+
+        case DataGridViewContentAlignment.TopCenter:
+          return ContentAlignment.TopCenter;
+
+        case DataGridViewContentAlignment.TopLeft:
+          return ContentAlignment.TopLeft;
+
+        case DataGridViewContentAlignment.TopRight:
+          return ContentAlignment.TopRight;
+      }
+
+      return ContentAlignment.TopLeft;
+    }
+
+    /// <summary>
+    /// Converts a <see cref="ContentAlignment"/> value into a <see cref="DataGridViewContentAlignment"/> one.
+    /// </summary>
+    /// <param name="alignment">A <see cref="ContentAlignment"/> value.</param>
+    /// <returns>A <see cref="DataGridViewContentAlignment"/> value.</returns>
+    public static DataGridViewContentAlignment ToDataGridViewContentAlignment(this ContentAlignment alignment)
+    {
+      switch (alignment)
+      {
+        case ContentAlignment.BottomCenter:
+          return DataGridViewContentAlignment.BottomCenter;
+
+        case ContentAlignment.BottomLeft:
+          return DataGridViewContentAlignment.BottomLeft;
+
+        case ContentAlignment.BottomRight:
+          return DataGridViewContentAlignment.BottomRight;
+
+        case ContentAlignment.MiddleCenter:
+          return DataGridViewContentAlignment.MiddleCenter;
+
+        case ContentAlignment.MiddleLeft:
+          return DataGridViewContentAlignment.MiddleLeft;
+
+        case ContentAlignment.MiddleRight:
+          return DataGridViewContentAlignment.MiddleRight;
+
+        case ContentAlignment.TopCenter:
+          return DataGridViewContentAlignment.TopCenter;
+
+        case ContentAlignment.TopLeft:
+          return DataGridViewContentAlignment.TopLeft;
+
+        case ContentAlignment.TopRight:
+          return DataGridViewContentAlignment.TopRight;
+      }
+
+      return DataGridViewContentAlignment.NotSet;
+    }
+
+    /// <summary>
+    /// Converts a <see cref="DataGridViewContentAlignment"/> value to a <see cref="StringFormat"/> object representation.
+    /// </summary>
+    /// <param name="gridViewContentAlignment">The <see cref="DataGridViewContentAlignment"/> value to convert.</param>
+    /// <returns>The <see cref="StringFormat"/> object representation.</returns>
+    public static StringFormat ToStringFormat(this DataGridViewContentAlignment gridViewContentAlignment)
+    {
+      var stringFormat = new StringFormat();
+      switch (gridViewContentAlignment)
+      {
+        case DataGridViewContentAlignment.BottomCenter:
+          stringFormat.Alignment = StringAlignment.Center;
+          stringFormat.LineAlignment = StringAlignment.Far;
+          break;
+
+        case DataGridViewContentAlignment.BottomLeft:
+          stringFormat.Alignment = StringAlignment.Near;
+          stringFormat.LineAlignment = StringAlignment.Far;
+          break;
+
+        case DataGridViewContentAlignment.BottomRight:
+          stringFormat.Alignment = StringAlignment.Far;
+          stringFormat.LineAlignment = StringAlignment.Far;
+          break;
+
+        case DataGridViewContentAlignment.MiddleCenter:
+        case DataGridViewContentAlignment.NotSet:
+          stringFormat.Alignment = StringAlignment.Center;
+          stringFormat.LineAlignment = StringAlignment.Center;
+          break;
+
+        case DataGridViewContentAlignment.MiddleLeft:
+          stringFormat.Alignment = StringAlignment.Near;
+          stringFormat.LineAlignment = StringAlignment.Center;
+          break;
+
+        case DataGridViewContentAlignment.MiddleRight:
+          stringFormat.Alignment = StringAlignment.Far;
+          stringFormat.LineAlignment = StringAlignment.Center;
+          break;
+
+        case DataGridViewContentAlignment.TopCenter:
+          stringFormat.Alignment = StringAlignment.Center;
+          stringFormat.LineAlignment = StringAlignment.Near;
+          break;
+
+        case DataGridViewContentAlignment.TopLeft:
+          stringFormat.Alignment = StringAlignment.Near;
+          stringFormat.LineAlignment = StringAlignment.Near;
+          break;
+
+        case DataGridViewContentAlignment.TopRight:
+          stringFormat.Alignment = StringAlignment.Far;
+          stringFormat.LineAlignment = StringAlignment.Near;
+          break;
+      }
+
+      return stringFormat;
     }
   }
 }

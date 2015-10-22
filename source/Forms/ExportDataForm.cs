@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -654,7 +654,10 @@ namespace MySQL.ForExcel.Forms
       Cursor = Cursors.WaitCursor;
       try
       {
-        _exportDataTable = new MySqlDataTable(_previewDataTable, _exportDataRange);
+        _exportDataTable = _previewDataTable.CloneSchema(false, false);
+        _exportDataTable.DetectDatatype = false;
+        _exportDataTable.IsPreviewTable = false;
+        _exportDataTable.SetupColumnsWithData(_exportDataRange, false);
       }
       catch (Exception ex)
       {
@@ -821,6 +824,10 @@ namespace MySQL.ForExcel.Forms
       DataTypeComboBox.DataSource = DataTypeBindingSource;
       DataTypeComboBox.DisplayMember = "Key";
       DataTypeComboBox.ValueMember = "Key";
+      DataTypeComboBox.DropDownWidth = MySqlDataType.GetCommonDataTypesLongestDescriptionLength(
+        !Settings.Default.ExportShowAllMySqlDataTypes,
+        DataTypeComboBox.Font,
+        (SystemInformation.VerticalScrollBarWidth * 2) + 2);
       _isUserInput = true;
     }
 

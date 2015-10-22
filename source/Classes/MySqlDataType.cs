@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -15,8 +15,11 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -176,14 +179,15 @@ namespace MySQL.ForExcel.Classes
           new MySqlDataType("Time", "For columns that only store a time", 0, true, true, true),
           new MySqlDataType("Bool", "Holds values like (0, 1), (True, False) or (Yes, No)", 0, true, true, true),
           new MySqlDataType("BigInt", "For columns containing large whole-number integers with up to 19 digits", 1, true, true, true),
-          new MySqlDataType("Decimal(12, 2)", "Exact decimal numbers with 12 digits with 2 of them after decimal point", 2, false, true, true),
-          new MySqlDataType("Decimal(65, 30)", "Biggest exact decimal numbers with 65 digits with 30 of them after decimal point", 2, false, true, true),
+          new MySqlDataType("Decimal(12, 2)", "Exact decimal numbers with 12 digits, 2 of them after the decimal point", 2, false, true, true),
+          new MySqlDataType("Decimal(65, 30)", "Biggest exact decimal numbers with 65 digits, 30 of them after the decimal point", 2, false, true, true),
           new MySqlDataType("Double", "Biggest float pointing number with approximately 15 decimal places", 2, true, true, true),
 
           // Other data types to be displayed
           new MySqlDataType("Bit", "For columns containing numbers in binary notation", 1, true, true, false),
           new MySqlDataType("Enum", "Holds values from a specified list of enumerated permitted values", -1, true, true, false),
           new MySqlDataType("Set", "String that can have zero or more values out of a list of permitted values", -1, true, true, false),
+          new MySqlDataType("JSON", "Enables efficient access to data in JSON (JavaScript Object Notation) documents.", 0, true, true, false),
           new MySqlDataType("TinyInt", "For columns containing tiny whole-number integers with up to  digits", 1, true, true, false),
           new MySqlDataType("SmallInt", "For columns containing small whole-number integers with up to 5 digits", 1, true, true, false),
           new MySqlDataType("MediumInt", "For columns containing medium whole-number integers with up to 7 digits", 1, true, true, false),
@@ -271,5 +275,24 @@ namespace MySQL.ForExcel.Classes
     public int ParametersCount { get; private set; }
 
     #endregion Properties
+
+    /// <summary>
+    /// Gets the length, in pixels, of the longest description among the specified dictionary of MySQL data types.
+    /// </summary>
+    /// <param name="commonTypesOnly">Flag indicating whether the dictionary of common types or the one with all types is used.</param>
+    /// <param name="font">The <see cref="Font"/> used to draw the text.</param>
+    /// <param name="addedPadding">Length, in pixels, of any padding to add to the computed length.</param>
+    /// <returns>The length, in pixels, of the longest description among the specified dictionary of MySQL data types.</returns>
+    public static int GetCommonDataTypesLongestDescriptionLength(bool commonTypesOnly, Font font, int addedPadding = 0)
+    {
+      int longestLength = 0;
+      var typesDictionary = commonTypesOnly ? CommonDataTypesDictionary : AllDataTypesDictionary;
+      foreach (var dicItem in typesDictionary)
+      {
+        longestLength = Math.Max(longestLength, TextRenderer.MeasureText(dicItem.Value, font).Width);
+      }
+
+      return longestLength + addedPadding;
+    }
   }
 }

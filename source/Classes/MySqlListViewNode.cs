@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -90,9 +90,10 @@ namespace MySQL.ForExcel.Classes
     /// Initializes a new instance of the <see cref="MySqlListViewNode"/> class intended to be a header node containing sub-nodes.
     /// </summary>
     /// <param name="headerTitle">The title text of the tree node.</param>
+    /// <param name="type">The type of MySQL information related to the node.</param>
     /// <param name="excludeFromMultiSelection">Flag indicating whether the tree node is skipped during a multiple selection.</param>
-    public MySqlListViewNode(string headerTitle, bool excludeFromMultiSelection = false)
-      : this(headerTitle, null, MySqlNodeType.Header, excludeFromMultiSelection)
+    public MySqlListViewNode(string headerTitle, MySqlNodeType type, bool excludeFromMultiSelection = false)
+      : this(headerTitle, null, type, excludeFromMultiSelection)
     {
     }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -273,18 +273,19 @@ namespace MySQL.ForExcel.Panels
     }
 
     /// <summary>
-    /// Event delegate method fired when a key is pressed within the <see cref="SchemaFilter"/> control.
+    /// Event delegate method fired when a key is pressed that triggers the search.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void SchemaFilter_KeyDown(object sender, KeyEventArgs e)
+    private void SchemaFilter_SearchFired(object sender, EventArgs e)
     {
-      if (e.KeyCode != Keys.Enter)
+      var searchBox = sender as SearchEdit;
+      if (searchBox == null)
       {
         return;
       }
 
-      _filter = SchemaFilter.Text.Trim().ToUpper();
+      _filter = SchemaFilter.Text.ToUpper();
       LoadSchemas();
     }
 

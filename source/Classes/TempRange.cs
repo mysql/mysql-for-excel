@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014-2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -56,21 +56,20 @@ namespace MySQL.ForExcel.Classes
     /// <param name="hideAndDeleteWorksheet">Flag indicating whether the new temporary <see cref="ExcelInterop.Worksheet"/> will be hidden and deleted when the <see cref="TempRange"/> is disposed.</param>
     /// <param name="createAutoPkRange">Flag indicating whether a sequential numbered column is prepended to the range to represent the values for an AutoPK column.</param>
     /// <param name="firstRowContainsColumnNames">Flag indicating whether the the first row of excelData contains the column names for a new table.</param>
-    /// <param name="dateColumnIndexes">Array of indexes of columns that will populate a date MySQL column.</param>
     /// <param name="limitRowsQuantity">Gets a limit on the number of rows copied from the source range to the temporary range. If less than 1 it means there is no limit.</param>
     /// <param name="disableScreenUpdating">Flag indicating whether screen updating will be disabled to speed up processing.</param>
-    public TempRange(ExcelInterop.Range sourceRange, bool cropToNonEmptyRange, bool skipEmptyColumns, bool hideAndDeleteWorksheet, bool createAutoPkRange, bool firstRowContainsColumnNames = false, int[] dateColumnIndexes = null, int limitRowsQuantity = 0, bool disableScreenUpdating = true)
+    public TempRange(ExcelInterop.Range sourceRange, bool cropToNonEmptyRange, bool skipEmptyColumns, bool hideAndDeleteWorksheet, bool createAutoPkRange, bool firstRowContainsColumnNames = false, int limitRowsQuantity = 0, bool disableScreenUpdating = true)
       : this(sourceRange, cropToNonEmptyRange, skipEmptyColumns, hideAndDeleteWorksheet, limitRowsQuantity, disableScreenUpdating)
     {
       if (createAutoPkRange)
       {
         RangeType = TempRangeType.AutoPkRange;
-        CreateAutoPkTempRange(dateColumnIndexes, firstRowContainsColumnNames);
+        CreateAutoPkTempRange(firstRowContainsColumnNames);
       }
       else
       {
         RangeType = TempRangeType.CopiedRange;
-        CreateCopiedTempRange(dateColumnIndexes);
+        CreateCopiedTempRange();
       }
     }
 
@@ -267,16 +266,15 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Creates a temporary <see cref="ExcelInterop.Range"/> containing a copy of the data in <see cref="SourceRange"/> with a new sequential numeric column prepended to it.
     /// </summary>
-    /// <param name="dateColumnIndexes">Array of indexes of columns that will populate a date MySQL column.</param>
     /// <param name="firstRowContainsColumnNames">Flag indicating whether the the first row of excelData contains the column names for a new table.</param>
-    private void CreateAutoPkTempRange(int[] dateColumnIndexes = null, bool firstRowContainsColumnNames = false)
+    private void CreateAutoPkTempRange(bool firstRowContainsColumnNames = false)
     {
       if (TempWorksheet == null)
       {
         return;
       }
 
-      CreateCopiedTempRange(dateColumnIndexes);
+      CreateCopiedTempRange();
       int rowsCount = Range.Rows.Count;
       ExcelInterop.Range firstColumn = TempWorksheet.Columns[1];
       firstColumn.Insert();
@@ -290,8 +288,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Creates a temporary <see cref="ExcelInterop.Range"/> containing a copy of the data in <see cref="SourceRange"/>.
     /// </summary>
-    /// <param name="dateColumnIndexes">Array of indexes of columns that will populate a date MySQL column.</param>
-    private void CreateCopiedTempRange(int[] dateColumnIndexes = null)
+    private void CreateCopiedTempRange()
     {
       if (TempWorksheet == null)
       {
@@ -306,7 +303,6 @@ namespace MySQL.ForExcel.Classes
         SourceRange = SourceRange.SafeResize(copiedRows, SourceRange.Columns.Count);
       }
 
-      string sourceWorksheetName = SourceRange.Worksheet.Name;
       foreach (ExcelInterop.Range sourceColumnRange in SourceRange.Columns)
       {
         if (SkipEmptyColumns && !sourceColumnRange.ContainsAnyData())
@@ -316,19 +312,8 @@ namespace MySQL.ForExcel.Classes
 
         ExcelInterop.Range targetColumnRange = TempWorksheet.Cells[1, firstTargetColumnIndex];
         targetColumnRange = targetColumnRange.SafeResize(copiedRows, 1);
-        if (dateColumnIndexes != null && dateColumnIndexes.Contains(firstTargetColumnIndex))
-        {
-          string formula = string.Format("=IF({0}!{1}<>0,TEXT({0}!{1},LOCAL_MYSQL_DATE_FORMAT),\"{2}\")",
-            sourceWorksheetName,
-            sourceColumnRange.Address[false, false],
-            DataTypeUtilities.MYSQL_EMPTY_DATE);
-          targetColumnRange.FormulaArray = formula;
-        }
-        else
-        {
-          sourceColumnRange.Copy();
-          targetColumnRange.PasteSpecial(ExcelInterop.XlPasteType.xlPasteValuesAndNumberFormats, ExcelInterop.XlPasteSpecialOperation.xlPasteSpecialOperationNone, false, false);
-        }
+        sourceColumnRange.Copy();
+        targetColumnRange.PasteSpecial(ExcelInterop.XlPasteType.xlPasteValuesAndNumberFormats, ExcelInterop.XlPasteSpecialOperation.xlPasteSpecialOperationNone, false, false);
 
         firstTargetColumnIndex++;
       }

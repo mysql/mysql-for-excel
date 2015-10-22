@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014-2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -122,8 +122,18 @@ namespace MySQL.ForExcel.Classes
         return 0;
       }
 
-      string sql = string.Format("SELECT COUNT(*) FROM `{0}`.`{1}`", Connection.Schema, Name);
-      object objCount = MySqlHelper.ExecuteScalar(Connection.GetConnectionStringBuilder().ConnectionString, sql);
+      object objCount = null;
+      try
+      {
+        string sql = string.Format("SELECT COUNT(*) FROM `{0}`.`{1}`", Connection.Schema, Name);
+        objCount = MySqlHelper.ExecuteScalar(Connection.GetConnectionStringBuilder().ConnectionString, sql);
+      }
+      catch (Exception ex)
+      {
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, this is DbTable ? "table" : "view", Name), ex.Message);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
+
       return objCount != null ? (long)objCount : 0;
     }
 

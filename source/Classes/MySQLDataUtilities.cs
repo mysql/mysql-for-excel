@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -96,8 +96,16 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      string sql = string.Format("DROP TABLE IF EXISTS `{0}`.`{1}`", connection.Schema, tableName);
-      MySqlHelper.ExecuteNonQuery(connection.GetConnectionStringBuilder().ConnectionString, sql);
+      try
+      {
+        string sql = string.Format("DROP TABLE IF EXISTS `{0}`.`{1}`", connection.Schema, tableName);
+        MySqlHelper.ExecuteNonQuery(connection.GetConnectionStringBuilder().ConnectionString, sql);
+      }
+      catch (Exception ex)
+      {
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToDropTableError, tableName), ex.Message);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
     }
 
     /// <summary>
@@ -296,8 +304,9 @@ namespace MySQL.ForExcel.Classes
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="schemaName">The schema the MySQL table belongs to.</param>
     /// <param name="tableName">The name of a MySQL table.</param>
+    /// <param name="beautifyDataTypes">Flag indicating whether the data types are camel cased as shown in the Export Data data type combo box.</param>
     /// <returns>A table containing schema information for columns contained in a MySQL table with the given name.</returns>
-    public static MySqlColumnsInformationTable GetColumnsInformationTable(this MySqlWorkbenchConnection connection, string schemaName, string tableName)
+    public static MySqlColumnsInformationTable GetColumnsInformationTable(this MySqlWorkbenchConnection connection, string schemaName, string tableName, bool beautifyDataTypes = false)
     {
       if (connection == null)
       {
@@ -314,9 +323,16 @@ namespace MySQL.ForExcel.Classes
       var columnsInfoTable = new MySqlColumnsInformationTable(schemaTable.TableName);
       foreach (DataRow row in schemaTable.Rows)
       {
+        string dataType = row["COLUMN_TYPE"].ToString();
+        if (beautifyDataTypes)
+        {
+          bool isValidMySqlType;
+          dataType = DataTypeUtilities.BeautifyMySqlDataType(dataType, false, out isValidMySqlType);
+        }
+
         var infoRow = columnsInfoTable.NewRow();
         infoRow["Name"] = row["COLUMN_NAME"];
-        infoRow["Type"] = row["COLUMN_TYPE"];
+        infoRow["Type"] = dataType;
         infoRow["Null"] = row["IS_NULLABLE"];
         infoRow["Key"] = row["COLUMN_KEY"];
         infoRow["Default"] = row["COLUMN_DEFAULT"];
@@ -434,16 +450,22 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      var connectionBuilder = connection.GetConnectionStringBuilder();
-      connectionBuilder.AllowUserVariables = true;
-      DataSet ds = MySqlHelper.ExecuteDataset(connectionBuilder.ConnectionString, query);
-      if (ds == null || ds.Tables.Count <= 0 || tableIndex < 0 || tableIndex >= ds.Tables.Count)
+      DataSet ds = null;
+      try
       {
-        return null;
+        var connectionBuilder = connection.GetConnectionStringBuilder();
+        connectionBuilder.AllowUserVariables = true;
+        ds = MySqlHelper.ExecuteDataset(connectionBuilder.ConnectionString, query);
+      }
+      catch (Exception ex)
+      {
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, "from query: ", query), ex.Message);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
 
-      DataTable retTable = ds.Tables[tableIndex];
-      return retTable;
+      return ds == null || ds.Tables.Count <= 0 || tableIndex < 0 || tableIndex >= ds.Tables.Count
+        ? null
+        : ds.Tables[tableIndex];
     }
 
     /// <summary>
@@ -531,7 +553,7 @@ namespace MySQL.ForExcel.Classes
         return string.Empty;
       }
 
-      bool requireQuotes = parameter.DbType.RequiresQuotesForValue();
+      bool requireQuotes = parameter.MySqlDbType.RequiresQuotesForValue();
       return string.Format("{0} @{1} = {2}{3}{2}",
         firstParameter ? "SET" : ",",
         parameter.ParameterName,
@@ -648,8 +670,18 @@ namespace MySQL.ForExcel.Classes
         return false;
       }
 
-      string sql = string.Format("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{0}' AND table_name = '{1}'", schemaName, tableName.EscapeDataValueString());
-      object objCount = MySqlHelper.ExecuteScalar(connection.GetConnectionStringBuilder().ConnectionString, sql);
+      object objCount = null;
+      try
+      {
+        string sql = string.Format("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{0}' AND table_name = '{1}'", schemaName, tableName.EscapeDataValueString());
+        objCount = MySqlHelper.ExecuteScalar(connection.GetConnectionStringBuilder().ConnectionString, sql);
+      }
+      catch (Exception ex)
+      {
+        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, string.Format("`{0}`.", schemaName), tableName), ex.Message);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
+
       long retCount = objCount != null ? (long)objCount : 0;
       return retCount > 0;
     }
@@ -817,8 +849,16 @@ namespace MySQL.ForExcel.Classes
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     public static void UnlockTablesInClientSession(this MySqlWorkbenchConnection connection)
     {
-      const string sql = "UNLOCK TABLES";
-      MySqlHelper.ExecuteNonQuery(connection.GetConnectionStringBuilder().ConnectionString, sql);
+      try
+      {
+        const string sql = "UNLOCK TABLES";
+        MySqlHelper.ExecuteNonQuery(connection.GetConnectionStringBuilder().ConnectionString, sql);
+      }
+      catch (Exception ex)
+      {
+        MiscUtilities.ShowCustomizedErrorDialog(Resources.UnableToUnlockTablesError, ex.Message);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
+      }
     }
 
     /// <summary>

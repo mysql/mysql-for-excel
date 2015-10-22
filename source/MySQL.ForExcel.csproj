@@ -236,6 +236,8 @@
     <Compile Include="Classes\DbTable.cs" />
     <Compile Include="Classes\DbView.cs" />
     <Compile Include="Classes\EventArguments\ColumnWarningsChangedArgs.cs" />
+    <Compile Include="Classes\EventArguments\HeaderCellColumnSpanChangedArgs.cs" />
+    <Compile Include="Classes\EventArguments\HeaderCellTextChangedArgs.cs" />
     <Compile Include="Classes\EventArguments\TableWarningsChangedArgs.cs" />
     <Compile Include="Classes\Exceptions\MySqlDataLoadException.cs" />
     <Compile Include="Classes\Exceptions\ParentWorkbookNullException.cs" />
@@ -248,6 +250,9 @@
     <Compile Include="Classes\Exceptions\UnhandledMySqlTypeException.cs" />
     <Compile Include="Classes\ListViewColumnSorter.cs" />
     <Compile Include="Classes\MiscUtilities.cs" />
+    <Compile Include="Classes\MultiHeaderCell.cs" />
+    <Compile Include="Classes\MultiHeaderCellsSpanningInfo.cs" />
+    <Compile Include="Classes\MultiHeaderRow.cs" />
     <Compile Include="Classes\MySqlColumnMapping.cs" />
     <Compile Include="Classes\MySqlDataColumn.cs">
       <SubType>Component</SubType>

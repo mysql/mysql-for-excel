@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -325,7 +325,7 @@ namespace MySQL.ForExcel.Classes
       OperationType = DataOperationType.Append;
       if (fetchColumnsSchemaInfo)
       {
-        CreateTableSchema(tableName);
+        CreateTableSchema(tableName, true);
       }
 
       _mysqlMaxAllowedPacket = WbConnection.GetMySqlServerMaxAllowedPacket();
@@ -726,7 +726,7 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a value indicating whether data type for each column is automatically detected when data is loaded by the <see cref="SetupColumnsWithData"/> method.
+    /// Gets or sets a value indicating whether data type for each column is automatically detected when data is loaded by the <see cref="SetupColumnsWithData"/> method.
     /// </summary>
     public bool DetectDatatype
     {
@@ -1431,7 +1431,20 @@ namespace MySQL.ForExcel.Classes
       var comparisonMethod = caseSensitive
         ? StringComparison.InvariantCulture
         : StringComparison.InvariantCultureIgnoreCase;
-      var mySqlCol = Columns.Cast<MySqlDataColumn>().FirstOrDefault(col => !skipExcludedColumns || !col.ExcludeColumn && col.Ordinal != exceptAtIndex && string.Equals(useDisplayName ? col.DisplayName : col.ColumnName, columnName, comparisonMethod));
+      MySqlDataColumn mySqlCol = null;
+      foreach (MySqlDataColumn col in Columns)
+      {
+        if ((col.ExcludeColumn && skipExcludedColumns)
+            || col.Ordinal == exceptAtIndex
+            || !string.Equals(useDisplayName ? col.DisplayName : col.ColumnName, columnName, comparisonMethod))
+        {
+          continue;
+        }
+
+        mySqlCol = col;
+        break;
+      }
+
       return mySqlCol != null ? mySqlCol.Ordinal : -1;
     }
 
@@ -1813,7 +1826,7 @@ namespace MySQL.ForExcel.Classes
         }
 
         // Format columns that have a MySQL TIME data type
-        foreach (var col in Columns.Cast<MySqlDataColumn>().Where(col => col.IsTime))
+        foreach (var col in Columns.Cast<MySqlDataColumn>().Where(col => col.StrippedMySqlDataType.IsMySqlDataTypeTime()))
         {
           ExcelInterop.Range firstColumnDataCell = fillingRange.Cells[headerRowModifier + 1, col.Ordinal + 1];
           var dataColumnRange = firstColumnDataCell.Resize[cappedNumRows, 1];
@@ -2028,10 +2041,7 @@ namespace MySQL.ForExcel.Classes
       Clear();
 
       // Add the Excel data to rows in this table.
-      var dateColumnIndexes = new List<int>(Columns.Count);
-      int dateColumnIndexAdjust = AddPrimaryKeyColumn ? 1 : 0;
-      dateColumnIndexes.AddRange(from MySqlDataColumn column in Columns where column.IsDate select column.RangeColumnIndex - dateColumnIndexAdjust);
-      using (var temporaryRange = new TempRange(dataRange, true, false, true, _addPrimaryKeyColumn, _firstRowContainsColumnNames, dateColumnIndexes.ToArray(), limitRowsQuantity))
+      using (var temporaryRange = new TempRange(dataRange, true, false, true, _addPrimaryKeyColumn, _firstRowContainsColumnNames, limitRowsQuantity))
       {
         CreateColumns(temporaryRange, recreateColumnsFromData);
         bool success = AddExcelData(temporaryRange);
@@ -2310,7 +2320,8 @@ namespace MySQL.ForExcel.Classes
     /// Creates columns for this table using the information schema of a MySQL table with the given name to mirror their properties.
     /// </summary>
     /// <param name="tableName">Name of the table.</param>
-    private void CreateTableSchema(string tableName)
+    /// <param name="beautifyDataTypes">Flag indicating whether the data types are camel cased as shown in the Export Data data type combo box.</param>
+    private void CreateTableSchema(string tableName, bool beautifyDataTypes = false)
     {
       string tableCharSet;
       string tableCollation = WbConnection.GetTableCollation(null, tableName, out tableCharSet);
@@ -2320,7 +2331,7 @@ namespace MySQL.ForExcel.Classes
         Collation = tableCollation;
       }
 
-      var columnsInfoTable = WbConnection.GetColumnsInformationTable(null, tableName);
+      var columnsInfoTable = WbConnection.GetColumnsInformationTable(null, tableName, beautifyDataTypes);
       CreateTableSchema(columnsInfoTable);
     }
 

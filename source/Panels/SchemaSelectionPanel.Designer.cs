@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -136,12 +136,11 @@ namespace MySQL.ForExcel.Panels
       this.SchemasList.DescriptionColor = System.Drawing.Color.Silver;
       this.SchemasList.DescriptionColorOpacity = 1D;
       this.SchemasList.DescriptionFont = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.SchemasList.DescriptionTextVerticalPixelsOffset = 0;
-      this.SchemasList.DrawMode = System.Windows.Forms.TreeViewDrawMode.OwnerDrawAll;
+      this.SchemasList.DescriptionTextVerticalOffset = 0;
+      this.SchemasList.DisplayImagesOfDisabledNodesInGrayScale = true;
       this.SchemasList.ExpandedIcon = global::MySQL.ForExcel.Properties.Resources.ArrowDown;
       this.SchemasList.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.SchemasList.ImageHorizontalPixelsOffset = 14;
-      this.SchemasList.ImageToTextHorizontalPixelsOffset = 3;
+      this.SchemasList.ImageHorizontalOffset = 14;
       this.SchemasList.Indent = 18;
       this.SchemasList.ItemHeight = 10;
       this.SchemasList.Location = new System.Drawing.Point(9, 226);
@@ -149,11 +148,14 @@ namespace MySQL.ForExcel.Panels
       this.SchemasList.Name = "SchemasList";
       this.SchemasList.NodeHeightMultiple = 3;
       this.SchemasList.NodeImages = this.LargeImagesList;
+      this.SchemasList.ScaledImagesVerticalSpacing = 1;
+      this.SchemasList.ScaleImages = false;
       this.SchemasList.ShowNodeToolTips = true;
       this.SchemasList.Size = new System.Drawing.Size(242, 325);
       this.SchemasList.TabIndex = 23;
+      this.SchemasList.TextHorizontalOffset = 3;
       this.SchemasList.TitleColorOpacity = 0.8D;
-      this.SchemasList.TitleTextVerticalPixelsOffset = 0;
+      this.SchemasList.TitleTextVerticalOffset = 0;
       this.SchemasList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.SchemasList_AfterSelect);
       this.SchemasList.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.SchemasList_NodeMouseDoubleClick);
       // 
@@ -192,8 +194,8 @@ namespace MySQL.ForExcel.Panels
       this.CreateNewSchemaHotLabel.DescriptionColorOpacity = 0.6D;
       this.CreateNewSchemaHotLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.CreateNewSchemaHotLabel.DescriptionShadowOpacity = 0.4D;
-      this.CreateNewSchemaHotLabel.DescriptionShadowPixelsXOffset = 0;
-      this.CreateNewSchemaHotLabel.DescriptionShadowPixelsYOffset = 1;
+      this.CreateNewSchemaHotLabel.DescriptionShadowXOffset = 0;
+      this.CreateNewSchemaHotLabel.DescriptionShadowYOffset = 1;
       this.CreateNewSchemaHotLabel.DisabledImage = null;
       this.CreateNewSchemaHotLabel.DrawShadow = true;
       this.CreateNewSchemaHotLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -209,11 +211,11 @@ namespace MySQL.ForExcel.Panels
       this.CreateNewSchemaHotLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.CreateNewSchemaHotLabel.TitleColorOpacity = 0.95D;
       this.CreateNewSchemaHotLabel.TitleDescriptionPixelsSpacing = 0;
-      this.CreateNewSchemaHotLabel.TitlePixelsXOffset = 3;
-      this.CreateNewSchemaHotLabel.TitlePixelsYOffset = 0;
       this.CreateNewSchemaHotLabel.TitleShadowOpacity = 0.2D;
-      this.CreateNewSchemaHotLabel.TitleShadowPixelsXOffset = 0;
-      this.CreateNewSchemaHotLabel.TitleShadowPixelsYOffset = 1;
+      this.CreateNewSchemaHotLabel.TitleShadowXOffset = 0;
+      this.CreateNewSchemaHotLabel.TitleShadowYOffset = 1;
+      this.CreateNewSchemaHotLabel.TitleXOffset = 3;
+      this.CreateNewSchemaHotLabel.TitleYOffset = 0;
       this.CreateNewSchemaHotLabel.Click += new System.EventHandler(this.CreateNewSchemaHotLabel_Click);
       // 
       // UpperPanel
@@ -234,7 +236,6 @@ namespace MySQL.ForExcel.Panels
       // 
       // SeparatorImage
       // 
-      this.SeparatorImage.BackColor = System.Drawing.Color.Transparent;
       this.SeparatorImage.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Separator;
       this.SeparatorImage.Location = new System.Drawing.Point(9, 136);
       this.SeparatorImage.Name = "SeparatorImage";
@@ -258,13 +259,18 @@ namespace MySQL.ForExcel.Panels
             | System.Windows.Forms.AnchorStyles.Right)));
       this.SchemaFilter.BackColor = System.Drawing.SystemColors.Window;
       this.SchemaFilter.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+      this.SchemaFilter.ImageXOffset = 3;
       this.SchemaFilter.Location = new System.Drawing.Point(9, 199);
       this.SchemaFilter.Name = "SchemaFilter";
       this.SchemaFilter.NoTextLabel = "Filter Schemas";
+      this.SchemaFilter.NoTextLabelColor = System.Drawing.SystemColors.InactiveCaption;
+      this.SchemaFilter.ScaleImage = false;
+      this.SchemaFilter.SearchFiredOnLeave = false;
       this.SchemaFilter.SearchImage = global::MySQL.ForExcel.Properties.Resources.ExcelAddinFilter;
       this.SchemaFilter.Size = new System.Drawing.Size(242, 21);
       this.SchemaFilter.TabIndex = 32;
-      this.SchemaFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SchemaFilter_KeyDown);
+      this.SchemaFilter.TextColor = System.Drawing.SystemColors.ControlText;
+      this.SchemaFilter.SearchFired += new System.EventHandler(this.SchemaFilter_SearchFired);
       // 
       // SelectSchemaHotLabel
       // 
@@ -275,8 +281,8 @@ namespace MySQL.ForExcel.Panels
       this.SelectSchemaHotLabel.DescriptionColorOpacity = 0.6D;
       this.SelectSchemaHotLabel.DescriptionFont = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.SelectSchemaHotLabel.DescriptionShadowOpacity = 0.4D;
-      this.SelectSchemaHotLabel.DescriptionShadowPixelsXOffset = 0;
-      this.SelectSchemaHotLabel.DescriptionShadowPixelsYOffset = 1;
+      this.SelectSchemaHotLabel.DescriptionShadowXOffset = 0;
+      this.SelectSchemaHotLabel.DescriptionShadowYOffset = 1;
       this.SelectSchemaHotLabel.DisabledImage = null;
       this.SelectSchemaHotLabel.DrawShadow = true;
       this.SelectSchemaHotLabel.Font = new System.Drawing.Font("Tahoma", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -292,11 +298,11 @@ namespace MySQL.ForExcel.Panels
       this.SelectSchemaHotLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.SelectSchemaHotLabel.TitleColorOpacity = 0.95D;
       this.SelectSchemaHotLabel.TitleDescriptionPixelsSpacing = 0;
-      this.SelectSchemaHotLabel.TitlePixelsXOffset = 3;
-      this.SelectSchemaHotLabel.TitlePixelsYOffset = 0;
       this.SelectSchemaHotLabel.TitleShadowOpacity = 0.2D;
-      this.SelectSchemaHotLabel.TitleShadowPixelsXOffset = 0;
-      this.SelectSchemaHotLabel.TitleShadowPixelsYOffset = 1;
+      this.SelectSchemaHotLabel.TitleShadowXOffset = 0;
+      this.SelectSchemaHotLabel.TitleShadowYOffset = 1;
+      this.SelectSchemaHotLabel.TitleXOffset = 3;
+      this.SelectSchemaHotLabel.TitleYOffset = 0;
       // 
       // InstructionsLabel
       // 

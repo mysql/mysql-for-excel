@@ -487,5 +487,31 @@ namespace MySQL.ForExcel.Properties {
                 this["DeleteAutomaticallyOrphanedConnectionInfos"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AppendShowDataTypes {
+            get {
+                return ((bool)(this["AppendShowDataTypes"]));
+            }
+            set {
+                this["AppendShowDataTypes"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AppendConfirmColumnMappingOverwriting {
+            get {
+                return ((bool)(this["AppendConfirmColumnMappingOverwriting"]));
+            }
+            set {
+                this["AppendConfirmColumnMappingOverwriting"] = value;
+            }
+        }
     }
 }

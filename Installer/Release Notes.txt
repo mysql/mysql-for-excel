@@ -1,3 +1,31 @@
+MySQL for Excel 1.3.5 Release Notes
+------------------------------------
+
+Welcome to the release notes for MySQL for Excel 1.3.5
+
+* Added support for JSON data type columns. The JSON data type appears now as a selectable one in the Export
+  Data dialog for columns (if the advanced option to show all data types is selected). All data operations
+  (Import, Export, Append and Edit) work with the new JSON data type.
+- Added an option to the Advanced Options dialog for Append Data operations, called "Show column data types
+  above column names", that when checked data type information for columns on source and target grids of the
+  Append Data dialog is shown. Showing the data types can sometimes aid users when doing manual mapping of
+  columns.
+- Stopped using some hidden defined names to store formulas to transform date values into a the date format
+  used by MySQL. These defined names were being detected by Excel as macros or user functions that could not
+  be saved in macro-free workbooks, thus generating an annoying warning every time a Workbook was saved, if
+  the add-in was active.
+- Fixed a bug where connection information for ListObjects created by MySQL for Excel when importing data was
+  not being saved, so after the Workbook was re-opened a COM Exception was being thrown when attempting to
+  refresh the contents of those ListObects.
+- Fixed code in the Append Data dialog that was incorrectly mapping columns when only a single row of Excel
+  data was selected to append. Additionally validated that if a single row of Excel data is selected and then
+  on the Append Data dialog "First Row Contains Column Names" is checked, a warning is displayed stating no
+  rows are available to complete the append operation.
+* Other bug fixes (for a complete list refer to the CHANGES file).
+
+
+
+
 MySQL for Excel 1.3.4 Release Notes
 ------------------------------------
 
@@ -28,8 +56,8 @@ Welcome to the release notes for MySQL for Excel 1.3.4
 
 Known Issues
 --------------------
-* Upgrading from versions 1.3.2 and lower is not possible due to a bug fixed in this version (1.3.3).
-  In that scenario the version (1.3.2 or lower) must be uninstalled first. Upgrading from 1.3.3 will work
+* Upgrading from versions 1.3.2 and lower is not possible due to a bug fixed in version 1.3.3.
+  In that scenario the version (1.3.2 or lower) must be uninstalled first. Upgrading from 1.3.3 and higher works
   as expected.
   
   
