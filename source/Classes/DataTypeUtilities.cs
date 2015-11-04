@@ -903,11 +903,10 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="mySqlType">A MySQL data type name.</param>
     /// <param name="unsigned">Flag indicating whether the type is unsigned.</param>
-    /// <param name="bitPrecision">The precision for a bit data type to determine if it represents a boolean value or a number.</param>
     /// <param name="defaultValue">The default value of the data type.</param>
     /// <param name="realAsFloat">Flag indicating if real is translated to float or to double.</param>
     /// <returns>The <see cref="MySqlDbType"/> corresponding to the given MySQL data type.</returns>
-    public static MySqlDbType GetMySqlDbType(string mySqlType, bool unsigned, byte bitPrecision, out object defaultValue, bool realAsFloat = false)
+    public static MySqlDbType GetMySqlDbType(string mySqlType, bool unsigned, out object defaultValue, bool realAsFloat = false)
     {
       if (string.IsNullOrEmpty(mySqlType))
       {
@@ -920,14 +919,7 @@ namespace MySQL.ForExcel.Classes
       {
         case "bit":
           dbType = MySqlDbType.Bit;
-          if (bitPrecision == 1)
-          {
-            defaultValue = false;
-          }
-          else
-          {
-            defaultValue = 0;
-          }
+          defaultValue = 0;
           break;
 
         case "int":
@@ -937,6 +929,8 @@ namespace MySQL.ForExcel.Classes
           break;
 
         case "tinyint":
+        case "bool":
+        case "boolean":
           dbType = unsigned ? MySqlDbType.UByte : MySqlDbType.Byte;
           defaultValue = (Byte)0;
           break;
@@ -976,7 +970,6 @@ namespace MySQL.ForExcel.Classes
         case "dec":
         case "decimal":
         case "fixed":
-          // Check with Connector/NET team if dbType = MySqlDbType.NewDecimal if connection.driver.Version.isAtLeast(5, 0, 3)
           dbType = MySqlDbType.Decimal;
           defaultValue = (Double)0;
           break;
@@ -1722,7 +1715,7 @@ namespace MySQL.ForExcel.Classes
     public static MySqlDbType NameToMySqlType(string strippedMySqlDataType, bool unsigned, bool realAsFloat = false)
     {
       object defaultValue;
-      return GetMySqlDbType(strippedMySqlDataType, unsigned, 0, out defaultValue, realAsFloat);
+      return GetMySqlDbType(strippedMySqlDataType, unsigned, out defaultValue, realAsFloat);
     }
 
     /// <summary>

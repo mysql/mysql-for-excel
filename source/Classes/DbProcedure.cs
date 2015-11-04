@@ -293,42 +293,60 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      var parametersCount = parametersTable.Rows.Count;
-      Parameters = new List<Tuple<string, MySqlParameter>>(parametersCount);
-      for (int paramIdx = 0; paramIdx < parametersCount; paramIdx++)
+      try
       {
-        DataRow dr = parametersTable.Rows[paramIdx];
-        string dataType = dr["DATA_TYPE"].ToString().ToLowerInvariant();
-        string paramName = dr["PARAMETER_NAME"].ToString();
-        ParameterDirection paramDirection = ParameterDirection.Input;
-        int paramSize = dr["CHARACTER_MAXIMUM_LENGTH"] != null && dr["CHARACTER_MAXIMUM_LENGTH"] != DBNull.Value ? Convert.ToInt32(dr["CHARACTER_MAXIMUM_LENGTH"]) : 0;
-        byte paramPrecision = dr["NUMERIC_PRECISION"] != null && dr["NUMERIC_PRECISION"] != DBNull.Value ? Convert.ToByte(dr["NUMERIC_PRECISION"]) : (byte)0;
-        byte paramScale = dr["NUMERIC_SCALE"] != null && dr["NUMERIC_SCALE"] != DBNull.Value ? Convert.ToByte(dr["NUMERIC_SCALE"]) : (byte)0;
-        bool paramUnsigned = dr["DTD_IDENTIFIER"].ToString().Contains("unsigned");
-        string paramDirectionStr = paramName != "RETURN_VALUE" ? dr["PARAMETER_MODE"].ToString().ToLowerInvariant() : "return";
-
-        switch (paramDirectionStr)
+        var parametersCount = parametersTable.Rows.Count;
+        Parameters = new List<Tuple<string, MySqlParameter>>(parametersCount);
+        for (int paramIdx = 0; paramIdx < parametersCount; paramIdx++)
         {
-          case "in":
-            paramDirection = ParameterDirection.Input;
-            break;
+          DataRow dr = parametersTable.Rows[paramIdx];
+          string dataType = dr["DATA_TYPE"].ToString().ToLowerInvariant();
+          string paramName = dr["PARAMETER_NAME"].ToString();
+          ParameterDirection paramDirection = ParameterDirection.Input;
+          int paramSize = dr["CHARACTER_MAXIMUM_LENGTH"] != null && dr["CHARACTER_MAXIMUM_LENGTH"] != DBNull.Value
+            ? Convert.ToInt32(dr["CHARACTER_MAXIMUM_LENGTH"])
+            : 0;
+          byte paramPrecision = dr["NUMERIC_PRECISION"] != null && dr["NUMERIC_PRECISION"] != DBNull.Value
+            ? Convert.ToByte(dr["NUMERIC_PRECISION"])
+            : (byte) 0;
+          byte paramScale = dr["NUMERIC_SCALE"] != null && dr["NUMERIC_SCALE"] != DBNull.Value
+            ? Convert.ToByte(dr["NUMERIC_SCALE"])
+            : (byte) 0;
+          bool paramUnsigned = dr["DTD_IDENTIFIER"].ToString().Contains("unsigned");
+          string paramDirectionStr = paramName != "RETURN_VALUE"
+            ? dr["PARAMETER_MODE"].ToString().ToLowerInvariant()
+            : "return";
 
-          case "out":
-            paramDirection = ParameterDirection.Output;
-            break;
+          switch (paramDirectionStr)
+          {
+            case "in":
+              paramDirection = ParameterDirection.Input;
+              break;
 
-          case "inout":
-            paramDirection = ParameterDirection.InputOutput;
-            break;
+            case "out":
+              paramDirection = ParameterDirection.Output;
+              break;
 
-          case "return":
-            paramDirection = ParameterDirection.ReturnValue;
-            break;
+            case "inout":
+              paramDirection = ParameterDirection.InputOutput;
+              break;
+
+            case "return":
+              paramDirection = ParameterDirection.ReturnValue;
+              break;
+          }
+
+          object objValue;
+          var dbType = DataTypeUtilities.GetMySqlDbType(dataType, paramUnsigned, out objValue);
+          Parameters.Add(new Tuple<string, MySqlParameter>(dataType,
+            new MySqlParameter(paramName, dbType, paramSize, paramDirection, false, paramPrecision, paramScale, null,
+              DataRowVersion.Current, objValue)));
         }
-
-        object objValue;
-        var dbType = DataTypeUtilities.GetMySqlDbType(dataType, paramUnsigned, paramPrecision, out objValue);
-        Parameters.Add(new Tuple<string, MySqlParameter>(dataType, new MySqlParameter(paramName, dbType, paramSize, paramDirection, false, paramPrecision, paramScale, null, DataRowVersion.Current, objValue)));
+      }
+      catch (Exception ex)
+      {
+        MiscUtilities.ShowCustomizedErrorDialog(Resources.ProcedureParametersInitializationError, ex.Message, true);
+        MySqlSourceTrace.WriteAppErrorToLog(ex);
       }
     }
 

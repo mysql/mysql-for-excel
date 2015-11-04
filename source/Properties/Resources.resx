@@ -1141,4 +1141,7 @@ In order to avoid receiving this error message each time the Excel table is refr
   <data name="UnableToUnlockTablesError" xml:space="preserve">
     <value>Unable to unlock tables.</value>
   </data>
+  <data name="ProcedureParametersInitializationError" xml:space="preserve">
+    <value>Error initializing the stored procedure's parameters.</value>
+  </data>
 </root>

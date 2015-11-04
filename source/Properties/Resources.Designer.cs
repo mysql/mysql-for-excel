@@ -2303,6 +2303,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error initializing the stored procedure&apos;s parameters..
+        /// </summary>
+        internal static string ProcedureParametersInitializationError {
+            get {
+                return ResourceManager.GetString("ProcedureParametersInitializationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Query did not match any rows in the DB, {0}values in the row {1}may have changed; please refresh values from the DB..
         /// </summary>
         internal static string QueryDidNotMatchRowsWarning {
