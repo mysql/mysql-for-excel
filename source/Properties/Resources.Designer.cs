@@ -509,20 +509,11 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Do you want to continue loading the remaining Excel tables?.
+        ///   Looks up a localized string similar to Do you want to continue refreshing remaining Excel objects?.
         /// </summary>
-        internal static string ContinueRefreshingExcelTablesQuestionText {
+        internal static string ContinueRefreshingExcelObjectsText {
             get {
-                return ResourceManager.GetString("ContinueRefreshingExcelTablesQuestionText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Do you want to continue loading the remaining Pivot Tables?.
-        /// </summary>
-        internal static string ContinueRefreshingPivotTablesQuestionText {
-            get {
-                return ResourceManager.GetString("ContinueRefreshingPivotTablesQuestionText", resourceCulture);
+                return ResourceManager.GetString("ContinueRefreshingExcelObjectsText", resourceCulture);
             }
         }
         

@@ -1,4 +1,6 @@
 1.3.6
+- Fixed a problem when Refresh All was done so that the Refresh method is not called for Excel ListObjects that have an Excel range as their data source, since
+  that throws a COM Exception. (MySQL Bug #78941, Bug #22110627 - MYSQL FOR EXCEL 1.3.4 (AND 1.3.5): HRESULT: 0X800A03EC UPON "REFRESH ALL")
 - Fixed code that detects the data type of Excel data for Export and Append Data operations that was broken on the previous version when the JSON data type was
   initially supported. (Bug #22138966 - [EXPORT] MYSQL4EXCEL NOT EXPORTING BOOL DATA)
 

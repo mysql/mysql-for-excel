@@ -1507,11 +1507,16 @@ namespace MySQL.ForExcel.Classes
         return true;
       }
 
-      // If the ExcelInterop.ListObject is tied to MySQL data, then it will be refreshed and skip to the next one.
-      // Otherwise the standard ExcelInterop.ListObject.Refresh is called.
       bool continueLoading = true;
-      foreach (var listObject in worksheet.ListObjects.Cast<ExcelInterop.ListObject>().Where(listObject => !listObject.RefreshMySqlData()))
+      foreach (ExcelInterop.ListObject listObject in worksheet.ListObjects)
       {
+        if (listObject.RefreshMySqlData() || listObject.SourceType == ExcelInterop.XlListObjectSourceType.xlSrcRange)
+        {
+          // If it can be refreshed as a MySQL-related ListObject or its source is an Excel range then go to the next one.
+          continue;
+        }
+
+        // The try-catch block must be INSIDE the foreach loop since we may want to continue refreshing the next ListObject even if an Exception is thrown.
         try
         {
           listObject.Refresh();
@@ -1523,7 +1528,7 @@ namespace MySQL.ForExcel.Classes
             InfoDialog.InfoType.Error,
             Resources.OperationErrorTitle,
             string.Format(Resources.StandardListObjectRefreshError, listObject.DisplayName),
-            Resources.ContinueRefreshingExcelTablesQuestionText,
+            Resources.ContinueRefreshingExcelObjectsText,
             listObject.Comment.IsGuid() ? Resources.StandardListObjectRefreshMoreInfo : ex.GetFormattedMessage());
           infoProperties.WordWrapMoreInfo = true;
           if (InfoDialog.ShowDialog(infoProperties).DialogResult != DialogResult.Yes)
@@ -1566,7 +1571,7 @@ namespace MySQL.ForExcel.Classes
             InfoDialog.InfoType.Error,
             Resources.OperationErrorTitle,
             string.Format(Resources.StandardPivotTableRefreshError, pivotTable.Name),
-            Resources.ContinueRefreshingPivotTablesQuestionText,
+            Resources.ContinueRefreshingExcelObjectsText,
             ex.GetFormattedMessage());
           infoProperties.WordWrapMoreInfo = true;
           if (InfoDialog.ShowDialog(infoProperties).DialogResult != DialogResult.Yes)
