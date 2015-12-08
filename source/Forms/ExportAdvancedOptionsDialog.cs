@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -110,10 +110,25 @@ namespace MySQL.ForExcel.Forms
       Settings.Default.ExportAddBufferToVarchar = AddBufferToVarCharCheckBox.Checked;
       Settings.Default.ExportAutoIndexIntColumns = AutoIndexIntColumnsCheckBox.Checked;
       Settings.Default.ExportAutoAllowEmptyNonIndexColumns = AutoAllowEmptyNonIndexColumnsCheckBox.Checked;
+      Settings.Default.ExportShowAllMySqlDataTypes = ShowAllDataTypesCheckBox.Checked;
       Settings.Default.ExportUseFormattedValues = UseFormattedValuesCheckBox.Checked;
       Settings.Default.ExportSqlQueriesCreateIndexesLast = CreateTableIndexesLastCheckBox.Checked;
-      Settings.Default.ExportShowAllMySqlDataTypes = ShowAllDataTypesCheckBox.Checked;
+      Settings.Default.ExportGenerateMultipleInserts = GenerateMultipleInsertsCheckBox.Checked;
       MiscUtilities.SaveSettings();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="GenerateMultipleInsertsCheckBox"/> checked state changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void GenerateMultipleInsertsCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+      CreateTableIndexesLastCheckBox.Enabled = GenerateMultipleInsertsCheckBox.Checked;
+      if (!GenerateMultipleInsertsCheckBox.Checked)
+      {
+        CreateTableIndexesLastCheckBox.Checked = false;
+      }
     }
 
     /// <summary>
@@ -154,26 +169,28 @@ namespace MySQL.ForExcel.Forms
         AddBufferToVarCharCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportAddBufferToVarchar");
         AutoIndexIntColumnsCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportAutoIndexIntColumns");
         AutoAllowEmptyNonIndexColumnsCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportAutoAllowEmptyNonIndexColumns");
-        UseFormattedValuesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportUseFormattedValues");
-        AddBufferToVarCharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
-        CreateTableIndexesLastCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportSqlQueriesCreateIndexesLast");
         ShowAllDataTypesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportShowAllMySqlDataTypes");
+        UseFormattedValuesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportUseFormattedValues");
+        CreateTableIndexesLastCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportSqlQueriesCreateIndexesLast");
+        GenerateMultipleInsertsCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportGenerateMultipleInserts");
       }
       else
       {
         ExportDetectDatatypeChanged = false;
         ParentFormRequiresRefresh = false;
-        PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum,
-          Settings.Default.ExportLimitPreviewRowsQuantity);
+        PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.ExportLimitPreviewRowsQuantity);
         DetectDatatypeCheckBox.Checked = Settings.Default.ExportDetectDatatype;
         AddBufferToVarCharCheckBox.Checked = Settings.Default.ExportAddBufferToVarchar;
         AutoIndexIntColumnsCheckBox.Checked = Settings.Default.ExportAutoIndexIntColumns;
         AutoAllowEmptyNonIndexColumnsCheckBox.Checked = Settings.Default.ExportAutoAllowEmptyNonIndexColumns;
-        UseFormattedValuesCheckBox.Checked = Settings.Default.ExportUseFormattedValues;
-        AddBufferToVarCharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
-        CreateTableIndexesLastCheckBox.Checked = Settings.Default.ExportSqlQueriesCreateIndexesLast;
         ShowAllDataTypesCheckBox.Checked = Settings.Default.ExportShowAllMySqlDataTypes;
+        UseFormattedValuesCheckBox.Checked = Settings.Default.ExportUseFormattedValues;
+        CreateTableIndexesLastCheckBox.Checked = Settings.Default.ExportSqlQueriesCreateIndexesLast;
+        GenerateMultipleInsertsCheckBox.Checked = Settings.Default.ExportGenerateMultipleInserts;
       }
+
+      AddBufferToVarCharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
+      CreateTableIndexesLastCheckBox.Enabled = GenerateMultipleInsertsCheckBox.Checked;
     }
 
     /// <summary>

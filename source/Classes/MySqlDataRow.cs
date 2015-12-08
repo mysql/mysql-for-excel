@@ -404,6 +404,7 @@ namespace MySQL.ForExcel.Classes
       var sqlBuilderForInsert = parentTable.SqlBuilderForInsert;
       sqlBuilderForInsert.Clear();
       sqlBuilderForInsert.Append(parentTable.PreSqlForAddedRows);
+      sqlBuilderForInsert.Append('(');
       string colsSeparator = string.Empty;
       foreach (MySqlDataColumn column in parentTable.ColumnsForInsertion)
       {

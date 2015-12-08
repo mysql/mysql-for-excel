@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -66,6 +66,7 @@ namespace MySQL.ForExcel.Forms
       this.SqlQueriesLabel = new System.Windows.Forms.Label();
       this.HelpToolTip = new System.Windows.Forms.ToolTip(this.components);
       this.ShowAllDataTypesCheckBox = new System.Windows.Forms.CheckBox();
+      this.GenerateMultipleInsertsCheckBox = new System.Windows.Forms.CheckBox();
       this.ResetToDefaultsButton = new System.Windows.Forms.Button();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
@@ -80,6 +81,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // ContentAreaPanel
       // 
+      this.ContentAreaPanel.Controls.Add(this.GenerateMultipleInsertsCheckBox);
       this.ContentAreaPanel.Controls.Add(this.ShowAllDataTypesCheckBox);
       this.ContentAreaPanel.Controls.Add(this.CreateTableIndexesLastCheckBox);
       this.ContentAreaPanel.Controls.Add(this.SqlQueriesLabel);
@@ -96,14 +98,14 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.AddBufferToVarCharCheckBox);
       this.ContentAreaPanel.Controls.Add(this.DetectDatatypeCheckBox);
       this.ContentAreaPanel.Controls.Add(this.ColumnDatatypeOptionsLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(584, 451);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(584, 476);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.ResetToDefaultsButton);
       this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 406);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 431);
       this.CommandAreaPanel.Size = new System.Drawing.Size(584, 45);
       // 
       // DialogAcceptButton
@@ -184,7 +186,7 @@ namespace MySQL.ForExcel.Forms
       this.AutoIndexIntColumnsCheckBox.UseVisualStyleBackColor = false;
       this.AutoIndexIntColumnsCheckBox.CheckedChanged += new System.EventHandler(this.AutoIndexIntColumnsCheckBox_CheckedChanged);
       // 
-      // AddBufferToVarcharCheckBox
+      // AddBufferToVarCharCheckBox
       // 
       this.AddBufferToVarCharCheckBox.AutoSize = true;
       this.AddBufferToVarCharCheckBox.BackColor = System.Drawing.Color.Transparent;
@@ -194,7 +196,6 @@ namespace MySQL.ForExcel.Forms
       this.AddBufferToVarCharCheckBox.Size = new System.Drawing.Size(417, 19);
       this.AddBufferToVarCharCheckBox.TabIndex = 6;
       this.AddBufferToVarCharCheckBox.Text = "Add additional buffer to Varchar length (round up to 12, 25, 45, 125, 255)";
-      this.HelpToolTip.SetToolTip(this.AddBufferToVarCharCheckBox, resources.GetString("AddBufferToVarcharCheckBox.ToolTip"));
       this.AddBufferToVarCharCheckBox.UseVisualStyleBackColor = false;
       // 
       // DetectDatatypeCheckBox
@@ -286,10 +287,10 @@ namespace MySQL.ForExcel.Forms
       this.ColumnOptionsLostWarningLabel.BackColor = System.Drawing.Color.Transparent;
       this.ColumnOptionsLostWarningLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.ColumnOptionsLostWarningLabel.ForeColor = System.Drawing.Color.Red;
-      this.ColumnOptionsLostWarningLabel.Location = new System.Drawing.Point(50, 369);
+      this.ColumnOptionsLostWarningLabel.Location = new System.Drawing.Point(50, 394);
       this.ColumnOptionsLostWarningLabel.Name = "ColumnOptionsLostWarningLabel";
       this.ColumnOptionsLostWarningLabel.Size = new System.Drawing.Size(282, 12);
-      this.ColumnOptionsLostWarningLabel.TabIndex = 14;
+      this.ColumnOptionsLostWarningLabel.TabIndex = 15;
       this.ColumnOptionsLostWarningLabel.Text = "Table columns will be recreated so column options changes will be lost.";
       this.ColumnOptionsLostWarningLabel.Visible = false;
       // 
@@ -297,7 +298,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.ColumnOptionsLostWarningPictureBox.BackColor = System.Drawing.Color.Transparent;
       this.ColumnOptionsLostWarningPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.ColumnOptionsLostWarningPictureBox.Location = new System.Drawing.Point(27, 364);
+      this.ColumnOptionsLostWarningPictureBox.Location = new System.Drawing.Point(27, 389);
       this.ColumnOptionsLostWarningPictureBox.Name = "ColumnOptionsLostWarningPictureBox";
       this.ColumnOptionsLostWarningPictureBox.Size = new System.Drawing.Size(20, 20);
       this.ColumnOptionsLostWarningPictureBox.TabIndex = 47;
@@ -308,12 +309,11 @@ namespace MySQL.ForExcel.Forms
       // 
       this.CreateTableIndexesLastCheckBox.AutoSize = true;
       this.CreateTableIndexesLastCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-      this.CreateTableIndexesLastCheckBox.Location = new System.Drawing.Point(53, 340);
+      this.CreateTableIndexesLastCheckBox.Location = new System.Drawing.Point(73, 365);
       this.CreateTableIndexesLastCheckBox.Name = "CreateTableIndexesLastCheckBox";
-      this.CreateTableIndexesLastCheckBox.Size = new System.Drawing.Size(512, 19);
-      this.CreateTableIndexesLastCheckBox.TabIndex = 13;
-      this.CreateTableIndexesLastCheckBox.Text = "Create table\'s secondary indexes after data has been exported to speed-up rows in" +
-    "sertion";
+      this.CreateTableIndexesLastCheckBox.Size = new System.Drawing.Size(453, 19);
+      this.CreateTableIndexesLastCheckBox.TabIndex = 14;
+      this.CreateTableIndexesLastCheckBox.Text = "Create table\'s indexes after data has been exported to speed-up rows insertion";
       this.HelpToolTip.SetToolTip(this.CreateTableIndexesLastCheckBox, resources.GetString("CreateTableIndexesLastCheckBox.ToolTip"));
       this.CreateTableIndexesLastCheckBox.UseVisualStyleBackColor = true;
       // 
@@ -349,6 +349,19 @@ namespace MySQL.ForExcel.Forms
       this.ShowAllDataTypesCheckBox.UseVisualStyleBackColor = false;
       this.ShowAllDataTypesCheckBox.CheckedChanged += new System.EventHandler(this.ShowAllDataTypesCheckBox_CheckedChanged);
       // 
+      // GenerateMultipleInsertsCheckBox
+      // 
+      this.GenerateMultipleInsertsCheckBox.AutoSize = true;
+      this.GenerateMultipleInsertsCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+      this.GenerateMultipleInsertsCheckBox.Location = new System.Drawing.Point(53, 340);
+      this.GenerateMultipleInsertsCheckBox.Name = "GenerateMultipleInsertsCheckBox";
+      this.GenerateMultipleInsertsCheckBox.Size = new System.Drawing.Size(295, 19);
+      this.GenerateMultipleInsertsCheckBox.TabIndex = 13;
+      this.GenerateMultipleInsertsCheckBox.Text = "Generate an INSERT statement for each data row";
+      this.HelpToolTip.SetToolTip(this.GenerateMultipleInsertsCheckBox, resources.GetString("GenerateMultipleInsertsCheckBox.ToolTip"));
+      this.GenerateMultipleInsertsCheckBox.UseVisualStyleBackColor = true;
+      this.GenerateMultipleInsertsCheckBox.CheckedChanged += new System.EventHandler(this.GenerateMultipleInsertsCheckBox_CheckedChanged);
+      // 
       // ResetToDefaultsButton
       // 
       this.ResetToDefaultsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -365,7 +378,7 @@ namespace MySQL.ForExcel.Forms
       this.AcceptButton = this.DialogAcceptButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(584, 451);
+      this.ClientSize = new System.Drawing.Size(584, 476);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
@@ -403,5 +416,6 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.ToolTip HelpToolTip;
     private System.Windows.Forms.Button ResetToDefaultsButton;
     private System.Windows.Forms.CheckBox ShowAllDataTypesCheckBox;
+    private System.Windows.Forms.CheckBox GenerateMultipleInsertsCheckBox;
   }
 }

@@ -505,7 +505,9 @@ namespace MySQL.ForExcel.Forms
         _createdTable = false;
         _lockedTable = false;
         _originalStatementRowsList.Clear();
-        bool createTableOnly = _mySqlTable.OperationType.IsForExport() && _mySqlTable.CreateTableWithoutData;
+        bool isForExport = _mySqlTable.OperationType.IsForExport();
+        bool isForAppend = _mySqlTable.OperationType.IsForAppend();
+        bool createTableOnly = isForExport && _mySqlTable.CreateTableWithoutData;
         if (!createTableOnly && _mySqlTable.ChangedOrDeletedRows == 0)
         {
           return;
@@ -517,12 +519,12 @@ namespace MySQL.ForExcel.Forms
           int builderLength = createTableOnly ? MiscUtilities.STRING_BUILDER_DEFAULT_CAPACITY : _mySqlTable.MaxQueryLength;
           var sqlScript = new StringBuilder(builderLength);
           IList<MySqlDummyRow> dummyRows;
-          bool createTableDummyRows = _mySqlTable.OperationType.IsForExport() || _mySqlTable.OperationType.IsForAppend();
+          bool createTableDummyRows = isForExport || isForAppend;
           if (createTableDummyRows)
           {
             // Create optimization statements for INSERTS that disable key constraints and lock table.
             // Also incluldes a CREATE statement if table on Export mode.
-            dummyRows = _mySqlTable.GetTableDummyRows(true);
+            dummyRows = _mySqlTable.GetDummyRowsForTableCreationAndIndexOptimization(true);
             if (dummyRows != null)
             {
               foreach (var dummyRow in dummyRows)
@@ -547,24 +549,41 @@ namespace MySQL.ForExcel.Forms
           // Do not change this code to get changed rows via the GetChanges method since the references to the MySqlDataTable and MySqlDataTable objects will be broken.
           if (!createTableOnly)
           {
-            DataRowState[] rowStatesWithChanges = { DataRowState.Deleted, DataRowState.Added, DataRowState.Modified };
-            foreach (var mySqlRow in rowStatesWithChanges.SelectMany(rowState => _mySqlTable.Rows.Cast<MySqlDataRow>().Where(dr => !dr.IsHeadersRow && dr.RowState == rowState)))
+            bool isBulkInsert = (isForExport && !Settings.Default.ExportGenerateMultipleInserts)
+                                || (isForAppend && !Settings.Default.AppendGenerateMultipleInserts);
+            if (isBulkInsert)
             {
-              _originalStatementRowsList.Add(mySqlRow);
-              string mainSqlQuery = mySqlRow.Statement.SqlQuery;
-              if (!string.IsNullOrEmpty(mySqlRow.Statement.SetVariablesSqlQuery))
+              // Generate INSERT statements as a bulk operations for all rows being processed
+              // Maybe more than 1 INSERT statement is generated depending on the size of the data and the value of the max allowed packet.
+              dummyRows = _mySqlTable.GetBulkInsertDummyRows();
+              foreach (var dummyRow in dummyRows)
               {
-                sqlScript.AppendFormat("{0};{1}", mySqlRow.Statement.SetVariablesSqlQuery, Environment.NewLine);
+                _originalStatementRowsList.Add(dummyRow);
+                sqlScript.AppendFormat("{0};{1}", dummyRow.Statement.SqlQuery, Environment.NewLine);
               }
+            }
+            else
+            {
+              // Generate a statement for each data row being processed
+              DataRowState[] rowStatesWithChanges = { DataRowState.Deleted, DataRowState.Added, DataRowState.Modified };
+              foreach (var mySqlRow in rowStatesWithChanges.SelectMany(rowState => _mySqlTable.Rows.Cast<MySqlDataRow>().Where(dr => !dr.IsHeadersRow && dr.RowState == rowState)))
+              {
+                _originalStatementRowsList.Add(mySqlRow);
+                string mainSqlQuery = mySqlRow.Statement.SqlQuery;
+                if (!string.IsNullOrEmpty(mySqlRow.Statement.SetVariablesSqlQuery))
+                {
+                  sqlScript.AppendFormat("{0};{1}", mySqlRow.Statement.SetVariablesSqlQuery, Environment.NewLine);
+                }
 
-              sqlScript.AppendFormat("{0};{1}", mainSqlQuery, Environment.NewLine);
+                sqlScript.AppendFormat("{0};{1}", mainSqlQuery, Environment.NewLine);
+              }
             }
           }
 
           // Create optimization statements for INSERTS that re-enable key constraints and unlock table.
           if (createTableDummyRows)
           {
-            dummyRows = _mySqlTable.GetTableDummyRows(false);
+            dummyRows = _mySqlTable.GetDummyRowsForTableCreationAndIndexOptimization(false);
             if (dummyRows != null)
             {
               foreach (var dummyRow in dummyRows)

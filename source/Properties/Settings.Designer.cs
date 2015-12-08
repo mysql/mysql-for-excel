@@ -513,5 +513,44 @@ namespace MySQL.ForExcel.Properties {
                 this["AppendConfirmColumnMappingOverwriting"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ExportGenerateMultipleInserts {
+            get {
+                return ((bool)(this["ExportGenerateMultipleInserts"]));
+            }
+            set {
+                this["ExportGenerateMultipleInserts"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AppendGenerateMultipleInserts {
+            get {
+                return ((bool)(this["AppendGenerateMultipleInserts"]));
+            }
+            set {
+                this["AppendGenerateMultipleInserts"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AdjustedMultipleInsertFlags {
+            get {
+                return ((bool)(this["AdjustedMultipleInsertFlags"]));
+            }
+            set {
+                this["AdjustedMultipleInsertFlags"] = value;
+            }
+        }
     }
 }

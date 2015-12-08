@@ -282,7 +282,7 @@ namespace MySQL.ForExcel.Forms
       var targetMySqlFinalDataTable = _targetMySqlPreviewDataTable.CloneSchema(true, false);
       targetMySqlFinalDataTable.FirstRowContainsColumnNames = _sourceMySqlPreviewDataTable.FirstRowContainsColumnNames;
       var mappedIndexes = new List<int>(targetMySqlFinalDataTable.Columns.Count);
-      foreach (var sourceColumnIndex in from MySqlDataColumn targetColumn in targetMySqlFinalDataTable.Columns select targetColumn.MappedDataColOrdinal)
+      foreach (var sourceColumnIndex in targetMySqlFinalDataTable.Columns.Cast<MySqlDataColumn>().Select(targetColumn => targetColumn.MappedDataColOrdinal))
       {
         if (sourceColumnIndex < 0)
         {

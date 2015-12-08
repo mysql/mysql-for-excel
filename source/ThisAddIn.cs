@@ -419,6 +419,30 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Adjusts the settings related to bulk inserts.
+    /// </summary>
+    private void AdjustSettingsForBulkInserts()
+    {
+      if (Settings.Default.AdjustedMultipleInsertFlags)
+      {
+        return;
+      }
+
+      if (!Settings.Default.ExportGenerateMultipleInserts && Settings.Default.ExportSqlQueriesCreateIndexesLast)
+      {
+        Settings.Default.ExportSqlQueriesCreateIndexesLast = false;
+      }
+
+      if (!Settings.Default.AppendGenerateMultipleInserts && Settings.Default.AppendSqlQueriesDisableIndexes)
+      {
+        Settings.Default.AppendSqlQueriesDisableIndexes = false;
+      }
+
+      Settings.Default.AdjustedMultipleInsertFlags = true;
+      MiscUtilities.SaveSettings();
+    }
+
+    /// <summary>
     /// Event delegate method fired when an Excel <see cref="ExcelInterop.Worksheet"/> is activated.
     /// </summary>
     /// <param name="workSheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
@@ -951,11 +975,17 @@ namespace MySQL.ForExcel
     /// </summary>
     private static void ConvertSettingsStoredMappingsCasing()
     {
+      if (Settings.Default.ConvertedSettingsStoredMappingsCasing)
+      {
+        return;
+      }
+
       // Check if settings file exists, if it does not flag the conversion as done since it was not needed.
       MySqlForExcelSettings settings = new MySqlForExcelSettings();
       if (!File.Exists(settings.SettingsPath))
       {
         Settings.Default.ConvertedSettingsStoredMappingsCasing = true;
+        MiscUtilities.SaveSettings();
         return;
       }
 
@@ -978,7 +1008,7 @@ namespace MySQL.ForExcel
         File.WriteAllText(settings.SettingsPath, settingsConfigText, Encoding.Unicode);
         Settings.Default.Reload();
         Settings.Default.ConvertedSettingsStoredMappingsCasing = true;
-        Settings.Default.Save();
+        MiscUtilities.SaveSettings();
       }
       catch (Exception ex)
       {
@@ -1390,6 +1420,15 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Adjusts values in the settings.config file that have changed and must be adjusted or transformed.
+    /// </summary>
+    private void PerformSettingsAdjustments()
+    {
+      ConvertSettingsStoredMappingsCasing();
+      AdjustSettingsForBulkInserts();
+    }
+
+    /// <summary>
     /// Processes the missing connections to either create and assign them a new connection or disconnect their excel tables.
     /// </summary>
     /// <param name="missingConnectionInfoConnections">A list of <see cref="ImportConnectionInfo" /> objects which connection is not found.</param>
@@ -1737,11 +1776,8 @@ namespace MySQL.ForExcel
         string majorVersionText = pointPos >= 0 ? Application.Version.Substring(0, pointPos) : Application.Version;
         ExcelVersionNumber = Int32.Parse(majorVersionText, CultureInfo.InvariantCulture);
 
-        // Convert the StoredDataMappings setting's data type to MySql
-        if (!Settings.Default.ConvertedSettingsStoredMappingsCasing)
-        {
-          ConvertSettingsStoredMappingsCasing();
-        }
+        // Adjust values in the settings.config file that have changed and must be adjusted or transformed
+        PerformSettingsAdjustments();
 
         // Subscribe events tracked even when no Excel panes are open.
         Application.WorkbookOpen += Application_WorkbookOpen;

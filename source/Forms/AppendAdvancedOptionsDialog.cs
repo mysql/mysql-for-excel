@@ -108,6 +108,7 @@ namespace MySQL.ForExcel.Forms
       Settings.Default.AppendShowDataTypes = ShowDataTypesCheckBox.Checked;
       Settings.Default.AppendLimitPreviewRowsQuantity = previewRowsQuantity;
       Settings.Default.AppendSqlQueriesDisableIndexes = DisableTableIndexesCheckBox.Checked;
+      Settings.Default.AppendGenerateMultipleInserts = GenerateMultipleInsertsCheckBox.Checked;
       Settings.Default.StoredDataMappings = Mappings;
       MiscUtilities.SaveSettings();
     }
@@ -127,6 +128,20 @@ namespace MySQL.ForExcel.Forms
       MappingsChanged = true;
       Mappings.Remove(_selectedMapping);
       RefreshMappingList();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when an item within the <see cref="GenerateMultipleInsertsCheckBox"/> list view is selected.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void GenerateMultipleInsertsCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+      DisableTableIndexesCheckBox.Enabled = GenerateMultipleInsertsCheckBox.Checked;
+      if (!GenerateMultipleInsertsCheckBox.Checked)
+      {
+        DisableTableIndexesCheckBox.Checked = false;
+      }
     }
 
     /// <summary>
@@ -158,6 +173,7 @@ namespace MySQL.ForExcel.Forms
         ShowDataTypesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendShowDataTypes");
         PreviewRowsQuantityNumericUpDown.Value = settings.GetPropertyDefaultValueByName<int>("AppendLimitPreviewRowsQuantity");
         DisableTableIndexesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendSqlQueriesDisableIndexes");
+        GenerateMultipleInsertsCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendGenerateMultipleInserts");
       }
       else
       {
@@ -169,7 +185,10 @@ namespace MySQL.ForExcel.Forms
         ShowDataTypesCheckBox.Checked = Settings.Default.AppendShowDataTypes;
         PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.AppendLimitPreviewRowsQuantity);
         DisableTableIndexesCheckBox.Checked = Settings.Default.AppendSqlQueriesDisableIndexes;
+        GenerateMultipleInsertsCheckBox.Checked = Settings.Default.AppendGenerateMultipleInserts;
       }
+
+      DisableTableIndexesCheckBox.Enabled = GenerateMultipleInsertsCheckBox.Checked;
     }
 
     /// <summary>
