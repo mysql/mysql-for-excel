@@ -208,6 +208,11 @@ namespace MySQL.ForExcel.Forms
       using (var optionsDialog = new ExportAdvancedOptionsDialog())
       {
         optionsDialog.ShowDialog();
+        foreach (var mySqlCol in _previewDataTable.Columns.Cast<MySqlDataColumn>().Where(mySqlCol => !mySqlCol.AutoPk))
+        {
+          mySqlCol.UpdateAutoIncrementWarning();
+        }
+
         if (optionsDialog.ExportShowAllMySqlDataTypesChanged)
         {
           InitializeDataTypeCombo();
@@ -438,6 +443,44 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
+    /// Event delegate method fired when the <see cref="AutoIncrementCheckBox"/> control's checked state changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void AutoIncrementCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+      if (!_isUserInput)
+      {
+        return;
+      }
+
+      var currentCol = GetCurrentMySqlDataColumn();
+      if (currentCol == null || !currentCol.MySqlDataType.IsNumeric || AutoIncrementCheckBox.Checked == currentCol.AutoIncrement)
+      {
+        return;
+      }
+
+      currentCol.AutoIncrement = AutoIncrementCheckBox.Checked;
+
+      if (currentCol.AutoIncrement)
+      {
+        // The column must be indexed
+        currentCol.CreateIndex = true;
+
+        // The column can't have a default value
+        currentCol.SetUserDefaultValue(null);
+
+        // There can only be 1 column with AutoIncrement = true
+        foreach (var column in _previewDataTable.Columns.Cast<MySqlDataColumn>().Where(column => column != currentCol))
+        {
+          column.AutoIncrement = false;
+        }
+      }
+
+      RefreshColumnControlsEnabledStatus(false);
+    }
+
+    /// <summary>
     /// Event delegate method fired when the <see cref="ColumnNameTextBox"/> textbox's text changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
@@ -502,7 +545,7 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="CreateIndexCheckBox"/> object's checked state changes.
+    /// Event delegate method fired when the <see cref="CreateIndexCheckBox"/> control's checked state changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="ea">Event arguments.</param>
@@ -520,6 +563,13 @@ namespace MySQL.ForExcel.Forms
       }
 
       currentCol.CreateIndex = CreateIndexCheckBox.Checked;
+
+      // The Auto Increment can't be true if the column is not indexed
+      if (!currentCol.CreateIndex && currentCol.AutoIncrement)
+      {
+        currentCol.AutoIncrement = false;
+      }
+
       RefreshColumnControlsEnabledStatus(false);
     }
 
@@ -544,7 +594,7 @@ namespace MySQL.ForExcel.Forms
     {
       MySqlDataColumn currentCol = GetCurrentMySqlDataColumn();
       var selectedType = DataTypeComboBox.SelectedValue != null ? DataTypeComboBox.SelectedValue.ToString() : string.Empty;
-      if (currentCol == null || string.IsNullOrEmpty(selectedType) || string.Equals(selectedType, currentCol.MySqlDataType, StringComparison.InvariantCultureIgnoreCase))
+      if (currentCol == null || string.IsNullOrEmpty(selectedType) || string.Equals(selectedType, currentCol.MySqlDataType.FullType, StringComparison.InvariantCultureIgnoreCase))
       {
         return;
       }
@@ -554,16 +604,16 @@ namespace MySQL.ForExcel.Forms
       {
         case "Enum":
           currentCol.SetCollectionDataType(MySqlDataColumn.CollectionDataType.Enum);
-          BeginInvoke(new Action(() => DataTypeComboBox.Text = currentCol.MySqlDataType));
+          BeginInvoke(new Action(() => DataTypeComboBox.Text = currentCol.MySqlDataType.FullType));
           break;
 
         case "Set":
           currentCol.SetCollectionDataType(MySqlDataColumn.CollectionDataType.Set);
-          BeginInvoke(new Action(() => DataTypeComboBox.Text = currentCol.MySqlDataType));
+          BeginInvoke(new Action(() => DataTypeComboBox.Text = currentCol.MySqlDataType.FullType));
           break;
 
         default:
-          currentCol.SetMySqlDataType(selectedType, false, true);
+          currentCol.SetMySqlDataType(selectedType, true, true);
           break;
       }
     }
@@ -588,12 +638,13 @@ namespace MySQL.ForExcel.Forms
       TextChangedTimer.Stop();
       string newDataType = DataTypeComboBox.Text.Trim();
       MySqlDataColumn currentCol = GetCurrentMySqlDataColumn();
-      if (currentCol == null || DataTypeComboBox.SelectedIndex >= 0 || currentCol.MySqlDataType == newDataType)
+      if (currentCol == null || DataTypeComboBox.SelectedIndex >= 0 || currentCol.MySqlDataType.FullType == newDataType)
       {
         return;
       }
 
-      currentCol.SetMySqlDataType(newDataType, true, true);
+      currentCol.SetMySqlDataType(newDataType, false, true);
+      //SetControlTextValue(DataTypeComboBox, currentCol.MySqlDataType.FullType);
     }
 
     /// <summary>
@@ -610,6 +661,88 @@ namespace MySQL.ForExcel.Forms
         : comboItem.ToString();
       e.Graphics.DrawString(itemText, DataTypeComboBox.Font, Brushes.Black, new RectangleF(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height));
       e.DrawFocusRectangle();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="DataTypeContextMenuStrip"/> context menu is being opened.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void DataTypeContextMenuStrip_Opening(object sender, CancelEventArgs e)
+    {
+      var currentCol = GetCurrentMySqlDataColumn();
+      if (currentCol == null || !currentCol.MySqlDataType.IsNumeric)
+      {
+        e.Cancel = true;
+        return;
+      }
+
+      UnsignedToolStripMenuItem.Checked = currentCol.MySqlDataType.Unsigned;
+      ZeroFillToolStripMenuItem.Checked = currentCol.MySqlDataType.ZeroFill;
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="DefaultValuePictureBox"/> picture is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void DefaultValuePictureBox_Click(object sender, EventArgs e)
+    {
+      var currentCol = GetCurrentMySqlDataColumn();
+      if (currentCol == null)
+      {
+        return;
+      }
+
+      currentCol.SetUserDefaultValue(MySqlDataType.ATTRIBUTE_CURRENT_TIMESTAMP);
+      ResetDefaultValuePictureVisibility(currentCol);
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="DefaultValueTextBox"/> text changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void DefaultValueTextBox_TextChanged(object sender, EventArgs e)
+    {
+      ResetTextChangedTimer();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="DefaultValueTextBox"/> text is validated.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void DefaultValueTextBox_Validating(object sender, CancelEventArgs e)
+    {
+      TextChangedTimer.Stop();
+      if (!_isUserInput)
+      {
+        return;
+      }
+
+      var currentCol = GetCurrentMySqlDataColumn();
+      string trimmedDefaultValue = DefaultValueTextBox.Text.Trim();
+      if (currentCol == null)
+      {
+        return;
+      }
+
+      if (trimmedDefaultValue.Equals(currentCol.UserDefaultValue, StringComparison.InvariantCulture))
+      {
+        return;
+      }
+
+      currentCol.SetUserDefaultValue(trimmedDefaultValue);
+
+      // The Auto Increment can't be true if a default value is supplied
+      if (!string.IsNullOrEmpty(currentCol.UserDefaultValue) && currentCol.AutoIncrement)
+      {
+        currentCol.AutoIncrement = false;
+      }
+
+      RefreshColumnControlsEnabledStatus(false);
+      ResetDefaultValuePictureVisibility(currentCol);
     }
 
     /// <summary>
@@ -818,13 +951,13 @@ namespace MySQL.ForExcel.Forms
     {
       _isUserInput = false;
       DataTypeBindingSource.DataSource = Settings.Default.ExportShowAllMySqlDataTypes
-        ? MySqlDataType.AllDataTypesDictionary
-        : MySqlDataType.CommonDataTypesDictionary;
+        ? MySqlDisplayDataType.AllDataTypesDictionary
+        : MySqlDisplayDataType.CommonDataTypesDictionary;
       DataTypeBindingSource.DataMember = null;
       DataTypeComboBox.DataSource = DataTypeBindingSource;
       DataTypeComboBox.DisplayMember = "Key";
       DataTypeComboBox.ValueMember = "Key";
-      DataTypeComboBox.DropDownWidth = MySqlDataType.GetCommonDataTypesLongestDescriptionLength(
+      DataTypeComboBox.DropDownWidth = MySqlDisplayDataType.GetCommonDataTypesLongestDescriptionLength(
         !Settings.Default.ExportShowAllMySqlDataTypes,
         DataTypeComboBox.Font,
         (SystemInformation.VerticalScrollBarWidth * 2) + 2);
@@ -897,7 +1030,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void PreviewDataGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
     {
-      if (e.ListChangedType != ListChangedType.Reset)
+      if (e.ListChangedType != ListChangedType.Reset || PreviewDataGridView.Rows.Count == 0)
       {
         return;
       }
@@ -980,6 +1113,10 @@ namespace MySQL.ForExcel.Forms
           AllowEmptyCheckBox.Checked = changedColumn.AllowNull;
           break;
 
+        case "AutoIncrement":
+          AutoIncrementCheckBox.Checked = changedColumn.AutoIncrement;
+          break;
+
         case "CreateIndex":
           CreateIndexCheckBox.Checked = changedColumn.CreateIndex;
           break;
@@ -988,12 +1125,22 @@ namespace MySQL.ForExcel.Forms
           ExcludeColumnCheckBox.Checked = changedColumn.ExcludeColumn;
           break;
 
+        case "MySqlDataType":
+          DataTypeComboBox.Text = currentColumn.MySqlDataType.FullType;
+          RefreshColumnControlsEnabledStatus(false);
+          ResetDefaultValuePictureVisibility(currentColumn);
+          break;
+
         case "PrimaryKey":
           PrimaryKeyCheckBox.Checked = changedColumn.PrimaryKey;
           break;
 
         case "UniqueKey":
           UniqueIndexCheckBox.Checked = changedColumn.UniqueKey;
+          break;
+
+        case "UserDefaultValue":
+          DefaultValueTextBox.Text = changedColumn.UserDefaultValue;
           break;
       }
 
@@ -1161,12 +1308,17 @@ namespace MySQL.ForExcel.Forms
 
       // Set controls tied to column properties
       SetControlTextValue(ColumnNameTextBox, mysqlCol.DisplayName);
-      SetControlTextValue(DataTypeComboBox, mysqlCol.MySqlDataType);
+      SetControlTextValue(DataTypeComboBox, mysqlCol.MySqlDataType.FullType);
       CreateIndexCheckBox.Checked = mysqlCol.CreateIndex;
       UniqueIndexCheckBox.Checked = mysqlCol.UniqueKey;
       PrimaryKeyCheckBox.Checked = mysqlCol.PrimaryKey;
       AllowEmptyCheckBox.Checked = mysqlCol.AllowNull;
+      AutoIncrementCheckBox.Checked = mysqlCol.AutoIncrement;
       ExcludeColumnCheckBox.Checked = mysqlCol.ExcludeColumn;
+      DefaultValueTextBox.Text = mysqlCol.UserDefaultValue;
+
+      // Refresh the image shown for DateTime and TimeStamp type
+      ResetDefaultValuePictureVisibility(mysqlCol);
 
       // Update column warnings
       RefreshColumnWarnings(mysqlCol);
@@ -1192,6 +1344,8 @@ namespace MySQL.ForExcel.Forms
       UniqueIndexCheckBox.Enabled = !ExcludeColumnCheckBox.Checked;
       CreateIndexCheckBox.Enabled = !(ExcludeColumnCheckBox.Checked || UniqueIndexCheckBox.Checked || PrimaryKeyCheckBox.Checked);
       AllowEmptyCheckBox.Enabled = !(ExcludeColumnCheckBox.Checked || PrimaryKeyCheckBox.Checked);
+      DefaultValueTextBox.Enabled = !(ExcludeColumnCheckBox.Checked || mysqlCol.MySqlDataType.IsJson || mysqlCol.MySqlDataType.IsText || mysqlCol.MySqlDataType.IsBlob || mysqlCol.AutoIncrement);
+      AutoIncrementCheckBox.Enabled = !ExcludeColumnCheckBox.Checked && mysqlCol.MySqlDataType.IsNumeric && string.IsNullOrEmpty(DefaultValueTextBox.Text);
       UseExistingColumnRadioButton.Enabled = !_previewDataTable.Columns.Cast<MySqlDataColumn>().Skip(1).All(i => i.ExcludeColumn);
       PrimaryKeyColumnsComboBox.Enabled = UseExistingColumnRadioButton.Enabled && UseExistingColumnRadioButton.Checked;
       DataTypeComboBox.Enabled = !mysqlCol.AutoPk;
@@ -1278,6 +1432,21 @@ namespace MySQL.ForExcel.Forms
 
       PrimaryKeyColumnsComboBox.SelectedIndexChanged += PrimaryKeyColumnsComboBox_SelectedIndexChanged;
       PrimaryKeyColumnsComboBox.EndUpdate();
+    }
+
+    /// <summary>
+    /// Sets the <see cref="DefaultValuePictureBox"/> visibility depending on properties of its related <see cref="MySqlDataColumn"/>.
+    /// </summary>
+    /// <param name="relatedColumn">A related <see cref="MySqlDataColumn"/>.</param>
+    private void ResetDefaultValuePictureVisibility(MySqlDataColumn relatedColumn)
+    {
+      if (relatedColumn == null)
+      {
+        return;
+      }
+
+      DefaultValuePictureBox.Visible = relatedColumn.MySqlDataType.IsDateTimeOrTimeStamp
+                                        && !MySqlDataType.ATTRIBUTE_CURRENT_TIMESTAMP.Equals(relatedColumn.UserDefaultValue, StringComparison.InvariantCultureIgnoreCase);
     }
 
     /// <summary>
@@ -1423,6 +1592,10 @@ namespace MySQL.ForExcel.Forms
       {
         DataTypeComboBox_Validating(DataTypeComboBox, new CancelEventArgs());
       }
+      else if (DefaultValueTextBox.Focused)
+      {
+        DefaultValueTextBox_Validating(DefaultValueTextBox , new CancelEventArgs());
+      }
       else
       {
         // In case no control has focus no validation is needed, just stop the timer.
@@ -1442,7 +1615,7 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      MySqlDataColumn currentCol = GetCurrentMySqlDataColumn();
+      var currentCol = GetCurrentMySqlDataColumn();
       if (currentCol == null || UniqueIndexCheckBox.Checked == currentCol.UniqueKey)
       {
         return;
@@ -1450,6 +1623,23 @@ namespace MySQL.ForExcel.Forms
 
       currentCol.UniqueKey = UniqueIndexCheckBox.Checked;
       RefreshColumnControlsEnabledStatus(false);
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="UnsignedToolStripMenuItem"/> checked state changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void UnsignedToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+    {
+      var currentCol = GetCurrentMySqlDataColumn();
+      if (currentCol == null || UnsignedToolStripMenuItem.Checked == currentCol.MySqlDataType.Unsigned)
+      {
+        return;
+      }
+
+      currentCol.MySqlDataType.Unsigned = UnsignedToolStripMenuItem.Checked;
+      SetControlTextValue(DataTypeComboBox, currentCol.MySqlDataType.FullType);
     }
 
     /// <summary>
@@ -1478,6 +1668,23 @@ namespace MySQL.ForExcel.Forms
 
       // Give focus to the field related to the checkbox whose status changed.
       PrimaryKeyColumnsComboBox.Focus();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="ZeroFillToolStripMenuItem"/> checked state changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ZeroFillToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+    {
+      var currentCol = GetCurrentMySqlDataColumn();
+      if (currentCol == null || ZeroFillToolStripMenuItem.Checked == currentCol.MySqlDataType.ZeroFill)
+      {
+        return;
+      }
+
+      currentCol.MySqlDataType.ZeroFill = ZeroFillToolStripMenuItem.Checked;
+      SetControlTextValue(DataTypeComboBox, currentCol.MySqlDataType.FullType);
     }
   }
 }

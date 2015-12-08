@@ -704,7 +704,7 @@ namespace MySQL.ForExcel.Forms
 
           MySqlDataColumn sourceColumn = _sourceMySqlPreviewDataTable.GetColumnAtIndex(sourceColumnIndex);
           MySqlDataColumn targetColumn = _targetMySqlPreviewDataTable.GetColumnAtIndex(targetColumnIndex);
-          if (!DataTypeUtilities.Type1FitsIntoType2(sourceColumn.StrippedMySqlDataType, targetColumn.StrippedMySqlDataType))
+          if (!sourceColumn.MySqlDataType.FitsIntoTargetType(targetColumn.MySqlDataType))
           {
             continue;
           }
@@ -730,7 +730,7 @@ namespace MySQL.ForExcel.Forms
 
         MySqlDataColumn sourceColumn = _sourceMySqlPreviewDataTable.GetColumnAtIndex(columnIndex);
         MySqlDataColumn targetColumn = _targetMySqlPreviewDataTable.GetColumnAtIndex(columnIndex);
-        if (!DataTypeUtilities.Type1FitsIntoType2(sourceColumn.StrippedMySqlDataType, targetColumn.StrippedMySqlDataType))
+        if (!sourceColumn.MySqlDataType.FitsIntoTargetType(targetColumn.MySqlDataType))
         {
           continue;
         }
@@ -806,7 +806,7 @@ namespace MySQL.ForExcel.Forms
         if (sourceColFoundInFromTableIdx >= 0)
         {
           MySqlDataColumn sourceColumn = _sourceMySqlPreviewDataTable.GetColumnAtIndex(sourceColFoundInFromTableIdx);
-          if (DataTypeUtilities.Type1FitsIntoType2(sourceColumn.StrippedMySqlDataType, targetColumn.StrippedMySqlDataType))
+          if (sourceColumn.MySqlDataType.FitsIntoTargetType(targetColumn.MySqlDataType))
           {
             matchedMapping.MappedSourceIndexes[targetColumnIndex] = sourceColFoundInFromTableIdx;
           }
@@ -825,7 +825,7 @@ namespace MySQL.ForExcel.Forms
           }
 
           MySqlDataColumn sourceColumn = _sourceMySqlPreviewDataTable.GetColumnAtIndex(proposedSourceMapping);
-          if (DataTypeUtilities.Type1FitsIntoType2(sourceColumn.StrippedMySqlDataType, targetColumn.StrippedMySqlDataType))
+          if (sourceColumn.MySqlDataType.FitsIntoTargetType(targetColumn.MySqlDataType))
           {
             matchedMapping.MappedSourceIndexes[targetColumnIndex] = proposedSourceMapping;
           }
@@ -1148,7 +1148,7 @@ namespace MySQL.ForExcel.Forms
           var mySqlColumn = mySqlTable.Columns[gridColumn.Index] as MySqlDataColumn;
           if (mySqlColumn != null)
           {
-            gridColumn.Tag = mySqlColumn.StrippedMySqlDataType;
+            gridColumn.Tag = mySqlColumn.MySqlDataType.TypeName;
           }
         }
 

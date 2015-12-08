@@ -134,21 +134,21 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Checks that each element of a list of strings is correctly wrapped in single quotes and that other single quotes inside are properly escaped in MySQL notation.
+    /// Checks that each element within a list of strings is correctly wrapped in single quotes and that other single quotes inside are properly escaped in MySQL notation.
     /// </summary>
-    /// <param name="elementsList">A list of strings.</param>
+    /// <param name="elements">A list of strings.</param>
     /// <returns>The indexes of the elements of the list with an incorrect escaping of single quotes, or not wrapped in single quotes correctly.</returns>
-    public static List<int> CheckForCorrectSingleQuoting(this List<string> elementsList)
+    public static int[] CheckForCorrectSingleQuoting(this List<string> elements)
     {
-      if (elementsList == null || elementsList.Count == 0)
+      if (elements == null || elements.Count == 0)
       {
         return null;
       }
 
-      var indexesList = new List<int>(elementsList.Count);
-      for (int elementIndex = 0; elementIndex < elementsList.Count; elementIndex++)
+      var indexesList = new List<int>(elements.Count);
+      for (int elementIndex = 0; elementIndex < elements.Count; elementIndex++)
       {
-        if (elementsList[elementIndex].CheckForCorrectSingleQuoting())
+        if (elements[elementIndex].CheckForCorrectSingleQuoting())
         {
           continue;
         }
@@ -156,7 +156,7 @@ namespace MySQL.ForExcel.Classes
         indexesList.Add(elementIndex);
       }
 
-      return indexesList;
+      return indexesList.ToArray();
     }
 
     /// <summary>

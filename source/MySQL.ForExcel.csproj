@@ -229,7 +229,6 @@
   <ItemGroup>
     <Compile Include="Classes\CustomProperty.cs" />
     <Compile Include="Classes\CustomPropertyDescriptor.cs" />
-    <Compile Include="Classes\DataTypeUtilities.cs" />
     <Compile Include="Classes\DbObject.cs" />
     <Compile Include="Classes\DbProcedure.cs" />
     <Compile Include="Classes\DbSchema.cs" />
@@ -264,6 +263,7 @@
     </Compile>
     <Compile Include="Classes\MySqlDataType.cs" />
     <Compile Include="Classes\MySqlDataUtilities.cs" />
+    <Compile Include="Classes\MySqlDisplayDataType.cs" />
     <Compile Include="Classes\MySqlDummyRow.cs" />
     <Compile Include="Classes\MySqlForExcelSettings.cs" />
     <Compile Include="Classes\MySqlListViewNode.cs" />
@@ -580,6 +580,7 @@
     <None Include="Resources\clear_output.png" />
     <None Include="Resources\edit.png" />
     <None Include="Resources\exit.png" />
+    <None Include="Resources\help.png" />
     <Content Include="Resources\mysql-for-excel.ico" />
     <None Include="Resources\MySQLforExcel-ObjectPanel-EditData-24x24.png" />
     <None Include="Resources\MySQLforExcel-ObjectPanel-EditData-Disabled-24x24.png" />

@@ -326,8 +326,8 @@ namespace MySQL.ForExcel.Classes
         string dataType = row["COLUMN_TYPE"].ToString();
         if (beautifyDataTypes)
         {
-          bool isValidMySqlType;
-          dataType = DataTypeUtilities.BeautifyMySqlDataType(dataType, false, out isValidMySqlType);
+          var mySqlDataType = new MySqlDataType(dataType, false);
+          dataType = mySqlDataType.FullType;
         }
 
         var infoRow = columnsInfoTable.NewRow();
@@ -362,13 +362,13 @@ namespace MySQL.ForExcel.Classes
       {
         var newRow = schemaInfoTable.NewRow();
         newRow["Name"] = column.ColumnName;
-        newRow["Type"] = column.DataType.GetMySqlDataType();
+        newRow["Type"] = MySqlDataType.GetMySqlDataType(column.DataType);
         newRow["Null"] = column.AllowDBNull ? "YES" : "NO";
         newRow["Key"] = dataTable.PrimaryKey.Any(indexCol => indexCol.ColumnName == column.ColumnName) ? "PRI" : string.Empty;
         newRow["Default"] = column.DefaultValue != null ? column.DefaultValue.ToString() : string.Empty;
         newRow["CharSet"] = null;
         newRow["Collation"] = null;
-        newRow["Extra"] = column.AutoIncrement ? "auto_increment" : string.Empty;
+        newRow["Extra"] = column.AutoIncrement ? MySqlDataColumn.ATTRIBUTE_AUTO_INCREMENT : string.Empty;
         schemaInfoTable.Rows.Add(newRow);
       }
 
@@ -553,7 +553,8 @@ namespace MySQL.ForExcel.Classes
         return string.Empty;
       }
 
-      bool requireQuotes = parameter.MySqlDbType.RequiresQuotesForValue();
+      var mySqlDataType = MySqlDataType.FromMySqlDbType(parameter.MySqlDbType);
+      bool requireQuotes = mySqlDataType.RequiresQuotesForValue;
       return string.Format("{0} @{1} = {2}{3}{2}",
         firstParameter ? "SET" : ",",
         parameter.ParameterName,
@@ -619,6 +620,31 @@ namespace MySQL.ForExcel.Classes
     public static bool IsForImport(this MySqlDataTable.DataOperationType operationType)
     {
       return operationType == MySqlDataTable.DataOperationType.ImportTableOrView || operationType == MySqlDataTable.DataOperationType.ImportProcedure;
+    }
+
+    /// <summary>
+    /// Checks if the string value representing a date is a MySQL zero date.
+    /// </summary>
+    /// <param name="dateValueAsString">The string value representing a date.</param>
+    /// <param name="checkIfIntZero">Flag indicating whether a value of 0 should also be treated as a zero date.</param>
+    /// <returns><c>true</c> if the passed string value is a MySQL zero date, <c>false</c> otherwise.</returns>
+    public static bool IsMySqlZeroDateTimeValue(this string dateValueAsString, bool checkIfIntZero = false)
+    {
+      int zeroValue;
+      bool isDateValueZero = checkIfIntZero && int.TryParse(dateValueAsString, out zeroValue) && zeroValue == 0;
+      bool isDateValueAZeroDate;
+      MySqlDataType.IsMySqlDateTimeValue(dateValueAsString, out isDateValueAZeroDate);
+      return isDateValueZero || isDateValueAZeroDate;
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the value of the given parameter should not be written to depending on its direction.
+    /// </summary>
+    /// <param name="parameter">A <see cref="MySqlParameter"/> object.</param>
+    /// <returns><c>true</c> if the parameter's direction is <see cref="ParameterDirection.Output"/> or <see cref="ParameterDirection.ReturnValue"/>, <c>false</c> otherwise.</returns>
+    public static bool IsReadOnly(this MySqlParameter parameter)
+    {
+      return parameter != null && (parameter.Direction == ParameterDirection.Output || parameter.Direction == ParameterDirection.ReturnValue);
     }
 
     /// <summary>

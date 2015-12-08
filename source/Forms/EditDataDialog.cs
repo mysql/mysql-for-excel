@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -559,7 +559,7 @@ namespace MySQL.ForExcel.Forms
                 object insertingValue = DBNull.Value;
                 if (cellValue != null)
                 {
-                  insertingValue = DataTypeUtilities.GetInsertingValueForColumnType(cellValue, currCol, false);
+                  insertingValue = currCol.GetInsertingValueForType(cellValue, false);
                 }
 
                 if (insertingValue == null)
@@ -584,7 +584,7 @@ namespace MySQL.ForExcel.Forms
           catch (ArgumentException argEx)
           {
             undoChanges = true;
-            operationSummary = string.Format(Resources.EditDataInvalidValueError, currCol != null ? currCol.MySqlDataType : "Unknown");
+            operationSummary = string.Format(Resources.EditDataInvalidValueError, currCol != null ? currCol.MySqlDataType.FullType : "Unknown");
             operationDetails = argEx.Message;
           }
           catch (Exception ex)

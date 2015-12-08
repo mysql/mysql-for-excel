@@ -312,7 +312,7 @@ namespace MySQL.ForExcel.Classes
           byte paramScale = dr["NUMERIC_SCALE"] != null && dr["NUMERIC_SCALE"] != DBNull.Value
             ? Convert.ToByte(dr["NUMERIC_SCALE"])
             : (byte) 0;
-          bool paramUnsigned = dr["DTD_IDENTIFIER"].ToString().Contains("unsigned");
+          bool paramUnsigned = dr["DTD_IDENTIFIER"].ToString().Contains("unsigned", StringComparison.InvariantCultureIgnoreCase);
           string paramDirectionStr = paramName != "RETURN_VALUE"
             ? dr["PARAMETER_MODE"].ToString().ToLowerInvariant()
             : "return";
@@ -336,11 +336,14 @@ namespace MySQL.ForExcel.Classes
               break;
           }
 
-          object objValue;
-          var dbType = DataTypeUtilities.GetMySqlDbType(dataType, paramUnsigned, out objValue);
+          var mySqlType = new MySqlDataType(dataType, true);
+          if (paramUnsigned)
+          {
+            mySqlType.Unsigned = true;
+          }
+
           Parameters.Add(new Tuple<string, MySqlParameter>(dataType,
-            new MySqlParameter(paramName, dbType, paramSize, paramDirection, false, paramPrecision, paramScale, null,
-              DataRowVersion.Current, objValue)));
+            new MySqlParameter(paramName, mySqlType.MySqlDbType, paramSize, paramDirection, false, paramPrecision, paramScale, null, DataRowVersion.Current, mySqlType.TypeDefaultValue)));
         }
       }
       catch (Exception ex)

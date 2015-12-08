@@ -258,41 +258,6 @@ namespace MySQL.ForExcel.Classes
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MySqlDataTable"/> class.
-    /// This constructor is meant to be used by the <see cref="ExportDataForm"/> class.
-    /// </summary>
-    /// <param name="fromTemplate">Template <see cref="MySqlDataTable"/> from which to build a new one, the new table is a copy with the same data, but the schema is built from the template not cloned.</param>
-    /// <param name="dataRange">The <see cref="ExcelInterop.Range"/> containing the data to be fed to the new <see cref="MySqlDataTable"/>. If <c>null</c> the data is copied from the <seealso cref="fromTemplate"/> table.</param>
-    public MySqlDataTable(MySqlDataTable fromTemplate, ExcelInterop.Range dataRange)
-      : this(fromTemplate.WbConnection, fromTemplate.TableName)
-    {
-      AddBufferToVarChar = fromTemplate.AddBufferToVarChar;
-      AddPrimaryKeyColumn = fromTemplate.AddPrimaryKeyColumn;
-      AutoAllowEmptyNonIndexColumns = fromTemplate.AutoAllowEmptyNonIndexColumns;
-      AutoIndexIntColumns = fromTemplate.AutoIndexIntColumns;
-      CharSet = fromTemplate.CharSet;
-      Collation = fromTemplate.Collation;
-      DetectDatatype = false;
-      FirstRowContainsColumnNames = fromTemplate.FirstRowContainsColumnNames;
-      IsFormatted = fromTemplate.IsFormatted;
-      IsPreviewTable = false;
-      OperationType = fromTemplate.OperationType;
-      UseFirstColumnAsPk = fromTemplate.UseFirstColumnAsPk;
-      UseOptimisticUpdate = fromTemplate.UseOptimisticUpdate;
-
-      var schemaInfoTable = fromTemplate.GetColumnsSchemaInfo();
-      CreateTableSchema(schemaInfoTable);
-      if (dataRange == null)
-      {
-        CopyTableData(fromTemplate, true);
-      }
-      else
-      {
-        SetupColumnsWithData(dataRange, false);
-      }
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MySqlDataTable"/> class.
     /// This constructor is meant to be used by the <see cref="AppendDataForm"/> class to fetch schema information from the corresponding MySQL table before copying its excelData.
     /// </summary>
     /// <param name="fromDbTable">The <see cref="DbTable"/> object from which the new <see cref="MySqlDataTable"/> will get its schema information and its data.</param>
@@ -645,7 +610,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_columnsDataLength == 0)
         {
-          _columnsDataLength = Columns.Cast<MySqlDataColumn>().Sum(col => col.MySqlDataTypeLength);
+          _columnsDataLength = Columns.Cast<MySqlDataColumn>().Sum(col => col.MySqlDataType.Length > 0 ? col.MySqlDataType.Length : col.MySqlDataType.MaxLength);
           _maxQueryLength = 0;
         }
 
@@ -801,7 +766,7 @@ namespace MySQL.ForExcel.Classes
         int firstColIdx = AddPrimaryKeyColumn ? 1 : 0;
         if (Columns.Count > firstColIdx)
         {
-          containsIntegers = GetColumnAtIndex(firstColIdx).MySqlDataType.ToLowerInvariant() == "integer";
+          containsIntegers = GetColumnAtIndex(firstColIdx).MySqlDataType.TypeName.Equals("integer", StringComparison.InvariantCultureIgnoreCase);
         }
 
         if (containsIntegers)
@@ -916,7 +881,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_maxQueryForPrimaryColumnsLength == 0)
         {
-          long maxSize = PrimaryKeyColumnsDataLength + (DataTypeUtilities.MYSQL_DB_OBJECTS_MAX_LENGTH * 3);
+          long maxSize = PrimaryKeyColumnsDataLength + (MySqlDataType.MYSQL_DB_OBJECTS_MAX_LENGTH * 3);
           _maxQueryForPrimaryColumnsLength = (int)Math.Min(maxSize, int.MaxValue);
           _sqlBuilderForDelete = null;
         }
@@ -934,7 +899,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_maxQueryLength == 0)
         {
-          long maxSize = ColumnsDataLength + (DataTypeUtilities.MYSQL_DB_OBJECTS_MAX_LENGTH * 3);
+          long maxSize = ColumnsDataLength + (MySqlDataType.MYSQL_DB_OBJECTS_MAX_LENGTH * 3);
           _maxQueryLength = (int)Math.Min(maxSize, MySqlMaxAllowedPacket);
           _sqlBuilderForInsert = null;
           _sqlBuilderForUpdate = null;
@@ -1014,7 +979,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_primaryKeyColumnsDataLength == 0)
         {
-          _primaryKeyColumnsDataLength = Columns.Cast<MySqlDataColumn>().Where(pkCol => pkCol.PrimaryKey).Sum(col => col.MySqlDataTypeLength);
+          _primaryKeyColumnsDataLength = Columns.Cast<MySqlDataColumn>().Where(pkCol => pkCol.PrimaryKey).Sum(col => col.MySqlDataType.Length > 0 ? col.MySqlDataType.Length : col.MySqlDataType.MaxLength);
         }
 
         return _primaryKeyColumnsDataLength;
@@ -1800,8 +1765,8 @@ namespace MySQL.ForExcel.Classes
         foreach (var column in ColumnsForInsertion)
         {
           bool insertingValueIsNull;
-          string valueToDb = DataTypeUtilities.GetStringValueForColumn(dr[column.ColumnName], column, out insertingValueIsNull);
-          string wrapValueCharacter = column.ColumnRequiresQuotes && !insertingValueIsNull ? "'" : string.Empty;
+          string valueToDb = column.GetStringValue(dr[column.ColumnName], out insertingValueIsNull);
+          string wrapValueCharacter = column.MySqlDataType.RequiresQuotesForValue && !insertingValueIsNull ? "'" : string.Empty;
           singleRowValuesBuilder.AppendFormat("{0}{1}{2}{1}", colsSeparator, wrapValueCharacter, valueToDb);
           colsSeparator = ",";
         }
@@ -1941,7 +1906,7 @@ namespace MySQL.ForExcel.Classes
         }
 
         // Format columns that have a MySQL TIME data type
-        foreach (var col in Columns.Cast<MySqlDataColumn>().Where(col => col.StrippedMySqlDataType.IsMySqlDataTypeTime()))
+        foreach (var col in Columns.Cast<MySqlDataColumn>().Where(col => col.MySqlDataType.IsTime))
         {
           ExcelInterop.Range firstColumnDataCell = fillingRange.Cells[headerRowModifier + 1, col.Ordinal + 1];
           var dataColumnRange = firstColumnDataCell.Resize[cappedNumRows, 1];
@@ -2039,7 +2004,9 @@ namespace MySQL.ForExcel.Classes
       for (int colIdx = 0; colIdx < Columns.Count; colIdx++)
       {
         var targetColumn = Columns[colIdx] as MySqlDataColumn;
-        var importingValue = DataTypeUtilities.GetInsertingValueForColumnType(itemArray[colIdx], targetColumn, false);
+        var importingValue = targetColumn != null
+          ? targetColumn.GetInsertingValueForType(itemArray[colIdx], false)
+          : itemArray[colIdx];
         if (escapeFormulaTexts)
         {
           importingValue = importingValue.EscapeStartingEqualSign();
@@ -2755,7 +2722,7 @@ namespace MySQL.ForExcel.Classes
       foreach (var mySqlCol in mySqlColumns)
       {
         mySqlCol.SetDisplayName(_firstRowContainsColumnNames ? row[mySqlCol.Ordinal].ToString().ToValidMySqlColumnName() : mySqlCol.ColumnName, false);
-        mySqlCol.SetMySqlDataType(_firstRowContainsColumnNames ? mySqlCol.RowsFromSecondDataType : mySqlCol.RowsFromFirstDataType);
+        mySqlCol.SetMySqlDataType(_firstRowContainsColumnNames ? MySqlDataColumn.MySqlDataTypeFromRowType.FromSecond : MySqlDataColumn.MySqlDataTypeFromRowType.FromFirst);
       }
 
       // Check about duplicate column names now that all column names were set to the ones given by the user.

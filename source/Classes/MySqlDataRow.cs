@@ -409,8 +409,8 @@ namespace MySQL.ForExcel.Classes
       foreach (MySqlDataColumn column in parentTable.ColumnsForInsertion)
       {
         bool insertingValueIsNull;
-        string valueToDb = DataTypeUtilities.GetStringValueForColumn(this[column.ColumnName], column, out insertingValueIsNull);
-        string wrapValueCharacter = column.ColumnRequiresQuotes && !insertingValueIsNull ? "'" : string.Empty;
+        string valueToDb = column.GetStringValue(this[column.ColumnName], out insertingValueIsNull);
+        string wrapValueCharacter = column.MySqlDataType.RequiresQuotesForValue && !insertingValueIsNull ? "'" : string.Empty;
         sqlBuilderForInsert.AppendFormat("{0}{1}{2}{1}", colsSeparator, wrapValueCharacter, valueToDb);
         colsSeparator = ",";
       }
@@ -460,8 +460,8 @@ namespace MySQL.ForExcel.Classes
       foreach (var column in parentTable.Columns.Cast<MySqlDataColumn>().Where(col => ChangedColumnNames.Contains(col.ColumnName)))
       {
         bool updatingValueIsNull;
-        var valueToDb = DataTypeUtilities.GetStringValueForColumn(this[column.ColumnName], column, out updatingValueIsNull);
-        string wrapValueCharacter = column.ColumnRequiresQuotes && !updatingValueIsNull ? "'" : string.Empty;
+        var valueToDb = column.GetStringValue(this[column.ColumnName], out updatingValueIsNull);
+        string wrapValueCharacter = column.MySqlDataType.RequiresQuotesForValue && !updatingValueIsNull ? "'" : string.Empty;
         sqlBuilderForUpdate.AppendFormat("{0}`{1}`={2}{3}{2}", colsSeparator, column.ColumnNameForSqlQueries, wrapValueCharacter, valueToDb);
         colsSeparator = ",";
       }
@@ -500,12 +500,11 @@ namespace MySQL.ForExcel.Classes
       foreach (MySqlDataColumn column in parentTable.Columns)
       {
         bool updatingValueIsNull;
-        bool columnRequiresQuotes = column.ColumnRequiresQuotes;
-        bool columnIsText = column.StrippedMySqlDataType.IsMySqlDataTypeCharOrText() || column.StrippedMySqlDataType.IsMySqlDataTypeSetOrEnum();
-        bool columnIsJson = column.StrippedMySqlDataType.IsMySqlDataTypeJson();
-        string valueToDb = DataTypeUtilities.GetStringValueForColumn(this[column.ColumnName, DataRowVersion.Original], column, out updatingValueIsNull);
+        bool columnRequiresQuotes = column.MySqlDataType.RequiresQuotesForValue;
+        bool columnIsText = column.MySqlDataType.IsChar || column.MySqlDataType.IsText || column.MySqlDataType.IsSetOrEnum;
+        bool columnIsJson = column.MySqlDataType.IsJson;
+        string valueToDb = column.GetStringValue(this[column.ColumnName, DataRowVersion.Original], out updatingValueIsNull);
         string wrapValueCharacter = columnRequiresQuotes && !updatingValueIsNull ? "'" : string.Empty;
-        string valueForClause;
         if (column.AllowNull)
         {
           var columnCollation = column.AbsoluteCollation;
@@ -516,6 +515,7 @@ namespace MySQL.ForExcel.Classes
 
           // If the length of the string value * 2 is greater than the string it requires to declare a variable for it, then declare the variable to save query space.
           bool needToCreateVariable = (valueToDb.Length * 2) > (valueToDb.Length + 24 + (needToCollateTextValue ? columnCollation.Length + 9 : 0));
+          string valueForClause;
           if (needToCreateVariable)
           {
             valueForClause = "@OldCol" + (column.Ordinal + 1) + "Value";
@@ -546,7 +546,7 @@ namespace MySQL.ForExcel.Classes
           continue;
         }
 
-        valueToDb = DataTypeUtilities.GetStringValueForColumn(this[column.ColumnName], column, out updatingValueIsNull);
+        valueToDb = column.GetStringValue(this[column.ColumnName], out updatingValueIsNull);
         wrapValueCharacter = columnRequiresQuotes && !updatingValueIsNull ? "'" : string.Empty;
         sqlBuilderForUpdate.AppendFormat("{0}`{1}`={2}{3}{2}", colsSeparator, column.ColumnNameForSqlQueries, wrapValueCharacter, valueToDb);
         colsSeparator = ",";
@@ -603,8 +603,8 @@ namespace MySQL.ForExcel.Classes
       foreach (MySqlDataColumn pkCol in parentTable.PrimaryKeyColumns)
       {
         bool pkValueIsNull;
-        string valueToDb = DataTypeUtilities.GetStringValueForColumn(this[pkCol.ColumnName, dataRowVersion], pkCol, out pkValueIsNull);
-        string wrapValueCharacter = pkCol.ColumnRequiresQuotes && !pkValueIsNull ? "'" : string.Empty;
+        string valueToDb = pkCol.GetStringValue(this[pkCol.ColumnName, dataRowVersion], out pkValueIsNull);
+        string wrapValueCharacter = pkCol.MySqlDataType.RequiresQuotesForValue && !pkValueIsNull ? "'" : string.Empty;
         wClauseBuilder.AppendFormat("{0}`{1}`={2}{3}{2}", colsSeparator, pkCol.ColumnNameForSqlQueries, wrapValueCharacter, valueToDb);
         colsSeparator = " AND ";
       }

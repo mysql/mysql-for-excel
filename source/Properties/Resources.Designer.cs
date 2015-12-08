@@ -300,6 +300,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Entered default value is not valid for the column&apos;s data type..
+        /// </summary>
+        internal static string ColumnDefaultValueNotValidWarning {
+            get {
+                return ResourceManager.GetString("ColumnDefaultValueNotValidWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Another column with this name already exists in the table..
         /// </summary>
         internal static string ColumnExistsWarning {
@@ -1154,6 +1163,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Advanced option to create indexes after data is exported conflicts with Auto Increment since column must be indexed.
+        /// </summary>
+        internal static string ExportIndexesCreatedLastWarning {
+            get {
+                return ResourceManager.GetString("ExportIndexesCreatedLastWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MySQL Error {0}: {1}.
         /// </summary>
         internal static string GenericConnectionErrorText {
@@ -1168,6 +1186,16 @@ namespace MySQL.ForExcel.Properties {
         internal static string GenericMySQLError {
             get {
                 return ResourceManager.GetString("GenericMySQLError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap help {
+            get {
+                object obj = ResourceManager.GetObject("help", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         

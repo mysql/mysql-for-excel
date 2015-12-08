@@ -66,6 +66,7 @@ namespace MySQL.ForExcel.Forms
     private void InitializeComponent()
     {
       this.components = new System.ComponentModel.Container();
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExportDataForm));
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
       System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -76,7 +77,14 @@ namespace MySQL.ForExcel.Forms
       this.PrimaryKeyWarningLabel = new System.Windows.Forms.Label();
       this.PrimaryKeyWarningPictureBox = new System.Windows.Forms.PictureBox();
       this.ColumnOptionsGroupBox = new System.Windows.Forms.GroupBox();
+      this.DefaultValuePictureBox = new System.Windows.Forms.PictureBox();
+      this.AutoIncrementCheckBox = new System.Windows.Forms.CheckBox();
+      this.DefaultValueTextBox = new System.Windows.Forms.TextBox();
+      this.DefaultValueLabel = new System.Windows.Forms.Label();
       this.DataTypeComboBox = new System.Windows.Forms.ComboBox();
+      this.DataTypeContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.UnsignedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.ZeroFillToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.ExcludeColumnCheckBox = new System.Windows.Forms.CheckBox();
       this.AllowEmptyCheckBox = new System.Windows.Forms.CheckBox();
       this.PrimaryKeyCheckBox = new System.Windows.Forms.CheckBox();
@@ -114,20 +122,23 @@ namespace MySQL.ForExcel.Forms
       this.CreateTableToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.CollationComboBox = new System.Windows.Forms.ComboBox();
       this.CollationLabel = new System.Windows.Forms.Label();
-      this.PreviewDataGridView = new MySQL.ForExcel.Controls.PreviewDataGridView();
       this.DataTypeBindingSource = new System.Windows.Forms.BindingSource(this.components);
+      this.HelpToolTip = new System.Windows.Forms.ToolTip(this.components);
+      this.PreviewDataGridView = new MySQL.ForExcel.Controls.PreviewDataGridView();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.PrimaryKeyWarningPictureBox)).BeginInit();
       this.ColumnOptionsGroupBox.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.DefaultValuePictureBox)).BeginInit();
+      this.DataTypeContextMenuStrip.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.ColumnOptionsWarningPictureBox)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.ColumnOptionsPictureBox)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.TableNameWarningPictureBox)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.PrimaryKeyPictureBox)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.TablePictureBox)).BeginInit();
       this.ExportContextMenuStrip.SuspendLayout();
-      ((System.ComponentModel.ISupportInitialize)(this.PreviewDataGridView)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.DataTypeBindingSource)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.PreviewDataGridView)).BeginInit();
       this.SuspendLayout();
       // 
       // FootnoteAreaPanel
@@ -166,7 +177,7 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.TableNameSubLabel);
       this.ContentAreaPanel.Controls.Add(this.TableNameMainLabel);
       this.ContentAreaPanel.Controls.Add(this.TablePictureBox);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(844, 601);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(884, 625);
       // 
       // CommandAreaPanel
       // 
@@ -174,8 +185,8 @@ namespace MySQL.ForExcel.Forms
       this.CommandAreaPanel.Controls.Add(this.AdvancedOptionsButton);
       this.CommandAreaPanel.Controls.Add(this.ExportButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 556);
-      this.CommandAreaPanel.Size = new System.Drawing.Size(844, 45);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 580);
+      this.CommandAreaPanel.Size = new System.Drawing.Size(884, 45);
       // 
       // TextChangedTimer
       // 
@@ -198,7 +209,7 @@ namespace MySQL.ForExcel.Forms
       this.ExportButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.ExportButton.DialogResult = System.Windows.Forms.DialogResult.OK;
       this.ExportButton.Enabled = false;
-      this.ExportButton.Location = new System.Drawing.Point(649, 12);
+      this.ExportButton.Location = new System.Drawing.Point(689, 12);
       this.ExportButton.Name = "ExportButton";
       this.ExportButton.Size = new System.Drawing.Size(102, 23);
       this.ExportButton.TabIndex = 1;
@@ -209,7 +220,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.DialogCancelButton.Location = new System.Drawing.Point(757, 12);
+      this.DialogCancelButton.Location = new System.Drawing.Point(797, 12);
       this.DialogCancelButton.Name = "DialogCancelButton";
       this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
       this.DialogCancelButton.TabIndex = 3;
@@ -219,13 +230,12 @@ namespace MySQL.ForExcel.Forms
       // PrimaryKeyWarningLabel
       // 
       this.PrimaryKeyWarningLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.PrimaryKeyWarningLabel.AutoSize = true;
       this.PrimaryKeyWarningLabel.BackColor = System.Drawing.Color.Transparent;
       this.PrimaryKeyWarningLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.PrimaryKeyWarningLabel.ForeColor = System.Drawing.Color.Red;
-      this.PrimaryKeyWarningLabel.Location = new System.Drawing.Point(485, 176);
+      this.PrimaryKeyWarningLabel.Location = new System.Drawing.Point(528, 172);
       this.PrimaryKeyWarningLabel.Name = "PrimaryKeyWarningLabel";
-      this.PrimaryKeyWarningLabel.Size = new System.Drawing.Size(336, 12);
+      this.PrimaryKeyWarningLabel.Size = new System.Drawing.Size(274, 26);
       this.PrimaryKeyWarningLabel.TabIndex = 14;
       this.PrimaryKeyWarningLabel.Text = "Primary Key column cannot be created because another column has the same name.";
       this.PrimaryKeyWarningLabel.Visible = false;
@@ -235,7 +245,7 @@ namespace MySQL.ForExcel.Forms
       this.PrimaryKeyWarningPictureBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.PrimaryKeyWarningPictureBox.BackColor = System.Drawing.Color.Transparent;
       this.PrimaryKeyWarningPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.PrimaryKeyWarningPictureBox.Location = new System.Drawing.Point(462, 171);
+      this.PrimaryKeyWarningPictureBox.Location = new System.Drawing.Point(505, 173);
       this.PrimaryKeyWarningPictureBox.Name = "PrimaryKeyWarningPictureBox";
       this.PrimaryKeyWarningPictureBox.Size = new System.Drawing.Size(20, 20);
       this.PrimaryKeyWarningPictureBox.TabIndex = 45;
@@ -247,6 +257,10 @@ namespace MySQL.ForExcel.Forms
       this.ColumnOptionsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.ColumnOptionsGroupBox.BackColor = System.Drawing.Color.Transparent;
+      this.ColumnOptionsGroupBox.Controls.Add(this.DefaultValuePictureBox);
+      this.ColumnOptionsGroupBox.Controls.Add(this.AutoIncrementCheckBox);
+      this.ColumnOptionsGroupBox.Controls.Add(this.DefaultValueTextBox);
+      this.ColumnOptionsGroupBox.Controls.Add(this.DefaultValueLabel);
       this.ColumnOptionsGroupBox.Controls.Add(this.DataTypeComboBox);
       this.ColumnOptionsGroupBox.Controls.Add(this.ExcludeColumnCheckBox);
       this.ColumnOptionsGroupBox.Controls.Add(this.AllowEmptyCheckBox);
@@ -259,10 +273,59 @@ namespace MySQL.ForExcel.Forms
       this.ColumnOptionsGroupBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.ColumnOptionsGroupBox.Location = new System.Drawing.Point(82, 444);
       this.ColumnOptionsGroupBox.Name = "ColumnOptionsGroupBox";
-      this.ColumnOptionsGroupBox.Size = new System.Drawing.Size(677, 89);
+      this.ColumnOptionsGroupBox.Size = new System.Drawing.Size(720, 113);
       this.ColumnOptionsGroupBox.TabIndex = 20;
       this.ColumnOptionsGroupBox.TabStop = false;
       this.ColumnOptionsGroupBox.Text = "Column Options";
+      // 
+      // DefaultValuePictureBox
+      // 
+      this.DefaultValuePictureBox.Image = global::MySQL.ForExcel.Properties.Resources.help;
+      this.DefaultValuePictureBox.Location = new System.Drawing.Point(263, 84);
+      this.DefaultValuePictureBox.Name = "DefaultValuePictureBox";
+      this.DefaultValuePictureBox.Size = new System.Drawing.Size(16, 16);
+      this.DefaultValuePictureBox.TabIndex = 12;
+      this.DefaultValuePictureBox.TabStop = false;
+      this.HelpToolTip.SetToolTip(this.DefaultValuePictureBox, "Click here to assign CURRENT_TIMESTAMP as the default value for DateTime or TimeS" +
+        "tamp type.");
+      this.DefaultValuePictureBox.Visible = false;
+      this.DefaultValuePictureBox.Click += new System.EventHandler(this.DefaultValuePictureBox_Click);
+      // 
+      // AutoIncrementCheckBox
+      // 
+      this.AutoIncrementCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.AutoIncrementCheckBox.AutoSize = true;
+      this.AutoIncrementCheckBox.Location = new System.Drawing.Point(529, 53);
+      this.AutoIncrementCheckBox.Name = "AutoIncrementCheckBox";
+      this.AutoIncrementCheckBox.Size = new System.Drawing.Size(109, 19);
+      this.AutoIncrementCheckBox.TabIndex = 11;
+      this.AutoIncrementCheckBox.Text = "Auto Increment";
+      this.HelpToolTip.SetToolTip(this.AutoIncrementCheckBox, resources.GetString("AutoIncrementCheckBox.ToolTip"));
+      this.AutoIncrementCheckBox.UseVisualStyleBackColor = true;
+      this.AutoIncrementCheckBox.CheckedChanged += new System.EventHandler(this.AutoIncrementCheckBox_CheckedChanged);
+      // 
+      // DefaultValueTextBox
+      // 
+      this.DefaultValueTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.DefaultValueTextBox.Location = new System.Drawing.Point(122, 81);
+      this.DefaultValueTextBox.Name = "DefaultValueTextBox";
+      this.DefaultValueTextBox.Size = new System.Drawing.Size(135, 23);
+      this.DefaultValueTextBox.TabIndex = 5;
+      this.HelpToolTip.SetToolTip(this.DefaultValueTextBox, "A default value can\'t be applied to Blob, Text, Geometry and JSON data types.\r\nIf" +
+        " a default value is set, the column can\'t be set to Auto Increment its values.");
+      this.DefaultValueTextBox.TextChanged += new System.EventHandler(this.DefaultValueTextBox_TextChanged);
+      this.DefaultValueTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.DefaultValueTextBox_Validating);
+      // 
+      // DefaultValueLabel
+      // 
+      this.DefaultValueLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+      this.DefaultValueLabel.AutoSize = true;
+      this.DefaultValueLabel.Location = new System.Drawing.Point(28, 84);
+      this.DefaultValueLabel.Name = "DefaultValueLabel";
+      this.DefaultValueLabel.Size = new System.Drawing.Size(80, 15);
+      this.DefaultValueLabel.TabIndex = 4;
+      this.DefaultValueLabel.Text = "Default Value:";
       // 
       // DataTypeComboBox
       // 
@@ -270,6 +333,7 @@ namespace MySQL.ForExcel.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
       this.DataTypeComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
       this.DataTypeComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+      this.DataTypeComboBox.ContextMenuStrip = this.DataTypeContextMenuStrip;
       this.DataTypeComboBox.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
       this.DataTypeComboBox.DropDownWidth = 400;
       this.DataTypeComboBox.FormattingEnabled = true;
@@ -277,20 +341,48 @@ namespace MySQL.ForExcel.Forms
       this.DataTypeComboBox.Name = "DataTypeComboBox";
       this.DataTypeComboBox.Size = new System.Drawing.Size(135, 24);
       this.DataTypeComboBox.TabIndex = 3;
+      this.HelpToolTip.SetToolTip(this.DataTypeComboBox, resources.GetString("DataTypeComboBox.ToolTip"));
       this.DataTypeComboBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.DataTypeComboBoxDrawItem);
       this.DataTypeComboBox.SelectedIndexChanged += new System.EventHandler(this.DataTypeComboBox_SelectedIndexChanged);
       this.DataTypeComboBox.TextChanged += new System.EventHandler(this.DataTypeComboBox_TextChanged);
       this.DataTypeComboBox.Validating += new System.ComponentModel.CancelEventHandler(this.DataTypeComboBox_Validating);
       // 
+      // DataTypeContextMenuStrip
+      // 
+      this.DataTypeContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.UnsignedToolStripMenuItem,
+            this.ZeroFillToolStripMenuItem});
+      this.DataTypeContextMenuStrip.Name = "DataTypeContextMenuStrip";
+      this.DataTypeContextMenuStrip.Size = new System.Drawing.Size(125, 48);
+      this.DataTypeContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.DataTypeContextMenuStrip_Opening);
+      // 
+      // UnsignedToolStripMenuItem
+      // 
+      this.UnsignedToolStripMenuItem.CheckOnClick = true;
+      this.UnsignedToolStripMenuItem.Name = "UnsignedToolStripMenuItem";
+      this.UnsignedToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+      this.UnsignedToolStripMenuItem.Text = "Unsigned";
+      this.UnsignedToolStripMenuItem.CheckedChanged += new System.EventHandler(this.UnsignedToolStripMenuItem_CheckedChanged);
+      // 
+      // ZeroFillToolStripMenuItem
+      // 
+      this.ZeroFillToolStripMenuItem.CheckOnClick = true;
+      this.ZeroFillToolStripMenuItem.Name = "ZeroFillToolStripMenuItem";
+      this.ZeroFillToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+      this.ZeroFillToolStripMenuItem.Text = "Zero Fill";
+      this.ZeroFillToolStripMenuItem.CheckedChanged += new System.EventHandler(this.ZeroFillToolStripMenuItem_CheckedChanged);
+      // 
       // ExcludeColumnCheckBox
       // 
       this.ExcludeColumnCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.ExcludeColumnCheckBox.AutoSize = true;
-      this.ExcludeColumnCheckBox.Location = new System.Drawing.Point(529, 21);
+      this.ExcludeColumnCheckBox.Location = new System.Drawing.Point(529, 24);
       this.ExcludeColumnCheckBox.Name = "ExcludeColumnCheckBox";
       this.ExcludeColumnCheckBox.Size = new System.Drawing.Size(112, 19);
-      this.ExcludeColumnCheckBox.TabIndex = 8;
+      this.ExcludeColumnCheckBox.TabIndex = 10;
       this.ExcludeColumnCheckBox.Text = "Exclude Column";
+      this.HelpToolTip.SetToolTip(this.ExcludeColumnCheckBox, "When checked, the column is excluded from the table creation and Export Data oper" +
+        "ation.");
       this.ExcludeColumnCheckBox.UseVisualStyleBackColor = true;
       this.ExcludeColumnCheckBox.CheckedChanged += new System.EventHandler(this.ExcludeCheckBox_CheckedChanged);
       // 
@@ -301,8 +393,9 @@ namespace MySQL.ForExcel.Forms
       this.AllowEmptyCheckBox.Location = new System.Drawing.Point(407, 53);
       this.AllowEmptyCheckBox.Name = "AllowEmptyCheckBox";
       this.AllowEmptyCheckBox.Size = new System.Drawing.Size(93, 19);
-      this.AllowEmptyCheckBox.TabIndex = 7;
+      this.AllowEmptyCheckBox.TabIndex = 9;
       this.AllowEmptyCheckBox.Text = "Allow Empty";
+      this.HelpToolTip.SetToolTip(this.AllowEmptyCheckBox, resources.GetString("AllowEmptyCheckBox.ToolTip"));
       this.AllowEmptyCheckBox.UseVisualStyleBackColor = true;
       this.AllowEmptyCheckBox.CheckedChanged += new System.EventHandler(this.AllowEmptyCheckBox_CheckedChanged);
       // 
@@ -310,11 +403,13 @@ namespace MySQL.ForExcel.Forms
       // 
       this.PrimaryKeyCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.PrimaryKeyCheckBox.AutoSize = true;
-      this.PrimaryKeyCheckBox.Location = new System.Drawing.Point(407, 21);
+      this.PrimaryKeyCheckBox.Location = new System.Drawing.Point(283, 24);
       this.PrimaryKeyCheckBox.Name = "PrimaryKeyCheckBox";
       this.PrimaryKeyCheckBox.Size = new System.Drawing.Size(89, 19);
       this.PrimaryKeyCheckBox.TabIndex = 6;
       this.PrimaryKeyCheckBox.Text = "Primary Key";
+      this.HelpToolTip.SetToolTip(this.PrimaryKeyCheckBox, "A Primary Key can be a multiple-column index, and it represents a unique index wh" +
+        "ere all key columns must not allow empty (null) values.\r\n");
       this.PrimaryKeyCheckBox.UseVisualStyleBackColor = true;
       this.PrimaryKeyCheckBox.CheckedChanged += new System.EventHandler(this.PrimaryKeyCheckBox_CheckedChanged);
       // 
@@ -325,8 +420,11 @@ namespace MySQL.ForExcel.Forms
       this.UniqueIndexCheckBox.Location = new System.Drawing.Point(283, 53);
       this.UniqueIndexCheckBox.Name = "UniqueIndexCheckBox";
       this.UniqueIndexCheckBox.Size = new System.Drawing.Size(95, 19);
-      this.UniqueIndexCheckBox.TabIndex = 5;
+      this.UniqueIndexCheckBox.TabIndex = 7;
       this.UniqueIndexCheckBox.Text = "Unique Index";
+      this.HelpToolTip.SetToolTip(this.UniqueIndexCheckBox, "A Unique Index creates a constraint such that all values in the index must be dis" +
+        "tinct.\r\nAn error occurs if you try to add a new row with a key value that matche" +
+        "s an existing row. ");
       this.UniqueIndexCheckBox.UseVisualStyleBackColor = true;
       this.UniqueIndexCheckBox.CheckedChanged += new System.EventHandler(this.UniqueIndexCheckBox_CheckedChanged);
       // 
@@ -334,11 +432,12 @@ namespace MySQL.ForExcel.Forms
       // 
       this.CreateIndexCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.CreateIndexCheckBox.AutoSize = true;
-      this.CreateIndexCheckBox.Location = new System.Drawing.Point(283, 21);
+      this.CreateIndexCheckBox.Location = new System.Drawing.Point(407, 24);
       this.CreateIndexCheckBox.Name = "CreateIndexCheckBox";
       this.CreateIndexCheckBox.Size = new System.Drawing.Size(91, 19);
-      this.CreateIndexCheckBox.TabIndex = 4;
+      this.CreateIndexCheckBox.TabIndex = 8;
       this.CreateIndexCheckBox.Text = "Create Index";
+      this.HelpToolTip.SetToolTip(this.CreateIndexCheckBox, resources.GetString("CreateIndexCheckBox.ToolTip"));
       this.CreateIndexCheckBox.UseVisualStyleBackColor = true;
       this.CreateIndexCheckBox.CheckedChanged += new System.EventHandler(this.CreateIndexCheckBox_CheckedChanged);
       // 
@@ -359,6 +458,7 @@ namespace MySQL.ForExcel.Forms
       this.ColumnNameTextBox.Name = "ColumnNameTextBox";
       this.ColumnNameTextBox.Size = new System.Drawing.Size(135, 23);
       this.ColumnNameTextBox.TabIndex = 1;
+      this.HelpToolTip.SetToolTip(this.ColumnNameTextBox, "The name of the column.");
       this.ColumnNameTextBox.TextChanged += new System.EventHandler(this.ColumnNameTextBox_TextChanged);
       this.ColumnNameTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.ColumnNameTextBox_Validating);
       // 
@@ -420,6 +520,8 @@ namespace MySQL.ForExcel.Forms
       this.FirstRowHeadersCheckBox.Size = new System.Drawing.Size(210, 19);
       this.FirstRowHeadersCheckBox.TabIndex = 17;
       this.FirstRowHeadersCheckBox.Text = "First Row Contains Column Names";
+      this.HelpToolTip.SetToolTip(this.FirstRowHeadersCheckBox, "When checked, the first data row is used to set the names of the columns and the " +
+        "data rows start on the second column.");
       this.FirstRowHeadersCheckBox.UseVisualStyleBackColor = false;
       this.FirstRowHeadersCheckBox.CheckedChanged += new System.EventHandler(this.FirstRowHeadersCheckBox_CheckedChanged);
       // 
@@ -490,10 +592,11 @@ namespace MySQL.ForExcel.Forms
       this.PrimaryKeyColumnsComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
       this.PrimaryKeyColumnsComboBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.PrimaryKeyColumnsComboBox.FormattingEnabled = true;
-      this.PrimaryKeyColumnsComboBox.Location = new System.Drawing.Point(638, 144);
+      this.PrimaryKeyColumnsComboBox.Location = new System.Drawing.Point(681, 146);
       this.PrimaryKeyColumnsComboBox.Name = "PrimaryKeyColumnsComboBox";
       this.PrimaryKeyColumnsComboBox.Size = new System.Drawing.Size(121, 23);
       this.PrimaryKeyColumnsComboBox.TabIndex = 13;
+      this.HelpToolTip.SetToolTip(this.PrimaryKeyColumnsComboBox, "Sets one of the data columns being exported as the table\'s Primary Key column.");
       this.PrimaryKeyColumnsComboBox.ValueMember = "DisplayName";
       this.PrimaryKeyColumnsComboBox.SelectedIndexChanged += new System.EventHandler(this.PrimaryKeyColumnsComboBox_SelectedIndexChanged);
       // 
@@ -503,7 +606,7 @@ namespace MySQL.ForExcel.Forms
       this.UseExistingColumnRadioButton.AutoSize = true;
       this.UseExistingColumnRadioButton.BackColor = System.Drawing.Color.Transparent;
       this.UseExistingColumnRadioButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.UseExistingColumnRadioButton.Location = new System.Drawing.Point(462, 144);
+      this.UseExistingColumnRadioButton.Location = new System.Drawing.Point(505, 146);
       this.UseExistingColumnRadioButton.Name = "UseExistingColumnRadioButton";
       this.UseExistingColumnRadioButton.Size = new System.Drawing.Size(134, 19);
       this.UseExistingColumnRadioButton.TabIndex = 12;
@@ -516,10 +619,11 @@ namespace MySQL.ForExcel.Forms
       // 
       this.AddPrimaryKeyTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.AddPrimaryKeyTextBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.AddPrimaryKeyTextBox.Location = new System.Drawing.Point(637, 116);
+      this.AddPrimaryKeyTextBox.Location = new System.Drawing.Point(680, 118);
       this.AddPrimaryKeyTextBox.Name = "AddPrimaryKeyTextBox";
       this.AddPrimaryKeyTextBox.Size = new System.Drawing.Size(122, 22);
       this.AddPrimaryKeyTextBox.TabIndex = 11;
+      this.HelpToolTip.SetToolTip(this.AddPrimaryKeyTextBox, "Prepends an integer Primary Key column with the given name.");
       this.AddPrimaryKeyTextBox.TextChanged += new System.EventHandler(this.AddPrimaryKeyTextBox_TextChanged);
       this.AddPrimaryKeyTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.AddPrimaryKeyTextBox_Validating);
       // 
@@ -529,7 +633,7 @@ namespace MySQL.ForExcel.Forms
       this.AddPrimaryKeyRadioButton.AutoSize = true;
       this.AddPrimaryKeyRadioButton.BackColor = System.Drawing.Color.Transparent;
       this.AddPrimaryKeyRadioButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.AddPrimaryKeyRadioButton.Location = new System.Drawing.Point(462, 116);
+      this.AddPrimaryKeyRadioButton.Location = new System.Drawing.Point(505, 118);
       this.AddPrimaryKeyRadioButton.Name = "AddPrimaryKeyRadioButton";
       this.AddPrimaryKeyRadioButton.Size = new System.Drawing.Size(169, 19);
       this.AddPrimaryKeyRadioButton.TabIndex = 10;
@@ -545,8 +649,9 @@ namespace MySQL.ForExcel.Forms
       this.TableNameInputTextBox.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.TableNameInputTextBox.Location = new System.Drawing.Point(127, 118);
       this.TableNameInputTextBox.Name = "TableNameInputTextBox";
-      this.TableNameInputTextBox.Size = new System.Drawing.Size(219, 22);
+      this.TableNameInputTextBox.Size = new System.Drawing.Size(250, 22);
       this.TableNameInputTextBox.TabIndex = 4;
+      this.HelpToolTip.SetToolTip(this.TableNameInputTextBox, "Mandatory field.\r\nIt is good practice to not use upper case letters or spaces.");
       this.TableNameInputTextBox.TextChanged += new System.EventHandler(this.TableNameInputTextBox_TextChanged);
       this.TableNameInputTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.TableNameInputTextBox_Validating);
       // 
@@ -565,15 +670,15 @@ namespace MySQL.ForExcel.Forms
       // PrimaryKeySubLabel
       // 
       this.PrimaryKeySubLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.PrimaryKeySubLabel.AutoSize = true;
       this.PrimaryKeySubLabel.BackColor = System.Drawing.Color.Transparent;
       this.PrimaryKeySubLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.PrimaryKeySubLabel.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.PrimaryKeySubLabel.Location = new System.Drawing.Point(459, 71);
+      this.PrimaryKeySubLabel.Location = new System.Drawing.Point(502, 73);
       this.PrimaryKeySubLabel.Name = "PrimaryKeySubLabel";
-      this.PrimaryKeySubLabel.Size = new System.Drawing.Size(264, 30);
+      this.PrimaryKeySubLabel.Size = new System.Drawing.Size(300, 30);
       this.PrimaryKeySubLabel.TabIndex = 9;
-      this.PrimaryKeySubLabel.Text = "Each row of data needs to hold a unique number\r\nthat is used as the Primary Key.";
+      this.PrimaryKeySubLabel.Text = "Each row of data needs to hold a unique number that is used as the Primary Key.\r\n" +
+    "";
       // 
       // PrimaryKeyMainLabel
       // 
@@ -582,7 +687,7 @@ namespace MySQL.ForExcel.Forms
       this.PrimaryKeyMainLabel.BackColor = System.Drawing.Color.Transparent;
       this.PrimaryKeyMainLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.PrimaryKeyMainLabel.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.PrimaryKeyMainLabel.Location = new System.Drawing.Point(459, 54);
+      this.PrimaryKeyMainLabel.Location = new System.Drawing.Point(502, 56);
       this.PrimaryKeyMainLabel.Name = "PrimaryKeyMainLabel";
       this.PrimaryKeyMainLabel.Size = new System.Drawing.Size(128, 17);
       this.PrimaryKeyMainLabel.TabIndex = 8;
@@ -593,7 +698,7 @@ namespace MySQL.ForExcel.Forms
       this.PrimaryKeyPictureBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.PrimaryKeyPictureBox.BackColor = System.Drawing.Color.Transparent;
       this.PrimaryKeyPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_PrimaryKey_32x32;
-      this.PrimaryKeyPictureBox.Location = new System.Drawing.Point(421, 57);
+      this.PrimaryKeyPictureBox.Location = new System.Drawing.Point(464, 59);
       this.PrimaryKeyPictureBox.Name = "PrimaryKeyPictureBox";
       this.PrimaryKeyPictureBox.Size = new System.Drawing.Size(32, 32);
       this.PrimaryKeyPictureBox.TabIndex = 28;
@@ -664,12 +769,13 @@ namespace MySQL.ForExcel.Forms
       this.DropDownButton.FlatAppearance.BorderSize = 0;
       this.DropDownButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
       this.DropDownButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.DropDownButton.Location = new System.Drawing.Point(737, 15);
-      this.DropDownButton.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
+      this.DropDownButton.Location = new System.Drawing.Point(777, 16);
+      this.DropDownButton.Margin = new System.Windows.Forms.Padding(0);
       this.DropDownButton.Name = "DropDownButton";
-      this.DropDownButton.Size = new System.Drawing.Size(12, 17);
+      this.DropDownButton.Size = new System.Drawing.Size(12, 15);
       this.DropDownButton.TabIndex = 2;
       this.DropDownButton.Text = "▼";
+      this.HelpToolTip.SetToolTip(this.DropDownButton, "Click here to select between Export Data and Create Table operations.");
       this.DropDownButton.UseVisualStyleBackColor = true;
       this.DropDownButton.Click += new System.EventHandler(this.DropDownButton_Click);
       // 
@@ -710,8 +816,10 @@ namespace MySQL.ForExcel.Forms
       this.CollationComboBox.FormattingEnabled = true;
       this.CollationComboBox.Location = new System.Drawing.Point(127, 146);
       this.CollationComboBox.Name = "CollationComboBox";
-      this.CollationComboBox.Size = new System.Drawing.Size(219, 23);
+      this.CollationComboBox.Size = new System.Drawing.Size(250, 23);
       this.CollationComboBox.TabIndex = 6;
+      this.HelpToolTip.SetToolTip(this.CollationComboBox, "Specifies a default collation for the table.\r\nBy default the table will inherit t" +
+        "he collation from its parent schema.");
       // 
       // CollationLabel
       // 
@@ -722,6 +830,12 @@ namespace MySQL.ForExcel.Forms
       this.CollationLabel.Size = new System.Drawing.Size(58, 15);
       this.CollationLabel.TabIndex = 5;
       this.CollationLabel.Text = "Collation:";
+      // 
+      // HelpToolTip
+      // 
+      this.HelpToolTip.AutoPopDelay = 5000;
+      this.HelpToolTip.InitialDelay = 1000;
+      this.HelpToolTip.ReshowDelay = 100;
       // 
       // PreviewDataGridView
       // 
@@ -757,7 +871,7 @@ namespace MySQL.ForExcel.Forms
       dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
       dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
       this.PreviewDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
-      this.PreviewDataGridView.Size = new System.Drawing.Size(677, 157);
+      this.PreviewDataGridView.Size = new System.Drawing.Size(720, 157);
       this.PreviewDataGridView.TabIndex = 19;
       this.PreviewDataGridView.CellToolTipTextNeeded += new System.Windows.Forms.DataGridViewCellToolTipTextNeededEventHandler(this.PreviewDataGridView_CellToolTipTextNeeded);
       this.PreviewDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.PreviewDataGridView_DataBindingComplete);
@@ -769,12 +883,12 @@ namespace MySQL.ForExcel.Forms
       this.AcceptButton = this.ExportButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(844, 601);
+      this.ClientSize = new System.Drawing.Size(884, 625);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
       this.MainInstructionLocation = new System.Drawing.Point(10, 15);
-      this.MinimumSize = new System.Drawing.Size(860, 640);
+      this.MinimumSize = new System.Drawing.Size(900, 664);
       this.Name = "ExportDataForm";
       this.Text = "Export Data";
       this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ExportDataForm_FormClosing);
@@ -788,14 +902,16 @@ namespace MySQL.ForExcel.Forms
       ((System.ComponentModel.ISupportInitialize)(this.PrimaryKeyWarningPictureBox)).EndInit();
       this.ColumnOptionsGroupBox.ResumeLayout(false);
       this.ColumnOptionsGroupBox.PerformLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.DefaultValuePictureBox)).EndInit();
+      this.DataTypeContextMenuStrip.ResumeLayout(false);
       ((System.ComponentModel.ISupportInitialize)(this.ColumnOptionsWarningPictureBox)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.ColumnOptionsPictureBox)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.TableNameWarningPictureBox)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.PrimaryKeyPictureBox)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.TablePictureBox)).EndInit();
       this.ExportContextMenuStrip.ResumeLayout(false);
-      ((System.ComponentModel.ISupportInitialize)(this.PreviewDataGridView)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.DataTypeBindingSource)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.PreviewDataGridView)).EndInit();
       this.ResumeLayout(false);
 
     }
@@ -849,5 +965,13 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.Label CollationLabel;
     private System.Windows.Forms.BindingSource DataTypeBindingSource;
     private System.Windows.Forms.LinkLabel MoreInfoLinkLabel;
+    private System.Windows.Forms.ContextMenuStrip DataTypeContextMenuStrip;
+    private System.Windows.Forms.ToolStripMenuItem UnsignedToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem ZeroFillToolStripMenuItem;
+    private System.Windows.Forms.TextBox DefaultValueTextBox;
+    private System.Windows.Forms.Label DefaultValueLabel;
+    private System.Windows.Forms.ToolTip HelpToolTip;
+    private System.Windows.Forms.CheckBox AutoIncrementCheckBox;
+    private System.Windows.Forms.PictureBox DefaultValuePictureBox;
   }
 }

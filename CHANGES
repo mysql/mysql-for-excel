@@ -2,6 +2,10 @@
 - Added an option to the Advanced Options dialog for Append and Export Data operations, called "Generate an INSERT statement for each data row", which is off
   by default. When checked an INSERT statement for each data row being appended or exported is generated in the resulting SQL query sent to the MySQL server.
   When unchecked a single INSERT statement is generated as a bulk data operation, which performs better than multiple INSERT statements.
+- Added column properties to the Export Data dialog to support the definition of Auto Increment and Default Value for the new MySQL table where the data will
+  be exported to. Added a context menu to declare a numeric field to be Unsigned or to have Zero Fill, accessible by right-clicking the Data Type combo box.
+  Added the TimeStamp data type to the full list of valid data types, as it was not being shown before. Added help tooltips to fields in the Export Data dialog
+  that explain in detail how the column properties work in a MySQL database.
 - Fixed a problem when Refresh All was done so that the Refresh method is not called for Excel ListObjects that have an Excel range as their data source, since
   that throws a COM Exception. (MySQL Bug #78941, Bug #22110627 - MYSQL FOR EXCEL 1.3.4 (AND 1.3.5): HRESULT: 0X800A03EC UPON "REFRESH ALL")
 - Fixed code that detects the data type of Excel data for Export and Append Data operations that was broken on the previous version when the JSON data type was
