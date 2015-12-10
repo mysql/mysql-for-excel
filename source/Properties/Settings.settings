@@ -125,5 +125,14 @@
     <Setting Name="AdjustedMultipleInsertFlags" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="ImportExcelFormatLongDates" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.String" Scope="User">
+      <Value Profile="(Default)">m/d/yyyy h:mm</Value>
+    </Setting>
+    <Setting Name="ImportExcelFormatShortDates" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.String" Scope="User">
+      <Value Profile="(Default)">m/d/yyyy</Value>
+    </Setting>
+    <Setting Name="ImportExcelFormatTime" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.String" Scope="User">
+      <Value Profile="(Default)">hh:mm:ss</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

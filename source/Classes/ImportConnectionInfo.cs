@@ -552,9 +552,15 @@ namespace MySQL.ForExcel.Classes
           newRange = newRange.SafeResize(MySqlTable.Rows.Count + headerRows + summaryRows, MySqlTable.Columns.Count);
         }
 
+        // Redimension the ExcelTools.ListObject's range
         ToolsExcelTable.Resize(newRange);
 
-        // Bind the redimensioned ExcelTools.ListObject to the MySqlDataTable.
+        // Re-format the importing range
+        ExcelInterop.Range dataOnlyRange = newRange.Offset[headerRows];
+        dataOnlyRange = dataOnlyRange.Resize[newRange.Rows.Count - headerRows - summaryRows];
+        MySqlTable.FormatImportExcelRange(dataOnlyRange, true);
+
+        // Bind the redimensioned ExcelTools.ListObject to the MySqlDataTable
         ToolsExcelTable.SetDataBinding(MySqlTable);
         if (MySqlTable.ImportColumnNames)
         {

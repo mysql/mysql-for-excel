@@ -38,6 +38,16 @@ namespace MySQL.ForExcel.Classes
     #region Constants
 
     /// <summary>
+    /// The Excel short date format, this one automatically adjusts to the user's regional settings.
+    /// </summary>
+    public const string DATE_FORMAT = "m/d/yyyy";
+
+    /// <summary>
+    /// The Excel long date format, this one automatically adjusts to the user's regional settings.
+    /// </summary>
+    public const string DATETIME_FORMAT = "m/d/yyyy h:mm";
+
+    /// <summary>
     /// The default interior color for Excel cells committed to the MySQL server during an Edit Data operation.
     /// </summary>
     /// <remarks>Green-ish.</remarks>
@@ -89,11 +99,6 @@ namespace MySQL.ForExcel.Classes
     public const int EN_US_LOCALE_CODE = 1033;
 
     /// <summary>
-    /// The universal long time format which includes hours minutes and seconds.
-    /// </summary>
-    public const string LONG_TIME_FORMAT = "hh:mm:ss";
-
-    /// <summary>
     /// The maximum number of columns that can exist in 2003 and older versions of Excel;
     /// </summary>
     public const int MAXIMUM_WORKSHEET_COLUMNS_IN_COMPATIBILITY_MODE = 256;
@@ -122,6 +127,16 @@ namespace MySQL.ForExcel.Classes
     /// The default number of rows a <see cref="ExcelInterop.PivotTable"/> placeholder occupies.
     /// </summary>
     public const int PIVOT_TABLES_PLACEHOLDER_DEFAULT_ROWS_SIZE = 18;
+
+    /// <summary>
+    /// The Excel format to treat cells as text.
+    /// </summary>
+    public const string TEXT_FORMAT = "@";
+
+    /// <summary>
+    /// The Excel time format which includes hours minutes and seconds.
+    /// </summary>
+    public const string TIME_FORMAT = "hh:mm:ss";
 
     /// <summary>
     /// The name of the <see cref="ExcelInterop.WorkbookConnection"/> created for the whole Excel data model in the active <see cref="ExcelInterop.Workbook"/>.

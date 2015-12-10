@@ -552,5 +552,44 @@ namespace MySQL.ForExcel.Properties {
                 this["AdjustedMultipleInsertFlags"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("m/d/yyyy h:mm")]
+        public string ImportExcelFormatLongDates {
+            get {
+                return ((string)(this["ImportExcelFormatLongDates"]));
+            }
+            set {
+                this["ImportExcelFormatLongDates"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("m/d/yyyy")]
+        public string ImportExcelFormatShortDates {
+            get {
+                return ((string)(this["ImportExcelFormatShortDates"]));
+            }
+            set {
+                this["ImportExcelFormatShortDates"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("hh:mm:ss")]
+        public string ImportExcelFormatTime {
+            get {
+                return ((string)(this["ImportExcelFormatTime"]));
+            }
+            set {
+                this["ImportExcelFormatTime"] = value;
+            }
+        }
     }
 }

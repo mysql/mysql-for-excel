@@ -1355,6 +1355,57 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Formats columns in the given <see cref="ExcelInterop.Range"/> depending on the data types of columns being imported.
+    /// </summary>
+    /// <param name="excelRange">The <see cref="ExcelInterop.Range"/> where this table's daa is going to be imported.</param>
+    /// <param name="importingToExcelTable">Flag indicating whether the data is being imported to an Excel Table (ListObject) or to an Excel Range.</param>
+    public void FormatImportExcelRange(ExcelInterop.Range excelRange, bool importingToExcelTable)
+    {
+      if (excelRange == null)
+      {
+        return;
+      }
+
+      if (!importingToExcelTable)
+      {
+        excelRange.ClearFormats();
+      }
+
+      var colsCount = excelRange.Columns.CountLarge;
+      foreach (var col in Columns.Cast<MySqlDataColumn>().TakeWhile(col => col.Ordinal < colsCount))
+      {
+        string format;
+        if (!importingToExcelTable && col.MySqlDataType.IsTime)
+        {
+          // Format columns that have a MySQL TIME data type
+          format = Settings.Default.ImportExcelFormatTime;
+        }
+        else if (col.MySqlDataType.IsChar || col.MySqlDataType.IsText || col.MySqlDataType.IsSetOrEnum || col.MySqlDataType.IsJson)
+        {
+          // Format string columns containing numbers that may be misformatted by Excel as numbers
+          format = ExcelUtilities.TEXT_FORMAT;
+        }
+        else if (col.MySqlDataType.IsDateTimeOrTimeStamp)
+        {
+          // Format DATETIME and TIMESTAMP data types with a long date format
+          format = Settings.Default.ImportExcelFormatLongDates;
+        }
+        else if (col.MySqlDataType.TypeName.Equals("date", StringComparison.InvariantCultureIgnoreCase))
+        {
+          // Format DATE data type with a short date format
+          format = Settings.Default.ImportExcelFormatShortDates;
+        }
+        else
+        {
+          continue;
+        }
+
+        ExcelInterop.Range dataColumnRange = excelRange.Columns[col.Ordinal + 1];
+        dataColumnRange.NumberFormat = format;
+      }
+    }
+
+    /// <summary>
     /// Creates a SQL query to lock or unlock the table.
     /// </summary>
     /// <param name="lockTable">Flag indicating if the query is locking or unlocking the table.</param>
@@ -1895,22 +1946,19 @@ namespace MySQL.ForExcel.Classes
           mySqlRow.ExcelRange = fillingRange.Rows[absRowIndex + 1] as ExcelInterop.Range;
         }
 
+        // Clear any formatting
         Globals.ThisAddIn.Application.Goto(fillingRange, false);
-        fillingRange.ClearFormats();
+
+        // Format Excel column ranges depending on the imported column data types
+        FormatImportExcelRange(fillingRange, false);
+
+        // Assign values
         fillingRange.Value = fillingArray;
 
         // Format column names for imported range
         if (ImportColumnNames)
         {
           fillingRange.SetHeaderStyle();
-        }
-
-        // Format columns that have a MySQL TIME data type
-        foreach (var col in Columns.Cast<MySqlDataColumn>().Where(col => col.MySqlDataType.IsTime))
-        {
-          ExcelInterop.Range firstColumnDataCell = fillingRange.Cells[headerRowModifier + 1, col.Ordinal + 1];
-          var dataColumnRange = firstColumnDataCell.Resize[cappedNumRows, 1];
-          dataColumnRange.NumberFormat = ExcelUtilities.LONG_TIME_FORMAT;
         }
 
         fillingRange.Columns.AutoFit();

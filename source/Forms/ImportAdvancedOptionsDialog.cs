@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -85,6 +85,15 @@ namespace MySQL.ForExcel.Forms
       Settings.Default.ImportExcelTableStyleName = UseStyleComboBox.Text;
       Settings.Default.ImportPrefixExcelTable = PrefixExcelTablesCheckBox.Checked;
       Settings.Default.ImportPrefixExcelTableText = PrefixExcelTablesTextBox.Text;
+      Settings.Default.ImportExcelFormatLongDates = string.IsNullOrWhiteSpace(FormatLongDatesTextBox.Text)
+        ? ExcelUtilities.DATETIME_FORMAT
+        : FormatLongDatesTextBox.Text;
+      Settings.Default.ImportExcelFormatShortDates = string.IsNullOrWhiteSpace(FormatShortDatesTextBox.Text)
+        ? ExcelUtilities.DATE_FORMAT
+        : FormatShortDatesTextBox.Text;
+      Settings.Default.ImportExcelFormatTime = string.IsNullOrWhiteSpace(FormatTimeTextBox.Text)
+        ? ExcelUtilities.TIME_FORMAT
+        : FormatTimeTextBox.Text;
       MiscUtilities.SaveSettings();
     }
 
@@ -123,6 +132,9 @@ namespace MySQL.ForExcel.Forms
         UseStyleComboBox.Text = settings.GetPropertyDefaultValueByName<string>("ImportExcelTableStyleName");
         PrefixExcelTablesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ImportPrefixExcelTable");
         PrefixExcelTablesTextBox.Text = settings.GetPropertyDefaultValueByName<string>("ImportPrefixExcelTableText");
+        FormatLongDatesTextBox.Text = settings.GetPropertyDefaultValueByName<string>("ImportExcelFormatLongDates");
+        FormatShortDatesTextBox.Text = settings.GetPropertyDefaultValueByName<string>("ImportExcelFormatShortDates");
+        FormatTimeTextBox.Text = settings.GetPropertyDefaultValueByName<string>("ImportExcelFormatTime");
       }
       else
       {
@@ -133,6 +145,9 @@ namespace MySQL.ForExcel.Forms
         UseStyleComboBox.Text = Settings.Default.ImportExcelTableStyleName;
         PrefixExcelTablesCheckBox.Checked = Settings.Default.ImportPrefixExcelTable;
         PrefixExcelTablesTextBox.Text = Settings.Default.ImportPrefixExcelTableText;
+        FormatLongDatesTextBox.Text = Settings.Default.ImportExcelFormatLongDates;
+        FormatShortDatesTextBox.Text = Settings.Default.ImportExcelFormatShortDates;
+        FormatTimeTextBox.Text = Settings.Default.ImportExcelFormatTime;
       }
     }
 

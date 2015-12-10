@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -63,6 +63,13 @@ namespace MySQL.ForExcel.Forms
       this.PrefixExcelTablesCheckBox = new System.Windows.Forms.CheckBox();
       this.HelpToolTip = new System.Windows.Forms.ToolTip(this.components);
       this.ResetToDefaultsButton = new System.Windows.Forms.Button();
+      this.FormattingOptionsLabel = new System.Windows.Forms.Label();
+      this.FormatLongDatesLabel = new System.Windows.Forms.Label();
+      this.FormatLongDatesTextBox = new System.Windows.Forms.TextBox();
+      this.FormatShortDatesTextBox = new System.Windows.Forms.TextBox();
+      this.FormatShortDatesLabel = new System.Windows.Forms.Label();
+      this.FormatTimeTextBox = new System.Windows.Forms.TextBox();
+      this.FormatTimeLabel = new System.Windows.Forms.Label();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.PreviewRowsQuantityNumericUpDown)).BeginInit();
@@ -75,6 +82,13 @@ namespace MySQL.ForExcel.Forms
       // 
       // ContentAreaPanel
       // 
+      this.ContentAreaPanel.Controls.Add(this.FormatTimeLabel);
+      this.ContentAreaPanel.Controls.Add(this.FormatTimeTextBox);
+      this.ContentAreaPanel.Controls.Add(this.FormatShortDatesLabel);
+      this.ContentAreaPanel.Controls.Add(this.FormatShortDatesTextBox);
+      this.ContentAreaPanel.Controls.Add(this.FormatLongDatesTextBox);
+      this.ContentAreaPanel.Controls.Add(this.FormatLongDatesLabel);
+      this.ContentAreaPanel.Controls.Add(this.FormattingOptionsLabel);
       this.ContentAreaPanel.Controls.Add(this.PrefixExcelTablesCheckBox);
       this.ContentAreaPanel.Controls.Add(this.PrefixExcelTablesTextBox);
       this.ContentAreaPanel.Controls.Add(this.UseStyle2Label);
@@ -88,14 +102,14 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.AdvancedImportOptionsLabel);
       this.ContentAreaPanel.Controls.Add(this.EscapeFormulaValuesCheckBox);
       this.ContentAreaPanel.Controls.Add(this.GeneralOptionsLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(544, 331);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(544, 449);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.ResetToDefaultsButton);
       this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 286);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 404);
       this.CommandAreaPanel.Size = new System.Drawing.Size(544, 45);
       // 
       // DialogAcceptButton
@@ -128,7 +142,7 @@ namespace MySQL.ForExcel.Forms
       this.EscapeFormulaValuesCheckBox.Location = new System.Drawing.Point(53, 110);
       this.EscapeFormulaValuesCheckBox.Name = "EscapeFormulaValuesCheckBox";
       this.EscapeFormulaValuesCheckBox.Size = new System.Drawing.Size(443, 19);
-      this.EscapeFormulaValuesCheckBox.TabIndex = 6;
+      this.EscapeFormulaValuesCheckBox.TabIndex = 5;
       this.EscapeFormulaValuesCheckBox.Text = "Escape text values that start with \"=\" so Excel does not treat them as formulas";
       this.HelpToolTip.SetToolTip(this.EscapeFormulaValuesCheckBox, "When checked the equals signs found at the start of text values in the importing " +
         "MySQL data are removed so they are not treated as formulas by Excel.");
@@ -142,7 +156,7 @@ namespace MySQL.ForExcel.Forms
       this.AdvancedImportOptionsLabel.Location = new System.Drawing.Point(17, 17);
       this.AdvancedImportOptionsLabel.Name = "AdvancedImportOptionsLabel";
       this.AdvancedImportOptionsLabel.Size = new System.Drawing.Size(180, 20);
-      this.AdvancedImportOptionsLabel.TabIndex = 1;
+      this.AdvancedImportOptionsLabel.TabIndex = 0;
       this.AdvancedImportOptionsLabel.Text = "Advanced Import Options";
       // 
       // PreviewRowsQuantity1Label
@@ -152,7 +166,7 @@ namespace MySQL.ForExcel.Forms
       this.PreviewRowsQuantity1Label.Location = new System.Drawing.Point(50, 85);
       this.PreviewRowsQuantity1Label.Name = "PreviewRowsQuantity1Label";
       this.PreviewRowsQuantity1Label.Size = new System.Drawing.Size(71, 15);
-      this.PreviewRowsQuantity1Label.TabIndex = 3;
+      this.PreviewRowsQuantity1Label.TabIndex = 2;
       this.PreviewRowsQuantity1Label.Text = "Use the first";
       // 
       // PreviewRowsQuantity2Label
@@ -162,7 +176,7 @@ namespace MySQL.ForExcel.Forms
       this.PreviewRowsQuantity2Label.Location = new System.Drawing.Point(185, 85);
       this.PreviewRowsQuantity2Label.Name = "PreviewRowsQuantity2Label";
       this.PreviewRowsQuantity2Label.Size = new System.Drawing.Size(223, 15);
-      this.PreviewRowsQuantity2Label.TabIndex = 5;
+      this.PreviewRowsQuantity2Label.TabIndex = 4;
       this.PreviewRowsQuantity2Label.Text = "rows to preview the MySQL table\'s data.";
       // 
       // PreviewRowsQuantityNumericUpDown
@@ -181,7 +195,7 @@ namespace MySQL.ForExcel.Forms
             0});
       this.PreviewRowsQuantityNumericUpDown.Name = "PreviewRowsQuantityNumericUpDown";
       this.PreviewRowsQuantityNumericUpDown.Size = new System.Drawing.Size(52, 21);
-      this.PreviewRowsQuantityNumericUpDown.TabIndex = 4;
+      this.PreviewRowsQuantityNumericUpDown.TabIndex = 3;
       this.HelpToolTip.SetToolTip(this.PreviewRowsQuantityNumericUpDown, "Limits the data preview to the given number of Excel data rows.");
       this.PreviewRowsQuantityNumericUpDown.Value = new decimal(new int[] {
             1,
@@ -198,18 +212,19 @@ namespace MySQL.ForExcel.Forms
       this.GeneralOptionsLabel.Location = new System.Drawing.Point(24, 56);
       this.GeneralOptionsLabel.Name = "GeneralOptionsLabel";
       this.GeneralOptionsLabel.Size = new System.Drawing.Size(103, 17);
-      this.GeneralOptionsLabel.TabIndex = 2;
+      this.GeneralOptionsLabel.TabIndex = 1;
       this.GeneralOptionsLabel.Text = "General Options";
       // 
       // CreateExcelTableCheckbox
       // 
+      this.CreateExcelTableCheckbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.CreateExcelTableCheckbox.AutoSize = true;
       this.CreateExcelTableCheckbox.BackColor = System.Drawing.Color.Transparent;
       this.CreateExcelTableCheckbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.CreateExcelTableCheckbox.Location = new System.Drawing.Point(53, 178);
+      this.CreateExcelTableCheckbox.Location = new System.Drawing.Point(53, 296);
       this.CreateExcelTableCheckbox.Name = "CreateExcelTableCheckbox";
       this.CreateExcelTableCheckbox.Size = new System.Drawing.Size(304, 19);
-      this.CreateExcelTableCheckbox.TabIndex = 8;
+      this.CreateExcelTableCheckbox.TabIndex = 14;
       this.CreateExcelTableCheckbox.Text = "Create an Excel table for the imported MySQL data.";
       this.HelpToolTip.SetToolTip(this.CreateExcelTableCheckbox, "When checked an Excel table (previously known as Excel lists) will be created for" +
         " the imported data.");
@@ -218,63 +233,69 @@ namespace MySQL.ForExcel.Forms
       // 
       // ExcelTableOptionsLabel
       // 
+      this.ExcelTableOptionsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.ExcelTableOptionsLabel.AutoSize = true;
       this.ExcelTableOptionsLabel.BackColor = System.Drawing.Color.Transparent;
       this.ExcelTableOptionsLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.ExcelTableOptionsLabel.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.ExcelTableOptionsLabel.Location = new System.Drawing.Point(24, 150);
+      this.ExcelTableOptionsLabel.Location = new System.Drawing.Point(24, 268);
       this.ExcelTableOptionsLabel.Name = "ExcelTableOptionsLabel";
       this.ExcelTableOptionsLabel.Size = new System.Drawing.Size(123, 17);
-      this.ExcelTableOptionsLabel.TabIndex = 7;
+      this.ExcelTableOptionsLabel.TabIndex = 13;
       this.ExcelTableOptionsLabel.Text = "Excel Table Options";
       // 
       // UseStyle1Label
       // 
+      this.UseStyle1Label.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.UseStyle1Label.AutoSize = true;
       this.UseStyle1Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.UseStyle1Label.Location = new System.Drawing.Point(70, 205);
+      this.UseStyle1Label.Location = new System.Drawing.Point(70, 324);
       this.UseStyle1Label.Name = "UseStyle1Label";
       this.UseStyle1Label.Size = new System.Drawing.Size(56, 15);
-      this.UseStyle1Label.TabIndex = 9;
+      this.UseStyle1Label.TabIndex = 15;
       this.UseStyle1Label.Text = "Use style";
       // 
       // UseStyleComboBox
       // 
+      this.UseStyleComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.UseStyleComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
       this.UseStyleComboBox.FormattingEnabled = true;
-      this.UseStyleComboBox.Location = new System.Drawing.Point(132, 204);
+      this.UseStyleComboBox.Location = new System.Drawing.Point(132, 322);
       this.UseStyleComboBox.Name = "UseStyleComboBox";
       this.UseStyleComboBox.Size = new System.Drawing.Size(225, 21);
-      this.UseStyleComboBox.TabIndex = 10;
+      this.UseStyleComboBox.TabIndex = 16;
       this.HelpToolTip.SetToolTip(this.UseStyleComboBox, "You can quickly format table data by applying a predefined or custom table style." +
         "");
       // 
       // UseStyle2Label
       // 
+      this.UseStyle2Label.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.UseStyle2Label.AutoSize = true;
       this.UseStyle2Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.UseStyle2Label.Location = new System.Drawing.Point(363, 205);
+      this.UseStyle2Label.Location = new System.Drawing.Point(363, 324);
       this.UseStyle2Label.Name = "UseStyle2Label";
       this.UseStyle2Label.Size = new System.Drawing.Size(133, 15);
-      this.UseStyle2Label.TabIndex = 11;
+      this.UseStyle2Label.TabIndex = 17;
       this.UseStyle2Label.Text = "for the new Excel table.";
       // 
       // PrefixExcelTablesTextBox
       // 
+      this.PrefixExcelTablesTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.PrefixExcelTablesTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-      this.PrefixExcelTablesTextBox.Location = new System.Drawing.Point(327, 231);
+      this.PrefixExcelTablesTextBox.Location = new System.Drawing.Point(327, 349);
       this.PrefixExcelTablesTextBox.Name = "PrefixExcelTablesTextBox";
       this.PrefixExcelTablesTextBox.Size = new System.Drawing.Size(169, 21);
-      this.PrefixExcelTablesTextBox.TabIndex = 13;
+      this.PrefixExcelTablesTextBox.TabIndex = 19;
       // 
       // PrefixExcelTablesCheckBox
       // 
+      this.PrefixExcelTablesCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.PrefixExcelTablesCheckBox.AutoSize = true;
       this.PrefixExcelTablesCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
-      this.PrefixExcelTablesCheckBox.Location = new System.Drawing.Point(73, 233);
+      this.PrefixExcelTablesCheckBox.Location = new System.Drawing.Point(73, 351);
       this.PrefixExcelTablesCheckBox.Name = "PrefixExcelTablesCheckBox";
       this.PrefixExcelTablesCheckBox.Size = new System.Drawing.Size(248, 19);
-      this.PrefixExcelTablesCheckBox.TabIndex = 12;
+      this.PrefixExcelTablesCheckBox.TabIndex = 18;
       this.PrefixExcelTablesCheckBox.Text = "Prefix Excel tables with the following text:";
       this.HelpToolTip.SetToolTip(this.PrefixExcelTablesCheckBox, "When checked the specified text will be used to prefix the names of created Excel" +
         " tables.");
@@ -298,12 +319,80 @@ namespace MySQL.ForExcel.Forms
       this.ResetToDefaultsButton.UseVisualStyleBackColor = true;
       this.ResetToDefaultsButton.Click += new System.EventHandler(this.ResetToDefaultsButton_Click);
       // 
+      // FormattingOptionsLabel
+      // 
+      this.FormattingOptionsLabel.AutoSize = true;
+      this.FormattingOptionsLabel.BackColor = System.Drawing.Color.Transparent;
+      this.FormattingOptionsLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.FormattingOptionsLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.FormattingOptionsLabel.Location = new System.Drawing.Point(24, 150);
+      this.FormattingOptionsLabel.Name = "FormattingOptionsLabel";
+      this.FormattingOptionsLabel.Size = new System.Drawing.Size(121, 17);
+      this.FormattingOptionsLabel.TabIndex = 6;
+      this.FormattingOptionsLabel.Text = "Formatting Options";
+      // 
+      // FormatLongDatesLabel
+      // 
+      this.FormatLongDatesLabel.AutoSize = true;
+      this.FormatLongDatesLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+      this.FormatLongDatesLabel.Location = new System.Drawing.Point(50, 179);
+      this.FormatLongDatesLabel.Name = "FormatLongDatesLabel";
+      this.FormatLongDatesLabel.Size = new System.Drawing.Size(316, 15);
+      this.FormatLongDatesLabel.TabIndex = 7;
+      this.FormatLongDatesLabel.Text = "Excel number format for DateTime and TimeStamp data:";
+      // 
+      // FormatLongDatesTextBox
+      // 
+      this.FormatLongDatesTextBox.Location = new System.Drawing.Point(372, 178);
+      this.FormatLongDatesTextBox.Name = "FormatLongDatesTextBox";
+      this.FormatLongDatesTextBox.Size = new System.Drawing.Size(124, 20);
+      this.FormatLongDatesTextBox.TabIndex = 8;
+      this.HelpToolTip.SetToolTip(this.FormatLongDatesTextBox, "The Excel format string to be used for DateTime and TimeStamp MySQL data.\r\nA long" +
+        " date format is suitable in this case.");
+      // 
+      // FormatShortDatesTextBox
+      // 
+      this.FormatShortDatesTextBox.Location = new System.Drawing.Point(255, 204);
+      this.FormatShortDatesTextBox.Name = "FormatShortDatesTextBox";
+      this.FormatShortDatesTextBox.Size = new System.Drawing.Size(124, 20);
+      this.FormatShortDatesTextBox.TabIndex = 10;
+      this.HelpToolTip.SetToolTip(this.FormatShortDatesTextBox, "The Excel format string to be used for Date MySQL data.\r\nA short date format is s" +
+        "uitable in this case.");
+      // 
+      // FormatShortDatesLabel
+      // 
+      this.FormatShortDatesLabel.AutoSize = true;
+      this.FormatShortDatesLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+      this.FormatShortDatesLabel.Location = new System.Drawing.Point(50, 205);
+      this.FormatShortDatesLabel.Name = "FormatShortDatesLabel";
+      this.FormatShortDatesLabel.Size = new System.Drawing.Size(197, 15);
+      this.FormatShortDatesLabel.TabIndex = 9;
+      this.FormatShortDatesLabel.Text = "Excel number format for Date data:";
+      // 
+      // FormatTimeTextBox
+      // 
+      this.FormatTimeTextBox.Location = new System.Drawing.Point(255, 230);
+      this.FormatTimeTextBox.Name = "FormatTimeTextBox";
+      this.FormatTimeTextBox.Size = new System.Drawing.Size(124, 20);
+      this.FormatTimeTextBox.TabIndex = 12;
+      this.HelpToolTip.SetToolTip(this.FormatTimeTextBox, "The Excel format string to be used for Time MySQL data.");
+      // 
+      // FormatTimeLabel
+      // 
+      this.FormatTimeLabel.AutoSize = true;
+      this.FormatTimeLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+      this.FormatTimeLabel.Location = new System.Drawing.Point(50, 231);
+      this.FormatTimeLabel.Name = "FormatTimeLabel";
+      this.FormatTimeLabel.Size = new System.Drawing.Size(199, 15);
+      this.FormatTimeLabel.TabIndex = 11;
+      this.FormatTimeLabel.Text = "Excel number format for Time data:";
+      // 
       // ImportAdvancedOptionsDialog
       // 
       this.AcceptButton = this.DialogAcceptButton;
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(544, 331);
+      this.ClientSize = new System.Drawing.Size(544, 449);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
@@ -337,5 +426,12 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.TextBox PrefixExcelTablesTextBox;
     private System.Windows.Forms.ToolTip HelpToolTip;
     private System.Windows.Forms.Button ResetToDefaultsButton;
+    private System.Windows.Forms.Label FormattingOptionsLabel;
+    private System.Windows.Forms.Label FormatShortDatesLabel;
+    private System.Windows.Forms.TextBox FormatShortDatesTextBox;
+    private System.Windows.Forms.TextBox FormatLongDatesTextBox;
+    private System.Windows.Forms.Label FormatLongDatesLabel;
+    private System.Windows.Forms.Label FormatTimeLabel;
+    private System.Windows.Forms.TextBox FormatTimeTextBox;
   }
 }
