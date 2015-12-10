@@ -1,4 +1,7 @@
 1.3.6
+- Tweaked the code that runs when closing an Excel workbook to disable events for Excel 2007 only while the workbook is being saved. This fixes a problem
+  where MySQL for Excel offered to save an unsaved Excel workbook when closing it, but the save was not happening causing all unsaved changes to be lost.
+  (MySQL Bug:  78910, Bug #22081313 - EXCEL ADD-IN DOES NOT SAVE DATA WHEN EXCEL IS CLOSED)
 - Fixed code for data import operations done to an Excel range so that numeric data stored in text columns is correctly formatted by Excel as text and not as
   the "General" format that automatically formats cells as numbers when the data is stored in a text object. This fixes the problem seen in Edit Data operations
   where text columns were being formated as numbers and leading zeros stripped from them. Added new advanced options for Import Data operations to define the

@@ -768,22 +768,34 @@ namespace MySQL.ForExcel
         switch (MessageBox.Show(string.Format(Resources.WorkbookSavingDetailText, workbook.Name), Application.Name, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1))
         {
           case DialogResult.Yes:
-            for (int retry = 1; retry <= 3 && !wasAlreadySaved; retry++)
+            for (int retry = 1; retry <= 3 && !wasAlreadySaved && !cancel; retry++)
             {
               try
               {
                 if (workbook.IsNew())
                 {
                   // The workbook is being saved for the very first time, so show the Save As dialog to users which will save the Workbook where the user wants to.
-                  Application.Dialogs[ExcelInterop.XlBuiltInDialog.xlDialogSaveAs].Show(workbook.Name);
+                  if (ExcelVersionNumber <= EXCEL_2007_VERSION_NUMBER)
+                  {
+                    Application.EnableEvents = false; //Stops beforesave event from re-running
+                    var saveAsDialog = Application.Dialogs[ExcelInterop.XlBuiltInDialog.xlDialogSaveAs];
+                    wasAlreadySaved = saveAsDialog.Show(workbook.Name, Application.DefaultSaveFormat, null, true, null, false);
+                    Application.EnableEvents = true;
+                  }
+                  else
+                  {
+                    var saveAsDialog = Application.Dialogs[ExcelInterop.XlBuiltInDialog.xlDialogSaveAs];
+                    wasAlreadySaved = saveAsDialog.Show(workbook.Name);
+                  }
+
+                  cancel = !wasAlreadySaved;
                 }
                 else
                 {
                   // The workbook has been saved before, so just overwrite it.
                   workbook.Save();
+                  wasAlreadySaved = true;
                 }
-
-                wasAlreadySaved = true;
               }
               catch (Exception ex)
               {
@@ -793,8 +805,6 @@ namespace MySQL.ForExcel
                 MySqlSourceTrace.WriteAppErrorToLog(ex);
               }
             }
-
-            cancel = !wasAlreadySaved;
             break;
 
           case DialogResult.No:
@@ -803,8 +813,13 @@ namespace MySQL.ForExcel
 
           case DialogResult.Cancel:
             cancel = true;
-            return;
+            break;
         }
+      }
+
+      if (cancel)
+      {
+        return;
       }
 
       // Cleanup and close EditConnectionInfo and ImportConnectionInfo objects from the closing workbook.
