@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -139,6 +139,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.DialogCancelButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.DialogCancelButton.Location = new System.Drawing.Point(857, 11);
       this.DialogCancelButton.Name = "DialogCancelButton";
       this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
@@ -235,7 +236,7 @@ namespace MySQL.ForExcel.Forms
             this.SelectAllToolStripMenuItem,
             this.SelectNoneToolStripMenuItem});
       this.TablesViewsContextMenuStrip.Name = "TablesViewsContextMenuStrip";
-      this.TablesViewsContextMenuStrip.Size = new System.Drawing.Size(176, 114);
+      this.TablesViewsContextMenuStrip.Size = new System.Drawing.Size(176, 92);
       this.TablesViewsContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.TablesViewsContextMenuStrip_Opening);
       // 
       // AddRelatedTablesToolStripMenuItem
@@ -293,12 +294,13 @@ namespace MySQL.ForExcel.Forms
             this.RelatedTableColumnHeader,
             this.RelatedRelatedToColumnHeader});
       this.RelatedTablesListView.ContextMenuStrip = this.TablesViewsContextMenuStrip;
+      this.RelatedTablesListView.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.RelatedTablesListView.FullRowSelect = true;
       this.RelatedTablesListView.HideSelection = false;
       this.RelatedTablesListView.Location = new System.Drawing.Point(516, 136);
       this.RelatedTablesListView.MultiSelect = false;
       this.RelatedTablesListView.Name = "RelatedTablesListView";
-      this.RelatedTablesListView.Size = new System.Drawing.Size(347, 303);
+      this.RelatedTablesListView.Size = new System.Drawing.Size(347, 309);
       this.RelatedTablesListView.SmallImageList = this.DbObjectsImageList;
       this.RelatedTablesListView.TabIndex = 8;
       this.RelatedTablesListView.UseCompatibleStateImageBehavior = false;
@@ -332,12 +334,13 @@ namespace MySQL.ForExcel.Forms
             this.TableViewColumnHeader,
             this.RelatedToColumnHeader});
       this.TablesViewsListView.ContextMenuStrip = this.TablesViewsContextMenuStrip;
+      this.TablesViewsListView.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.TablesViewsListView.FullRowSelect = true;
       this.TablesViewsListView.HideSelection = false;
       this.TablesViewsListView.Location = new System.Drawing.Point(80, 136);
       this.TablesViewsListView.MultiSelect = false;
       this.TablesViewsListView.Name = "TablesViewsListView";
-      this.TablesViewsListView.Size = new System.Drawing.Size(347, 303);
+      this.TablesViewsListView.Size = new System.Drawing.Size(347, 309);
       this.TablesViewsListView.SmallImageList = this.DbObjectsImageList;
       this.TablesViewsListView.TabIndex = 4;
       this.TablesViewsListView.UseCompatibleStateImageBehavior = false;
@@ -380,9 +383,10 @@ namespace MySQL.ForExcel.Forms
       // AdvancedOptionsButton
       // 
       this.AdvancedOptionsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.AdvancedOptionsButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.AdvancedOptionsButton.Location = new System.Drawing.Point(12, 11);
       this.AdvancedOptionsButton.Name = "AdvancedOptionsButton";
-      this.AdvancedOptionsButton.Size = new System.Drawing.Size(131, 23);
+      this.AdvancedOptionsButton.Size = new System.Drawing.Size(140, 23);
       this.AdvancedOptionsButton.TabIndex = 0;
       this.AdvancedOptionsButton.Text = "Advanced Options...";
       this.AdvancedOptionsButton.UseVisualStyleBackColor = true;
@@ -421,6 +425,7 @@ namespace MySQL.ForExcel.Forms
       this.OptionsGroupBox.Controls.Add(this.WhyDisabledLinkLabel);
       this.OptionsGroupBox.Controls.Add(this.CreateExcelRelationshipsCheckBox);
       this.OptionsGroupBox.Controls.Add(this.CreatePivotTableCheckBox);
+      this.OptionsGroupBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.OptionsGroupBox.Location = new System.Drawing.Point(82, 461);
       this.OptionsGroupBox.Name = "OptionsGroupBox";
       this.OptionsGroupBox.Size = new System.Drawing.Size(781, 70);
@@ -439,7 +444,7 @@ namespace MySQL.ForExcel.Forms
             "for each imported table or view."});
       this.PivotTablesComboBox.Location = new System.Drawing.Point(136, 21);
       this.PivotTablesComboBox.Name = "PivotTablesComboBox";
-      this.PivotTablesComboBox.Size = new System.Drawing.Size(209, 21);
+      this.PivotTablesComboBox.Size = new System.Drawing.Size(209, 23);
       this.PivotTablesComboBox.TabIndex = 1;
       // 
       // AddSummaryFieldsCheckBox
@@ -494,7 +499,8 @@ namespace MySQL.ForExcel.Forms
       // ImportMultipleDialog
       // 
       this.AcceptButton = this.ImportButton;
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.DialogCancelButton;
       this.ClientSize = new System.Drawing.Size(944, 601);
       this.CommandAreaVisible = true;

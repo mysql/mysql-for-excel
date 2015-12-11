@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -59,8 +59,8 @@ namespace MySQL.ForExcel.Forms
       // 
       // FootnoteAreaPanel
       // 
-      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 102);
-      this.FootnoteAreaPanel.Size = new System.Drawing.Size(514, 0);
+      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 292);
+      this.FootnoteAreaPanel.Size = new System.Drawing.Size(634, 0);
       // 
       // ContentAreaPanel
       // 
@@ -106,10 +106,11 @@ namespace MySQL.ForExcel.Forms
       // 
       // MappingNameTextBox
       // 
+      this.MappingNameTextBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.MappingNameTextBox.Location = new System.Drawing.Point(186, 90);
       this.MappingNameTextBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.MappingNameTextBox.Name = "MappingNameTextBox";
-      this.MappingNameTextBox.Size = new System.Drawing.Size(316, 20);
+      this.MappingNameTextBox.Size = new System.Drawing.Size(316, 23);
       this.MappingNameTextBox.TabIndex = 1;
       this.MappingNameTextBox.TextChanged += new System.EventHandler(this.MappingNameTextBox_TextChanged);
       // 
@@ -157,10 +158,12 @@ namespace MySQL.ForExcel.Forms
       // AppendNewColumnMappingDialog
       // 
       this.AcceptButton = this.OKButton;
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.DialogCancelButton;
       this.ClientSize = new System.Drawing.Size(514, 182);
       this.CommandAreaVisible = true;
+      this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 13);
       this.MainInstructionLocationOffset = new System.Drawing.Size(-10, 10);

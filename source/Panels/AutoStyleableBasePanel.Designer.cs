@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -53,7 +53,7 @@ namespace MySQL.ForExcel.Panels
       // 
       // AutoStyleableBasePanel
       // 
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
       this.Name = "AutoStyleableBasePanel";
       this.ResumeLayout(false);
 

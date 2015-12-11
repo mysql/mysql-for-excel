@@ -70,8 +70,8 @@ namespace MySQL.ForExcel.Forms
       this.HelpToolTip = new System.Windows.Forms.ToolTip(this.components);
       this.ShowDataTypesCheckBox = new System.Windows.Forms.CheckBox();
       this.ConfirmMappingOverwritingCheckBox = new System.Windows.Forms.CheckBox();
-      this.ResetToDefaultsButton = new System.Windows.Forms.Button();
       this.GenerateMultipleInsertsCheckBox = new System.Windows.Forms.CheckBox();
+      this.ResetToDefaultsButton = new System.Windows.Forms.Button();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.PreviewRowsQuantityNumericUpDown)).BeginInit();
@@ -117,6 +117,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.DialogAcceptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.DialogAcceptButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+      this.DialogAcceptButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.DialogAcceptButton.Location = new System.Drawing.Point(316, 11);
       this.DialogAcceptButton.Name = "DialogAcceptButton";
       this.DialogAcceptButton.Size = new System.Drawing.Size(75, 23);
@@ -128,6 +129,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.DialogCancelButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.DialogCancelButton.Location = new System.Drawing.Point(397, 11);
       this.DialogCancelButton.Name = "DialogCancelButton";
       this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
@@ -139,10 +141,10 @@ namespace MySQL.ForExcel.Forms
       // 
       this.UseFormattedValuesCheckBox.AutoSize = true;
       this.UseFormattedValuesCheckBox.BackColor = System.Drawing.Color.Transparent;
-      this.UseFormattedValuesCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.UseFormattedValuesCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.UseFormattedValuesCheckBox.Location = new System.Drawing.Point(53, 249);
       this.UseFormattedValuesCheckBox.Name = "UseFormattedValuesCheckBox";
-      this.UseFormattedValuesCheckBox.Size = new System.Drawing.Size(141, 19);
+      this.UseFormattedValuesCheckBox.Size = new System.Drawing.Size(137, 19);
       this.UseFormattedValuesCheckBox.TabIndex = 10;
       this.UseFormattedValuesCheckBox.Text = "Use formatted values";
       this.HelpToolTip.SetToolTip(this.UseFormattedValuesCheckBox, "If checked it treats dates in Excel as such, otherwise it treats them as numbers." +
@@ -165,10 +167,10 @@ namespace MySQL.ForExcel.Forms
       // 
       this.ReloadColumnMappingCheckBox.AutoSize = true;
       this.ReloadColumnMappingCheckBox.BackColor = System.Drawing.Color.Transparent;
-      this.ReloadColumnMappingCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ReloadColumnMappingCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.ReloadColumnMappingCheckBox.Location = new System.Drawing.Point(53, 131);
       this.ReloadColumnMappingCheckBox.Name = "ReloadColumnMappingCheckBox";
-      this.ReloadColumnMappingCheckBox.Size = new System.Drawing.Size(390, 19);
+      this.ReloadColumnMappingCheckBox.Size = new System.Drawing.Size(381, 19);
       this.ReloadColumnMappingCheckBox.TabIndex = 4;
       this.ReloadColumnMappingCheckBox.Text = "Reload stored column mapping for the selected table automatically";
       this.HelpToolTip.SetToolTip(this.ReloadColumnMappingCheckBox, "When checked if there is a stored mapping saved for the selected MySQL table, the" +
@@ -180,7 +182,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.AutoStoreColumnMappingCheckBox.AutoSize = true;
       this.AutoStoreColumnMappingCheckBox.BackColor = System.Drawing.Color.Transparent;
-      this.AutoStoreColumnMappingCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.AutoStoreColumnMappingCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.AutoStoreColumnMappingCheckBox.Location = new System.Drawing.Point(53, 108);
       this.AutoStoreColumnMappingCheckBox.Name = "AutoStoreColumnMappingCheckBox";
       this.AutoStoreColumnMappingCheckBox.Size = new System.Drawing.Size(343, 19);
@@ -194,10 +196,10 @@ namespace MySQL.ForExcel.Forms
       // 
       this.DoNotPerformAutoMapCheckBox.AutoSize = true;
       this.DoNotPerformAutoMapCheckBox.BackColor = System.Drawing.Color.Transparent;
-      this.DoNotPerformAutoMapCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.DoNotPerformAutoMapCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.DoNotPerformAutoMapCheckBox.Location = new System.Drawing.Point(53, 85);
       this.DoNotPerformAutoMapCheckBox.Name = "DoNotPerformAutoMapCheckBox";
-      this.DoNotPerformAutoMapCheckBox.Size = new System.Drawing.Size(303, 19);
+      this.DoNotPerformAutoMapCheckBox.Size = new System.Drawing.Size(296, 19);
       this.DoNotPerformAutoMapCheckBox.TabIndex = 2;
       this.DoNotPerformAutoMapCheckBox.Text = "Perform an automatic mapping when dialog opens";
       this.HelpToolTip.SetToolTip(this.DoNotPerformAutoMapCheckBox, resources.GetString("DoNotPerformAutoMapCheckBox.ToolTip"));
@@ -241,6 +243,7 @@ namespace MySQL.ForExcel.Forms
       // RenameMappingButton
       // 
       this.RenameMappingButton.Enabled = false;
+      this.RenameMappingButton.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.RenameMappingButton.Location = new System.Drawing.Point(387, 443);
       this.RenameMappingButton.Name = "RenameMappingButton";
       this.RenameMappingButton.Size = new System.Drawing.Size(75, 23);
@@ -252,6 +255,7 @@ namespace MySQL.ForExcel.Forms
       // DeleteMappingButton
       // 
       this.DeleteMappingButton.Enabled = false;
+      this.DeleteMappingButton.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.DeleteMappingButton.Location = new System.Drawing.Point(387, 472);
       this.DeleteMappingButton.Name = "DeleteMappingButton";
       this.DeleteMappingButton.Size = new System.Drawing.Size(75, 23);
@@ -288,7 +292,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // PreviewRowsQuantityNumericUpDown
       // 
-      this.PreviewRowsQuantityNumericUpDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.PreviewRowsQuantityNumericUpDown.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.PreviewRowsQuantityNumericUpDown.Location = new System.Drawing.Point(127, 224);
       this.PreviewRowsQuantityNumericUpDown.Maximum = new decimal(new int[] {
             1000,
@@ -301,7 +305,7 @@ namespace MySQL.ForExcel.Forms
             0,
             0});
       this.PreviewRowsQuantityNumericUpDown.Name = "PreviewRowsQuantityNumericUpDown";
-      this.PreviewRowsQuantityNumericUpDown.Size = new System.Drawing.Size(52, 21);
+      this.PreviewRowsQuantityNumericUpDown.Size = new System.Drawing.Size(52, 23);
       this.PreviewRowsQuantityNumericUpDown.TabIndex = 8;
       this.HelpToolTip.SetToolTip(this.PreviewRowsQuantityNumericUpDown, "Limits the data preview and data type automatic detection to the given number of " +
         "Excel data rows.");
@@ -314,20 +318,20 @@ namespace MySQL.ForExcel.Forms
       // PreviewRowsQuantity2Label
       // 
       this.PreviewRowsQuantity2Label.AutoSize = true;
-      this.PreviewRowsQuantity2Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.PreviewRowsQuantity2Label.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.PreviewRowsQuantity2Label.Location = new System.Drawing.Point(185, 226);
       this.PreviewRowsQuantity2Label.Name = "PreviewRowsQuantity2Label";
-      this.PreviewRowsQuantity2Label.Size = new System.Drawing.Size(285, 15);
+      this.PreviewRowsQuantity2Label.Size = new System.Drawing.Size(275, 15);
       this.PreviewRowsQuantity2Label.TabIndex = 9;
       this.PreviewRowsQuantity2Label.Text = "Excel data rows to preview and calculate datatypes.";
       // 
       // PreviewRowsQuantity1Label
       // 
       this.PreviewRowsQuantity1Label.AutoSize = true;
-      this.PreviewRowsQuantity1Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.PreviewRowsQuantity1Label.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.PreviewRowsQuantity1Label.Location = new System.Drawing.Point(50, 226);
       this.PreviewRowsQuantity1Label.Name = "PreviewRowsQuantity1Label";
-      this.PreviewRowsQuantity1Label.Size = new System.Drawing.Size(71, 15);
+      this.PreviewRowsQuantity1Label.Size = new System.Drawing.Size(69, 15);
       this.PreviewRowsQuantity1Label.TabIndex = 7;
       this.PreviewRowsQuantity1Label.Text = "Use the first";
       // 
@@ -346,10 +350,10 @@ namespace MySQL.ForExcel.Forms
       // DisableTableIndexesCheckBox
       // 
       this.DisableTableIndexesCheckBox.AutoSize = true;
-      this.DisableTableIndexesCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+      this.DisableTableIndexesCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.DisableTableIndexesCheckBox.Location = new System.Drawing.Point(73, 369);
       this.DisableTableIndexesCheckBox.Name = "DisableTableIndexesCheckBox";
-      this.DisableTableIndexesCheckBox.Size = new System.Drawing.Size(291, 19);
+      this.DisableTableIndexesCheckBox.Size = new System.Drawing.Size(279, 19);
       this.DisableTableIndexesCheckBox.TabIndex = 14;
       this.DisableTableIndexesCheckBox.Text = "Disable table indexes to speed-up rows insertion";
       this.HelpToolTip.SetToolTip(this.DisableTableIndexesCheckBox, resources.GetString("DisableTableIndexesCheckBox.ToolTip"));
@@ -365,10 +369,10 @@ namespace MySQL.ForExcel.Forms
       // 
       this.ShowDataTypesCheckBox.AutoSize = true;
       this.ShowDataTypesCheckBox.BackColor = System.Drawing.Color.Transparent;
-      this.ShowDataTypesCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ShowDataTypesCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.ShowDataTypesCheckBox.Location = new System.Drawing.Point(53, 274);
       this.ShowDataTypesCheckBox.Name = "ShowDataTypesCheckBox";
-      this.ShowDataTypesCheckBox.Size = new System.Drawing.Size(280, 19);
+      this.ShowDataTypesCheckBox.Size = new System.Drawing.Size(273, 19);
       this.ShowDataTypesCheckBox.TabIndex = 11;
       this.ShowDataTypesCheckBox.Text = "Show column data types above column names";
       this.HelpToolTip.SetToolTip(this.ShowDataTypesCheckBox, "If checked the data types of the source data and target MySQL table are shown abo" +
@@ -380,43 +384,45 @@ namespace MySQL.ForExcel.Forms
       // 
       this.ConfirmMappingOverwritingCheckBox.AutoSize = true;
       this.ConfirmMappingOverwritingCheckBox.BackColor = System.Drawing.Color.Transparent;
-      this.ConfirmMappingOverwritingCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ConfirmMappingOverwritingCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.ConfirmMappingOverwritingCheckBox.Location = new System.Drawing.Point(53, 156);
       this.ConfirmMappingOverwritingCheckBox.Name = "ConfirmMappingOverwritingCheckBox";
-      this.ConfirmMappingOverwritingCheckBox.Size = new System.Drawing.Size(227, 19);
+      this.ConfirmMappingOverwritingCheckBox.Size = new System.Drawing.Size(228, 19);
       this.ConfirmMappingOverwritingCheckBox.TabIndex = 5;
       this.ConfirmMappingOverwritingCheckBox.Text = "Confirm column mapping overwriting";
       this.HelpToolTip.SetToolTip(this.ConfirmMappingOverwritingCheckBox, resources.GetString("ConfirmMappingOverwritingCheckBox.ToolTip"));
       this.ConfirmMappingOverwritingCheckBox.UseVisualStyleBackColor = false;
       // 
-      // ResetToDefaultsButton
-      // 
-      this.ResetToDefaultsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.ResetToDefaultsButton.Location = new System.Drawing.Point(12, 11);
-      this.ResetToDefaultsButton.Name = "ResetToDefaultsButton";
-      this.ResetToDefaultsButton.Size = new System.Drawing.Size(110, 23);
-      this.ResetToDefaultsButton.TabIndex = 2;
-      this.ResetToDefaultsButton.Text = "Reset to Defaults";
-      this.ResetToDefaultsButton.UseVisualStyleBackColor = true;
-      this.ResetToDefaultsButton.Click += new System.EventHandler(this.ResetToDefaultsButton_Click);
-      // 
       // GenerateMultipleInsertsCheckBox
       // 
       this.GenerateMultipleInsertsCheckBox.AutoSize = true;
-      this.GenerateMultipleInsertsCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+      this.GenerateMultipleInsertsCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.GenerateMultipleInsertsCheckBox.Location = new System.Drawing.Point(53, 344);
       this.GenerateMultipleInsertsCheckBox.Name = "GenerateMultipleInsertsCheckBox";
-      this.GenerateMultipleInsertsCheckBox.Size = new System.Drawing.Size(295, 19);
+      this.GenerateMultipleInsertsCheckBox.Size = new System.Drawing.Size(281, 19);
       this.GenerateMultipleInsertsCheckBox.TabIndex = 13;
       this.GenerateMultipleInsertsCheckBox.Text = "Generate an INSERT statement for each data row";
       this.HelpToolTip.SetToolTip(this.GenerateMultipleInsertsCheckBox, resources.GetString("GenerateMultipleInsertsCheckBox.ToolTip"));
       this.GenerateMultipleInsertsCheckBox.UseVisualStyleBackColor = true;
       this.GenerateMultipleInsertsCheckBox.CheckedChanged += new System.EventHandler(this.GenerateMultipleInsertsCheckBox_CheckedChanged);
       // 
+      // ResetToDefaultsButton
+      // 
+      this.ResetToDefaultsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.ResetToDefaultsButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ResetToDefaultsButton.Location = new System.Drawing.Point(12, 11);
+      this.ResetToDefaultsButton.Name = "ResetToDefaultsButton";
+      this.ResetToDefaultsButton.Size = new System.Drawing.Size(128, 23);
+      this.ResetToDefaultsButton.TabIndex = 2;
+      this.ResetToDefaultsButton.Text = "Reset to Defaults";
+      this.ResetToDefaultsButton.UseVisualStyleBackColor = true;
+      this.ResetToDefaultsButton.Click += new System.EventHandler(this.ResetToDefaultsButton_Click);
+      // 
       // AppendAdvancedOptionsDialog
       // 
       this.AcceptButton = this.DialogAcceptButton;
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.DialogCancelButton;
       this.ClientSize = new System.Drawing.Size(484, 646);
       this.CommandAreaVisible = true;

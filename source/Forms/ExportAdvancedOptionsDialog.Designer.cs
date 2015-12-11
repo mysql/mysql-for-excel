@@ -112,6 +112,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.DialogAcceptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.DialogAcceptButton.DialogResult = System.Windows.Forms.DialogResult.OK;
+      this.DialogAcceptButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.DialogAcceptButton.Location = new System.Drawing.Point(416, 11);
       this.DialogAcceptButton.Name = "DialogAcceptButton";
       this.DialogAcceptButton.Size = new System.Drawing.Size(75, 23);
@@ -123,6 +124,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.DialogCancelButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.DialogCancelButton.Location = new System.Drawing.Point(497, 11);
       this.DialogCancelButton.Name = "DialogCancelButton";
       this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
@@ -134,10 +136,10 @@ namespace MySQL.ForExcel.Forms
       // 
       this.UseFormattedValuesCheckBox.AutoSize = true;
       this.UseFormattedValuesCheckBox.BackColor = System.Drawing.Color.Transparent;
-      this.UseFormattedValuesCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.UseFormattedValuesCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.UseFormattedValuesCheckBox.Location = new System.Drawing.Point(53, 273);
       this.UseFormattedValuesCheckBox.Name = "UseFormattedValuesCheckBox";
-      this.UseFormattedValuesCheckBox.Size = new System.Drawing.Size(141, 19);
+      this.UseFormattedValuesCheckBox.Size = new System.Drawing.Size(137, 19);
       this.UseFormattedValuesCheckBox.TabIndex = 11;
       this.UseFormattedValuesCheckBox.Text = "Use formatted values";
       this.HelpToolTip.SetToolTip(this.UseFormattedValuesCheckBox, "If checked it treats dates in Excel as such, otherwise it treats them as numbers." +
@@ -161,10 +163,10 @@ namespace MySQL.ForExcel.Forms
       // 
       this.AutoAllowEmptyNonIndexColumnsCheckBox.AutoSize = true;
       this.AutoAllowEmptyNonIndexColumnsCheckBox.BackColor = System.Drawing.Color.Transparent;
-      this.AutoAllowEmptyNonIndexColumnsCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.AutoAllowEmptyNonIndexColumnsCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.AutoAllowEmptyNonIndexColumnsCheckBox.Location = new System.Drawing.Point(53, 185);
       this.AutoAllowEmptyNonIndexColumnsCheckBox.Name = "AutoAllowEmptyNonIndexColumnsCheckBox";
-      this.AutoAllowEmptyNonIndexColumnsCheckBox.Size = new System.Drawing.Size(436, 19);
+      this.AutoAllowEmptyNonIndexColumnsCheckBox.Size = new System.Drawing.Size(435, 19);
       this.AutoAllowEmptyNonIndexColumnsCheckBox.TabIndex = 8;
       this.AutoAllowEmptyNonIndexColumnsCheckBox.Text = "Automatically check the Allow Empty checkbox for columns without an index";
       this.HelpToolTip.SetToolTip(this.AutoAllowEmptyNonIndexColumnsCheckBox, "When checked the columns without an index are set to allow empty (null) values.");
@@ -175,10 +177,10 @@ namespace MySQL.ForExcel.Forms
       // 
       this.AutoIndexIntColumnsCheckBox.AutoSize = true;
       this.AutoIndexIntColumnsCheckBox.BackColor = System.Drawing.Color.Transparent;
-      this.AutoIndexIntColumnsCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.AutoIndexIntColumnsCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.AutoIndexIntColumnsCheckBox.Location = new System.Drawing.Point(53, 160);
       this.AutoIndexIntColumnsCheckBox.Name = "AutoIndexIntColumnsCheckBox";
-      this.AutoIndexIntColumnsCheckBox.Size = new System.Drawing.Size(349, 19);
+      this.AutoIndexIntColumnsCheckBox.Size = new System.Drawing.Size(345, 19);
       this.AutoIndexIntColumnsCheckBox.TabIndex = 7;
       this.AutoIndexIntColumnsCheckBox.Text = "Automatically check the Index checkbox for Integer columns";
       this.HelpToolTip.SetToolTip(this.AutoIndexIntColumnsCheckBox, "When checked the columns with a detected data type of Integer are set to have an " +
@@ -190,10 +192,10 @@ namespace MySQL.ForExcel.Forms
       // 
       this.AddBufferToVarCharCheckBox.AutoSize = true;
       this.AddBufferToVarCharCheckBox.BackColor = System.Drawing.Color.Transparent;
-      this.AddBufferToVarCharCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.AddBufferToVarCharCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.AddBufferToVarCharCheckBox.Location = new System.Drawing.Point(73, 135);
       this.AddBufferToVarCharCheckBox.Name = "AddBufferToVarCharCheckBox";
-      this.AddBufferToVarCharCheckBox.Size = new System.Drawing.Size(417, 19);
+      this.AddBufferToVarCharCheckBox.Size = new System.Drawing.Size(406, 19);
       this.AddBufferToVarCharCheckBox.TabIndex = 6;
       this.AddBufferToVarCharCheckBox.Text = "Add additional buffer to Varchar length (round up to 12, 25, 45, 125, 255)";
       this.AddBufferToVarCharCheckBox.UseVisualStyleBackColor = false;
@@ -202,10 +204,10 @@ namespace MySQL.ForExcel.Forms
       // 
       this.DetectDatatypeCheckBox.AutoSize = true;
       this.DetectDatatypeCheckBox.BackColor = System.Drawing.Color.Transparent;
-      this.DetectDatatypeCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.DetectDatatypeCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.DetectDatatypeCheckBox.Location = new System.Drawing.Point(53, 110);
       this.DetectDatatypeCheckBox.Name = "DetectDatatypeCheckBox";
-      this.DetectDatatypeCheckBox.Size = new System.Drawing.Size(418, 19);
+      this.DetectDatatypeCheckBox.Size = new System.Drawing.Size(416, 19);
       this.DetectDatatypeCheckBox.TabIndex = 5;
       this.DetectDatatypeCheckBox.Text = "Analyze and try to detect correct datatype based on column field contents";
       this.HelpToolTip.SetToolTip(this.DetectDatatypeCheckBox, "When checked the data type on each new column will be automatically detected base" +
@@ -239,26 +241,26 @@ namespace MySQL.ForExcel.Forms
       // PreviewRowsQuantity1Label
       // 
       this.PreviewRowsQuantity1Label.AutoSize = true;
-      this.PreviewRowsQuantity1Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.PreviewRowsQuantity1Label.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.PreviewRowsQuantity1Label.Location = new System.Drawing.Point(50, 85);
       this.PreviewRowsQuantity1Label.Name = "PreviewRowsQuantity1Label";
-      this.PreviewRowsQuantity1Label.Size = new System.Drawing.Size(71, 15);
+      this.PreviewRowsQuantity1Label.Size = new System.Drawing.Size(69, 15);
       this.PreviewRowsQuantity1Label.TabIndex = 2;
       this.PreviewRowsQuantity1Label.Text = "Use the first";
       // 
       // PreviewRowsQuantity2Label
       // 
       this.PreviewRowsQuantity2Label.AutoSize = true;
-      this.PreviewRowsQuantity2Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.PreviewRowsQuantity2Label.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.PreviewRowsQuantity2Label.Location = new System.Drawing.Point(185, 85);
       this.PreviewRowsQuantity2Label.Name = "PreviewRowsQuantity2Label";
-      this.PreviewRowsQuantity2Label.Size = new System.Drawing.Size(285, 15);
+      this.PreviewRowsQuantity2Label.Size = new System.Drawing.Size(275, 15);
       this.PreviewRowsQuantity2Label.TabIndex = 4;
       this.PreviewRowsQuantity2Label.Text = "Excel data rows to preview and calculate datatypes.";
       // 
       // PreviewRowsQuantityNumericUpDown
       // 
-      this.PreviewRowsQuantityNumericUpDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.PreviewRowsQuantityNumericUpDown.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.PreviewRowsQuantityNumericUpDown.Location = new System.Drawing.Point(127, 83);
       this.PreviewRowsQuantityNumericUpDown.Maximum = new decimal(new int[] {
             1000,
@@ -271,7 +273,7 @@ namespace MySQL.ForExcel.Forms
             0,
             0});
       this.PreviewRowsQuantityNumericUpDown.Name = "PreviewRowsQuantityNumericUpDown";
-      this.PreviewRowsQuantityNumericUpDown.Size = new System.Drawing.Size(52, 21);
+      this.PreviewRowsQuantityNumericUpDown.Size = new System.Drawing.Size(52, 23);
       this.PreviewRowsQuantityNumericUpDown.TabIndex = 3;
       this.HelpToolTip.SetToolTip(this.PreviewRowsQuantityNumericUpDown, resources.GetString("PreviewRowsQuantityNumericUpDown.ToolTip"));
       this.PreviewRowsQuantityNumericUpDown.Value = new decimal(new int[] {
@@ -308,10 +310,10 @@ namespace MySQL.ForExcel.Forms
       // CreateTableIndexesLastCheckBox
       // 
       this.CreateTableIndexesLastCheckBox.AutoSize = true;
-      this.CreateTableIndexesLastCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+      this.CreateTableIndexesLastCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.CreateTableIndexesLastCheckBox.Location = new System.Drawing.Point(73, 365);
       this.CreateTableIndexesLastCheckBox.Name = "CreateTableIndexesLastCheckBox";
-      this.CreateTableIndexesLastCheckBox.Size = new System.Drawing.Size(453, 19);
+      this.CreateTableIndexesLastCheckBox.Size = new System.Drawing.Size(435, 19);
       this.CreateTableIndexesLastCheckBox.TabIndex = 14;
       this.CreateTableIndexesLastCheckBox.Text = "Create table\'s indexes after data has been exported to speed-up rows insertion";
       this.HelpToolTip.SetToolTip(this.CreateTableIndexesLastCheckBox, resources.GetString("CreateTableIndexesLastCheckBox.ToolTip"));
@@ -339,10 +341,10 @@ namespace MySQL.ForExcel.Forms
       // 
       this.ShowAllDataTypesCheckBox.AutoSize = true;
       this.ShowAllDataTypesCheckBox.BackColor = System.Drawing.Color.Transparent;
-      this.ShowAllDataTypesCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ShowAllDataTypesCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.ShowAllDataTypesCheckBox.Location = new System.Drawing.Point(53, 210);
       this.ShowAllDataTypesCheckBox.Name = "ShowAllDataTypesCheckBox";
-      this.ShowAllDataTypesCheckBox.Size = new System.Drawing.Size(397, 19);
+      this.ShowAllDataTypesCheckBox.Size = new System.Drawing.Size(387, 19);
       this.ShowAllDataTypesCheckBox.TabIndex = 9;
       this.ShowAllDataTypesCheckBox.Text = "Show all available MySQL data types in the Data Type drop-down list";
       this.HelpToolTip.SetToolTip(this.ShowAllDataTypesCheckBox, resources.GetString("ShowAllDataTypesCheckBox.ToolTip"));
@@ -352,10 +354,10 @@ namespace MySQL.ForExcel.Forms
       // GenerateMultipleInsertsCheckBox
       // 
       this.GenerateMultipleInsertsCheckBox.AutoSize = true;
-      this.GenerateMultipleInsertsCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+      this.GenerateMultipleInsertsCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.GenerateMultipleInsertsCheckBox.Location = new System.Drawing.Point(53, 340);
       this.GenerateMultipleInsertsCheckBox.Name = "GenerateMultipleInsertsCheckBox";
-      this.GenerateMultipleInsertsCheckBox.Size = new System.Drawing.Size(295, 19);
+      this.GenerateMultipleInsertsCheckBox.Size = new System.Drawing.Size(281, 19);
       this.GenerateMultipleInsertsCheckBox.TabIndex = 13;
       this.GenerateMultipleInsertsCheckBox.Text = "Generate an INSERT statement for each data row";
       this.HelpToolTip.SetToolTip(this.GenerateMultipleInsertsCheckBox, resources.GetString("GenerateMultipleInsertsCheckBox.ToolTip"));
@@ -365,9 +367,10 @@ namespace MySQL.ForExcel.Forms
       // ResetToDefaultsButton
       // 
       this.ResetToDefaultsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.ResetToDefaultsButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.ResetToDefaultsButton.Location = new System.Drawing.Point(12, 11);
       this.ResetToDefaultsButton.Name = "ResetToDefaultsButton";
-      this.ResetToDefaultsButton.Size = new System.Drawing.Size(110, 23);
+      this.ResetToDefaultsButton.Size = new System.Drawing.Size(128, 23);
       this.ResetToDefaultsButton.TabIndex = 0;
       this.ResetToDefaultsButton.Text = "Reset to Defaults";
       this.ResetToDefaultsButton.UseVisualStyleBackColor = true;
@@ -376,7 +379,8 @@ namespace MySQL.ForExcel.Forms
       // ExportAdvancedOptionsDialog
       // 
       this.AcceptButton = this.DialogAcceptButton;
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.DialogCancelButton;
       this.ClientSize = new System.Drawing.Size(584, 476);
       this.CommandAreaVisible = true;

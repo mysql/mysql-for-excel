@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -307,6 +307,7 @@ namespace MySQL.ForExcel.Forms
       dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
       this.PreviewDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
       this.PreviewDataGridView.ColumnsMaximumWidth = 200;
+      this.PreviewDataGridView.ColumnsMinimumWidth = 5;
       this.PreviewDataGridView.ContextMenuStrip = this.ContextMenuForGrid;
       dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.InactiveCaption;
@@ -318,7 +319,7 @@ namespace MySQL.ForExcel.Forms
       this.PreviewDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
       this.PreviewDataGridView.Location = new System.Drawing.Point(80, 164);
       this.PreviewDataGridView.Name = "PreviewDataGridView";
-      this.PreviewDataGridView.Size = new System.Drawing.Size(695, 265);
+      this.PreviewDataGridView.Size = new System.Drawing.Size(695, 319);
       this.PreviewDataGridView.TabIndex = 7;
       this.PreviewDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.PreviewDataGridView_DataBindingComplete);
       this.PreviewDataGridView.SelectionChanged += new System.EventHandler(this.PreviewDataGridView_SelectionChanged);
@@ -457,6 +458,7 @@ namespace MySQL.ForExcel.Forms
       // AdvancedOptionsButton
       // 
       this.AdvancedOptionsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.AdvancedOptionsButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.AdvancedOptionsButton.Location = new System.Drawing.Point(12, 11);
       this.AdvancedOptionsButton.Name = "AdvancedOptionsButton";
       this.AdvancedOptionsButton.Size = new System.Drawing.Size(131, 23);
@@ -468,7 +470,8 @@ namespace MySQL.ForExcel.Forms
       // ImportTableViewForm
       // 
       this.AcceptButton = this.ImportButton;
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.DialogCancelButton;
       this.ClientSize = new System.Drawing.Size(849, 611);
       this.CommandAreaVisible = true;

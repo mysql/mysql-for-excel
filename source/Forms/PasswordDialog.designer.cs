@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -223,9 +223,10 @@ namespace MySQL.ForExcel.Forms
       // StorePasswordSecurelyCheckBox
       // 
       this.StorePasswordSecurelyCheckBox.AutoSize = true;
+      this.StorePasswordSecurelyCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.StorePasswordSecurelyCheckBox.Location = new System.Drawing.Point(196, 202);
       this.StorePasswordSecurelyCheckBox.Name = "StorePasswordSecurelyCheckBox";
-      this.StorePasswordSecurelyCheckBox.Size = new System.Drawing.Size(147, 17);
+      this.StorePasswordSecurelyCheckBox.Size = new System.Drawing.Size(157, 19);
       this.StorePasswordSecurelyCheckBox.TabIndex = 11;
       this.StorePasswordSecurelyCheckBox.Text = "Store password securely?";
       this.StorePasswordSecurelyCheckBox.UseVisualStyleBackColor = true;
@@ -288,10 +289,12 @@ namespace MySQL.ForExcel.Forms
       // PasswordDialog
       // 
       this.AcceptButton = this.DialogOKButton;
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.DialogCancelButton;
       this.ClientSize = new System.Drawing.Size(514, 286);
       this.CommandAreaVisible = true;
+      this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.FootnoteAreaHeight = 0;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
       this.MainInstructionLocation = new System.Drawing.Point(19, 19);

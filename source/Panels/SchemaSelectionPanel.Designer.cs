@@ -186,7 +186,8 @@ namespace MySQL.ForExcel.Panels
       // 
       // CreateNewSchemaHotLabel
       // 
-      this.CreateNewSchemaHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.CreateNewSchemaHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.CreateNewSchemaHotLabel.Behavior = MySQL.ForExcel.Controls.HotLabel.BehaviorType.Button;
       this.CreateNewSchemaHotLabel.CheckedImage = null;
       this.CreateNewSchemaHotLabel.Description = "Add a new Database Schema";
@@ -236,10 +237,13 @@ namespace MySQL.ForExcel.Panels
       // 
       // SeparatorImage
       // 
+      this.SeparatorImage.Anchor = System.Windows.Forms.AnchorStyles.Top;
       this.SeparatorImage.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Separator;
       this.SeparatorImage.Location = new System.Drawing.Point(9, 136);
+      this.SeparatorImage.MaintainAspectRatio = true;
       this.SeparatorImage.Name = "SeparatorImage";
       this.SeparatorImage.Opacity = 0.3F;
+      this.SeparatorImage.ScaleImage = false;
       this.SeparatorImage.Size = new System.Drawing.Size(242, 21);
       this.SeparatorImage.TabIndex = 33;
       // 
@@ -274,6 +278,8 @@ namespace MySQL.ForExcel.Panels
       // 
       // SelectSchemaHotLabel
       // 
+      this.SelectSchemaHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.SelectSchemaHotLabel.Behavior = MySQL.ForExcel.Controls.HotLabel.BehaviorType.Label;
       this.SelectSchemaHotLabel.CheckedImage = null;
       this.SelectSchemaHotLabel.Description = "Then click the [Next>] button below";
@@ -306,6 +312,8 @@ namespace MySQL.ForExcel.Panels
       // 
       // InstructionsLabel
       // 
+      this.InstructionsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.InstructionsLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.InstructionsLabel.ForeColor = System.Drawing.SystemColors.ControlText;
       this.InstructionsLabel.Location = new System.Drawing.Point(10, 73);
@@ -342,7 +350,7 @@ namespace MySQL.ForExcel.Panels
       // 
       // SchemaSelectionPanel
       // 
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
       this.Controls.Add(this.UpperPanel);
       this.Controls.Add(this.SchemasList);
       this.Controls.Add(this.CreateNewSchemaHotLabel);

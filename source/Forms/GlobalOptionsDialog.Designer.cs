@@ -112,7 +112,7 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.ConnectionTimeout1Label);
       this.ContentAreaPanel.Controls.Add(this.GlobalOptionsLabel);
       this.ContentAreaPanel.Controls.Add(this.ConnectionOptionsLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(504, 531);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(514, 531);
       // 
       // CommandAreaPanel
       // 
@@ -120,13 +120,14 @@ namespace MySQL.ForExcel.Forms
       this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
       this.CommandAreaPanel.Location = new System.Drawing.Point(0, 486);
-      this.CommandAreaPanel.Size = new System.Drawing.Size(504, 45);
+      this.CommandAreaPanel.Size = new System.Drawing.Size(514, 45);
       // 
       // DialogAcceptButton
       // 
       this.DialogAcceptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.DialogAcceptButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.DialogAcceptButton.Location = new System.Drawing.Point(326, 11);
+      this.DialogAcceptButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.DialogAcceptButton.Location = new System.Drawing.Point(346, 11);
       this.DialogAcceptButton.Name = "DialogAcceptButton";
       this.DialogAcceptButton.Size = new System.Drawing.Size(75, 23);
       this.DialogAcceptButton.TabIndex = 0;
@@ -137,7 +138,8 @@ namespace MySQL.ForExcel.Forms
       // 
       this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.DialogCancelButton.Location = new System.Drawing.Point(407, 11);
+      this.DialogCancelButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.DialogCancelButton.Location = new System.Drawing.Point(427, 11);
       this.DialogCancelButton.Name = "DialogCancelButton";
       this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
       this.DialogCancelButton.TabIndex = 1;
@@ -170,7 +172,7 @@ namespace MySQL.ForExcel.Forms
       // ConnectionTimeout1Label
       // 
       this.ConnectionTimeout1Label.AutoSize = true;
-      this.ConnectionTimeout1Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ConnectionTimeout1Label.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.ConnectionTimeout1Label.Location = new System.Drawing.Point(50, 85);
       this.ConnectionTimeout1Label.Name = "ConnectionTimeout1Label";
       this.ConnectionTimeout1Label.Size = new System.Drawing.Size(34, 15);
@@ -179,7 +181,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // ConnectionTimeoutNumericUpDown
       // 
-      this.ConnectionTimeoutNumericUpDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ConnectionTimeoutNumericUpDown.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.ConnectionTimeoutNumericUpDown.Location = new System.Drawing.Point(90, 83);
       this.ConnectionTimeoutNumericUpDown.Maximum = new decimal(new int[] {
             1000,
@@ -192,7 +194,7 @@ namespace MySQL.ForExcel.Forms
             0,
             0});
       this.ConnectionTimeoutNumericUpDown.Name = "ConnectionTimeoutNumericUpDown";
-      this.ConnectionTimeoutNumericUpDown.Size = new System.Drawing.Size(52, 21);
+      this.ConnectionTimeoutNumericUpDown.Size = new System.Drawing.Size(52, 23);
       this.ConnectionTimeoutNumericUpDown.TabIndex = 3;
       this.ExcelToolTip.SetToolTip(this.ConnectionTimeoutNumericUpDown, "Number of seconds to wait before a connection to a MySQL server times out.\r\nOn ve" +
         "ry slow connections it is advised to raise this value.");
@@ -205,26 +207,26 @@ namespace MySQL.ForExcel.Forms
       // ConnectionTimeout2Label
       // 
       this.ConnectionTimeout2Label.AutoSize = true;
-      this.ConnectionTimeout2Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ConnectionTimeout2Label.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.ConnectionTimeout2Label.Location = new System.Drawing.Point(148, 85);
       this.ConnectionTimeout2Label.Name = "ConnectionTimeout2Label";
-      this.ConnectionTimeout2Label.Size = new System.Drawing.Size(310, 15);
+      this.ConnectionTimeout2Label.Size = new System.Drawing.Size(307, 15);
       this.ConnectionTimeout2Label.TabIndex = 4;
       this.ConnectionTimeout2Label.Text = "seconds for a connection to the server before timing out.";
       // 
       // QueryTimeout2Label
       // 
       this.QueryTimeout2Label.AutoSize = true;
-      this.QueryTimeout2Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.QueryTimeout2Label.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.QueryTimeout2Label.Location = new System.Drawing.Point(148, 112);
       this.QueryTimeout2Label.Name = "QueryTimeout2Label";
-      this.QueryTimeout2Label.Size = new System.Drawing.Size(324, 15);
+      this.QueryTimeout2Label.Size = new System.Drawing.Size(316, 15);
       this.QueryTimeout2Label.TabIndex = 7;
       this.QueryTimeout2Label.Text = "seconds for a database query to execute before timing out.";
       // 
       // QueryTimeoutNumericUpDown
       // 
-      this.QueryTimeoutNumericUpDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.QueryTimeoutNumericUpDown.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.QueryTimeoutNumericUpDown.Location = new System.Drawing.Point(90, 110);
       this.QueryTimeoutNumericUpDown.Maximum = new decimal(new int[] {
             1000,
@@ -237,7 +239,7 @@ namespace MySQL.ForExcel.Forms
             0,
             0});
       this.QueryTimeoutNumericUpDown.Name = "QueryTimeoutNumericUpDown";
-      this.QueryTimeoutNumericUpDown.Size = new System.Drawing.Size(52, 21);
+      this.QueryTimeoutNumericUpDown.Size = new System.Drawing.Size(52, 23);
       this.QueryTimeoutNumericUpDown.TabIndex = 6;
       this.ExcelToolTip.SetToolTip(this.QueryTimeoutNumericUpDown, "Number of seconds to wait before a query sent to a MySQL server times out.\r\nOn ve" +
         "ry slow connections or when connecting to a slow computer it is advised to raise" +
@@ -251,7 +253,7 @@ namespace MySQL.ForExcel.Forms
       // QueryTimeout1Label
       // 
       this.QueryTimeout1Label.AutoSize = true;
-      this.QueryTimeout1Label.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.QueryTimeout1Label.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.QueryTimeout1Label.Location = new System.Drawing.Point(50, 112);
       this.QueryTimeout1Label.Name = "QueryTimeout1Label";
       this.QueryTimeout1Label.Size = new System.Drawing.Size(34, 15);
@@ -273,9 +275,10 @@ namespace MySQL.ForExcel.Forms
       // RestoreSavedEditSessionsCheckBox
       // 
       this.RestoreSavedEditSessionsCheckBox.AutoSize = true;
+      this.RestoreSavedEditSessionsCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.RestoreSavedEditSessionsCheckBox.Location = new System.Drawing.Point(53, 338);
       this.RestoreSavedEditSessionsCheckBox.Name = "RestoreSavedEditSessionsCheckBox";
-      this.RestoreSavedEditSessionsCheckBox.Size = new System.Drawing.Size(349, 17);
+      this.RestoreSavedEditSessionsCheckBox.Size = new System.Drawing.Size(374, 19);
       this.RestoreSavedEditSessionsCheckBox.TabIndex = 13;
       this.RestoreSavedEditSessionsCheckBox.Text = "Restore saved Edit Data sessions when opening an Excel workbook";
       this.ExcelToolTip.SetToolTip(this.RestoreSavedEditSessionsCheckBox, "When checked, Edit Data sessions that were active when an Excel workbook was save" +
@@ -298,9 +301,10 @@ namespace MySQL.ForExcel.Forms
       // UseOptimisticUpdatesCheckBox
       // 
       this.UseOptimisticUpdatesCheckBox.AutoSize = true;
+      this.UseOptimisticUpdatesCheckBox.Font = new System.Drawing.Font("Segoe UI", 8.25F);
       this.UseOptimisticUpdatesCheckBox.Location = new System.Drawing.Point(53, 180);
       this.UseOptimisticUpdatesCheckBox.Name = "UseOptimisticUpdatesCheckBox";
-      this.UseOptimisticUpdatesCheckBox.Size = new System.Drawing.Size(250, 17);
+      this.UseOptimisticUpdatesCheckBox.Size = new System.Drawing.Size(271, 17);
       this.UseOptimisticUpdatesCheckBox.TabIndex = 9;
       this.UseOptimisticUpdatesCheckBox.Text = "Use optimistic updates on all Edit Data sessions";
       this.ExcelToolTip.SetToolTip(this.UseOptimisticUpdatesCheckBox, resources.GetString("UseOptimisticUpdatesCheckBox.ToolTip"));
@@ -313,15 +317,16 @@ namespace MySQL.ForExcel.Forms
       this.ShowQueriesOptionsPanel.Controls.Add(this.NoSqlStatementsRadioButton);
       this.ShowQueriesOptionsPanel.Location = new System.Drawing.Point(21, 191);
       this.ShowQueriesOptionsPanel.Name = "ShowQueriesOptionsPanel";
-      this.ShowQueriesOptionsPanel.Size = new System.Drawing.Size(461, 79);
+      this.ShowQueriesOptionsPanel.Size = new System.Drawing.Size(471, 79);
       this.ShowQueriesOptionsPanel.TabIndex = 10;
       // 
       // ShowExecutedSqlQueryRadioButton
       // 
       this.ShowExecutedSqlQueryRadioButton.AutoSize = true;
+      this.ShowExecutedSqlQueryRadioButton.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.ShowExecutedSqlQueryRadioButton.Location = new System.Drawing.Point(32, 56);
       this.ShowExecutedSqlQueryRadioButton.Name = "ShowExecutedSqlQueryRadioButton";
-      this.ShowExecutedSqlQueryRadioButton.Size = new System.Drawing.Size(284, 17);
+      this.ShowExecutedSqlQueryRadioButton.Size = new System.Drawing.Size(312, 19);
       this.ShowExecutedSqlQueryRadioButton.TabIndex = 2;
       this.ShowExecutedSqlQueryRadioButton.TabStop = true;
       this.ShowExecutedSqlQueryRadioButton.Text = "Show executed SQL statements along with their results";
@@ -332,9 +337,10 @@ namespace MySQL.ForExcel.Forms
       // PreviewSqlQueriesRadioButton
       // 
       this.PreviewSqlQueriesRadioButton.AutoSize = true;
+      this.PreviewSqlQueriesRadioButton.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.PreviewSqlQueriesRadioButton.Location = new System.Drawing.Point(32, 33);
       this.PreviewSqlQueriesRadioButton.Name = "PreviewSqlQueriesRadioButton";
-      this.PreviewSqlQueriesRadioButton.Size = new System.Drawing.Size(300, 17);
+      this.PreviewSqlQueriesRadioButton.Size = new System.Drawing.Size(326, 19);
       this.PreviewSqlQueriesRadioButton.TabIndex = 1;
       this.PreviewSqlQueriesRadioButton.TabStop = true;
       this.PreviewSqlQueriesRadioButton.Text = "Preview SQL statements before they are sent to the server";
@@ -345,9 +351,10 @@ namespace MySQL.ForExcel.Forms
       // NoSqlStatementsRadioButton
       // 
       this.NoSqlStatementsRadioButton.AutoSize = true;
+      this.NoSqlStatementsRadioButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.NoSqlStatementsRadioButton.Location = new System.Drawing.Point(32, 10);
       this.NoSqlStatementsRadioButton.Name = "NoSqlStatementsRadioButton";
-      this.NoSqlStatementsRadioButton.Size = new System.Drawing.Size(248, 17);
+      this.NoSqlStatementsRadioButton.Size = new System.Drawing.Size(270, 19);
       this.NoSqlStatementsRadioButton.TabIndex = 0;
       this.NoSqlStatementsRadioButton.TabStop = true;
       this.NoSqlStatementsRadioButton.Text = "Do not show SQL statements sent to the server";
@@ -360,15 +367,16 @@ namespace MySQL.ForExcel.Forms
       this.panel1.Controls.Add(this.ReuseWorksheetsRadioButton);
       this.panel1.Location = new System.Drawing.Point(21, 356);
       this.panel1.Name = "panel1";
-      this.panel1.Size = new System.Drawing.Size(461, 51);
+      this.panel1.Size = new System.Drawing.Size(480, 51);
       this.panel1.TabIndex = 14;
       // 
       // CreateNewWorksheetsRadioButton
       // 
       this.CreateNewWorksheetsRadioButton.AutoSize = true;
+      this.CreateNewWorksheetsRadioButton.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.CreateNewWorksheetsRadioButton.Location = new System.Drawing.Point(52, 28);
       this.CreateNewWorksheetsRadioButton.Name = "CreateNewWorksheetsRadioButton";
-      this.CreateNewWorksheetsRadioButton.Size = new System.Drawing.Size(329, 17);
+      this.CreateNewWorksheetsRadioButton.Size = new System.Drawing.Size(355, 19);
       this.CreateNewWorksheetsRadioButton.TabIndex = 1;
       this.CreateNewWorksheetsRadioButton.TabStop = true;
       this.CreateNewWorksheetsRadioButton.Text = "Create new Excel worksheets for the restored Edit Data sessions";
@@ -378,9 +386,10 @@ namespace MySQL.ForExcel.Forms
       // ReuseWorksheetsRadioButton
       // 
       this.ReuseWorksheetsRadioButton.AutoSize = true;
+      this.ReuseWorksheetsRadioButton.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.ReuseWorksheetsRadioButton.Location = new System.Drawing.Point(52, 5);
       this.ReuseWorksheetsRadioButton.Name = "ReuseWorksheetsRadioButton";
-      this.ReuseWorksheetsRadioButton.Size = new System.Drawing.Size(383, 17);
+      this.ReuseWorksheetsRadioButton.Size = new System.Drawing.Size(420, 19);
       this.ReuseWorksheetsRadioButton.TabIndex = 0;
       this.ReuseWorksheetsRadioButton.TabStop = true;
       this.ReuseWorksheetsRadioButton.Text = "Reuse Excel worksheets matching their names with the session table names";
@@ -396,11 +405,12 @@ namespace MySQL.ForExcel.Forms
       // 
       // ManageConnectionInfosButton
       // 
-      this.ManageConnectionInfosButton.Location = new System.Drawing.Point(27, 424);
+      this.ManageConnectionInfosButton.Font = new System.Drawing.Font("Segoe UI", 9F);
+      this.ManageConnectionInfosButton.Location = new System.Drawing.Point(27, 425);
       this.ManageConnectionInfosButton.Name = "ManageConnectionInfosButton";
-      this.ManageConnectionInfosButton.Size = new System.Drawing.Size(276, 23);
+      this.ManageConnectionInfosButton.Size = new System.Drawing.Size(445, 23);
       this.ManageConnectionInfosButton.TabIndex = 15;
-      this.ManageConnectionInfosButton.Text = "Manage Stored Import and Edit Connection Information";
+      this.ManageConnectionInfosButton.Text = "Manage Stored Import and Edit Connection Information...";
       this.ExcelToolTip.SetToolTip(this.ManageConnectionInfosButton, "Allows you to select from all stored Import and Edit connection information to be" +
         " deleted once you press Accept.");
       this.ManageConnectionInfosButton.UseVisualStyleBackColor = true;
@@ -409,9 +419,10 @@ namespace MySQL.ForExcel.Forms
       // PreviewTableDataCheckBox
       // 
       this.PreviewTableDataCheckBox.AutoSize = true;
+      this.PreviewTableDataCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.PreviewTableDataCheckBox.Location = new System.Drawing.Point(53, 315);
       this.PreviewTableDataCheckBox.Name = "PreviewTableDataCheckBox";
-      this.PreviewTableDataCheckBox.Size = new System.Drawing.Size(337, 17);
+      this.PreviewTableDataCheckBox.Size = new System.Drawing.Size(364, 19);
       this.PreviewTableDataCheckBox.TabIndex = 12;
       this.PreviewTableDataCheckBox.Text = "Preview MySQL table data before an Edit Data session is opened.";
       this.ExcelToolTip.SetToolTip(this.PreviewTableDataCheckBox, "When checked, the data of the selected MySQL table to edit is shown in a preview " +
@@ -421,9 +432,10 @@ namespace MySQL.ForExcel.Forms
       // ResetToDefaultsButton
       // 
       this.ResetToDefaultsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.ResetToDefaultsButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.ResetToDefaultsButton.Location = new System.Drawing.Point(12, 11);
       this.ResetToDefaultsButton.Name = "ResetToDefaultsButton";
-      this.ResetToDefaultsButton.Size = new System.Drawing.Size(110, 23);
+      this.ResetToDefaultsButton.Size = new System.Drawing.Size(128, 23);
       this.ResetToDefaultsButton.TabIndex = 3;
       this.ResetToDefaultsButton.Text = "Reset to Defaults";
       this.ResetToDefaultsButton.UseVisualStyleBackColor = true;
@@ -432,9 +444,10 @@ namespace MySQL.ForExcel.Forms
       // GlobalOptionsDialog
       // 
       this.AcceptButton = this.DialogAcceptButton;
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(504, 531);
+      this.ClientSize = new System.Drawing.Size(514, 531);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);

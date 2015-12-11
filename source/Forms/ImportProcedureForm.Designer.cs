@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -131,6 +131,7 @@ namespace MySQL.ForExcel.Forms
       this.ImportButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.ImportButton.DialogResult = System.Windows.Forms.DialogResult.OK;
       this.ImportButton.Enabled = false;
+      this.ImportButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.ImportButton.Location = new System.Drawing.Point(678, 11);
       this.ImportButton.Name = "ImportButton";
       this.ImportButton.Size = new System.Drawing.Size(75, 23);
@@ -142,6 +143,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.DialogCancelButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.DialogCancelButton.Location = new System.Drawing.Point(759, 11);
       this.DialogCancelButton.Name = "DialogCancelButton";
       this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
@@ -162,6 +164,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // ParametersPropertyGrid
       // 
+      this.ParametersPropertyGrid.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.ParametersPropertyGrid.HelpVisible = false;
       this.ParametersPropertyGrid.Location = new System.Drawing.Point(395, 75);
       this.ParametersPropertyGrid.Name = "ParametersPropertyGrid";
@@ -301,10 +304,11 @@ namespace MySQL.ForExcel.Forms
       this.ResultSetsTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+      this.ResultSetsTabControl.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.ResultSetsTabControl.Location = new System.Drawing.Point(82, 299);
       this.ResultSetsTabControl.Name = "ResultSetsTabControl";
       this.ResultSetsTabControl.SelectedIndex = 0;
-      this.ResultSetsTabControl.Size = new System.Drawing.Size(676, 238);
+      this.ResultSetsTabControl.Size = new System.Drawing.Size(676, 240);
       this.ResultSetsTabControl.TabIndex = 12;
       this.ResultSetsTabControl.SelectedIndexChanged += new System.EventHandler(this.ResultSetsTabControl_SelectedIndexChanged);
       // 
@@ -319,6 +323,7 @@ namespace MySQL.ForExcel.Forms
       dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
       this.ResultSetsDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
       this.ResultSetsDataGridView.ColumnsMaximumWidth = 200;
+      this.ResultSetsDataGridView.ColumnsMinimumWidth = 5;
       dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.InactiveCaption;
       dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -374,9 +379,10 @@ namespace MySQL.ForExcel.Forms
       // AdvancedOptionsButton
       // 
       this.AdvancedOptionsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.AdvancedOptionsButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.AdvancedOptionsButton.Location = new System.Drawing.Point(12, 11);
       this.AdvancedOptionsButton.Name = "AdvancedOptionsButton";
-      this.AdvancedOptionsButton.Size = new System.Drawing.Size(131, 23);
+      this.AdvancedOptionsButton.Size = new System.Drawing.Size(141, 23);
       this.AdvancedOptionsButton.TabIndex = 0;
       this.AdvancedOptionsButton.Text = "Advanced Options...";
       this.AdvancedOptionsButton.UseVisualStyleBackColor = true;
@@ -396,9 +402,10 @@ namespace MySQL.ForExcel.Forms
       // AddSummaryFieldsCheckBox
       // 
       this.AddSummaryFieldsCheckBox.AutoSize = true;
+      this.AddSummaryFieldsCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.AddSummaryFieldsCheckBox.Location = new System.Drawing.Point(395, 271);
       this.AddSummaryFieldsCheckBox.Name = "AddSummaryFieldsCheckBox";
-      this.AddSummaryFieldsCheckBox.Size = new System.Drawing.Size(121, 17);
+      this.AddSummaryFieldsCheckBox.Size = new System.Drawing.Size(135, 19);
       this.AddSummaryFieldsCheckBox.TabIndex = 32;
       this.AddSummaryFieldsCheckBox.Text = "Add Summary Fields";
       this.AddSummaryFieldsCheckBox.UseVisualStyleBackColor = true;
@@ -406,7 +413,8 @@ namespace MySQL.ForExcel.Forms
       // ImportProcedureForm
       // 
       this.AcceptButton = this.ImportButton;
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.DialogCancelButton;
       this.ClientSize = new System.Drawing.Size(846, 646);
       this.CommandAreaVisible = true;

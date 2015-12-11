@@ -46,9 +46,14 @@ namespace MySQL.ForExcel
     #region Constants
 
     /// <summary>
-    /// The Add-In's pane width in pixels.
+    /// The Add-In's maximum pane width in pixels.
     /// </summary>
-    public const int ADD_IN_PANE_WIDTH = 266;
+    public const int ADD_IN_MAX_PANE_WIDTH = 460;
+
+    /// <summary>
+    /// The Add-In's minimum pane width in pixels.
+    /// </summary>
+    public const int ADD_IN_MIN_PANE_WIDTH = 266;
 
     /// <summary>
     /// The string representation of the Escape key.
@@ -367,7 +372,7 @@ namespace MySQL.ForExcel
       activeCustomPane.VisibleChanged += CustomTaskPaneVisibleChanged;
       activeCustomPane.DockPosition = OfficeCore.MsoCTPDockPosition.msoCTPDockPositionRight;
       activeCustomPane.DockPositionRestrict = OfficeCore.MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoHorizontal;
-      activeCustomPane.Width = ADD_IN_PANE_WIDTH;
+      activeCustomPane.Width = ADD_IN_MIN_PANE_WIDTH;
 
       // First run if no Excel panes have been opened yet.
       if (firstRun)
@@ -1133,7 +1138,19 @@ namespace MySQL.ForExcel
 
       // Since there is no way to restrict the resizing of a custom task pane, cancel the resizing as soon as a
       //  user attempts to resize the pane.
-      bool shouldResetWidth = customTaskPane.Width != ADD_IN_PANE_WIDTH && Application.Width >= ADD_IN_PANE_WIDTH;
+      bool shouldResetWidth = false;
+      int resetToWidth = customTaskPane.Width;
+      if (resetToWidth < ADD_IN_MIN_PANE_WIDTH)
+      {
+        shouldResetWidth = true;
+        resetToWidth = ADD_IN_MIN_PANE_WIDTH;
+      }
+      else if (resetToWidth > ADD_IN_MAX_PANE_WIDTH)
+      {
+        shouldResetWidth = true;
+        resetToWidth = ADD_IN_MAX_PANE_WIDTH;
+      }
+
       if (!shouldResetWidth)
       {
         return;
@@ -1142,7 +1159,7 @@ namespace MySQL.ForExcel
       try
       {
         SendKeys.Send(ESCAPE_KEY);
-        customTaskPane.Width = ADD_IN_PANE_WIDTH;
+        customTaskPane.Width = resetToWidth;
       }
       catch (Exception ex)
       {

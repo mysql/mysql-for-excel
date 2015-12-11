@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -133,6 +133,7 @@ namespace MySQL.ForExcel.Forms
       dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
       this.PreviewDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
       this.PreviewDataGridView.ColumnsMaximumWidth = 200;
+      this.PreviewDataGridView.ColumnsMinimumWidth = 5;
       dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
       dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.InactiveCaption;
       dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -235,23 +236,25 @@ namespace MySQL.ForExcel.Forms
       // 
       this.RowsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.RowsLabel.AutoSize = true;
-      this.RowsLabel.Location = new System.Drawing.Point(157, 380);
+      this.RowsLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
+      this.RowsLabel.Location = new System.Drawing.Point(161, 380);
       this.RowsLabel.Name = "RowsLabel";
-      this.RowsLabel.Size = new System.Drawing.Size(32, 13);
+      this.RowsLabel.Size = new System.Drawing.Size(35, 15);
       this.RowsLabel.TabIndex = 9;
       this.RowsLabel.Text = "rows.";
       // 
       // RowsNumericUpDown
       // 
       this.RowsNumericUpDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.RowsNumericUpDown.Location = new System.Drawing.Point(91, 377);
+      this.RowsNumericUpDown.Font = new System.Drawing.Font("Segoe UI", 9F);
+      this.RowsNumericUpDown.Location = new System.Drawing.Point(94, 378);
       this.RowsNumericUpDown.Minimum = new decimal(new int[] {
             1,
             0,
             0,
             0});
       this.RowsNumericUpDown.Name = "RowsNumericUpDown";
-      this.RowsNumericUpDown.Size = new System.Drawing.Size(60, 20);
+      this.RowsNumericUpDown.Size = new System.Drawing.Size(60, 23);
       this.RowsNumericUpDown.TabIndex = 8;
       this.RowsNumericUpDown.Value = new decimal(new int[] {
             10,
@@ -263,16 +266,18 @@ namespace MySQL.ForExcel.Forms
       // 
       this.PreviewLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.PreviewLabel.AutoSize = true;
+      this.PreviewLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.PreviewLabel.Location = new System.Drawing.Point(40, 380);
       this.PreviewLabel.Name = "PreviewLabel";
-      this.PreviewLabel.Size = new System.Drawing.Size(45, 13);
+      this.PreviewLabel.Size = new System.Drawing.Size(48, 15);
       this.PreviewLabel.TabIndex = 7;
       this.PreviewLabel.Text = "Preview";
       // 
       // RefreshButton
       // 
       this.RefreshButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.RefreshButton.Location = new System.Drawing.Point(195, 375);
+      this.RefreshButton.Font = new System.Drawing.Font("Segoe UI", 9F);
+      this.RefreshButton.Location = new System.Drawing.Point(202, 376);
       this.RefreshButton.Name = "RefreshButton";
       this.RefreshButton.Size = new System.Drawing.Size(75, 23);
       this.RefreshButton.TabIndex = 10;
@@ -295,7 +300,8 @@ namespace MySQL.ForExcel.Forms
       // PreviewTableViewDialog
       // 
       this.AcceptButton = this.OkButton;
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.DialogCancelButton;
       this.ClientSize = new System.Drawing.Size(749, 461);
       this.CommandAreaVisible = true;

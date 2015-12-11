@@ -53,7 +53,7 @@ namespace MySQL.ForExcel.Forms
     {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ManageConnectionInfosDialog));
-      System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Workbook", System.Windows.Forms.HorizontalAlignment.Left);
+      System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("Workbook", System.Windows.Forms.HorizontalAlignment.Left);
       this.FromImageList = new System.Windows.Forms.ImageList(this.components);
       this.ChooseConnectionInfosSubLabel = new System.Windows.Forms.Label();
       this.ChooseConnectionInfosMainLabel = new System.Windows.Forms.Label();
@@ -208,10 +208,10 @@ namespace MySQL.ForExcel.Forms
             this.LastAccess});
       this.ConnectionInfosListView.ContextMenuStrip = this.TablesViewsContextMenuStrip;
       this.ConnectionInfosListView.FullRowSelect = true;
-      listViewGroup2.Header = "Workbook";
-      listViewGroup2.Name = "Workbook";
+      listViewGroup1.Header = "Workbook";
+      listViewGroup1.Name = "Workbook";
       this.ConnectionInfosListView.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup2});
+            listViewGroup1});
       this.ConnectionInfosListView.HideSelection = false;
       this.ConnectionInfosListView.Location = new System.Drawing.Point(39, 91);
       this.ConnectionInfosListView.Name = "ConnectionInfosListView";
@@ -429,7 +429,8 @@ namespace MySQL.ForExcel.Forms
       // ManageConnectionInfosDialog
       // 
       this.AcceptButton = this.DialogAcceptButton;
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.DialogCancelButton;
       this.ClientSize = new System.Drawing.Size(629, 531);
       this.CommandAreaVisible = true;

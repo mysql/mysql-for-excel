@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -52,11 +52,11 @@ namespace MySQL.ForExcel.Forms
       // 
       this.InstallerVersionLabel.AutoSize = true;
       this.InstallerVersionLabel.BackColor = System.Drawing.Color.Transparent;
-      this.InstallerVersionLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.InstallerVersionLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.InstallerVersionLabel.ForeColor = System.Drawing.Color.White;
-      this.InstallerVersionLabel.Location = new System.Drawing.Point(102, 133);
+      this.InstallerVersionLabel.Location = new System.Drawing.Point(102, 136);
       this.InstallerVersionLabel.Name = "InstallerVersionLabel";
-      this.InstallerVersionLabel.Size = new System.Drawing.Size(106, 13);
+      this.InstallerVersionLabel.Size = new System.Drawing.Size(114, 15);
       this.InstallerVersionLabel.TabIndex = 5;
       this.InstallerVersionLabel.Text = "MySQL Installer 1.4";
       this.InstallerVersionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -65,22 +65,24 @@ namespace MySQL.ForExcel.Forms
       // 
       this.ExcelVersionLabel.AutoSize = true;
       this.ExcelVersionLabel.BackColor = System.Drawing.Color.Transparent;
-      this.ExcelVersionLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ExcelVersionLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.ExcelVersionLabel.ForeColor = System.Drawing.Color.White;
       this.ExcelVersionLabel.Location = new System.Drawing.Point(102, 117);
       this.ExcelVersionLabel.Name = "ExcelVersionLabel";
-      this.ExcelVersionLabel.Size = new System.Drawing.Size(118, 13);
+      this.ExcelVersionLabel.Size = new System.Drawing.Size(128, 15);
       this.ExcelVersionLabel.TabIndex = 4;
       this.ExcelVersionLabel.Text = "MySQL for Excel 1.1.x";
       this.ExcelVersionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
       // 
       // AboutBox
       // 
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.BackgroundImage = global::MySQL.ForExcel.Properties.Resources.SplashScreenExcel;
       this.ClientSize = new System.Drawing.Size(560, 322);
       this.Controls.Add(this.InstallerVersionLabel);
       this.Controls.Add(this.ExcelVersionLabel);
+      this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
       this.MaximizeBox = false;
       this.MinimizeBox = false;

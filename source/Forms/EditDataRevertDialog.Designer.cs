@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -58,8 +58,8 @@ namespace MySQL.ForExcel.Forms
       // 
       // FootnoteAreaPanel
       // 
-      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 71);
-      this.FootnoteAreaPanel.Size = new System.Drawing.Size(484, 0);
+      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 292);
+      this.FootnoteAreaPanel.Size = new System.Drawing.Size(634, 0);
       // 
       // ContentAreaPanel
       // 
@@ -145,10 +145,12 @@ namespace MySQL.ForExcel.Forms
       // 
       // EditDataRevertDialog
       // 
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.DialogCancelButton;
       this.ClientSize = new System.Drawing.Size(484, 151);
       this.CommandAreaVisible = true;
+      this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.FootnoteAreaHeight = 0;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
       this.MaximumSize = new System.Drawing.Size(500, 190);

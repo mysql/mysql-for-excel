@@ -99,6 +99,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.ApplyButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.ApplyButton.Enabled = false;
+      this.ApplyButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.ApplyButton.Location = new System.Drawing.Point(716, 12);
       this.ApplyButton.Name = "ApplyButton";
       this.ApplyButton.Size = new System.Drawing.Size(75, 23);
@@ -111,6 +112,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+      this.DialogCancelButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.DialogCancelButton.Location = new System.Drawing.Point(797, 12);
       this.DialogCancelButton.Name = "DialogCancelButton";
       this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
@@ -186,9 +188,10 @@ namespace MySQL.ForExcel.Forms
       // OriginalQueryButton
       // 
       this.OriginalQueryButton.Enabled = false;
+      this.OriginalQueryButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.OriginalQueryButton.Location = new System.Drawing.Point(12, 12);
       this.OriginalQueryButton.Name = "OriginalQueryButton";
-      this.OriginalQueryButton.Size = new System.Drawing.Size(116, 23);
+      this.OriginalQueryButton.Size = new System.Drawing.Size(120, 23);
       this.OriginalQueryButton.TabIndex = 0;
       this.OriginalQueryButton.Text = "Original Query";
       this.OriginalQueryButton.UseVisualStyleBackColor = true;

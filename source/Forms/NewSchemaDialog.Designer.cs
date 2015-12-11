@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -117,11 +117,11 @@ namespace MySQL.ForExcel.Forms
       // 
       // SchemaNameTextBox
       // 
-      this.SchemaNameTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.SchemaNameTextBox.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.SchemaNameTextBox.Location = new System.Drawing.Point(183, 88);
       this.SchemaNameTextBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.SchemaNameTextBox.Name = "SchemaNameTextBox";
-      this.SchemaNameTextBox.Size = new System.Drawing.Size(319, 21);
+      this.SchemaNameTextBox.Size = new System.Drawing.Size(319, 23);
       this.SchemaNameTextBox.TabIndex = 3;
       this.SchemaNameTextBox.TextChanged += new System.EventHandler(this.SchemaNameTextBox_TextChanged);
       // 
@@ -138,39 +138,39 @@ namespace MySQL.ForExcel.Forms
       // NewSchemaNameLabel
       // 
       this.NewSchemaNameLabel.AutoSize = true;
-      this.NewSchemaNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.NewSchemaNameLabel.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.NewSchemaNameLabel.ForeColor = System.Drawing.Color.Navy;
       this.NewSchemaNameLabel.Location = new System.Drawing.Point(84, 23);
       this.NewSchemaNameLabel.Name = "NewSchemaNameLabel";
-      this.NewSchemaNameLabel.Size = new System.Drawing.Size(145, 18);
+      this.NewSchemaNameLabel.Size = new System.Drawing.Size(142, 20);
       this.NewSchemaNameLabel.TabIndex = 0;
       this.NewSchemaNameLabel.Text = "New Schema Name:";
       // 
       // InstructionsLabel
       // 
       this.InstructionsLabel.AutoSize = true;
-      this.InstructionsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.InstructionsLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.InstructionsLabel.Location = new System.Drawing.Point(84, 45);
       this.InstructionsLabel.Name = "InstructionsLabel";
-      this.InstructionsLabel.Size = new System.Drawing.Size(234, 15);
+      this.InstructionsLabel.Size = new System.Drawing.Size(222, 15);
       this.InstructionsLabel.TabIndex = 1;
       this.InstructionsLabel.Text = "Please enter a name for the new schema.";
       // 
       // SchemaNameLabel
       // 
       this.SchemaNameLabel.AutoSize = true;
-      this.SchemaNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.SchemaNameLabel.Location = new System.Drawing.Point(84, 91);
+      this.SchemaNameLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.SchemaNameLabel.Location = new System.Drawing.Point(90, 91);
       this.SchemaNameLabel.Name = "SchemaNameLabel";
-      this.SchemaNameLabel.Size = new System.Drawing.Size(93, 15);
+      this.SchemaNameLabel.Size = new System.Drawing.Size(87, 15);
       this.SchemaNameLabel.TabIndex = 2;
       this.SchemaNameLabel.Text = "Schema Name:";
       // 
       // CollationLabel
       // 
       this.CollationLabel.AutoSize = true;
-      this.CollationLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.CollationLabel.Location = new System.Drawing.Point(119, 117);
+      this.CollationLabel.Font = new System.Drawing.Font("Segoe UI", 9F);
+      this.CollationLabel.Location = new System.Drawing.Point(119, 119);
       this.CollationLabel.Name = "CollationLabel";
       this.CollationLabel.Size = new System.Drawing.Size(58, 15);
       this.CollationLabel.TabIndex = 4;
@@ -191,7 +191,8 @@ namespace MySQL.ForExcel.Forms
       // NewSchemaDialog
       // 
       this.AcceptButton = this.DialogOKButton;
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.DialogCancelButton;
       this.ClientSize = new System.Drawing.Size(514, 211);
       this.CommandAreaVisible = true;

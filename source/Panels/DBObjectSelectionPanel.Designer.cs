@@ -212,7 +212,8 @@ namespace MySQL.ForExcel.Panels
       // 
       // AppendDataHotLabel
       // 
-      this.AppendDataHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.AppendDataHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.AppendDataHotLabel.Behavior = MySQL.ForExcel.Controls.HotLabel.BehaviorType.Button;
       this.AppendDataHotLabel.CheckedImage = null;
       this.AppendDataHotLabel.Description = "Add data to an existing MySQL Table";
@@ -247,7 +248,8 @@ namespace MySQL.ForExcel.Panels
       // 
       // EditDataHotLabel
       // 
-      this.EditDataHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.EditDataHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.EditDataHotLabel.Behavior = MySQL.ForExcel.Controls.HotLabel.BehaviorType.Button;
       this.EditDataHotLabel.CheckedImage = null;
       this.EditDataHotLabel.Description = "Open a new sheet to edit table data";
@@ -282,7 +284,8 @@ namespace MySQL.ForExcel.Panels
       // 
       // ImportDataHotLabel
       // 
-      this.ImportDataHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.ImportDataHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.ImportDataHotLabel.Behavior = MySQL.ForExcel.Controls.HotLabel.BehaviorType.Button;
       this.ImportDataHotLabel.CheckedImage = null;
       this.ImportDataHotLabel.Description = "Add object\'s data at the current cell";
@@ -344,10 +347,13 @@ namespace MySQL.ForExcel.Panels
       // 
       // SeparatorImage
       // 
+      this.SeparatorImage.Anchor = System.Windows.Forms.AnchorStyles.Top;
       this.SeparatorImage.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Separator;
       this.SeparatorImage.Location = new System.Drawing.Point(9, 108);
+      this.SeparatorImage.MaintainAspectRatio = true;
       this.SeparatorImage.Name = "SeparatorImage";
       this.SeparatorImage.Opacity = 0.3F;
+      this.SeparatorImage.ScaleImage = false;
       this.SeparatorImage.Size = new System.Drawing.Size(242, 22);
       this.SeparatorImage.TabIndex = 34;
       // 
@@ -380,6 +386,8 @@ namespace MySQL.ForExcel.Panels
       // 
       // SelectDatabaseObjectHotLabel
       // 
+      this.SelectDatabaseObjectHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.SelectDatabaseObjectHotLabel.Behavior = MySQL.ForExcel.Controls.HotLabel.BehaviorType.Label;
       this.SelectDatabaseObjectHotLabel.CheckedImage = null;
       this.SelectDatabaseObjectHotLabel.Description = "Use CTRL or SHIFT for multiple selection.";
@@ -422,6 +430,8 @@ namespace MySQL.ForExcel.Panels
       // 
       // ExportToNewTableHotLabel
       // 
+      this.ExportToNewTableHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.ExportToNewTableHotLabel.Behavior = MySQL.ForExcel.Controls.HotLabel.BehaviorType.Button;
       this.ExportToNewTableHotLabel.CheckedImage = null;
       this.ExportToNewTableHotLabel.Description = "Create a new table and fill it with data";
@@ -501,7 +511,7 @@ namespace MySQL.ForExcel.Panels
       // 
       // DbObjectSelectionPanel
       // 
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
       this.Controls.Add(this.UpperPanel);
       this.Controls.Add(this.AppendDataHotLabel);
       this.Controls.Add(this.DBObjectList);

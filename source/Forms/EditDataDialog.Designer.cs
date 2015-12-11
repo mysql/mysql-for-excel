@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -76,10 +76,10 @@ namespace MySQL.ForExcel.Forms
       this.EditContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.ExitEditModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.UseOptimisticUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.AutoCommitCheckBox = new System.Windows.Forms.CheckBox();
-      this.DialogToolTip = new System.Windows.Forms.ToolTip(this.components);
       this.ForThisSessionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.ForAllSessionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.AutoCommitCheckBox = new System.Windows.Forms.CheckBox();
+      this.DialogToolTip = new System.Windows.Forms.ToolTip(this.components);
       ((System.ComponentModel.ISupportInitialize)(this.SakilaLogoPictureBox)).BeginInit();
       this.EditContextMenu.SuspendLayout();
       this.SuspendLayout();
@@ -143,7 +143,7 @@ namespace MySQL.ForExcel.Forms
             this.ExitEditModeToolStripMenuItem,
             this.UseOptimisticUpdateToolStripMenuItem});
       this.EditContextMenu.Name = "contextMenu";
-      this.EditContextMenu.Size = new System.Drawing.Size(193, 70);
+      this.EditContextMenu.Size = new System.Drawing.Size(193, 48);
       // 
       // ExitEditModeToolStripMenuItem
       // 
@@ -163,6 +163,20 @@ namespace MySQL.ForExcel.Forms
       this.UseOptimisticUpdateToolStripMenuItem.Size = new System.Drawing.Size(192, 22);
       this.UseOptimisticUpdateToolStripMenuItem.Text = "Use Optimistic Update";
       // 
+      // ForThisSessionToolStripMenuItem
+      // 
+      this.ForThisSessionToolStripMenuItem.Name = "ForThisSessionToolStripMenuItem";
+      this.ForThisSessionToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+      this.ForThisSessionToolStripMenuItem.Text = "For this session";
+      this.ForThisSessionToolStripMenuItem.Click += new System.EventHandler(this.ForThisSessionToolStripMenuItem_Click);
+      // 
+      // ForAllSessionsToolStripMenuItem
+      // 
+      this.ForAllSessionsToolStripMenuItem.Name = "ForAllSessionsToolStripMenuItem";
+      this.ForAllSessionsToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+      this.ForAllSessionsToolStripMenuItem.Text = "For all sessions";
+      this.ForAllSessionsToolStripMenuItem.Click += new System.EventHandler(this.ForAllSessionsToolStripMenuItem_Click);
+      // 
       // AutoCommitCheckBox
       // 
       this.AutoCommitCheckBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -178,23 +192,10 @@ namespace MySQL.ForExcel.Forms
       this.AutoCommitCheckBox.UseVisualStyleBackColor = false;
       this.AutoCommitCheckBox.CheckedChanged += new System.EventHandler(this.AutoCommitCheckBox_CheckedChanged);
       // 
-      // ForThisSessionToolStripMenuItem
-      // 
-      this.ForThisSessionToolStripMenuItem.Name = "ForThisSessionToolStripMenuItem";
-      this.ForThisSessionToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
-      this.ForThisSessionToolStripMenuItem.Text = "For this session";
-      this.ForThisSessionToolStripMenuItem.Click += new System.EventHandler(this.ForThisSessionToolStripMenuItem_Click);
-      // 
-      // ForAllSessionsToolStripMenuItem
-      // 
-      this.ForAllSessionsToolStripMenuItem.Name = "ForAllSessionsToolStripMenuItem";
-      this.ForAllSessionsToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
-      this.ForAllSessionsToolStripMenuItem.Text = "For all sessions";
-      this.ForAllSessionsToolStripMenuItem.Click += new System.EventHandler(this.ForAllSessionsToolStripMenuItem_Click);
-      // 
       // EditDataDialog
       // 
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.BackColor = System.Drawing.Color.Black;
       this.ClientSize = new System.Drawing.Size(275, 78);
       this.ContextMenuStrip = this.EditContextMenu;
@@ -205,6 +206,7 @@ namespace MySQL.ForExcel.Forms
       this.Controls.Add(this.CommitChangesButton);
       this.Controls.Add(this.RevertDataButton);
       this.DoubleBuffered = true;
+      this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
       this.MaximizeBox = false;
       this.Name = "EditDataDialog";

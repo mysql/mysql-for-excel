@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -85,7 +85,8 @@ namespace MySQL.ForExcel.Panels
       // 
       // ManageConnectionsHotLabel
       // 
-      this.ManageConnectionsHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.ManageConnectionsHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.ManageConnectionsHotLabel.Behavior = MySQL.ForExcel.Controls.HotLabel.BehaviorType.Button;
       this.ManageConnectionsHotLabel.CheckedImage = null;
       this.ManageConnectionsHotLabel.Description = "Launch MySQL Workbench";
@@ -110,11 +111,11 @@ namespace MySQL.ForExcel.Panels
       this.ManageConnectionsHotLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.ManageConnectionsHotLabel.TitleColorOpacity = 0.95D;
       this.ManageConnectionsHotLabel.TitleDescriptionPixelsSpacing = 0;
-      this.ManageConnectionsHotLabel.TitleXOffset = 3;
-      this.ManageConnectionsHotLabel.TitleYOffset = -2;
       this.ManageConnectionsHotLabel.TitleShadowOpacity = 0.2D;
       this.ManageConnectionsHotLabel.TitleShadowXOffset = 0;
       this.ManageConnectionsHotLabel.TitleShadowYOffset = 1;
+      this.ManageConnectionsHotLabel.TitleXOffset = 3;
+      this.ManageConnectionsHotLabel.TitleYOffset = -2;
       this.ManageConnectionsHotLabel.Click += new System.EventHandler(this.ManageConnectionsHotLabel_Click);
       // 
       // ConnectionsList
@@ -139,6 +140,8 @@ namespace MySQL.ForExcel.Panels
       this.ConnectionsList.Name = "ConnectionsList";
       this.ConnectionsList.NodeHeightMultiple = 2;
       this.ConnectionsList.NodeImages = this.LargeImagesList;
+      this.ConnectionsList.ScaledImagesVerticalSpacing = 1;
+      this.ConnectionsList.ScaleImages = false;
       this.ConnectionsList.ShowNodeToolTips = true;
       this.ConnectionsList.Size = new System.Drawing.Size(242, 315);
       this.ConnectionsList.TabIndex = 22;
@@ -184,7 +187,8 @@ namespace MySQL.ForExcel.Panels
       // 
       // NewConnectionHotLabel
       // 
-      this.NewConnectionHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.NewConnectionHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.NewConnectionHotLabel.Behavior = MySQL.ForExcel.Controls.HotLabel.BehaviorType.Button;
       this.NewConnectionHotLabel.CheckedImage = null;
       this.NewConnectionHotLabel.Description = "Add a new Database Connection";
@@ -209,11 +213,11 @@ namespace MySQL.ForExcel.Panels
       this.NewConnectionHotLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.NewConnectionHotLabel.TitleColorOpacity = 0.95D;
       this.NewConnectionHotLabel.TitleDescriptionPixelsSpacing = 0;
-      this.NewConnectionHotLabel.TitleXOffset = 3;
-      this.NewConnectionHotLabel.TitleYOffset = 0;
       this.NewConnectionHotLabel.TitleShadowOpacity = 0.2D;
       this.NewConnectionHotLabel.TitleShadowXOffset = 0;
       this.NewConnectionHotLabel.TitleShadowYOffset = 1;
+      this.NewConnectionHotLabel.TitleXOffset = 3;
+      this.NewConnectionHotLabel.TitleYOffset = 0;
       this.NewConnectionHotLabel.Click += new System.EventHandler(this.NewConnectionHotLabel_Click);
       // 
       // UpperPanel
@@ -232,10 +236,13 @@ namespace MySQL.ForExcel.Panels
       // 
       // SeparatorImage
       // 
+      this.SeparatorImage.Anchor = System.Windows.Forms.AnchorStyles.Top;
       this.SeparatorImage.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Separator;
       this.SeparatorImage.Location = new System.Drawing.Point(9, 135);
+      this.SeparatorImage.MaintainAspectRatio = false;
       this.SeparatorImage.Name = "SeparatorImage";
       this.SeparatorImage.Opacity = 0.3F;
+      this.SeparatorImage.ScaleImage = true;
       this.SeparatorImage.Size = new System.Drawing.Size(242, 21);
       this.SeparatorImage.TabIndex = 30;
       // 
@@ -250,6 +257,8 @@ namespace MySQL.ForExcel.Panels
       // 
       // InstructionsLabel
       // 
+      this.InstructionsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.InstructionsLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.InstructionsLabel.ForeColor = System.Drawing.SystemColors.ControlText;
       this.InstructionsLabel.Location = new System.Drawing.Point(9, 72);
@@ -275,6 +284,8 @@ namespace MySQL.ForExcel.Panels
       // 
       // OpenConnectionHotLabel
       // 
+      this.OpenConnectionHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
       this.OpenConnectionHotLabel.Behavior = MySQL.ForExcel.Controls.HotLabel.BehaviorType.Label;
       this.OpenConnectionHotLabel.CheckedImage = null;
       this.OpenConnectionHotLabel.Description = "Double-Click a Connection to Start";
@@ -299,15 +310,15 @@ namespace MySQL.ForExcel.Panels
       this.OpenConnectionHotLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.OpenConnectionHotLabel.TitleColorOpacity = 0.95D;
       this.OpenConnectionHotLabel.TitleDescriptionPixelsSpacing = 0;
-      this.OpenConnectionHotLabel.TitleXOffset = 3;
-      this.OpenConnectionHotLabel.TitleYOffset = -3;
       this.OpenConnectionHotLabel.TitleShadowOpacity = 0.2D;
       this.OpenConnectionHotLabel.TitleShadowXOffset = 0;
       this.OpenConnectionHotLabel.TitleShadowYOffset = 1;
+      this.OpenConnectionHotLabel.TitleXOffset = 3;
+      this.OpenConnectionHotLabel.TitleYOffset = -3;
       // 
       // AboutHotLabel
       // 
-      this.AboutHotLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.AboutHotLabel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
       this.AboutHotLabel.Behavior = MySQL.ForExcel.Controls.HotLabel.BehaviorType.Button;
       this.AboutHotLabel.CheckedImage = null;
       this.AboutHotLabel.Description = "";
@@ -332,16 +343,16 @@ namespace MySQL.ForExcel.Panels
       this.AboutHotLabel.TitleColor = System.Drawing.SystemColors.GrayText;
       this.AboutHotLabel.TitleColorOpacity = 0.95D;
       this.AboutHotLabel.TitleDescriptionPixelsSpacing = 0;
-      this.AboutHotLabel.TitleXOffset = 3;
-      this.AboutHotLabel.TitleYOffset = 0;
       this.AboutHotLabel.TitleShadowOpacity = 0.2D;
       this.AboutHotLabel.TitleShadowXOffset = 0;
       this.AboutHotLabel.TitleShadowYOffset = 1;
+      this.AboutHotLabel.TitleXOffset = 3;
+      this.AboutHotLabel.TitleYOffset = 0;
       this.AboutHotLabel.Click += new System.EventHandler(this.AboutHotLabel_Click);
       // 
       // WelcomePanel
       // 
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
       this.Controls.Add(this.AboutHotLabel);
       this.Controls.Add(this.UpperPanel);
       this.Controls.Add(this.NewConnectionHotLabel);
