@@ -26,18 +26,18 @@
       <![CDATA[ Privileged  ]]>
     </Condition>
 
-    <!-- See if VSTO is installed -->
+    <!-- Check if VSTO is installed, otherwise abort installation -->
     <Property Id="VSTO_X86_INSTALLED">
-	  <RegistrySearch Id="VSTOx86InstalledSearch" Root="HKLM" Key="SOFTWARE\Wow6432Node\Microsoft\VSTO Runtime Setup\v4R" Name="VSTORFeature_CLR40" Type="raw"/>
+	    <RegistrySearch Id="VSTOx86InstalledSearch" Root="HKLM" Key="SOFTWARE\Wow6432Node\Microsoft\VSTO Runtime Setup\v4R" Name="VSTORFeature_CLR40" Type="raw"/>
     </Property>
-	<Property Id="VSTO_X64_INSTALLED">
-	  <RegistrySearch Id="VSTOx64InstalledSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VSTO Runtime Setup\v4R" Name="VSTORFeature_CLR40" Type="raw"/>
+	  <Property Id="VSTO_X64_INSTALLED">
+	    <RegistrySearch Id="VSTOx64InstalledSearch" Root="HKLM" Key="SOFTWARE\Microsoft\VSTO Runtime Setup\v4R" Name="VSTORFeature_CLR40" Type="raw"/>
     </Property>
     <Condition Message="The Microsoft Visual Studio Tools for Office Runtime must be installed prior to running this installation.">
       <![CDATA[Installed OR VSTO_X86_INSTALLED OR VSTO_X64_INSTALLED]]>
     </Condition>
 
-    <!-- First make sure that .NET is installed -->
+    <!-- Check if .NET FW 4.0 or greater is installed -->
     <PropertyRef Id="NETFRAMEWORK40CLIENT"/>
     <PropertyRef Id="NETFRAMEWORK40FULL"/>
     <Condition Message="This application requires .NET Framework 4.0. Please install the .NET Framework then run this installer again.  For more information, please see http://go.microsoft.com/fwlink/?LinkId=181012">

@@ -1,3 +1,36 @@
+MySQL for Excel 1.3.6 Release Notes
+------------------------------------
+
+Welcome to the release notes for MySQL for Excel 1.3.6
+
+* Changed settings for containers and forms to let all UI components to automatically scale on different DPI
+  settings. Removed the restriction to resize the add-in's pane, so in case a different DPI setting is used
+  and the fonts look too big, the add-in pane can be resized to let users see contents as best as possible.
+* Fixed code for data import operations done to an Excel range so that numeric data stored in text columns
+  is correctly formatted by Excel as text and not as the "General" format that automatically formats cells
+  as numbers when the data is stored in a text object. This fixes the problem seen in Edit Data operations
+  where text columns were being formated as numbers and leading zeros stripped from them. Added new advanced
+  options for Import Data operations to define the Excel format to apply to imported DateTime or TimeStamp,
+  Date and Time MySQL data.
+* Tweaked the code that runs when closing an Excel workbook to disable events for Excel 2007 only while the
+  workbook is being saved. This fixes a problem where MySQL for Excel offered to save an unsaved Excel
+  workbook when closing it, but the save was not happening causing all unsaved changes to be lost.
+* Added column properties to the Export Data dialog to support the definition of Auto Increment and Default
+  Value for the new MySQL table where the data will be exported to. Added a context menu to declare a numeric
+  field to be Unsigned or to have Zero Fill, accessible by right-clicking the Data Type combo box.
+  Added the TimeStamp data type to the full list of valid data types, as it was not being shown before.
+  Added help tooltips to fields in the Export Data dialog that explain in detail how the column properties
+  work in a MySQL database.
+* Added an option to the Advanced Options dialog for Append and Export Data operations, called "Generate an
+  INSERT statement for each data row", which is off by default. When checked an INSERT statement for each data
+  row being appended or exported is generated in the resulting SQL query sent to the MySQL server.
+  When unchecked a single INSERT statement is generated as a bulk data operation, which performs better than
+  multiple INSERT statements.
+* Other bug fixes (for a complete list refer to the CHANGES file).
+
+
+
+
 MySQL for Excel 1.3.5 Release Notes
 ------------------------------------
 
@@ -6,18 +39,18 @@ Welcome to the release notes for MySQL for Excel 1.3.5
 * Added support for JSON data type columns. The JSON data type appears now as a selectable one in the Export
   Data dialog for columns (if the advanced option to show all data types is selected). All data operations
   (Import, Export, Append and Edit) work with the new JSON data type.
-- Added an option to the Advanced Options dialog for Append Data operations, called "Show column data types
+* Added an option to the Advanced Options dialog for Append Data operations, called "Show column data types
   above column names", that when checked data type information for columns on source and target grids of the
   Append Data dialog is shown. Showing the data types can sometimes aid users when doing manual mapping of
   columns.
-- Stopped using some hidden defined names to store formulas to transform date values into a the date format
+* Stopped using some hidden defined names to store formulas to transform date values into a the date format
   used by MySQL. These defined names were being detected by Excel as macros or user functions that could not
   be saved in macro-free workbooks, thus generating an annoying warning every time a Workbook was saved, if
   the add-in was active.
-- Fixed a bug where connection information for ListObjects created by MySQL for Excel when importing data was
+* Fixed a bug where connection information for ListObjects created by MySQL for Excel when importing data was
   not being saved, so after the Workbook was re-opened a COM Exception was being thrown when attempting to
   refresh the contents of those ListObects.
-- Fixed code in the Append Data dialog that was incorrectly mapping columns when only a single row of Excel
+* Fixed code in the Append Data dialog that was incorrectly mapping columns when only a single row of Excel
   data was selected to append. Additionally validated that if a single row of Excel data is selected and then
   on the Append Data dialog "First Row Contains Column Names" is checked, a warning is displayed stating no
   rows are available to complete the append operation.
