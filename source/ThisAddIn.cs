@@ -94,6 +94,11 @@ namespace MySQL.ForExcel
     /// </summary>
     private bool _restoringExistingConnectionInfo;
 
+    /// <summary>
+    /// Flag indicating whether the detection of contents for a cell selection should be skipped.
+    /// </summary>
+    private bool _skipSelectedDataContentsDetection;
+
     #endregion Fields
 
     #region Properties
@@ -252,7 +257,22 @@ namespace MySQL.ForExcel
     /// Gets or sets a value indicating whether the detection of contents for a cell selection should be skipped.
     /// </summary>
     /// <remarks>Used when a cell selection is being done programatically and not by the user.</remarks>
-    public bool SkipSelectedDataContentsDetection { get; set; }
+    public bool SkipSelectedDataContentsDetection
+    {
+      get
+      {
+        return _skipSelectedDataContentsDetection;
+      }
+
+      set
+      {
+        _skipSelectedDataContentsDetection = value;
+        if (!_skipSelectedDataContentsDetection)
+        {
+          ActiveExcelPane.UpdateExcelSelectedDataStatus(Application.ActiveCell);
+        }
+      }
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether the <see cref="ExcelInterop.Worksheet.Change"/> event should be skipped.
@@ -1175,7 +1195,7 @@ namespace MySQL.ForExcel
       _editConnectionInfosByWorkbook = new Dictionary<string, List<EditConnectionInfo>>(EditConnectionInfos.Count);
       _lastDeactivatedSheetName = string.Empty;
       _restoringExistingConnectionInfo = false;
-      SkipSelectedDataContentsDetection = false;
+      _skipSelectedDataContentsDetection = false;
       SkipWorksheetChangeEvent = false;
 
       // Subscribe to Excel events

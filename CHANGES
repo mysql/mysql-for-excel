@@ -1,4 +1,6 @@
 1.3.6
+- Fixed the detection of contents in the current Excel active cell after importing data and after loading database obects when a schema is opened.
+  (Bug #22372915 - APPEND EXCEL DATA TABLE THROW AN OBJECT REFERENCE ERROR WITH SPECIFIC SCENARIO)
 - Changed settings for containers and forms to let all UI components to automatically scale on different DPI settings. Removed the restriction to resize the
   add-in's pane, so in case a different DPI setting is used and the fonts look too big, the add-in pane can be resized to let users see contents as best as
   possible. (MySQL Bug #71389, Bug #18099454 - MYSQL FOR EXCEL SIDEBAR NOT DISPLAYING CORRECTLY)

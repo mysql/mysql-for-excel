@@ -359,12 +359,12 @@ namespace MySQL.ForExcel.Controls
 
       set
       {
+        ClearSelectedNodes();
         if (!MultiSelect || value == null)
         {
           return;
         }
 
-        ClearSelectedNodes();
         if (value.Count == 0)
         {
           return;
@@ -513,6 +513,7 @@ namespace MySQL.ForExcel.Controls
     /// </summary>
     public void ClearChildNodes()
     {
+      ClearSelectedNodes();
       foreach (var headerNode in HeaderNodes)
       {
         headerNode.Nodes.Clear();
@@ -524,6 +525,7 @@ namespace MySQL.ForExcel.Controls
     /// </summary>
     public void ClearHeaderNodes()
     {
+      ClearSelectedNodes();
       HeaderNodes.Clear();
       Nodes.Clear();
     }

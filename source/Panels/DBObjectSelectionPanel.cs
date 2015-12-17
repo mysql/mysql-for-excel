@@ -191,7 +191,9 @@ namespace MySQL.ForExcel.Panels
       UserIPLabel.Text = string.Format("User: {0}, IP: {1}", _wbConnection.UserName, _wbConnection.Host);
       SchemaLabel.Text = string.Format("Schema: {0}", _wbConnection.Schema);
       DBObjectsFilter.Width = DBObjectList.Width;
-      return RefreshDbObjectsList(true);
+      bool schemasLoadedSuccessfully = RefreshDbObjectsList(true);
+      RefreshActionLabelsEnabledStatus(null, false);
+      return schemasLoadedSuccessfully;
     }
 
     /// <summary>
@@ -446,6 +448,7 @@ namespace MySQL.ForExcel.Panels
 
       try
       {
+        DialogResult dr = DialogResult.Cancel;
         Cursor = Cursors.WaitCursor;
         var activeWorkbook = Globals.ThisAddIn.ActiveWorkbook;
         if (selectedNode.DbObject is DbTable)
@@ -454,7 +457,7 @@ namespace MySQL.ForExcel.Panels
           dbTable.ImportParameters.ForEditDataOperation = false;
           using (var importForm = new ImportTableViewForm(dbTable, activeWorkbook.ActiveSheet.Name))
           {
-            importForm.ShowDialog();
+            dr = importForm.ShowDialog();
           }
         }
         else if (selectedNode.DbObject is DbView)
@@ -463,15 +466,20 @@ namespace MySQL.ForExcel.Panels
           dbView.ImportParameters.ForEditDataOperation = false;
           using (var importForm = new ImportTableViewForm(dbView, activeWorkbook.ActiveSheet.Name))
           {
-            importForm.ShowDialog();
+            dr = importForm.ShowDialog();
           }
         }
         else if (selectedNode.DbObject is DbProcedure)
         {
           using (var importProcedureForm = new ImportProcedureForm(selectedNode.DbObject as DbProcedure, parentTaskPane.ActiveWorksheet.Name))
           {
-            importProcedureForm.ShowDialog();
+            dr = importProcedureForm.ShowDialog();
           }
+        }
+
+        if (dr == DialogResult.OK)
+        {
+          RefreshActionLabelsEnabledStatus(null, false);
         }
       }
       catch (Exception ex)
@@ -512,7 +520,10 @@ namespace MySQL.ForExcel.Panels
       Cursor = Cursors.WaitCursor;
       using (var importDialog = new ImportMultipleDialog(tablesAndViewsList, selectAllRelatedDbObjects))
       {
-        importDialog.ShowDialog();
+        if (importDialog.ShowDialog() == DialogResult.OK)
+        {
+          RefreshActionLabelsEnabledStatus(null, false);
+        }
       }
 
       Cursor = Cursors.Default;
