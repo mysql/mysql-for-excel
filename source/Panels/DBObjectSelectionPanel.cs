@@ -255,6 +255,9 @@ namespace MySQL.ForExcel.Panels
     private void CloseButton_Click(object sender, EventArgs e)
     {
       Globals.ThisAddIn.CloseExcelPane(Parent as ExcelAddInPane);
+
+      // Synchronize the MySQL for Excel toggle button state of the currently activated window.
+      Globals.ThisAddIn.CustomMySqlRibbon.ChangeShowMySqlForExcelPaneToggleState(false);
     }
 
     /// <summary>

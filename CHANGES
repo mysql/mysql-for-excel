@@ -1,4 +1,6 @@
 1.3.6
+- Added code to synchronize the toggle status of the MySQL for Excel button in the Data ribbon when the add-in is closed from the Close button located at
+  the bottom of the panel showing database objects and their related operations. (MySQL Bug #79655, Bug #22374026 - CLOSE BUTTON NOT WORKING CORRECTLY)
 - Fixed the detection of contents in the current Excel active cell after importing data and after loading database obects when a schema is opened.
   (Bug #22372915 - APPEND EXCEL DATA TABLE THROW AN OBJECT REFERENCE ERROR WITH SPECIFIC SCENARIO)
 - Changed settings for containers and forms to let all UI components to automatically scale on different DPI settings. Removed the restriction to resize the
