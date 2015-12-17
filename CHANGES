@@ -1,4 +1,6 @@
 1.3.6
+- Fixed code to use the correct PivotTable version related to Excel 2016 when creating a PivotTable for all the tables in the Excel data model.
+  (Bug #22387425 - [IMPORT] ERROR CREATING PIVOTTABLE FOR ALL TABLES IN THE DATA MODEL)
 - Added code to synchronize the toggle status of the MySQL for Excel button in the Data ribbon when the add-in is closed from the Close button located at
   the bottom of the panel showing database objects and their related operations. (MySQL Bug #79655, Bug #22374026 - CLOSE BUTTON NOT WORKING CORRECTLY)
 - Fixed the detection of contents in the current Excel active cell after importing data and after loading database obects when a schema is opened.

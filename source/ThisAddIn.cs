@@ -75,6 +75,11 @@ namespace MySQL.ForExcel
     /// </summary>
     public const int EXCEL_2013_VERSION_NUMBER = 15;
 
+    /// <summary>
+    /// The Excel major version number corresponding to Excel 2016.
+    /// </summary>
+    public const int EXCEL_2016_VERSION_NUMBER = 16;
+
     #endregion Constants
 
     #region Fields
@@ -237,6 +242,7 @@ namespace MySQL.ForExcel
         switch (ExcelVersionNumber)
         {
           case EXCEL_2013_VERSION_NUMBER:
+          case EXCEL_2016_VERSION_NUMBER:
             return ExcelInterop.XlPivotTableVersionList.xlPivotTableVersion15;
 
           case EXCEL_2010_VERSION_NUMBER:
