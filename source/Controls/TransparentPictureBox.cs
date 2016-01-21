@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -26,7 +26,7 @@ namespace MySQL.ForExcel.Controls
   /// <summary>
   /// Provides a Windows picture box control for displaying an image controlling its opacity making it transparent.
   /// </summary>
-  public sealed class TransparentPictureBox : UserControl
+  public class TransparentPictureBox : UserControl
   {
     #region Fields
 
@@ -96,7 +96,7 @@ namespace MySQL.ForExcel.Controls
     /// Gets a value indicating whether this control should redraw its surface using a secondary buffer to reduce or prevent flicker.
     /// </summary>
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    protected override bool DoubleBuffered
+    protected sealed override bool DoubleBuffered
     {
       get
       {

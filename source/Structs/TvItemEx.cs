@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -62,7 +62,7 @@ namespace MySQL.ForExcel.Structs
     /// Note that although the tree-view control allows any length string to be stored as item text, only the first 260 characters are displayed.
     /// </summary>
     [MarshalAs(UnmanagedType.LPTStr)]
-    public String lpszText;
+    public string lpszText;
 
     /// <summary>
     /// Size of the buffer pointed to by the pszText member, in characters.
@@ -102,5 +102,26 @@ namespace MySQL.ForExcel.Structs
     /// as otherwise the behavior is undefined.
     /// </summary>
     public int iIntegral;
+
+    /// <summary>
+    /// Initializes a new instance of <see cref="TvItemEx"/>
+    /// </summary>
+    /// <param name="mask">Array of flags that indicate which of the other structure members contain valid data.</param>
+    /// <param name="hItem">Handle to the item.</param>
+    /// <param name="iIntegral">Height of the item, in multiples of the standard item height (see TVM_SETITEMHEIGHT).</param>
+    public TvItemEx(int mask, IntPtr hItem, int iIntegral)
+    {
+      lpszText = null;
+      this.mask = mask;
+      this.hItem = hItem;
+      state = 0;
+      stateMask = 0;
+      cchTextMax = 0;
+      iImage = 0;
+      iSelectedImage = 0;
+      cChildren = 0;
+      lParam = new IntPtr();
+      this.iIntegral = iIntegral;
+    }
   }
 }

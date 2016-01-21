@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -1361,13 +1361,7 @@ namespace MySQL.ForExcel.Controls
         return;
       }
 
-      var tex = new TvItemEx
-      {
-        mask = TVIF_HANDLE | TVIF_INTEGRAL,
-        hItem = node.Handle,
-        iIntegral = heightMultiplier
-      };
-
+      var tex = new TvItemEx(TVIF_HANDLE | TVIF_INTEGRAL, node.Handle, heightMultiplier);
       IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(tex));
       Marshal.StructureToPtr(tex, ptr, false);
       MiscUtilities.SendMessage(Handle, TVM_SETITEM, IntPtr.Zero, ptr);
