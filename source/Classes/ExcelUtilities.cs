@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -24,6 +24,7 @@ using System.Windows.Forms;
 using Microsoft.Office.Core;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQL;
 using MySQL.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 using ExcelTools = Microsoft.Office.Tools.Excel;
@@ -1040,6 +1041,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch
       {
+        // ignored
       }
 
       // SpecialCells method throws exception if no cells are found matching criteria (possible bug in VSTO).
@@ -1049,6 +1051,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch
       {
+        // ignored
       }
 
       if (rangeWithFormulas != null && rangeWithConstants != null)

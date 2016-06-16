@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -23,11 +23,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Microsoft.Office.Core;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQL;
 using MySQL.Utility.Classes.MySQLInstaller;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
@@ -109,7 +111,7 @@ namespace MySQL.ForExcel
     #region Properties
 
     /// <summary>
-    /// Gets the <see cref="Microsoft.Office.Tools.CustomTaskPane"/> contained in the active Excel window.
+    /// Gets the <see cref="CustomTaskPane"/> contained in the active Excel window.
     /// </summary>
     public OfficeTools.CustomTaskPane ActiveCustomPane
     {
@@ -360,7 +362,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets the custom task pane in the active window, if not found creates it.
     /// </summary>
-    /// <returns>the active or newly created <see cref="Microsoft.Office.Tools.CustomTaskPane"/> object.</returns>
+    /// <returns>the active or newly created <see cref="CustomTaskPane"/> object.</returns>
     public OfficeTools.CustomTaskPane GetOrCreateActiveCustomPane()
     {
       OfficeTools.CustomTaskPane activeCustomPane = ActiveCustomPane;
@@ -1063,19 +1065,21 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Customizes the looks of the <see cref="MySQL.Utility.Forms.InfoDialog"/> form for MySQL for ExcelInterop.
+    /// Customizes the looks of some dialogs found in the MySQL.Utility for ExcelInterop.
     /// </summary>
-    private void CustomizeInfoDialog()
+    private void CustomizeUtilityDialogs()
     {
       InfoDialog.ApplicationName = AssemblyTitle;
       InfoDialog.SuccessLogo = Resources.MySQLforExcel_InfoDlg_Success_64x64;
       InfoDialog.ErrorLogo = Resources.MySQLforExcel_InfoDlg_Error_64x64;
       InfoDialog.WarningLogo = Resources.MySQLforExcel_InfoDlg_Warning_64x64;
       InfoDialog.InformationLogo = Resources.MySQLforExcel_Logo_64x64;
+      PasswordDialog.ApplicationIcon = Resources.mysql_for_excel;
+      PasswordDialog.SecurityLogo = Resources.MySQLforExcel_Security;
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="OfficeTools.CustomTaskPane"/> visible property value changes.
+    /// Event delegate method fired when the <see cref="CustomTaskPane"/> visible property value changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Sender object.</param>
@@ -1255,6 +1259,17 @@ namespace MySQL.ForExcel
       MySqlWorkbenchPasswordVault.ApplicationPasswordVaultFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\user_data.dat";
       MySqlWorkbench.ExternalConnections.CreateDefaultConnections = !MySqlWorkbench.ConnectionsFileExists && MySqlWorkbench.Connections.Count == 0;
       MySqlWorkbench.ExternalApplicationConnectionsFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\connections.xml";
+      MySqlWorkbench.ChangeCurrentCursor = delegate(Cursor cursor)
+      {
+        if (cursor == Cursors.WaitCursor)
+        {
+          Globals.ThisAddIn.Application.Cursor = ExcelInterop.XlMousePointer.xlWait;
+        }
+        else if (cursor == Cursors.Default)
+        {
+          Globals.ThisAddIn.Application.Cursor = ExcelInterop.XlMousePointer.xlDefault;
+        }
+      };
     }
 
     /// <summary>
@@ -1550,7 +1565,7 @@ namespace MySQL.ForExcel
             //Fill the new connection with the old HostIdentifier information for the New Connection Dialog if available;
             var missingConnectionconnectionInfo = missingConnectionInfoConnections.FirstOrDefault(s => s.ConnectionId == missingConnectionId);
             //Create the new connection and assign it to all corresponding connectionInfos.
-            using (var newConnectionDialog = new MySqlWorkbenchConnectionDialog(null))
+            using (var newConnectionDialog = new MySqlWorkbenchConnectionDialog(null, false))
             {
               //If the HostIdentifier is set, we use it to fill in the blanks for the new connection in the dialog.
               if (missingConnectionconnectionInfo != null && !string.IsNullOrEmpty(missingConnectionconnectionInfo.HostIdentifier))
@@ -1817,7 +1832,7 @@ namespace MySQL.ForExcel
         // Static initializations.
         System.Windows.Forms.Application.EnableVisualStyles();
         System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
-        CustomizeInfoDialog();
+        CustomizeUtilityDialogs();
         InitializeMySqlWorkbenchStaticSettings();
         MySqlInstaller.LoadData();
         AssemblyTitle = AssemblyInfo.AssemblyTitle;

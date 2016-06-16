@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@ using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQL;
 using MySQL.Utility.Classes.MySQLWorkbench;
 
 namespace MySQL.ForExcel.Panels
@@ -342,7 +342,7 @@ namespace MySQL.ForExcel.Panels
     {
       var selectedNode = DBObjectList.SelectedNode;
       var selectedTable = selectedNode.DbObject as DbTable;
-      if (selectedNode == null || selectedNode.Type != MySqlListViewNode.MySqlNodeType.DbObject || selectedTable == null || _wbConnection == null)
+      if (selectedNode.Type != MySqlListViewNode.MySqlNodeType.DbObject || selectedTable == null || _wbConnection == null)
       {
         return;
       }

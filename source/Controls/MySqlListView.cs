@@ -27,6 +27,7 @@ using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Structs;
 using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQL;
 using MySQL.Utility.Classes.MySQLWorkbench;
 
 namespace MySQL.ForExcel.Controls

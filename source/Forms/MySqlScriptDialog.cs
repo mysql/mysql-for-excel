@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -28,6 +28,7 @@ using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQL;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
 

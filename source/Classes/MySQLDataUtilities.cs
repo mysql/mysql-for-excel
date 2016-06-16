@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -21,13 +21,10 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using MySql.Data.MySqlClient;
-using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
-using MySQL.ForExcel.Structs;
-using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQL;
 using MySQL.Utility.Classes.MySQLWorkbench;
-using MySQL.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
@@ -480,7 +477,7 @@ namespace MySQL.ForExcel.Classes
         return string.Empty;
       }
 
-      bool isSsh = connection.DriverType == MySqlWorkbenchConnectionType.Ssh;
+      bool isSsh = connection.ConnectionMethod == MySqlWorkbenchConnection.ConnectionMethodType.Ssh;
       string hostName = (connection.Host ?? string.Empty).Trim();
       if (!isSsh)
       {
@@ -648,20 +645,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Checks if the given connection may be using SSL.
-    /// </summary>
-    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <returns><c>true</c> if the connection uses SSL, <c>false</c> otherwise.</returns>
-    public static bool IsSsl(this MySqlWorkbenchConnection connection)
-    {
-      return connection.UseSsl
-        || !(string.IsNullOrWhiteSpace(connection.SslCa)
-        && string.IsNullOrWhiteSpace(connection.SslCert)
-        && string.IsNullOrWhiteSpace(connection.SslCipher)
-        && string.IsNullOrWhiteSpace(connection.SslKey));
-    }
-
-    /// <summary>
     /// Checks if a MySQL collation with the given name is a Unicode one.
     /// </summary>
     /// <param name="charSetOrCollation">A MySQL character set or collation name.</param>
@@ -731,135 +714,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Tests the current connection until the user enters a correct password.
-    /// </summary>
-    /// <param name="wbConnection">A <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.</param>
-    /// <param name="tryConnectionBeforeAskingForPassword">Flag indicating whether a connection test is made with the connection as is before asking for a password</param>
-    /// <returns>A <see cref="PasswordDialogFlags"/> containing data about the operation.</returns>
-    public static PasswordDialogFlags TestConnectionAndRetryOnWrongPassword(this MySqlWorkbenchConnection wbConnection, bool tryConnectionBeforeAskingForPassword = true)
-    {
-      PasswordDialogFlags passwordFlags = new PasswordDialogFlags(wbConnection)
-      {
-        // Assume a wrong password at first so if the connection is not tested without a password we ensure to ask for one.
-        ConnectionResult = TestConnectionResult.WrongPassword
-      };
-
-      // First connection attempt with the connection exactly as loaded (maybe without a password).
-      if (tryConnectionBeforeAskingForPassword)
-      {
-        passwordFlags.ConnectionResult = wbConnection.TestConnectionAndReturnResult(false);
-        passwordFlags.Cancelled = passwordFlags.ConnectionResult == TestConnectionResult.PasswordExpired;
-
-        // If on the first attempt a connection could not be made and not because of a bad password, exit.
-        if (!passwordFlags.ConnectionSuccess && !passwordFlags.WrongPassword)
-        {
-          return passwordFlags;
-        }
-      }
-
-      // If the connection does not have a stored password or the stored password failed then ask for one and retry.
-      while (!passwordFlags.ConnectionSuccess && passwordFlags.WrongPassword)
-      {
-        passwordFlags = PasswordDialog.ShowConnectionPasswordDialog(wbConnection, true);
-        if (passwordFlags.Cancelled)
-        {
-          break;
-        }
-
-        wbConnection.Password = passwordFlags.NewPassword;
-      }
-
-      return passwordFlags;
-    }
-
-    /// <summary>
-    /// Tests the given connection to check if it can successfully connect to the corresponding MySQL instance.
-    /// </summary>
-    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <param name="displayErrorOnEmptyPassword">Flag indicating whether errors caused by a blank or null password are displayed to the user.</param>
-    /// <returns>Enumeration indicating the result of the connection test.</returns>
-    public static TestConnectionResult TestConnectionAndReturnResult(this MySqlWorkbenchConnection connection, bool displayErrorOnEmptyPassword)
-    {
-      if (connection == null)
-      {
-        return TestConnectionResult.None;
-      }
-
-      Globals.ThisAddIn.Application.Cursor = ExcelInterop.XlMousePointer.xlWait;
-      TestConnectionResult connectionResult;
-      Exception connectionException;
-      if (connection.TestConnection(out connectionException))
-      {
-        connectionResult = TestConnectionResult.ConnectionSuccess;
-        Globals.ThisAddIn.Application.Cursor = ExcelInterop.XlMousePointer.xlDefault;
-        return connectionResult;
-      }
-
-      // If the error returned is about the connection failing the password check, it may be because either the stored password is wrong or no password.
-      connectionResult = TestConnectionResult.ConnectionError;
-      if (connectionException is MySqlException)
-      {
-        MySqlException mySqlException = connectionException as MySqlException;
-        switch (mySqlException.Number)
-        {
-          // Connection could not be made.
-          case MySqlWorkbenchConnection.MYSQL_EXCEPTION_NUMBER_SERVER_UNREACHABLE:
-            connectionResult = TestConnectionResult.HostUnreachable;
-            InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties(
-              Resources.ConnectFailedWarningTitle,
-              mySqlException.Message,
-              null,
-              mySqlException.InnerException != null ? mySqlException.InnerException.Message : null));
-            break;
-
-          // Wrong password.
-          case MySqlWorkbenchConnection.MYSQL_EXCEPTION_NUMBER_WRONG_PASSWORD:
-            connectionResult = TestConnectionResult.WrongPassword;
-            if (!string.IsNullOrEmpty(connection.Password) || displayErrorOnEmptyPassword)
-            {
-              InfoDialog.ShowDialog(InfoDialogProperties.GetWarningDialogProperties(
-                Resources.ConnectFailedWarningTitle,
-                mySqlException.Message,
-                null,
-                connection.IsSsl() ? Resources.ConnectSSLFailedDetailWarning : null));
-            }
-            break;
-
-          // Password has expired so any statement can't be run before resetting the expired password.
-          case MySqlWorkbenchConnection.MYSQL_EXCEPTION_NUMBER_EXPIRED_PASSWORD:
-            PasswordDialogFlags passwordFlags = PasswordDialog.ShowExpiredPasswordDialog(connection, false);
-            if (!passwordFlags.Cancelled)
-            {
-              connection.Password = passwordFlags.NewPassword;
-            }
-
-            connectionResult = passwordFlags.Cancelled ? TestConnectionResult.PasswordExpired : TestConnectionResult.PasswordReset;
-            break;
-
-          // Any other exception.
-          default:
-            InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties(
-              Resources.ConnectFailedWarningTitle,
-              string.Format(Resources.GenericConnectionErrorText, mySqlException.Number, mySqlException.Message),
-              null,
-              mySqlException.InnerException != null ? mySqlException.InnerException.Message : null));
-            break;
-        }
-      }
-      else
-      {
-        InfoDialog.ShowDialog(InfoDialogProperties.GetErrorDialogProperties(
-          Resources.ConnectFailedWarningTitle,
-          connectionException.Message,
-          null,
-          connectionException.InnerException != null ? connectionException.InnerException.Message : null));
-      }
-
-      Globals.ThisAddIn.Application.Cursor = ExcelInterop.XlMousePointer.xlDefault;
-      return connectionResult;
-    }
-
-    /// <summary>
     /// Converts a data string to a valid column name.
     /// </summary>
     /// <param name="proposedName">String intended to be used as a MySQL column name.</param>
@@ -906,46 +760,5 @@ namespace MySQL.ForExcel.Classes
     {
       return statementResult != MySqlStatement.StatementResultType.ConnectionLost && statementResult != MySqlStatement.StatementResultType.ErrorThrown;
     }
-  }
-
-  /// <summary>
-  /// Specifies identifiers to indicate the result of a connection test.
-  /// </summary>
-  public enum TestConnectionResult
-  {
-    /// <summary>
-    /// No connection test was made.
-    /// </summary>
-    None,
-
-    /// <summary>
-    /// An error was thrown by the server and was shown to the user.
-    /// </summary>
-    ConnectionError,
-
-    /// <summary>
-    /// Connection was successful.
-    /// </summary>
-    ConnectionSuccess,
-
-    /// <summary>
-    /// Could not connect to the specified MySQL host.
-    /// </summary>
-    HostUnreachable,
-
-    /// <summary>
-    /// The password of the current user has expired and must be reset.
-    /// </summary>
-    PasswordExpired,
-
-    /// <summary>
-    /// The password of the current user has been reset.
-    /// </summary>
-    PasswordReset,
-
-    /// <summary>
-    /// Could not connect to the MySQL host with the specified password for the current user.
-    /// </summary>
-    WrongPassword
   }
 }

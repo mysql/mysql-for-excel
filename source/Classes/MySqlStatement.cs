@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@ using System.Text;
 using MySql.Data.MySqlClient;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQL;
 
 namespace MySQL.ForExcel.Classes
 {

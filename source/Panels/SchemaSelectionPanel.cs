@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@ using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQL;
 using MySQL.Utility.Classes.MySQLWorkbench;
 
 namespace MySQL.ForExcel.Panels
@@ -43,11 +43,6 @@ namespace MySQL.ForExcel.Panels
     private string _filter;
 
     /// <summary>
-    /// String array containing schema names considered system schemas.
-    /// </summary>
-    private static string[] _systemSchemasListValues;
-
-    /// <summary>
     /// A <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.
     /// </summary>
     private MySqlWorkbenchConnection _wbConnection;
@@ -59,7 +54,6 @@ namespace MySQL.ForExcel.Panels
     /// </summary>
     public SchemaSelectionPanel()
     {
-      _systemSchemasListValues = new[] { "mysql", "information_schema", "performance_schema" };
       InitializeComponent();
 
       DisplaySchemaCollationsToolStripMenuItem.Checked = Settings.Default.SchemasDisplayCollations;
@@ -179,7 +173,7 @@ namespace MySQL.ForExcel.Panels
           // Create the DbSchema and MySqlListViewNode objects
           var schemaObject = new DbSchema(_wbConnection, schemaName, row["DEFAULT_CHARACTER_SET_NAME"].ToString(), row["DEFAULT_COLLATION_NAME"].ToString(), DisplaySchemaCollationsToolStripMenuItem.Checked);
           string lcSchemaName = schemaName.ToLowerInvariant();
-          var headerNode = SchemasList.HeaderNodes[_systemSchemasListValues.Contains(lcSchemaName) ? 1 : 0];
+          var headerNode = SchemasList.HeaderNodes[MySqlWorkbenchConnection.SystemSchemaNames.Contains(lcSchemaName) ? 1 : 0];
           LoadedSchemas.Add(schemaObject);
           var node = SchemasList.AddDbObjectNode(headerNode, schemaObject);
           node.ImageIndex = DisplaySchemaCollationsToolStripMenuItem.Checked ? 1 : 0;

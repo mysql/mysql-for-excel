@@ -419,12 +419,6 @@
     <Compile Include="Forms\NewSchemaDialog.Designer.cs">
       <DependentUpon>NewSchemaDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\PasswordDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\PasswordDialog.designer.cs">
-      <DependentUpon>PasswordDialog.cs</DependentUpon>
-    </Compile>
     <Compile Include="Controls\TransparentPictureBox.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -520,9 +514,6 @@
     <EmbeddedResource Include="Forms\NewSchemaDialog.resx">
       <DependentUpon>NewSchemaDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\PasswordDialog.resx">
-      <DependentUpon>PasswordDialog.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Panels\AutoStyleableBasePanel.resx">
       <DependentUpon>AutoStyleableBasePanel.cs</DependentUpon>
     </EmbeddedResource>
@@ -556,7 +547,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Structs\PasswordDialogFlags.cs" />
     <Compile Include="Structs\TvItemEx.cs" />
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>

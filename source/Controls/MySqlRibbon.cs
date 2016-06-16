@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -19,7 +19,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using MySQL.Utility.Classes;
+using MySQL.Utility.Classes.MySQL;
 using OfficeCore = Microsoft.Office.Core;
 
 namespace MySQL.ForExcel.Controls

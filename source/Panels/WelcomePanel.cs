@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -74,7 +74,7 @@ namespace MySQL.ForExcel.Panels
       }
 
       // Load connections just obtained from Workbench or locally created
-      foreach (var conn in MySqlWorkbench.Connections.Where(conn => conn.IsListable).OrderBy(conn => conn.Name))
+      foreach (var conn in MySqlWorkbench.Connections.OrderBy(conn => conn.Name))
       {
         conn.AllowZeroDateTimeValues = true;
         AddConnectionToList(conn);
@@ -113,18 +113,22 @@ namespace MySQL.ForExcel.Panels
         return;
       }
 
-      var isSsh = conn.DriverType == MySqlWorkbenchConnectionType.Ssh;
+      var isSsh = conn.ConnectionMethod == MySqlWorkbenchConnection.ConnectionMethodType.Ssh;
       var headerNode = ConnectionsList.HeaderNodes[conn.IsLocalConnection ? 0 : 1];
       var node = ConnectionsList.AddConnectionNode(headerNode, conn);
       node.Enable = !isSsh;
-      switch (conn.DriverType)
+      switch (conn.ConnectionMethod)
       {
-        case MySqlWorkbenchConnectionType.Tcp:
-        case MySqlWorkbenchConnectionType.NamedPipes:
-          node.ImageIndex = conn.IsFabricManaged ? 4 : (node.Enable ? 0 : 1);
+        case MySqlWorkbenchConnection.ConnectionMethodType.Tcp:
+        case MySqlWorkbenchConnection.ConnectionMethodType.LocalUnixSocketOrWindowsPipe:
+          node.ImageIndex = node.Enable ? 0 : 1;
           break;
 
-        case MySqlWorkbenchConnectionType.Ssh:
+        case MySqlWorkbenchConnection.ConnectionMethodType.FabricManaged:
+          node.ImageIndex = 4;
+          break;
+
+        case MySqlWorkbenchConnection.ConnectionMethodType.Ssh:
           node.ImageIndex = node.Enable ? 2 : 3;
           break;
       }
@@ -200,7 +204,7 @@ namespace MySQL.ForExcel.Panels
 
       var connectionToEdit = ConnectionsList.SelectedNode.WbConnection;
       bool editedConnection;
-      using (var instanceConnectionDialog = new MySqlWorkbenchConnectionDialog(connectionToEdit))
+      using (var instanceConnectionDialog = new MySqlWorkbenchConnectionDialog(connectionToEdit, false))
       {
         editedConnection = instanceConnectionDialog.ShowIfWorkbenchNotRunning() == DialogResult.OK;
       }
@@ -235,7 +239,7 @@ namespace MySQL.ForExcel.Panels
         return;
       }
 
-      using (var newConnectionDialog = new MySqlWorkbenchConnectionDialog(null))
+      using (var newConnectionDialog = new MySqlWorkbenchConnectionDialog(null, false))
       {
         var result = newConnectionDialog.ShowDialog();
         if (result == DialogResult.OK)

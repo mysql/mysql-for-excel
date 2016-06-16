@@ -405,9 +405,6 @@ Please re-enter your password to try again.</value>
   <data name="refresh_sidebar" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\refresh_sidebar.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="ConnectFailedWarningTitle" xml:space="preserve">
-    <value>Connection attempt failed.</value>
-  </data>
   <data name="DeleteHS" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\DeleteHS.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -419,11 +416,6 @@ Please re-enter your password to try again.</value>
   </data>
   <data name="WorkbookInCompatibilityModeWarning" xml:space="preserve">
     <value>Excel Workbook is in Compatibility Mode which has a row limit of 65,536 rows.</value>
-  </data>
-  <data name="ConnectSSLFailedDetailWarning" xml:space="preserve">
-    <value>A possible fail reason could be that your user requires a SSL connection that is not currently supported by MySQL for Excel.
-
-Please check with the Administrator if you require a SSL Connection and if he can authorize your user to login without a SSL connection.</value>
   </data>
   <data name="ImportVerticallyExceedsMaxRowsDetailWarning" xml:space="preserve">
     <value>Rows in all result sets exceed the limit of 65,536 rows in Compatibility Mode, one or more Result Sets will be truncated.</value>
@@ -728,38 +720,6 @@ To be able to make modifications on cells not related to MySQL data please exit 
   </data>
   <data name="WorksheetCreationErrorText" xml:space="preserve">
     <value>Error while creating new Excel Worksheet</value>
-  </data>
-  <data name="OldPasswordLabelText" xml:space="preserve">
-    <value>Old Password:</value>
-  </data>
-  <data name="PasswordLabelText" xml:space="preserve">
-    <value>Password:</value>
-  </data>
-  <data name="ConnectionPasswordLabelText" xml:space="preserve">
-    <value>Please enter the password for the connection:</value>
-  </data>
-  <data name="ConnectionPasswordWindowTitleText" xml:space="preserve">
-    <value>Connection Password</value>
-  </data>
-  <data name="ExpiredPasswordLabelText" xml:space="preserve">
-    <value>The password for the MySQL account has expired.
-Please enter a new password:</value>
-  </data>
-  <data name="ExpiredPasswordWindowTitleText" xml:space="preserve">
-    <value>Password Expired</value>
-  </data>
-  <data name="PasswordsMismatchErrorText" xml:space="preserve">
-    <value>The new password and its confirmation do not match. Please enter them again and make sure they match.</value>
-  </data>
-  <data name="PasswordResetErrorDetailText" xml:space="preserve">
-    <value>An error ocurred trying to reset the password for the current user.
-Please select your MySQL connection again to retry.</value>
-  </data>
-  <data name="PasswordResetErrorTitleText" xml:space="preserve">
-    <value>Password Reset Error</value>
-  </data>
-  <data name="GenericConnectionErrorText" xml:space="preserve">
-    <value>MySQL Error {0}: {1}</value>
   </data>
   <data name="WorksheetInEditModeSavedLogWarning" xml:space="preserve">
     <value>Warning: Excel Worksheet {0} was saved password-protected because it was used within an Edit Data operation. To unprotect it use the password: {1}</value>
@@ -1149,5 +1109,8 @@ In order to avoid receiving this error message each time the Excel table is refr
   </data>
   <data name="ExportIndexesCreatedLastWarning" xml:space="preserve">
     <value>Advanced option to create indexes after data is exported conflicts with Auto Increment since column must be indexed</value>
+  </data>
+  <data name="mysql_for_excel" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\mysql-for-excel.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

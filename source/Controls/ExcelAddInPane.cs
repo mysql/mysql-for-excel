@@ -24,10 +24,10 @@ using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Panels;
 using MySQL.ForExcel.Properties;
-using MySQL.ForExcel.Structs;
 using MySQL.Utility.Classes;
 using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
+using MySQL.Utility.Structs;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Controls
