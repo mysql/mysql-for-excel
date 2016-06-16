@@ -23,6 +23,7 @@ using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySQL.Utility.Classes.MySQL;
 using MySQL.Utility.Classes.MySQLWorkbench;
+using MySQL.Utility.Enums;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 using ExcelTools = Microsoft.Office.Tools.Excel;
 
@@ -448,13 +449,13 @@ namespace MySQL.ForExcel.Classes
       }
 
       Exception connectionException;
-      bool connectionIsValid = _connection.TestConnection(out connectionException);
+      var connectionTestResult = _connection.TestConnectionSilently(out connectionException);
       if (connectionException != null)
       {
         ConnectionInfoError = ConnectionInfoErrorType.ConnectionRefused;
       }
 
-      return connectionIsValid;
+      return connectionTestResult == TestConnectionResult.ConnectionSuccess;
     }
 
     /// <summary>
