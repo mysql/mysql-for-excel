@@ -655,9 +655,6 @@ To be able to make modifications on cells not related to MySQL data please exit 
   <data name="OperationWarningTitle" xml:space="preserve">
     <value>Operation Completed With Warnings</value>
   </data>
-  <data name="AppName" xml:space="preserve">
-    <value>MySQL For Excel</value>
-  </data>
   <data name="AppendDataRowsAppendedSuccessfullyText" xml:space="preserve">
     <value>Appended {0} row(s) successfully.</value>
   </data>

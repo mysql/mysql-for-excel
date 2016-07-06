@@ -58,6 +58,16 @@ namespace MySQL.ForExcel
     public const int ADD_IN_MIN_PANE_WIDTH = 266;
 
     /// <summary>
+    /// The relative path of the stored connections file under the application data directory.
+    /// </summary>
+    public const string CONNECTIONS_FILE_RELATIVE_PATH = SETTINGS_DIRECTORY_RELATIVE_PATH + @"\connections.xml";
+
+    /// <summary>
+    /// The relative path of the log file under the application data directory.
+    /// </summary>
+    public const string ERROR_LOG_FILE_RELATIVE_PATH = SETTINGS_DIRECTORY_RELATIVE_PATH + @"\MySQLForExcelInterop.log";
+
+    /// <summary>
     /// The string representation of the Escape key.
     /// </summary>
     public const string ESCAPE_KEY = "{ESC}";
@@ -81,6 +91,21 @@ namespace MySQL.ForExcel
     /// The Excel major version number corresponding to Excel 2016.
     /// </summary>
     public const int EXCEL_2016_VERSION_NUMBER = 16;
+
+    /// <summary>
+    /// The relative path of the passwords vault file under the application data directory.
+    /// </summary>
+    public const string PASSWORDS_VAULT_FILE_RELATIVE_PATH = SETTINGS_DIRECTORY_RELATIVE_PATH + @"\user_data.dat";
+
+    /// <summary>
+    /// The relative path of the settings directory under the application data directory.
+    /// </summary>
+    public const string SETTINGS_DIRECTORY_RELATIVE_PATH = @"\Oracle\MySQL for Excel";
+
+    /// <summary>
+    /// The relative path of the settings file under the application data directory.
+    /// </summary>
+    public const string SETTINGS_FILE_RELATIVE_PATH = SETTINGS_DIRECTORY_RELATIVE_PATH + @"\settings.config";
 
     #endregion Constants
 
@@ -109,6 +134,17 @@ namespace MySQL.ForExcel
     #endregion Fields
 
     #region Properties
+
+    /// <summary>
+    /// Gets the environment's application data directory.
+    /// </summary>
+    public static string EnvironmentApplicationDataDirectory
+    {
+      get
+      {
+        return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+      }
+    }
 
     /// <summary>
     /// Gets the <see cref="CustomTaskPane"/> contained in the active Excel window.
@@ -1252,13 +1288,13 @@ namespace MySQL.ForExcel
     /// </summary>
     private void InitializeMySqlWorkbenchStaticSettings()
     {
-      string applicationDataFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-      MySqlSourceTrace.LogFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\MySQLForExcelInterop.log";
+      string applicationDataFolderPath = EnvironmentApplicationDataDirectory;
+      MySqlSourceTrace.LogFilePath = applicationDataFolderPath + ERROR_LOG_FILE_RELATIVE_PATH;
       MySqlSourceTrace.SourceTraceClass = "MySQLForExcel";
       MySqlWorkbench.ExternalApplicationName = AssemblyTitle;
-      MySqlWorkbenchPasswordVault.ApplicationPasswordVaultFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\user_data.dat";
+      MySqlWorkbenchPasswordVault.ApplicationPasswordVaultFilePath = applicationDataFolderPath + PASSWORDS_VAULT_FILE_RELATIVE_PATH;
       MySqlWorkbench.ExternalConnections.CreateDefaultConnections = !MySqlWorkbench.ConnectionsFileExists && MySqlWorkbench.Connections.Count == 0;
-      MySqlWorkbench.ExternalApplicationConnectionsFilePath = applicationDataFolderPath + @"\Oracle\MySQL for Excel\connections.xml";
+      MySqlWorkbench.ExternalApplicationConnectionsFilePath = applicationDataFolderPath + CONNECTIONS_FILE_RELATIVE_PATH;
       MySqlWorkbench.ChangeCurrentCursor = delegate(Cursor cursor)
       {
         if (cursor == Cursors.WaitCursor)
@@ -1839,7 +1875,7 @@ namespace MySQL.ForExcel
         UsingTempWorksheet = false;
 
         // Make sure the settings directory exists
-        Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Oracle\MySQL for Excel");
+        Directory.CreateDirectory(EnvironmentApplicationDataDirectory + SETTINGS_DIRECTORY_RELATIVE_PATH);
 
         // Log the Add-In's Startup
         MySqlSourceTrace.WriteToLog(Resources.StartupMessage, SourceLevels.Information);
