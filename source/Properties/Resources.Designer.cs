@@ -2596,9 +2596,9 @@ namespace MySQL.ForExcel.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap SplashScreenExcel {
+        internal static System.Drawing.Bitmap SplashScreen {
             get {
-                object obj = ResourceManager.GetObject("SplashScreenExcel", resourceCulture);
+                object obj = ResourceManager.GetObject("SplashScreen", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

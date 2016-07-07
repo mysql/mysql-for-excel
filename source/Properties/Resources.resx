@@ -586,9 +586,6 @@ To be able to make modifications on cells not related to MySQL data please exit 
   <data name="TableDataCopyErrorTitle" xml:space="preserve">
     <value>Error copying table data</value>
   </data>
-  <data name="SplashScreenExcel" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\SplashScreenExcel.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="ColumnExistsWarning" xml:space="preserve">
     <value>Another column with this name already exists in the table.</value>
   </data>
@@ -1109,5 +1106,8 @@ In order to avoid receiving this error message each time the Excel table is refr
   </data>
   <data name="mysql_for_excel" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\mysql-for-excel.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SplashScreen" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\SplashScreen.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

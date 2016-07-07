@@ -98,8 +98,10 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void AboutHotLabel_Click(object sender, EventArgs e)
     {
-      AboutBox aboutBox = new AboutBox();
-      aboutBox.ShowDialog();
+      using (var aboutBox = new AboutBox())
+      {
+        aboutBox.ShowDialog();
+      }
     }
 
     /// <summary>
