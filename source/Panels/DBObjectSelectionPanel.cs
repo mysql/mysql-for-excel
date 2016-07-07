@@ -597,19 +597,7 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void OptionsButton_Click(object sender, EventArgs e)
     {
-      using (var optionsDialog = new GlobalOptionsDialog())
-      {
-        if (optionsDialog.ShowDialog() != DialogResult.OK)
-        {
-          return;
-        }
-
-        var excelAddInPane = Parent as ExcelAddInPane;
-        if (excelAddInPane != null)
-        {
-          excelAddInPane.RefreshWbConnectionTimeouts();
-        }
-      }
+      Globals.ThisAddIn.ShowGlobalOptionsDialog();
     }
 
     /// <summary>

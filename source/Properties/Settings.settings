@@ -134,5 +134,14 @@
     <Setting Name="ImportExcelFormatTime" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.String" Scope="User">
       <Value Profile="(Default)">hh:mm:ss</Value>
     </Setting>
+    <Setting Name="WorkbenchMigrationRetryDelay" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="WorkbenchMigrationSucceeded" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="WorkbenchMigrationLastAttempt" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.DateTime" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -587,7 +587,7 @@ namespace MySQL.ForExcel.Classes
     public static DialogResult ShowCustomizedInfoDialog(InfoDialog.InfoType infoType, string detail, string moreInformation = null, bool wordWrapMoreInfo = true)
     {
       string title = string.Empty;
-      var layoutType = InfoButtonsProperties.ButtonsLayoutType.OkOnly;
+      var layoutType = CommandAreaProperties.ButtonsLayoutType.OkOnly;
       switch (infoType)
       {
         case InfoDialog.InfoType.Success:
@@ -600,7 +600,7 @@ namespace MySQL.ForExcel.Classes
 
         case InfoDialog.InfoType.Error:
           title = Resources.OperationErrorTitle;
-          layoutType = InfoButtonsProperties.ButtonsLayoutType.BackOnly;
+          layoutType = CommandAreaProperties.ButtonsLayoutType.BackOnly;
           break;
 
         case InfoDialog.InfoType.Info:
@@ -611,7 +611,7 @@ namespace MySQL.ForExcel.Classes
       string subDetailText = string.Format(Resources.OperationSubDetailText, infoType == InfoDialog.InfoType.Error ? "Back" : "OK");
       var infoProperties = new InfoDialogProperties
       {
-        ButtonsProperties = new InfoButtonsProperties(layoutType),
+        CommandAreaProperties = new CommandAreaProperties(layoutType),
         InfoType = infoType,
         TitleText =  title,
         DetailText = detail,

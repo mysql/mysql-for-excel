@@ -93,6 +93,11 @@ namespace MySQL.ForExcel
     public const int EXCEL_2016_VERSION_NUMBER = 16;
 
     /// <summary>
+    /// The number of seconds in 1 hour.
+    /// </summary>
+    public const int MILLISECONDS_IN_HOUR = 3600000;
+
+    /// <summary>
     /// The relative path of the passwords vault file under the application data directory.
     /// </summary>
     public const string PASSWORDS_VAULT_FILE_RELATIVE_PATH = SETTINGS_DIRECTORY_RELATIVE_PATH + @"\user_data.dat";
@@ -112,14 +117,29 @@ namespace MySQL.ForExcel
     #region Fields
 
     /// <summary>
+    /// The timer that checks for automatic connetions migration.
+    /// </summary>
+    private Timer _connectionsMigrationTimer;
+
+    /// <summary>
     /// A dictionary containing subsets of the <see cref="EditConnectionInfo"/> list filtered by <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
     private Dictionary<string, List<EditConnectionInfo>> _editConnectionInfosByWorkbook;
 
     /// <summary>
+    /// The <see cref="GlobalOptionsDialog"/>.
+    /// </summary>
+    private GlobalOptionsDialog _globalOptionsDialog;
+
+    /// <summary>
     /// The name of the last deactivated Excel <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
     private string _lastDeactivatedSheetName;
+
+    /// <summary>
+    /// Flag indicating whether the code that migrates connections is in progress.
+    /// </summary>
+    private bool _migratingStoredConnections;
 
     /// <summary>
     /// True while restoring existing <see cref="EditConnectionInfo"/> objects for the current workbook, avoiding unwanted actions to be raised during the process.
@@ -298,6 +318,22 @@ namespace MySQL.ForExcel
     public int ExcelVersionNumber { get; private set; }
 
     /// <summary>
+    /// Gets a <see cref="DateTime"/> value for when the next automatic connections migration will occur.
+    /// </summary>
+    public DateTime NextAutomaticConnectionsMigration
+    {
+      get
+      {
+        var alreadyMigrated = Settings.Default.WorkbenchMigrationSucceeded;
+        var delay = Settings.Default.WorkbenchMigrationRetryDelay;
+        var lastAttempt = Settings.Default.WorkbenchMigrationLastAttempt;
+        return alreadyMigrated || (lastAttempt.Equals(DateTime.MinValue) && delay == 0)
+          ? DateTime.MinValue
+          : (delay == -1 ? DateTime.MaxValue : lastAttempt.AddHours(delay));
+      }
+    }
+
+    /// <summary>
     /// Gets or sets a value indicating whether the detection of contents for a cell selection should be skipped.
     /// </summary>
     /// <remarks>Used when a cell selection is being done programatically and not by the user.</remarks>
@@ -420,8 +456,8 @@ namespace MySQL.ForExcel
       bool firstRun = ExcelPanesList.Count == 0;
       if (firstRun)
       {
-        // Migrate all Workbench connections created with version 1.0.6 (in a local connections file) to the Workbench connections file.
-        MySqlWorkbench.MigrateExternalConnectionsToWorkbench();
+        // Attemtp to migrate all locally stored connections to the MySQL Workbench connections file.
+        CheckForNextAutomaticConnectionsMigration(false);
       }
 
       // Instantiate the Excel Add-In pane to attach it to the Excel's custom task pane.
@@ -434,8 +470,8 @@ namespace MySQL.ForExcel
       // Create a new custom task pane and initialize it.
       activeCustomPane = CustomTaskPanes.Add(excelPane, AssemblyTitle);
       activeCustomPane.VisibleChanged += CustomTaskPaneVisibleChanged;
-      activeCustomPane.DockPosition = OfficeCore.MsoCTPDockPosition.msoCTPDockPositionRight;
-      activeCustomPane.DockPositionRestrict = OfficeCore.MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoHorizontal;
+      activeCustomPane.DockPosition = MsoCTPDockPosition.msoCTPDockPositionRight;
+      activeCustomPane.DockPositionRestrict = MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoHorizontal;
       activeCustomPane.Width = ADD_IN_MIN_PANE_WIDTH;
 
       // First run if no Excel panes have been opened yet.
@@ -446,6 +482,54 @@ namespace MySQL.ForExcel
 
       Application.Cursor = ExcelInterop.XlMousePointer.xlDefault;
       return activeCustomPane;
+    }
+
+    /// <summary>
+    /// Attempts to migrate connections created in the MySQL for Excel's connections file to the Workbench's one.
+    /// </summary>
+    /// <param name="showDelayOptions">Flag indicating whether options to delay the migration are shown in case the user chooses not to migrate connections now.</param>
+    public void MigrateExternalConnectionsToWorkbench(bool showDelayOptions)
+    {
+      _migratingStoredConnections = true;
+
+      // If the method is not being called from the glbal options dialog itself, then force close the dialog.
+      // This is necessary since when this code is executed from another thread the dispatch is posted to the main thread, so we don't have control over when the code
+      // starts and when finishes in order to prevent the users from doing a manual migration in the options dialog, and we can't update the automatic migration date either.
+      if (showDelayOptions && _globalOptionsDialog != null)
+      {
+        _globalOptionsDialog.Close();
+        _globalOptionsDialog.Dispose();
+        _globalOptionsDialog = null;
+      }
+
+      // Attempt to perform the migration
+      MySqlWorkbench.MigrateExternalConnectionsToWorkbench(showDelayOptions);
+
+      // Update settings depending on the migration outcome.
+      Settings.Default.WorkbenchMigrationSucceeded = MySqlWorkbench.ConnectionsMigrationStatus == MySqlWorkbench.ConnectionsMigrationStatusType.MigrationNeededAlreadyMigrated;
+      if (MySqlWorkbench.ConnectionsMigrationStatus == MySqlWorkbench.ConnectionsMigrationStatusType.MigrationNeededButNotMigrated)
+      {
+        Settings.Default.WorkbenchMigrationLastAttempt = DateTime.Now;
+        if (showDelayOptions)
+        {
+          Settings.Default.WorkbenchMigrationRetryDelay = MySqlWorkbench.ConnectionsMigrationDelay.ToHours();
+        }
+      }
+      else
+      {
+        Settings.Default.WorkbenchMigrationLastAttempt = DateTime.MinValue;
+        Settings.Default.WorkbenchMigrationRetryDelay = 0;
+      }
+
+      Settings.Default.Save();
+
+      // If the migration was done successfully, no need to keep the timer running.
+      if (Settings.Default.WorkbenchMigrationSucceeded && _connectionsMigrationTimer != null)
+      {
+        _connectionsMigrationTimer.Enabled = false;
+      }
+
+      _migratingStoredConnections = false;
     }
 
     /// <summary>
@@ -475,6 +559,26 @@ namespace MySQL.ForExcel
     {
       var listObject = Application.ActiveCell.ListObject;
       return listObject.RefreshMySqlData();
+    }
+
+    /// <summary>
+    /// Shows the <see cref="GlobalOptionsDialog"/>.
+    /// </summary>
+    public void ShowGlobalOptionsDialog()
+    {
+      using (_globalOptionsDialog = new GlobalOptionsDialog())
+      {
+        if (_globalOptionsDialog.ShowDialog() != DialogResult.OK)
+        {
+          return;
+        }
+
+        var excelAddInPane = ActiveExcelPane;
+        if (excelAddInPane != null)
+        {
+          excelAddInPane.RefreshWbConnectionTimeouts();
+        }
+      }
     }
 
     /// <summary>
@@ -1006,6 +1110,48 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Event delegate that checks if it's time to display the dialog for connections migration.
+    /// </summary>
+    /// <param name="fromTimer">Flag indicating whether this method is called from a timer.</param>
+    private void CheckForNextAutomaticConnectionsMigration(bool fromTimer)
+    {
+      // If the execution of the code that migrates connections is sitll executing, then exit.
+      if (_migratingStoredConnections)
+      {
+        return;
+      }
+
+      // Temporarily disable the timer.
+      if (fromTimer)
+      {
+        _connectionsMigrationTimer.Enabled = false;
+      }
+
+      // Check if the next connections migration is due now.
+      bool doMigration = true;
+      var nextMigrationAttempt = NextAutomaticConnectionsMigration;
+      if (!fromTimer && !nextMigrationAttempt.Equals(DateTime.MinValue) && (nextMigrationAttempt.Equals(DateTime.MaxValue) || DateTime.Now.CompareTo(nextMigrationAttempt) < 0))
+      {
+        doMigration = false;
+      }
+      else if (fromTimer && nextMigrationAttempt.Equals(DateTime.MinValue) || nextMigrationAttempt.Equals(DateTime.MaxValue) || DateTime.Now.CompareTo(nextMigrationAttempt) < 0)
+      {
+        doMigration = false;
+      }
+
+      if (doMigration)
+      {
+        MigrateExternalConnectionsToWorkbench(true);
+      }
+
+      // Re-enable the timer.
+      if (fromTimer)
+      {
+        _connectionsMigrationTimer.Enabled = true;
+      }
+    }
+
+    /// <summary>
     /// Closes and removes the <see cref="EditConnectionInfo"/> associated to the given <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
     /// <param name="workbook">An <see cref="ExcelInterop.Workbook"/>.</param>
@@ -1055,9 +1201,19 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Event delegate method fired when the <see cref="_connectionsMigrationTimer"/> ticks.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ConnectionsMigrationTimer_Tick(object sender, EventArgs e)
+    {
+      CheckForNextAutomaticConnectionsMigration(true);
+    }
+
+    /// <summary>
     /// Converts the settings stored mappings property to the renamed MySqlColumnMapping class.
     /// </summary>
-    private static void ConvertSettingsStoredMappingsCasing()
+    private void ConvertSettingsStoredMappingsCasing()
     {
       if (Settings.Default.ConvertedSettingsStoredMappingsCasing)
       {
@@ -1565,7 +1721,7 @@ namespace MySQL.ForExcel
         Resources.ImportConnectionInfosMissingConnectionsDetail,
         null,
         stringBuilder.ToString());
-      dialogProperties.ButtonsProperties = new InfoButtonsProperties(InfoButtonsProperties.ButtonsLayoutType.Generic3Buttons)
+      dialogProperties.CommandAreaProperties = new CommandAreaProperties(CommandAreaProperties.ButtonsLayoutType.Generic3Buttons)
       {
         Button1Text = Resources.CreateButtonText,
         Button1DialogResult = DialogResult.OK,
@@ -1801,13 +1957,13 @@ namespace MySQL.ForExcel
       }
 
       var infoProperties = InfoDialogProperties.GetWarningDialogProperties(Resources.RestoreEditConnectionInfoTitle, Resources.RestoreEditConnectionInfoDetail);
-      infoProperties.ButtonsProperties.LayoutType = InfoButtonsProperties.ButtonsLayoutType.Generic3Buttons;
-      infoProperties.ButtonsProperties.Button1Text = Resources.RestoreButtonText;
-      infoProperties.ButtonsProperties.Button1DialogResult = DialogResult.Yes;
-      infoProperties.ButtonsProperties.Button2Text = Resources.WorkOfflineButtonText;
-      infoProperties.ButtonsProperties.Button2DialogResult = DialogResult.Cancel;
-      infoProperties.ButtonsProperties.Button3Text = Resources.DeleteButtonText;
-      infoProperties.ButtonsProperties.Button3DialogResult = DialogResult.Abort;
+      infoProperties.CommandAreaProperties.ButtonsLayout = CommandAreaProperties.ButtonsLayoutType.Generic3Buttons;
+      infoProperties.CommandAreaProperties.Button1Text = Resources.RestoreButtonText;
+      infoProperties.CommandAreaProperties.Button1DialogResult = DialogResult.Yes;
+      infoProperties.CommandAreaProperties.Button2Text = Resources.WorkOfflineButtonText;
+      infoProperties.CommandAreaProperties.Button2DialogResult = DialogResult.Cancel;
+      infoProperties.CommandAreaProperties.Button3Text = Resources.DeleteButtonText;
+      infoProperties.CommandAreaProperties.Button3DialogResult = DialogResult.Abort;
       infoProperties.WordWrapMoreInfo = false;
       var infoResult = InfoDialog.ShowDialog(infoProperties);
       switch (infoResult.DialogResult)
@@ -1825,12 +1981,43 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Starts the global timer that fires connections migration checks.
+    /// </summary>
+    private void StartConnectionsMigrationTimer()
+    {
+      _connectionsMigrationTimer = null;
+      _migratingStoredConnections = false;
+
+      // Determine if the timer is needed
+      if (Settings.Default.WorkbenchMigrationSucceeded && !MySqlWorkbench.ExternalApplicationConnectionsFileExists)
+      {
+        return;
+      }
+
+      _connectionsMigrationTimer = new Timer();
+      _connectionsMigrationTimer.Tick += ConnectionsMigrationTimer_Tick; ;
+      _connectionsMigrationTimer.Interval = 20000; //MILLISECONDS_IN_HOUR;
+      _connectionsMigrationTimer.Start();
+    }
+
+    /// <summary>
     /// Event delegate method fired when the <see cref="ThisAddIn"/> is closed.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
     private void ThisAddIn_Shutdown(object sender, EventArgs e)
     {
+      // Stop global timer and dispose of it
+      if (_connectionsMigrationTimer != null)
+      {
+        if (_connectionsMigrationTimer.Enabled)
+        {
+          _connectionsMigrationTimer.Enabled = false;
+        }
+
+        _connectionsMigrationTimer.Dispose();
+      }
+
       // Close all Excel panes created
       if (ExcelPanesList != null)
       {
@@ -1890,6 +2077,9 @@ namespace MySQL.ForExcel
 
         // Subscribe events tracked even when no Excel panes are open.
         Application.WorkbookOpen += Application_WorkbookOpen;
+
+        // Start timer that checks for automatic connections migration.
+        StartConnectionsMigrationTimer();
       }
       catch (Exception ex)
       {

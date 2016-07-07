@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -16,21 +16,40 @@
 // 02110-1301  USA
 
 using System;
-using System.Linq;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
+using MySQL.Utility.Classes.MySQLWorkbench;
 using MySQL.Utility.Forms;
 
 namespace MySQL.ForExcel.Forms
 {
   /// <summary>
-  /// Advanced options dialog for the operations performed by the <see cref="ExportDataForm"/>.
+  /// Advanced options dialog for the add-in.
   /// </summary>
   public partial class GlobalOptionsDialog : AutoStyleableBaseDialog
   {
+    #region Constants
+
+    /// <summary>
+    /// The spacing in pixels defined for the inner panel of the dialog from controls.
+    /// </summary>
+    public const int DIALOG_BORDER_WIDTH = 8;
+
+    /// <summary>
+    /// The spacing in pixels defined for the inner panel of the dialog from controls.
+    /// </summary>
+    public const int DIALOG_RIGHT_SPACING_TO_CONTROLS = 50;
+
+    #endregion Constants
+
     #region Fields
+
+    /// <summary>
+    /// The dialog's initial width.
+    /// </summary>
+    private int _initialWidth;
 
     /// <summary>
     /// Dialog showing saved <see cref="IConnectionInfo"/> entries that should be deleted.
@@ -46,9 +65,24 @@ namespace MySQL.ForExcel.Forms
     {
       _manageConnectionInfosDialog = null;
       InitializeComponent();
-      ConnectionTimeoutNumericUpDown.Maximum = Int32.MaxValue / 1000;
+      _initialWidth = Width;
+      ConnectionTimeoutNumericUpDown.Maximum = Convert.ToInt32(int.MaxValue / 1000);
       RefreshControlValues();
       SetRestoreSessionsRadioButtonsEnabledStatus();
+      SetAutomaticMigrationDelayText();
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the <see cref="MigrateWorkbenchConnectionsButton"/> should be enabled.
+    /// </summary>
+    private bool MigrateConnectionsButtonEnabled
+    {
+      get
+      {
+        return !Settings.Default.WorkbenchMigrationSucceeded &&
+               Settings.Default.WorkbenchMigrationLastAttempt != DateTime.MinValue &&
+               Settings.Default.WorkbenchMigrationRetryDelay != 0;
+      }
     }
 
     /// <summary>
@@ -126,6 +160,17 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
+    /// Event delegate method fired when the <see cref="MigrateWorkbenchConnectionsButton"/> is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void MigrateWorkbenchConnectionsButton_Click(object sender, EventArgs e)
+    {
+      Globals.ThisAddIn.MigrateExternalConnectionsToWorkbench(false);
+      SetAutomaticMigrationDelayText();
+    }
+
+    /// <summary>
     /// Refreshes the dialog controls' values.
     /// </summary>
     /// <param name="useDefaultValues">Controls are set to their default values if <c>true</c>. Current stored values in application settings are used otherwise.</param>
@@ -190,6 +235,25 @@ namespace MySQL.ForExcel.Forms
 
       // Give focus to the field related to the checkbox whose status changed.
       ReuseWorksheetsRadioButton.Focus();
+    }
+
+    /// <summary>
+    /// Icnreases the width of the dialog in case the <see cref="AutomaticMigrationDelayLabel"/> gets too big.
+    /// </summary>
+    private void SetAutomaticMigrationDelayText()
+    {
+      SuspendLayout();
+
+      AutomaticMigrationDelayValueLabel.Text = MySqlWorkbench.GetConnectionsMigrationDelayText(Globals.ThisAddIn.NextAutomaticConnectionsMigration, Settings.Default.WorkbenchMigrationSucceeded);
+      MigrateWorkbenchConnectionsButton.Enabled = MigrateConnectionsButtonEnabled;
+      Width = _initialWidth;
+      var spacingDelta = AutomaticMigrationDelayValueLabel.Location.X + AutomaticMigrationDelayValueLabel.Size.Width + DIALOG_RIGHT_SPACING_TO_CONTROLS + (DIALOG_BORDER_WIDTH * 2) - Width;
+      if (spacingDelta > 0)
+      {
+        Width += spacingDelta;
+      }
+
+      ResumeLayout();
     }
 
     /// <summary>

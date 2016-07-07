@@ -1,3 +1,11 @@
+1.3.7
+- Enhanced the logic that migrates stored MySQL connections to the MySQL Workbench connections.xml file. In previous versions the migration was offered
+  and if not done at that moment, the dialog to migrate was shown every time MySQL for Excel was run again, but there was no way to choose to remain storing
+  MySQL connections in the MySQL for Excel configuration folder instead of merging them with the Workbench ones. Now the connections migration dialog offers
+  a way to postpone the migration 1 hour, 1 day, 1 week, 1 month or indefinitely. If the migration is postponed the dialog is shown again after that time
+  elapses, although if it is postponed indefinitely an option was added to the Options dialog that permits the migration of connections to be done manually,
+  as long as MySQL Workbench is installed.
+
 1.3.6
 - Fixed code to use the correct PivotTable version related to Excel 2016 when creating a PivotTable for all the tables in the Excel data model.
   (Bug #22387425 - [IMPORT] ERROR CREATING PIVOTTABLE FOR ALL TABLES IN THE DATA MODEL)

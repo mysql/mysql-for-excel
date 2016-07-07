@@ -61,7 +61,7 @@ namespace MySQL.ForExcel.Panels
     {
       if (reloadConnections)
       {
-        MySqlWorkbench.Connections.Load();
+        MySqlWorkbench.Connections.Load(true);
       }
 
       // Avoids flickering of connections list while adding the items to it.
