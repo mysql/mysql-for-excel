@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -17,7 +17,8 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using MySQL.Utility.Classes.MySQLWorkbench;
+using MySql.Utility.Classes.MySqlWorkbench;
+using MySql.Utility.Enums;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
@@ -114,7 +115,7 @@ namespace MySQL.ForExcel.Classes
         return relationshipsList;
       }
 
-      var dt = Connection.GetSchemaCollection("Foreign Key Columns", null, Connection.Schema);
+      var dt = Connection.GetSchemaInformation(SchemaInformationType.ForeignKeyColumns, true, null, Connection.Schema);
 
       // Detect relationships with Normal direction
       var rows = dt.Select(string.Format("TABLE_NAME = '{0}'", Name));

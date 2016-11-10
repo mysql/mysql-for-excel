@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -19,7 +19,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using MySQL.Utility.Classes;
+using MySql.Utility.Classes;
 
 namespace MySQL.ForExcel.Controls
 {
@@ -339,7 +339,7 @@ namespace MySQL.ForExcel.Controls
         ? (Behavior != BehaviorType.CheckBox
           ? Image
           : (CheckedState == CheckState.Checked ? CheckedImage : Image))
-        : (DisabledImage == null && Image != null ? new Bitmap(Image).MakeGrayscale() : DisabledImage);
+        : (DisabledImage == null && Image != null ? new Bitmap(Image).ToGrayscale() : DisabledImage);
       Size imageSize = Size.Empty;
       if (i != null)
       {

@@ -25,10 +25,11 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
+using MySQL.ForExcel.Properties;
 using MySQL.ForExcel.Structs;
-using MySQL.Utility.Classes;
-using MySQL.Utility.Classes.MySQL;
-using MySQL.Utility.Classes.MySQLWorkbench;
+using MySql.Utility.Classes;
+using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.MySqlWorkbench;
 
 namespace MySQL.ForExcel.Controls
 {
@@ -596,8 +597,7 @@ namespace MySQL.ForExcel.Controls
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(Properties.Resources.RefreshDBObjectsErrorTitle, ex.Message, true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.RefreshDBObjectsErrorTitle, true);
       }
     }
 
@@ -847,7 +847,7 @@ namespace MySQL.ForExcel.Controls
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
       }
       finally
       {
@@ -990,7 +990,7 @@ namespace MySQL.ForExcel.Controls
       Image nodeImage = NodeImages != null && NodeImages.Images.Count > 0 && node.ImageIndex >= 0 && node.ImageIndex < NodeImages.Images.Count ? NodeImages.Images[node.ImageIndex] : null;
       if (nodeImage != null && disabled && DisplayImagesOfDisabledNodesInGrayScale)
       {
-        nodeImage = new Bitmap(nodeImage).MakeGrayscale();
+        nodeImage = new Bitmap(nodeImage).ToGrayscale();
       }
 
       int textInitialY = string.IsNullOrEmpty(node.Subtitle) ? ((e.Bounds.Height - Convert.ToInt32(titleStringSize.Height) + Convert.ToInt32(descriptionStringSize.Height)) / 2) : 0;
@@ -1319,7 +1319,7 @@ namespace MySQL.ForExcel.Controls
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
       }
       finally
       {

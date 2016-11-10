@@ -22,7 +22,7 @@ using System.Text;
 using MySql.Data.MySqlClient;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes.MySQL;
+using MySql.Utility.Classes.MySql;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -498,7 +498,7 @@ namespace MySQL.ForExcel.Classes
         StatementResult = StatementResultType.ErrorThrown;
         AffectedRows = 0;
         _mySqlRow.RowError = baseException.Message;
-        MySqlSourceTrace.WriteAppErrorToLog(baseException);
+        MySqlSourceTrace.WriteAppErrorToLog(baseException, false);
         if (baseException is MySqlException)
         {
           var mysqlEx = baseException as MySqlException;

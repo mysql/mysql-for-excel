@@ -21,9 +21,9 @@ using System.Xml.Serialization;
 using MySQL.ForExcel.Classes.Exceptions;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes.MySQL;
-using MySQL.Utility.Classes.MySQLWorkbench;
-using MySQL.Utility.Enums;
+using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.MySqlWorkbench;
+using MySql.Utility.Enums;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 using ExcelTools = Microsoft.Office.Tools.Excel;
 
@@ -375,7 +375,7 @@ namespace MySQL.ForExcel.Classes
         }
 
         // If the Workbench connection does not exist anymore, log a message to the log, remove this object from the global connections collection and exit.
-        MySqlSourceTrace.WriteToLog(string.Format(Resources.ImportConnectionInfoRemovedConnectionText, WorkbookName, WorksheetName, ExcelTableName), SourceLevels.Warning);
+        MySqlSourceTrace.WriteToLog(string.Format(Resources.ImportConnectionInfoRemovedConnectionText, WorkbookName, WorksheetName, ExcelTableName), false, SourceLevels.Warning);
         Globals.ThisAddIn.StoredImportConnectionInfos.Remove(this);
         return;
       }
@@ -396,8 +396,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.ImportDataRefreshError, _excelTableName), ex.GetFormattedMessage(), true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.ImportDataRefreshError, _excelTableName), true);
       }
     }
 
@@ -578,8 +577,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.ImportDataBindError, _excelTableName), ex.GetFormattedMessage(), true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.ImportDataBindError, _excelTableName), true);
       }
       finally
       {
@@ -659,8 +657,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.ExcelTableCreationError, ExcelTable != null ? ExcelTable.Name : MySqlTable.ExcelTableName), ex.Message, true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.ExcelTableCreationError, ExcelTable != null ? ExcelTable.Name : MySqlTable.ExcelTableName), false);
       }
     }
   }

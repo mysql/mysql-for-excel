@@ -26,10 +26,10 @@ using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Classes.EventArguments;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes;
-using MySQL.Utility.Classes.MySQL;
-using MySQL.Utility.Classes.MySQLWorkbench;
-using MySQL.Utility.Forms;
+using MySql.Utility.Classes;
+using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.MySqlWorkbench;
+using MySql.Utility.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Forms
@@ -796,8 +796,7 @@ namespace MySQL.ForExcel.Forms
       catch (Exception ex)
       {
         _exportDataTable = null;
-        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.TableDataAdditionErrorTitle, "exporting"), ex.Message + Environment.NewLine + Environment.NewLine + ex.StackTrace);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.TableDataAdditionErrorTitle, "exporting"), true);
       }
 
       Cursor = Cursors.Default;

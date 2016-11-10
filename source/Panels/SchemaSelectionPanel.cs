@@ -25,8 +25,9 @@ using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes.MySQL;
-using MySQL.Utility.Classes.MySQLWorkbench;
+using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.MySqlWorkbench;
+using MySql.Utility.Enums;
 
 namespace MySQL.ForExcel.Panels
 {
@@ -159,7 +160,7 @@ namespace MySQL.ForExcel.Panels
           node.Nodes.Clear();
         }
 
-        DataTable databases = _wbConnection.GetSchemaCollection("Databases", null);
+        DataTable databases = _wbConnection.GetSchemaInformation(SchemaInformationType.Databases, false, null);
         foreach (DataRow row in databases.Rows)
         {
           string schemaName = row["DATABASE_NAME"].ToString();
@@ -191,8 +192,7 @@ namespace MySQL.ForExcel.Panels
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.SchemasLoadingErrorTitle, ex.Message, true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.SchemasLoadingErrorTitle, true);
         return false;
       }
     }
@@ -226,8 +226,7 @@ namespace MySQL.ForExcel.Panels
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.SchemaOpeningErrorTitle, ex.Message, true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.SchemaOpeningErrorTitle, true);
       }
     }
 

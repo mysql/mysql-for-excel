@@ -18,7 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MySQL.Utility.Classes.MySQL;
+using MySql.Utility.Classes.MySql;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
@@ -379,8 +379,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
-        MiscUtilities.ShowCustomizedErrorDialog(ex.Message, ex.StackTrace);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, true);
       }
     }
   }

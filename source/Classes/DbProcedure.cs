@@ -23,10 +23,11 @@ using System.Text;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes;
-using MySQL.Utility.Classes.MySQL;
-using MySQL.Utility.Classes.MySQLWorkbench;
-using MySQL.Utility.Forms;
+using MySql.Utility.Classes;
+using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.MySqlWorkbench;
+using MySql.Utility.Enums;
+using MySql.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
@@ -276,8 +277,7 @@ namespace MySQL.ForExcel.Classes
       catch (Exception ex)
       {
         success = false;
-        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, "procedure", Name), ex.Message);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.UnableToRetrieveData, "procedure", Name), true);
       }
 
       return success;
@@ -288,7 +288,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public void InitializeParameters()
     {
-      var parametersTable = Connection.GetSchemaCollection("Procedure Parameters", null, Connection.Schema, Name);
+      var parametersTable = Connection.GetSchemaInformation(SchemaInformationType.ProcedureParameters, true, null, Connection.Schema, Name);
       if (parametersTable == null)
       {
         return;
@@ -349,8 +349,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.ProcedureParametersInitializationError, ex.Message, true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.ProcedureParametersInitializationError, true);
       }
     }
 

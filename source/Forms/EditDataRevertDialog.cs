@@ -16,7 +16,7 @@
 // 02110-1301  USA
 
 using System;
-using MySQL.Utility.Forms;
+using MySql.Utility.Forms;
 
 namespace MySQL.ForExcel.Forms
 {

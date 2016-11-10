@@ -27,10 +27,10 @@ using MySql.Data.MySqlClient;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes;
-using MySQL.Utility.Classes.MySQL;
-using MySQL.Utility.Classes.MySQLWorkbench;
-using MySQL.Utility.Forms;
+using MySql.Utility.Classes;
+using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.MySqlWorkbench;
+using MySql.Utility.Forms;
 
 namespace MySQL.ForExcel.Forms
 {
@@ -599,8 +599,7 @@ namespace MySQL.ForExcel.Forms
         }
         catch (OutOfMemoryException oomEx)
         {
-          MySqlSourceTrace.WriteAppErrorToLog(oomEx);
-          MiscUtilities.ShowCustomizedErrorDialog(Resources.SqlScriptTooBigErrorDetail, oomEx.Message, true);
+          MySqlSourceTrace.WriteAppErrorToLog(oomEx, null, Resources.SqlScriptTooBigErrorDetail, true);
         }
       }
       else if (!string.IsNullOrEmpty(OriginalSqlScript) && _originalStatementRowsList.Count == 0)
@@ -723,7 +722,7 @@ namespace MySQL.ForExcel.Forms
       else
       {
         // The code should never hit this block in which case there is something wrong.
-        MySqlSourceTrace.WriteToLog("QueryChangedTimer's Tick event fired but no valid control had focus.");
+        MySqlSourceTrace.WriteToLog(Resources.QueryChangedTimerTickNoValidControlFocusError, false);
         QueryChangedTimer.Stop();
       }
     }

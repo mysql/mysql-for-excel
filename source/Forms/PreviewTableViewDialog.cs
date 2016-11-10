@@ -23,8 +23,8 @@ using System.IO;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes.MySQL;
-using MySQL.Utility.Forms;
+using MySql.Utility.Classes.MySql;
+using MySql.Utility.Forms;
 
 namespace MySQL.ForExcel.Forms
 {
@@ -164,12 +164,11 @@ namespace MySQL.ForExcel.Forms
       }
       catch (ArgumentException argEx)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(argEx);
+        MySqlSourceTrace.WriteAppErrorToLog(argEx, false);
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.DataLoadingError, ex.Message);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.DataLoadingError, true);
       }
     }
 

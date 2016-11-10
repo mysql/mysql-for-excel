@@ -27,11 +27,11 @@ using System.Text;
 using System.Windows.Forms;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes;
-using MySQL.Utility.Classes.MySQL;
-using MySQL.Utility.Classes.MySQLWorkbench;
-using MySQL.Utility.Classes.Tokenizers;
-using MySQL.Utility.Forms;
+using MySql.Utility.Classes;
+using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.MySqlWorkbench;
+using MySql.Utility.Classes.Tokenizers;
+using MySql.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
@@ -273,29 +273,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a formatted string with the messages in the given <see cref="Exception"/> and its <see cref="Exception.InnerException"/> if it exists.
-    /// </summary>
-    /// <param name="exception">An <see cref="Exception"/> object.</param>
-    /// <returns>A formatted string with the messages in the given <see cref="Exception"/> and its <see cref="Exception.InnerException"/> if it exists.</returns>
-    public static string GetFormattedMessage(this Exception exception)
-    {
-      if (exception == null)
-      {
-        return string.Empty;
-      }
-
-      var formattedMessagesBuilder = new StringBuilder(exception.Message);
-      if (exception.InnerException != null)
-      {
-        formattedMessagesBuilder.Append(Environment.NewLine);
-        formattedMessagesBuilder.Append(Environment.NewLine);
-        formattedMessagesBuilder.Append(exception.InnerException.Message);
-      }
-
-      return formattedMessagesBuilder.ToString();
-    }
-
-    /// <summary>
     /// Gets the owner <see cref="ListView"/> of a <see cref="ContextMenuStrip"/> control.
     /// </summary>
     /// <param name="toolStripMenuControl">An boxed object containing a <see cref="ContextMenuStrip"/> or <see cref="ToolStripMenuItem"/> control.</param>
@@ -501,7 +478,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the settings file was saved successfully, <c>false</c> otherwise.</returns>
     public static bool SaveSettings()
     {
-      string errorMessage = null;
+      bool success = true;
 
       // Attempt to save the settings file up to 3 times, if not successful show an error message to users.
       for (int i = 0; i < 3; i++)
@@ -509,21 +486,15 @@ namespace MySQL.ForExcel.Classes
         try
         {
           Settings.Default.Save();
-          errorMessage = null;
         }
         catch (Exception ex)
         {
-          MySqlSourceTrace.WriteAppErrorToLog(ex);
-          errorMessage = ex.Message;
+          success = false;
+          MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.SettingsFileSaveErrorTitle, true);
         }
       }
 
-      if (!string.IsNullOrEmpty(errorMessage))
-      {
-        ShowCustomizedErrorDialog(Resources.SettingsFileSaveErrorTitle, errorMessage);
-      }
-
-      return errorMessage == null;
+      return success;
     }
 
     /// <summary>
@@ -613,7 +584,7 @@ namespace MySQL.ForExcel.Classes
       {
         CommandAreaProperties = new CommandAreaProperties(layoutType),
         InfoType = infoType,
-        TitleText =  title,
+        TitleText = title,
         DetailText = detail,
         DetailSubText = subDetailText,
         MoreInfoText = moreInformation,

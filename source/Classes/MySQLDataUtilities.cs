@@ -23,8 +23,9 @@ using System.Text;
 using MySql.Data.MySqlClient;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes.MySQL;
-using MySQL.Utility.Classes.MySQLWorkbench;
+using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.MySqlWorkbench;
+using MySql.Utility.Enums;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
@@ -68,7 +69,7 @@ namespace MySQL.ForExcel.Classes
       DataTable dt = GetDataFromSelectQuery(wbConnection, selectQuery);
       if (dt == null)
       {
-        MySqlSourceTrace.WriteToLog(string.Format(Resources.SelectQueryReturnedNothing, selectQuery));
+        MySqlSourceTrace.WriteToLog(string.Format(Resources.SelectQueryReturnedNothing, selectQuery), false);
         return null;
       }
 
@@ -100,8 +101,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToDropTableError, tableName), ex.Message);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.UnableToDropTableError, tableName), true);
       }
     }
 
@@ -311,7 +311,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       schemaName = string.IsNullOrEmpty(schemaName) ? connection.Schema : schemaName;
-      var schemaTable = connection.GetSchemaCollection("Columns", null, schemaName, tableName);
+      var schemaTable = connection.GetSchemaInformation(SchemaInformationType.ColumnsFull, true, null, schemaName, tableName);
       if (schemaTable == null)
       {
         return null;
@@ -456,8 +456,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, "from query: ", query), ex.Message);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.UnableToRetrieveData, "from query: ", query), true);
       }
 
       return ds == null || ds.Tables.Count <= 0 || tableIndex < 0 || tableIndex >= ds.Tables.Count
@@ -521,7 +520,7 @@ namespace MySQL.ForExcel.Classes
         proposedName = DEFAULT_NEW_SCHEMA_NAME;
       }
 
-      var schemas = connection.GetSchemaCollection("Databases", null);
+      var schemas = connection.GetSchemaInformation(SchemaInformationType.Databases, true, null);
       if (schemas == null || schemas.Rows.Count == 0)
       {
         return proposedName;
@@ -575,7 +574,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       schemaName = string.IsNullOrEmpty(schemaName) ? connection.Schema : schemaName;
-      var dt = connection.GetSchemaCollection("Indexes", null, schemaName, tableName, indexName);
+      var dt = connection.GetSchemaInformation(SchemaInformationType.Indexes, true, null, schemaName, tableName, indexName);
       return dt != null && dt.Rows.Count > 0;
     }
 
@@ -687,8 +686,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.UnableToRetrieveData, string.Format("`{0}`.", schemaName), tableName), ex.Message);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.UnableToRetrieveData, string.Format("`{0}`.", schemaName), tableName), true);
       }
 
       long retCount = objCount != null ? (long)objCount : 0;
@@ -736,8 +734,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.UnableToUnlockTablesError, ex.Message);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.UnableToUnlockTablesError, true);
       }
     }
 

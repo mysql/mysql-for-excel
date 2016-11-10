@@ -507,6 +507,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not get or create a custom task pane for the active Excel window. Using Excel version {0}..
+        /// </summary>
+        internal static string CustomTaskPaneGetOrCreateError {
+            get {
+                return ResourceManager.GetString("CustomTaskPaneGetOrCreateError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error when loading database connections file.
         /// </summary>
         internal static string DatabaseConnectionsFileLoadingErrorTitle {
@@ -2216,6 +2225,15 @@ namespace MySQL.ForExcel.Properties {
         internal static string ProcedureParametersInitializationError {
             get {
                 return ResourceManager.GetString("ProcedureParametersInitializationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to QueryChangedTimer&apos;s Tick event fired but no valid control had focus..
+        /// </summary>
+        internal static string QueryChangedTimerTickNoValidControlFocusError {
+            get {
+                return ResourceManager.GetString("QueryChangedTimerTickNoValidControlFocusError", resourceCulture);
             }
         }
         

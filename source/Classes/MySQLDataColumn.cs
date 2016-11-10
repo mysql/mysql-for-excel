@@ -24,8 +24,8 @@ using System.Text;
 using MySql.Data.Types;
 using MySQL.ForExcel.Classes.EventArguments;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes;
-using MySQL.Utility.Classes.MySQL;
+using MySql.Utility.Classes;
+using MySql.Utility.Classes.MySql;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
@@ -379,8 +379,7 @@ namespace MySQL.ForExcel.Classes
           }
           catch (Exception ex)
           {
-            MiscUtilities.ShowCustomizedErrorDialog("AutoIncrement set error.", ex.Message + Environment.NewLine + Environment.NewLine + ex.StackTrace, true);
-            MySqlSourceTrace.WriteAppErrorToLog(ex);
+            MySqlSourceTrace.WriteAppErrorToLog(ex, null, "AutoIncrement set error.", true);
           }
         }
 

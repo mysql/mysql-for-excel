@@ -27,9 +27,9 @@ using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes.MySQL;
-using MySQL.Utility.Classes.MySQLWorkbench;
-using MySQL.Utility.Forms;
+using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.MySqlWorkbench;
+using MySql.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Forms
@@ -592,7 +592,7 @@ namespace MySQL.ForExcel.Forms
             undoChanges = true;
             operationSummary = Resources.EditDataCellModificationError;
             operationDetails = ex.Message;
-            MySqlSourceTrace.WriteAppErrorToLog(ex);
+            MySqlSourceTrace.WriteAppErrorToLog(ex, false);
           }
           finally
           {
@@ -969,7 +969,7 @@ namespace MySQL.ForExcel.Forms
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
       }
 
       Globals.ThisAddIn.SkipWorksheetChangeEvent = false;

@@ -1110,4 +1110,10 @@ In order to avoid receiving this error message each time the Excel table is refr
   <data name="SplashScreen" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\SplashScreen.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="QueryChangedTimerTickNoValidControlFocusError" xml:space="preserve">
+    <value>QueryChangedTimer's Tick event fired but no valid control had focus.</value>
+  </data>
+  <data name="CustomTaskPaneGetOrCreateError" xml:space="preserve">
+    <value>Could not get or create a custom task pane for the active Excel window. Using Excel version {0}.</value>
+  </data>
 </root>

@@ -28,11 +28,11 @@ using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes;
-using MySQL.Utility.Classes.MySQL;
-using MySQL.Utility.Classes.MySQLInstaller;
-using MySQL.Utility.Classes.MySQLWorkbench;
-using MySQL.Utility.Forms;
+using MySql.Utility.Classes;
+using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.MySqlInstaller;
+using MySql.Utility.Classes.MySqlWorkbench;
+using MySql.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 using ExcelTools = Microsoft.Office.Tools.Excel;
 using OfficeTools = Microsoft.Office.Tools;
@@ -407,7 +407,7 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
       }
     }
 
@@ -875,7 +875,7 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
         triggerAfterSave = false;
       }
 
@@ -973,9 +973,7 @@ namespace MySQL.ForExcel
               catch (Exception ex)
               {
                 var errorTitle = retry <= 3 ? Resources.WorkbookSaveErrorText : Resources.WorkbookSaveErrorFinalText;
-                MiscUtilities.ShowCustomizedErrorDialog(errorTitle, ex.Message, true);
-                MySqlSourceTrace.WriteToLog(errorTitle);
-                MySqlSourceTrace.WriteAppErrorToLog(ex);
+                MySqlSourceTrace.WriteAppErrorToLog(ex, null, errorTitle, true);
               }
             }
             break;
@@ -1252,7 +1250,7 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
       }
     }
 
@@ -1300,7 +1298,7 @@ namespace MySQL.ForExcel
 
       if (logOperation)
       {
-        MySqlSourceTrace.WriteToLog(Resources.DeletingConnectionInfosWithNonExistentWorkbook, SourceLevels.Information);
+        MySqlSourceTrace.WriteToLog(Resources.DeletingConnectionInfosWithNonExistentWorkbook, false, SourceLevels.Information);
       }
 
       foreach (var connectionInfo in orphanedConnectionInfos)
@@ -1385,7 +1383,7 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
       }
     }
 
@@ -1995,8 +1993,8 @@ namespace MySQL.ForExcel
       }
 
       _connectionsMigrationTimer = new Timer();
-      _connectionsMigrationTimer.Tick += ConnectionsMigrationTimer_Tick; ;
-      _connectionsMigrationTimer.Interval = 20000; //MILLISECONDS_IN_HOUR;
+      _connectionsMigrationTimer.Tick += ConnectionsMigrationTimer_Tick;
+      _connectionsMigrationTimer.Interval = MILLISECONDS_IN_HOUR;
       _connectionsMigrationTimer.Start();
     }
 
@@ -2028,7 +2026,7 @@ namespace MySQL.ForExcel
       }
 
       ExcelAddInPanesClosed();
-      MySqlSourceTrace.WriteToLog(Resources.ShutdownMessage, SourceLevels.Information);
+      MySqlSourceTrace.WriteToLog(Resources.ShutdownMessage, false, SourceLevels.Information);
 
       // Unsubscribe events tracked even when no Excel panes are open.
       Application.WorkbookOpen -= Application_WorkbookOpen;
@@ -2065,7 +2063,7 @@ namespace MySQL.ForExcel
         Directory.CreateDirectory(EnvironmentApplicationDataDirectory + SETTINGS_DIRECTORY_RELATIVE_PATH);
 
         // Log the Add-In's Startup
-        MySqlSourceTrace.WriteToLog(Resources.StartupMessage, SourceLevels.Information);
+        MySqlSourceTrace.WriteToLog(Resources.StartupMessage, false, SourceLevels.Information);
 
         // Detect Excel version.
         int pointPos = Application.Version.IndexOf('.');
@@ -2083,7 +2081,7 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
       }
     }
 

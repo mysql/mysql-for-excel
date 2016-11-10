@@ -23,9 +23,9 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.Office.Core;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes;
-using MySQL.Utility.Classes.MySQL;
-using MySQL.Utility.Forms;
+using MySql.Utility.Classes;
+using MySql.Utility.Classes.MySql;
+using MySql.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 using ExcelTools = Microsoft.Office.Tools.Excel;
 
@@ -511,8 +511,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.PivotTableCreationError, proposedName), ex.Message, true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.PivotTableCreationError, proposedName), true);
       }
 
       return pivotTable;
@@ -554,8 +553,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(string.Format(Resources.PivotTableCreationError, proposedName), ex.Message, true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.PivotTableCreationError, proposedName), true);
       }
 
       return pivotTable;
@@ -588,8 +586,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.WorksheetCreationErrorText, ex.Message, true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.WorksheetCreationErrorText, true);
       }
 
       return newWorksheet;
@@ -618,7 +615,7 @@ namespace MySQL.ForExcel.Classes
         success = false;
         if (logException)
         {
-          MySqlSourceTrace.WriteAppErrorToLog(ex);
+          MySqlSourceTrace.WriteAppErrorToLog(ex, false);
         }
       }
 
@@ -654,7 +651,7 @@ namespace MySQL.ForExcel.Classes
         success = false;
         if (logException)
         {
-          MySqlSourceTrace.WriteAppErrorToLog(ex);
+          MySqlSourceTrace.WriteAppErrorToLog(ex, false);
         }
       }
 
@@ -679,9 +676,9 @@ namespace MySQL.ForExcel.Classes
         toolsExcelTable.Disconnect();
       }
 
-      if (toolsExcelTable.DataSource is MySqlDataTable)
+      var boundTable = toolsExcelTable.DataSource as MySqlDataTable;
+      if (boundTable != null)
       {
-        var boundTable = toolsExcelTable.DataSource as MySqlDataTable;
         boundTable.Dispose();
       }
 
@@ -1541,7 +1538,7 @@ namespace MySQL.ForExcel.Classes
         }
         catch (Exception ex)
         {
-          MySqlSourceTrace.WriteAppErrorToLog(ex);
+          MySqlSourceTrace.WriteAppErrorToLog(ex, false);
           var infoProperties = InfoDialogProperties.GetYesNoDialogProperties(
             InfoDialog.InfoType.Error,
             Resources.OperationErrorTitle,
@@ -1584,7 +1581,7 @@ namespace MySQL.ForExcel.Classes
         }
         catch (Exception ex)
         {
-          MySqlSourceTrace.WriteAppErrorToLog(ex);
+          MySqlSourceTrace.WriteAppErrorToLog(ex, false);
           var infoProperties = InfoDialogProperties.GetYesNoDialogProperties(
             InfoDialog.InfoType.Error,
             Resources.OperationErrorTitle,

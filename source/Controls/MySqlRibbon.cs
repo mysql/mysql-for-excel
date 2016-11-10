@@ -19,7 +19,8 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using MySQL.Utility.Classes.MySQL;
+using MySQL.ForExcel.Properties;
+using MySql.Utility.Classes.MySql;
 using OfficeCore = Microsoft.Office.Core;
 
 namespace MySQL.ForExcel.Controls
@@ -34,13 +35,6 @@ namespace MySQL.ForExcel.Controls
     /// A reference to the custom ribbon UI.
     /// </summary>
     private OfficeCore.IRibbonUI _ribbon;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MySqlRibbon"/> class.
-    /// </summary>
-    public MySqlRibbon()
-    {
-    }
 
     /// <summary>
     /// Gets or sets a value indicating whether the toggle button with id MySqlForExcelGroup is pressed.
@@ -90,7 +84,7 @@ namespace MySQL.ForExcel.Controls
       switch (control.Id)
       {
         case "ShowMySqlForExcelPane":
-          return Properties.Resources.MySQLforExcel_Logo_48x48;
+          return Resources.MySQLforExcel_Logo_48x48;
       }
 
       return null;
@@ -107,7 +101,7 @@ namespace MySQL.ForExcel.Controls
       Microsoft.Office.Tools.CustomTaskPane taskPane = Globals.ThisAddIn.GetOrCreateActiveCustomPane();
       if (taskPane == null)
       {
-        MySqlSourceTrace.WriteToLog(string.Format("Could not get or create a custom task pane for the active Excel window. Using Excel version {0}.", Globals.ThisAddIn.ExcelVersionNumber));
+        MySqlSourceTrace.WriteToLog(string.Format(Resources.CustomTaskPaneGetOrCreateError, Globals.ThisAddIn.ExcelVersionNumber), false);
         return;
       }
 

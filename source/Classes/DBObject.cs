@@ -16,8 +16,7 @@
 // 02110-1301  USA
 
 using System;
-using MySQL.Utility.Classes.MySQLWorkbench;
-using ExcelInterop = Microsoft.Office.Interop.Excel;
+using MySql.Utility.Classes.MySqlWorkbench;
 
 namespace MySQL.ForExcel.Classes
 {

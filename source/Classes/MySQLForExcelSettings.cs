@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
-using MySQL.Utility.Classes;
+using MySql.Utility.Classes;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -24,6 +24,16 @@ namespace MySQL.ForExcel.Classes
   /// </summary>
   public class MySqlForExcelSettings : CustomSettingsProvider
   {
+    /// <summary>
+    /// The text from <see cref="AssemblyInfo.AssemblyTitle"/> stripped of spaces.
+    /// </summary>
+    private string _assemblyTitleWithoutSpaces;
+
+    /// <summary>
+    /// Gets or sets the name used for the root XML element of the settings file.
+    /// </summary>
+    public static string RootElementName { get; set; }
+
     /// <summary>
     /// Gets the fle path for the settings file.
     /// </summary>
@@ -47,6 +57,26 @@ namespace MySQL.ForExcel.Classes
 
       set
       {
+      }
+    }
+
+    /// <summary>
+    /// Gets or sets the name used for the root XML element of the settings file.
+    /// </summary>
+    public override string RootElementApplicationName
+    {
+      get
+      {
+        if (string.IsNullOrEmpty(_assemblyTitleWithoutSpaces))
+        {
+          _assemblyTitleWithoutSpaces = string.IsNullOrEmpty(AssemblyInfo.AssemblyTitle)
+            ? "settings"
+            : AssemblyInfo.AssemblyTitle.Replace(" ", string.Empty);
+        }
+
+        return string.IsNullOrEmpty(RootElementName)
+          ? _assemblyTitleWithoutSpaces
+          : RootElementName;
       }
     }
 

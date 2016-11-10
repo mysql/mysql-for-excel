@@ -25,8 +25,9 @@ using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes.MySQL;
-using MySQL.Utility.Classes.MySQLWorkbench;
+using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.MySqlWorkbench;
+using MySql.Utility.Enums;
 
 namespace MySQL.ForExcel.Panels
 {
@@ -221,8 +222,7 @@ namespace MySQL.ForExcel.Panels
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.AppendDataErrorTitle, ex.Message, true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.AppendDataErrorTitle, true);
       }
       finally
       {
@@ -328,8 +328,7 @@ namespace MySQL.ForExcel.Panels
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(ex.Message);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, true);
       }
     }
 
@@ -360,8 +359,7 @@ namespace MySQL.ForExcel.Panels
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.EditDataErrorTitle, ex.Message, true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.EditDataErrorTitle, true);
       }
     }
 
@@ -487,8 +485,7 @@ namespace MySQL.ForExcel.Panels
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.ImportDataErrorTitle, ex.Message, true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.ImportDataErrorTitle, true);
       }
       finally
       {
@@ -547,7 +544,7 @@ namespace MySQL.ForExcel.Panels
     /// </summary>
     private void LoadProcedures()
     {
-      var proceduresTable = _wbConnection.GetSchemaCollection("Procedures", null, _wbConnection.Schema, null, "PROCEDURE");
+      var proceduresTable = _wbConnection.GetSchemaInformation(SchemaInformationType.Procedures, true, null, _wbConnection.Schema, null, "PROCEDURE");
       if (proceduresTable == null)
       {
         return;
@@ -559,11 +556,11 @@ namespace MySQL.ForExcel.Panels
     }
 
     /// <summary>
-    /// Fetches all MySQL table names of the given type from the current connection and loads them in the <see cref="LoadedProcedures"/> list.
+    /// Fetches all MySQL table names of the given type from the current connection and loads them in the <see cref="LoadedTables"/> list.
     /// </summary>
     private void LoadTables()
     {
-      var tablesTable = _wbConnection.GetSchemaCollection("Tables", null, _wbConnection.Schema);
+      var tablesTable = _wbConnection.GetSchemaInformation(SchemaInformationType.Tables, true, null, _wbConnection.Schema);
       if (tablesTable == null)
       {
         return;
@@ -575,11 +572,11 @@ namespace MySQL.ForExcel.Panels
     }
 
     /// <summary>
-    /// Fetches all MySQL table names of the given type from the current connection and loads them in the <see cref="LoadedProcedures"/> list.
+    /// Fetches all MySQL table names of the given type from the current connection and loads them in the <see cref="LoadedViews"/> list.
     /// </summary>
     private void LoadViews()
     {
-      var viewsTable = _wbConnection.GetSchemaCollection("Views", null, _wbConnection.Schema);
+      var viewsTable = _wbConnection.GetSchemaInformation(SchemaInformationType.Views, true, null, _wbConnection.Schema);
       if (viewsTable == null)
       {
         return;
@@ -687,8 +684,7 @@ namespace MySQL.ForExcel.Panels
       catch (Exception ex)
       {
         success = false;
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.RefreshDBObjectsErrorTitle, ex.Message, true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.RefreshDBObjectsErrorTitle, true);
       }
 
       return success;

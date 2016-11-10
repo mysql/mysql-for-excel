@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -18,8 +18,8 @@
 using System.Drawing;
 using System.Windows.Forms;
 using MySQL.ForExcel.Controls;
-using MySQL.Utility.Classes;
-using MySQL.Utility.Classes.MySQLWorkbench;
+using MySql.Utility.Classes;
+using MySql.Utility.Classes.MySqlWorkbench;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -247,7 +247,7 @@ namespace MySQL.ForExcel.Classes
 
       if (maxWidth > 0)
       {
-        _truncatedSubtitle = Subtitle.TruncateString(graphics, maxWidth, font);
+        _truncatedSubtitle = Subtitle.TruncateString(maxWidth, font);
       }
 
       UpdateTruncatedSubtitle = false;
@@ -271,7 +271,7 @@ namespace MySQL.ForExcel.Classes
 
       if (maxWidth > 0)
       {
-        _truncatedTitle = Title.TruncateString(graphics, maxWidth, font);
+        _truncatedTitle = Title.TruncateString(maxWidth, font);
       }
 
       UpdateTruncatedTitle = false;

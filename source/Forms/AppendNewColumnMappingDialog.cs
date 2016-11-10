@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -16,7 +16,7 @@
 // 02110-1301  USA
 
 using System;
-using MySQL.Utility.Forms;
+using MySql.Utility.Forms;
 
 namespace MySQL.ForExcel.Forms
 {

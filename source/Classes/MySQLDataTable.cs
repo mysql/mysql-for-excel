@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using MySQL.ForExcel.Classes.EventArguments;
@@ -26,12 +27,11 @@ using MySQL.ForExcel.Classes.Exceptions;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes;
-using MySQL.Utility.Classes.MySQLWorkbench;
+using MySql.Utility.Classes;
+using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.MySqlWorkbench;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 using ExcelTools = Microsoft.Office.Tools.Excel;
-using System.Globalization;
-using MySQL.Utility.Classes.MySQL;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -501,7 +501,7 @@ namespace MySQL.ForExcel.Classes
         }
 
         var schemaCharSetAndCollation = WbConnection.GetSchemaCharSetAndCollation();
-        return schemaCharSetAndCollation == null ? null : schemaCharSetAndCollation[1];
+        return schemaCharSetAndCollation == null ? null : schemaCharSetAndCollation.Item2;
       }
     }
 
@@ -1285,9 +1285,8 @@ namespace MySQL.ForExcel.Classes
       catch (Exception ex)
       {
         DataLoadException = new MySqlDataLoadException(ex);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
         var errorTitle = string.Format(Resources.TableDataAdditionErrorTitle, OperationType.IsForExport() ? "exporting" : "appending");
-        MiscUtilities.ShowCustomizedErrorDialog(errorTitle, ex.Message + Environment.NewLine + Environment.NewLine + ex.StackTrace);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, errorTitle, true);
         success = false;
       }
       finally
@@ -1969,8 +1968,7 @@ namespace MySQL.ForExcel.Classes
       catch (Exception ex)
       {
         fillingRange = null;
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.ImportDataErrorDetailText, ex.Message, true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.ImportDataErrorDetailText, true);
       }
       finally
       {
@@ -2027,8 +2025,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.ImportDataErrorDetailText, ex.Message, true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.ImportDataErrorDetailText, true);
       }
       finally
       {
@@ -2392,8 +2389,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.TableDataCopyErrorTitle, ex.Message + Environment.NewLine + Environment.NewLine + ex.StackTrace, true);
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.TableDataCopyErrorTitle, true);
       }
       finally
       {

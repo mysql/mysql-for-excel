@@ -24,7 +24,7 @@ using System.Text;
 using MySQL.ForExcel.Classes.Exceptions;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
-using MySQL.Utility.Classes.MySQL;
+using MySql.Utility.Classes.MySql;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
@@ -203,7 +203,7 @@ namespace MySQL.ForExcel.Classes
 
       if (MySqlTable == null)
       {
-        MySqlSourceTrace.WriteToLog(Resources.MySqlDataTableExpectedError, SourceLevels.Critical);
+        MySqlSourceTrace.WriteToLog(Resources.MySqlDataTableExpectedError, false, SourceLevels.Critical);
         _sqlQuery = null;
         return _sqlQuery;
       }
@@ -314,7 +314,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
         refreshSuccessful = false;
       }
       finally
