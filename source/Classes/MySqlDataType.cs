@@ -60,9 +60,14 @@ namespace MySQL.ForExcel.Classes
     public const int MYSQL_BIT_MAX_LENGTH = 64;
 
     /// <summary>
+    /// The date format used by Date fields in MySQL databases.
+    /// </summary>
+    public const string MYSQL_DATE_FORMAT = "yyyy-MM-dd";
+
+    /// <summary>
     /// The date format used by DateTime fields in MySQL databases.
     /// </summary>
-    public const string MYSQL_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public const string MYSQL_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     /// <summary>
     /// The maximum length a MySQL date column can hold.
@@ -197,6 +202,11 @@ namespace MySQL.ForExcel.Classes
     /// Flag indicating whether this data type is fixed or variable sized character-based.
     /// </summary>
     private bool? _isChar;
+
+    /// <summary>
+    /// Flag indicating whether this data type is a DATE.
+    /// </summary>
+    private bool? _isDate;
 
     /// <summary>
     /// Flag indicating whether this data type is used for dates.
@@ -547,6 +557,22 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets a value indicating whether this data type is a DATE.
+    /// </summary>
+    public bool IsDate
+    {
+      get
+      {
+        if (_isDate == null)
+        {
+          _isDate = !string.IsNullOrEmpty(TypeName) && _typeName.Equals("date", StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        return (bool)_isDate;
+      }
+    }
+
+    /// <summary>
     /// Gets a value indicating whether this data type is used for dates.
     /// </summary>
     public bool IsDateBased
@@ -555,9 +581,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_isDateBased == null)
         {
-          _isDateBased = IsDateTimeOrTimeStamp
-                          || (string.IsNullOrEmpty(TypeName)
-                              && _typeName.Equals("date", StringComparison.InvariantCultureIgnoreCase));
+          _isDateBased = IsDateTimeOrTimeStamp || IsDate;
         }
 
         return (bool)_isDateBased;
@@ -2340,6 +2364,7 @@ namespace MySQL.ForExcel.Classes
       _isBlob = null;
       _isBool = null;
       _isChar = null;
+      _isDate = null;
       _isDateBased = null;
       _isDateTimeOrTimeStamp = null;
       _isFixedPoint = null;

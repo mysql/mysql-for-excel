@@ -1213,14 +1213,14 @@ namespace MySQL.ForExcel.Classes
         var dtValue = (DateTime)valueObject;
         valueToDb = dtValue.Equals(DateTime.MinValue)
           ? GetNullDateValueAsString(out valueIsNull)
-          : dtValue.ToString(MySqlDataType.MYSQL_DATE_FORMAT);
+          : dtValue.ToString(MySqlDataType.IsDate ? MySqlDataType.MYSQL_DATE_FORMAT : MySqlDataType.MYSQL_DATETIME_FORMAT);
       }
       else if (valueObject is MySqlDateTime)
       {
         var dtValue = (MySqlDateTime)valueObject;
         valueToDb = !dtValue.IsValidDateTime || dtValue.GetDateTime().Equals(DateTime.MinValue)
           ? GetNullDateValueAsString(out valueIsNull)
-          : dtValue.GetDateTime().ToString(MySqlDataType.MYSQL_DATE_FORMAT);
+          : dtValue.GetDateTime().ToString(MySqlDataType.IsDate ? MySqlDataType.MYSQL_DATE_FORMAT : MySqlDataType.MYSQL_DATETIME_FORMAT);
       }
       else
       {
