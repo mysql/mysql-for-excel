@@ -1,7 +1,7 @@
 1.3.7
-- Fixed the code that translates datetime values being exported/appended to a MySQL table depending on the target column data type. Excel values are always
-  stored internally as a number corresponding to a datetime type, MySQL for Excel now correctly converts the value to a string representation based on the
-  target type (DATE or DATETIME). (MySQL Bug:  80079, Bug #22585674 - IMPROPER HANDLING OF EXCEL DATE PREVENTS EXPORTING)
+- Fixed the code that translates datetime values being inserted or updated into a MySQL table depending on the target column data type. Excel values are
+  always stored internally as a number corresponding to a datetime type, MySQL for Excel now correctly converts the value to a string representation based
+  on the target type (DATE or DATETIME). (MySQL Bug:  80079, Bug #22585674 - IMPROPER HANDLING OF EXCEL DATE PREVENTS EXPORTING) 
 - Added code to differentiate properly a DATE and a DATETIME MySQL data column, this impacts the handling for date and datetime values for Import, Export,
   Append and Edit data operations. (MySQL Bug:  80139, Bug #22627266 - IMPORT IS INTERRUPTED DUE TO DATE/TIME VALUE)
 - Enhanced the logic that migrates stored MySQL connections to the MySQL Workbench connections.xml file. In previous versions the migration was offered
