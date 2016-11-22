@@ -334,7 +334,7 @@ namespace MySQL.ForExcel.Forms
       {
         var dataType = dataTypeAndParameterTuple.Item1;
         var parameter = dataTypeAndParameterTuple.Item2;
-        var customProperty = new CustomProperty(parameter.ParameterName, parameter.Value, parameter.IsReadOnly(), true)
+        var customProperty = new CustomProperty(parameter.ParameterName, dataType, parameter.Value, parameter.IsReadOnly(), true)
         {
           Description = string.Format("Direction: {0}, Data Type: {1}", parameter.Direction, dataType)
         };

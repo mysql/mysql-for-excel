@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -102,7 +102,63 @@ namespace MySQL.ForExcel.Classes
     {
       get
       {
-        return _property.Value.GetType();
+        var dotNetType = _property.MySqlType.DotNetType;
+        if (dotNetType == typeof(byte))
+        {
+          return typeof(byte?);
+        }
+
+        if (dotNetType == typeof(sbyte))
+        {
+          return typeof(sbyte?);
+        }
+
+        if (dotNetType == typeof(int))
+        {
+          return typeof(int?);
+        }
+
+        if (dotNetType == typeof(uint))
+        {
+          return typeof(uint?);
+        }
+
+        if (dotNetType == typeof(short))
+        {
+          return typeof(short?);
+        }
+
+        if (dotNetType == typeof(ushort))
+        {
+          return typeof(ushort?);
+        }
+
+        if (dotNetType == typeof(long))
+        {
+          return typeof(long?);
+        }
+
+        if (dotNetType == typeof(ulong))
+        {
+          return typeof(ulong?);
+        }
+
+        if (dotNetType == typeof(decimal))
+        {
+          return typeof(decimal?);
+        }
+
+        if (dotNetType == typeof(float))
+        {
+          return typeof(float?);
+        }
+
+        if (dotNetType == typeof(double))
+        {
+          return typeof(double?);
+        }
+
+        return dotNetType;
       }
     }
 
@@ -113,7 +169,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the value can be reset, <c>false</c> otherwise.</returns>
     public override bool CanResetValue(object component)
     {
-      return false;
+      return true;
     }
 
     /// <summary>
@@ -132,7 +188,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="component"></param>
     public override void ResetValue(object component)
     {
-      //// Have to implement
+      _property.Value = _property.MySqlType.TypeDefaultValue;
     }
 
     /// <summary>

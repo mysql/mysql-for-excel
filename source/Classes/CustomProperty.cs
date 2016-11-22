@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -26,16 +26,33 @@ namespace MySQL.ForExcel.Classes
     /// Instantiates a new instance of the <see cref="CustomProperty"/> class.
     /// </summary>
     /// <param name="name">The property name.</param>
+    /// <param name="mySqlType">The name of the MySQL type of the value the property will hold.</param>
     /// <param name="value">The property value.</param>
     /// <param name="readOnly">Flag indicating whether the property is read only.</param>
     /// <param name="visible">Flag indicating whether the property is visible in a property editor.</param>
-    public CustomProperty(string name, object value, bool readOnly, bool visible)
+    public CustomProperty(string name, string mySqlType, object value, bool readOnly, bool visible)
+      : this(name, new MySqlDataType(mySqlType, true, false), value, readOnly, visible)
+    {
+    }
+
+    /// <summary>
+    /// Instantiates a new instance of the <see cref="CustomProperty"/> class.
+    /// </summary>
+    /// <param name="name">The property name.</param>
+    /// <param name="mySqltype">The <see cref="MySqlDataType"/> of the value the property will hold.</param>
+    /// <param name="value">The property value.</param>
+    /// <param name="readOnly">Flag indicating whether the property is read only.</param>
+    /// <param name="visible">Flag indicating whether the property is visible in a property editor.</param>
+    public CustomProperty(string name, MySqlDataType mySqltype, object value, bool readOnly, bool visible)
     {
       Name = name;
-      Value = value;
       ReadOnly = readOnly;
+      MySqlType = mySqltype;
+      Value = value;
       Visible = visible;
     }
+
+    #region Properties
 
     /// <summary>
     /// Gets or sets the property description.
@@ -53,6 +70,11 @@ namespace MySQL.ForExcel.Classes
     public bool ReadOnly { get; private set; }
 
     /// <summary>
+    /// Gets the <see cref="MySqlDataType"/> of the value the property will hold.
+    /// </summary>
+    public MySqlDataType MySqlType { get; private set; }
+
+    /// <summary>
     /// Gets or sets the property value.
     /// </summary>
     public object Value { get; set; }
@@ -61,5 +83,7 @@ namespace MySQL.ForExcel.Classes
     /// Gets a value indicating whether the property is visible in a property editor.
     /// </summary>
     public bool Visible { get; private set; }
+
+    #endregion Properties
   }
 }
