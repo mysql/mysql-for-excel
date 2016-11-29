@@ -1462,11 +1462,11 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Unprotects the given Excel worksheet and stops listening for its Change event.
+    /// Protects the given Excel worksheet and starts listening for its Change event.
     /// </summary>
     /// <param name="worksheet">The <see cref="ExcelInterop.Worksheet"/> to unprotect.</param>
     /// <param name="changeEventHandlerDelegate">The change event handler delegate of the Excel worksheet.</param>
-    /// <param name="protectionKey">The key used to unprotect the worksheet.</param>
+    /// <param name="protectionKey">The key used to protect the worksheet.</param>
     /// <param name="mysqlDataRange">The Excel range containing the MySQL data being edited.</param>
     public static void ProtectEditingWorksheet(this ExcelInterop.Worksheet worksheet, ExcelInterop.DocEvents_ChangeEventHandler changeEventHandlerDelegate, string protectionKey, ExcelInterop.Range mysqlDataRange)
     {
@@ -1832,7 +1832,7 @@ namespace MySQL.ForExcel.Classes
         worksheet.Change -= changeEventHandlerDelegate;
       }
 
-      worksheet.Unprotect(worksheet.GetProtectionKey());
+      worksheet.Unprotect(protectionKey);
     }
 
     /// <summary>

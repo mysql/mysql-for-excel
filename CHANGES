@@ -1,4 +1,10 @@
 1.3.7
+- There seems to be a bug in Microsoft's Excel interop code to unprotect Worksheets in the BeforeSave event when the save is done programatically (through
+  the Workbook.Save method). This bug seems to be present in VBA as well, and other developers in the Internet report the same problem. The problem happens
+  when the Workbook is closed and needs to be saved, the Worksheets with an Edit Data session are not unprotected before the Workbook is saved, so the next
+  time the Workbook is opened, the Edit Data sessions can't be restored on a protected Worksheet. Coded a workaround to unprotect the Worksheets when a
+  Workbook is closed and needs to be saved, but before the Save takes place. This way when Edit Data sessions are restored the Worksheets are not protected
+  as they should be. (Bug #22138958 - EDIT DATA SESSIONS NOT RESTORED WHEN OPENING A SAVED WORKBOOK)
 - Enhanced the way parameter values are handled in the Import Procedure Data dialog, so that numeric values can be blanked out and treated as null values.
   (MySQL Bug #81417, Bug #23281495 - EXCEL ADDIN - CANNOT PASS NULL PARAMETER TO STORED PROC TO IMPORT DATA)
 - Fixed the code that translates datetime values being inserted or updated into a MySQL table depending on the target column data type. Excel values are

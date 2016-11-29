@@ -800,31 +800,8 @@ namespace MySQL.ForExcel
     /// <param name="success">Flag indicating whether the save operation was successful.</param>
     private void Application_WorkbookAfterSave(ExcelInterop.Workbook workbook, bool success)
     {
-      var workbookId = workbook.GetOrCreateId();
       var workbookEditConnectionInfos = GetWorkbookEditConnectionInfos(workbook);
-
-      // Protect all worksheets with an active editing table.
-      foreach (var activeEditConnectionInfo in workbookEditConnectionInfos)
-      {
-        if (activeEditConnectionInfo.EditDialog != null)
-        {
-          activeEditConnectionInfo.EditDialog.ProtectWorksheet();
-        }
-
-        if (!success)
-        {
-          continue;
-        }
-
-        // Add new EditConnectionInfo in memory collection to serialized collection
-        activeEditConnectionInfo.LastAccess = DateTime.Now;
-        activeEditConnectionInfo.WorkbookFilePath = workbook.FullName;
-        if (!EditConnectionInfos.Contains(activeEditConnectionInfo))
-        {
-          EditConnectionInfos.Add(activeEditConnectionInfo);
-        }
-      }
-
+      ProtectEditingWorksheets(workbook, success, workbookEditConnectionInfos);
       if (!success)
       {
         workbook.Saved = false;
@@ -841,6 +818,7 @@ namespace MySQL.ForExcel
       }
 
       // Remove deleted EditConnectionInfo objects from memory collection also from serialized collection
+      var workbookId = workbook.GetOrCreateId();
       foreach (var storedConnectionInfo in EditConnectionInfos.FindAll(storedConnectionInfo => string.Equals(storedConnectionInfo.WorkbookGuid, workbookId, StringComparison.InvariantCulture) && !workbookEditConnectionInfos.Exists(wbConnectionInfo => wbConnectionInfo.HasSameWorkbookAndTable(storedConnectionInfo))))
       {
         EditConnectionInfos.Remove(storedConnectionInfo);
@@ -887,43 +865,6 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Event delegate method fired when a new <see cref="ExcelInterop.Workbook"/> is created.
-    /// </summary>
-    /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/> being created.</param>
-    private void Application_WorkbookNewWorkbook(Microsoft.Office.Interop.Excel.Workbook workbook)
-    {
-      InitializeWorkbook(workbook);
-    }
-
-    /// <summary>
-    /// Removes invalid import connection information from the collection.
-    /// </summary>
-    private void RemoveInvalidImportConnectionInformation()
-    {
-      var invalidConnectionInfos = new List<ImportConnectionInfo>();
-      foreach (var importConnectionInfo in ActiveWorkbookImportConnectionInfos)
-      {
-        try
-        {
-          // DO NOT REMOVE this line. If the excel table is invalid, accessing it will throw an exception.
-          var excelTableComment = importConnectionInfo.ExcelTable.Comment;
-        }
-        catch
-        {
-          // The importConnectionInfo's list object was moved to another worksheet or when its columns had been deleted or the reference to it no longer exists.
-          invalidConnectionInfos.Add(importConnectionInfo);
-        }
-      }
-
-      // Dispose of ImportConnectionInfo objects that are no longer valid for the current workbook.
-      if (invalidConnectionInfos.Count > 0)
-      {
-        invalidConnectionInfos.ForEach(invalidSession => invalidSession.ExcelTable.DeleteSafely(false));
-        invalidConnectionInfos.ForEach(invalidSession => StoredImportConnectionInfos.Remove(invalidSession));
-      }
-    }
-
-    /// <summary>
     /// Event delegate method fired before a <see cref="ExcelInterop.Workbook"/> is closed.
     /// </summary>
     /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
@@ -941,6 +882,7 @@ namespace MySQL.ForExcel
         switch (MessageBox.Show(string.Format(Resources.WorkbookSavingDetailText, workbook.Name), Application.Name, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1))
         {
           case DialogResult.Yes:
+            UnprotectEditingWorksheets(workbook);
             for (int retry = 1; retry <= 3 && !wasAlreadySaved && !cancel; retry++)
             {
               try
@@ -976,6 +918,8 @@ namespace MySQL.ForExcel
                 MySqlSourceTrace.WriteAppErrorToLog(ex, null, errorTitle, true);
               }
             }
+
+            ProtectEditingWorksheets(workbook, false);
             break;
 
           case DialogResult.No:
@@ -1018,13 +962,7 @@ namespace MySQL.ForExcel
     /// <param name="cancel">Flag indicating whether the user cancelled the saving event.</param>
     private void Application_WorkbookBeforeSave(ExcelInterop.Workbook workbook, bool saveAsUi, ref bool cancel)
     {
-      var workbookConnectionInfos = GetWorkbookEditConnectionInfos(workbook);
-
-      // Unprotect all worksheets with an active editing table.
-      foreach (var activeEditConnectionInfo in workbookConnectionInfos.Where(activeEditConnectionInfo => activeEditConnectionInfo.EditDialog != null))
-      {
-        activeEditConnectionInfo.EditDialog.UnprotectWorksheet();
-      }
+      UnprotectEditingWorksheets(workbook);
 
       //The WorkbookAfterSave event in Excel 2007 does not exist so we need to sligthly alter the program flow to overcome this limitation.
       if (ExcelVersionNumber <= EXCEL_2007_VERSION_NUMBER)
@@ -1056,6 +994,15 @@ namespace MySQL.ForExcel
       {
         ChangeEditDialogVisibility(wSheet, false);
       }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when a new <see cref="ExcelInterop.Workbook"/> is created.
+    /// </summary>
+    /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/> being created.</param>
+    private void Application_WorkbookNewWorkbook(Microsoft.Office.Interop.Excel.Workbook workbook)
+    {
+      InitializeWorkbook(workbook);
     }
 
     /// <summary>
@@ -1341,53 +1288,6 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="ExcelAddInPane"/> size changes.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void ExcelPane_SizeChanged(object sender, EventArgs e)
-    {
-      ExcelAddInPane excelPane = sender as ExcelAddInPane;
-
-      // Find the parent Custom Task Pane
-      OfficeTools.CustomTaskPane customTaskPane = CustomTaskPanes.FirstOrDefault(ctp => ctp.Control == excelPane);
-      if (customTaskPane == null || !customTaskPane.Visible)
-      {
-        return;
-      }
-
-      // Since there is no way to restrict the resizing of a custom task pane, cancel the resizing as soon as a
-      //  user attempts to resize the pane.
-      bool shouldResetWidth = false;
-      int resetToWidth = customTaskPane.Width;
-      if (resetToWidth < ADD_IN_MIN_PANE_WIDTH)
-      {
-        shouldResetWidth = true;
-        resetToWidth = ADD_IN_MIN_PANE_WIDTH;
-      }
-      else if (resetToWidth > ADD_IN_MAX_PANE_WIDTH)
-      {
-        shouldResetWidth = true;
-        resetToWidth = ADD_IN_MAX_PANE_WIDTH;
-      }
-
-      if (!shouldResetWidth)
-      {
-        return;
-      }
-
-      try
-      {
-        SendKeys.Send(ESCAPE_KEY);
-        customTaskPane.Width = resetToWidth;
-      }
-      catch (Exception ex)
-      {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
-      }
-    }
-
-    /// <summary>
     /// Performs initializations that must occur when the first Excel pane is opened by the user and not at the Add-In startup.
     /// </summary>
     private void ExcelAddInPaneFirstRun()
@@ -1438,57 +1338,50 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Initializes settings for the <see cref="MySqlWorkbench"/> and <see cref="MySqlWorkbenchPasswordVault"/> classes.
+    /// Event delegate method fired when the <see cref="ExcelAddInPane"/> size changes.
     /// </summary>
-    private void InitializeMySqlWorkbenchStaticSettings()
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ExcelPane_SizeChanged(object sender, EventArgs e)
     {
-      string applicationDataFolderPath = EnvironmentApplicationDataDirectory;
-      MySqlSourceTrace.LogFilePath = applicationDataFolderPath + ERROR_LOG_FILE_RELATIVE_PATH;
-      MySqlSourceTrace.SourceTraceClass = "MySQLForExcel";
-      MySqlWorkbench.ExternalApplicationName = AssemblyTitle;
-      MySqlWorkbenchPasswordVault.ApplicationPasswordVaultFilePath = applicationDataFolderPath + PASSWORDS_VAULT_FILE_RELATIVE_PATH;
-      MySqlWorkbench.ExternalConnections.CreateDefaultConnections = !MySqlWorkbench.ConnectionsFileExists && MySqlWorkbench.Connections.Count == 0;
-      MySqlWorkbench.ExternalApplicationConnectionsFilePath = applicationDataFolderPath + CONNECTIONS_FILE_RELATIVE_PATH;
-      MySqlWorkbench.ChangeCurrentCursor = delegate(Cursor cursor)
-      {
-        if (cursor == Cursors.WaitCursor)
-        {
-          Globals.ThisAddIn.Application.Cursor = ExcelInterop.XlMousePointer.xlWait;
-        }
-        else if (cursor == Cursors.Default)
-        {
-          Globals.ThisAddIn.Application.Cursor = ExcelInterop.XlMousePointer.xlDefault;
-        }
-      };
-    }
+      ExcelAddInPane excelPane = sender as ExcelAddInPane;
 
-    /// <summary>
-    /// Method used to initialize a <see cref="ExcelInterop.Workbook" /> when it is opened or created.
-    /// </summary>
-    /// <param name="workbook">The <see cref="ExcelInterop.Workbook" /> being opened.</param>
-    private void InitializeWorkbook(ExcelInterop.Workbook workbook)
-    {
-      if (workbook == null)
+      // Find the parent Custom Task Pane
+      OfficeTools.CustomTaskPane customTaskPane = CustomTaskPanes.FirstOrDefault(ctp => ctp.Control == excelPane);
+      if (customTaskPane == null || !customTaskPane.Visible)
       {
         return;
       }
 
-      // Add the custom MySQL table style (for Excel tables) to this workbook.
-      workbook.CreateMySqlTableStyle();
+      // Since there is no way to restrict the resizing of a custom task pane, cancel the resizing as soon as a
+      //  user attempts to resize the pane.
+      bool shouldResetWidth = false;
+      int resetToWidth = customTaskPane.Width;
+      if (resetToWidth < ADD_IN_MIN_PANE_WIDTH)
+      {
+        shouldResetWidth = true;
+        resetToWidth = ADD_IN_MIN_PANE_WIDTH;
+      }
+      else if (resetToWidth > ADD_IN_MAX_PANE_WIDTH)
+      {
+        shouldResetWidth = true;
+        resetToWidth = ADD_IN_MAX_PANE_WIDTH;
+      }
 
-      // When it is a new workbook it won't have any IConnectionInfo object related to it, so we could skip the rest of the method altogether.
-      if (workbook.IsNew())
+      if (!shouldResetWidth)
       {
         return;
       }
 
-      RestoreImportConnectionInfos(workbook);
-      if (ActiveExcelPane == null)
+      try
       {
-        return;
+        SendKeys.Send(ESCAPE_KEY);
+        customTaskPane.Width = resetToWidth;
       }
-
-      ShowOpenEditConnectionInfosDialog(workbook);
+      catch (Exception ex)
+      {
+        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
+      }
     }
 
     /// <summary>
@@ -1539,60 +1432,57 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Opens an <see cref="EditDataDialog"/> for each <see cref="EditConnectionInfo" />.
+    /// Initializes settings for the <see cref="MySqlWorkbench"/> and <see cref="MySqlWorkbenchPasswordVault"/> classes.
     /// </summary>
-    /// <param name="workbook">The workbook.</param>
-    private void OpenEditConnectionInfosOfTables(ExcelInterop.Workbook workbook)
+    private void InitializeMySqlWorkbenchStaticSettings()
+    {
+      string applicationDataFolderPath = EnvironmentApplicationDataDirectory;
+      MySqlSourceTrace.LogFilePath = applicationDataFolderPath + ERROR_LOG_FILE_RELATIVE_PATH;
+      MySqlSourceTrace.SourceTraceClass = "MySQLForExcel";
+      MySqlWorkbench.ExternalApplicationName = AssemblyTitle;
+      MySqlWorkbenchPasswordVault.ApplicationPasswordVaultFilePath = applicationDataFolderPath + PASSWORDS_VAULT_FILE_RELATIVE_PATH;
+      MySqlWorkbench.ExternalConnections.CreateDefaultConnections = !MySqlWorkbench.ConnectionsFileExists && MySqlWorkbench.Connections.Count == 0;
+      MySqlWorkbench.ExternalApplicationConnectionsFilePath = applicationDataFolderPath + CONNECTIONS_FILE_RELATIVE_PATH;
+      MySqlWorkbench.ChangeCurrentCursor = delegate (Cursor cursor)
+      {
+        if (cursor == Cursors.WaitCursor)
+        {
+          Globals.ThisAddIn.Application.Cursor = ExcelInterop.XlMousePointer.xlWait;
+        }
+        else if (cursor == Cursors.Default)
+        {
+          Globals.ThisAddIn.Application.Cursor = ExcelInterop.XlMousePointer.xlDefault;
+        }
+      };
+    }
+
+    /// <summary>
+    /// Method used to initialize a <see cref="ExcelInterop.Workbook" /> when it is opened or created.
+    /// </summary>
+    /// <param name="workbook">The <see cref="ExcelInterop.Workbook" /> being opened.</param>
+    private void InitializeWorkbook(ExcelInterop.Workbook workbook)
     {
       if (workbook == null)
       {
         return;
       }
 
-      var workbookConnectionInfos = GetWorkbookEditConnectionInfos(workbook);
-      if (workbookConnectionInfos.Count == 0)
+      // Add the custom MySQL table style (for Excel tables) to this workbook.
+      workbook.CreateMySqlTableStyle();
+
+      // When it is a new workbook it won't have any IConnectionInfo object related to it, so we could skip the rest of the method altogether.
+      if (workbook.IsNew())
       {
         return;
       }
 
-      var missingTables = new List<string>();
-      _restoringExistingConnectionInfo = true;
-      foreach (var connectionInfos in workbookConnectionInfos)
-      {
-        var editTableObject = ActiveExcelPane.LoadedTables.FirstOrDefault(dbo => string.Equals(dbo.Name, connectionInfos.TableName, StringComparison.InvariantCulture));
-        if (editTableObject == null)
-        {
-          missingTables.Add(connectionInfos.TableName);
-          continue;
-        }
-
-        ActiveExcelPane.EditTableData(editTableObject, true, workbook);
-      }
-
-      if (workbookConnectionInfos.Count - missingTables.Count > 0)
-      {
-        ActiveExcelPane.ActiveEditDialog.ShowDialog();
-      }
-
-      _restoringExistingConnectionInfo = false;
-
-      // If no errors were found at the opening process do not display the warning dialog at the end.
-      if (missingTables.Count <= 0)
+      RestoreImportConnectionInfos(workbook);
+      if (ActiveExcelPane == null)
       {
         return;
       }
 
-      var errorMessage = new StringBuilder();
-      if (missingTables.Count > 0)
-      {
-        errorMessage.AppendLine(Resources.RestoreConnectionInfosMissingTablesMessage);
-        foreach (var table in missingTables)
-        {
-          errorMessage.AppendLine(table);
-        }
-      }
-
-      MiscUtilities.ShowCustomizedInfoDialog(InfoDialog.InfoType.Warning, Resources.RestoreConnectionInfosWarningMessage, errorMessage.ToString());
+      ShowOpenEditConnectionInfosDialog(workbook);
     }
 
     /// <summary>
@@ -1680,6 +1570,63 @@ namespace MySQL.ForExcel
       }
 
       return ActiveExcelPane.WbConnection;
+    }
+
+    /// <summary>
+    /// Opens an <see cref="EditDataDialog"/> for each <see cref="EditConnectionInfo" />.
+    /// </summary>
+    /// <param name="workbook">The workbook.</param>
+    private void OpenEditConnectionInfosOfTables(ExcelInterop.Workbook workbook)
+    {
+      if (workbook == null)
+      {
+        return;
+      }
+
+      var workbookConnectionInfos = GetWorkbookEditConnectionInfos(workbook);
+      if (workbookConnectionInfos.Count == 0)
+      {
+        return;
+      }
+
+      var missingTables = new List<string>();
+      _restoringExistingConnectionInfo = true;
+      foreach (var connectionInfos in workbookConnectionInfos)
+      {
+        var editTableObject = ActiveExcelPane.LoadedTables.FirstOrDefault(dbo => string.Equals(dbo.Name, connectionInfos.TableName, StringComparison.InvariantCulture));
+        if (editTableObject == null)
+        {
+          missingTables.Add(connectionInfos.TableName);
+          continue;
+        }
+
+        ActiveExcelPane.EditTableData(editTableObject, true, workbook);
+      }
+
+      if (workbookConnectionInfos.Count - missingTables.Count > 0)
+      {
+        ActiveExcelPane.ActiveEditDialog.ShowDialog();
+      }
+
+      _restoringExistingConnectionInfo = false;
+
+      // If no errors were found at the opening process do not display the warning dialog at the end.
+      if (missingTables.Count <= 0)
+      {
+        return;
+      }
+
+      var errorMessage = new StringBuilder();
+      if (missingTables.Count > 0)
+      {
+        errorMessage.AppendLine(Resources.RestoreConnectionInfosMissingTablesMessage);
+        foreach (var table in missingTables)
+        {
+          errorMessage.AppendLine(table);
+        }
+      }
+
+      MiscUtilities.ShowCustomizedInfoDialog(InfoDialog.InfoType.Warning, Resources.RestoreConnectionInfosWarningMessage, errorMessage.ToString());
     }
 
     /// <summary>
@@ -1799,6 +1746,74 @@ namespace MySQL.ForExcel
         case DialogResult.Abort: //The user selected Work offline so we will disconnect every invalid connectionInfo.
           missingConnectionInfoConnections.ForEach(connectionInfo => connectionInfo.ExcelTable.Unlink());
           break;
+      }
+    }
+
+    /// <summary>
+    /// Protects all Worksheets that have an active Edit Data session.
+    /// </summary>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
+    /// <param name="addEditingWorksheetToPersistedList">Flag indicating whether the <see cref="EditConnectionInfo"/>s are added to the collection persisted to disk.</param>
+    /// <param name="workbookEditConnectionInfos"></param>
+    private void ProtectEditingWorksheets(ExcelInterop.Workbook workbook, bool addEditingWorksheetToPersistedList, List<EditConnectionInfo> workbookEditConnectionInfos = null)
+    {
+      if (workbook == null)
+      {
+        return;
+      }
+
+      if (workbookEditConnectionInfos == null)
+      {
+        workbookEditConnectionInfos = GetWorkbookEditConnectionInfos(workbook);
+      }
+
+      foreach (var activeEditConnectionInfo in workbookEditConnectionInfos)
+      {
+        if (activeEditConnectionInfo.EditDialog != null && !activeEditConnectionInfo.EditDialog.EditingWorksheet.ProtectContents)
+        {
+          activeEditConnectionInfo.EditDialog.ProtectWorksheet();
+        }
+
+        if (!addEditingWorksheetToPersistedList)
+        {
+          continue;
+        }
+
+        // Add new EditConnectionInfo in memory collection to serialized collection
+        activeEditConnectionInfo.LastAccess = DateTime.Now;
+        activeEditConnectionInfo.WorkbookFilePath = workbook.FullName;
+        if (!EditConnectionInfos.Contains(activeEditConnectionInfo))
+        {
+          EditConnectionInfos.Add(activeEditConnectionInfo);
+        }
+      }
+    }
+
+    /// <summary>
+    /// Removes invalid import connection information from the collection.
+    /// </summary>
+    private void RemoveInvalidImportConnectionInformation()
+    {
+      var invalidConnectionInfos = new List<ImportConnectionInfo>();
+      foreach (var importConnectionInfo in ActiveWorkbookImportConnectionInfos)
+      {
+        try
+        {
+          // DO NOT REMOVE this line. If the excel table is invalid, accessing it will throw an exception.
+          var excelTableComment = importConnectionInfo.ExcelTable.Comment;
+        }
+        catch
+        {
+          // The importConnectionInfo's list object was moved to another worksheet or when its columns had been deleted or the reference to it no longer exists.
+          invalidConnectionInfos.Add(importConnectionInfo);
+        }
+      }
+
+      // Dispose of ImportConnectionInfo objects that are no longer valid for the current workbook.
+      if (invalidConnectionInfos.Count > 0)
+      {
+        invalidConnectionInfos.ForEach(invalidSession => invalidSession.ExcelTable.DeleteSafely(false));
+        invalidConnectionInfos.ForEach(invalidSession => StoredImportConnectionInfos.Remove(invalidSession));
       }
     }
 
@@ -2082,6 +2097,19 @@ namespace MySQL.ForExcel
       catch (Exception ex)
       {
         MySqlSourceTrace.WriteAppErrorToLog(ex, false);
+      }
+    }
+
+    /// <summary>
+    /// Unprotects all Worksheets that have an active Edit Data session.
+    /// </summary>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
+    private void UnprotectEditingWorksheets(ExcelInterop.Workbook workbook)
+    {
+      var workbookEditConnectionInfos = GetWorkbookEditConnectionInfos(workbook);
+      foreach (var activeEditConnectionInfo in workbookEditConnectionInfos.Where(activeEditConnectionInfo => activeEditConnectionInfo.EditDialog != null && activeEditConnectionInfo.EditDialog.EditingWorksheet.ProtectContents))
+      {
+        activeEditConnectionInfo.EditDialog.UnprotectWorksheet();
       }
     }
 
