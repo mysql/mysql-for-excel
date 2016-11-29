@@ -616,6 +616,17 @@ namespace MySQL.ForExcel.Classes
     public MySqlDataType MySqlDataType { get; private set; }
 
     /// <summary>
+    /// Gets a name in the format "ColumnX" where X is the <see cref="DataColumn.Ordinal"/> position + 1.
+    /// </summary>
+    public string OrdinalColumnName
+    {
+      get
+      {
+        return string.Format("Column{0}", Ordinal + 1);
+      }
+    }
+
+    /// <summary>
     /// Gets the parent table of this column as a <see cref="MySqlDataTable"/> object.
     /// </summary>
     public MySqlDataTable ParentTable

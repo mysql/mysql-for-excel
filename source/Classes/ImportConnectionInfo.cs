@@ -96,7 +96,7 @@ namespace MySQL.ForExcel.Classes
     {
       if (mySqlTable == null)
       {
-        throw new ArgumentNullException("mySqlTable");
+        throw new ArgumentNullException(nameof(mySqlTable));
       }
 
       _connection = mySqlTable.WbConnection;
@@ -562,12 +562,18 @@ namespace MySQL.ForExcel.Classes
 
         // Bind the redimensioned ExcelTools.ListObject to the MySqlDataTable
         ToolsExcelTable.SetDataBinding(MySqlTable);
-        if (MySqlTable.ImportColumnNames)
+
+        // Rename columns
+        var importColumnNames = MySqlTable.ImportColumnNames;
+        for (int colIndex = MySqlTable.Columns.Count - 1; colIndex >= 0; colIndex--)
         {
-          foreach (MySqlDataColumn col in MySqlTable.Columns)
+          var col = MySqlTable.Columns[colIndex] as MySqlDataColumn;
+          if (col == null)
           {
-            ToolsExcelTable.ListColumns[col.Ordinal + 1].Name = col.DisplayName;
+            continue;
           }
+
+          ToolsExcelTable.ListColumns[col.Ordinal + 1].Name = importColumnNames ? col.DisplayName : col.OrdinalColumnName;
         }
 
         ToolsExcelTable.Range.Columns.AutoFit();

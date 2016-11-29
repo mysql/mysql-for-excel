@@ -1,4 +1,7 @@
 1.3.7
+- Fixed the way column names in a bound Excel table (ListObject) are overriden, names need to be given traversing the ListObject's columns in a reversed
+  way, otherwise the first column that is to be named as "Column1" can't be named since the 2nd column already has that default name.
+  (Bug #22373140 - [IMPORT] WRONG COLUMN NAME IMPORTING DATA WITHOUT COLUMN NAMES AS HEADERS)
 - There seems to be a bug in Microsoft's Excel interop code to unprotect Worksheets in the BeforeSave event when the save is done programatically (through
   the Workbook.Save method). This bug seems to be present in VBA as well, and other developers in the Internet report the same problem. The problem happens
   when the Workbook is closed and needs to be saved, the Worksheets with an Edit Data session are not unprotected before the Workbook is saved, so the next
