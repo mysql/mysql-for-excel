@@ -284,6 +284,11 @@ namespace MySQL.ForExcel.Classes
     private long _maxLength;
 
     /// <summary>
+    /// Flag indicating whether this data type is a tinyint(1) or bit or bit(1) and may hold boolean values.
+    /// </summary>
+    private bool? _mayBeBool;
+
+    /// <summary>
     /// The <see cref="MySql.Data.MySqlClient.MySqlDbType"/> object corresponding to this column's data type.
     /// </summary>
     private MySqlDbType _mySqlDbType;
@@ -531,9 +536,7 @@ namespace MySQL.ForExcel.Classes
         {
           _isBool = !string.IsNullOrEmpty(TypeName)
                     && !string.IsNullOrEmpty(_fullType)
-                    && (_typeName.StartsWith("bool", StringComparison.InvariantCultureIgnoreCase)
-                        || (_typeName.Equals("bit", StringComparison.InvariantCultureIgnoreCase) && (Length == 0 || Length == 1))
-                        || (_typeName.Equals("tinyint", StringComparison.InvariantCultureIgnoreCase) && Length == 1));
+                    && _typeName.StartsWith("bool", StringComparison.InvariantCultureIgnoreCase);
         }
 
         return (bool)_isBool;
@@ -864,6 +867,25 @@ namespace MySQL.ForExcel.Classes
         }
 
         return _maxLength;
+      }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether this data type is a tinyint(1) or bit or bit(1) and may hold boolean values.
+    /// </summary>
+    public bool MayBeBool
+    {
+      get
+      {
+        if (_mayBeBool == null)
+        {
+          _mayBeBool = !string.IsNullOrEmpty(TypeName)
+                    && !string.IsNullOrEmpty(_fullType)
+                    && ((_typeName.Equals("bit", StringComparison.InvariantCultureIgnoreCase) && (Length == 0 || Length == 1))
+                        || (_typeName.Equals("tinyint", StringComparison.InvariantCultureIgnoreCase) && Length == 1));
+        }
+
+        return (bool)_mayBeBool;
       }
     }
 
@@ -1435,7 +1457,7 @@ namespace MySQL.ForExcel.Classes
     /// Gets a boxed <see cref="bool"/> value from .
     /// </summary>
     /// <param name="rawValue">An object.</param>
-    /// <returns>A boxed <see cref="DateTime"/> object where its data is converted to a proper date value if it is of date origin, or the same object if not..</returns>
+    /// <returns>A boxed <see cref="DateTime"/> object where its data is converted to a proper date value if it is of date origin, or the same object if not.</returns>
     public static object GetValueAsBoolean(object rawValue)
     {
       if (rawValue == null || rawValue == DBNull.Value)
@@ -1603,8 +1625,13 @@ namespace MySQL.ForExcel.Classes
       // Check for boolean
       if (IsBool)
       {
-        strValue = strValue.ToLowerInvariant();
-        return (strValue == "true" || strValue == "false" || strValue == "0" || strValue == "1" || strValue == "yes" || strValue == "no" || strValue == "ja" || strValue == "nein");
+        return strValue.IsBooleanValue();
+      }
+
+      // Check for tinyint(1), bit and bit(1), which may be boolean
+      if (MayBeBool && strValue.IsBooleanValue())
+      {
+        return true;
       }
 
       // Check for integer values
@@ -1612,7 +1639,7 @@ namespace MySQL.ForExcel.Classes
       if (lowerTypeName == "int" || lowerTypeName == "integer" || lowerTypeName == "mediumint")
       {
         int tryIntValue;
-        return Int32.TryParse(strValue, out tryIntValue);
+        return int.TryParse(strValue, out tryIntValue);
       }
 
       if (IsYear)
@@ -1624,38 +1651,38 @@ namespace MySQL.ForExcel.Classes
       if (lowerTypeName == "tinyint")
       {
         byte tryByteValue;
-        return Byte.TryParse(strValue, out tryByteValue);
+        return byte.TryParse(strValue, out tryByteValue);
       }
 
       if (lowerTypeName == "smallint")
       {
         short trySmallIntValue;
-        return Int16.TryParse(strValue, out trySmallIntValue);
+        return short.TryParse(strValue, out trySmallIntValue);
       }
 
       if (lowerTypeName == "bigint")
       {
         long tryBigIntValue;
-        return Int64.TryParse(strValue, out tryBigIntValue);
+        return long.TryParse(strValue, out tryBigIntValue);
       }
 
       if (lowerTypeName == "bit")
       {
         ulong tryBitValue;
-        return UInt64.TryParse(strValue, out tryBitValue);
+        return ulong.TryParse(strValue, out tryBitValue);
       }
 
       // Check for big numeric values
       if (lowerTypeName.StartsWith("float"))
       {
         float tryFloatValue;
-        return Single.TryParse(strValue, out tryFloatValue);
+        return float.TryParse(strValue, out tryFloatValue);
       }
 
       if (lowerTypeName.StartsWith("double") || lowerTypeName == "real")
       {
         double tryDoubleValue;
-        return Double.TryParse(strValue, out tryDoubleValue);
+        return double.TryParse(strValue, out tryDoubleValue);
       }
 
       // Check for date and time values.
@@ -1713,11 +1740,11 @@ namespace MySQL.ForExcel.Classes
         if (lowerTypeName == "decimal" || lowerTypeName == "numeric")
         {
           decimal tryDecimalValue;
-          return Decimal.TryParse(strValue, out tryDecimalValue) && floatingPointCompliant;
+          return decimal.TryParse(strValue, out tryDecimalValue) && floatingPointCompliant;
         }
 
         double tryDoubleValue;
-        return Double.TryParse(strValue, out tryDoubleValue) && floatingPointCompliant;
+        return double.TryParse(strValue, out tryDoubleValue) && floatingPointCompliant;
       }
 
       // For future types non recognized by MySQL for Excel.
@@ -2380,6 +2407,7 @@ namespace MySQL.ForExcel.Classes
       _isYear = null;
       _length = -1;
       _maxLength = -1;
+      _mayBeBool = null;
       _mySqlDbType = MySqlDbType.Guid;
       _parameters = null;
       _typeName = null;

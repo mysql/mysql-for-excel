@@ -665,6 +665,21 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Sets additional properties used by each connection opened in MySQL for Excel that are not persisted in a <see cref="MySqlWorkbenchConnection"/>.
+    /// </summary>
+    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
+    public static void SetAdditionalConnectionProperties(this MySqlWorkbenchConnection connection)
+    {
+      if (connection == null)
+      {
+        return;
+      }
+
+      connection.AllowZeroDateTimeValues = true;
+      connection.TreatTinyIntAsBoolean = false;
+    }
+
+    /// <summary>
     /// Checks if a table with the given name exists in the given schema.
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>

@@ -432,6 +432,28 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Checks whether a string value could be stored in a MySQL boolean column.
+    /// </summary>
+    /// <param name="value">A string value.</param>
+    /// <returns><c>true</c> if a string value could be stored in a MySQL boolean column, <c>false</c> otherwise.</returns>
+    public static bool IsBooleanValue(this string value)
+    {
+      if (string.IsNullOrEmpty(value))
+      {
+        return false;
+      }
+
+      return string.Equals(value, "true", StringComparison.OrdinalIgnoreCase)
+              || string.Equals(value, "false", StringComparison.OrdinalIgnoreCase)
+              || string.Equals(value, "0", StringComparison.OrdinalIgnoreCase)
+              || string.Equals(value, "1", StringComparison.OrdinalIgnoreCase)
+              || string.Equals(value, "yes", StringComparison.OrdinalIgnoreCase)
+              || string.Equals(value, "no", StringComparison.OrdinalIgnoreCase)
+              || string.Equals(value, "ja", StringComparison.OrdinalIgnoreCase)
+              || string.Equals(value, "nein", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
     /// Checks if the given string value contains a guid in string representation.
     /// </summary>
     /// <param name="value">A <see cref="string"/> value.</param>

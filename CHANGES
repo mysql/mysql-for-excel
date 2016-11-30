@@ -1,4 +1,9 @@
 1.3.7
+- Fixed the way tinyint(1), bit and bit(1) values are treated by MySQL for Excel. Before values mapped to columns of those aforementioned data types were
+  assumed to be boolean values and always converted to true and false representation (1 and 0 values in Excel). Now tinyint(1) is treated as a type that
+  can be either boolean or numeric for Export and Edit Data operations (since BOOL/BOOLEAN are actually synonyms of TINYINT(1), but not viceversa). For
+  Import Data operations, connections are now using the TreatTinyAsBoolean=false in the connection string for all connections opened by MySQL for Excel.
+  (MySQL Bug #80880, Bug #23022665 - TINYINT INCORRECTLY MAPPED TO BOOLEAN)
 - Fixed the way column names in a bound Excel table (ListObject) are overriden, names need to be given traversing the ListObject's columns in a reversed
   way, otherwise the first column that is to be named as "Column1" can't be named since the 2nd column already has that default name.
   (Bug #22373140 - [IMPORT] WRONG COLUMN NAME IMPORTING DATA WITHOUT COLUMN NAMES AS HEADERS)

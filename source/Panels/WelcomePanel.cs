@@ -76,7 +76,7 @@ namespace MySQL.ForExcel.Panels
       // Load connections just obtained from Workbench or locally created
       foreach (var conn in MySqlWorkbench.Connections.OrderBy(conn => conn.Name))
       {
-        conn.AllowZeroDateTimeValues = true;
+        conn.SetAdditionalConnectionProperties();
         AddConnectionToList(conn);
       }
 

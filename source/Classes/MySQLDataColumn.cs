@@ -26,6 +26,7 @@ using MySQL.ForExcel.Classes.EventArguments;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes;
 using MySql.Utility.Classes.MySql;
+using MySQL.ForExcel.Classes.Exceptions;
 using Excel = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
@@ -966,7 +967,7 @@ namespace MySQL.ForExcel.Classes
         string valueAsString = rawValue.ToString();
         bool valueOverflow;
         var proposedType = MySqlDataType.DetectDataType(valueAsString, out valueOverflow, datesAsMySqlDates);
-        if (proposedType.IsBool)
+        if (proposedType.IsBool || proposedType.MayBeBool)
         {
           proposedType = new MySqlDataType("VarChar(5)", true, datesAsMySqlDates);
         }
@@ -1148,6 +1149,18 @@ namespace MySQL.ForExcel.Classes
       if (MySqlDataType.IsBool)
       {
         return MySqlDataType.GetValueAsBoolean(rawValue);
+      }
+
+      try
+      {
+        if (MySqlDataType.MayBeBool)
+        {
+          return MySqlDataType.GetValueAsBoolean(rawValue);
+        }
+      }
+      catch (ValueNotSuitableForConversionException)
+      {
+        return rawValue;
       }
 
       if (MySqlDataType.RequiresQuotesForValue)
@@ -1599,7 +1612,7 @@ namespace MySQL.ForExcel.Classes
         {
           proposedStrippedDataType = "Text";
         }
-        else if ((integerCount = rowsDataTypesList.Count(mySqlType => mySqlType.TypeName == "Integer")) + rowsDataTypesList.Count(mySqlType => mySqlType.IsBool) == rowsDataTypesList.Count)
+        else if ((integerCount = rowsDataTypesList.Count(mySqlType => mySqlType.TypeName == "Integer")) + rowsDataTypesList.Count(mySqlType => mySqlType.IsBool || mySqlType.MayBeBool) == rowsDataTypesList.Count)
         {
           proposedStrippedDataType = "Integer";
         }
