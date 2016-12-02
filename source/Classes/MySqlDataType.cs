@@ -1460,7 +1460,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>A boxed <see cref="DateTime"/> object where its data is converted to a proper date value if it is of date origin, or the same object if not.</returns>
     public static object GetValueAsBoolean(object rawValue)
     {
-      if (rawValue == null || rawValue == DBNull.Value)
+      if (rawValue.IsEmptyValue())
       {
         return false;
       }
@@ -1497,7 +1497,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>A boxed <see cref="DateTime"/> object where its data is converted to a proper date value if it is of date origin, or the same object if not..</returns>
     public static object GetValueAsDateTime(object rawValue)
     {
-      if (rawValue == null || rawValue == DBNull.Value)
+      if (rawValue.IsEmptyValue())
       {
         return null;
       }

@@ -1,4 +1,7 @@
 1.3.7
+- Fixed the case where Excel cells contain an empty string instead of a blank, maybe coming from pasted data, so that when the data is processed to be
+  inserted into a MySQL table (trhough an Export, Append or Edit Data operation) the emtpy string is considered the same as a blank cell.
+  (MySQL Bug #82497, Bug #24431935 - MYSQL EXCEL CONNECTOR ERRS WITH NULL FIELDS)
 - Fixed the way tinyint(1), bit and bit(1) values are treated by MySQL for Excel. Before values mapped to columns of those aforementioned data types were
   assumed to be boolean values and always converted to true and false representation (1 and 0 values in Excel). Now tinyint(1) is treated as a type that
   can be either boolean or numeric for Export and Edit Data operations (since BOOL/BOOLEAN are actually synonyms of TINYINT(1), but not viceversa). For

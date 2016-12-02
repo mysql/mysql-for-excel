@@ -432,7 +432,7 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Checks whether a string value could be stored in a MySQL boolean column.
+    /// Checks if a string value can be stored in a MySQL boolean column.
     /// </summary>
     /// <param name="value">A string value.</param>
     /// <returns><c>true</c> if a string value could be stored in a MySQL boolean column, <c>false</c> otherwise.</returns>
@@ -451,6 +451,16 @@ namespace MySQL.ForExcel.Classes
               || string.Equals(value, "no", StringComparison.OrdinalIgnoreCase)
               || string.Equals(value, "ja", StringComparison.OrdinalIgnoreCase)
               || string.Equals(value, "nein", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks if the given boxed object represents an empty value in Excel.
+    /// </summary>
+    /// <param name="rawValue">An object.</param>
+    /// <returns><c>true</c> if the given boxed object represents an empty value in Excel, <c>false</c> otherwise.</returns>
+    public static bool IsEmptyValue(this object rawValue)
+    {
+      return rawValue == null || rawValue == DBNull.Value || Equals(rawValue, string.Empty);
     }
 
     /// <summary>

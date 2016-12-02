@@ -958,7 +958,7 @@ namespace MySQL.ForExcel.Classes
       {
         Excel.Range excelCell = columnRange.Cells[rowPos, 1];
         object rawValue = excelCell != null ? excelCell.GetCellPackedValue(useFormattedValues) : null;
-        if (rawValue == null)
+        if (rawValue.IsEmptyValue())
         {
           continue;
         }
@@ -1121,22 +1121,17 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Return values for empty raw values
-      bool nullRawValue = rawValue == null || rawValue == DBNull.Value;
-      if (nullRawValue)
+      bool isEmptyValue = rawValue.IsEmptyValue();
+      if (isEmptyValue)
       {
         if (AllowNull)
         {
           return DBNull.Value;
         }
 
-        if (MySqlDataType.IsNumeric || MySqlDataType.IsBinary)
+        if (MySqlDataType.IsNumeric || MySqlDataType.IsYear || MySqlDataType.IsBinary)
         {
           return 0;
-        }
-
-        if (!MySqlDataType.IsDateBased)
-        {
-          return MySqlDataType.RequiresQuotesForValue ? string.Empty : rawValue;
         }
       }
 
@@ -1165,7 +1160,7 @@ namespace MySQL.ForExcel.Classes
 
       if (MySqlDataType.RequiresQuotesForValue)
       {
-        return rawValue == null ? null : (escapeStringForTextTypes ? rawValue.ToString().EscapeDataValueString() : rawValue.ToString());
+        return isEmptyValue ? null : (escapeStringForTextTypes ? rawValue.ToString().EscapeDataValueString() : rawValue.ToString());
       }
 
       return rawValue;
