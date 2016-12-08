@@ -1,4 +1,8 @@
 1.3.7
+- Changed the way the Refresh All is overridden by MySQL for Excel, in previous versions the Refresh All was looping through all Excel tables (ListObjects)
+  and PivotTables found in every Excel Worksheet and refreshed their contents. Now the Refresh All is overridden to loop through all Workbook connections,
+  any connection created by MySQL for Excel to refresh imported data is handled internally by the add-in, the rest of the connections are refreshed in the
+  standard way. (MySQL Bug #81901, Bug #23605635 - MYSQL FOR EXCEL V1.3.6 - REFRESH ALL)
 - Fixed the case where Excel cells contain an empty string instead of a blank, maybe coming from pasted data, so that when the data is processed to be
   inserted into a MySQL table (trhough an Export, Append or Edit Data operation) the emtpy string is considered the same as a blank cell.
   (MySQL Bug #82497, Bug #24431935 - MYSQL EXCEL CONNECTOR ERRS WITH NULL FIELDS)

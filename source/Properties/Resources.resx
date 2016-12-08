@@ -1058,14 +1058,8 @@ Since Excel relationships cannot be created, a single PivotTable for the whole E
   <data name="ColumnDataSetOrEnumNotValidMoreInfoTitle" xml:space="preserve">
     <value>The following element within the Enum or Set declaration is not using single quotes correctly:</value>
   </data>
-  <data name="ContinueRefreshingExcelObjectsText" xml:space="preserve">
-    <value>Do you want to continue refreshing remaining Excel objects?</value>
-  </data>
   <data name="StandardListObjectRefreshError" xml:space="preserve">
     <value>An error ocurred trying to refresh data in Excel table "{0}".</value>
-  </data>
-  <data name="StandardPivotTableRefreshError" xml:space="preserve">
-    <value>An error ocurred trying to refresh data in Pivot Table "{0}".</value>
   </data>
   <data name="ValueLessThanZeroError" xml:space="preserve">
     <value>Value must be greater or equal to 0.</value>
@@ -1115,5 +1109,11 @@ In order to avoid receiving this error message each time the Excel table is refr
   </data>
   <data name="CustomTaskPaneGetOrCreateError" xml:space="preserve">
     <value>Could not get or create a custom task pane for the active Excel window. Using Excel version {0}.</value>
+  </data>
+  <data name="ContinueRefreshingWorkbookConnectionsText" xml:space="preserve">
+    <value>Do you want to continue refreshing remaining Workbook connections?</value>
+  </data>
+  <data name="StandardWorkbookConnectionRefreshError" xml:space="preserve">
+    <value>An error ocurred trying to refresh data in Workbook connection "{0}".</value>
   </data>
 </root>

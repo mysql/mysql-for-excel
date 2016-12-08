@@ -471,11 +471,11 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Do you want to continue refreshing remaining Excel objects?.
+        ///   Looks up a localized string similar to Do you want to continue refreshing remaining Workbook connections?.
         /// </summary>
-        internal static string ContinueRefreshingExcelObjectsText {
+        internal static string ContinueRefreshingWorkbookConnectionsText {
             get {
-                return ResourceManager.GetString("ContinueRefreshingExcelObjectsText", resourceCulture);
+                return ResourceManager.GetString("ContinueRefreshingWorkbookConnectionsText", resourceCulture);
             }
         }
         
@@ -2660,11 +2660,11 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error ocurred trying to refresh data in Pivot Table &quot;{0}&quot;..
+        ///   Looks up a localized string similar to An error ocurred trying to refresh data in Workbook connection &quot;{0}&quot;..
         /// </summary>
-        internal static string StandardPivotTableRefreshError {
+        internal static string StandardWorkbookConnectionRefreshError {
             get {
-                return ResourceManager.GetString("StandardPivotTableRefreshError", resourceCulture);
+                return ResourceManager.GetString("StandardWorkbookConnectionRefreshError", resourceCulture);
             }
         }
         

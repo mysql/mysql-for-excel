@@ -537,16 +537,33 @@ namespace MySQL.ForExcel
     /// </summary>
     public void RefreshAllCustomFunctionality()
     {
-      foreach (ExcelInterop.Worksheet worksheet in ActiveWorkbook.Worksheets)
+      foreach (ExcelInterop.WorkbookConnection wbConnection in ActiveWorkbook.Connections)
       {
-        if (!worksheet.RefreshAllListObjects())
+        var excelTable = wbConnection.GetExcelTable();
+        if (excelTable != null && excelTable.RefreshMySqlData())
         {
-          break;
+          continue;
         }
 
-        if (!worksheet.RefreshAllPivotTables())
+        // The try-catch block must be INSIDE the foreach loop since we may want to continue refreshing the next WorkbookConnection even if an Exception is thrown.
+        try
         {
-          break;
+          wbConnection.Refresh();
+        }
+        catch (Exception ex)
+        {
+          MySqlSourceTrace.WriteAppErrorToLog(ex, false);
+          var infoProperties = InfoDialogProperties.GetYesNoDialogProperties(
+            InfoDialog.InfoType.Error,
+            Resources.OperationErrorTitle,
+            string.Format(Resources.StandardWorkbookConnectionRefreshError, wbConnection.Name),
+            Resources.ContinueRefreshingWorkbookConnectionsText,
+            ex.GetFormattedMessage());
+          infoProperties.WordWrapMoreInfo = true;
+          if (InfoDialog.ShowDialog(infoProperties).DialogResult != DialogResult.Yes)
+          {
+            break;
+          }
         }
       }
     }

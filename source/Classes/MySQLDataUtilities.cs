@@ -42,6 +42,16 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public const string DEFAULT_NEW_SCHEMA_NAME = "new_schema";
 
+    /// <summary>
+    /// The OLEDB connection string used for <see cref="ExcelInterop.WorkbookConnection"/> instances that connect to MySQL Server instances.
+    /// </summary>
+    public const string OLEDB_MYSQL_CONNECTION_STRING_FULL = OLEDB_MYSQL_CONNECTION_STRING_STATIC + "Server={0};Port={1};Database={2};User={3};Option=3;";
+
+    /// <summary>
+    /// The OLEDB connection string used for <see cref="ExcelInterop.WorkbookConnection"/> instances that connect to MySQL Server instances.
+    /// </summary>
+    public const string OLEDB_MYSQL_CONNECTION_STRING_STATIC = "OLEDB;Driver={{MySQL ODBC 5.3 ANSI Driver}};Provider=MSDASQL;";
+
     #endregion Constants
 
     /// <summary>
@@ -379,7 +389,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The connection string used for a new <see cref="ExcelInterop.WorkbookConnection"/> that uses a <see cref="ExcelInterop.XlCmdType.xlCmdDefault"/> command type.</returns>
     public static string GetConnectionStringForCmdDefault(this MySqlWorkbenchConnection connection)
     {
-      return connection == null ? string.Empty : string.Format("OLEDB;Driver={{MySQL ODBC 5.3 ANSI Driver}};Provider=MSDASQL;Server={0};Port={1};Database={2};User={3};Option=3;", connection.Host, connection.Port, connection.Schema, connection.UserName);
+      return connection == null ? string.Empty : string.Format(OLEDB_MYSQL_CONNECTION_STRING_FULL, connection.Host, connection.Port, connection.Schema, connection.UserName);
     }
 
     /// <summary>

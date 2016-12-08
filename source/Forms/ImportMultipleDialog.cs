@@ -297,7 +297,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       var activeWorkbook = Globals.ThisAddIn.ActiveWorkbook;
-      var workbookDataModelConnection = activeWorkbook.Connections.Cast<ExcelInterop.WorkbookConnection>().FirstOrDefault(wbConn => wbConn.Name == ExcelUtilities.WORKBOOK_DATA_MODEL_CONNECTION_NAME);
+      var workbookDataModelConnection = activeWorkbook.GetDataModelConnection();
       if (workbookDataModelConnection == null)
       {
         return;

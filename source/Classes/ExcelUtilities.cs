@@ -20,7 +20,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using Microsoft.Office.Core;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes;
@@ -756,6 +755,62 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Returns the global Excel Data Model <see cref="ExcelInterop.WorkbookConnection"/> if any.
+    /// </summary>
+    /// <param name="workbook">A ExcelInterop.Workbook object.</param>
+    /// <returns>The global Excel Data Model <see cref="ExcelInterop.WorkbookConnection"/> if any.</returns>
+    public static ExcelInterop.WorkbookConnection GetDataModelConnection(this ExcelInterop.Workbook workbook)
+    {
+      return workbook != null
+        ? workbook.Connections.Cast<ExcelInterop.WorkbookConnection>().FirstOrDefault(wbConn => wbConn.Name == WORKBOOK_DATA_MODEL_CONNECTION_NAME)
+        : null;
+    }
+
+    /// <summary>
+    /// Gets a <see cref="ExcelInterop.ListObject"/> related to the given <see cref="ExcelInterop.WorkbookConnection"/>.
+    /// </summary>
+    /// <param name="workbookConnection">A <see cref="ExcelInterop.WorkbookConnection"/> instance.</param>
+    /// <returns>A <see cref="ExcelInterop.ListObject"/> contained in one of the <see cref="ExcelInterop.Worksheet"/>s contained in the given <see cref="ExcelInterop.Workbook"/>.</returns>
+    public static ExcelInterop.ListObject GetExcelTable(this ExcelInterop.WorkbookConnection workbookConnection)
+    {
+      if (workbookConnection == null)
+      {
+        return null;
+      }
+
+      var workbook = workbookConnection.Parent as ExcelInterop.Workbook;
+      return workbook.GetExcelTableByConnectionName(workbookConnection.Name);
+    }
+
+    /// <summary>
+    /// Gets a <see cref="ExcelInterop.ListObject"/> contained in one of the <see cref="ExcelInterop.Worksheet"/>s contained in the given <see cref="ExcelInterop.Workbook"/>.
+    /// </summary>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> instance.</param>
+    /// <param name="workbookConnectionName">The name of the <see cref="ExcelInterop.WorkbookConnection"/> tied to the <see cref="ExcelInterop.ListObject"/>.</param>
+    /// <returns>A <see cref="ExcelInterop.ListObject"/> contained in one of the <see cref="ExcelInterop.Worksheet"/>s contained in the given <see cref="ExcelInterop.Workbook"/>.</returns>
+    public static ExcelInterop.ListObject GetExcelTableByConnectionName(this ExcelInterop.Workbook workbook, string workbookConnectionName)
+    {
+      ExcelInterop.ListObject excelTable = null;
+      if (workbook == null)
+      {
+        return null;
+      }
+
+      foreach (ExcelInterop.Worksheet worksheet in workbook.Worksheets)
+      {
+        excelTable = worksheet.ListObjects.Cast<ExcelInterop.ListObject>().FirstOrDefault(lo => lo.QueryTable != null 
+                                                                                                && lo.QueryTable.WorkbookConnection != null
+                                                                                                && string.Equals(lo.QueryTable.WorkbookConnection.Name, workbookConnectionName, StringComparison.OrdinalIgnoreCase));
+        if (excelTable != null)
+        {
+          break;
+        }
+      }
+
+      return excelTable;
+    }
+
+    /// <summary>
     /// Returns a <see cref="ExcelInterop.ListObject"/> contained in the given <see cref="ExcelInterop.Worksheet"/> with the given name.
     /// </summary>
     /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
@@ -1209,22 +1264,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the name of the parent <see cref="ExcelInterop.Workbook"/> of the given <see cref="ExcelInterop.Worksheet"/>.
-    /// </summary>
-    /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
-    /// <returns>The name of the parent <see cref="ExcelInterop.Workbook"/>.</returns>
-    public static string GetParentWorkbookName(this ExcelInterop.Worksheet worksheet)
-    {
-      if (worksheet == null)
-      {
-        return string.Empty;
-      }
-
-      var parentWorkbook = worksheet.Parent as ExcelInterop.Workbook;
-      return parentWorkbook != null ? parentWorkbook.Name : string.Empty;
-    }
-
-    /// <summary>
     /// Gets a valid name for a new <see cref="ExcelInterop.PivotTable"/> that avoids duplicates with existing ones in the current <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
     /// <param name="pivotTableName">The proposed name for a <see cref="ExcelInterop.PivotTable"/>.</param>
@@ -1510,97 +1549,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Refreshes all <see cref="ExcelInterop.ListObject"/> objects in the given <see cref="ExcelInterop.Worksheet"/>.
-    /// If a <see cref="ExcelInterop.ListObject"/> is related to a <see cref="ImportConnectionInfo"/> object then its custom refresh functionality is performed, otherwise the native one is.
-    /// </summary>
-    /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/>.</param>
-    /// <returns><c>true</c> if <see cref="ExcelInterop.ListObject"/>s in other <see cref="ExcelInterop.Worksheet"/>s should be refreshed as well, <c>false</c> to stop refreshing.</returns>
-    public static bool RefreshAllListObjects(this ExcelInterop.Worksheet worksheet)
-    {
-      if (worksheet == null)
-      {
-        return true;
-      }
-
-      bool continueLoading = true;
-      foreach (ExcelInterop.ListObject listObject in worksheet.ListObjects)
-      {
-        if (listObject.RefreshMySqlData() || listObject.SourceType == ExcelInterop.XlListObjectSourceType.xlSrcRange)
-        {
-          // If it can be refreshed as a MySQL-related ListObject or its source is an Excel range then go to the next one.
-          continue;
-        }
-
-        // The try-catch block must be INSIDE the foreach loop since we may want to continue refreshing the next ListObject even if an Exception is thrown.
-        try
-        {
-          listObject.Refresh();
-        }
-        catch (Exception ex)
-        {
-          MySqlSourceTrace.WriteAppErrorToLog(ex, false);
-          var infoProperties = InfoDialogProperties.GetYesNoDialogProperties(
-            InfoDialog.InfoType.Error,
-            Resources.OperationErrorTitle,
-            string.Format(Resources.StandardListObjectRefreshError, listObject.DisplayName),
-            Resources.ContinueRefreshingExcelObjectsText,
-            listObject.Comment.IsGuid() ? Resources.StandardListObjectRefreshMoreInfo : ex.GetFormattedMessage());
-          infoProperties.WordWrapMoreInfo = true;
-          if (InfoDialog.ShowDialog(infoProperties).DialogResult != DialogResult.Yes)
-          {
-            continueLoading = false;
-            break;
-          }
-        }
-      }
-
-      return continueLoading;
-    }
-
-    /// <summary>
-    /// Refreshes all <see cref="ExcelInterop.PivotTable"/> objects in the given <see cref="ExcelInterop.Worksheet"/>.
-    /// </summary>
-    /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/>.</param>
-    /// <returns><c>true</c> if <see cref="ExcelInterop.ListObject"/>s in other <see cref="ExcelInterop.Worksheet"/>s should be refreshed as well, <c>false</c> to stop refreshing.</returns>
-    public static bool RefreshAllPivotTables(this ExcelInterop.Worksheet worksheet)
-    {
-      if (worksheet == null)
-      {
-        return true;
-      }
-
-      bool continueLoading = true;
-      foreach (var pivotTable in worksheet.GetPivotTables())
-      {
-        try
-        {
-          if (pivotTable.RefreshTable())
-          {
-            pivotTable.Update();
-          }
-        }
-        catch (Exception ex)
-        {
-          MySqlSourceTrace.WriteAppErrorToLog(ex, false);
-          var infoProperties = InfoDialogProperties.GetYesNoDialogProperties(
-            InfoDialog.InfoType.Error,
-            Resources.OperationErrorTitle,
-            string.Format(Resources.StandardPivotTableRefreshError, pivotTable.Name),
-            Resources.ContinueRefreshingExcelObjectsText,
-            ex.GetFormattedMessage());
-          infoProperties.WordWrapMoreInfo = true;
-          if (InfoDialog.ShowDialog(infoProperties).DialogResult != DialogResult.Yes)
-          {
-            continueLoading = false;
-            break;
-          }
-        }
-      }
-
-      return continueLoading;
-    }
-
-    /// <summary>
     /// Checks if the given <see cref="ExcelInterop.ListObject"/> object is related to a <see cref="ImportConnectionInfo"/> object in order to perform its custom refresh functionality.
     /// </summary>
     /// <param name="excelTable">A <see cref="ExcelInterop.ListObject"/>.</param>
@@ -1849,23 +1797,6 @@ namespace MySQL.ForExcel.Classes
       }
 
       return workbook.Worksheets.Cast<ExcelInterop.Worksheet>().Any(ws => string.Equals(ws.Name, worksheetName, StringComparison.InvariantCulture));
-    }
-
-    /// <summary>
-    /// Checks if an Excel <see cref="ExcelInterop.Worksheet"/> with a given name exists in a <see cref="ExcelInterop.Workbook"/> with the given name.
-    /// </summary>
-    /// <param name="workbookName">Name of the <see cref="ExcelInterop.Workbook"/>.</param>
-    /// <param name="worksheetName">Name of the <see cref="ExcelInterop.Worksheet"/>.</param>
-    /// <returns><c>true</c> if the <see cref="ExcelInterop.Worksheet"/> exists, <c>false</c> otherwise.</returns>
-    public static bool WorksheetExists(string workbookName, string worksheetName)
-    {
-      if (workbookName.Length <= 0)
-      {
-        return false;
-      }
-
-      var wBook = Globals.ThisAddIn.Application.Workbooks.Cast<ExcelInterop.Workbook>().FirstOrDefault(wb => string.Equals(wb.Name, workbookName, StringComparison.InvariantCulture));
-      return wBook != null && wBook.WorksheetExists(worksheetName);
     }
 
     /// <summary>
