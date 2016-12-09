@@ -238,12 +238,12 @@ namespace MySQL.ForExcel.Classes
     /// <param name="mySqlFullDataType">Data type for a table column supported by MySQL Server.</param>
     /// <param name="charSet">The character set used to store text data in this column.</param>
     /// <param name="collation">The collation used with the character set to store text data in this column.</param>
-    /// <param name="datesAsMySqlDates">Flag indicating if the data type for dates will be stored as <see cref="MySql.Data.Types.MySqlDateTime"/>
-    /// or <see cref="System.DateTime"/>.</param>
+    /// <param name="datesAsMySqlDates">Flag indicating if the data type for dates will be stored as <see cref="MySql.Data.Types.MySqlDateTime"/> or <see cref="System.DateTime"/>.</param>
     /// <param name="allowNulls">Flag indicating if the column will accept null values.</param>
     /// <param name="keyInfo">Information about the type of key this column belongs to.</param>
+    /// <param name="defaultValue">The default value of this column.</param>
     /// <param name="extraInfo">Extra information related to the column's data type as stored by the MySQL server.</param>
-    public MySqlDataColumn(string columnName, string mySqlFullDataType, string charSet, string collation, bool datesAsMySqlDates, bool allowNulls, string keyInfo, string extraInfo)
+    public MySqlDataColumn(string columnName, string mySqlFullDataType, string charSet, string collation, bool datesAsMySqlDates, bool allowNulls, string keyInfo, string defaultValue, string extraInfo)
       : this()
     {
       DisplayName = ColumnName = columnName;
@@ -252,6 +252,7 @@ namespace MySQL.ForExcel.Classes
       Collation = collation;
       SetMySqlDataType(new MySqlDataType(mySqlFullDataType, true, datesAsMySqlDates));
       DataType = MySqlDataType.DotNetType;
+      UserDefaultValue = defaultValue;
       CreateIndex = keyInfo.Equals("mul", StringComparison.InvariantCultureIgnoreCase);
       PrimaryKey = keyInfo.Equals("pri", StringComparison.InvariantCultureIgnoreCase);
       UniqueKey = keyInfo.Equals("uni", StringComparison.InvariantCultureIgnoreCase);
@@ -273,7 +274,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="datesAsMySqlDates">Flag indicating if the data type for dates will be stored as <see cref="MySql.Data.Types.MySqlDateTime"/>
     /// or <see cref="System.DateTime"/>.</param>
     public MySqlDataColumn(string columnName, string mySqlFullDataType, bool datesAsMySqlDates)
-      : this(columnName, mySqlFullDataType, null, null, datesAsMySqlDates, false, string.Empty, string.Empty)
+      : this(columnName, mySqlFullDataType, null, null, datesAsMySqlDates, false, string.Empty, null, string.Empty)
     {
     }
 
@@ -1033,7 +1034,7 @@ namespace MySQL.ForExcel.Classes
 
       var extraBuilder = new StringBuilder();
       schemaInfoRow["Name"] = DisplayName;
-      schemaInfoRow["Type"] = MySqlDataType;
+      schemaInfoRow["Type"] = MySqlDataType.FullType;
       schemaInfoRow["Null"] = AllowNull ? "YES" : "NO";
       if (PrimaryKey)
       {

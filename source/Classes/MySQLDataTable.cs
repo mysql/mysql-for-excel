@@ -259,6 +259,41 @@ namespace MySQL.ForExcel.Classes
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MySqlDataTable"/> class.
+    /// This constructor is meant to be used by the <see cref="ExportDataForm"/> class.
+    /// </summary>
+    /// <param name="fromTemplate">Template <see cref="MySqlDataTable"/> from which to build a new one, the new table is a copy with the same data, but the schema is built from the template not cloned.</param>
+    /// <param name="dataRange">The <see cref="ExcelInterop.Range"/> containing the data to be fed to the new <see cref="MySqlDataTable"/>. If <c>null</c> the data is copied from the <seealso cref="fromTemplate"/> table.</param>
+    public MySqlDataTable(MySqlDataTable fromTemplate, ExcelInterop.Range dataRange)
+      : this(fromTemplate.WbConnection, fromTemplate.TableName)
+    {
+      AddBufferToVarChar = fromTemplate.AddBufferToVarChar;
+      AddPrimaryKeyColumn = fromTemplate.AddPrimaryKeyColumn;
+      AutoAllowEmptyNonIndexColumns = fromTemplate.AutoAllowEmptyNonIndexColumns;
+      AutoIndexIntColumns = fromTemplate.AutoIndexIntColumns;
+      CharSet = fromTemplate.CharSet;
+      Collation = fromTemplate.Collation;
+      DetectDatatype = false;
+      FirstRowContainsColumnNames = fromTemplate.FirstRowContainsColumnNames;
+      IsFormatted = fromTemplate.IsFormatted;
+      IsPreviewTable = false;
+      OperationType = fromTemplate.OperationType;
+      UseFirstColumnAsPk = fromTemplate.UseFirstColumnAsPk;
+      UseOptimisticUpdate = fromTemplate.UseOptimisticUpdate;
+
+      var schemaInfoTable = fromTemplate.GetColumnsSchemaInfo();
+      CreateTableSchema(schemaInfoTable);
+      if (dataRange == null)
+      {
+        CopyTableData(fromTemplate, true);
+      }
+      else
+      {
+        SetupColumnsWithData(dataRange, false);
+      }
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MySqlDataTable"/> class.
     /// This constructor is meant to be used by the <see cref="AppendDataForm"/> class to fetch schema information from the corresponding MySQL table before copying its excelData.
     /// </summary>
     /// <param name="fromDbTable">The <see cref="DbTable"/> object from which the new <see cref="MySqlDataTable"/> will get its schema information and its data.</param>
@@ -2486,10 +2521,11 @@ namespace MySQL.ForExcel.Classes
         string dataType = columnInfoRow["Type"].ToString();
         bool allowNulls = columnInfoRow["Null"].ToString() == "YES";
         string keyInfo = columnInfoRow["Key"].ToString();
+        string defaultValue = columnInfoRow["Default"].ToString();
         string charSet = columnInfoRow["CharSet"].ToString();
         string collation = columnInfoRow["Collation"].ToString();
         string extraInfo = columnInfoRow["Extra"].ToString();
-        var column = new MySqlDataColumn(colName, dataType, charSet, collation, false, allowNulls, keyInfo, extraInfo);
+        var column = new MySqlDataColumn(colName, dataType, charSet, collation, false, allowNulls, keyInfo, defaultValue, extraInfo);
         column.PropertyChanged += ColumnPropertyValueChanged;
         Columns.Add(column);
         column.SubscribeToParentTablePropertyChange();

@@ -1397,57 +1397,57 @@ namespace MySQL.ForExcel.Classes
     {
       if (boxedValue is sbyte)
       {
-        return ((sbyte)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+        return ((sbyte)boxedValue).ToString("G", ci);
       }
 
       if (boxedValue is byte)
       {
-        return ((byte)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+        return ((byte)boxedValue).ToString("G", ci);
       }
 
       if (boxedValue is short)
       {
-        return ((short)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+        return ((short)boxedValue).ToString("G", ci);
       }
 
       if (boxedValue is ushort)
       {
-        return ((ushort)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+        return ((ushort)boxedValue).ToString("G", ci);
       }
 
       if (boxedValue is int)
       {
-        return ((int)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+        return ((int)boxedValue).ToString("G", ci);
       }
 
       if (boxedValue is uint)
       {
-        return ((uint)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+        return ((uint)boxedValue).ToString("G", ci);
       }
 
       if (boxedValue is long)
       {
-        return ((long)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+        return ((long)boxedValue).ToString("G", ci);
       }
 
       if (boxedValue is ulong)
       {
-        return ((ulong)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+        return ((ulong)boxedValue).ToString("G", ci);
       }
 
       if (boxedValue is float)
       {
-        return ((float)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+        return ((float)boxedValue).ToString("G", ci);
       }
 
       if (boxedValue is double)
       {
-        return ((double)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+        return ((double)boxedValue).ToString("G", ci);
       }
 
       if (boxedValue is decimal)
       {
-        return ((decimal)boxedValue).ToString("G", CultureInfo.InvariantCulture);
+        return ((decimal)boxedValue).ToString("G", ci);
       }
 
       return boxedValue.ToString();

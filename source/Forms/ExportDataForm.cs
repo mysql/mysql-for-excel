@@ -788,10 +788,7 @@ namespace MySQL.ForExcel.Forms
       Cursor = Cursors.WaitCursor;
       try
       {
-        _exportDataTable = _previewDataTable.CloneSchema(false, false);
-        _exportDataTable.DetectDatatype = false;
-        _exportDataTable.IsPreviewTable = false;
-        _exportDataTable.SetupColumnsWithData(_exportDataRange, false);
+        _exportDataTable = new MySqlDataTable(_previewDataTable, _exportDataRange);
       }
       catch (Exception ex)
       {

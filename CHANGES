@@ -1,4 +1,8 @@
 1.3.7
+- Reverted back the way Export Data operations prepare data to be exported so the DataTable container has the final data types before the operation takes
+  place, this automatically makes the decimal numbers conversion from any locale to an invariant one. The locale-free fix for numbers was removed in 1.3.5
+  where that fix was found to introduce other problems. Now it has been added back and the other problems sorted out.
+  (MySQL Bug #84049, Bug #25214984 - MYSQL FOR EXCEL AND COMMA SEPARATOR IN CURRENCY)
 - Changed the way the Refresh All is overridden by MySQL for Excel, in previous versions the Refresh All was looping through all Excel tables (ListObjects)
   and PivotTables found in every Excel Worksheet and refreshed their contents. Now the Refresh All is overridden to loop through all Workbook connections,
   any connection created by MySQL for Excel to refresh imported data is handled internally by the add-in, the rest of the connections are refreshed in the
