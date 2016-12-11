@@ -1,4 +1,11 @@
 1.3.7
+- Fixed the case where passwords were not being stored in the MySQL for Excel's user data folder after MySQL connections were set to be migrated manually
+  (the option to delay indefinitely was chosen) to the MySQL Workbench's connections file.
+  (MySQL Bug #83855, Bug #25108196 - SAVED CONNECTION PASSWORDS NOT BEING REUSED WHEN OPENING A CONNECTION)
+- Fixed the way MySQL connections hold values for the schema being used to connect, so that the default schema is differentiated from the current schema
+  in use. Fixed the validation that prevents the connections dialog from being displayed if MySQL Workbench is running to only prevent it if the
+  connections are stored in the MySQL Workbench's connections file and allow the dialog to be displayed if the connections are stored in the MySQL for
+  Excel's connections file. (Bug #22074426 - [EDIT] DEFAULT SCHEMA MODIFIED FOR EDITED TABLE)
 - Fixed the way the current schema is assigned to the connection being used to refresh imported data. Connections for imported data are first checked
   to see if they are already connected, otherwise a connection is attempted; if successful the current schema is assigned to the connection. That way
   we ensure a shared connection for different imported tables switches to the current schema correctly.
