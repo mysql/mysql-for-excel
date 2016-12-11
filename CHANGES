@@ -1,4 +1,8 @@
 1.3.7
+- Fixed the way the current schema is assigned to the connection being used to refresh imported data. Connections for imported data are first checked
+  to see if they are already connected, otherwise a connection is attempted; if successful the current schema is assigned to the connection. That way
+  we ensure a shared connection for different imported tables switches to the current schema correctly.
+  (MySQL Bug #84154, Bug #25233309 - ERROR REFRESHING IMPORTED DATA FROM DIFFERENT SCHEMAS IN SAME CONNECTION)
 - Added code to check the status of MySQL connections before attempting to refresh imported MySQL data using those connections, if connections are not
   active an attempt to connect is done. If the connections do not have a password specified the connection is attempted without password, if that fails
   then a dialog is displayed asking for the password before attempting to open the connection again. Added 2 new options to the Global Options dialog to

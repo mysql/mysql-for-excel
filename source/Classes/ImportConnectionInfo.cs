@@ -23,7 +23,6 @@ using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes.MySql;
 using MySql.Utility.Classes.MySqlWorkbench;
-using MySql.Utility.Enums;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 using ExcelTools = Microsoft.Office.Tools.Excel;
 
@@ -145,7 +144,6 @@ namespace MySQL.ForExcel.Classes
         }
         else
         {
-          _connection.Schema = SchemaName;
           _connection.SetAdditionalConnectionProperties();
           HostIdentifier = _connection.HostIdentifier;
         }
@@ -425,32 +423,19 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      if (_connection != null)
+      if (!TestConnection())
       {
-        if (_connection.ConnectionStatus != MySqlWorkbenchConnection.ConnectionStatusType.AcceptingConnections)
-        {
-          _connection.TestConnectionAndRetryOnWrongPassword();
-        }
+        return;
+      }
 
-        if (_connection.ConnectionStatus == MySqlWorkbenchConnection.ConnectionStatusType.AcceptingConnections)
-        {
-          MySqlTable = _connection.CreateImportMySqlTable(OperationType, TableName, ImportColumnNames, SelectQuery, ProcedureResultSetIndex);
-        }
-        else
-        {
-          ConnectionInfoError = ConnectionInfoErrorType.ConnectionRefused;
-        }
-      }
-      else
-      {
-        ConnectionInfoError = ConnectionInfoErrorType.WorkbenchConnectionDoesNotExist;
-      }
+      _connection.Schema = SchemaName;
+      MySqlTable = _connection.CreateImportMySqlTable(OperationType, TableName, ImportColumnNames, SelectQuery, ProcedureResultSetIndex);
     }
 
     /// <summary>
     /// Tests the <see cref="ImportConnectionInfo"/> connection.
     /// </summary>
-    /// <returns><c>true</c> if all connection parameters are valid to stablish the connection.</returns>
+    /// <returns><c>true</c> if all connection parameters are valid to establish the connection.</returns>
     public bool TestConnection()
     {
       if (_connection == null)
@@ -459,14 +444,17 @@ namespace MySQL.ForExcel.Classes
         return false;
       }
 
-      Exception connectionException;
-      var connectionTestResult = _connection.TestConnectionSilently(out connectionException);
-      if (connectionException != null)
+      if (_connection.ConnectionStatus == MySqlWorkbenchConnection.ConnectionStatusType.AcceptingConnections)
       {
-        ConnectionInfoError = ConnectionInfoErrorType.ConnectionRefused;
+        ConnectionInfoError = ConnectionInfoErrorType.None;
+        return true;
       }
 
-      return connectionTestResult == TestConnectionResult.ConnectionSuccess;
+      var passwordFlags = _connection.TestConnectionAndRetryOnWrongPassword();
+      ConnectionInfoError = !passwordFlags.ConnectionSuccess
+          ? ConnectionInfoErrorType.ConnectionRefused
+          : ConnectionInfoErrorType.None;
+      return ConnectionInfoError == ConnectionInfoErrorType.None;
     }
 
     /// <summary>

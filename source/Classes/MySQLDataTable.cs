@@ -2493,7 +2493,7 @@ namespace MySQL.ForExcel.Classes
         Collation = tableCollation;
       }
 
-      var columnsInfoTable = WbConnection.GetColumnsInformationTable(null, tableName, beautifyDataTypes);
+      var columnsInfoTable = WbConnection.GetColumnsInformationTable(SchemaName, tableName, beautifyDataTypes);
       CreateTableSchema(columnsInfoTable);
     }
 
