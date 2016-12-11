@@ -1493,13 +1493,18 @@ namespace MySQL.ForExcel
         return;
       }
 
-      RestoreImportConnectionInfos(workbook);
       if (ActiveExcelPane == null)
       {
-        return;
+        if (Settings.Default.GlobalImportDataRestoreWhenOpeningWorkbook)
+        {
+          RestoreImportConnectionInfos(workbook);
+        }
       }
-
-      ShowOpenEditConnectionInfosDialog(workbook);
+      else
+      {
+        RestoreImportConnectionInfos(workbook);
+        ShowOpenEditConnectionInfosDialog(workbook);
+      }
     }
 
     /// <summary>
@@ -1507,7 +1512,7 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <param name="connectionInfoConnection">The <see cref="MySqlWorkbenchConnection"/> the <see cref="EditConnectionInfo" /> uses.</param>
     /// <returns><c>true</c> if the connection was successfully opened, <c>false</c> otherwise.</returns>
-    private bool OpenConnectionForSavedEditConnectionInfo(MySqlWorkbenchConnection connectionInfoConnection)
+    private bool OpenConnectionForSavedConnectionInfo(MySqlWorkbenchConnection connectionInfoConnection)
     {
       var connectionResult = ActiveExcelPane.OpenConnection(connectionInfoConnection, false);
       if (connectionResult.Cancelled)
@@ -1527,18 +1532,18 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Attempts to open a <see cref="MySqlWorkbenchConnection"/> from an Editing table.
     /// </summary>
-    /// <param name="connectionInfo">A saved <see cref="EditConnectionInfo"/> object.</param>
+    /// <param name="editConnectionInfo">A saved <see cref="EditConnectionInfo"/> object.</param>
     /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object related to the <see cref="EditConnectionInfo" />.</param>
     /// <returns>The opened <see cref="MySqlWorkbenchConnection"/>.</returns>
-    private MySqlWorkbenchConnection OpenConnectionForSavedEditConnectionInfo(EditConnectionInfo connectionInfo, ExcelInterop.Workbook workbook)
+    private MySqlWorkbenchConnection OpenConnectionForSavedEditConnectionInfo(EditConnectionInfo editConnectionInfo, ExcelInterop.Workbook workbook)
     {
-      if (connectionInfo == null || workbook == null)
+      if (editConnectionInfo == null || workbook == null)
       {
         return null;
       }
 
       // Check if connection in stored the <see cref="EditConnectionInfo" /> still exists in the collection of Workbench connections.
-      var wbConnectionInfoConnection = MySqlWorkbench.Connections.GetConnectionForId(connectionInfo.ConnectionId);
+      var wbConnectionInfoConnection = MySqlWorkbench.Connections.GetConnectionForId(editConnectionInfo.ConnectionId);
       DialogResult dialogResult;
       if (wbConnectionInfoConnection == null)
       {
@@ -1555,7 +1560,7 @@ namespace MySQL.ForExcel
       if (ActiveExcelPane.WbConnection == null)
       {
         // If the connection in the active pane is null it means an active connection does not exist, so open a connection.
-        if (!OpenConnectionForSavedEditConnectionInfo(wbConnectionInfoConnection))
+        if (!OpenConnectionForSavedConnectionInfo(wbConnectionInfoConnection))
         {
           return null;
         }
@@ -1580,7 +1585,7 @@ namespace MySQL.ForExcel
           ActiveExcelPane.CloseConnection(false);
         }
 
-        if (!OpenConnectionForSavedEditConnectionInfo(wbConnectionInfoConnection))
+        if (!OpenConnectionForSavedConnectionInfo(wbConnectionInfoConnection))
         {
           return null;
         }

@@ -1,4 +1,9 @@
 1.3.7
+- Added code to check the status of MySQL connections before attempting to refresh imported MySQL data using those connections, if connections are not
+  active an attempt to connect is done. If the connections do not have a password specified the connection is attempted without password, if that fails
+  then a dialog is displayed asking for the password before attempting to open the connection again. Added 2 new options to the Global Options dialog to
+  either "Restore imported MySQL data in Excel Tables when opening an Excel workbook" or "Restore imported MySQL data in Excel Tables when showing the
+  Add-In's sidebar". (MySQL Bug #84136, Bug #25227226 - ERROR REFRESHING IMPORTED DATA WITH A CONNECTION WHERE THE PASSWORD WASN'T SAVED)
 - Reverted back the way Export Data operations prepare data to be exported so the DataTable container has the final data types before the operation takes
   place, this automatically makes the decimal numbers conversion from any locale to an invariant one. The locale-free fix for numbers was removed in 1.3.5
   where that fix was found to introduce other problems. Now it has been added back and the other problems sorted out.

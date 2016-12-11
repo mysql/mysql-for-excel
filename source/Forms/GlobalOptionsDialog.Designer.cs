@@ -74,22 +74,28 @@ namespace MySQL.ForExcel.Forms
       this.ShowExecutedSqlQueryRadioButton = new System.Windows.Forms.RadioButton();
       this.PreviewSqlQueriesRadioButton = new System.Windows.Forms.RadioButton();
       this.NoSqlStatementsRadioButton = new System.Windows.Forms.RadioButton();
-      this.panel1 = new System.Windows.Forms.Panel();
+      this.EditSessionOptionsPanel = new System.Windows.Forms.Panel();
       this.CreateNewWorksheetsRadioButton = new System.Windows.Forms.RadioButton();
       this.ReuseWorksheetsRadioButton = new System.Windows.Forms.RadioButton();
       this.ExcelToolTip = new System.Windows.Forms.ToolTip(this.components);
       this.ManageConnectionInfosButton = new System.Windows.Forms.Button();
       this.PreviewTableDataCheckBox = new System.Windows.Forms.CheckBox();
+      this.MigrateWorkbenchConnectionsButton = new System.Windows.Forms.Button();
+      this.ShowingSidebarRadioButton = new System.Windows.Forms.RadioButton();
+      this.OpeningWorkbookRadioButton = new System.Windows.Forms.RadioButton();
       this.ResetToDefaultsButton = new System.Windows.Forms.Button();
       this.AutomaticMigrationDelayValueLabel = new System.Windows.Forms.Label();
       this.AutomaticMigrationDelayLabel = new System.Windows.Forms.Label();
-      this.MigrateWorkbenchConnectionsButton = new System.Windows.Forms.Button();
+      this.ImportedTablesOptionsLabel = new System.Windows.Forms.Label();
+      this.ImportedTablesOptionsPanel = new System.Windows.Forms.Panel();
+      this.RestoreImportedMySqlDataInExcelTablesLabel = new System.Windows.Forms.Label();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.ConnectionTimeoutNumericUpDown)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.QueryTimeoutNumericUpDown)).BeginInit();
       this.ShowQueriesOptionsPanel.SuspendLayout();
-      this.panel1.SuspendLayout();
+      this.EditSessionOptionsPanel.SuspendLayout();
+      this.ImportedTablesOptionsPanel.SuspendLayout();
       this.SuspendLayout();
       // 
       // FootnoteAreaPanel
@@ -99,12 +105,15 @@ namespace MySQL.ForExcel.Forms
       // 
       // ContentAreaPanel
       // 
+      this.ContentAreaPanel.Controls.Add(this.RestoreImportedMySqlDataInExcelTablesLabel);
+      this.ContentAreaPanel.Controls.Add(this.ImportedTablesOptionsPanel);
+      this.ContentAreaPanel.Controls.Add(this.ImportedTablesOptionsLabel);
       this.ContentAreaPanel.Controls.Add(this.AutomaticMigrationDelayValueLabel);
       this.ContentAreaPanel.Controls.Add(this.PreviewTableDataCheckBox);
       this.ContentAreaPanel.Controls.Add(this.AutomaticMigrationDelayLabel);
       this.ContentAreaPanel.Controls.Add(this.MigrateWorkbenchConnectionsButton);
       this.ContentAreaPanel.Controls.Add(this.ManageConnectionInfosButton);
-      this.ContentAreaPanel.Controls.Add(this.panel1);
+      this.ContentAreaPanel.Controls.Add(this.EditSessionOptionsPanel);
       this.ContentAreaPanel.Controls.Add(this.UseOptimisticUpdatesCheckBox);
       this.ContentAreaPanel.Controls.Add(this.ShowQueriesOptionsPanel);
       this.ContentAreaPanel.Controls.Add(this.RestoreSavedEditSessionsCheckBox);
@@ -118,14 +127,14 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.ConnectionTimeout1Label);
       this.ContentAreaPanel.Controls.Add(this.GlobalOptionsLabel);
       this.ContentAreaPanel.Controls.Add(this.ConnectionOptionsLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(514, 581);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(514, 691);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.ResetToDefaultsButton);
       this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 536);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 646);
       this.CommandAreaPanel.Size = new System.Drawing.Size(514, 45);
       // 
       // DialogAcceptButton
@@ -282,7 +291,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.RestoreSavedEditSessionsCheckBox.AutoSize = true;
       this.RestoreSavedEditSessionsCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.RestoreSavedEditSessionsCheckBox.Location = new System.Drawing.Point(53, 388);
+      this.RestoreSavedEditSessionsCheckBox.Location = new System.Drawing.Point(53, 504);
       this.RestoreSavedEditSessionsCheckBox.Name = "RestoreSavedEditSessionsCheckBox";
       this.RestoreSavedEditSessionsCheckBox.Size = new System.Drawing.Size(374, 19);
       this.RestoreSavedEditSessionsCheckBox.TabIndex = 16;
@@ -298,7 +307,7 @@ namespace MySQL.ForExcel.Forms
       this.EditSessionOptionsLabel.BackColor = System.Drawing.Color.Transparent;
       this.EditSessionOptionsLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.EditSessionOptionsLabel.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.EditSessionOptionsLabel.Location = new System.Drawing.Point(24, 336);
+      this.EditSessionOptionsLabel.Location = new System.Drawing.Point(24, 452);
       this.EditSessionOptionsLabel.Name = "EditSessionOptionsLabel";
       this.EditSessionOptionsLabel.Size = new System.Drawing.Size(134, 17);
       this.EditSessionOptionsLabel.TabIndex = 14;
@@ -367,14 +376,14 @@ namespace MySQL.ForExcel.Forms
       this.ExcelToolTip.SetToolTip(this.NoSqlStatementsRadioButton, "SQL statements are never shown, only the results of the executed queries are.");
       this.NoSqlStatementsRadioButton.UseVisualStyleBackColor = true;
       // 
-      // panel1
+      // EditSessionOptionsPanel
       // 
-      this.panel1.Controls.Add(this.CreateNewWorksheetsRadioButton);
-      this.panel1.Controls.Add(this.ReuseWorksheetsRadioButton);
-      this.panel1.Location = new System.Drawing.Point(21, 406);
-      this.panel1.Name = "panel1";
-      this.panel1.Size = new System.Drawing.Size(480, 51);
-      this.panel1.TabIndex = 17;
+      this.EditSessionOptionsPanel.Controls.Add(this.CreateNewWorksheetsRadioButton);
+      this.EditSessionOptionsPanel.Controls.Add(this.ReuseWorksheetsRadioButton);
+      this.EditSessionOptionsPanel.Location = new System.Drawing.Point(21, 522);
+      this.EditSessionOptionsPanel.Name = "EditSessionOptionsPanel";
+      this.EditSessionOptionsPanel.Size = new System.Drawing.Size(480, 51);
+      this.EditSessionOptionsPanel.TabIndex = 17;
       // 
       // CreateNewWorksheetsRadioButton
       // 
@@ -414,7 +423,7 @@ namespace MySQL.ForExcel.Forms
       this.ManageConnectionInfosButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.ManageConnectionInfosButton.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.ManageConnectionInfosButton.Location = new System.Drawing.Point(53, 475);
+      this.ManageConnectionInfosButton.Location = new System.Drawing.Point(53, 591);
       this.ManageConnectionInfosButton.Name = "ManageConnectionInfosButton";
       this.ManageConnectionInfosButton.Size = new System.Drawing.Size(411, 23);
       this.ManageConnectionInfosButton.TabIndex = 18;
@@ -428,7 +437,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.PreviewTableDataCheckBox.AutoSize = true;
       this.PreviewTableDataCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.PreviewTableDataCheckBox.Location = new System.Drawing.Point(53, 365);
+      this.PreviewTableDataCheckBox.Location = new System.Drawing.Point(53, 481);
       this.PreviewTableDataCheckBox.Name = "PreviewTableDataCheckBox";
       this.PreviewTableDataCheckBox.Size = new System.Drawing.Size(364, 19);
       this.PreviewTableDataCheckBox.TabIndex = 15;
@@ -436,6 +445,49 @@ namespace MySQL.ForExcel.Forms
       this.ExcelToolTip.SetToolTip(this.PreviewTableDataCheckBox, "When checked, the data of the selected MySQL table to edit is shown in a preview " +
         "dialog before the Edit Data session is opened.");
       this.PreviewTableDataCheckBox.UseVisualStyleBackColor = true;
+      // 
+      // MigrateWorkbenchConnectionsButton
+      // 
+      this.MigrateWorkbenchConnectionsButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.MigrateWorkbenchConnectionsButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.MigrateWorkbenchConnectionsButton.Location = new System.Drawing.Point(53, 154);
+      this.MigrateWorkbenchConnectionsButton.Name = "MigrateWorkbenchConnectionsButton";
+      this.MigrateWorkbenchConnectionsButton.Size = new System.Drawing.Size(411, 23);
+      this.MigrateWorkbenchConnectionsButton.TabIndex = 10;
+      this.MigrateWorkbenchConnectionsButton.Text = "Migrate stored connections to MySQL Workbench now";
+      this.ExcelToolTip.SetToolTip(this.MigrateWorkbenchConnectionsButton, "Migrates MySQL Server stored connections to the MySQL Workbench\'s connections fil" +
+        "e.");
+      this.MigrateWorkbenchConnectionsButton.UseVisualStyleBackColor = true;
+      this.MigrateWorkbenchConnectionsButton.Click += new System.EventHandler(this.MigrateWorkbenchConnectionsButton_Click);
+      // 
+      // ShowingSidebarRadioButton
+      // 
+      this.ShowingSidebarRadioButton.AutoSize = true;
+      this.ShowingSidebarRadioButton.Font = new System.Drawing.Font("Segoe UI", 9F);
+      this.ShowingSidebarRadioButton.Location = new System.Drawing.Point(52, 28);
+      this.ShowingSidebarRadioButton.Name = "ShowingSidebarRadioButton";
+      this.ShowingSidebarRadioButton.Size = new System.Drawing.Size(180, 19);
+      this.ShowingSidebarRadioButton.TabIndex = 1;
+      this.ShowingSidebarRadioButton.TabStop = true;
+      this.ShowingSidebarRadioButton.Text = "Showing the Add-In\'s sidebar";
+      this.ExcelToolTip.SetToolTip(this.ShowingSidebarRadioButton, "When checked, all MySQL data imported as Excel Tables is restored in the current " +
+        "Excel workbook when the Add-In\'s sidebar is shown.");
+      this.ShowingSidebarRadioButton.UseVisualStyleBackColor = true;
+      // 
+      // OpeningWorkbookRadioButton
+      // 
+      this.OpeningWorkbookRadioButton.AutoSize = true;
+      this.OpeningWorkbookRadioButton.Font = new System.Drawing.Font("Segoe UI", 9F);
+      this.OpeningWorkbookRadioButton.Location = new System.Drawing.Point(52, 5);
+      this.OpeningWorkbookRadioButton.Name = "OpeningWorkbookRadioButton";
+      this.OpeningWorkbookRadioButton.Size = new System.Drawing.Size(172, 19);
+      this.OpeningWorkbookRadioButton.TabIndex = 0;
+      this.OpeningWorkbookRadioButton.TabStop = true;
+      this.OpeningWorkbookRadioButton.Text = "Opening an Excel workbook";
+      this.ExcelToolTip.SetToolTip(this.OpeningWorkbookRadioButton, "When checked, all MySQL data imported as Excel Tables is restored when the Excel " +
+        "workbook is opened even if the Add-In\'s sidebar has not been shown yet.");
+      this.OpeningWorkbookRadioButton.UseVisualStyleBackColor = true;
       // 
       // ResetToDefaultsButton
       // 
@@ -470,20 +522,36 @@ namespace MySQL.ForExcel.Forms
       this.AutomaticMigrationDelayLabel.TabIndex = 8;
       this.AutomaticMigrationDelayLabel.Text = "Automatic connections migration delayed until: ";
       // 
-      // MigrateWorkbenchConnectionsButton
+      // ImportedTablesOptionsLabel
       // 
-      this.MigrateWorkbenchConnectionsButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.MigrateWorkbenchConnectionsButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.MigrateWorkbenchConnectionsButton.Location = new System.Drawing.Point(53, 154);
-      this.MigrateWorkbenchConnectionsButton.Name = "MigrateWorkbenchConnectionsButton";
-      this.MigrateWorkbenchConnectionsButton.Size = new System.Drawing.Size(411, 23);
-      this.MigrateWorkbenchConnectionsButton.TabIndex = 10;
-      this.MigrateWorkbenchConnectionsButton.Text = "Migrate stored connections to MySQL Workbench now";
-      this.ExcelToolTip.SetToolTip(this.MigrateWorkbenchConnectionsButton, "Migrates MySQL Server stored connections to the MySQL Workbench\'s connections fil" +
-        "e.");
-      this.MigrateWorkbenchConnectionsButton.UseVisualStyleBackColor = true;
-      this.MigrateWorkbenchConnectionsButton.Click += new System.EventHandler(this.MigrateWorkbenchConnectionsButton_Click);
+      this.ImportedTablesOptionsLabel.AutoSize = true;
+      this.ImportedTablesOptionsLabel.BackColor = System.Drawing.Color.Transparent;
+      this.ImportedTablesOptionsLabel.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ImportedTablesOptionsLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.ImportedTablesOptionsLabel.Location = new System.Drawing.Point(24, 336);
+      this.ImportedTablesOptionsLabel.Name = "ImportedTablesOptionsLabel";
+      this.ImportedTablesOptionsLabel.Size = new System.Drawing.Size(153, 17);
+      this.ImportedTablesOptionsLabel.TabIndex = 19;
+      this.ImportedTablesOptionsLabel.Text = "Imported Tables Options";
+      // 
+      // ImportedTablesOptionsPanel
+      // 
+      this.ImportedTablesOptionsPanel.Controls.Add(this.ShowingSidebarRadioButton);
+      this.ImportedTablesOptionsPanel.Controls.Add(this.OpeningWorkbookRadioButton);
+      this.ImportedTablesOptionsPanel.Location = new System.Drawing.Point(22, 383);
+      this.ImportedTablesOptionsPanel.Name = "ImportedTablesOptionsPanel";
+      this.ImportedTablesOptionsPanel.Size = new System.Drawing.Size(480, 51);
+      this.ImportedTablesOptionsPanel.TabIndex = 20;
+      // 
+      // RestoreImportedMySqlDataInExcelTablesLabel
+      // 
+      this.RestoreImportedMySqlDataInExcelTablesLabel.AutoSize = true;
+      this.RestoreImportedMySqlDataInExcelTablesLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.RestoreImportedMySqlDataInExcelTablesLabel.Location = new System.Drawing.Point(51, 367);
+      this.RestoreImportedMySqlDataInExcelTablesLabel.Name = "RestoreImportedMySqlDataInExcelTablesLabel";
+      this.RestoreImportedMySqlDataInExcelTablesLabel.Size = new System.Drawing.Size(278, 15);
+      this.RestoreImportedMySqlDataInExcelTablesLabel.TabIndex = 21;
+      this.RestoreImportedMySqlDataInExcelTablesLabel.Text = "Restore imported MySQL data in Excel Tables when:";
       // 
       // GlobalOptionsDialog
       // 
@@ -491,7 +559,7 @@ namespace MySQL.ForExcel.Forms
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(514, 581);
+      this.ClientSize = new System.Drawing.Size(514, 691);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
@@ -505,8 +573,10 @@ namespace MySQL.ForExcel.Forms
       ((System.ComponentModel.ISupportInitialize)(this.QueryTimeoutNumericUpDown)).EndInit();
       this.ShowQueriesOptionsPanel.ResumeLayout(false);
       this.ShowQueriesOptionsPanel.PerformLayout();
-      this.panel1.ResumeLayout(false);
-      this.panel1.PerformLayout();
+      this.EditSessionOptionsPanel.ResumeLayout(false);
+      this.EditSessionOptionsPanel.PerformLayout();
+      this.ImportedTablesOptionsPanel.ResumeLayout(false);
+      this.ImportedTablesOptionsPanel.PerformLayout();
       this.ResumeLayout(false);
 
     }
@@ -531,7 +601,7 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.RadioButton ShowExecutedSqlQueryRadioButton;
     private System.Windows.Forms.RadioButton PreviewSqlQueriesRadioButton;
     private System.Windows.Forms.RadioButton NoSqlStatementsRadioButton;
-    private System.Windows.Forms.Panel panel1;
+    private System.Windows.Forms.Panel EditSessionOptionsPanel;
     private System.Windows.Forms.RadioButton CreateNewWorksheetsRadioButton;
     private System.Windows.Forms.RadioButton ReuseWorksheetsRadioButton;
     private System.Windows.Forms.ToolTip ExcelToolTip;
@@ -541,5 +611,10 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.Label AutomaticMigrationDelayValueLabel;
     private System.Windows.Forms.Label AutomaticMigrationDelayLabel;
     private System.Windows.Forms.Button MigrateWorkbenchConnectionsButton;
+    private System.Windows.Forms.Panel ImportedTablesOptionsPanel;
+    private System.Windows.Forms.RadioButton ShowingSidebarRadioButton;
+    private System.Windows.Forms.RadioButton OpeningWorkbookRadioButton;
+    private System.Windows.Forms.Label ImportedTablesOptionsLabel;
+    private System.Windows.Forms.Label RestoreImportedMySqlDataInExcelTablesLabel;
   }
 }

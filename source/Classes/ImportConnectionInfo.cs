@@ -146,7 +146,7 @@ namespace MySQL.ForExcel.Classes
         else
         {
           _connection.Schema = SchemaName;
-          _connection.AllowZeroDateTimeValues = true;
+          _connection.SetAdditionalConnectionProperties();
           HostIdentifier = _connection.HostIdentifier;
         }
       }
@@ -427,7 +427,19 @@ namespace MySQL.ForExcel.Classes
 
       if (_connection != null)
       {
-        MySqlTable = _connection.CreateImportMySqlTable(OperationType, TableName, ImportColumnNames, SelectQuery, ProcedureResultSetIndex);
+        if (_connection.ConnectionStatus != MySqlWorkbenchConnection.ConnectionStatusType.AcceptingConnections)
+        {
+          _connection.TestConnectionAndRetryOnWrongPassword();
+        }
+
+        if (_connection.ConnectionStatus == MySqlWorkbenchConnection.ConnectionStatusType.AcceptingConnections)
+        {
+          MySqlTable = _connection.CreateImportMySqlTable(OperationType, TableName, ImportColumnNames, SelectQuery, ProcedureResultSetIndex);
+        }
+        else
+        {
+          ConnectionInfoError = ConnectionInfoErrorType.ConnectionRefused;
+        }
       }
       else
       {

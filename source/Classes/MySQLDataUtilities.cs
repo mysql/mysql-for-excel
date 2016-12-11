@@ -466,7 +466,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.UnableToRetrieveData, "from query: ", query), true);
+        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.UnableToRetrieveData, "query: ", query), true);
       }
 
       return ds == null || ds.Tables.Count <= 0 || tableIndex < 0 || tableIndex >= ds.Tables.Count

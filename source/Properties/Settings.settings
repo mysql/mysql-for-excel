@@ -143,5 +143,8 @@
     <Setting Name="WorkbenchMigrationLastAttempt" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.DateTime" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="GlobalImportDataRestoreWhenOpeningWorkbook" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

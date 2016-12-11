@@ -135,6 +135,7 @@ namespace MySQL.ForExcel.Forms
       settings.EditPreviewMySqlData = PreviewTableDataCheckBox.Checked;
       settings.EditSessionsRestoreWhenOpeningWorkbook = RestoreSavedEditSessionsCheckBox.Checked;
       settings.EditSessionsReuseWorksheets = ReuseWorksheetsRadioButton.Checked;
+      settings.GlobalImportDataRestoreWhenOpeningWorkbook = OpeningWorkbookRadioButton.Checked;
       if (_manageConnectionInfosDialog != null)
       {
         settings.ConnectionInfosLastAccessDays = _manageConnectionInfosDialog.ConnectionInfosLastAccessDays;
@@ -188,6 +189,7 @@ namespace MySQL.ForExcel.Forms
         RestoreSavedEditSessionsCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("EditSessionsRestoreWhenOpeningWorkbook");
         ReuseWorksheetsRadioButton.Checked = settings.GetPropertyDefaultValueByName<bool>("EditSessionsReuseWorksheets");
         PreviewTableDataCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("EditPreviewMySqlData");
+        OpeningWorkbookRadioButton.Checked = settings.GetPropertyDefaultValueByName<bool>("GlobalImportDataRestoreWhenOpeningWorkbook");
       }
       else
       {
@@ -199,10 +201,12 @@ namespace MySQL.ForExcel.Forms
         RestoreSavedEditSessionsCheckBox.Checked = settings.EditSessionsRestoreWhenOpeningWorkbook;
         ReuseWorksheetsRadioButton.Checked = settings.EditSessionsReuseWorksheets;
         PreviewTableDataCheckBox.Checked = settings.EditPreviewMySqlData;
+        OpeningWorkbookRadioButton.Checked = settings.GlobalImportDataRestoreWhenOpeningWorkbook;
       }
 
       NoSqlStatementsRadioButton.Checked = !PreviewSqlQueriesRadioButton.Checked && !ShowExecutedSqlQueryRadioButton.Checked;
       CreateNewWorksheetsRadioButton.Checked = !ReuseWorksheetsRadioButton.Checked;
+      ShowExecutedSqlQueryRadioButton.Checked = !OpeningWorkbookRadioButton.Checked;
       if (_manageConnectionInfosDialog != null)
       {
         _manageConnectionInfosDialog.RefreshControlValues(useDefaultValues);

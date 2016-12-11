@@ -629,5 +629,18 @@ namespace MySQL.ForExcel.Properties {
                 this["WorkbenchMigrationLastAttempt"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool GlobalImportDataRestoreWhenOpeningWorkbook {
+            get {
+                return ((bool)(this["GlobalImportDataRestoreWhenOpeningWorkbook"]));
+            }
+            set {
+                this["GlobalImportDataRestoreWhenOpeningWorkbook"] = value;
+            }
+        }
     }
 }
