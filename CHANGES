@@ -1,4 +1,10 @@
 1.3.7
+- Fixed a problem where connections migrated from the MySQL for Excel connections file to the MySQL Workbench connections file were being saved with a
+  connection method of "Local Socket/Pipe" instead of "Stantard TCP/IP". Fixed a problem where the MySQL for Excel connections file was being re-created
+  after connections were migrated successfully to the MySQL Workbench connections file, when it should remain deleted. Fixed a problem where the dialog
+  asking the user if he wants to migrate connections from the MySQL for Excel connections file to the MySQL Workbench connections file was displayed even
+  when there is no existing MySQL Workbench connections file; now if the MySQL Workbench connections file does not exist a migration is not offered.
+  (Bug #22079779 - [CONN] AUTO DETECT IS NOT POPULATING THE CONNECTION PARAMETERS)
 - Fixed the case where passwords were not being stored in the MySQL for Excel's user data folder after MySQL connections were set to be migrated manually
   (the option to delay indefinitely was chosen) to the MySQL Workbench's connections file.
   (MySQL Bug #83855, Bug #25108196 - SAVED CONNECTION PASSWORDS NOT BEING REUSED WHEN OPENING A CONNECTION)
