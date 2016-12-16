@@ -438,7 +438,14 @@ namespace MySQL.ForExcel.Forms
         if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults && statement.SqlQuery.Length > 0)
         {
           operationDetails.AddNewLine();
-          operationDetails.AppendFormat(sqlQueriesFormat, statement.ExecutionOrder, statement.SqlQuery);
+          if (statement.MySqlRow is MySqlDummyErroredRow)
+          {
+            operationDetails.Append(statement.SqlQuery);
+          }
+          else
+          {
+            operationDetails.AppendFormat(sqlQueriesFormat, statement.ExecutionOrder, statement.SqlQuery);
+          }
         }
 
         switch (statement.StatementResult)
@@ -471,6 +478,12 @@ namespace MySQL.ForExcel.Forms
             operationDetails.AddNewLine(2, true);
             operationDetails.Append(Resources.AppendDataRowsInsertionErrorText);
             operationDetails.AddNewLine(2);
+            if (statement.MySqlRow is MySqlDummyErroredRow)
+            {
+              // This is not really the SQL Query, for a MySqlDummyErroredRow it contains a header for the error message displayed in the ResultText.
+              operationDetails.AppendLine(statement.SqlQuery);
+            }
+
             operationDetails.Append(statement.ResultText);
             break;
         }

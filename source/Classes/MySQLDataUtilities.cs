@@ -461,7 +461,6 @@ namespace MySQL.ForExcel.Classes
       try
       {
         var connectionBuilder = connection.GetConnectionStringBuilder();
-        connectionBuilder.AllowUserVariables = true;
         ds = MySqlHelper.ExecuteDataset(connectionBuilder.ConnectionString, query);
       }
       catch (Exception ex)
@@ -685,7 +684,9 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
+      connection.AllowUserVariables = true;
       connection.AllowZeroDateTimeValues = true;
+      connection.CharacterSet = "utf8";
       connection.TreatTinyIntAsBoolean = false;
     }
 

@@ -460,7 +460,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the given boxed object represents an empty value in Excel, <c>false</c> otherwise.</returns>
     public static bool IsEmptyValue(this object rawValue)
     {
-      return rawValue == null || rawValue == DBNull.Value || Equals(rawValue, string.Empty);
+      return Equals(rawValue, string.Empty) || rawValue.IsNull();
     }
 
     /// <summary>
@@ -477,6 +477,16 @@ namespace MySQL.ForExcel.Classes
 
       Guid guid;
       return Guid.TryParse(value, out guid);
+    }
+
+    /// <summary>
+    /// Checks if the given boxed object represents a null value.
+    /// </summary>
+    /// <param name="rawValue">An object.</param>
+    /// <returns><c>true</c> if the given boxed object represents a null value, <c>false</c> otherwise.</returns>
+    public static bool IsNull(this object rawValue)
+    {
+      return rawValue == null || rawValue == DBNull.Value;
     }
 
     /// <summary>

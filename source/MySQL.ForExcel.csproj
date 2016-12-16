@@ -272,6 +272,7 @@
     <Compile Include="Classes\MySqlDataType.cs" />
     <Compile Include="Classes\MySqlDataUtilities.cs" />
     <Compile Include="Classes\MySqlDisplayDataType.cs" />
+    <Compile Include="Classes\MySqlDummyErroredRow.cs" />
     <Compile Include="Classes\MySqlDummyRow.cs" />
     <Compile Include="Classes\MySqlForExcelSettings.cs" />
     <Compile Include="Classes\MySqlListViewNode.cs" />

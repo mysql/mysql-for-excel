@@ -363,7 +363,9 @@ namespace MySQL.ForExcel.Forms
 
       // Handle error message thrown back by the server and show it to the user.
       var errorMessage = ErroredOutDataRow != null
-        ? ErroredOutDataRow.Statement.ResultText
+        ? (ErroredOutDataRow is MySqlDummyErroredRow
+            ? ErroredOutDataRow.Statement.SqlQuery + Environment.NewLine + Environment.NewLine + ErroredOutDataRow.Statement.ResultText
+            : ErroredOutDataRow.Statement.ResultText)
         : Resources.StatementExecutionGenericError;
       Cursor = Cursors.Default;
       MiscUtilities.ShowCustomizedInfoDialog(InfoDialog.InfoType.Error, _errorDialogSummary, errorMessage, false);
@@ -383,51 +385,73 @@ namespace MySQL.ForExcel.Forms
       }
 
       var connectionStringBuilder = _wbConnection.GetConnectionStringBuilder();
-      connectionStringBuilder.AllowUserVariables = true;
-      using (var conn = new MySqlConnection(connectionStringBuilder.ConnectionString))
+      if (_mySqlTable != null)
       {
-        conn.Open();
-        MySqlTransaction transaction = conn.BeginTransaction();
-        var command = new MySqlCommand(string.Empty, conn, transaction);
-        uint executionOrder = 1;
-        foreach (var mySqlRow in ActualStatementRowsList)
+        // Set the client character set (SET NAMES) to the same character set being used by the target table.
+        connectionStringBuilder.CharacterSet = (_mySqlTable.OperationType.IsForExport() || _mySqlTable.OperationType.IsForAppend()) && _mySqlTable.CharSet.IsUnicodeCharSetOrCollation()
+          ? "utf8"
+          : _mySqlTable.CharSet;
+      }
+
+      try
+      {
+        using (var conn = new MySqlConnection(connectionStringBuilder.ConnectionString))
         {
-          // Before attempting to execute the MySqlStatement object, check if the connection is still open.
-          if (conn.State != ConnectionState.Open)
+          conn.Open();
+          MySqlTransaction transaction = conn.BeginTransaction();
+          var command = new MySqlCommand(string.Empty, conn, transaction);
+          uint executionOrder = 1;
+          foreach (var mySqlRow in ActualStatementRowsList)
           {
-            ErroredOutDataRow = mySqlRow;
-            ErroredOutDataRow.RowError = Resources.ConnectionLostErrorText;
-            ScriptResult = MySqlStatement.StatementResultType.ConnectionLost;
-            break;
-          }
-
-          var rowStatement = mySqlRow.Statement;
-          rowStatement.Execute(command, executionOrder++, _useOptimisticUpdate);
-          ScriptResult = rowStatement.JoinResultTypes(ScriptResult);
-          if (ScriptResult.WithoutErrors())
-          {
-            continue;
-          }
-
-          ErroredOutDataRow = mySqlRow;
-          if (ScriptResult == MySqlStatement.StatementResultType.ErrorThrown)
-          {
-            // Check if the result was errored out because the connection was broken and if so, flip the ScriptResult to its proper value.
+            // Before attempting to execute the MySqlStatement object, check if the connection is still open.
             if (conn.State != ConnectionState.Open)
             {
+              ErroredOutDataRow = mySqlRow;
               ErroredOutDataRow.RowError = Resources.ConnectionLostErrorText;
               ScriptResult = MySqlStatement.StatementResultType.ConnectionLost;
               break;
             }
 
-            mySqlRow.ReflectError();
+            var rowStatement = mySqlRow.Statement;
+            rowStatement.Execute(command, executionOrder++, _useOptimisticUpdate);
+            ScriptResult = rowStatement.JoinResultTypes(ScriptResult);
+            if (ScriptResult.WithoutErrors())
+            {
+              continue;
+            }
+
+            ErroredOutDataRow = mySqlRow;
+            if (ScriptResult == MySqlStatement.StatementResultType.ErrorThrown)
+            {
+              // Check if the result was errored out because the connection was broken and if so, flip the ScriptResult to its proper value.
+              if (conn.State != ConnectionState.Open)
+              {
+                ErroredOutDataRow.RowError = Resources.ConnectionLostErrorText;
+                ScriptResult = MySqlStatement.StatementResultType.ConnectionLost;
+                break;
+              }
+
+              mySqlRow.ReflectError();
+            }
+
+            break;
           }
 
-          break;
+          PostApplyScript(transaction);
+          transaction.Dispose();
         }
-
-        PostApplyScript(transaction);
-        transaction.Dispose();
+      }
+      catch (MySqlException mySqlEx)
+      {
+        ScriptResult = MySqlStatement.StatementResultType.ErrorThrown;
+        MySqlSourceTrace.WriteAppErrorToLog(mySqlEx, false);
+        ErroredOutDataRow = new MySqlDummyErroredRow(mySqlEx.Number == 1231 ? Resources.UnsupportedClientCharSetError : Resources.ConnectionOrTransactionInitializationError, mySqlEx.Message);
+      }
+      catch (Exception ex)
+      {
+        ScriptResult = MySqlStatement.StatementResultType.ErrorThrown;
+        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
+        ErroredOutDataRow = new MySqlDummyErroredRow(Resources.ConnectionOrTransactionInitializationError, ex.Message);
       }
     }
 

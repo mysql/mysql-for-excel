@@ -120,11 +120,6 @@ namespace MySQL.ForExcel.Classes
     private string _executionOrderFormat;
 
     /// <summary>
-    /// The <see cref="IMySqlDataRow"/> object holding a SQL statement to be applied against the database.
-    /// </summary>
-    private readonly IMySqlDataRow _mySqlRow;
-
-    /// <summary>
     /// The query text of this SQL statement to be applied against the database.
     /// </summary>
     private string _sqlQuery;
@@ -147,16 +142,29 @@ namespace MySQL.ForExcel.Classes
     /// <param name="mySqlRow">The <see cref="IMySqlDataRow"/> object holding a SQL statement to be applied against the database.</param>
     public MySqlStatement(IMySqlDataRow mySqlRow)
     {
-      _mySqlRow = mySqlRow;
       _sqlQuery = string.Empty;
       _warningsBuilder = null;
       AffectedRows = 0;
       ExecutionOrder = 0;
+      MySqlRow = mySqlRow;
       ResultText = string.Empty;
       SetVariablesSqlQuery = null;
       StatementResult = StatementResultType.NotApplied;
       StatementsQuantityFormat = STATEMENTS_QUANTITY_DEFAULT_FORMAT;
       WarningsQuantity = 0;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MySqlStatement"/> class.
+    /// </summary>
+    /// <param name="mySqlRow">A <see cref="MySqlDummyRow"/> instance.</param>
+    /// <param name="errorMessage">An error message.</param>
+    /// <remarks>This constructor is meant to be used to create a dummy statement that holds just an error message.</remarks>
+    public MySqlStatement(MySqlDummyRow mySqlRow, string errorMessage)
+      : this(mySqlRow)
+    {
+      ResultText = errorMessage;
+      StatementResult = StatementResultType.ErrorThrown;
     }
 
     #region Enumerations
@@ -278,6 +286,11 @@ namespace MySQL.ForExcel.Classes
     public uint ExecutionOrder { get; private set; }
 
     /// <summary>
+    /// Gets the <see cref="IMySqlDataRow"/> object holding a SQL statement to be applied against the database.
+    /// </summary>
+    public IMySqlDataRow MySqlRow { get; private set; }
+
+    /// <summary>
     /// Gets the text returned by the MySQL server after executing this statement.
     /// </summary>
     public string ResultText { get; private set; }
@@ -295,7 +308,7 @@ namespace MySQL.ForExcel.Classes
       get
       {
         string setVariablesSqlQuery = null;
-        string freshQuery = _mySqlRow != null ? _mySqlRow.GetSql(out setVariablesSqlQuery) : string.Empty;
+        string freshQuery = MySqlRow != null ? MySqlRow.GetSql(out setVariablesSqlQuery) : string.Empty;
         SetVariablesSqlQuery = setVariablesSqlQuery;
         if (!string.IsNullOrEmpty(freshQuery))
         {
@@ -362,7 +375,7 @@ namespace MySQL.ForExcel.Classes
     {
       get
       {
-        return _mySqlRow != null && _mySqlRow.ExcelRow > 0 ? _mySqlRow.ExcelRow.ToString(CultureInfo.InvariantCulture) : string.Empty;
+        return MySqlRow != null && MySqlRow.ExcelRow > 0 ? MySqlRow.ExcelRow.ToString(CultureInfo.InvariantCulture) : string.Empty;
       }
     }
 
@@ -441,11 +454,11 @@ namespace MySQL.ForExcel.Classes
       ExecutionOrder = executionOrder;
       if (mySqlCommand == null)
       {
-        throw new ArgumentNullException("mySqlCommand");
+        throw new ArgumentNullException(nameof(mySqlCommand));
       }
 
       StatementResult = StatementResultType.NotApplied;
-      if (_mySqlRow == null || string.IsNullOrEmpty(SqlQuery))
+      if (MySqlRow == null || string.IsNullOrEmpty(SqlQuery))
       {
         return;
       }
@@ -454,7 +467,7 @@ namespace MySQL.ForExcel.Classes
       {
         StatementResult = StatementResultType.ConnectionLost;
         ResultText = Resources.ConnectionLostErrorText;
-        _mySqlRow.RowError = ResultText;
+        MySqlRow.RowError = ResultText;
         return;
       }
 
@@ -497,7 +510,7 @@ namespace MySQL.ForExcel.Classes
         var baseException = ex.GetBaseException();
         StatementResult = StatementResultType.ErrorThrown;
         AffectedRows = 0;
-        _mySqlRow.RowError = baseException.Message;
+        MySqlRow.RowError = baseException.Message;
         MySqlSourceTrace.WriteAppErrorToLog(baseException, false);
         if (baseException is MySqlException)
         {
@@ -596,7 +609,7 @@ namespace MySQL.ForExcel.Classes
         _warningsBuilder = new StringBuilder(MiscUtilities.STRING_BUILDER_DEFAULT_CAPACITY);
       }
 
-      _mySqlRow.RowError = NO_MATCH;
+      MySqlRow.RowError = NO_MATCH;
       WarningsQuantity++;
       _warningsBuilder.AppendFormat(_executionOrderFormat, ExecutionOrder);
       _warningsBuilder.Append(": ");

@@ -206,7 +206,7 @@ namespace MySQL.ForExcel.Forms
 
       NoSqlStatementsRadioButton.Checked = !PreviewSqlQueriesRadioButton.Checked && !ShowExecutedSqlQueryRadioButton.Checked;
       CreateNewWorksheetsRadioButton.Checked = !ReuseWorksheetsRadioButton.Checked;
-      ShowExecutedSqlQueryRadioButton.Checked = !OpeningWorkbookRadioButton.Checked;
+      ShowingSidebarRadioButton.Checked = !OpeningWorkbookRadioButton.Checked;
       if (_manageConnectionInfosDialog != null)
       {
         _manageConnectionInfosDialog.RefreshControlValues(useDefaultValues);

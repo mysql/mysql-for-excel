@@ -1116,4 +1116,11 @@ In order to avoid receiving this error message each time the Excel table is refr
   <data name="StandardWorkbookConnectionRefreshError" xml:space="preserve">
     <value>An error ocurred trying to refresh data in Workbook connection "{0}".</value>
   </data>
+  <data name="ConnectionOrTransactionInitializationError" xml:space="preserve">
+    <value>Error initializing connection or transaction.</value>
+  </data>
+  <data name="UnsupportedClientCharSetError" xml:space="preserve">
+    <value>A Unicode client character set different to UTF-8 is not supported by the MySQL Server.
+Connection will fall back to use a client character set of UTF-8.</value>
+  </data>
 </root>

@@ -435,6 +435,15 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error initializing connection or transaction..
+        /// </summary>
+        internal static string ConnectionOrTransactionInitializationError {
+            get {
+                return ResourceManager.GetString("ConnectionOrTransactionInitializationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Workbench connections.xml file not found.
         /// </summary>
         internal static string ConnectionsFileNotFound {
@@ -2858,6 +2867,16 @@ namespace MySQL.ForExcel.Properties {
         internal static string UnhandledMySqlTypeEncounteredError {
             get {
                 return ResourceManager.GetString("UnhandledMySqlTypeEncounteredError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A Unicode client character set different to UTF-8 is not supported by the MySQL Server.
+        ///Connection will fall back to use a client character set of UTF-8..
+        /// </summary>
+        internal static string UnsupportedClientCharSetError {
+            get {
+                return ResourceManager.GetString("UnsupportedClientCharSetError", resourceCulture);
             }
         }
         

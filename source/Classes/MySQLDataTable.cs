@@ -344,8 +344,8 @@ namespace MySQL.ForExcel.Classes
     public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string tableName, DataTable filledTable, DataOperationType operationType, string selectQuery)
       : this(wbConnection, tableName, true, true, selectQuery)
     {
-      CopyTableData(filledTable, false);
       OperationType = operationType;
+      CopyTableData(filledTable, false);
     }
 
     /// <summary>
@@ -2486,7 +2486,7 @@ namespace MySQL.ForExcel.Classes
     private void CreateTableSchema(string tableName, bool beautifyDataTypes = false)
     {
       string tableCharSet;
-      string tableCollation = WbConnection.GetTableCollation(null, tableName, out tableCharSet);
+      string tableCollation = WbConnection.GetTableCollation(SchemaName, tableName, out tableCharSet);
       if (!string.IsNullOrEmpty(tableCollation))
       {
         CharSet = tableCharSet;

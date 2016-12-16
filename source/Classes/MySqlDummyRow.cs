@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -89,7 +89,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the <see cref="MySqlStatement"/> object containing a SQL query to push changes to the database.
     /// </summary>
-    public MySqlStatement Statement { get; private set; }
+    public MySqlStatement Statement { get; protected set; }
 
     #endregion Properties
 

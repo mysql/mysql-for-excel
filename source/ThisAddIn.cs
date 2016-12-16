@@ -1556,7 +1556,7 @@ namespace MySQL.ForExcel
         return null;
       }
 
-      wbConnectionInfoConnection.AllowZeroDateTimeValues = true;
+      wbConnectionInfoConnection.SetAdditionalConnectionProperties();
       if (ActiveExcelPane.WbConnection == null)
       {
         // If the connection in the active pane is null it means an active connection does not exist, so open a connection.

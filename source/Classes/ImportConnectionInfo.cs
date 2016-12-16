@@ -144,8 +144,8 @@ namespace MySQL.ForExcel.Classes
         }
         else
         {
-          _connection.SetAdditionalConnectionProperties();
           HostIdentifier = _connection.HostIdentifier;
+          _connection.SetAdditionalConnectionProperties();
         }
       }
     }

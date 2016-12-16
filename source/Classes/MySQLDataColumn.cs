@@ -1122,7 +1122,10 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Return values for empty raw values
-      bool isEmptyValue = rawValue.IsEmptyValue();
+      bool isEmptyValue = ParentTable.OperationType == MySqlDataTable.DataOperationType.Append
+                            || ParentTable.OperationType == MySqlDataTable.DataOperationType.Export
+                          ? rawValue.IsEmptyValue()
+                          : rawValue.IsNull();
       if (isEmptyValue)
       {
         if (AllowNull)
@@ -1220,7 +1223,7 @@ namespace MySQL.ForExcel.Classes
     {
       string valueToDb = "null";
       object valueObject = GetInsertingValueForType(rawValue, true);
-      valueIsNull = valueObject == null || valueObject == DBNull.Value;
+      valueIsNull = valueObject.IsNull();
       if (valueIsNull)
       {
         return MySqlDataType.IsDateBased
