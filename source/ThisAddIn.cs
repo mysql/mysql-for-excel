@@ -347,9 +347,10 @@ namespace MySQL.ForExcel
       set
       {
         _skipSelectedDataContentsDetection = value;
-        if (!_skipSelectedDataContentsDetection)
+        var activeExcelPane = ActiveExcelPane;
+        if (!_skipSelectedDataContentsDetection && activeExcelPane != null)
         {
-          ActiveExcelPane.UpdateExcelSelectedDataStatus(Application.ActiveCell);
+          activeExcelPane.UpdateExcelSelectedDataStatus(Application.ActiveCell);
         }
       }
     }

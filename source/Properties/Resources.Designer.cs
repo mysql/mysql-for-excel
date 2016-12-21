@@ -925,7 +925,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error ocurred trying to create the Excel table `{0}`.
+        ///   Looks up a localized string similar to An error occurred trying to create the Excel table `{0}`.
         /// </summary>
         internal static string ExcelTableCreationError {
             get {
@@ -1179,7 +1179,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error ocurred trying to bind MySQL data to Excel table &quot;{0}&quot;..
+        ///   Looks up a localized string similar to An error occurred trying to bind MySQL data to Excel table &quot;{0}&quot;..
         /// </summary>
         internal static string ImportDataBindError {
             get {
@@ -1188,7 +1188,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error ocurred when trying to import the data..
+        ///   Looks up a localized string similar to An error occurred when trying to import the data..
         /// </summary>
         internal static string ImportDataErrorDetailText {
             get {
@@ -1206,7 +1206,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error ocurred trying to refresh MySQL data in Excel table &quot;{0}&quot;..
+        ///   Looks up a localized string similar to An error occurred trying to refresh MySQL data in Excel table &quot;{0}&quot;..
         /// </summary>
         internal static string ImportDataRefreshError {
             get {
@@ -2110,7 +2110,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An Error Ocurred.
+        ///   Looks up a localized string similar to An Error Occurred.
         /// </summary>
         internal static string OperationErrorTitle {
             get {
@@ -2193,7 +2193,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error ocurred trying to create the PivotTable &quot;{0}&quot;.
+        ///   Looks up a localized string similar to An error occurred trying to create the PivotTable &quot;{0}&quot;.
         /// </summary>
         internal static string PivotTableCreationError {
             get {
@@ -2603,7 +2603,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error ocurred when savings user settings file.
+        ///   Looks up a localized string similar to An error occurred when saving user settings file.
         /// </summary>
         internal static string SettingsFileSaveErrorTitle {
             get {
@@ -2649,7 +2649,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error ocurred trying to refresh data in Excel table &quot;{0}&quot;..
+        ///   Looks up a localized string similar to An error occurred trying to refresh data in Excel table &quot;{0}&quot;..
         /// </summary>
         internal static string StandardListObjectRefreshError {
             get {
@@ -2669,7 +2669,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error ocurred trying to refresh data in Workbook connection &quot;{0}&quot;..
+        ///   Looks up a localized string similar to An error occurred trying to refresh data in Workbook connection &quot;{0}&quot;..
         /// </summary>
         internal static string StandardWorkbookConnectionRefreshError {
             get {
@@ -2687,7 +2687,7 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An unknown error ocurred when trying to apply changes against the connected MySQL server..
+        ///   Looks up a localized string similar to An unknown error occurred when trying to apply changes against the connected MySQL server..
         /// </summary>
         internal static string StatementExecutionGenericError {
             get {

@@ -581,7 +581,7 @@ To be able to make modifications on cells not related to MySQL data please exit 
     <value>Error loading schemas</value>
   </data>
   <data name="SettingsFileSaveErrorTitle" xml:space="preserve">
-    <value>An error ocurred when savings user settings file</value>
+    <value>An error occurred when saving user settings file</value>
   </data>
   <data name="TableDataCopyErrorTitle" xml:space="preserve">
     <value>Error copying table data</value>
@@ -638,7 +638,7 @@ To be able to make modifications on cells not related to MySQL data please exit 
     <value>Mapping name is already in use</value>
   </data>
   <data name="OperationErrorTitle" xml:space="preserve">
-    <value>An Error Ocurred</value>
+    <value>An Error Occurred</value>
   </data>
   <data name="OperationInformationTitle" xml:space="preserve">
     <value>Information</value>
@@ -707,7 +707,7 @@ To be able to make modifications on cells not related to MySQL data please exit 
     <value>Revert Data Error</value>
   </data>
   <data name="ImportDataErrorDetailText" xml:space="preserve">
-    <value>An error ocurred when trying to import the data.</value>
+    <value>An error occurred when trying to import the data.</value>
   </data>
   <data name="TaskPaneEditingNotPossibleTitleText" xml:space="preserve">
     <value>Editing not possible</value>
@@ -855,7 +855,7 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
     <value>Value '{0}' is not suitable to be converted to a {1} data type.</value>
   </data>
   <data name="StatementExecutionGenericError" xml:space="preserve">
-    <value>An unknown error ocurred when trying to apply changes against the connected MySQL server.</value>
+    <value>An unknown error occurred when trying to apply changes against the connected MySQL server.</value>
   </data>
   <data name="MySQLforExcel_ObjectPanel_ImportManyDisabled_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySQLforExcel-ObjectPanel-ImportManyDisabled-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -921,13 +921,13 @@ Do you want to exit Edit Mode on all Worksheets within the Workbook before savin
     <value>The parent workbook of worksheet "{0}" could not be obtained.</value>
   </data>
   <data name="ExcelTableCreationError" xml:space="preserve">
-    <value>An error ocurred trying to create the Excel table `{0}`</value>
+    <value>An error occurred trying to create the Excel table `{0}`</value>
   </data>
   <data name="PivotTableCreationError" xml:space="preserve">
-    <value>An error ocurred trying to create the PivotTable "{0}"</value>
+    <value>An error occurred trying to create the PivotTable "{0}"</value>
   </data>
   <data name="ImportDataRefreshError" xml:space="preserve">
-    <value>An error ocurred trying to refresh MySQL data in Excel table "{0}".</value>
+    <value>An error occurred trying to refresh MySQL data in Excel table "{0}".</value>
   </data>
   <data name="ImportConnectionInfosMissingConnectionsDetail" xml:space="preserve">
     <value>Some Excel tables could not be reconnected to their corresponding MySQL databases because the connections could not be located.</value>
@@ -1005,7 +1005,7 @@ Since Excel relationships cannot be created, a single PivotTable for the whole E
     <value>There was an error saving the Excel workbook, please try again.</value>
   </data>
   <data name="ImportDataBindError" xml:space="preserve">
-    <value>An error ocurred trying to bind MySQL data to Excel table "{0}".</value>
+    <value>An error occurred trying to bind MySQL data to Excel table "{0}".</value>
   </data>
   <data name="MySQLforExcel_WelcomePanel_Connection_Fabric" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySQLforExcel-WelcomePanel-Connection-Fabric.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -1059,7 +1059,7 @@ Since Excel relationships cannot be created, a single PivotTable for the whole E
     <value>The following element within the Enum or Set declaration is not using single quotes correctly:</value>
   </data>
   <data name="StandardListObjectRefreshError" xml:space="preserve">
-    <value>An error ocurred trying to refresh data in Excel table "{0}".</value>
+    <value>An error occurred trying to refresh data in Excel table "{0}".</value>
   </data>
   <data name="ValueLessThanZeroError" xml:space="preserve">
     <value>Value must be greater or equal to 0.</value>
@@ -1114,7 +1114,7 @@ In order to avoid receiving this error message each time the Excel table is refr
     <value>Do you want to continue refreshing remaining Workbook connections?</value>
   </data>
   <data name="StandardWorkbookConnectionRefreshError" xml:space="preserve">
-    <value>An error ocurred trying to refresh data in Workbook connection "{0}".</value>
+    <value>An error occurred trying to refresh data in Workbook connection "{0}".</value>
   </data>
   <data name="ConnectionOrTransactionInitializationError" xml:space="preserve">
     <value>Error initializing connection or transaction.</value>

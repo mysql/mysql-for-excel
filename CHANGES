@@ -1,4 +1,6 @@
 1.3.7
+- Fixed the refreshing code to avoid attempting to update properties in the sidebar if it is not visible.
+  (MySQL Bug #84291, Bug #25301136 - ERROR REFRESHING MYSQL DATA WHEN THE ADD-IN'S SIDEBAR IS NOT VISIBLE)
 - Fixed code that runs when the MySQL for Excel add-in is loaded that loads connection information before the add-in's side bar is shown.
   (MySQL Bug #84290, Bug #25300917 - MYSQL DATA NOT REFRESHED AUTOMATICALLY WHEN OPENING A WORKBOOK)
 - Fixed a problem with the assembled where clause for queries generated in Edit Data sessions when having the option to use optimistic concurrency; when
