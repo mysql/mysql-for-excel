@@ -1255,7 +1255,7 @@ namespace MySQL.ForExcel
       }
 
       var orphanedConnectionInfos = ManageConnectionInfosDialog.GetConnectionInfosWithNonExistentWorkbook();
-      if (orphanedConnectionInfos == null)
+      if (orphanedConnectionInfos == null || orphanedConnectionInfos.Count == 0)
       {
         return;
       }

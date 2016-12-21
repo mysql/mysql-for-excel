@@ -1,4 +1,6 @@
 1.3.7
+- Fixed code that runs when the MySQL for Excel add-in is loaded that loads connection information before the add-in's side bar is shown.
+  (MySQL Bug #84290, Bug #25300917 - MYSQL DATA NOT REFRESHED AUTOMATICALLY WHEN OPENING A WORKBOOK)
 - Fixed a problem with the assembled where clause for queries generated in Edit Data sessions when having the option to use optimistic concurrency; when
   empty strings were present in the editing MySQL table, the values where being incorrectly converted to null in the where clause. Ensured the connection
   used to push Edit Data changes uses the same client character set the editing table has. Added a friendly error message in case the editing table has

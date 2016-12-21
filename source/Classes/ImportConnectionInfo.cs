@@ -137,7 +137,7 @@ namespace MySQL.ForExcel.Classes
           return;
         }
 
-        _connection = MySqlWorkbench.Connections.GetConnectionForId(ConnectionId);
+        _connection = MySqlWorkbench.Connections.GetConnectionForId(_connectionId);
         if (_connection == null)
         {
           ConnectionInfoError = ConnectionInfoErrorType.WorkbenchConnectionDoesNotExist;
