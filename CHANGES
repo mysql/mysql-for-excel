@@ -1,4 +1,6 @@
 1.3.7
+- Fixed the sizes of grids and some other fields that are set to grow to the bottom and to the right when the form is resized, and changed the way
+  anchors are defined for them. (MySQL Bug #84351, Bug #25325457 - GRIDS SIZES WRONG AT THE BOTTOM)
 - Fixed the way a summary row is created when using Excel tables (ListObjects) to import MySQL data. The summary row must be created after the ListObject
   is bound to the data source. Also fixed the fact that an extra blank row must be left at the end of the imported data when at the very bottom of the
   Excel Worksheet, the extra blank row is needed in the case a summary row is manually added by the users, otherwise Excel throws a COM Exception.

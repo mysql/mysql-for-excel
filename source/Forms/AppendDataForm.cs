@@ -139,6 +139,7 @@ namespace MySQL.ForExcel.Forms
 
       InitializeComponent();
 
+      SetAnchors();
       InitializeSourceTableGrid();
       InitializeTargetTableGrid();
 
@@ -1247,6 +1248,14 @@ namespace MySQL.ForExcel.Forms
       }
 
       return appliedStoredMapping;
+    }
+
+    /// <summary>
+    /// Sets the anchors for some controls that for some reason can't be set at design time.
+    /// </summary>
+    private void SetAnchors()
+    {
+      TargetMySqlTableDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
     }
 
     /// <summary>

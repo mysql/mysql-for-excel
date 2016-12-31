@@ -104,6 +104,7 @@ namespace MySQL.ForExcel.Forms
       _atRow = atCell == null ? 1 : atCell.Row;
       InitializeComponent();
 
+      SetAnchors();
       PreviewDataGridView.DataError += PreviewDataGridView_DataError;
       TableNameMainLabel.Text = importDbTableOrView is DbTable ? "Table Name" : "View Name";
       PickColumnsSubLabel.Text = string.Format(Resources.ImportTableOrViewSubText, importDbTableOrView is DbTable ? "table" : "view");
@@ -541,6 +542,14 @@ namespace MySQL.ForExcel.Forms
       show = RowsLimit < _totalRowsCount;
       OptionsWarningPictureBox.Visible = show;
       OptionsWarningLabel.Visible = show;
+    }
+
+    /// <summary>
+    /// Sets the anchors for some controls that for some reason can't be set at design time.
+    /// </summary>
+    private void SetAnchors()
+    {
+      PreviewDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
     }
 
     /// <summary>

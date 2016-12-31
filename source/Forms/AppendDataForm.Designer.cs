@@ -300,7 +300,7 @@ namespace MySQL.ForExcel.Forms
       this.ExportDataLabel.ForeColor = System.Drawing.Color.Navy;
       this.ExportDataLabel.Location = new System.Drawing.Point(17, 17);
       this.ExportDataLabel.Name = "ExportDataLabel";
-      this.ExportDataLabel.Size = new System.Drawing.Size(207, 20);
+      this.ExportDataLabel.Size = new System.Drawing.Size(205, 20);
       this.ExportDataLabel.TabIndex = 0;
       this.ExportDataLabel.Text = "Append Data to MySQL Table";
       // 
@@ -445,8 +445,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.TargetMySqlTableDataGridView.AllowChangingHeaderCellsColors = true;
       this.TargetMySqlTableDataGridView.AllowDrop = true;
-      this.TargetMySqlTableDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+      this.TargetMySqlTableDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.TargetMySqlTableDataGridView.AutoSizeColumnsBasedOnAdditionalHeadersContent = true;
       this.TargetMySqlTableDataGridView.BaseColumnHeadersTextAlignment = System.Windows.Forms.HorizontalAlignment.Center;

@@ -465,8 +465,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // PreviewDataGridView
       // 
-      this.PreviewDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+      this.PreviewDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
       dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.InactiveCaption;
@@ -489,7 +488,7 @@ namespace MySQL.ForExcel.Forms
       this.PreviewDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
       this.PreviewDataGridView.Location = new System.Drawing.Point(80, 160);
       this.PreviewDataGridView.Name = "PreviewDataGridView";
-      this.PreviewDataGridView.Size = new System.Drawing.Size(695, 319);
+      this.PreviewDataGridView.Size = new System.Drawing.Size(695, 271);
       this.PreviewDataGridView.TabIndex = 7;
       this.PreviewDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.PreviewDataGridView_DataBindingComplete);
       this.PreviewDataGridView.SelectionChanged += new System.EventHandler(this.PreviewDataGridView_SelectionChanged);

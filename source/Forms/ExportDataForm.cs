@@ -92,6 +92,7 @@ namespace MySQL.ForExcel.Forms
       _exportDataRange = exportDataRange;
 
       InitializeComponent();
+      SetAnchors();
       if (!exportingWorksheetName.ToLowerInvariant().StartsWith("sheet"))
       {
         _proposedTableName = exportingWorksheetName.ToLower().Replace(' ', '_');
@@ -110,7 +111,6 @@ namespace MySQL.ForExcel.Forms
       }
 
       PreviewTableWarningsChanged(_previewDataTable, new TableWarningsChangedArgs(_previewDataTable, false));
-
       TableNameInputTextBox.Focus();
       TableNameInputTextBox.SelectAll();
     }
@@ -793,6 +793,17 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
+    /// Event delegate method fired when the <see cref="ExportButton"/> gets enabled or disabled.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ExportButton_EnabledChanged(object sender, EventArgs e)
+    {
+      DropDownButton.Enabled = ExportButton.Enabled;
+      DropDownButton.BackColor = ExportButton.BackColor;
+    }
+
+    /// <summary>
     /// Exports the selected Excel data to a new MySQL table.
     /// </summary>
     /// <returns><c>true</c> if the export is successful, <c>false</c> otherwise.</returns>
@@ -1471,6 +1482,18 @@ namespace MySQL.ForExcel.Forms
 
       TextChangedTimer.Stop();
       TextChangedTimer.Start();
+    }
+
+    /// <summary>
+    /// Sets the anchors for some controls that for some reason can't be set at design time.
+    /// </summary>
+    private void SetAnchors()
+    {
+      PreviewDataGridView.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+      ColumnNameTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+      DataTypeComboBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+      DefaultValueTextBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+      DefaultValuePictureBox.Anchor = AnchorStyles.Top | AnchorStyles.Right;
     }
 
     /// <summary>

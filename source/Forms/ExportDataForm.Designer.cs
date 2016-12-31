@@ -217,6 +217,7 @@ namespace MySQL.ForExcel.Forms
       this.ExportButton.TabIndex = 1;
       this.ExportButton.Text = "Export Data  ";
       this.ExportButton.UseVisualStyleBackColor = true;
+      this.ExportButton.EnabledChanged += new System.EventHandler(this.ExportButton_EnabledChanged);
       // 
       // DialogCancelButton
       // 
@@ -309,11 +310,9 @@ namespace MySQL.ForExcel.Forms
       // 
       // DefaultValueTextBox
       // 
-      this.DefaultValueTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
       this.DefaultValueTextBox.Location = new System.Drawing.Point(118, 81);
       this.DefaultValueTextBox.Name = "DefaultValueTextBox";
-      this.DefaultValueTextBox.Size = new System.Drawing.Size(173, 23);
+      this.DefaultValueTextBox.Size = new System.Drawing.Size(177, 23);
       this.DefaultValueTextBox.TabIndex = 5;
       this.HelpToolTip.SetToolTip(this.DefaultValueTextBox, "A default value can\'t be applied to Blob, Text, Geometry and JSON data types.\r\nIf" +
         " a default value is set, the column can\'t be set to Auto Increment its values.");
@@ -322,18 +321,15 @@ namespace MySQL.ForExcel.Forms
       // 
       // DefaultValueLabel
       // 
-      this.DefaultValueLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.DefaultValueLabel.AutoSize = true;
       this.DefaultValueLabel.Location = new System.Drawing.Point(32, 85);
       this.DefaultValueLabel.Name = "DefaultValueLabel";
-      this.DefaultValueLabel.Size = new System.Drawing.Size(80, 15);
+      this.DefaultValueLabel.Size = new System.Drawing.Size(79, 15);
       this.DefaultValueLabel.TabIndex = 4;
       this.DefaultValueLabel.Text = "Default Value:";
       // 
       // DataTypeComboBox
       // 
-      this.DataTypeComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
       this.DataTypeComboBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
       this.DataTypeComboBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
       this.DataTypeComboBox.ContextMenuStrip = this.DataTypeContextMenuStrip;
@@ -342,7 +338,7 @@ namespace MySQL.ForExcel.Forms
       this.DataTypeComboBox.FormattingEnabled = true;
       this.DataTypeComboBox.Location = new System.Drawing.Point(118, 51);
       this.DataTypeComboBox.Name = "DataTypeComboBox";
-      this.DataTypeComboBox.Size = new System.Drawing.Size(173, 24);
+      this.DataTypeComboBox.Size = new System.Drawing.Size(177, 24);
       this.DataTypeComboBox.TabIndex = 3;
       this.HelpToolTip.SetToolTip(this.DataTypeComboBox, resources.GetString("DataTypeComboBox.ToolTip"));
       this.DataTypeComboBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.DataTypeComboBoxDrawItem);
@@ -449,17 +445,15 @@ namespace MySQL.ForExcel.Forms
       this.DatatypeLabel.AutoSize = true;
       this.DatatypeLabel.Location = new System.Drawing.Point(49, 54);
       this.DatatypeLabel.Name = "DatatypeLabel";
-      this.DatatypeLabel.Size = new System.Drawing.Size(63, 15);
+      this.DatatypeLabel.Size = new System.Drawing.Size(62, 15);
       this.DatatypeLabel.TabIndex = 2;
       this.DatatypeLabel.Text = "Data Type:";
       // 
       // ColumnNameTextBox
       // 
-      this.ColumnNameTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
       this.ColumnNameTextBox.Location = new System.Drawing.Point(118, 22);
       this.ColumnNameTextBox.Name = "ColumnNameTextBox";
-      this.ColumnNameTextBox.Size = new System.Drawing.Size(173, 23);
+      this.ColumnNameTextBox.Size = new System.Drawing.Size(177, 23);
       this.ColumnNameTextBox.TabIndex = 1;
       this.HelpToolTip.SetToolTip(this.ColumnNameTextBox, "The name of the column.");
       this.ColumnNameTextBox.TextChanged += new System.EventHandler(this.ColumnNameTextBox_TextChanged);
@@ -728,7 +722,7 @@ namespace MySQL.ForExcel.Forms
       this.TableNameMainLabel.ForeColor = System.Drawing.SystemColors.ControlText;
       this.TableNameMainLabel.Location = new System.Drawing.Point(79, 54);
       this.TableNameMainLabel.Name = "TableNameMainLabel";
-      this.TableNameMainLabel.Size = new System.Drawing.Size(126, 17);
+      this.TableNameMainLabel.Size = new System.Drawing.Size(125, 17);
       this.TableNameMainLabel.TabIndex = 1;
       this.TableNameMainLabel.Text = "1. Set a Table Name";
       // 
@@ -769,17 +763,20 @@ namespace MySQL.ForExcel.Forms
       // DropDownButton
       // 
       this.DropDownButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.DropDownButton.BackColor = System.Drawing.SystemColors.Control;
+      this.DropDownButton.Enabled = false;
       this.DropDownButton.FlatAppearance.BorderSize = 0;
       this.DropDownButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
       this.DropDownButton.Font = new System.Drawing.Font("Segoe UI", 5.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.DropDownButton.Location = new System.Drawing.Point(777, 16);
+      this.DropDownButton.Location = new System.Drawing.Point(775, 16);
       this.DropDownButton.Margin = new System.Windows.Forms.Padding(0);
       this.DropDownButton.Name = "DropDownButton";
       this.DropDownButton.Size = new System.Drawing.Size(12, 15);
       this.DropDownButton.TabIndex = 2;
+      this.DropDownButton.TabStop = false;
       this.DropDownButton.Text = "▼";
       this.HelpToolTip.SetToolTip(this.DropDownButton, "Click here to select between Export Data and Create Table operations.");
-      this.DropDownButton.UseVisualStyleBackColor = true;
+      this.DropDownButton.UseVisualStyleBackColor = false;
       this.DropDownButton.Click += new System.EventHandler(this.DropDownButton_Click);
       // 
       // ExportContextMenuStrip
@@ -790,21 +787,21 @@ namespace MySQL.ForExcel.Forms
       this.ExportContextMenuStrip.Name = "ExportContextMenuStrip";
       this.ExportContextMenuStrip.ShowCheckMargin = true;
       this.ExportContextMenuStrip.ShowImageMargin = false;
-      this.ExportContextMenuStrip.Size = new System.Drawing.Size(141, 48);
+      this.ExportContextMenuStrip.Size = new System.Drawing.Size(140, 48);
       // 
       // ExportDataToolStripMenuItem
       // 
       this.ExportDataToolStripMenuItem.Checked = true;
       this.ExportDataToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
       this.ExportDataToolStripMenuItem.Name = "ExportDataToolStripMenuItem";
-      this.ExportDataToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+      this.ExportDataToolStripMenuItem.Size = new System.Drawing.Size(139, 22);
       this.ExportDataToolStripMenuItem.Text = "Export Data";
       this.ExportDataToolStripMenuItem.Click += new System.EventHandler(this.ExportDataToolStripMenuItem_Click);
       // 
       // CreateTableToolStripMenuItem
       // 
       this.CreateTableToolStripMenuItem.Name = "CreateTableToolStripMenuItem";
-      this.CreateTableToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+      this.CreateTableToolStripMenuItem.Size = new System.Drawing.Size(139, 22);
       this.CreateTableToolStripMenuItem.Text = "Create Table";
       this.CreateTableToolStripMenuItem.Click += new System.EventHandler(this.CreateTableToolStripMenuItem_Click);
       // 
@@ -842,8 +839,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // PreviewDataGridView
       // 
-      this.PreviewDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+      this.PreviewDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
       dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
