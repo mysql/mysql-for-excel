@@ -308,7 +308,7 @@ namespace MySQL.ForExcel.Forms
       this.ResultSetsTabControl.Location = new System.Drawing.Point(82, 299);
       this.ResultSetsTabControl.Name = "ResultSetsTabControl";
       this.ResultSetsTabControl.SelectedIndex = 0;
-      this.ResultSetsTabControl.Size = new System.Drawing.Size(676, 240);
+      this.ResultSetsTabControl.Size = new System.Drawing.Size(676, 238);
       this.ResultSetsTabControl.TabIndex = 12;
       this.ResultSetsTabControl.SelectedIndexChanged += new System.EventHandler(this.ResultSetsTabControl_SelectedIndexChanged);
       // 
@@ -394,7 +394,7 @@ namespace MySQL.ForExcel.Forms
       this.CreatePivotTableCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.CreatePivotTableCheckBox.Location = new System.Drawing.Point(395, 246);
       this.CreatePivotTableCheckBox.Name = "CreatePivotTableCheckBox";
-      this.CreatePivotTableCheckBox.Size = new System.Drawing.Size(279, 19);
+      this.CreatePivotTableCheckBox.Size = new System.Drawing.Size(278, 19);
       this.CreatePivotTableCheckBox.TabIndex = 11;
       this.CreatePivotTableCheckBox.Text = "Create a PivotTable for each imported result set.";
       this.CreatePivotTableCheckBox.UseVisualStyleBackColor = true;

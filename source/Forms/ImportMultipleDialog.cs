@@ -86,7 +86,7 @@ namespace MySQL.ForExcel.Forms
     {
       if (tableOrViews == null)
       {
-        throw new ArgumentNullException("tableOrViews");
+        throw new ArgumentNullException(nameof(tableOrViews));
       }
 
       _tableOrViews = tableOrViews;

@@ -29,23 +29,26 @@ namespace MySQL.ForExcel.Forms
   public partial class ImportAdvancedOptionsDialog : AutoStyleableBaseDialog
   {
     /// <summary>
-    /// Gets or sets a value indicating whether the data in the parent form needs to be reloaded on the grids.
-    /// </summary>
-    /// <value>
-    ///   <c>true</c> if requires refreshing; otherwise, <c>false</c>.
-    /// </value>
-    public bool ParentFormRequiresRefresh { get; private set; }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="ImportAdvancedOptionsDialog"/> class.
     /// </summary>
     public ImportAdvancedOptionsDialog()
     {
-      ParentFormRequiresRefresh = false;
+      ParentFormRequiresDataReload = false;
+      ParentFormRequiresLimitRecalculation = false;
       InitializeComponent();
       RefreshControlValues();
       SetExcelTableControlsAvailability();
     }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the data in the parent form needs to be reloaded on the grids.
+    /// </summary>
+    public bool ParentFormRequiresDataReload { get; private set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the limit of rows maximum value in the parent form needs to be recalculated.
+    /// </summary>
+    public bool ParentFormRequiresLimitRecalculation { get; private set; }
 
     /// <summary>
     /// Event delegate method fired when the <see cref="CreateExcelTableCheckbox"/> checkbox is checked.
@@ -77,7 +80,8 @@ namespace MySQL.ForExcel.Forms
       }
 
       var previewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
-      ParentFormRequiresRefresh = Settings.Default.ImportPreviewRowsQuantity != previewRowsQuantity;
+      ParentFormRequiresDataReload = Settings.Default.ImportPreviewRowsQuantity != previewRowsQuantity;
+      ParentFormRequiresLimitRecalculation = Settings.Default.ImportCreateExcelTable != CreateExcelTableCheckbox.Checked;
 
       Settings.Default.ImportPreviewRowsQuantity = previewRowsQuantity;
       Settings.Default.ImportEscapeFormulaTextValues = EscapeFormulaValuesCheckBox.Checked;

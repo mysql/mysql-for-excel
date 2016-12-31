@@ -598,8 +598,7 @@ namespace MySQL.ForExcel.Classes
     /// <remarks>This method must be used in Excel versions lesser than 15 (2013) where the Data Model is not supported.</remarks>
     /// <param name="worksheet"></param>
     /// <param name="atCell">The top left Excel cell of the new <see cref="ExcelInterop.ListObject"/>.</param>
-    /// <param name="addSummaryRow">Flag indicating whether to include a row with summary fields at the end of the data rows.</param>
-    private void CreateExcelTableFromExternalSource(ExcelTools.Worksheet worksheet, ExcelInterop.Range atCell, bool addSummaryRow)
+    private void CreateExcelTableFromExternalSource(ExcelTools.Worksheet worksheet, ExcelInterop.Range atCell)
     {
       // Prepare Excel table name and dummy connection string
       string proposedName = MySqlTable.ExcelTableName;
@@ -619,11 +618,6 @@ namespace MySQL.ForExcel.Classes
       excelTable.QueryTable.WorkbookConnection.Name = workbookConnectionName;
       excelTable.QueryTable.WorkbookConnection.Description = Resources.WorkbookConnectionForExcelTableDescription;
       excelTable.Comment = Guid.NewGuid().ToString();
-      if (addSummaryRow)
-      {
-        excelTable.AddSummaryRow();
-      }
-
       ExcelTable = excelTable;
     }
 
@@ -636,7 +630,7 @@ namespace MySQL.ForExcel.Classes
     {
       if (importDataAtCell == null)
       {
-        throw new ArgumentNullException("importDataAtCell");
+        throw new ArgumentNullException(nameof(importDataAtCell));
       }
 
       var worksheet = Globals.Factory.GetVstoObject(importDataAtCell.Worksheet);
@@ -650,10 +644,16 @@ namespace MySQL.ForExcel.Classes
       try
       {
         // Create the Excel table needed to place the imported data into the Excel worksheet.
-        CreateExcelTableFromExternalSource(worksheet, importDataAtCell, addSummaryRow);
+        CreateExcelTableFromExternalSource(worksheet, importDataAtCell);
 
         // Bind the MySqlDataTable already filled with data to the Excel table.
         BindMySqlDataTable();
+
+        // Add summary row if needed.
+        if (addSummaryRow && ExcelTable != null)
+        {
+          ExcelTable.AddSummaryRow();
+        }
 
         // Add this instance of the ImportConnectionInfo class if not present already in the global collection.
         if (!Globals.ThisAddIn.StoredImportConnectionInfos.Exists(connectionInfo => connectionInfo.WorkbookGuid == workbookGuid && connectionInfo.MySqlTable == MySqlTable && string.Equals(connectionInfo.ExcelTableName, ExcelTable.Name, StringComparison.InvariantCultureIgnoreCase)))

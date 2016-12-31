@@ -1215,6 +1215,24 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Rows maximum limit capped to total rows minus start row..
+        /// </summary>
+        internal static string ImportDataRowsLimitCappedDueStartRowWarning {
+            get {
+                return ResourceManager.GetString("ImportDataRowsLimitCappedDueStartRowWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rows maximum limit capped to avoid exceeding available Worksheet&apos;s space..
+        /// </summary>
+        internal static string ImportDataRowsLimitCappedDueWorksheetSpaceWarning {
+            get {
+                return ResourceManager.GetString("ImportDataRowsLimitCappedDueWorksheetSpaceWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Importing data will be truncated since it exceeds the available Worksheet&apos;s space..
         /// </summary>
         internal static string ImportDataWillBeTruncatedWarning {
@@ -2755,6 +2773,16 @@ namespace MySQL.ForExcel.Properties {
         internal static string TaskPaneEditingNotPossibleTitleText {
             get {
                 return ResourceManager.GetString("TaskPaneEditingNotPossibleTitleText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap top {
+            get {
+                object obj = ResourceManager.GetObject("top", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         

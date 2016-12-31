@@ -1,4 +1,10 @@
 1.3.7
+- Fixed the way a summary row is created when using Excel tables (ListObjects) to import MySQL data. The summary row must be created after the ListObject
+  is bound to the data source. Also fixed the fact that an extra blank row must be left at the end of the imported data when at the very bottom of the
+  Excel Worksheet, the extra blank row is needed in the case a summary row is manually added by the users, otherwise Excel throws a COM Exception.
+  Enhanced the way capping the number of rows to import is calculated to automatically adjust the maximum number of rows the "Limit to" field allows.
+  If the maximum limit is capped, a warning is displayed now so users are aware of the reason why the maximum limit is not equal to the total number of
+  rows in the table. (MySQL Bug #73982, Bug #19652840 - ERROR IMPORTING AT WORKSHEET BOTTOM WHEN ADD SUMMARY ROW IS SELECTED)
 - Fixed the refreshing code to avoid attempting to update properties in the sidebar if it is not visible.
   (MySQL Bug #84291, Bug #25301136 - ERROR REFRESHING MYSQL DATA WHEN THE ADD-IN'S SIDEBAR IS NOT VISIBLE)
 - Fixed code that runs when the MySQL for Excel add-in is loaded that loads connection information before the add-in's side bar is shown.
