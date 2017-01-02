@@ -426,7 +426,7 @@ namespace MySQL.ForExcel.Classes
       if (!string.IsNullOrEmpty(charset))
       {
         sqlBuilder.AppendFormat(" {0} {1}", MySqlStatement.STATEMENT_DEFAULT_CHARSET, charset);
-        if (!string.IsNullOrEmpty(collation))
+        if (!string.IsNullOrEmpty(collation) && !charset.Equals("binary", StringComparison.OrdinalIgnoreCase))
         {
           sqlBuilder.AppendFormat(" {0} {1}", MySqlStatement.STATEMENT_COLLATE, collation);
         }
