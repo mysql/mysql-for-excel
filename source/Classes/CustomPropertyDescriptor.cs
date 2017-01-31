@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -17,6 +17,7 @@
 
 using System;
 using System.ComponentModel;
+using MySql.Utility.Classes.Spatial;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -54,11 +55,27 @@ namespace MySQL.ForExcel.Classes
       }
     }
 
+    /// <summary>
+    /// Gets the type of the component this property is bound to.
+    /// </summary>
     public override Type ComponentType
     {
       get
       {
-        return null;
+        return PropertyType;
+      }
+    }
+
+    /// <summary>
+    /// Gets the type converter for this property.
+    /// </summary>
+    public override TypeConverter Converter
+    {
+      get
+      {
+        return _property.MySqlType.IsSpatial
+          ? new GeometryConverter(Globals.ThisAddIn.SpatialDataAsTextFormat)
+          : base.Converter;
       }
     }
 
@@ -188,7 +205,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="component"></param>
     public override void ResetValue(object component)
     {
-      _property.Value = _property.MySqlType.TypeDefaultValue;
+      //_property.Value = _property.MySqlType.TypeDefaultValue;
     }
 
     /// <summary>

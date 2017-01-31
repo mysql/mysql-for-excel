@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -26,6 +26,7 @@ using MySQL.ForExcel.Classes.EventArguments;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes;
 using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.Spatial;
 using MySQL.ForExcel.Classes.Exceptions;
 using Excel = Microsoft.Office.Interop.Excel;
 
@@ -1140,6 +1141,11 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Return values for raw values with data
+      if (MySqlDataType.IsSpatial)
+      {
+        return MySqlDataType.GetValueAsGeometry(rawValue);
+      }
+
       if (MySqlDataType.IsDateBased)
       {
         return MySqlDataType.GetValueAsDateTime(rawValue);
@@ -1244,6 +1250,11 @@ namespace MySQL.ForExcel.Classes
         valueToDb = !dtValue.IsValidDateTime || dtValue.GetDateTime().Equals(DateTime.MinValue)
           ? GetNullDateValueAsString(out valueIsNull)
           : dtValue.GetDateTime().ToString(MySqlDataType.IsDate ? MySqlDataType.MYSQL_DATE_FORMAT : MySqlDataType.MYSQL_DATETIME_FORMAT);
+      }
+      else if (valueObject is Geometry)
+      {
+        var geomValue = (Geometry)valueObject;
+        valueToDb = string.Format("ST_GeomFromText('{0}')", geomValue.ToWktString());
       }
       else
       {
@@ -1630,6 +1641,10 @@ namespace MySQL.ForExcel.Classes
         else if (rowsDataTypesList.Count(mySqlType => mySqlType.IsDateBased) + integerCount == rowsDataTypesList.Count)
         {
           proposedStrippedDataType = "DateTime";
+        }
+        else if (rowsDataTypesList.Count(mySqlType => mySqlType.IsSpatial) == rowsDataTypesList.Count)
+        {
+          proposedStrippedDataType = "Geometry";
         }
         else
         {

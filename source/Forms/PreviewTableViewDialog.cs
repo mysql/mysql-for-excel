@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -16,14 +16,10 @@
 // 02110-1301  USA
 
 using System;
-using System.Data;
-using System.Drawing;
 using System.Globalization;
-using System.IO;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Properties;
-using MySql.Utility.Classes.MySql;
 using MySql.Utility.Forms;
 
 namespace MySQL.ForExcel.Forms
@@ -41,11 +37,6 @@ namespace MySQL.ForExcel.Forms
     private readonly DbView _previewTableOrView;
 
     /// <summary>
-    /// A <see cref="System.Data.DataTable"/> object containing a subset of the whole data which is shown in the preview grid.
-    /// </summary>
-    private DataTable _previewDataTable;
-
-    /// <summary>
     /// The total rows contained in the MySQL table or view selected for import.
     /// </summary>
     private long _totalRowsCount;
@@ -61,14 +52,14 @@ namespace MySQL.ForExcel.Forms
     {
       if (previewTableOrView == null)
       {
-        throw new ArgumentNullException("previewTableOrView");
+        throw new ArgumentNullException(nameof(previewTableOrView));
       }
 
-      _previewDataTable = null;
       _previewTableOrView = previewTableOrView;
 
       InitializeComponent();
 
+      PreviewDataGridView.SelectAllAfterBindingComplete = true;
       InitializeDialogButtons(showCancelButton);
       RowsNumericUpDown.Value = Settings.Default.ImportPreviewRowsQuantity;
       TableNameMainLabel.Text = previewTableOrView is DbTable ? "Table Name" : "View Name";
@@ -101,18 +92,13 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void FillPreviewGrid()
     {
+      Cursor = Cursors.WaitCursor;
       SetImportParameterValues();
-      _previewDataTable = _previewTableOrView.GetData();
+      PreviewDataGridView.Fill(_previewTableOrView);
       _totalRowsCount = _previewTableOrView.GetRowsCount();
       RowsCountSubLabel.Text = _totalRowsCount.ToString(CultureInfo.InvariantCulture);
-      PreviewDataGridView.DataSource = _previewDataTable;
-      foreach (DataGridViewColumn gridCol in PreviewDataGridView.Columns)
-      {
-        gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
-      }
-
-      PreviewDataGridView.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
       RowsNumericUpDown.Maximum = _totalRowsCount;
+      Cursor = Cursors.Default;
     }
 
     /// <summary>
@@ -130,46 +116,6 @@ namespace MySQL.ForExcel.Forms
       OkButton.Anchor = AnchorStyles.None;
       OkButton.Location = DialogCancelButton.Location;
       OkButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="PreviewDataGridView"/> grid is done with its data binding operation.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void PreviewDataGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
-    {
-      PreviewDataGridView.SelectAll();
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="PreviewDataGridView"/> detects a data error in one of its cells.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void PreviewDataGridView_DataError(object sender, DataGridViewDataErrorEventArgs e)
-    {
-      if (PreviewDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex].ValueType != Type.GetType("System.Byte[]"))
-      {
-        return;
-      }
-
-      try
-      {
-        var img = (byte[])(PreviewDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex]).Value;
-        using (var ms = new MemoryStream(img))
-        {
-          Image.FromStream(ms);
-        }
-      }
-      catch (ArgumentException argEx)
-      {
-        MySqlSourceTrace.WriteAppErrorToLog(argEx, false);
-      }
-      catch (Exception ex)
-      {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.DataLoadingError, true);
-      }
     }
 
     /// <summary>

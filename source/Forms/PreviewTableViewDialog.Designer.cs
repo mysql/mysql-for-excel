@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -37,11 +37,6 @@ namespace MySQL.ForExcel.Forms
         if (components != null)
         {
           components.Dispose();
-        }
-
-        if (_previewDataTable != null)
-        {
-          _previewDataTable.Dispose();
         }
       }
 
@@ -147,8 +142,6 @@ namespace MySQL.ForExcel.Forms
       this.PreviewDataGridView.Name = "PreviewDataGridView";
       this.PreviewDataGridView.Size = new System.Drawing.Size(668, 265);
       this.PreviewDataGridView.TabIndex = 6;
-      this.PreviewDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.PreviewDataGridView_DataBindingComplete);
-      this.PreviewDataGridView.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.PreviewDataGridView_DataError);
       // 
       // PreviewPictureBox
       // 

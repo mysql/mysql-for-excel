@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -17,7 +17,10 @@
 
 using System;
 using System.ComponentModel;
+using System.Data;
 using System.Windows.Forms;
+using MySQL.ForExcel.Classes;
+using MySQL.ForExcel.Properties;
 
 namespace MySQL.ForExcel.Controls
 {
@@ -48,6 +51,11 @@ namespace MySQL.ForExcel.Controls
     private int _columnsMinimumWidth;
 
     /// <summary>
+    /// A <see cref="DataTable"/> object containing a subset of the whole data which is shown in the preview grid.
+    /// </summary>
+    private DataTable _previewDataTable;
+
+    /// <summary>
     /// Flag indicating if recalculation of column width is not necessary so it must be skipped.
     /// </summary>
     private bool _skipWidthRecalculation;
@@ -61,6 +69,7 @@ namespace MySQL.ForExcel.Controls
     {
       _columnsMaximumWidth = 0;
       _columnsMinimumWidth = DEFAULT_COLUMNS_MINIMUM_WIDTH;
+      _previewDataTable = null;
       RowHeadersVisible = false;
       ShowCellErrors = false;
       ShowEditingIcon = false;
@@ -71,8 +80,10 @@ namespace MySQL.ForExcel.Controls
       AllowUserToResizeColumns = false;
       AllowUserToResizeRows = false;
       ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+      CellPainting += PreviewDataGridView_CellPainting;
       ReadOnly = true;
       RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+      SelectAllAfterBindingComplete = false;
       AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
       DisableColumnsSelection = false;
     }
@@ -299,6 +310,12 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
+    /// Gets or sets a value indicating whether all cells are selected after the data binding is done.
+    /// </summary>
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool SelectAllAfterBindingComplete { get; set; }
+
+    /// <summary>
     /// Gets a value indicating whether to show cell errors.
     /// </summary>
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -350,6 +367,58 @@ namespace MySQL.ForExcel.Controls
     }
 
     #endregion Properties
+
+    /// <summary>
+    /// Fills the <see cref="PreviewDataGridView"/> with data coming from the given <see cref="DbView"/> instance.
+    /// </summary>
+    /// <param name="dbTableOrView">A <see cref="DbView"/> instance.</param>
+    public void Fill(DbView dbTableOrView)
+    {
+      if (dbTableOrView == null)
+      {
+        return;
+      }
+
+      DoubleBuffered = true;
+      _previewDataTable = dbTableOrView.GetData();
+      DataSource = _previewDataTable;
+      var nullImage = Resources._null;
+      var blobImage = Resources.blob;
+      foreach (DataGridViewColumn gridCol in Columns)
+      {
+        gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
+        var imageColumn = gridCol as DataGridViewImageColumn;
+        foreach (DataGridViewRow row in Rows)
+        {
+          DataGridViewCell cell = row.Cells[gridCol.Index];
+          if (imageColumn == null)
+          {
+            continue;
+          }
+
+          cell.Value = cell.Value == DBNull.Value ? nullImage : blobImage;
+        }
+      }
+
+      SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
+    }
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// </summary>
+    /// <param name="disposing">Indicates whether the method was invoked from the <see cref="IDisposable.Dispose"/> implementation or from the finalizer.</param>
+    protected override void Dispose(bool disposing)
+    {
+      if (disposing)
+      {
+        if (_previewDataTable != null)
+        {
+          _previewDataTable.Dispose();
+        }
+      }
+
+      base.Dispose(disposing);
+    }
 
     /// <summary>
     /// Raises the <see cref="DataGridView.CellMouseDown"/> event.
@@ -409,9 +478,32 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
+    /// Raises the <see cref="DataGridView.DataBindingComplete"/> event.
+    /// </summary>
+    /// <param name="e">A <see cref="DataGridViewBindingCompleteEventArgs"/> that contains the event data.</param>
+    protected override void OnDataBindingComplete(DataGridViewBindingCompleteEventArgs e)
+    {
+      base.OnDataBindingComplete(e);
+      if (SelectAllAfterBindingComplete)
+      {
+        SelectAll();
+      }
+    }
+
+    /// <summary>
+    /// Raises the <see cref="DataGridView.DataError"/> event.
+    /// </summary>
+    /// <param name="displayErrorDialogIfNoHandler">A <see cref="DataGridViewDataErrorEventArgs"/> that contains the event data.</param>
+    /// <param name="e"></param>
+    protected override void OnDataError(bool displayErrorDialogIfNoHandler, DataGridViewDataErrorEventArgs e)
+    {
+      // Do not error out.
+    }
+
+    /// <summary>
     /// Recalculates the given <see cref="DataGridViewColumn"/> width comparing it to the <see cref="ColumnsMaximumWidth"/> value.
     /// </summary>
-    /// <param name="column">A <see cref="DataGridViewColumn"/>.</param>
+    /// <param name="column">A <see cref="DataGridViewColumn"/> instance.</param>
     protected void PerformColumnWidthRecalculation(DataGridViewColumn column)
     {
       bool wrapText = false;
@@ -434,6 +526,24 @@ namespace MySQL.ForExcel.Controls
         column.Width = cappedWidth;
         _skipWidthRecalculation = false;
       }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="PreviewDataGridView"/> paints every cell.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void PreviewDataGridView_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+    {
+      e.PaintBackground(e.ClipBounds, true);
+      if (e.Value == DBNull.Value)
+      {
+        var nullImage = Resources._null;
+        e.Graphics.DrawImage(nullImage, e.CellBounds.Left + (e.CellBounds.Width - nullImage.Width) / 2, e.CellBounds.Top + (e.CellBounds.Height - nullImage.Height) / 2);
+      }
+
+      e.PaintContent(e.ClipBounds);
+      e.Handled = true;
     }
   }
 }

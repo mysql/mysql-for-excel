@@ -1,4 +1,9 @@
 1.3.7
+- Added support to handle spatial data in MySQL for Excel. Spatial data is handled using corresponding text representations such as Well-Known Text
+  (WKT), Keyhole Markup Language (KML), Geography Markup Language (GML) and GeoJSON. The last 3 formats are converted into WKT internally since that is
+  the format natively supported by MySQL. A new option was added to the Global Options dialog to select the text format to use to handle spatial data
+  (WKT by default). Options in the Global Options dialog were rearranged to be grouped in tab pages for easier navigation.
+  (Bug #22081263 - [IMPORT] ERROR IMPORTING GEOMETRY TYPE DATA)
 - Fixed the query sent to the server when creating a new schema with a BINARY character set so that it never includes a "COLLATE binary" after specifying
   the charcter set, since the binary collation is the only one allowed for a binary character set, the MySQL server deems the "COLLATE binary" as an
   invalid syntax. (Bug #22371690 - BINARY - BINARY COLLATION RISES AN SQL ERROR)

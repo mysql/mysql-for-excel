@@ -54,12 +54,13 @@
         <Directory Id='CompanyDir' Name='MySQL'>
           <Directory Id="INSTALLDIR" Name="$(var.ProductName)">
             <Component Id='MainItems' Guid='2395C79F-4F2E-415F-9667-76CBE129D4CE'>
-              <File Id="Manifest" Name="MySQL.ForExcel.dll.manifest" Source="..\Source\bin\release\MySQL.ForExcel.dll.manifest" />
-              <File Id="MySql.Utility" Name="MySQL.Utility.dll" Source="..\Source\bin\release\mysql.utility.dll" />
-              <File Id="MySql.Data" Name="MySql.Data.dll" Source="..\Source\bin\release\mysql.data.dll" />
-              <File Id="v40Utilities" Name="Microsoft.Office.Tools.Common.v4.0.Utilities.dll" Source="..\Source\bin\release\Microsoft.Office.Tools.Common.v4.0.Utilities.dll" />
-              <File Id="VSTOFile" Name="MySQL.ForExcel.vsto" Source="..\Source\bin\release\MySQL.ForExcel.vsto" />
-              <File Id="AddIn" Name="MySQL.ForExcel.dll" KeyPath="yes" Source="..\Source\bin\release\MySQL.ForExcel.dll" />
+              <File Id="Manifest" Name="MySQL.ForExcel.dll.manifest" Source="..\Source\bin\Release\MySQL.ForExcel.dll.manifest" />
+              <File Id="MySql.Utility" Name="MySQL.Utility.dll" Source="..\Source\bin\Release\MySQL.Utility.dll" />
+              <File Id="MySql.Utility.RegularExpressions" Name="MySql.Utility.RegularExpressions.dll" Source="..\Source\bin\Release\MySql.Utility.RegularExpressions.dll" />
+              <File Id="MySql.Data" Name="MySql.Data.dll" Source="..\Source\bin\Release\MySql.Data.dll" />
+              <File Id="v40Utilities" Name="Microsoft.Office.Tools.Common.v4.0.Utilities.dll" Source="..\Source\bin\Release\Microsoft.Office.Tools.Common.v4.0.Utilities.dll" />
+              <File Id="VSTOFile" Name="MySQL.ForExcel.vsto" Source="..\Source\bin\Release\MySQL.ForExcel.vsto" />
+              <File Id="AddIn" Name="MySQL.ForExcel.dll" KeyPath="yes" Source="..\Source\bin\Release\MySQL.ForExcel.dll" />
               <File Id='ReleaseNotes' Name='Release Notes.txt' Source='Release Notes.txt'/>
               <?if $(var.IsGPL) = true ?>
               <File Id='ReadMe' Name='README' Source='README'/>

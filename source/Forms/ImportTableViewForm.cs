@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -18,15 +18,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Properties;
-using MySql.Utility.Classes.MySql;
 using MySql.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 
@@ -60,11 +56,6 @@ namespace MySQL.ForExcel.Forms
     private List<string> _importColumns;
 
     /// <summary>
-    /// A <see cref="DataTable"/> object containing a subset of the whole data which is shown in the preview grid.
-    /// </summary>
-    private DataTable _previewDataTable;
-
-    /// <summary>
     /// Flag indicating whether the returning rows number exceeds the Worksheet's rows maximum limit.
     /// </summary>
     private bool? _rowsExceedWorksheetLimit;
@@ -95,7 +86,6 @@ namespace MySQL.ForExcel.Forms
 
       _dbTableOrView = importDbTableOrView;
       _importColumns = null;
-      _previewDataTable = null;
       _rowsExceedWorksheetLimit = null;
       _rowsLimit = null;
       MySqlTable = null;
@@ -104,8 +94,8 @@ namespace MySQL.ForExcel.Forms
       _atRow = atCell == null ? 1 : atCell.Row;
       InitializeComponent();
 
+      PreviewDataGridView.SelectAllAfterBindingComplete = true;
       SetAnchors();
-      PreviewDataGridView.DataError += PreviewDataGridView_DataError;
       TableNameMainLabel.Text = importDbTableOrView is DbTable ? "Table Name" : "View Name";
       PickColumnsSubLabel.Text = string.Format(Resources.ImportTableOrViewSubText, importDbTableOrView is DbTable ? "table" : "view");
       Text = @"Import Data - " + importToWorksheetName;
@@ -246,20 +236,15 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void FillPreviewGrid()
     {
+      Cursor = Cursors.WaitCursor;
       _importColumns = null;
       SetImportParameterValues(Settings.Default.ImportPreviewRowsQuantity);
-      _previewDataTable = _dbTableOrView.GetData();
+      PreviewDataGridView.Fill(_dbTableOrView);
       _totalRowsCount = _dbTableOrView.GetRowsCount();
       RowsCountSubLabel.Text = _totalRowsCount.ToString(CultureInfo.InvariantCulture);
-      PreviewDataGridView.DataSource = _previewDataTable;
-      foreach (DataGridViewColumn gridCol in PreviewDataGridView.Columns)
-      {
-        gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
-      }
-
       FromRowNumericUpDown.Maximum = _totalRowsCount;
-      PreviewDataGridView.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
       ResetRowsLimit();
+      Cursor = Cursors.Default;
     }
 
     /// <summary>
@@ -429,46 +414,6 @@ namespace MySQL.ForExcel.Forms
       else if (owner.SourceControl == RowsLimitNumericUpDown)
       {
         RowsLimitNumericUpDown.Value = RowsLimitNumericUpDown.Maximum;
-      }
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="PreviewDataGridView"/> grid is done with its data binding operation.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void PreviewDataGridView_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
-    {
-      PreviewDataGridView.SelectAll();
-    }
-
-    /// <summary>
-    /// Event delegate method fired when the <see cref="PreviewDataGridView"/> detects a data error in one of its cells.
-    /// </summary>
-    /// <param name="sender">Sender object.</param>
-    /// <param name="e">Event arguments.</param>
-    private void PreviewDataGridView_DataError(object sender, DataGridViewDataErrorEventArgs e)
-    {
-      if (PreviewDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex].ValueType != Type.GetType("System.Byte[]"))
-      {
-        return;
-      }
-
-      try
-      {
-        var img = (byte[])(PreviewDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex]).Value;
-        using (var ms = new MemoryStream(img))
-        {
-          Image.FromStream(ms);
-        }
-      }
-      catch (ArgumentException argEx)
-      {
-        MySqlSourceTrace.WriteAppErrorToLog(argEx, false);
-      }
-      catch (Exception ex)
-      {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.DataLoadingError, true);
       }
     }
 

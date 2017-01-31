@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -81,7 +81,7 @@ namespace MySQL.ForExcel.Forms
     {
       if (dbProcedure == null)
       {
-        throw new ArgumentNullException("dbProcedure");
+        throw new ArgumentNullException(nameof(dbProcedure));
       }
 
       _dbProcedure = dbProcedure;
@@ -99,7 +99,7 @@ namespace MySQL.ForExcel.Forms
       ParametersPropertyGrid.SelectedObject = _procedureParamsProperties;
       AddSummaryFieldsCheckBox.Enabled = Settings.Default.ImportCreateExcelTable;
 
-      InitializeMultipleResultSetsCombo();
+      ImportResultsetsComboBox.InitializeComboBoxFromEnum(DbProcedure.ProcedureResultSetsImportType.SelectedResultSet);
       PrepareParameters();
     }
 
@@ -297,31 +297,6 @@ namespace MySQL.ForExcel.Forms
       {
         e.Cancel = !ImportData();
       }
-    }
-
-    /// <summary>
-    /// Initializes the result sets combo box with the different import options.
-    /// </summary>
-    private void InitializeMultipleResultSetsCombo()
-    {
-      var dt = new DataTable();
-      var intType = Type.GetType("System.Int32");
-      if (intType != null)
-      {
-        dt.Columns.Add("Value", intType);
-      }
-      else
-      {
-        dt.Columns.Add("Value");
-      }
-
-      dt.Columns.Add("Description");
-      dt.Rows.Add(new object[] { DbProcedure.ProcedureResultSetsImportType.SelectedResultSet, Resources.ImportProcedureSelectedResultSet });
-      dt.Rows.Add(new object[] { DbProcedure.ProcedureResultSetsImportType.AllResultSetsHorizontally, Resources.ImportProcedureAllResultSetsHorizontally });
-      dt.Rows.Add(new object[] { DbProcedure.ProcedureResultSetsImportType.AllResultSetsVertically, Resources.ImportProcedureAllResultSetsVertically });
-      ImportResultsetsComboBox.DataSource = dt;
-      ImportResultsetsComboBox.DisplayMember = "Description";
-      ImportResultsetsComboBox.ValueMember = "Value";
     }
 
     /// <summary>

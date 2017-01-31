@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -490,7 +490,6 @@ namespace MySQL.ForExcel.Forms
       this.PreviewDataGridView.Name = "PreviewDataGridView";
       this.PreviewDataGridView.Size = new System.Drawing.Size(695, 271);
       this.PreviewDataGridView.TabIndex = 7;
-      this.PreviewDataGridView.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.PreviewDataGridView_DataBindingComplete);
       this.PreviewDataGridView.SelectionChanged += new System.EventHandler(this.PreviewDataGridView_SelectionChanged);
       // 
       // ImportTableViewForm

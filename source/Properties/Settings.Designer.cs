@@ -642,5 +642,18 @@ namespace MySQL.ForExcel.Properties {
                 this["GlobalImportDataRestoreWhenOpeningWorkbook"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("WKT")]
+        public string GlobalSpatialDataAsTextFormat {
+            get {
+                return ((string)(this["GlobalSpatialDataAsTextFormat"]));
+            }
+            set {
+                this["GlobalSpatialDataAsTextFormat"] = value;
+            }
+        }
     }
 }

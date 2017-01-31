@@ -61,6 +61,16 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap _null {
+            get {
+                object obj = ResourceManager.GetObject("_null", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to All active editing connection information on the current schema will be terminated. Do you wish to continue?.
         /// </summary>
         internal static string ActiveEditConnectionInfosCloseWarningDetail {
@@ -204,6 +214,16 @@ namespace MySQL.ForExcel.Properties {
         internal static System.Drawing.Bitmap ArrowRight {
             get {
                 object obj = ResourceManager.GetObject("ArrowRight", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap blob {
+            get {
+                object obj = ResourceManager.GetObject("blob", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -30,6 +30,7 @@ using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes;
 using MySql.Utility.Classes.MySql;
 using MySql.Utility.Classes.MySqlWorkbench;
+using MySql.Utility.Classes.Spatial;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 using ExcelTools = Microsoft.Office.Tools.Excel;
 
@@ -1973,6 +1974,11 @@ namespace MySQL.ForExcel.Classes
               {
                 cellValue = dateValue.ToString(CultureInfo.CurrentCulture);
               }
+            }
+            else if (cellValue is Geometry)
+            {
+              var geomValue = (Geometry)cellValue;
+              cellValue = geomValue.ToString(Globals.ThisAddIn.SpatialDataAsTextFormat);
             }
 
             fillingArray[absRowIndex, currCol] = cellValue;

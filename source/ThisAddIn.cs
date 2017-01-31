@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -32,6 +32,7 @@ using MySql.Utility.Classes;
 using MySql.Utility.Classes.MySql;
 using MySql.Utility.Classes.MySqlInstaller;
 using MySql.Utility.Classes.MySqlWorkbench;
+using MySql.Utility.Enums;
 using MySql.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 using ExcelTools = Microsoft.Office.Tools.Excel;
@@ -150,6 +151,11 @@ namespace MySQL.ForExcel
     /// Flag indicating whether the detection of contents for a cell selection should be skipped.
     /// </summary>
     private bool _skipSelectedDataContentsDetection;
+
+    /// <summary>
+    /// The <see cref="GeometryAsTextFormatType"/> global option to handle spatial data as text.
+    /// </summary>
+    private GeometryAsTextFormatType _spatialDataAsTextFormat;
 
     #endregion Fields
 
@@ -360,6 +366,42 @@ namespace MySQL.ForExcel
     /// </summary>
     /// <remarks>Used when a cell's value is being set programatically and not by the user.</remarks>
     public bool SkipWorksheetChangeEvent { get; set; }
+
+    /// <summary>
+    /// Gets or sets the <see cref="GeometryAsTextFormatType"/> global option to handle spatial data as text.
+    /// </summary>
+    public GeometryAsTextFormatType SpatialDataAsTextFormat
+    {
+      get
+      {
+        if (_spatialDataAsTextFormat != GeometryAsTextFormatType.None)
+        {
+          return _spatialDataAsTextFormat;
+        }
+
+        GeometryAsTextFormatType format;
+        if (Enum.TryParse<GeometryAsTextFormatType>(Settings.Default.GlobalSpatialDataAsTextFormat, out format))
+        {
+          _spatialDataAsTextFormat = format;
+          return _spatialDataAsTextFormat;
+        }
+
+        SpatialDataAsTextFormat = GeometryAsTextFormatType.WKT;
+        return GeometryAsTextFormatType.WKT;
+      }
+
+      set
+      {
+        if (_spatialDataAsTextFormat == value)
+        {
+          return;
+        }
+
+        _spatialDataAsTextFormat = value == GeometryAsTextFormatType.None ? GeometryAsTextFormatType.WKT : value;
+        Settings.Default.GlobalSpatialDataAsTextFormat = _spatialDataAsTextFormat.ToString();
+        MiscUtilities.SaveSettings();
+      }
+    }
 
     /// <summary>
     /// Gets a list of <see cref="ImportConnectionInfo"/> objects saved to disk.
@@ -1245,6 +1287,19 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
+    /// Event delegate method fired when a default property value changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void Default_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName == nameof(Settings.Default.GlobalSpatialDataAsTextFormat))
+      {
+        _spatialDataAsTextFormat = GeometryAsTextFormatType.None;
+      }
+    }
+
+    /// <summary>
     /// Deletes automatically saved connection information entries with non-existent Excel Workbooks.
     /// </summary>
     /// <param name="logOperation">Flag indicating whether this operation is written in the application log.</param>
@@ -1314,6 +1369,7 @@ namespace MySQL.ForExcel
       _lastDeactivatedSheetName = string.Empty;
       _restoringExistingConnectionInfo = false;
       _skipSelectedDataContentsDetection = false;
+      _spatialDataAsTextFormat = GeometryAsTextFormatType.None;
       SkipWorksheetChangeEvent = false;
 
       // Subscribe to Excel events
@@ -1953,6 +2009,7 @@ namespace MySQL.ForExcel
         Application.WorkbookBeforeClose += Application_WorkbookBeforeClose;
         Application.WorkbookBeforeSave += Application_WorkbookBeforeSave;
         Application.WorkbookDeactivate += Application_WorkbookDeactivate;
+        Settings.Default.PropertyChanged += Default_PropertyChanged;
       }
       else
       {
@@ -1972,6 +2029,7 @@ namespace MySQL.ForExcel
         Application.WorkbookBeforeClose -= Application_WorkbookBeforeClose;
         Application.WorkbookBeforeSave -= Application_WorkbookBeforeSave;
         Application.WorkbookDeactivate -= Application_WorkbookDeactivate;
+        Settings.Default.PropertyChanged -= Default_PropertyChanged;
       }
     }
 

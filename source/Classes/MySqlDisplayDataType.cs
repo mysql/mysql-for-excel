@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -204,18 +204,14 @@ namespace MySQL.ForExcel.Classes
           new MySqlDisplayDataType("Blob", "For binary large objects up to 65 Kb", true, true, false),
           new MySqlDisplayDataType("MediumBlob", "For binary large objects up to 16 Mb", true, true, false),
           new MySqlDisplayDataType("LongBlob", "For binary large objects up to 4 Gb", true, true, false),
-          new MySqlDisplayDataType("Curve", "For spatial data, one-dimensional geometry represented by a sequence of points", true, true, false),
           new MySqlDisplayDataType("Geometry", "For spatial data, base type for all geometry values", true, true, false),
           new MySqlDisplayDataType("GeometryCollection", "For spatial data, a collection of one or more geometries of any type", true, true, false),
           new MySqlDisplayDataType("LineString", "For spatial data, a Curve with linear interpolation between points", true, true, false),
-          new MySqlDisplayDataType("MultiCurve", "For spatial data, a geometry collection composed of Curve elements", true, true, false),
           new MySqlDisplayDataType("MultiLineString", "For spatial data, a geometry collection composed of LineString elements", true, true, false),
           new MySqlDisplayDataType("MultiPoint", "For spatial data, a geometry collection composed of Point elements", true, true, false),
           new MySqlDisplayDataType("MultiPolygon", "For spatial data, a geometry collection composed of Polygon elements", true, true, false),
-          new MySqlDisplayDataType("MultiSurface", "For spatial data, a geometry collection composed of Surface elements", true, true, false),
           new MySqlDisplayDataType("Point", "For spatial data, a geometry that represents a single location in coordinate space", true, true, false),
           new MySqlDisplayDataType("Polygon", "For spatial data, a planar Surface representing a multi-sided geometry", true, true, false),
-          new MySqlDisplayDataType("Surface", "For spatial data, a base type two-dimensional geometry", true, true, false),
 
           // Other data types not to be displayed
           new MySqlDisplayDataType("Int", "Same as Integer", true, false, false),

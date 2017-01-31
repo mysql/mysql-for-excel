@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -17,10 +17,12 @@
 
 using System;
 using System.Windows.Forms;
+using MySql.Utility.Classes;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes.MySqlWorkbench;
+using MySql.Utility.Enums;
 using MySql.Utility.Forms;
 
 namespace MySQL.ForExcel.Forms
@@ -67,6 +69,7 @@ namespace MySQL.ForExcel.Forms
       InitializeComponent();
       _initialWidth = Width;
       ConnectionTimeoutNumericUpDown.Maximum = Convert.ToInt32(int.MaxValue / 1000);
+      SpatialTextFormatComboBox.InitializeComboBoxFromEnum(GeometryAsTextFormatType.None, true);
       RefreshControlValues();
       SetRestoreSessionsRadioButtonsEnabledStatus();
       SetAutomaticMigrationDelayText();
@@ -136,6 +139,7 @@ namespace MySQL.ForExcel.Forms
       settings.EditSessionsRestoreWhenOpeningWorkbook = RestoreSavedEditSessionsCheckBox.Checked;
       settings.EditSessionsReuseWorksheets = ReuseWorksheetsRadioButton.Checked;
       settings.GlobalImportDataRestoreWhenOpeningWorkbook = OpeningWorkbookRadioButton.Checked;
+      settings.GlobalSpatialDataAsTextFormat = SpatialTextFormatComboBox.SelectedValue.ToString();
       if (_manageConnectionInfosDialog != null)
       {
         settings.ConnectionInfosLastAccessDays = _manageConnectionInfosDialog.ConnectionInfosLastAccessDays;
@@ -179,17 +183,21 @@ namespace MySQL.ForExcel.Forms
     {
       var settings = Settings.Default;
       QueryTimeoutNumericUpDown.Maximum = ConnectionTimeoutNumericUpDown.Maximum;
+      GeometryAsTextFormatType spatialFormat;
       if (useDefaultValues)
       {
-        ConnectionTimeoutNumericUpDown.Value = Math.Min(ConnectionTimeoutNumericUpDown.Maximum, settings.GetPropertyDefaultValueByName<uint>("GlobalConnectionConnectionTimeout"));
-        QueryTimeoutNumericUpDown.Value = settings.GetPropertyDefaultValueByName<uint>("GlobalConnectionCommandTimeout");
-        UseOptimisticUpdatesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("EditUseOptimisticUpdate");
-        PreviewSqlQueriesRadioButton.Checked = settings.GetPropertyDefaultValueByName<bool>("GlobalSqlQueriesPreviewQueries");
-        ShowExecutedSqlQueryRadioButton.Checked = settings.GetPropertyDefaultValueByName<bool>("GlobalSqlQueriesShowQueriesWithResults");
-        RestoreSavedEditSessionsCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("EditSessionsRestoreWhenOpeningWorkbook");
-        ReuseWorksheetsRadioButton.Checked = settings.GetPropertyDefaultValueByName<bool>("EditSessionsReuseWorksheets");
-        PreviewTableDataCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("EditPreviewMySqlData");
-        OpeningWorkbookRadioButton.Checked = settings.GetPropertyDefaultValueByName<bool>("GlobalImportDataRestoreWhenOpeningWorkbook");
+        ConnectionTimeoutNumericUpDown.Value = Math.Min(ConnectionTimeoutNumericUpDown.Maximum, MiscUtilities.GetPropertyDefaultValueByName<uint>(settings, "GlobalConnectionConnectionTimeout"));
+        QueryTimeoutNumericUpDown.Value = MiscUtilities.GetPropertyDefaultValueByName<uint>(settings, "GlobalConnectionCommandTimeout");
+        UseOptimisticUpdatesCheckBox.Checked = MiscUtilities.GetPropertyDefaultValueByName<bool>(settings, "EditUseOptimisticUpdate");
+        PreviewSqlQueriesRadioButton.Checked = MiscUtilities.GetPropertyDefaultValueByName<bool>(settings, "GlobalSqlQueriesPreviewQueries");
+        ShowExecutedSqlQueryRadioButton.Checked = MiscUtilities.GetPropertyDefaultValueByName<bool>(settings, "GlobalSqlQueriesShowQueriesWithResults");
+        RestoreSavedEditSessionsCheckBox.Checked = MiscUtilities.GetPropertyDefaultValueByName<bool>(settings, "EditSessionsRestoreWhenOpeningWorkbook");
+        ReuseWorksheetsRadioButton.Checked = MiscUtilities.GetPropertyDefaultValueByName<bool>(settings, "EditSessionsReuseWorksheets");
+        PreviewTableDataCheckBox.Checked = MiscUtilities.GetPropertyDefaultValueByName<bool>(settings, "EditPreviewMySqlData");
+        OpeningWorkbookRadioButton.Checked = MiscUtilities.GetPropertyDefaultValueByName<bool>(settings, "GlobalImportDataRestoreWhenOpeningWorkbook");
+        SpatialTextFormatComboBox.SelectedValue = Enum.TryParse(MiscUtilities.GetPropertyDefaultValueByName<string>(settings, "GlobalSpatialDataAsTextFormat"), out spatialFormat)
+            ? spatialFormat
+            : GeometryAsTextFormatType.None;
       }
       else
       {
@@ -202,6 +210,9 @@ namespace MySQL.ForExcel.Forms
         ReuseWorksheetsRadioButton.Checked = settings.EditSessionsReuseWorksheets;
         PreviewTableDataCheckBox.Checked = settings.EditPreviewMySqlData;
         OpeningWorkbookRadioButton.Checked = settings.GlobalImportDataRestoreWhenOpeningWorkbook;
+        SpatialTextFormatComboBox.SelectedValue = Enum.TryParse(settings.GlobalSpatialDataAsTextFormat, out spatialFormat)
+            ? spatialFormat
+            : GeometryAsTextFormatType.None;
       }
 
       NoSqlStatementsRadioButton.Checked = !PreviewSqlQueriesRadioButton.Checked && !ShowExecutedSqlQueryRadioButton.Checked;

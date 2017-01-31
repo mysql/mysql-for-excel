@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -24,6 +24,7 @@ using MySql.Data.MySqlClient;
 using MySql.Data.Types;
 using MySQL.ForExcel.Classes.Exceptions;
 using MySql.Utility.Classes;
+using MySql.Utility.Classes.Spatial;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -231,7 +232,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Flag indicating whether this data type stores a geometry-based object.
     /// </summary>
-    private bool? _isGeometry;
+    private bool? _isSpatial;
 
     /// <summary>
     /// Flag indicating whether this data type is integer-based.
@@ -486,7 +487,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_isBinary == null)
         {
-          _isBinary = !string.IsNullOrEmpty(TypeName) && _typeName.Contains("binary", StringComparison.InvariantCultureIgnoreCase);
+          _isBinary = IsBinaryType(TypeName);
         }
 
         return (bool)_isBinary;
@@ -502,7 +503,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_isBit == null)
         {
-          _isBit = !string.IsNullOrEmpty(TypeName) && _typeName.Equals("bit", StringComparison.InvariantCultureIgnoreCase);
+          _isBit = IsBitType(TypeName);
         }
 
         return (bool)_isBit;
@@ -518,7 +519,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_isBlob == null)
         {
-          _isBlob = !string.IsNullOrEmpty(TypeName) && _typeName.EndsWith("blob", StringComparison.InvariantCultureIgnoreCase);
+          _isBlob = IsBlobType(TypeName);
         }
 
         return (bool)_isBlob;
@@ -534,9 +535,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_isBool == null)
         {
-          _isBool = !string.IsNullOrEmpty(TypeName)
-                    && !string.IsNullOrEmpty(_fullType)
-                    && _typeName.StartsWith("bool", StringComparison.InvariantCultureIgnoreCase);
+          _isBool = IsBoolType(TypeName);
         }
 
         return (bool)_isBool;
@@ -552,7 +551,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_isChar == null)
         {
-          _isChar = !string.IsNullOrEmpty(TypeName) && _typeName.Contains("char", StringComparison.InvariantCultureIgnoreCase);
+          _isChar = IsCharType(TypeName);
         }
 
         return (bool)_isChar;
@@ -568,7 +567,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_isDate == null)
         {
-          _isDate = !string.IsNullOrEmpty(TypeName) && _typeName.Equals("date", StringComparison.InvariantCultureIgnoreCase);
+          _isDate = IsDateType(TypeName);
         }
 
         return (bool)_isDate;
@@ -600,9 +599,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_isDateTimeOrTimeStamp == null)
         {
-          _isDateTimeOrTimeStamp = !string.IsNullOrEmpty(TypeName)
-                                    && (_typeName.Equals("datetime", StringComparison.InvariantCultureIgnoreCase)
-                                        || _typeName.Equals("timestamp", StringComparison.InvariantCultureIgnoreCase));
+          _isDateTimeOrTimeStamp = IsDateTimeOrTimeStampType(TypeName);
         }
 
         return (bool)_isDateTimeOrTimeStamp;
@@ -629,9 +626,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_isFixedPoint == null)
         {
-          _isFixedPoint = !string.IsNullOrEmpty(TypeName)
-                            && (_typeName.Equals("decimal", StringComparison.InvariantCultureIgnoreCase)
-                                || _typeName.Equals("numeric", StringComparison.InvariantCultureIgnoreCase));
+          _isFixedPoint = IsFixedPointType(TypeName);
         }
 
         return (bool)_isFixedPoint;
@@ -647,35 +642,10 @@ namespace MySQL.ForExcel.Classes
       {
         if (_isFloatingPoint == null)
         {
-          _isFloatingPoint = !string.IsNullOrEmpty(TypeName)
-                                && (_typeName.Equals("real", StringComparison.InvariantCultureIgnoreCase)
-                                    || _typeName.StartsWith("double", StringComparison.InvariantCultureIgnoreCase)
-                                    || _typeName.Equals("float", StringComparison.InvariantCultureIgnoreCase));
+          _isFloatingPoint = IsFloatingPointType(TypeName);
         }
 
         return (bool)_isFloatingPoint;
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether this data type stores a geometry-based object.
-    /// </summary>
-    public bool IsGeometry
-    {
-      get
-      {
-        if (_isGeometry == null)
-        {
-          _isGeometry = !string.IsNullOrEmpty(TypeName)
-                        && (_typeName.Contains("curve", StringComparison.InvariantCultureIgnoreCase)
-                            || _typeName.Contains("geometry", StringComparison.InvariantCultureIgnoreCase)
-                            || _typeName.Contains("line", StringComparison.InvariantCultureIgnoreCase)
-                            || _typeName.Contains("point", StringComparison.InvariantCultureIgnoreCase)
-                            || _typeName.Contains("polygon", StringComparison.InvariantCultureIgnoreCase)
-                            || _typeName.Contains("surface", StringComparison.InvariantCultureIgnoreCase));
-        }
-
-        return (bool)_isGeometry;
       }
     }
 
@@ -688,7 +658,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_isInteger == null)
         {
-          _isInteger = !string.IsNullOrEmpty(TypeName) && _typeName.Contains("int", StringComparison.InvariantCultureIgnoreCase);
+          _isInteger = IsIntegerType(TypeName);
         }
 
         return (bool)_isInteger;
@@ -704,7 +674,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_isJson == null)
         {
-          _isJson = !string.IsNullOrEmpty(TypeName) && _typeName.Equals("json", StringComparison.InvariantCultureIgnoreCase);
+          _isJson = IsJsonType(TypeName);
         }
 
         return (bool)_isJson;
@@ -731,12 +701,26 @@ namespace MySQL.ForExcel.Classes
       {
         if (_isSetOrEnum == null)
         {
-          _isSetOrEnum = !string.IsNullOrEmpty(TypeName)
-                          && (_typeName.Equals("set", StringComparison.InvariantCultureIgnoreCase)
-                              || _typeName.Equals("enum", StringComparison.InvariantCultureIgnoreCase));
+          _isSetOrEnum = IsSetOrEnumType(TypeName);
         }
 
         return (bool)_isSetOrEnum;
+      }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether this data type stores spatial data.
+    /// </summary>
+    public bool IsSpatial
+    {
+      get
+      {
+        if (_isSpatial == null)
+        {
+          _isSpatial = IsSpatialType(TypeName);
+        }
+
+        return (bool)_isSpatial;
       }
     }
 
@@ -749,7 +733,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_isText == null)
         {
-          _isText = !string.IsNullOrEmpty(TypeName) && _typeName.Contains("text", StringComparison.InvariantCultureIgnoreCase);
+          _isText = IsTextType(TypeName);
         }
 
         return (bool)_isText;
@@ -765,7 +749,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_isTime == null)
         {
-          _isTime = !string.IsNullOrEmpty(TypeName) && _typeName.Equals("time", StringComparison.InvariantCultureIgnoreCase);
+          _isTime = IsTimeType(TypeName);
         }
 
         return (bool)_isTime;
@@ -797,7 +781,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_isVariable == null)
         {
-          _isVariable = !string.IsNullOrEmpty(TypeName) && _typeName.StartsWith("var", StringComparison.InvariantCultureIgnoreCase);
+          _isVariable = IsVariableType(TypeName);
         }
 
         return (bool)_isVariable;
@@ -813,7 +797,7 @@ namespace MySQL.ForExcel.Classes
       {
         if (_isYear == null)
         {
-          _isYear = !string.IsNullOrEmpty(TypeName) && _typeName.Equals("year", StringComparison.InvariantCultureIgnoreCase);
+          _isYear = IsYearType(TypeName);
         }
 
         return (bool)_isYear;
@@ -1076,14 +1060,14 @@ namespace MySQL.ForExcel.Classes
         if (decimalPointPos < 0)
         {
           int intResult;
-          if (Int32.TryParse(strValue, out intResult))
+          if (int.TryParse(strValue, out intResult))
           {
             strType = "System.Int32";
           }
           else
           {
             long longResult;
-            if (Int64.TryParse(strValue, out longResult))
+            if (long.TryParse(strValue, out longResult))
             {
               strType = "System.Int64";
             }
@@ -1106,10 +1090,18 @@ namespace MySQL.ForExcel.Classes
         {
           strType = "MySql.Data.Types.MySqlDateTime";
         }
+        else if (Geometry.IsValid(strValue, Globals.ThisAddIn.SpatialDataAsTextFormat, out fullType))
+        {
+          strType = "MySql.Utility.Classes.Spatial.Geometry";
+        }
       }
 
       switch (strType)
       {
+        case "MySql.Utility.Classes.Spatial.Geometry":
+          // Full type already set in the call to Geometry.IsValid.
+          break;
+
         case "System.String":
           foreach (int t in varCharApproxLen.Where(t => strLength <= t))
           {
@@ -1369,6 +1361,11 @@ namespace MySQL.ForExcel.Classes
           retType = "time";
           break;
 
+        case "MySql.Utility.Classes.Spatial.Geometry":
+        case "MySql.Data.Types.MySqlGeometry":
+          retType = "geometry";
+          break;
+
         case "System.Guid":
           retType = "binary(16)";
           break;
@@ -1494,7 +1491,7 @@ namespace MySQL.ForExcel.Classes
     /// Gets a boxed <see cref="DateTime"/> object where its data is converted to a proper date value if it is of date origin, or the same object if not.
     /// </summary>
     /// <param name="rawValue">An object.</param>
-    /// <returns>A boxed <see cref="DateTime"/> object where its data is converted to a proper date value if it is of date origin, or the same object if not..</returns>
+    /// <returns>A boxed <see cref="DateTime"/> object where its data is converted to a proper date value if it is of date origin, or the same object if not.</returns>
     public static object GetValueAsDateTime(object rawValue)
     {
       if (rawValue.IsEmptyValue())
@@ -1540,6 +1537,180 @@ namespace MySQL.ForExcel.Classes
       }
 
       throw new ValueNotSuitableForConversionException(rawValue.ToString(), "DateTime");
+    }
+
+    /// <summary>
+    /// Gets a boxed <see cref="Geometry"/> object.
+    /// </summary>
+    /// <param name="rawValue">An object.</param>
+    /// <returns>A boxed <see cref="Geometry"/> object.</returns>
+    public static object GetValueAsGeometry(object rawValue)
+    {
+      if (rawValue.IsEmptyValue())
+      {
+        return null;
+      }
+
+      Geometry geometry = null;
+      if (rawValue is Geometry)
+      {
+        geometry = (Geometry)rawValue;
+      }
+
+      if (rawValue is byte[])
+      {
+        geometry = WkbHandler.GetGeometryFromBinaryWkb((byte[])rawValue);
+      }
+
+      if (rawValue is string)
+      {
+        geometry = Geometry.Parse(rawValue.ToString(), Globals.ThisAddIn.SpatialDataAsTextFormat);
+      }
+
+      if (geometry == null)
+      {
+        throw new ValueNotSuitableForConversionException(rawValue.ToString(), "Geometry");
+      }
+
+      geometry.TextFormat = Globals.ThisAddIn.SpatialDataAsTextFormat;
+      return geometry;
+    }
+
+    /// <summary>
+    /// Checks whether the given data type is of binary nature.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type is of binary nature, <c>false</c> otherwise.</returns>
+    public static bool IsBinaryType(string mySqlType)
+    {
+      return !string.IsNullOrEmpty(mySqlType) && mySqlType.Contains("binary", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks whether the given data type is bit.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type is bit, <c>false</c> otherwise.</returns>
+    public static bool IsBitType(string mySqlType)
+    {
+      return !string.IsNullOrEmpty(mySqlType) && mySqlType.Equals("bit", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks whether the given data type is a BLOB.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type is a BLOB, <c>false</c> otherwise.</returns>
+    public static bool IsBlobType(string mySqlType)
+    {
+      return !string.IsNullOrEmpty(mySqlType) && mySqlType.EndsWith("blob", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks whether the given data type can hold boolean values.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type can hold boolean values, <c>false</c> otherwise.</returns>
+    public static bool IsBoolType(string mySqlType)
+    {
+      return !string.IsNullOrEmpty(mySqlType) && mySqlType.StartsWith("bool", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks whether the given data type is fixed or variable sized character-based.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type is fixed or variable sized character-based, <c>false</c> otherwise.</returns>
+    public static bool IsCharType(string mySqlType)
+    {
+      return !string.IsNullOrEmpty(mySqlType) && mySqlType.Contains("char", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks whether the given data type is a DATE.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type is a DATE, <c>false</c> otherwise.</returns>
+    public static bool IsDateType(string mySqlType)
+    {
+      return !string.IsNullOrEmpty(mySqlType) && mySqlType.Equals("date", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks whether the given data type is used for dates.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type is used for dates, <c>false</c> otherwise.</returns>
+    public static bool IsDateBasedType(string mySqlType)
+    {
+      return IsDateTimeOrTimeStampType(mySqlType) || IsDateType(mySqlType);
+    }
+
+    /// <summary>
+    /// Checks whether the given data type is a DATETIME or TIMESTAMP.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type is a DATETIME or TIMESTAMP, <c>false</c> otherwise.</returns>
+    public static bool IsDateTimeOrTimeStampType(string mySqlType)
+    {
+      return !string.IsNullOrEmpty(mySqlType)
+              && (mySqlType.Equals("datetime", StringComparison.InvariantCultureIgnoreCase)
+                  || mySqlType.Equals("timestamp", StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    /// <summary>
+    /// Checks whether the given data type is of floating-point nature.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type is of floating-point nature, <c>false</c> otherwise.</returns>
+    public static bool IsDecimalType(string mySqlType)
+    {
+      return IsFixedPointType(mySqlType) || IsFloatingPointType(mySqlType);
+    }
+
+    /// <summary>
+    /// Checks whether the given data type stores fixed-point decimal numbers.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type stores fixed-point decimal numbers, <c>false</c> otherwise.</returns>
+    public static bool IsFixedPointType(string mySqlType)
+    {
+      return !string.IsNullOrEmpty(mySqlType)
+              && (mySqlType.Equals("decimal", StringComparison.InvariantCultureIgnoreCase)
+                  || mySqlType.Equals("numeric", StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    /// <summary>
+    /// Checks whether the given data type stores floating-point decimal numbers.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type stores floating-point decimal numbers, <c>false</c> otherwise.</returns>
+    public static bool IsFloatingPointType(string mySqlType)
+    {
+      return !string.IsNullOrEmpty(mySqlType)
+              && (mySqlType.Equals("real", StringComparison.InvariantCultureIgnoreCase)
+                  || mySqlType.StartsWith("double", StringComparison.InvariantCultureIgnoreCase)
+                  || mySqlType.Equals("float", StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    /// <summary>
+    /// Checks whether the given data type is integer-based.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type is integer-based, <c>false</c> otherwise.</returns>
+    public static bool IsIntegerType(string mySqlType)
+    {
+      return !string.IsNullOrEmpty(mySqlType) && mySqlType.Contains("int", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks whether the given data type is a JSON type.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type is a JSON type, <c>false</c> otherwise.</returns>
+    public static bool IsJsonType(string mySqlType)
+    {
+      return !string.IsNullOrEmpty(mySqlType) && mySqlType.Equals("json", StringComparison.InvariantCultureIgnoreCase);
     }
 
     /// <summary>
@@ -1597,6 +1768,86 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Checks whether the given data type is numeric.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type is numeric, <c>false</c> otherwise.</returns>
+    public static bool IsNumericType(string mySqlType)
+    {
+      return IsDecimalType(mySqlType) || IsIntegerType(mySqlType);
+    }
+
+    /// <summary>
+    /// Checks whether the given data type is a Set or Enumeration.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type is a Set or Enumeration, <c>false</c> otherwise.</returns>
+    public static bool IsSetOrEnumType(string mySqlType)
+    {
+      return !string.IsNullOrEmpty(mySqlType)
+              && (mySqlType.Equals("set", StringComparison.InvariantCultureIgnoreCase)
+                  || mySqlType.Equals("enum", StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    /// <summary>
+    /// Checks whether the given data type stores spatial data.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type stores spatial data, <c>false</c> otherwise.</returns>
+    public static bool IsSpatialType(string mySqlType)
+    {
+      return !string.IsNullOrEmpty(mySqlType)
+              && (mySqlType.Equals("geometry", StringComparison.InvariantCultureIgnoreCase)
+                  || mySqlType.Equals("point", StringComparison.InvariantCultureIgnoreCase)
+                  || mySqlType.Equals("linestring", StringComparison.InvariantCultureIgnoreCase)
+                  || mySqlType.Equals("polygon", StringComparison.InvariantCultureIgnoreCase)
+                  || mySqlType.Equals("multipoint", StringComparison.InvariantCultureIgnoreCase)
+                  || mySqlType.Equals("multilinestring", StringComparison.InvariantCultureIgnoreCase)
+                  || mySqlType.Equals("multipolygon", StringComparison.InvariantCultureIgnoreCase)
+                  || mySqlType.Equals("geometrycollection", StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    /// <summary>
+    /// Checks whether the given data type is fixed or variable sized character-based.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type is fixed or variable sized character-based, <c>false</c> otherwise.</returns>
+    public static bool IsTextType(string mySqlType)
+    {
+      return !string.IsNullOrEmpty(mySqlType) && mySqlType.Contains("text", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks whether the given data type is Time.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type is Time, <c>false</c> otherwise.</returns>
+    public static bool IsTimeType(string mySqlType)
+    {
+      return !string.IsNullOrEmpty(mySqlType) && mySqlType.Equals("time", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks whether the given data type is a variable one like VARCHAR or VARBINARY.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type is a variable one like VARCHAR or VARBINARY, <c>false</c> otherwise.</returns>
+    public static bool IsVariableType(string mySqlType)
+    {
+      return !string.IsNullOrEmpty(mySqlType) && mySqlType.StartsWith("var", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks whether the given data type is Year.
+    /// </summary>
+    /// <param name="mySqlType">A MySQL data type.</param>
+    /// <returns><c>true</c> if the given data type is Year, <c>false</c> otherwise.</returns>
+    public static bool IsYearType(string mySqlType)
+    {
+      return !string.IsNullOrEmpty(mySqlType) && mySqlType.Equals("year", StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    /// <summary>
     /// Checks whether a given string value can be stored using this data type.
     /// </summary>
     /// <param name="strValue">The value as a string representation to store in this column.</param>
@@ -1615,11 +1866,10 @@ namespace MySQL.ForExcel.Classes
         return true;
       }
 
-      // Return immediately for spatial data types since values for them can be created in a wide variety of ways
-      // (using WKT, WKB or MySQL spatial functions that return spatial objects), so leave the validation to the MySQL Server.
-      if (IsGeometry)
+      // Check if valid geometry representation.
+      if (IsSpatial)
       {
-        return true;
+        return Geometry.IsValid(strValue, Globals.ThisAddIn.SpatialDataAsTextFormat);
       }
 
       // Check for boolean
@@ -1790,92 +2040,60 @@ namespace MySQL.ForExcel.Classes
         return true;
       }
 
-      if (targetTypeName.Contains("char") || targetTypeName.Contains("text") || targetTypeName.Contains("enum") || targetTypeName.Contains("set") || targetTypeName == "json")
+      if (IsCharType(targetTypeName) || IsTextType(targetTypeName) || IsSetOrEnumType(targetTypeName) || IsJsonType(targetTypeName))
       {
         return true;
       }
 
-      bool type1IsInt = sourceTypeName.Contains("int");
-      bool type2IsInt = targetTypeName.Contains("int");
-      bool type1IsDecimal = sourceTypeName == "float" || sourceTypeName == "numeric" || sourceTypeName == "decimal" || sourceTypeName == "real" || sourceTypeName == "double";
-      bool type2IsDecimal = targetTypeName == "float" || targetTypeName == "numeric" || targetTypeName == "decimal" || targetTypeName == "real" || targetTypeName == "double";
-      if ((type1IsInt || sourceTypeName == "year") && (type2IsInt || type2IsDecimal || targetTypeName == "year"))
+      bool sourceIsInt = IsIntegerType(sourceTypeName);
+      bool targetIsInt = IsIntegerType(targetTypeName);
+      bool sourceIsDecimal = IsDecimalType(sourceTypeName);
+      bool targetIsDecimal = IsDecimalType(targetTypeName);
+      if ((sourceIsInt || IsYearType(sourceTypeName)) && (targetIsInt || targetIsDecimal || IsYearType(targetTypeName)))
       {
         return true;
       }
 
-      if (type1IsDecimal && type2IsDecimal)
+      if (sourceIsDecimal && targetIsDecimal)
       {
         return true;
       }
 
-      if ((sourceTypeName.Contains("bool") || sourceTypeName == "tinyint" || sourceTypeName == "bit") && (targetTypeName.Contains("bool") || targetTypeName == "tinyint" || targetTypeName == "bit"))
+      if ((IsBoolType(sourceTypeName) || sourceTypeName == "tinyint" || IsBitType(sourceTypeName))
+          && (IsBoolType(targetTypeName) || targetTypeName == "tinyint" || IsBitType(targetTypeName)))
       {
         return true;
       }
 
-      bool type1IsDate = sourceTypeName.Contains("date") || sourceTypeName == "timestamp";
-      bool type2IsDate = targetTypeName.Contains("date") || targetTypeName == "timestamp";
-      if (type1IsDate && type2IsDate)
+      bool sourceIsDate = IsDateBasedType(sourceTypeName);
+      bool targetIsDate = IsDateBasedType(targetTypeName);
+      if (sourceIsDate && targetIsDate)
       {
         return true;
       }
 
-      if (sourceTypeName == "time" && targetTypeName == "time")
+      if (IsTimeType(sourceTypeName) && IsTimeType(targetTypeName))
       {
         return true;
       }
 
-      if (sourceTypeName.Contains("blob") && targetTypeName.Contains("blob"))
+      if (IsBlobType(sourceTypeName) && IsBlobType(targetTypeName))
       {
         return true;
       }
 
-      if (sourceTypeName.Contains("binary") && targetTypeName.Contains("binary"))
+      if (IsBinaryType(sourceTypeName) && IsBinaryType(targetTypeName))
       {
         return true;
       }
 
       // Spatial data
-      var type2IsGeometryCollection = targetTypeName.Contains("geometrycollection");
-      var type2IsGeometry = targetTypeName.Contains("geometry") && !type2IsGeometryCollection;
-      var type2IsMultiCurve = targetTypeName.Contains("multicurve");
-      var type2IsCurve = targetTypeName.Contains("curve") && !type2IsMultiCurve;
-      var type2IsMultiSurface = targetTypeName.Contains("multisurface");
-      var type2IsSurface = targetTypeName.Contains("surface") && !type2IsMultiSurface;
-      var type1IsMultiSpatial = sourceTypeName.Contains("multi");
-      if (sourceTypeName.Contains("multilinestring") && type2IsMultiCurve)
+      if (IsSpatialType(sourceTypeName) && targetTypeName == "geometry")
       {
         return true;
       }
 
-      if (sourceTypeName.Contains("multipolygon") && type2IsMultiSurface)
-      {
-        return true;
-      }
-
-      if (type1IsMultiSpatial && (type2IsGeometryCollection || type2IsGeometry))
-      {
-        return true;
-      }
-
-      if (sourceTypeName.Contains("polygon") && type2IsSurface || type2IsGeometry)
-      {
-        return true;
-      }
-
-      var type1IsLineString = sourceTypeName.Contains("linestring");
-      if (type1IsLineString && (type2IsCurve || type2IsGeometry))
-      {
-        return true;
-      }
-
-      if (!type1IsMultiSpatial && !type1IsLineString && sourceTypeName.Contains("line") && (targetTypeName.Contains("linestring") || type2IsCurve || type2IsGeometry))
-      {
-        return true;
-      }
-
-      if ((targetTypeName.Contains("geometrycollection") || targetTypeName.Contains("surface") || targetTypeName.Contains("curve") || targetTypeName.Contains("point")) && type2IsGeometry)
+      if (sourceTypeName.Contains("multi") && targetTypeName == "geometrycollection")
       {
         return true;
       }
@@ -2020,17 +2238,13 @@ namespace MySQL.ForExcel.Classes
           return MySqlDbType.JSON;
 
         case "geometry":
-        case "curve":
         case "geometrycollection":
         case "linestring":
-        case "multicurve":
         case "multilinestring":
         case "multipoint":
         case "multipolygon":
-        case "multisurface":
         case "point":
         case "polygon":
-        case "surface":
           return MySqlDbType.Geometry;
       }
 
@@ -2138,18 +2352,14 @@ namespace MySQL.ForExcel.Classes
           return Type.GetType("System.Object");
 
         case "geometry":
-        case "curve":
         case "geometrycollection":
         case "linestring":
-        case "multicurve":
         case "multilinestring":
         case "multipoint":
         case "multipolygon":
-        case "multisurface":
         case "point":
         case "polygon":
-        case "surface":
-          return typeof(MySqlGeometry);
+          return typeof(Geometry);
       }
 
       return null;
@@ -2284,18 +2494,14 @@ namespace MySQL.ForExcel.Classes
         case "set":
         case "enum":
         case "json":
-        case "curve":
         case "geometry":
         case "geometrycollection":
         case "linestring":
-        case "multicurve":
         case "multilinestring":
         case "multipoint":
         case "multipolygon":
-        case "multisurface":
         case "point":
         case "polygon":
-        case "surface":
           return ushort.MaxValue;
 
         case "mediumblob":
@@ -2396,7 +2602,7 @@ namespace MySQL.ForExcel.Classes
       _isDateTimeOrTimeStamp = null;
       _isFixedPoint = null;
       _isFloatingPoint = null;
-      _isGeometry = null;
+      _isSpatial = null;
       _isInteger = null;
       _isJson = null;
       _isSetOrEnum = null;

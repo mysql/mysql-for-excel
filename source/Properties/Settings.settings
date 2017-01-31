@@ -146,5 +146,8 @@
     <Setting Name="GlobalImportDataRestoreWhenOpeningWorkbook" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="GlobalSpatialDataAsTextFormat" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.String" Scope="User">
+      <Value Profile="(Default)">WKT</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
