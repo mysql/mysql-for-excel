@@ -149,5 +149,8 @@
     <Setting Name="GlobalSpatialDataAsTextFormat" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.String" Scope="User">
       <Value Profile="(Default)">WKT</Value>
     </Setting>
+    <Setting Name="AppendDuplicateUniqueValuesAction" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ErrorOutAndAbort</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

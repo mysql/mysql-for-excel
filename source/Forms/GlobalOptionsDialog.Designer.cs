@@ -73,6 +73,8 @@ namespace MySQL.ForExcel.Forms
       this.CreateNewWorksheetsRadioButton = new System.Windows.Forms.RadioButton();
       this.ReuseWorksheetsRadioButton = new System.Windows.Forms.RadioButton();
       this.RestoreSavedEditSessionsCheckBox = new System.Windows.Forms.CheckBox();
+      this.UseOptimisticUpdatesCheckBox = new System.Windows.Forms.CheckBox();
+      this.SpatialTextFormatComboBox = new System.Windows.Forms.ComboBox();
       this.ResetToDefaultsButton = new System.Windows.Forms.Button();
       this.OptionsTabControl = new System.Windows.Forms.TabControl();
       this.ConnectionsTabPage = new System.Windows.Forms.TabPage();
@@ -84,11 +86,9 @@ namespace MySQL.ForExcel.Forms
       this.ConnectionTimeout1Label = new System.Windows.Forms.Label();
       this.ConnectionOptionsLabel = new System.Windows.Forms.Label();
       this.SqlQueriesTabPage = new System.Windows.Forms.TabPage();
-      this.UseOptimisticUpdatesCheckBox = new System.Windows.Forms.CheckBox();
       this.ShowQueriesOptionsPanel = new System.Windows.Forms.Panel();
       this.SqlQueriesLabel = new System.Windows.Forms.Label();
       this.SpatialDataTabPage = new System.Windows.Forms.TabPage();
-      this.SpatialTextFormatComboBox = new System.Windows.Forms.ComboBox();
       this.SpatialTextFormatLabel = new System.Windows.Forms.Label();
       this.SpatialDataLabel = new System.Windows.Forms.Label();
       this.ImportedTablesTabPage = new System.Windows.Forms.TabPage();
@@ -167,7 +167,7 @@ namespace MySQL.ForExcel.Forms
       this.MigrateWorkbenchConnectionsButton.Location = new System.Drawing.Point(37, 118);
       this.MigrateWorkbenchConnectionsButton.Name = "MigrateWorkbenchConnectionsButton";
       this.MigrateWorkbenchConnectionsButton.Size = new System.Drawing.Size(411, 23);
-      this.MigrateWorkbenchConnectionsButton.TabIndex = 20;
+      this.MigrateWorkbenchConnectionsButton.TabIndex = 9;
       this.MigrateWorkbenchConnectionsButton.Text = "Migrate stored connections to MySQL Workbench now";
       this.ExcelToolTip.SetToolTip(this.MigrateWorkbenchConnectionsButton, "Migrates MySQL Server stored connections to the MySQL Workbench\'s connections fil" +
         "e.");
@@ -190,7 +190,7 @@ namespace MySQL.ForExcel.Forms
             0});
       this.QueryTimeoutNumericUpDown.Name = "QueryTimeoutNumericUpDown";
       this.QueryTimeoutNumericUpDown.Size = new System.Drawing.Size(52, 23);
-      this.QueryTimeoutNumericUpDown.TabIndex = 16;
+      this.QueryTimeoutNumericUpDown.TabIndex = 5;
       this.ExcelToolTip.SetToolTip(this.QueryTimeoutNumericUpDown, "Number of seconds to wait before a query sent to a MySQL server times out.\r\nOn ve" +
         "ry slow connections or when connecting to a slow computer it is advised to raise" +
         " this value.");
@@ -216,7 +216,7 @@ namespace MySQL.ForExcel.Forms
             0});
       this.ConnectionTimeoutNumericUpDown.Name = "ConnectionTimeoutNumericUpDown";
       this.ConnectionTimeoutNumericUpDown.Size = new System.Drawing.Size(52, 23);
-      this.ConnectionTimeoutNumericUpDown.TabIndex = 13;
+      this.ConnectionTimeoutNumericUpDown.TabIndex = 2;
       this.ExcelToolTip.SetToolTip(this.ConnectionTimeoutNumericUpDown, "Number of seconds to wait before a connection to a MySQL server times out.\r\nOn ve" +
         "ry slow connections it is advised to raise this value.");
       this.ConnectionTimeoutNumericUpDown.Value = new decimal(new int[] {
@@ -272,7 +272,7 @@ namespace MySQL.ForExcel.Forms
       this.ManageImportConnectionInfosButton.Location = new System.Drawing.Point(38, 124);
       this.ManageImportConnectionInfosButton.Name = "ManageImportConnectionInfosButton";
       this.ManageImportConnectionInfosButton.Size = new System.Drawing.Size(440, 23);
-      this.ManageImportConnectionInfosButton.TabIndex = 25;
+      this.ManageImportConnectionInfosButton.TabIndex = 3;
       this.ManageImportConnectionInfosButton.Text = "Manage Stored Import Connection Information...";
       this.ExcelToolTip.SetToolTip(this.ManageImportConnectionInfosButton, "Allows you to select from all stored Import and Edit connection information to be" +
         " deleted once you press Accept.");
@@ -313,7 +313,7 @@ namespace MySQL.ForExcel.Forms
       this.ManageEditConnectionInfosButton.Location = new System.Drawing.Point(37, 147);
       this.ManageEditConnectionInfosButton.Name = "ManageEditConnectionInfosButton";
       this.ManageEditConnectionInfosButton.Size = new System.Drawing.Size(440, 23);
-      this.ManageEditConnectionInfosButton.TabIndex = 22;
+      this.ManageEditConnectionInfosButton.TabIndex = 4;
       this.ManageEditConnectionInfosButton.Text = "Manage Stored Edit Connection Information...";
       this.ExcelToolTip.SetToolTip(this.ManageEditConnectionInfosButton, "Allows you to select from all stored Import and Edit connection information to be" +
         " deleted once you press Accept.");
@@ -327,7 +327,7 @@ namespace MySQL.ForExcel.Forms
       this.PreviewTableDataCheckBox.Location = new System.Drawing.Point(37, 49);
       this.PreviewTableDataCheckBox.Name = "PreviewTableDataCheckBox";
       this.PreviewTableDataCheckBox.Size = new System.Drawing.Size(364, 19);
-      this.PreviewTableDataCheckBox.TabIndex = 19;
+      this.PreviewTableDataCheckBox.TabIndex = 1;
       this.PreviewTableDataCheckBox.Text = "Preview MySQL table data before an Edit Data session is opened.";
       this.ExcelToolTip.SetToolTip(this.PreviewTableDataCheckBox, "When checked, the data of the selected MySQL table to edit is shown in a preview " +
         "dialog before the Edit Data session is opened.");
@@ -367,12 +367,34 @@ namespace MySQL.ForExcel.Forms
       this.RestoreSavedEditSessionsCheckBox.Location = new System.Drawing.Point(37, 72);
       this.RestoreSavedEditSessionsCheckBox.Name = "RestoreSavedEditSessionsCheckBox";
       this.RestoreSavedEditSessionsCheckBox.Size = new System.Drawing.Size(374, 19);
-      this.RestoreSavedEditSessionsCheckBox.TabIndex = 20;
+      this.RestoreSavedEditSessionsCheckBox.TabIndex = 2;
       this.RestoreSavedEditSessionsCheckBox.Text = "Restore saved Edit Data sessions when opening an Excel workbook";
       this.ExcelToolTip.SetToolTip(this.RestoreSavedEditSessionsCheckBox, "When checked, Edit Data sessions that were active when an Excel workbook was save" +
         "d, are restored when the workbook is opened again.");
       this.RestoreSavedEditSessionsCheckBox.UseVisualStyleBackColor = true;
       this.RestoreSavedEditSessionsCheckBox.CheckedChanged += new System.EventHandler(this.RestoreSavedEditSessionsCheckBox_CheckedChanged);
+      // 
+      // UseOptimisticUpdatesCheckBox
+      // 
+      this.UseOptimisticUpdatesCheckBox.AutoSize = true;
+      this.UseOptimisticUpdatesCheckBox.Font = new System.Drawing.Font("Segoe UI", 8.25F);
+      this.UseOptimisticUpdatesCheckBox.Location = new System.Drawing.Point(37, 49);
+      this.UseOptimisticUpdatesCheckBox.Name = "UseOptimisticUpdatesCheckBox";
+      this.UseOptimisticUpdatesCheckBox.Size = new System.Drawing.Size(271, 17);
+      this.UseOptimisticUpdatesCheckBox.TabIndex = 2;
+      this.UseOptimisticUpdatesCheckBox.Text = "Use optimistic updates on all Edit Data sessions";
+      this.ExcelToolTip.SetToolTip(this.UseOptimisticUpdatesCheckBox, resources.GetString("UseOptimisticUpdatesCheckBox.ToolTip"));
+      this.UseOptimisticUpdatesCheckBox.UseVisualStyleBackColor = true;
+      // 
+      // SpatialTextFormatComboBox
+      // 
+      this.SpatialTextFormatComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.SpatialTextFormatComboBox.FormattingEnabled = true;
+      this.SpatialTextFormatComboBox.Location = new System.Drawing.Point(308, 48);
+      this.SpatialTextFormatComboBox.Name = "SpatialTextFormatComboBox";
+      this.SpatialTextFormatComboBox.Size = new System.Drawing.Size(168, 23);
+      this.SpatialTextFormatComboBox.TabIndex = 2;
+      this.ExcelToolTip.SetToolTip(this.SpatialTextFormatComboBox, resources.GetString("SpatialTextFormatComboBox.ToolTip"));
       // 
       // ResetToDefaultsButton
       // 
@@ -401,7 +423,7 @@ namespace MySQL.ForExcel.Forms
       this.OptionsTabControl.Name = "OptionsTabControl";
       this.OptionsTabControl.SelectedIndex = 0;
       this.OptionsTabControl.Size = new System.Drawing.Size(521, 235);
-      this.OptionsTabControl.TabIndex = 23;
+      this.OptionsTabControl.TabIndex = 0;
       // 
       // ConnectionsTabPage
       // 
@@ -432,7 +454,7 @@ namespace MySQL.ForExcel.Forms
       this.AutomaticMigrationDelayValueLabel.Location = new System.Drawing.Point(306, 99);
       this.AutomaticMigrationDelayValueLabel.Name = "AutomaticMigrationDelayValueLabel";
       this.AutomaticMigrationDelayValueLabel.Size = new System.Drawing.Size(67, 15);
-      this.AutomaticMigrationDelayValueLabel.TabIndex = 19;
+      this.AutomaticMigrationDelayValueLabel.TabIndex = 8;
       this.AutomaticMigrationDelayValueLabel.Text = "Delay Value";
       // 
       // AutomaticMigrationDelayLabel
@@ -442,7 +464,7 @@ namespace MySQL.ForExcel.Forms
       this.AutomaticMigrationDelayLabel.Location = new System.Drawing.Point(34, 100);
       this.AutomaticMigrationDelayLabel.Name = "AutomaticMigrationDelayLabel";
       this.AutomaticMigrationDelayLabel.Size = new System.Drawing.Size(263, 15);
-      this.AutomaticMigrationDelayLabel.TabIndex = 18;
+      this.AutomaticMigrationDelayLabel.TabIndex = 7;
       this.AutomaticMigrationDelayLabel.Text = "Automatic connections migration delayed until: ";
       // 
       // QueryTimeout2Label
@@ -452,7 +474,7 @@ namespace MySQL.ForExcel.Forms
       this.QueryTimeout2Label.Location = new System.Drawing.Point(132, 76);
       this.QueryTimeout2Label.Name = "QueryTimeout2Label";
       this.QueryTimeout2Label.Size = new System.Drawing.Size(316, 15);
-      this.QueryTimeout2Label.TabIndex = 17;
+      this.QueryTimeout2Label.TabIndex = 6;
       this.QueryTimeout2Label.Text = "seconds for a database query to execute before timing out.";
       // 
       // QueryTimeout1Label
@@ -462,7 +484,7 @@ namespace MySQL.ForExcel.Forms
       this.QueryTimeout1Label.Location = new System.Drawing.Point(34, 76);
       this.QueryTimeout1Label.Name = "QueryTimeout1Label";
       this.QueryTimeout1Label.Size = new System.Drawing.Size(34, 15);
-      this.QueryTimeout1Label.TabIndex = 15;
+      this.QueryTimeout1Label.TabIndex = 4;
       this.QueryTimeout1Label.Text = "Wait ";
       // 
       // ConnectionTimeout2Label
@@ -472,7 +494,7 @@ namespace MySQL.ForExcel.Forms
       this.ConnectionTimeout2Label.Location = new System.Drawing.Point(132, 49);
       this.ConnectionTimeout2Label.Name = "ConnectionTimeout2Label";
       this.ConnectionTimeout2Label.Size = new System.Drawing.Size(307, 15);
-      this.ConnectionTimeout2Label.TabIndex = 14;
+      this.ConnectionTimeout2Label.TabIndex = 3;
       this.ConnectionTimeout2Label.Text = "seconds for a connection to the server before timing out.";
       // 
       // ConnectionTimeout1Label
@@ -482,7 +504,7 @@ namespace MySQL.ForExcel.Forms
       this.ConnectionTimeout1Label.Location = new System.Drawing.Point(34, 49);
       this.ConnectionTimeout1Label.Name = "ConnectionTimeout1Label";
       this.ConnectionTimeout1Label.Size = new System.Drawing.Size(34, 15);
-      this.ConnectionTimeout1Label.TabIndex = 12;
+      this.ConnectionTimeout1Label.TabIndex = 1;
       this.ConnectionTimeout1Label.Text = "Wait ";
       // 
       // ConnectionOptionsLabel
@@ -494,7 +516,7 @@ namespace MySQL.ForExcel.Forms
       this.ConnectionOptionsLabel.Location = new System.Drawing.Point(8, 20);
       this.ConnectionOptionsLabel.Name = "ConnectionOptionsLabel";
       this.ConnectionOptionsLabel.Size = new System.Drawing.Size(123, 17);
-      this.ConnectionOptionsLabel.TabIndex = 11;
+      this.ConnectionOptionsLabel.TabIndex = 0;
       this.ConnectionOptionsLabel.Text = "Connection Options";
       // 
       // SqlQueriesTabPage
@@ -510,18 +532,6 @@ namespace MySQL.ForExcel.Forms
       this.SqlQueriesTabPage.Text = "SQL Queries";
       this.SqlQueriesTabPage.UseVisualStyleBackColor = true;
       // 
-      // UseOptimisticUpdatesCheckBox
-      // 
-      this.UseOptimisticUpdatesCheckBox.AutoSize = true;
-      this.UseOptimisticUpdatesCheckBox.Font = new System.Drawing.Font("Segoe UI", 8.25F);
-      this.UseOptimisticUpdatesCheckBox.Location = new System.Drawing.Point(37, 49);
-      this.UseOptimisticUpdatesCheckBox.Name = "UseOptimisticUpdatesCheckBox";
-      this.UseOptimisticUpdatesCheckBox.Size = new System.Drawing.Size(271, 17);
-      this.UseOptimisticUpdatesCheckBox.TabIndex = 15;
-      this.UseOptimisticUpdatesCheckBox.Text = "Use optimistic updates on all Edit Data sessions";
-      this.ExcelToolTip.SetToolTip(this.UseOptimisticUpdatesCheckBox, resources.GetString("UseOptimisticUpdatesCheckBox.ToolTip"));
-      this.UseOptimisticUpdatesCheckBox.UseVisualStyleBackColor = true;
-      // 
       // ShowQueriesOptionsPanel
       // 
       this.ShowQueriesOptionsPanel.Controls.Add(this.ShowExecutedSqlQueryRadioButton);
@@ -530,7 +540,7 @@ namespace MySQL.ForExcel.Forms
       this.ShowQueriesOptionsPanel.Location = new System.Drawing.Point(5, 60);
       this.ShowQueriesOptionsPanel.Name = "ShowQueriesOptionsPanel";
       this.ShowQueriesOptionsPanel.Size = new System.Drawing.Size(427, 79);
-      this.ShowQueriesOptionsPanel.TabIndex = 16;
+      this.ShowQueriesOptionsPanel.TabIndex = 1;
       // 
       // SqlQueriesLabel
       // 
@@ -541,7 +551,7 @@ namespace MySQL.ForExcel.Forms
       this.SqlQueriesLabel.Location = new System.Drawing.Point(8, 20);
       this.SqlQueriesLabel.Name = "SqlQueriesLabel";
       this.SqlQueriesLabel.Size = new System.Drawing.Size(130, 17);
-      this.SqlQueriesLabel.TabIndex = 14;
+      this.SqlQueriesLabel.TabIndex = 0;
       this.SqlQueriesLabel.Text = "SQL Queries Options";
       // 
       // SpatialDataTabPage
@@ -557,16 +567,6 @@ namespace MySQL.ForExcel.Forms
       this.SpatialDataTabPage.Text = "Spatial Data";
       this.SpatialDataTabPage.UseVisualStyleBackColor = true;
       // 
-      // SpatialTextFormatComboBox
-      // 
-      this.SpatialTextFormatComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-      this.SpatialTextFormatComboBox.FormattingEnabled = true;
-      this.SpatialTextFormatComboBox.Location = new System.Drawing.Point(308, 48);
-      this.SpatialTextFormatComboBox.Name = "SpatialTextFormatComboBox";
-      this.SpatialTextFormatComboBox.Size = new System.Drawing.Size(168, 23);
-      this.SpatialTextFormatComboBox.TabIndex = 26;
-      this.ExcelToolTip.SetToolTip(this.SpatialTextFormatComboBox, resources.GetString("SpatialTextFormatComboBox.ToolTip"));
-      // 
       // SpatialTextFormatLabel
       // 
       this.SpatialTextFormatLabel.AutoSize = true;
@@ -574,7 +574,7 @@ namespace MySQL.ForExcel.Forms
       this.SpatialTextFormatLabel.Location = new System.Drawing.Point(35, 51);
       this.SpatialTextFormatLabel.Name = "SpatialTextFormatLabel";
       this.SpatialTextFormatLabel.Size = new System.Drawing.Size(264, 15);
-      this.SpatialTextFormatLabel.TabIndex = 25;
+      this.SpatialTextFormatLabel.TabIndex = 1;
       this.SpatialTextFormatLabel.Text = "Format to use when handling spatial data as text:";
       // 
       // SpatialDataLabel
@@ -586,7 +586,7 @@ namespace MySQL.ForExcel.Forms
       this.SpatialDataLabel.Location = new System.Drawing.Point(8, 20);
       this.SpatialDataLabel.Name = "SpatialDataLabel";
       this.SpatialDataLabel.Size = new System.Drawing.Size(128, 17);
-      this.SpatialDataLabel.TabIndex = 15;
+      this.SpatialDataLabel.TabIndex = 0;
       this.SpatialDataLabel.Text = "Spatial Data Options";
       // 
       // ImportedTablesTabPage
@@ -609,7 +609,7 @@ namespace MySQL.ForExcel.Forms
       this.RestoreImportedMySqlDataInExcelTablesLabel.Location = new System.Drawing.Point(35, 51);
       this.RestoreImportedMySqlDataInExcelTablesLabel.Name = "RestoreImportedMySqlDataInExcelTablesLabel";
       this.RestoreImportedMySqlDataInExcelTablesLabel.Size = new System.Drawing.Size(278, 15);
-      this.RestoreImportedMySqlDataInExcelTablesLabel.TabIndex = 24;
+      this.RestoreImportedMySqlDataInExcelTablesLabel.TabIndex = 1;
       this.RestoreImportedMySqlDataInExcelTablesLabel.Text = "Restore imported MySQL data in Excel Tables when:";
       // 
       // ImportedTablesOptionsPanel
@@ -619,7 +619,7 @@ namespace MySQL.ForExcel.Forms
       this.ImportedTablesOptionsPanel.Location = new System.Drawing.Point(6, 67);
       this.ImportedTablesOptionsPanel.Name = "ImportedTablesOptionsPanel";
       this.ImportedTablesOptionsPanel.Size = new System.Drawing.Size(472, 51);
-      this.ImportedTablesOptionsPanel.TabIndex = 23;
+      this.ImportedTablesOptionsPanel.TabIndex = 2;
       // 
       // ImportedTablesOptionsLabel
       // 
@@ -630,7 +630,7 @@ namespace MySQL.ForExcel.Forms
       this.ImportedTablesOptionsLabel.Location = new System.Drawing.Point(8, 20);
       this.ImportedTablesOptionsLabel.Name = "ImportedTablesOptionsLabel";
       this.ImportedTablesOptionsLabel.Size = new System.Drawing.Size(153, 17);
-      this.ImportedTablesOptionsLabel.TabIndex = 22;
+      this.ImportedTablesOptionsLabel.TabIndex = 0;
       this.ImportedTablesOptionsLabel.Text = "Imported Tables Options";
       // 
       // EditSessionsTabPage
@@ -654,7 +654,7 @@ namespace MySQL.ForExcel.Forms
       this.EditSessionOptionsPanel.Location = new System.Drawing.Point(5, 90);
       this.EditSessionOptionsPanel.Name = "EditSessionOptionsPanel";
       this.EditSessionOptionsPanel.Size = new System.Drawing.Size(487, 51);
-      this.EditSessionOptionsPanel.TabIndex = 21;
+      this.EditSessionOptionsPanel.TabIndex = 3;
       // 
       // EditSessionOptionsLabel
       // 
@@ -665,7 +665,7 @@ namespace MySQL.ForExcel.Forms
       this.EditSessionOptionsLabel.Location = new System.Drawing.Point(8, 20);
       this.EditSessionOptionsLabel.Name = "EditSessionOptionsLabel";
       this.EditSessionOptionsLabel.Size = new System.Drawing.Size(134, 17);
-      this.EditSessionOptionsLabel.TabIndex = 18;
+      this.EditSessionOptionsLabel.TabIndex = 0;
       this.EditSessionOptionsLabel.Text = "Edit Sesssion Options";
       // 
       // GlobalOptionsDialog

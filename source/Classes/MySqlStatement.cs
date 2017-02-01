@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -81,9 +81,19 @@ namespace MySQL.ForExcel.Classes
     public const string STATEMENT_INSERT = "INSERT INTO";
 
     /// <summary>
+    /// Key word used for an INSERT IGNORE statement.
+    /// </summary>
+    public const string STATEMENT_INSERT_IGNORE = "INSERT IGNORE INTO";
+
+    /// <summary>
     /// Key word used for a LOCK TABLES statement.
     /// </summary>
     public const string STATEMENT_LOCK_TABLES = "LOCK TABLES";
+
+    /// <summary>
+    /// Key word used for a REPLACE statement.
+    /// </summary>
+    public const string STATEMENT_REPLACE = "REPLACE INTO";
 
     /// <summary>
     /// Key word used for a SET statement.
@@ -399,7 +409,9 @@ namespace MySQL.ForExcel.Classes
       {
         statementType = SqlStatementType.Update;
       }
-      else if (sqlStatement.StartsWith(STATEMENT_INSERT))
+      else if (sqlStatement.StartsWith(STATEMENT_INSERT)
+               || sqlStatement.StartsWith(STATEMENT_INSERT_IGNORE)
+               || sqlStatement.StartsWith(STATEMENT_REPLACE))
       {
         statementType = SqlStatementType.Insert;
       }

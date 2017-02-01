@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -121,14 +121,13 @@ namespace MySQL.ForExcel.Forms
     {
       if (appendDbTable == null)
       {
-        throw new ArgumentNullException("appendDbTable");
+        throw new ArgumentNullException(nameof(appendDbTable));
       }
 
       _appendDataRange = appendDataRange;
       _appendDbTable = appendDbTable;
       _sourceMySqlPreviewDataTable = null;
       _targetMySqlPreviewDataTable = null;
-
       _dragBoxFromMouseDown = Rectangle.Empty;
       _draggingCursor = new Bitmap(Resources.MySQLforExcel_Cursor_Dragging_32x32).CreateCursor(3, 3);
       _droppableCursor = new Bitmap(Resources.MySQLforExcel_Cursor_Dropable_32x32).CreateCursor(3, 3);
@@ -159,7 +158,7 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets or sets the text associated with this control.
     /// </summary>
-    public override sealed string Text
+    public sealed override string Text
     {
       get
       {
@@ -194,7 +193,12 @@ namespace MySQL.ForExcel.Forms
     {
       using (var optionsDialog = new AppendAdvancedOptionsDialog(StoredColumnMappingsList))
       {
-        optionsDialog.ShowDialog();
+        var result = optionsDialog.ShowDialog();
+        if (result == DialogResult.Cancel)
+        {
+          return;
+        }
+
         if (optionsDialog.MappingsChanged)
         {
           // A stored mapping was renamed or deleted, so we need to refresh the combobox that shows stored mappings and re-select the mapping that matches the current table

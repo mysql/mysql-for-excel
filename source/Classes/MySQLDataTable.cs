@@ -438,6 +438,27 @@ namespace MySQL.ForExcel.Classes
     #region Enums
 
     /// <summary>
+    /// Specifies identifiers to indicate the type action to perform in Append Data operations when new rows contain unique key values that duplicate old rows.
+    /// </summary>
+    public enum AppendDuplicateValuesActionType
+    {
+      /// <summary>
+      /// Error out and abort the append operation.
+      /// </summary>
+      ErrorOutAndAbort,
+
+      /// <summary>
+      /// Ignore rows with duplicate unique key values.
+      /// </summary>
+      IgnoreDuplicates,
+
+      /// <summary>
+      /// Replace the values in the old rows with the ones in new rows.
+      /// </summary>
+      ReplaceDuplicates
+    }
+
+    /// <summary>
     /// Specifies identifiers to indicate the type of operation a <see cref="MySqlDataTable"/> is used for.
     /// </summary>
     public enum DataOperationType
@@ -2646,7 +2667,26 @@ namespace MySQL.ForExcel.Classes
                                || (OperationType.IsForAppend() && Settings.Default.AppendGenerateMultipleInserts)
         ? " "
         : Environment.NewLine;
-      PreSqlBuilder.Append(MySqlStatement.STATEMENT_INSERT);
+      var insertStatement = MySqlStatement.STATEMENT_INSERT;
+      if (OperationType.IsForAppend())
+      {
+        AppendDuplicateValuesActionType duplicateValuesAction;
+        if (Enum.TryParse(Settings.Default.AppendDuplicateUniqueValuesAction, out duplicateValuesAction))
+        {
+          switch (duplicateValuesAction)
+          {
+            case AppendDuplicateValuesActionType.IgnoreDuplicates:
+              insertStatement = MySqlStatement.STATEMENT_INSERT_IGNORE;
+              break;
+
+            case AppendDuplicateValuesActionType.ReplaceDuplicates:
+              insertStatement = MySqlStatement.STATEMENT_REPLACE;
+              break;
+          }
+        }
+      }
+
+      PreSqlBuilder.Append(insertStatement);
       PreSqlBuilder.AppendFormat(" `{0}`.`{1}`{2}(", SchemaName, TableNameForSqlQueries, valuesSeparator);
       foreach (var column in ColumnsForInsertion)
       {

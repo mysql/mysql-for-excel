@@ -1,4 +1,10 @@
 1.3.7
+- Added new options to the Advanced Append Data Options dialog to choose the behavior for rows containing unique key values that are duplicates of the
+  ones in the rows in the database. The options are "Error out and abort the append operation", which behaves as previous versions of MySQL for Excel where
+  the server returns an error if any duplicate unique key values are found; the second option is "Ignore rows with duplicate unique key values", which
+  causes rows containing duplicate values for unique keys to be ignored or skipped, and only the rows without duplicate values are inserted to the database;
+  the third option is "Replace the values in the old rows with the ones in new rows", which causes rows containing duplicate values for unique keys replace
+  the values of the corresponding rows in the database. (MySQL Bug #83801, Bug #25479653 - MYSQL FOR EXCEL - IGNORE DUPLICATES OPTION)
 - Added support to handle spatial data in MySQL for Excel. Spatial data is handled using corresponding text representations such as Well-Known Text
   (WKT), Keyhole Markup Language (KML), Geography Markup Language (GML) and GeoJSON. The last 3 formats are converted into WKT internally since that is
   the format natively supported by MySQL. A new option was added to the Global Options dialog to select the text format to use to handle spatial data

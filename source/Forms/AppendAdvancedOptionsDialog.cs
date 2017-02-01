@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -108,6 +108,11 @@ namespace MySQL.ForExcel.Forms
       Settings.Default.AppendShowDataTypes = ShowDataTypesCheckBox.Checked;
       Settings.Default.AppendLimitPreviewRowsQuantity = previewRowsQuantity;
       Settings.Default.AppendSqlQueriesDisableIndexes = DisableTableIndexesCheckBox.Checked;
+      Settings.Default.AppendDuplicateUniqueValuesAction = ErrorAndAbortRadioButton.Checked
+        ? MySqlDataTable.AppendDuplicateValuesActionType.ErrorOutAndAbort.ToString()
+        : (IgnoreDuplicatesRadioButton.Checked
+          ? MySqlDataTable.AppendDuplicateValuesActionType.IgnoreDuplicates.ToString()
+          : MySqlDataTable.AppendDuplicateValuesActionType.ReplaceDuplicates.ToString());
       Settings.Default.AppendGenerateMultipleInserts = GenerateMultipleInsertsCheckBox.Checked;
       Settings.Default.StoredDataMappings = Mappings;
       MiscUtilities.SaveSettings();
@@ -162,6 +167,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="useDefaultValues">Controls are set to their default values if <c>true</c>. Current stored values in application settings are used otherwise.</param>
     private void RefreshControlValues(bool useDefaultValues = false)
     {
+      MySqlDataTable.AppendDuplicateValuesActionType duplicateValuesAction;
       if (useDefaultValues)
       {
         var settings = Settings.Default;
@@ -174,6 +180,12 @@ namespace MySQL.ForExcel.Forms
         PreviewRowsQuantityNumericUpDown.Value = settings.GetPropertyDefaultValueByName<int>("AppendLimitPreviewRowsQuantity");
         DisableTableIndexesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendSqlQueriesDisableIndexes");
         GenerateMultipleInsertsCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("AppendGenerateMultipleInserts");
+        if (Enum.TryParse(settings.GetPropertyDefaultValueByName<string>("AppendDuplicateUniqueValuesAction"), out duplicateValuesAction))
+        {
+          ErrorAndAbortRadioButton.Checked = duplicateValuesAction == MySqlDataTable.AppendDuplicateValuesActionType.ErrorOutAndAbort;
+          IgnoreDuplicatesRadioButton.Checked = duplicateValuesAction == MySqlDataTable.AppendDuplicateValuesActionType.IgnoreDuplicates;
+          ReplaceDuplicatesRadioButton.Checked = duplicateValuesAction == MySqlDataTable.AppendDuplicateValuesActionType.ReplaceDuplicates;
+        }
       }
       else
       {
@@ -186,6 +198,12 @@ namespace MySQL.ForExcel.Forms
         PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.AppendLimitPreviewRowsQuantity);
         DisableTableIndexesCheckBox.Checked = Settings.Default.AppendSqlQueriesDisableIndexes;
         GenerateMultipleInsertsCheckBox.Checked = Settings.Default.AppendGenerateMultipleInserts;
+        if (Enum.TryParse(Settings.Default.AppendDuplicateUniqueValuesAction, out duplicateValuesAction))
+        {
+          ErrorAndAbortRadioButton.Checked = duplicateValuesAction == MySqlDataTable.AppendDuplicateValuesActionType.ErrorOutAndAbort;
+          IgnoreDuplicatesRadioButton.Checked = duplicateValuesAction == MySqlDataTable.AppendDuplicateValuesActionType.IgnoreDuplicates;
+          ReplaceDuplicatesRadioButton.Checked = duplicateValuesAction == MySqlDataTable.AppendDuplicateValuesActionType.ReplaceDuplicates;
+        }
       }
 
       DisableTableIndexesCheckBox.Enabled = GenerateMultipleInsertsCheckBox.Checked;

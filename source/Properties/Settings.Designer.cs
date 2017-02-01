@@ -655,5 +655,18 @@ namespace MySQL.ForExcel.Properties {
                 this["GlobalSpatialDataAsTextFormat"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ErrorOutAndAbort")]
+        public string AppendDuplicateUniqueValuesAction {
+            get {
+                return ((string)(this["AppendDuplicateUniqueValuesAction"]));
+            }
+            set {
+                this["AppendDuplicateUniqueValuesAction"] = value;
+            }
+        }
     }
 }
