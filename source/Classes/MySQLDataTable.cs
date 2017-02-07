@@ -438,7 +438,7 @@ namespace MySQL.ForExcel.Classes
     #region Enums
 
     /// <summary>
-    /// Specifies identifiers to indicate the type action to perform in Append Data operations when new rows contain unique key values that duplicate old rows.
+    /// Specifies identifiers to indicate the type of action to perform in Append Data operations when new rows contain unique key values that duplicate old rows.
     /// </summary>
     public enum AppendDuplicateValuesActionType
     {

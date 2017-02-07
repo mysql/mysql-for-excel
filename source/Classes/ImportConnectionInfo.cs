@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -32,7 +32,7 @@ namespace MySQL.ForExcel.Classes
   /// This class stores all the connection information required by an import to be stored in disk, able to be reopened if excel is closed and restarted.
   /// </summary>
   [Serializable]
-  public class ImportConnectionInfo : IConnectionInfo
+  public class ImportConnectionInfo : IConnectionInfo, IEquatable<ImportConnectionInfo>
   {
     #region Fields
 
@@ -151,6 +151,12 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets or sets a <see cref="ImportConnectionInfo" /> error identifier if there is a problem with the MySqlWorkbenchConnection.
+    /// </summary>
+    [XmlAttribute]
+    public ConnectionInfoErrorType ConnectionInfoError { get; set; }
+
+    /// <summary>
     /// Gets or sets the <see cref="ExcelInterop.ListObject"/> object related to the <see cref="ImportConnectionInfo" />.
     /// </summary>
     [XmlIgnore]
@@ -261,12 +267,6 @@ namespace MySQL.ForExcel.Classes
     public string SelectQuery { get; set; }
 
     /// <summary>
-    /// Gets or sets a <see cref="ImportConnectionInfo" /> error identifier if there is a problem with the MySqlWorkbenchConnection.
-    /// </summary>
-    [XmlAttribute]
-    public ConnectionInfoErrorType ConnectionInfoError { get; set; }
-
-    /// <summary>
     /// Gets or sets the table name the connection works with.
     /// </summary>
     [XmlAttribute]
@@ -345,6 +345,18 @@ namespace MySQL.ForExcel.Classes
 
     #endregion Enums
 
+    public static bool operator !=(ImportConnectionInfo lhs, ImportConnectionInfo rhs)
+    {
+      return !(lhs == rhs);
+    }
+
+    public static bool operator ==(ImportConnectionInfo lhs, ImportConnectionInfo rhs)
+    {
+      return ReferenceEquals(lhs, null)
+        ? ReferenceEquals(rhs, null)
+        : lhs.Equals(rhs);
+    }
+
     /// <summary>
     /// Releases all resources used by the <see cref="ImportConnectionInfo"/> class
     /// </summary>
@@ -352,6 +364,88 @@ namespace MySQL.ForExcel.Classes
     {
       Dispose(true);
       GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Determines whether the specified object is equal to the current object.
+    /// </summary>
+    /// <param name="obj">The object to compare with the current object.</param>
+    /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+    public override bool Equals(object obj)
+    {
+      return Equals(obj as ImportConnectionInfo);
+    }
+
+    /// <summary>
+    /// Indicates whether the current object is equal to another object of the same type.
+    /// </summary>
+    /// <param name="other">An object to compare with this object.</param>
+    /// <returns><c>true</c> if the current object is equal to the other parameter; otherwise, <c>false</c>.</returns>
+    public bool Equals(ImportConnectionInfo other)
+    {
+      // If parameter is null, return false.
+      if (ReferenceEquals(other, null))
+      {
+        return false;
+      }
+
+      // Optimization for a common success case.
+      if (ReferenceEquals(this, other))
+      {
+        return true;
+      }
+
+      // If run-time types are not exactly the same, return false.
+      if (GetType() != other.GetType())
+      {
+        return false;
+      }
+
+      // Return true if the fields match.
+      // Note that the base class is not invoked because it is
+      // System.Object, which defines Equals as reference equality.
+      return ConnectionId.Equals(other.ConnectionId, StringComparison.OrdinalIgnoreCase)
+             && ConnectionInfoError == other.ConnectionInfoError
+             && ExcelTableName.Equals(other.ExcelTableName, StringComparison.OrdinalIgnoreCase)
+             && HostIdentifier.Equals(other.HostIdentifier, StringComparison.OrdinalIgnoreCase)
+             && ImportColumnNames == other.ImportColumnNames
+             && OperationType == other.OperationType
+             && ProcedureResultSetIndex == other.ProcedureResultSetIndex
+             && SchemaName.Equals(other.SchemaName, StringComparison.OrdinalIgnoreCase)
+             && SelectQuery.Equals(other.SelectQuery, StringComparison.OrdinalIgnoreCase)
+             && TableName.Equals(other.TableName, StringComparison.OrdinalIgnoreCase)
+             && WorkbookFilePath.Equals(other.WorkbookFilePath, StringComparison.OrdinalIgnoreCase)
+             && WorkbookGuid.Equals(other.WorkbookGuid, StringComparison.OrdinalIgnoreCase)
+             && WorkbookName.Equals(other.WorkbookName, StringComparison.OrdinalIgnoreCase)
+             && WorksheetName.Equals(other.WorksheetName, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Serves as the default hash function.
+    /// </summary>
+    /// <returns>A hash code for the current object.</returns>
+    public override int GetHashCode()
+    {
+      // Arbitrary number to generate the hash code.
+      const int hashCodeMultiplier = 397;
+      unchecked
+      {
+        int hashCode = ConnectionId != null ? ConnectionId.GetHashCode() : 1;
+        hashCode = (hashCode * hashCodeMultiplier) ^ ConnectionInfoError.GetHashCode();
+        hashCode = (hashCode * hashCodeMultiplier) ^ (ExcelTableName != null ? ExcelTableName.GetHashCode() : 0);
+        hashCode = (hashCode * hashCodeMultiplier) ^ (HostIdentifier != null ? HostIdentifier.GetHashCode() : 0);
+        hashCode = (hashCode * hashCodeMultiplier) ^ ImportColumnNames.GetHashCode();
+        hashCode = (hashCode * hashCodeMultiplier) ^ OperationType.GetHashCode();
+        hashCode = (hashCode * hashCodeMultiplier) ^ ProcedureResultSetIndex;
+        hashCode = (hashCode * hashCodeMultiplier) ^ (SchemaName != null ? SchemaName.GetHashCode() : 0);
+        hashCode = (hashCode * hashCodeMultiplier) ^ (SelectQuery != null ? SelectQuery.GetHashCode() : 0);
+        hashCode = (hashCode * hashCodeMultiplier) ^ (TableName != null ? TableName.GetHashCode() : 0);
+        hashCode = (hashCode * hashCodeMultiplier) ^ (WorkbookFilePath != null ? WorkbookFilePath.GetHashCode() : 0);
+        hashCode = (hashCode * hashCodeMultiplier) ^ (WorkbookGuid != null ? WorkbookGuid.GetHashCode() : 0);
+        hashCode = (hashCode * hashCodeMultiplier) ^ (WorkbookName != null ? WorkbookName.GetHashCode() : 0);
+        hashCode = (hashCode * hashCodeMultiplier) ^ (WorksheetName != null ? WorksheetName.GetHashCode() : 0);
+        return hashCode;
+      }
     }
 
     /// <summary>
@@ -374,7 +468,8 @@ namespace MySQL.ForExcel.Classes
 
         // If the Workbench connection does not exist anymore, log a message to the log, remove this object from the global connections collection and exit.
         MySqlSourceTrace.WriteToLog(string.Format(Resources.ImportConnectionInfoRemovedConnectionText, WorkbookName, WorksheetName, ExcelTableName), false, SourceLevels.Warning);
-        Globals.ThisAddIn.StoredImportConnectionInfos.Remove(this);
+        var workbookImportConnectionInfos = WorkbookConnectionInfos.GetWorkbookImportConnectionInfos(Globals.ThisAddIn.ActiveWorkbook);
+        workbookImportConnectionInfos.Remove(this);
         return;
       }
 
@@ -656,9 +751,10 @@ namespace MySQL.ForExcel.Classes
         }
 
         // Add this instance of the ImportConnectionInfo class if not present already in the global collection.
-        if (!Globals.ThisAddIn.StoredImportConnectionInfos.Exists(connectionInfo => connectionInfo.WorkbookGuid == workbookGuid && connectionInfo.MySqlTable == MySqlTable && string.Equals(connectionInfo.ExcelTableName, ExcelTable.Name, StringComparison.InvariantCultureIgnoreCase)))
+        var workbookImportConnectionInfos = WorkbookConnectionInfos.GetWorkbookImportConnectionInfos(workbook);
+        if (!workbookImportConnectionInfos.Exists(connectionInfo => connectionInfo.WorkbookGuid == workbookGuid && connectionInfo.MySqlTable == MySqlTable && string.Equals(connectionInfo.ExcelTableName, ExcelTable.Name, StringComparison.InvariantCultureIgnoreCase)))
         {
-          Globals.ThisAddIn.StoredImportConnectionInfos.Add(this);
+          workbookImportConnectionInfos.Add(this);
         }
       }
       catch (Exception ex)

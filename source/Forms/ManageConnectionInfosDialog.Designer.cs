@@ -131,12 +131,12 @@ namespace MySQL.ForExcel.Forms
       this.ChooseConnectionInfosSubLabel.BackColor = System.Drawing.Color.Transparent;
       this.ChooseConnectionInfosSubLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.ChooseConnectionInfosSubLabel.ForeColor = System.Drawing.SystemColors.ControlText;
-      this.ChooseConnectionInfosSubLabel.Location = new System.Drawing.Point(91, 57);
+      this.ChooseConnectionInfosSubLabel.Location = new System.Drawing.Point(91, 61);
       this.ChooseConnectionInfosSubLabel.Name = "ChooseConnectionInfosSubLabel";
-      this.ChooseConnectionInfosSubLabel.Size = new System.Drawing.Size(424, 15);
+      this.ChooseConnectionInfosSubLabel.Size = new System.Drawing.Size(429, 15);
       this.ChooseConnectionInfosSubLabel.TabIndex = 3;
-      this.ChooseConnectionInfosSubLabel.Text = "Select entries that no longer will be used, to be erased from storage definitivel" +
-    "y.";
+      this.ChooseConnectionInfosSubLabel.Text = "Select entries that no longer will be used, to be erased from the user settings f" +
+    "ile.";
       // 
       // ChooseConnectionInfosMainLabel
       // 
@@ -191,9 +191,9 @@ namespace MySQL.ForExcel.Forms
       this.ManageConnectionInformationTitleLabel.ForeColor = System.Drawing.Color.Navy;
       this.ManageConnectionInformationTitleLabel.Location = new System.Drawing.Point(17, 17);
       this.ManageConnectionInformationTitleLabel.Name = "ManageConnectionInformationTitleLabel";
-      this.ManageConnectionInformationTitleLabel.Size = new System.Drawing.Size(472, 20);
+      this.ManageConnectionInformationTitleLabel.Size = new System.Drawing.Size(399, 20);
       this.ManageConnectionInformationTitleLabel.TabIndex = 1;
-      this.ManageConnectionInformationTitleLabel.Text = "MySQL for Excel Import and Edit connection information maintenance";
+      this.ManageConnectionInformationTitleLabel.Text = "Import and Edit connection information in user settings file";
       // 
       // ConnectionInfosListView
       // 

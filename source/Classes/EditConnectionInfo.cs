@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -26,7 +26,7 @@ namespace MySQL.ForExcel.Classes
   /// This class contains all the information required to connect to the database and sync changes to the Table being edited.
   /// </summary>
   [Serializable]
-  public class EditConnectionInfo : IConnectionInfo
+  public class EditConnectionInfo : IConnectionInfo, IEquatable<EditConnectionInfo>
   {
     #region Fields
 
@@ -120,18 +120,30 @@ namespace MySQL.ForExcel.Classes
     public string TableName { get; set; }
 
     /// <summary>
-    /// Gets or sets the workbook guid the <see cref="EditConnectionInfo" /> object works with.
-    /// </summary>
-    [XmlAttribute]
-    public string WorkbookGuid { get; set; }
-
-    /// <summary>
     /// Gets or sets the workbook full path name.
     /// </summary>
     [XmlAttribute]
     public string WorkbookFilePath { get; set; }
 
+    /// <summary>
+    /// Gets or sets the workbook guid the <see cref="EditConnectionInfo" /> object works with.
+    /// </summary>
+    [XmlAttribute]
+    public string WorkbookGuid { get; set; }
+
     #endregion Properties
+
+    public static bool operator !=(EditConnectionInfo lhs, EditConnectionInfo rhs)
+    {
+      return !(lhs == rhs);
+    }
+
+    public static bool operator ==(EditConnectionInfo lhs, EditConnectionInfo rhs)
+    {
+      return ReferenceEquals(lhs, null)
+        ? ReferenceEquals(rhs, null)
+        : lhs.Equals(rhs);
+    }
 
     /// <summary>
     /// Releases all resources used by the <see cref="EditConnectionInfo"/> class
@@ -140,6 +152,70 @@ namespace MySQL.ForExcel.Classes
     {
       Dispose(true);
       GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Determines whether the specified object is equal to the current object.
+    /// </summary>
+    /// <param name="obj">The object to compare with the current object.</param>
+    /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
+    public override bool Equals(object obj)
+    {
+      return Equals(obj as EditConnectionInfo);
+    }
+
+    /// <summary>
+    /// Indicates whether the current object is equal to another object of the same type.
+    /// </summary>
+    /// <param name="other">An object to compare with this object.</param>
+    /// <returns><c>true</c> if the current object is equal to the other parameter; otherwise, <c>false</c>.</returns>
+    public bool Equals(EditConnectionInfo other)
+    {
+      // If parameter is null, return false.
+      if (ReferenceEquals(other, null))
+      {
+        return false;
+      }
+
+      // Optimization for a common success case.
+      if (ReferenceEquals(this, other))
+      {
+        return true;
+      }
+
+      // If run-time types are not exactly the same, return false.
+      if (GetType() != other.GetType())
+      {
+        return false;
+      }
+
+      // Return true if the fields match.
+      // Note that the base class is not invoked because it is
+      // System.Object, which defines Equals as reference equality.
+      return ConnectionId.Equals(other.ConnectionId, StringComparison.OrdinalIgnoreCase)
+             && SchemaName.Equals(other.SchemaName, StringComparison.OrdinalIgnoreCase)
+             && TableName.Equals(other.TableName, StringComparison.OrdinalIgnoreCase)
+             && WorkbookFilePath.Equals(other.WorkbookFilePath, StringComparison.OrdinalIgnoreCase)
+             && WorkbookGuid.Equals(other.WorkbookGuid, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Serves as the default hash function.
+    /// </summary>
+    /// <returns>A hash code for the current object.</returns>
+    public override int GetHashCode()
+    {
+      // Arbitrary number to generate the hash code.
+      const int hashCodeMultiplier = 397;
+      unchecked
+      {
+        int hashCode = ConnectionId != null ? ConnectionId.GetHashCode() : 1;
+        hashCode = (hashCode * hashCodeMultiplier) ^ (SchemaName != null ? SchemaName.GetHashCode() : 0);
+        hashCode = (hashCode * hashCodeMultiplier) ^ (TableName != null ? TableName.GetHashCode() : 0);
+        hashCode = (hashCode * hashCodeMultiplier) ^ (WorkbookFilePath != null ? WorkbookFilePath.GetHashCode() : 0);
+        hashCode = (hashCode * hashCodeMultiplier) ^ (WorkbookGuid != null ? WorkbookGuid.GetHashCode() : 0);
+        return hashCode;
+      }
     }
 
     /// <summary>

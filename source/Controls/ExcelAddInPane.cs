@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -91,8 +91,10 @@ namespace MySQL.ForExcel.Controls
     {
       get
       {
-        return ActiveWorksheet != null
-                && Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.Exists(connectionInfo => connectionInfo.EditDialog != null && connectionInfo.EditDialog.EditingWorksheet == ActiveWorksheet);
+        var activeWorkbookEditConnectionInfos = WorkbookConnectionInfos.GetWorkbookEditConnectionInfos(Globals.ThisAddIn.ActiveWorkbook);
+        var activeWorkSheet = ActiveWorksheet;
+        return activeWorkSheet != null
+                && activeWorkbookEditConnectionInfos.Exists(connectionInfo => connectionInfo.EditDialog != null && connectionInfo.EditDialog.EditingWorksheet == activeWorkSheet);
       }
     }
 
@@ -211,7 +213,7 @@ namespace MySQL.ForExcel.Controls
       }
 
       // Free up open Edit Dialogs
-      Globals.ThisAddIn.CloseWorkbookEditConnectionInfos(Globals.ThisAddIn.ActiveWorkbook);
+      WorkbookConnectionInfos.CloseWorkbookEditConnectionInfos(Globals.ThisAddIn.ActiveWorkbook);
     }
 
     /// <summary>
@@ -222,9 +224,9 @@ namespace MySQL.ForExcel.Controls
     /// <returns><c>true</c> if the schema and its open <see cref="EditConnectionInfo"/> objects are closed, <c>false</c> otherwise.</returns>
     public bool CloseSchema(bool askToCloseConnections, bool givePanelFocus)
     {
-      if (askToCloseConnections && Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.Count > 0)
+      if (askToCloseConnections && WorkbookConnectionInfos.GetWorkbookEditConnectionInfos(Globals.ThisAddIn.ActiveWorkbook).Count > 0)
       {
-        // If there are Active EditConnectionInfos warn the users that by closing the schema the active EditConnectionInfos will be closed.
+        // If there are Active OldStoredEditConnectionInfos warn the users that by closing the schema the active EditConnectionInfos will be closed.
         DialogResult dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.ActiveEditConnectionInfosCloseWarningTitle, Resources.ActiveEditConnectionInfosCloseWarningDetail);
         if (dr == DialogResult.No)
         {
@@ -232,7 +234,7 @@ namespace MySQL.ForExcel.Controls
         }
       }
 
-      Globals.ThisAddIn.CloseWorkbookEditConnectionInfos(Globals.ThisAddIn.ActiveWorkbook);
+      WorkbookConnectionInfos.CloseWorkbookEditConnectionInfos(Globals.ThisAddIn.ActiveWorkbook);
       if (givePanelFocus)
       {
         SchemaSelectionPanel2.BringToFront();
@@ -304,10 +306,12 @@ namespace MySQL.ForExcel.Controls
         return false;
       }
 
+      var activeWorkbookEditConnectionInfos = WorkbookConnectionInfos.GetWorkbookEditConnectionInfos(Globals.ThisAddIn.ActiveWorkbook);
+
       // Hide all other open EditDataDialog forms before opening a new one.
       if (!fromSavedConnectionInfo)
       {
-        foreach (var connectionInfo in Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.Where(connectionInfo => connectionInfo.EditDialog != null && connectionInfo.EditDialog.Visible))
+        foreach (var connectionInfo in activeWorkbookEditConnectionInfos.Where(connectionInfo => connectionInfo.EditDialog != null && connectionInfo.EditDialog.Visible))
         {
           connectionInfo.EditDialog.Hide();
         }
@@ -335,7 +339,7 @@ namespace MySQL.ForExcel.Controls
       if (fromSavedConnectionInfo)
       {
         // If restoring EditConnectionInfo objects we need to create and link their corresponding EditDialog to it.
-        var editConnectionInfoBeingRestored = Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.FirstOrDefault(connectionInfo => connectionInfo.TableName.Equals(editConnectionInfo.TableName));
+        var editConnectionInfoBeingRestored = activeWorkbookEditConnectionInfos.FirstOrDefault(connectionInfo => connectionInfo.TableName.Equals(editConnectionInfo.TableName));
         if (editConnectionInfoBeingRestored != null)
         {
           editConnectionInfoBeingRestored.EditDialog = editConnectionInfo.EditDialog;
@@ -346,9 +350,8 @@ namespace MySQL.ForExcel.Controls
         ActiveEditDialog.ShowDialog();
 
         // If not restoring EditConnectionInfo objects we need to add the manually triggered EditConnectionInfo to the list of the active workbook.
-        Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.Add(editConnectionInfo);
+        activeWorkbookEditConnectionInfos.Add(editConnectionInfo);
       }
-
 
       return true;
     }
@@ -437,12 +440,14 @@ namespace MySQL.ForExcel.Controls
     /// <returns><c>true</c> if the table has is in editing mode, <c>false</c> otherwise.</returns>
     public bool TableHasEditOnGoing(string tableName)
     {
-      if (Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.Count == 0)
+      var activeWorkbook = Globals.ThisAddIn.ActiveWorkbook;
+      var activeWorkbookEditConnectionInfos = WorkbookConnectionInfos.GetWorkbookEditConnectionInfos(activeWorkbook);
+      if (activeWorkbookEditConnectionInfos.Count == 0)
       {
         return false;
       }
 
-      var editContainer = Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.FirstOrDefault(ac => ac.EditDialog != null && ac.TableName == tableName);
+      var editContainer = activeWorkbookEditConnectionInfos.FirstOrDefault(ac => ac.EditDialog != null && ac.TableName == tableName);
       if (editContainer == null)
       {
         return false;
@@ -489,15 +494,17 @@ namespace MySQL.ForExcel.Controls
       ExcelInterop.Range editingRange = mySqlTable.ImportDataIntoExcelRange(atCell);
       EditConnectionInfo connectionInfo = null;
 
-      if (Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.Count > 0)
+      var workbookEditConnectionInfos = WorkbookConnectionInfos.GetWorkbookEditConnectionInfos(Globals.ThisAddIn.ActiveWorkbook);
+      if (workbookEditConnectionInfos.Count > 0)
       {
-        connectionInfo = Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.GetActiveEditConnectionInfo(Globals.ThisAddIn.ActiveWorkbook, mySqlTable.TableName);
+        connectionInfo = workbookEditConnectionInfos.GetActiveEditConnectionInfo(mySqlTable.TableName);
       }
 
       // The EditConnectionInfo is new and has to be created from scratch.
       if (connectionInfo == null)
       {
-        connectionInfo = new EditConnectionInfo(ActiveWorkbookId, Globals.ThisAddIn.ActiveWorkbook.FullName, WbConnection.Id, WbConnection.Schema, mySqlTable.TableName);
+        var activeWorkbook = Globals.ThisAddIn.ActiveWorkbook;
+        connectionInfo = new EditConnectionInfo(activeWorkbook.GetOrCreateId(), activeWorkbook.FullName, WbConnection.Id, WbConnection.Schema, mySqlTable.TableName);
       }
 
       if (connectionInfo.EditDialog != null)

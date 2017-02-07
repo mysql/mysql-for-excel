@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -109,15 +109,14 @@ namespace MySQL.ForExcel.Classes
     public const int MAXIMUM_WORKSHEET_COLUMNS_IN_LATEST_VERSION = 16384;
 
     /// <summary>
-    /// The maximum number of rows that can exist in 2007 and newer versions of Excel;
-    /// </summary>
-    public const int MAXIMUM_WORKSHEET_ROWS_IN_LATEST_VERSION = 1048576;
-
-    /// <summary>
     /// The maximum number of rows that can exist in 2003 and older versions of Excel;
     /// </summary>
     public const int MAXIMUM_WORKSHEET_ROWS_IN_COMPATIBILITY_MODE = UInt16.MaxValue + 1;
 
+    /// <summary>
+    /// The maximum number of rows that can exist in 2007 and newer versions of Excel;
+    /// </summary>
+    public const int MAXIMUM_WORKSHEET_ROWS_IN_LATEST_VERSION = 1048576;
     /// <summary>
     /// The default number of columns a <see cref="ExcelInterop.PivotTable"/> placeholder occupies.
     /// </summary>
@@ -201,6 +200,26 @@ namespace MySQL.ForExcel.Classes
     /// Gets the interior color for Excel cells that caused errors during a commit of an Edit Data operation.
     /// </summary>
     public static int ErroredCellsOleColor { get; private set; }
+
+    /// <summary>
+    /// Loads the string value of a document property saved in the given <see cref="ExcelInterop.Workbook"/>.
+    /// </summary>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
+    /// <param name="propertyName">The name of the document property.</param>
+    /// <returns>The value of the document property.</returns>
+    public static string LoadStringDocumentProperty(this ExcelInterop.Workbook workbook, string propertyName)
+    {
+      if (workbook == null || string.IsNullOrEmpty(propertyName))
+      {
+        return null;
+      }
+
+      DocumentProperties properties = workbook.CustomDocumentProperties;
+      var customProperty = properties.Cast<DocumentProperty>().FirstOrDefault(property => property.Name == propertyName);
+      return customProperty != null
+        ? customProperty.Value.ToString()
+        : null;
+    }
 
     /// <summary>
     /// Gets or sets the interior color for Excel cells locked during an Edit Data operation (like the headers containing column names).
@@ -373,21 +392,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Checks if the given <see cref="ExcelInterop.Range"/> contains data in any of its cells.
-    /// </summary>
-    /// <param name="range">A <see cref="ExcelInterop.Range"/> object.</param>
-    /// <returns><c>true</c> if the given range is not empty, <c>false</c> otherwise.</returns>
-    public static bool ContainsAnyData(this ExcelInterop.Range range)
-    {
-      if (range == null || range.CountLarge < 1)
-      {
-        return false;
-      }
-
-      return Globals.ThisAddIn.Application.WorksheetFunction.CountA(range).CompareTo(0) != 0;
-    }
-
-    /// <summary>
     /// Indicates whether a number of columns relative to the actual position exceeds the <see cref="ExcelInterop.Worksheet"/> columns limit.
     /// </summary>
     /// <param name="columns">The number of columns to the right of the actual position to evaluate.</param>
@@ -410,6 +414,46 @@ namespace MySQL.ForExcel.Classes
       var maxColumnNumber = activeWorkbook.GetWorkbookMaxColumnNumber();
       var totalColumns = Math.Min(columns, (maxColumnNumber - currentColumn) + 1);
       return columns > totalColumns;
+    }
+
+    /// <summary>
+    /// Indicates whether a number of rows relative to the actual position exceeds the <see cref="ExcelInterop.Worksheet"/> rows limit.
+    /// </summary>
+    /// <param name="rows">The number of rows to the right of the actual position to evaluate.</param>
+    /// <returns><c>true</c> if number of rows to the right of the actual position exceeds the <see cref="ExcelInterop.Worksheet"/> rows limit, <c>false</c> otherwise.</returns>
+    public static bool CheckIfRowsExceedWorksheetLimit(long rows)
+    {
+      var atCell = Globals.ThisAddIn.Application.ActiveCell;
+      if (atCell == null)
+      {
+        return false;
+      }
+
+      var currentRow = atCell.Row;
+      var activeWorkbook = atCell.Worksheet.Parent as ExcelInterop.Workbook;
+      if (activeWorkbook == null)
+      {
+        return false;
+      }
+
+      var maxRowNumber = activeWorkbook.GetWorkbookMaxRowNumber();
+      var totalRows = Math.Min(rows, (maxRowNumber - currentRow) + 1);
+      return rows > totalRows;
+    }
+
+    /// <summary>
+    /// Checks if the given <see cref="ExcelInterop.Range"/> contains data in any of its cells.
+    /// </summary>
+    /// <param name="range">A <see cref="ExcelInterop.Range"/> object.</param>
+    /// <returns><c>true</c> if the given range is not empty, <c>false</c> otherwise.</returns>
+    public static bool ContainsAnyData(this ExcelInterop.Range range)
+    {
+      if (range == null || range.CountLarge < 1)
+      {
+        return false;
+      }
+
+      return Globals.ThisAddIn.Application.WorksheetFunction.CountA(range).CompareTo(0) != 0;
     }
 
     /// <summary>
@@ -755,6 +799,18 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Returns a <see cref="WorkbookConnectionInfos.ConnectionInfosStorageType"/> value depending on the given <see cref="ExcelInterop.Workbook"/>'s support for XML parts.
+    /// </summary>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> instance.</param>
+    /// <returns>A a <see cref="WorkbookConnectionInfos.ConnectionInfosStorageType"/> value depending on the given <see cref="ExcelInterop.Workbook"/>'s support for XML parts.</returns>
+    public static WorkbookConnectionInfos.ConnectionInfosStorageType GetConnectionInfosStorageType(this ExcelInterop.Workbook workbook)
+    {
+      return workbook == null || !workbook.SupportsXmlParts()
+        ? WorkbookConnectionInfos.ConnectionInfosStorageType.UserSettingsFile
+        : WorkbookConnectionInfos.ConnectionInfosStorageType.WorkbookXmlParts;
+    }
+
+    /// <summary>
     /// Returns the global Excel Data Model <see cref="ExcelInterop.WorkbookConnection"/> if any.
     /// </summary>
     /// <param name="workbook">A ExcelInterop.Workbook object.</param>
@@ -888,7 +944,10 @@ namespace MySQL.ForExcel.Classes
 
       ImportConnectionInfo importConnectionInfo = null;
       var invalidConnectionInfos = new List<ImportConnectionInfo>();
-      foreach (var workbookConnectionInfo in Globals.ThisAddIn.ActiveWorkbookImportConnectionInfos)
+      ExcelInterop.Worksheet parentWorksheet = excelTable.Parent;
+      ExcelInterop.Workbook parentWorkbook = parentWorksheet.Parent;
+      var workbookImportConnectionInfos = WorkbookConnectionInfos.GetWorkbookImportConnectionInfos(parentWorkbook);
+      foreach (var workbookConnectionInfo in workbookImportConnectionInfos)
       {
         try
         {
@@ -912,7 +971,7 @@ namespace MySQL.ForExcel.Classes
       if (invalidConnectionInfos.Count > 0)
       {
         invalidConnectionInfos.ForEach(invalidConnectionInfo => invalidConnectionInfo.ExcelTable.DeleteSafely(false));
-        invalidConnectionInfos.ForEach(invalidConnectionInfo => Globals.ThisAddIn.StoredImportConnectionInfos.Remove(invalidConnectionInfo));
+        invalidConnectionInfos.ForEach(invalidConnectionInfo => workbookImportConnectionInfos.Remove(invalidConnectionInfo));
       }
 
       return importConnectionInfo;
@@ -1004,26 +1063,6 @@ namespace MySQL.ForExcel.Classes
       }
 
       return intersectingRange;
-    }
-
-    /// <summary>
-    /// Gets the maximum column number possible for the current configuration mode in the active workbook.
-    /// </summary>
-    /// <param name="activeWorkbook">The active workbook.</param>
-    /// <returns>The number of the maximum row index in the current configuration mode for the active workbook.</returns>
-    public static int GetWorkbookMaxColumnNumber(this ExcelInterop.Workbook activeWorkbook)
-    {
-      return activeWorkbook == null ? 0 : activeWorkbook.Excel8CompatibilityMode ? MAXIMUM_WORKSHEET_COLUMNS_IN_COMPATIBILITY_MODE : MAXIMUM_WORKSHEET_COLUMNS_IN_LATEST_VERSION;
-    }
-
-    /// <summary>
-    /// Gets the maximum row number possible for the current configuration mode in the active workbook.
-    /// </summary>
-    /// <param name="activeWorkbook">The active workbook.</param>
-    /// <returns>The number of the maximum row index in the current configuration mode for the active workbook.</returns>
-    public static int GetWorkbookMaxRowNumber(this ExcelInterop.Workbook activeWorkbook)
-    {
-      return activeWorkbook == null ? 0 : activeWorkbook.Excel8CompatibilityMode ? MAXIMUM_WORKSHEET_ROWS_IN_COMPATIBILITY_MODE : MAXIMUM_WORKSHEET_ROWS_IN_LATEST_VERSION;
     }
 
     /// <summary>
@@ -1224,14 +1263,14 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      var guid = ((DocumentProperties)workbook.CustomDocumentProperties).Cast<DocumentProperty>().FirstOrDefault(property => property.Name.Equals("WorkbookGuid"));
+      DocumentProperties properties = workbook.CustomDocumentProperties;
+      var guid = properties.Cast<DocumentProperty>().FirstOrDefault(property => property.Name.Equals("WorkbookGuid"));
       if (guid != null)
       {
         return guid.Value.ToString();
       }
 
       string newGuid = Guid.NewGuid().ToString();
-      DocumentProperties properties = workbook.CustomDocumentProperties;
       properties.Add("WorkbookGuid", false, MsoDocProperties.msoPropertyTypeString, newGuid);
       return newGuid;
     }
@@ -1274,6 +1313,32 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets a collection of <see cref="ExcelInterop.PivotTable"/> objects in the given <see cref="ExcelInterop.Worksheet"/>.
+    /// This is used instead of the <see cref="ExcelInterop.Worksheet.PivotTables"/> method since it can return either a <see cref="ExcelInterop.PivotTables"/> or a <see cref="ExcelInterop.PivotTable"/> object.
+    /// </summary>
+    /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/>.</param>
+    /// <returns>a collection of <see cref="ExcelInterop.PivotTable"/> objects in the given <see cref="ExcelInterop.Worksheet"/>.</returns>
+    public static IEnumerable<ExcelInterop.PivotTable> GetPivotTables(this ExcelInterop.Worksheet worksheet)
+    {
+      if (worksheet == null)
+      {
+        return null;
+      }
+
+      // Since the PivotTables method of an Excel Worksheet can return either a collection of PivotTable objects or
+      // a single PivotTable instance, we need to test the type of the returned object first.
+      object pivotTables = worksheet.PivotTables();
+      if (pivotTables is ExcelInterop.PivotTables)
+      {
+        var pivotTablesCollection = pivotTables as ExcelInterop.PivotTables;
+        return pivotTablesCollection.Cast<ExcelInterop.PivotTable>();
+      }
+
+      var pivotTable = pivotTables as ExcelInterop.PivotTable;
+      return pivotTable != null ? new List<ExcelInterop.PivotTable>(1) { pivotTable } : null;
+    }
+
+    /// <summary>
     /// Gets the <see cref="ExcelInterop.Range"/> of the Excel cell where a <see cref="ExcelInterop.PivotTable"/> will be placed (its top left corner).
     /// </summary>
     /// <param name="fromSourceRange">The <see cref="ExcelInterop.Range"/> of the <see cref="ExcelInterop.PivotTable"/>'s source data.</param>
@@ -1300,32 +1365,6 @@ namespace MySQL.ForExcel.Classes
       }
 
       return atCell;
-    }
-
-    /// <summary>
-    /// Gets a collection of <see cref="ExcelInterop.PivotTable"/> objects in the given <see cref="ExcelInterop.Worksheet"/>.
-    /// This is used instead of the <see cref="ExcelInterop.Worksheet.PivotTables"/> method since it can return either a <see cref="ExcelInterop.PivotTables"/> or a <see cref="ExcelInterop.PivotTable"/> object.
-    /// </summary>
-    /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/>.</param>
-    /// <returns>a collection of <see cref="ExcelInterop.PivotTable"/> objects in the given <see cref="ExcelInterop.Worksheet"/>.</returns>
-    public static IEnumerable<ExcelInterop.PivotTable> GetPivotTables(this ExcelInterop.Worksheet worksheet)
-    {
-      if (worksheet == null)
-      {
-        return null;
-      }
-
-      // Since the PivotTables method of an Excel Worksheet can return either a collection of PivotTable objects or
-      // a single PivotTable instance, we need to test the type of the returned object first.
-      object pivotTables = worksheet.PivotTables();
-      if (pivotTables is ExcelInterop.PivotTables)
-      {
-        var pivotTablesCollection = pivotTables as ExcelInterop.PivotTables;
-        return pivotTablesCollection.Cast<ExcelInterop.PivotTable>();
-      }
-
-      var pivotTable = pivotTables as ExcelInterop.PivotTable;
-      return pivotTable != null ? new List<ExcelInterop.PivotTable>(1) { pivotTable } : null;
     }
 
     /// <summary>
@@ -1386,6 +1425,25 @@ namespace MySQL.ForExcel.Classes
       return workbookConnectionName.GetWorkbookConnectionNameAvoidingDuplicates(1);
     }
 
+    /// <summary>
+    /// Gets the maximum column number possible for the current configuration mode in the active workbook.
+    /// </summary>
+    /// <param name="activeWorkbook">The active workbook.</param>
+    /// <returns>The number of the maximum row index in the current configuration mode for the active workbook.</returns>
+    public static int GetWorkbookMaxColumnNumber(this ExcelInterop.Workbook activeWorkbook)
+    {
+      return activeWorkbook == null ? 0 : activeWorkbook.Excel8CompatibilityMode ? MAXIMUM_WORKSHEET_COLUMNS_IN_COMPATIBILITY_MODE : MAXIMUM_WORKSHEET_COLUMNS_IN_LATEST_VERSION;
+    }
+
+    /// <summary>
+    /// Gets the maximum row number possible for the current configuration mode in the active workbook.
+    /// </summary>
+    /// <param name="activeWorkbook">The active workbook.</param>
+    /// <returns>The number of the maximum row index in the current configuration mode for the active workbook.</returns>
+    public static int GetWorkbookMaxRowNumber(this ExcelInterop.Workbook activeWorkbook)
+    {
+      return activeWorkbook == null ? 0 : activeWorkbook.Excel8CompatibilityMode ? MAXIMUM_WORKSHEET_ROWS_IN_COMPATIBILITY_MODE : MAXIMUM_WORKSHEET_ROWS_IN_LATEST_VERSION;
+    }
     /// <summary>
     /// Gets a valid name for a new <see cref="ExcelInterop.Worksheet"/> that avoids duplicates with existing ones in the given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
@@ -1595,31 +1653,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Indicates whether a number of rows relative to the actual position exceeds the <see cref="ExcelInterop.Worksheet"/> rows limit.
-    /// </summary>
-    /// <param name="rows">The number of rows to the right of the actual position to evaluate.</param>
-    /// <returns><c>true</c> if number of rows to the right of the actual position exceeds the <see cref="ExcelInterop.Worksheet"/> rows limit, <c>false</c> otherwise.</returns>
-    public static bool CheckIfRowsExceedWorksheetLimit(long rows)
-    {
-      var atCell = Globals.ThisAddIn.Application.ActiveCell;
-      if (atCell == null)
-      {
-        return false;
-      }
-
-      var currentRow = atCell.Row;
-      var activeWorkbook = atCell.Worksheet.Parent as ExcelInterop.Workbook;
-      if (activeWorkbook == null)
-      {
-        return false;
-      }
-
-      var maxRowNumber = activeWorkbook.GetWorkbookMaxRowNumber();
-      var totalRows = Math.Min(rows, (maxRowNumber - currentRow) + 1);
-      return rows > totalRows;
-    }
-
-    /// <summary>
     /// Returns a valid resized range to the given dimensions and sheet location.
     /// </summary>
     /// <param name="range">The range to be resized.</param>
@@ -1647,6 +1680,41 @@ namespace MySQL.ForExcel.Classes
       var totalColumns = Math.Min(columns, maxColumnNumber - currentColumn + 1);
       var result = range.Resize[totalRows, totalColumns];
       return result;
+    }
+
+    /// <summary>
+    /// Saves a string value as a document property of the given <see cref="ExcelInterop.Workbook"/>.
+    /// </summary>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
+    /// <param name="propertyName">The name of the document property.</param>
+    /// <param name="propertyValue">The value of the document property.</param>
+    public static void SaveStringDocumentProperty(this ExcelInterop.Workbook workbook, string propertyName, string propertyValue)
+    {
+      if (workbook == null || string.IsNullOrEmpty(propertyName))
+      {
+        return;
+      }
+
+      DocumentProperties properties = workbook.CustomDocumentProperties;
+      var customProperty = properties.Cast<DocumentProperty>().FirstOrDefault(property => property.Name == propertyName);
+      if (customProperty == null)
+      {
+        if (!string.IsNullOrEmpty(propertyValue))
+        {
+          properties.Add(propertyName, false, MsoDocProperties.msoPropertyTypeString, propertyValue);
+        }
+      }
+      else
+      {
+        if (!string.IsNullOrEmpty(propertyValue))
+        {
+          customProperty.Value = propertyValue;
+        }
+        else
+        {
+          customProperty.Delete();
+        }
+      }
     }
 
     /// <summary>
@@ -1760,6 +1828,26 @@ namespace MySQL.ForExcel.Classes
       }
       protectionKeyProperty.Value = protectionKey;
       return true;
+    }
+
+    /// <summary>
+    /// Checks whether the given <see cref="ExcelInterop.Workbook"/> supports custom XML parts.
+    /// </summary>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> instance.</param>
+    /// <returns><c>true</c> if the given <see cref="ExcelInterop.Workbook"/> supports custom XML parts, <c>false</c> otherwise.</returns>
+    public static bool SupportsXmlParts(this ExcelInterop.Workbook workbook)
+    {
+      return workbook != null
+             && (workbook.FileFormat == ExcelInterop.XlFileFormat.xlOpenXMLWorkbook                     // Excel Workbook (.xlsx)
+                 || workbook.FileFormat == ExcelInterop.XlFileFormat.xlOpenXMLWorkbookMacroEnabled      // Excel Macro-Enabled Workbook (*xlsm)
+                 || workbook.FileFormat == ExcelInterop.XlFileFormat.xlExcel12                          // Excel Binary Workbook (*xlsb)
+                 || workbook.FileFormat == ExcelInterop.XlFileFormat.xlExcel8                           // Excel 97-2003 Workbook (*.xls)
+                 || workbook.FileFormat == ExcelInterop.XlFileFormat.xlOpenXMLTemplate                  // Excel Template (*.xltx)
+                 || workbook.FileFormat == ExcelInterop.XlFileFormat.xlOpenXMLTemplateMacroEnabled      // Excel Macro-Enabled Template (*.xltm)
+                 || workbook.FileFormat == ExcelInterop.XlFileFormat.xlTemplate                         // Excel 97-2003 Template (*.xlt)
+                 || workbook.FileFormat == ExcelInterop.XlFileFormat.xlExcel5                           // Microsoft Excel 5.0/95 Workbook (*.xls)
+                 || workbook.FileFormat == ExcelInterop.XlFileFormat.xlOpenXMLStrictWorkbook            // Strict Open XML Spreadsheet (*.xlsx)
+                );
     }
 
     /// <summary>

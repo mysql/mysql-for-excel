@@ -1538,6 +1538,44 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Connection information can be saved within the Workbook to allow portability (go to See Details to know more)..
+        /// </summary>
+        internal static string MoveConnectionsInfoFromSettingsFileToXmlPartsDetail {
+            get {
+                return ResourceManager.GetString("MoveConnectionsInfoFromSettingsFileToXmlPartsDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connection information used to refresh information of MySQL data imported into Excel tables and used by Edit Data sessions that were open when an Excel Workbook is saved, was stored by MySQL for Excel (in versions lower than 1.3.7) in the user settings file.
+        ///
+        ///This means that as long as the Workbook was opened using the same Windows account and in the same computer when the Workbook was last saved, Excel tables containing MySQL data would be able to refresh their information and Edit Data sessions would be [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string MoveConnectionsInfoFromSettingsFileToXmlPartsMoreInfo {
+            get {
+                return ResourceManager.GetString("MoveConnectionsInfoFromSettingsFileToXmlPartsMoreInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you want to proceed with the migration?.
+        /// </summary>
+        internal static string MoveConnectionsInfoFromSettingsFileToXmlPartsSubDetail {
+            get {
+                return ResourceManager.GetString("MoveConnectionsInfoFromSettingsFileToXmlPartsSubDetail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Migrate Import/Edit Data connection information.
+        /// </summary>
+        internal static string MoveConnectionsInfoFromSettingsFileToXmlPartsTitle {
+            get {
+                return ResourceManager.GetString("MoveConnectionsInfoFromSettingsFileToXmlPartsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Operation can only be performed with 1 area selected, multiple selections are not supported..
         /// </summary>
         internal static string MultipleAreasNotSupportedWarningDetail {

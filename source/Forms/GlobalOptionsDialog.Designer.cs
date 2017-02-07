@@ -273,7 +273,7 @@ namespace MySQL.ForExcel.Forms
       this.ManageImportConnectionInfosButton.Name = "ManageImportConnectionInfosButton";
       this.ManageImportConnectionInfosButton.Size = new System.Drawing.Size(440, 23);
       this.ManageImportConnectionInfosButton.TabIndex = 3;
-      this.ManageImportConnectionInfosButton.Text = "Manage Stored Import Connection Information...";
+      this.ManageImportConnectionInfosButton.Text = "Manage connection information stored in the user settings file...";
       this.ExcelToolTip.SetToolTip(this.ManageImportConnectionInfosButton, "Allows you to select from all stored Import and Edit connection information to be" +
         " deleted once you press Accept.");
       this.ManageImportConnectionInfosButton.UseVisualStyleBackColor = true;
@@ -314,7 +314,7 @@ namespace MySQL.ForExcel.Forms
       this.ManageEditConnectionInfosButton.Name = "ManageEditConnectionInfosButton";
       this.ManageEditConnectionInfosButton.Size = new System.Drawing.Size(440, 23);
       this.ManageEditConnectionInfosButton.TabIndex = 4;
-      this.ManageEditConnectionInfosButton.Text = "Manage Stored Edit Connection Information...";
+      this.ManageEditConnectionInfosButton.Text = "Manage connection information stored in the user settings file...";
       this.ExcelToolTip.SetToolTip(this.ManageEditConnectionInfosButton, "Allows you to select from all stored Import and Edit connection information to be" +
         " deleted once you press Accept.");
       this.ManageEditConnectionInfosButton.UseVisualStyleBackColor = true;
@@ -527,7 +527,7 @@ namespace MySQL.ForExcel.Forms
       this.SqlQueriesTabPage.Location = new System.Drawing.Point(4, 24);
       this.SqlQueriesTabPage.Name = "SqlQueriesTabPage";
       this.SqlQueriesTabPage.Padding = new System.Windows.Forms.Padding(3);
-      this.SqlQueriesTabPage.Size = new System.Drawing.Size(513, 207);
+      this.SqlQueriesTabPage.Size = new System.Drawing.Size(626, 224);
       this.SqlQueriesTabPage.TabIndex = 1;
       this.SqlQueriesTabPage.Text = "SQL Queries";
       this.SqlQueriesTabPage.UseVisualStyleBackColor = true;
@@ -562,7 +562,7 @@ namespace MySQL.ForExcel.Forms
       this.SpatialDataTabPage.Location = new System.Drawing.Point(4, 24);
       this.SpatialDataTabPage.Name = "SpatialDataTabPage";
       this.SpatialDataTabPage.Padding = new System.Windows.Forms.Padding(3);
-      this.SpatialDataTabPage.Size = new System.Drawing.Size(513, 207);
+      this.SpatialDataTabPage.Size = new System.Drawing.Size(626, 224);
       this.SpatialDataTabPage.TabIndex = 2;
       this.SpatialDataTabPage.Text = "Spatial Data";
       this.SpatialDataTabPage.UseVisualStyleBackColor = true;

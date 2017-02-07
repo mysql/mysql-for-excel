@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -83,8 +83,8 @@ namespace MySQL.ForExcel.Forms
     public static List<IConnectionInfo> GetConnectionInfosWithNonExistentWorkbook()
     {
       var allConnectionInfos = new List<IConnectionInfo>();
-      allConnectionInfos.AddRange(Globals.ThisAddIn.EditConnectionInfos);
-      allConnectionInfos.AddRange(Globals.ThisAddIn.StoredImportConnectionInfos);
+      allConnectionInfos.AddRange(WorkbookConnectionInfos.UserSettingsEditConnectionInfos);
+      allConnectionInfos.AddRange(WorkbookConnectionInfos.UserSettingsImportConnectionInfos);
       var orphanedConnectionInfos = allConnectionInfos.Where(connectionInfo => !File.Exists(connectionInfo.WorkbookFilePath)).ToList();
       return orphanedConnectionInfos;
     }
@@ -115,8 +115,8 @@ namespace MySQL.ForExcel.Forms
     {
       var currentWorkbookId = Globals.ThisAddIn.ActiveWorkbook.GetOrCreateId();
       var allConnectionInfos = new List<IConnectionInfo>();
-      allConnectionInfos.AddRange(Globals.ThisAddIn.EditConnectionInfos);
-      allConnectionInfos.AddRange(Globals.ThisAddIn.StoredImportConnectionInfos);
+      allConnectionInfos.AddRange(WorkbookConnectionInfos.UserSettingsEditConnectionInfos);
+      allConnectionInfos.AddRange(WorkbookConnectionInfos.UserSettingsImportConnectionInfos);
       ConnectionInfosListView.Groups.Clear();
 
       foreach (var connectionInfo in allConnectionInfos)

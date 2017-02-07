@@ -1138,4 +1138,22 @@ Connection will fall back to use a client character set of UTF-8.</value>
   <data name="_null" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\null.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="MoveConnectionsInfoFromSettingsFileToXmlPartsDetail" xml:space="preserve">
+    <value>Connection information can be saved within the Workbook to allow portability (go to See Details to know more).</value>
+  </data>
+  <data name="MoveConnectionsInfoFromSettingsFileToXmlPartsMoreInfo" xml:space="preserve">
+    <value>Connection information used to refresh information of MySQL data imported into Excel tables and used by Edit Data sessions that were open when an Excel Workbook is saved, was stored by MySQL for Excel (in versions lower than 1.3.7) in the user settings file.
+
+This means that as long as the Workbook was opened using the same Windows account and in the same computer when the Workbook was last saved, Excel tables containing MySQL data would be able to refresh their information and Edit Data sessions would be able to be automatically restored, since the connection information would be able to be retrieved from the user settings file. If the Workbook was opened with a different Windows account or moved to a different computer, the data refresh and the restoring of Edit Data sessions was not possible.
+
+Starting with MySQL for Excel 1.3.7, connection information related to imported MySQL data into Excel tables and to Edit Data sessions, can now be stored within the Excel Workbook as XML parts when the Workbook is saved, as long as the Workbook file format supports XML parts. This allows portability of the connection information.
+
+MySQL for Excel will automatically attempt to migrate Import and Edit Data related connection information from the user settings file to the Workbook's XML parts when the Workbook is opened, if the Workbook supports XML parts and connection information related to that Workbook is found in the user settings file.</value>
+  </data>
+  <data name="MoveConnectionsInfoFromSettingsFileToXmlPartsSubDetail" xml:space="preserve">
+    <value>Do you want to proceed with the migration?</value>
+  </data>
+  <data name="MoveConnectionsInfoFromSettingsFileToXmlPartsTitle" xml:space="preserve">
+    <value>Migrate Import/Edit Data connection information</value>
+  </data>
 </root>

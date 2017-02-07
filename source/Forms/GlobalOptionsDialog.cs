@@ -107,11 +107,11 @@ namespace MySQL.ForExcel.Forms
 
         if (connectionInfo.GetType() == typeof(EditConnectionInfo))
         {
-          Globals.ThisAddIn.EditConnectionInfos.Remove(connectionInfo as EditConnectionInfo);
+          WorkbookConnectionInfos.UserSettingsEditConnectionInfos.Remove(connectionInfo as EditConnectionInfo);
         }
         else
         {
-          Globals.ThisAddIn.StoredImportConnectionInfos.Remove(connectionInfo as ImportConnectionInfo);
+          WorkbookConnectionInfos.UserSettingsImportConnectionInfos.Remove(connectionInfo as ImportConnectionInfo);
         }
       }
     }

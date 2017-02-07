@@ -238,6 +238,7 @@
     can be found.
   -->
   <ItemGroup>
+    <Compile Include="Classes\WorkbookConnectionInfos.cs" />
     <Compile Include="Classes\CustomProperty.cs" />
     <Compile Include="Classes\CustomPropertyDescriptor.cs" />
     <Compile Include="Classes\DbObject.cs" />

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -311,12 +311,7 @@ namespace MySQL.ForExcel.Forms
         }
       }
 
-      var connectionInfo = Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.FirstOrDefault(ac => ac.EditDialog.Equals(this));
-      if (connectionInfo != null)
-      {
-        Globals.ThisAddIn.ActiveWorkbookEditConnectionInfos.Remove(connectionInfo);
-      }
-
+      WorkbookConnectionInfos.RemoveEditConnectionInfoWithEditDialog(this);
       Dispose();
     }
 

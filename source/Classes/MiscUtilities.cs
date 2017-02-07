@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -20,11 +20,13 @@ using System.Configuration;
 using System.Drawing;
 using System.Globalization;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes;
@@ -162,6 +164,18 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Deserializes the given XML text to an object instance of the specified type.
+    /// </summary>
+    /// <typeparam name="T">A specified type.</typeparam>
+    /// <param name="xml">The XML text to deserialize.</param>
+    /// <returns>An object instance of the specified type.</returns>
+    public static T Deserialize<T>(this string xml)
+    {
+      var xs = new XmlSerializer(typeof(T));
+      return (T)xs.Deserialize(new StringReader(xml));
+    }
+
+    /// <summary>
     /// Escapes a text that starts with an equals sign so Excel does not treat it as a formula.
     /// </summary>
     /// <param name="text">A string.</param>
@@ -250,15 +264,11 @@ namespace MySQL.ForExcel.Classes
     /// Gets the active <see cref="EditConnectionInfo"/> related to a given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
     /// <param name="connectionInfosList">The <see cref="EditConnectionInfo"/> objects list.</param>
-    /// <param name="workbook">The <see cref="ExcelInterop.Workbook"/> related to the active <see cref="EditConnectionInfo"/>.</param>
     /// <param name="tableName">Name of the table being edited in the <see cref="EditConnectionInfo"/>.</param>
     /// <returns>An <see cref="EditConnectionInfo"/> object.</returns>
-    public static EditConnectionInfo GetActiveEditConnectionInfo(this List<EditConnectionInfo> connectionInfosList, ExcelInterop.Workbook workbook, string tableName)
+    public static EditConnectionInfo GetActiveEditConnectionInfo(this List<EditConnectionInfo> connectionInfosList, string tableName)
     {
-      var workBookId = workbook.GetOrCreateId();
-      return connectionInfosList == null ? null : connectionInfosList.FirstOrDefault(connectionInfo => connectionInfo.EditDialog != null &&
-      string.Equals(connectionInfo.WorkbookGuid, workBookId, StringComparison.InvariantCulture) &&
-      connectionInfo.TableName == tableName);
+      return connectionInfosList == null ? null : connectionInfosList.FirstOrDefault(connectionInfo => connectionInfo.EditDialog != null && connectionInfo.TableName == tableName);
     }
 
     /// <summary>
@@ -552,6 +562,24 @@ namespace MySQL.ForExcel.Classes
     /// <returns>Specifies the result of the message processing; it depends on the message sent.</returns>
     [DllImport("user32.dll")]
     public static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+    /// <summary>
+    /// Serializes the given object instance into XML text.
+    /// </summary>
+    /// <param name="instance">An object instance.</param>
+    /// <returns>The serialized XML text.</returns>
+    public static string Serialize(this object instance)
+    {
+      if (instance == null)
+      {
+        return null;
+      }
+
+      var xs = new XmlSerializer(instance.GetType());
+      var xml = new StringWriter();
+      xs.Serialize(xml, instance);
+      return xml.ToString();
+    }
 
     /// <summary>
     /// Initializes the contents of a <see cref="ComboBox"/> with character sets and their corresponding collations.
