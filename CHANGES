@@ -1,4 +1,7 @@
 1.3.7
+- Fixed a problem where empty string values mixed in an Excel column's data that is used in an Export or Append Data operation cause the generated SQL
+  queries to have no value, instead of an "empty" value corresponding to the target column's data type (e.g. 0 for integer, false for bool if the column
+  does not allow null values, or null otherwise). (MySQL Bug #84851, Bug #25509312 - CANNOT APPEND NUMBERS THAT ARE THE RESULT OF FORMULAS)
 - Connection information used to refresh information of MySQL data imported into Excel tables and used by Edit Data sessions that were open when an Excel
   Workbook is saved, was stored by MySQL for Excel (in versions lower than 1.3.7) in the user settings file. This means that as long as the Workbook was
   opened using the same Windows account and in the same computer when the Workbook was last saved, Excel tables containing MySQL data would be able to
