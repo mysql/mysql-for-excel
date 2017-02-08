@@ -18,6 +18,7 @@
 using System;
 using System.ComponentModel;
 using System.Data;
+using System.Drawing;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Properties;
@@ -369,19 +370,19 @@ namespace MySQL.ForExcel.Controls
     #endregion Properties
 
     /// <summary>
-    /// Fills the <see cref="PreviewDataGridView"/> with data coming from the given <see cref="DbView"/> instance.
+    /// Fills the <see cref="PreviewDataGridView"/> with data coming from the given <see cref="DataTable"/> instance.
     /// </summary>
-    /// <param name="dbTableOrView">A <see cref="DbView"/> instance.</param>
-    public void Fill(DbView dbTableOrView)
+    /// <param name="dataTable">A <see cref="DataTable"/> instance.</param>
+    public void Fill(DataTable dataTable)
     {
-      if (dbTableOrView == null)
+      if (dataTable == null)
       {
         return;
       }
 
       DoubleBuffered = true;
-      _previewDataTable = dbTableOrView.GetData();
-      DataSource = _previewDataTable;
+      SelectionMode = DataGridViewSelectionMode.CellSelect;
+      DataSource = dataTable;
       var nullImage = Resources._null;
       var blobImage = Resources.blob;
       foreach (DataGridViewColumn gridCol in Columns)
@@ -401,6 +402,21 @@ namespace MySQL.ForExcel.Controls
       }
 
       SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
+    }
+
+    /// <summary>
+    /// Fills the <see cref="PreviewDataGridView"/> with data coming from the given <see cref="DbView"/> instance.
+    /// </summary>
+    /// <param name="dbTableOrView">A <see cref="DbView"/> instance.</param>
+    public void Fill(DbView dbTableOrView)
+    {
+      if (dbTableOrView == null)
+      {
+        return;
+      }
+
+      var mySqlDataTable = new MySqlDataTable(dbTableOrView.Connection, dbTableOrView.Name, dbTableOrView.GetData(), MySqlDataTable.DataOperationType.ImportTableOrView, dbTableOrView.GetSelectQuery());
+      Fill(mySqlDataTable);
     }
 
     /// <summary>
@@ -540,9 +556,24 @@ namespace MySQL.ForExcel.Controls
       {
         var nullImage = Resources._null;
         e.Graphics.DrawImage(nullImage, e.CellBounds.Left + (e.CellBounds.Width - nullImage.Width) / 2, e.CellBounds.Top + (e.CellBounds.Height - nullImage.Height) / 2);
+        e.PaintContent(e.ClipBounds);
+      }
+      else if (e.Value.GetType() == typeof(byte[]))
+      {
+        var blobImage = Resources.blob;
+        e.PaintBackground(e.ClipBounds, true);
+        var imageRectangle = new Rectangle(e.CellBounds.Left + (e.CellBounds.Width - blobImage.Width) / 2,
+                                           e.CellBounds.Top + (e.CellBounds.Height - blobImage.Height) / 2,
+                                           blobImage.Width,
+                                           blobImage.Height);
+        //e.Graphics.DrawImage(blobImage, e.CellBounds.Left + (e.CellBounds.Width - blobImage.Width) / 2, e.CellBounds.Top + (e.CellBounds.Height - blobImage.Height) / 2);
+        e.Graphics.DrawImage(blobImage, imageRectangle);
+      }
+      else
+      {
+        e.PaintContent(e.ClipBounds);
       }
 
-      e.PaintContent(e.ClipBounds);
       e.Handled = true;
     }
   }

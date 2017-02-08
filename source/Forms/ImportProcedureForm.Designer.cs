@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -74,19 +74,19 @@ namespace MySQL.ForExcel.Forms
       this.ProcedureParametersPictureBox = new System.Windows.Forms.PictureBox();
       this.ImportDataLabel = new System.Windows.Forms.Label();
       this.ResultSetsTabControl = new System.Windows.Forms.TabControl();
-      this.ResultSetsDataGridView = new MySQL.ForExcel.Controls.PreviewDataGridView();
       this.OptionsWarningLabel = new System.Windows.Forms.Label();
       this.OptionsWarningPictureBox = new System.Windows.Forms.PictureBox();
       this.SubSetOfDataLabel = new System.Windows.Forms.Label();
       this.AdvancedOptionsButton = new System.Windows.Forms.Button();
       this.CreatePivotTableCheckBox = new System.Windows.Forms.CheckBox();
       this.AddSummaryFieldsCheckBox = new System.Windows.Forms.CheckBox();
+      this.ResultSetsDataGridView = new MySQL.ForExcel.Controls.PreviewDataGridView();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.ColumnOptionsPictureBox)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.ProcedureParametersPictureBox)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.ResultSetsDataGridView)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.OptionsWarningPictureBox)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.ResultSetsDataGridView)).BeginInit();
       this.SuspendLayout();
       // 
       // FootnoteAreaPanel
@@ -312,31 +312,6 @@ namespace MySQL.ForExcel.Forms
       this.ResultSetsTabControl.TabIndex = 12;
       this.ResultSetsTabControl.SelectedIndexChanged += new System.EventHandler(this.ResultSetsTabControl_SelectedIndexChanged);
       // 
-      // ResultSetsDataGridView
-      // 
-      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-      dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.InactiveCaption;
-      dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
-      dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.ResultSetsDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-      this.ResultSetsDataGridView.ColumnsMaximumWidth = 200;
-      this.ResultSetsDataGridView.ColumnsMinimumWidth = 5;
-      dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.InactiveCaption;
-      dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Window;
-      dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.ResultSetsDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
-      this.ResultSetsDataGridView.Location = new System.Drawing.Point(82, 299);
-      this.ResultSetsDataGridView.Name = "ResultSetsDataGridView";
-      this.ResultSetsDataGridView.Size = new System.Drawing.Size(676, 238);
-      this.ResultSetsDataGridView.TabIndex = 9;
-      // 
       // OptionsWarningLabel
       // 
       this.OptionsWarningLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -410,6 +385,32 @@ namespace MySQL.ForExcel.Forms
       this.AddSummaryFieldsCheckBox.Text = "Add Summary Fields";
       this.AddSummaryFieldsCheckBox.UseVisualStyleBackColor = true;
       // 
+      // ResultSetsDataGridView
+      // 
+      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+      dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.InactiveCaption;
+      dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
+      dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Control;
+      dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.ResultSetsDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+      this.ResultSetsDataGridView.ColumnsMaximumWidth = 200;
+      this.ResultSetsDataGridView.ColumnsMinimumWidth = 5;
+      dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+      dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.InactiveCaption;
+      dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Window;
+      dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.ControlText;
+      dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+      this.ResultSetsDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
+      this.ResultSetsDataGridView.DisableColumnsSelection = true;
+      this.ResultSetsDataGridView.Location = new System.Drawing.Point(82, 299);
+      this.ResultSetsDataGridView.Name = "ResultSetsDataGridView";
+      this.ResultSetsDataGridView.Size = new System.Drawing.Size(676, 238);
+      this.ResultSetsDataGridView.TabIndex = 9;
+      // 
       // ImportProcedureForm
       // 
       this.AcceptButton = this.ImportButton;
@@ -425,13 +426,14 @@ namespace MySQL.ForExcel.Forms
       this.Name = "ImportProcedureForm";
       this.Text = "Import Data";
       this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ImportProcedureForm_FormClosing);
+      this.Load += new System.EventHandler(this.ImportProcedureForm_Load);
       this.ContentAreaPanel.ResumeLayout(false);
       this.ContentAreaPanel.PerformLayout();
       this.CommandAreaPanel.ResumeLayout(false);
       ((System.ComponentModel.ISupportInitialize)(this.ColumnOptionsPictureBox)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.ProcedureParametersPictureBox)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.ResultSetsDataGridView)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.OptionsWarningPictureBox)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.ResultSetsDataGridView)).EndInit();
       this.ResumeLayout(false);
 
     }

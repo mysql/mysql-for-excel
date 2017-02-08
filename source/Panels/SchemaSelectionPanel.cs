@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -148,6 +148,7 @@ namespace MySQL.ForExcel.Panels
         return false;
       }
 
+      Cursor = Cursors.WaitCursor;
       try
       {
         // Avoids flickering of schemas list while adding the items to it.
@@ -172,7 +173,10 @@ namespace MySQL.ForExcel.Panels
           }
 
           // Create the DbSchema and MySqlListViewNode objects
-          var schemaObject = new DbSchema(_wbConnection, schemaName, row["DEFAULT_CHARACTER_SET_NAME"].ToString(), row["DEFAULT_COLLATION_NAME"].ToString(), DisplaySchemaCollationsToolStripMenuItem.Checked);
+          var schemaObject = new DbSchema(_wbConnection, schemaName,
+                                          row["DEFAULT_CHARACTER_SET_NAME"].ToString(),
+                                          row["DEFAULT_COLLATION_NAME"].ToString(),
+                                          DisplaySchemaCollationsToolStripMenuItem.Checked);
           string lcSchemaName = schemaName.ToLowerInvariant();
           var headerNode = SchemasList.HeaderNodes[MySqlWorkbenchConnection.SystemSchemaNames.Contains(lcSchemaName) ? 1 : 0];
           LoadedSchemas.Add(schemaObject);
@@ -194,6 +198,10 @@ namespace MySQL.ForExcel.Panels
       {
         MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.SchemasLoadingErrorTitle, true);
         return false;
+      }
+      finally
+      {
+        Cursor = Cursors.Default;
       }
     }
 

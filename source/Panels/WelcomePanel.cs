@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -59,6 +59,7 @@ namespace MySQL.ForExcel.Panels
     /// </summary>
     public void LoadConnections(bool reloadConnections)
     {
+      Cursor = Cursors.WaitCursor;
       if (reloadConnections)
       {
         MySqlWorkbench.Connections.Load(true);
@@ -89,6 +90,7 @@ namespace MySQL.ForExcel.Panels
 
       // Avoids flickering of connections list while adding the items to it.
       ConnectionsList.EndUpdate();
+      Cursor = Cursors.Default;
     }
 
     /// <summary>

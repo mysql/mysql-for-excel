@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -154,6 +155,26 @@ namespace MySQL.ForExcel.Classes
       var outParamsMySqlTable = new MySqlDataTable(Connection, outParamsTable, procedureSql, resultIndex - 1);
       returnDataSet.Tables.Add(outParamsMySqlTable);
       return returnDataSet;
+    }
+
+    /// <summary>
+    /// Gets the maximum text length of the names of the parameters in this <see cref="DbProcedure"/>.
+    /// </summary>
+    /// <returns></returns>
+    public int GetMaxParameterNameLength(Font font)
+    {
+      if (Parameters == null)
+      {
+        return 0;
+      }
+
+      int maxLength = 0;
+      foreach (var param in Parameters)
+      {
+        maxLength = Math.Max(maxLength, TextRenderer.MeasureText(param.Item2.ParameterName, font).Width);
+      }
+
+      return maxLength;
     }
 
     /// <summary>
@@ -343,8 +364,9 @@ namespace MySQL.ForExcel.Classes
             mySqlType.Unsigned = true;
           }
 
+          var mySqlDbType = mySqlType.MySqlDbType == MySqlDbType.Geometry ? MySqlDbType.Blob : mySqlType.MySqlDbType;
           Parameters.Add(new Tuple<string, MySqlParameter>(dataType,
-            new MySqlParameter(paramName, mySqlType.MySqlDbType, paramSize, paramDirection, false, paramPrecision, paramScale, null, DataRowVersion.Current, mySqlType.TypeDefaultValue)));
+            new MySqlParameter(paramName, mySqlDbType, paramSize, paramDirection, false, paramPrecision, paramScale, null, DataRowVersion.Current, mySqlType.TypeDefaultValue)));
         }
       }
       catch (Exception ex)

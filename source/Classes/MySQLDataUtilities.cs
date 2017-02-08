@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -209,7 +209,7 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Executes a routine and returns all result sets as tables within a dataset.
+    /// Executes a routine and returns all result sets as tables within a <see cref="DataSet"/>.
     /// </summary>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="routineName">Qualified routine name (i.e. Schema.Routine).</param>
@@ -222,36 +222,52 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
+      // Create empty return DataSet
+      var ds = new DataSet();
+
       // Create & open a SqlConnection, and dispose of it after we are done.
-      using (MySqlConnection baseConnection = new MySqlConnection(connection.GetConnectionStringBuilder().ConnectionString))
+      using (var baseConnection = new MySqlConnection(connection.GetConnectionStringBuilder().ConnectionString))
       {
         baseConnection.Open();
 
         // Create a command and prepare it for execution
-        MySqlCommand cmd = new MySqlCommand
+        using (var cmd = new MySqlCommand
         {
           Connection = baseConnection,
           CommandText = routineName,
           CommandType = CommandType.StoredProcedure
-        };
-
-        if (routineParameters != null)
+        })
         {
-          foreach (MySqlParameter p in routineParameters)
+          if (routineParameters != null)
           {
-            cmd.Parameters.Add(p);
+            foreach (var p in routineParameters)
+            {
+              cmd.Parameters.Add(p);
+            }
           }
+
+          using (var reader = cmd.ExecuteReader())
+          {
+            var resultSetTable = reader.ReadResultSet("ResultSet");
+            if (resultSetTable != null)
+            {
+              ds.Tables.Add(resultSetTable);
+            }
+
+            var resultSetIndex = 1;
+            while (reader.NextResult())
+            {
+              resultSetTable = reader.ReadResultSet("ResultSet" + resultSetIndex++);
+              if (resultSetTable != null)
+              {
+                ds.Tables.Add(resultSetTable);
+              }
+            }
+          }
+
+          // Detach the MySqlParameters from the command object, so they can be used again.
+          cmd.Parameters.Clear();
         }
-
-        // Create the DataAdapter & DataSet
-        MySqlDataAdapter da = new MySqlDataAdapter(cmd);
-        DataSet ds = new DataSet();
-
-        // Fill the DataSet using default values for DataTable names, etc.
-        da.Fill(ds);
-
-        // Detach the MySqlParameters from the command object, so they can be used again.
-        cmd.Parameters.Clear();
 
         // Return the dataset
         return ds;
@@ -356,8 +372,9 @@ namespace MySQL.ForExcel.Classes
     /// Gets the columns schema information for the given database table.
     /// </summary>
     /// <param name="dataTable">The data table to get the schema info for.</param>
+    /// <param name="dataTypeFromCaption">Flag indicating whether the column datatype should be taken from the <see cref="DataColumn"/>'s Caption property.</param>
     /// <returns>Table with schema information regarding its columns.</returns>
-    public static MySqlColumnsInformationTable GetColumnsInformationTable(this DataTable dataTable)
+    public static MySqlColumnsInformationTable GetColumnsInformationTable(this DataTable dataTable, bool dataTypeFromCaption = false)
     {
       if (dataTable == null)
       {
@@ -369,7 +386,9 @@ namespace MySQL.ForExcel.Classes
       {
         var newRow = schemaInfoTable.NewRow();
         newRow["Name"] = column.ColumnName;
-        newRow["Type"] = MySqlDataType.GetMySqlDataType(column.DataType);
+        newRow["Type"] = dataTypeFromCaption && !string.IsNullOrEmpty(column.Caption) && MySqlDisplayDataType.ValidateTypeName(column.Caption)
+          ? column.Caption
+          : MySqlDataType.GetMySqlDataType(column.DataType);
         newRow["Null"] = column.AllowDBNull ? "YES" : "NO";
         newRow["Key"] = dataTable.PrimaryKey.Any(indexCol => indexCol.ColumnName == column.ColumnName) ? "PRI" : string.Empty;
         newRow["Default"] = column.DefaultValue != null ? column.DefaultValue.ToString() : string.Empty;
@@ -671,6 +690,50 @@ namespace MySQL.ForExcel.Classes
              || charSetOrCollation.StartsWith("utf16le")
              || charSetOrCollation.StartsWith("utf32")
              || charSetOrCollation.StartsWith("utf8mb4");
+    }
+
+    /// <summary>
+    /// Returns a <see cref="DataTable"/> with the data read from the given <see cref="IDataReader"/>.
+    /// </summary>
+    /// <param name="dataReader">A <see cref="IDataReader"/> instance.</param>
+    /// <param name="resultSetTableName">An optional name for the returned <see cref="DataTable"/>.</param>
+    /// <returns>A <see cref="DataTable"/> with the data read from the given <see cref="IDataReader"/>.</returns>
+    public static DataTable ReadResultSet(this IDataReader dataReader, string resultSetTableName = null)
+    {
+      if (dataReader == null || dataReader.IsClosed)
+      {
+        return null;
+      }
+
+      if (string.IsNullOrEmpty(resultSetTableName))
+      {
+        resultSetTableName = "ResultSet";
+      }
+
+      var resultSetDataTable = new DataTable(resultSetTableName);
+      for (int colIdx = 0; colIdx < dataReader.FieldCount; colIdx++)
+      {
+        var type = dataReader.GetFieldType(colIdx);
+        var newColumn = new DataColumn(dataReader.GetName(colIdx), type == null ? typeof(string) : type)
+        {
+          // Hack the Caption property of the DataColumn to store the MySQL data type (useful only for spatial data which data type is a byte array which can be mistaken as a BLOB)
+          Caption = dataReader.GetDataTypeName(colIdx).ToLowerInvariant()
+        };
+        resultSetDataTable.Columns.Add(newColumn);
+      }
+
+      while (dataReader.Read())
+      {
+        var newRow = resultSetDataTable.NewRow();
+        for (int colIdx = 0; colIdx < dataReader.FieldCount; colIdx++)
+        {
+          newRow[colIdx] = dataReader[colIdx];
+        }
+
+        resultSetDataTable.Rows.Add(newRow);
+      }
+
+      return resultSetDataTable;
     }
 
     /// <summary>

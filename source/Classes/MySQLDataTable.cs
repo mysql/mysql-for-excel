@@ -382,8 +382,8 @@ namespace MySQL.ForExcel.Classes
     public MySqlDataTable(MySqlWorkbenchConnection wbConnection, DataTable filledTable, string procedureSql, int resultSetIndex)
       : this(wbConnection, filledTable.TableName)
     {
-      CopyTableSchemaAndData(filledTable);
       OperationType = DataOperationType.ImportProcedure;
+      CopyTableSchemaAndData(filledTable);
       ProcedureResultSetIndex = resultSetIndex;
       _selectQuery = procedureSql;
     }
@@ -2467,7 +2467,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="schemaOnly">Flag indicating whether only the schema is copied without data.</param>
     private void CopyTableSchemaAndData(DataTable filledTable, bool schemaOnly = false)
     {
-      var columnsInfoTable = filledTable.GetColumnsInformationTable();
+      var columnsInfoTable = filledTable.GetColumnsInformationTable(OperationType == DataOperationType.ImportProcedure);
       CreateTableSchema(columnsInfoTable);
       if (!schemaOnly)
       {

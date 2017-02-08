@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -609,10 +609,13 @@ namespace MySQL.ForExcel.Panels
         return;
       }
 
+      Cursor = Cursors.WaitCursor;
       using (var previewDialog = new PreviewTableViewDialog(DBObjectList.SelectedNode.DbObject as DbView, false))
       {
         previewDialog.ShowDialog();
       }
+
+      Cursor = Cursors.Default;
     }
 
     /// <summary>
@@ -637,6 +640,7 @@ namespace MySQL.ForExcel.Panels
       }
 
       bool success = true;
+      Cursor = Cursors.WaitCursor;
       try
       {
         // Avoids flickering of DB Objects lists while adding the items to it.
@@ -685,6 +689,10 @@ namespace MySQL.ForExcel.Panels
       {
         success = false;
         MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.RefreshDBObjectsErrorTitle, true);
+      }
+      finally
+      {
+        Cursor = Cursors.Default;
       }
 
       return success;

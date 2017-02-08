@@ -19,10 +19,12 @@ using System;
 using System.Data;
 using System.Reflection;
 using System.Windows.Forms;
+using MySql.Data.MySqlClient;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes;
 using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.Spatial;
 using MySql.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 
@@ -185,7 +187,26 @@ namespace MySQL.ForExcel.Forms
         for (int paramIdx = 0; paramIdx < _procedureParamsProperties.Count; paramIdx++)
         {
           var parameter = _dbProcedure.Parameters[paramIdx].Item2;
-          parameter.Value = _procedureParamsProperties[paramIdx].Value;
+          var parameterValue = _procedureParamsProperties[paramIdx].Value;
+          if (_dbProcedure.Parameters[paramIdx].Item1.Equals("geometry", StringComparison.OrdinalIgnoreCase)
+              && parameter.MySqlDbType == MySqlDbType.Blob)
+          {
+            // Spatial data
+            string textValue = parameterValue == null ? null : parameterValue.ToString();
+            if (string.IsNullOrEmpty(textValue))
+            {
+              parameterValue = null;
+            }
+            else
+            {
+              var geometry = Geometry.Parse(textValue, Globals.ThisAddIn.SpatialDataAsTextFormat);
+              parameterValue = geometry == null
+                ? null
+                : WkbHandler.GetBinaryWkbFromGeometry(geometry, WkbHandler.DefaultByteOrder);
+            }
+          }
+
+          parameter.Value = parameterValue;
         }
 
         // Call stored procedure
@@ -218,7 +239,7 @@ namespace MySQL.ForExcel.Forms
           resultSetsRowSum += _importDataSet.Tables[tableIdx].Rows.Count;
           if (_workbookInCompatibilityMode)
           {
-            _sumOfResultSetsExceedsMaxCompatibilityRows = _sumOfResultSetsExceedsMaxCompatibilityRows || resultSetsRowSum > UInt16.MaxValue;
+            _sumOfResultSetsExceedsMaxCompatibilityRows = _sumOfResultSetsExceedsMaxCompatibilityRows || resultSetsRowSum > ushort.MaxValue;
           }
 
           int limitRows = Math.Min(_importDataSet.Tables[tableIdx].Rows.Count, Settings.Default.ImportPreviewRowsQuantity);
@@ -300,6 +321,16 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
+    /// Event delegate method fired when the <see cref="ImportProcedureForm"/> is loaded.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ImportProcedureForm_Load(object sender, EventArgs e)
+    {
+      ResetPropertyGridSplitterPosition();
+    }
+
+    /// <summary>
     /// Prepares the procedure parameters needed to call the MySQL procedure.
     /// </summary>
     private void PrepareParameters()
@@ -316,14 +347,19 @@ namespace MySQL.ForExcel.Forms
 
         _procedureParamsProperties.Add(customProperty);
       }
+    }
 
-      FieldInfo fi = ParametersPropertyGrid.GetType().GetField("gridView", BindingFlags.NonPublic | BindingFlags.Instance);
-      object gridViewRef = fi != null ? fi.GetValue(ParametersPropertyGrid) : ParametersPropertyGrid;
-      Type gridViewType = gridViewRef.GetType();
-      MethodInfo mi = gridViewType.GetMethod("MoveSplitterTo", BindingFlags.NonPublic | BindingFlags.Instance);
-      int gridColWidth = (int)Math.Truncate(ParametersPropertyGrid.Width * 0.4);
-      mi.Invoke(gridViewRef, new object[] { gridColWidth });
-      ParametersPropertyGrid.Refresh();
+    /// <summary>
+    /// Resets the position of the splitter dividing parameter names and their values.
+    /// </summary>
+    private void ResetPropertyGridSplitterPosition()
+    {
+      var methodInfo = typeof(PropertyGrid).GetMethod("GetPropertyGridView", BindingFlags.NonPublic | BindingFlags.Instance);
+      var gridView = methodInfo.Invoke(ParametersPropertyGrid, new object[] { });
+      methodInfo = gridView.GetType().GetMethod("MoveSplitterTo", BindingFlags.NonPublic | BindingFlags.Instance);
+      var parametersTextWidth = _dbProcedure.GetMaxParameterNameLength(ParametersPropertyGrid.Font);
+      var newPosition = parametersTextWidth + 30;
+      methodInfo.Invoke(gridView, new object[] { newPosition });
     }
 
     /// <summary>
@@ -341,21 +377,9 @@ namespace MySQL.ForExcel.Forms
       _selectedResultSetIndex = ResultSetsTabControl.SelectedIndex;
       ResultSetsTabControl.TabPages[_selectedResultSetIndex].Controls.Add(ResultSetsDataGridView);
       ResultSetsDataGridView.Dock = DockStyle.Fill;
-      ResultSetsDataGridView.SelectionMode = DataGridViewSelectionMode.CellSelect;
-      if (ResultSetsDataGridView.DataSource == null)
-      {
-        ResultSetsDataGridView.DataSource = _previewDataSet;
-      }
-
-      ResultSetsDataGridView.DataMember = _previewDataSet.Tables[_selectedResultSetIndex].TableName;
-      bool cappingAtMaxCompatRows = _workbookInCompatibilityMode && _importDataSet.Tables[_selectedResultSetIndex].Rows.Count > UInt16.MaxValue;
+      ResultSetsDataGridView.Fill(_previewDataSet.Tables[_selectedResultSetIndex]);
+      bool cappingAtMaxCompatRows = _workbookInCompatibilityMode && _importDataSet.Tables[_selectedResultSetIndex].Rows.Count > ushort.MaxValue;
       SetCompatibilityWarning(cappingAtMaxCompatRows);
-      foreach (DataGridViewColumn gridCol in ResultSetsDataGridView.Columns)
-      {
-        gridCol.SortMode = DataGridViewColumnSortMode.NotSortable;
-      }
-
-      ResultSetsDataGridView.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
     }
 
     /// <summary>

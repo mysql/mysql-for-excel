@@ -1369,6 +1369,10 @@ namespace MySQL.ForExcel.Classes
         case "System.Guid":
           retType = "binary(16)";
           break;
+
+        case "System.Byte[]":
+          retType = "blob";
+          break;
       }
 
       return retType;
