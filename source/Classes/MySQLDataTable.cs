@@ -2849,7 +2849,14 @@ namespace MySQL.ForExcel.Classes
       foreach (var mySqlCol in mySqlColumns)
       {
         mySqlCol.SetDisplayName(_firstRowContainsColumnNames ? row[mySqlCol.Ordinal].ToString().ToValidMySqlColumnName() : mySqlCol.ColumnName, false);
-        mySqlCol.SetMySqlDataType(_firstRowContainsColumnNames ? MySqlDataColumn.MySqlDataTypeFromRowType.FromSecond : MySqlDataColumn.MySqlDataTypeFromRowType.FromFirst);
+        if (mySqlCol.MySqlDataTypeOverridenByUser)
+        {
+          mySqlCol.SetMySqlDataType(mySqlCol.MySqlDataType.FullType, mySqlCol.MySqlDataType.IsValid, true, true);
+        }
+        else
+        {
+          mySqlCol.SetMySqlDataType(_firstRowContainsColumnNames ? MySqlDataColumn.MySqlDataTypeFromRowType.FromSecond : MySqlDataColumn.MySqlDataTypeFromRowType.FromFirst);
+        }
       }
 
       // Check about duplicate column names now that all column names were set to the ones given by the user.

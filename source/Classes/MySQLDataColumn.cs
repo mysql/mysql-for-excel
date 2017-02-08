@@ -190,6 +190,8 @@ namespace MySQL.ForExcel.Classes
       _columnNameForSqlQueries = null;
       _excludeColumn = false;
       _mappedDataColOrdinal = -1;
+      _rowsFromFirstDataType = DefaultDataTypeForEmptyColumns;
+      _rowsFromSecondDataType = DefaultDataTypeForEmptyColumns;
       _userDefaultValue = null;
       AutoIncrement = false;
       AutoPk = false;
@@ -201,10 +203,9 @@ namespace MySQL.ForExcel.Classes
       IsDisplayNameDuplicate = false;
       MappedDataColName = null;
       MySqlDataType = null;
+      MySqlDataTypeOverridenByUser = false;
       PrimaryKey = false;
       RangeColumnIndex = 0;
-      RowsFromFirstDataType = null;
-      RowsFromSecondDataType = null;
       SetupWarnings();
     }
 
@@ -225,6 +226,10 @@ namespace MySQL.ForExcel.Classes
         AutoIncrement = true;
         PrimaryKey = true;
         SetMySqlDataType(new MySqlDataType("Integer", true));
+      }
+      else
+      {
+        SetMySqlDataType(new MySqlDataType("VarChar(255)", true));
       }
 
       ColumnName = autoPk ? "AutoPK" : columnName;
@@ -619,6 +624,11 @@ namespace MySQL.ForExcel.Classes
     public MySqlDataType MySqlDataType { get; private set; }
 
     /// <summary>
+    /// Gets a value indicating whether the <see cref="MySqlDataType"/> was overriden by user on a new table's declaration.
+    /// </summary>
+    public bool MySqlDataTypeOverridenByUser { get; private set; }
+
+    /// <summary>
     /// Gets a name in the format "ColumnX" where X is the <see cref="DataColumn.Ordinal"/> position + 1.
     /// </summary>
     public string OrdinalColumnName
@@ -674,38 +684,6 @@ namespace MySQL.ForExcel.Classes
     /// Gets the index of the Excel range column used to populate this column with data.
     /// </summary>
     public int RangeColumnIndex { get; private set; }
-
-    /// <summary>
-    /// Gets the consistent <see cref="MySqlDataType"/> that can hold the data for all rows starting from the first row.
-    /// </summary>
-    public MySqlDataType RowsFromFirstDataType
-    {
-      get
-      {
-        return _rowsFromFirstDataType;
-      }
-
-      set
-      {
-        _rowsFromFirstDataType = value ?? DefaultDataTypeForEmptyColumns;
-      }
-    }
-
-    /// <summary>
-    /// Gets the consistent <see cref="MySqlDataType"/> that can hold the data for all rows starting from the second row.
-    /// </summary>
-    public MySqlDataType RowsFromSecondDataType
-    {
-      get
-      {
-        return _rowsFromSecondDataType;
-      }
-
-      set
-      {
-        _rowsFromSecondDataType = value ?? DefaultDataTypeForEmptyColumns;
-      }
-    }
 
     /// <summary>
     /// Gets or sets a value indicating whether the column has a related unique index.
@@ -1002,24 +980,24 @@ namespace MySQL.ForExcel.Classes
       if (typesListFromSecondRow.Count + typesListForFirstAndRest.Count == 0)
       {
         // There is no data on the column, so set the data types to the default for empty columns.
-        RowsFromFirstDataType = DefaultDataTypeForEmptyColumns;
-        RowsFromSecondDataType = DefaultDataTypeForEmptyColumns;
+        _rowsFromFirstDataType = DefaultDataTypeForEmptyColumns;
+        _rowsFromSecondDataType = DefaultDataTypeForEmptyColumns;
       }
       else
       {
         // Get the consistent DataType for all rows except first one.
-        RowsFromSecondDataType = GetConsistentDataTypeOnAllRows(typesListFromSecondRow, maxTextLengthFromSecondRow);
+        _rowsFromSecondDataType = GetConsistentDataTypeOnAllRows(typesListFromSecondRow, maxTextLengthFromSecondRow);
         if (typesListFromSecondRow.Count > 0)
         {
-          typesListForFirstAndRest.Add(RowsFromSecondDataType);
+          typesListForFirstAndRest.Add(_rowsFromSecondDataType);
         }
 
         // Get the consistent DataType between first row and the previously computed consistent DataType for the rest of the rows.
-        RowsFromFirstDataType = GetConsistentDataTypeOnAllRows(typesListForFirstAndRest, Math.Max(maxTextLengthForFirstRow, maxTextLengthFromSecondRow));
+        _rowsFromFirstDataType = GetConsistentDataTypeOnAllRows(typesListForFirstAndRest, Math.Max(maxTextLengthForFirstRow, maxTextLengthFromSecondRow));
       }
 
       // Set the MySqlDataType using the string type in order to run logic that automatically sets column flags depending on the detected type.
-      SetMySqlDataType(ParentTable.FirstRowContainsColumnNames ? RowsFromSecondDataType.FullType : RowsFromFirstDataType.FullType, true, false);
+      SetMySqlDataType(ParentTable.FirstRowContainsColumnNames ? _rowsFromSecondDataType.FullType : _rowsFromFirstDataType.FullType, true, false, false);
     }
 
     /// <summary>
@@ -1351,31 +1329,33 @@ namespace MySQL.ForExcel.Classes
 
       // Join the resulting list of elements into a list delimited by commas.
       var values = string.Join(",", collectionElements.ToArray());
-      RowsFromSecondDataType = new MySqlDataType(string.Format("{0}({1})", type, values), true, DatesAsMySqlDates);
+      _rowsFromSecondDataType = new MySqlDataType(string.Format("{0}({1})", type, values), true, DatesAsMySqlDates);
       if (!collectionElements.Contains(firstRowElement))
       {
         values = firstRowElement + "," + values;
       }
 
-      RowsFromFirstDataType = new MySqlDataType(string.Format("{0}({1})", type, values), true, DatesAsMySqlDates);
+      _rowsFromFirstDataType = new MySqlDataType(string.Format("{0}({1})", type, values), true, DatesAsMySqlDates);
       SetMySqlDataType(ParentTable.FirstRowContainsColumnNames ? MySqlDataTypeFromRowType.FromSecond : MySqlDataTypeFromRowType.FromFirst);
     }
 
     /// <summary>
-    /// Sets the <see cref="MySqlDataType"/> property to the value of <see cref="RowsFromFirstDataType"/> or <see cref="RowsFromSecondDataType"/>.
+    /// Sets the <see cref="MySqlDataType"/> property to the value of <see cref="_rowsFromFirstDataType"/> or <see cref="_rowsFromFirstDataType"/>.
     /// </summary>
     /// <param name="dataTypeFromRow">A <see cref="MySqlDataTypeFromRowType"/> value.</param>
-    public void SetMySqlDataType(MySqlDataTypeFromRowType dataTypeFromRow)
+    /// <param name="resetWarnings">Flag indicating whether column data checks and warning resets need to take place.</param>
+    public void SetMySqlDataType(MySqlDataTypeFromRowType dataTypeFromRow, bool resetWarnings = false)
     {
-      switch (dataTypeFromRow)
+      var mySqlDataType = dataTypeFromRow == MySqlDataTypeFromRowType.FromFirst
+        ? _rowsFromFirstDataType
+        : _rowsFromSecondDataType;
+      if (resetWarnings)
       {
-        case MySqlDataTypeFromRowType.FromFirst:
-          SetMySqlDataType(RowsFromFirstDataType);
-          break;
-
-        case MySqlDataTypeFromRowType.FromSecond:
-          SetMySqlDataType(RowsFromSecondDataType);
-          break;
+        SetMySqlDataType(mySqlDataType.FullType, true, true, false);
+      }
+      else
+      {
+        SetMySqlDataType(mySqlDataType);
       }
     }
 
@@ -1383,14 +1363,15 @@ namespace MySQL.ForExcel.Classes
     /// Sets the given <see cref="MySqlDataType"/> to the <see cref="MySqlDataType"/> property.
     /// </summary>
     /// <param name="mySqlDataType">A <see cref="MySqlDataType"/>.</param>
-    public void SetMySqlDataType(MySqlDataType mySqlDataType)
+    /// <param name="fromUserInput">Flag indicating if the data type comes from user input and not programmatically.</param>
+    public void SetMySqlDataType(MySqlDataType mySqlDataType, bool fromUserInput = false)
     {
       if (AutoPk)
       {
         // Always override the type if it is the AutoPK column.
         MySqlDataType = new MySqlDataType("Integer", true, DatesAsMySqlDates);
-        RowsFromFirstDataType = MySqlDataType;
-        RowsFromSecondDataType = MySqlDataType;
+        _rowsFromFirstDataType = MySqlDataType;
+        _rowsFromSecondDataType = MySqlDataType;
         return;
       }
 
@@ -1402,7 +1383,15 @@ namespace MySQL.ForExcel.Classes
         {
           AllowNull = !PrimaryKey && !CreateIndex;
         }
+
+        if (!ParentTable.DetectDatatype)
+        {
+          _rowsFromFirstDataType = MySqlDataType;
+          _rowsFromSecondDataType = MySqlDataType;
+        }
       }
+
+      MySqlDataTypeOverridenByUser = fromUserInput;
 
       // Reset auto increment and default values because of the data type change
       AutoIncrement = false;
@@ -1417,17 +1406,12 @@ namespace MySQL.ForExcel.Classes
     /// <param name="fullDataType">A MySQL data type as specified for new columns in a CREATE TABLE statement.</param>
     /// <param name="isValidType">Flag indicating whether the data type is a valid one, or if validations need to be performed.</param>
     /// <param name="testTypeOnData">Flag indicating if the data type will be tested against the column's data to see if the type is suitable for the data.</param>
+    /// <param name="fromUserInput">Flag indicating if the data type comes from user input and not programmatically.</param>
     /// <returns><c>true</c> if the type is a valid MySQL data type, <c>false</c> otherwise.</returns>
-    public bool SetMySqlDataType(string fullDataType, bool isValidType, bool testTypeOnData)
+    public bool SetMySqlDataType(string fullDataType, bool isValidType, bool testTypeOnData, bool fromUserInput)
     {
       bool datesAsMySqlDates = MySqlDataType == null || MySqlDataType.DatesAsMySqlDates;
-      SetMySqlDataType(new MySqlDataType(fullDataType, isValidType, datesAsMySqlDates));
-      if (ParentTable != null && !ParentTable.DetectDatatype)
-      {
-        RowsFromFirstDataType = MySqlDataType;
-        RowsFromSecondDataType = MySqlDataType;
-      }
-
+      SetMySqlDataType(new MySqlDataType(fullDataType, isValidType, datesAsMySqlDates), fromUserInput);
       if (AutoPk)
       {
         return true;
@@ -1438,7 +1422,7 @@ namespace MySQL.ForExcel.Classes
         return false;
       }
 
-      if (MySqlDataType.FullType.Length == 0)
+      if (string.IsNullOrEmpty(MySqlDataType.FullType))
       {
         // Show warning stating the column data type cannot be empty
         if (_warnings.Show(NO_DATA_TYPE_WARNING_KEY))
@@ -1523,8 +1507,6 @@ namespace MySQL.ForExcel.Classes
       SetDisplayName(fromColumn.DisplayName, false);
       DataType = fromColumn.DataType;
       MySqlDataType = fromColumn.MySqlDataType.Clone() as MySqlDataType;
-      RowsFromFirstDataType = fromColumn.RowsFromFirstDataType;
-      RowsFromSecondDataType = fromColumn.RowsFromSecondDataType;
       AutoPk = fromColumn.AutoPk;
       InExportMode = fromColumn.InExportMode;
 

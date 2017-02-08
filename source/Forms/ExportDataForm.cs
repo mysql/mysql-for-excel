@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -240,7 +240,7 @@ namespace MySQL.ForExcel.Forms
         _previewDataTable.FirstRowContainsColumnNames = FirstRowHeadersCheckBox.Checked;
 
         // Force Empty columns with emtpy column names from being stated defaulty when this is not desired.
-        RecreateColumns();
+        RefreshPreviewGridColumnNames();
         SetDefaultPrimaryKey();
 
         // Refresh first row headers accordingly
@@ -627,7 +627,7 @@ namespace MySQL.ForExcel.Forms
           break;
 
         default:
-          currentCol.SetMySqlDataType(selectedType, true, true);
+          currentCol.SetMySqlDataType(selectedType, true, true, true);
           break;
       }
     }
@@ -657,8 +657,7 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      currentCol.SetMySqlDataType(newDataType, false, true);
-      //SetControlTextValue(DataTypeComboBox, currentCol.MySqlDataType.FullType);
+      currentCol.SetMySqlDataType(newDataType, false, true, true);
     }
 
     /// <summary>
@@ -685,13 +684,27 @@ namespace MySQL.ForExcel.Forms
     private void DataTypeContextMenuStrip_Opening(object sender, CancelEventArgs e)
     {
       var currentCol = GetCurrentMySqlDataColumn();
-      if (currentCol == null || !currentCol.MySqlDataType.IsNumeric)
+      if (currentCol == null)
       {
         e.Cancel = true;
         return;
       }
 
+      bool showResetMenuItems = currentCol.ParentTable != null
+                                && currentCol.ParentTable.DetectDatatype
+                                && currentCol.MySqlDataTypeOverridenByUser;
+      bool showNumericExtendedMenuItems = currentCol.MySqlDataType.IsNumeric;
+      if (!showResetMenuItems && !showNumericExtendedMenuItems)
+      {
+        e.Cancel = true;
+        return;
+      }
+
+      PropertiesToolStripSeparator.Visible = showResetMenuItems && showNumericExtendedMenuItems;
+      ResetToAutoDetectedToolStripMenuItem.Visible = showResetMenuItems;
+      UnsignedToolStripMenuItem.Visible = showNumericExtendedMenuItems;
       UnsignedToolStripMenuItem.Checked = currentCol.MySqlDataType.Unsigned;
+      ZeroFillToolStripMenuItem.Visible = showNumericExtendedMenuItems;
       ZeroFillToolStripMenuItem.Checked = currentCol.MySqlDataType.ZeroFill;
     }
 
@@ -904,7 +917,7 @@ namespace MySQL.ForExcel.Forms
     {
       int grdIndex = PreviewDataGridView.SelectedColumns.Count > 0 ? PreviewDataGridView.SelectedColumns[0].Index : 0;
       _previewDataTable.FirstRowContainsColumnNames = FirstRowHeadersCheckBox.Checked;
-      RecreateColumns();
+      RefreshPreviewGridColumnNames();
       SetControlTextValue(AddPrimaryKeyTextBox, _previewDataTable.AutoPkName);
       PreviewDataGridView.CurrentCell = null;
       PreviewDataGridView.Rows[0].Visible = !FirstRowHeadersCheckBox.Checked;
@@ -1295,23 +1308,6 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Refreshes the columns names and data types based on the data having the first row (not used as column names) or not.
-    /// </summary>
-    private void RecreateColumns()
-    {
-      for (int colIdx = 0; colIdx < _previewDataTable.Columns.Count; colIdx++)
-      {
-        MySqlDataColumn mysqlCol = _previewDataTable.GetColumnAtIndex(colIdx);
-        DataGridViewColumn gridCol = PreviewDataGridView.Columns[colIdx];
-        gridCol.HeaderText = mysqlCol.DisplayName;
-        PreviewDataGridView.Columns[colIdx].SortMode = DataGridViewColumnSortMode.NotSortable;
-      }
-
-      PreviewDataGridView.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
-      RefreshPrimaryKeyColumnsCombo(true);
-    }
-
-    /// <summary>
     /// Refreshes the values of controls tied to column properties and its related warning controls.
     /// </summary>
     private void RefreshColumnControlsAndWarnings()
@@ -1393,6 +1389,23 @@ namespace MySQL.ForExcel.Forms
       bool showWarning = !string.IsNullOrEmpty(column.CurrentWarningText);
       _columnOptionsWarningMoreInfo = column.CurrentWarningMoreInfo;
       ShowValidationWarning("ColumnOptionsWarning", showWarning, column.CurrentWarningText, column.CurrentWarningMoreInfo != null);
+    }
+
+    /// <summary>
+    /// Refreshes the columns names and data types based on the data having the first row (not used as column names) or not.
+    /// </summary>
+    private void RefreshPreviewGridColumnNames()
+    {
+      for (int colIdx = 0; colIdx < _previewDataTable.Columns.Count; colIdx++)
+      {
+        MySqlDataColumn mysqlCol = _previewDataTable.GetColumnAtIndex(colIdx);
+        DataGridViewColumn gridCol = PreviewDataGridView.Columns[colIdx];
+        gridCol.HeaderText = mysqlCol.DisplayName;
+        PreviewDataGridView.Columns[colIdx].SortMode = DataGridViewColumnSortMode.NotSortable;
+      }
+
+      PreviewDataGridView.SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
+      RefreshPrimaryKeyColumnsCombo(true);
     }
 
     /// <summary>
@@ -1482,6 +1495,22 @@ namespace MySQL.ForExcel.Forms
 
       TextChangedTimer.Stop();
       TextChangedTimer.Start();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="ResetToAutoDetectedToolStripMenuItem"/> is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ResetToAutoDetectedToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      var currentCol = GetCurrentMySqlDataColumn();
+      if (currentCol == null || !currentCol.MySqlDataTypeOverridenByUser)
+      {
+        return;
+      }
+
+      currentCol.SetMySqlDataType(_previewDataTable.FirstRowContainsColumnNames ? MySqlDataColumn.MySqlDataTypeFromRowType.FromSecond : MySqlDataColumn.MySqlDataTypeFromRowType.FromFirst, true);
     }
 
     /// <summary>

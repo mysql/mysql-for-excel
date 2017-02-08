@@ -1,4 +1,9 @@
 1.3.7
+- Changed the behavior of how the "First Row Contains Column Names" selection affects the Data Type for columns. The value of the aforementioned checkbox
+  controls the auto-detected Data Type for columns either by defaulting the type to a suitable one for rows 2-n (if checked), or to one suitable for rows
+  1-n (if unchecked). Now if the default auto-detected Data Type value is changed by the user, the overridden value remains even when changing the value
+  of "First Row Contains Column Names". A new option called "Reset to auto-detected" was added to the Data Type field's context menu, to easily revert the
+  Data Type value back to the auto-detected one. (MySQL Bug #84802, Bug #25492772 - LOSES MAPPINGS WHEN [DE-]SELECTING FIRST COLUMN CONTAINS NAMES)
 - Fixed a problem where empty string values mixed in an Excel column's data that is used in an Export or Append Data operation cause the generated SQL
   queries to have no value, instead of an "empty" value corresponding to the target column's data type (e.g. 0 for integer, false for bool if the column
   does not allow null values, or null otherwise). (MySQL Bug #84851, Bug #25509312 - CANNOT APPEND NUMBERS THAT ARE THE RESULT OF FORMULAS)

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -83,6 +83,8 @@ namespace MySQL.ForExcel.Forms
       this.DefaultValueLabel = new System.Windows.Forms.Label();
       this.DataTypeComboBox = new System.Windows.Forms.ComboBox();
       this.DataTypeContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.ResetToAutoDetectedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.PropertiesToolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
       this.UnsignedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.ZeroFillToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.ExcludeColumnCheckBox = new System.Windows.Forms.CheckBox();
@@ -349,17 +351,32 @@ namespace MySQL.ForExcel.Forms
       // DataTypeContextMenuStrip
       // 
       this.DataTypeContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ResetToAutoDetectedToolStripMenuItem,
+            this.PropertiesToolStripSeparator,
             this.UnsignedToolStripMenuItem,
             this.ZeroFillToolStripMenuItem});
       this.DataTypeContextMenuStrip.Name = "DataTypeContextMenuStrip";
-      this.DataTypeContextMenuStrip.Size = new System.Drawing.Size(125, 48);
+      this.DataTypeContextMenuStrip.Size = new System.Drawing.Size(195, 98);
       this.DataTypeContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.DataTypeContextMenuStrip_Opening);
+      // 
+      // ResetToAutoDetectedToolStripMenuItem
+      // 
+      this.ResetToAutoDetectedToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.reset;
+      this.ResetToAutoDetectedToolStripMenuItem.Name = "ResetToAutoDetectedToolStripMenuItem";
+      this.ResetToAutoDetectedToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
+      this.ResetToAutoDetectedToolStripMenuItem.Text = "Reset to auto-detected";
+      this.ResetToAutoDetectedToolStripMenuItem.Click += new System.EventHandler(this.ResetToAutoDetectedToolStripMenuItem_Click);
+      // 
+      // PropertiesToolStripSeparator
+      // 
+      this.PropertiesToolStripSeparator.Name = "PropertiesToolStripSeparator";
+      this.PropertiesToolStripSeparator.Size = new System.Drawing.Size(191, 6);
       // 
       // UnsignedToolStripMenuItem
       // 
       this.UnsignedToolStripMenuItem.CheckOnClick = true;
       this.UnsignedToolStripMenuItem.Name = "UnsignedToolStripMenuItem";
-      this.UnsignedToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+      this.UnsignedToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
       this.UnsignedToolStripMenuItem.Text = "Unsigned";
       this.UnsignedToolStripMenuItem.CheckedChanged += new System.EventHandler(this.UnsignedToolStripMenuItem_CheckedChanged);
       // 
@@ -367,7 +384,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.ZeroFillToolStripMenuItem.CheckOnClick = true;
       this.ZeroFillToolStripMenuItem.Name = "ZeroFillToolStripMenuItem";
-      this.ZeroFillToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
+      this.ZeroFillToolStripMenuItem.Size = new System.Drawing.Size(194, 22);
       this.ZeroFillToolStripMenuItem.Text = "Zero Fill";
       this.ZeroFillToolStripMenuItem.CheckedChanged += new System.EventHandler(this.ZeroFillToolStripMenuItem_CheckedChanged);
       // 
@@ -973,5 +990,7 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.ToolTip HelpToolTip;
     private System.Windows.Forms.CheckBox AutoIncrementCheckBox;
     private System.Windows.Forms.PictureBox DefaultValuePictureBox;
+    private System.Windows.Forms.ToolStripMenuItem ResetToAutoDetectedToolStripMenuItem;
+    private System.Windows.Forms.ToolStripSeparator PropertiesToolStripSeparator;
   }
 }
