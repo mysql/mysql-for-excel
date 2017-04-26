@@ -42,6 +42,9 @@ namespace MySQL.ForExcel.Panels
 
       InitializeComponent();
 
+      LargeImagesList.Images.Add("Connection_SSH-Disabled.png", Resources.Connection_SSH.ToGrayscale());
+      LargeImagesList.Images.Add("Connection_X_32x32-Disabled.png", Resources.Connection_X_32x32.ToGrayscale());
+
       InheritFontToControlsExceptionList.Add(OpenConnectionHotLabel.Name);
       InheritFontToControlsExceptionList.Add(NewConnectionHotLabel.Name);
       InheritFontToControlsExceptionList.Add(ManageConnectionsHotLabel.Name);
@@ -75,7 +78,7 @@ namespace MySQL.ForExcel.Panels
       }
 
       // Load connections just obtained from Workbench or locally created
-      foreach (var conn in MySqlWorkbench.Connections.OrderBy(conn => conn.Name))
+      foreach (var conn in MySqlWorkbench.Connections.OrderBy(conn => conn.Name).Where(conn => !conn.IsUnknownConnection && !conn.IsFabricManaged))
       {
         conn.SetAdditionalConnectionProperties();
         AddConnectionToList(conn);
@@ -117,23 +120,28 @@ namespace MySQL.ForExcel.Panels
         return;
       }
 
-      var isSsh = conn.ConnectionMethod == MySqlWorkbenchConnection.ConnectionMethodType.Ssh;
       var headerNode = ConnectionsList.HeaderNodes[conn.IsLocalConnection ? 0 : 1];
       var node = ConnectionsList.AddConnectionNode(headerNode, conn);
-      node.Enable = !isSsh;
       switch (conn.ConnectionMethod)
       {
         case MySqlWorkbenchConnection.ConnectionMethodType.Tcp:
-        case MySqlWorkbenchConnection.ConnectionMethodType.LocalUnixSocketOrWindowsPipe:
-          node.ImageIndex = node.Enable ? 0 : 1;
+          node.Enable = true;
+          node.ImageIndex = 0;
           break;
 
-        case MySqlWorkbenchConnection.ConnectionMethodType.FabricManaged:
-          node.ImageIndex = 4;
+        case MySqlWorkbenchConnection.ConnectionMethodType.LocalUnixSocketOrWindowsPipe:
+          node.Enable = true;
+          node.ImageIndex = 1;
           break;
 
         case MySqlWorkbenchConnection.ConnectionMethodType.Ssh:
-          node.ImageIndex = node.Enable ? 2 : 3;
+          node.Enable = false;
+          node.ImageIndex = node.Enable ? 2 : 4;
+          break;
+
+        case MySqlWorkbenchConnection.ConnectionMethodType.XProtocol:
+          node.Enable = false;
+          node.ImageIndex = node.Enable ? 3 : 5;
           break;
       }
     }

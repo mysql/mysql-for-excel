@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -864,20 +864,27 @@ namespace MySQL.ForExcel.Controls
       // If the user clicks on a node that was not previously selected, select it now.
       base.SelectedNode = null;
       var node = GetNodeAt(e.Location) as MySqlListViewNode;
-      if (node != null)
+      if (node != null && node.Enable)
       {
-        int leftBound = node.Bounds.X; // - 20; // Allow user to click on image
-        int rightBound = node.Bounds.Right + 10; // Give a little extra room
-        if (e.Location.X > leftBound && e.Location.X < rightBound)
+        if (node.Enable)
         {
-          if (ModifierKeys == Keys.None && (_selectedNodes.Contains(node)))
+          int leftBound = node.Bounds.X; // - 20; // Allow user to click on image
+          int rightBound = node.Bounds.Right + 10; // Give a little extra room
+          if (e.Location.X > leftBound && e.Location.X < rightBound)
           {
-            // Possible mouse drop, let MouseUp handle the case.
+            if (ModifierKeys == Keys.None && (_selectedNodes.Contains(node)))
+            {
+              // Possible mouse drop, let MouseUp handle the case.
+            }
+            else
+            {
+              SelectNodes(node);
+            }
           }
-          else
-          {
-            SelectNodes(node);
-          }
+        }
+        else
+        {
+          ClearSelectedNodes();
         }
       }
 
@@ -895,15 +902,21 @@ namespace MySQL.ForExcel.Controls
       var node = GetNodeAt(e.Location) as MySqlListViewNode;
       if (node != null)
       {
-        if (ModifierKeys == Keys.None && _selectedNodes.Contains(node))
+        if (node.Enable)
         {
-          int leftBound = node.Bounds.X; // -20; // Allow user to click on image
-          int rightBound = node.Bounds.Right + 10; // Give a little extra room
-          if (e.Location.X > leftBound && e.Location.X < rightBound)
+          if (ModifierKeys == Keys.None && _selectedNodes.Contains(node))
           {
-
-            SelectNodes(node);
+            int leftBound = node.Bounds.X; // -20; // Allow user to click on image
+            int rightBound = node.Bounds.Right + 10; // Give a little extra room
+            if (e.Location.X > leftBound && e.Location.X < rightBound)
+            {
+              SelectNodes(node);
+            }
           }
+        }
+        else
+        {
+          ClearSelectedNodes();
         }
       }
 
@@ -933,6 +946,11 @@ namespace MySQL.ForExcel.Controls
         if (node.Type == MySqlListViewNode.MySqlNodeType.Header || node.Nodes.Count > 0)
         {
           return GetFirstChildNode(node);
+        }
+
+        if (!node.Enable)
+        {
+          continue;
         }
 
         return node;
@@ -1118,7 +1136,7 @@ namespace MySQL.ForExcel.Controls
         return;
       }
 
-      var unselectableNode = node.Type == MySqlListViewNode.MySqlNodeType.Header;
+      var unselectableNode = node.Type == MySqlListViewNode.MySqlNodeType.Header || !node.Enable;
       _selectedNode = node;
       if (unselectableNode)
       {

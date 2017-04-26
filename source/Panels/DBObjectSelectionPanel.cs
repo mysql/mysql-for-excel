@@ -544,7 +544,7 @@ namespace MySQL.ForExcel.Panels
     /// </summary>
     private void LoadProcedures()
     {
-      var proceduresTable = _wbConnection.GetSchemaInformation(SchemaInformationType.Procedures, true, null, _wbConnection.Schema, null, "PROCEDURE");
+      var proceduresTable = _wbConnection.GetSchemaInformation(SchemaInformationType.Routines, true, null, _wbConnection.Schema, null, "PROCEDURE");
       if (proceduresTable == null)
       {
         return;

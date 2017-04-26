@@ -268,9 +268,6 @@
   <data name="MySQLforExcel_WelcomePanel_Connection_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySQLforExcel-WelcomePanel-Connection-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="MySQLforExcel_WelcomePanel_ListItem_Connection_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-WelcomePanel-ListItem-Connection-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="MySQLforExcel_WelcomePanel_ManageConnection_24x24" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MySQLforExcel-WelcomePanel-ManageConnection-24x24.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -1007,18 +1004,6 @@ Since Excel relationships cannot be created, a single PivotTable for the whole E
   <data name="ImportDataBindError" xml:space="preserve">
     <value>An error occurred trying to bind MySQL data to Excel table "{0}".</value>
   </data>
-  <data name="MySQLforExcel_WelcomePanel_Connection_Fabric" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-WelcomePanel-Connection-Fabric.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLforExcel_WelcomePanel_Connection_SSH" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-WelcomePanel-Connection-SSH.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLforExcel_WelcomePanel_Connection_SSH_Disabled" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-WelcomePanel-Connection-SSH-Disabled.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="MySQLforExcel_WelcomePanel_ListItem_Connection_Disabled_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\MySQLforExcel-WelcomePanel-ListItem-Connection-Disabled-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="ImportDataWillBeTruncatedWarning" xml:space="preserve">
     <value>Importing data will be truncated since it exceeds the available Worksheet's space.</value>
   </data>
@@ -1158,5 +1143,17 @@ MySQL for Excel will automatically attempt to migrate Import and Edit Data relat
   </data>
   <data name="reset" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\reset.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Connection_Socket_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Connection-Socket-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Connection_SSH" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Connection-SSH.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Connection_TCP_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Connection-TCP-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Connection_X_32x32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Connection-X-32x32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

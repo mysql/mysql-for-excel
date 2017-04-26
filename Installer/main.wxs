@@ -38,10 +38,9 @@
     </Condition>
 
     <!-- Check if .NET FW 4.0 or greater is installed -->
-    <PropertyRef Id="NETFRAMEWORK40CLIENT"/>
     <PropertyRef Id="NETFRAMEWORK40FULL"/>
     <Condition Message="This application requires .NET Framework 4.0. Please install the .NET Framework then run this installer again.  For more information, please see http://go.microsoft.com/fwlink/?LinkId=181012">
-      <![CDATA[Installed OR NETFRAMEWORK40FULL OR NETFRAMEWORK40CLIENT]]>
+      <![CDATA[Installed OR NETFRAMEWORK40FULL]]>
     </Condition>
 
     <!-- See if Office 2007 (only 32bit version is available) is installed -->

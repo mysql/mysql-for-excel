@@ -410,6 +410,46 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Connection_Socket_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("Connection_Socket_32x32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Connection_SSH {
+            get {
+                object obj = ResourceManager.GetObject("Connection_SSH", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Connection_TCP_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("Connection_TCP_32x32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Connection_X_32x32 {
+            get {
+                object obj = ResourceManager.GetObject("Connection_X_32x32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MySQL Connection is closed, must be opened first to perform action.
         /// </summary>
         internal static string ConnectionClosedError {
@@ -2038,56 +2078,6 @@ namespace MySQL.ForExcel.Properties {
         internal static System.Drawing.Bitmap MySQLforExcel_WelcomePanel_Connection_24x24 {
             get {
                 object obj = ResourceManager.GetObject("MySQLforExcel_WelcomePanel_Connection_24x24", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap MySQLforExcel_WelcomePanel_Connection_Fabric {
-            get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_WelcomePanel_Connection_Fabric", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap MySQLforExcel_WelcomePanel_Connection_SSH {
-            get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_WelcomePanel_Connection_SSH", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap MySQLforExcel_WelcomePanel_Connection_SSH_Disabled {
-            get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_WelcomePanel_Connection_SSH_Disabled", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap MySQLforExcel_WelcomePanel_ListItem_Connection_32x32 {
-            get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_WelcomePanel_ListItem_Connection_32x32", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap MySQLforExcel_WelcomePanel_ListItem_Connection_Disabled_32x32 {
-            get {
-                object obj = ResourceManager.GetObject("MySQLforExcel_WelcomePanel_ListItem_Connection_Disabled_32x32", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

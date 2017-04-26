@@ -77,11 +77,10 @@ namespace MySQL.ForExcel.Panels
       // 
       this.LargeImagesList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("LargeImagesList.ImageStream")));
       this.LargeImagesList.TransparentColor = System.Drawing.Color.Transparent;
-      this.LargeImagesList.Images.SetKeyName(0, "MySQLforExcel-WelcomePanel-ListItem-Connection-32x32.png");
-      this.LargeImagesList.Images.SetKeyName(1, "MySQLforExcel-WelcomePanel-ListItem-Connection-Disabled-32x32.png");
-      this.LargeImagesList.Images.SetKeyName(2, "MySQLforExcel-WelcomePanel-Connection-SSH.png");
-      this.LargeImagesList.Images.SetKeyName(3, "MySQLforExcel-WelcomePanel-Connection-SSH-Disabled.png");
-      this.LargeImagesList.Images.SetKeyName(4, "MySQLforExcel-WelcomePanel-Connection-Fabric.png");
+      this.LargeImagesList.Images.SetKeyName(0, "Connection-TCP-32x32.png");
+      this.LargeImagesList.Images.SetKeyName(1, "Connection-Socket-32x32.png");
+      this.LargeImagesList.Images.SetKeyName(2, "Connection-SSH.png");
+      this.LargeImagesList.Images.SetKeyName(3, "Connection-X-32x32.png");
       // 
       // ManageConnectionsHotLabel
       // 
