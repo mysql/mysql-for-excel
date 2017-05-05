@@ -1197,7 +1197,6 @@ namespace MySQL.ForExcel
     {
       // Unsubscribe from Excel events
       SetupExcelEvents(false);
-      WorkbookConnectionInfos.ConnectionInfosByWorkbook.Clear();
     }
 
     /// <summary>
@@ -1494,6 +1493,7 @@ namespace MySQL.ForExcel
 
       // Dispose (close) all ImportConnectionInfo object
       WorkbookConnectionInfos.DisposeWorkbookImportConnectionInfos(ActiveWorkbook);
+      WorkbookConnectionInfos.ConnectionInfosByWorkbook.Clear();
     }
 
     /// <summary>
