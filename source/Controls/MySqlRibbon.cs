@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -19,8 +19,8 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using MySql.Utility.Classes.Logging;
 using MySQL.ForExcel.Properties;
-using MySql.Utility.Classes.MySql;
 using OfficeCore = Microsoft.Office.Core;
 
 namespace MySQL.ForExcel.Controls
@@ -101,7 +101,7 @@ namespace MySQL.ForExcel.Controls
       Microsoft.Office.Tools.CustomTaskPane taskPane = Globals.ThisAddIn.GetOrCreateActiveCustomPane();
       if (taskPane == null)
       {
-        MySqlSourceTrace.WriteToLog(string.Format(Resources.CustomTaskPaneGetOrCreateError, Globals.ThisAddIn.ExcelVersionNumber), false);
+        Logger.LogError(string.Format(Resources.CustomTaskPaneGetOrCreateError, Globals.ThisAddIn.ExcelVersionNumber));
         return;
       }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -18,16 +18,15 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using MySql.Utility.Classes.Logging;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Properties;
-using MySql.Utility.Classes.MySql;
 using MySql.Utility.Classes.MySqlWorkbench;
 using MySql.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
@@ -186,7 +185,7 @@ namespace MySQL.ForExcel.Forms
         {
           // Do NOT remove the following line although the wb variable is not used in the method the casting of the
           // EditingWorksheet.Parent is needed to determine if the parent Workbook is valid and has not been disposed of.
-          ExcelInterop.Workbook wb = EditingWorksheet.Parent as ExcelInterop.Workbook;
+          var wb = EditingWorksheet.Parent as ExcelInterop.Workbook;
           exists = true;
         }
         catch
@@ -352,7 +351,7 @@ namespace MySQL.ForExcel.Forms
     protected override void OnPaintBackground(PaintEventArgs e)
     {
       base.OnPaintBackground(e);
-      Pen pen = new Pen(Color.White, 3f);
+      var pen = new Pen(Color.White, 3f);
       e.Graphics.DrawRectangle(pen, 0, 0, Width - 2, Height - 2);
       pen.Width = 1f;
       e.Graphics.DrawLine(pen, 0, 25, Width, 25);
@@ -454,12 +453,12 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      bool rowWasDeleted = EditingWorksheet.UsedRange.Rows.Count < _editingRowsQuantity && target.Columns.Count == EditingWorksheet.Columns.Count;
-      bool undoChanges = false;
+      var rowWasDeleted = EditingWorksheet.UsedRange.Rows.Count < _editingRowsQuantity && target.Columns.Count == EditingWorksheet.Columns.Count;
+      var undoChanges = false;
       string operationSummary = null;
       string operationDetails = null;
 
-      ExcelInterop.Range intersectRange = _editDataRange.IntersectWith(target);
+      var intersectRange = _editDataRange.IntersectWith(target);
       if (intersectRange == null || intersectRange.CountLarge == 0)
       {
         undoChanges = true;
@@ -490,22 +489,22 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      ExcelInterop.Range startCell = intersectRange.Item[1, 1] as ExcelInterop.Range;
+      var startCell = intersectRange.Item[1, 1] as ExcelInterop.Range;
       if (startCell != null)
       {
         // Substract from the Excel indexes since they start at 1, ExcelRow is subtracted by 2 if we imported headers.
-        int startDataTableRow = startCell.Row - 2;
-        int startDataTableCol = startCell.Column - 1;
+        var startDataTableRow = startCell.Row - 2;
+        var startDataTableCol = startCell.Column - 1;
 
         // Detect if a row was deleted and if so flag it for deletion
         if (rowWasDeleted)
         {
-          List<int> skipDeletedRowsList = new List<int>();
+          var skipDeletedRowsList = new List<int>();
           foreach (ExcelInterop.Range deletedRow in target.Rows)
           {
             startDataTableRow = deletedRow.Row - 2;
             startDataTableRow = _mySqlTable.SearchRowIndexNotDeleted(startDataTableRow, skipDeletedRowsList, _editDataRange.Rows.Count);
-            DataRow dr = _mySqlTable.Rows[startDataTableRow];
+            var dr = _mySqlTable.Rows[startDataTableRow];
             dr.Delete();
             skipDeletedRowsList.Add(startDataTableRow);
           }
@@ -518,9 +517,9 @@ namespace MySQL.ForExcel.Forms
           MySqlDataColumn currCol = null;
           try
           {
-            for (int rowIdx = 1; rowIdx <= intersectRange.Rows.Count; rowIdx++)
+            for (var rowIdx = 1; rowIdx <= intersectRange.Rows.Count; rowIdx++)
             {
-              for (int colIdx = 1; colIdx <= intersectRange.Columns.Count; colIdx++)
+              for (var colIdx = 1; colIdx <= intersectRange.Columns.Count; colIdx++)
               {
                 ExcelInterop.Range cell = intersectRange.Cells[rowIdx, colIdx];
                 if (cell == null)
@@ -536,8 +535,8 @@ namespace MySQL.ForExcel.Forms
                     continue;
                   }
 
-                  ExcelInterop.Range insertingRowRange = AddNewRowToEditingRange(true);
-                  MySqlDataRow newRow = _mySqlTable.NewRow() as MySqlDataRow;
+                  var insertingRowRange = AddNewRowToEditingRange(true);
+                  var newRow = _mySqlTable.NewRow() as MySqlDataRow;
                   if (newRow != null)
                   {
                     newRow.ExcelRange = insertingRowRange;
@@ -545,12 +544,12 @@ namespace MySQL.ForExcel.Forms
                   }
                 }
 
-                int absRow = startDataTableRow + rowIdx - 1;
+                var absRow = startDataTableRow + rowIdx - 1;
                 absRow = _mySqlTable.SearchRowIndexNotDeleted(absRow, null, _editDataRange.Rows.Count);
-                int absCol = startDataTableCol + colIdx - 1;
+                var absCol = startDataTableCol + colIdx - 1;
 
                 currCol = _mySqlTable.GetColumnAtIndex(absCol);
-                object cellValue = cell.GetCellPackedValue(true);
+                var cellValue = cell.GetCellPackedValue(true);
                 object insertingValue = DBNull.Value;
                 if (cellValue != null)
                 {
@@ -587,7 +586,7 @@ namespace MySQL.ForExcel.Forms
             undoChanges = true;
             operationSummary = Resources.EditDataCellModificationError;
             operationDetails = ex.Message;
-            MySqlSourceTrace.WriteAppErrorToLog(ex, false);
+            Logger.LogException(ex);
           }
           finally
           {
@@ -613,7 +612,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="target"></param>
     private void EditingWorksheet_SelectionChange(ExcelInterop.Range target)
     {
-      ExcelInterop.Range intersectRange = _editDataRange.IntersectWith(target);
+      var intersectRange = _editDataRange.IntersectWith(target);
       if (intersectRange == null || intersectRange.CountLarge == 0)
       {
         Hide();
@@ -708,10 +707,10 @@ namespace MySQL.ForExcel.Forms
     /// <returns><c>true</c> if the transaction was committed successfully to the database, <c>false</c> otherwise.</returns>
     private bool PushDataChanges()
     {
-      bool warningsFound = false;
-      bool errorsFound = false;
-      bool autoCommitOn = AutoCommitCheckBox.Checked;
-      int warningsCount = 0;
+      var warningsFound = false;
+      var errorsFound = false;
+      var autoCommitOn = AutoCommitCheckBox.Checked;
+      var warningsCount = 0;
 
       Cursor = Cursors.WaitCursor;
       _mySqlTable.UseOptimisticUpdate = _useOptimisticUpdateForThisSession;
@@ -722,10 +721,10 @@ namespace MySQL.ForExcel.Forms
         return false;
       }
 
-      StringBuilder operationSummary = new StringBuilder();
-      StringBuilder operationDetails = new StringBuilder();
-      StringBuilder warningDetails = new StringBuilder();
-      StringBuilder warningStatementDetails = new StringBuilder();
+      var operationSummary = new StringBuilder();
+      var operationDetails = new StringBuilder();
+      var warningDetails = new StringBuilder();
+      var warningStatementDetails = new StringBuilder();
       operationSummary.AppendFormat(Resources.EditedDataForTable, EditingTableName);
       if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults)
       {
@@ -737,9 +736,9 @@ namespace MySQL.ForExcel.Forms
         operationDetails.AddNewLine();
       }
 
-      bool warningDetailHeaderAppended = false;
-      string statementsQuantityFormat = new string('0', modifiedRowsList.Count.StringSize());
-      string sqlQueriesFormat = "{0:" + statementsQuantityFormat + "}: {1}";
+      var warningDetailHeaderAppended = false;
+      var statementsQuantityFormat = new string('0', modifiedRowsList.Count.StringSize());
+      var sqlQueriesFormat = "{0:" + statementsQuantityFormat + "}: {1}";
       foreach (var statement in modifiedRowsList.Select(statementRow => statementRow.Statement))
       {
         if (Settings.Default.GlobalSqlQueriesShowQueriesWithResults && statement.SqlQuery.Length > 0)
@@ -874,8 +873,8 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void RevertDataButton_Click(object sender, EventArgs e)
     {
-      EditDataRevertDialog revertDialog = new EditDataRevertDialog(!AutoCommitCheckBox.Checked && UncommitedDataExists);
-      DialogResult dr = revertDialog.ShowDialog();
+      var revertDialog = new EditDataRevertDialog(!AutoCommitCheckBox.Checked && UncommitedDataExists);
+      var dr = revertDialog.ShowDialog();
       if (dr == DialogResult.Cancel)
       {
         return;
@@ -977,7 +976,7 @@ namespace MySQL.ForExcel.Forms
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
+        Logger.LogException(ex);
       }
 
       Globals.ThisAddIn.SkipWorksheetChangeEvent = false;

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Office.Core;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes;
-using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.Logging;
 using MySql.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 using ExcelTools = Microsoft.Office.Tools.Excel;
@@ -554,7 +554,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.PivotTableCreationError, proposedName), true);
+        Logger.LogException(ex, true, string.Format(Resources.PivotTableCreationError, proposedName));
       }
 
       return pivotTable;
@@ -596,7 +596,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.PivotTableCreationError, proposedName), true);
+        Logger.LogException(ex, true, string.Format(Resources.PivotTableCreationError, proposedName));
       }
 
       return pivotTable;
@@ -629,7 +629,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.WorksheetCreationErrorText, true);
+        Logger.LogException(ex, true, Resources.WorksheetCreationErrorText);
       }
 
       return newWorksheet;
@@ -658,7 +658,7 @@ namespace MySQL.ForExcel.Classes
         success = false;
         if (logException)
         {
-          MySqlSourceTrace.WriteAppErrorToLog(ex, false);
+          Logger.LogException(ex);
         }
       }
 
@@ -681,20 +681,15 @@ namespace MySQL.ForExcel.Classes
       bool success = true;
       try
       {
-        var interopExcelTable = toolsExcelTable.InnerObject;
         toolsExcelTable.Delete();
         toolsExcelTable.Dispose();
-        if (interopExcelTable != null)
-        {
-          interopExcelTable.Delete();
-        }
       }
       catch (Exception ex)
       {
         success = false;
         if (logException)
         {
-          MySqlSourceTrace.WriteAppErrorToLog(ex, false);
+          Logger.LogException(ex);
         }
       }
 
@@ -719,8 +714,7 @@ namespace MySQL.ForExcel.Classes
         toolsExcelTable.Disconnect();
       }
 
-      var boundTable = toolsExcelTable.DataSource as MySqlDataTable;
-      if (boundTable != null)
+      if (toolsExcelTable.DataSource is MySqlDataTable boundTable)
       {
         boundTable.Dispose();
       }
@@ -778,14 +772,14 @@ namespace MySQL.ForExcel.Classes
       // Since the PivotTables method of an Excel Worksheet can return either a collection of PivotTable objects or
       // a single PivotTable instance, we need to test the type of the returned object first.
       object chartObjects = worksheet.ChartObjects();
-      if (chartObjects is ExcelInterop.ChartObjects)
+      if (chartObjects is ExcelInterop.ChartObjects chartObjectsCollection)
       {
-        var chartObjectsCollection = chartObjects as ExcelInterop.ChartObjects;
         return chartObjectsCollection.Cast<ExcelInterop.ChartObject>();
       }
 
-      var chartObject = chartObjects as ExcelInterop.ChartObject;
-      return chartObject != null ? new List<ExcelInterop.ChartObject>(1) { chartObject } : null;
+      return chartObjects is ExcelInterop.ChartObject chartObject
+        ? new List<ExcelInterop.ChartObject>(1) { chartObject }
+        : null;
     }
 
     /// <summary>
@@ -795,7 +789,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The Excel range with the first row cells corresponding to the column names</returns>
     public static ExcelInterop.Range GetColumnNamesRange(this ExcelInterop.Range mysqlDataRange)
     {
-      return mysqlDataRange == null ? null : mysqlDataRange.SafeResize(1, mysqlDataRange.Columns.Count);
+      return mysqlDataRange?.SafeResize(1, mysqlDataRange.Columns.Count);
     }
 
     /// <summary>
@@ -817,9 +811,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The global Excel Data Model <see cref="ExcelInterop.WorkbookConnection"/> if any.</returns>
     public static ExcelInterop.WorkbookConnection GetDataModelConnection(this ExcelInterop.Workbook workbook)
     {
-      return workbook != null
-        ? workbook.Connections.Cast<ExcelInterop.WorkbookConnection>().FirstOrDefault(wbConn => wbConn.Name == WORKBOOK_DATA_MODEL_CONNECTION_NAME)
-        : null;
+      return workbook?.Connections.Cast<ExcelInterop.WorkbookConnection>().FirstOrDefault(wbConn => wbConn.Name == WORKBOOK_DATA_MODEL_CONNECTION_NAME);
     }
 
     /// <summary>
@@ -829,13 +821,8 @@ namespace MySQL.ForExcel.Classes
     /// <returns>A <see cref="ExcelInterop.ListObject"/> contained in one of the <see cref="ExcelInterop.Worksheet"/>s contained in the given <see cref="ExcelInterop.Workbook"/>.</returns>
     public static ExcelInterop.ListObject GetExcelTable(this ExcelInterop.WorkbookConnection workbookConnection)
     {
-      if (workbookConnection == null)
-      {
-        return null;
-      }
-
-      var workbook = workbookConnection.Parent as ExcelInterop.Workbook;
-      return workbook.GetExcelTableByConnectionName(workbookConnection.Name);
+      var workbook = workbookConnection?.Parent as ExcelInterop.Workbook;
+      return workbook?.GetExcelTableByConnectionName(workbookConnection.Name);
     }
 
     /// <summary>
@@ -854,9 +841,7 @@ namespace MySQL.ForExcel.Classes
 
       foreach (ExcelInterop.Worksheet worksheet in workbook.Worksheets)
       {
-        excelTable = worksheet.ListObjects.Cast<ExcelInterop.ListObject>().FirstOrDefault(lo => lo.QueryTable != null 
-                                                                                                && lo.QueryTable.WorkbookConnection != null
-                                                                                                && string.Equals(lo.QueryTable.WorkbookConnection.Name, workbookConnectionName, StringComparison.OrdinalIgnoreCase));
+        excelTable = worksheet.ListObjects.Cast<ExcelInterop.ListObject>().FirstOrDefault(lo => lo.QueryTable?.WorkbookConnection != null && string.Equals(lo.QueryTable.WorkbookConnection.Name, workbookConnectionName, StringComparison.OrdinalIgnoreCase));
         if (excelTable != null)
         {
           break;
@@ -874,7 +859,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>A <see cref="ExcelInterop.ListObject"/> contained in an <see cref="ExcelInterop.Worksheet"/> with the given names.</returns>
     public static ExcelInterop.ListObject GetExcelTableByName(this ExcelInterop.Worksheet worksheet, string excelTableName)
     {
-      return worksheet == null ? null : worksheet.ListObjects.Cast<ExcelInterop.ListObject>().FirstOrDefault(lo => string.Equals(lo.Name, excelTableName, StringComparison.InvariantCultureIgnoreCase));
+      return worksheet?.ListObjects.Cast<ExcelInterop.ListObject>().FirstOrDefault(lo => string.Equals(lo.Name, excelTableName, StringComparison.InvariantCultureIgnoreCase));
     }
 
     /// <summary>
@@ -886,13 +871,8 @@ namespace MySQL.ForExcel.Classes
     /// <returns>A <see cref="ExcelInterop.ListObject"/> contained in an <see cref="ExcelInterop.Worksheet"/> with the given names.</returns>
     public static ExcelInterop.ListObject GetExcelTableByName(this ExcelInterop.Workbook workbook, string worksheetName, string excelTableName)
     {
-      if (workbook == null)
-      {
-        return null;
-      }
-
-      var worksheet = workbook.Worksheets.Cast<ExcelInterop.Worksheet>().FirstOrDefault(ws => string.Equals(ws.Name, worksheetName, StringComparison.InvariantCultureIgnoreCase));
-      return worksheet.GetExcelTableByName(excelTableName);
+      var worksheet = workbook?.Worksheets.Cast<ExcelInterop.Worksheet>().FirstOrDefault(ws => string.Equals(ws.Name, worksheetName, StringComparison.InvariantCultureIgnoreCase));
+      return worksheet?.GetExcelTableByName(excelTableName);
     }
 
     /// <summary>
@@ -1328,14 +1308,12 @@ namespace MySQL.ForExcel.Classes
       // Since the PivotTables method of an Excel Worksheet can return either a collection of PivotTable objects or
       // a single PivotTable instance, we need to test the type of the returned object first.
       object pivotTables = worksheet.PivotTables();
-      if (pivotTables is ExcelInterop.PivotTables)
+      if (pivotTables is ExcelInterop.PivotTables pivotTablesCollection)
       {
-        var pivotTablesCollection = pivotTables as ExcelInterop.PivotTables;
         return pivotTablesCollection.Cast<ExcelInterop.PivotTable>();
       }
 
-      var pivotTable = pivotTables as ExcelInterop.PivotTable;
-      return pivotTable != null ? new List<ExcelInterop.PivotTable>(1) { pivotTable } : null;
+      return pivotTables is ExcelInterop.PivotTable pivotTable ? new List<ExcelInterop.PivotTable>(1) { pivotTable } : null;
     }
 
     /// <summary>
@@ -1374,12 +1352,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The worksheet's protection key if the property exist, otherwise returns null.</returns>
     public static string GetProtectionKey(this ExcelInterop.Worksheet worksheet)
     {
-      if (worksheet == null)
-      {
-        return null;
-      }
-
-      ExcelInterop.CustomProperties properties = worksheet.CustomProperties;
+      ExcelInterop.CustomProperties properties = worksheet?.CustomProperties;
       if (properties == null)
       {
         return null;
@@ -1640,16 +1613,8 @@ namespace MySQL.ForExcel.Classes
     /// <param name="worksheet">A <see cref="ExcelInterop.Worksheet"/> object.</param>
     public static void RemoveProtectionKey(this ExcelInterop.Worksheet worksheet)
     {
-      if (worksheet == null)
-      {
-        return;
-      }
-
-      var protectionKeyProperty = worksheet.CustomProperties.Cast<ExcelInterop.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetGuid"));
-      if (protectionKeyProperty != null)
-      {
-        protectionKeyProperty.Delete();
-      }
+      var protectionKeyProperty = worksheet?.CustomProperties.Cast<ExcelInterop.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetGuid"));
+      protectionKeyProperty?.Delete();
     }
 
     /// <summary>
@@ -1904,7 +1869,7 @@ namespace MySQL.ForExcel.Classes
       string retName;
       do
       {
-        retName = copyIndex > 1 ? string.Format("{0}.{1}", excelTableName, copyIndex) : excelTableName;
+        retName = copyIndex > 1 ? $"{excelTableName}.{copyIndex}" : excelTableName;
         copyIndex++;
       } while (activeWorkbook.Worksheets.Cast<ExcelInterop.Worksheet>().Any(ws => ws.ListObjects.Cast<ExcelInterop.ListObject>().Any(excelTable => excelTable.Name == retName)));
 
@@ -1930,7 +1895,7 @@ namespace MySQL.ForExcel.Classes
       do
       {
         foundSameName = true;
-        retName = copyIndex > 1 ? string.Format("{0}.{1}", pivotTableName, copyIndex) : pivotTableName;
+        retName = copyIndex > 1 ? $"{pivotTableName}.{copyIndex}" : pivotTableName;
         copyIndex++;
         foreach (var worksheetPivotTables in activeWorkbook.Worksheets.Cast<ExcelInterop.Worksheet>().Select(worksheet => worksheet.GetPivotTables()).Where(worksheetPivotTables => worksheetPivotTables != null))
         {
@@ -1962,7 +1927,7 @@ namespace MySQL.ForExcel.Classes
       string retName;
       do
       {
-        retName = copyIndex > 1 ? string.Format("{0}.{1}", workbookConnectionName, copyIndex) : workbookConnectionName;
+        retName = copyIndex > 1 ? $"{workbookConnectionName}.{copyIndex}" : workbookConnectionName;
         copyIndex++;
       } while (activeWorkbook.Connections.Cast<ExcelInterop.WorkbookConnection>().Any(wBconn => wBconn.Name == retName));
 
@@ -1986,7 +1951,7 @@ namespace MySQL.ForExcel.Classes
       string retName;
       do
       {
-        retName = copyIndex > 0 ? string.Format("Copy {0} of {1}", copyIndex, worksheetName) : worksheetName;
+        retName = copyIndex > 0 ? $"Copy {copyIndex} of {worksheetName}" : worksheetName;
         copyIndex++;
       } while (workbook.Worksheets.Cast<ExcelInterop.Worksheet>().Any(ws => ws.Name == retName));
 

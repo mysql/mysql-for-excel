@@ -56,7 +56,7 @@ namespace MySQL.ForExcel.Forms
       this.PreviewRowsQuantityNumericUpDown = new System.Windows.Forms.NumericUpDown();
       this.AutoAllowEmptyNonIndexColumnsCheckBox = new System.Windows.Forms.CheckBox();
       this.AutoIndexIntColumnsCheckBox = new System.Windows.Forms.CheckBox();
-      this.DetectDatatypeCheckBox = new System.Windows.Forms.CheckBox();
+      this.DetectDataTypeCheckBox = new System.Windows.Forms.CheckBox();
       this.UseFormattedValuesCheckBox = new System.Windows.Forms.CheckBox();
       this.GenerateMultipleInsertsCheckBox = new System.Windows.Forms.CheckBox();
       this.CreateTableIndexesLastCheckBox = new System.Windows.Forms.CheckBox();
@@ -225,20 +225,20 @@ namespace MySQL.ForExcel.Forms
       this.AutoIndexIntColumnsCheckBox.UseVisualStyleBackColor = false;
       this.AutoIndexIntColumnsCheckBox.CheckedChanged += new System.EventHandler(this.AutoIndexIntColumnsCheckBox_CheckedChanged);
       // 
-      // DetectDatatypeCheckBox
+      // DetectDataTypeCheckBox
       // 
-      this.DetectDatatypeCheckBox.AutoSize = true;
-      this.DetectDatatypeCheckBox.BackColor = System.Drawing.Color.Transparent;
-      this.DetectDatatypeCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.DetectDatatypeCheckBox.Location = new System.Drawing.Point(37, 74);
-      this.DetectDatatypeCheckBox.Name = "DetectDatatypeCheckBox";
-      this.DetectDatatypeCheckBox.Size = new System.Drawing.Size(419, 19);
-      this.DetectDatatypeCheckBox.TabIndex = 4;
-      this.DetectDatatypeCheckBox.Text = "Analyze and try to detect correct data type based on column field contents";
-      this.HelpToolTip.SetToolTip(this.DetectDatatypeCheckBox, "When checked the data type on each new column will be automatically detected base" +
+      this.DetectDataTypeCheckBox.AutoSize = true;
+      this.DetectDataTypeCheckBox.BackColor = System.Drawing.Color.Transparent;
+      this.DetectDataTypeCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
+      this.DetectDataTypeCheckBox.Location = new System.Drawing.Point(37, 74);
+      this.DetectDataTypeCheckBox.Name = "DetectDataTypeCheckBox";
+      this.DetectDataTypeCheckBox.Size = new System.Drawing.Size(419, 19);
+      this.DetectDataTypeCheckBox.TabIndex = 4;
+      this.DetectDataTypeCheckBox.Text = "Analyze and try to detect correct data type based on column field contents";
+      this.HelpToolTip.SetToolTip(this.DetectDataTypeCheckBox, "When checked the data type on each new column will be automatically detected base" +
         "d on the Excel data values.");
-      this.DetectDatatypeCheckBox.UseVisualStyleBackColor = false;
-      this.DetectDatatypeCheckBox.CheckedChanged += new System.EventHandler(this.DetectDatatypeCheckBox_CheckedChanged);
+      this.DetectDataTypeCheckBox.UseVisualStyleBackColor = false;
+      this.DetectDataTypeCheckBox.CheckedChanged += new System.EventHandler(this.DetectDataTypeCheckBox_CheckedChanged);
       // 
       // UseFormattedValuesCheckBox
       // 
@@ -314,7 +314,7 @@ namespace MySQL.ForExcel.Forms
       this.ColumnsTabPage.Controls.Add(this.AutoAllowEmptyNonIndexColumnsCheckBox);
       this.ColumnsTabPage.Controls.Add(this.AutoIndexIntColumnsCheckBox);
       this.ColumnsTabPage.Controls.Add(this.AddBufferToVarCharCheckBox);
-      this.ColumnsTabPage.Controls.Add(this.DetectDatatypeCheckBox);
+      this.ColumnsTabPage.Controls.Add(this.DetectDataTypeCheckBox);
       this.ColumnsTabPage.Controls.Add(this.ColumnDatatypeOptionsLabel);
       this.ColumnsTabPage.Location = new System.Drawing.Point(4, 24);
       this.ColumnsTabPage.Name = "ColumnsTabPage";
@@ -463,7 +463,7 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.CheckBox AutoAllowEmptyNonIndexColumnsCheckBox;
     private System.Windows.Forms.CheckBox AutoIndexIntColumnsCheckBox;
     private System.Windows.Forms.CheckBox AddBufferToVarCharCheckBox;
-    private System.Windows.Forms.CheckBox DetectDatatypeCheckBox;
+    private System.Windows.Forms.CheckBox DetectDataTypeCheckBox;
     private System.Windows.Forms.Label ColumnDatatypeOptionsLabel;
     private System.Windows.Forms.CheckBox UseFormattedValuesCheckBox;
     private System.Windows.Forms.Label FieldDataOptionsLabel;

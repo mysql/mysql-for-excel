@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@ using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes;
-using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.Logging;
 using MySql.Utility.Classes.MySqlWorkbench;
 using MySql.Utility.Enums;
 using MySql.Utility.Forms;
@@ -58,7 +58,7 @@ namespace MySQL.ForExcel.Classes
     public enum ProcedureResultSetsImportType
     {
       /// <summary>
-      /// Only the result seet selected by users is imported.
+      /// Only the result set selected by users is imported.
       /// </summary>
       SelectedResultSet,
 
@@ -115,20 +115,20 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      string sql = string.Format("`{0}`.`{1}`", Connection.Schema, Name);
+      string sql = $"`{Connection.Schema}`.`{Name}`";
       var resultSetDs = Connection.ExecuteRoutine(sql, Parameters.Select(tuple => tuple.Item2).ToArray());
       if (resultSetDs == null || resultSetDs.Tables.Count == 0)
       {
         return null;
       }
 
-      // Create result set dataset and MySqlDataTable tables for each table in the result sets
+      // Create result set data set and MySqlDataTable tables for each table in the result sets
       var returnDataSet = new DataSet(Name + "ResultSet");
       var procedureSql = GetSql();
       int resultIndex = 1;
       foreach (DataTable table in resultSetDs.Tables)
       {
-        table.TableName = string.Format("Result{0}", resultIndex);
+        table.TableName = $"Result{resultIndex}";
         var mySqlDataTable = new MySqlDataTable(Connection, table, procedureSql, resultIndex - 1);
         returnDataSet.Tables.Add(mySqlDataTable);
         resultIndex++;
@@ -298,7 +298,7 @@ namespace MySQL.ForExcel.Classes
       catch (Exception ex)
       {
         success = false;
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.UnableToRetrieveData, "procedure", Name), true);
+        Logger.LogException(ex, true, string.Format(Resources.UnableToRetrieveData, "procedure", Name));
       }
 
       return success;
@@ -371,7 +371,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.ProcedureParametersInitializationError, true);
+        Logger.LogException(ex, true, Resources.ProcedureParametersInitializationError);
       }
     }
 

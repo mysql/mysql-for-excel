@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -15,13 +15,12 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 // 02110-1301  USA
 
-using System.Diagnostics;
 using System;
 using System.Xml.Serialization;
+using MySql.Utility.Classes.Logging;
 using MySQL.ForExcel.Classes.Exceptions;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
-using MySql.Utility.Classes.MySql;
 using MySql.Utility.Classes.MySqlWorkbench;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 using ExcelTools = Microsoft.Office.Tools.Excel;
@@ -467,7 +466,7 @@ namespace MySQL.ForExcel.Classes
         }
 
         // If the Workbench connection does not exist anymore, log a message to the log, remove this object from the global connections collection and exit.
-        MySqlSourceTrace.WriteToLog(string.Format(Resources.ImportConnectionInfoRemovedConnectionText, WorkbookName, WorksheetName, ExcelTableName), false, SourceLevels.Warning);
+        Logger.LogWarning(string.Format(Resources.ImportConnectionInfoRemovedConnectionText, WorkbookName, WorksheetName, ExcelTableName));
         var workbookImportConnectionInfos = WorkbookConnectionInfos.GetWorkbookImportConnectionInfos(Globals.ThisAddIn.ActiveWorkbook);
         workbookImportConnectionInfos.Remove(this);
         return;
@@ -489,7 +488,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.ImportDataRefreshError, _excelTableName), true);
+        Logger.LogException(ex, true, string.Format(Resources.ImportDataRefreshError, _excelTableName));
       }
     }
 
@@ -678,7 +677,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.ImportDataBindError, _excelTableName), true);
+        Logger.LogException(ex, true, string.Format(Resources.ImportDataBindError, _excelTableName));
       }
       finally
       {
@@ -745,9 +744,9 @@ namespace MySQL.ForExcel.Classes
         BindMySqlDataTable();
 
         // Add summary row if needed.
-        if (addSummaryRow && ExcelTable != null)
+        if (addSummaryRow)
         {
-          ExcelTable.AddSummaryRow();
+          ExcelTable?.AddSummaryRow();
         }
 
         // Add this instance of the ImportConnectionInfo class if not present already in the global collection.
@@ -759,7 +758,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.ExcelTableCreationError, ExcelTable != null ? ExcelTable.Name : MySqlTable.ExcelTableName), false);
+        Logger.LogException(ex, false, string.Format(Resources.ExcelTableCreationError, ExcelTable != null ? ExcelTable.Name : MySqlTable.ExcelTableName));
       }
     }
   }

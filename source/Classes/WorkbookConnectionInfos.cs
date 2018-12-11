@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2017, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -17,14 +17,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using Microsoft.Office.Core;
 using MySql.Utility.Classes;
-using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.Logging;
 using MySql.Utility.Classes.MySqlWorkbench;
 using MySql.Utility.Forms;
 using MySQL.ForExcel.Controls;
@@ -104,31 +103,19 @@ namespace MySQL.ForExcel.Classes
     /// Gets a dictionary containing <see cref="WorkbookConnectionInfos"/> instances per each open Workbook.
     /// </summary>
     [XmlIgnore]
-    public static Dictionary<string, WorkbookConnectionInfos> ConnectionInfosByWorkbook { get; private set; }
+    public static Dictionary<string, WorkbookConnectionInfos> ConnectionInfosByWorkbook { get; }
 
     /// <summary>
     /// Gets a list of <see cref="EditConnectionInfo"/> objects saved to the user settings file.
     /// </summary>
     [XmlIgnore]
-    public static List<EditConnectionInfo> UserSettingsEditConnectionInfos
-    {
-      get
-      {
-        return Settings.Default.EditConnectionInfosList ?? (Settings.Default.EditConnectionInfosList = new List<EditConnectionInfo>());
-      }
-    }
+    public static List<EditConnectionInfo> UserSettingsEditConnectionInfos => Settings.Default.EditConnectionInfosList ?? (Settings.Default.EditConnectionInfosList = new List<EditConnectionInfo>());
 
     /// <summary>
     /// Gets a list of <see cref="ImportConnectionInfo"/> objects saved to user settings file.
     /// </summary>
     [XmlIgnore]
-    public static List<ImportConnectionInfo> UserSettingsImportConnectionInfos
-    {
-      get
-      {
-        return Settings.Default.ImportConnectionInfosList ?? (Settings.Default.ImportConnectionInfosList = new List<ImportConnectionInfo>());
-      }
-    }
+    public static List<ImportConnectionInfo> UserSettingsImportConnectionInfos => Settings.Default.ImportConnectionInfosList ?? (Settings.Default.ImportConnectionInfosList = new List<ImportConnectionInfo>());
 
     /// <summary>
     /// Gets or sets a list of <see cref="EditConnectionInfo"/> objects saved to disk.
@@ -198,13 +185,14 @@ namespace MySQL.ForExcel.Classes
       }
 
       propertyValue = workbook.LoadStringDocumentProperty("ConnectionInfosStorage");
-      if (propertyValue != null)
+      if (propertyValue == null)
       {
-        ConnectionInfosStorageType storage;
-        if (Enum.TryParse(propertyValue, out storage))
-        {
-          Storage = storage;
-        }
+        return;
+      }
+
+      if (Enum.TryParse(propertyValue, out ConnectionInfosStorageType storage))
+      {
+        Storage = storage;
       }
     }
 
@@ -272,13 +260,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="worksheet">The <see cref="ExcelInterop.Worksheet"/> associated to the <see cref="EditConnectionInfo"/> to close.</param>
     public static void CloseWorksheetEditConnectionInfo(ExcelInterop.Worksheet worksheet)
     {
-      if (worksheet == null)
-      {
-        return;
-      }
-
-      ExcelInterop.Workbook parentWorkbook = worksheet.Parent as ExcelInterop.Workbook;
-      if (parentWorkbook == null)
+      if (!(worksheet?.Parent is ExcelInterop.Workbook parentWorkbook))
       {
         return;
       }
@@ -312,7 +294,7 @@ namespace MySQL.ForExcel.Classes
 
       if (logOperation)
       {
-        MySqlSourceTrace.WriteToLog(Resources.DeletingConnectionInfosWithNonExistentWorkbook, false, SourceLevels.Information);
+        Logger.LogInformation(Resources.DeletingConnectionInfosWithNonExistentWorkbook);
       }
 
       foreach (var connectionInfo in orphanedConnectionInfos)
@@ -349,10 +331,10 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a <see cref="WorkbookConnectionInfos"/> assocaiated to the given <see cref="ExcelInterop.Workbook"/>.
+    /// Gets a <see cref="WorkbookConnectionInfos"/> associated to the given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
     /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> instance.</param>
-    /// <returns>A <see cref="WorkbookConnectionInfos"/> assocaiated to the given <see cref="ExcelInterop.Workbook"/>.</returns>
+    /// <returns>A <see cref="WorkbookConnectionInfos"/> associated to the given <see cref="ExcelInterop.Workbook"/>.</returns>
     public static WorkbookConnectionInfos GetWorkbookConnectionInfos(ExcelInterop.Workbook workbook)
     {
       if (workbook == null)
@@ -367,10 +349,10 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a subset of the <see cref="EditConnectionInfo"/> listing only those assocaiated to the given <see cref="ExcelInterop.Workbook"/>.
+    /// Gets a subset of the <see cref="EditConnectionInfo"/> listing only those associated to the given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
     /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> with active <see cref="EditConnectionInfo"/> objects.</param>
-    /// <returns>A subset of the <see cref="EditConnectionInfo"/> listing only those assocaiated to the given <see cref="ExcelInterop.Workbook"/></returns>
+    /// <returns>A subset of the <see cref="EditConnectionInfo"/> listing only those associated to the given <see cref="ExcelInterop.Workbook"/></returns>
     public static List<EditConnectionInfo> GetWorkbookEditConnectionInfos(ExcelInterop.Workbook workbook)
     {
       var workbookConnectionInfos = GetWorkbookConnectionInfos(workbook);
@@ -380,10 +362,10 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a subset of the <see cref="ImportConnectionInfo" /> listing only those assocaiated to the given <see cref="ExcelInterop.Workbook" />.
+    /// Gets a subset of the <see cref="ImportConnectionInfo" /> listing only those associated to the given <see cref="ExcelInterop.Workbook" />.
     /// </summary>
     /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> with active <see cref="ImportConnectionInfo"/> objects.</param>
-    /// <returns> A subset of the <see cref="ImportConnectionInfo" /> listing only those assocaiated to the given <see cref="ExcelInterop.Workbook" /></returns>
+    /// <returns> A subset of the <see cref="ImportConnectionInfo" /> listing only those associated to the given <see cref="ExcelInterop.Workbook" /></returns>
     public static List<ImportConnectionInfo> GetWorkbookImportConnectionInfos(ExcelInterop.Workbook workbook)
     {
       var workbookConnectionInfos = GetWorkbookConnectionInfos(workbook);
@@ -689,9 +671,9 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Open the connection from the EditConnectionInfo, check also if the current connection can be used to avoid opening a new one.
-      var currenConnection = activeExcelPane.WbConnection;
+      var currentConnection = activeExcelPane.WbConnection;
       var firstConnectionInfo = workbookEditConnectionInfos[0];
-      var currentSchema = currenConnection != null ? currenConnection.Schema : string.Empty;
+      var currentSchema = currentConnection != null ? currentConnection.Schema : string.Empty;
       var connectionInfoConnection = OpenConnectionForSavedEditConnectionInfo(firstConnectionInfo, workbook);
       if (connectionInfoConnection == null)
       {
@@ -699,7 +681,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Close the current schema if the current connection is being reused but the EditConnectionInfo's schema is different
-      bool connectionReused = connectionInfoConnection.Equals(currenConnection);
+      bool connectionReused = connectionInfoConnection.Equals(currentConnection);
       bool openSchema = !connectionReused;
       if (connectionReused && !string.Equals(currentSchema, firstConnectionInfo.SchemaName, StringComparison.InvariantCulture))
       {
@@ -762,12 +744,7 @@ namespace MySQL.ForExcel.Classes
     public static void SaveForWorkbook(ExcelInterop.Workbook workbook)
     {
       var workbookConnectionInfos = GetWorkbookConnectionInfos(workbook);
-      if (workbookConnectionInfos == null)
-      {
-        return;
-      }
-
-      workbookConnectionInfos.Save(workbook);
+      workbookConnectionInfos?.Save(workbook);
     }
 
     /// <summary>
@@ -907,18 +884,17 @@ namespace MySQL.ForExcel.Classes
           foreach (var missingConnectionId in missingConnectionIds)
           {
             // Fill the new connection with the old HostIdentifier information for the New Connection Dialog if available;
-            var missingConnectionconnectionInfo = missingConnectionInfoConnections.FirstOrDefault(s => s.ConnectionId == missingConnectionId);
+            var missingConnectionInfo = missingConnectionInfoConnections.FirstOrDefault(s => s.ConnectionId == missingConnectionId);
             // Create the new connection and assign it to all corresponding connectionInfos.
             using (var newConnectionDialog = new MySqlWorkbenchConnectionDialog(null, false))
             {
               //If the HostIdentifier is set, we use it to fill in the blanks for the new connection in the dialog.
-              if (missingConnectionconnectionInfo != null && !string.IsNullOrEmpty(missingConnectionconnectionInfo.HostIdentifier))
+              if (missingConnectionInfo != null && !string.IsNullOrEmpty(missingConnectionInfo.HostIdentifier))
               {
-                var hostIdArray = missingConnectionconnectionInfo.HostIdentifier.ToLower().Replace("mysql@", string.Empty).Split(':').ToArray();
+                var hostIdArray = missingConnectionInfo.HostIdentifier.ToLower().Replace("mysql@", string.Empty).Split(':').ToArray();
                 var host = hostIdArray.Length > 0 ? hostIdArray[0] : string.Empty;
                 var portString = hostIdArray.Length > 1 ? hostIdArray[1] : string.Empty;
-                uint port;
-                uint.TryParse(portString, out port);
+                uint.TryParse(portString, out var port);
                 newConnectionDialog.WorkbenchConnection.Host = host;
                 newConnectionDialog.WorkbenchConnection.Port = port;
               }
@@ -1093,11 +1069,7 @@ namespace MySQL.ForExcel.Classes
           var customXmlPart = string.IsNullOrEmpty(EditConnectionInfosXmlPartId)
             ? null
             : workbook.CustomXMLParts.SelectByID(EditConnectionInfosXmlPartId);
-          if (customXmlPart != null)
-          {
-            customXmlPart.Delete();
-          }
-
+          customXmlPart?.Delete();
           if (EditConnectionInfos.Count > 0)
           {
             EditConnectionInfosXmlPartId = workbook.CustomXMLParts.Add(EditConnectionInfos.Serialize()).Id;
@@ -1132,11 +1104,7 @@ namespace MySQL.ForExcel.Classes
           var customXmlPart = string.IsNullOrEmpty(ImportConnectionInfosXmlPartId)
             ? null
             : workbook.CustomXMLParts.SelectByID(ImportConnectionInfosXmlPartId);
-          if (customXmlPart != null)
-          {
-            customXmlPart.Delete();
-          }
-
+          customXmlPart?.Delete();
           if (ImportConnectionInfos.Count > 0)
           {
             ImportConnectionInfosXmlPartId = workbook.CustomXMLParts.Add(ImportConnectionInfos.Serialize()).Id;

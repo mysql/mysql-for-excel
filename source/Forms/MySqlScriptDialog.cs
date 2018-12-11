@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -28,7 +28,7 @@ using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes;
-using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.Logging;
 using MySql.Utility.Classes.MySqlWorkbench;
 using MySql.Utility.Forms;
 
@@ -444,13 +444,13 @@ namespace MySQL.ForExcel.Forms
       catch (MySqlException mySqlEx)
       {
         ScriptResult = MySqlStatement.StatementResultType.ErrorThrown;
-        MySqlSourceTrace.WriteAppErrorToLog(mySqlEx, false);
+        Logger.LogException(mySqlEx);
         ErroredOutDataRow = new MySqlDummyErroredRow(mySqlEx.Number == 1231 ? Resources.UnsupportedClientCharSetError : Resources.ConnectionOrTransactionInitializationError, mySqlEx.Message);
       }
       catch (Exception ex)
       {
         ScriptResult = MySqlStatement.StatementResultType.ErrorThrown;
-        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
+        Logger.LogException(ex);
         ErroredOutDataRow = new MySqlDummyErroredRow(Resources.ConnectionOrTransactionInitializationError, ex.Message);
       }
     }
@@ -623,7 +623,7 @@ namespace MySQL.ForExcel.Forms
         }
         catch (OutOfMemoryException oomEx)
         {
-          MySqlSourceTrace.WriteAppErrorToLog(oomEx, null, Resources.SqlScriptTooBigErrorDetail, true);
+          Logger.LogException(oomEx, true, Resources.SqlScriptTooBigErrorDetail);
         }
       }
       else if (!string.IsNullOrEmpty(OriginalSqlScript) && _originalStatementRowsList.Count == 0)
@@ -746,7 +746,7 @@ namespace MySQL.ForExcel.Forms
       else
       {
         // The code should never hit this block in which case there is something wrong.
-        MySqlSourceTrace.WriteToLog(Resources.QueryChangedTimerTickNoValidControlFocusError, false);
+        Logger.LogError(Resources.QueryChangedTimerTickNoValidControlFocusError);
         QueryChangedTimer.Stop();
       }
     }

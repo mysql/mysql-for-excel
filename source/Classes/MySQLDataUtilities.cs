@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -21,9 +21,9 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using MySql.Data.MySqlClient;
+using MySql.Utility.Classes.Logging;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
-using MySql.Utility.Classes.MySql;
 using MySql.Utility.Classes.MySqlWorkbench;
 using MySql.Utility.Enums;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
@@ -79,7 +79,7 @@ namespace MySQL.ForExcel.Classes
       DataTable dt = GetDataFromSelectQuery(wbConnection, selectQuery);
       if (dt == null)
       {
-        MySqlSourceTrace.WriteToLog(string.Format(Resources.SelectQueryReturnedNothing, selectQuery), false);
+        Logger.LogVerbose(string.Format(Resources.SelectQueryReturnedNothing, selectQuery));
         return null;
       }
 
@@ -106,12 +106,12 @@ namespace MySQL.ForExcel.Classes
 
       try
       {
-        string sql = string.Format("DROP TABLE IF EXISTS `{0}`.`{1}`", connection.Schema, tableName);
+        string sql = $"DROP TABLE IF EXISTS `{connection.Schema}`.`{tableName}`";
         MySqlHelper.ExecuteNonQuery(connection.GetConnectionStringBuilder().ConnectionString, sql);
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.UnableToDropTableError, tableName), true);
+        Logger.LogException(ex, true, string.Format(Resources.UnableToDropTableError, tableName));
       }
     }
 
@@ -119,7 +119,7 @@ namespace MySQL.ForExcel.Classes
     /// Escapes special characters that cause problems when passed within queries, from this data value string.
     /// </summary>
     /// <param name="valueToEscape">The data value text containing special characters.</param>
-    /// <returns>A new string built from the given data value string withouth the special characters.</returns>
+    /// <returns>A new string built from the given data value string without the special characters.</returns>
     public static string EscapeDataValueString(this string valueToEscape)
     {
       if (string.IsNullOrEmpty(valueToEscape))
@@ -187,7 +187,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="sqlStatement">The string representing the SQL statement to be sent to the MySQL server.</param>
     /// <param name="maxAllowedPacketValue">The value of the the MySQL Server's MAX_ALLOWED_PACKET variable.</param>
     /// <param name="safetyBytes">A safety value before reaching the MAX_ALLOWED_PACKET variable value.</param>
-    /// <returns><c>true</c> if the length of the statement exceeds the vlaue of the server's MAX_ALLOWED_PACKET variable, <c>false</c> otherwise.</returns>
+    /// <returns><c>true</c> if the length of the statement exceeds the value of the server's MAX_ALLOWED_PACKET variable, <c>false</c> otherwise.</returns>
     public static bool ExceedsMySqlMaxAllowedPacketValue(this string sqlStatement, int maxAllowedPacketValue, int safetyBytes = 0)
     {
       var maxByteCount = maxAllowedPacketValue > 0 ? maxAllowedPacketValue - safetyBytes : 0;
@@ -201,7 +201,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="sqlStatement">The string representing the SQL statement to be sent to the MySQL server.</param>
     /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="safetyBytes">A safety value before reaching the MAX_ALLOWED_PACKET variable value.</param>
-    /// <returns><c>true</c> if the length of the statement exceeds the vlaue of the server's MAX_ALLOWED_PACKET variable, <c>false</c> otherwise.</returns>
+    /// <returns><c>true</c> if the length of the statement exceeds the value of the server's MAX_ALLOWED_PACKET variable, <c>false</c> otherwise.</returns>
     public static bool ExceedsMySqlMaxAllowedPacketValue(this string sqlStatement, MySqlWorkbenchConnection wbConnection, int safetyBytes = 0)
     {
       var maxAllowedPacketValue = wbConnection.GetMySqlServerMaxAllowedPacket();
@@ -269,7 +269,7 @@ namespace MySQL.ForExcel.Classes
           cmd.Parameters.Clear();
         }
 
-        // Return the dataset
+        // Return the data set
         return ds;
       }
     }
@@ -302,9 +302,9 @@ namespace MySQL.ForExcel.Classes
       // start points to the index where the words 'select' starts from, we need the index of the first character afterwards to begin parsing.
       start += 6;
 
-      // We calculate the length bewteen start and end to parse only the part of selectQuery that contains the column names.
-      var lenght = end - start;
-      var queryToAnalyze = selectQuery.Substring(start, lenght);
+      // We calculate the length between start and end to parse only the part of selectQuery that contains the column names.
+      var length = end - start;
+      var queryToAnalyze = selectQuery.Substring(start, length);
 
       //If all columns are listed, we don't need to enumerate them.
       if (queryToAnalyze.Contains("*"))
@@ -315,7 +315,7 @@ namespace MySQL.ForExcel.Classes
       var result = queryToAnalyze.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
       for (int i = 0; i < result.Length; i++)
       {
-        result[i] = result[i].Trim(new[] { ' ', '`' });
+        result[i] = result[i].Trim(' ', '`');
       }
 
       return result;
@@ -372,7 +372,7 @@ namespace MySQL.ForExcel.Classes
     /// Gets the columns schema information for the given database table.
     /// </summary>
     /// <param name="dataTable">The data table to get the schema info for.</param>
-    /// <param name="dataTypeFromCaption">Flag indicating whether the column datatype should be taken from the <see cref="DataColumn"/>'s Caption property.</param>
+    /// <param name="dataTypeFromCaption">Flag indicating whether the column data type should be taken from the <see cref="DataColumn"/>'s Caption property.</param>
     /// <returns>Table with schema information regarding its columns.</returns>
     public static MySqlColumnsInformationTable GetColumnsInformationTable(this DataTable dataTable, bool dataTypeFromCaption = false)
     {
@@ -484,7 +484,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.UnableToRetrieveData, "query: ", query), true);
+        Logger.LogException(ex, true, string.Format(Resources.UnableToRetrieveData, "query: ", query));
       }
 
       return ds == null || ds.Tables.Count <= 0 || tableIndex < 0 || tableIndex >= ds.Tables.Count
@@ -654,10 +654,8 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the passed string value is a MySQL zero date, <c>false</c> otherwise.</returns>
     public static bool IsMySqlZeroDateTimeValue(this string dateValueAsString, bool checkIfIntZero = false)
     {
-      int zeroValue;
-      bool isDateValueZero = checkIfIntZero && int.TryParse(dateValueAsString, out zeroValue) && zeroValue == 0;
-      bool isDateValueAZeroDate;
-      MySqlDataType.IsMySqlDateTimeValue(dateValueAsString, out isDateValueAZeroDate);
+      bool isDateValueZero = checkIfIntZero && int.TryParse(dateValueAsString, out var zeroValue) && zeroValue == 0;
+      MySqlDataType.IsMySqlDateTimeValue(dateValueAsString, out var isDateValueAZeroDate);
       return isDateValueZero || isDateValueAZeroDate;
     }
 
@@ -770,15 +768,15 @@ namespace MySQL.ForExcel.Classes
       object objCount = null;
       try
       {
-        string sql = string.Format("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{0}' AND table_name = '{1}'", schemaName, tableName.EscapeDataValueString());
+        string sql = $"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{schemaName}' AND table_name = '{tableName.EscapeDataValueString()}'";
         objCount = MySqlHelper.ExecuteScalar(connection.GetConnectionStringBuilder().ConnectionString, sql);
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.UnableToRetrieveData, string.Format("`{0}`.", schemaName), tableName), true);
+        Logger.LogException(ex, true, string.Format(Resources.UnableToRetrieveData, $"`{schemaName}`.", tableName));
       }
 
-      long retCount = objCount != null ? (long)objCount : 0;
+      long retCount = (long?)objCount ?? 0;
       return retCount > 0;
     }
 
@@ -795,7 +793,7 @@ namespace MySQL.ForExcel.Classes
         return false;
       }
 
-      string sql = string.Format("SHOW KEYS FROM `{0}` IN `{1}` WHERE Key_name = 'PRIMARY';", tableName, connection.Schema);
+      string sql = $"SHOW KEYS FROM `{tableName}` IN `{connection.Schema}` WHERE Key_name = 'PRIMARY';";
       DataTable dt = GetDataFromSelectQuery(connection, sql);
       return dt != null && dt.Rows.Count > 0;
     }
@@ -823,7 +821,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.UnableToUnlockTablesError, true);
+        Logger.LogException(ex, true, Resources.UnableToUnlockTablesError);
       }
     }
 

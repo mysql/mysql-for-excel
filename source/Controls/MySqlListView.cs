@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -28,7 +28,7 @@ using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Properties;
 using MySQL.ForExcel.Structs;
 using MySql.Utility.Classes;
-using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.Logging;
 using MySql.Utility.Classes.MySqlWorkbench;
 
 namespace MySQL.ForExcel.Controls
@@ -63,7 +63,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// The default multiple number for the height of tree nodes.
     /// </summary>
-    public const int DEFAULT_NODE_HEIGH_TMULTIPLE = 2;
+    public const int DEFAULT_NODE_HEIGHT_MULTIPLE = 2;
 
     /// <summary>
     /// The default tree view title color opacity factor.
@@ -141,7 +141,7 @@ namespace MySQL.ForExcel.Controls
       _selectedNodes = new List<MySqlListViewNode>();
       HeaderNodes = new List<MySqlListViewNode>();
       MultiSelect = false;
-      NodeHeightMultiple = DEFAULT_NODE_HEIGH_TMULTIPLE;
+      NodeHeightMultiple = DEFAULT_NODE_HEIGHT_MULTIPLE;
       DisplayImagesOfDisabledNodesInGrayScale = true;
       DoubleBuffered = true;
       DrawMode = TreeViewDrawMode.OwnerDrawAll;
@@ -251,15 +251,9 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Description("The mode in which the control is drawn.")]
     public new TreeViewDrawMode DrawMode
     {
-      get
-      {
-        return base.DrawMode;
-      }
+      get => base.DrawMode;
 
-      private set
-      {
-        base.DrawMode = value;
-      }
+      private set => base.DrawMode = value;
     }
 
     /// <summary>
@@ -272,7 +266,7 @@ namespace MySQL.ForExcel.Controls
     /// Gets the list of header nodes containing sub-nodes.
     /// </summary>
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<MySqlListViewNode> HeaderNodes { get; private set; }
+    public List<MySqlListViewNode> HeaderNodes { get; }
 
     /// <summary>
     /// Gets or sets the horizontal offset, in pixels, for the node image.
@@ -292,10 +286,7 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Description("The multiple number for the height of tree nodes.")]
     public int NodeHeightMultiple
     {
-      get
-      {
-        return _nodeHeightMultiple;
-      }
+      get => _nodeHeightMultiple;
 
       set
       {
@@ -333,10 +324,7 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new MySqlListViewNode SelectedNode
     {
-      get
-      {
-        return _selectedNode;
-      }
+      get => _selectedNode;
 
       set
       {
@@ -354,10 +342,7 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<MySqlListViewNode> SelectedNodes
     {
-      get
-      {
-        return _selectedNodes;
-      }
+      get => _selectedNodes;
 
       set
       {
@@ -386,7 +371,7 @@ namespace MySQL.ForExcel.Controls
     /// </summary>
     /// <remarks>Replaces base functionality to fix ShowLines/FullRowSelect issues in base.</remarks>
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public new bool ShowLines { get; private set; }
+    public new bool ShowLines { get; }
 
     /// <summary>
     /// Gets or sets the horizontal offset, in pixels, for the node text relative to the node image or to the left bounds if no image is used.
@@ -430,30 +415,17 @@ namespace MySQL.ForExcel.Controls
     /// Gets or sets a value indicating whether the control should redraw its surface using a secondary buffer.
     /// </summary>
     [Category("MySQL Custom"), Description("A value indicating whether the control should redraw its surface using a secondary buffer.")]
-    protected override sealed bool DoubleBuffered
+    protected sealed override bool DoubleBuffered
     {
-      get
-      {
-        return base.DoubleBuffered;
-      }
-
-      set
-      {
-        base.DoubleBuffered = value;
-      }
+      get => base.DoubleBuffered;
+      set => base.DoubleBuffered = value;
     }
 
     /// <summary>
     /// Gets the collection of tree nodes that are assigned to the control.
     /// </summary>
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    private new TreeNodeCollection Nodes
-    {
-      get
-      {
-        return base.Nodes;
-      }
-    }
+    private new TreeNodeCollection Nodes => base.Nodes;
 
     #endregion Properties
 
@@ -597,7 +569,7 @@ namespace MySQL.ForExcel.Controls
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.RefreshDBObjectsErrorTitle, true);
+        Logger.LogException(ex, true, Resources.RefreshDBObjectsErrorTitle);
       }
     }
 
@@ -656,8 +628,7 @@ namespace MySQL.ForExcel.Controls
     {
       // If the user drags a node and the node being dragged is NOT selected, then clear the active selection, select the node being dragged and drag it.
       // Otherwise if the node being dragged is selected, drag the entire selection.
-      var node = e.Item as MySqlListViewNode;
-      if (node != null && !_selectedNodes.Contains(node))
+      if (e.Item is MySqlListViewNode node && !_selectedNodes.Contains(node))
       {
         SelectSingleNode(node, SingleSelectionSource.ItemDrag);
         MarkNodeAsSelected(node, true);
@@ -725,7 +696,7 @@ namespace MySQL.ForExcel.Controls
 
             if (!_selectedNode.IsExpanded)
             {
-              // Expand a collpased node's children
+              // Expand a collapsed node's children
               _selectedNode.Expand();
             }
             else
@@ -847,7 +818,7 @@ namespace MySQL.ForExcel.Controls
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
+        Logger.LogException(ex);
       }
       finally
       {
@@ -863,8 +834,7 @@ namespace MySQL.ForExcel.Controls
     {
       // If the user clicks on a node that was not previously selected, select it now.
       base.SelectedNode = null;
-      var node = GetNodeAt(e.Location) as MySqlListViewNode;
-      if (node != null && node.Enable)
+      if (GetNodeAt(e.Location) is MySqlListViewNode node && node.Enable)
       {
         if (node.Enable)
         {
@@ -899,8 +869,7 @@ namespace MySQL.ForExcel.Controls
     {
       // If the user clicked on a node that was previously selected then reselect it now.
       // This will clear any other selected nodes. e.g. A B C D are selected the user clicks on B, now A C & D are no longer selected.
-      var node = GetNodeAt(e.Location) as MySqlListViewNode;
-      if (node != null)
+      if (GetNodeAt(e.Location) is MySqlListViewNode node)
       {
         if (node.Enable)
         {
@@ -1080,8 +1049,8 @@ namespace MySQL.ForExcel.Controls
     private void DrawHeaderNode(DrawTreeNodeEventArgs e)
     {
       var graphics = e.Graphics;
-      var nodeBackbrush = new SolidBrush(e.Node.BackColor);
-      graphics.FillRectangle(nodeBackbrush, e.Bounds);
+      var nodeBackBrush = new SolidBrush(e.Node.BackColor);
+      graphics.FillRectangle(nodeBackBrush, e.Bounds);
 
       Point pt = e.Bounds.Location;
 
@@ -1120,7 +1089,7 @@ namespace MySQL.ForExcel.Controls
       pt.Y = e.Bounds.Top + ((e.Bounds.Height - headerTextSize.Height) / 2);
       graphics.DrawString(e.Node.Text, headerFont, textBrush, pt.X, pt.Y);
 
-      nodeBackbrush.Dispose();
+      nodeBackBrush.Dispose();
       textBrush.Dispose();
     }
 
@@ -1241,7 +1210,7 @@ namespace MySQL.ForExcel.Controls
         {
           if (_selectedNode == null || ModifierKeys == Keys.Control)
           {
-            // Ctrl+Click selects an unselected node, or unselects a selected node.
+            // Ctrl+Click selects an unselected node, or deselects a selected node.
             if (node.ExcludeFromMultiSelection)
             {
               return;
@@ -1337,7 +1306,7 @@ namespace MySQL.ForExcel.Controls
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
+        Logger.LogException(ex);
       }
       finally
       {

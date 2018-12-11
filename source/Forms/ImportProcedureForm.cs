@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@ using MySql.Data.MySqlClient;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes;
-using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.Logging;
 using MySql.Utility.Classes.Spatial;
 using MySql.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
@@ -81,12 +81,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="importToWorksheetName">The name of the Excel worksheet where data will be imported.</param>
     public ImportProcedureForm(DbProcedure dbProcedure, string importToWorksheetName)
     {
-      if (dbProcedure == null)
-      {
-        throw new ArgumentNullException(nameof(dbProcedure));
-      }
-
-      _dbProcedure = dbProcedure;
+      _dbProcedure = dbProcedure ?? throw new ArgumentNullException(nameof(dbProcedure));
       _previewDataSet = null;
       _procedureParamsProperties = new PropertiesCollection();
       _selectedResultSetIndex = -1;
@@ -192,7 +187,7 @@ namespace MySQL.ForExcel.Forms
               && parameter.MySqlDbType == MySqlDbType.Blob)
           {
             // Spatial data
-            string textValue = parameterValue == null ? null : parameterValue.ToString();
+            string textValue = parameterValue?.ToString();
             if (string.IsNullOrEmpty(textValue))
             {
               parameterValue = null;
@@ -265,7 +260,7 @@ namespace MySQL.ForExcel.Forms
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.ImportProcedureErrorTitle, true);
+        Logger.LogException(ex, true, Resources.ImportProcedureErrorTitle);
       }
       finally
       {
@@ -342,7 +337,7 @@ namespace MySQL.ForExcel.Forms
         var parameter = dataTypeAndParameterTuple.Item2;
         var customProperty = new CustomProperty(parameter.ParameterName, dataType, parameter.Value, parameter.IsReadOnly(), true)
         {
-          Description = string.Format("Direction: {0}, Data Type: {1}", parameter.Direction, dataType)
+          Description = $"Direction: {parameter.Direction}, Data Type: {dataType}"
         };
 
         _procedureParamsProperties.Add(customProperty);

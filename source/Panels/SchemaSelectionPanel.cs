@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -21,11 +21,11 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
+using MySql.Utility.Classes.Logging;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Properties;
-using MySql.Utility.Classes.MySql;
 using MySql.Utility.Classes.MySqlWorkbench;
 using MySql.Utility.Enums;
 
@@ -72,7 +72,7 @@ namespace MySQL.ForExcel.Panels
     /// Gets a list of schemas loaded in this panel.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<DbSchema> LoadedSchemas { get; private set; }
+    public List<DbSchema> LoadedSchemas { get; }
 
     #endregion Properties
 
@@ -86,7 +86,7 @@ namespace MySQL.ForExcel.Panels
       _filter = string.Empty;
       _wbConnection = connection;
       ConnectionNameLabel.Text = connection.Name;
-      UserIPLabel.Text = string.Format("User: {0}, IP: {1}", connection.UserName, connection.Host);
+      UserIPLabel.Text = $@"User: {connection.UserName}, IP: {connection.Host}";
       bool schemasLoaded = LoadSchemas();
       if (schemasLoaded)
       {
@@ -104,8 +104,7 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void BackButton_Click(object sender, EventArgs e)
     {
-      var excelAddInPane = Parent as ExcelAddInPane;
-      if (excelAddInPane != null)
+      if (Parent is ExcelAddInPane excelAddInPane)
       {
         excelAddInPane.CloseConnection(true);
       }
@@ -196,7 +195,7 @@ namespace MySQL.ForExcel.Panels
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.SchemasLoadingErrorTitle, true);
+        Logger.LogException(ex, true, Resources.SchemasLoadingErrorTitle);
         return false;
       }
       finally
@@ -226,15 +225,14 @@ namespace MySQL.ForExcel.Panels
 
       try
       {
-        var excelAddInPane = Parent as ExcelAddInPane;
-        if (excelAddInPane != null)
+        if (Parent is ExcelAddInPane excelAddInPane)
         {
           excelAddInPane.OpenSchema(selectedNode.DbObject.Name, true);
         }
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.SchemaOpeningErrorTitle, true);
+        Logger.LogException(ex, true, Resources.SchemaOpeningErrorTitle);
       }
     }
 
@@ -285,7 +283,7 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void SchemasList_AfterSelect(object sender, TreeViewEventArgs e)
     {
-      NextButton.Enabled = e != null && e.Node != null && e.Node.Level > 0;
+      NextButton.Enabled = e?.Node != null && e.Node.Level > 0;
     }
 
     /// <summary>

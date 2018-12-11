@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -45,9 +45,9 @@ namespace MySQL.ForExcel.Forms
     public bool ParentFormRequiresRefresh { get; private set; }
 
     /// <summary>
-    /// Gets a value indicating whether the auto-detect datatypes setting was changed by the user.
+    /// Gets a value indicating whether the auto-detect data types setting was changed by the user.
     /// </summary>
-    public bool ExportDetectDatatypeChanged { get; private set; }
+    public bool ExportDetectDataTypeChanged { get; private set; }
 
     /// <summary>
     /// Gets a value indicating whether the setting to show all MySQL data types in the Data Type drop-down list was changed by the user.
@@ -77,19 +77,19 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="DetectDatatypeCheckBox"/> checked state changes.
+    /// Event delegate method fired when the <see cref="DetectDataTypeCheckBox"/> checked state changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
-    private void DetectDatatypeCheckBox_CheckedChanged(object sender, EventArgs e)
+    private void DetectDataTypeCheckBox_CheckedChanged(object sender, EventArgs e)
     {
-      AddBufferToVarCharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
-      if (!DetectDatatypeCheckBox.Checked)
+      AddBufferToVarCharCheckBox.Enabled = DetectDataTypeCheckBox.Checked;
+      if (!DetectDataTypeCheckBox.Checked)
       {
         AddBufferToVarCharCheckBox.Checked = false;
       }
 
-      ExportDetectDatatypeChanged = Settings.Default.ExportDetectDatatype != DetectDatatypeCheckBox.Checked;
+      ExportDetectDataTypeChanged = Settings.Default.ExportDetectDataType != DetectDataTypeCheckBox.Checked;
       RecalculateParentFormRequiresRefresh();
     }
 
@@ -106,7 +106,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       Settings.Default.ExportLimitPreviewRowsQuantity = (int)PreviewRowsQuantityNumericUpDown.Value;
-      Settings.Default.ExportDetectDatatype = DetectDatatypeCheckBox.Checked;
+      Settings.Default.ExportDetectDataType = DetectDataTypeCheckBox.Checked;
       Settings.Default.ExportAddBufferToVarchar = AddBufferToVarCharCheckBox.Checked;
       Settings.Default.ExportAutoIndexIntColumns = AutoIndexIntColumnsCheckBox.Checked;
       Settings.Default.ExportAutoAllowEmptyNonIndexColumns = AutoAllowEmptyNonIndexColumnsCheckBox.Checked;
@@ -147,7 +147,7 @@ namespace MySQL.ForExcel.Forms
     /// <returns>The recalculated value of the <see cref="ParentFormRequiresRefresh"/> property.</returns>
     private void RecalculateParentFormRequiresRefresh()
     {
-      ParentFormRequiresRefresh = ExportDetectDatatypeChanged
+      ParentFormRequiresRefresh = ExportDetectDataTypeChanged
                                   || Settings.Default.ExportLimitPreviewRowsQuantity != (int)PreviewRowsQuantityNumericUpDown.Value
                                   || Settings.Default.ExportAutoIndexIntColumns != AutoIndexIntColumnsCheckBox.Checked
                                   || Settings.Default.ExportAutoAllowEmptyNonIndexColumns != AutoAllowEmptyNonIndexColumnsCheckBox.Checked
@@ -165,7 +165,7 @@ namespace MySQL.ForExcel.Forms
       {
         var settings = Settings.Default;
         PreviewRowsQuantityNumericUpDown.Value = settings.GetPropertyDefaultValueByName<int>("ExportLimitPreviewRowsQuantity");
-        DetectDatatypeCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportDetectDatatype");
+        DetectDataTypeCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportDetectDataType");
         AddBufferToVarCharCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportAddBufferToVarchar");
         AutoIndexIntColumnsCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportAutoIndexIntColumns");
         AutoAllowEmptyNonIndexColumnsCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ExportAutoAllowEmptyNonIndexColumns");
@@ -176,10 +176,10 @@ namespace MySQL.ForExcel.Forms
       }
       else
       {
-        ExportDetectDatatypeChanged = false;
+        ExportDetectDataTypeChanged = false;
         ParentFormRequiresRefresh = false;
         PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.ExportLimitPreviewRowsQuantity);
-        DetectDatatypeCheckBox.Checked = Settings.Default.ExportDetectDatatype;
+        DetectDataTypeCheckBox.Checked = Settings.Default.ExportDetectDataType;
         AddBufferToVarCharCheckBox.Checked = Settings.Default.ExportAddBufferToVarchar;
         AutoIndexIntColumnsCheckBox.Checked = Settings.Default.ExportAutoIndexIntColumns;
         AutoAllowEmptyNonIndexColumnsCheckBox.Checked = Settings.Default.ExportAutoAllowEmptyNonIndexColumns;
@@ -189,7 +189,7 @@ namespace MySQL.ForExcel.Forms
         GenerateMultipleInsertsCheckBox.Checked = Settings.Default.ExportGenerateMultipleInserts;
       }
 
-      AddBufferToVarCharCheckBox.Enabled = DetectDatatypeCheckBox.Checked;
+      AddBufferToVarCharCheckBox.Enabled = DetectDataTypeCheckBox.Checked;
       CreateTableIndexesLastCheckBox.Enabled = GenerateMultipleInsertsCheckBox.Checked;
     }
 

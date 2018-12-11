@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -28,7 +28,7 @@ using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes;
-using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.Logging;
 using MySql.Utility.Classes.MySqlWorkbench;
 using MySql.Utility.Classes.Spatial;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
@@ -132,7 +132,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Flag indicating whether data type for each column is automatically detected when data is loaded by the <see cref="SetupColumnsWithData"/> method.
     /// </summary>
-    private bool _detectDatatype;
+    private bool _detectDataType;
 
     /// <summary>
     /// The default DB engine used for new table creations.
@@ -145,7 +145,7 @@ namespace MySQL.ForExcel.Classes
     private bool _firstRowContainsColumnNames;
 
     /// <summary>
-    /// Gets an approximation for a maximum SQL quey length containing primary key column data only.
+    /// Gets an approximation for a maximum SQL query length containing primary key column data only.
     /// </summary>
     private int _maxQueryForPrimaryColumnsLength;
 
@@ -251,7 +251,7 @@ namespace MySQL.ForExcel.Classes
       AddPrimaryKeyColumn = addPrimaryKeyCol;
       AutoAllowEmptyNonIndexColumns = autoAllowEmptyNonIndexColumns;
       AutoIndexIntColumns = autoIndexIntColumns;
-      DetectDatatype = detectDataType;
+      DetectDataType = detectDataType;
       IsFormatted = useFormattedValues;
       IsPreviewTable = true;
       OperationType = forExportOperation ? DataOperationType.Export : DataOperationType.Append;
@@ -273,7 +273,7 @@ namespace MySQL.ForExcel.Classes
       AutoIndexIntColumns = fromTemplate.AutoIndexIntColumns;
       CharSet = fromTemplate.CharSet;
       Collation = fromTemplate.Collation;
-      DetectDatatype = false;
+      DetectDataType = false;
       FirstRowContainsColumnNames = fromTemplate.FirstRowContainsColumnNames;
       IsFormatted = fromTemplate.IsFormatted;
       IsPreviewTable = false;
@@ -367,7 +367,7 @@ namespace MySQL.ForExcel.Classes
         TableName = tableName;
       }
 
-      SelectQuery = string.Format("SELECT * FROM `{0}`.`{1}`", SchemaName, TableNameForSqlQueries);
+      SelectQuery = $"SELECT * FROM `{SchemaName}`.`{TableNameForSqlQueries}`";
       WbConnection = wbConnection;
     }
 
@@ -377,7 +377,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="filledTable"><see cref="DataTable"/> object containing imported excelData from the MySQL table to be edited.</param>
-    /// <param name="procedureSql">The SQL containint the schema name and the name of the stored procedure for which this table is created.</param>
+    /// <param name="procedureSql">The SQL containing the schema name and the name of the stored procedure for which this table is created.</param>
     /// <param name="resultSetIndex">The index of the result set of a stored procedure this table contains data for. -1 represents the output parameters and return values result set.</param>
     public MySqlDataTable(MySqlWorkbenchConnection wbConnection, DataTable filledTable, string procedureSql, int resultSetIndex)
       : this(wbConnection, filledTable.TableName)
@@ -401,7 +401,7 @@ namespace MySQL.ForExcel.Classes
       _columnsDataLength = 0;
       _copyingTableData = false;
       _createTableWithoutData = false;
-      _detectDatatype = false;
+      _detectDataType = false;
       _engine = null;
       _maxQueryLength = 0;
       _maxQueryForPrimaryColumnsLength = 0;
@@ -412,7 +412,7 @@ namespace MySQL.ForExcel.Classes
       _primaryKeyColumns = null;
       _primaryKeyColumnsDataLength = 0;
       _tableExistsInSchema = null;
-      _selectQuery = string.Format("SELECT * FROM `{0}`", TableNameForSqlQueries);
+      _selectQuery = $"SELECT * FROM `{TableNameForSqlQueries}`";
       _sqlBuilderForDelete = null;
       _sqlBuilderForInsert = null;
       _sqlBuilderForSelect = null;
@@ -558,24 +558,21 @@ namespace MySQL.ForExcel.Classes
         }
 
         var schemaCharSetAndCollation = WbConnection.GetSchemaCharSetAndCollation();
-        return schemaCharSetAndCollation == null ? null : schemaCharSetAndCollation.Item2;
+        return schemaCharSetAndCollation?.Item2;
       }
     }
 
     /// <summary>
     /// Gets a value indicating whether columns with an auto-detected varchar type will get a padding buffer for its size.
     /// </summary>
-    public bool AddBufferToVarChar { get; private set; }
+    public bool AddBufferToVarChar { get; }
 
     /// <summary>
     /// Gets a value indicating whether an auto-generated primary key column will be added as the first column in the table.
     /// </summary>
     public bool AddPrimaryKeyColumn
     {
-      get
-      {
-        return _addPrimaryKeyColumn;
-      }
+      get => _addPrimaryKeyColumn;
 
       private set
       {
@@ -588,23 +585,17 @@ namespace MySQL.ForExcel.Classes
     /// Gets a value indicating whether columns that have their <see cref="MySqlDataColumn.CreateIndex"/> property value set to <c>false</c>
     /// will automatically get their <see cref="MySqlDataColumn.AllowNull"/> property value set to <c>true</c>.
     /// </summary>
-    public bool AutoAllowEmptyNonIndexColumns { get; private set; }
+    public bool AutoAllowEmptyNonIndexColumns { get; }
 
     /// <summary>
     /// Gets a value indicating whether columns with an integer-based data-type will have their <see cref="MySqlDataColumn.CreateIndex"/>property value set to <param name=">true"></param>.
     /// </summary>
-    public bool AutoIndexIntColumns { get; private set; }
+    public bool AutoIndexIntColumns { get; }
 
     /// <summary>
     /// Gets the name of the auto-generated primary key column.
     /// </summary>
-    public string AutoPkName
-    {
-      get
-      {
-        return AddPrimaryKeyColumn && Columns.Count > 0 ? GetColumnAtIndex(0).DisplayName : string.Empty;
-      }
-    }
+    public string AutoPkName => AddPrimaryKeyColumn && Columns.Count > 0 ? GetColumnAtIndex(0).DisplayName : string.Empty;
 
     /// <summary>
     /// Gets the number of changed or deleted rows in this table.
@@ -616,7 +607,7 @@ namespace MySQL.ForExcel.Classes
         if (_changedOrDeletedRows < 0)
         {
           var changesTable = GetChanges();
-          _changedOrDeletedRows = changesTable != null ? changesTable.Rows.Count : 0;
+          _changedOrDeletedRows = changesTable?.Rows.Count ?? 0;
         }
 
         return _changedOrDeletedRows;
@@ -629,10 +620,7 @@ namespace MySQL.ForExcel.Classes
     /// <remarks>If null or empty it means the schema character set is used.</remarks>
     public string CharSet
     {
-      get
-      {
-        return _charSet;
-      }
+      get => _charSet;
 
       set
       {
@@ -647,10 +635,7 @@ namespace MySQL.ForExcel.Classes
     /// <remarks>If null or empty it means the default collation is used.</remarks>
     public string Collation
     {
-      get
-      {
-        return _collation;
-      }
+      get => _collation;
 
       set
       {
@@ -693,10 +678,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public bool CreateTableWithoutData
     {
-      get
-      {
-        return _createTableWithoutData;
-      }
+      get => _createTableWithoutData;
 
       set
       {
@@ -712,24 +694,12 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the last warning text associated to the auto-generated primary key.
     /// </summary>
-    public string CurrentAutoPkWarningText
-    {
-      get
-      {
-        return _autoPkWarnings.CurrentWarningText;
-      }
-    }
+    public string CurrentAutoPkWarningText => _autoPkWarnings.CurrentWarningText;
 
     /// <summary>
     /// Gets the last warning text associated to the table.
     /// </summary>
-    public string CurrentTableWarningText
-    {
-      get
-      {
-        return _tableWarnings.CurrentWarningText;
-      }
-    }
+    public string CurrentTableWarningText => _tableWarnings.CurrentWarningText;
 
     /// <summary>
     /// Gets a <see cref="MySqlDataLoadException"/> indicating an error during a data load.
@@ -744,28 +714,25 @@ namespace MySQL.ForExcel.Classes
       get
       {
         DataTable changesDt = GetChanges(DataRowState.Deleted);
-        return changesDt != null ? changesDt.Rows.Count : 0;
+        return changesDt?.Rows.Count ?? 0;
       }
     }
 
     /// <summary>
     /// Gets or sets a value indicating whether data type for each column is automatically detected when data is loaded by the <see cref="SetupColumnsWithData"/> method.
     /// </summary>
-    public bool DetectDatatype
+    public bool DetectDataType
     {
-      get
-      {
-        return _detectDatatype;
-      }
+      get => _detectDataType;
 
       set
       {
-        if (_detectDatatype != value)
+        if (_detectDataType != value)
         {
-          OnPropertyChanged("DetectDatatype");
+          OnPropertyChanged("DetectDataType");
         }
 
-        _detectDatatype = value;
+        _detectDataType = value;
       }
     }
 
@@ -788,13 +755,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a value indicating whether any value loaded into this <see cref="MySqlDataTable"/> must be checked to escape a starting equals sign so Excel does not mistake it as a formula.
     /// </summary>
-    public bool EscapeFormulaTexts
-    {
-      get
-      {
-        return (OperationType.IsForImport() || OperationType.IsForEdit()) && Settings.Default.ImportEscapeFormulaTextValues;
-      }
-    }
+    public bool EscapeFormulaTexts => (OperationType.IsForImport() || OperationType.IsForEdit()) && Settings.Default.ImportEscapeFormulaTextValues;
 
     /// <summary>
     /// Gets the name to be used in related <see cref="ExcelInterop.ListObject"/> objects.
@@ -837,8 +798,7 @@ namespace MySQL.ForExcel.Classes
         containsIntegers = startingRow < rowsToAnalyzeCount;
         for (int rowIdx = startingRow; rowIdx < rowsToAnalyzeCount; rowIdx++)
         {
-          int res;
-          containsIntegers = containsIntegers && int.TryParse(Rows[rowIdx][1].ToString(), out res);
+          containsIntegers = containsIntegers && int.TryParse(Rows[rowIdx][1].ToString(), out _);
         }
 
         return containsIntegers;
@@ -850,10 +810,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public bool FirstRowContainsColumnNames
     {
-      get
-      {
-        return _firstRowContainsColumnNames;
-      }
+      get => _firstRowContainsColumnNames;
 
       set
       {
@@ -880,20 +837,14 @@ namespace MySQL.ForExcel.Classes
       get
       {
         DataTable changesDt = GetChanges(DataRowState.Added);
-        return changesDt != null ? changesDt.Rows.Count : 0;
+        return changesDt?.Rows.Count ?? 0;
       }
     }
 
     /// <summary>
     /// Gets a value indicating whether the automatically added column used for the primary key is not a duplicate of another column.
     /// </summary>
-    public bool IsAutoPkColumnNameValid
-    {
-      get
-      {
-        return AddPrimaryKeyColumn && !GetColumnAtIndex(0).IsDisplayNameDuplicate;
-      }
-    }
+    public bool IsAutoPkColumnNameValid => AddPrimaryKeyColumn && !GetColumnAtIndex(0).IsDisplayNameDuplicate;
 
     /// <summary>
     /// Gets a value indicating whether the Excel Data used to populate this table is formatted (numbers, dates, text) or not (numbers and text).
@@ -931,7 +882,7 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets an approximation for a maximum SQL quey length containing primary key column data only.
+    /// Gets an approximation for a maximum SQL query length containing primary key column data only.
     /// </summary>
     public int MaxQueryForPrimaryColumnsLength
     {
@@ -976,8 +927,8 @@ namespace MySQL.ForExcel.Classes
       {
         if (_mysqlMaxAllowedPacket == 0 && WbConnection != null)
         {
-          var serverMaxallowedPacket = WbConnection.GetMySqlServerMaxAllowedPacket();
-          _mysqlMaxAllowedPacket = serverMaxallowedPacket > 0 ? serverMaxallowedPacket - SAFE_BYTES_BEFORE_REACHING_MAX_ALLOWED_PACKET : 0;
+          var serverMaxAllowedPacket = WbConnection.GetMySqlServerMaxAllowedPacket();
+          _mysqlMaxAllowedPacket = serverMaxAllowedPacket > 0 ? serverMaxAllowedPacket - SAFE_BYTES_BEFORE_REACHING_MAX_ALLOWED_PACKET : 0;
         }
 
         return _mysqlMaxAllowedPacket;
@@ -1053,17 +1004,14 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the name of the schema where this table exists or will be created.
     /// </summary>
-    public string SchemaName { get; private set; }
+    public string SchemaName { get; }
 
     /// <summary>
     /// Gets or sets the SELECT query used to retrieve the excelData from the corresponding MySQL table to fill this one.
     /// </summary>
     public string SelectQuery
     {
-      get
-      {
-        return _selectQuery;
-      }
+      get => _selectQuery;
 
       set
       {
@@ -1079,26 +1027,17 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// The <see cref="StringBuilder"/> used to build SQL DELETE queries text.
     /// </summary>
-    public StringBuilder SqlBuilderForDelete
-    {
-      get { return _sqlBuilderForDelete ?? (_sqlBuilderForDelete = new StringBuilder(MaxQueryForPrimaryColumnsLength)); }
-    }
+    public StringBuilder SqlBuilderForDelete => _sqlBuilderForDelete ?? (_sqlBuilderForDelete = new StringBuilder(MaxQueryForPrimaryColumnsLength));
 
     /// <summary>
     /// The <see cref="StringBuilder"/> used to build SQL INSERT queries text.
     /// </summary>
-    public StringBuilder SqlBuilderForInsert
-    {
-      get { return _sqlBuilderForInsert ?? (_sqlBuilderForInsert = new StringBuilder(MaxQueryLength)); }
-    }
+    public StringBuilder SqlBuilderForInsert => _sqlBuilderForInsert ?? (_sqlBuilderForInsert = new StringBuilder(MaxQueryLength));
 
     /// <summary>
     /// The <see cref="StringBuilder"/> used to build SQL INSERT queries text.
     /// </summary>
-    public StringBuilder SqlBuilderForSelect
-    {
-      get { return _sqlBuilderForSelect ?? (_sqlBuilderForSelect = new StringBuilder(MaxQueryForPrimaryColumnsLength)); }
-    }
+    public StringBuilder SqlBuilderForSelect => _sqlBuilderForSelect ?? (_sqlBuilderForSelect = new StringBuilder(MaxQueryForPrimaryColumnsLength));
 
     /// <summary>
     /// The <see cref="StringBuilder"/> used to build SQL UPDATE queries text.
@@ -1134,10 +1073,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public new string TableName
     {
-      get
-      {
-        return base.TableName;
-      }
+      get => base.TableName;
 
       set
       {
@@ -1163,13 +1099,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the <see cref="TableName"/> escaping the back-tick character.
     /// </summary>
-    public string TableNameForSqlQueries
-    {
-      get
-      {
-        return TableName.Replace("`", "``");
-      }
-    }
+    public string TableNameForSqlQueries => TableName.Replace("`", "``");
 
     /// <summary>
     /// Gets the number of changed rows meaning the number of pending UPDATE operations in an Edit Data operation.
@@ -1179,7 +1109,7 @@ namespace MySQL.ForExcel.Classes
       get
       {
         DataTable changesDt = GetChanges(DataRowState.Modified);
-        return changesDt != null ? changesDt.Rows.Count : 0;
+        return changesDt?.Rows.Count ?? 0;
       }
     }
 
@@ -1188,10 +1118,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public bool UseFirstColumnAsPk
     {
-      get
-      {
-        return _useFirstColumnAsPk;
-      }
+      get => _useFirstColumnAsPk;
 
       set
       {
@@ -1225,10 +1152,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public bool UseOptimisticUpdate
     {
-      get
-      {
-        return _useOptimisticUpdate;
-      }
+      get => _useOptimisticUpdate;
 
       set
       {
@@ -1244,15 +1168,12 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.
     /// </summary>
-    public MySqlWorkbenchConnection WbConnection { get; private set; }
+    public MySqlWorkbenchConnection WbConnection { get; }
 
     /// <summary>
     /// The <see cref="StringBuilder"/> used to build SQL query text.
     /// </summary>
-    private StringBuilder PreSqlBuilder
-    {
-      get { return _preSqlBuilder ?? (_preSqlBuilder = new StringBuilder(PreSqlLength)); }
-    }
+    private StringBuilder PreSqlBuilder => _preSqlBuilder ?? (_preSqlBuilder = new StringBuilder(PreSqlLength));
 
     /// <summary>
     /// The length of the static part of the SQL queries made up of schema, table and column names plus the SQL statement keywords.
@@ -1307,7 +1228,7 @@ namespace MySQL.ForExcel.Classes
     public bool AddExcelData(TempRange temporaryRange)
     {
       DataLoadException = null;
-      if (temporaryRange == null || temporaryRange.Range == null)
+      if (temporaryRange?.Range == null)
       {
         return false;
       }
@@ -1343,7 +1264,7 @@ namespace MySQL.ForExcel.Classes
       {
         DataLoadException = new MySqlDataLoadException(ex);
         var errorTitle = string.Format(Resources.TableDataAdditionErrorTitle, OperationType.IsForExport() ? "exporting" : "appending");
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, errorTitle, true);
+        Logger.LogException(ex, true, errorTitle);
         success = false;
       }
       finally
@@ -1372,7 +1293,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Creates a new <see cref="MySqlDataTable"/> object with its schema cloned from this table but no data.
     /// </summary>
-    /// <param name="autoPkCreationOnlyIfFirstColumnIsPk">Flag indicating whether an Auto PK column is prepended only if the value of the <see cref="UseFirstColumnAsPk"/> property is <c>strue</c>.</param>
+    /// <param name="autoPkCreationOnlyIfFirstColumnIsPk">Flag indicating whether an Auto PK column is prepended only if the value of the <see cref="UseFirstColumnAsPk"/> property is <c>true</c>.</param>
     /// <param name="subscribePropertyChangedEvent">Flag indicating whether the cloned columns subscribe to the parent table's <see cref="ColumnPropertyValueChanged"/> event.</param>
     /// <returns>Cloned <see cref="MySqlDataTable"/> object.</returns>
     public MySqlDataTable CloneSchema(bool autoPkCreationOnlyIfFirstColumnIsPk, bool subscribePropertyChangedEvent)
@@ -1383,7 +1304,7 @@ namespace MySQL.ForExcel.Classes
         TableName,
         createAutoPkColumn,
         IsFormatted,
-        DetectDatatype,
+        DetectDataType,
         AddBufferToVarChar,
         AutoIndexIntColumns,
         AutoAllowEmptyNonIndexColumns)
@@ -1470,7 +1391,7 @@ namespace MySQL.ForExcel.Classes
     public string GeLockTableSql(bool lockTable)
     {
       return lockTable
-        ? string.Format("{0} `{1}`.`{2}` WRITE", MySqlStatement.STATEMENT_LOCK_TABLES, SchemaName, TableName)
+        ? $"{MySqlStatement.STATEMENT_LOCK_TABLES} `{SchemaName}`.`{TableName}` WRITE"
         : MySqlStatement.STATEMENT_UNLOCK_TABLES;
     }
 
@@ -1518,7 +1439,7 @@ namespace MySQL.ForExcel.Classes
         break;
       }
 
-      return mySqlCol != null ? mySqlCol.Ordinal : -1;
+      return mySqlCol?.Ordinal ?? -1;
     }
 
     /// <summary>
@@ -1589,7 +1510,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>ALTER TABLE SQL query disabling or enabling foreign key constraints.</returns>
     public string GetDisableForeignKeysSql(bool disable)
     {
-      return string.Format("SET foreign_key_checks = {0}", (disable ? "0" : "1"));
+      return $"SET foreign_key_checks = {(disable ? "0" : "1")}";
     }
 
     /// <summary>
@@ -1600,7 +1521,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>ALTER TABLE SQL query disabling or enabling keys.</returns>
     public string GetDisableKeysSql(bool disable)
     {
-      return string.Format("ALTER TABLE `{0}`.`{1}` {2} KEYS", SchemaName, TableName, (disable ? "DISABLE" : "ENABLE"));
+      return $"ALTER TABLE `{SchemaName}`.`{TableName}` {(disable ? "DISABLE" : "ENABLE")} KEYS";
     }
 
     /// <summary>
@@ -1611,7 +1532,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>ALTER TABLE SQL query disabling or enabling foreign key constraints.</returns>
     public string GetDisableUniqueKeysSql(bool disable)
     {
-      return string.Format("SET unique_checks = {0}", (disable ? "0" : "1"));
+      return $"SET unique_checks = {(disable ? "0" : "1")}";
     }
 
     /// <summary>
@@ -1625,7 +1546,7 @@ namespace MySQL.ForExcel.Classes
       bool isForExport = OperationType.IsForExport();
 
       // Set the type of SQL statement generated by the GetNewTableSql method, notice that there is a difference on the type depending on value
-      // of the beforeInserts paramenter, meaning the query is executed before or after INSERT statements. The ones before normally disable keys
+      // of the beforeInserts parameter, meaning the query is executed before or after INSERT statements. The ones before normally disable keys
       // or create a new table without any keys, the ones after enable back the keys or add the keys for a new table.
       var sqlType = isForExport
         ? (CreateTableWithoutData || !Settings.Default.ExportSqlQueriesCreateIndexesLast
@@ -1804,8 +1725,7 @@ namespace MySQL.ForExcel.Classes
       int nextRow = 0;
       do
       {
-        int processedRows;
-        var insertSql = GetBulkInsertSql(nextRow, -1, out nextRow, out processedRows);
+        var insertSql = GetBulkInsertSql(nextRow, -1, out nextRow, out _);
         var dummyRow = new MySqlDummyRow(insertSql);
         dummyRows.Add(dummyRow);
       } while (nextRow >= 0);
@@ -1872,8 +1792,7 @@ namespace MySQL.ForExcel.Classes
         string colsSeparator = string.Empty;
         foreach (var column in ColumnsForInsertion)
         {
-          bool insertingValueIsNull;
-          string valueToDb = column.GetStringValue(dr[column.ColumnName], out insertingValueIsNull);
+          string valueToDb = column.GetStringValue(dr[column.ColumnName], out var insertingValueIsNull);
           string wrapValueCharacter = column.MySqlDataType.RequiresQuotesForValue && !insertingValueIsNull ? "'" : string.Empty;
           singleRowValuesBuilder.AppendFormat("{0}{1}{2}{1}", colsSeparator, wrapValueCharacter, valueToDb);
           colsSeparator = ",";
@@ -1986,19 +1905,16 @@ namespace MySQL.ForExcel.Classes
               // Convert TimeSpan data to a format Excel recognizes as native time.
               cellValue = ((TimeSpan)mySqlRow[currCol]).TotalDays;
             }
-            else if (cellValue is DateTime)
+            else if (cellValue is DateTime dateValue)
             {
-              var dateValue = (DateTime)cellValue;
-
               // Convert DateTime values before the Excel minimum date of "1/1/1900" to text, otherwise Excel will throw an error
               if (dateValue < excelMinDate)
               {
                 cellValue = dateValue.ToString(CultureInfo.CurrentCulture);
               }
             }
-            else if (cellValue is Geometry)
+            else if (cellValue is Geometry geomValue)
             {
-              var geomValue = (Geometry)cellValue;
               cellValue = geomValue.ToString(Globals.ThisAddIn.SpatialDataAsTextFormat);
             }
 
@@ -2030,7 +1946,7 @@ namespace MySQL.ForExcel.Classes
       catch (Exception ex)
       {
         fillingRange = null;
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.ImportDataErrorDetailText, true);
+        Logger.LogException(ex, true, Resources.ImportDataErrorDetailText);
       }
       finally
       {
@@ -2087,7 +2003,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.ImportDataErrorDetailText, true);
+        Logger.LogException(ex, true, Resources.ImportDataErrorDetailText);
       }
       finally
       {
@@ -2111,8 +2027,7 @@ namespace MySQL.ForExcel.Classes
 
       for (int colIdx = 0; colIdx < Columns.Count; colIdx++)
       {
-        var targetColumn = Columns[colIdx] as MySqlDataColumn;
-        var importingValue = targetColumn != null
+        var importingValue = Columns[colIdx] is MySqlDataColumn targetColumn
           ? targetColumn.GetInsertingValueForType(itemArray[colIdx], false)
           : itemArray[colIdx];
         if (escapeFormulaTexts)
@@ -2235,7 +2150,7 @@ namespace MySQL.ForExcel.Classes
       {
         CreateColumns(temporaryRange, recreateColumnsFromData);
         bool success = AddExcelData(temporaryRange);
-        if (!success || !DetectDatatype)
+        if (!success || !DetectDataType)
         {
           return success;
         }
@@ -2301,8 +2216,7 @@ namespace MySQL.ForExcel.Classes
           return;
         }
 
-        var mySqlRow = e.Row as MySqlDataRow;
-        if (mySqlRow != null)
+        if (e.Row is MySqlDataRow mySqlRow)
         {
           mySqlRow.RowAdded();
         }
@@ -2334,10 +2248,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="column">The <see cref="MySqlDataColumn"/> object that contains changes in its warning texts.</param>
     protected virtual void OnTableWarningsChanged(MySqlDataColumn column)
     {
-      if (TableWarningsChanged != null)
-      {
-        TableWarningsChanged(column, new TableWarningsChangedArgs(column));
-      }
+      TableWarningsChanged?.Invoke(column, new TableWarningsChangedArgs(column));
     }
 
     /// <summary>
@@ -2346,10 +2257,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="autoPkWarning">Flag indicating if the warning is related to the auto-generated primary key or to the table.</param>
     protected virtual void OnTableWarningsChanged(bool autoPkWarning)
     {
-      if (TableWarningsChanged != null)
-      {
-        TableWarningsChanged(this, new TableWarningsChangedArgs(this, autoPkWarning));
-      }
+      TableWarningsChanged?.Invoke(this, new TableWarningsChangedArgs(this, autoPkWarning));
     }
 
     /// <summary>
@@ -2402,10 +2310,7 @@ namespace MySQL.ForExcel.Classes
           break;
       }
 
-      if (TableColumnPropertyValueChanged != null)
-      {
-        TableColumnPropertyValueChanged(sender as MySqlDataColumn, args);
-      }
+      TableColumnPropertyValueChanged?.Invoke(sender as MySqlDataColumn, args);
     }
 
     /// <summary>
@@ -2451,7 +2356,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.TableDataCopyErrorTitle, true);
+        Logger.LogException(ex, true, Resources.TableDataCopyErrorTitle);
       }
       finally
       {
@@ -2482,7 +2387,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="recreateColumnsFromData">Flag indicating if any existing columns in the table must be dropped and re-created based on the given data range.</param>
     private void CreateColumns(TempRange temporaryRange, bool recreateColumnsFromData)
     {
-      if (temporaryRange == null || temporaryRange.Range == null || (!recreateColumnsFromData && Columns.Count > 0))
+      if (temporaryRange?.Range == null || !recreateColumnsFromData && Columns.Count > 0)
       {
         return;
       }
@@ -2512,8 +2417,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="beautifyDataTypes">Flag indicating whether the data types are camel cased as shown in the Export Data data type combo box.</param>
     private void CreateTableSchema(string tableName, bool beautifyDataTypes = false)
     {
-      string tableCharSet;
-      string tableCollation = WbConnection.GetTableCollation(SchemaName, tableName, out tableCharSet);
+      string tableCollation = WbConnection.GetTableCollation(SchemaName, tableName, out var tableCharSet);
       if (!string.IsNullOrEmpty(tableCollation))
       {
         CharSet = tableCharSet;
@@ -2560,12 +2464,12 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a piece of a CREATE TABLE statament containing only the index definitions given the index type.
+    /// Gets a piece of a CREATE TABLE statement containing only the index definitions given the index type.
     /// </summary>
     /// <param name="sqlType">The type of SQL statement used for the new table.</param>
     /// <param name="indexType">The type of index created for this table.</param>
     /// <param name="indexesDelimiter">The delimiter used to separate each index definition.</param>
-    /// <returns>A piece of a CREATE TABLE statament containing only the index definitions given the index type.</returns>
+    /// <returns>A piece of a CREATE TABLE statement containing only the index definitions given the index type.</returns>
     private string GetIndexesSqlPiece(NewTableSqlType sqlType, IndexType indexType, ref string indexesDelimiter)
     {
       IEnumerable<MySqlDataColumn> indexColumns = null;
@@ -2670,8 +2574,7 @@ namespace MySQL.ForExcel.Classes
       var insertStatement = MySqlStatement.STATEMENT_INSERT;
       if (OperationType.IsForAppend())
       {
-        AppendDuplicateValuesActionType duplicateValuesAction;
-        if (Enum.TryParse(Settings.Default.AppendDuplicateUniqueValuesAction, out duplicateValuesAction))
+        if (Enum.TryParse(Settings.Default.AppendDuplicateUniqueValuesAction, out AppendDuplicateValuesActionType duplicateValuesAction))
         {
           switch (duplicateValuesAction)
           {
@@ -2715,10 +2618,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="propertyName">The name of the property whose value changed.</param>
     private void OnPropertyChanged(string propertyName)
     {
-      if (PropertyChanged != null)
-      {
-        PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-      }
+      PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     /// <summary>
@@ -2747,8 +2647,7 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      var firstRow = Rows[0] as MySqlDataRow;
-      if (firstRow != null)
+      if (Rows[0] is MySqlDataRow firstRow)
       {
         firstRow.IsHeadersRow = FirstRowContainsColumnNames;
       }
@@ -2766,7 +2665,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       _changedOrDeletedRows = -1;
-      var mySqlRow = args.Row as MySqlDataRow;
+      var mySqlRow = (MySqlDataRow)args.Row;
       mySqlRow.RowChanged(args.Action);
     }
 
@@ -2820,8 +2719,8 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     private void UpdateTableSelectQuery()
     {
-      string schemaPiece = !string.IsNullOrEmpty(SchemaName) ? string.Format("`{0}`.", SchemaName) : string.Empty;
-      SelectQuery = string.Format("SELECT * FROM {0}`{1}`", schemaPiece, TableNameForSqlQueries);
+      string schemaPiece = !string.IsNullOrEmpty(SchemaName) ? $"`{SchemaName}`." : string.Empty;
+      SelectQuery = $"SELECT * FROM {schemaPiece}`{TableNameForSqlQueries}`";
     }
 
     /// <summary>

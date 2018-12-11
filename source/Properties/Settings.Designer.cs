@@ -12,7 +12,7 @@ namespace MySQL.ForExcel.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.9.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -27,12 +27,12 @@ namespace MySQL.ForExcel.Properties {
         [global::System.Configuration.SettingsProviderAttribute(typeof(MySQL.ForExcel.Classes.MySqlForExcelSettings))]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool ExportDetectDatatype {
+        public bool ExportDetectDataType {
             get {
-                return ((bool)(this["ExportDetectDatatype"]));
+                return ((bool)(this["ExportDetectDataType"]));
             }
             set {
-                this["ExportDetectDatatype"] = value;
+                this["ExportDetectDataType"] = value;
             }
         }
         

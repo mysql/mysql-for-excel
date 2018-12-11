@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -18,7 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.Logging;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
@@ -129,7 +129,7 @@ namespace MySQL.ForExcel.Classes
     public enum TempRangeType
     {
       /// <summary>
-      /// A temporary range with a prepended column holding sequential numbers represenging an automatic primary key column.
+      /// A temporary range with a prepended column holding sequential numbers representing an automatic primary key column.
       /// </summary>
       AutoPkRange,
 
@@ -151,18 +151,18 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a value indicating whether the range was cropped to a subrange with only non-empty cells.
     /// </summary>
-    public bool CropToNonEmptyRange { get; private set; }
+    public bool CropToNonEmptyRange { get; }
 
     /// <summary>
     /// Gets a value indicating whether the new temporary <see cref="ExcelInterop.Worksheet"/> will be hidden and deleted when the <see cref="TempRange"/> is disposed.
     /// </summary>
-    public bool HideAndDeleteWorksheet { get; private set; }
+    public bool HideAndDeleteWorksheet { get; }
 
     /// <summary>
     /// Gets a limit on the number of rows copied from the source range to the temporary range.
     /// If less than 1 it means there is no limit.
     /// </summary>
-    public int LimitRowsQuantity { get; private set; }
+    public int LimitRowsQuantity { get; }
 
     /// <summary>
     /// Gets the original source <see cref="ExcelInterop.Range"/> whose data is copied to the temporary one.
@@ -177,12 +177,12 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the type of temporary range created.
     /// </summary>
-    public TempRangeType RangeType { get; private set; }
+    public TempRangeType RangeType { get; }
 
     /// <summary>
     /// Gets a value indicating whether empty columns are not copied to the target range.
     /// </summary>
-    public bool SkipEmptyColumns { get; private set; }
+    public bool SkipEmptyColumns { get; }
 
     /// <summary>
     /// Gets the source <see cref="ExcelInterop.Range"/> that might be cropped depending on the <see cref="CropToNonEmptyRange"/> value.
@@ -280,7 +280,7 @@ namespace MySQL.ForExcel.Classes
       firstColumn.Insert();
       firstColumn = TempWorksheet.Cells[1, 1];
       firstColumn = firstColumn.SafeResize(rowsCount, 1);
-      firstColumn.FormulaArray = string.Format("=ROW() - {0}", firstRowContainsColumnNames ? 1 : 0);
+      firstColumn.FormulaArray = $"=ROW() - {(firstRowContainsColumnNames ? 1 : 0)}";
       firstColumn = TempWorksheet.Cells[1, 1];
       Range = firstColumn.SafeResize(rowsCount, Range.Columns.Count + 1);
     }
@@ -379,7 +379,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, true);
+        Logger.LogException(ex, true);
       }
     }
   }

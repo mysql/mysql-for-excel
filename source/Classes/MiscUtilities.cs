@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -30,7 +30,7 @@ using System.Xml.Serialization;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes;
-using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.Logging;
 using MySql.Utility.Classes.MySqlWorkbench;
 using MySql.Utility.Classes.Tokenizers;
 using MySql.Utility.Forms;
@@ -39,7 +39,7 @@ using ExcelInterop = Microsoft.Office.Interop.Excel;
 namespace MySQL.ForExcel.Classes
 {
   /// <summary>
-  /// Provides extension methods and other static methods to leverage miscelaneous tasks.
+  /// Provides extension methods and other static methods to leverage miscellaneous tasks.
   /// </summary>
   public static class MiscUtilities
   {
@@ -114,7 +114,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Strip the element from its wrapping quotes.
-      element = element.Trim(new[] { '\'' });
+      element = element.Trim('\'');
 
       // Check that each found single quote is properly wrapped in MySQL notation, i.e. that 2 consecutive single quotes appear where a single quote is expected to be in the text.
       int currentQuotePos;
@@ -198,12 +198,9 @@ namespace MySQL.ForExcel.Classes
     /// <returns>An object with text escaped with an apostrophe in case it starts with an equals sign.</returns>
     public static object EscapeStartingEqualSign(this object possibleBoxedText)
     {
-      if (!(possibleBoxedText is string))
-      {
-        return possibleBoxedText;
-      }
-
-      return (possibleBoxedText as string).EscapeStartingEqualSign();
+      return possibleBoxedText is string s
+        ? s.EscapeStartingEqualSign()
+        : possibleBoxedText;
     }
 
     /// <summary>
@@ -268,7 +265,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>An <see cref="EditConnectionInfo"/> object.</returns>
     public static EditConnectionInfo GetActiveEditConnectionInfo(this List<EditConnectionInfo> connectionInfosList, string tableName)
     {
-      return connectionInfosList == null ? null : connectionInfosList.FirstOrDefault(connectionInfo => connectionInfo.EditDialog != null && connectionInfo.TableName == tableName);
+      return connectionInfosList?.FirstOrDefault(connectionInfo => connectionInfo.EditDialog != null && connectionInfo.TableName == tableName);
     }
 
     /// <summary>
@@ -279,7 +276,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>An <see cref="EditConnectionInfo"/> object.</returns>
     public static EditConnectionInfo GetActiveEditConnectionInfo(this List<EditConnectionInfo> connectionInfosList, ExcelInterop.Worksheet worksheet)
     {
-      return connectionInfosList == null ? null : connectionInfosList.FirstOrDefault(connectionInfo => connectionInfo.EditDialog != null && connectionInfo.EditDialog.EditingWorksheet.Name == worksheet.Name);
+      return connectionInfosList?.FirstOrDefault(connectionInfo => connectionInfo.EditDialog != null && connectionInfo.EditDialog.EditingWorksheet.Name == worksheet.Name);
     }
 
     /// <summary>
@@ -290,26 +287,25 @@ namespace MySQL.ForExcel.Classes
     public static ListView GetOwnerListViewControl(object toolStripMenuControl)
     {
       ContextMenuStrip ownerMenuStrip = null;
-      if (toolStripMenuControl is ToolStripMenuItem)
+      switch (toolStripMenuControl)
       {
-        var menuItem = toolStripMenuControl as ToolStripMenuItem;
-        ownerMenuStrip = menuItem.Owner as ContextMenuStrip;
-        if (ownerMenuStrip == null)
+        case ToolStripMenuItem menuItem:
         {
-          return null;
+          ownerMenuStrip = menuItem.Owner as ContextMenuStrip;
+          if (ownerMenuStrip == null)
+          {
+            return null;
+          }
+
+          break;
         }
-      }
-      else if (toolStripMenuControl is ContextMenuStrip)
-      {
-        ownerMenuStrip = toolStripMenuControl as ContextMenuStrip;
+
+        case ContextMenuStrip strip:
+          ownerMenuStrip = strip;
+          break;
       }
 
-      if (ownerMenuStrip == null)
-      {
-        return null;
-      }
-
-      var listView = ownerMenuStrip.SourceControl as ListView;
+      var listView = ownerMenuStrip?.SourceControl as ListView;
       return listView;
     }
 
@@ -361,8 +357,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>A <see cref="DbView"/> object representing a selected table or view.</returns>
     public static DbView GetSelectedDbTableOrView(object toolStripMenuControl)
     {
-      ListView listView;
-      return GetSelectedDbTableOrView(toolStripMenuControl, out listView);
+      return GetSelectedDbTableOrView(toolStripMenuControl, out _);
     }
 
     /// <summary>
@@ -480,13 +475,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the given string value contains a guid in string representation, <c>false</c> otherwise.</returns>
     public static bool IsGuid(this string value)
     {
-      if (string.IsNullOrEmpty(value))
-      {
-        return false;
-      }
-
-      Guid guid;
-      return Guid.TryParse(value, out guid);
+      return !string.IsNullOrEmpty(value) && Guid.TryParse(value, out _);
     }
 
     /// <summary>
@@ -502,7 +491,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Resets the settings that correspond to the defined section to its default values.
     /// </summary>
-    /// <param name="settings">The application defualt settings (extension method)</param>
+    /// <param name="settings">The application default settings (extension method)</param>
     /// <param name="section">The section type</param>
     public static void ResetSectionToDefaultValues(this ApplicationSettingsBase settings, PropertyGroup.SettingsGroup section)
     {
@@ -542,7 +531,7 @@ namespace MySQL.ForExcel.Classes
         catch (Exception ex)
         {
           success = false;
-          MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.SettingsFileSaveErrorTitle, true);
+          Logger.LogException(ex, true, Resources.SettingsFileSaveErrorTitle);
         }
       }
 
@@ -586,7 +575,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="comboBox">The <see cref="ComboBox"/> to initialize.</param>
     /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <param name="firstElement">A custom string for the first element of the dictioary.</param>
+    /// <param name="firstElement">A custom string for the first element of the dictionary.</param>
     public static void SetupCollations(this ComboBox comboBox, MySqlWorkbenchConnection connection, string firstElement)
     {
       if (comboBox == null)

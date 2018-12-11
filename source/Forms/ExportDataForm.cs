@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -27,7 +27,7 @@ using MySQL.ForExcel.Classes.EventArguments;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes;
-using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.Logging;
 using MySql.Utility.Classes.MySqlWorkbench;
 using MySql.Utility.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -57,7 +57,7 @@ namespace MySQL.ForExcel.Forms
     private MySqlDataTable _exportDataTable;
 
     /// <summary>
-    /// Flag indicating whether when text changes on an input control was due user input or programatic.
+    /// Flag indicating whether when text changes on an input control was due user input or programmatic.
     /// </summary>
     private bool _isUserInput;
 
@@ -98,7 +98,7 @@ namespace MySQL.ForExcel.Forms
         _proposedTableName = exportingWorksheetName.ToLower().Replace(' ', '_');
       }
 
-      Text = string.Format("Export Data - {0} [{1}]", exportingWorksheetName, _exportDataRange.Address.Replace("$", string.Empty));
+      Text = $@"Export Data - {exportingWorksheetName} [{_exportDataRange.Address.Replace("$", string.Empty)}]";
       LoadPreviewData();
       InitializeDataTypeCombo();
       CollationComboBox.SetupCollations(_wbConnection, "Schema Default");
@@ -120,17 +120,10 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets or sets the text associated with this control.
     /// </summary>
-    public override sealed string Text
+    public sealed override string Text
     {
-      get
-      {
-        return base.Text;
-      }
-
-      set
-      {
-        base.Text = value;
-      }
+      get => base.Text;
+      set => base.Text = value;
     }
 
     #endregion Properties
@@ -225,7 +218,7 @@ namespace MySQL.ForExcel.Forms
         }
 
         LoadPreviewData();
-        if (optionsDialog.ExportDetectDatatypeChanged && Settings.Default.ExportDetectDatatype)
+        if (optionsDialog.ExportDetectDataTypeChanged && Settings.Default.ExportDetectDataType)
         {
           // Reset background colors to default since those aren't reset when the condition above is fulfilled.
           foreach (var mysqldc in _previewDataTable.Columns.Cast<MySqlDataColumn>().Where(mysqldc => mysqldc != null))
@@ -239,7 +232,7 @@ namespace MySQL.ForExcel.Forms
         _previewDataTable.UseFirstColumnAsPk = AddPrimaryKeyRadioButton.Checked;
         _previewDataTable.FirstRowContainsColumnNames = FirstRowHeadersCheckBox.Checked;
 
-        // Force Empty columns with emtpy column names from being stated defaulty when this is not desired.
+        // Force Empty columns with empty column names from being stated by default when this is not desired.
         RefreshPreviewGridColumnNames();
         SetDefaultPrimaryKey();
 
@@ -669,8 +662,8 @@ namespace MySQL.ForExcel.Forms
     {
       e.DrawBackground();
       var comboItem = DataTypeComboBox.Items[e.Index];
-      string itemText = comboItem is KeyValuePair<string, string>
-        ? ((KeyValuePair<string, string>)comboItem).Value
+      string itemText = comboItem is KeyValuePair<string, string> pair
+        ? pair.Value
         : comboItem.ToString();
       e.Graphics.DrawString(itemText, DataTypeComboBox.Font, Brushes.Black, new RectangleF(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height));
       e.DrawFocusRectangle();
@@ -691,7 +684,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       bool showResetMenuItems = currentCol.ParentTable != null
-                                && currentCol.ParentTable.DetectDatatype
+                                && currentCol.ParentTable.DetectDataType
                                 && currentCol.MySqlDataTypeOverridenByUser;
       bool showNumericExtendedMenuItems = currentCol.MySqlDataType.IsNumeric;
       if (!showResetMenuItems && !showNumericExtendedMenuItems)
@@ -830,7 +823,7 @@ namespace MySQL.ForExcel.Forms
       catch (Exception ex)
       {
         _exportDataTable = null;
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.TableDataAdditionErrorTitle, "exporting"), true);
+        Logger.LogException(ex, true, string.Format(Resources.TableDataAdditionErrorTitle, "exporting"));
       }
 
       Cursor = Cursors.Default;
@@ -839,9 +832,8 @@ namespace MySQL.ForExcel.Forms
         return false;
       }
 
-      if (CollationComboBox.SelectedItem is KeyValuePair<string, string[]>)
+      if (CollationComboBox.SelectedItem is KeyValuePair<string, string[]> collationEntry)
       {
-        var collationEntry = (KeyValuePair<string, string[]>)CollationComboBox.SelectedItem;
         _exportDataTable.CharSet = collationEntry.Value[0];
         _exportDataTable.Collation = collationEntry.Value[1];
       }
@@ -1013,7 +1005,7 @@ namespace MySQL.ForExcel.Forms
         _proposedTableName,
         true,
         Settings.Default.ExportUseFormattedValues,
-        Settings.Default.ExportDetectDatatype,
+        Settings.Default.ExportDetectDataType,
         Settings.Default.ExportAddBufferToVarchar,
         Settings.Default.ExportAutoIndexIntColumns,
         Settings.Default.ExportAutoAllowEmptyNonIndexColumns);
@@ -1196,8 +1188,7 @@ namespace MySQL.ForExcel.Forms
           break;
 
         case TableWarningsChangedArgs.TableWarningsType.ColumnWarnings:
-          var column = sender as MySqlDataColumn;
-          if (column != null)
+          if (sender is MySqlDataColumn column)
           {
             SetGridColumnBackgroundColor(column);
             if (column == GetCurrentMySqlDataColumn())
@@ -1411,7 +1402,7 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Fills the <see cref="PrimaryKeyColumnsComboBox"/> combo box containing the names of column names to choose from to create a Primary Key.
     /// </summary>
-    /// <param name="recreatingColumnNames">Flag indicating if the primarky key columns combobox is being refreshed due a recreation of all column names.</param>
+    /// <param name="recreatingColumnNames">Flag indicating if the primary key columns combobox is being refreshed due a recreation of all column names.</param>
     private void RefreshPrimaryKeyColumnsCombo(bool recreatingColumnNames)
     {
       int selectedIndex = -1;

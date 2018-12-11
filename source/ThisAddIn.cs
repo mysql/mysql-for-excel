@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -17,7 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -29,7 +28,7 @@ using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes;
-using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.Logging;
 using MySql.Utility.Classes.MySqlInstaller;
 using MySql.Utility.Classes.MySqlWorkbench;
 using MySql.Utility.Enums;
@@ -59,14 +58,14 @@ namespace MySQL.ForExcel
     public const int ADD_IN_MIN_PANE_WIDTH = 266;
 
     /// <summary>
+    /// The application name without spaces.
+    /// </summary>
+    public const string APP_NAME_NO_SPACES = "MySQLForExcel";
+
+    /// <summary>
     /// The relative path of the stored connections file under the application data directory.
     /// </summary>
     public const string CONNECTIONS_FILE_RELATIVE_PATH = SETTINGS_DIRECTORY_RELATIVE_PATH + @"\connections.xml";
-
-    /// <summary>
-    /// The relative path of the log file under the application data directory.
-    /// </summary>
-    public const string ERROR_LOG_FILE_RELATIVE_PATH = SETTINGS_DIRECTORY_RELATIVE_PATH + @"\MySQLForExcelInterop.log";
 
     /// <summary>
     /// The string representation of the Escape key.
@@ -118,7 +117,7 @@ namespace MySQL.ForExcel
     #region Fields
 
     /// <summary>
-    /// The timer that checks for automatic connetions migration.
+    /// The timer that checks for automatic connections migration.
     /// </summary>
     private Timer _connectionsMigrationTimer;
 
@@ -154,13 +153,7 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets the environment's application data directory.
     /// </summary>
-    public static string EnvironmentApplicationDataDirectory
-    {
-      get
-      {
-        return Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-      }
-    }
+    public static string EnvironmentApplicationDataDirectory => Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
     /// <summary>
     /// Gets the <see cref="CustomTaskPane"/> contained in the active Excel window.
@@ -169,7 +162,7 @@ namespace MySQL.ForExcel
     {
       get
       {
-        OfficeTools.CustomTaskPane addInPane = CustomTaskPanes.FirstOrDefault(ctp =>
+        var addInPane = CustomTaskPanes.FirstOrDefault(ctp =>
         {
           bool isParentWindowActiveExcelWindow;
           if (ExcelVersionNumber >= EXCEL_2013_VERSION_NUMBER)
@@ -185,6 +178,7 @@ namespace MySQL.ForExcel
             }
             catch
             {
+              // ignored
             }
 
             isParentWindowActiveExcelWindow = paneWindow != null && Application.ActiveWindow != null && paneWindow.Hwnd == Application.ActiveWindow.Hwnd;
@@ -205,24 +199,12 @@ namespace MySQL.ForExcel
     /// <summary>
     /// Gets the pane containing the MySQL for Excel add-in contained in the custom task pane shown in the active window.
     /// </summary>
-    public ExcelAddInPane ActiveExcelPane
-    {
-      get
-      {
-        return ActiveCustomPane != null ? ActiveCustomPane.Control as ExcelAddInPane : null;
-      }
-    }
+    public ExcelAddInPane ActiveExcelPane => ActiveCustomPane?.Control as ExcelAddInPane;
 
     /// <summary>
     /// Gets the active <see cref="ExcelInterop.Workbook"/> or creates one if there is no active one.
     /// </summary>
-    public ExcelInterop.Workbook ActiveWorkbook
-    {
-      get
-      {
-        return Application.ActiveWorkbook ?? Application.Workbooks.Add(1);
-      }
-    }
+    public ExcelInterop.Workbook ActiveWorkbook => Application.ActiveWorkbook ?? Application.Workbooks.Add(1);
 
     /// <summary>
     /// Gets the title given to the assembly of the Add-In.
@@ -283,7 +265,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Gets or sets a value indiating whether <see cref="EditConnectionInfo"/> objects are being restored.
+    /// Gets or sets a value indicating whether <see cref="EditConnectionInfo"/> objects are being restored.
     /// </summary>
     public bool RestoringExistingConnectionInfo { get; set; }
 
@@ -293,18 +275,15 @@ namespace MySQL.ForExcel
     /// <remarks>Used when a cell selection is being done programatically and not by the user.</remarks>
     public bool SkipSelectedDataContentsDetection
     {
-      get
-      {
-        return _skipSelectedDataContentsDetection;
-      }
+      get => _skipSelectedDataContentsDetection;
 
       set
       {
         _skipSelectedDataContentsDetection = value;
         var activeExcelPane = ActiveExcelPane;
-        if (!_skipSelectedDataContentsDetection && activeExcelPane != null)
+        if (!_skipSelectedDataContentsDetection)
         {
-          activeExcelPane.UpdateExcelSelectedDataStatus(Application.ActiveCell);
+          activeExcelPane?.UpdateExcelSelectedDataStatus(Application.ActiveCell);
         }
       }
     }
@@ -327,8 +306,7 @@ namespace MySQL.ForExcel
           return _spatialDataAsTextFormat;
         }
 
-        GeometryAsTextFormatType format;
-        if (Enum.TryParse<GeometryAsTextFormatType>(Settings.Default.GlobalSpatialDataAsTextFormat, out format))
+        if (Enum.TryParse<GeometryAsTextFormatType>(Settings.Default.GlobalSpatialDataAsTextFormat, out var format))
         {
           _spatialDataAsTextFormat = format;
           return _spatialDataAsTextFormat;
@@ -378,7 +356,7 @@ namespace MySQL.ForExcel
         }
 
         excelPane.Dispose();
-        OfficeTools.CustomTaskPane customPane = CustomTaskPanes.FirstOrDefault(ctp => ctp.Control is ExcelAddInPane && ctp.Control == excelPane);
+        var customPane = CustomTaskPanes.FirstOrDefault(ctp => ctp.Control is ExcelAddInPane && ctp.Control == excelPane);
         if (customPane != null)
         {
           CustomTaskPanes.Remove(customPane);
@@ -387,7 +365,7 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
+        Logger.LogException(ex);
       }
     }
 
@@ -397,7 +375,7 @@ namespace MySQL.ForExcel
     /// <returns>the active or newly created <see cref="CustomTaskPane"/> object.</returns>
     public OfficeTools.CustomTaskPane GetOrCreateActiveCustomPane()
     {
-      OfficeTools.CustomTaskPane activeCustomPane = ActiveCustomPane;
+      var activeCustomPane = ActiveCustomPane;
 
       // If there is no custom pane associated to the Excel Add-In in the active window, create one.
       if (activeCustomPane != null)
@@ -413,10 +391,10 @@ namespace MySQL.ForExcel
 
       // Determine if this is the first run of the Add-In by checking if there are no Excel panes in the collection.
       // This must be done at this point of the code, before the lines below that create an Excel pane.
-      bool firstRun = ExcelPanesList.Count == 0;
+      var firstRun = ExcelPanesList.Count == 0;
       if (firstRun)
       {
-        // Attemtp to migrate all locally stored connections to the MySQL Workbench connections file.
+        // Attempt to migrate all locally stored connections to the MySQL Workbench connections file.
         CheckForNextAutomaticConnectionsMigration(false);
       }
 
@@ -457,14 +435,14 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Attempts to migrate connections created in the MySQL for Excel's connections file to the Workbench's one.
+    /// Attempts to migrate connections created in the MySQL for Excel connections file to the Workbench's one.
     /// </summary>
     /// <param name="showDelayOptions">Flag indicating whether options to delay the migration are shown in case the user chooses not to migrate connections now.</param>
     public void MigrateExternalConnectionsToWorkbench(bool showDelayOptions)
     {
       _migratingStoredConnections = true;
 
-      // If the method is not being called from the glbal options dialog itself, then force close the dialog.
+      // If the method is not being called from the global options dialog itself, then force close the dialog.
       // This is necessary since when this code is executed from another thread the dispatch is posted to the main thread, so we don't have control over when the code
       // starts and when finishes in order to prevent the users from doing a manual migration in the options dialog, and we can't update the automatic migration date either.
       if (showDelayOptions && _globalOptionsDialog != null)
@@ -524,7 +502,7 @@ namespace MySQL.ForExcel
         }
         catch (Exception ex)
         {
-          MySqlSourceTrace.WriteAppErrorToLog(ex, false);
+          Logger.LogException(ex);
           var infoProperties = InfoDialogProperties.GetYesNoDialogProperties(
             InfoDialog.InfoType.Error,
             Resources.OperationErrorTitle,
@@ -541,7 +519,7 @@ namespace MySQL.ForExcel
     }
 
     /// <summary>
-    /// Attempts to refresh the MySQL data tied to the <see cref="ExcelInterop.ListObject"/> of the active Excell cell.
+    /// Attempts to refresh the MySQL data tied to the <see cref="ExcelInterop.ListObject"/> of the active Excel cell.
     /// </summary>
     /// <returns><c>true</c> if the active <see cref="ExcelInterop.ListObject"/> has a related <see cref="ImportConnectionInfo"/>, <c>false</c> otherwise.</returns>
     public bool RefreshDataCustomFunctionality()
@@ -563,10 +541,7 @@ namespace MySQL.ForExcel
         }
 
         var excelAddInPane = ActiveExcelPane;
-        if (excelAddInPane != null)
-        {
-          excelAddInPane.RefreshWbConnectionTimeouts();
-        }
+        excelAddInPane?.RefreshWbConnectionTimeouts();
       }
     }
 
@@ -615,7 +590,7 @@ namespace MySQL.ForExcel
         return;
       }
 
-      ExcelInterop.Worksheet activeSheet = workSheet as ExcelInterop.Worksheet;
+      var activeSheet = workSheet as ExcelInterop.Worksheet;
       if (!activeSheet.IsVisible())
       {
         return;
@@ -641,7 +616,7 @@ namespace MySQL.ForExcel
         return;
       }
 
-      ExcelInterop.Worksheet activeSheet = workSheet as ExcelInterop.Worksheet;
+      var activeSheet = workSheet as ExcelInterop.Worksheet;
       if (!activeSheet.IsVisible())
       {
         return;
@@ -669,7 +644,7 @@ namespace MySQL.ForExcel
         return;
       }
 
-      ExcelInterop.Worksheet activeSheet = workSheet as ExcelInterop.Worksheet;
+      var activeSheet = workSheet as ExcelInterop.Worksheet;
       if (!activeSheet.IsVisible())
       {
         return;
@@ -692,7 +667,7 @@ namespace MySQL.ForExcel
         return;
       }
 
-      ExcelInterop.Worksheet deactivatedSheet = workSheet as ExcelInterop.Worksheet;
+      var deactivatedSheet = workSheet as ExcelInterop.Worksheet;
       if (!deactivatedSheet.IsVisible())
       {
         return;
@@ -734,8 +709,8 @@ namespace MySQL.ForExcel
     private void Application_WindowActivate(ExcelInterop.Workbook workbook, ExcelInterop.Window window)
     {
       // Verify the collection of custom task panes to dispose of custom task panes pointing to closed (invalid) windows.
-      bool disposePane = false;
-      foreach (OfficeTools.CustomTaskPane customPane in CustomTaskPanes.Where(customPane => customPane.Control is ExcelAddInPane))
+      var disposePane = false;
+      foreach (var customPane in CustomTaskPanes.Where(customPane => customPane.Control is ExcelAddInPane))
       {
         try
         {
@@ -745,7 +720,7 @@ namespace MySQL.ForExcel
         }
         catch
         {
-          // If an error ocurred trying to access the custom task pane window, it means its window is no longer valid
+          // If an error occurred trying to access the custom task pane window, it means its window is no longer valid
           //  or in other words, it has been closed. There is no other way to find out if a windows was closed
           //  (similar to the way we find out if a Worksheet has been closed as there are no events for that).
           disposePane = true;
@@ -756,7 +731,7 @@ namespace MySQL.ForExcel
           continue;
         }
 
-        ExcelAddInPane excelPane = customPane.Control as ExcelAddInPane;
+        var excelPane = customPane.Control as ExcelAddInPane;
         CloseExcelPane(excelPane);
         break;
       }
@@ -771,7 +746,7 @@ namespace MySQL.ForExcel
     /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
     private void Application_WorkbookActivate(object workbook)
     {
-      ExcelInterop.Workbook activeWorkbook = workbook as ExcelInterop.Workbook;
+      var activeWorkbook = workbook as ExcelInterop.Workbook;
       if (activeWorkbook == null)
       {
         return;
@@ -785,7 +760,7 @@ namespace MySQL.ForExcel
         return;
       }
 
-      ExcelInterop.Worksheet activeSheet = activeWorkbook.ActiveSheet as ExcelInterop.Worksheet;
+      var activeSheet = activeWorkbook.ActiveSheet as ExcelInterop.Worksheet;
       ChangeEditDialogVisibility(activeSheet, true);
       ActiveExcelPane.RefreshDbObjectPanelActionLabelsEnabledStatus();
     }
@@ -815,8 +790,8 @@ namespace MySQL.ForExcel
     /// <param name="saveAsUi">Flag indicating whether the Save As dialog was displayed.</param>
     private void Application_WorkbookAfterSave2007(ExcelInterop.Workbook workbook, bool saveAsUi)
     {
-      Application.EnableEvents = false; //Stops beforesave event from re-running
-      bool triggerAfterSave = true;
+      Application.EnableEvents = false; //Stops before save event from re-running
+      var triggerAfterSave = true;
 
       try
       {
@@ -832,7 +807,7 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
+        Logger.LogException(ex);
         triggerAfterSave = false;
       }
 
@@ -855,14 +830,14 @@ namespace MySQL.ForExcel
         return;
       }
 
-      bool wasAlreadySaved = workbook.Saved;
+      var wasAlreadySaved = workbook.Saved;
       if (!wasAlreadySaved)
       {
         switch (MessageBox.Show(string.Format(Resources.WorkbookSavingDetailText, workbook.Name), Application.Name, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1))
         {
           case DialogResult.Yes:
             UnprotectEditingWorksheets(workbook);
-            for (int retry = 1; retry <= 3 && !wasAlreadySaved && !cancel; retry++)
+            for (var retry = 1; retry <= 3 && !wasAlreadySaved && !cancel; retry++)
             {
               try
               {
@@ -871,7 +846,7 @@ namespace MySQL.ForExcel
                   // The workbook is being saved for the very first time, so show the Save As dialog to users which will save the Workbook where the user wants to.
                   if (ExcelVersionNumber <= EXCEL_2007_VERSION_NUMBER)
                   {
-                    Application.EnableEvents = false; //Stops beforesave event from re-running
+                    Application.EnableEvents = false; //Stops before save event from re-running
                     var saveAsDialog = Application.Dialogs[ExcelInterop.XlBuiltInDialog.xlDialogSaveAs];
                     wasAlreadySaved = saveAsDialog.Show(workbook.Name, Application.DefaultSaveFormat, null, true, null, false);
                     Application.EnableEvents = true;
@@ -894,7 +869,7 @@ namespace MySQL.ForExcel
               catch (Exception ex)
               {
                 var errorTitle = retry <= 3 ? Resources.WorkbookSaveErrorText : Resources.WorkbookSaveErrorFinalText;
-                MySqlSourceTrace.WriteAppErrorToLog(ex, null, errorTitle, true);
+                Logger.LogException(ex, true, errorTitle);
               }
             }
 
@@ -949,7 +924,7 @@ namespace MySQL.ForExcel
       // Save WorkbookConnectionInfos
       WorkbookConnectionInfos.SaveForWorkbook(workbook);
 
-      //The WorkbookAfterSave event in Excel 2007 does not exist so we need to sligthly alter the program flow to overcome this limitation.
+      //The WorkbookAfterSave event in Excel 2007 does not exist so we need to slightly alter the program flow to overcome this limitation.
       if (ExcelVersionNumber <= EXCEL_2007_VERSION_NUMBER)
       {
         cancel = true; //Cancels the users original save command request in order to execute the following code override.
@@ -969,7 +944,7 @@ namespace MySQL.ForExcel
       }
 
       // Hide editDialogs from deactivated Workbook
-      ExcelInterop.Workbook deactivatedWorkbook = workbook as ExcelInterop.Workbook;
+      var deactivatedWorkbook = workbook as ExcelInterop.Workbook;
       if (deactivatedWorkbook == null)
       {
         return;
@@ -1006,13 +981,7 @@ namespace MySQL.ForExcel
     /// <param name="show">Flag indicating if the dialog will be shown or hidden.</param>
     private void ChangeEditDialogVisibility(ExcelInterop.Worksheet workSheet, bool show)
     {
-      if (workSheet == null)
-      {
-        return;
-      }
-
-      var parentWorkbook = workSheet.Parent as ExcelInterop.Workbook;
-      if (parentWorkbook == null)
+      if (!(workSheet?.Parent is ExcelInterop.Workbook parentWorkbook))
       {
         return;
       }
@@ -1045,7 +1014,7 @@ namespace MySQL.ForExcel
     /// <param name="fromTimer">Flag indicating whether this method is called from a timer.</param>
     private void CheckForNextAutomaticConnectionsMigration(bool fromTimer)
     {
-      // If the execution of the code that migrates connections is sitll executing, then exit.
+      // If the execution of the code that migrates connections is still executing, then exit.
       if (_migratingStoredConnections)
       {
         return;
@@ -1058,7 +1027,7 @@ namespace MySQL.ForExcel
       }
 
       // Check if the next connections migration is due now.
-      bool doMigration = true;
+      var doMigration = true;
       var nextMigrationAttempt = NextAutomaticConnectionsMigration;
       if (!fromTimer && !nextMigrationAttempt.Equals(DateTime.MinValue) && (nextMigrationAttempt.Equals(DateTime.MaxValue) || DateTime.Now.CompareTo(nextMigrationAttempt) < 0))
       {
@@ -1102,7 +1071,7 @@ namespace MySQL.ForExcel
       }
 
       // Check if settings file exists, if it does not flag the conversion as done since it was not needed.
-      MySqlForExcelSettings settings = new MySqlForExcelSettings();
+      var settings = new MySqlForExcelSettings();
       if (!File.Exists(settings.SettingsPath))
       {
         Settings.Default.ConvertedSettingsStoredMappingsCasing = true;
@@ -1113,8 +1082,8 @@ namespace MySQL.ForExcel
       // Open the settings.config file for writing and convert the MySQLColumnMapping class to MySqlColumnMapping.
       try
       {
-        bool converted = false;
-        string settingsConfigText = File.ReadAllText(settings.SettingsPath, Encoding.Unicode);
+        var converted = false;
+        var settingsConfigText = File.ReadAllText(settings.SettingsPath, Encoding.Unicode);
         if (settingsConfigText.Contains("MySQLColumnMapping"))
         {
           settingsConfigText = settingsConfigText.Replace("MySQLColumnMapping", "MySqlColumnMapping");
@@ -1133,7 +1102,7 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
+        Logger.LogException(ex);
       }
     }
 
@@ -1158,8 +1127,7 @@ namespace MySQL.ForExcel
     /// <param name="e">Sender object.</param>
     private void CustomTaskPaneVisibleChanged(object sender, EventArgs e)
     {
-      OfficeTools.CustomTaskPane customTaskPane = sender as OfficeTools.CustomTaskPane;
-      CustomMySqlRibbon.ChangeShowMySqlForExcelPaneToggleState(customTaskPane != null && customTaskPane.Visible);
+      CustomMySqlRibbon.ChangeShowMySqlForExcelPaneToggleState(sender is OfficeTools.CustomTaskPane customTaskPane && customTaskPane.Visible);
     }
 
     /// <summary>
@@ -1206,10 +1174,10 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void ExcelPane_SizeChanged(object sender, EventArgs e)
     {
-      ExcelAddInPane excelPane = sender as ExcelAddInPane;
+      var excelPane = sender as ExcelAddInPane;
 
       // Find the parent Custom Task Pane
-      OfficeTools.CustomTaskPane customTaskPane = CustomTaskPanes.FirstOrDefault(ctp => ctp.Control == excelPane);
+      var customTaskPane = CustomTaskPanes.FirstOrDefault(ctp => ctp.Control == excelPane);
       if (customTaskPane == null || !customTaskPane.Visible)
       {
         return;
@@ -1217,8 +1185,8 @@ namespace MySQL.ForExcel
 
       // Since there is no way to restrict the resizing of a custom task pane, cancel the resizing as soon as a
       //  user attempts to resize the pane.
-      bool shouldResetWidth = false;
-      int resetToWidth = customTaskPane.Width;
+      var shouldResetWidth = false;
+      var resetToWidth = customTaskPane.Width;
       if (resetToWidth < ADD_IN_MIN_PANE_WIDTH)
       {
         shouldResetWidth = true;
@@ -1242,8 +1210,17 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
+        Logger.LogException(ex);
       }
+    }
+
+    /// <summary>
+    /// Initializes the <see cref="Logger"/> class with its required information.
+    /// </summary>
+    public void InitializeLogger()
+    {
+      Logger.Initialize(EnvironmentApplicationDataDirectory + SETTINGS_DIRECTORY_RELATIVE_PATH, APP_NAME_NO_SPACES, false, false, APP_NAME_NO_SPACES);
+      Logger.PrependUserNameToLogFileName = true;
     }
 
     /// <summary>
@@ -1251,9 +1228,7 @@ namespace MySQL.ForExcel
     /// </summary>
     private void InitializeMySqlWorkbenchStaticSettings()
     {
-      string applicationDataFolderPath = EnvironmentApplicationDataDirectory;
-      MySqlSourceTrace.LogFilePath = applicationDataFolderPath + ERROR_LOG_FILE_RELATIVE_PATH;
-      MySqlSourceTrace.SourceTraceClass = "MySQLForExcel";
+      var applicationDataFolderPath = EnvironmentApplicationDataDirectory;
       MySqlWorkbench.ExternalApplicationName = AssemblyTitle;
       MySqlWorkbenchPasswordVault.ApplicationPasswordVaultFilePath = applicationDataFolderPath + PASSWORDS_VAULT_FILE_RELATIVE_PATH;
       MySqlWorkbench.ExternalConnections.CreateDefaultConnections = !MySqlWorkbench.ConnectionsFileExists && MySqlWorkbench.Connections.Count == 0;
@@ -1486,7 +1461,7 @@ namespace MySQL.ForExcel
       }
 
       ExcelAddInPanesClosed();
-      MySqlSourceTrace.WriteToLog(Resources.ShutdownMessage, false, SourceLevels.Information);
+      Logger.LogInformation(Resources.ShutdownMessage);
 
       // Unsubscribe events tracked even when no Excel panes are open.
       Application.WorkbookOpen -= Application_WorkbookOpen;
@@ -1508,22 +1483,23 @@ namespace MySQL.ForExcel
         // Static initializations.
         System.Windows.Forms.Application.EnableVisualStyles();
         System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+        AssemblyTitle = AssemblyInfo.AssemblyTitle;
+        InitializeLogger();
         CustomizeUtilityDialogs();
         InitializeMySqlWorkbenchStaticSettings();
         MySqlInstaller.LoadData();
-        AssemblyTitle = AssemblyInfo.AssemblyTitle;
         UsingTempWorksheet = false;
 
         // Make sure the settings directory exists
         Directory.CreateDirectory(EnvironmentApplicationDataDirectory + SETTINGS_DIRECTORY_RELATIVE_PATH);
 
         // Log the Add-In's Startup
-        MySqlSourceTrace.WriteToLog(Resources.StartupMessage, false, SourceLevels.Information);
+        Logger.LogInformation(Resources.StartupMessage);
 
         // Detect Excel version.
-        int pointPos = Application.Version.IndexOf('.');
-        string majorVersionText = pointPos >= 0 ? Application.Version.Substring(0, pointPos) : Application.Version;
-        ExcelVersionNumber = Int32.Parse(majorVersionText, CultureInfo.InvariantCulture);
+        var pointPos = Application.Version.IndexOf('.');
+        var majorVersionText = pointPos >= 0 ? Application.Version.Substring(0, pointPos) : Application.Version;
+        ExcelVersionNumber = int.Parse(majorVersionText, CultureInfo.InvariantCulture);
 
         // Adjust values in the settings.config file that have changed and must be adjusted or transformed
         PerformSettingsAdjustments();
@@ -1539,7 +1515,7 @@ namespace MySQL.ForExcel
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
+        Logger.LogException(ex);
       }
     }
 

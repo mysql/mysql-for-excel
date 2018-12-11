@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@ using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes;
-using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.Logging;
 using MySql.Utility.Classes.MySqlWorkbench;
 using MySql.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
@@ -126,15 +126,15 @@ namespace MySQL.ForExcel.Classes
       object objCount = null;
       try
       {
-        string sql = string.Format("SELECT COUNT(*) FROM `{0}`.`{1}`", Connection.Schema, Name);
+        string sql = $"SELECT COUNT(*) FROM `{Connection.Schema}`.`{Name}`";
         objCount = MySqlHelper.ExecuteScalar(Connection.GetConnectionStringBuilder().ConnectionString, sql);
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.UnableToRetrieveData, this is DbTable ? "table" : "view", Name), true);
+        Logger.LogException(ex, true, string.Format(Resources.UnableToRetrieveData, this is DbTable ? "table" : "view", Name));
       }
 
-      return objCount != null ? (long)objCount : 0;
+      return (long?)objCount ?? 0;
     }
 
     /// <summary>
@@ -251,7 +251,7 @@ namespace MySQL.ForExcel.Classes
       catch (Exception ex)
       {
         retTuple = null;
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, string.Format(Resources.UnableToRetrieveData, this is DbTable ? "table" : "view", Name), true);
+        Logger.LogException(ex, true, string.Format(Resources.UnableToRetrieveData, this is DbTable ? "table" : "view", Name));
       }
 
       return retTuple;

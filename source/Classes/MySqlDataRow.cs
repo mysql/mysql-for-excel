@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -18,13 +18,12 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using MySql.Utility.Classes.Logging;
 using MySQL.ForExcel.Classes.Exceptions;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
-using MySql.Utility.Classes.MySql;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
@@ -92,17 +91,14 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a list of column names with data changes.
     /// </summary>
-    public List<string> ChangedColumnNames { get; private set; }
+    public List<string> ChangedColumnNames { get; }
 
     /// <summary>
     /// Gets or sets the Excel range representing the whole data row.
     /// </summary>
     public ExcelInterop.Range ExcelRange
     {
-      get
-      {
-        return _excelRange;
-      }
+      get => _excelRange;
 
       set
       {
@@ -116,42 +112,24 @@ namespace MySQL.ForExcel.Classes
 
     /// <summary>
     /// Gets the related Excel row number if any.
-    /// A valule of 0 indicates there is no related Excel row.
+    /// A value of 0 indicates there is no related Excel row.
     /// </summary>
-    public int ExcelRow
-    {
-      get
-      {
-        return ExcelRange != null ? ExcelRange.Row : 0;
-      }
-    }
+    public int ExcelRow => ExcelRange?.Row ?? 0;
 
     /// <summary>
     /// Gets a list of <see cref="ExcelInterop.Range"/> objects representing cells with modified values.
     /// </summary>
-    public List<ExcelInterop.Range> ExcelModifiedRangesList { get; private set; }
+    public List<ExcelInterop.Range> ExcelModifiedRangesList { get; }
 
     /// <summary>
     /// Gets a value indicating whether there are concurrency warnings in a row.
     /// </summary>
-    public bool HasConcurrencyWarnings
-    {
-      get
-      {
-        return !string.IsNullOrEmpty(RowError) && string.Equals(RowError, MySqlStatement.NO_MATCH, StringComparison.InvariantCulture);
-      }
-    }
+    public bool HasConcurrencyWarnings => !string.IsNullOrEmpty(RowError) && string.Equals(RowError, MySqlStatement.NO_MATCH, StringComparison.InvariantCulture);
 
     /// <summary>
     /// Gets a value indicating whether there are errors in a row.
     /// </summary>
-    public new bool HasErrors
-    {
-      get
-      {
-        return !string.IsNullOrEmpty(RowError) && !string.Equals(RowError, MySqlStatement.NO_MATCH, StringComparison.InvariantCulture);
-      }
-    }
+    public new bool HasErrors => !string.IsNullOrEmpty(RowError) && !string.Equals(RowError, MySqlStatement.NO_MATCH, StringComparison.InvariantCulture);
 
     /// <summary>
     /// Gets a value indicating whether the row is being deleted.
@@ -166,18 +144,12 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the parent <see cref="MySqlDataTable"/> for this row.
     /// </summary>
-    public MySqlDataTable MySqlTable
-    {
-      get
-      {
-        return _mySqlTable ?? (_mySqlTable = Table as MySqlDataTable);
-      }
-    }
+    public MySqlDataTable MySqlTable => _mySqlTable ?? (_mySqlTable = Table as MySqlDataTable);
 
     /// <summary>
     /// Gets the <see cref="MySqlStatement"/> object containing a SQL query to push changes to the database.
     /// </summary>
-    public MySqlStatement Statement { get; private set; }
+    public MySqlStatement Statement { get; }
 
     #endregion Properties
 
@@ -203,7 +175,7 @@ namespace MySQL.ForExcel.Classes
 
       if (MySqlTable == null)
       {
-        MySqlSourceTrace.WriteToLog(Resources.MySqlDataTableExpectedError, false, SourceLevels.Critical);
+        Logger.LogError(Resources.MySqlDataTableExpectedError);
         _sqlQuery = null;
         return _sqlQuery;
       }
@@ -314,7 +286,7 @@ namespace MySQL.ForExcel.Classes
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, false);
+        Logger.LogException(ex);
         refreshSuccessful = false;
       }
       finally
@@ -408,8 +380,7 @@ namespace MySQL.ForExcel.Classes
       string colsSeparator = string.Empty;
       foreach (MySqlDataColumn column in parentTable.ColumnsForInsertion)
       {
-        bool insertingValueIsNull;
-        string valueToDb = column.GetStringValue(this[column.ColumnName], out insertingValueIsNull);
+        string valueToDb = column.GetStringValue(this[column.ColumnName], out var insertingValueIsNull);
         string wrapValueCharacter = column.MySqlDataType.RequiresQuotesForValue && !insertingValueIsNull ? "'" : string.Empty;
         sqlBuilderForInsert.AppendFormat("{0}{1}{2}{1}", colsSeparator, wrapValueCharacter, valueToDb);
         colsSeparator = ",";
@@ -459,8 +430,7 @@ namespace MySQL.ForExcel.Classes
       sqlBuilderForUpdate.AppendFormat(" `{0}`.`{1}` SET ", parentTable.SchemaName, parentTable.TableNameForSqlQueries);
       foreach (var column in parentTable.Columns.Cast<MySqlDataColumn>().Where(col => ChangedColumnNames.Contains(col.ColumnName)))
       {
-        bool updatingValueIsNull;
-        var valueToDb = column.GetStringValue(this[column.ColumnName], out updatingValueIsNull);
+        var valueToDb = column.GetStringValue(this[column.ColumnName], out var updatingValueIsNull);
         string wrapValueCharacter = column.MySqlDataType.RequiresQuotesForValue && !updatingValueIsNull ? "'" : string.Empty;
         sqlBuilderForUpdate.AppendFormat("{0}`{1}`={2}{3}{2}", colsSeparator, column.ColumnNameForSqlQueries, wrapValueCharacter, valueToDb);
         colsSeparator = ",";
@@ -499,11 +469,10 @@ namespace MySQL.ForExcel.Classes
       sqlBuilderForUpdate.AppendFormat(" `{0}`.`{1}` SET ", parentTable.SchemaName, parentTable.TableNameForSqlQueries);
       foreach (MySqlDataColumn column in parentTable.Columns)
       {
-        bool updatingValueIsNull;
         bool columnRequiresQuotes = column.MySqlDataType.RequiresQuotesForValue;
         bool columnIsText = column.MySqlDataType.IsChar || column.MySqlDataType.IsText || column.MySqlDataType.IsSetOrEnum;
         bool columnIsJson = column.MySqlDataType.IsJson;
-        string valueToDb = column.GetStringValue(this[column.ColumnName, DataRowVersion.Original], out updatingValueIsNull);
+        string valueToDb = column.GetStringValue(this[column.ColumnName, DataRowVersion.Original], out var updatingValueIsNull);
         string wrapValueCharacter = columnRequiresQuotes && !updatingValueIsNull ? "'" : string.Empty;
         if (column.AllowNull)
         {
@@ -589,7 +558,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       var parentTable = MySqlTable;
-      if (parentTable == null || parentTable.PrimaryKeyColumns == null)
+      if (parentTable?.PrimaryKeyColumns == null)
       {
         return string.Empty;
       }
@@ -602,8 +571,7 @@ namespace MySQL.ForExcel.Classes
       var dataRowVersion = useOriginalData ? DataRowVersion.Original : DataRowVersion.Current;
       foreach (MySqlDataColumn pkCol in parentTable.PrimaryKeyColumns)
       {
-        bool pkValueIsNull;
-        string valueToDb = pkCol.GetStringValue(this[pkCol.ColumnName, dataRowVersion], out pkValueIsNull);
+        string valueToDb = pkCol.GetStringValue(this[pkCol.ColumnName, dataRowVersion], out var pkValueIsNull);
         string wrapValueCharacter = pkCol.MySqlDataType.RequiresQuotesForValue && !pkValueIsNull ? "'" : string.Empty;
         wClauseBuilder.AppendFormat("{0}`{1}`={2}{3}{2}", colsSeparator, pkCol.ColumnNameForSqlQueries, wrapValueCharacter, valueToDb);
         colsSeparator = " AND ";
@@ -643,7 +611,7 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Reflects changes in Excel worksheet if this row has just been commited.
+    /// Reflects changes in Excel worksheet if this row has just been committed.
     /// </summary>
     private void ReflectChangesForCommittedRow()
     {
@@ -668,10 +636,10 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     private void ReflectChangesForModifiedRow()
     {
-      if (RowState == DataRowState.Added && ExcelRange != null)
+      if (RowState == DataRowState.Added)
       {
         // A recently added row's value is being modified, we just need to re-paint the whole "added" row.
-        ExcelRange.SetInteriorColor(ExcelUtilities.UncommittedCellsOleColor);
+        ExcelRange?.SetInteriorColor(ExcelUtilities.UncommittedCellsOleColor);
       }
 
       if (RowState != DataRowState.Modified)
@@ -689,7 +657,7 @@ namespace MySQL.ForExcel.Classes
       // Check column by column for data changes, set related Excel cells color accordingly.
       for (int colIndex = 0; colIndex < Table.Columns.Count; colIndex++)
       {
-        ExcelInterop.Range columnCell = ExcelRange != null ? ExcelRange.Cells[1, colIndex + 1] : null;
+        ExcelInterop.Range columnCell = ExcelRange?.Cells[1, colIndex + 1];
         bool originalAndModifiedIdentical = this[colIndex].Equals(this[colIndex, DataRowVersion.Original]);
         if (!originalAndModifiedIdentical)
         {
@@ -726,13 +694,8 @@ namespace MySQL.ForExcel.Classes
       {
         for (int colIndex = 0; colIndex < Table.Columns.Count; colIndex++)
         {
-          ExcelInterop.Range columnCell = ExcelRange != null ? ExcelRange.Cells[1, colIndex + 1] : null;
-          if (columnCell == null)
-          {
-            continue;
-          }
-
-          columnCell.SetInteriorColor(_excelRangePreviousColors[colIndex]);
+          ExcelInterop.Range columnCell = ExcelRange?.Cells[1, colIndex + 1];
+          columnCell?.SetInteriorColor(_excelRangePreviousColors[colIndex]);
         }
 
         ExcelModifiedRangesList.Clear();

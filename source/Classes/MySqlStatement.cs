@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -20,9 +20,9 @@ using System.Data;
 using System.Globalization;
 using System.Text;
 using MySql.Data.MySqlClient;
+using MySql.Utility.Classes.Logging;
 using MySQL.ForExcel.Interfaces;
 using MySQL.ForExcel.Properties;
-using MySql.Utility.Classes.MySql;
 
 namespace MySQL.ForExcel.Classes
 {
@@ -298,7 +298,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the <see cref="IMySqlDataRow"/> object holding a SQL statement to be applied against the database.
     /// </summary>
-    public IMySqlDataRow MySqlRow { get; private set; }
+    public IMySqlDataRow MySqlRow { get; }
 
     /// <summary>
     /// Gets the text returned by the MySQL server after executing this statement.
@@ -332,13 +332,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the type of operation to be performed against the database.
     /// </summary>
-    public SqlStatementType StatementType
-    {
-      get
-      {
-        return GetSqlStatementType(SqlQuery);
-      }
-    }
+    public SqlStatementType StatementType => GetSqlStatementType(SqlQuery);
 
     /// <summary>
     /// Gets the result of the query after it is executed.
@@ -350,10 +344,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public string StatementsQuantityFormat
     {
-      get
-      {
-        return _statementsQuantityFormat;
-      }
+      get => _statementsQuantityFormat;
 
       set
       {
@@ -363,15 +354,9 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets a value indicating whether the statement was applied either successfuly or with warnings.
+    /// Gets a value indicating whether the statement was applied either successfully or with warnings.
     /// </summary>
-    public bool StatementWasApplied
-    {
-      get
-      {
-        return StatementResult.WasApplied();
-      }
-    }
+    public bool StatementWasApplied => StatementResult.WasApplied();
 
     /// <summary>
     /// Gets the quantity of warnings thrown by executing the statement.
@@ -381,13 +366,9 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the corresponding Excel row number converted to string.
     /// </summary>
-    private string ExcelRowText
-    {
-      get
-      {
-        return MySqlRow != null && MySqlRow.ExcelRow > 0 ? MySqlRow.ExcelRow.ToString(CultureInfo.InvariantCulture) : string.Empty;
-      }
-    }
+    private string ExcelRowText => MySqlRow != null && MySqlRow.ExcelRow > 0
+                                    ? MySqlRow.ExcelRow.ToString(CultureInfo.InvariantCulture)
+                                    : string.Empty;
 
     #endregion Properties
 
@@ -523,10 +504,9 @@ namespace MySQL.ForExcel.Classes
         StatementResult = StatementResultType.ErrorThrown;
         AffectedRows = 0;
         MySqlRow.RowError = baseException.Message;
-        MySqlSourceTrace.WriteAppErrorToLog(baseException, false);
-        if (baseException is MySqlException)
+        Logger.LogException(baseException);
+        if (baseException is MySqlException mysqlEx)
         {
-          var mysqlEx = baseException as MySqlException;
           ResultText = string.Format(Resources.ErrorMySQLText, mysqlEx.Number) + Environment.NewLine + mysqlEx.Message;
         }
         else

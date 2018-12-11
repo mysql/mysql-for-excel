@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.Linq;
 using MySql.Utility.Classes.MySqlWorkbench;
 using MySql.Utility.Enums;
-using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Classes
 {

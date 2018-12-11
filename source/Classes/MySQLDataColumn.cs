@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@ using MySql.Data.Types;
 using MySQL.ForExcel.Classes.EventArguments;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes;
-using MySql.Utility.Classes.MySql;
+using MySql.Utility.Classes.Logging;
 using MySql.Utility.Classes.Spatial;
 using MySQL.ForExcel.Classes.Exceptions;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -387,7 +387,7 @@ namespace MySQL.ForExcel.Classes
           }
           catch (Exception ex)
           {
-            MySqlSourceTrace.WriteAppErrorToLog(ex, null, "AutoIncrement set error.", true);
+            Logger.LogException(ex, true, "AutoIncrement set error.");
           }
         }
 
@@ -937,16 +937,15 @@ namespace MySQL.ForExcel.Classes
       for (int rowPos = 1; rowPos <= columnRange.Rows.Count; rowPos++)
       {
         Excel.Range excelCell = columnRange.Cells[rowPos, 1];
-        object rawValue = excelCell != null ? excelCell.GetCellPackedValue(useFormattedValues) : null;
+        object rawValue = excelCell?.GetCellPackedValue(useFormattedValues);
         if (rawValue.IsEmptyValue())
         {
           continue;
         }
 
-        // Treat always as a Varchar value first in case all rows do not have a consistent datatype just to see the varchar len calculated by GetMySQLExportDataType
+        // Treat always as a Varchar value first in case all rows do not have a consistent data type just to see the varchar len calculated by GetMySQLExportDataType
         string valueAsString = rawValue.ToString();
-        bool valueOverflow;
-        var proposedType = MySqlDataType.DetectDataType(valueAsString, out valueOverflow, datesAsMySqlDates);
+        var proposedType = MySqlDataType.DetectDataType(valueAsString, out _, datesAsMySqlDates);
         if (proposedType.IsBool || proposedType.MayBeBool)
         {
           proposedType = new MySqlDataType("VarChar(5)", true, datesAsMySqlDates);
@@ -962,8 +961,8 @@ namespace MySQL.ForExcel.Classes
           maxTextLengthFromSecondRow = Math.Max(typeLength, maxTextLengthFromSecondRow);
         }
 
-        // Normal datatype detection
-        proposedType = MySqlDataType.DetectDataType(rawValue, out valueOverflow, datesAsMySqlDates);
+        // Normal data type detection
+        proposedType = MySqlDataType.DetectDataType(rawValue, out _, datesAsMySqlDates);
 
         if (rowPos == 1)
         {
@@ -1384,7 +1383,7 @@ namespace MySQL.ForExcel.Classes
           AllowNull = !PrimaryKey && !CreateIndex;
         }
 
-        if (!ParentTable.DetectDatatype)
+        if (!ParentTable.DetectDataType)
         {
           _rowsFromFirstDataType = MySqlDataType;
           _rowsFromSecondDataType = MySqlDataType;

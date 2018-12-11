@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -21,11 +21,11 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
+using MySql.Utility.Classes.Logging;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Forms;
 using MySQL.ForExcel.Properties;
-using MySql.Utility.Classes.MySql;
 using MySql.Utility.Classes.MySqlWorkbench;
 using MySql.Utility.Enums;
 
@@ -108,10 +108,7 @@ namespace MySQL.ForExcel.Panels
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool ExcelSelectionContainsData
     {
-      get
-      {
-        return _excelSelectionContainsData;
-      }
+      get => _excelSelectionContainsData;
 
       set
       {
@@ -131,19 +128,19 @@ namespace MySQL.ForExcel.Panels
     /// Gets a list of stored procedures loaded in this panel.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<DbProcedure> LoadedProcedures { get; private set; }
+    public List<DbProcedure> LoadedProcedures { get; }
 
     /// <summary>
     /// Gets a list of tables loaded in this panel.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<DbTable> LoadedTables { get; private set; }
+    public List<DbTable> LoadedTables { get; }
 
     /// <summary>
     /// Gets a list of views loaded in this panel.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<DbView> LoadedViews { get; private set; }
+    public List<DbView> LoadedViews { get; }
 
     #endregion Properties
 
@@ -222,7 +219,7 @@ namespace MySQL.ForExcel.Panels
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.AppendDataErrorTitle, true);
+        Logger.LogException(ex, true, Resources.AppendDataErrorTitle);
       }
       finally
       {
@@ -240,8 +237,7 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void BackButton_Click(object sender, EventArgs e)
     {
-      var excelAddInPane = Parent as ExcelAddInPane;
-      if (excelAddInPane != null)
+      if (Parent is ExcelAddInPane excelAddInPane)
       {
         excelAddInPane.CloseSchema(true, true);
       }
@@ -268,7 +264,7 @@ namespace MySQL.ForExcel.Panels
     private void DBObjectList_AfterSelect(object sender, TreeViewEventArgs e)
     {
       var listControl = sender as MySqlListView;
-      if (listControl == null || listControl.SelectedNode == null)
+      if (listControl?.SelectedNode == null)
       {
         return;
       }
@@ -284,8 +280,7 @@ namespace MySQL.ForExcel.Panels
         var editActive = false;
         if (listControl.SelectedNodes.Count == 1)
         {
-          var addInPane = Parent as ExcelAddInPane;
-          editActive = addInPane != null && addInPane.TableHasEditOnGoing(listControl.SelectedNode.DbObject.Name);
+          editActive = Parent is ExcelAddInPane addInPane && addInPane.TableHasEditOnGoing(listControl.SelectedNode.DbObject.Name);
         }
 
         RefreshActionLabelsEnabledStatus(null, editActive);
@@ -315,8 +310,7 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void DBObjectsFilter_SearchFired(object sender, EventArgs e)
     {
-      var searchBox = sender as SearchEdit;
-      if (searchBox == null)
+      if (!(sender is SearchEdit))
       {
         return;
       }
@@ -328,7 +322,7 @@ namespace MySQL.ForExcel.Panels
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, true);
+        Logger.LogException(ex, true);
       }
     }
 
@@ -354,12 +348,11 @@ namespace MySQL.ForExcel.Panels
 
       try
       {
-        var excelAddInPane = Parent as ExcelAddInPane;
-        EditDataHotLabel.Enabled = excelAddInPane != null && !excelAddInPane.EditTableData(selectedTable, false, null);
+        EditDataHotLabel.Enabled = Parent is ExcelAddInPane excelAddInPane && !excelAddInPane.EditTableData(selectedTable, false, null);
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.EditDataErrorTitle, true);
+        Logger.LogException(ex, true, Resources.EditDataErrorTitle);
       }
     }
 
@@ -370,8 +363,7 @@ namespace MySQL.ForExcel.Panels
     /// <returns><c>true</c> if data was exported/appended successfully, <c>false</c> otherwise.</returns>
     private bool ExportDataToTable(DbTable appendToTable)
     {
-      var excelAddInPane = Parent as ExcelAddInPane;
-      return excelAddInPane != null && excelAddInPane.AppendDataToTable(appendToTable);
+      return Parent is ExcelAddInPane excelAddInPane && excelAddInPane.AppendDataToTable(appendToTable);
     }
 
     /// <summary>
@@ -452,27 +444,25 @@ namespace MySQL.ForExcel.Panels
         DialogResult dr = DialogResult.Cancel;
         Cursor = Cursors.WaitCursor;
         var activeWorkbook = Globals.ThisAddIn.ActiveWorkbook;
-        if (selectedNode.DbObject is DbTable)
+        if (selectedNode.DbObject is DbTable dbTable)
         {
-          var dbTable = selectedNode.DbObject as DbTable;
           dbTable.ImportParameters.ForEditDataOperation = false;
           using (var importForm = new ImportTableViewForm(dbTable, activeWorkbook.ActiveSheet.Name))
           {
             dr = importForm.ShowDialog();
           }
         }
-        else if (selectedNode.DbObject is DbView)
+        else if (selectedNode.DbObject is DbView dbView)
         {
-          var dbView = selectedNode.DbObject as DbView;
           dbView.ImportParameters.ForEditDataOperation = false;
           using (var importForm = new ImportTableViewForm(dbView, activeWorkbook.ActiveSheet.Name))
           {
             dr = importForm.ShowDialog();
           }
         }
-        else if (selectedNode.DbObject is DbProcedure)
+        else if (selectedNode.DbObject is DbProcedure procedure)
         {
-          using (var importProcedureForm = new ImportProcedureForm(selectedNode.DbObject as DbProcedure, parentTaskPane.ActiveWorksheet.Name))
+          using (var importProcedureForm = new ImportProcedureForm(procedure, parentTaskPane.ActiveWorksheet.Name))
           {
             dr = importProcedureForm.ShowDialog();
           }
@@ -485,7 +475,7 @@ namespace MySQL.ForExcel.Panels
       }
       catch (Exception ex)
       {
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.ImportDataErrorTitle, true);
+        Logger.LogException(ex, true, Resources.ImportDataErrorTitle);
       }
       finally
       {
@@ -604,7 +594,7 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void PreviewDataToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      if (DBObjectList.SelectedNodes.Count != 1 || DBObjectList.SelectedNode == null || !(DBObjectList.SelectedNode.DbObject is DbView))
+      if (DBObjectList.SelectedNodes.Count != 1 || !(DBObjectList.SelectedNode?.DbObject is DbView))
       {
         return;
       }
@@ -688,7 +678,7 @@ namespace MySQL.ForExcel.Panels
       catch (Exception ex)
       {
         success = false;
-        MySqlSourceTrace.WriteAppErrorToLog(ex, null, Resources.RefreshDBObjectsErrorTitle, true);
+        Logger.LogException(ex, true, Resources.RefreshDBObjectsErrorTitle);
       }
       finally
       {
