@@ -1508,7 +1508,10 @@ namespace MySQL.ForExcel
         Application.WorkbookOpen += Application_WorkbookOpen;
 
         // Initialize default Workbook
-        InitializeWorkbook(ActiveWorkbook);
+        if (Application.ActiveWorkbook != null)
+        {
+          InitializeWorkbook(Application.ActiveWorkbook);
+        }
 
         // Start timer that checks for automatic connections migration.
         StartConnectionsMigrationTimer();

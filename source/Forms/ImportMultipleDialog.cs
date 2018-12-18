@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -84,12 +84,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="selectAllRelatedTables">Flag indicating whether all found related tables are selected by default.</param>
     public ImportMultipleDialog(List<DbView> tableOrViews, bool selectAllRelatedTables)
     {
-      if (tableOrViews == null)
-      {
-        throw new ArgumentNullException(nameof(tableOrViews));
-      }
-
-      _tableOrViews = tableOrViews;
+      _tableOrViews = tableOrViews ?? throw new ArgumentNullException(nameof(tableOrViews));
       _tableOrViews.ForEach(dbo => dbo.Excluded = false);
       _importTablesOrViews = _tableOrViews.Where(dbo => dbo.Selected).ToList();
       _relatedTables = new List<DbView>();
@@ -110,28 +105,15 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets a value indicating whether the Excel version is 2010 or lower.
     /// </summary>
-    public static bool Excel2010OrLower
-    {
-      get
-      {
-        return Globals.ThisAddIn.ExcelVersionNumber < ThisAddIn.EXCEL_2013_VERSION_NUMBER;
-      }
-    }
+    public static bool Excel2010OrLower => Globals.ThisAddIn.ExcelVersionNumber < ThisAddIn.EXCEL_2013_VERSION_NUMBER;
 
     /// <summary>
     /// Gets or sets the text associated with this control.
     /// </summary>
-    public override sealed string Text
+    public sealed override string Text
     {
-      get
-      {
-        return base.Text;
-      }
-
-      set
-      {
-        base.Text = value;
-      }
+      get => base.Text;
+      set => base.Text = value;
     }
 
     #endregion Properties
@@ -141,7 +123,7 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     /// <param name="dbTable">A <see cref="DbTable"/> already in the list.</param>
     /// <param name="checkAllRelatedTables">Flag indicating whether all found related tables not in the original selection are checked by default.</param>
-    /// <param name="checkIfNotAlreadyInRelatedListView">Flag inidicating whether any found related table should be checked if it exists already in the <see cref="RelatedTablesListView"/>.</param>
+    /// <param name="checkIfNotAlreadyInRelatedListView">Flag indicating whether any found related table should be checked if it exists already in the <see cref="RelatedTablesListView"/>.</param>
     private void AddRelatedTablesToRelatedTablesListView(DbTable dbTable, bool checkAllRelatedTables, bool checkIfNotAlreadyInRelatedListView)
     {
       var tablesInOriginalSelection = _importTablesOrViews.Where(dbo => dbo is DbTable).Select(dbo => dbo.Name).ToList();
@@ -229,10 +211,8 @@ namespace MySQL.ForExcel.Forms
       var relationshipsCreationErrorBuilder = new StringBuilder(_relationshipsToCreateList.Count * 200);
       foreach (var relationship in _relationshipsToCreateList)
       {
-        ExcelInterop.ListObject excelTable;
-        ExcelInterop.ListObject relatedExcelTable;
-        bool excelTableExists = _excelTablesDictionary.TryGetValue(relationship.TableName, out excelTable);
-        bool relatedExcelTableExists = _excelTablesDictionary.TryGetValue(relationship.RelatedTableName, out relatedExcelTable);
+        bool excelTableExists = _excelTablesDictionary.TryGetValue(relationship.TableName, out var excelTable);
+        bool relatedExcelTableExists = _excelTablesDictionary.TryGetValue(relationship.RelatedTableName, out var relatedExcelTable);
         if (!excelTableExists || !relatedExcelTableExists)
         {
           if (relationshipsCreationErrorBuilder.Length > 0)
@@ -316,7 +296,7 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Imports the selected MySQL tables data into new Excel worksheets.
     /// </summary>
-    /// <returns><c>true</c> if the import is successful, <c>false</c> if errros were found during the import.</returns>
+    /// <returns><c>true</c> if the import is successful, <c>false</c> if errors were found during the import.</returns>
     private void ImportData()
     {
       _relationshipsToCreateList = new List<MySqlDataRelationship>();
@@ -372,12 +352,7 @@ namespace MySQL.ForExcel.Forms
     private void ListViewColumnClick(object sender, ColumnClickEventArgs e)
     {
       var listView = sender as ListView;
-      if (listView == null)
-      {
-        return;
-      }
-
-      var sorter = listView.ListViewItemSorter as ListViewColumnSorter;
+      var sorter = listView?.ListViewItemSorter as ListViewColumnSorter;
       if (sorter == null)
       {
         return;
@@ -530,8 +505,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void TablesViewsContextMenuStrip_Opening(object sender, CancelEventArgs e)
     {
-      ListView listView;
-      var dbView = MiscUtilities.GetSelectedDbTableOrView(sender, out listView);
+      var dbView = MiscUtilities.GetSelectedDbTableOrView(sender, out var listView);
       if (listView == null)
       {
         return;

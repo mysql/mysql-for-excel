@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -348,7 +348,7 @@ namespace MySQL.ForExcel.Classes
         _typeName = DEFAULT_DATA_TYPE;
         _validTypeName = true;
         _length = DEFAULT_DATA_TYPE_LENGTH;
-        _fullType = string.Format("{0}({1})", _typeName, _length);
+        _fullType = $"{_typeName}({_length})";
         _fullTypeSql = _fullType.ToUpperInvariant();
         _isValid = true;
         _parameters = new List<string> { _length.ToString(CultureInfo.InvariantCulture) };
@@ -383,18 +383,12 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets an array of attributes specified in the <see cref="FullType"/>.
     /// </summary>
-    public List<string> Attributes
-    {
-      get
-      {
-        return _attributes ?? (_attributes = GetAttributes());
-      }
-    }
+    public List<string> Attributes => _attributes ?? (_attributes = GetAttributes());
 
     /// <summary>
     /// Gets a value indicating whether the <see cref="Type"/> used for dates will be stored as <see cref="MySql.Data.Types.MySqlDateTime"/> or as <see cref="DateTime"/>.
     /// </summary>
-    public bool DatesAsMySqlDates { get; private set; }
+    public bool DatesAsMySqlDates { get; }
 
     /// <summary>
     /// Gets or sets the number of places after the decimal point for floating point data types.
@@ -433,13 +427,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the <see cref="Type"/> used in .NET corresponding to this data type.
     /// </summary>
-    public Type DotNetType
-    {
-      get
-      {
-        return _dotNetType ?? (_dotNetType = GetDotNetType());
-      }
-    }
+    public Type DotNetType => _dotNetType ?? (_dotNetType = GetDotNetType());
 
     /// <summary>
     /// Gets the full MySQL data type declaration as appears in a CREATE TABLE statement.
@@ -609,13 +597,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a value indicating whether this data type is of floating-point nature.
     /// </summary>
-    public bool IsDecimal
-    {
-      get
-      {
-        return IsFixedPoint || IsFloatingPoint;
-      }
-    }
+    public bool IsDecimal => IsFixedPoint || IsFloatingPoint;
 
     /// <summary>
     /// Gets a value indicating whether this data type stores fixed-point decimal numbers.
@@ -684,13 +666,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a value indicating whether this data type is numeric.
     /// </summary>
-    public bool IsNumeric
-    {
-      get
-      {
-        return IsDecimal || IsInteger;
-      }
-    }
+    public bool IsNumeric => IsDecimal || IsInteger;
 
     /// <summary>
     /// Gets a value indicating whether this data type is a Set or Enumeration.
@@ -892,62 +868,39 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets list of parameters specified in the <see cref="FullType"/>.
     /// </summary>
-    public List<string> Parameters
-    {
-      get
-      {
-        return _parameters ?? (_parameters = GetParameters());
-      }
-    }
+    public List<string> Parameters => _parameters ?? (_parameters = GetParameters());
 
     /// <summary>
     /// Gets a value indicating whether the data type requires parameters in parenthesis.
     /// </summary>
-    public bool RequiresParameters
-    {
-      get
-      {
-        return IsChar || IsNumeric || IsBit || IsYear || IsBinary;
-      }
-    }
+    public bool RequiresParameters => IsChar || IsNumeric || IsBit || IsYear || IsBinary;
 
     /// <summary>
     /// Gets a value indicating whether a value for the given <see cref="MySqlDbType"/> must be wrapped in quotes when assembling a SQL query.
     /// </summary>
-    public bool RequiresQuotesForValue
-    {
-      get
-      {
-        return IsChar || IsText || IsSetOrEnum || IsDateBased || IsJson;
-      }
-    }
+    public bool RequiresQuotesForValue => IsChar || IsText || IsSetOrEnum || IsDateBased || IsJson;
 
     /// <summary>
     /// Gets a list of elements included in a SET or ENUM declaration.
     /// </summary>
-    public List<string> SetOrEnumElements
-    {
-      get
-      {
-        return IsSetOrEnum ? Parameters : null;
-      }
-    }
+    public List<string> SetOrEnumElements => IsSetOrEnum ? Parameters : null;
 
     /// <summary>
     /// Gets or sets a value indicating whether real is translated to float or to double.
     /// </summary>
     public bool TreatRealAsFloat
     {
-      get
-      {
-        return _treatRealAsFloat;
-      }
+      get => _treatRealAsFloat;
 
       set
       {
         bool oldValue = _treatRealAsFloat;
         _treatRealAsFloat = value;
-        if (_treatRealAsFloat == oldValue) return;
+        if (_treatRealAsFloat == oldValue)
+        {
+          return;
+        }
+
         _maxLength = -1;
         _mySqlDbType = MySqlDbType.Guid;
       }
@@ -1059,15 +1012,13 @@ namespace MySQL.ForExcel.Classes
       {
         if (decimalPointPos < 0)
         {
-          int intResult;
-          if (int.TryParse(strValue, out intResult))
+          if (int.TryParse(strValue, out _))
           {
             strType = "System.Int32";
           }
           else
           {
-            long longResult;
-            if (long.TryParse(strValue, out longResult))
+            if (long.TryParse(strValue, out _))
             {
               strType = "System.Int64";
             }
@@ -1105,7 +1056,7 @@ namespace MySQL.ForExcel.Classes
         case "System.String":
           foreach (int t in varCharApproxLen.Where(t => strLength <= t))
           {
-            fullType = string.Format("VarChar({0})", t);
+            fullType = $"VarChar({t})";
             break;
           }
 
@@ -1185,23 +1136,28 @@ namespace MySQL.ForExcel.Classes
 
         case MySqlDbType.Int32:
         case MySqlDbType.UInt32:
-          return new MySqlDataType(string.Format("Integer{0}", mySqlDbType == MySqlDbType.UInt32 ? " " + ATTRIBUTE_UNSIGNED : string.Empty), true, datesAsMySqlDates);
+          return new MySqlDataType(
+            $"Integer{(mySqlDbType == MySqlDbType.UInt32 ? " " + ATTRIBUTE_UNSIGNED : string.Empty)}", true, datesAsMySqlDates);
 
         case MySqlDbType.Byte:
         case MySqlDbType.UByte:
-          return new MySqlDataType(string.Format("TinyInt{0}", mySqlDbType == MySqlDbType.UByte ? " " + ATTRIBUTE_UNSIGNED : string.Empty), true, datesAsMySqlDates);
+          return new MySqlDataType(
+            $"TinyInt{(mySqlDbType == MySqlDbType.UByte ? " " + ATTRIBUTE_UNSIGNED : string.Empty)}", true, datesAsMySqlDates);
 
         case MySqlDbType.Int16:
         case MySqlDbType.UInt16:
-          return new MySqlDataType(string.Format("SmallInt{0}", mySqlDbType == MySqlDbType.UInt16 ? " " + ATTRIBUTE_UNSIGNED : string.Empty), true, datesAsMySqlDates);
+          return new MySqlDataType(
+            $"SmallInt{(mySqlDbType == MySqlDbType.UInt16 ? " " + ATTRIBUTE_UNSIGNED : string.Empty)}", true, datesAsMySqlDates);
 
         case MySqlDbType.Int24:
         case MySqlDbType.UInt24:
-          return new MySqlDataType(string.Format("MediumInt{0}", mySqlDbType == MySqlDbType.UInt24 ? " " + ATTRIBUTE_UNSIGNED : string.Empty), true, datesAsMySqlDates);
+          return new MySqlDataType(
+            $"MediumInt{(mySqlDbType == MySqlDbType.UInt24 ? " " + ATTRIBUTE_UNSIGNED : string.Empty)}", true, datesAsMySqlDates);
 
         case MySqlDbType.Int64:
         case MySqlDbType.UInt64:
-          return new MySqlDataType(string.Format("BigInt{0}", mySqlDbType == MySqlDbType.UInt64 ? " " + ATTRIBUTE_UNSIGNED : string.Empty), true, datesAsMySqlDates);
+          return new MySqlDataType(
+            $"BigInt{(mySqlDbType == MySqlDbType.UInt64 ? " " + ATTRIBUTE_UNSIGNED : string.Empty)}", true, datesAsMySqlDates);
 
         case MySqlDbType.Float:
           return new MySqlDataType("Float", true, datesAsMySqlDates);
@@ -1213,13 +1169,13 @@ namespace MySQL.ForExcel.Classes
           return new MySqlDataType("Decimal", true, datesAsMySqlDates);
 
         case MySqlDbType.VarChar:
-          return new MySqlDataType(string.Format("VarChar({0})", DEFAULT_DATA_TYPE_LENGTH), true, datesAsMySqlDates);
+          return new MySqlDataType($"VarChar({DEFAULT_DATA_TYPE_LENGTH})", true, datesAsMySqlDates);
 
         case MySqlDbType.Binary:
           return new MySqlDataType("Binary", true, datesAsMySqlDates);
 
         case MySqlDbType.VarBinary:
-          return new MySqlDataType(string.Format("VarBinary({0})", DEFAULT_DATA_TYPE_LENGTH), true, datesAsMySqlDates);
+          return new MySqlDataType($"VarBinary({DEFAULT_DATA_TYPE_LENGTH})", true, datesAsMySqlDates);
 
         case MySqlDbType.Set:
           return new MySqlDataType("Set('')", true, datesAsMySqlDates);
@@ -1298,7 +1254,7 @@ namespace MySQL.ForExcel.Classes
     /// Gets the matching MySQL data type from unboxing a packed value.
     /// </summary>
     /// <param name="dotNetType">A valid .NET data type.</param>
-    /// <param name="strLength">In case of a string type, the lenght of the string data.</param>
+    /// <param name="strLength">In case of a string type, the length of the string data.</param>
     /// <returns>The matching MySQL data type.</returns>
     public static string GetMySqlDataType(Type dotNetType, int strLength = 0)
     {
@@ -1309,8 +1265,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       string strType = dotNetType.FullName;
-      bool unsigned = strType.Contains(".U");
-
+      bool unsigned = strType != null && strType.Contains(".U");
       switch (strType)
       {
         case "System.String":
@@ -1323,17 +1278,17 @@ namespace MySQL.ForExcel.Classes
 
         case "System.UInt16":
         case "System.Int16":
-          retType = string.Format("smallint{0}", unsigned ? " unsigned" : string.Empty);
+          retType = $"smallint{(unsigned ? " unsigned" : string.Empty)}";
           break;
 
         case "System.UInt32":
         case "System.Int32":
-          retType = string.Format("int{0}", unsigned ? " unsigned" : string.Empty);
+          retType = $"int{(unsigned ? " unsigned" : string.Empty)}";
           break;
 
         case "System.UInt64":
         case "System.Int64":
-          retType = string.Format("bigint{0}", unsigned ? " unsigned" : string.Empty);
+          retType = $"bigint{(unsigned ? " unsigned" : string.Empty)}";
           break;
 
         case "System.Decimal":
@@ -1396,59 +1351,59 @@ namespace MySQL.ForExcel.Classes
     /// <returns>String representation of the given boxed number.</returns>
     public static string GetStringRepresentationForNumericObject(object boxedValue, CultureInfo ci)
     {
-      if (boxedValue is sbyte)
+      if (boxedValue is sbyte @sbyte)
       {
-        return ((sbyte)boxedValue).ToString("G", ci);
+        return @sbyte.ToString("G", ci);
       }
 
-      if (boxedValue is byte)
+      if (boxedValue is byte @byte)
       {
-        return ((byte)boxedValue).ToString("G", ci);
+        return @byte.ToString("G", ci);
       }
 
-      if (boxedValue is short)
+      if (boxedValue is short @short)
       {
-        return ((short)boxedValue).ToString("G", ci);
+        return @short.ToString("G", ci);
       }
 
-      if (boxedValue is ushort)
+      if (boxedValue is ushort @ushort)
       {
-        return ((ushort)boxedValue).ToString("G", ci);
+        return @ushort.ToString("G", ci);
       }
 
-      if (boxedValue is int)
+      if (boxedValue is int @int)
       {
-        return ((int)boxedValue).ToString("G", ci);
+        return @int.ToString("G", ci);
       }
 
-      if (boxedValue is uint)
+      if (boxedValue is uint @uint)
       {
-        return ((uint)boxedValue).ToString("G", ci);
+        return @uint.ToString("G", ci);
       }
 
-      if (boxedValue is long)
+      if (boxedValue is long @long)
       {
-        return ((long)boxedValue).ToString("G", ci);
+        return @long.ToString("G", ci);
       }
 
-      if (boxedValue is ulong)
+      if (boxedValue is ulong @ulong)
       {
-        return ((ulong)boxedValue).ToString("G", ci);
+        return @ulong.ToString("G", ci);
       }
 
-      if (boxedValue is float)
+      if (boxedValue is float @float)
       {
-        return ((float)boxedValue).ToString("G", ci);
+        return @float.ToString("G", ci);
       }
 
-      if (boxedValue is double)
+      if (boxedValue is double @double)
       {
-        return ((double)boxedValue).ToString("G", ci);
+        return @double.ToString("G", ci);
       }
 
-      if (boxedValue is decimal)
+      if (boxedValue is decimal @decimal)
       {
-        return ((decimal)boxedValue).ToString("G", ci);
+        return @decimal.ToString("G", ci);
       }
 
       return boxedValue.ToString();
@@ -1503,44 +1458,29 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      if (rawValue is DateTime)
+      switch (rawValue)
       {
-        var dtValue = (DateTime)rawValue;
-        if (dtValue.CompareTo(DateTime.MinValue) == 0 || dtValue.CompareTo(DateTime.FromOADate(0)) == 0)
-        {
+        case DateTime dtValue when dtValue.CompareTo(DateTime.MinValue) == 0 || dtValue.CompareTo(DateTime.FromOADate(0)) == 0:
           return null;
-        }
 
-        return dtValue;
-      }
+        case DateTime dtValue:
+          return dtValue;
 
-      if (rawValue is MySqlDateTime)
-      {
-        var mysqlDate = (MySqlDateTime)rawValue;
-        if (!mysqlDate.IsValidDateTime)
-        {
+        case MySqlDateTime mysqlDate when !mysqlDate.IsValidDateTime:
           return null;
-        }
 
-        return GetValueAsDateTime(mysqlDate.GetDateTime());
-      }
+        case MySqlDateTime mysqlDate:
+          return GetValueAsDateTime(mysqlDate.GetDateTime());
 
-      if (rawValue is string)
-      {
-        var rawValueAsString = rawValue.ToString();
-        DateTime dtValue;
-        if (DateTime.TryParse(rawValueAsString, out dtValue))
-        {
-          return GetValueAsDateTime(dtValue);
-        }
+        case string rawValueAsString when DateTime.TryParse(rawValueAsString, out var dateTimeValue):
+          return GetValueAsDateTime(dateTimeValue);
 
-        if (rawValueAsString.IsMySqlZeroDateTimeValue(true))
-        {
+        case string rawValueAsString when rawValueAsString.IsMySqlZeroDateTimeValue(true):
           return null;
-        }
-      }
 
-      throw new ValueNotSuitableForConversionException(rawValue.ToString(), "DateTime");
+        default:
+          throw new ValueNotSuitableForConversionException(rawValue.ToString(), "DateTime");
+      }
     }
 
     /// <summary>
@@ -1732,8 +1672,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Step 1: Attempt to parse the string value into a regular DateTime, if it can be parsed then it can be stored in a MySqlDateTime, so return true.
-      DateTime parsedDateTime;
-      bool canBeParsedByDateTime = DateTime.TryParse(dateValueAsString, out parsedDateTime);
+      bool canBeParsedByDateTime = DateTime.TryParse(dateValueAsString, out var parsedDateTime);
       if (canBeParsedByDateTime)
       {
         return true;
@@ -1892,58 +1831,49 @@ namespace MySQL.ForExcel.Classes
       var lowerTypeName = TypeName.ToLowerInvariant();
       if (lowerTypeName == "int" || lowerTypeName == "integer" || lowerTypeName == "mediumint")
       {
-        int tryIntValue;
-        return int.TryParse(strValue, out tryIntValue);
+        return int.TryParse(strValue, out _);
       }
 
       if (IsYear)
       {
-        int parsedYearValue;
-        return string.IsNullOrEmpty(strValue) || (int.TryParse(strValue, out parsedYearValue) && (Length == 2 && parsedYearValue >= 0 && parsedYearValue < 100) || (parsedYearValue > 1900 && parsedYearValue < 2156));
+        return string.IsNullOrEmpty(strValue) || (int.TryParse(strValue, out var parsedYearValue) && (Length == 2 && parsedYearValue >= 0 && parsedYearValue < 100) || (parsedYearValue > 1900 && parsedYearValue < 2156));
       }
 
       if (lowerTypeName == "tinyint")
       {
-        byte tryByteValue;
-        return byte.TryParse(strValue, out tryByteValue);
+        return byte.TryParse(strValue, out _);
       }
 
       if (lowerTypeName == "smallint")
       {
-        short trySmallIntValue;
-        return short.TryParse(strValue, out trySmallIntValue);
+        return short.TryParse(strValue, out _);
       }
 
       if (lowerTypeName == "bigint")
       {
-        long tryBigIntValue;
-        return long.TryParse(strValue, out tryBigIntValue);
+        return long.TryParse(strValue, out _);
       }
 
       if (lowerTypeName == "bit")
       {
-        ulong tryBitValue;
-        return ulong.TryParse(strValue, out tryBitValue);
+        return ulong.TryParse(strValue, out _);
       }
 
       // Check for big numeric values
       if (lowerTypeName.StartsWith("float"))
       {
-        float tryFloatValue;
-        return float.TryParse(strValue, out tryFloatValue);
+        return float.TryParse(strValue, out _);
       }
 
       if (lowerTypeName.StartsWith("double") || lowerTypeName == "real")
       {
-        double tryDoubleValue;
-        return double.TryParse(strValue, out tryDoubleValue);
+        return double.TryParse(strValue, out _);
       }
 
       // Check for date and time values.
       if (IsTime)
       {
-        TimeSpan tryTimeSpanValue;
-        return TimeSpan.TryParse(strValue, out tryTimeSpanValue);
+        return TimeSpan.TryParse(strValue, out _);
       }
 
       if (IsDateBased)
@@ -1953,8 +1883,7 @@ namespace MySQL.ForExcel.Classes
           return true;
         }
 
-        DateTime tryDateTimeValue;
-        return DateTime.TryParse(strValue, out tryDateTimeValue);
+        return DateTime.TryParse(strValue, out _);
       }
 
       // Check of char or varchar.
@@ -1972,7 +1901,7 @@ namespace MySQL.ForExcel.Classes
         }
 
         strValue = strValue.ToLowerInvariant();
-        var superSet = new HashSet<string>(SetOrEnumElements.Select(el => el.ToLowerInvariant().Trim(new[] { '\'' })));
+        var superSet = new HashSet<string>(SetOrEnumElements.Select(el => el.ToLowerInvariant().Trim('\'')));
         if (lowerTypeName == "enum")
         {
           return superSet.Contains(strValue);
@@ -1993,12 +1922,10 @@ namespace MySQL.ForExcel.Classes
         bool floatingPointCompliant = lengthCompliant && decimalPlacesCompliant;
         if (lowerTypeName == "decimal" || lowerTypeName == "numeric")
         {
-          decimal tryDecimalValue;
-          return decimal.TryParse(strValue, out tryDecimalValue) && floatingPointCompliant;
+          return decimal.TryParse(strValue, out _) && floatingPointCompliant;
         }
 
-        double tryDoubleValue;
-        return double.TryParse(strValue, out tryDoubleValue) && floatingPointCompliant;
+        return double.TryParse(strValue, out _) && floatingPointCompliant;
       }
 
       // For future types non recognized by MySQL for Excel.
@@ -2702,7 +2629,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if attributes are correctly specified, <c>false</c> otherwise.</returns>
     private bool ValidateParameters()
     {
-      int paramsCount = Parameters == null ? 0 : Parameters.Count;
+      int paramsCount = Parameters?.Count ?? 0;
       if (IsSetOrEnum)
       {
         if (paramsCount == 0)
@@ -2734,8 +2661,7 @@ namespace MySQL.ForExcel.Classes
       validParameters = validParameters && long.TryParse(_parameters[0], out length);
       if (IsDecimal && paramsCount > 1)
       {
-        int decimalPlaces;
-        return validParameters && int.TryParse(_parameters[1], out decimalPlaces);
+        return validParameters && int.TryParse(_parameters[1], out _);
       }
 
       if (IsYear)
