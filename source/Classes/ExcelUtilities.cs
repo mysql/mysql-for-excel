@@ -111,7 +111,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// The maximum number of rows that can exist in 2003 and older versions of Excel;
     /// </summary>
-    public const int MAXIMUM_WORKSHEET_ROWS_IN_COMPATIBILITY_MODE = UInt16.MaxValue + 1;
+    public const int MAXIMUM_WORKSHEET_ROWS_IN_COMPATIBILITY_MODE = ushort.MaxValue + 1;
 
     /// <summary>
     /// The maximum number of rows that can exist in 2007 and newer versions of Excel;
@@ -149,7 +149,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     static ExcelUtilities()
     {
-      CommitedCellsHtmlColor = DEFAULT_COMMITED_CELLS_HTML_COLOR;
+      CommittedCellsHtmlColor = DEFAULT_COMMITED_CELLS_HTML_COLOR;
       ErroredCellsHtmlColor = DEFAULT_ERRORED_CELLS_HTML_COLOR;
       LockedCellsHtmlColor = DEFAULT_LOCKED_CELLS_HTML_COLOR;
       NewRowCellsHtmlColor = DEFAULT_NEW_ROW_CELLS_HTML_COLOR;
@@ -162,38 +162,24 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets or sets the interior color for Excel cells committed to the MySQL server during an Edit Data operation.
     /// </summary>
-    public static string CommitedCellsHtmlColor
+    public static string CommittedCellsHtmlColor
     {
-      get
-      {
-        return ColorTranslator.ToHtml(ColorTranslator.FromOle(CommitedCellsOleColor));
-      }
-
-      set
-      {
-        CommitedCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
-      }
+      get => ColorTranslator.ToHtml(ColorTranslator.FromOle(CommittedCellsOleColor));
+      set => CommittedCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
     }
 
     /// <summary>
     /// Gets the interior color for Excel cells committed to the MySQL server during an Edit Data operation.
     /// </summary>
-    public static int CommitedCellsOleColor { get; private set; }
+    public static int CommittedCellsOleColor { get; private set; }
 
     /// <summary>
     /// Gets or sets the interior color for Excel cells that caused errors during a commit of an Edit Data operation.
     /// </summary>
     public static string ErroredCellsHtmlColor
     {
-      get
-      {
-        return ColorTranslator.ToHtml(ColorTranslator.FromOle(ErroredCellsOleColor));
-      }
-
-      set
-      {
-        ErroredCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
-      }
+      get => ColorTranslator.ToHtml(ColorTranslator.FromOle(ErroredCellsOleColor));
+      set => ErroredCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
     }
 
     /// <summary>
@@ -216,9 +202,7 @@ namespace MySQL.ForExcel.Classes
 
       DocumentProperties properties = workbook.CustomDocumentProperties;
       var customProperty = properties.Cast<DocumentProperty>().FirstOrDefault(property => property.Name == propertyName);
-      return customProperty != null
-        ? customProperty.Value.ToString()
-        : null;
+      return customProperty?.Value.ToString();
     }
 
     /// <summary>
@@ -226,15 +210,8 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public static string LockedCellsHtmlColor
     {
-      get
-      {
-        return ColorTranslator.ToHtml(ColorTranslator.FromOle(LockedCellsOleColor));
-      }
-
-      set
-      {
-        LockedCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
-      }
+      get => ColorTranslator.ToHtml(ColorTranslator.FromOle(LockedCellsOleColor));
+      set => LockedCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
     }
 
     /// <summary>
@@ -247,15 +224,8 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public static string NewRowCellsHtmlColor
     {
-      get
-      {
-        return ColorTranslator.ToHtml(ColorTranslator.FromOle(NewRowCellsOleColor));
-      }
-
-      set
-      {
-        NewRowCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
-      }
+      get => ColorTranslator.ToHtml(ColorTranslator.FromOle(NewRowCellsOleColor));
+      set => NewRowCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
     }
 
     /// <summary>
@@ -268,15 +238,8 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public static string UncommittedCellsHtmlColor
     {
-      get
-      {
-        return ColorTranslator.ToHtml(ColorTranslator.FromOle(UncommittedCellsOleColor));
-      }
-
-      set
-      {
-        UncommittedCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
-      }
+      get => ColorTranslator.ToHtml(ColorTranslator.FromOle(UncommittedCellsOleColor));
+      set => UncommittedCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
     }
 
     /// <summary>
@@ -289,15 +252,8 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public static string WarningCellsHtmlColor
     {
-      get
-      {
-        return ColorTranslator.ToHtml(ColorTranslator.FromOle(WarningCellsOleColor));
-      }
-
-      set
-      {
-        WarningCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
-      }
+      get => ColorTranslator.ToHtml(ColorTranslator.FromOle(WarningCellsOleColor));
+      set => WarningCellsOleColor = ColorTranslator.ToOle(ColorTranslator.FromHtml(value));
     }
 
     /// <summary>
@@ -405,8 +361,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       var currentColumn = atCell.Column;
-      var activeWorkbook = atCell.Worksheet.Parent as ExcelInterop.Workbook;
-      if (activeWorkbook == null)
+      if (!(atCell.Worksheet.Parent is ExcelInterop.Workbook activeWorkbook))
       {
         return false;
       }
@@ -430,8 +385,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       var currentRow = atCell.Row;
-      var activeWorkbook = atCell.Worksheet.Parent as ExcelInterop.Workbook;
-      if (activeWorkbook == null)
+      if (!(atCell.Worksheet.Parent is ExcelInterop.Workbook activeWorkbook))
       {
         return false;
       }
@@ -536,8 +490,7 @@ namespace MySQL.ForExcel.Classes
         proposedName = "PivotTable";
       }
 
-      var workbook = atCell.Worksheet.Parent as ExcelInterop.Workbook;
-      if (workbook == null)
+      if (!(atCell.Worksheet.Parent is ExcelInterop.Workbook workbook))
       {
         return null;
       }
@@ -545,11 +498,11 @@ namespace MySQL.ForExcel.Classes
       ExcelInterop.PivotTable pivotTable = null;
       try
       {
-        string pivotSource = fromExcelRange.Address[true, true, ExcelInterop.XlReferenceStyle.xlR1C1, true];
+        var pivotSource = fromExcelRange.Address[true, true, ExcelInterop.XlReferenceStyle.xlR1C1, true];
         proposedName = proposedName.GetPivotTableNameAvoidingDuplicates();
         var pivotTableVersion = Globals.ThisAddIn.ExcelPivotTableVersion;
         var pivotCache = workbook.PivotCaches().Create(ExcelInterop.XlPivotTableSourceType.xlDatabase, pivotSource, pivotTableVersion);
-        string tableDestination = atCell.Address[true, true, ExcelInterop.XlReferenceStyle.xlR1C1, true];
+        var tableDestination = atCell.Address[true, true, ExcelInterop.XlReferenceStyle.xlR1C1, true];
         pivotTable = pivotCache.CreatePivotTable(tableDestination, proposedName, true, pivotTableVersion);
       }
       catch (Exception ex)
@@ -579,8 +532,7 @@ namespace MySQL.ForExcel.Classes
         proposedName = "PivotTable";
       }
 
-      var workbook = atCell.Worksheet.Parent as ExcelInterop.Workbook;
-      if (workbook == null)
+      if (!(atCell.Worksheet.Parent is ExcelInterop.Workbook workbook))
       {
         return null;
       }
@@ -591,7 +543,7 @@ namespace MySQL.ForExcel.Classes
         proposedName = proposedName.GetPivotTableNameAvoidingDuplicates();
         var pivotTableVersion = Globals.ThisAddIn.ExcelPivotTableVersion;
         var pivotCache = workbook.PivotCaches().Create(ExcelInterop.XlPivotTableSourceType.xlExternal, fromWorkbookConnection, pivotTableVersion);
-        string tableDestination = atCell.Address[true, true, ExcelInterop.XlReferenceStyle.xlR1C1, true];
+        var tableDestination = atCell.Address[true, true, ExcelInterop.XlReferenceStyle.xlR1C1, true];
         pivotTable = pivotCache.CreatePivotTable(tableDestination, proposedName, true, pivotTableVersion);
       }
       catch (Exception ex)
@@ -648,7 +600,7 @@ namespace MySQL.ForExcel.Classes
         return false;
       }
 
-      bool success = true;
+      var success = true;
       try
       {
         excelTable.Delete();
@@ -678,7 +630,7 @@ namespace MySQL.ForExcel.Classes
         return false;
       }
 
-      bool success = true;
+      var success = true;
       try
       {
         toolsExcelTable.Delete();
@@ -889,7 +841,7 @@ namespace MySQL.ForExcel.Classes
         return newName;
       }
 
-      int copyIndex = 1;
+      var copyIndex = 1;
       do
       {
         // Prepare Excel table name and dummy connection
@@ -1061,8 +1013,8 @@ namespace MySQL.ForExcel.Classes
       }
 
       ExcelInterop.Range currentTopLeftCell = currentResultSetRange.Cells[1, 1];
-      int columnsOffset = 0;
-      int rowsOffset = 0;
+      var columnsOffset = 0;
+      var rowsOffset = 0;
       switch (importType)
       {
         case DbProcedure.ProcedureResultSetsImportType.AllResultSetsHorizontally:
@@ -1073,7 +1025,7 @@ namespace MySQL.ForExcel.Classes
         case DbProcedure.ProcedureResultSetsImportType.AllResultSetsVertically:
           var pivotTablePlaceHolderRows = withPivotTable ? PIVOT_TABLES_PLACEHOLDER_DEFAULT_ROWS_SIZE : 0;
           rowsOffset = Math.Max(currentResultSetRange.Rows.Count, pivotTablePlaceHolderRows) + spacing;
-          if (Globals.ThisAddIn.ActiveWorkbook.Excel8CompatibilityMode && currentTopLeftCell.Row + rowsOffset > UInt16.MaxValue)
+          if (Globals.ThisAddIn.ActiveWorkbook.Excel8CompatibilityMode && currentTopLeftCell.Row + rowsOffset > ushort.MaxValue)
           {
             return null;
           }
@@ -1162,7 +1114,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       ExcelInterop.Range firstOriginalCell = range.Cells[1, 1];
-      ExcelInterop.Range lastRowCell = range.Cells.Find(
+      var lastRowCell = range.Cells.Find(
         "*",
         firstOriginalCell,
         ExcelInterop.XlFindLookIn.xlValues,
@@ -1177,8 +1129,8 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      int lastCellRow = lastRowCell.Row;
-      ExcelInterop.Range lastColumnCell = range.Cells.Find(
+      var lastCellRow = lastRowCell.Row;
+      var lastColumnCell = range.Cells.Find(
         "*",
         firstOriginalCell,
         ExcelInterop.XlFindLookIn.xlValues,
@@ -1193,9 +1145,9 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      int lastCellColumn = lastColumnCell.Column;
+      var lastCellColumn = lastColumnCell.Column;
       ExcelInterop.Range lastCell = range.Worksheet.Cells[lastCellRow, lastCellColumn];
-      ExcelInterop.Range firstRowCell = range.Cells.Find(
+      var firstRowCell = range.Cells.Find(
         "*",
         lastCell,
         ExcelInterop.XlFindLookIn.xlValues,
@@ -1210,8 +1162,8 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      int firstCellRow = firstRowCell.Row;
-      ExcelInterop.Range firstColumnCell = range.Cells.Find(
+      var firstCellRow = firstRowCell.Row;
+      var firstColumnCell = range.Cells.Find(
         "*",
         lastCell,
         ExcelInterop.XlFindLookIn.xlValues,
@@ -1226,7 +1178,7 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      int firstCellColumn = firstColumnCell.Column;
+      var firstCellColumn = firstColumnCell.Column;
       ExcelInterop.Range firstCell = range.Worksheet.Cells[firstCellRow, firstCellColumn];
       return range.Worksheet.Range[firstCell, lastCell];
     }
@@ -1250,7 +1202,7 @@ namespace MySQL.ForExcel.Classes
         return guid.Value.ToString();
       }
 
-      string newGuid = Guid.NewGuid().ToString();
+      var newGuid = Guid.NewGuid().ToString();
       properties.Add("WorkbookGuid", false, MsoDocProperties.msoPropertyTypeString, newGuid);
       return newGuid;
     }
@@ -1352,14 +1304,14 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The worksheet's protection key if the property exist, otherwise returns null.</returns>
     public static string GetProtectionKey(this ExcelInterop.Worksheet worksheet)
     {
-      ExcelInterop.CustomProperties properties = worksheet?.CustomProperties;
+      var properties = worksheet?.CustomProperties;
       if (properties == null)
       {
         return null;
       }
 
       var guid = properties.Cast<ExcelInterop.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetGuid"));
-      return guid == null ? null : guid.Value.ToString();
+      return guid?.Value.ToString();
     }
 
     /// <summary>
@@ -1377,9 +1329,9 @@ namespace MySQL.ForExcel.Classes
       }
 
       ExcelInterop.Range rowRange = range.Rows[rowIndex];
-      int columnsCount = rowRange.Columns.Count;
+      var columnsCount = rowRange.Columns.Count;
       var linearArray = new object[columnsCount];
-      for (int columnIndex = 1; columnIndex <= columnsCount; columnIndex++)
+      for (var columnIndex = 1; columnIndex <= columnsCount; columnIndex++)
       {
         var excelCell = rowRange.Cells[1, columnIndex] as ExcelInterop.Range;
         linearArray[columnIndex - 1] = excelCell.GetCellPackedValue(useFormattedValues);
@@ -1552,7 +1504,7 @@ namespace MySQL.ForExcel.Classes
 
       if (mysqlDataRange != null)
       {
-        ExcelInterop.Range extendedRange = mysqlDataRange.Range["A2"];
+        var extendedRange = mysqlDataRange.Range["A2"];
         extendedRange = extendedRange.SafeResize(mysqlDataRange.Rows.Count - 1, worksheet.Columns.Count);
         extendedRange.Locked = false;
 
@@ -1587,7 +1539,7 @@ namespace MySQL.ForExcel.Classes
     public static bool RefreshMySqlData(this ExcelInterop.ListObject excelTable)
     {
       var importConnectionInfo = excelTable.GetImportConnectionInfo();
-      bool hasImportConnectionInfo = importConnectionInfo != null;
+      var hasImportConnectionInfo = importConnectionInfo != null;
       if (hasImportConnectionInfo)
       {
         importConnectionInfo.Refresh();
@@ -1633,8 +1585,7 @@ namespace MySQL.ForExcel.Classes
 
       var currentRow = range.Row;
       var currentColumn = range.Column;
-      var activeWorkbook = range.Worksheet.Parent as ExcelInterop.Workbook;
-      if (activeWorkbook == null)
+      if (!(range.Worksheet.Parent is ExcelInterop.Workbook activeWorkbook))
       {
         return null;
       }
@@ -1787,7 +1738,7 @@ namespace MySQL.ForExcel.Classes
       var protectionKeyProperty = worksheet.CustomProperties.Cast<ExcelInterop.CustomProperty>().FirstOrDefault(property => property.Name.Equals("WorksheetGuid"));
       if (protectionKeyProperty == null)
       {
-        ExcelInterop.CustomProperties properties = worksheet.CustomProperties;
+        var properties = worksheet.CustomProperties;
         properties.Add("WorksheetGuid", protectionKey);
         return true;
       }

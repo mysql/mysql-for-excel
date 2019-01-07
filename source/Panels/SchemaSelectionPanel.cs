@@ -87,7 +87,7 @@ namespace MySQL.ForExcel.Panels
       _wbConnection = connection;
       ConnectionNameLabel.Text = connection.Name;
       UserIPLabel.Text = $@"User: {connection.UserName}, IP: {connection.Host}";
-      bool schemasLoaded = LoadSchemas();
+      var schemasLoaded = LoadSchemas();
       if (schemasLoaded)
       {
         SchemasList_AfterSelect(null, null);
@@ -160,10 +160,10 @@ namespace MySQL.ForExcel.Panels
           node.Nodes.Clear();
         }
 
-        DataTable databases = _wbConnection.GetSchemaInformation(SchemaInformationType.Databases, false, null);
+        var databases = _wbConnection.GetSchemaInformation(SchemaInformationType.Databases, false, null);
         foreach (DataRow row in databases.Rows)
         {
-          string schemaName = row["DATABASE_NAME"].ToString();
+          var schemaName = row["DATABASE_NAME"].ToString();
 
           // If the user has specified a filter then check it
           if (!string.IsNullOrEmpty(_filter) && !schemaName.ToUpper().Contains(_filter))
@@ -176,7 +176,7 @@ namespace MySQL.ForExcel.Panels
                                           row["DEFAULT_CHARACTER_SET_NAME"].ToString(),
                                           row["DEFAULT_COLLATION_NAME"].ToString(),
                                           DisplaySchemaCollationsToolStripMenuItem.Checked);
-          string lcSchemaName = schemaName.ToLowerInvariant();
+          var lcSchemaName = schemaName.ToLowerInvariant();
           var headerNode = SchemasList.HeaderNodes[MySqlWorkbenchConnection.SystemSchemaNames.Contains(lcSchemaName) ? 1 : 0];
           LoadedSchemas.Add(schemaObject);
           var node = SchemasList.AddDbObjectNode(headerNode, schemaObject);
@@ -266,8 +266,7 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void SchemaFilter_SearchFired(object sender, EventArgs e)
     {
-      var searchBox = sender as SearchEdit;
-      if (searchBox == null)
+      if (!(sender is SearchEdit))
       {
         return;
       }
@@ -302,7 +301,7 @@ namespace MySQL.ForExcel.Panels
     /// <param name="refreshSchemasList">Flag indicating whether the <see cref="SchemasList"/> must be refreshed after resetting the appearance.</param>
     private void SetItemsAppearance(bool refreshSchemasList)
     {
-      bool displayCollations = DisplaySchemaCollationsToolStripMenuItem.Checked;
+      var displayCollations = DisplaySchemaCollationsToolStripMenuItem.Checked;
       if (Settings.Default.SchemasDisplayCollations != displayCollations)
       {
         Settings.Default.SchemasDisplayCollations = displayCollations;

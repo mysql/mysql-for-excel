@@ -53,7 +53,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the parameters used on Import Data operations.
     /// </summary>
-    public ImportDataParams ImportParameters { get; private set; }
+    public ImportDataParams ImportParameters { get; }
 
     #endregion Properties
 
@@ -90,7 +90,7 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      string queryString = GetSelectQuery();
+      var queryString = GetSelectQuery();
       return string.IsNullOrEmpty(queryString) ? null : Connection.GetDataFromSelectQuery(queryString);
     }
 
@@ -126,7 +126,7 @@ namespace MySQL.ForExcel.Classes
       object objCount = null;
       try
       {
-        string sql = $"SELECT COUNT(*) FROM `{Connection.Schema}`.`{Name}`";
+        var sql = $"SELECT COUNT(*) FROM `{Connection.Schema}`.`{Name}`";
         objCount = MySqlHelper.ExecuteScalar(Connection.GetConnectionStringBuilder().ConnectionString, sql);
       }
       catch (Exception ex)
@@ -156,7 +156,7 @@ namespace MySQL.ForExcel.Classes
       }
       else
       {
-        foreach (string columnName in ImportParameters.ColumnsNamesList)
+        foreach (var columnName in ImportParameters.ColumnsNamesList)
         {
           queryStringBuilder.AppendFormat("`{0}`,", columnName.Replace("`", "``"));
         }
@@ -167,7 +167,7 @@ namespace MySQL.ForExcel.Classes
       queryStringBuilder.AppendFormat(" FROM `{0}`.`{1}`", Connection.Schema, Name);
       if (ImportParameters.FirstRowIndex > 0)
       {
-        string strCount = ImportParameters.RowsCount >= 0 ? ImportParameters.RowsCount.ToString(CultureInfo.InvariantCulture) : bigRowCountLimit;
+        var strCount = ImportParameters.RowsCount >= 0 ? ImportParameters.RowsCount.ToString(CultureInfo.InvariantCulture) : bigRowCountLimit;
         queryStringBuilder.AppendFormat(" LIMIT {0},{1}", ImportParameters.FirstRowIndex, strCount);
       }
       else if (ImportParameters.RowsCount >= 0)

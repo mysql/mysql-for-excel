@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -100,7 +100,7 @@ namespace MySQL.ForExcel.Classes
     public MySqlColumnMapping(MySqlColumnMapping likeMapping)
       : this(likeMapping, likeMapping.SourceColumns, likeMapping.TargetColumns)
     {
-      for (int idx = 0; idx < likeMapping.MappedSourceIndexes.Length; idx++)
+      for (var idx = 0; idx < likeMapping.MappedSourceIndexes.Length; idx++)
       {
         MappedSourceIndexes[idx] = likeMapping.MappedSourceIndexes[idx];
       }
@@ -160,25 +160,13 @@ namespace MySQL.ForExcel.Classes
     /// Gets the quantity of source columns mapped to target columns.
     /// </summary>
     [XmlIgnore]
-    public int MappedQuantity
-    {
-      get
-      {
-        return MappedSourceIndexes.Count(idx => idx >= 0);
-      }
-    }
+    public int MappedQuantity => MappedSourceIndexes.Count(idx => idx >= 0);
 
     /// <summary>
     /// Gets a value indicating whether all source columns are mapped to target columns.
     /// </summary>
     [XmlIgnore]
-    public bool AllColumnsMapped
-    {
-      get
-      {
-        return MappedQuantity == MappedSourceIndexes.Length;
-      }
-    }
+    public bool AllColumnsMapped => MappedQuantity == MappedSourceIndexes.Length;
 
     #endregion Properties
 
@@ -203,7 +191,7 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      for (int i = 0; i < TargetColumns.Length; i++)
+      for (var i = 0; i < TargetColumns.Length; i++)
       {
         MappedSourceIndexes[i] = -1;
       }
@@ -238,15 +226,15 @@ namespace MySQL.ForExcel.Classes
     /// <returns>Number of matching columns.</returns>
     public int GetMatchingColumnsQuantity(DataTable dataTable, bool sameOrdinals)
     {
-      int matchingColumnsQty = 0;
+      var matchingColumnsQty = 0;
       if (dataTable == null || TargetColumns == null)
       {
         return matchingColumnsQty;
       }
 
-      for (int colIdx = 0; colIdx < TargetColumns.Length; colIdx++)
+      for (var colIdx = 0; colIdx < TargetColumns.Length; colIdx++)
       {
-        string colName = TargetColumns[colIdx];
+        var colName = TargetColumns[colIdx];
         if (sameOrdinals)
         {
           if (string.Equals(dataTable.Columns[colIdx].ColumnName, colName, StringComparison.InvariantCultureIgnoreCase))

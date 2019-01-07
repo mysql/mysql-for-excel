@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -63,25 +63,13 @@ namespace MySQL.ForExcel.Controls
     /// Gets the active <see cref="ExcelInterop.Workbook"/> unique identifier.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public string ActiveWorkbookId
-    {
-      get
-      {
-        return Globals.ThisAddIn.ActiveWorkbook.GetOrCreateId();
-      }
-    }
+    public string ActiveWorkbookId => Globals.ThisAddIn.ActiveWorkbook.GetOrCreateId();
 
     /// <summary>
     /// Gets the active <see cref="ExcelInterop.Worksheet"/> in the Excel application.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ExcelInterop.Worksheet ActiveWorksheet
-    {
-      get
-      {
-        return Globals.ThisAddIn.Application.ActiveSheet as ExcelInterop.Worksheet;
-      }
-    }
+    public ExcelInterop.Worksheet ActiveWorksheet => Globals.ThisAddIn.Application.ActiveSheet as ExcelInterop.Worksheet;
 
     /// <summary>
     /// Gets a value indicating whether the <see cref="ActiveWorksheet"/> is in edit mode.
@@ -102,55 +90,31 @@ namespace MySQL.ForExcel.Controls
     /// Gets or sets the first <see cref="EditConnectionInfo"/> object.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public EditConnectionInfo FirstConnectionInfo { get; private set; }
+    public EditConnectionInfo FirstConnectionInfo { get; }
 
     /// <summary>
     /// Gets a list of stored procedures loaded in this pane.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<DbProcedure> LoadedProcedures
-    {
-      get
-      {
-        return DBObjectSelectionPanel3.LoadedProcedures;
-      }
-    }
+    public List<DbProcedure> LoadedProcedures => DBObjectSelectionPanel3.LoadedProcedures;
 
     /// <summary>
     /// Gets a list of schemas loaded in this pane.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<DbSchema> LoadedSchemas
-    {
-      get
-      {
-        return SchemaSelectionPanel2.LoadedSchemas;
-      }
-    }
+    public List<DbSchema> LoadedSchemas => SchemaSelectionPanel2.LoadedSchemas;
 
     /// <summary>
     /// Gets a list of tables loaded in this pane.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<DbTable> LoadedTables
-    {
-      get
-      {
-        return DBObjectSelectionPanel3.LoadedTables;
-      }
-    }
+    public List<DbTable> LoadedTables => DBObjectSelectionPanel3.LoadedTables;
 
     /// <summary>
     /// Gets a list of views loaded in this pane.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<DbView> LoadedViews
-    {
-      get
-      {
-        return DBObjectSelectionPanel3.LoadedViews;
-      }
-    }
+    public List<DbView> LoadedViews => DBObjectSelectionPanel3.LoadedViews;
 
     /// <summary>
     /// Gets a <see cref="MySqlWorkbenchConnection"/> object representing the connection to a MySQL server instance selected by users.
@@ -168,8 +132,7 @@ namespace MySQL.ForExcel.Controls
     public bool AppendDataToTable(DbTable toTableObject)
     {
       DialogResult dr;
-      ExcelInterop.Range exportRange = Globals.ThisAddIn.Application.Selection as ExcelInterop.Range;
-      if (exportRange == null)
+      if (!(Globals.ThisAddIn.Application.Selection is ExcelInterop.Range exportRange))
       {
         return false;
       }
@@ -227,7 +190,7 @@ namespace MySQL.ForExcel.Controls
       if (askToCloseConnections && WorkbookConnectionInfos.GetWorkbookEditConnectionInfos(Globals.ThisAddIn.ActiveWorkbook).Count > 0)
       {
         // If there are Active OldStoredEditConnectionInfos warn the users that by closing the schema the active EditConnectionInfos will be closed.
-        DialogResult dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.ActiveEditConnectionInfosCloseWarningTitle, Resources.ActiveEditConnectionInfosCloseWarningDetail);
+        var dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.ActiveEditConnectionInfosCloseWarningTitle, Resources.ActiveEditConnectionInfosCloseWarningDetail);
         if (dr == DialogResult.No)
         {
           return false;
@@ -257,9 +220,9 @@ namespace MySQL.ForExcel.Controls
         return false;
       }
 
-      string schemaAndTableNames = WbConnection.Schema + "." + tableObject.Name;
+      var schemaAndTableNames = WbConnection.Schema + "." + tableObject.Name;
 
-      // Check if the current dbobject has an edit ongoing
+      // Check if the current DB object has an edit ongoing
       if (TableHasEditOnGoing(tableObject.Name))
       {
         // Display an error since there is an ongoing Editing operation and return
@@ -287,7 +250,7 @@ namespace MySQL.ForExcel.Controls
       }
 
       // Attempt to Import Data unless the user cancels the import operation
-      string proposedWorksheetName = fromSavedConnectionInfo ? tableObject.Name : Globals.ThisAddIn.ActiveWorkbook.GetWorksheetNameAvoidingDuplicates(tableObject.Name);
+      var proposedWorksheetName = fromSavedConnectionInfo ? tableObject.Name : Globals.ThisAddIn.ActiveWorkbook.GetWorksheetNameAvoidingDuplicates(tableObject.Name);
       tableObject.ImportParameters.ForEditDataOperation = true;
       MySqlDataTable mySqlTable;
       using (var importForm = new ImportTableViewForm(tableObject, proposedWorksheetName))
@@ -403,7 +366,7 @@ namespace MySQL.ForExcel.Controls
     /// <param name="tableName">Name of the table with status update.</param>
     public void RefreshDbObjectPanelActionLabelsEnabledStatus(string tableName)
     {
-      bool editActive = TableHasEditOnGoing(tableName);
+      var editActive = TableHasEditOnGoing(tableName);
       RefreshDbObjectPanelActionLabelsEnabledStatus(tableName, editActive);
     }
 
@@ -464,7 +427,7 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Checks if the selected <see cref="ExcelInterop.Range"/> contains any data in it and updates that status in the corresponidng panel.
+    /// Checks if the selected <see cref="ExcelInterop.Range"/> contains any data in it and updates that status in the corresponding panel.
     /// </summary>
     /// <param name="range">The <see cref="ExcelInterop.Range"/> where the selection is.</param>
     public void UpdateExcelSelectedDataStatus(ExcelInterop.Range range)
@@ -490,8 +453,8 @@ namespace MySQL.ForExcel.Controls
         return null;
       }
 
-      ExcelInterop.Range atCell = currentWorksheet.Range["A1", Type.Missing];
-      ExcelInterop.Range editingRange = mySqlTable.ImportDataIntoExcelRange(atCell);
+      var atCell = currentWorksheet.Range["A1", Type.Missing];
+      var editingRange = mySqlTable.ImportDataIntoExcelRange(atCell);
       EditConnectionInfo connectionInfo = null;
 
       var workbookEditConnectionInfos = WorkbookConnectionInfos.GetWorkbookEditConnectionInfos(Globals.ThisAddIn.ActiveWorkbook);

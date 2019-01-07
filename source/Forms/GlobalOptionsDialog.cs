@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -78,22 +78,16 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets a value indicating whether the <see cref="MigrateWorkbenchConnectionsButton"/> should be enabled.
     /// </summary>
-    private bool MigrateConnectionsButtonEnabled
-    {
-      get
-      {
-        return !Settings.Default.WorkbenchMigrationSucceeded &&
-               Settings.Default.WorkbenchMigrationLastAttempt != DateTime.MinValue &&
-               Settings.Default.WorkbenchMigrationRetryDelay != 0;
-      }
-    }
+    private bool MigrateConnectionsButtonEnabled => !Settings.Default.WorkbenchMigrationSucceeded &&
+                                                    Settings.Default.WorkbenchMigrationLastAttempt != DateTime.MinValue &&
+                                                    Settings.Default.WorkbenchMigrationRetryDelay != 0;
 
     /// <summary>
     /// Deletes the edit/import connection information objects marked to in the management dialog.
     /// </summary>
     private void DeleteConnectionInfos()
     {
-      if (_manageConnectionInfosDialog == null || _manageConnectionInfosDialog.ConnectionInfosToDelete == null)
+      if (_manageConnectionInfosDialog?.ConnectionInfosToDelete == null)
       {
         return;
       }

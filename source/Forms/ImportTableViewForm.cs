@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -79,19 +79,14 @@ namespace MySQL.ForExcel.Forms
     /// <param name="importToWorksheetName">Name of the Excel worksheet where the data will be imported to.</param>
     public ImportTableViewForm(DbView importDbTableOrView, string importToWorksheetName)
     {
-      if (importDbTableOrView == null)
-      {
-        throw new ArgumentNullException(nameof(importDbTableOrView));
-      }
-
-      _dbTableOrView = importDbTableOrView;
+      _dbTableOrView = importDbTableOrView ?? throw new ArgumentNullException(nameof(importDbTableOrView));
       _importColumns = null;
       _rowsExceedWorksheetLimit = null;
       _rowsLimit = null;
       MySqlTable = null;
       _activeWorkbookMaxRowNumber = Globals.ThisAddIn.ActiveWorkbook.GetWorkbookMaxRowNumber();
       var atCell = Globals.ThisAddIn.Application.ActiveCell;
-      _atRow = atCell == null ? 1 : atCell.Row;
+      _atRow = atCell?.Row ?? 1;
       InitializeComponent();
 
       PreviewDataGridView.SelectAllAfterBindingComplete = true;
@@ -118,15 +113,8 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     public sealed override string Text
     {
-      get
-      {
-        return base.Text;
-      }
-
-      set
-      {
-        base.Text = value;
-      }
+      get => base.Text;
+      set => base.Text = value;
     }
 
     /// <summary>
@@ -176,13 +164,7 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets a value indicating the number of rows to be fetched by the select query.
     /// </summary>
-    private int RowsToReturn
-    {
-      get
-      {
-        return LimitRowsCheckBox.Checked ? (int)RowsLimitNumericUpDown.Value : -1;
-      }
-    }
+    private int RowsToReturn => LimitRowsCheckBox.Checked ? (int)RowsLimitNumericUpDown.Value : -1;
 
     #endregion Properties
 
@@ -192,7 +174,7 @@ namespace MySQL.ForExcel.Forms
     /// <returns>Always DialogResult.OK</returns>
     public DialogResult ImportHidingDialog()
     {
-      bool success = ImportData();
+      var success = ImportData();
       return success ? DialogResult.OK : DialogResult.Cancel;
     }
 
@@ -271,7 +253,7 @@ namespace MySQL.ForExcel.Forms
       var headerRowsCount = usingExcelTables || IncludeHeadersCheckBox.Checked ? 1 : 0;
       var summaryRowsCount = AddSummaryFieldsCheckBox.Checked ? 1 : 0;
       var extraRowIfUsingExcelTables = usingExcelTables ? 1 : 0;
-      int maximumExcelRowsThatFit = _activeWorkbookMaxRowNumber - _atRow - headerRowsCount - summaryRowsCount - extraRowIfUsingExcelTables;
+      var maximumExcelRowsThatFit = _activeWorkbookMaxRowNumber - _atRow - headerRowsCount - summaryRowsCount - extraRowIfUsingExcelTables;
 
       // Get the minimum value between the rows that can fit in the Worksheet VS the rows that can be fetched from the table given the start row and the total rows.
       var rowsLimit = Math.Min(maximumTableRowsToImport, maximumExcelRowsThatFit) + 1;
@@ -327,7 +309,7 @@ namespace MySQL.ForExcel.Forms
 
       // Import data into Excel
       var importTuple = _dbTableOrView.ImportData();
-      MySqlTable = importTuple != null ? importTuple.Item1 : null;
+      MySqlTable = importTuple?.Item1;
 
       Cursor = Cursors.Default;
       return MySqlTable != null;
@@ -374,7 +356,7 @@ namespace MySQL.ForExcel.Forms
     private void LimitRowsCheckBox_CheckedChanged(object sender, EventArgs e)
     {
       _rowsExceedWorksheetLimit = null;
-      bool limitRows = LimitRowsCheckBox.Checked;
+      var limitRows = LimitRowsCheckBox.Checked;
       FromRowNumericUpDown.Enabled = limitRows;
       RowsLimitNumericUpDown.Enabled = limitRows;
       ResetRowsLimit();
@@ -396,13 +378,7 @@ namespace MySQL.ForExcel.Forms
     private void MaxValueToolStripMenuItem_Click(object sender, EventArgs e)
     {
       var item = sender as ToolStripMenuItem;
-      if (item == null)
-      {
-        return;
-      }
-
-      var owner = item.Owner as ContextMenuStrip;
-      if (owner == null)
+      if (!(item?.Owner is ContextMenuStrip owner))
       {
         return;
       }
@@ -469,7 +445,7 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Shows or hides the compatibility warning controls to let the users know if the rows to be imported exceed the limit of rows of the current Excel's Worksheet.
+    /// Shows or hides the compatibility warning controls to let the users know if the rows to be imported exceed the limit of rows of the current Excel Worksheet.
     /// </summary>
     private void SetCompatibilityWarningControlsVisibility()
     {

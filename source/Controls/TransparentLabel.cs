@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -38,7 +38,7 @@ namespace MySQL.ForExcel.Controls
     private StringFormat _customFormatter;
 
     /// <summary>
-    /// Specifies the algignment for the label text.
+    /// Specifies the alignment for the label text.
     /// </summary>
     private ContentAlignment _textAlign;
 
@@ -98,7 +98,7 @@ namespace MySQL.ForExcel.Controls
     #region Properties
 
     /// <summary>
-    /// Gets or sets a valie indicating whether anti-aliasing is applied when rendering the text.
+    /// Gets or sets a value indicating whether anti-aliasing is applied when rendering the text.
     /// </summary>
     [Category("MySQL Custom"), DefaultValue(false), Description("Applies anti-aliasing when rendering the text.")]
     public bool ApplyAntiAlias { get; set; }
@@ -151,14 +151,11 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), DefaultValue(ContentAlignment.TopLeft), Description("Determines the position of the text within the label.")]
     public ContentAlignment TextAlign
     {
-      get
-      {
-        return _textAlign;
-      }
+      get => _textAlign;
 
       set
       {
-        bool valueChanged = _textAlign != value;
+        var valueChanged = _textAlign != value;
         _textAlign = value;
         if (valueChanged)
         {
@@ -179,14 +176,11 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), DefaultValue(""), Description("The text to display in the control.")]
     public string TransparentText
     {
-      get
-      {
-        return _transparentText;
-      }
+      get => _transparentText;
 
       set
       {
-        bool valueChanged = _transparentText != value;
+        var valueChanged = _transparentText != value;
         _transparentText = value;
         if (!valueChanged)
         {
@@ -208,10 +202,7 @@ namespace MySQL.ForExcel.Controls
     {
       if (disposing)
       {
-        if (_customFormatter != null)
-        {
-          _customFormatter.Dispose();
-        }
+        _customFormatter?.Dispose();
       }
 
       base.Dispose(disposing);
@@ -274,9 +265,9 @@ namespace MySQL.ForExcel.Controls
         return;
       }
 
-      SolidBrush shadowBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(ShadowOpacity * 255), ShadowColor));
-      SolidBrush textBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TextOpacity * 255), ForeColor));
-      Point p = e.ClipRectangle.Location;
+      var shadowBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(ShadowOpacity * 255), ShadowColor));
+      var textBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TextOpacity * 255), ForeColor));
+      var p = e.ClipRectangle.Location;
 
       switch (_customFormatter.Alignment)
       {
@@ -289,7 +280,7 @@ namespace MySQL.ForExcel.Controls
           break;
       }
 
-      foreach (string lineText in _wordWrapLines)
+      foreach (var lineText in _wordWrapLines)
       {
         if (DrawShadow)
         {

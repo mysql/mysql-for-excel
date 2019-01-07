@@ -342,7 +342,7 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      string workbookId = workbook.GetOrCreateId();
+      var workbookId = workbook.GetOrCreateId();
       return !string.IsNullOrEmpty(workbookId) && ConnectionInfosByWorkbook.ContainsKey(workbookId)
         ? ConnectionInfosByWorkbook[workbookId]
         : null;
@@ -455,7 +455,7 @@ namespace MySQL.ForExcel.Classes
       else if (!string.Equals(wbConnectionInfoConnection.HostIdentifier, activeExcelPane.WbConnection.HostIdentifier, StringComparison.InvariantCulture))
       {
         // If the stored connection points to a different host as the current connection, ask the user if he wants to open a new connection only if there are active Edit dialogs.
-        string workbookId = workbook.GetOrCreateId();
+        var workbookId = workbook.GetOrCreateId();
         if (ConnectionInfosByWorkbook.Count(ci => ci.Key != workbookId && ci.Value.EditConnectionInfos.Count > 0) > 0)
         {
           var dialogProperties = InfoDialogProperties.GetYesNoDialogProperties(
@@ -639,7 +639,7 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      string workbookId = workbook.GetOrCreateId();
+      var workbookId = workbook.GetOrCreateId();
 
       // Remove migrated ImportConnectionInfos
       UserSettingsImportConnectionInfos.RemoveAll(ici => ici.WorkbookGuid == workbookId && workbookConnectionInfos.ImportConnectionInfos.Contains(ici));
@@ -681,8 +681,8 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Close the current schema if the current connection is being reused but the EditConnectionInfo's schema is different
-      bool connectionReused = connectionInfoConnection.Equals(currentConnection);
-      bool openSchema = !connectionReused;
+      var connectionReused = connectionInfoConnection.Equals(currentConnection);
+      var openSchema = !connectionReused;
       if (connectionReused && !string.Equals(currentSchema, firstConnectionInfo.SchemaName, StringComparison.InvariantCulture))
       {
         if (!activeExcelPane.CloseSchema(true, false))
@@ -838,7 +838,7 @@ namespace MySQL.ForExcel.Classes
         ? Resources.UnableToAddConnectionsWhenWBRunning + Environment.NewLine + Resources.ImportConnectionInfosMissingConnectionsMoreInfo
         : Resources.ImportConnectionInfosMissingConnectionsMoreInfo;
       var stringBuilder = new StringBuilder(moreInfoText);
-      List<string> missingHostIds = missingConnectionInfoConnections.Select(i => i.HostIdentifier).Distinct().ToList();
+      var missingHostIds = missingConnectionInfoConnections.Select(i => i.HostIdentifier).Distinct().ToList();
       foreach (var missingHostId in missingHostIds)
       {
         stringBuilder.Append(Environment.NewLine);
@@ -944,14 +944,22 @@ namespace MySQL.ForExcel.Classes
       switch (Storage)
       {
         case ConnectionInfosStorageType.UserSettingsFile:
-          string workbookId = workbook.GetOrCreateId();
+          var workbookId = workbook.GetOrCreateId();
           EditConnectionInfos = UserSettingsEditConnectionInfos.FindAll(editConnectionInfo => editConnectionInfo.WorkbookGuid == workbookId);
           break;
 
         case ConnectionInfosStorageType.WorkbookXmlParts:
-          if (workbook == null || string.IsNullOrEmpty(EditConnectionInfosXmlPartId)) return;
+          if (workbook == null || string.IsNullOrEmpty(EditConnectionInfosXmlPartId))
+          {
+            return;
+          }
+
           var customXmlPart = workbook.CustomXMLParts.SelectByID(EditConnectionInfosXmlPartId);
-          if (customXmlPart == null) return;
+          if (customXmlPart == null)
+          {
+            return;
+          }
+
           EditConnectionInfos = customXmlPart.XML.Deserialize<List<EditConnectionInfo>>();
           break;
       }
@@ -966,14 +974,22 @@ namespace MySQL.ForExcel.Classes
       switch (Storage)
       {
         case ConnectionInfosStorageType.UserSettingsFile:
-          string workbookId = workbook.GetOrCreateId();
+          var workbookId = workbook.GetOrCreateId();
           ImportConnectionInfos = UserSettingsImportConnectionInfos.FindAll(importConnectionInfo => importConnectionInfo.WorkbookGuid == workbookId);
           break;
 
         case ConnectionInfosStorageType.WorkbookXmlParts:
-          if (workbook == null || string.IsNullOrEmpty(ImportConnectionInfosXmlPartId)) return;
+          if (workbook == null || string.IsNullOrEmpty(ImportConnectionInfosXmlPartId))
+          {
+            return;
+          }
+
           var customXmlPart = workbook.CustomXMLParts.SelectByID(ImportConnectionInfosXmlPartId);
-          if (customXmlPart == null) return;
+          if (customXmlPart == null)
+          {
+            return;
+          }
+
           ImportConnectionInfos = customXmlPart.XML.Deserialize<List<ImportConnectionInfo>>();
           break;
       }
@@ -990,7 +1006,7 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      string workbookId = workbook.GetOrCreateId();
+      var workbookId = workbook.GetOrCreateId();
       var userSettingsWorkbookImportConnectionInfos = UserSettingsImportConnectionInfos.FindAll(ici => ici.WorkbookGuid == workbookId);
       var userSettingsWorkbookEditConnectionInfos = UserSettingsEditConnectionInfos.FindAll(eci => eci.WorkbookGuid == workbookId);
       if (userSettingsWorkbookImportConnectionInfos.Count + userSettingsWorkbookEditConnectionInfos.Count == 0)
@@ -1011,7 +1027,7 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      int migratedConnectionInfosCount = 0;
+      var migratedConnectionInfosCount = 0;
       Storage = ConnectionInfosStorageType.WorkbookXmlParts;
 
       // Migrate ImportConnectionInfos
@@ -1065,7 +1081,11 @@ namespace MySQL.ForExcel.Classes
           break;
 
         case ConnectionInfosStorageType.WorkbookXmlParts:
-          if (workbook == null) return;
+          if (workbook == null)
+          {
+            return;
+          }
+
           var customXmlPart = string.IsNullOrEmpty(EditConnectionInfosXmlPartId)
             ? null
             : workbook.CustomXMLParts.SelectByID(EditConnectionInfosXmlPartId);
@@ -1100,7 +1120,11 @@ namespace MySQL.ForExcel.Classes
           break;
 
         case ConnectionInfosStorageType.WorkbookXmlParts:
-          if (workbook == null) return;
+          if (workbook == null)
+          {
+            return;
+          }
+
           var customXmlPart = string.IsNullOrEmpty(ImportConnectionInfosXmlPartId)
             ? null
             : workbook.CustomXMLParts.SelectByID(ImportConnectionInfosXmlPartId);

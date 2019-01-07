@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -158,77 +158,71 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a static list containing all allowed MySQL data types.
     /// </summary>
-    public static List<MySqlDisplayDataType> DataTypesList
+    public static List<MySqlDisplayDataType> DataTypesList => _dataTypesList ?? (_dataTypesList = new List<MySqlDisplayDataType>(50)
     {
-      get
-      {
-        return _dataTypesList ?? (_dataTypesList = new List<MySqlDisplayDataType>(50)
-        {
-          // Commonly displayed data types
-          new MySqlDisplayDataType("Integer", "Default for whole-number columns", true, true, true),
-          new MySqlDisplayDataType("VarChar(5)", "Small string up to 5 characters", false, true, true),
-          new MySqlDisplayDataType("VarChar(12)", "Small string up to 12 characters", false, true, true),
-          new MySqlDisplayDataType("VarChar(25)", "Small string up to 25 characters", false, true, true),
-          new MySqlDisplayDataType("VarChar(45)", "Standard string up to 45 characters", false, true, true),
-          new MySqlDisplayDataType("VarChar(255)", "Standard string up to 255 characters", false, true, true),
-          new MySqlDisplayDataType("VarChar(4000)", "Large string up to 4k characters", false, true, true),
-          new MySqlDisplayDataType("Text", "Maximum string up to 65k characters", true, true, true),
-          new MySqlDisplayDataType("DateTime", "For columns that store both, date and time", true, true, true),
-          new MySqlDisplayDataType("Date", "For columns that only store a date", true, true, true),
-          new MySqlDisplayDataType("Time", "For columns that only store a time", true, true, true),
-          new MySqlDisplayDataType("Bool", "Holds values like (0, 1), (True, False) or (Yes, No)", true, true, true),
-          new MySqlDisplayDataType("BigInt", "For columns containing large whole-number integers with up to 19 digits", true, true, true),
-          new MySqlDisplayDataType("Decimal(12, 2)", "Exact decimal numbers with 12 digits, 2 of them after the decimal point", false, true, true),
-          new MySqlDisplayDataType("Decimal(65, 30)", "Biggest exact decimal numbers with 65 digits, 30 of them after the decimal point", false, true, true),
-          new MySqlDisplayDataType("Double", "Biggest float pointing number with approximately 15 decimal places", true, true, true),
+      // Commonly displayed data types
+      new MySqlDisplayDataType("Integer", "Default for whole-number columns", true, true, true),
+      new MySqlDisplayDataType("VarChar(5)", "Small string up to 5 characters", false, true, true),
+      new MySqlDisplayDataType("VarChar(12)", "Small string up to 12 characters", false, true, true),
+      new MySqlDisplayDataType("VarChar(25)", "Small string up to 25 characters", false, true, true),
+      new MySqlDisplayDataType("VarChar(45)", "Standard string up to 45 characters", false, true, true),
+      new MySqlDisplayDataType("VarChar(255)", "Standard string up to 255 characters", false, true, true),
+      new MySqlDisplayDataType("VarChar(4000)", "Large string up to 4k characters", false, true, true),
+      new MySqlDisplayDataType("Text", "Maximum string up to 65k characters", true, true, true),
+      new MySqlDisplayDataType("DateTime", "For columns that store both, date and time", true, true, true),
+      new MySqlDisplayDataType("Date", "For columns that only store a date", true, true, true),
+      new MySqlDisplayDataType("Time", "For columns that only store a time", true, true, true),
+      new MySqlDisplayDataType("Bool", "Holds values like (0, 1), (True, False) or (Yes, No)", true, true, true),
+      new MySqlDisplayDataType("BigInt", "For columns containing large whole-number integers with up to 19 digits", true, true, true),
+      new MySqlDisplayDataType("Decimal(12, 2)", "Exact decimal numbers with 12 digits, 2 of them after the decimal point", false, true, true),
+      new MySqlDisplayDataType("Decimal(65, 30)", "Biggest exact decimal numbers with 65 digits, 30 of them after the decimal point", false, true, true),
+      new MySqlDisplayDataType("Double", "Biggest float pointing number with approximately 15 decimal places", true, true, true),
 
-          // Other data types to be displayed
-          new MySqlDisplayDataType("Bit", "For columns containing numbers in binary notation", true, true, false),
-          new MySqlDisplayDataType("Enum", "Holds values from a specified list of enumerated permitted values", true, true, false),
-          new MySqlDisplayDataType("Set", "String that can have zero or more values out of a list of permitted values", true, true, false),
-          new MySqlDisplayDataType("JSON", "Enables efficient access to data in JSON (JavaScript Object Notation) documents.", true, true, false),
-          new MySqlDisplayDataType("TinyInt", "For columns containing tiny whole-number integers with up to  digits", true, true, false),
-          new MySqlDisplayDataType("SmallInt", "For columns containing small whole-number integers with up to 5 digits", true, true, false),
-          new MySqlDisplayDataType("MediumInt", "For columns containing medium whole-number integers with up to 7 digits", true, true, false),
-          new MySqlDisplayDataType("Float", "Floating point number with approximately 7 decimal places", true, true, false),
-          new MySqlDisplayDataType("Decimal", "For exact decimal numbers", true, true, false),
-          new MySqlDisplayDataType("TimeStamp", "For columns that store both, date and time in UTC format", true, true, false),
-          new MySqlDisplayDataType("Year", "For years in 2 or 4 digit format", true, true, false),
-          new MySqlDisplayDataType("Char", "For fixed-lenght strings up to 255 characters", true, true, false),
-          new MySqlDisplayDataType("TinyText", "Maximum string up to 255 characters", true, true, false),
-          new MySqlDisplayDataType("MediumText", "Maximum string up to 16M characters", true, true, false),
-          new MySqlDisplayDataType("LongText", "Maximum string up to 4G characters", true, true, false),
-          new MySqlDisplayDataType("Binary", "For fixed-lenght binary data up to 255 bytes", true, true, false),
-          new MySqlDisplayDataType("VarBinary", "For variable-length binary data", true, true, false),
-          new MySqlDisplayDataType("TinyBlob", "For binary large objects up to 256 bytes", true, true, false),
-          new MySqlDisplayDataType("Blob", "For binary large objects up to 65 Kb", true, true, false),
-          new MySqlDisplayDataType("MediumBlob", "For binary large objects up to 16 Mb", true, true, false),
-          new MySqlDisplayDataType("LongBlob", "For binary large objects up to 4 Gb", true, true, false),
-          new MySqlDisplayDataType("Geometry", "For spatial data, base type for all geometry values", true, true, false),
-          new MySqlDisplayDataType("GeometryCollection", "For spatial data, a collection of one or more geometries of any type", true, true, false),
-          new MySqlDisplayDataType("LineString", "For spatial data, a Curve with linear interpolation between points", true, true, false),
-          new MySqlDisplayDataType("MultiLineString", "For spatial data, a geometry collection composed of LineString elements", true, true, false),
-          new MySqlDisplayDataType("MultiPoint", "For spatial data, a geometry collection composed of Point elements", true, true, false),
-          new MySqlDisplayDataType("MultiPolygon", "For spatial data, a geometry collection composed of Polygon elements", true, true, false),
-          new MySqlDisplayDataType("Point", "For spatial data, a geometry that represents a single location in coordinate space", true, true, false),
-          new MySqlDisplayDataType("Polygon", "For spatial data, a planar Surface representing a multi-sided geometry", true, true, false),
+      // Other data types to be displayed
+      new MySqlDisplayDataType("Bit", "For columns containing numbers in binary notation", true, true, false),
+      new MySqlDisplayDataType("Enum", "Holds values from a specified list of enumerated permitted values", true, true, false),
+      new MySqlDisplayDataType("Set", "String that can have zero or more values out of a list of permitted values", true, true, false),
+      new MySqlDisplayDataType("JSON", "Enables efficient access to data in JSON (JavaScript Object Notation) documents.", true, true, false),
+      new MySqlDisplayDataType("TinyInt", "For columns containing tiny whole-number integers with up to  digits", true, true, false),
+      new MySqlDisplayDataType("SmallInt", "For columns containing small whole-number integers with up to 5 digits", true, true, false),
+      new MySqlDisplayDataType("MediumInt", "For columns containing medium whole-number integers with up to 7 digits", true, true, false),
+      new MySqlDisplayDataType("Float", "Floating point number with approximately 7 decimal places", true, true, false),
+      new MySqlDisplayDataType("Decimal", "For exact decimal numbers", true, true, false),
+      new MySqlDisplayDataType("TimeStamp", "For columns that store both, date and time in UTC format", true, true, false),
+      new MySqlDisplayDataType("Year", "For years in 2 or 4 digit format", true, true, false),
+      new MySqlDisplayDataType("Char", "For fixed-lenght strings up to 255 characters", true, true, false),
+      new MySqlDisplayDataType("TinyText", "Maximum string up to 255 characters", true, true, false),
+      new MySqlDisplayDataType("MediumText", "Maximum string up to 16M characters", true, true, false),
+      new MySqlDisplayDataType("LongText", "Maximum string up to 4G characters", true, true, false),
+      new MySqlDisplayDataType("Binary", "For fixed-lenght binary data up to 255 bytes", true, true, false),
+      new MySqlDisplayDataType("VarBinary", "For variable-length binary data", true, true, false),
+      new MySqlDisplayDataType("TinyBlob", "For binary large objects up to 256 bytes", true, true, false),
+      new MySqlDisplayDataType("Blob", "For binary large objects up to 65 Kb", true, true, false),
+      new MySqlDisplayDataType("MediumBlob", "For binary large objects up to 16 Mb", true, true, false),
+      new MySqlDisplayDataType("LongBlob", "For binary large objects up to 4 Gb", true, true, false),
+      new MySqlDisplayDataType("Geometry", "For spatial data, base type for all geometry values", true, true, false),
+      new MySqlDisplayDataType("GeometryCollection", "For spatial data, a collection of one or more geometries of any type", true, true, false),
+      new MySqlDisplayDataType("LineString", "For spatial data, a Curve with linear interpolation between points", true, true, false),
+      new MySqlDisplayDataType("MultiLineString", "For spatial data, a geometry collection composed of LineString elements", true, true, false),
+      new MySqlDisplayDataType("MultiPoint", "For spatial data, a geometry collection composed of Point elements", true, true, false),
+      new MySqlDisplayDataType("MultiPolygon", "For spatial data, a geometry collection composed of Polygon elements", true, true, false),
+      new MySqlDisplayDataType("Point", "For spatial data, a geometry that represents a single location in coordinate space", true, true, false),
+      new MySqlDisplayDataType("Polygon", "For spatial data, a planar Surface representing a multi-sided geometry", true, true, false),
 
-          // Other data types not to be displayed
-          new MySqlDisplayDataType("Int", "Same as Integer", true, false, false),
-          new MySqlDisplayDataType("Numeric", "Same as Decimal", true, false, false),
-          new MySqlDisplayDataType("Fixed", "Same as Decimal", true, false, false),
-          new MySqlDisplayDataType("Real", "Same as Double)", true, false, false),
-          new MySqlDisplayDataType("Double Precision", "Same as Double)", true, false, false),
-          new MySqlDisplayDataType("Boolean", "Same as Bool)", true, false, false),
-          new MySqlDisplayDataType("VarChar", "For variable-length strings", true, false, false)
-        });
-      }
-    }
+      // Other data types not to be displayed
+      new MySqlDisplayDataType("Int", "Same as Integer", true, false, false),
+      new MySqlDisplayDataType("Numeric", "Same as Decimal", true, false, false),
+      new MySqlDisplayDataType("Fixed", "Same as Decimal", true, false, false),
+      new MySqlDisplayDataType("Real", "Same as Double)", true, false, false),
+      new MySqlDisplayDataType("Double Precision", "Same as Double)", true, false, false),
+      new MySqlDisplayDataType("Boolean", "Same as Bool)", true, false, false),
+      new MySqlDisplayDataType("VarChar", "For variable-length strings", true, false, false)
+    });
 
     /// <summary>
     /// Gets a friendly description for the data type.
     /// </summary>
-    public string Description { get; private set; }
+    public string Description { get; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the data type will be displayed as an option for users to select.
@@ -238,7 +232,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a value indicating whether the data type is a base type without other specifiers.
     /// </summary>
-    public bool IsBaseType { get; private set; }
+    public bool IsBaseType { get; }
 
     /// <summary>
     /// Gets a value indicating whether the data type is a common one.
@@ -248,7 +242,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the MySQL data type name.
     /// </summary>
-    public string Name { get; private set; }
+    public string Name { get; }
 
     /// <summary>
     /// Gets the name and description for this data type.
@@ -277,7 +271,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The length, in pixels, of the longest description among the specified dictionary of MySQL data types.</returns>
     public static int GetCommonDataTypesLongestDescriptionLength(bool commonTypesOnly, Font font, int addedPadding = 0)
     {
-      int longestLength = 0;
+      var longestLength = 0;
       var typesDictionary = commonTypesOnly ? CommonDataTypesDictionary : AllDataTypesDictionary;
       foreach (var dicItem in typesDictionary)
       {
@@ -326,8 +320,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the given type is a valid MySQL data type, <c>false</c> otherwise.</returns>
     public static bool ValidateTypeName(string typeName)
     {
-      bool isValid;
-      GetDisplayTypeName(typeName, out isValid);
+      GetDisplayTypeName(typeName, out var isValid);
       return isValid;
     }
   }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -72,7 +72,7 @@ namespace MySQL.ForExcel.Classes
     {
       if (columnIndex < 0)
       {
-        throw new ArgumentOutOfRangeException("columnIndex", Resources.ValueLessThanZeroError);
+        throw new ArgumentOutOfRangeException(nameof(columnIndex), Resources.ValueLessThanZeroError);
       }
 
       _columnSpan = 1;
@@ -96,7 +96,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the index of the original <see cref="DataGridViewColumn"/> this object is associated with.
     /// </summary>
-    public int ColumnIndex { get; private set; }
+    public int ColumnIndex { get; }
 
     /// <summary>
     /// Gets or sets the number of original columns this header will span.
@@ -104,10 +104,7 @@ namespace MySQL.ForExcel.Classes
     /// <remarks>If less than 0 or this cell is already part of another cell's span, it will default to 1.</remarks>
     public int ColumnSpan
     {
-      get
-      {
-        return _columnSpan;
-      }
+      get => _columnSpan;
 
       set
       {
@@ -116,7 +113,7 @@ namespace MySQL.ForExcel.Classes
           return;
         }
 
-        int oldColumnSpan = _columnSpan;
+        var oldColumnSpan = _columnSpan;
         _columnSpan = value < 1 || InSpan ? 1 : value;
         OnHeaderCellColumnSpanChanged(oldColumnSpan);
       }
@@ -132,10 +129,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public int SeparatorWidth
     {
-      get
-      {
-        return _separatorWidth;
-      }
+      get => _separatorWidth;
 
       set
       {
@@ -154,10 +148,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public string Text
     {
-      get
-      {
-        return _text;
-      }
+      get => _text;
 
       set
       {
@@ -166,7 +157,7 @@ namespace MySQL.ForExcel.Classes
           return;
         }
 
-        string oldText = value;
+        var oldText = value;
         _text = value;
         OnHeaderCellTextChanged(oldText);
       }
@@ -177,10 +168,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public bool UseColumnPaddingsForSizeCalculation
     {
-      get
-      {
-        return _useColumnPaddingsForSizeCalculation;
-      }
+      get => _useColumnPaddingsForSizeCalculation;
 
       set
       {
@@ -224,8 +212,8 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public void CalculateCellSize()
     {
-      string computingText = Text;
-      bool emptyText = string.IsNullOrEmpty(computingText);
+      var computingText = Text;
+      var emptyText = string.IsNullOrEmpty(computingText);
       if (emptyText)
       {
         computingText = "Text";
@@ -249,7 +237,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The last base column index according to the columns spanned by this header cell.</returns>
     public int GetLastBaseColumnIndexFromSpan(int baseColumnsCount)
     {
-      int lastColumnIndex = ColumnIndex + ColumnSpan - 1;
+      var lastColumnIndex = ColumnIndex + ColumnSpan - 1;
       if (lastColumnIndex >= baseColumnsCount)
       {
         lastColumnIndex = baseColumnsCount - 1;
@@ -264,12 +252,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="oldColumnSpan">The old value of the <see cref="MultiHeaderCell.ColumnSpan"/> property.</param>
     protected virtual void OnHeaderCellColumnSpanChanged(int oldColumnSpan)
     {
-      if (HeaderCellColumnSpanChanged == null)
-      {
-        return;
-      }
-
-      HeaderCellColumnSpanChanged(this, new HeaderCellColumnSpanChangedArgs(this, oldColumnSpan));
+      HeaderCellColumnSpanChanged?.Invoke(this, new HeaderCellColumnSpanChangedArgs(this, oldColumnSpan));
     }
 
     /// <summary>
@@ -279,12 +262,7 @@ namespace MySQL.ForExcel.Classes
     protected virtual void OnHeaderCellTextChanged(string oldText)
     {
       CalculateCellSize();
-      if (HeaderCellTextChanged == null)
-      {
-        return;
-      }
-
-      HeaderCellTextChanged(this, new HeaderCellTextChangedArgs(this, oldText));
+      HeaderCellTextChanged?.Invoke(this, new HeaderCellTextChangedArgs(this, oldText));
     }
   }
 }

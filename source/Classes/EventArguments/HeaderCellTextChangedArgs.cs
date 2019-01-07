@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -38,22 +38,16 @@ namespace MySQL.ForExcel.Classes.EventArguments
     /// <summary>
     /// Gets the <see cref="MultiHeaderCell"/> object whose column span changed.
     /// </summary>
-    public MultiHeaderCell HeaderCell { get; private set; }
+    public MultiHeaderCell HeaderCell { get; }
 
     /// <summary>
     /// Gets the new value of the <see cref="MultiHeaderCell.Text"/> property.
     /// </summary>
-    public string NewText
-    {
-      get
-      {
-        return HeaderCell != null ? HeaderCell.Text : null;
-      }
-    }
+    public string NewText => HeaderCell?.Text;
 
     /// <summary>
     /// Gets the old value of the <see cref="MultiHeaderCell.Text"/> property.
     /// </summary>
-    public string OldText { get; private set; }
+    public string OldText { get; }
   }
 }

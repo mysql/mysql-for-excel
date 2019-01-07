@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -83,10 +83,7 @@ namespace MySQL.ForExcel.Classes
     [XmlIgnore]
     public EditDataDialog EditDialog
     {
-      get
-      {
-        return _editDialog;
-      }
+      get => _editDialog;
 
       set
       {
@@ -140,9 +137,7 @@ namespace MySQL.ForExcel.Classes
 
     public static bool operator ==(EditConnectionInfo lhs, EditConnectionInfo rhs)
     {
-      return ReferenceEquals(lhs, null)
-        ? ReferenceEquals(rhs, null)
-        : lhs.Equals(rhs);
+      return lhs?.Equals(rhs) ?? rhs is null;
     }
 
     /// <summary>
@@ -172,7 +167,7 @@ namespace MySQL.ForExcel.Classes
     public bool Equals(EditConnectionInfo other)
     {
       // If parameter is null, return false.
-      if (ReferenceEquals(other, null))
+      if (other is null)
       {
         return false;
       }
@@ -209,7 +204,7 @@ namespace MySQL.ForExcel.Classes
       const int hashCodeMultiplier = 397;
       unchecked
       {
-        int hashCode = ConnectionId != null ? ConnectionId.GetHashCode() : 1;
+        var hashCode = ConnectionId != null ? ConnectionId.GetHashCode() : 1;
         hashCode = (hashCode * hashCodeMultiplier) ^ (SchemaName != null ? SchemaName.GetHashCode() : 0);
         hashCode = (hashCode * hashCodeMultiplier) ^ (TableName != null ? TableName.GetHashCode() : 0);
         hashCode = (hashCode * hashCodeMultiplier) ^ (WorkbookFilePath != null ? WorkbookFilePath.GetHashCode() : 0);

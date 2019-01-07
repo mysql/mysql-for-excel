@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -73,7 +73,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the name of the MySQL table, view or procedure to import data from.
     /// </summary>
-    public string DbObjectName { get; private set; }
+    public string DbObjectName { get; }
 
     /// <summary>
     /// Gets or sets the index of the row where the select query will start pulling data from.
@@ -105,15 +105,8 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public int RowsCount
     {
-      get
-      {
-        return _rowsCount;
-      }
-
-      set
-      {
-        _rowsCount = Globals.ThisAddIn.ActiveWorkbook.Excel8CompatibilityMode ? Math.Min(UInt16.MaxValue, value) : value;
-      }
+      get => _rowsCount;
+      set => _rowsCount = Globals.ThisAddIn.ActiveWorkbook.Excel8CompatibilityMode ? Math.Min(ushort.MaxValue, value) : value;
     }
 
     #endregion Properties

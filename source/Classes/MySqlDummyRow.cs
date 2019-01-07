@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -30,7 +30,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// The SQL query needed to commit changes contained in this row to the SQL server.
     /// </summary>
-    private string _sqlQuery;
+    private readonly string _sqlQuery;
 
     #endregion Fields
 
@@ -49,37 +49,19 @@ namespace MySQL.ForExcel.Classes
 
     /// <summary>
     /// Gets the related Excel row number if any.
-    /// A valule of 0 indicates there is no related Excel row.
+    /// A value of 0 indicates there is no related Excel row.
     /// </summary>
-    public int ExcelRow
-    {
-      get
-      {
-        return 0;
-      }
-    }
+    public int ExcelRow => 0;
 
     /// <summary>
     /// Gets a value indicating whether there are concurrency warnings in a row.
     /// </summary>
-    public bool HasConcurrencyWarnings
-    {
-      get
-      {
-        return !string.IsNullOrEmpty(RowError) && string.Equals(RowError, MySqlStatement.NO_MATCH, StringComparison.InvariantCulture);
-      }
-    }
+    public bool HasConcurrencyWarnings => !string.IsNullOrEmpty(RowError) && string.Equals(RowError, MySqlStatement.NO_MATCH, StringComparison.InvariantCulture);
 
     /// <summary>
     /// Gets a value indicating whether there are errors in a row.
     /// </summary>
-    public bool HasErrors
-    {
-      get
-      {
-        return !string.IsNullOrEmpty(RowError) && !string.Equals(RowError, MySqlStatement.NO_MATCH, StringComparison.InvariantCulture);
-      }
-    }
+    public bool HasErrors => !string.IsNullOrEmpty(RowError) && !string.Equals(RowError, MySqlStatement.NO_MATCH, StringComparison.InvariantCulture);
 
     /// <summary>
     /// Gets or sets the custom error description for a row.

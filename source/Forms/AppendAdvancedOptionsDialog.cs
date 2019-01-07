@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -65,10 +65,10 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// List of column mappings for the current user.
     /// </summary>
-    public List<MySqlColumnMapping> Mappings { get; private set; }
+    public List<MySqlColumnMapping> Mappings { get; }
 
     /// <summary>
-    /// Gets a value indicatng whether mappings were renamed or deleted.
+    /// Gets a value indicating whether mappings were renamed or deleted.
     /// </summary>
     public bool MappingsChanged { get; private set; }
 
@@ -218,9 +218,9 @@ namespace MySQL.ForExcel.Forms
 
       foreach (var item in Mappings)
       {
-        ListViewItem itemList = new ListViewItem
+        var itemList = new ListViewItem
         {
-          Text = string.Format("{0} ({1}.{2})", item.Name, item.SchemaName, item.TableName)
+          Text = $@"{item.Name} ({item.SchemaName}.{item.TableName})"
         };
         itemList.SubItems.Add(string.Empty);
         itemList.Tag = item;
@@ -250,7 +250,7 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      int indexForName = 1;
+      var indexForName = 1;
       string proposedMappingName;
       do
       {
@@ -262,7 +262,7 @@ namespace MySQL.ForExcel.Forms
       string newName;
       using (var newColumnMappingDialog = new AppendNewColumnMappingDialog(proposedMappingName))
       {
-        DialogResult dr = newColumnMappingDialog.ShowDialog();
+        var dr = newColumnMappingDialog.ShowDialog();
         if (dr == DialogResult.Cancel)
         {
           return;
@@ -281,7 +281,7 @@ namespace MySQL.ForExcel.Forms
 
       _selectedMapping.Name = newName;
       RefreshMappingList();
-      ListViewItem item = MappingsListView.FindItemWithText(string.Format("{0} ({1}.{2})", newName, _selectedMapping.SchemaName, _selectedMapping.TableName));
+      var item = MappingsListView.FindItemWithText($"{newName} ({_selectedMapping.SchemaName}.{_selectedMapping.TableName})");
       if (item != null)
       {
         MappingsListView.Items[item.Index].Selected = true;

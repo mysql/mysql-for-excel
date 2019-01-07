@@ -51,7 +51,7 @@ namespace MySQL.ForExcel.Classes
     /// Initializes a new instance of the <see cref="TempRange"/> class that prepends an AutoPK column to the range.
     /// </summary>
     /// <param name="sourceRange">The original source <see cref="ExcelInterop.Range"/> whose data is copied to the temporary one.</param>
-    /// <param name="cropToNonEmptyRange">Flag indicating whether the range is cropped to a subrange with only non-empty cells.</param>
+    /// <param name="cropToNonEmptyRange">Flag indicating whether the range is cropped to a sub-range with only non-empty cells.</param>
     /// <param name="skipEmptyColumns">Flag indicating whether empty columns are not copied to the target range.</param>
     /// <param name="hideAndDeleteWorksheet">Flag indicating whether the new temporary <see cref="ExcelInterop.Worksheet"/> will be hidden and deleted when the <see cref="TempRange"/> is disposed.</param>
     /// <param name="createAutoPkRange">Flag indicating whether a sequential numbered column is prepended to the range to represent the values for an AutoPK column.</param>
@@ -77,7 +77,7 @@ namespace MySQL.ForExcel.Classes
     /// Initializes a new instance of the <see cref="TempRange"/> class with columns mapped from the source range.
     /// </summary>
     /// <param name="sourceRange">The original source <see cref="ExcelInterop.Range"/> whose data is copied to the temporary one.</param>
-    /// <param name="cropToNonEmptyRange">Flag indicating whether the range is cropped to a subrange with only non-empty cells.</param>
+    /// <param name="cropToNonEmptyRange">Flag indicating whether the range is cropped to a sub-range with only non-empty cells.</param>
     /// <param name="skipEmptyColumns">Flag indicating whether empty columns are not copied to the target range.</param>
     /// <param name="hideAndDeleteWorksheet">Flag indicating whether the new temporary <see cref="ExcelInterop.Worksheet"/> will be hidden and deleted when the <see cref="TempRange"/> is disposed.</param>
     /// <param name="mappedIndexes">An array of indexes containing the source column from the <see cref="sourceRange"/> whose contents will be copied to the returned range.</param>
@@ -93,7 +93,7 @@ namespace MySQL.ForExcel.Classes
     /// Initializes a new instance of the <see cref="TempRange"/> class.
     /// </summary>
     /// <param name="sourceRange">The original source <see cref="ExcelInterop.Range"/> whose data is copied to the temporary one.</param>
-    /// <param name="cropToNonEmptyRange">Flag indicating whether the range is cropped to a subrange with only non-empty cells.</param>
+    /// <param name="cropToNonEmptyRange">Flag indicating whether the range is cropped to a sub-range with only non-empty cells.</param>
     /// <param name="skipEmptyColumns">Flag indicating whether empty columns are not copied to the target range.</param>
     /// <param name="hideAndDeleteWorksheet">Flag indicating whether the new temporary <see cref="ExcelInterop.Worksheet"/> will be hidden and deleted when the <see cref="TempRange"/> is disposed.</param>
     /// <param name="limitRowsQuantity">Gets a limit on the number of rows copied from the source range to the temporary range. If less than 1 it means there is no limit.</param>
@@ -149,7 +149,7 @@ namespace MySQL.ForExcel.Classes
     #region Properties
 
     /// <summary>
-    /// Gets a value indicating whether the range was cropped to a subrange with only non-empty cells.
+    /// Gets a value indicating whether the range was cropped to a sub-range with only non-empty cells.
     /// </summary>
     public bool CropToNonEmptyRange { get; }
 
@@ -197,13 +197,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the count of visible rows within the <see cref="SourceRange"/>.
     /// </summary>
-    public int VisibleRowsCount
-    {
-      get
-      {
-        return SourceRange.Rows.Cast<ExcelInterop.Range>().Count(row => !row.Hidden);
-      }
-    }
+    public int VisibleRowsCount => SourceRange.Rows.Cast<ExcelInterop.Range>().Count(row => !row.Hidden);
 
     #endregion Properties
 
@@ -275,7 +269,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       CreateCopiedTempRange();
-      int rowsCount = Range.Rows.Count;
+      var rowsCount = Range.Rows.Count;
       ExcelInterop.Range firstColumn = TempWorksheet.Columns[1];
       firstColumn.Insert();
       firstColumn = TempWorksheet.Cells[1, 1];
@@ -295,9 +289,9 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      int firstTargetColumnIndex = 1;
+      var firstTargetColumnIndex = 1;
       var visibleRowsCount = VisibleRowsCount;
-      int copiedRows = LimitRowsQuantity > 0 ? Math.Min(LimitRowsQuantity, visibleRowsCount) : visibleRowsCount;
+      var copiedRows = LimitRowsQuantity > 0 ? Math.Min(LimitRowsQuantity, visibleRowsCount) : visibleRowsCount;
       if (copiedRows < visibleRowsCount)
       {
         SourceRange = SourceRange.SafeResize(copiedRows, SourceRange.Columns.Count);
@@ -333,10 +327,10 @@ namespace MySQL.ForExcel.Classes
       }
 
       var visibleRowsCount = VisibleRowsCount;
-      for (int arrayIndex = 0; arrayIndex < mappedIndexes.Count; arrayIndex++)
+      for (var arrayIndex = 0; arrayIndex < mappedIndexes.Count; arrayIndex++)
       {
-        int excelColumnIndex = arrayIndex + 1;
-        int mappedIndex = mappedIndexes[arrayIndex];
+        var excelColumnIndex = arrayIndex + 1;
+        var mappedIndex = mappedIndexes[arrayIndex];
         if (mappedIndex < 1)
         {
           continue;
@@ -344,7 +338,7 @@ namespace MySQL.ForExcel.Classes
 
         ExcelInterop.Range sourceColumnRange = SourceRange.Columns[mappedIndex];
         ExcelInterop.Range targetColumnTopCell = TempWorksheet.Cells[1, excelColumnIndex];
-        ExcelInterop.Range targetColumnRange = targetColumnTopCell.SafeResize(visibleRowsCount, 1);
+        var targetColumnRange = targetColumnTopCell.SafeResize(visibleRowsCount, 1);
         sourceColumnRange.Copy();
         targetColumnRange.PasteSpecial(ExcelInterop.XlPasteType.xlPasteValuesAndNumberFormats, ExcelInterop.XlPasteSpecialOperation.xlPasteSpecialOperationNone, false, false);
       }
@@ -365,8 +359,7 @@ namespace MySQL.ForExcel.Classes
 
       try
       {
-        var parentWorkbook = SourceRange.Worksheet.Parent as ExcelInterop.Workbook;
-        if (parentWorkbook == null)
+        if (!(SourceRange.Worksheet.Parent is ExcelInterop.Workbook parentWorkbook))
         {
           return;
         }

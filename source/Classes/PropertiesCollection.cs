@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -34,15 +34,8 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The custom property object.</returns>
     public CustomProperty this[int index]
     {
-      get
-      {
-        return (CustomProperty)List[index];
-      }
-
-      set
-      {
-        List[index] = value;
-      }
+      get => (CustomProperty)List[index];
+      set => List[index] = value;
     }
 
     /// <summary>
@@ -60,7 +53,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="name">The name of the custom property to remove.</param>
     public void Remove(string name)
     {
-      foreach (CustomProperty prop in List.Cast<CustomProperty>().Where(prop => prop.Name == name))
+      foreach (var prop in List.Cast<CustomProperty>().Where(prop => prop.Name == name))
       {
         List.Remove(prop);
         return;
@@ -81,8 +74,8 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Returns the name of the class for the specified component using a custom type descriptor.
     /// </summary>
-    /// <returns>A <see cref="String"/> containing the name of the class for the specified component.</returns>
-    public String GetClassName()
+    /// <returns>A <see cref="string"/> containing the name of the class for the specified component.</returns>
+    public string GetClassName()
     {
       return TypeDescriptor.GetClassName(this, true);
     }
@@ -91,7 +84,7 @@ namespace MySQL.ForExcel.Classes
     /// Returns the name of the specified component using a custom type descriptor.
     /// </summary>
     /// <returns>The name of the class for the specified component, or <c>null</c> if there is no component name.</returns>
-    public String GetComponentName()
+    public string GetComponentName()
     {
       return TypeDescriptor.GetComponentName(this, true);
     }
@@ -159,10 +152,10 @@ namespace MySQL.ForExcel.Classes
     /// <returns>A <see cref="PropertyDescriptorCollection"/> with properties corresponding to thegiven attributes.</returns>
     public PropertyDescriptorCollection GetProperties(Attribute[] attributes)
     {
-      PropertyDescriptor[] newProps = new PropertyDescriptor[Count];
-      for (int i = 0; i < Count; i++)
+      var newProps = new PropertyDescriptor[Count];
+      for (var i = 0; i < Count; i++)
       {
-        CustomProperty prop = this[i];
+        var prop = this[i];
         newProps[i] = new CustomPropertyDescriptor(ref prop, attributes);
       }
 
@@ -182,7 +175,7 @@ namespace MySQL.ForExcel.Classes
     /// Returns an object that contains the property described by the specified property descriptor.
     /// </summary>
     /// <param name="pd">A <see cref="PropertyDescriptor"/> that represents the property whose owner is to be found.</param>
-    /// <returns>An <see cref="Object"/> that represents the owner of the specified property.</returns>
+    /// <returns>An <see cref="object"/> that represents the owner of the specified property.</returns>
     public object GetPropertyOwner(PropertyDescriptor pd)
     {
       return this;

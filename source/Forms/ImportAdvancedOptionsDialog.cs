@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -108,7 +108,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void PrefixExcelTablesCheckBox_CheckedChanged(object sender, EventArgs e)
     {
-      bool prefixExcelTableNames = PrefixExcelTablesCheckBox.Checked;
+      var prefixExcelTableNames = PrefixExcelTablesCheckBox.Checked;
       PrefixExcelTablesTextBox.ReadOnly = !(CreateExcelTableCheckbox.Checked && prefixExcelTableNames);
       if (!prefixExcelTableNames || !PrefixExcelTablesTextBox.CanFocus)
       {
@@ -167,7 +167,7 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Set sthe availability of the Excel table creation controls.
+    /// Sets the availability of the Excel table creation controls.
     /// </summary>
     private void SetExcelTableControlsAvailability()
     {

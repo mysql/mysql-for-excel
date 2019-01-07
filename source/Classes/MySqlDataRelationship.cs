@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -34,7 +34,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     /// <param name="direction">The relationship direction dictated by what table defined the foreign key constraint.</param>
     /// <param name="mySqlForeignKeyName">The name of the foreign key constraint from which the relationship was created from.</param>
-    /// <param name="tableName">The name of the table defining the relationsip to a foreign one.</param>
+    /// <param name="tableName">The name of the table defining the relationship to a foreign one.</param>
     /// <param name="relatedTableName">The name of the related foreign table.</param>
     /// <param name="columnName">The name of the column defining the relationship to a foreign one.</param>
     /// <param name="relatedColumnName">The name of the related foreign column.</param>
@@ -44,22 +44,22 @@ namespace MySQL.ForExcel.Classes
       MySqlForeignKeyName = mySqlForeignKeyName;
       if (string.IsNullOrEmpty(tableName))
       {
-        throw new ArgumentNullException("tableName");
+        throw new ArgumentNullException(nameof(tableName));
       }
 
       if (string.IsNullOrEmpty(relatedTableName))
       {
-        throw new ArgumentNullException("relatedTableName");
+        throw new ArgumentNullException(nameof(relatedTableName));
       }
 
       if (string.IsNullOrEmpty(columnName))
       {
-        throw new ArgumentNullException("columnName");
+        throw new ArgumentNullException(nameof(columnName));
       }
 
       if (string.IsNullOrEmpty(relatedColumnName))
       {
-        throw new ArgumentNullException("relatedColumnName");
+        throw new ArgumentNullException(nameof(relatedColumnName));
       }
 
       TableName = tableName;
@@ -263,12 +263,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>A string describing the current relationship.</returns>
     public override string ToString()
     {
-      return string.Format("`{0}` (`{1}`) {2} `{3}` (`{4}`)",
-        TableName,
-        ColumnName,
-        Direction == DirectionType.Normal ? ">--" : "--<",
-        RelatedTableName,
-        RelatedColumnName);
+      return $"`{TableName}` (`{ColumnName}`) {(Direction == DirectionType.Normal ? ">--" : "--<")} `{RelatedTableName}` (`{RelatedColumnName}`)";
     }
 
     /// <summary>
@@ -283,7 +278,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       var activeWorkbook = Globals.ThisAddIn.ActiveWorkbook;
-      var commandText = string.Format("{0}!{1}", activeWorkbook.Name, modelTableName);
+      var commandText = $"{activeWorkbook.Name}!{modelTableName}";
       var connectionName = "ModelConnection_For_" + commandText;
       var connectionStringForCmdExcel = "WORKSHEET;" + activeWorkbook.Name;
       var workbookConnection = activeWorkbook.Connections.Add2(connectionName, string.Empty, connectionStringForCmdExcel, commandText, ExcelInterop.XlCmdType.xlCmdExcel, true, false);

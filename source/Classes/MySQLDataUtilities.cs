@@ -76,7 +76,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>MySql Table created from the selectQuery.</returns>
     public static MySqlDataTable CreateImportMySqlTable(this MySqlWorkbenchConnection wbConnection, MySqlDataTable.DataOperationType operationType, string tableOrViewName, bool importColumnNames, string selectQuery, int procedureResultSetIndex = 0)
     {
-      DataTable dt = GetDataFromSelectQuery(wbConnection, selectQuery);
+      var dt = GetDataFromSelectQuery(wbConnection, selectQuery);
       if (dt == null)
       {
         Logger.LogVerbose(string.Format(Resources.SelectQueryReturnedNothing, selectQuery));
@@ -106,7 +106,7 @@ namespace MySQL.ForExcel.Classes
 
       try
       {
-        string sql = $"DROP TABLE IF EXISTS `{connection.Schema}`.`{tableName}`";
+        var sql = $"DROP TABLE IF EXISTS `{connection.Schema}`.`{tableName}`";
         MySqlHelper.ExecuteNonQuery(connection.GetConnectionStringBuilder().ConnectionString, sql);
       }
       catch (Exception ex)
@@ -136,10 +136,10 @@ namespace MySQL.ForExcel.Classes
                 + "\uFF40"                       // back-tick
         + "\"" + "\u02BA" + "\u030E" + "\uFF02"; // double-quotes
 
-      StringBuilder sb = new StringBuilder(valueToEscape.Length * 2);
-      foreach (char c in valueToEscape)
+      var sb = new StringBuilder(valueToEscape.Length * 2);
+      foreach (var c in valueToEscape)
       {
-        char escape = char.MinValue;
+        var escape = char.MinValue;
         switch (c)
         {
           case '\u0000':
@@ -313,7 +313,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       var result = queryToAnalyze.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-      for (int i = 0; i < result.Length; i++)
+      for (var i = 0; i < result.Length; i++)
       {
         result[i] = result[i].Trim(' ', '`');
       }
@@ -346,7 +346,7 @@ namespace MySQL.ForExcel.Classes
       var columnsInfoTable = new MySqlColumnsInformationTable(schemaTable.TableName);
       foreach (DataRow row in schemaTable.Rows)
       {
-        string dataType = row["COLUMN_TYPE"].ToString();
+        var dataType = row["COLUMN_TYPE"].ToString();
         if (beautifyDataTypes)
         {
           var mySqlDataType = new MySqlDataType(dataType, false);
@@ -504,15 +504,15 @@ namespace MySQL.ForExcel.Classes
         return string.Empty;
       }
 
-      bool isSsh = connection.ConnectionMethod == MySqlWorkbenchConnection.ConnectionMethodType.Ssh;
-      string hostName = (connection.Host ?? string.Empty).Trim();
+      var isSsh = connection.ConnectionMethod == MySqlWorkbenchConnection.ConnectionMethodType.Ssh;
+      var hostName = (connection.Host ?? string.Empty).Trim();
       if (!isSsh)
       {
         return hostName;
       }
 
-      string[] sshConnection = connection.HostIdentifier.Split('@');
-      string dbHost = sshConnection[1].Split(':')[0].Trim();
+      var sshConnection = connection.HostIdentifier.Split('@');
+      var dbHost = sshConnection[1].Split(':')[0].Trim();
       hostName = dbHost + @" (SSH)";
       return hostName;
     }
@@ -525,9 +525,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The total count of affected rows for a given statement type.</returns>
     public static int GetResultsCount(this List<IMySqlDataRow> rowsList, MySqlStatement.SqlStatementType statementType)
     {
-      return rowsList != null
-          ? rowsList.Where(iMsqlRow => iMsqlRow.Statement.StatementType == statementType && iMsqlRow.Statement.AffectedRows > 0).Sum(iMsqlRow => iMsqlRow.Statement.AffectedRows)
-          : 0;
+      return rowsList?.Where(iMsqlRow => iMsqlRow.Statement.StatementType == statementType && iMsqlRow.Statement.AffectedRows > 0).Sum(iMsqlRow => iMsqlRow.Statement.AffectedRows) ?? 0;
     }
 
     /// <summary>
@@ -554,8 +552,8 @@ namespace MySQL.ForExcel.Classes
         return proposedName;
       }
 
-      int suffix = 2;
-      string finalName = proposedName;
+      var suffix = 2;
+      var finalName = proposedName;
       while (schemas.Rows.Cast<DataRow>().Any(schemaRow => string.Equals(schemaRow["DATABASE_NAME"].ToString(), finalName, StringComparison.InvariantCultureIgnoreCase)))
       {
         finalName = proposedName + suffix++;
@@ -578,7 +576,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       var mySqlDataType = MySqlDataType.FromMySqlDbType(parameter.MySqlDbType);
-      bool requireQuotes = mySqlDataType.RequiresQuotesForValue;
+      var requireQuotes = mySqlDataType.RequiresQuotesForValue;
       return string.Format("{0} @{1} = {2}{3}{2}",
         firstParameter ? "SET" : ",",
         parameter.ParameterName,
@@ -654,7 +652,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the passed string value is a MySQL zero date, <c>false</c> otherwise.</returns>
     public static bool IsMySqlZeroDateTimeValue(this string dateValueAsString, bool checkIfIntZero = false)
     {
-      bool isDateValueZero = checkIfIntZero && int.TryParse(dateValueAsString, out var zeroValue) && zeroValue == 0;
+      var isDateValueZero = checkIfIntZero && int.TryParse(dateValueAsString, out var zeroValue) && zeroValue == 0;
       MySqlDataType.IsMySqlDateTimeValue(dateValueAsString, out var isDateValueAZeroDate);
       return isDateValueZero || isDateValueAZeroDate;
     }
@@ -709,10 +707,10 @@ namespace MySQL.ForExcel.Classes
       }
 
       var resultSetDataTable = new DataTable(resultSetTableName);
-      for (int colIdx = 0; colIdx < dataReader.FieldCount; colIdx++)
+      for (var colIdx = 0; colIdx < dataReader.FieldCount; colIdx++)
       {
         var type = dataReader.GetFieldType(colIdx);
-        var newColumn = new DataColumn(dataReader.GetName(colIdx), type == null ? typeof(string) : type)
+        var newColumn = new DataColumn(dataReader.GetName(colIdx), type ?? typeof(string))
         {
           // Hack the Caption property of the DataColumn to store the MySQL data type (useful only for spatial data which data type is a byte array which can be mistaken as a BLOB)
           Caption = dataReader.GetDataTypeName(colIdx).ToLowerInvariant()
@@ -723,7 +721,7 @@ namespace MySQL.ForExcel.Classes
       while (dataReader.Read())
       {
         var newRow = resultSetDataTable.NewRow();
-        for (int colIdx = 0; colIdx < dataReader.FieldCount; colIdx++)
+        for (var colIdx = 0; colIdx < dataReader.FieldCount; colIdx++)
         {
           newRow[colIdx] = dataReader[colIdx];
         }
@@ -768,7 +766,7 @@ namespace MySQL.ForExcel.Classes
       object objCount = null;
       try
       {
-        string sql = $"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{schemaName}' AND table_name = '{tableName.EscapeDataValueString()}'";
+        var sql = $"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '{schemaName}' AND table_name = '{tableName.EscapeDataValueString()}'";
         objCount = MySqlHelper.ExecuteScalar(connection.GetConnectionStringBuilder().ConnectionString, sql);
       }
       catch (Exception ex)
@@ -776,7 +774,7 @@ namespace MySQL.ForExcel.Classes
         Logger.LogException(ex, true, string.Format(Resources.UnableToRetrieveData, $"`{schemaName}`.", tableName));
       }
 
-      long retCount = (long?)objCount ?? 0;
+      var retCount = (long?)objCount ?? 0;
       return retCount > 0;
     }
 
@@ -793,8 +791,8 @@ namespace MySQL.ForExcel.Classes
         return false;
       }
 
-      string sql = $"SHOW KEYS FROM `{tableName}` IN `{connection.Schema}` WHERE Key_name = 'PRIMARY';";
-      DataTable dt = GetDataFromSelectQuery(connection, sql);
+      var sql = $"SHOW KEYS FROM `{tableName}` IN `{connection.Schema}` WHERE Key_name = 'PRIMARY';";
+      var dt = GetDataFromSelectQuery(connection, sql);
       return dt != null && dt.Rows.Count > 0;
     }
 

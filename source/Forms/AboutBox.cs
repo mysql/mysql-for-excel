@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -35,24 +35,18 @@ namespace MySQL.ForExcel.Forms
     public AboutBox()
     {
       InitializeComponent();
-      ExcelVersionLabel.Text = string.Format("{0} {1}.{2}.{3}", AssemblyInfo.AssemblyTitle, Version[0], Version[1], Version[2]);
+      ExcelVersionLabel.Text = $@"{AssemblyInfo.AssemblyTitle} {Version[0]}.{Version[1]}.{Version[2]}";
       if (MySqlInstaller.IsInstalled && !string.IsNullOrEmpty(MySqlInstaller.Version))
       {
         var installerVersion = MySqlInstaller.Version.Split('.');
-        InstallerVersionLabel.Text = string.Format("MySQL Installer {0}.{1}", installerVersion[0], installerVersion[1]);
+        InstallerVersionLabel.Text = $@"MySQL Installer {installerVersion[0]}.{installerVersion[1]}";
       }
     }
 
     /// <summary>
-    /// Gets the executing assembly version splitted in the sub-versions as an array.
+    /// Gets the executing assembly version split in the sub-versions as an array.
     /// </summary>
-    public string[] Version
-    {
-      get
-      {
-        return Assembly.GetExecutingAssembly().GetName().Version.ToString().Split('.');
-      }
-    }
+    public string[] Version => Assembly.GetExecutingAssembly().GetName().Version.ToString().Split('.');
 
     /// <summary>
     /// Event delegate method fired when the About box is clicked on

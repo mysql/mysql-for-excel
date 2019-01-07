@@ -140,8 +140,7 @@ namespace MySQL.ForExcel.Forms
 
       foreach (var relationship in relationships)
       {
-        var relatedTable = _tableOrViews.FirstOrDefault(dbo => dbo.Name == relationship.RelatedTableName) as DbTable;
-        if (relatedTable == null || _relatedTables.Contains(relatedTable))
+        if (!(_tableOrViews.FirstOrDefault(dbo => dbo.Name == relationship.RelatedTableName) is DbTable relatedTable) || _relatedTables.Contains(relatedTable))
         {
           continue;
         }
@@ -162,8 +161,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void AddRelatedTablesToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      var selectedTableOrView = MiscUtilities.GetSelectedDbTableOrView(sender) as DbTable;
-      if (selectedTableOrView == null)
+      if (!(MiscUtilities.GetSelectedDbTableOrView(sender) is DbTable selectedTableOrView))
       {
         return;
       }
@@ -211,8 +209,8 @@ namespace MySQL.ForExcel.Forms
       var relationshipsCreationErrorBuilder = new StringBuilder(_relationshipsToCreateList.Count * 200);
       foreach (var relationship in _relationshipsToCreateList)
       {
-        bool excelTableExists = _excelTablesDictionary.TryGetValue(relationship.TableName, out var excelTable);
-        bool relatedExcelTableExists = _excelTablesDictionary.TryGetValue(relationship.RelatedTableName, out var relatedExcelTable);
+        var excelTableExists = _excelTablesDictionary.TryGetValue(relationship.TableName, out var excelTable);
+        var relatedExcelTableExists = _excelTablesDictionary.TryGetValue(relationship.RelatedTableName, out var relatedExcelTable);
         if (!excelTableExists || !relatedExcelTableExists)
         {
           if (relationshipsCreationErrorBuilder.Length > 0)
@@ -254,7 +252,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void CreatePivotOrRelationshipsCheckedChanged(object sender, EventArgs e)
     {
-      bool createPivotTable = CreatePivotTableCheckBox.Checked;
+      var createPivotTable = CreatePivotTableCheckBox.Checked;
       PivotTablesComboBox.Enabled = !Excel2010OrLower && createPivotTable && CreateExcelRelationshipsCheckBox.Checked;
       PivotTablesComboBox.SelectedIndex = Excel2010OrLower || !CreateExcelRelationshipsCheckBox.Checked ? 1 : 0;
       if (!createPivotTable || !PivotTablesComboBox.CanFocus)
@@ -311,9 +309,7 @@ namespace MySQL.ForExcel.Forms
 
         // Import the table/view data into an Excel worksheet
         var importTuple = importTableOrView.ImportData();
-        var excelTable = importTuple.Item2 as ExcelInterop.ListObject;
-        var dbTable = importTableOrView as DbTable;
-        if (excelTable == null || dbTable == null || !CreateExcelRelationshipsCheckBox.Checked)
+        if (!(importTuple.Item2 is ExcelInterop.ListObject excelTable) || !(importTableOrView is DbTable dbTable) || !CreateExcelRelationshipsCheckBox.Checked)
         {
           continue;
         }
@@ -352,8 +348,7 @@ namespace MySQL.ForExcel.Forms
     private void ListViewColumnClick(object sender, ColumnClickEventArgs e)
     {
       var listView = sender as ListView;
-      var sorter = listView?.ListViewItemSorter as ListViewColumnSorter;
-      if (sorter == null)
+      if (!(listView?.ListViewItemSorter is ListViewColumnSorter sorter))
       {
         return;
       }
@@ -428,8 +423,7 @@ namespace MySQL.ForExcel.Forms
     private void RelatedTablesViewsListView_ItemChecked(object sender, ItemCheckedEventArgs e)
     {
       RelatedTablesViewsLabel.Text = Resources.SelectedRelatedTablesAndViewsText + RelatedTablesListView.CheckedIndices.Count;
-      var relatedDbObject = e.Item.Tag as DbObject;
-      if (relatedDbObject == null)
+      if (!(e.Item.Tag is DbObject relatedDbObject))
       {
         return;
       }
@@ -492,7 +486,7 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void SetWorkbookCompatibilityWarning()
     {
-      bool workbookInCompatibilityMode = Globals.ThisAddIn.ActiveWorkbook.Excel8CompatibilityMode;
+      var workbookInCompatibilityMode = Globals.ThisAddIn.ActiveWorkbook.Excel8CompatibilityMode;
       WorkbookInCompatibilityModeWarningLabel.Text = Resources.WorkbookInCompatibilityModeWarning;
       WorkbookInCompatibilityModeWarningLabel.Visible = workbookInCompatibilityMode;
       WorkbookInCompatibilityModeWarningPictureBox.Visible = workbookInCompatibilityMode;
@@ -511,8 +505,8 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      bool showRelatedTablesItems = listView != TablesViewsListView;
-      bool dbViewIsSelected = dbView != null;
+      var showRelatedTablesItems = listView != TablesViewsListView;
+      var dbViewIsSelected = dbView != null;
       AddRelatedTablesToolStripMenuItem.Visible = dbViewIsSelected && showRelatedTablesItems;
       PreviewDataToolStripMenuItem.Visible = dbViewIsSelected;
       SelectAllToolStripMenuItem.Visible = showRelatedTablesItems;

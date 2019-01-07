@@ -98,7 +98,7 @@ namespace MySQL.ForExcel.Controls
     public void OnClickMySqlForExcel(OfficeCore.IRibbonControl control, bool buttonPressed)
     {
       ShowMySqlForExcelPaneTogglePressed = buttonPressed;
-      Microsoft.Office.Tools.CustomTaskPane taskPane = Globals.ThisAddIn.GetOrCreateActiveCustomPane();
+      var taskPane = Globals.ThisAddIn.GetOrCreateActiveCustomPane();
       if (taskPane == null)
       {
         Logger.LogError(string.Format(Resources.CustomTaskPaneGetOrCreateError, Globals.ThisAddIn.ExcelVersionNumber));
@@ -157,8 +157,8 @@ namespace MySQL.ForExcel.Controls
     private static string GetResourceText(string resourceName)
     {
       var asm = Assembly.GetExecutingAssembly();
-      string[] resourceNames = asm.GetManifestResourceNames();
-      foreach (string t in resourceNames)
+      var resourceNames = asm.GetManifestResourceNames();
+      foreach (var t in resourceNames)
       {
         if (string.Compare(resourceName, t, StringComparison.OrdinalIgnoreCase) != 0)
         {

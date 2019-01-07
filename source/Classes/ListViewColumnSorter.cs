@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -30,7 +30,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Case insensitive comparer object
     /// </summary>
-    private CaseInsensitiveComparer _objectCompare;
+    private readonly CaseInsensitiveComparer _objectCompare;
 
     #endregion Fields
 
@@ -77,16 +77,13 @@ namespace MySQL.ForExcel.Classes
     public int Compare(object x, object y)
     {
       // Cast the objects to be compared to ListViewItem objects
-      var listviewX = x as ListViewItem;
-      var listviewY = y as ListViewItem;
-
-      if (listviewX == null || listviewY == null)
+      if (!(x is ListViewItem listViewX) || !(y is ListViewItem listViewY))
       {
         return 0;
       }
 
       // Compare the two items
-      int compareResult = _objectCompare.Compare(listviewX.SubItems[SortColumnIndex].Text, listviewY.SubItems[SortColumnIndex].Text);
+      var compareResult = _objectCompare.Compare(listViewX.SubItems[SortColumnIndex].Text, listViewY.SubItems[SortColumnIndex].Text);
 
       // Calculate correct return value based on object comparison
       switch (Order)

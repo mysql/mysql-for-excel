@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -26,7 +26,7 @@ namespace MySQL.ForExcel.Interfaces
   {
     /// <summary>
     /// Gets the related Excel row number if any.
-    /// A valule of 0 indicates there is no related Excel row.
+    /// A value of 0 indicates there is no related Excel row.
     /// </summary>
     int ExcelRow { get; }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -37,23 +37,14 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the fle path for the settings file.
     /// </summary>
-    public static string SettingsFilePath
-    {
-      get
-      {
-        return ThisAddIn.EnvironmentApplicationDataDirectory + ThisAddIn.SETTINGS_FILE_RELATIVE_PATH;
-      }
-    }
+    public static string SettingsFilePath => ThisAddIn.EnvironmentApplicationDataDirectory + ThisAddIn.SETTINGS_FILE_RELATIVE_PATH;
 
     /// <summary>
     /// Gets the name of this application.
     /// </summary>
     public override string ApplicationName
     {
-      get
-      {
-        return AssemblyInfo.AssemblyTitle;
-      }
+      get => AssemblyInfo.AssemblyTitle;
 
       set
       {
@@ -83,12 +74,6 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the custom path where the settings file is saved.
     /// </summary>
-    public override string SettingsPath
-    {
-      get
-      {
-        return SettingsFilePath;
-      }
-    }
+    public override string SettingsPath => SettingsFilePath;
   }
 }

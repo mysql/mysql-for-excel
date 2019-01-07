@@ -73,7 +73,7 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      for (int index = 1; index <= quantity; index++)
+      for (var index = 1; index <= quantity; index++)
       {
         stringBuilder.Append(Environment.NewLine);
       }
@@ -118,8 +118,8 @@ namespace MySQL.ForExcel.Classes
 
       // Check that each found single quote is properly wrapped in MySQL notation, i.e. that 2 consecutive single quotes appear where a single quote is expected to be in the text.
       int currentQuotePos;
-      int previousQuotePos = 0;
-      bool nonEscapedQuoteFound = false;
+      var previousQuotePos = 0;
+      var nonEscapedQuoteFound = false;
       while ((currentQuotePos = element.IndexOf('\'', previousQuotePos + 1)) >= 0)
       {
         // If a single quote was previously found, check if this new one is just next to it (meaning the previous one is escaping the current one)
@@ -150,7 +150,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       var indexesList = new List<int>(elements.Count);
-      for (int elementIndex = 0; elementIndex < elements.Count; elementIndex++)
+      for (var elementIndex = 0; elementIndex < elements.Count; elementIndex++)
       {
         if (elements[elementIndex].CheckForCorrectSingleQuoting())
         {
@@ -216,8 +216,8 @@ namespace MySQL.ForExcel.Classes
         return string.Empty;
       }
 
-      string chars = alphaOnly ? "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" : "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-      int charsLenght = chars.Length;
+      var chars = alphaOnly ? "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" : "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+      var charsLength = chars.Length;
       byte[] data;
       using (var crypto = new RNGCryptoServiceProvider())
       {
@@ -226,9 +226,9 @@ namespace MySQL.ForExcel.Classes
       }
 
       var result = new StringBuilder(size);
-      foreach (byte b in data)
+      foreach (var b in data)
       {
-        var randomIndex = b % charsLenght;
+        var randomIndex = b % charsLength;
         result.Append(chars[randomIndex]);
       }
 
@@ -387,8 +387,8 @@ namespace MySQL.ForExcel.Classes
         return -1;
       }
 
-      int index = -1;
-      for (int i = 0; i < intArray.Length; i++)
+      var index = -1;
+      for (var i = 0; i < intArray.Length; i++)
       {
         if (intArray[i] != intElement)
         {
@@ -421,8 +421,8 @@ namespace MySQL.ForExcel.Classes
         stringElement = stringElement.ToLowerInvariant();
       }
 
-      int index = -1;
-      for (int i = 0; i < stringArray.Length; i++)
+      var index = -1;
+      for (var i = 0; i < stringArray.Length; i++)
       {
         if (stringElement != (caseSensitive ? stringArray[i] : stringArray[i].ToLowerInvariant()))
         {
@@ -519,10 +519,10 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the settings file was saved successfully, <c>false</c> otherwise.</returns>
     public static bool SaveSettings()
     {
-      bool success = true;
+      var success = true;
 
       // Attempt to save the settings file up to 3 times, if not successful show an error message to users.
-      for (int i = 0; i < 3; i++)
+      for (var i = 0; i < 3; i++)
       {
         try
         {
@@ -616,7 +616,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>A dialog result with the user's selection.</returns>
     public static DialogResult ShowCustomizedInfoDialog(InfoDialog.InfoType infoType, string detail, string moreInformation = null, bool wordWrapMoreInfo = true)
     {
-      string title = string.Empty;
+      var title = string.Empty;
       var layoutType = CommandAreaProperties.ButtonsLayoutType.OkOnly;
       switch (infoType)
       {
@@ -638,7 +638,7 @@ namespace MySQL.ForExcel.Classes
           break;
       }
 
-      string subDetailText = string.Format(Resources.OperationSubDetailText, infoType == InfoDialog.InfoType.Error ? "Back" : "OK");
+      var subDetailText = string.Format(Resources.OperationSubDetailText, infoType == InfoDialog.InfoType.Error ? "Back" : "OK");
       var infoProperties = new InfoDialogProperties
       {
         CommandAreaProperties = new CommandAreaProperties(layoutType),

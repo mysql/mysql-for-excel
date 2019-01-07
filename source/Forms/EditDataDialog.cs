@@ -153,13 +153,7 @@ namespace MySQL.ForExcel.Forms
     /// Gets the name of the MySQL table whose data is being edited.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public string EditingTableName
-    {
-      get
-      {
-        return _mySqlTable != null ? _mySqlTable.TableName : null;
-      }
-    }
+    public string EditingTableName => _mySqlTable?.TableName;
 
     /// <summary>
     /// Gets the Excel worksheet tied to the current editing session.
@@ -207,8 +201,7 @@ namespace MySQL.ForExcel.Forms
       {
         try
         {
-          var workbook = EditingWorksheet.Parent as ExcelInterop.Workbook;
-          if (workbook != null)
+          if (EditingWorksheet.Parent is ExcelInterop.Workbook workbook)
           {
             return workbook.Name;
           }
@@ -245,18 +238,12 @@ namespace MySQL.ForExcel.Forms
     /// Gets the GUID used as a key to protect the editing Excel worksheet.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public string WorksheetProtectionKey { get; private set; }
+    public string WorksheetProtectionKey { get; }
 
     /// <summary>
-    /// Gets a value indicating whether uncommited data exists in the editing session.
+    /// Gets a value indicating whether uncommitted data exists in the editing session.
     /// </summary>
-    private bool UncommitedDataExists
-    {
-      get
-      {
-        return _mySqlTable.ChangedOrDeletedRows > 0;
-      }
-    }
+    private bool UncommittedDataExists => _mySqlTable.ChangedOrDeletedRows > 0;
 
     #endregion Properties
 
@@ -388,9 +375,8 @@ namespace MySQL.ForExcel.Forms
     /// <returns>An Excel range containing just the newly added row.</returns>
     private ExcelInterop.Range AddNewRowToEditingRange(bool clearColoringOfOldNewRow)
     {
-      ExcelInterop.Range newRowRange;
       EditingWorksheet.UnprotectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey);
-      _editDataRange = _editDataRange.AddNewRow(clearColoringOfOldNewRow, out newRowRange);
+      _editDataRange = _editDataRange.AddNewRow(clearColoringOfOldNewRow, out var newRowRange);
       EditingWorksheet.ProtectEditingWorksheet(EditingWorksheet_Change, WorksheetProtectionKey, _editDataRange);
       _editingRowsQuantity = _editDataRange.Rows.Count;
       return newRowRange;
@@ -403,7 +389,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void AutoCommitCheckBox_CheckedChanged(object sender, EventArgs e)
     {
-      CommitChangesButton.Enabled = !AutoCommitCheckBox.Checked && UncommitedDataExists;
+      CommitChangesButton.Enabled = !AutoCommitCheckBox.Checked && UncommittedDataExists;
     }
 
     /// <summary>
@@ -489,10 +475,9 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      var startCell = intersectRange.Item[1, 1] as ExcelInterop.Range;
-      if (startCell != null)
+      if (intersectRange.Item[1, 1] is ExcelInterop.Range startCell)
       {
-        // Substract from the Excel indexes since they start at 1, ExcelRow is subtracted by 2 if we imported headers.
+        // Subtract from the Excel indexes since they start at 1, ExcelRow is subtracted by 2 if we imported headers.
         var startDataTableRow = startCell.Row - 2;
         var startDataTableCol = startCell.Column - 1;
 
@@ -536,8 +521,7 @@ namespace MySQL.ForExcel.Forms
                   }
 
                   var insertingRowRange = AddNewRowToEditingRange(true);
-                  var newRow = _mySqlTable.NewRow() as MySqlDataRow;
-                  if (newRow != null)
+                  if (_mySqlTable.NewRow() is MySqlDataRow newRow)
                   {
                     newRow.ExcelRange = insertingRowRange;
                     _mySqlTable.Rows.Add(newRow);
@@ -599,8 +583,8 @@ namespace MySQL.ForExcel.Forms
         }
       }
 
-      CommitChangesButton.Enabled = !AutoCommitCheckBox.Checked && UncommitedDataExists;
-      if (AutoCommitCheckBox.Checked && UncommitedDataExists)
+      CommitChangesButton.Enabled = !AutoCommitCheckBox.Checked && UncommittedDataExists;
+      if (AutoCommitCheckBox.Checked && UncommittedDataExists)
       {
         PushDataChanges();
       }
@@ -853,7 +837,7 @@ namespace MySQL.ForExcel.Forms
       operationDetails.Clear();
       warningDetails.Clear();
       warningStatementDetails.Clear();
-      CommitChangesButton.Enabled = UncommitedDataExists && !autoCommitOn;
+      CommitChangesButton.Enabled = UncommittedDataExists && !autoCommitOn;
       Cursor = Cursors.Default;
       return !errorsFound;
     }
@@ -873,7 +857,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void RevertDataButton_Click(object sender, EventArgs e)
     {
-      var revertDialog = new EditDataRevertDialog(!AutoCommitCheckBox.Checked && UncommitedDataExists);
+      var revertDialog = new EditDataRevertDialog(!AutoCommitCheckBox.Checked && UncommittedDataExists);
       var dr = revertDialog.ShowDialog();
       if (dr == DialogResult.Cancel)
       {

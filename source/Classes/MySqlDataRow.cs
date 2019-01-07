@@ -252,7 +252,7 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      bool refreshSuccessful = true;
+      var refreshSuccessful = true;
       try
       {
         var refreshQuery = GetSqlForRefreshingRow();
@@ -279,7 +279,7 @@ namespace MySQL.ForExcel.Classes
         }
 
         Globals.ThisAddIn.SkipWorksheetChangeEvent = true;
-        for (int columnIndex = 1; columnIndex <= ExcelRange.Columns.Count; columnIndex++)
+        for (var columnIndex = 1; columnIndex <= ExcelRange.Columns.Count; columnIndex++)
         {
           ExcelRange.Cells[1, columnIndex] = rowValues[columnIndex - 1];
         }
@@ -377,11 +377,11 @@ namespace MySQL.ForExcel.Classes
       sqlBuilderForInsert.Clear();
       sqlBuilderForInsert.Append(parentTable.PreSqlForAddedRows);
       sqlBuilderForInsert.Append('(');
-      string colsSeparator = string.Empty;
-      foreach (MySqlDataColumn column in parentTable.ColumnsForInsertion)
+      var colsSeparator = string.Empty;
+      foreach (var column in parentTable.ColumnsForInsertion)
       {
-        string valueToDb = column.GetStringValue(this[column.ColumnName], out var insertingValueIsNull);
-        string wrapValueCharacter = column.MySqlDataType.RequiresQuotesForValue && !insertingValueIsNull ? "'" : string.Empty;
+        var valueToDb = column.GetStringValue(this[column.ColumnName], out var insertingValueIsNull);
+        var wrapValueCharacter = column.MySqlDataType.RequiresQuotesForValue && !insertingValueIsNull ? "'" : string.Empty;
         sqlBuilderForInsert.AppendFormat("{0}{1}{2}{1}", colsSeparator, wrapValueCharacter, valueToDb);
         colsSeparator = ",";
       }
@@ -425,13 +425,13 @@ namespace MySQL.ForExcel.Classes
 
       var sqlBuilderForUpdate = parentTable.SqlBuilderForUpdate;
       sqlBuilderForUpdate.Clear();
-      string colsSeparator = string.Empty;
+      var colsSeparator = string.Empty;
       sqlBuilderForUpdate.Append(MySqlStatement.STATEMENT_UPDATE);
       sqlBuilderForUpdate.AppendFormat(" `{0}`.`{1}` SET ", parentTable.SchemaName, parentTable.TableNameForSqlQueries);
       foreach (var column in parentTable.Columns.Cast<MySqlDataColumn>().Where(col => ChangedColumnNames.Contains(col.ColumnName)))
       {
         var valueToDb = column.GetStringValue(this[column.ColumnName], out var updatingValueIsNull);
-        string wrapValueCharacter = column.MySqlDataType.RequiresQuotesForValue && !updatingValueIsNull ? "'" : string.Empty;
+        var wrapValueCharacter = column.MySqlDataType.RequiresQuotesForValue && !updatingValueIsNull ? "'" : string.Empty;
         sqlBuilderForUpdate.AppendFormat("{0}`{1}`={2}{3}{2}", colsSeparator, column.ColumnNameForSqlQueries, wrapValueCharacter, valueToDb);
         colsSeparator = ",";
       }
@@ -460,30 +460,30 @@ namespace MySQL.ForExcel.Classes
       wClauseBuilder.Clear();
       sqlBuilderForUpdate.Clear();
 
-      string serverCollation = parentTable.WbConnection.ServerCollation;
-      string setSeparator = "SET";
-      string colsSeparator = string.Empty;
-      string wClauseColsSeparator = string.Empty;
+      var serverCollation = parentTable.WbConnection.ServerCollation;
+      var setSeparator = "SET";
+      var colsSeparator = string.Empty;
+      var wClauseColsSeparator = string.Empty;
       wClauseBuilder.Append(" WHERE ");
       sqlBuilderForUpdate.Append(MySqlStatement.STATEMENT_UPDATE);
       sqlBuilderForUpdate.AppendFormat(" `{0}`.`{1}` SET ", parentTable.SchemaName, parentTable.TableNameForSqlQueries);
       foreach (MySqlDataColumn column in parentTable.Columns)
       {
-        bool columnRequiresQuotes = column.MySqlDataType.RequiresQuotesForValue;
-        bool columnIsText = column.MySqlDataType.IsChar || column.MySqlDataType.IsText || column.MySqlDataType.IsSetOrEnum;
-        bool columnIsJson = column.MySqlDataType.IsJson;
-        string valueToDb = column.GetStringValue(this[column.ColumnName, DataRowVersion.Original], out var updatingValueIsNull);
-        string wrapValueCharacter = columnRequiresQuotes && !updatingValueIsNull ? "'" : string.Empty;
+        var columnRequiresQuotes = column.MySqlDataType.RequiresQuotesForValue;
+        var columnIsText = column.MySqlDataType.IsChar || column.MySqlDataType.IsText || column.MySqlDataType.IsSetOrEnum;
+        var columnIsJson = column.MySqlDataType.IsJson;
+        var valueToDb = column.GetStringValue(this[column.ColumnName, DataRowVersion.Original], out var updatingValueIsNull);
+        var wrapValueCharacter = columnRequiresQuotes && !updatingValueIsNull ? "'" : string.Empty;
         if (column.AllowNull)
         {
           var columnCollation = column.AbsoluteCollation;
-          bool needToCollateTextValue = columnIsText && !updatingValueIsNull
+          var needToCollateTextValue = columnIsText && !updatingValueIsNull
                                         && serverCollation != null
                                         && !serverCollation.Equals(columnCollation, StringComparison.InvariantCultureIgnoreCase)
                                         && columnCollation.IsUnicodeCharSetOrCollation();
 
           // If the length of the string value * 2 is greater than the string it requires to declare a variable for it, then declare the variable to save query space.
-          bool needToCreateVariable = (valueToDb.Length * 2) > (valueToDb.Length + 24 + (needToCollateTextValue ? columnCollation.Length + 9 : 0));
+          var needToCreateVariable = (valueToDb.Length * 2) > (valueToDb.Length + 24 + (needToCollateTextValue ? columnCollation.Length + 9 : 0));
           string valueForClause;
           if (needToCreateVariable)
           {
@@ -566,13 +566,13 @@ namespace MySQL.ForExcel.Classes
       // Reuse the builder we use for INSERT queries now for where clauses, instead of using a new one in order to save memory.
       var wClauseBuilder = parentTable.SqlBuilderForInsert;
       wClauseBuilder.Clear();
-      string colsSeparator = string.Empty;
+      var colsSeparator = string.Empty;
       wClauseBuilder.Append(" WHERE ");
       var dataRowVersion = useOriginalData ? DataRowVersion.Original : DataRowVersion.Current;
-      foreach (MySqlDataColumn pkCol in parentTable.PrimaryKeyColumns)
+      foreach (var pkCol in parentTable.PrimaryKeyColumns)
       {
-        string valueToDb = pkCol.GetStringValue(this[pkCol.ColumnName, dataRowVersion], out var pkValueIsNull);
-        string wrapValueCharacter = pkCol.MySqlDataType.RequiresQuotesForValue && !pkValueIsNull ? "'" : string.Empty;
+        var valueToDb = pkCol.GetStringValue(this[pkCol.ColumnName, dataRowVersion], out var pkValueIsNull);
+        var wrapValueCharacter = pkCol.MySqlDataType.RequiresQuotesForValue && !pkValueIsNull ? "'" : string.Empty;
         wClauseBuilder.AppendFormat("{0}`{1}`={2}{3}{2}", colsSeparator, pkCol.ColumnNameForSqlQueries, wrapValueCharacter, valueToDb);
         colsSeparator = " AND ";
       }
@@ -617,8 +617,8 @@ namespace MySQL.ForExcel.Classes
     {
       if (!IsBeingDeleted && ExcelRange != null)
       {
-        ExcelModifiedRangesList.SetInteriorColor(ExcelUtilities.CommitedCellsOleColor);
-        SaveCurrentColor(ExcelUtilities.CommitedCellsOleColor);
+        ExcelModifiedRangesList.SetInteriorColor(ExcelUtilities.CommittedCellsOleColor);
+        SaveCurrentColor(ExcelUtilities.CommittedCellsOleColor);
         if (!HasErrors)
         {
           ExcelModifiedRangesList.Clear();
@@ -655,10 +655,10 @@ namespace MySQL.ForExcel.Classes
       ChangedColumnNames.Clear();
 
       // Check column by column for data changes, set related Excel cells color accordingly.
-      for (int colIndex = 0; colIndex < Table.Columns.Count; colIndex++)
+      for (var colIndex = 0; colIndex < Table.Columns.Count; colIndex++)
       {
         ExcelInterop.Range columnCell = ExcelRange?.Cells[1, colIndex + 1];
-        bool originalAndModifiedIdentical = this[colIndex].Equals(this[colIndex, DataRowVersion.Original]);
+        var originalAndModifiedIdentical = this[colIndex].Equals(this[colIndex, DataRowVersion.Original]);
         if (!originalAndModifiedIdentical)
         {
           if (columnCell != null)
@@ -692,7 +692,7 @@ namespace MySQL.ForExcel.Classes
     {
       if (!IsBeingDeleted)
       {
-        for (int colIndex = 0; colIndex < Table.Columns.Count; colIndex++)
+        for (var colIndex = 0; colIndex < Table.Columns.Count; colIndex++)
         {
           ExcelInterop.Range columnCell = ExcelRange?.Cells[1, colIndex + 1];
           columnCell?.SetInteriorColor(_excelRangePreviousColors[colIndex]);
@@ -716,7 +716,7 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      foreach (int colIndex in ExcelModifiedRangesList.Select(modifiedRange => modifiedRange.Column).Where(colIndex => colIndex <= _excelRangePreviousColors.Length))
+      foreach (var colIndex in ExcelModifiedRangesList.Select(modifiedRange => modifiedRange.Column).Where(colIndex => colIndex <= _excelRangePreviousColors.Length))
       {
         _excelRangePreviousColors[colIndex - 1] = oleColor;
       }

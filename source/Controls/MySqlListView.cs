@@ -240,7 +240,7 @@ namespace MySQL.ForExcel.Controls
     public int DescriptionTextVerticalOffset { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether images for disabled nodes are converted to a grayscale representation automatically.
+    /// Gets or sets a value indicating whether images for disabled nodes are converted to a gray scale representation automatically.
     /// </summary>
     [Category("MySQL Custom"), Description("A value indicating whether images for disabled nodes are converted to a grayscale representation automatically.")]
     public bool DisplayImagesOfDisabledNodesInGrayScale { get; set; }
@@ -550,8 +550,7 @@ namespace MySQL.ForExcel.Controls
     /// <param name="e">A <see cref="DrawTreeNodeEventArgs"/> that contains the event data.</param>
     protected override void OnDrawNode(DrawTreeNodeEventArgs e)
     {
-      var node = e.Node as MySqlListViewNode;
-      if (node == null)
+      if (!(e.Node is MySqlListViewNode node))
       {
         return;
       }
@@ -838,8 +837,8 @@ namespace MySQL.ForExcel.Controls
       {
         if (node.Enable)
         {
-          int leftBound = node.Bounds.X; // - 20; // Allow user to click on image
-          int rightBound = node.Bounds.Right + 10; // Give a little extra room
+          var leftBound = node.Bounds.X; // - 20; // Allow user to click on image
+          var rightBound = node.Bounds.Right + 10; // Give a little extra room
           if (e.Location.X > leftBound && e.Location.X < rightBound)
           {
             if (ModifierKeys == Keys.None && (_selectedNodes.Contains(node)))
@@ -875,8 +874,8 @@ namespace MySQL.ForExcel.Controls
         {
           if (ModifierKeys == Keys.None && _selectedNodes.Contains(node))
           {
-            int leftBound = node.Bounds.X; // -20; // Allow user to click on image
-            int rightBound = node.Bounds.Right + 10; // Give a little extra room
+            var leftBound = node.Bounds.X; // -20; // Allow user to click on image
+            var rightBound = node.Bounds.Right + 10; // Give a little extra room
             if (e.Location.X > leftBound && e.Location.X < rightBound)
             {
               SelectNodes(node);
@@ -964,23 +963,22 @@ namespace MySQL.ForExcel.Controls
     private void DrawChildNode(DrawTreeNodeEventArgs e)
     {
       string truncatedText;
-      var node = e.Node as MySqlListViewNode;
-      if (node == null)
+      if (!(e.Node is MySqlListViewNode node))
       {
         return;
       }
 
-      bool disabled = !node.Enable;
-      Point pt = e.Bounds.Location;
-      SizeF titleStringSize = e.Graphics.MeasureString(node.Title, Font);
-      SizeF descriptionStringSize = e.Graphics.MeasureString(node.Subtitle, DescriptionFont);
-      Image nodeImage = NodeImages != null && NodeImages.Images.Count > 0 && node.ImageIndex >= 0 && node.ImageIndex < NodeImages.Images.Count ? NodeImages.Images[node.ImageIndex] : null;
+      var disabled = !node.Enable;
+      var pt = e.Bounds.Location;
+      var titleStringSize = e.Graphics.MeasureString(node.Title, Font);
+      var descriptionStringSize = e.Graphics.MeasureString(node.Subtitle, DescriptionFont);
+      var nodeImage = NodeImages != null && NodeImages.Images.Count > 0 && node.ImageIndex >= 0 && node.ImageIndex < NodeImages.Images.Count ? NodeImages.Images[node.ImageIndex] : null;
       if (nodeImage != null && disabled && DisplayImagesOfDisabledNodesInGrayScale)
       {
         nodeImage = new Bitmap(nodeImage).ToGrayscale();
       }
 
-      int textInitialY = string.IsNullOrEmpty(node.Subtitle) ? ((e.Bounds.Height - Convert.ToInt32(titleStringSize.Height) + Convert.ToInt32(descriptionStringSize.Height)) / 2) : 0;
+      var textInitialY = string.IsNullOrEmpty(node.Subtitle) ? ((e.Bounds.Height - Convert.ToInt32(titleStringSize.Height) + Convert.ToInt32(descriptionStringSize.Height)) / 2) : 0;
       node.ToolTipText = string.Empty;
 
       // Paint background
@@ -991,17 +989,17 @@ namespace MySQL.ForExcel.Controls
       if (nodeImage != null)
       {
         pt.X += ImageHorizontalOffset;
-        int drawnImageWidth = nodeImage.Width;
+        var drawnImageWidth = nodeImage.Width;
         if (ScaleImages)
         {
-          int y = pt.Y + ScaledImagesVerticalSpacing;
-          int scaledHeight = e.Bounds.Height - (ScaledImagesVerticalSpacing * 2);
+          var y = pt.Y + ScaledImagesVerticalSpacing;
+          var scaledHeight = e.Bounds.Height - (ScaledImagesVerticalSpacing * 2);
           drawnImageWidth = nodeImage.Width * scaledHeight / nodeImage.Height;
           e.Graphics.DrawImage(nodeImage, pt.X, y, drawnImageWidth, scaledHeight);
         }
         else
         {
-          int y = pt.Y + ((e.Bounds.Height - nodeImage.Height) / 2);
+          var y = pt.Y + ((e.Bounds.Height - nodeImage.Height) / 2);
           e.Graphics.DrawImageUnscaled(nodeImage, pt.X, y);
         }
 
@@ -1015,7 +1013,7 @@ namespace MySQL.ForExcel.Controls
       var titleBrush = disabled ? new SolidBrush(Color.FromArgb(80, 0, 0, 0)) : new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleColorOpacity * 255), ForeColor));
       if (!string.IsNullOrEmpty(node.Title))
       {
-        SizeF stringSize = e.Graphics.MeasureString(node.Title, Font);
+        var stringSize = e.Graphics.MeasureString(node.Title, Font);
         truncatedText = node.GetTruncatedTitle(node.TreeView.ClientRectangle.Width - pt.X, e.Graphics, Font);
         e.Graphics.DrawString(truncatedText, Font, titleBrush, pt.X, pt.Y);
         pt.Y += (int)(stringSize.Height) + DescriptionTextVerticalOffset;
@@ -1052,17 +1050,17 @@ namespace MySQL.ForExcel.Controls
       var nodeBackBrush = new SolidBrush(e.Node.BackColor);
       graphics.FillRectangle(nodeBackBrush, e.Bounds);
 
-      Point pt = e.Bounds.Location;
+      var pt = e.Bounds.Location;
 
       // Draw header image centered
       var headerImage = e.Node.IsExpanded ? ExpandedIcon : CollapsedIcon;
       if (headerImage != null)
       {
-        int drawnImageWidth = headerImage.Width;
+        var drawnImageWidth = headerImage.Width;
         if (ScaleImages)
         {
           pt.Y += ScaledImagesVerticalSpacing;
-          int scaledHeight = e.Bounds.Height - (ScaledImagesVerticalSpacing * 2);
+          var scaledHeight = e.Bounds.Height - (ScaledImagesVerticalSpacing * 2);
           drawnImageWidth = headerImage.Width * scaledHeight / headerImage.Height;
           e.Graphics.DrawImage(headerImage, pt.X, pt.Y, drawnImageWidth, scaledHeight);
         }
@@ -1216,7 +1214,7 @@ namespace MySQL.ForExcel.Controls
               return;
             }
 
-            bool isSelected = _selectedNodes.Contains(node);
+            var isSelected = _selectedNodes.Contains(node);
             MarkNodeAsSelected(node, !isSelected);
           }
           else if (ModifierKeys == Keys.Shift)
@@ -1248,7 +1246,7 @@ namespace MySQL.ForExcel.Controls
               // We need to find a common parent to determine if we need to walk down selecting, or walk up selecting.
               TreeNode ndStartP = ndStart;
               TreeNode ndEndP = ndEnd;
-              int startDepth = Math.Min(ndStartP.Level, ndEndP.Level);
+              var startDepth = Math.Min(ndStartP.Level, ndEndP.Level);
 
               // Bring lower node up to common depth
               while (ndStartP.Level > startDepth)
@@ -1350,7 +1348,7 @@ namespace MySQL.ForExcel.Controls
       }
 
       var tex = new TvItemEx(TVIF_HANDLE | TVIF_INTEGRAL, node.Handle, heightMultiplier);
-      IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(tex));
+      var ptr = Marshal.AllocHGlobal(Marshal.SizeOf(tex));
       Marshal.StructureToPtr(tex, ptr, false);
       MiscUtilities.SendMessage(Handle, TVM_SETITEM, IntPtr.Zero, ptr);
       Marshal.FreeHGlobal(ptr);
@@ -1361,7 +1359,7 @@ namespace MySQL.ForExcel.Controls
     /// </summary>
     private void UpdateExtendedStyles()
     {
-      int style = 0;
+      var style = 0;
       if (DoubleBuffered)
       {
         style |= TVS_EX_DOUBLEBUFFER;

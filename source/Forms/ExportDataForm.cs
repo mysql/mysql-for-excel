@@ -159,7 +159,7 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="AddPrimaryKeyTextBox"/> textbox's text changes.
+    /// Event delegate method fired when the <see cref="AddPrimaryKeyTextBox"/> text box's text changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
@@ -169,15 +169,15 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="AddPrimaryKeyTextBox"/> textbox is being validated.
+    /// Event delegate method fired when the <see cref="AddPrimaryKeyTextBox"/> text box is being validated.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
     private void AddPrimaryKeyTextBox_Validating(object sender, CancelEventArgs e)
     {
       TextChangedTimer.Stop();
-      string newAutoPkName = AddPrimaryKeyTextBox.Text.Trim();
-      MySqlDataColumn pkColumn = _previewDataTable.GetColumnAtIndex(0);
+      var newAutoPkName = AddPrimaryKeyTextBox.Text.Trim();
+      var pkColumn = _previewDataTable.GetColumnAtIndex(0);
       if (pkColumn.DisplayName == newAutoPkName && PreviewDataGridView.Columns[0].HeaderText == newAutoPkName)
       {
         return;
@@ -185,7 +185,7 @@ namespace MySQL.ForExcel.Forms
 
       pkColumn.SetDisplayName(AddPrimaryKeyTextBox.Text, true);
       PreviewDataGridView.Columns[0].HeaderText = pkColumn.DisplayName;
-      MySqlDataColumn currentColumn = GetCurrentMySqlDataColumn();
+      var currentColumn = GetCurrentMySqlDataColumn();
       if (currentColumn != null && currentColumn.Ordinal == 0)
       {
         SetControlTextValue(ColumnNameTextBox, currentColumn.DisplayName);
@@ -249,7 +249,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="ea">Event arguments.</param>
     private void AllowEmptyCheckBox_CheckedChanged(object sender, EventArgs ea)
     {
-      MySqlDataColumn currentCol = GetCurrentMySqlDataColumn();
+      var currentCol = GetCurrentMySqlDataColumn();
       if (currentCol == null || AllowEmptyCheckBox.Checked == currentCol.AllowNull)
       {
         return;
@@ -266,12 +266,12 @@ namespace MySQL.ForExcel.Forms
     /// <returns><c>true</c> if the overall result of the operation was successful (even if warnings were found), <c>false</c> if an error was thrown.</returns>
     private bool AssembleAndShowOperationResults(List<IMySqlDataRow> modifiedRowsList)
     {
-      int warningsCount = 0;
-      bool errorsFound = false;
-      bool warningsFound = false;
-      bool tableCreated = true;
+      var warningsCount = 0;
+      var errorsFound = false;
+      var warningsFound = false;
+      var tableCreated = true;
       string operationSummary;
-      bool warningDetailHeaderAppended = false;
+      var warningDetailHeaderAppended = false;
       var operationDetails = new StringBuilder();
       var warningDetails = new StringBuilder();
       var warningStatementDetails = new StringBuilder();
@@ -282,8 +282,8 @@ namespace MySQL.ForExcel.Forms
         return false;
       }
 
-      string statementsQuantityFormat = new string('0', modifiedRowsList.Count.StringSize());
-      string sqlQueriesFormat = "{0:" + statementsQuantityFormat + "}: {1}";
+      var statementsQuantityFormat = new string('0', modifiedRowsList.Count.StringSize());
+      var sqlQueriesFormat = "{0:" + statementsQuantityFormat + "}: {1}";
       foreach (var statement in modifiedRowsList.Select(statementRow => statementRow.Statement))
       {
         // Create details text for the table creation.
@@ -408,8 +408,8 @@ namespace MySQL.ForExcel.Forms
         operationsType = warningsFound ? InfoDialog.InfoType.Warning : InfoDialog.InfoType.Success;
         if (!_exportDataTable.CreateTableWithoutData)
         {
-          int insertedCount = modifiedRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Insert);
-          int insertingCount = _exportDataTable.Rows.Count;
+          var insertedCount = modifiedRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Insert);
+          var insertingCount = _exportDataTable.Rows.Count;
           if (warningsFound)
           {
             operationDetails.AppendFormat(Resources.ExportDataRowsInsertedWithWarningsText, insertedCount, warningsCount);
@@ -488,7 +488,7 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="ColumnNameTextBox"/> textbox's text changes.
+    /// Event delegate method fired when the <see cref="ColumnNameTextBox"/> text box's text changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
@@ -498,15 +498,15 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="ColumnNameTextBox"/> textbox is being validated.
+    /// Event delegate method fired when the <see cref="ColumnNameTextBox"/> text box is being validated.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
     private void ColumnNameTextBox_Validating(object sender, CancelEventArgs e)
     {
       TextChangedTimer.Stop();
-      string newColumnName = ColumnNameTextBox.Text.Trim();
-      MySqlDataColumn column = GetCurrentMySqlDataColumn();
+      var newColumnName = ColumnNameTextBox.Text.Trim();
+      var column = GetCurrentMySqlDataColumn();
       if (column == null || column.DisplayName == newColumnName)
       {
         return;
@@ -531,8 +531,8 @@ namespace MySQL.ForExcel.Forms
       }
 
       // Update the columnIndex for the cmbPrimaryKeyColumns combo box since it does not include Excluded columns
-      int comboColumnIndex = -1;
-      for (int i = 1; i < _previewDataTable.Columns.Count && i != column.Ordinal; i++)
+      var comboColumnIndex = -1;
+      for (var i = 1; i < _previewDataTable.Columns.Count && i != column.Ordinal; i++)
       {
         column = _previewDataTable.GetColumnAtIndex(i);
         if (!column.ExcludeColumn)
@@ -563,7 +563,7 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      MySqlDataColumn currentCol = GetCurrentMySqlDataColumn();
+      var currentCol = GetCurrentMySqlDataColumn();
       if (currentCol == null || CreateIndexCheckBox.Checked == currentCol.CreateIndex)
       {
         return;
@@ -599,7 +599,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void DataTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
     {
-      MySqlDataColumn currentCol = GetCurrentMySqlDataColumn();
+      var currentCol = GetCurrentMySqlDataColumn();
       var selectedType = DataTypeComboBox.SelectedValue != null ? DataTypeComboBox.SelectedValue.ToString() : string.Empty;
       if (currentCol == null || string.IsNullOrEmpty(selectedType) || string.Equals(selectedType, currentCol.MySqlDataType.FullType, StringComparison.InvariantCultureIgnoreCase))
       {
@@ -643,8 +643,8 @@ namespace MySQL.ForExcel.Forms
     private void DataTypeComboBox_Validating(object sender, CancelEventArgs e)
     {
       TextChangedTimer.Stop();
-      string newDataType = DataTypeComboBox.Text.Trim();
-      MySqlDataColumn currentCol = GetCurrentMySqlDataColumn();
+      var newDataType = DataTypeComboBox.Text.Trim();
+      var currentCol = GetCurrentMySqlDataColumn();
       if (currentCol == null || DataTypeComboBox.SelectedIndex >= 0 || currentCol.MySqlDataType.FullType == newDataType)
       {
         return;
@@ -662,7 +662,7 @@ namespace MySQL.ForExcel.Forms
     {
       e.DrawBackground();
       var comboItem = DataTypeComboBox.Items[e.Index];
-      string itemText = comboItem is KeyValuePair<string, string> pair
+      var itemText = comboItem is KeyValuePair<string, string> pair
         ? pair.Value
         : comboItem.ToString();
       e.Graphics.DrawString(itemText, DataTypeComboBox.Font, Brushes.Black, new RectangleF(e.Bounds.X, e.Bounds.Y, e.Bounds.Width, e.Bounds.Height));
@@ -683,10 +683,10 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      bool showResetMenuItems = currentCol.ParentTable != null
+      var showResetMenuItems = currentCol.ParentTable != null
                                 && currentCol.ParentTable.DetectDataType
                                 && currentCol.MySqlDataTypeOverridenByUser;
-      bool showNumericExtendedMenuItems = currentCol.MySqlDataType.IsNumeric;
+      var showNumericExtendedMenuItems = currentCol.MySqlDataType.IsNumeric;
       if (!showResetMenuItems && !showNumericExtendedMenuItems)
       {
         e.Cancel = true;
@@ -742,7 +742,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       var currentCol = GetCurrentMySqlDataColumn();
-      string trimmedDefaultValue = DefaultValueTextBox.Text.Trim();
+      var trimmedDefaultValue = DefaultValueTextBox.Text.Trim();
       if (currentCol == null)
       {
         return;
@@ -787,7 +787,7 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      MySqlDataColumn currentCol = GetCurrentMySqlDataColumn();
+      var currentCol = GetCurrentMySqlDataColumn();
       if (currentCol == null || ExcludeColumnCheckBox.Checked == currentCol.ExcludeColumn)
       {
         return;
@@ -844,7 +844,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       // Check if there is data to export, if there is not then ask the user if he wants to proceed with the table creation only.
-      bool tableContainsDataToExport = _exportDataTable.Rows.Count > (_exportDataTable.FirstRowContainsColumnNames ? 1 : 0);
+      var tableContainsDataToExport = _exportDataTable.Rows.Count > (_exportDataTable.FirstRowContainsColumnNames ? 1 : 0);
       if (!tableContainsDataToExport)
       {
         var dr = MiscUtilities.ShowCustomizedWarningDialog(Resources.ExportDataNoDataToExportTitleWarning, Resources.ExportDataNoDataToExportDetailWarning);
@@ -901,13 +901,13 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="FirstRowHeadersCheckBox"/> checkbox's checked state changes.
+    /// Event delegate method fired when the <see cref="FirstRowHeadersCheckBox"/> check box's checked state changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
     private void FirstRowHeadersCheckBox_CheckedChanged(object sender, EventArgs e)
     {
-      int grdIndex = PreviewDataGridView.SelectedColumns.Count > 0 ? PreviewDataGridView.SelectedColumns[0].Index : 0;
+      var grdIndex = PreviewDataGridView.SelectedColumns.Count > 0 ? PreviewDataGridView.SelectedColumns[0].Index : 0;
       _previewDataTable.FirstRowContainsColumnNames = FirstRowHeadersCheckBox.Checked;
       RefreshPreviewGridColumnNames();
       SetControlTextValue(AddPrimaryKeyTextBox, _previewDataTable.AutoPkName);
@@ -927,7 +927,7 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void FlagMultiColumnPrimaryKey()
     {
-      int pkQty = _previewDataTable.NumberOfPk;
+      var pkQty = _previewDataTable.NumberOfPk;
       AddPrimaryKeyRadioButton.Checked = pkQty == 0;
       UseExistingColumnRadioButton.Checked = pkQty > 0;
       if (PrimaryKeyColumnsComboBox.Items.Count == 0)
@@ -1011,7 +1011,7 @@ namespace MySQL.ForExcel.Forms
         Settings.Default.ExportAutoAllowEmptyNonIndexColumns);
       _previewDataTable.TableColumnPropertyValueChanged += PreviewTableColumnPropertyValueChanged;
       _previewDataTable.TableWarningsChanged += PreviewTableWarningsChanged;
-      int previewRowsQty = Math.Min(_exportDataRange.Rows.Count, Settings.Default.ExportLimitPreviewRowsQuantity);
+      var previewRowsQty = Math.Min(_exportDataRange.Rows.Count, Settings.Default.ExportLimitPreviewRowsQuantity);
       _previewDataTable.SetupColumnsWithData(_exportDataRange, true, previewRowsQty);
       PreviewDataGridView.DataSource = _previewDataTable;
     }
@@ -1082,7 +1082,7 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      int currentSelectedIdx = PreviewDataGridView.SelectedColumns[0].Index;
+      var currentSelectedIdx = PreviewDataGridView.SelectedColumns[0].Index;
       int newIdx;
       switch (e.KeyCode.ToString())
       {
@@ -1125,9 +1125,8 @@ namespace MySQL.ForExcel.Forms
     /// <param name="args">Event arguments.</param>
     public void PreviewTableColumnPropertyValueChanged(object sender, PropertyChangedEventArgs args)
     {
-      MySqlDataColumn changedColumn = sender as MySqlDataColumn;
-      MySqlDataColumn currentColumn = GetCurrentMySqlDataColumn();
-      if (changedColumn == null || changedColumn != currentColumn)
+      var currentColumn = GetCurrentMySqlDataColumn();
+      if (!(sender is MySqlDataColumn changedColumn) || changedColumn != currentColumn)
       {
         return;
       }
@@ -1180,7 +1179,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="args">Event arguments.</param>
     private void PreviewTableWarningsChanged(object sender, TableWarningsChangedArgs args)
     {
-      bool showWarning = !string.IsNullOrEmpty(args.CurrentWarning);
+      var showWarning = !string.IsNullOrEmpty(args.CurrentWarning);
       switch (args.WarningsType)
       {
         case TableWarningsChangedArgs.TableWarningsType.AutoPrimaryKeyWarnings:
@@ -1221,7 +1220,7 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      MySqlDataColumn currentCol = GetCurrentMySqlDataColumn();
+      var currentCol = GetCurrentMySqlDataColumn();
       if (currentCol == null || PrimaryKeyCheckBox.Checked == currentCol.PrimaryKey)
       {
         return;
@@ -1253,7 +1252,7 @@ namespace MySQL.ForExcel.Forms
       if (PrimaryKeyColumnsComboBox.Items[0].ToString() == Resources.ExportDataMultiPrimaryKeyText)
       {
         PrimaryKeyColumnsComboBox.BeginUpdate();
-        int index = PrimaryKeyColumnsComboBox.SelectedIndex;
+        var index = PrimaryKeyColumnsComboBox.SelectedIndex;
         PrimaryKeyColumnsComboBox.Items.RemoveAt(0);
         if (index == 0)
         {
@@ -1264,11 +1263,11 @@ namespace MySQL.ForExcel.Forms
       }
 
       // Now we need to adjust the index of the actual column we want to set the PrimaryKey flag for
-      int comboColumnIndex = 0;
-      MySqlDataColumn currentColumn = GetCurrentMySqlDataColumn();
-      for (int coldIdx = 1; coldIdx < _previewDataTable.Columns.Count; coldIdx++)
+      var comboColumnIndex = 0;
+      var currentColumn = GetCurrentMySqlDataColumn();
+      for (var coldIdx = 1; coldIdx < _previewDataTable.Columns.Count; coldIdx++)
       {
-        MySqlDataColumn col = _previewDataTable.GetColumnAtIndex(coldIdx);
+        var col = _previewDataTable.GetColumnAtIndex(coldIdx);
         if (col.ExcludeColumn)
         {
           continue;
@@ -1303,7 +1302,7 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void RefreshColumnControlsAndWarnings()
     {
-      bool columnSelected = PreviewDataGridView.SelectedColumns.Count > 0;
+      var columnSelected = PreviewDataGridView.SelectedColumns.Count > 0;
       ColumnOptionsGroupBox.Enabled = columnSelected;
       if (!columnSelected)
       {
@@ -1311,8 +1310,8 @@ namespace MySQL.ForExcel.Forms
       }
 
       // Set current column
-      DataGridViewColumn gridCol = PreviewDataGridView.SelectedColumns[0];
-      MySqlDataColumn mysqlCol = _previewDataTable.GetColumnAtIndex(gridCol.Index);
+      var gridCol = PreviewDataGridView.SelectedColumns[0];
+      var mysqlCol = _previewDataTable.GetColumnAtIndex(gridCol.Index);
 
       // Set controls tied to column properties
       SetControlTextValue(ColumnNameTextBox, mysqlCol.DisplayName);
@@ -1346,7 +1345,7 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      MySqlDataColumn mysqlCol = GetCurrentMySqlDataColumn();
+      var mysqlCol = GetCurrentMySqlDataColumn();
       ExcludeColumnCheckBox.Enabled = true;
       PrimaryKeyCheckBox.Enabled = !(ExcludeColumnCheckBox.Checked || AddPrimaryKeyRadioButton.Checked);
       UniqueIndexCheckBox.Enabled = !ExcludeColumnCheckBox.Checked;
@@ -1377,7 +1376,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="column">Column to refresh warnings for.</param>
     private void RefreshColumnWarnings(MySqlDataColumn column)
     {
-      bool showWarning = !string.IsNullOrEmpty(column.CurrentWarningText);
+      var showWarning = !string.IsNullOrEmpty(column.CurrentWarningText);
       _columnOptionsWarningMoreInfo = column.CurrentWarningMoreInfo;
       ShowValidationWarning("ColumnOptionsWarning", showWarning, column.CurrentWarningText, column.CurrentWarningMoreInfo != null);
     }
@@ -1387,10 +1386,10 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void RefreshPreviewGridColumnNames()
     {
-      for (int colIdx = 0; colIdx < _previewDataTable.Columns.Count; colIdx++)
+      for (var colIdx = 0; colIdx < _previewDataTable.Columns.Count; colIdx++)
       {
-        MySqlDataColumn mysqlCol = _previewDataTable.GetColumnAtIndex(colIdx);
-        DataGridViewColumn gridCol = PreviewDataGridView.Columns[colIdx];
+        var mysqlCol = _previewDataTable.GetColumnAtIndex(colIdx);
+        var gridCol = PreviewDataGridView.Columns[colIdx];
         gridCol.HeaderText = mysqlCol.DisplayName;
         PreviewDataGridView.Columns[colIdx].SortMode = DataGridViewColumnSortMode.NotSortable;
       }
@@ -1405,7 +1404,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="recreatingColumnNames">Flag indicating if the primary key columns combobox is being refreshed due a recreation of all column names.</param>
     private void RefreshPrimaryKeyColumnsCombo(bool recreatingColumnNames)
     {
-      int selectedIndex = -1;
+      var selectedIndex = -1;
       string selectedItem = null;
       if (UseExistingColumnRadioButton.Checked)
       {
@@ -1420,7 +1419,7 @@ namespace MySQL.ForExcel.Forms
         PrimaryKeyColumnsComboBox.Items.Add(Resources.ExportDataMultiPrimaryKeyText ?? string.Empty);
       }
 
-      foreach (MySqlDataColumn mysqlCol in _previewDataTable.Columns.Cast<MySqlDataColumn>().Where(mysqlCol => mysqlCol.Ordinal != 0 && !mysqlCol.ExcludeColumn))
+      foreach (var mysqlCol in _previewDataTable.Columns.Cast<MySqlDataColumn>().Where(mysqlCol => mysqlCol.Ordinal != 0 && !mysqlCol.ExcludeColumn))
       {
         PrimaryKeyColumnsComboBox.Items.Add(mysqlCol.DisplayName);
       }
@@ -1438,7 +1437,7 @@ namespace MySQL.ForExcel.Forms
         PrimaryKeyColumnsComboBox.SelectedItem = selectedItem;
         if (PrimaryKeyColumnsComboBox.SelectedItem == null)
         {
-          int pkQty = _previewDataTable.NumberOfPk;
+          var pkQty = _previewDataTable.NumberOfPk;
           if (pkQty > 0)
           {
             var pkColumn = _previewDataTable.Columns.Cast<MySqlDataColumn>().Skip(1).First(i => i.PrimaryKey);
@@ -1557,7 +1556,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="mySqlColumn">A <see cref="MySqlDataColumn"/>.</param>
     private void SetGridColumnBackgroundColor(MySqlDataColumn mySqlColumn)
     {
-      DataGridViewColumn gridCol = PreviewDataGridView.Columns[mySqlColumn.Ordinal];
+      var gridCol = PreviewDataGridView.Columns[mySqlColumn.Ordinal];
       gridCol.DefaultCellStyle.BackColor = mySqlColumn.ExcludeColumn
         ? Color.LightGray
         : (string.IsNullOrEmpty(mySqlColumn.CurrentWarningText) ? PreviewDataGridView.DefaultCellStyle.BackColor : Color.OrangeRed);
@@ -1573,8 +1572,8 @@ namespace MySQL.ForExcel.Forms
     private void ShowValidationWarning(string warningControlsPrefix, bool showWarningControls, string text, bool showMoreInfoLink = false)
     {
       showWarningControls = showWarningControls && !string.IsNullOrEmpty(text);
-      string pictureBoxControlName = warningControlsPrefix + "PictureBox";
-      string labelControlName = warningControlsPrefix + "Label";
+      var pictureBoxControlName = warningControlsPrefix + "PictureBox";
+      var labelControlName = warningControlsPrefix + "Label";
 
       if (ContentAreaPanel.Controls.ContainsKey(pictureBoxControlName) && ContentAreaPanel.Controls.ContainsKey(labelControlName))
       {
@@ -1594,7 +1593,7 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="TableNameInputTextBox"/> textbox's text changes.
+    /// Event delegate method fired when the <see cref="TableNameInputTextBox"/> text box's text changes.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
@@ -1604,14 +1603,14 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Event delegate method fired when the <see cref="TableNameInputTextBox"/> textbox is being validated.
+    /// Event delegate method fired when the <see cref="TableNameInputTextBox"/> text box is being validated.
     /// </summary>
     /// <param name="sender">Sender object.</param>
     /// <param name="e">Event arguments.</param>
     private void TableNameInputTextBox_Validating(object sender, CancelEventArgs e)
     {
       TextChangedTimer.Stop();
-      string newTableName = TableNameInputTextBox.Text.Trim();
+      var newTableName = TableNameInputTextBox.Text.Trim();
       if (_previewDataTable == null || _previewDataTable.TableName == newTableName)
       {
         return;

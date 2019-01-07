@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -31,7 +31,7 @@ namespace MySQL.ForExcel.Controls
     #region Fields
 
     /// <summary>
-    /// The mouse button pressed by the user wheb clicking on the label.
+    /// The mouse button pressed by the user when clicking on the label.
     /// </summary>
     private MouseButtons _downButton;
 
@@ -69,8 +69,8 @@ namespace MySQL.ForExcel.Controls
       TitleXOffset = 0;
       TitleYOffset = 3;
 
-      FontFamily family = Parent != null ? Parent.Font.FontFamily : FontFamily.GenericSansSerif;
-      float size = Parent != null ? Parent.Font.Size : 8.25f;
+      var family = Parent != null ? Parent.Font.FontFamily : FontFamily.GenericSansSerif;
+      var size = Parent?.Font.Size ?? 8.25f;
       Font = new Font(family, size * 1.25f, FontStyle.Bold);
       DescriptionFont = new Font(Font.FontFamily, Font.Size * 0.5f, FontStyle.Regular);
     }
@@ -252,15 +252,8 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     protected override bool DoubleBuffered
     {
-      get
-      {
-        return base.DoubleBuffered;
-      }
-
-      set
-      {
-        base.DoubleBuffered = value;
-      }
+      get => base.DoubleBuffered;
+      set => base.DoubleBuffered = value;
     }
 
     #endregion Properties
@@ -335,23 +328,23 @@ namespace MySQL.ForExcel.Controls
     {
       base.OnPaint(e);
 
-      Image i = Enabled
+      var i = Enabled
         ? (Behavior != BehaviorType.CheckBox
           ? Image
           : (CheckedState == CheckState.Checked ? CheckedImage : Image))
         : (DisabledImage == null && Image != null ? new Bitmap(Image).ToGrayscale() : DisabledImage);
-      Size imageSize = Size.Empty;
+      var imageSize = Size.Empty;
       if (i != null)
       {
         imageSize = i.Size;
-        int y = (Height - imageSize.Height) / 2;
+        var y = (Height - imageSize.Height) / 2;
         e.Graphics.DrawImage(i, ImagePixelsXOffset, y + ImagePixelsYOffset, imageSize.Width, imageSize.Height);
       }
 
-      Point pt = new Point(imageSize.Width + TitleXOffset, TitleYOffset);
+      var pt = new Point(imageSize.Width + TitleXOffset, TitleYOffset);
       if (!string.IsNullOrEmpty(Title))
       {
-        Color currentTitleColor = _tracking ? SystemColors.HotTrack : TitleColor;
+        var currentTitleColor = _tracking ? SystemColors.HotTrack : TitleColor;
         if (DrawShadow && Enabled)
         {
           using (var titleShadowBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleShadowOpacity * 255), TitleColor)))
@@ -367,7 +360,7 @@ namespace MySQL.ForExcel.Controls
           e.Graphics.DrawString(Title, Font, titleBrush, pt.X, pt.Y);
         }
 
-        SizeF stringSize = e.Graphics.MeasureString(Title, Font);
+        var stringSize = e.Graphics.MeasureString(Title, Font);
         pt.Y += (int)(stringSize.Height + TitleDescriptionPixelsSpacing);
       }
 

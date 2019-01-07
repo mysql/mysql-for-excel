@@ -81,7 +81,7 @@ namespace MySQL.ForExcel.Forms
     private readonly string _errorDialogSummary;
 
     /// <summary>
-    /// Flag indicating whether when text changes in the <see cref="QueryTextBox"/> was due user input or programatic.
+    /// Flag indicating whether when text changes in the <see cref="QueryTextBox"/> was due user input or programmatic.
     /// </summary>
     private bool _isUserInput;
 
@@ -240,13 +240,7 @@ namespace MySQL.ForExcel.Forms
     /// Gets the number of delete operations successfully performed against the database server.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public int DeletedOperations
-    {
-      get
-      {
-        return ActualStatementRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Delete);
-      }
-    }
+    public int DeletedOperations => ActualStatementRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Delete);
 
     /// <summary>
     /// Gets the <see cref="IMySqlDataRow"/> object that generated an error.
@@ -258,13 +252,7 @@ namespace MySQL.ForExcel.Forms
     /// Gets the number of insert operations successfully performed against the database server.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public int InsertedOperations
-    {
-      get
-      {
-        return ActualStatementRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Insert);
-      }
-    }
+    public int InsertedOperations => ActualStatementRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Insert);
 
     /// <summary>
     /// Gets the text describing the current operation this script belongs to.
@@ -301,10 +289,7 @@ namespace MySQL.ForExcel.Forms
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string SqlScript
     {
-      get
-      {
-        return QueryTextBox.Text.Replace("\n", Environment.NewLine);
-      }
+      get => QueryTextBox.Text.Replace("\n", Environment.NewLine);
 
       private set
       {
@@ -318,13 +303,7 @@ namespace MySQL.ForExcel.Forms
     /// Gets the number of update operations successfully performed against the database server.
     /// </summary>
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public int UpdatedOperations
-    {
-      get
-      {
-        return ActualStatementRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Update);
-      }
-    }
+    public int UpdatedOperations => ActualStatementRowsList.GetResultsCount(MySqlStatement.SqlStatementType.Update);
 
     /// <summary>
     /// Gets the value of the MAX_ALLOWED_PACKET MySQL Server variable indicating the max size in bytes of the packet returned by a single query.
@@ -372,7 +351,7 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Applies the SQL query by breaking it into stataments and executing one by one inside a transaction.
+    /// Applies the SQL query by breaking it into statements and executing one by one inside a transaction.
     /// </summary>
     public void ApplyScript()
     {
@@ -398,7 +377,7 @@ namespace MySQL.ForExcel.Forms
         using (var conn = new MySqlConnection(connectionStringBuilder.ConnectionString))
         {
           conn.Open();
-          MySqlTransaction transaction = conn.BeginTransaction();
+          var transaction = conn.BeginTransaction();
           var command = new MySqlCommand(string.Empty, conn, transaction);
           uint executionOrder = 1;
           foreach (var mySqlRow in ActualStatementRowsList)
@@ -530,9 +509,9 @@ namespace MySQL.ForExcel.Forms
         _createdTable = false;
         _lockedTable = false;
         _originalStatementRowsList.Clear();
-        bool isForExport = _mySqlTable.OperationType.IsForExport();
-        bool isForAppend = _mySqlTable.OperationType.IsForAppend();
-        bool createTableOnly = isForExport && _mySqlTable.CreateTableWithoutData;
+        var isForExport = _mySqlTable.OperationType.IsForExport();
+        var isForAppend = _mySqlTable.OperationType.IsForAppend();
+        var createTableOnly = isForExport && _mySqlTable.CreateTableWithoutData;
         if (!createTableOnly && _mySqlTable.ChangedOrDeletedRows == 0)
         {
           return;
@@ -541,14 +520,14 @@ namespace MySQL.ForExcel.Forms
         try
         {
           // Calculate the StringBuilder initial length to avoid its size to be internally doubled each time an Append to it is done to increase performance.
-          int builderLength = createTableOnly ? MiscUtilities.STRING_BUILDER_DEFAULT_CAPACITY : _mySqlTable.MaxQueryLength;
+          var builderLength = createTableOnly ? MiscUtilities.STRING_BUILDER_DEFAULT_CAPACITY : _mySqlTable.MaxQueryLength;
           var sqlScript = new StringBuilder(builderLength);
           IList<MySqlDummyRow> dummyRows;
-          bool createTableDummyRows = isForExport || isForAppend;
+          var createTableDummyRows = isForExport || isForAppend;
           if (createTableDummyRows)
           {
             // Create optimization statements for INSERTS that disable key constraints and lock table.
-            // Also incluldes a CREATE statement if table on Export mode.
+            // Also includes a CREATE statement if table on Export mode.
             dummyRows = _mySqlTable.GetDummyRowsForTableCreationAndIndexOptimization(true);
             if (dummyRows != null)
             {
@@ -574,7 +553,7 @@ namespace MySQL.ForExcel.Forms
           // Do not change this code to get changed rows via the GetChanges method since the references to the MySqlDataTable and MySqlDataTable objects will be broken.
           if (!createTableOnly)
           {
-            bool isBulkInsert = (isForExport && !Settings.Default.ExportGenerateMultipleInserts)
+            var isBulkInsert = (isForExport && !Settings.Default.ExportGenerateMultipleInserts)
                                 || (isForAppend && !Settings.Default.AppendGenerateMultipleInserts);
             if (isBulkInsert)
             {
@@ -594,7 +573,7 @@ namespace MySQL.ForExcel.Forms
               foreach (var mySqlRow in rowStatesWithChanges.SelectMany(rowState => _mySqlTable.Rows.Cast<MySqlDataRow>().Where(dr => !dr.IsHeadersRow && dr.RowState == rowState)))
               {
                 _originalStatementRowsList.Add(mySqlRow);
-                string mainSqlQuery = mySqlRow.Statement.SqlQuery;
+                var mainSqlQuery = mySqlRow.Statement.SqlQuery;
                 if (!string.IsNullOrEmpty(mySqlRow.Statement.SetVariablesSqlQuery))
                 {
                   sqlScript.AppendFormat("{0};{1}", mySqlRow.Statement.SetVariablesSqlQuery, Environment.NewLine);
@@ -782,7 +761,7 @@ namespace MySQL.ForExcel.Forms
       QueryChangedTimer.Stop();
 
       // Identify the statements that would exceed the server's max allowed packet value and highlight them for the user.
-      string queryText = QueryTextBox.Text.Trim();
+      var queryText = QueryTextBox.Text.Trim();
       if (queryText.Length <= 0)
       {
         return;
@@ -791,12 +770,12 @@ namespace MySQL.ForExcel.Forms
       QueryTextBox.ReadOnly = true;
       Cursor = Cursors.WaitCursor;
 
-      bool statementsExceedingMaxAllowedPacketValueFound = false;
-      bool reachedEnd = false;
-      int statementStartPosition = 0;
+      var statementsExceedingMaxAllowedPacketValueFound = false;
+      var reachedEnd = false;
+      var statementStartPosition = 0;
       do
       {
-        int statementEndPosition = queryText.IndexOf(";", statementStartPosition, StringComparison.Ordinal);
+        var statementEndPosition = queryText.IndexOf(";", statementStartPosition, StringComparison.Ordinal);
         if (statementEndPosition < 0)
         {
           reachedEnd = true;
@@ -804,7 +783,7 @@ namespace MySQL.ForExcel.Forms
         }
 
         // Get SQL statement
-        string sqlStatement = queryText.Substring(statementStartPosition, statementEndPosition - statementStartPosition).Trim();
+        var sqlStatement = queryText.Substring(statementStartPosition, statementEndPosition - statementStartPosition).Trim();
 
         // TODO: Split statement in tokens using MySQL parser classes and paint them accordingly.
 
@@ -887,8 +866,8 @@ namespace MySQL.ForExcel.Forms
 
         if (_mySqlTable.OperationType != MySqlDataTable.DataOperationType.Export || !_mySqlTable.CreateTableWithoutData)
         {
-          int operationRows = _mySqlTable.DeletingOperations;
-          int totalOperationRows = operationRows;
+          var operationRows = _mySqlTable.DeletingOperations;
+          var totalOperationRows = operationRows;
           if (operationRows > 0)
           {
             originalOperationsInfo.AddSeparator(", ", true);
@@ -939,7 +918,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void ZoomInToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      float newValue = QueryTextBox.ZoomFactor * ZOOMING_STEP;
+      var newValue = QueryTextBox.ZoomFactor * ZOOMING_STEP;
       if (newValue.CompareTo(64) >= 0)
       {
         ZoomInToolStripMenuItem.Visible = false;
@@ -958,8 +937,9 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void ZoomOutToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      float newValue = QueryTextBox.ZoomFactor / ZOOMING_STEP;
-      if (newValue.CompareTo(1 / 64) <= 0)
+      var newValue = QueryTextBox.ZoomFactor / ZOOMING_STEP;
+      var comparison = 1 / 64;
+      if (newValue.CompareTo(comparison) <= 0)
       {
         ZoomOutToolStripMenuItem.Visible = false;
         return;

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -65,8 +65,8 @@ namespace MySQL.ForExcel.Classes
     public MySqlListViewNode(MySqlWorkbenchConnection connection, bool excludeFromMultiSelection = false)
       : this(connection.Name, string.Empty, MySqlNodeType.Connection, excludeFromMultiSelection)
     {
-      string hostName = connection.GetHostNameForConnectionSubtitle();
-      Subtitle = string.Format("User: {0}, Host: {1}:{2}", connection.UserName, hostName, connection.Port);
+      var hostName = connection.GetHostNameForConnectionSubtitle();
+      Subtitle = $"User: {connection.UserName}, Host: {hostName}:{connection.Port}";
       WbConnection = connection;
     }
 
@@ -79,8 +79,7 @@ namespace MySQL.ForExcel.Classes
       : this(dbObject.Name, null, MySqlNodeType.DbObject, includeOnlyTablesAndViewsInMultiSelection && !(dbObject is DbTable) && !(dbObject is DbView))
     {
       DbObject = dbObject;
-      var dbSchema = dbObject as DbSchema;
-      if (dbSchema != null && dbSchema.DisplayCollation)
+      if (dbObject is DbSchema dbSchema && dbSchema.DisplayCollation)
       {
         Subtitle = dbSchema.Collation;
       }
@@ -143,7 +142,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the <see cref="DbObject"/> related to the node.
     /// </summary>
-    public DbObject DbObject { get; private set; }
+    public DbObject DbObject { get; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the tree node is displayed as being enabled.
@@ -160,10 +159,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public new bool IsSelected
     {
-      get
-      {
-        return _isSelected;
-      }
+      get => _isSelected;
 
       set
       {
@@ -180,10 +176,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public string Subtitle
     {
-      get
-      {
-        return _subtitle;
-      }
+      get => _subtitle;
 
       set
       {
@@ -197,10 +190,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public string Title
     {
-      get
-      {
-        return _title;
-      }
+      get => _title;
 
       set
       {
@@ -212,7 +202,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the type of MySQL information related to the node.
     /// </summary>
-    public MySqlNodeType Type { get; private set; }
+    public MySqlNodeType Type { get; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the sub-title text is truncated.
@@ -227,7 +217,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the <see cref="MySqlWorkbenchConnection"/> associated to the node.
     /// </summary>
-    public MySqlWorkbenchConnection WbConnection { get; private set; }
+    public MySqlWorkbenchConnection WbConnection { get; }
 
     #endregion Properties
 

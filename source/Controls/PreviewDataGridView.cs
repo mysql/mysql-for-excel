@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -54,7 +54,7 @@ namespace MySQL.ForExcel.Controls
     /// <summary>
     /// A <see cref="DataTable"/> object containing a subset of the whole data which is shown in the preview grid.
     /// </summary>
-    private DataTable _previewDataTable;
+    private readonly DataTable _previewDataTable;
 
     /// <summary>
     /// Flag indicating if recalculation of column width is not necessary so it must be skipped.
@@ -97,15 +97,8 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool AllowUserToAddRows
     {
-      get
-      {
-        return base.AllowUserToAddRows;
-      }
-
-      protected set
-      {
-        base.AllowUserToAddRows = value;
-      }
+      get => base.AllowUserToAddRows;
+      protected set => base.AllowUserToAddRows = value;
     }
 
     /// <summary>
@@ -114,15 +107,8 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool AllowUserToDeleteRows
     {
-      get
-      {
-        return base.AllowUserToDeleteRows;
-      }
-
-      protected set
-      {
-        base.AllowUserToDeleteRows = value;
-      }
+      get => base.AllowUserToDeleteRows;
+      protected set => base.AllowUserToDeleteRows = value;
     }
 
     /// <summary>
@@ -131,15 +117,8 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool AllowUserToOrderColumns
     {
-      get
-      {
-        return base.AllowUserToOrderColumns;
-      }
-
-      protected set
-      {
-        base.AllowUserToOrderColumns = value;
-      }
+      get => base.AllowUserToOrderColumns;
+      protected set => base.AllowUserToOrderColumns = value;
     }
 
     /// <summary>
@@ -148,15 +127,8 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool AllowUserToResizeColumns
     {
-      get
-      {
-        return base.AllowUserToResizeColumns;
-      }
-
-      protected set
-      {
-        base.AllowUserToResizeColumns = value;
-      }
+      get => base.AllowUserToResizeColumns;
+      protected set => base.AllowUserToResizeColumns = value;
     }
 
     /// <summary>
@@ -165,15 +137,8 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool AllowUserToResizeRows
     {
-      get
-      {
-        return base.AllowUserToResizeRows;
-      }
-
-      protected set
-      {
-        base.AllowUserToResizeRows = value;
-      }
+      get => base.AllowUserToResizeRows;
+      protected set => base.AllowUserToResizeRows = value;
     }
 
     /// <summary>
@@ -182,15 +147,8 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new DataGridViewAutoSizeColumnsMode AutoSizeColumnsMode
     {
-      get
-      {
-        return base.AutoSizeColumnsMode;
-      }
-
-      protected set
-      {
-        base.AutoSizeColumnsMode = value;
-      }
+      get => base.AutoSizeColumnsMode;
+      protected set => base.AutoSizeColumnsMode = value;
     }
 
     /// <summary>
@@ -199,15 +157,8 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new DataGridViewColumnHeadersHeightSizeMode ColumnHeadersHeightSizeMode
     {
-      get
-      {
-        return base.ColumnHeadersHeightSizeMode;
-      }
-
-      protected set
-      {
-        base.ColumnHeadersHeightSizeMode = value;
-      }
+      get => base.ColumnHeadersHeightSizeMode;
+      protected set => base.ColumnHeadersHeightSizeMode = value;
     }
 
     /// <summary>
@@ -216,10 +167,7 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), DefaultValue(0), Description("The maximum column width, in pixels, of all columns in the grid. If 0 the column is automatically sized to fit its contents.")]
     public int ColumnsMaximumWidth
     {
-      get
-      {
-        return _columnsMaximumWidth;
-      }
+      get => _columnsMaximumWidth;
 
       set
       {
@@ -237,10 +185,7 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), DefaultValue(0), Description("The minimum column width, in pixels, of all columns in the grid. If 0 the column is automatically sized to fit its contents.")]
     public int ColumnsMinimumWidth
     {
-      get
-      {
-        return _columnsMinimumWidth;
-      }
+      get => _columnsMinimumWidth;
 
       set
       {
@@ -265,15 +210,8 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool ReadOnly
     {
-      get
-      {
-        return base.ReadOnly;
-      }
-
-      protected set
-      {
-        base.ReadOnly = value;
-      }
+      get => base.ReadOnly;
+      protected set => base.ReadOnly = value;
     }
 
     /// <summary>
@@ -282,15 +220,8 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool RowHeadersVisible
     {
-      get
-      {
-        return base.RowHeadersVisible;
-      }
-
-      protected set
-      {
-        base.RowHeadersVisible = value;
-      }
+      get => base.RowHeadersVisible;
+      protected set => base.RowHeadersVisible = value;
     }
 
     /// <summary>
@@ -299,15 +230,8 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new DataGridViewRowHeadersWidthSizeMode RowHeadersWidthSizeMode
     {
-      get
-      {
-        return base.RowHeadersWidthSizeMode;
-      }
-
-      protected set
-      {
-        base.RowHeadersWidthSizeMode = value;
-      }
+      get => base.RowHeadersWidthSizeMode;
+      protected set => base.RowHeadersWidthSizeMode = value;
     }
 
     /// <summary>
@@ -322,15 +246,8 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool ShowCellErrors
     {
-      get
-      {
-        return base.ShowCellErrors;
-      }
-
-      protected set
-      {
-        base.ShowCellErrors = value;
-      }
+      get => base.ShowCellErrors;
+      protected set => base.ShowCellErrors = value;
     }
 
     /// <summary>
@@ -339,15 +256,8 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool ShowEditingIcon
     {
-      get
-      {
-        return base.ShowEditingIcon;
-      }
-
-      protected set
-      {
-        base.ShowEditingIcon = value;
-      }
+      get => base.ShowEditingIcon;
+      protected set => base.ShowEditingIcon = value;
     }
 
     /// <summary>
@@ -356,15 +266,8 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool ShowRowErrors
     {
-      get
-      {
-        return base.ShowRowErrors;
-      }
-
-      protected set
-      {
-        base.ShowRowErrors = value;
-      }
+      get => base.ShowRowErrors;
+      protected set => base.ShowRowErrors = value;
     }
 
     #endregion Properties
@@ -391,7 +294,7 @@ namespace MySQL.ForExcel.Controls
         var imageColumn = gridCol as DataGridViewImageColumn;
         foreach (DataGridViewRow row in Rows)
         {
-          DataGridViewCell cell = row.Cells[gridCol.Index];
+          var cell = row.Cells[gridCol.Index];
           if (imageColumn == null)
           {
             continue;
@@ -427,10 +330,7 @@ namespace MySQL.ForExcel.Controls
     {
       if (disposing)
       {
-        if (_previewDataTable != null)
-        {
-          _previewDataTable.Dispose();
-        }
+        _previewDataTable?.Dispose();
       }
 
       base.Dispose(disposing);
@@ -522,8 +422,8 @@ namespace MySQL.ForExcel.Controls
     /// <param name="column">A <see cref="DataGridViewColumn"/> instance.</param>
     protected void PerformColumnWidthRecalculation(DataGridViewColumn column)
     {
-      bool wrapText = false;
-      int cappedWidth = column.Width;
+      var wrapText = false;
+      var cappedWidth = column.Width;
       if (column.Width > _columnsMaximumWidth && _columnsMaximumWidth > 0)
       {
         cappedWidth = _columnsMaximumWidth;

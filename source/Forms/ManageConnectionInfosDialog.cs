@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -67,7 +67,7 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets a list of the connection information entries to delete.
     /// </summary>
-    public List<IConnectionInfo> ConnectionInfosToDelete { get; private set; }
+    public List<IConnectionInfo> ConnectionInfosToDelete { get; }
 
     /// <summary>
     /// Gets a value indicating whether <see cref="IConnectionInfo"/> objects should be automatically deleted if they are related to a Workbook that is no longer found.
@@ -152,7 +152,7 @@ namespace MySQL.ForExcel.Forms
           ? new Font(listViewItem.Font, listViewItem.Font.Style | FontStyle.Bold)
           : new Font(listViewItem.Font, listViewItem.Font.Style | FontStyle.Regular);
 
-        //Set the session's font in red if the worbooks it belongs to is not found in the system.
+        //Set the session's font in red if the workbooks it belongs to is not found in the system.
         listViewItem.ForeColor = _connectionInfosWithNonExistentWorkbook.Any(ci => ci.Equals(connectionInfo)) ? Color.Red : Color.Black;
       }
     }
@@ -260,8 +260,8 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void TablesViewsContextMenuStrip_Opening(object sender, System.ComponentModel.CancelEventArgs e)
     {
-      int checkedCount = ConnectionInfosListView.CheckedItems.Count;
-      int itemsCount = ConnectionInfosListView.Items.Count;
+      var checkedCount = ConnectionInfosListView.CheckedItems.Count;
+      var itemsCount = ConnectionInfosListView.Items.Count;
       SelectAllToolStripMenuItem.Visible = checkedCount < itemsCount;
       SelectNoneToolStripMenuItem.Visible = checkedCount > 0;
     }
@@ -275,8 +275,7 @@ namespace MySQL.ForExcel.Forms
       {
         foreach (ListViewItem listViewItem in ConnectionInfosListView.Items)
         {
-          var connectionInfo = listViewItem.Tag as IConnectionInfo;
-          if (connectionInfo == null)
+          if (!(listViewItem.Tag is IConnectionInfo connectionInfo))
           {
             continue;
           }

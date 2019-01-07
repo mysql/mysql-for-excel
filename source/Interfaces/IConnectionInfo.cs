@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@ namespace MySQL.ForExcel.Interfaces
   public interface IConnectionInfo : IDisposable
   {
     /// <summary>
-    /// Gets or sets the connection id, enabling to retrieve the credentials to access the reffered MySQL instance in it.
+    /// Gets or sets the connection id, enabling to retrieve the credentials to access the referred MySQL instance in it.
     /// </summary>
     string ConnectionId { get; set; }
 

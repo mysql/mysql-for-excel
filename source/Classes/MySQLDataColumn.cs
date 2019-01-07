@@ -95,7 +95,7 @@ namespace MySQL.ForExcel.Classes
     private const string INVALID_DEFAULT_VALUE_WARNING_KEY = "INVALID_DEFAULT_VALUE";
 
     /// <summary>
-    /// Key used to represent a warning about the column's data type declaraton for an ENUM or SET being incorrect due to a specific element.
+    /// Key used to represent a warning about the column's data type declaration for an ENUM or SET being incorrect due to a specific element.
     /// </summary>
     private const string INVALID_SET_ENUM_WARNING_KEY = "INVALID_SET_ENUM";
 
@@ -164,7 +164,7 @@ namespace MySQL.ForExcel.Classes
     private bool _uniqueKey;
 
     /// <summary>
-    /// The user speficied default value for the column.
+    /// The user specified default value for the column.
     /// </summary>
     private string _userDefaultValue;
 
@@ -287,7 +287,7 @@ namespace MySQL.ForExcel.Classes
     #region Enumerations
 
     /// <summary>
-    /// Describes the type of a MySQL collecion data type.
+    /// Describes the type of a MySQL collection data type.
     /// </summary>
     public enum CollectionDataType
     {
@@ -325,27 +325,18 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the collation used to store text data in this column, looking up if not defined at this element.
     /// </summary>
-    public string AbsoluteCollation
-    {
-      get
-      {
-        return string.IsNullOrEmpty(Collation) ? ParentTable.AbsoluteCollation : Collation;
-      }
-    }
+    public string AbsoluteCollation => string.IsNullOrEmpty(Collation) ? ParentTable.AbsoluteCollation : Collation;
 
     /// <summary>
     /// Gets or sets a value indicating whether the column will accept null values.
     /// </summary>
     public bool AllowNull
     {
-      get
-      {
-        return _allowNull;
-      }
+      get => _allowNull;
 
       set
       {
-        bool valueChanged = _allowNull != value;
+        var valueChanged = _allowNull != value;
         _allowNull = value;
         if (!valueChanged || !InExportMode)
         {
@@ -365,14 +356,11 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public new bool AutoIncrement
     {
-      get
-      {
-        return InExportMode ? _autoIncrement : base.AutoIncrement;
-      }
+      get => InExportMode ? _autoIncrement : base.AutoIncrement;
 
       set
       {
-        bool valueChanged = false;
+        var valueChanged = false;
         if (InExportMode)
         {
           valueChanged = _autoIncrement != value;
@@ -423,10 +411,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public new string ColumnName
     {
-      get
-      {
-        return base.ColumnName;
-      }
+      get => base.ColumnName;
 
       set
       {
@@ -443,27 +428,18 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the <see cref="DataColumn.ColumnName"/> escaping the back-tick character.
     /// </summary>
-    public string ColumnNameForSqlQueries
-    {
-      get
-      {
-        return _columnNameForSqlQueries ?? (_columnNameForSqlQueries = ColumnName.Replace("`", "``"));
-      }
-    }
+    public string ColumnNameForSqlQueries => _columnNameForSqlQueries ?? (_columnNameForSqlQueries = ColumnName.Replace("`", "``"));
 
     /// <summary>
     /// Gets or sets a value indicating whether this column has an index automatically created for it.
     /// </summary>
     public bool CreateIndex
     {
-      get
-      {
-        return _createIndex;
-      }
+      get => _createIndex;
 
       set
       {
-        bool valueChanged = _createIndex != value;
+        var valueChanged = _createIndex != value;
         _createIndex = value;
         if (!valueChanged || !InExportMode)
         {
@@ -486,7 +462,7 @@ namespace MySQL.ForExcel.Classes
     {
       get
       {
-        string currentWarningText = _warnings.CurrentWarningText;
+        var currentWarningText = _warnings.CurrentWarningText;
         return ExcludeColumn || string.IsNullOrEmpty(currentWarningText)
           ? string.Empty
           : currentWarningText;
@@ -496,26 +472,14 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a tuple containing a title and description texts, of additional information related to the <see cref="CurrentWarningText"/>.
     /// </summary>
-    public Tuple<string, string> CurrentWarningMoreInfo
-    {
-      get
-      {
-        return ExcludeColumn || string.IsNullOrEmpty(_warnings.CurrentWarningKey) || !_warningsMoreInfosDictionary.ContainsKey(_warnings.CurrentWarningKey)
-          ? null
-          : _warningsMoreInfosDictionary[_warnings.CurrentWarningKey];
-      }
-    }
+    public Tuple<string, string> CurrentWarningMoreInfo => ExcludeColumn || string.IsNullOrEmpty(_warnings.CurrentWarningKey) || !_warningsMoreInfosDictionary.ContainsKey(_warnings.CurrentWarningKey)
+      ? null
+      : _warningsMoreInfosDictionary[_warnings.CurrentWarningKey];
 
     /// <summary>
     /// Gets a value indicating whether the <see cref="Type"/> used for dates will be stored as <see cref="MySql.Data.Types.MySqlDateTime"/> or as <see cref="DateTime"/>.
     /// </summary>
-    public bool DatesAsMySqlDates
-    {
-      get
-      {
-        return MySqlDataType == null || MySqlDataType.DatesAsMySqlDates;
-      }
-    }
+    public bool DatesAsMySqlDates => MySqlDataType == null || MySqlDataType.DatesAsMySqlDates;
 
     /// <summary>
     /// Gets the name for this column, when its value is different than the one in <see cref="DataColumn.ColumnName"/>
@@ -526,13 +490,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the <see cref="DisplayName"/> escaping the back-tick character.
     /// </summary>
-    public string DisplayNameForSqlQueries
-    {
-      get
-      {
-        return DisplayName.Replace("`", "``");
-      }
-    }
+    public string DisplayNameForSqlQueries => DisplayName.Replace("`", "``");
 
     /// <summary>
     /// Gets the number of duplicate groups found when doing a unique data check.
@@ -544,14 +502,11 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public bool ExcludeColumn
     {
-      get
-      {
-        return _excludeColumn;
-      }
+      get => _excludeColumn;
 
       set
       {
-        bool valueChanged = _excludeColumn != value;
+        var valueChanged = _excludeColumn != value;
         _excludeColumn = value;
         if (!valueChanged || !InExportMode)
         {
@@ -578,13 +533,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a value indicating whether the column is included for INSERT queries.
     /// </summary>
-    public bool IncludeForInsertion
-    {
-      get
-      {
-        return !ExcludeColumn && (!ParentTable.OperationType.IsForAppend() || MappedDataColOrdinal >= 0);
-      }
-    }
+    public bool IncludeForInsertion => !ExcludeColumn && (!ParentTable.OperationType.IsForAppend() || MappedDataColOrdinal >= 0);
 
     /// <summary>
     /// Gets a value indicating whether the column is being constructed for exporting it to a new MySQL table.
@@ -606,10 +555,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public int MappedDataColOrdinal
     {
-      get
-      {
-        return _mappedDataColOrdinal;
-      }
+      get => _mappedDataColOrdinal;
 
       set
       {
@@ -631,38 +577,23 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a name in the format "ColumnX" where X is the <see cref="DataColumn.Ordinal"/> position + 1.
     /// </summary>
-    public string OrdinalColumnName
-    {
-      get
-      {
-        return string.Format("Column{0}", Ordinal + 1);
-      }
-    }
+    public string OrdinalColumnName => $"Column{Ordinal + 1}";
 
     /// <summary>
     /// Gets the parent table of this column as a <see cref="MySqlDataTable"/> object.
     /// </summary>
-    public MySqlDataTable ParentTable
-    {
-      get
-      {
-        return Table as MySqlDataTable;
-      }
-    }
+    public MySqlDataTable ParentTable => Table as MySqlDataTable;
 
     /// <summary>
     /// Gets or sets a value indicating whether the column is part of the primary key.
     /// </summary>
     public bool PrimaryKey
     {
-      get
-      {
-        return _primaryKey;
-      }
+      get => _primaryKey;
 
       set
       {
-        bool valueChanged = _primaryKey != value;
+        var valueChanged = _primaryKey != value;
         _primaryKey = value;
         if (!valueChanged || !InExportMode)
         {
@@ -690,14 +621,11 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     public bool UniqueKey
     {
-      get
-      {
-        return _uniqueKey;
-      }
+      get => _uniqueKey;
 
       set
       {
-        bool valueChanged = _uniqueKey != value;
+        var valueChanged = _uniqueKey != value;
         _uniqueKey = value;
         if (!valueChanged || !InExportMode)
         {
@@ -716,18 +644,15 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets or sets the user speficied default value for the column.
+    /// Gets or sets the user specified default value for the column.
     /// </summary>
     public string UserDefaultValue
     {
-      get
-      {
-        return _userDefaultValue;
-      }
+      get => _userDefaultValue;
 
       set
       {
-        bool valueChanged = _userDefaultValue != value;
+        var valueChanged = _userDefaultValue != value;
         _userDefaultValue = value;
         if (!valueChanged || !InExportMode)
         {
@@ -741,13 +666,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a <see cref="MySqlDataType"/> used as a default for columns with no data.
     /// </summary>
-    private MySqlDataType DefaultDataTypeForEmptyColumns
-    {
-      get
-      {
-        return new MySqlDataType(null, true, DatesAsMySqlDates);
-      }
-    }
+    private MySqlDataType DefaultDataTypeForEmptyColumns => new MySqlDataType(null, true, DatesAsMySqlDates);
 
     #endregion Properties
 
@@ -785,12 +704,11 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Test the data on each row of the parent table in this specific column to check if it could be stored in the target column
-      bool dataFitsIntoType = true;
-      MySqlDataTable parentTable = Table as MySqlDataTable;
-      int rowIdx = 0;
-      if (parentTable != null)
+      var dataFitsIntoType = true;
+      var rowIdx = 0;
+      if (Table is MySqlDataTable parentTable)
       {
-        foreach (string strValueFromArray in parentTable.Rows.Cast<DataRow>()
+        foreach (var strValueFromArray in parentTable.Rows.Cast<DataRow>()
             .Where(dr => !parentTable.FirstRowContainsColumnNames || rowIdx++ != 0)
             .Select(dr => dr[Ordinal].ToString())
             .Where(strValueFromArray => strValueFromArray.Length != 0))
@@ -807,7 +725,7 @@ namespace MySQL.ForExcel.Classes
 
       // Update warning stating the column's data type is not suitable for all of its data (in the preview table)
       // either for the Append or Export Data operation.
-      string warningKey = targetColumn.ParentTable != null && targetColumn.ParentTable.OperationType.IsForAppend()
+      var warningKey = targetColumn.ParentTable != null && targetColumn.ParentTable.OperationType.IsForAppend()
         ? DATA_NOT_SUITABLE_APPEND_WARNING_KEY
         : DATA_NOT_SUITABLE_EXPORT_WARNING_KEY;
       if (targetColumn._warnings.SetVisibility(warningKey, !dataFitsIntoType))
@@ -863,7 +781,7 @@ namespace MySQL.ForExcel.Classes
         var moreInfoTextBuilder = new StringBuilder(DuplicateGroupsFound * byte.MaxValue);
         foreach (var dictPair in duplicates)
         {
-          moreInfoTextBuilder.AppendLine(string.Format("{0} ({1})", dictPair.Key, dictPair.Value));
+          moreInfoTextBuilder.AppendLine($"{dictPair.Key} ({dictPair.Value})");
         }
 
         var moreInfoTuple = new Tuple<string, string>(Resources.ColumnDataNotUniqueMoreInfoTitle, moreInfoTextBuilder.ToString());
@@ -894,7 +812,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns>A new <see cref="MySqlDataColumn"/> object with a schema cloned from this column.</returns>
     public MySqlDataColumn CloneSchema()
     {
-      MySqlDataColumn clonedColumn = new MySqlDataColumn { ColumnName = ColumnName };
+      var clonedColumn = new MySqlDataColumn { ColumnName = ColumnName };
       clonedColumn.SyncSchema(this);
       return clonedColumn;
     }
@@ -903,7 +821,7 @@ namespace MySQL.ForExcel.Classes
     /// Analyzes the data stored in this column and automatically detects the MySQL data type for it.
     /// </summary>
     /// <param name="dataRange">Excel data range containing the data to fill the table.</param>
-    /// <param name="cropRange">Attempts to crop the data range to a subrange containing only formulas or constants.</param>
+    /// <param name="cropRange">Attempts to crop the data range to a sub-range containing only formulas or constants.</param>
     /// <remarks>
     /// The data type detection cannot be done with the data already stored in the column's table, the columns which need data type detection
     /// are created by default with a string data type, when Excel data is inserted to it it is already converted to string so the data type
@@ -932,19 +850,19 @@ namespace MySQL.ForExcel.Classes
       var typesListFromSecondRow = new List<MySqlDataType>(Table.Rows.Count);
       long maxTextLengthForFirstRow = 0;
       long maxTextLengthFromSecondRow = 0;
-      bool addBufferToVarChar = ParentTable.AddBufferToVarChar;
-      bool datesAsMySqlDates = DatesAsMySqlDates;
-      for (int rowPos = 1; rowPos <= columnRange.Rows.Count; rowPos++)
+      var addBufferToVarChar = ParentTable.AddBufferToVarChar;
+      var datesAsMySqlDates = DatesAsMySqlDates;
+      for (var rowPos = 1; rowPos <= columnRange.Rows.Count; rowPos++)
       {
         Excel.Range excelCell = columnRange.Cells[rowPos, 1];
-        object rawValue = excelCell?.GetCellPackedValue(useFormattedValues);
-        if (rawValue.IsEmptyValue())
+        var rawValue = excelCell?.GetCellPackedValue(useFormattedValues);
+        if (rawValue == null || rawValue.IsEmptyValue())
         {
           continue;
         }
 
         // Treat always as a Varchar value first in case all rows do not have a consistent data type just to see the varchar len calculated by GetMySQLExportDataType
-        string valueAsString = rawValue.ToString();
+        var valueAsString = rawValue.ToString();
         var proposedType = MySqlDataType.DetectDataType(valueAsString, out _, datesAsMySqlDates);
         if (proposedType.IsBool || proposedType.MayBeBool)
         {
@@ -952,7 +870,7 @@ namespace MySQL.ForExcel.Classes
         }
         else if (proposedType.IsDateBased)
         {
-          proposedType = new MySqlDataType(string.Format("VarChar({0})", valueAsString.Length), true, datesAsMySqlDates);
+          proposedType = new MySqlDataType($"VarChar({valueAsString.Length})", true, datesAsMySqlDates);
         }
 
         if (!proposedType.IsText)
@@ -1100,7 +1018,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Return values for empty raw values
-      bool isEmptyValue = ParentTable.OperationType == MySqlDataTable.DataOperationType.Append
+      var isEmptyValue = ParentTable.OperationType == MySqlDataTable.DataOperationType.Append
                             || ParentTable.OperationType == MySqlDataTable.DataOperationType.Export
                           ? rawValue.IsEmptyValue()
                           : rawValue.IsNull();
@@ -1180,7 +1098,7 @@ namespace MySQL.ForExcel.Classes
       colDefinitionBuilder.AppendFormat(" {0}NULL", AllowNull ? string.Empty : "NOT ");
       if (!string.IsNullOrEmpty(UserDefaultValue))
       {
-        bool isDefaultValueCurrentTimestamp = UserDefaultValue.Equals(MySqlDataType.ATTRIBUTE_CURRENT_TIMESTAMP, StringComparison.InvariantCultureIgnoreCase);
+        var isDefaultValueCurrentTimestamp = UserDefaultValue.Equals(MySqlDataType.ATTRIBUTE_CURRENT_TIMESTAMP, StringComparison.InvariantCultureIgnoreCase);
         colDefinitionBuilder.AppendFormat(" {0} {1}{2}{1}",
           ATTRIBUTE_DEFAULT,
           MySqlDataType.RequiresQuotesForValue && !isDefaultValueCurrentTimestamp ? "'" : string.Empty,
@@ -1204,8 +1122,8 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The text representation of the raw value.</returns>
     public string GetStringValue(object rawValue, out bool valueIsNull)
     {
-      string valueToDb = "null";
-      object valueObject = GetInsertingValueForType(rawValue, true);
+      var valueToDb = "null";
+      var valueObject = GetInsertingValueForType(rawValue, true);
       valueIsNull = valueObject.IsNull();
       if (valueIsNull)
       {
@@ -1214,24 +1132,21 @@ namespace MySQL.ForExcel.Classes
           : valueToDb;
       }
 
-      if (valueObject is DateTime)
+      if (valueObject is DateTime dtValue)
       {
-        var dtValue = (DateTime)valueObject;
         valueToDb = dtValue.Equals(DateTime.MinValue)
           ? GetNullDateValueAsString(out valueIsNull)
           : dtValue.ToString(MySqlDataType.IsDate ? MySqlDataType.MYSQL_DATE_FORMAT : MySqlDataType.MYSQL_DATETIME_FORMAT);
       }
-      else if (valueObject is MySqlDateTime)
+      else if (valueObject is MySqlDateTime mySqlDtValue)
       {
-        var dtValue = (MySqlDateTime)valueObject;
-        valueToDb = !dtValue.IsValidDateTime || dtValue.GetDateTime().Equals(DateTime.MinValue)
+        valueToDb = !mySqlDtValue.IsValidDateTime || mySqlDtValue.GetDateTime().Equals(DateTime.MinValue)
           ? GetNullDateValueAsString(out valueIsNull)
-          : dtValue.GetDateTime().ToString(MySqlDataType.IsDate ? MySqlDataType.MYSQL_DATE_FORMAT : MySqlDataType.MYSQL_DATETIME_FORMAT);
+          : mySqlDtValue.GetDateTime().ToString(MySqlDataType.IsDate ? MySqlDataType.MYSQL_DATE_FORMAT : MySqlDataType.MYSQL_DATETIME_FORMAT);
       }
-      else if (valueObject is Geometry)
+      else if (valueObject is Geometry geomValue)
       {
-        var geomValue = (Geometry)valueObject;
-        valueToDb = string.Format("ST_GeomFromText('{0}')", geomValue.ToWktString());
+        valueToDb = $"ST_GeomFromText('{geomValue.ToWktString()}')";
       }
       else
       {
@@ -1248,7 +1163,7 @@ namespace MySQL.ForExcel.Classes
     public void SetUserDefaultValue(string defaultValue)
     {
       UserDefaultValue = defaultValue;
-      bool isValidDefaultValue = string.IsNullOrEmpty(defaultValue)
+      var isValidDefaultValue = string.IsNullOrEmpty(defaultValue)
                                   || MySqlDataType.IsDateTimeOrTimeStamp && MySqlDataType.ATTRIBUTE_CURRENT_TIMESTAMP.Equals(defaultValue, StringComparison.InvariantCultureIgnoreCase)
                                   || MySqlDataType.CanStoreValue(defaultValue);
 
@@ -1310,14 +1225,14 @@ namespace MySQL.ForExcel.Classes
           // For the ENUM we need to consider each value as a single element, then remove the duplicates
           collectionElements.AddRange(
             ParentTable.Rows.Cast<MySqlDataRow>()
-              .Select(row => string.Format("'{0}'", row[Ordinal].ToString().Replace("'", "''"))));
+              .Select(row => $"'{row[Ordinal].ToString().Replace("'", "''")}'"));
           break;
 
         case CollectionDataType.Set:
           // For the SET we need to break up each value in sub-tokens using the comma as a delimiter, then remove the duplicates.
           collectionElements.AddRange(
             ParentTable.Rows.Cast<MySqlDataRow>()
-              .SelectMany(row => row[Ordinal].ToString().Replace("'", "''").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(element => string.Format("'{0}'", element))));
+              .SelectMany(row => row[Ordinal].ToString().Replace("'", "''").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(element => $"'{element}'")));
           break;
       }
 
@@ -1328,13 +1243,13 @@ namespace MySQL.ForExcel.Classes
 
       // Join the resulting list of elements into a list delimited by commas.
       var values = string.Join(",", collectionElements.ToArray());
-      _rowsFromSecondDataType = new MySqlDataType(string.Format("{0}({1})", type, values), true, DatesAsMySqlDates);
+      _rowsFromSecondDataType = new MySqlDataType($"{type}({values})", true, DatesAsMySqlDates);
       if (!collectionElements.Contains(firstRowElement))
       {
         values = firstRowElement + "," + values;
       }
 
-      _rowsFromFirstDataType = new MySqlDataType(string.Format("{0}({1})", type, values), true, DatesAsMySqlDates);
+      _rowsFromFirstDataType = new MySqlDataType($"{type}({values})", true, DatesAsMySqlDates);
       SetMySqlDataType(ParentTable.FirstRowContainsColumnNames ? MySqlDataTypeFromRowType.FromSecond : MySqlDataTypeFromRowType.FromFirst);
     }
 
@@ -1409,7 +1324,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if the type is a valid MySQL data type, <c>false</c> otherwise.</returns>
     public bool SetMySqlDataType(string fullDataType, bool isValidType, bool testTypeOnData, bool fromUserInput)
     {
-      bool datesAsMySqlDates = MySqlDataType == null || MySqlDataType.DatesAsMySqlDates;
+      var datesAsMySqlDates = MySqlDataType == null || MySqlDataType.DatesAsMySqlDates;
       SetMySqlDataType(new MySqlDataType(fullDataType, isValidType, datesAsMySqlDates), fromUserInput);
       if (AutoPk)
       {
@@ -1433,8 +1348,8 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Hide warning stating the column data type cannot be empty
-      bool warningsChanged = _warnings.Hide(NO_DATA_TYPE_WARNING_KEY);
-      bool showInvalidSetOrEnumWarning = false;
+      var warningsChanged = _warnings.Hide(NO_DATA_TYPE_WARNING_KEY);
+      var showInvalidSetOrEnumWarning = false;
       Tuple<string, string> moreInfoTuple = null;
       if (!isValidType)
       {
@@ -1442,7 +1357,7 @@ namespace MySQL.ForExcel.Classes
         if (showInvalidSetOrEnumWarning)
         {
           var invalidElementsBuilder = new StringBuilder();
-          foreach (int index in MySqlDataType.InvalidSetOrEnumElementsIndexes)
+          foreach (var index in MySqlDataType.InvalidSetOrEnumElementsIndexes)
           {
             invalidElementsBuilder.AppendLine(MySqlDataType.SetOrEnumElements[index]);
           }
@@ -1483,7 +1398,7 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Subsribes this column to the event fired when a property value in the parent table changes.
+    /// Subscribes this column to the event fired when a property value in the parent table changes.
     /// </summary>
     public void SubscribeToParentTablePropertyChange()
     {
@@ -1541,10 +1456,7 @@ namespace MySQL.ForExcel.Classes
     /// </summary>
     protected virtual void OnColumnWarningsChanged()
     {
-      if (ColumnWarningsChanged != null)
-      {
-        ColumnWarningsChanged(this, new ColumnWarningsChangedArgs(this));
-      }
+      ColumnWarningsChanged?.Invoke(this, new ColumnWarningsChangedArgs(this));
     }
 
     /// <summary>
@@ -1553,10 +1465,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="args">Event arguments.</param>
     protected void OnPropertyChanged(PropertyChangedEventArgs args)
     {
-      if (PropertyChanged != null)
-      {
-        PropertyChanged(this, args);
-      }
+      PropertyChanged?.Invoke(this, args);
     }
 
     /// <summary>
@@ -1587,9 +1496,9 @@ namespace MySQL.ForExcel.Classes
         maxTextLength = 5;
       }
 
-      string proposedStrippedDataType = rowsDataTypesList.First().TypeName;
+      var proposedStrippedDataType = rowsDataTypesList.First().TypeName;
       string fullDataType;
-      bool typesConsistent = rowsDataTypesList.All(mySqlType => mySqlType.TypeName == proposedStrippedDataType);
+      var typesConsistent = rowsDataTypesList.All(mySqlType => mySqlType.TypeName == proposedStrippedDataType);
       if (!typesConsistent)
       {
         int integerCount;
@@ -1633,7 +1542,7 @@ namespace MySQL.ForExcel.Classes
         }
       }
 
-      long maxLength = proposedStrippedDataType == "VarChar" || proposedStrippedDataType == "Decimal"
+      var maxLength = proposedStrippedDataType == "VarChar" || proposedStrippedDataType == "Decimal"
         ? rowsDataTypesList.Max(mySqlType => mySqlType.Length)
         : 0;
       if (typesConsistent)
@@ -1641,11 +1550,11 @@ namespace MySQL.ForExcel.Classes
         switch (proposedStrippedDataType)
         {
           case "VarChar":
-            fullDataType = string.Format("VarChar({0})", maxLength);
+            fullDataType = $"VarChar({maxLength})";
             break;
 
           case "Decimal":
-            int maxDecimalPlaces = rowsDataTypesList.Max(mySqlType => mySqlType.DecimalPlaces);
+            var maxDecimalPlaces = rowsDataTypesList.Max(mySqlType => mySqlType.DecimalPlaces);
             if (maxLength > 12 || maxDecimalPlaces > 2)
             {
               maxLength = 65;
@@ -1657,7 +1566,7 @@ namespace MySQL.ForExcel.Classes
               maxDecimalPlaces = 2;
             }
 
-            fullDataType = string.Format("Decimal({0}, {1})", maxLength, maxDecimalPlaces);
+            fullDataType = $"Decimal({maxLength}, {maxDecimalPlaces})";
             break;
 
           default:
@@ -1668,7 +1577,7 @@ namespace MySQL.ForExcel.Classes
       else
       {
         fullDataType = maxTextLength <= MySqlDataType.MYSQL_VARCHAR_MAX_PROPOSED_LEN
-          ? string.Format("VarChar({0})", maxTextLength)
+          ? $"VarChar({maxTextLength})"
           : "Text";
       }
 
@@ -1726,8 +1635,8 @@ namespace MySQL.ForExcel.Classes
     {
       // Storing the value in a variable since it is easier to debug.
       var currentDuplicateGroupsCount = DuplicateGroupsFound;
-      bool dataIsUnique = !_uniqueKey || CheckForDataUniqueness();
-      bool duplicateGroupsCountChanged = DuplicateGroupsFound > 0 &&
+      var dataIsUnique = !_uniqueKey || CheckForDataUniqueness();
+      var duplicateGroupsCountChanged = DuplicateGroupsFound > 0 &&
                                          DuplicateGroupsFound != currentDuplicateGroupsCount;
       if (_warnings.SetVisibility(DATA_NOT_UNIQUE_WARNING_KEY, !dataIsUnique) || duplicateGroupsCountChanged)
       {

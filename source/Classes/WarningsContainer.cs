@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -69,7 +69,7 @@ namespace MySQL.ForExcel.Classes
     public enum CurrentWarningChangedMethodType
     {
       /// <summary>
-      /// Signals a change of current warning every time the <see cref="Show"/> method is called for a warning alredy being shown.
+      /// Signals a change of current warning every time the <see cref="Show"/> method is called for a warning already being shown.
       /// </summary>
       OnEveryShow,
 
@@ -91,15 +91,9 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the currently shown warning key, i.e. the warning that was shown last using the <see cref="Show"/> method.
     /// </summary>
-    public string CurrentWarningKey
-    {
-      get
-      {
-        return _shownWarningKeys != null && _shownWarningKeys.Count > 0
-          ? _shownWarningKeys.Last()
-          : null;
-      }
-    }
+    public string CurrentWarningKey => _shownWarningKeys != null && _shownWarningKeys.Count > 0
+      ? _shownWarningKeys.Last()
+      : null;
 
     /// <summary>
     /// Gets the currently shown warning, i.e. the warning that was shown last using the <see cref="Show"/> method.
@@ -108,7 +102,7 @@ namespace MySQL.ForExcel.Classes
     {
       get
       {
-        string currentKey = CurrentWarningKey;
+        var currentKey = CurrentWarningKey;
         return !string.IsNullOrEmpty(currentKey) && _allWarnings != null && _allWarnings.ContainsKey(currentKey)
           ? _allWarnings[currentKey]
           : null;
@@ -118,24 +112,12 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the quantity of warnings defined in the container.
     /// </summary>
-    public int DefinedQuantity
-    {
-      get
-      {
-        return _allWarnings != null ? _allWarnings.Count : 0;
-      }
-    }
+    public int DefinedQuantity => _allWarnings?.Count ?? 0;
 
     /// <summary>
     /// Gets the quantity of warnings set to be shown.
     /// </summary>
-    public int ShownQuantity
-    {
-      get
-      {
-        return _shownWarningKeys != null ? _shownWarningKeys.Count : 0;
-      }
-    }
+    public int ShownQuantity => _shownWarningKeys?.Count ?? 0;
 
     #endregion Properties
 
@@ -187,7 +169,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Remove the warning
-      bool currentKeyChanged = string.Equals(_shownWarningKeys.Last(), warningKey, StringComparison.InvariantCulture);
+      var currentKeyChanged = string.Equals(_shownWarningKeys.Last(), warningKey, StringComparison.InvariantCulture);
       _shownWarningKeys.Remove(warningKey);
       return currentKeyChanged;
     }
@@ -205,7 +187,7 @@ namespace MySQL.ForExcel.Classes
         return false;
       }
 
-      bool currentKeyChanged = string.Equals(_shownWarningKeys.Last(), warningKey, StringComparison.InvariantCulture);
+      var currentKeyChanged = string.Equals(_shownWarningKeys.Last(), warningKey, StringComparison.InvariantCulture);
       _shownWarningKeys.Remove(warningKey);
       _allWarnings.Remove(warningKey);
       return currentKeyChanged;

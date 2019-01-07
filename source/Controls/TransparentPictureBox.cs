@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -81,15 +81,8 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Description("The background color of the control.")]
     public new Color BackColor
     {
-      get
-      {
-        return base.BackColor;
-      }
-
-      protected set
-      {
-        base.BackColor = value;
-      }
+      get => base.BackColor;
+      protected set => base.BackColor = value;
     }
 
     /// <summary>
@@ -98,15 +91,8 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     protected sealed override bool DoubleBuffered
     {
-      get
-      {
-        return base.DoubleBuffered;
-      }
-
-      set
-      {
-        base.DoubleBuffered = value;
-      }
+      get => base.DoubleBuffered;
+      set => base.DoubleBuffered = value;
     }
 
     /// <summary>
@@ -115,10 +101,7 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Description("The image that is displayed by this control.")]
     public Image Image
     {
-      get
-      {
-        return _image;
-      }
+      get => _image;
 
       set
       {
@@ -134,10 +117,7 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Description("Indicates whether the image size is calculated to maintain its original aspect ratio when the image is scaled.")]
     public bool MaintainAspectRatio
     {
-      get
-      {
-        return _maintainAspectRatio;
-      }
+      get => _maintainAspectRatio;
 
       set
       {
@@ -152,10 +132,7 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Description("The opacity factor of the picture ranging from 0 to 1.")]
     public float Opacity
     {
-      get
-      {
-        return _opacity;
-      }
+      get => _opacity;
 
       set
       {
@@ -165,7 +142,7 @@ namespace MySQL.ForExcel.Controls
         }
 
         _opacity = value;
-        ColorMatrix cm = new ColorMatrix();
+        var cm = new ColorMatrix();
         cm.Matrix00 = cm.Matrix11 = cm.Matrix22 = cm.Matrix44 = 1;
         cm.Matrix33 = _opacity;
         _imageAttributes = new ImageAttributes();
@@ -180,10 +157,7 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Description("Value indicating whether the Image is scaled to fit the size of this control.")]
     public bool ScaleImage
     {
-      get
-      {
-        return _scaleImage;
-      }
+      get => _scaleImage;
 
       set
       {
@@ -201,7 +175,7 @@ namespace MySQL.ForExcel.Controls
     {
       get
       {
-        CreateParams cp = base.CreateParams;
+        var cp = base.CreateParams;
         cp.ExStyle |= 0x20;  // WS_EX_TRANSPARENT
         return cp;
       }
@@ -217,10 +191,7 @@ namespace MySQL.ForExcel.Controls
     {
       if (disposing)
       {
-        if (_imageAttributes != null)
-        {
-          _imageAttributes.Dispose();
-        }
+        _imageAttributes?.Dispose();
       }
 
       base.Dispose(disposing);
@@ -239,16 +210,16 @@ namespace MySQL.ForExcel.Controls
       }
 
       Rectangle drawRectangle;
-      Size sourceImageSize = Size.Empty;
-      int clipWidth = e.ClipRectangle.Width;
-      int clipHeight = e.ClipRectangle.Height;
+      var sourceImageSize = Size.Empty;
+      var clipWidth = e.ClipRectangle.Width;
+      var clipHeight = e.ClipRectangle.Height;
       if (ScaleImage)
       {
         Size drawImageSize;
         if (_maintainAspectRatio)
         {
-          int deltaHeight = clipHeight - _image.Height;
-          int deltaWidth = clipWidth - _image.Width;
+          var deltaHeight = clipHeight - _image.Height;
+          var deltaWidth = clipWidth - _image.Width;
           drawImageSize = deltaHeight > deltaWidth
             ? new Size(clipWidth, _image.Height * clipWidth / _image.Width)
             : new Size(_image.Width * clipHeight / _image.Height, clipHeight);

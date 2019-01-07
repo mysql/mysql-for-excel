@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -96,24 +96,12 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the total overflowing width (both directions), in pixels.
     /// </summary>
-    public int TotalOverflowingWidth
-    {
-      get
-      {
-        return LeftOverflowingWidth + RightOverflowingWidth;
-      }
-    }
+    public int TotalOverflowingWidth => LeftOverflowingWidth + RightOverflowingWidth;
 
     /// <summary>
     /// Gets the total spanning width, in pixels.
     /// </summary>
-    public int TotalSpanningWidth
-    {
-      get
-      {
-        return VisibleWidth + TotalOverflowingWidth;
-      }
-    }
+    public int TotalSpanningWidth => VisibleWidth + TotalOverflowingWidth;
 
     /// <summary>
     /// Gets a <see cref="Rectangle"/> specifying the visible area of the spanning columns.
@@ -178,7 +166,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       // In case the column span goes beyond the number of columns, then set the last index using the last column of the grid control.
-      int lastColumnIndex = headerCell.GetLastBaseColumnIndexFromSpan(multiHeaderGrid.Columns.Count);
+      var lastColumnIndex = headerCell.GetLastBaseColumnIndexFromSpan(multiHeaderGrid.Columns.Count);
 
       // Calculate the displayed columns
       var firstDisplayedColumnIndex = multiHeaderGrid.FirstDisplayedScrollingColumnIndex;
@@ -186,7 +174,7 @@ namespace MySQL.ForExcel.Classes
 
       // Loop through spanning columns to accumulate information on each of them
       spanningInfo.RightDividerWidth = multiHeaderGrid.Columns[lastColumnIndex].DividerWidth;
-      for (int idx = headerCell.ColumnIndex; idx <= lastColumnIndex; idx++)
+      for (var idx = headerCell.ColumnIndex; idx <= lastColumnIndex; idx++)
       {
         var spanningColumn = multiHeaderGrid.Columns[idx];
 
@@ -194,15 +182,15 @@ namespace MySQL.ForExcel.Classes
         if (spanningColumn.Index >= firstDisplayedColumnIndex && spanningColumn.Index <= lastDisplayedColumnIndex)
         {
           // Get visible area of the current spanned column, we already know by this point it has at least some visible part
-          var visiblevisibleColumnHeaderRectangle = multiHeaderGrid.GetCellDisplayRectangle(spanningColumn.Index, -1, true);
+          var visibleColumnHeaderRectangle = multiHeaderGrid.GetCellDisplayRectangle(spanningColumn.Index, -1, true);
 
           // Check if the current column has overflow and to what direction is the overflow happening
-          var overflow = spanningColumn.Width - visiblevisibleColumnHeaderRectangle.Width;
-          var hitTestInfo = multiHeaderGrid.HitTest(visiblevisibleColumnHeaderRectangle.X + spanningColumn.Width, visiblevisibleColumnHeaderRectangle.Y);
-          bool overFlowToRight = hitTestInfo.Type == DataGridViewHitTestType.None;
+          var overflow = spanningColumn.Width - visibleColumnHeaderRectangle.Width;
+          var hitTestInfo = multiHeaderGrid.HitTest(visibleColumnHeaderRectangle.X + spanningColumn.Width, visibleColumnHeaderRectangle.Y);
+          var overFlowToRight = hitTestInfo.Type == DataGridViewHitTestType.None;
 
           // Widths may be split among the overflowing and regular accumulated width if the column is partially displayed
-          spanningInfo.VisibleWidth += visiblevisibleColumnHeaderRectangle.Width;
+          spanningInfo.VisibleWidth += visibleColumnHeaderRectangle.Width;
           if (overFlowToRight)
           {
             spanningInfo.RightOverflowingWidth += overflow;
@@ -216,18 +204,18 @@ namespace MySQL.ForExcel.Classes
           if (spanningInfo.VisibleArea == Rectangle.Empty)
           {
             spanningInfo.VisibleArea = new Rectangle(
-              visiblevisibleColumnHeaderRectangle.Location,
-              visiblevisibleColumnHeaderRectangle.Size);
+              visibleColumnHeaderRectangle.Location,
+              visibleColumnHeaderRectangle.Size);
             spanningInfo.TotalArea = new Rectangle(
-                visiblevisibleColumnHeaderRectangle.X - spanningInfo.LeftOverflowingWidth,
-                visiblevisibleColumnHeaderRectangle.Y,
-                visiblevisibleColumnHeaderRectangle.Width + spanningInfo.LeftOverflowingWidth,
-                visiblevisibleColumnHeaderRectangle.Height);
+                visibleColumnHeaderRectangle.X - spanningInfo.LeftOverflowingWidth,
+                visibleColumnHeaderRectangle.Y,
+                visibleColumnHeaderRectangle.Width + spanningInfo.LeftOverflowingWidth,
+                visibleColumnHeaderRectangle.Height);
           }
           else
           {
-            spanningInfo.VisibleArea.Inflate(visiblevisibleColumnHeaderRectangle.Width, 0);
-            spanningInfo.TotalArea.Inflate(visiblevisibleColumnHeaderRectangle.Width + overflow, 0);
+            spanningInfo.VisibleArea.Inflate(visibleColumnHeaderRectangle.Width, 0);
+            spanningInfo.TotalArea.Inflate(visibleColumnHeaderRectangle.Width + overflow, 0);
           }
         }
         else if (spanningColumn.Index < firstDisplayedColumnIndex)

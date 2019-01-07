@@ -88,13 +88,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// A list of data type names and parameters for this stored procedure.
     /// </summary>
-    public List<Tuple<string, MySqlParameter>> ReadOnlyParameters
-    {
-      get
-      {
-        return Parameters != null ? Parameters.Where(tuple => tuple.Item2.IsReadOnly()).ToList() : null;
-      }
-    }
+    public List<Tuple<string, MySqlParameter>> ReadOnlyParameters => Parameters?.Where(tuple => tuple.Item2.IsReadOnly()).ToList();
 
     #endregion Properties
 
@@ -115,7 +109,7 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      string sql = $"`{Connection.Schema}`.`{Name}`";
+      var sql = $"`{Connection.Schema}`.`{Name}`";
       var resultSetDs = Connection.ExecuteRoutine(sql, Parameters.Select(tuple => tuple.Item2).ToArray());
       if (resultSetDs == null || resultSetDs.Tables.Count == 0)
       {
@@ -125,7 +119,7 @@ namespace MySQL.ForExcel.Classes
       // Create result set data set and MySqlDataTable tables for each table in the result sets
       var returnDataSet = new DataSet(Name + "ResultSet");
       var procedureSql = GetSql();
-      int resultIndex = 1;
+      var resultIndex = 1;
       foreach (DataTable table in resultSetDs.Tables)
       {
         table.TableName = $"Result{resultIndex}";
@@ -168,7 +162,7 @@ namespace MySQL.ForExcel.Classes
         return 0;
       }
 
-      int maxLength = 0;
+      var maxLength = 0;
       foreach (var param in Parameters)
       {
         maxLength = Math.Max(maxLength, TextRenderer.MeasureText(param.Item2.ParameterName, font).Width);
@@ -198,7 +192,7 @@ namespace MySQL.ForExcel.Classes
 
       var sqlSetBuilder = new StringBuilder();
       var sqlSelectBuilder = new StringBuilder();
-      for (int parameterIndex = 0; parameterIndex < Parameters.Count; parameterIndex++)
+      for (var parameterIndex = 0; parameterIndex < Parameters.Count; parameterIndex++)
       {
         var parameter = Parameters[parameterIndex].Item2;
         switch (parameter.Direction)
@@ -247,7 +241,7 @@ namespace MySQL.ForExcel.Classes
         resultSetsDataSet = Execute();
       }
 
-      bool success = true;
+      var success = true;
       try
       {
         var activeWorkbook = Globals.ThisAddIn.ActiveWorkbook;
@@ -272,10 +266,10 @@ namespace MySQL.ForExcel.Classes
           }
         }
 
-        int tableIdx = 0;
-        bool createPivotTable = ImportParameters.CreatePivotTable;
-        bool addSummaryRow = ImportParameters.AddSummaryRow;
-        ExcelInterop.Range nextTopLeftCell = Globals.ThisAddIn.Application.ActiveCell;
+        var tableIdx = 0;
+        var createPivotTable = ImportParameters.CreatePivotTable;
+        var addSummaryRow = ImportParameters.AddSummaryRow;
+        var nextTopLeftCell = Globals.ThisAddIn.Application.ActiveCell;
         foreach (var mySqlTable in resultSetsDataSet.Tables.Cast<MySqlDataTable>().Where(mySqlTable => importType != ProcedureResultSetsImportType.SelectedResultSet || selectedResultSetIndex == tableIdx++))
         {
           Globals.ThisAddIn.Application.Goto(nextTopLeftCell, false);
@@ -289,8 +283,8 @@ namespace MySQL.ForExcel.Classes
             continue;
           }
 
-          var fillingRange = excelObj is ExcelInterop.ListObject
-            ? (excelObj as ExcelInterop.ListObject).Range
+          var fillingRange = excelObj is ExcelInterop.ListObject listObject
+            ? listObject.Range
             : excelObj as ExcelInterop.Range;
           nextTopLeftCell = fillingRange.GetNextResultSetTopLeftCell(importType, createPivotTable);
         }
@@ -319,23 +313,23 @@ namespace MySQL.ForExcel.Classes
       {
         var parametersCount = parametersTable.Rows.Count;
         Parameters = new List<Tuple<string, MySqlParameter>>(parametersCount);
-        for (int paramIdx = 0; paramIdx < parametersCount; paramIdx++)
+        for (var paramIdx = 0; paramIdx < parametersCount; paramIdx++)
         {
-          DataRow dr = parametersTable.Rows[paramIdx];
-          string dataType = dr["DATA_TYPE"].ToString().ToLowerInvariant();
-          string paramName = dr["PARAMETER_NAME"].ToString();
-          ParameterDirection paramDirection = ParameterDirection.Input;
-          int paramSize = dr["CHARACTER_MAXIMUM_LENGTH"] != null && dr["CHARACTER_MAXIMUM_LENGTH"] != DBNull.Value
+          var dr = parametersTable.Rows[paramIdx];
+          var dataType = dr["DATA_TYPE"].ToString().ToLowerInvariant();
+          var paramName = dr["PARAMETER_NAME"].ToString();
+          var paramDirection = ParameterDirection.Input;
+          var paramSize = dr["CHARACTER_MAXIMUM_LENGTH"] != null && dr["CHARACTER_MAXIMUM_LENGTH"] != DBNull.Value
             ? Convert.ToInt32(dr["CHARACTER_MAXIMUM_LENGTH"])
             : 0;
-          byte paramPrecision = dr["NUMERIC_PRECISION"] != null && dr["NUMERIC_PRECISION"] != DBNull.Value
+          var paramPrecision = dr["NUMERIC_PRECISION"] != null && dr["NUMERIC_PRECISION"] != DBNull.Value
             ? Convert.ToByte(dr["NUMERIC_PRECISION"])
             : (byte) 0;
-          byte paramScale = dr["NUMERIC_SCALE"] != null && dr["NUMERIC_SCALE"] != DBNull.Value
+          var paramScale = dr["NUMERIC_SCALE"] != null && dr["NUMERIC_SCALE"] != DBNull.Value
             ? Convert.ToByte(dr["NUMERIC_SCALE"])
             : (byte) 0;
-          bool paramUnsigned = dr["DTD_IDENTIFIER"].ToString().Contains("unsigned", StringComparison.InvariantCultureIgnoreCase);
-          string paramDirectionStr = paramName != "RETURN_VALUE"
+          var paramUnsigned = dr["DTD_IDENTIFIER"].ToString().Contains("unsigned", StringComparison.InvariantCultureIgnoreCase);
+          var paramDirectionStr = paramName != "RETURN_VALUE"
             ? dr["PARAMETER_MODE"].ToString().ToLowerInvariant()
             : "return";
 
@@ -414,10 +408,10 @@ namespace MySQL.ForExcel.Classes
         return false;
       }
 
-      bool createPivotTable = ImportParameters.CreatePivotTable;
-      bool collisionDetected = false;
+      var createPivotTable = ImportParameters.CreatePivotTable;
+      var collisionDetected = false;
       var atCell = Globals.ThisAddIn.Application.ActiveCell;
-      int tableIdx = 0;
+      var tableIdx = 0;
       var pivotPosition = importType == ProcedureResultSetsImportType.AllResultSetsHorizontally
         ? ExcelUtilities.PivotTablePosition.Below
         : ExcelUtilities.PivotTablePosition.Right;

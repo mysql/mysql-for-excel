@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -96,17 +96,16 @@ namespace MySQL.ForExcel.Panels
     /// Event delegate method fired when a <see cref="Label"/> control is being painted.
     /// </summary>
     /// <param name="sender">A <see cref="Label"/> control object.</param>
-    /// <param name="e">Event aruments.</param>
+    /// <param name="e">Event arguments.</param>
     protected void Label_Paint(object sender, PaintEventArgs e)
     {
-      Label label = sender as Label;
-      if (label == null)
+      if (!(sender is Label label))
       {
         return;
       }
 
       // Get the actual size of rectangle needed for all of text.
-      SizeF fullSize = e.Graphics.MeasureString(label.Text, label.Font);
+      var fullSize = e.Graphics.MeasureString(label.Text, label.Font);
 
       // Set a tooltip if not all text fits in label's size.
       if (fullSize.Width > label.Width || fullSize.Height > label.Height)
@@ -131,7 +130,7 @@ namespace MySQL.ForExcel.Panels
         return;
       }
 
-      Font inheritingFont = Font;
+      var inheritingFont = Font;
       if (Font.Name != SystemFonts.IconTitleFont.Name)
       {
         inheritingFont = new Font(SystemFonts.IconTitleFont.FontFamily, Font.Size, Font.Style, Font.Unit, Font.GdiCharSet, Font.GdiVerticalFont);

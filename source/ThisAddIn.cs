@@ -746,8 +746,7 @@ namespace MySQL.ForExcel
     /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
     private void Application_WorkbookActivate(object workbook)
     {
-      var activeWorkbook = workbook as ExcelInterop.Workbook;
-      if (activeWorkbook == null)
+      if (!(workbook is ExcelInterop.Workbook activeWorkbook))
       {
         return;
       }
@@ -944,8 +943,7 @@ namespace MySQL.ForExcel
       }
 
       // Hide editDialogs from deactivated Workbook
-      var deactivatedWorkbook = workbook as ExcelInterop.Workbook;
-      if (deactivatedWorkbook == null)
+      if (!(workbook is ExcelInterop.Workbook deactivatedWorkbook))
       {
         return;
       }

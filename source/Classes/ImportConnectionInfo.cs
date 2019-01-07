@@ -123,10 +123,7 @@ namespace MySQL.ForExcel.Classes
     [XmlAttribute]
     public string ConnectionId
     {
-      get
-      {
-        return _connectionId;
-      }
+      get => _connectionId;
 
       set
       {
@@ -161,10 +158,7 @@ namespace MySQL.ForExcel.Classes
     [XmlIgnore]
     public ExcelInterop.ListObject ExcelTable
     {
-      get
-      {
-        return _excelTable;
-      }
+      get => _excelTable;
 
       set
       {
@@ -185,10 +179,7 @@ namespace MySQL.ForExcel.Classes
     [XmlAttribute]
     public string ExcelTableName
     {
-      get
-      {
-        return _excelTableName;
-      }
+      get => _excelTableName;
 
       set
       {
@@ -242,10 +233,7 @@ namespace MySQL.ForExcel.Classes
     [XmlAttribute]
     public string SchemaName
     {
-      get
-      {
-        return _schemaName;
-      }
+      get => _schemaName;
 
       set
       {
@@ -290,7 +278,7 @@ namespace MySQL.ForExcel.Classes
     public string WorkbookGuid { get; set; }
 
     /// <summary>
-    /// Gets or sets the name of the worbook.
+    /// Gets or sets the name of the workbook.
     /// </summary>
     [XmlAttribute]
     public string WorkbookName { get; set; }
@@ -351,9 +339,7 @@ namespace MySQL.ForExcel.Classes
 
     public static bool operator ==(ImportConnectionInfo lhs, ImportConnectionInfo rhs)
     {
-      return ReferenceEquals(lhs, null)
-        ? ReferenceEquals(rhs, null)
-        : lhs.Equals(rhs);
+      return lhs?.Equals(rhs) ?? rhs is null;
     }
 
     /// <summary>
@@ -383,7 +369,7 @@ namespace MySQL.ForExcel.Classes
     public bool Equals(ImportConnectionInfo other)
     {
       // If parameter is null, return false.
-      if (ReferenceEquals(other, null))
+      if (other is null)
       {
         return false;
       }
@@ -429,7 +415,7 @@ namespace MySQL.ForExcel.Classes
       const int hashCodeMultiplier = 397;
       unchecked
       {
-        int hashCode = ConnectionId != null ? ConnectionId.GetHashCode() : 1;
+        var hashCode = ConnectionId != null ? ConnectionId.GetHashCode() : 1;
         hashCode = (hashCode * hashCodeMultiplier) ^ ConnectionInfoError.GetHashCode();
         hashCode = (hashCode * hashCodeMultiplier) ^ (ExcelTableName != null ? ExcelTableName.GetHashCode() : 0);
         hashCode = (hashCode * hashCodeMultiplier) ^ (HostIdentifier != null ? HostIdentifier.GetHashCode() : 0);
@@ -575,10 +561,7 @@ namespace MySQL.ForExcel.Classes
           ToolsExcelTable.DeleteSafely(false);
         }
 
-        if (MySqlTable != null)
-        {
-          MySqlTable.Dispose();
-        }
+        MySqlTable?.Dispose();
 
         // Set variables to null so this object does not hold references to them and the GC disposes of them sooner.
         _connection = null;
@@ -617,7 +600,7 @@ namespace MySQL.ForExcel.Classes
         // Resize the ExcelTools.ListObject by giving it an ExcelInterop.Range calculated with the refreshed MySqlDataTable dimensions.
         // Detection of a collision with another Excel object must be performed first and if any then shift rows and columns to fix the collision.
         const int headerRows = 1;
-        int summaryRows = ExcelTable.ShowTotals ? 1 : 0;
+        var summaryRows = ExcelTable.ShowTotals ? 1 : 0;
         ExcelInterop.Range newRange = ToolsExcelTable.Range.Cells[1, 1];
         newRange = newRange.SafeResize(MySqlTable.Rows.Count + headerRows + summaryRows, MySqlTable.Columns.Count);
         var intersectingRange = newRange.GetIntersectingRangeWithAnyExcelObject(true, true, true, _excelTable.Comment);
@@ -628,41 +611,40 @@ namespace MySQL.ForExcel.Classes
           // Determine if the collision is avoided by inserting either new columns or new rows.
           if (intersectingRange.Columns.Count < intersectingRange.Rows.Count)
           {
-            for (int colIdx = 0; colIdx <= intersectingRange.Columns.Count; colIdx++)
+            for (var colIdx = 0; colIdx <= intersectingRange.Columns.Count; colIdx++)
             {
               bottomRightCell.EntireColumn.Insert(ExcelInterop.XlInsertShiftDirection.xlShiftToRight, Type.Missing);
             }
           }
           else
           {
-            for (int rowIdx = 0; rowIdx <= intersectingRange.Rows.Count; rowIdx++)
+            for (var rowIdx = 0; rowIdx <= intersectingRange.Rows.Count; rowIdx++)
             {
               bottomRightCell.EntireRow.Insert(ExcelInterop.XlInsertShiftDirection.xlShiftDown, Type.Missing);
             }
           }
 
-          // Redimension the new range. This is needed since the new rows or columns inserted are not present in the previously calculated one.
+          // Re-dimension the new range. This is needed since the new rows or columns inserted are not present in the previously calculated one.
           newRange = ToolsExcelTable.Range.Cells[1, 1];
           newRange = newRange.SafeResize(MySqlTable.Rows.Count + headerRows + summaryRows, MySqlTable.Columns.Count);
         }
 
-        // Redimension the ExcelTools.ListObject's range
+        // Re-dimension the ExcelTools.ListObject's range
         ToolsExcelTable.Resize(newRange);
 
         // Re-format the importing range
-        ExcelInterop.Range dataOnlyRange = newRange.Offset[headerRows];
+        var dataOnlyRange = newRange.Offset[headerRows];
         dataOnlyRange = dataOnlyRange.Resize[newRange.Rows.Count - headerRows - summaryRows];
         MySqlTable.FormatImportExcelRange(dataOnlyRange, true);
 
-        // Bind the redimensioned ExcelTools.ListObject to the MySqlDataTable
+        // Bind the re-dimensioned ExcelTools.ListObject to the MySqlDataTable
         ToolsExcelTable.SetDataBinding(MySqlTable);
 
         // Rename columns
         var importColumnNames = MySqlTable.ImportColumnNames;
-        for (int colIndex = MySqlTable.Columns.Count - 1; colIndex >= 0; colIndex--)
+        for (var colIndex = MySqlTable.Columns.Count - 1; colIndex >= 0; colIndex--)
         {
-          var col = MySqlTable.Columns[colIndex] as MySqlDataColumn;
-          if (col == null)
+          if (!(MySqlTable.Columns[colIndex] is MySqlDataColumn col))
           {
             continue;
           }
@@ -695,11 +677,11 @@ namespace MySQL.ForExcel.Classes
     private void CreateExcelTableFromExternalSource(ExcelTools.Worksheet worksheet, ExcelInterop.Range atCell)
     {
       // Prepare Excel table name and dummy connection string
-      string proposedName = MySqlTable.ExcelTableName;
-      string excelTableName = worksheet.GetExcelTableNameAvoidingDuplicates(proposedName);
-      string workbookConnectionName = excelTableName.StartsWith("MySQL.") ? excelTableName : "MySQL." + excelTableName;
+      var proposedName = MySqlTable.ExcelTableName;
+      var excelTableName = worksheet.GetExcelTableNameAvoidingDuplicates(proposedName);
+      var workbookConnectionName = excelTableName.StartsWith("MySQL.") ? excelTableName : "MySQL." + excelTableName;
       workbookConnectionName = workbookConnectionName.GetWorkbookConnectionNameAvoidingDuplicates();
-      string connectionStringForCmdDefault = MySqlTable.WbConnection.GetConnectionStringForCmdDefault();
+      var connectionStringForCmdDefault = MySqlTable.WbConnection.GetConnectionStringForCmdDefault();
 
       // Create empty Interop Excel table that will be connected to a data source.
       // This automatically creates a Workbook connection as well although the data refresh does not use the Workbook connection since it is a dummy one.
@@ -728,13 +710,12 @@ namespace MySQL.ForExcel.Classes
       }
 
       var worksheet = Globals.Factory.GetVstoObject(importDataAtCell.Worksheet);
-      var workbook = worksheet.Parent as ExcelInterop.Workbook;
-      if (workbook == null)
+      if (!(worksheet.Parent is ExcelInterop.Workbook workbook))
       {
         throw new ParentWorkbookNullException(worksheet.Name);
       }
 
-      string workbookGuid = workbook.GetOrCreateId();
+      var workbookGuid = workbook.GetOrCreateId();
       try
       {
         // Create the Excel table needed to place the imported data into the Excel worksheet.

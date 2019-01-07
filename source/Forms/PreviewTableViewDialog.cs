@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -50,12 +50,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="showCancelButton">Flag indicating whether the Cancel button is shown along with the OK one, or hidden.</param>
     public PreviewTableViewDialog(DbView previewTableOrView, bool showCancelButton)
     {
-      if (previewTableOrView == null)
-      {
-        throw new ArgumentNullException(nameof(previewTableOrView));
-      }
-
-      _previewTableOrView = previewTableOrView;
+      _previewTableOrView = previewTableOrView ?? throw new ArgumentNullException(nameof(previewTableOrView));
 
       InitializeComponent();
 
@@ -72,17 +67,10 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets or sets the text associated with this control.
     /// </summary>
-    public override sealed string Text
+    public sealed override string Text
     {
-      get
-      {
-        return base.Text;
-      }
-
-      set
-      {
-        base.Text = value;
-      }
+      get => base.Text;
+      set => base.Text = value;
     }
 
     #endregion Properties

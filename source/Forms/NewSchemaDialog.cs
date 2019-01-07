@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -47,12 +47,7 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     public NewSchemaDialog(MySqlWorkbenchConnection wbConnection)
     {
-      if (wbConnection == null)
-      {
-        throw new ArgumentNullException(nameof(wbConnection));
-      }
-
-      _wbConnection = wbConnection;
+      _wbConnection = wbConnection ?? throw new ArgumentNullException(nameof(wbConnection));
       InitializeComponent();
       SchemaName = _wbConnection.GetSchemaNameAvoidingDuplicates(null);
       CollationComboBox.SetupCollations(_wbConnection, "Server Default");
@@ -63,43 +58,24 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets the character set for the collation selected by the user in the <see cref="CollationComboBox"/>;
     /// </summary>
-    private string CharSet
-    {
-      get
-      {
-        return CollationComboBox.SelectedItem is KeyValuePair<string, string[]>
-          ? ((KeyValuePair<string, string[]>)CollationComboBox.SelectedItem).Value[0]
-          : string.Empty;
-      }
-    }
+    private string CharSet => CollationComboBox.SelectedItem is KeyValuePair<string, string[]>
+      ? ((KeyValuePair<string, string[]>)CollationComboBox.SelectedItem).Value[0]
+      : string.Empty;
 
     /// <summary>
     /// Gets the collation selected by the user in the <see cref="CollationComboBox"/>;
     /// </summary>
-    private string Collation
-    {
-      get
-      {
-        return CollationComboBox.SelectedItem is KeyValuePair<string, string[]>
-          ? ((KeyValuePair<string, string[]>)CollationComboBox.SelectedItem).Value[1]
-          : string.Empty;
-      }
-    }
+    private string Collation => CollationComboBox.SelectedItem is KeyValuePair<string, string[]>
+      ? ((KeyValuePair<string, string[]>)CollationComboBox.SelectedItem).Value[1]
+      : string.Empty;
 
     /// <summary>
     /// Gets or sets the name of the new schema.
     /// </summary>
     private string SchemaName
     {
-      get
-      {
-        return SchemaNameTextBox.Text.Trim();
-      }
-
-      set
-      {
-        SchemaNameTextBox.Text = value;
-      }
+      get => SchemaNameTextBox.Text.Trim();
+      set => SchemaNameTextBox.Text = value;
     }
 
     #endregion Properties
@@ -117,7 +93,7 @@ namespace MySQL.ForExcel.Forms
       }
 
       Cursor = Cursors.WaitCursor;
-      string createSql = _wbConnection.GetCreateSchemaSql(SchemaName, CharSet, Collation, false);
+      var createSql = _wbConnection.GetCreateSchemaSql(SchemaName, CharSet, Collation, false);
       var operationInfoText = string.Format(Resources.ScriptCreatingSchemaText, SchemaName);
       List<IMySqlDataRow> results;
       using (var sqlScriptDialog = new MySqlScriptDialog(_wbConnection, createSql, operationInfoText))
@@ -144,8 +120,8 @@ namespace MySQL.ForExcel.Forms
       }
 
       string operationSummary;
-      bool success = true;
-      bool warningsFound = false;
+      var success = true;
+      var warningsFound = false;
       var operationDetails = new StringBuilder();
       var warningStatementDetails = new StringBuilder();
       foreach (var statement in results.Select(statementRow => statementRow.Statement))

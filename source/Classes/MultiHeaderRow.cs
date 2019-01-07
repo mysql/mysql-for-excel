@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2015, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -47,7 +47,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Initializes a new instance of the <see cref="MultiHeaderRow"/> class.
     /// </summary>
-    /// <param name="initialColumnsCapacity">The initial capacity of the colletion.</param>
+    /// <param name="initialColumnsCapacity">The initial capacity of the collection.</param>
     public MultiHeaderRow(int initialColumnsCapacity = 0)
     {
       _height = 0;
@@ -77,24 +77,12 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the number of columns contained in this row.
     /// </summary>
-    public int Count
-    {
-      get
-      {
-        return _headerCells.Count;
-      }
-    }
+    public int Count => _headerCells.Count;
 
     /// <summary>
-    /// Gets a value indicating whether this colletion is read-only.
+    /// Gets a value indicating whether this collection is read-only.
     /// </summary>
-    public bool IsReadOnly
-    {
-      get
-      {
-        return false;
-      }
-    }
+    public bool IsReadOnly => false;
 
     /// <summary>
     /// Gets or sets the element at the specified index.
@@ -103,15 +91,8 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The element at the specified index.</returns>
     public MultiHeaderCell this[int index]
     {
-      get
-      {
-        return _headerCells[index];
-      }
-
-      set
-      {
-        _headerCells[index] = value;
-      }
+      get => _headerCells[index];
+      set => _headerCells[index] = value;
     }
 
     #endregion IList implementation
@@ -140,6 +121,11 @@ namespace MySQL.ForExcel.Classes
     /// <param name="headerCell">A <see cref="MultiHeaderCell"/> to add.</param>
     public void Add(MultiHeaderCell headerCell)
     {
+      if (headerCell == null)
+      {
+        return;
+      }
+
       headerCell.HeaderCellColumnSpanChanged += HeaderCellColumnSpanChangedAction;
       headerCell.HeaderCellTextChanged += HeaderCellTextChangedAction;
       _headerCells.Add(headerCell);
@@ -149,7 +135,7 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Removes all items from this header columns colletction.
+    /// Removes all items from this header columns collection.
     /// </summary>
     public void Clear()
     {
@@ -302,10 +288,7 @@ namespace MySQL.ForExcel.Classes
       _height = 0;
 
       // Fire corresponding event
-      if (HeaderCellColumnSpanChanged != null)
-      {
-        HeaderCellColumnSpanChanged(this, args);
-      }
+      HeaderCellColumnSpanChanged?.Invoke(this, args);
     }
 
     /// <summary>
@@ -319,10 +302,7 @@ namespace MySQL.ForExcel.Classes
       _height = 0;
 
       // Fire corresponding event
-      if (HeaderCellTextChanged != null)
-      {
-        HeaderCellTextChanged(this, args);
-      }
+      HeaderCellTextChanged?.Invoke(this, args);
     }
 
     /// <summary>
@@ -333,7 +313,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="inSpan">Flag indicating if the adjacent columns should be in the span or not.</param>
     private void ResetHeaderCellsInSpan(int columnIndex, int columnSpan, bool inSpan)
     {
-      for (int cellIndex = columnIndex + 1; cellIndex < columnIndex + columnSpan; cellIndex++)
+      for (var cellIndex = columnIndex + 1; cellIndex < columnIndex + columnSpan; cellIndex++)
       {
         var headerCell = _headerCells.FirstOrDefault(hc => hc.ColumnIndex == cellIndex);
         if (headerCell == null)

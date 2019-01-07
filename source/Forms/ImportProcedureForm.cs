@@ -105,17 +105,10 @@ namespace MySQL.ForExcel.Forms
     /// <summary>
     /// Gets or sets the text associated with this control.
     /// </summary>
-    public override sealed string Text
+    public sealed override string Text
     {
-      get
-      {
-        return base.Text;
-      }
-
-      set
-      {
-        base.Text = value;
-      }
+      get => base.Text;
+      set => base.Text = value;
     }
 
     /// <summary>
@@ -126,7 +119,7 @@ namespace MySQL.ForExcel.Forms
       get
       {
         var retType = DbProcedure.ProcedureResultSetsImportType.SelectedResultSet;
-        int multTypeValue = ImportResultsetsComboBox != null && ImportResultsetsComboBox.Items.Count > 0 ? (int)ImportResultsetsComboBox.SelectedValue : 0;
+        var multTypeValue = ImportResultsetsComboBox != null && ImportResultsetsComboBox.Items.Count > 0 ? (int)ImportResultsetsComboBox.SelectedValue : 0;
         switch (multTypeValue)
         {
           case 0:
@@ -179,7 +172,7 @@ namespace MySQL.ForExcel.Forms
         }
 
         // Fill procedure parameter values
-        for (int paramIdx = 0; paramIdx < _procedureParamsProperties.Count; paramIdx++)
+        for (var paramIdx = 0; paramIdx < _procedureParamsProperties.Count; paramIdx++)
         {
           var parameter = _dbProcedure.Parameters[paramIdx].Item2;
           var parameterValue = _procedureParamsProperties[paramIdx].Value;
@@ -187,7 +180,7 @@ namespace MySQL.ForExcel.Forms
               && parameter.MySqlDbType == MySqlDbType.Blob)
           {
             // Spatial data
-            string textValue = parameterValue?.ToString();
+            var textValue = parameterValue?.ToString();
             if (string.IsNullOrEmpty(textValue))
             {
               parameterValue = null;
@@ -213,7 +206,7 @@ namespace MySQL.ForExcel.Forms
         }
 
         // Refresh output/return parameter values in PropertyGrid
-        for (int paramIdx = 0; paramIdx < _procedureParamsProperties.Count; paramIdx++)
+        for (var paramIdx = 0; paramIdx < _procedureParamsProperties.Count; paramIdx++)
         {
           var parameter = _dbProcedure.Parameters[paramIdx].Item2;
           if (!parameter.IsReadOnly())
@@ -228,8 +221,8 @@ namespace MySQL.ForExcel.Forms
 
         // Prepare Preview DataSet to show it on Grids
         _previewDataSet = _importDataSet.Clone();
-        int resultSetsRowSum = 0;
-        for (int tableIdx = 0; tableIdx < _importDataSet.Tables.Count; tableIdx++)
+        var resultSetsRowSum = 0;
+        for (var tableIdx = 0; tableIdx < _importDataSet.Tables.Count; tableIdx++)
         {
           resultSetsRowSum += _importDataSet.Tables[tableIdx].Rows.Count;
           if (_workbookInCompatibilityMode)
@@ -237,8 +230,8 @@ namespace MySQL.ForExcel.Forms
             _sumOfResultSetsExceedsMaxCompatibilityRows = _sumOfResultSetsExceedsMaxCompatibilityRows || resultSetsRowSum > ushort.MaxValue;
           }
 
-          int limitRows = Math.Min(_importDataSet.Tables[tableIdx].Rows.Count, Settings.Default.ImportPreviewRowsQuantity);
-          for (int rowIdx = 0; rowIdx < limitRows; rowIdx++)
+          var limitRows = Math.Min(_importDataSet.Tables[tableIdx].Rows.Count, Settings.Default.ImportPreviewRowsQuantity);
+          for (var rowIdx = 0; rowIdx < limitRows; rowIdx++)
           {
             _previewDataSet.Tables[tableIdx].ImportRow(_importDataSet.Tables[tableIdx].Rows[rowIdx]);
           }
@@ -247,7 +240,7 @@ namespace MySQL.ForExcel.Forms
         // Refresh ResultSets in Tab Control
         ResultSetsDataGridView.DataSource = null;
         ResultSetsTabControl.TabPages.Clear();
-        for (int dtIdx = 0; dtIdx < _importDataSet.Tables.Count; dtIdx++)
+        for (var dtIdx = 0; dtIdx < _importDataSet.Tables.Count; dtIdx++)
         {
           ResultSetsTabControl.TabPages.Add(_importDataSet.Tables[dtIdx].TableName);
         }
@@ -296,7 +289,7 @@ namespace MySQL.ForExcel.Forms
       _dbProcedure.ImportParameters.IntoNewWorksheet = false;
 
       // Import the result sets into Excel
-      bool success = _dbProcedure.ImportData(ProcedureResultSetsImportType, _selectedResultSetIndex, _importDataSet);
+      var success = _dbProcedure.ImportData(ProcedureResultSetsImportType, _selectedResultSetIndex, _importDataSet);
 
       Cursor = Cursors.Default;
       return success;
@@ -373,7 +366,7 @@ namespace MySQL.ForExcel.Forms
       ResultSetsTabControl.TabPages[_selectedResultSetIndex].Controls.Add(ResultSetsDataGridView);
       ResultSetsDataGridView.Dock = DockStyle.Fill;
       ResultSetsDataGridView.Fill(_previewDataSet.Tables[_selectedResultSetIndex]);
-      bool cappingAtMaxCompatRows = _workbookInCompatibilityMode && _importDataSet.Tables[_selectedResultSetIndex].Rows.Count > ushort.MaxValue;
+      var cappingAtMaxCompatRows = _workbookInCompatibilityMode && _importDataSet.Tables[_selectedResultSetIndex].Rows.Count > ushort.MaxValue;
       SetCompatibilityWarning(cappingAtMaxCompatRows);
     }
 

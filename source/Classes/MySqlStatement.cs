@@ -318,7 +318,7 @@ namespace MySQL.ForExcel.Classes
       get
       {
         string setVariablesSqlQuery = null;
-        string freshQuery = MySqlRow != null ? MySqlRow.GetSql(out setVariablesSqlQuery) : string.Empty;
+        var freshQuery = MySqlRow != null ? MySqlRow.GetSql(out setVariablesSqlQuery) : string.Empty;
         SetVariablesSqlQuery = setVariablesSqlQuery;
         if (!string.IsNullOrEmpty(freshQuery))
         {
@@ -384,7 +384,7 @@ namespace MySQL.ForExcel.Classes
         return SqlStatementType.None;
       }
 
-      SqlStatementType statementType = SqlStatementType.Other;
+      var statementType = SqlStatementType.Other;
       sqlStatement = sqlStatement.TrimStart().ToUpperInvariant();
       if (sqlStatement.StartsWith(STATEMENT_UPDATE))
       {
@@ -558,7 +558,7 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
-      string nl = string.Empty;
+      var nl = string.Empty;
       if (_warningsBuilder == null)
       {
         _warningsBuilder = new StringBuilder(MiscUtilities.STRING_BUILDER_DEFAULT_CAPACITY);
@@ -568,8 +568,8 @@ namespace MySQL.ForExcel.Classes
         nl = Environment.NewLine;
       }
 
-      string excelRowText = ExcelRowText;
-      bool addExcelRowText = !string.IsNullOrEmpty(excelRowText);
+      var excelRowText = ExcelRowText;
+      var addExcelRowText = !string.IsNullOrEmpty(excelRowText);
       foreach (var warning in args.errors)
       {
         WarningsQuantity++;

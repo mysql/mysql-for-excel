@@ -151,7 +151,7 @@ namespace MySQL.ForExcel.Panels
     /// <param name="editActive">Flag indicating if the Edit Data action is enabled on the currently selected object.</param>
     public void RefreshActionLabelsEnabledStatus(string tableName, bool editActive)
     {
-      bool multipleObjectsSelected = DBObjectList.SelectedNodes.Count > 1;
+      var multipleObjectsSelected = DBObjectList.SelectedNodes.Count > 1;
       ImportDataHotLabel.Visible = !multipleObjectsSelected;
       ImportDataHotLabel.Refresh();
       ImportMultiHotLabel.Visible = multipleObjectsSelected;
@@ -166,10 +166,10 @@ namespace MySQL.ForExcel.Panels
         return;
       }
 
-      DbObject dbObj = CurrentSelectedDbObject;
-      bool isSelected = dbObj != null;
-      bool isTable = dbObj is DbTable;
-      bool tableNameMatches = isTable && !string.IsNullOrEmpty(tableName) && dbObj.Name == tableName;
+      var dbObj = CurrentSelectedDbObject;
+      var isSelected = dbObj != null;
+      var isTable = dbObj is DbTable;
+      var tableNameMatches = isTable && !string.IsNullOrEmpty(tableName) && dbObj.Name == tableName;
       ImportDataHotLabel.Enabled = isSelected;
       EditDataHotLabel.Enabled = isTable && !editActive && (tableName == null || tableNameMatches);
       AppendDataHotLabel.Enabled = isTable && ExcelSelectionContainsData;
@@ -186,10 +186,10 @@ namespace MySQL.ForExcel.Panels
       _wbConnection = connection;
       _wbConnection.Schema = schema;
       ConnectionNameLabel.Text = _wbConnection.Name;
-      UserIPLabel.Text = string.Format("User: {0}, IP: {1}", _wbConnection.UserName, _wbConnection.Host);
-      SchemaLabel.Text = string.Format("Schema: {0}", _wbConnection.Schema);
+      UserIPLabel.Text = $@"User: {_wbConnection.UserName}, IP: {_wbConnection.Host}";
+      SchemaLabel.Text = $@"Schema: {_wbConnection.Schema}";
       DBObjectsFilter.Width = DBObjectList.Width;
-      bool schemasLoadedSuccessfully = RefreshDbObjectsList(true);
+      var schemasLoadedSuccessfully = RefreshDbObjectsList(true);
       RefreshActionLabelsEnabledStatus(null, false);
       return schemasLoadedSuccessfully;
     }
@@ -215,7 +215,7 @@ namespace MySQL.ForExcel.Panels
 
       try
       {
-        ExportDataToTable(selectedNode.DbObject as DbTable);
+        ExportDataToTable((DbTable)selectedNode.DbObject);
       }
       catch (Exception ex)
       {
@@ -294,11 +294,11 @@ namespace MySQL.ForExcel.Panels
     /// <param name="e">Event arguments.</param>
     private void DBObjectsContextMenuStrip_Opening(object sender, CancelEventArgs e)
     {
-      bool selectedNodeIsDbObject = DBObjectList.SelectedNodes.Count == 1
+      var selectedNodeIsDbObject = DBObjectList.SelectedNodes.Count == 1
         && DBObjectList.SelectedNode != null
         && DBObjectList.SelectedNode.Type == MySqlListViewNode.MySqlNodeType.DbObject;
-      bool selectedNodeIsDbTable = selectedNodeIsDbObject && DBObjectList.SelectedNode.DbObject is DbTable;
-      bool selectedNodeIsDbView = selectedNodeIsDbObject && DBObjectList.SelectedNode.DbObject is DbView;
+      var selectedNodeIsDbTable = selectedNodeIsDbObject && DBObjectList.SelectedNode.DbObject is DbTable;
+      var selectedNodeIsDbView = selectedNodeIsDbObject && DBObjectList.SelectedNode.DbObject is DbView;
       ImportRelatedToolStripMenuItem.Visible = selectedNodeIsDbTable;
       PreviewDataToolStripMenuItem.Visible = selectedNodeIsDbTable || selectedNodeIsDbView;
     }
@@ -379,7 +379,7 @@ namespace MySQL.ForExcel.Panels
         return;
       }
 
-      bool success = ExportDataToTable(null);
+      var success = ExportDataToTable(null);
       if (!success)
       {
         return;
@@ -441,7 +441,7 @@ namespace MySQL.ForExcel.Panels
 
       try
       {
-        DialogResult dr = DialogResult.Cancel;
+        var dr = DialogResult.Cancel;
         Cursor = Cursors.WaitCursor;
         var activeWorkbook = Globals.ThisAddIn.ActiveWorkbook;
         if (selectedNode.DbObject is DbTable dbTable)
@@ -600,7 +600,7 @@ namespace MySQL.ForExcel.Panels
       }
 
       Cursor = Cursors.WaitCursor;
-      using (var previewDialog = new PreviewTableViewDialog(DBObjectList.SelectedNode.DbObject as DbView, false))
+      using (var previewDialog = new PreviewTableViewDialog((DbView)DBObjectList.SelectedNode.DbObject, false))
       {
         previewDialog.ShowDialog();
       }
@@ -629,7 +629,7 @@ namespace MySQL.ForExcel.Panels
         return false;
       }
 
-      bool success = true;
+      var success = true;
       Cursor = Cursors.WaitCursor;
       try
       {

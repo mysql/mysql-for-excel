@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -47,70 +47,34 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets the category name the property belongs to.
     /// </summary>
-    public override string Category
-    {
-      get
-      {
-        return string.Empty;
-      }
-    }
+    public override string Category => string.Empty;
 
     /// <summary>
     /// Gets the type of the component this property is bound to.
     /// </summary>
-    public override Type ComponentType
-    {
-      get
-      {
-        return PropertyType;
-      }
-    }
+    public override Type ComponentType => PropertyType;
 
     /// <summary>
     /// Gets the type converter for this property.
     /// </summary>
-    public override TypeConverter Converter
-    {
-      get
-      {
-        return _property.MySqlType.IsSpatial
-          ? new GeometryConverter(Globals.ThisAddIn.SpatialDataAsTextFormat)
-          : base.Converter;
-      }
-    }
+    public override TypeConverter Converter => _property.MySqlType.IsSpatial
+      ? new GeometryConverter(Globals.ThisAddIn.SpatialDataAsTextFormat)
+      : base.Converter;
 
     /// <summary>
     /// Gets the property description.
     /// </summary>
-    public override string Description
-    {
-      get
-      {
-        return _property.Description;
-      }
-    }
+    public override string Description => _property.Description;
 
     /// <summary>
     /// Gets the name of the property.
     /// </summary>
-    public override string DisplayName
-    {
-      get
-      {
-        return _property.Name;
-      }
-    }
+    public override string DisplayName => _property.Name;
 
     /// <summary>
     /// Gets a value indicating whether the property is read only.
     /// </summary>
-    public override bool IsReadOnly
-    {
-      get
-      {
-        return _property.ReadOnly;
-      }
-    }
+    public override bool IsReadOnly => _property.ReadOnly;
 
     /// <summary>
     /// Gets the data type of the property.

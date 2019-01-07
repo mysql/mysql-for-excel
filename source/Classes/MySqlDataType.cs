@@ -894,7 +894,7 @@ namespace MySQL.ForExcel.Classes
 
       set
       {
-        bool oldValue = _treatRealAsFloat;
+        var oldValue = _treatRealAsFloat;
         _treatRealAsFloat = value;
         if (_treatRealAsFloat == oldValue)
         {
@@ -999,12 +999,12 @@ namespace MySQL.ForExcel.Classes
         return null;
       }
 
-      Type objUnpackedType = packedValue.GetType();
+      var objUnpackedType = packedValue.GetType();
       string fullType = null;
-      string strType = objUnpackedType.FullName;
-      string strValue = packedValue.ToString();
-      int strLength = strValue.Length;
-      int decimalPointPos = strValue.IndexOf(".", StringComparison.Ordinal);
+      var strType = objUnpackedType.FullName;
+      var strValue = packedValue.ToString();
+      var strLength = strValue.Length;
+      var decimalPointPos = strValue.IndexOf(".", StringComparison.Ordinal);
       int[] varCharApproxLen = { 5, 12, 25, 45, 255, MYSQL_VARCHAR_MAX_PROPOSED_LEN };
       int[,] decimalApproxLen = { { 12, 2 }, { 65, 30 } };
 
@@ -1054,7 +1054,7 @@ namespace MySQL.ForExcel.Classes
           break;
 
         case "System.String":
-          foreach (int t in varCharApproxLen.Where(t => strLength <= t))
+          foreach (var t in varCharApproxLen.Where(t => strLength <= t))
           {
             fullType = $"VarChar({t})";
             break;
@@ -1072,8 +1072,8 @@ namespace MySQL.ForExcel.Classes
 
         case "System.Decimal":
         case "System.Single":
-          int intLen = decimalPointPos;
-          int fractLen = strLength - intLen - 1;
+          var intLen = decimalPointPos;
+          var fractLen = strLength - intLen - 1;
           if (intLen <= decimalApproxLen[0, 0] && fractLen <= decimalApproxLen[0, 1])
           {
             fullType = "Decimal(12,2)";
@@ -1244,8 +1244,8 @@ namespace MySQL.ForExcel.Classes
         return string.Empty;
       }
 
-      Type objUnpackedType = packedValue.GetType();
-      int strLength = packedValue.ToString().Length;
+      var objUnpackedType = packedValue.GetType();
+      var strLength = packedValue.ToString().Length;
       strLength = strLength + (10 - strLength % 10);
       return GetMySqlDataType(objUnpackedType, strLength);
     }
@@ -1258,14 +1258,14 @@ namespace MySQL.ForExcel.Classes
     /// <returns>The matching MySQL data type.</returns>
     public static string GetMySqlDataType(Type dotNetType, int strLength = 0)
     {
-      string retType = string.Empty;
+      var retType = string.Empty;
       if (dotNetType == null)
       {
         return retType;
       }
 
-      string strType = dotNetType.FullName;
-      bool unsigned = strType != null && strType.Contains(".U");
+      var strType = dotNetType.FullName;
+      var unsigned = strType != null && strType.Contains(".U");
       switch (strType)
       {
         case "System.String":
@@ -1672,7 +1672,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Step 1: Attempt to parse the string value into a regular DateTime, if it can be parsed then it can be stored in a MySqlDateTime, so return true.
-      bool canBeParsedByDateTime = DateTime.TryParse(dateValueAsString, out var parsedDateTime);
+      var canBeParsedByDateTime = DateTime.TryParse(dateValueAsString, out var parsedDateTime);
       if (canBeParsedByDateTime)
       {
         return true;
@@ -1689,13 +1689,13 @@ namespace MySQL.ForExcel.Classes
       try
       {
         // Step 3: Convert back the 1s into 0s and store them in individual date/time components.
-        int year = int.Parse(parsedDateTime.Year.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
-        int month = int.Parse(parsedDateTime.Month.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
-        int day = int.Parse(parsedDateTime.Month.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
-        int hour = int.Parse(parsedDateTime.Hour.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
-        int minute = int.Parse(parsedDateTime.Minute.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
-        int second = int.Parse(parsedDateTime.Second.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
-        int millisecond = int.Parse(parsedDateTime.Millisecond.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
+        var year = int.Parse(parsedDateTime.Year.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
+        var month = int.Parse(parsedDateTime.Month.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
+        var day = int.Parse(parsedDateTime.Month.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
+        var hour = int.Parse(parsedDateTime.Hour.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
+        var minute = int.Parse(parsedDateTime.Minute.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
+        var second = int.Parse(parsedDateTime.Second.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
+        var millisecond = int.Parse(parsedDateTime.Millisecond.ToString(CultureInfo.InvariantCulture).Replace("1", "0"));
 
         // Step 4: Create a new MySqlDateTime struct with the date/time components.
         var mySqlDateObject = new MySqlDateTime(year, month, day, hour, minute, second, millisecond);
@@ -1914,12 +1914,12 @@ namespace MySQL.ForExcel.Classes
       // Check for decimal values.
       if (IsDecimal)
       {
-        int floatingPointPos = strValue.IndexOf(".", StringComparison.Ordinal);
-        int floatingPointLen = floatingPointPos >= 0 ? 1 : 0;
-        int signLen = strValue.StartsWith("+") || strValue.StartsWith("-") ? 1 : 0;
-        bool lengthCompliant = (strValue.Length - floatingPointLen - signLen) <= Length;
-        bool decimalPlacesCompliant = floatingPointPos < 0 || strValue.Substring(floatingPointPos + 1, strValue.Length - floatingPointPos - 1).Length <= DecimalPlaces;
-        bool floatingPointCompliant = lengthCompliant && decimalPlacesCompliant;
+        var floatingPointPos = strValue.IndexOf(".", StringComparison.Ordinal);
+        var floatingPointLen = floatingPointPos >= 0 ? 1 : 0;
+        var signLen = strValue.StartsWith("+") || strValue.StartsWith("-") ? 1 : 0;
+        var lengthCompliant = (strValue.Length - floatingPointLen - signLen) <= Length;
+        var decimalPlacesCompliant = floatingPointPos < 0 || strValue.Substring(floatingPointPos + 1, strValue.Length - floatingPointPos - 1).Length <= DecimalPlaces;
+        var floatingPointCompliant = lengthCompliant && decimalPlacesCompliant;
         if (lowerTypeName == "decimal" || lowerTypeName == "numeric")
         {
           return decimal.TryParse(strValue, out _) && floatingPointCompliant;
@@ -1976,10 +1976,10 @@ namespace MySQL.ForExcel.Classes
         return true;
       }
 
-      bool sourceIsInt = IsIntegerType(sourceTypeName);
-      bool targetIsInt = IsIntegerType(targetTypeName);
-      bool sourceIsDecimal = IsDecimalType(sourceTypeName);
-      bool targetIsDecimal = IsDecimalType(targetTypeName);
+      var sourceIsInt = IsIntegerType(sourceTypeName);
+      var targetIsInt = IsIntegerType(targetTypeName);
+      var sourceIsDecimal = IsDecimalType(sourceTypeName);
+      var targetIsDecimal = IsDecimalType(targetTypeName);
       if ((sourceIsInt || IsYearType(sourceTypeName)) && (targetIsInt || targetIsDecimal || IsYearType(targetTypeName)))
       {
         return true;
@@ -1996,8 +1996,8 @@ namespace MySQL.ForExcel.Classes
         return true;
       }
 
-      bool sourceIsDate = IsDateBasedType(sourceTypeName);
-      bool targetIsDate = IsDateBasedType(targetTypeName);
+      var sourceIsDate = IsDateBasedType(sourceTypeName);
+      var targetIsDate = IsDateBasedType(targetTypeName);
       if (sourceIsDate && targetIsDate)
       {
         return true;
@@ -2193,14 +2193,14 @@ namespace MySQL.ForExcel.Classes
         return new List<string>();
       }
 
-      int rightParensIndex = _fullType.IndexOf(')');
-      int spaceIndex = _fullType.IndexOf(' ', rightParensIndex >= 0 ? rightParensIndex : TypeName.Length - 1);
+      var rightParensIndex = _fullType.IndexOf(')');
+      var spaceIndex = _fullType.IndexOf(' ', rightParensIndex >= 0 ? rightParensIndex : TypeName.Length - 1);
       if (spaceIndex < 0)
       {
         return new List<string>();
       }
 
-      string attributesText = _fullType.Substring(spaceIndex + 1);
+      var attributesText = _fullType.Substring(spaceIndex + 1);
       var attributesArray = attributesText.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
       var tempAttributesList = new List<string>(attributesArray.Length);
       tempAttributesList.AddRange(attributesArray.Select(attribute => attribute.ToUpperInvariant()));
@@ -2469,14 +2469,14 @@ namespace MySQL.ForExcel.Classes
         return new List<string>();
       }
 
-      int lParensIndex = _fullType.IndexOf('(');
-      int rParensIndex = _fullType.IndexOf(')');
+      var lParensIndex = _fullType.IndexOf('(');
+      var rParensIndex = _fullType.IndexOf(')');
       if (lParensIndex < 0 || rParensIndex < 0)
       {
         return new List<string>();
       }
 
-      int firstParamIndex = lParensIndex + 1;
+      var firstParamIndex = lParensIndex + 1;
       return _fullType.Substring(firstParamIndex, rParensIndex - firstParamIndex).Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(element => element.Trim()).ToList();
     }
 
@@ -2492,14 +2492,14 @@ namespace MySQL.ForExcel.Classes
       }
 
       string typeName;
-      int lParensIndex = _fullType.IndexOf('(');
+      var lParensIndex = _fullType.IndexOf('(');
       if (lParensIndex >= 0)
       {
         typeName = _fullType.Substring(0, lParensIndex);
       }
       else
       {
-        int spaceIndex = _fullType.IndexOf(' ');
+        var spaceIndex = _fullType.IndexOf(' ');
         if (spaceIndex >= 0 &&
             _fullType.Substring(spaceIndex + 1).StartsWith("precision", StringComparison.InvariantCultureIgnoreCase))
         {
@@ -2509,7 +2509,7 @@ namespace MySQL.ForExcel.Classes
         typeName = spaceIndex >= 0 ? _fullType.Substring(0, spaceIndex) : _fullType;
       }
 
-      string displayTypeName = MySqlDisplayDataType.GetDisplayTypeName(typeName, out _validTypeName);
+      var displayTypeName = MySqlDisplayDataType.GetDisplayTypeName(typeName, out _validTypeName);
       return displayTypeName;
     }
 
@@ -2599,10 +2599,10 @@ namespace MySQL.ForExcel.Classes
         return true;
       }
 
-      bool allValid = true;
-      int unsignedCount = 0;
-      int zeroFillCount = 0;
-      foreach (string attribute in _attributes)
+      var allValid = true;
+      var unsignedCount = 0;
+      var zeroFillCount = 0;
+      foreach (var attribute in _attributes)
       {
         if (attribute.Equals(ATTRIBUTE_UNSIGNED, StringComparison.InvariantCultureIgnoreCase))
         {
@@ -2629,7 +2629,7 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if attributes are correctly specified, <c>false</c> otherwise.</returns>
     private bool ValidateParameters()
     {
-      int paramsCount = Parameters?.Count ?? 0;
+      var paramsCount = Parameters?.Count ?? 0;
       if (IsSetOrEnum)
       {
         if (paramsCount == 0)
@@ -2654,7 +2654,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       // Validate first the number of parameters
-      bool validParameters = (IsFloatingPoint && paramsCount == 2) || (IsFixedPoint && paramsCount >= 1) || paramsCount == 1;
+      var validParameters = (IsFloatingPoint && paramsCount == 2) || (IsFixedPoint && paramsCount >= 1) || paramsCount == 1;
 
       // Validate then if the parameters are numeric
       long length = -1;

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -80,7 +80,7 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
-    /// Event ocurring when the ENTER key is pressed by the user.
+    /// Event occurring when the ENTER key is pressed by the user.
     /// </summary>
     [Category("MySQL Custom"), Description("Event ocurring when the key code, specified in the SearchFiredTrigger property, is pressed by the user.")]
     public event EventHandler SearchFired;
@@ -93,10 +93,7 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Description("The horizontal offset, in pixels, to draw the SearchImage.")]
     public int ImageXOffset
     {
-      get
-      {
-        return _imageXOffset;
-      }
+      get => _imageXOffset;
 
       set
       {
@@ -113,10 +110,7 @@ namespace MySQL.ForExcel.Controls
      Description("The label displayed within the search control when no text has been input by users.")]
     public string NoTextLabel
     {
-      get
-      {
-        return _noTextLabel;
-      }
+      get => _noTextLabel;
 
       set
       {
@@ -140,10 +134,7 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Description("Value indicating whether the SearchImage is scaled to fit the height of the search box.")]
     public bool ScaleImage
     {
-      get
-      {
-        return _scaleImage;
-      }
+      get => _scaleImage;
 
       set
       {
@@ -165,10 +156,7 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Description("Tthe image displayed at the left side of the control.")]
     public Image SearchImage
     {
-      get
-      {
-        return _searchImage;
-      }
+      get => _searchImage;
 
       set
       {
@@ -184,12 +172,9 @@ namespace MySQL.ForExcel.Controls
     [Category("MySQL Custom"), Description("The search text.")]
     public override string Text
     {
-      get
-      {
-        return _isEmpty
-          ? string.Empty
-          : InnerTextBox.Text.Trim();
-      }
+      get => _isEmpty
+        ? string.Empty
+        : InnerTextBox.Text.Trim();
 
       set
       {
@@ -211,33 +196,21 @@ namespace MySQL.ForExcel.Controls
     /// Gets the scaled height, in pixels, of the <see cref="SearchImage"/>.
     /// </summary>
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    private int ScaledImageHeight
-    {
-      get
-      {
-        return _searchImage == null
-          ? 0
-          : _scaleImage
-            ? Height - ((Height - InnerTextBox.Height) / 2)
-            : _searchImage.Height;
-      }
-    }
+    private int ScaledImageHeight => _searchImage == null
+      ? 0
+      : _scaleImage
+        ? Height - ((Height - InnerTextBox.Height) / 2)
+        : _searchImage.Height;
 
     /// <summary>
     /// Gets the scaled width, in pixels, of the <see cref="SearchImage"/>.
     /// </summary>
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    private int ScaledImageWidth
-    {
-      get
-      {
-        return _searchImage == null
-          ? 0
-          : _scaleImage
-            ? _searchImage.Width * ScaledImageHeight / _searchImage.Height
-            : _searchImage.Width;
-      }
-    }
+    private int ScaledImageWidth => _searchImage == null
+      ? 0
+      : _scaleImage
+        ? _searchImage.Width * ScaledImageHeight / _searchImage.Height
+        : _searchImage.Width;
 
     #endregion Properties
 
@@ -265,7 +238,7 @@ namespace MySQL.ForExcel.Controls
       }
       else
       {
-        int yOffset = (Height - _searchImage.Height) / 2;
+        var yOffset = (Height - _searchImage.Height) / 2;
         e.Graphics.DrawImageUnscaled(_searchImage, _imageXOffset, yOffset);
       }
     }
@@ -338,8 +311,8 @@ namespace MySQL.ForExcel.Controls
     /// <param name="e">Event arguments.</param>
     private void SearchEdit_Resize(object sender, EventArgs e)
     {
-      int imageWidth = ScaledImageWidth;
-      int xOffset = imageWidth + (_imageXOffset * 2);
+      var imageWidth = ScaledImageWidth;
+      var xOffset = imageWidth + (_imageXOffset * 2);
       InnerTextBox.SetBounds(xOffset, (Height - InnerTextBox.Height) / 2, Size.Width - xOffset, InnerTextBox.Height);
     }
   }
