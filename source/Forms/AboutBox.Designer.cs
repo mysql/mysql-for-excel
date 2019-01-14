@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2019, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -60,9 +60,9 @@ namespace MySQL.ForExcel.Forms
       this.InstallerVersionLabel.ForeColor = System.Drawing.Color.White;
       this.InstallerVersionLabel.Location = new System.Drawing.Point(102, 136);
       this.InstallerVersionLabel.Name = "InstallerVersionLabel";
-      this.InstallerVersionLabel.Size = new System.Drawing.Size(114, 15);
+      this.InstallerVersionLabel.Size = new System.Drawing.Size(113, 15);
       this.InstallerVersionLabel.TabIndex = 5;
-      this.InstallerVersionLabel.Text = "MySQL Installer 1.4";
+      this.InstallerVersionLabel.Text = "MySQL Installer x.y";
       this.InstallerVersionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
       // 
       // ExcelVersionLabel
@@ -73,9 +73,9 @@ namespace MySQL.ForExcel.Forms
       this.ExcelVersionLabel.ForeColor = System.Drawing.Color.White;
       this.ExcelVersionLabel.Location = new System.Drawing.Point(102, 117);
       this.ExcelVersionLabel.Name = "ExcelVersionLabel";
-      this.ExcelVersionLabel.Size = new System.Drawing.Size(128, 15);
+      this.ExcelVersionLabel.Size = new System.Drawing.Size(125, 15);
       this.ExcelVersionLabel.TabIndex = 4;
-      this.ExcelVersionLabel.Text = "MySQL for Excel 1.1.x";
+      this.ExcelVersionLabel.Text = "MySQL for Excel x.y.z";
       this.ExcelVersionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
       // 
       // ForExcelLabel
@@ -112,7 +112,7 @@ namespace MySQL.ForExcel.Forms
       this.CopyrightLabel.Name = "CopyrightLabel";
       this.CopyrightLabel.Size = new System.Drawing.Size(304, 11);
       this.CopyrightLabel.TabIndex = 8;
-      this.CopyrightLabel.Text = "Copyright © 2008, 2017 Oracle and/or its affiliates. All Rights Reserved.";
+      this.CopyrightLabel.Text = "Copyright © 2008, 2019 Oracle and/or its affiliates. All Rights Reserved.";
       // 
       // TrademarkLabel
       // 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2019, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -21,7 +21,7 @@ using MySQL.ForExcel.Forms;
 namespace MySQL.ForExcel.Classes
 {
   /// <summary>
-  /// Custom attribute class used to sectionize the application settings' properties by groups.
+  /// Custom attribute class used to divide in sections the application settings' properties by groups.
   /// </summary>
   [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
   public class PropertyGroup : Attribute
@@ -32,7 +32,7 @@ namespace MySQL.ForExcel.Classes
     public enum SettingsGroup
     {
       /// <summary>
-      // Application Settings used in the <see cref="ImportAdvancedOptionsDialog"/> class.
+      /// Application Settings used in the <see cref="ImportAdvancedOptionsDialog"/> class.
       /// </summary>
       Import,
       /// <summary>
