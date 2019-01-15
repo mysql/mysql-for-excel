@@ -152,5 +152,8 @@
     <Setting Name="AppendDuplicateUniqueValuesAction" Provider="MySQL.ForExcel.Classes.MySqlForExcelSettings" Type="System.String" Scope="User">
       <Value Profile="(Default)">ErrorOutAndAbort</Value>
     </Setting>
+    <Setting Name="GlobalEditToleranceForFloatAndDouble" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">0.0001</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

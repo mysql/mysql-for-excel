@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2013, 2019, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -73,7 +73,6 @@ namespace MySQL.ForExcel.Forms
       this.CreateNewWorksheetsRadioButton = new System.Windows.Forms.RadioButton();
       this.ReuseWorksheetsRadioButton = new System.Windows.Forms.RadioButton();
       this.RestoreSavedEditSessionsCheckBox = new System.Windows.Forms.CheckBox();
-      this.UseOptimisticUpdatesCheckBox = new System.Windows.Forms.CheckBox();
       this.SpatialTextFormatComboBox = new System.Windows.Forms.ComboBox();
       this.ResetToDefaultsButton = new System.Windows.Forms.Button();
       this.OptionsTabControl = new System.Windows.Forms.TabControl();
@@ -96,6 +95,9 @@ namespace MySQL.ForExcel.Forms
       this.ImportedTablesOptionsPanel = new System.Windows.Forms.Panel();
       this.ImportedTablesOptionsLabel = new System.Windows.Forms.Label();
       this.EditSessionsTabPage = new System.Windows.Forms.TabPage();
+      this.ToleranceForFloatAndDoubleTextBox = new System.Windows.Forms.TextBox();
+      this.ToleranceForFloatAndDoubleLabel = new System.Windows.Forms.Label();
+      this.UseOptimisticUpdatesCheckBox = new System.Windows.Forms.CheckBox();
       this.EditSessionOptionsPanel = new System.Windows.Forms.Panel();
       this.EditSessionOptionsLabel = new System.Windows.Forms.Label();
       this.ContentAreaPanel.SuspendLayout();
@@ -121,22 +123,22 @@ namespace MySQL.ForExcel.Forms
       // ContentAreaPanel
       // 
       this.ContentAreaPanel.Controls.Add(this.OptionsTabControl);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(521, 275);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(541, 321);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.ResetToDefaultsButton);
       this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 230);
-      this.CommandAreaPanel.Size = new System.Drawing.Size(521, 45);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 276);
+      this.CommandAreaPanel.Size = new System.Drawing.Size(541, 45);
       // 
       // DialogAcceptButton
       // 
       this.DialogAcceptButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.DialogAcceptButton.DialogResult = System.Windows.Forms.DialogResult.OK;
       this.DialogAcceptButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.DialogAcceptButton.Location = new System.Drawing.Point(353, 11);
+      this.DialogAcceptButton.Location = new System.Drawing.Point(373, 11);
       this.DialogAcceptButton.Name = "DialogAcceptButton";
       this.DialogAcceptButton.Size = new System.Drawing.Size(75, 23);
       this.DialogAcceptButton.TabIndex = 0;
@@ -148,7 +150,7 @@ namespace MySQL.ForExcel.Forms
       this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
       this.DialogCancelButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.DialogCancelButton.Location = new System.Drawing.Point(434, 11);
+      this.DialogCancelButton.Location = new System.Drawing.Point(454, 11);
       this.DialogCancelButton.Name = "DialogCancelButton";
       this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
       this.DialogCancelButton.TabIndex = 1;
@@ -164,7 +166,7 @@ namespace MySQL.ForExcel.Forms
       // MigrateWorkbenchConnectionsButton
       // 
       this.MigrateWorkbenchConnectionsButton.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.MigrateWorkbenchConnectionsButton.Location = new System.Drawing.Point(37, 118);
+      this.MigrateWorkbenchConnectionsButton.Location = new System.Drawing.Point(37, 131);
       this.MigrateWorkbenchConnectionsButton.Name = "MigrateWorkbenchConnectionsButton";
       this.MigrateWorkbenchConnectionsButton.Size = new System.Drawing.Size(411, 23);
       this.MigrateWorkbenchConnectionsButton.TabIndex = 9;
@@ -310,10 +312,10 @@ namespace MySQL.ForExcel.Forms
       // ManageEditConnectionInfosButton
       // 
       this.ManageEditConnectionInfosButton.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.ManageEditConnectionInfosButton.Location = new System.Drawing.Point(37, 147);
+      this.ManageEditConnectionInfosButton.Location = new System.Drawing.Point(37, 200);
       this.ManageEditConnectionInfosButton.Name = "ManageEditConnectionInfosButton";
-      this.ManageEditConnectionInfosButton.Size = new System.Drawing.Size(440, 23);
-      this.ManageEditConnectionInfosButton.TabIndex = 4;
+      this.ManageEditConnectionInfosButton.Size = new System.Drawing.Size(464, 23);
+      this.ManageEditConnectionInfosButton.TabIndex = 7;
       this.ManageEditConnectionInfosButton.Text = "Manage connection information stored in the user settings file...";
       this.ExcelToolTip.SetToolTip(this.ManageEditConnectionInfosButton, "Allows you to select from all stored Import and Edit connection information to be" +
         " deleted once you press Accept.");
@@ -364,27 +366,15 @@ namespace MySQL.ForExcel.Forms
       // 
       this.RestoreSavedEditSessionsCheckBox.AutoSize = true;
       this.RestoreSavedEditSessionsCheckBox.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.RestoreSavedEditSessionsCheckBox.Location = new System.Drawing.Point(37, 72);
+      this.RestoreSavedEditSessionsCheckBox.Location = new System.Drawing.Point(37, 125);
       this.RestoreSavedEditSessionsCheckBox.Name = "RestoreSavedEditSessionsCheckBox";
       this.RestoreSavedEditSessionsCheckBox.Size = new System.Drawing.Size(374, 19);
-      this.RestoreSavedEditSessionsCheckBox.TabIndex = 2;
+      this.RestoreSavedEditSessionsCheckBox.TabIndex = 5;
       this.RestoreSavedEditSessionsCheckBox.Text = "Restore saved Edit Data sessions when opening an Excel workbook";
       this.ExcelToolTip.SetToolTip(this.RestoreSavedEditSessionsCheckBox, "When checked, Edit Data sessions that were active when an Excel workbook was save" +
         "d, are restored when the workbook is opened again.");
       this.RestoreSavedEditSessionsCheckBox.UseVisualStyleBackColor = true;
       this.RestoreSavedEditSessionsCheckBox.CheckedChanged += new System.EventHandler(this.RestoreSavedEditSessionsCheckBox_CheckedChanged);
-      // 
-      // UseOptimisticUpdatesCheckBox
-      // 
-      this.UseOptimisticUpdatesCheckBox.AutoSize = true;
-      this.UseOptimisticUpdatesCheckBox.Font = new System.Drawing.Font("Segoe UI", 8.25F);
-      this.UseOptimisticUpdatesCheckBox.Location = new System.Drawing.Point(37, 49);
-      this.UseOptimisticUpdatesCheckBox.Name = "UseOptimisticUpdatesCheckBox";
-      this.UseOptimisticUpdatesCheckBox.Size = new System.Drawing.Size(271, 17);
-      this.UseOptimisticUpdatesCheckBox.TabIndex = 2;
-      this.UseOptimisticUpdatesCheckBox.Text = "Use optimistic updates on all Edit Data sessions";
-      this.ExcelToolTip.SetToolTip(this.UseOptimisticUpdatesCheckBox, resources.GetString("UseOptimisticUpdatesCheckBox.ToolTip"));
-      this.UseOptimisticUpdatesCheckBox.UseVisualStyleBackColor = true;
       // 
       // SpatialTextFormatComboBox
       // 
@@ -422,7 +412,7 @@ namespace MySQL.ForExcel.Forms
       this.OptionsTabControl.Location = new System.Drawing.Point(0, 0);
       this.OptionsTabControl.Name = "OptionsTabControl";
       this.OptionsTabControl.SelectedIndex = 0;
-      this.OptionsTabControl.Size = new System.Drawing.Size(521, 235);
+      this.OptionsTabControl.Size = new System.Drawing.Size(541, 281);
       this.OptionsTabControl.TabIndex = 0;
       // 
       // ConnectionsTabPage
@@ -441,7 +431,7 @@ namespace MySQL.ForExcel.Forms
       this.ConnectionsTabPage.Location = new System.Drawing.Point(4, 24);
       this.ConnectionsTabPage.Name = "ConnectionsTabPage";
       this.ConnectionsTabPage.Padding = new System.Windows.Forms.Padding(3);
-      this.ConnectionsTabPage.Size = new System.Drawing.Size(513, 207);
+      this.ConnectionsTabPage.Size = new System.Drawing.Size(533, 253);
       this.ConnectionsTabPage.TabIndex = 0;
       this.ConnectionsTabPage.Text = "Connections";
       this.ConnectionsTabPage.UseVisualStyleBackColor = true;
@@ -451,7 +441,7 @@ namespace MySQL.ForExcel.Forms
       this.AutomaticMigrationDelayValueLabel.AutoSize = true;
       this.AutomaticMigrationDelayValueLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.AutomaticMigrationDelayValueLabel.ForeColor = System.Drawing.SystemColors.GrayText;
-      this.AutomaticMigrationDelayValueLabel.Location = new System.Drawing.Point(306, 99);
+      this.AutomaticMigrationDelayValueLabel.Location = new System.Drawing.Point(303, 110);
       this.AutomaticMigrationDelayValueLabel.Name = "AutomaticMigrationDelayValueLabel";
       this.AutomaticMigrationDelayValueLabel.Size = new System.Drawing.Size(67, 15);
       this.AutomaticMigrationDelayValueLabel.TabIndex = 8;
@@ -461,7 +451,7 @@ namespace MySQL.ForExcel.Forms
       // 
       this.AutomaticMigrationDelayLabel.AutoSize = true;
       this.AutomaticMigrationDelayLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.AutomaticMigrationDelayLabel.Location = new System.Drawing.Point(34, 100);
+      this.AutomaticMigrationDelayLabel.Location = new System.Drawing.Point(34, 110);
       this.AutomaticMigrationDelayLabel.Name = "AutomaticMigrationDelayLabel";
       this.AutomaticMigrationDelayLabel.Size = new System.Drawing.Size(263, 15);
       this.AutomaticMigrationDelayLabel.TabIndex = 7;
@@ -521,13 +511,12 @@ namespace MySQL.ForExcel.Forms
       // 
       // SqlQueriesTabPage
       // 
-      this.SqlQueriesTabPage.Controls.Add(this.UseOptimisticUpdatesCheckBox);
       this.SqlQueriesTabPage.Controls.Add(this.ShowQueriesOptionsPanel);
       this.SqlQueriesTabPage.Controls.Add(this.SqlQueriesLabel);
       this.SqlQueriesTabPage.Location = new System.Drawing.Point(4, 24);
       this.SqlQueriesTabPage.Name = "SqlQueriesTabPage";
       this.SqlQueriesTabPage.Padding = new System.Windows.Forms.Padding(3);
-      this.SqlQueriesTabPage.Size = new System.Drawing.Size(626, 224);
+      this.SqlQueriesTabPage.Size = new System.Drawing.Size(533, 253);
       this.SqlQueriesTabPage.TabIndex = 1;
       this.SqlQueriesTabPage.Text = "SQL Queries";
       this.SqlQueriesTabPage.UseVisualStyleBackColor = true;
@@ -537,7 +526,7 @@ namespace MySQL.ForExcel.Forms
       this.ShowQueriesOptionsPanel.Controls.Add(this.ShowExecutedSqlQueryRadioButton);
       this.ShowQueriesOptionsPanel.Controls.Add(this.PreviewSqlQueriesRadioButton);
       this.ShowQueriesOptionsPanel.Controls.Add(this.NoSqlStatementsRadioButton);
-      this.ShowQueriesOptionsPanel.Location = new System.Drawing.Point(5, 60);
+      this.ShowQueriesOptionsPanel.Location = new System.Drawing.Point(6, 40);
       this.ShowQueriesOptionsPanel.Name = "ShowQueriesOptionsPanel";
       this.ShowQueriesOptionsPanel.Size = new System.Drawing.Size(427, 79);
       this.ShowQueriesOptionsPanel.TabIndex = 1;
@@ -562,7 +551,7 @@ namespace MySQL.ForExcel.Forms
       this.SpatialDataTabPage.Location = new System.Drawing.Point(4, 24);
       this.SpatialDataTabPage.Name = "SpatialDataTabPage";
       this.SpatialDataTabPage.Padding = new System.Windows.Forms.Padding(3);
-      this.SpatialDataTabPage.Size = new System.Drawing.Size(626, 224);
+      this.SpatialDataTabPage.Size = new System.Drawing.Size(533, 253);
       this.SpatialDataTabPage.TabIndex = 2;
       this.SpatialDataTabPage.Text = "Spatial Data";
       this.SpatialDataTabPage.UseVisualStyleBackColor = true;
@@ -597,7 +586,7 @@ namespace MySQL.ForExcel.Forms
       this.ImportedTablesTabPage.Controls.Add(this.ImportedTablesOptionsLabel);
       this.ImportedTablesTabPage.Location = new System.Drawing.Point(4, 24);
       this.ImportedTablesTabPage.Name = "ImportedTablesTabPage";
-      this.ImportedTablesTabPage.Size = new System.Drawing.Size(513, 207);
+      this.ImportedTablesTabPage.Size = new System.Drawing.Size(533, 253);
       this.ImportedTablesTabPage.TabIndex = 3;
       this.ImportedTablesTabPage.Text = "Imported Tables";
       this.ImportedTablesTabPage.UseVisualStyleBackColor = true;
@@ -635,6 +624,9 @@ namespace MySQL.ForExcel.Forms
       // 
       // EditSessionsTabPage
       // 
+      this.EditSessionsTabPage.Controls.Add(this.ToleranceForFloatAndDoubleTextBox);
+      this.EditSessionsTabPage.Controls.Add(this.ToleranceForFloatAndDoubleLabel);
+      this.EditSessionsTabPage.Controls.Add(this.UseOptimisticUpdatesCheckBox);
       this.EditSessionsTabPage.Controls.Add(this.ManageEditConnectionInfosButton);
       this.EditSessionsTabPage.Controls.Add(this.PreviewTableDataCheckBox);
       this.EditSessionsTabPage.Controls.Add(this.EditSessionOptionsPanel);
@@ -642,19 +634,48 @@ namespace MySQL.ForExcel.Forms
       this.EditSessionsTabPage.Controls.Add(this.EditSessionOptionsLabel);
       this.EditSessionsTabPage.Location = new System.Drawing.Point(4, 24);
       this.EditSessionsTabPage.Name = "EditSessionsTabPage";
-      this.EditSessionsTabPage.Size = new System.Drawing.Size(513, 207);
+      this.EditSessionsTabPage.Size = new System.Drawing.Size(533, 253);
       this.EditSessionsTabPage.TabIndex = 4;
       this.EditSessionsTabPage.Text = "Edit Sessions";
       this.EditSessionsTabPage.UseVisualStyleBackColor = true;
+      // 
+      // ToleranceForFloatAndDoubleTextBox
+      // 
+      this.ToleranceForFloatAndDoubleTextBox.Location = new System.Drawing.Point(409, 96);
+      this.ToleranceForFloatAndDoubleTextBox.Name = "ToleranceForFloatAndDoubleTextBox";
+      this.ToleranceForFloatAndDoubleTextBox.Size = new System.Drawing.Size(92, 23);
+      this.ToleranceForFloatAndDoubleTextBox.TabIndex = 4;
+      this.ToleranceForFloatAndDoubleTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.ToleranceForFloatAndDoubleTextBox_Validating);
+      // 
+      // ToleranceForFloatAndDoubleLabel
+      // 
+      this.ToleranceForFloatAndDoubleLabel.AutoSize = true;
+      this.ToleranceForFloatAndDoubleLabel.Location = new System.Drawing.Point(54, 99);
+      this.ToleranceForFloatAndDoubleLabel.Name = "ToleranceForFloatAndDoubleLabel";
+      this.ToleranceForFloatAndDoubleLabel.Size = new System.Drawing.Size(349, 15);
+      this.ToleranceForFloatAndDoubleLabel.TabIndex = 3;
+      this.ToleranceForFloatAndDoubleLabel.Text = "Tolerance for FLOAT and DOUBLE comparisons in WHERE clause:";
+      // 
+      // UseOptimisticUpdatesCheckBox
+      // 
+      this.UseOptimisticUpdatesCheckBox.AutoSize = true;
+      this.UseOptimisticUpdatesCheckBox.Font = new System.Drawing.Font("Segoe UI", 8.25F);
+      this.UseOptimisticUpdatesCheckBox.Location = new System.Drawing.Point(37, 74);
+      this.UseOptimisticUpdatesCheckBox.Name = "UseOptimisticUpdatesCheckBox";
+      this.UseOptimisticUpdatesCheckBox.Size = new System.Drawing.Size(271, 17);
+      this.UseOptimisticUpdatesCheckBox.TabIndex = 2;
+      this.UseOptimisticUpdatesCheckBox.Text = "Use optimistic updates on all Edit Data sessions";
+      this.UseOptimisticUpdatesCheckBox.UseVisualStyleBackColor = true;
+      this.UseOptimisticUpdatesCheckBox.CheckedChanged += new System.EventHandler(this.UseOptimisticUpdatesCheckBox_CheckedChanged);
       // 
       // EditSessionOptionsPanel
       // 
       this.EditSessionOptionsPanel.Controls.Add(this.CreateNewWorksheetsRadioButton);
       this.EditSessionOptionsPanel.Controls.Add(this.ReuseWorksheetsRadioButton);
-      this.EditSessionOptionsPanel.Location = new System.Drawing.Point(5, 90);
+      this.EditSessionOptionsPanel.Location = new System.Drawing.Point(5, 143);
       this.EditSessionOptionsPanel.Name = "EditSessionOptionsPanel";
-      this.EditSessionOptionsPanel.Size = new System.Drawing.Size(487, 51);
-      this.EditSessionOptionsPanel.TabIndex = 3;
+      this.EditSessionOptionsPanel.Size = new System.Drawing.Size(496, 51);
+      this.EditSessionOptionsPanel.TabIndex = 6;
       // 
       // EditSessionOptionsLabel
       // 
@@ -674,7 +695,7 @@ namespace MySQL.ForExcel.Forms
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(521, 275);
+      this.ClientSize = new System.Drawing.Size(541, 321);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
@@ -726,7 +747,6 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.Label ConnectionTimeout1Label;
     private System.Windows.Forms.Label ConnectionOptionsLabel;
     private System.Windows.Forms.TabPage SqlQueriesTabPage;
-    private System.Windows.Forms.CheckBox UseOptimisticUpdatesCheckBox;
     private System.Windows.Forms.Panel ShowQueriesOptionsPanel;
     private System.Windows.Forms.RadioButton ShowExecutedSqlQueryRadioButton;
     private System.Windows.Forms.RadioButton PreviewSqlQueriesRadioButton;
@@ -751,5 +771,8 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.Label SpatialDataLabel;
     private System.Windows.Forms.ComboBox SpatialTextFormatComboBox;
     private System.Windows.Forms.Label SpatialTextFormatLabel;
+    private System.Windows.Forms.TextBox ToleranceForFloatAndDoubleTextBox;
+    private System.Windows.Forms.Label ToleranceForFloatAndDoubleLabel;
+    private System.Windows.Forms.CheckBox UseOptimisticUpdatesCheckBox;
   }
 }

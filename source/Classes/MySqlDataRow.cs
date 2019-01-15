@@ -464,6 +464,7 @@ namespace MySQL.ForExcel.Classes
       var setSeparator = "SET";
       var colsSeparator = string.Empty;
       var wClauseColsSeparator = string.Empty;
+      var epsilonTolerance = Settings.Default.GlobalEditToleranceForFloatAndDouble;
       wClauseBuilder.Append(" WHERE ");
       sqlBuilderForUpdate.Append(MySqlStatement.STATEMENT_UPDATE);
       sqlBuilderForUpdate.AppendFormat(" `{0}`.`{1}` SET ", parentTable.SchemaName, parentTable.TableNameForSqlQueries);
@@ -472,8 +473,10 @@ namespace MySQL.ForExcel.Classes
         var columnRequiresQuotes = column.MySqlDataType.RequiresQuotesForValue;
         var columnIsText = column.MySqlDataType.IsChar || column.MySqlDataType.IsText || column.MySqlDataType.IsSetOrEnum;
         var columnIsJson = column.MySqlDataType.IsJson;
+        var columnIsFloatOrDouble = column.MySqlDataType.IsFloatingPoint;
         var valueToDb = column.GetStringValue(this[column.ColumnName, DataRowVersion.Original], out var updatingValueIsNull);
         var wrapValueCharacter = columnRequiresQuotes && !updatingValueIsNull ? "'" : string.Empty;
+        var valueForClause = string.Format("{0}{1}{0}", wrapValueCharacter, valueToDb);
         if (column.AllowNull)
         {
           var columnCollation = column.AbsoluteCollation;
@@ -483,12 +486,14 @@ namespace MySQL.ForExcel.Classes
                                         && columnCollation.IsUnicodeCharSetOrCollation();
 
           // If the length of the string value * 2 is greater than the string it requires to declare a variable for it, then declare the variable to save query space.
-          var needToCreateVariable = (valueToDb.Length * 2) > (valueToDb.Length + 24 + (needToCollateTextValue ? columnCollation.Length + 9 : 0));
-          string valueForClause;
+          var needToCreateVariable = valueToDb.Length * 2 > valueToDb.Length + 24 + (needToCollateTextValue ? columnCollation.Length + 9 : 0);
           if (needToCreateVariable)
           {
-            valueForClause = "@OldCol" + (column.Ordinal + 1) + "Value";
-            setVariablesBuilder.AppendFormat("{0} {1} = {2}{3}{2}", setSeparator, valueForClause, wrapValueCharacter, valueToDb);
+            var sqlVariableName = $"@OldCol{column.Ordinal + 1}Value";
+            setVariablesBuilder.AppendFormat("{0} {1} = {2}", setSeparator, sqlVariableName, valueForClause);
+
+            // Assigning the variable name to valueForClause so it's used in the next section instead of the actual value when assembling the WHERE clause.
+            valueForClause = sqlVariableName;
             setSeparator = ",";
             if (needToCollateTextValue)
             {
@@ -496,19 +501,18 @@ namespace MySQL.ForExcel.Classes
               setVariablesBuilder.Append(columnCollation);
             }
           }
-          else
-          {
-            valueForClause = string.Format("{0}{1}{0}", wrapValueCharacter, valueToDb);
-          }
 
-          wClauseBuilder.AppendFormat("{0}(({2} IS NULL AND `{1}` IS NULL) ", wClauseColsSeparator, column.ColumnNameForSqlQueries, valueForClause);
-          wClauseBuilder.AppendFormat(columnIsJson && !updatingValueIsNull ? "OR `{0}`=CAST({1} AS JSON))" : "OR `{0}`={1})", column.ColumnNameForSqlQueries, valueForClause);
-        }
-        else
-        {
-          wClauseBuilder.AppendFormat(columnIsJson && !updatingValueIsNull ? "{0}`{1}`=CAST({2}{3}{2} AS JSON)" : "{0}`{1}`={2}{3}{2}", wClauseColsSeparator, column.ColumnNameForSqlQueries, wrapValueCharacter, valueToDb);
+          // At this point valueForClause contains the value already wrapped in single quotes if needed.
+          wClauseBuilder.AppendFormat("{0}(({2} IS NULL AND `{1}` IS NULL)", wClauseColsSeparator, column.ColumnNameForSqlQueries, valueForClause);
+          wClauseColsSeparator = " OR ";
         }
 
+        wClauseBuilder.AppendFormat(columnIsJson && !updatingValueIsNull
+            ? "{0}`{1}`=CAST({2} AS JSON){3}"
+            : columnIsFloatOrDouble
+              ? "{0}`{1}` BETWEEN {2}-{4} AND {2}+{4}{3}"
+              : "{0}`{1}`={2}{3}"
+          , wClauseColsSeparator, column.ColumnNameForSqlQueries, valueForClause, column.AllowNull ? ")" : string.Empty, epsilonTolerance);
         wClauseColsSeparator = " AND ";
         if (!ChangedColumnNames.Contains(column.ColumnName))
         {

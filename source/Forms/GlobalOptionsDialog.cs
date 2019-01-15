@@ -16,6 +16,7 @@
 // 02110-1301  USA
 
 using System;
+using System.Globalization;
 using System.Windows.Forms;
 using MySql.Utility.Classes;
 using MySQL.ForExcel.Classes;
@@ -130,6 +131,7 @@ namespace MySQL.ForExcel.Forms
       settings.GlobalSqlQueriesPreviewQueries = PreviewSqlQueriesRadioButton.Checked;
       settings.GlobalSqlQueriesShowQueriesWithResults = ShowExecutedSqlQueryRadioButton.Checked;
       settings.EditPreviewMySqlData = PreviewTableDataCheckBox.Checked;
+      settings.GlobalEditToleranceForFloatAndDouble = decimal.Parse(ToleranceForFloatAndDoubleTextBox.Text);
       settings.EditSessionsRestoreWhenOpeningWorkbook = RestoreSavedEditSessionsCheckBox.Checked;
       settings.EditSessionsReuseWorksheets = ReuseWorksheetsRadioButton.Checked;
       settings.GlobalImportDataRestoreWhenOpeningWorkbook = OpeningWorkbookRadioButton.Checked;
@@ -192,6 +194,7 @@ namespace MySQL.ForExcel.Forms
         SpatialTextFormatComboBox.SelectedValue = Enum.TryParse(MiscUtilities.GetPropertyDefaultValueByName<string>(settings, "GlobalSpatialDataAsTextFormat"), out spatialFormat)
             ? spatialFormat
             : GeometryAsTextFormatType.None;
+        ToleranceForFloatAndDoubleTextBox.Text = MiscUtilities.GetPropertyDefaultValueByName<decimal>(settings, "GlobalEditToleranceForFloatAndDouble").ToString(CultureInfo.CurrentCulture);
       }
       else
       {
@@ -207,15 +210,14 @@ namespace MySQL.ForExcel.Forms
         SpatialTextFormatComboBox.SelectedValue = Enum.TryParse(settings.GlobalSpatialDataAsTextFormat, out spatialFormat)
             ? spatialFormat
             : GeometryAsTextFormatType.None;
+        ToleranceForFloatAndDoubleTextBox.Text = settings.GlobalEditToleranceForFloatAndDouble.ToString(CultureInfo.CurrentCulture);
       }
 
       NoSqlStatementsRadioButton.Checked = !PreviewSqlQueriesRadioButton.Checked && !ShowExecutedSqlQueryRadioButton.Checked;
       CreateNewWorksheetsRadioButton.Checked = !ReuseWorksheetsRadioButton.Checked;
       ShowingSidebarRadioButton.Checked = !OpeningWorkbookRadioButton.Checked;
-      if (_manageConnectionInfosDialog != null)
-      {
-        _manageConnectionInfosDialog.RefreshControlValues(useDefaultValues);
-      }
+      _manageConnectionInfosDialog?.RefreshControlValues(useDefaultValues);
+      ToleranceForFloatAndDoubleTextBox.ReadOnly = UseOptimisticUpdatesCheckBox.Checked;
     }
 
     /// <summary>
@@ -247,7 +249,7 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Icnreases the width of the dialog in case the <see cref="AutomaticMigrationDelayLabel"/> gets too big.
+    /// Increases the width of the dialog in case the <see cref="AutomaticMigrationDelayLabel"/> gets too big.
     /// </summary>
     private void SetAutomaticMigrationDelayText()
     {
@@ -272,6 +274,32 @@ namespace MySQL.ForExcel.Forms
     {
       ReuseWorksheetsRadioButton.Enabled = RestoreSavedEditSessionsCheckBox.Checked;
       CreateNewWorksheetsRadioButton.Enabled = RestoreSavedEditSessionsCheckBox.Checked;
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="ToleranceForFloatAndDoubleTextBox"/> is being validated.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ToleranceForFloatAndDoubleTextBox_Validating(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+      if (!(sender is TextBox textBox)
+          || decimal.TryParse(textBox.Text, out _))
+      {
+        return;
+      }
+
+      e.Cancel = true;
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="UseOptimisticUpdatesCheckBox"/> check state changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void UseOptimisticUpdatesCheckBox_CheckedChanged(object sender, EventArgs e)
+    {
+      ToleranceForFloatAndDoubleTextBox.ReadOnly = UseOptimisticUpdatesCheckBox.Checked;
     }
   }
 }

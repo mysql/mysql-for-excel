@@ -668,5 +668,17 @@ namespace MySQL.ForExcel.Properties {
                 this["AppendDuplicateUniqueValuesAction"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.0001")]
+        public decimal GlobalEditToleranceForFloatAndDouble {
+            get {
+                return ((decimal)(this["GlobalEditToleranceForFloatAndDouble"]));
+            }
+            set {
+                this["GlobalEditToleranceForFloatAndDouble"] = value;
+            }
+        }
     }
 }

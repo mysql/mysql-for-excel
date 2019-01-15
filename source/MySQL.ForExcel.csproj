@@ -40,7 +40,7 @@
     <ManifestKeyFile>MySQL.ForExcel_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>3026D7DB2CE7C8FA89C3967733D9F0DCB81D15E9</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>E2BA07D0242E8F63CCCE2CF5C699D4E0E7C36BB8</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
