@@ -878,7 +878,7 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets a value indicating whether a value for the given <see cref="MySqlDbType"/> must be wrapped in quotes when assembling a SQL query.
     /// </summary>
-    public bool RequiresQuotesForValue => IsChar || IsText || IsSetOrEnum || IsDateBased || IsJson;
+    public bool RequiresQuotesForValue => IsChar || IsText || IsSetOrEnum || IsDateBased || IsTime || IsJson;
 
     /// <summary>
     /// Gets a list of elements included in a SET or ENUM declaration.
