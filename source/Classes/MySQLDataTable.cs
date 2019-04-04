@@ -175,16 +175,6 @@ namespace MySQL.ForExcel.Classes
     private int _preSqlLength;
 
     /// <summary>
-    /// Gets an array of <see cref="MySqlDataColumn"/> objects that compose the primary key of this table.
-    /// </summary>
-    private MySqlDataColumn[] _primaryKeyColumns;
-
-    /// <summary>
-    /// Gets the combined length of data representation as text for primary key columns.
-    /// </summary>
-    private long _primaryKeyColumnsDataLength;
-
-    /// <summary>
     /// The SELECT query used to retrieve the excelData from the corresponding MySQL table to fill this one.
     /// </summary>
     private string _selectQuery;
@@ -409,8 +399,6 @@ namespace MySQL.ForExcel.Classes
       _preSqlBuilder = null;
       _preSqlForAddedRows = null;
       _preSqlLength = 0;
-      _primaryKeyColumns = null;
-      _primaryKeyColumnsDataLength = 0;
       _tableExistsInSchema = null;
       _selectQuery = $"SELECT * FROM `{TableNameForSqlQueries}`";
       _sqlBuilderForDelete = null;
@@ -957,23 +945,12 @@ namespace MySQL.ForExcel.Classes
     /// <summary>
     /// Gets an array of <see cref="MySqlDataColumn"/> objects that compose the primary key of this table.
     /// </summary>
-    public MySqlDataColumn[] PrimaryKeyColumns => _primaryKeyColumns ?? (_primaryKeyColumns = Columns.Cast<MySqlDataColumn>().Where(pkCol => pkCol.PrimaryKey).ToArray());
+    public MySqlDataColumn[] PrimaryKeyColumns => Columns.Cast<MySqlDataColumn>().Where(pkCol => pkCol.PrimaryKey).ToArray();
 
     /// <summary>
     /// Gets the combined length of data representation as text for primary key columns.
     /// </summary>
-    public long PrimaryKeyColumnsDataLength
-    {
-      get
-      {
-        if (_primaryKeyColumnsDataLength == 0)
-        {
-          _primaryKeyColumnsDataLength = Columns.Cast<MySqlDataColumn>().Where(pkCol => pkCol.PrimaryKey).Sum(col => col.MySqlDataType.Length > 0 ? col.MySqlDataType.Length : col.MySqlDataType.MaxLength);
-        }
-
-        return _primaryKeyColumnsDataLength;
-      }
-    }
+    public long PrimaryKeyColumnsDataLength => PrimaryKeyColumns.Sum(col => col.MySqlDataType.Length > 0 ? col.MySqlDataType.Length : col.MySqlDataType.MaxLength);
 
     /// <summary>
     /// Gets or sets the index of the result set of a stored procedure this table contains data for.
@@ -2266,8 +2243,6 @@ namespace MySQL.ForExcel.Classes
       switch (args.PropertyName)
       {
         case "PrimaryKey":
-          _primaryKeyColumns = null;
-          _primaryKeyColumnsDataLength = 0;
           _maxQueryForPrimaryColumnsLength = 0;
           break;
 
