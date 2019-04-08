@@ -290,7 +290,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="fromDbTable">The <see cref="DbTable"/> object from which the new <see cref="MySqlDataTable"/> will get its schema information and its data.</param>
     /// <param name="useFormattedValues">Flag indicating if the Excel excelData used to populate this table is formatted (numbers, dates, text) or not (numbers and text).</param>
     public MySqlDataTable(DbView fromDbTable, bool useFormattedValues)
-      : this(fromDbTable.Connection, fromDbTable.Name, true, useFormattedValues)
+      : this(fromDbTable.Connection, fromDbTable.Name, true, useFormattedValues, null, DataOperationType.Append)
     {
       var dbTableData = fromDbTable.GetData();
       CopyTableData(dbTableData, false);
@@ -298,14 +298,14 @@ namespace MySQL.ForExcel.Classes
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MySqlDataTable"/> class.
-    /// This constructor is meant to be used by the <see cref="AppendDataForm"/> class to fetch schema information from the corresponding MySQL table before copying its excelData.
     /// </summary>
     /// <param name="wbConnection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
     /// <param name="tableName">Name of the table.</param>
     /// <param name="fetchColumnsSchemaInfo">Flag indicating if the schema information from the corresponding MySQL table is fetched and recreated before any excelData is added to the table.</param>
     /// <param name="useFormattedValues">Flag indicating if the Excel excelData used to populate this table is formatted (numbers, dates, text) or not (numbers and text).</param>
     /// <param name="selectQuery">A SELECT query against a database object to fill the [MySqlDataTable] return object with.</param>
-    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string tableName, bool fetchColumnsSchemaInfo, bool useFormattedValues, string selectQuery = null)
+    /// <param name="operationType">The <see cref="DataOperationType"/> intended for this object.</param>
+    public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string tableName, bool fetchColumnsSchemaInfo, bool useFormattedValues, string selectQuery, DataOperationType operationType)
       : this(wbConnection, tableName)
     {
       if (!string.IsNullOrEmpty(selectQuery))
@@ -314,7 +314,7 @@ namespace MySQL.ForExcel.Classes
       }
 
       IsFormatted = useFormattedValues;
-      OperationType = DataOperationType.Append;
+      OperationType = operationType;
       if (fetchColumnsSchemaInfo)
       {
         CreateTableSchema(tableName, true);
@@ -333,7 +333,7 @@ namespace MySQL.ForExcel.Classes
     /// <param name="operationType">The <see cref="DataOperationType"/> intended for this object.</param>
     /// <param name="selectQuery">A SELECT query against a database object to fill the [MySqlDataTable] return object with.</param>
     public MySqlDataTable(MySqlWorkbenchConnection wbConnection, string tableName, DataTable filledTable, DataOperationType operationType, string selectQuery)
-      : this(wbConnection, tableName, true, true, selectQuery)
+      : this(wbConnection, tableName, true, true, selectQuery, operationType)
     {
       OperationType = operationType;
       CopyTableData(filledTable, false);
@@ -2398,12 +2398,26 @@ namespace MySQL.ForExcel.Classes
       foreach (DataRow columnInfoRow in schemaInfoTable.Rows)
       {
         var colName = columnInfoRow["Name"].ToString();
-        if (columnsNames != null && columnsNames.All(c => string.Compare(c, colName, CultureInfo.InvariantCulture, CompareOptions.IgnoreCase) != 0))
+        if (columnsNames != null
+            && columnsNames.All(c => string.Compare(c, colName, CultureInfo.InvariantCulture, CompareOptions.IgnoreCase) != 0))
         {
           continue;
         }
 
         var dataType = columnInfoRow["Type"].ToString();
+        if ((OperationType.IsForImport() || OperationType.IsForEdit())
+            && Settings.Default.ImportFloatingPointDataAsDecimal)
+        {
+          if (dataType.StartsWith("float", StringComparison.OrdinalIgnoreCase))
+          {
+            dataType = $"Decimal{dataType.Substring(5)}";
+          }
+          else if (dataType.StartsWith("double", StringComparison.OrdinalIgnoreCase))
+          {
+            dataType = $"Decimal{dataType.Substring(6)}";
+          }
+        }
+
         var allowNulls = columnInfoRow["Null"].ToString() == "YES";
         var keyInfo = columnInfoRow["Key"].ToString();
         var defaultValue = columnInfoRow["Default"].ToString();

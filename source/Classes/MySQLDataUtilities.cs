@@ -65,6 +65,44 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Converts the <see cref="float"/> columns in a <see cref="DataTable"/> to <see cref="decimal"/> to workaround the problems inherent to floating point precision.
+    /// </summary>
+    /// <param name="dataTable">A <see cref="DataTable"/> instance.</param>
+    /// <returns>A clone of the original <see cref="DataTable"/> with all <see cref="float"/> columns converted to <see cref="decimal"/>.</returns>
+    public static DataTable ConvertApproximateFloatingPointDataTypeColumnsToExact(this DataTable dataTable)
+    {
+      if (dataTable == null)
+      {
+        return null;
+      }
+
+      if (!dataTable.Columns.Cast<DataColumn>().Any(col => col.DataType.IsApproximateFloatingPointDataType()))
+      {
+        // Nothing to convert.
+        return dataTable;
+      }
+
+      var newTable = dataTable.Clone();
+      for (int columnIndex = 0; columnIndex < dataTable.Columns.Count; columnIndex++)
+      {
+        if (!newTable.Columns[columnIndex].DataType.IsApproximateFloatingPointDataType())
+        {
+          continue;
+        }
+
+        newTable.Columns[columnIndex].DataType = typeof(decimal);
+      }
+
+      newTable.AcceptChanges();
+      foreach (DataRow row in dataTable.Rows)
+      {
+        newTable.ImportRow(row);
+      }
+
+      return newTable;
+    }
+
+    /// <summary>
     /// Creates the import my SQL table.
     /// </summary>
     /// <param name="wbConnection">The wb connection.</param>
@@ -127,7 +165,7 @@ namespace MySQL.ForExcel.Classes
         return valueToEscape;
       }
 
-      const string quotesAndOtherDangerousChars =
+      const string QUOTES_AND_OTHER_DANGEROUS_CHARS =
           "\\" + "\u2216" + "\uFF3C"               // backslashes
         + "'" + "\u00B4" + "\u02B9" + "\u02BC" + "\u02C8" + "\u02CA"
                 + "\u0301" + "\u2019" + "\u201A" + "\u2032"
@@ -159,7 +197,7 @@ namespace MySQL.ForExcel.Classes
             break;
 
           default:
-            if (quotesAndOtherDangerousChars.IndexOf(c) >= 0)
+            if (QUOTES_AND_OTHER_DANGEROUS_CHARS.IndexOf(c) >= 0)
             {
               escape = c;
             }
@@ -487,9 +525,12 @@ namespace MySQL.ForExcel.Classes
         Logger.LogException(ex, true, string.Format(Resources.UnableToRetrieveData, "query: ", query));
       }
 
-      return ds == null || ds.Tables.Count <= 0 || tableIndex < 0 || tableIndex >= ds.Tables.Count
+      var dataTable = ds == null || ds.Tables.Count <= 0 || tableIndex < 0 || tableIndex >= ds.Tables.Count
         ? null
         : ds.Tables[tableIndex];
+      return Settings.Default.ImportFloatingPointDataAsDecimal
+        ? dataTable.ConvertApproximateFloatingPointDataTypeColumnsToExact()
+        : dataTable;
     }
 
     /// <summary>
@@ -602,6 +643,17 @@ namespace MySQL.ForExcel.Classes
       schemaName = string.IsNullOrEmpty(schemaName) ? connection.Schema : schemaName;
       var dt = connection.GetSchemaInformation(SchemaInformationType.Indexes, true, null, schemaName, tableName, indexName);
       return dt != null && dt.Rows.Count > 0;
+    }
+
+    /// <summary>
+    /// Checks if the given type corresponds to a data type that MySQL deems as an approximate floating point type.
+    /// </summary>
+    /// <param name="type">A data type.</param>
+    /// <returns><c>true</c> if the given type corresponds to a data type that MySQL deems as an approximate floating point type, <c>false</c> otherwise.</returns>
+    public static bool IsApproximateFloatingPointDataType(this Type type)
+    {
+      return type != null
+             && (type == typeof(float) || type == typeof(double));
     }
 
     /// <summary>
@@ -814,8 +866,8 @@ namespace MySQL.ForExcel.Classes
     {
       try
       {
-        const string sql = "UNLOCK TABLES";
-        MySqlHelper.ExecuteNonQuery(connection.GetConnectionStringBuilder().ConnectionString, sql);
+        const string SQL = "UNLOCK TABLES";
+        MySqlHelper.ExecuteNonQuery(connection.GetConnectionStringBuilder().ConnectionString, SQL);
       }
       catch (Exception ex)
       {

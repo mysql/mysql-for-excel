@@ -1,3 +1,24 @@
+1.3.8
+- Updated the MySql.Data library that handles all internal connections to the MySQL database to support connections to MySQL 8.0 servers and the new
+  SHA256 authentication plugin. This update of the MySql.Data library also fixes a MySQL Server 8.0 bug where fetching schema information for columns
+  returns the rows in alphabetical order instead of ordinal order.
+  (MySQL Bug #93501, Bug #29030866 - ERROR COPYING TABLE DATA / VALUE IS NOT SUITABLE TO BE CONVERTED TO A DATETIME)
+- Fixed a bug where MySQL for Excel was creating a new blank workbook in the scenario where a Workbook is being opened, so by the time the add-in loads
+  the application's active workbook has not been yet defined. (MySQL Bug #86633, Bug #26245818 - MYSQL FOR EXCEL ADDON)
+- Added a new advanced setting to the Import Data dialog called "Import all floating-point data using a DECIMAL data type". This option is used to import
+  all floating-point data as DECIMAL to prevent seeing differences between stored numbers in the database and how they are imported to Excel. This
+  behavior affects FLOAT and DOUBLE data types, which follow the IEEE-754 standard and are stored as an approximate value. DECIMAL data is stored as an
+  exact value. (MySQL Bug #86203, Bug #26008777 - MYSQL FOR EXCEL ADDS MORE NUMBERS WHEN A FLOAT DATA TYPE IS IMPORTED)
+- Added a new global option for Edit Sessions called "Tolerance for FLOAT and DOUBLE comparisons in WHERE clause", which is used along with the "Use
+  optimistic updates on all Edit Data sessions" option. Now WHERE clauses for optimistic updates use something like "??float_or_double_column?? BETWEEN
+  [some_float_or_double_value]-[epsilon_tolerance] AND [some_float_or_double_value]+[epsilon_tolerance]" which allows for a proper row matching in the
+  database. This option does not have any effect if the "Import all floating-point data using a DECIMAL data type" option for the Import Data operation
+  is used. (MySQL Bug #93824, Bug #29179195 - "QUERY DID NOT MATCH ANY ROWS IN THE DB..." WHEN USING FLOAT OR DOUBLE)
+- Fixed the SQL query assembled during an Edit Data operation when involving time fields to wrap their value in single quotes.
+  (MySQL Bug #86723, Bug #26301455 - MYSQL FOR EXCEL WON'T SAVE TIME BACK TO MYSQL DATABASE)
+- Fixed a bug where committed data was not being recognized by the Edit Data dialog for subsequent commits.
+  (MySQL Bug #87642, Bug #27365464 - DURING EDIT MODE, COMMIT BEHAVES UNEXPECTEDLY AFTER REVERT/REFRESH FROM DB)
+
 1.3.7
 - Changed the behavior of how the "First Row Contains Column Names" selection affects the Data Type for columns. The value of the aforementioned checkbox
   controls the auto-detected Data Type for columns either by defaulting the type to a suitable one for rows 2-n (if checked), or to one suitable for rows

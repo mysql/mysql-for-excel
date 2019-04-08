@@ -46,6 +46,7 @@ namespace MySQL.ForExcel.Forms
     private void InitializeComponent()
     {
       this.components = new System.ComponentModel.Container();
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ImportAdvancedOptionsDialog));
       this.DialogAcceptButton = new System.Windows.Forms.Button();
       this.DialogCancelButton = new System.Windows.Forms.Button();
       this.HelpToolTip = new System.Windows.Forms.ToolTip(this.components);
@@ -58,6 +59,7 @@ namespace MySQL.ForExcel.Forms
       this.PrefixExcelTablesTextBox = new System.Windows.Forms.TextBox();
       this.UseStyleComboBox = new System.Windows.Forms.ComboBox();
       this.CreateExcelTableCheckbox = new System.Windows.Forms.CheckBox();
+      this.FloatingPointDataAsDecimalCheckBox = new System.Windows.Forms.CheckBox();
       this.ResetToDefaultsButton = new System.Windows.Forms.Button();
       this.OptionsTabControl = new System.Windows.Forms.TabControl();
       this.GeneralTabPage = new System.Windows.Forms.TabPage();
@@ -90,14 +92,14 @@ namespace MySQL.ForExcel.Forms
       // ContentAreaPanel
       // 
       this.ContentAreaPanel.Controls.Add(this.OptionsTabControl);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(551, 249);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(551, 276);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.ResetToDefaultsButton);
       this.CommandAreaPanel.Controls.Add(this.DialogAcceptButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 204);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 231);
       this.CommandAreaPanel.Size = new System.Drawing.Size(551, 45);
       // 
       // DialogAcceptButton
@@ -126,9 +128,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // HelpToolTip
       // 
-      this.HelpToolTip.AutoPopDelay = 5000;
-      this.HelpToolTip.InitialDelay = 1000;
-      this.HelpToolTip.ReshowDelay = 100;
+      this.HelpToolTip.AutomaticDelay = 2000;
       // 
       // PreviewRowsQuantityNumericUpDown
       // 
@@ -247,6 +247,17 @@ namespace MySQL.ForExcel.Forms
       this.CreateExcelTableCheckbox.UseVisualStyleBackColor = false;
       this.CreateExcelTableCheckbox.CheckedChanged += new System.EventHandler(this.CreateExcelTableCheckbox_CheckedChanged);
       // 
+      // FloatingPointDataAsDecimalCheckBox
+      // 
+      this.FloatingPointDataAsDecimalCheckBox.AutoSize = true;
+      this.FloatingPointDataAsDecimalCheckBox.Location = new System.Drawing.Point(34, 133);
+      this.FloatingPointDataAsDecimalCheckBox.Name = "FloatingPointDataAsDecimalCheckBox";
+      this.FloatingPointDataAsDecimalCheckBox.Size = new System.Drawing.Size(326, 19);
+      this.FloatingPointDataAsDecimalCheckBox.TabIndex = 7;
+      this.FloatingPointDataAsDecimalCheckBox.Text = "Import all floating-point data using a DECIMAL data type";
+      this.HelpToolTip.SetToolTip(this.FloatingPointDataAsDecimalCheckBox, resources.GetString("FloatingPointDataAsDecimalCheckBox.ToolTip"));
+      this.FloatingPointDataAsDecimalCheckBox.UseVisualStyleBackColor = true;
+      // 
       // ResetToDefaultsButton
       // 
       this.ResetToDefaultsButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -269,7 +280,7 @@ namespace MySQL.ForExcel.Forms
       this.OptionsTabControl.Location = new System.Drawing.Point(0, 0);
       this.OptionsTabControl.Name = "OptionsTabControl";
       this.OptionsTabControl.SelectedIndex = 0;
-      this.OptionsTabControl.Size = new System.Drawing.Size(551, 249);
+      this.OptionsTabControl.Size = new System.Drawing.Size(551, 276);
       this.OptionsTabControl.TabIndex = 0;
       // 
       // GeneralTabPage
@@ -282,7 +293,7 @@ namespace MySQL.ForExcel.Forms
       this.GeneralTabPage.Location = new System.Drawing.Point(4, 24);
       this.GeneralTabPage.Name = "GeneralTabPage";
       this.GeneralTabPage.Padding = new System.Windows.Forms.Padding(3);
-      this.GeneralTabPage.Size = new System.Drawing.Size(543, 221);
+      this.GeneralTabPage.Size = new System.Drawing.Size(543, 248);
       this.GeneralTabPage.TabIndex = 0;
       this.GeneralTabPage.Text = "General";
       this.GeneralTabPage.UseVisualStyleBackColor = true;
@@ -321,6 +332,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // FormattingTabPage
       // 
+      this.FormattingTabPage.Controls.Add(this.FloatingPointDataAsDecimalCheckBox);
       this.FormattingTabPage.Controls.Add(this.FormatTimeLabel);
       this.FormattingTabPage.Controls.Add(this.FormatTimeTextBox);
       this.FormattingTabPage.Controls.Add(this.FormatShortDatesLabel);
@@ -331,7 +343,7 @@ namespace MySQL.ForExcel.Forms
       this.FormattingTabPage.Location = new System.Drawing.Point(4, 24);
       this.FormattingTabPage.Name = "FormattingTabPage";
       this.FormattingTabPage.Padding = new System.Windows.Forms.Padding(3);
-      this.FormattingTabPage.Size = new System.Drawing.Size(626, 264);
+      this.FormattingTabPage.Size = new System.Drawing.Size(543, 248);
       this.FormattingTabPage.TabIndex = 1;
       this.FormattingTabPage.Text = "Formatting";
       this.FormattingTabPage.UseVisualStyleBackColor = true;
@@ -389,7 +401,7 @@ namespace MySQL.ForExcel.Forms
       this.ExcelTablesTabPage.Controls.Add(this.ExcelTableOptionsLabel);
       this.ExcelTablesTabPage.Location = new System.Drawing.Point(4, 24);
       this.ExcelTablesTabPage.Name = "ExcelTablesTabPage";
-      this.ExcelTablesTabPage.Size = new System.Drawing.Size(626, 264);
+      this.ExcelTablesTabPage.Size = new System.Drawing.Size(543, 248);
       this.ExcelTablesTabPage.TabIndex = 2;
       this.ExcelTablesTabPage.Text = "Excel Tables";
       this.ExcelTablesTabPage.UseVisualStyleBackColor = true;
@@ -433,7 +445,7 @@ namespace MySQL.ForExcel.Forms
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.AutoSize = true;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(551, 249);
+      this.ClientSize = new System.Drawing.Size(551, 276);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 21);
@@ -483,5 +495,6 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.Label UseStyle1Label;
     private System.Windows.Forms.CheckBox CreateExcelTableCheckbox;
     private System.Windows.Forms.Label ExcelTableOptionsLabel;
+    private System.Windows.Forms.CheckBox FloatingPointDataAsDecimalCheckBox;
   }
 }

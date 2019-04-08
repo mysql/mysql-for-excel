@@ -98,6 +98,7 @@ namespace MySQL.ForExcel.Forms
       Settings.Default.ImportExcelFormatTime = string.IsNullOrWhiteSpace(FormatTimeTextBox.Text)
         ? ExcelUtilities.TIME_FORMAT
         : FormatTimeTextBox.Text;
+      Settings.Default.ImportFloatingPointDataAsDecimal = FloatingPointDataAsDecimalCheckBox.Checked;
       MiscUtilities.SaveSettings();
     }
 
@@ -139,6 +140,7 @@ namespace MySQL.ForExcel.Forms
         FormatLongDatesTextBox.Text = settings.GetPropertyDefaultValueByName<string>("ImportExcelFormatLongDates");
         FormatShortDatesTextBox.Text = settings.GetPropertyDefaultValueByName<string>("ImportExcelFormatShortDates");
         FormatTimeTextBox.Text = settings.GetPropertyDefaultValueByName<string>("ImportExcelFormatTime");
+        FloatingPointDataAsDecimalCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ImportFloatingPointDataAsDecimal");
       }
       else
       {
@@ -152,6 +154,7 @@ namespace MySQL.ForExcel.Forms
         FormatLongDatesTextBox.Text = Settings.Default.ImportExcelFormatLongDates;
         FormatShortDatesTextBox.Text = Settings.Default.ImportExcelFormatShortDates;
         FormatTimeTextBox.Text = Settings.Default.ImportExcelFormatTime;
+        FloatingPointDataAsDecimalCheckBox.Checked = Settings.Default.ImportFloatingPointDataAsDecimal;
       }
     }
 

@@ -155,5 +155,8 @@
     <Setting Name="GlobalEditToleranceForFloatAndDouble" Type="System.Decimal" Scope="User">
       <Value Profile="(Default)">0.0001</Value>
     </Setting>
+    <Setting Name="ImportFloatingPointDataAsDecimal" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

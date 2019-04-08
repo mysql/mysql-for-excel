@@ -159,9 +159,7 @@ namespace MySQL.ForExcel.Forms
       // 
       // ExcelToolTip
       // 
-      this.ExcelToolTip.AutoPopDelay = 5000;
-      this.ExcelToolTip.InitialDelay = 1000;
-      this.ExcelToolTip.ReshowDelay = 100;
+      this.ExcelToolTip.AutomaticDelay = 2000;
       // 
       // MigrateWorkbenchConnectionsButton
       // 
@@ -516,7 +514,7 @@ namespace MySQL.ForExcel.Forms
       this.SqlQueriesTabPage.Location = new System.Drawing.Point(4, 24);
       this.SqlQueriesTabPage.Name = "SqlQueriesTabPage";
       this.SqlQueriesTabPage.Padding = new System.Windows.Forms.Padding(3);
-      this.SqlQueriesTabPage.Size = new System.Drawing.Size(533, 253);
+      this.SqlQueriesTabPage.Size = new System.Drawing.Size(626, 224);
       this.SqlQueriesTabPage.TabIndex = 1;
       this.SqlQueriesTabPage.Text = "SQL Queries";
       this.SqlQueriesTabPage.UseVisualStyleBackColor = true;
@@ -551,7 +549,7 @@ namespace MySQL.ForExcel.Forms
       this.SpatialDataTabPage.Location = new System.Drawing.Point(4, 24);
       this.SpatialDataTabPage.Name = "SpatialDataTabPage";
       this.SpatialDataTabPage.Padding = new System.Windows.Forms.Padding(3);
-      this.SpatialDataTabPage.Size = new System.Drawing.Size(533, 253);
+      this.SpatialDataTabPage.Size = new System.Drawing.Size(626, 224);
       this.SpatialDataTabPage.TabIndex = 2;
       this.SpatialDataTabPage.Text = "Spatial Data";
       this.SpatialDataTabPage.UseVisualStyleBackColor = true;
@@ -586,7 +584,7 @@ namespace MySQL.ForExcel.Forms
       this.ImportedTablesTabPage.Controls.Add(this.ImportedTablesOptionsLabel);
       this.ImportedTablesTabPage.Location = new System.Drawing.Point(4, 24);
       this.ImportedTablesTabPage.Name = "ImportedTablesTabPage";
-      this.ImportedTablesTabPage.Size = new System.Drawing.Size(533, 253);
+      this.ImportedTablesTabPage.Size = new System.Drawing.Size(626, 224);
       this.ImportedTablesTabPage.TabIndex = 3;
       this.ImportedTablesTabPage.Text = "Imported Tables";
       this.ImportedTablesTabPage.UseVisualStyleBackColor = true;
@@ -645,6 +643,7 @@ namespace MySQL.ForExcel.Forms
       this.ToleranceForFloatAndDoubleTextBox.Name = "ToleranceForFloatAndDoubleTextBox";
       this.ToleranceForFloatAndDoubleTextBox.Size = new System.Drawing.Size(92, 23);
       this.ToleranceForFloatAndDoubleTextBox.TabIndex = 4;
+      this.ExcelToolTip.SetToolTip(this.ToleranceForFloatAndDoubleTextBox, resources.GetString("ToleranceForFloatAndDoubleTextBox.ToolTip"));
       this.ToleranceForFloatAndDoubleTextBox.Validating += new System.ComponentModel.CancelEventHandler(this.ToleranceForFloatAndDoubleTextBox_Validating);
       // 
       // ToleranceForFloatAndDoubleLabel
@@ -665,6 +664,7 @@ namespace MySQL.ForExcel.Forms
       this.UseOptimisticUpdatesCheckBox.Size = new System.Drawing.Size(271, 17);
       this.UseOptimisticUpdatesCheckBox.TabIndex = 2;
       this.UseOptimisticUpdatesCheckBox.Text = "Use optimistic updates on all Edit Data sessions";
+      this.ExcelToolTip.SetToolTip(this.UseOptimisticUpdatesCheckBox, resources.GetString("UseOptimisticUpdatesCheckBox.ToolTip"));
       this.UseOptimisticUpdatesCheckBox.UseVisualStyleBackColor = true;
       this.UseOptimisticUpdatesCheckBox.CheckedChanged += new System.EventHandler(this.UseOptimisticUpdatesCheckBox_CheckedChanged);
       // 

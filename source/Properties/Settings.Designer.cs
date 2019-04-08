@@ -680,5 +680,17 @@ namespace MySQL.ForExcel.Properties {
                 this["GlobalEditToleranceForFloatAndDouble"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ImportFloatingPointDataAsDecimal {
+            get {
+                return ((bool)(this["ImportFloatingPointDataAsDecimal"]));
+            }
+            set {
+                this["ImportFloatingPointDataAsDecimal"] = value;
+            }
+        }
     }
 }
