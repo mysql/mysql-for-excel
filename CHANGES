@@ -18,6 +18,10 @@
   (MySQL Bug #86723, Bug #26301455 - MYSQL FOR EXCEL WON'T SAVE TIME BACK TO MYSQL DATABASE)
 - Fixed a bug where committed data was not being recognized by the Edit Data dialog for subsequent commits.
   (MySQL Bug #87642, Bug #27365464 - DURING EDIT MODE, COMMIT BEHAVES UNEXPECTEDLY AFTER REVERT/REFRESH FROM DB)
+- Changed the way connections information used for Import and Edit Data operations is stored as workbook XML part so that the metadata is not created when
+  the workbook is initially created, but when the Import and Edit Data operations are performed. This solves the issue of Excel prompting for saving changes
+  when there are no apparent data changes to the workbook.
+  (MySQL Bug #94959, Bug #29625731 - CLOSING EMPTY WORKBOOK GIVES A PROMPT TO SAVE CHANGES WHEN THERE ARE NONE)
 
 1.3.7
 - Changed the behavior of how the "First Row Contains Column Names" selection affects the Data Type for columns. The value of the aforementioned checkbox

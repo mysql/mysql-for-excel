@@ -412,23 +412,23 @@ namespace MySQL.ForExcel.Classes
     public override int GetHashCode()
     {
       // Arbitrary number to generate the hash code.
-      const int hashCodeMultiplier = 397;
+      const int HASH_CODE_MULTIPLIER = 397;
       unchecked
       {
         var hashCode = ConnectionId != null ? ConnectionId.GetHashCode() : 1;
-        hashCode = (hashCode * hashCodeMultiplier) ^ ConnectionInfoError.GetHashCode();
-        hashCode = (hashCode * hashCodeMultiplier) ^ (ExcelTableName != null ? ExcelTableName.GetHashCode() : 0);
-        hashCode = (hashCode * hashCodeMultiplier) ^ (HostIdentifier != null ? HostIdentifier.GetHashCode() : 0);
-        hashCode = (hashCode * hashCodeMultiplier) ^ ImportColumnNames.GetHashCode();
-        hashCode = (hashCode * hashCodeMultiplier) ^ OperationType.GetHashCode();
-        hashCode = (hashCode * hashCodeMultiplier) ^ ProcedureResultSetIndex;
-        hashCode = (hashCode * hashCodeMultiplier) ^ (SchemaName != null ? SchemaName.GetHashCode() : 0);
-        hashCode = (hashCode * hashCodeMultiplier) ^ (SelectQuery != null ? SelectQuery.GetHashCode() : 0);
-        hashCode = (hashCode * hashCodeMultiplier) ^ (TableName != null ? TableName.GetHashCode() : 0);
-        hashCode = (hashCode * hashCodeMultiplier) ^ (WorkbookFilePath != null ? WorkbookFilePath.GetHashCode() : 0);
-        hashCode = (hashCode * hashCodeMultiplier) ^ (WorkbookGuid != null ? WorkbookGuid.GetHashCode() : 0);
-        hashCode = (hashCode * hashCodeMultiplier) ^ (WorkbookName != null ? WorkbookName.GetHashCode() : 0);
-        hashCode = (hashCode * hashCodeMultiplier) ^ (WorksheetName != null ? WorksheetName.GetHashCode() : 0);
+        hashCode = (hashCode * HASH_CODE_MULTIPLIER) ^ ConnectionInfoError.GetHashCode();
+        hashCode = (hashCode * HASH_CODE_MULTIPLIER) ^ (ExcelTableName != null ? ExcelTableName.GetHashCode() : 0);
+        hashCode = (hashCode * HASH_CODE_MULTIPLIER) ^ (HostIdentifier != null ? HostIdentifier.GetHashCode() : 0);
+        hashCode = (hashCode * HASH_CODE_MULTIPLIER) ^ ImportColumnNames.GetHashCode();
+        hashCode = (hashCode * HASH_CODE_MULTIPLIER) ^ OperationType.GetHashCode();
+        hashCode = (hashCode * HASH_CODE_MULTIPLIER) ^ ProcedureResultSetIndex;
+        hashCode = (hashCode * HASH_CODE_MULTIPLIER) ^ (SchemaName != null ? SchemaName.GetHashCode() : 0);
+        hashCode = (hashCode * HASH_CODE_MULTIPLIER) ^ (SelectQuery != null ? SelectQuery.GetHashCode() : 0);
+        hashCode = (hashCode * HASH_CODE_MULTIPLIER) ^ (TableName != null ? TableName.GetHashCode() : 0);
+        hashCode = (hashCode * HASH_CODE_MULTIPLIER) ^ (WorkbookFilePath != null ? WorkbookFilePath.GetHashCode() : 0);
+        hashCode = (hashCode * HASH_CODE_MULTIPLIER) ^ (WorkbookGuid != null ? WorkbookGuid.GetHashCode() : 0);
+        hashCode = (hashCode * HASH_CODE_MULTIPLIER) ^ (WorkbookName != null ? WorkbookName.GetHashCode() : 0);
+        hashCode = (hashCode * HASH_CODE_MULTIPLIER) ^ (WorksheetName != null ? WorksheetName.GetHashCode() : 0);
         return hashCode;
       }
     }
@@ -599,10 +599,10 @@ namespace MySQL.ForExcel.Classes
 
         // Resize the ExcelTools.ListObject by giving it an ExcelInterop.Range calculated with the refreshed MySqlDataTable dimensions.
         // Detection of a collision with another Excel object must be performed first and if any then shift rows and columns to fix the collision.
-        const int headerRows = 1;
+        const int HEADER_ROWS = 1;
         var summaryRows = ExcelTable.ShowTotals ? 1 : 0;
         ExcelInterop.Range newRange = ToolsExcelTable.Range.Cells[1, 1];
-        newRange = newRange.SafeResize(MySqlTable.Rows.Count + headerRows + summaryRows, MySqlTable.Columns.Count);
+        newRange = newRange.SafeResize(MySqlTable.Rows.Count + HEADER_ROWS + summaryRows, MySqlTable.Columns.Count);
         var intersectingRange = newRange.GetIntersectingRangeWithAnyExcelObject(true, true, true, _excelTable.Comment);
         if (intersectingRange != null && intersectingRange.CountLarge != 0)
         {
@@ -626,15 +626,15 @@ namespace MySQL.ForExcel.Classes
 
           // Re-dimension the new range. This is needed since the new rows or columns inserted are not present in the previously calculated one.
           newRange = ToolsExcelTable.Range.Cells[1, 1];
-          newRange = newRange.SafeResize(MySqlTable.Rows.Count + headerRows + summaryRows, MySqlTable.Columns.Count);
+          newRange = newRange.SafeResize(MySqlTable.Rows.Count + HEADER_ROWS + summaryRows, MySqlTable.Columns.Count);
         }
 
         // Re-dimension the ExcelTools.ListObject's range
         ToolsExcelTable.Resize(newRange);
 
         // Re-format the importing range
-        var dataOnlyRange = newRange.Offset[headerRows];
-        dataOnlyRange = dataOnlyRange.Resize[newRange.Rows.Count - headerRows - summaryRows];
+        var dataOnlyRange = newRange.Offset[HEADER_ROWS];
+        dataOnlyRange = dataOnlyRange.Resize[newRange.Rows.Count - HEADER_ROWS - summaryRows];
         MySqlTable.FormatImportExcelRange(dataOnlyRange, true);
 
         // Bind the re-dimensioned ExcelTools.ListObject to the MySqlDataTable
@@ -718,6 +718,9 @@ namespace MySQL.ForExcel.Classes
       var workbookGuid = workbook.GetOrCreateId();
       try
       {
+        // Add the custom MySQL table style (for Excel tables) to this workbook if it was not added already.
+        workbook.CreateMySqlTableStyle();
+
         // Create the Excel table needed to place the imported data into the Excel worksheet.
         CreateExcelTableFromExternalSource(worksheet, importDataAtCell);
 

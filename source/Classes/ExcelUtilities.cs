@@ -1458,10 +1458,34 @@ namespace MySQL.ForExcel.Classes
     /// Returns a list of <see cref="ExcelInterop.TableStyle"/> names available to be used within the given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
     /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
+    /// <param name="addDefaultMySqlStyleIfNotInWorkbook">Flag indicating whether the default MySQL style name is added to the list if it's not in the workbook's styles list.</param>
     /// <returns>A list of style names available in the given <see cref="ExcelInterop.Workbook"/>.</returns>
-    public static List<string> ListTableStyles(this ExcelInterop.Workbook workbook)
+    public static List<string> ListTableStyles(this ExcelInterop.Workbook workbook, bool addDefaultMySqlStyleIfNotInWorkbook)
     {
-      return workbook == null ? null : (from ExcelInterop.TableStyle tableStyle in workbook.TableStyles orderby tableStyle.Name select tableStyle.Name).ToList();
+      if (workbook == null)
+      {
+        return null;
+      }
+
+      var tablesStylesList = new List<string>();
+      var defaultStylePresent = false;
+      foreach (var tableStyle in workbook.TableStyles.Cast<ExcelInterop.TableStyle>())
+      {
+        tablesStylesList.Add(tableStyle.Name);
+        if (tableStyle.Name.Equals(DEFAULT_MYSQL_STYLE_NAME, StringComparison.OrdinalIgnoreCase))
+        {
+          defaultStylePresent = true;
+        }
+      }
+
+      if (addDefaultMySqlStyleIfNotInWorkbook
+          && !defaultStylePresent)
+      {
+        tablesStylesList.Add(DEFAULT_MYSQL_STYLE_NAME);
+      }
+
+      tablesStylesList.Sort();
+      return tablesStylesList;
     }
 
     /// <summary>

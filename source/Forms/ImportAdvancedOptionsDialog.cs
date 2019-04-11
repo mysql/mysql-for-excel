@@ -127,13 +127,13 @@ namespace MySQL.ForExcel.Forms
     /// <param name="useDefaultValues">Controls are set to their default values if <c>true</c>. Current stored values in application settings are used otherwise.</param>
     private void RefreshControlValues(bool useDefaultValues = false)
     {
+      UseStyleComboBox.DataSource = Globals.ThisAddIn.ActiveWorkbook.ListTableStyles(true);
       if (useDefaultValues)
       {
         var settings = Settings.Default;
         PreviewRowsQuantityNumericUpDown.Value = settings.GetPropertyDefaultValueByName<int>("ImportPreviewRowsQuantity");
         EscapeFormulaValuesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ImportEscapeFormulaTextValues");
         CreateExcelTableCheckbox.Checked = settings.GetPropertyDefaultValueByName<bool>("ImportCreateExcelTable");
-        UseStyleComboBox.DataSource = Globals.ThisAddIn.ActiveWorkbook.ListTableStyles();
         UseStyleComboBox.Text = settings.GetPropertyDefaultValueByName<string>("ImportExcelTableStyleName");
         PrefixExcelTablesCheckBox.Checked = settings.GetPropertyDefaultValueByName<bool>("ImportPrefixExcelTable");
         PrefixExcelTablesTextBox.Text = settings.GetPropertyDefaultValueByName<string>("ImportPrefixExcelTableText");
@@ -147,7 +147,6 @@ namespace MySQL.ForExcel.Forms
         PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.ImportPreviewRowsQuantity);
         EscapeFormulaValuesCheckBox.Checked = Settings.Default.ImportEscapeFormulaTextValues;
         CreateExcelTableCheckbox.Checked = Settings.Default.ImportCreateExcelTable;
-        UseStyleComboBox.DataSource = Globals.ThisAddIn.ActiveWorkbook.ListTableStyles();
         UseStyleComboBox.Text = Settings.Default.ImportExcelTableStyleName;
         PrefixExcelTablesCheckBox.Checked = Settings.Default.ImportPrefixExcelTable;
         PrefixExcelTablesTextBox.Text = Settings.Default.ImportPrefixExcelTableText;

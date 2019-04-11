@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2019, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -751,9 +751,6 @@ namespace MySQL.ForExcel
         return;
       }
 
-      // Ensure the Workbook has been initialized
-      InitializeWorkbook(activeWorkbook, true);
-
       if (ActiveExcelPane == null)
       {
         return;
@@ -942,12 +939,18 @@ namespace MySQL.ForExcel
         return;
       }
 
-      // Hide editDialogs from deactivated Workbook
       if (!(workbook is ExcelInterop.Workbook deactivatedWorkbook))
       {
         return;
       }
 
+      if (WorkbookConnectionInfos.GetWorkbookConnectionInfos(deactivatedWorkbook, false) == null)
+      {
+        // The deactivated workbook has most likely been closed so nothing else to do with it.
+        return;
+      }
+
+      // Hide editDialogs from deactivated Workbook
       foreach (ExcelInterop.Worksheet wSheet in deactivatedWorkbook.Worksheets)
       {
         ChangeEditDialogVisibility(wSheet, false);
@@ -1248,22 +1251,15 @@ namespace MySQL.ForExcel
     /// Method used to initialize a <see cref="ExcelInterop.Workbook" /> when it is opened or created.
     /// </summary>
     /// <param name="workbook">The <see cref="ExcelInterop.Workbook" /> being opened.</param>
-    /// <param name="treatAsNew">Flag indicating whether only actions for new Workbooks are done.</param>
-    private void InitializeWorkbook(ExcelInterop.Workbook workbook, bool treatAsNew = false)
+    private void InitializeWorkbook(ExcelInterop.Workbook workbook)
     {
       if (workbook == null)
       {
         return;
       }
 
-      // Add the custom MySQL table style (for Excel tables) to this workbook.
-      workbook.CreateMySqlTableStyle();
-
-      // Load stored Import and Edit connection information related to this workbook.
-      WorkbookConnectionInfos.LoadForWorkbook(workbook);
-
       // When it is a new workbook it won't have any ConnectionInfo objects related to it, so we could skip the rest of the method altogether.
-      if (workbook.IsNew() || treatAsNew)
+      if (workbook.IsNew())
       {
         return;
       }

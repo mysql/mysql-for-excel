@@ -162,57 +162,6 @@ namespace MySQL.ForExcel.Classes
     #endregion Properties
 
     /// <summary>
-    /// Retrieves values of <see cref="WorkbookConnectionInfos"/> properties related to the given <see cref="ExcelInterop.Workbook"/> from its document properties.
-    /// </summary>
-    /// <param name="workbook">An <see cref="ExcelInterop.Workbook"/>.</param>
-    private void GetPropertiesFromWorkbook(ExcelInterop.Workbook workbook)
-    {
-      if (workbook == null)
-      {
-        return;
-      }
-
-      var propertyValue = workbook.LoadStringDocumentProperty(nameof(EditConnectionInfosXmlPartId));
-      if (propertyValue != null)
-      {
-        EditConnectionInfosXmlPartId = propertyValue;
-      }
-
-      propertyValue = workbook.LoadStringDocumentProperty(nameof(ImportConnectionInfosXmlPartId));
-      if (propertyValue != null)
-      {
-        ImportConnectionInfosXmlPartId = propertyValue;
-      }
-
-      propertyValue = workbook.LoadStringDocumentProperty("ConnectionInfosStorage");
-      if (propertyValue == null)
-      {
-        return;
-      }
-
-      if (Enum.TryParse(propertyValue, out ConnectionInfosStorageType storage))
-      {
-        Storage = storage;
-      }
-    }
-
-    /// <summary>
-    /// Saves values of <see cref="WorkbookConnectionInfos"/> properties related to the given <see cref="ExcelInterop.Workbook"/> into its document properties.
-    /// </summary>
-    /// <param name="workbook">An <see cref="ExcelInterop.Workbook"/>.</param>
-    private void SavePropertiesIntoWorkbook(ExcelInterop.Workbook workbook)
-    {
-      if (workbook == null)
-      {
-        return;
-      }
-
-      workbook.SaveStringDocumentProperty(nameof(EditConnectionInfosXmlPartId), EditConnectionInfosXmlPartId);
-      workbook.SaveStringDocumentProperty(nameof(ImportConnectionInfosXmlPartId), ImportConnectionInfosXmlPartId);
-      workbook.SaveStringDocumentProperty("ConnectionInfosStorage", Storage.ToString());
-    }
-
-    /// <summary>
     /// Closes and removes the <see cref="EditConnectionInfo"/> associated to the given <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
     /// <param name="workbook">An <see cref="ExcelInterop.Workbook"/>.</param>
@@ -334,8 +283,9 @@ namespace MySQL.ForExcel.Classes
     /// Gets a <see cref="WorkbookConnectionInfos"/> associated to the given <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
     /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> instance.</param>
+    /// <param name="loadIfNotPresent">Loads the connection infos if the workbook is not in the main <see cref="ConnectionInfosByWorkbook"/> collection.</param>
     /// <returns>A <see cref="WorkbookConnectionInfos"/> associated to the given <see cref="ExcelInterop.Workbook"/>.</returns>
-    public static WorkbookConnectionInfos GetWorkbookConnectionInfos(ExcelInterop.Workbook workbook)
+    public static WorkbookConnectionInfos GetWorkbookConnectionInfos(ExcelInterop.Workbook workbook, bool loadIfNotPresent = true)
     {
       if (workbook == null)
       {
@@ -343,9 +293,33 @@ namespace MySQL.ForExcel.Classes
       }
 
       var workbookId = workbook.GetOrCreateId();
-      return !string.IsNullOrEmpty(workbookId) && ConnectionInfosByWorkbook.ContainsKey(workbookId)
+      if (string.IsNullOrEmpty(workbookId))
+      {
+        return null;
+      }
+
+      var workbookConnectionsInfos = ConnectionInfosByWorkbook.ContainsKey(workbookId)
         ? ConnectionInfosByWorkbook[workbookId]
         : null;
+
+      if (workbookConnectionsInfos != null
+          || !loadIfNotPresent)
+      {
+        return workbookConnectionsInfos;
+      }
+
+      workbookConnectionsInfos = new WorkbookConnectionInfos(workbook);
+      workbookConnectionsInfos.Load(workbook);
+      if (ConnectionInfosByWorkbook.ContainsKey(workbookId))
+      {
+        ConnectionInfosByWorkbook[workbookId] = workbookConnectionsInfos;
+      }
+      else
+      {
+        ConnectionInfosByWorkbook.Add(workbookId, workbookConnectionsInfos);
+      }
+
+      return workbookConnectionsInfos;
     }
 
     /// <summary>
@@ -372,43 +346,6 @@ namespace MySQL.ForExcel.Classes
       return workbookConnectionInfos == null
         ? new List<ImportConnectionInfo>()
         : workbookConnectionInfos.ImportConnectionInfos;
-    }
-
-    /// <summary>
-    /// Loads connection information for Import and Edit Data operations from the storage defined in <see cref="Storage"/>.
-    /// </summary>
-    /// <param name="workbook">An <see cref="ExcelInterop.Workbook"/> instance.</param>
-    /// <returns>The deserialized <see cref="WorkbookConnectionInfos"/> stored in the given <see cref="ExcelInterop.Workbook"/> as a stored custom property.</returns>
-    public static WorkbookConnectionInfos LoadForWorkbook(ExcelInterop.Workbook workbook)
-    {
-      if (workbook == null)
-      {
-        return null;
-      }
-
-      var workbookConnectionsInfos = GetWorkbookConnectionInfos(workbook);
-      if (workbookConnectionsInfos != null && workbookConnectionsInfos.LoadDone)
-      {
-        return workbookConnectionsInfos;
-      }
-
-      if (workbookConnectionsInfos == null)
-      {
-        workbookConnectionsInfos = new WorkbookConnectionInfos(workbook);
-      }
-
-      workbookConnectionsInfos.Load(workbook);
-      var workbookId = workbook.GetOrCreateId();
-      if (ConnectionInfosByWorkbook.ContainsKey(workbookId))
-      {
-        ConnectionInfosByWorkbook[workbookId] = workbookConnectionsInfos;
-      }
-      else
-      {
-        ConnectionInfosByWorkbook.Add(workbookId, workbookConnectionsInfos);
-      }
-           
-      return workbookConnectionsInfos;
     }
 
     /// <summary>
@@ -936,6 +873,41 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Retrieves values of <see cref="WorkbookConnectionInfos"/> properties related to the given <see cref="ExcelInterop.Workbook"/> from its document properties.
+    /// </summary>
+    /// <param name="workbook">An <see cref="ExcelInterop.Workbook"/>.</param>
+    private void GetPropertiesFromWorkbook(ExcelInterop.Workbook workbook)
+    {
+      if (workbook == null)
+      {
+        return;
+      }
+
+      var propertyValue = workbook.LoadStringDocumentProperty(nameof(EditConnectionInfosXmlPartId));
+      if (propertyValue != null)
+      {
+        EditConnectionInfosXmlPartId = propertyValue;
+      }
+
+      propertyValue = workbook.LoadStringDocumentProperty(nameof(ImportConnectionInfosXmlPartId));
+      if (propertyValue != null)
+      {
+        ImportConnectionInfosXmlPartId = propertyValue;
+      }
+
+      propertyValue = workbook.LoadStringDocumentProperty("ConnectionInfosStorage");
+      if (propertyValue == null)
+      {
+        return;
+      }
+
+      if (Enum.TryParse(propertyValue, out ConnectionInfosStorageType storage))
+      {
+        Storage = storage;
+      }
+    }
+
+    /// <summary>
     /// Loads the value of the <see cref="EditConnectionInfos"/> property from the storage defined in <see cref="Storage"/>.
     /// </summary>
     /// <param name="workbook">An <see cref="ExcelInterop.Workbook"/> instance.</param>
@@ -1001,7 +973,10 @@ namespace MySQL.ForExcel.Classes
     /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> instance.</param>
     private void MigrateConnectionInfosFromSettingsFileToCustomProperties(ExcelInterop.Workbook workbook)
     {
-      if (workbook == null || !workbook.SupportsXmlParts())
+      if (workbook == null
+          || MigratedConnectionInfosFromSettingsFileToXmlParts
+          || Storage == ConnectionInfosStorageType.WorkbookXmlParts
+          || !workbook.SupportsXmlParts())
       {
         return;
       }
@@ -1011,6 +986,8 @@ namespace MySQL.ForExcel.Classes
       var userSettingsWorkbookEditConnectionInfos = UserSettingsEditConnectionInfos.FindAll(eci => eci.WorkbookGuid == workbookId);
       if (userSettingsWorkbookImportConnectionInfos.Count + userSettingsWorkbookEditConnectionInfos.Count == 0)
       {
+        // Nothing to migrate, but let's ensure from now on data is stored in XML parts.
+        Storage = ConnectionInfosStorageType.WorkbookXmlParts;
         return;
       }
 
@@ -1135,6 +1112,22 @@ namespace MySQL.ForExcel.Classes
           }
           break;
       }
+    }
+
+    /// <summary>
+    /// Saves values of <see cref="WorkbookConnectionInfos"/> properties related to the given <see cref="ExcelInterop.Workbook"/> into its document properties.
+    /// </summary>
+    /// <param name="workbook">An <see cref="ExcelInterop.Workbook"/>.</param>
+    private void SavePropertiesIntoWorkbook(ExcelInterop.Workbook workbook)
+    {
+      if (workbook == null)
+      {
+        return;
+      }
+
+      workbook.SaveStringDocumentProperty(nameof(EditConnectionInfosXmlPartId), EditConnectionInfosXmlPartId);
+      workbook.SaveStringDocumentProperty(nameof(ImportConnectionInfosXmlPartId), ImportConnectionInfosXmlPartId);
+      workbook.SaveStringDocumentProperty("ConnectionInfosStorage", Storage.ToString());
     }
   }
 }
