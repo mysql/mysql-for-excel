@@ -165,10 +165,9 @@ namespace MySQL.ForExcel.Classes
     /// Closes and removes the <see cref="EditConnectionInfo"/> associated to the given <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
     /// <param name="workbook">An <see cref="ExcelInterop.Workbook"/>.</param>
-    /// <param name="missingWorksheetName">The name of the <see cref="ExcelInterop.Worksheet"/> that no longer exists and that is associated to the <see cref="EditConnectionInfo"/> to close.</param>
-    public static void CloseMissingWorksheetEditConnectionInfo(ExcelInterop.Workbook workbook, string missingWorksheetName)
+    public static void CloseMissingWorksheetsEditConnectionInfo(ExcelInterop.Workbook workbook)
     {
-      if (workbook == null || string.IsNullOrEmpty(missingWorksheetName))
+      if (workbook == null)
       {
         return;
       }
@@ -215,13 +214,29 @@ namespace MySQL.ForExcel.Classes
       }
 
       var workbookConnectionInfos = GetWorkbookEditConnectionInfos(parentWorkbook);
-      var wsConnectionInfo = workbookConnectionInfos.FirstOrDefault(connectionInfo => string.Equals(connectionInfo.EditDialog.WorkbookName, parentWorkbook.Name, StringComparison.InvariantCulture) && string.Equals(connectionInfo.EditDialog.WorksheetName, worksheet.Name, StringComparison.InvariantCulture));
+      var wsConnectionInfo = workbookConnectionInfos.FirstOrDefault(connectionInfo => string.Equals(connectionInfo.EditDialog.WorkbookName, parentWorkbook.Name, StringComparison.OrdinalIgnoreCase) && string.Equals(connectionInfo.EditDialog.WorksheetName, worksheet.Name, StringComparison.OrdinalIgnoreCase));
       if (wsConnectionInfo == null)
       {
         return;
       }
 
       wsConnectionInfo.EditDialog.Close();
+    }
+
+    /// <summary>
+    /// Deletes the <see cref="ImportConnectionInfo"/> instances associated with a given Worksheet name.
+    /// </summary>
+    /// <param name="parentWorkbook">The <see cref="ExcelInterop.Workbook"/> associated to the <see cref="ImportConnectionInfo" /> objects to delete.</param>
+    /// <param name="worksheetName">A Worksheet name.</param>
+    public static void DeleteImportConnectionInfosForWorksheet(ExcelInterop.Workbook parentWorkbook, string worksheetName)
+    {
+      if (parentWorkbook == null || string.IsNullOrEmpty(worksheetName))
+      {
+        return;
+      }
+
+      var workbookConnectionInfos = GetWorkbookImportConnectionInfos(parentWorkbook);
+      workbookConnectionInfos.RemoveAll(ici => ici.WorksheetName.Equals(worksheetName, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>
@@ -534,6 +549,12 @@ namespace MySQL.ForExcel.Classes
       }
 
       var workbookImportConnectionInfos = GetWorkbookImportConnectionInfos(workbook);
+      if (workbookImportConnectionInfos == null
+          || workbookImportConnectionInfos.Count == 0)
+      {
+        return;
+      }
+
       var invalidConnectionInfos = new List<ImportConnectionInfo>();
       foreach (var importConnectionInfo in workbookImportConnectionInfos)
       {
@@ -659,6 +680,7 @@ namespace MySQL.ForExcel.Classes
         return;
       }
 
+      ScrubImportConnectionInfos(workbook, false);
       var importConnectionInfos = GetWorkbookImportConnectionInfos(workbook);
       if (importConnectionInfos == null)
       {
@@ -682,6 +704,55 @@ namespace MySQL.ForExcel.Classes
     {
       var workbookConnectionInfos = GetWorkbookConnectionInfos(workbook);
       workbookConnectionInfos?.Save(workbook);
+    }
+
+    /// <summary>
+    /// Scrubs <see cref="ImportConnectionInfo"/> instances in the given <see cref="ExcelInterop.Workbook"/>.
+    /// </summary>
+    /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> instance.</param>
+    /// <param name="removeInvalid">Flag indicating if any invalid connection info (with an Excel table that is not really functional) should be removed.</param>
+    public static void ScrubImportConnectionInfos(ExcelInterop.Workbook workbook, bool removeInvalid)
+    {
+      if (workbook == null)
+      {
+        return;
+      }
+
+      var workbookConnectionInfos = GetWorkbookImportConnectionInfos(workbook);
+      if (workbookConnectionInfos == null
+          || workbookConnectionInfos.Count == 0)
+      {
+        return;
+      }
+
+      var worksheetNames = workbook.Worksheets.Cast<ExcelInterop.Worksheet>().Select(ws => ws.Name).ToList();
+      var connectionsToRemove = new List<ImportConnectionInfo>(workbookConnectionInfos.Count);
+      foreach (var importConnectionInfo in workbookConnectionInfos)
+      {
+        // Step 1: Skip the ones that have a matching worksheet name
+        if (worksheetNames.Any(name => name.Equals(importConnectionInfo.WorksheetName, StringComparison.OrdinalIgnoreCase)))
+        {
+          continue;
+        }
+
+        // Step 2: Try to find if worksheet names changed, if so attempt to update with the new names
+        var candidateWorksheet = workbook.Worksheets.Cast<ExcelInterop.Worksheet>().FirstOrDefault(ws => ws.GetExcelTableByName(importConnectionInfo.ExcelTableName) == importConnectionInfo.ExcelTable);
+        if (candidateWorksheet != null)
+        {
+          importConnectionInfo.WorksheetName = candidateWorksheet.Name;
+          continue;
+        }
+
+        // Step 3: Remove the connection information, no matching Worksheet was found in the Workbook
+        connectionsToRemove.Add(importConnectionInfo);
+      }
+
+      workbookConnectionInfos.RemoveAll(ici => connectionsToRemove.Contains(ici));
+      if (removeInvalid)
+      {
+        // Step 4: Remove any connection info with an invalid Excel table
+        RemoveInvalidImportConnectionInfos(workbook);
+      }
     }
 
     /// <summary>

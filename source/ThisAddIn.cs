@@ -487,6 +487,7 @@ namespace MySQL.ForExcel
     /// </summary>
     public void RefreshAllCustomFunctionality()
     {
+      WorkbookConnectionInfos.ScrubImportConnectionInfos(ActiveWorkbook, true);
       foreach (ExcelInterop.WorkbookConnection wbConnection in ActiveWorkbook.Connections)
       {
         var excelTable = wbConnection.GetExcelTable();
@@ -599,7 +600,8 @@ namespace MySQL.ForExcel
       if (_lastDeactivatedSheetName.Length > 0 && !ActiveWorkbook.WorksheetExists(_lastDeactivatedSheetName))
       {
         // Worksheet was deleted and the Application_SheetBeforeDelete did not run, user is running Excel 2010 or earlier.
-        WorkbookConnectionInfos.CloseMissingWorksheetEditConnectionInfo(ActiveWorkbook, _lastDeactivatedSheetName);
+        WorkbookConnectionInfos.CloseMissingWorksheetsEditConnectionInfo(ActiveWorkbook);
+        WorkbookConnectionInfos.DeleteImportConnectionInfosForWorksheet(ActiveWorkbook, _lastDeactivatedSheetName);
       }
 
       ChangeEditDialogVisibility(activeSheet, true);
@@ -623,6 +625,7 @@ namespace MySQL.ForExcel
       }
 
       WorkbookConnectionInfos.CloseWorksheetEditConnectionInfo(activeSheet);
+      WorkbookConnectionInfos.DeleteImportConnectionInfosForWorksheet(ActiveWorkbook, activeSheet?.Name);
 
       // If the _lastDeactivatedSheetName is not empty it means a deactivated sheet may have been deleted, if this method ran it means the user is running
       // Excel 2013 or later where this method is supported, so we need to clean the _lastDeactivatedSheetName.
@@ -889,7 +892,6 @@ namespace MySQL.ForExcel
 
       // Cleanup and close EditConnectionInfo and ImportConnectionInfo objects from the closing workbook.
       WorkbookConnectionInfos.CloseWorkbookEditConnectionInfos(workbook);
-      WorkbookConnectionInfos.RemoveInvalidImportConnectionInfos(workbook);
       foreach (var importConnectionInfo in WorkbookConnectionInfos.GetWorkbookImportConnectionInfos(workbook))
       {
         importConnectionInfo.Dispose();
@@ -914,8 +916,8 @@ namespace MySQL.ForExcel
     {
       UnprotectEditingWorksheets(workbook);
 
-      // Process ImportConnectionInfos
-      WorkbookConnectionInfos.RemoveInvalidImportConnectionInfos(workbook);
+      // Scrub ImportConnectionInfos
+      WorkbookConnectionInfos.ScrubImportConnectionInfos(workbook, true);
 
       // Save WorkbookConnectionInfos
       WorkbookConnectionInfos.SaveForWorkbook(workbook);

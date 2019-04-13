@@ -19,7 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Microsoft.Office.Core;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes;
@@ -892,7 +891,7 @@ namespace MySQL.ForExcel.Classes
           importConnectionInfo = workbookConnectionInfo;
           break;
         }
-        catch (COMException)
+        catch
         {
           // The ListObject was moved to another worksheet or when its columns had been deleted or the reference to it no longer exists.
           invalidConnectionInfos.Add(workbookConnectionInfo);
