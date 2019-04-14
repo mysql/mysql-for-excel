@@ -51,6 +51,11 @@ namespace MySQL.ForExcel.Forms
     private Dictionary<string, ExcelInterop.ListObject> _excelTablesDictionary;
 
     /// <summary>
+    /// A list of the table names that will be imported by the <see cref="ImportData"/> method.
+    /// </summary>
+    private List<string> _importingTableNames;
+
+    /// <summary>
     /// The Tables or Views selected by users for import.
     /// </summary>
     private readonly List<DbView> _importTablesOrViews;
@@ -84,6 +89,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="selectAllRelatedTables">Flag indicating whether all found related tables are selected by default.</param>
     public ImportMultipleDialog(List<DbView> tableOrViews, bool selectAllRelatedTables)
     {
+      _importingTableNames = null;
       _tableOrViews = tableOrViews ?? throw new ArgumentNullException(nameof(tableOrViews));
       _tableOrViews.ForEach(dbo => dbo.Excluded = false);
       _importTablesOrViews = _tableOrViews.Where(dbo => dbo.Selected).ToList();
@@ -148,7 +154,7 @@ namespace MySQL.ForExcel.Forms
         // Fill the related tables and views list.
         _relatedTables.Add(relatedTable);
         var lvi = RelatedTablesListView.Items.Add(relationship.RelatedTableName, relationship.RelatedTableName, 0);
-        lvi.SubItems.Add(relatedTable.RelatedObjectNames);
+        lvi.SubItems.Add(relatedTable.RelatedTableNamesDelimitedList);
         lvi.Tag = relatedTable;
         lvi.Checked = checkAllRelatedTables;
       }
@@ -168,6 +174,39 @@ namespace MySQL.ForExcel.Forms
 
       AddRelatedTablesToRelatedTablesListView(selectedTableOrView, false, true);
       RelatedTablesListView.Sort();
+    }
+
+    /// <summary>
+    /// Adds relationships in the given <see cref="DbTable"/> to the list of relationships to be created, if they do not create a circular reference in the data model.
+    /// </summary>
+    /// <param name="forDbTable">A <see cref="DbTable"/> instance.</param>
+    private void AddRelationshipsAvoidingCircularReferences(DbTable forDbTable)
+    {
+      if (forDbTable == null
+          || _importingTableNames == null
+          || _importingTableNames.Count == 0)
+      {
+        return;
+      }
+
+      var forDbTableRelationships = forDbTable.Relationships.Where(rel => rel.ExistsAmongTablesInList(_importingTableNames)).ToList();
+      if (forDbTableRelationships.Count == 0)
+      {
+        return;
+      }
+
+      if (_relationshipsToCreateList == null)
+      {
+        _relationshipsToCreateList = new List<MySqlDataRelationship>();
+      }
+
+      foreach (var relationship in forDbTableRelationships)
+      {
+        if (!relationship.CheckIfCreatesCircularReference(_relationshipsToCreateList))
+        {
+          _relationshipsToCreateList.Add(relationship);
+        }
+      }
     }
 
     /// <summary>
@@ -201,7 +240,10 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void CreateExcelRelationships()
     {
-      if (!CreateExcelRelationshipsCheckBox.Checked || _relationshipsToCreateList == null || _relationshipsToCreateList.Count <= 0 || _excelTablesDictionary == null)
+      if (!CreateExcelRelationshipsCheckBox.Checked
+          || _relationshipsToCreateList == null
+          || _relationshipsToCreateList.Count == 0
+          || _excelTablesDictionary == null)
       {
         return;
       }
@@ -297,11 +339,10 @@ namespace MySQL.ForExcel.Forms
     /// <returns><c>true</c> if the import is successful, <c>false</c> if errors were found during the import.</returns>
     private void ImportData()
     {
-      _relationshipsToCreateList = new List<MySqlDataRelationship>();
-
       // Import tables data in Excel worksheets
       _excelTablesDictionary = new Dictionary<string, ExcelInterop.ListObject>();
       var fullImportList = _importTablesOrViews.Concat(_relatedTables.Where(dbo => !dbo.Excluded)).ToList();
+      _importingTableNames = fullImportList.Where(dbo => dbo is DbTable).Select(dbo => dbo.Name).ToList();
       foreach (var importTableOrView in fullImportList)
       {
         // Refresh import parameter values
@@ -309,15 +350,16 @@ namespace MySQL.ForExcel.Forms
 
         // Import the table/view data into an Excel worksheet
         var importTuple = importTableOrView.ImportData();
-        if (!(importTuple.Item2 is ExcelInterop.ListObject excelTable) || !(importTableOrView is DbTable dbTable) || !CreateExcelRelationshipsCheckBox.Checked)
+        if (!(importTuple.Item2 is ExcelInterop.ListObject excelTable)
+            || !(importTableOrView is DbTable dbTable)
+            || !CreateExcelRelationshipsCheckBox.Checked)
         {
           continue;
         }
 
         // Add relationships of the current importing
         _excelTablesDictionary.Add(importTuple.Item1.TableName, excelTable);
-        var importedTableNames = fullImportList.Where(dbo => dbo is DbTable).Select(dbo => dbo.Name).ToList();
-        _relationshipsToCreateList.AddRange(dbTable.Relationships.Where(rel => rel.ExistsAmongTablesInList(importedTableNames)));
+        AddRelationshipsAvoidingCircularReferences(dbTable);
       }
     }
 
@@ -408,7 +450,7 @@ namespace MySQL.ForExcel.Forms
         }
 
         // Get the related tables that are not in the original selection so we can fill the Related Tables list view.
-        lvi.SubItems[1].Text = dbTable.RelatedObjectNames;
+        lvi.SubItems[1].Text = dbTable.RelatedTableNamesDelimitedList;
         AddRelatedTablesToRelatedTablesListView(dbTable, checkAllRelatedTables, false);
       }
 

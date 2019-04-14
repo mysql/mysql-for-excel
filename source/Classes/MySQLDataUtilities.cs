@@ -313,6 +313,40 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Checks if a table with the given name is found within relationships in a recursive search following paths in the given relationships list.
+    /// </summary>
+    /// <param name="relationships">A list of relationships to look within for a table name.</param>
+    /// <param name="pivotTableName">The current pivot table from which relationships are searched.</param>
+    /// <param name="toFindTableName">The name of the table to find.</param>
+    /// <returns><c>true</c> if a table with the given name is found within relationships in a recursive search following paths in the given relationships list, <c>false</c> otherwise.</returns>
+    /// <remarks>This is used to find possible circular references within related tables.</remarks>
+    public static bool FindTableInRelationshipsFromPivot(this List<MySqlDataRelationship> relationships, string pivotTableName, string toFindTableName)
+    {
+      if (relationships == null
+          || relationships.Count == 0)
+      {
+        return false;
+      }
+
+      foreach (var relationship in relationships)
+      {
+        var counterPartTable = relationship.GetOtherTable(pivotTableName);
+        if (string.IsNullOrEmpty(counterPartTable))
+        {
+          continue;
+        }
+
+        if (string.Equals(counterPartTable, toFindTableName, StringComparison.OrdinalIgnoreCase)
+            || relationships.Where(r => r != relationship).ToList().FindTableInRelationshipsFromPivot(counterPartTable, toFindTableName))
+        {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    /// <summary>
     /// Gets the array of column names from a given SelectQuery.
     /// </summary>
     /// <param name="selectQuery">The select query to get the array of column names from.</param>

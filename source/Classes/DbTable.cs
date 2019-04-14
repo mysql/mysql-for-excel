@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2014, 2016, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2014, 2019, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -49,9 +49,9 @@ namespace MySQL.ForExcel.Classes
     #region Properties
 
     /// <summary>
-    /// Gets a string containing a comma delimited list of the names of other related <see cref="DbObject"/>s.
+    /// Gets a list of the names of other related <see cref="DbTable"/>s.
     /// </summary>
-    public string RelatedObjectNames
+    public List<string> RelatedTableNames
     {
       get
       {
@@ -60,9 +60,14 @@ namespace MySQL.ForExcel.Classes
           _relationships = GetMySqlRelationships();
         }
 
-        return string.Join(",", _relationships.Select(rel => rel.RelatedTableName).Distinct());
+        return _relationships.Select(rel => rel.RelatedTableName).Distinct().ToList();
       }
     }
+
+    /// <summary>
+    /// Gets a string containing a comma delimited list of the names of other related <see cref="DbTable"/>s.
+    /// </summary>
+    public string RelatedTableNamesDelimitedList => string.Join(",", RelatedTableNames);
 
     /// <summary>
     /// Gets a list of <see cref="MySqlDataRelationship"/> objects representing relationships between this <see cref="DbObject"/> and others.
@@ -117,7 +122,7 @@ namespace MySQL.ForExcel.Classes
       var dt = Connection.GetSchemaInformation(SchemaInformationType.ForeignKeyColumns, true, null, Connection.Schema);
 
       // Detect relationships with Normal direction
-      var rows = dt.Select(string.Format("TABLE_NAME = '{0}'", Name));
+      var rows = dt.Select($"TABLE_NAME = '{Name}'");
       relationshipsList.AddRange(rows.Select(row => new MySqlDataRelationship(MySqlDataRelationship.DirectionType.Normal, row["CONSTRAINT_NAME"].ToString(), row["TABLE_NAME"].ToString(), row["REFERENCED_TABLE_NAME"].ToString(), row["COLUMN_NAME"].ToString(), row["REFERENCED_COLUMN_NAME"].ToString())));
 
       // Detect relationships with Reverse direction where this object is not already defining a Normal direction one

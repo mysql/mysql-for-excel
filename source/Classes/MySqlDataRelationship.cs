@@ -155,6 +155,16 @@ namespace MySQL.ForExcel.Classes
     #endregion Properties
 
     /// <summary>
+    /// Checks whether adding this <see cref="MySqlDataRelationship"/> to the given table of relationships would create a circular reference.
+    /// </summary>
+    /// <param name="relationships">A list of relationships.</param>
+    /// <returns><c>true</c> if adding this <see cref="MySqlDataRelationship"/> to the given table of relationships would create a circular reference, <c>false</c> otherwise.</returns>
+    public bool CheckIfCreatesCircularReference(List<MySqlDataRelationship> relationships)
+    {
+      return relationships.FindTableInRelationshipsFromPivot(TableName, RelatedTableName);
+    }
+
+    /// <summary>
     /// Gets an error message corresponding to the given <see cref="CreationStatus"/>.
     /// </summary>
     /// <param name="creationStatus">A <see cref="CreationStatus"/> value.</param>
@@ -253,8 +263,30 @@ namespace MySQL.ForExcel.Classes
     {
       return tableNames != null
              && Direction == DirectionType.Normal
-             && tableNames.Any(table => string.Equals(table, TableName, StringComparison.InvariantCultureIgnoreCase))
-             && tableNames.Any(table => string.Equals(table, RelatedTableName, StringComparison.InvariantCultureIgnoreCase));
+             && tableNames.Any(table => string.Equals(table, TableName, StringComparison.OrdinalIgnoreCase))
+             && tableNames.Any(table => string.Equals(table, RelatedTableName, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Gets the name of the counterpart table in a relationship if the given table name is found in one side or the other of the relationship.
+    /// </summary>
+    /// <param name="tableName">A table name.</param>
+    /// <returns>The name of the counterpart table in a relationship if the given table name is found in one side or the other of the relationship, or <c>null</c> if not found.</returns>
+    public string GetOtherTable(string tableName)
+    {
+      if (string.IsNullOrEmpty(tableName))
+      {
+        return null;
+      }
+
+      if (TableName.Equals(tableName, StringComparison.OrdinalIgnoreCase))
+      {
+        return RelatedTableName;
+      }
+
+      return RelatedTableName.Equals(tableName, StringComparison.OrdinalIgnoreCase)
+        ? TableName
+        : null;
     }
 
     /// <summary>

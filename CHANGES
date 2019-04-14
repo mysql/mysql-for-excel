@@ -25,6 +25,9 @@
 - The add-in now attempts to scrub connection information for imported tables to check if worksheets changed names and if so, update the connections
   metadata. At the same time connections information for missing/deleted worksheets is removed.
   (MySQL Bug #89387, Bug #27441407 - DATA CANNOT BE LONGER REFRESHED AFTER RENAMING OF EXCEL-SHEETS)
+- Modified the way relationships are created for an Import Data operation for multiple tables, so that relationships among tables that could create a
+  circular reference are not added to the Excel data model.
+  (MySQL Bug #93581, Bug #29050558 - CANNOT CREATE RELATIONSHIPS ON DATA MODEL DURING IMPORT DATA FOR RELATED TABLES)
 
 1.3.7
 - Changed the behavior of how the "First Row Contains Column Names" selection affects the Data Type for columns. The value of the aforementioned checkbox
