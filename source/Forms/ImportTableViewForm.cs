@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
@@ -36,16 +37,6 @@ namespace MySQL.ForExcel.Forms
     #region Fields
 
     /// <summary>
-    ///  The active workbook's max row number.
-    /// </summary>
-    private readonly int _activeWorkbookMaxRowNumber;
-
-    /// <summary>
-    /// The current row we will attempt to import data to.
-    /// </summary>
-    private readonly int _atRow;
-
-    /// <summary>
     /// The type of DB object (MySQL table or view) from which to import data to the active Excel Worksheet.
     /// </summary>
     private readonly DbView _dbTableOrView;
@@ -56,19 +47,14 @@ namespace MySQL.ForExcel.Forms
     private List<string> _importColumns;
 
     /// <summary>
+    /// Information of the rows that can be imported to the active worksheet.
+    /// </summary>
+    private ImportingRowsInfo _importingRowsInfo;
+
+    /// <summary>
     /// Flag indicating whether the returning rows number exceeds the Worksheet's rows maximum limit.
     /// </summary>
     private bool? _rowsExceedWorksheetLimit;
-
-    /// <summary>
-    /// Value indicating the limit of rows to be obtained by the select query.
-    /// </summary>
-    private int? _rowsLimit;
-
-    /// <summary>
-    /// The total rows contained in the MySQL table or view selected for import.
-    /// </summary>
-    private long _totalRowsCount;
 
     #endregion Fields
 
@@ -81,12 +67,9 @@ namespace MySQL.ForExcel.Forms
     {
       _dbTableOrView = importDbTableOrView ?? throw new ArgumentNullException(nameof(importDbTableOrView));
       _importColumns = null;
+      _importingRowsInfo = null;
       _rowsExceedWorksheetLimit = null;
-      _rowsLimit = null;
       MySqlTable = null;
-      _activeWorkbookMaxRowNumber = Globals.ThisAddIn.ActiveWorkbook.GetWorkbookMaxRowNumber();
-      var atCell = Globals.ThisAddIn.Application.ActiveCell;
-      _atRow = atCell?.Row ?? 1;
       InitializeComponent();
 
       PreviewDataGridView.SelectAllAfterBindingComplete = true;
@@ -138,26 +121,10 @@ namespace MySQL.ForExcel.Forms
       {
         if (_rowsExceedWorksheetLimit == null)
         {
-          _rowsExceedWorksheetLimit = ExcelUtilities.CheckIfRowsExceedWorksheetLimit(RowsToReturn < 0 ? _totalRowsCount : RowsToReturn);
+          _rowsExceedWorksheetLimit = ExcelUtilities.CheckIfRowsExceedWorksheetLimit(RowsToReturn < 0 ? _importingRowsInfo.RowsCount : RowsToReturn);
         }
 
         return _rowsExceedWorksheetLimit.Value;
-      }
-    }
-
-    /// <summary>
-    /// Gets a value indicating the limit of rows to be obtained by the select query.
-    /// </summary>
-    private int RowsLimit
-    {
-      get
-      {
-        if (_rowsLimit == null)
-        {
-          _rowsLimit = GetRowsLimit();
-        }
-
-        return _rowsLimit.Value;
       }
     }
 
@@ -185,7 +152,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
     private void AddSummaryFieldsCheckBox_CheckedChanged(object sender, EventArgs e)
     {
-      ResetRowsLimit();
+      RecalculateImportingRowsInformation();
     }
 
     /// <summary>
@@ -205,7 +172,7 @@ namespace MySQL.ForExcel.Forms
 
         if (optionsDialog.ParentFormRequiresLimitRecalculation)
         {
-          ResetRowsLimit();
+          RecalculateImportingRowsInformation();
         }
 
         AddSummaryFieldsCheckBox.Checked = Settings.Default.ImportCreateExcelTable && AddSummaryFieldsCheckBox.Checked;
@@ -222,10 +189,10 @@ namespace MySQL.ForExcel.Forms
       _importColumns = null;
       SetImportParameterValues(Settings.Default.ImportPreviewRowsQuantity);
       PreviewDataGridView.Fill(_dbTableOrView);
-      _totalRowsCount = _dbTableOrView.GetRowsCount();
-      RowsCountSubLabel.Text = _totalRowsCount.ToString(CultureInfo.InvariantCulture);
-      FromRowNumericUpDown.Maximum = _totalRowsCount;
-      ResetRowsLimit();
+      RecalculateImportingRowsInformation();
+      RowsCountSubLabel.Text = _importingRowsInfo.RowsCount.ToString(CultureInfo.CurrentCulture);
+      FromRowNumericUpDown.Maximum = _importingRowsInfo.RowsCount;
+      RecalculateImportingRowsInformation();
       Cursor = Cursors.Default;
     }
 
@@ -236,39 +203,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments</param>
     private void FromRowNumericUpDown_ValueChanged(object sender, EventArgs e)
     {
-      ResetRowsLimit();
-    }
-
-    /// <summary>
-    /// Gets the maximum number of rows that can be fetched from the queried table and that can fit in the target Excel Worksheet.
-    /// </summary>
-    private int GetRowsLimit()
-    {
-      // Calculate the maximum rows that can be fetched (total rows - starting row)
-      var maximumTableRowsToImport = Convert.ToInt32(_totalRowsCount - FromRowNumericUpDown.Value);
-
-      // Calculate the maximum number of rows that can fit in the Worksheet, given the current Excel cell and the maximum rows in the Worksheet.
-      // Note that an extra row has to be subtracted when using Excel tables (ListObjects), an Exception is likely thrown since that extra row could be used to add a summary row.
-      var usingExcelTables = Settings.Default.ImportCreateExcelTable;
-      var headerRowsCount = usingExcelTables || IncludeHeadersCheckBox.Checked ? 1 : 0;
-      var summaryRowsCount = AddSummaryFieldsCheckBox.Checked ? 1 : 0;
-      var extraRowIfUsingExcelTables = usingExcelTables ? 1 : 0;
-      var maximumExcelRowsThatFit = _activeWorkbookMaxRowNumber - _atRow - headerRowsCount - summaryRowsCount - extraRowIfUsingExcelTables;
-
-      // Get the minimum value between the rows that can fit in the Worksheet VS the rows that can be fetched from the table given the start row and the total rows.
-      var rowsLimit = Math.Min(maximumTableRowsToImport, maximumExcelRowsThatFit) + 1;
-      if (rowsLimit < _totalRowsCount)
-      {
-        OptionsWarningLabel.Text = maximumExcelRowsThatFit < maximumTableRowsToImport
-          ? Resources.ImportDataRowsLimitCappedDueWorksheetSpaceWarning
-          : Resources.ImportDataRowsLimitCappedDueStartRowWarning;
-      }
-      else
-      {
-        OptionsWarningLabel.Text = string.Empty;
-      }
-
-      return rowsLimit;
+      RecalculateImportingRowsInformation();
     }
 
     /// <summary>
@@ -305,7 +240,7 @@ namespace MySQL.ForExcel.Forms
       Cursor = Cursors.WaitCursor;
 
       // If the importing data exceeds the number of available rows and no row limit was set we will force it for the Select Query.
-      SetImportParameterValues(RowsExceedWorksheetLimit ? RowsLimit : RowsToReturn);
+      SetImportParameterValues(RowsExceedWorksheetLimit ? (int)_importingRowsInfo.RowsLimit : RowsToReturn);
 
       // Import data into Excel
       var importTuple = _dbTableOrView.ImportData();
@@ -345,7 +280,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
     private void IncludeHeadersCheckBox_CheckedChanged(object sender, EventArgs e)
     {
-      ResetRowsLimit();
+      RecalculateImportingRowsInformation();
     }
 
     /// <summary>
@@ -359,7 +294,7 @@ namespace MySQL.ForExcel.Forms
       var limitRows = LimitRowsCheckBox.Checked;
       FromRowNumericUpDown.Enabled = limitRows;
       RowsLimitNumericUpDown.Enabled = limitRows;
-      ResetRowsLimit();
+      RecalculateImportingRowsInformation();
       if (!limitRows || !RowsLimitNumericUpDown.CanFocus)
       {
         return;
@@ -404,12 +339,14 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Resets the value of the <see cref="RowsLimit"/> property and assigns it to the <see cref="RowsLimitNumericUpDown"/> control's Maximum property.
+    /// Recalculates information for importing rows and assigns the rows limit to the <see cref="RowsLimitNumericUpDown"/> control's Maximum property.
     /// </summary>
-    private void ResetRowsLimit()
+    private void RecalculateImportingRowsInformation()
     {
-      _rowsLimit = null;
-      RowsLimitNumericUpDown.Maximum = RowsLimit;
+      _importingRowsInfo = PreviewDataGridView.DataSource is DataTable dataTable
+        ? ImportingRowsInfo.FromDataTable(dataTable, IncludeHeadersCheckBox.Checked, AddSummaryFieldsCheckBox.Checked, (long)FromRowNumericUpDown.Value)
+        : ImportingRowsInfo.FromRowsCount(_dbTableOrView.GetRowsCount(), IncludeHeadersCheckBox.Checked, AddSummaryFieldsCheckBox.Checked, (long)FromRowNumericUpDown.Value);
+      RowsLimitNumericUpDown.Maximum = _importingRowsInfo.RowsLimit;
       SetCompatibilityWarningControlsVisibility();
     }
 
@@ -460,7 +397,12 @@ namespace MySQL.ForExcel.Forms
       }
 
       // Warning for capping returning rows limit to avoid exceeding the Worksheet's row limit
-      show = RowsLimit < _totalRowsCount;
+      show = _importingRowsInfo.RowsLimit < _importingRowsInfo.RowsCount;
+      OptionsWarningLabel.Text = show
+        ? _importingRowsInfo.MaximumExcelRowsThatFit < _importingRowsInfo.RowsToImport
+          ? Resources.ImportDataRowsLimitCappedDueWorksheetSpaceWarning
+          : Resources.ImportDataRowsLimitCappedDueStartRowWarning
+        :string.Empty;
       OptionsWarningPictureBox.Visible = show;
       OptionsWarningLabel.Visible = show;
     }

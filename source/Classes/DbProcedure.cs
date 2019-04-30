@@ -272,12 +272,24 @@ namespace MySQL.ForExcel.Classes
         var nextTopLeftCell = Globals.ThisAddIn.Application.ActiveCell;
         foreach (var mySqlTable in resultSetsDataSet.Tables.Cast<MySqlDataTable>().Where(mySqlTable => importType != ProcedureResultSetsImportType.SelectedResultSet || selectedResultSetIndex == tableIdx++))
         {
+          var importingMySqlTable = mySqlTable;
+          var excludedColumnIndexes = mySqlTable.Columns.Cast<MySqlDataColumn>().Where(mySqlColumn => mySqlColumn.ExcludeColumn).Select(mySqlColumn => mySqlColumn.Ordinal).ToList();
+          if (excludedColumnIndexes.Count > 0)
+          {
+            importingMySqlTable = new MySqlDataTable(Connection, mySqlTable, mySqlTable.SelectQuery, mySqlTable.ProcedureResultSetIndex);
+            excludedColumnIndexes.Reverse();
+            foreach (var excludedColumnIndex in excludedColumnIndexes)
+            {
+              importingMySqlTable.Columns.RemoveAt(excludedColumnIndex);
+            }
+          }
+
           Globals.ThisAddIn.Application.Goto(nextTopLeftCell, false);
-          mySqlTable.ImportColumnNames = ImportParameters.IncludeColumnNames;
-          mySqlTable.TableName = Name + "." + mySqlTable.TableName;
+          importingMySqlTable.ImportColumnNames = ImportParameters.IncludeColumnNames;
+          importingMySqlTable.TableName = Name + "." + mySqlTable.TableName;
           var excelObj = Settings.Default.ImportCreateExcelTable
-            ? mySqlTable.ImportDataIntoExcelTable(createPivotTable, ExcelUtilities.PivotTablePosition.Right, addSummaryRow)
-            : mySqlTable.ImportDataIntoExcelRange(createPivotTable, ExcelUtilities.PivotTablePosition.Right, addSummaryRow);
+            ? importingMySqlTable.ImportDataIntoExcelTable(createPivotTable, ExcelUtilities.PivotTablePosition.Right, addSummaryRow)
+            : importingMySqlTable.ImportDataIntoExcelRange(createPivotTable, ExcelUtilities.PivotTablePosition.Right, addSummaryRow);
           if (excelObj == null)
           {
             continue;

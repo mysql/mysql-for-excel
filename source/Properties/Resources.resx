@@ -414,12 +414,6 @@ Please re-enter your password to try again.</value>
   <data name="WorkbookInCompatibilityModeWarning" xml:space="preserve">
     <value>Excel Workbook is in Compatibility Mode which has a row limit of 65,536 rows.</value>
   </data>
-  <data name="ImportVerticallyExceedsMaxRowsDetailWarning" xml:space="preserve">
-    <value>Rows in all result sets exceed the limit of 65,536 rows in Compatibility Mode, one or more Result Sets will be truncated.</value>
-  </data>
-  <data name="ImportVerticallyExceedsMaxRowsTitleWarning" xml:space="preserve">
-    <value>Import Exceeds Compatibility Mode Limit</value>
-  </data>
   <data name="UnableToMergeConnectionsErrorDetail" xml:space="preserve">
     <value>MySQL for Excel now works with the connections file used by MySQL Workbench if it is installed.
 

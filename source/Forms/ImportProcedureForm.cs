@@ -16,7 +16,10 @@
 // 02110-1301  USA
 
 using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
@@ -26,6 +29,7 @@ using MySql.Utility.Classes;
 using MySql.Utility.Classes.Logging;
 using MySql.Utility.Classes.Spatial;
 using MySql.Utility.Forms;
+using MySQL.ForExcel.Controls;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
 
 namespace MySQL.ForExcel.Forms
@@ -38,19 +42,34 @@ namespace MySQL.ForExcel.Forms
     #region Fields
 
     /// <summary>
+    /// The Procedure DB object selected by the users to import data from.
+    /// </summary>
+    private readonly DbProcedure _dbProcedure;
+
+    /// <summary>
     /// The <see cref="DataSet"/> containing the tables with all the result sets returned by the MySQL procedure.
     /// </summary>
     private DataSet _importDataSet;
 
     /// <summary>
-    /// The Procedure DB object selected by the users to import data from.
+    /// Information of the rows that can be imported to the active worksheet.
     /// </summary>
-    private DbProcedure _dbProcedure;
+    private List<ImportingRowsInfo> _importingRowsInfo;
 
     /// <summary>
     /// The <see cref="DataSet"/> with a subset of data to import from the procedure's result set to show in the preview grid.
     /// </summary>
     private DataSet _previewDataSet;
+
+    /// <summary>
+    /// The <see cref="DataGridViewCellStyle"/> used for regular cells.
+    /// </summary>
+    private DataGridViewCellStyle _previewGridCellsStyle;
+
+    /// <summary>
+    /// The <see cref="DataGridViewCellStyle"/> used for column headers.
+    /// </summary>
+    private DataGridViewCellStyle _previewGridColumnHeaderCellsStyle;
 
     /// <summary>
     /// Collection of properties of the MySQL procedure's parameters.
@@ -61,16 +80,6 @@ namespace MySQL.ForExcel.Forms
     /// The index of the table representing the result set selected by users.
     /// </summary>
     private int _selectedResultSetIndex;
-
-    /// <summary>
-    /// A value indicating whether the sum of rows in all result sets returned by the procedure exceeds the maximum number of rows in an Excel worksheet open in compatibility mode.
-    /// </summary>
-    private bool _sumOfResultSetsExceedsMaxCompatibilityRows;
-
-    /// <summary>
-    /// A value indicating whether the Excel workbook where data will be imported is open in compatibility mode.
-    /// </summary>
-    private readonly bool _workbookInCompatibilityMode;
 
     #endregion Fields
 
@@ -85,8 +94,6 @@ namespace MySQL.ForExcel.Forms
       _previewDataSet = null;
       _procedureParamsProperties = new PropertiesCollection();
       _selectedResultSetIndex = -1;
-      _sumOfResultSetsExceedsMaxCompatibilityRows = false;
-      _workbookInCompatibilityMode = Globals.ThisAddIn.ActiveWorkbook.Excel8CompatibilityMode;
 
       InitializeComponent();
 
@@ -98,6 +105,7 @@ namespace MySQL.ForExcel.Forms
 
       ImportResultsetsComboBox.InitializeComboBoxFromEnum(DbProcedure.ProcedureResultSetsImportType.SelectedResultSet);
       PrepareParameters();
+      InitializeCellStyles();
     }
 
     #region Properties
@@ -219,17 +227,13 @@ namespace MySQL.ForExcel.Forms
 
         ParametersPropertyGrid.Refresh();
 
+        // Fetch importing rows information
+        _importingRowsInfo = ImportingRowsInfo.FromDataSet(_importDataSet, IncludeHeadersCheckBox.Checked, AddSummaryFieldsCheckBox.Checked);
+
         // Prepare Preview DataSet to show it on Grids
         _previewDataSet = _importDataSet.Clone();
-        var resultSetsRowSum = 0;
         for (var tableIdx = 0; tableIdx < _importDataSet.Tables.Count; tableIdx++)
         {
-          resultSetsRowSum += _importDataSet.Tables[tableIdx].Rows.Count;
-          if (_workbookInCompatibilityMode)
-          {
-            _sumOfResultSetsExceedsMaxCompatibilityRows = _sumOfResultSetsExceedsMaxCompatibilityRows || resultSetsRowSum > ushort.MaxValue;
-          }
-
           var limitRows = Math.Min(_importDataSet.Tables[tableIdx].Rows.Count, Settings.Default.ImportPreviewRowsQuantity);
           for (var rowIdx = 0; rowIdx < limitRows; rowIdx++)
           {
@@ -238,16 +242,20 @@ namespace MySQL.ForExcel.Forms
         }
 
         // Refresh ResultSets in Tab Control
-        ResultSetsDataGridView.DataSource = null;
+        ResultSetsTabControl.TabPages.Cast<TabPage>().ToList().ForEach(tabPage => tabPage.Controls.OfType<DataGridView>().FirstOrDefault()?.Dispose());
         ResultSetsTabControl.TabPages.Clear();
         for (var dtIdx = 0; dtIdx < _importDataSet.Tables.Count; dtIdx++)
         {
-          ResultSetsTabControl.TabPages.Add(_importDataSet.Tables[dtIdx].TableName);
+          var tableName = _previewDataSet.Tables[dtIdx].TableName;
+          var tabPage = new TabPage(tableName);
+          var previewDataGridView = CreateResultSetDataGridView(tableName);
+          tabPage.Controls.Add(previewDataGridView);
+          ResultSetsTabControl.TabPages.Add(tabPage);
+          previewDataGridView.Fill(_previewDataSet.Tables[dtIdx]);
         }
 
         if (ResultSetsTabControl.TabPages.Count > 0)
         {
-          _selectedResultSetIndex = ResultSetsTabControl.SelectedIndex = 0;
           ResultSetsTabControl_SelectedIndexChanged(ResultSetsTabControl, EventArgs.Empty);
         }
       }
@@ -263,6 +271,29 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
+    /// Creates a new <see cref="PreviewDataGridView"/> with the default preview styles.
+    /// </summary>
+    /// <param name="name">The name of the grid view.</param>
+    /// <returns>A new <see cref="PreviewDataGridView"/>.</returns>
+    private PreviewDataGridView CreateResultSetDataGridView(string name)
+    {
+      var resultSetDataGridView = new PreviewDataGridView
+      {
+        ColumnHeadersDefaultCellStyle = _previewGridColumnHeaderCellsStyle,
+        ColumnsMaximumWidth = 200,
+        ColumnsMinimumWidth = 5,
+        DefaultCellStyle = _previewGridCellsStyle,
+        Name = name,
+        TabIndex = 9,
+        Dock = DockStyle.Fill,
+        ContextMenuStrip = GridContextMenuStrip,
+        SelectAllAfterBindingComplete = true
+      };
+      resultSetDataGridView.SelectionChanged += PreviewDataGridViewSelectionChanged;
+      return resultSetDataGridView;
+    }
+
+    /// <summary>
     /// Imports the selected MySQL procedure's result sets into the active <see cref="ExcelInterop.Worksheet"/>.
     /// </summary>
     private bool ImportData()
@@ -273,14 +304,24 @@ namespace MySQL.ForExcel.Forms
         return false;
       }
 
-      if (_sumOfResultSetsExceedsMaxCompatibilityRows && ProcedureResultSetsImportType == DbProcedure.ProcedureResultSetsImportType.AllResultSetsVertically && _importDataSet.Tables.Count > 1)
-      {
-        InfoDialog.ShowDialog(InfoDialogProperties.GetWarningDialogProperties(
-          Resources.ImportVerticallyExceedsMaxRowsTitleWarning,
-          Resources.ImportVerticallyExceedsMaxRowsDetailWarning));
-      }
-
       Cursor = Cursors.WaitCursor;
+
+      foreach (TabPage tabPage in ResultSetsTabControl.TabPages)
+      {
+        var previewGrid = tabPage.Controls.OfType<PreviewDataGridView>().FirstOrDefault();
+        if (previewGrid == null
+            || previewGrid.SelectedColumns.Count == 0
+            || previewGrid.SelectedColumns.Count == previewGrid.Columns.Count
+            || !(_importDataSet.Tables[tabPage.TabIndex] is MySqlDataTable mySqlTable))
+        {
+          continue;
+        }
+
+        foreach (MySqlDataColumn mySqlColumn in mySqlTable.Columns)
+        {
+          mySqlColumn.ExcludeColumn = !previewGrid.Columns[mySqlColumn.Ordinal].Selected;
+        }
+      }
 
       // Refresh import parameter values
       _dbProcedure.ImportParameters.AddSummaryRow = AddSummaryFieldsCheckBox.Checked;
@@ -319,6 +360,50 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
+    /// Event delegate method fired when the <see cref="ImportResultsetsComboBox"/> selected index changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ImportResultsetsComboBox_SelectedIndexChanged(object sender, EventArgs e)
+    {
+      SetCompatibilityWarningControlsVisibility();
+    }
+
+    /// <summary>
+    /// Initializes the styles used for the grid view controls holding result sets.
+    /// </summary>
+    private void InitializeCellStyles()
+    {
+      if (_previewGridColumnHeaderCellsStyle == null)
+      {
+        _previewGridColumnHeaderCellsStyle = new DataGridViewCellStyle
+        {
+          Alignment = DataGridViewContentAlignment.MiddleCenter,
+          BackColor = System.Drawing.SystemColors.InactiveCaption,
+          Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0),
+          ForeColor = System.Drawing.SystemColors.InactiveCaptionText,
+          SelectionBackColor = System.Drawing.SystemColors.Control,
+          SelectionForeColor = System.Drawing.SystemColors.ControlText,
+          WrapMode = DataGridViewTriState.False
+        };
+      }
+
+      if (_previewGridCellsStyle == null)
+      {
+        _previewGridCellsStyle = new DataGridViewCellStyle
+        {
+          Alignment = DataGridViewContentAlignment.MiddleLeft,
+          BackColor = System.Drawing.SystemColors.InactiveCaption,
+          Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0),
+          ForeColor = System.Drawing.SystemColors.ControlText,
+          SelectionBackColor = System.Drawing.SystemColors.Window,
+          SelectionForeColor = System.Drawing.SystemColors.ControlText,
+          WrapMode = DataGridViewTriState.False
+        };
+      }
+    }
+
+    /// <summary>
     /// Prepares the procedure parameters needed to call the MySQL procedure.
     /// </summary>
     private void PrepareParameters()
@@ -338,16 +423,26 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
+    /// Event delegate method fired when a <see cref="PreviewDataGridView"/> changes selection.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void PreviewDataGridViewSelectionChanged(object sender, EventArgs e)
+    {
+      ImportButton.Enabled = ResultSetsTabControl.TabPages.Cast<TabPage>().ToList().Sum(tabPage => tabPage.Controls.OfType<DataGridView>().Sum(grid => grid.SelectedColumns.Count)) > 0;
+    }
+
+    /// <summary>
     /// Resets the position of the splitter dividing parameter names and their values.
     /// </summary>
     private void ResetPropertyGridSplitterPosition()
     {
       var methodInfo = typeof(PropertyGrid).GetMethod("GetPropertyGridView", BindingFlags.NonPublic | BindingFlags.Instance);
-      var gridView = methodInfo.Invoke(ParametersPropertyGrid, new object[] { });
-      methodInfo = gridView.GetType().GetMethod("MoveSplitterTo", BindingFlags.NonPublic | BindingFlags.Instance);
+      var gridView = methodInfo?.Invoke(ParametersPropertyGrid, new object[] { });
+      methodInfo = gridView?.GetType().GetMethod("MoveSplitterTo", BindingFlags.NonPublic | BindingFlags.Instance);
       var parametersTextWidth = _dbProcedure.GetMaxParameterNameLength(ParametersPropertyGrid.Font);
       var newPosition = parametersTextWidth + 30;
-      methodInfo.Invoke(gridView, new object[] { newPosition });
+      methodInfo?.Invoke(gridView, new object[] { newPosition });
     }
 
     /// <summary>
@@ -362,22 +457,87 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      _selectedResultSetIndex = ResultSetsTabControl.SelectedIndex;
-      ResultSetsTabControl.TabPages[_selectedResultSetIndex].Controls.Add(ResultSetsDataGridView);
-      ResultSetsDataGridView.Dock = DockStyle.Fill;
-      ResultSetsDataGridView.Fill(_previewDataSet.Tables[_selectedResultSetIndex]);
-      var cappingAtMaxCompatRows = _workbookInCompatibilityMode && _importDataSet.Tables[_selectedResultSetIndex].Rows.Count > ushort.MaxValue;
-      SetCompatibilityWarning(cappingAtMaxCompatRows);
+      RowsCountSubLabel.Text = _importingRowsInfo[ResultSetsTabControl.SelectedIndex].RowsCount.ToString(CultureInfo.CurrentCulture);
+      SetCompatibilityWarningControlsVisibility();
     }
 
     /// <summary>
-    /// Shows or hides the Excel worksheet in compatibility mode warning controls.
+    /// Event delegate method fired when the <see cref="SelectAllToolStripMenuItem"/> context menu item is clicked.
     /// </summary>
-    /// <param name="show"></param>
-    private void SetCompatibilityWarning(bool show)
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void SelectAllToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      OptionsWarningLabel.Visible = show;
+      if (!(sender is ToolStripMenuItem toolStripMenuItem))
+      {
+        return;
+      }
+
+      if (!(toolStripMenuItem.Owner is ContextMenuStrip contextMenuStrip))
+      {
+        return;
+      }
+
+      if (!(contextMenuStrip.SourceControl is PreviewDataGridView previewDataGridView))
+      {
+        return;
+      }
+
+      previewDataGridView.SelectAll();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the <see cref="SelectNoneToolStripMenuItem"/> context menu item is clicked.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void SelectNoneToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      if (!(sender is ToolStripMenuItem toolStripMenuItem))
+      {
+        return;
+      }
+
+      if (!(toolStripMenuItem.Owner is ContextMenuStrip contextMenuStrip))
+      {
+        return;
+      }
+
+      if (!(contextMenuStrip.SourceControl is PreviewDataGridView previewDataGridView))
+      {
+        return;
+      }
+
+      previewDataGridView.ClearSelection();
+    }
+
+    /// <summary>
+    /// Shows or hides the compatibility warning controls to let the users know if the rows to be imported exceed the limit of rows of the current Excel Worksheet.
+    /// </summary>
+    private void SetCompatibilityWarningControlsVisibility()
+    {
+      long totalRowsCount = 0;
+      if (_importingRowsInfo != null)
+      {
+        switch (ProcedureResultSetsImportType)
+        {
+          case DbProcedure.ProcedureResultSetsImportType.AllResultSetsHorizontally:
+            totalRowsCount = _importingRowsInfo.Max(info => info.RowsCount);
+            break;
+
+          case DbProcedure.ProcedureResultSetsImportType.AllResultSetsVertically:
+            totalRowsCount = _importingRowsInfo.Sum(info => info.RowsCount) + _importingRowsInfo.Count - 1;
+            break;
+
+          case DbProcedure.ProcedureResultSetsImportType.SelectedResultSet:
+            totalRowsCount = _importingRowsInfo[ResultSetsTabControl.SelectedIndex].RowsCount;
+            break;
+        }
+      }
+
+      var show = ExcelUtilities.CheckIfRowsExceedWorksheetLimit(totalRowsCount);
       OptionsWarningPictureBox.Visible = show;
+      OptionsWarningLabel.Visible = show;
     }
   }
 }

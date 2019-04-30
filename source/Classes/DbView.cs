@@ -148,7 +148,7 @@ namespace MySQL.ForExcel.Classes
         return string.Empty;
       }
 
-      const string bigRowCountLimit = "18446744073709551615";
+      const string BIG_ROW_COUNT_LIMIT = "18446744073709551615";
       var queryStringBuilder = new StringBuilder("SELECT ");
       if (ImportParameters.ColumnsNamesList == null || ImportParameters.ColumnsNamesList.Count == 0)
       {
@@ -167,7 +167,7 @@ namespace MySQL.ForExcel.Classes
       queryStringBuilder.AppendFormat(" FROM `{0}`.`{1}`", Connection.Schema, Name);
       if (ImportParameters.FirstRowIndex > 0)
       {
-        var strCount = ImportParameters.RowsCount >= 0 ? ImportParameters.RowsCount.ToString(CultureInfo.InvariantCulture) : bigRowCountLimit;
+        var strCount = ImportParameters.RowsCount >= 0 ? ImportParameters.RowsCount.ToString(CultureInfo.InvariantCulture) : BIG_ROW_COUNT_LIMIT;
         queryStringBuilder.AppendFormat(" LIMIT {0},{1}", ImportParameters.FirstRowIndex, strCount);
       }
       else if (ImportParameters.RowsCount >= 0)

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2017, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2019, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -56,8 +56,7 @@ namespace MySQL.ForExcel.Forms
     /// </summary>
     private void InitializeComponent()
     {
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-      System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+      this.components = new System.ComponentModel.Container();
       this.ImportButton = new System.Windows.Forms.Button();
       this.DialogCancelButton = new System.Windows.Forms.Button();
       this.CallButton = new System.Windows.Forms.Button();
@@ -80,13 +79,17 @@ namespace MySQL.ForExcel.Forms
       this.AdvancedOptionsButton = new System.Windows.Forms.Button();
       this.CreatePivotTableCheckBox = new System.Windows.Forms.CheckBox();
       this.AddSummaryFieldsCheckBox = new System.Windows.Forms.CheckBox();
-      this.ResultSetsDataGridView = new MySQL.ForExcel.Controls.PreviewDataGridView();
+      this.GridContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.SelectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.SelectNoneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.RowsCountSubLabel = new System.Windows.Forms.Label();
+      this.RowsCountMainLabel = new System.Windows.Forms.Label();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.ColumnOptionsPictureBox)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.ProcedureParametersPictureBox)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.OptionsWarningPictureBox)).BeginInit();
-      ((System.ComponentModel.ISupportInitialize)(this.ResultSetsDataGridView)).BeginInit();
+      this.GridContextMenuStrip.SuspendLayout();
       this.SuspendLayout();
       // 
       // FootnoteAreaPanel
@@ -96,6 +99,8 @@ namespace MySQL.ForExcel.Forms
       // 
       // ContentAreaPanel
       // 
+      this.ContentAreaPanel.Controls.Add(this.RowsCountSubLabel);
+      this.ContentAreaPanel.Controls.Add(this.RowsCountMainLabel);
       this.ContentAreaPanel.Controls.Add(this.AddSummaryFieldsCheckBox);
       this.ContentAreaPanel.Controls.Add(this.CreatePivotTableCheckBox);
       this.ContentAreaPanel.Controls.Add(this.OptionsWarningLabel);
@@ -114,16 +119,15 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.ProcedureNameLabel);
       this.ContentAreaPanel.Controls.Add(this.ProcedureParametersMainLabel);
       this.ContentAreaPanel.Controls.Add(this.ProcedureParametersPictureBox);
-      this.ContentAreaPanel.Controls.Add(this.ResultSetsDataGridView);
       this.ContentAreaPanel.Controls.Add(this.SubSetOfDataLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(846, 646);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(846, 616);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.AdvancedOptionsButton);
       this.CommandAreaPanel.Controls.Add(this.ImportButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 601);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 571);
       this.CommandAreaPanel.Size = new System.Drawing.Size(846, 45);
       // 
       // ImportButton
@@ -195,6 +199,7 @@ namespace MySQL.ForExcel.Forms
       this.ImportResultsetsComboBox.Name = "ImportResultsetsComboBox";
       this.ImportResultsetsComboBox.Size = new System.Drawing.Size(216, 23);
       this.ImportResultsetsComboBox.TabIndex = 9;
+      this.ImportResultsetsComboBox.SelectedIndexChanged += new System.EventHandler(this.ImportResultsetsComboBox_SelectedIndexChanged);
       // 
       // ImportResultsetsLabel
       // 
@@ -305,11 +310,11 @@ namespace MySQL.ForExcel.Forms
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.ResultSetsTabControl.Font = new System.Drawing.Font("Segoe UI", 9F);
-      this.ResultSetsTabControl.Location = new System.Drawing.Point(82, 299);
+      this.ResultSetsTabControl.Location = new System.Drawing.Point(82, 314);
       this.ResultSetsTabControl.Name = "ResultSetsTabControl";
       this.ResultSetsTabControl.SelectedIndex = 0;
-      this.ResultSetsTabControl.Size = new System.Drawing.Size(676, 238);
-      this.ResultSetsTabControl.TabIndex = 12;
+      this.ResultSetsTabControl.Size = new System.Drawing.Size(676, 175);
+      this.ResultSetsTabControl.TabIndex = 15;
       this.ResultSetsTabControl.SelectedIndexChanged += new System.EventHandler(this.ResultSetsTabControl_SelectedIndexChanged);
       // 
       // OptionsWarningLabel
@@ -319,10 +324,10 @@ namespace MySQL.ForExcel.Forms
       this.OptionsWarningLabel.BackColor = System.Drawing.SystemColors.Window;
       this.OptionsWarningLabel.Font = new System.Drawing.Font("Segoe UI", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.OptionsWarningLabel.ForeColor = System.Drawing.Color.Red;
-      this.OptionsWarningLabel.Location = new System.Drawing.Point(104, 545);
+      this.OptionsWarningLabel.Location = new System.Drawing.Point(104, 500);
       this.OptionsWarningLabel.Name = "OptionsWarningLabel";
       this.OptionsWarningLabel.Size = new System.Drawing.Size(76, 12);
-      this.OptionsWarningLabel.TabIndex = 13;
+      this.OptionsWarningLabel.TabIndex = 16;
       this.OptionsWarningLabel.Text = "Warning Message";
       this.OptionsWarningLabel.Visible = false;
       // 
@@ -331,7 +336,7 @@ namespace MySQL.ForExcel.Forms
       this.OptionsWarningPictureBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.OptionsWarningPictureBox.BackColor = System.Drawing.SystemColors.Window;
       this.OptionsWarningPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.Warning;
-      this.OptionsWarningPictureBox.Location = new System.Drawing.Point(82, 540);
+      this.OptionsWarningPictureBox.Location = new System.Drawing.Point(82, 495);
       this.OptionsWarningPictureBox.Name = "OptionsWarningPictureBox";
       this.OptionsWarningPictureBox.Size = new System.Drawing.Size(20, 20);
       this.OptionsWarningPictureBox.TabIndex = 26;
@@ -345,10 +350,10 @@ namespace MySQL.ForExcel.Forms
       this.SubSetOfDataLabel.BackColor = System.Drawing.Color.Transparent;
       this.SubSetOfDataLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.SubSetOfDataLabel.ForeColor = System.Drawing.SystemColors.InactiveCaption;
-      this.SubSetOfDataLabel.Location = new System.Drawing.Point(434, 542);
+      this.SubSetOfDataLabel.Location = new System.Drawing.Point(434, 497);
       this.SubSetOfDataLabel.Name = "SubSetOfDataLabel";
       this.SubSetOfDataLabel.Size = new System.Drawing.Size(319, 15);
-      this.SubSetOfDataLabel.TabIndex = 14;
+      this.SubSetOfDataLabel.TabIndex = 17;
       this.SubSetOfDataLabel.Text = "This is a small subset of the data for preview purposes only.";
       // 
       // AdvancedOptionsButton
@@ -381,35 +386,57 @@ namespace MySQL.ForExcel.Forms
       this.AddSummaryFieldsCheckBox.Location = new System.Drawing.Point(395, 271);
       this.AddSummaryFieldsCheckBox.Name = "AddSummaryFieldsCheckBox";
       this.AddSummaryFieldsCheckBox.Size = new System.Drawing.Size(135, 19);
-      this.AddSummaryFieldsCheckBox.TabIndex = 32;
+      this.AddSummaryFieldsCheckBox.TabIndex = 12;
       this.AddSummaryFieldsCheckBox.Text = "Add Summary Fields";
       this.AddSummaryFieldsCheckBox.UseVisualStyleBackColor = true;
       // 
-      // ResultSetsDataGridView
+      // GridContextMenuStrip
       // 
-      dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-      dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.InactiveCaption;
-      dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.InactiveCaptionText;
-      dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Control;
-      dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.ResultSetsDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-      this.ResultSetsDataGridView.ColumnsMaximumWidth = 200;
-      this.ResultSetsDataGridView.ColumnsMinimumWidth = 5;
-      dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-      dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.InactiveCaption;
-      dataGridViewCellStyle2.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Window;
-      dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.ControlText;
-      dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-      this.ResultSetsDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
-      this.ResultSetsDataGridView.DisableColumnsSelection = true;
-      this.ResultSetsDataGridView.Location = new System.Drawing.Point(82, 299);
-      this.ResultSetsDataGridView.Name = "ResultSetsDataGridView";
-      this.ResultSetsDataGridView.Size = new System.Drawing.Size(676, 238);
-      this.ResultSetsDataGridView.TabIndex = 9;
+      this.GridContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.SelectAllToolStripMenuItem,
+            this.SelectNoneToolStripMenuItem});
+      this.GridContextMenuStrip.Name = "GridContextMenuStrip";
+      this.GridContextMenuStrip.Size = new System.Drawing.Size(138, 48);
+      // 
+      // SelectAllToolStripMenuItem
+      // 
+      this.SelectAllToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
+      this.SelectAllToolStripMenuItem.Name = "SelectAllToolStripMenuItem";
+      this.SelectAllToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+      this.SelectAllToolStripMenuItem.Text = "Select All";
+      this.SelectAllToolStripMenuItem.Click += new System.EventHandler(this.SelectAllToolStripMenuItem_Click);
+      // 
+      // SelectNoneToolStripMenuItem
+      // 
+      this.SelectNoneToolStripMenuItem.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_ExportDlg_ColumnOptions_32x32;
+      this.SelectNoneToolStripMenuItem.Name = "SelectNoneToolStripMenuItem";
+      this.SelectNoneToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+      this.SelectNoneToolStripMenuItem.Text = "Select None";
+      this.SelectNoneToolStripMenuItem.Click += new System.EventHandler(this.SelectNoneToolStripMenuItem_Click);
+      // 
+      // RowsCountSubLabel
+      // 
+      this.RowsCountSubLabel.AutoSize = true;
+      this.RowsCountSubLabel.BackColor = System.Drawing.Color.Transparent;
+      this.RowsCountSubLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.RowsCountSubLabel.ForeColor = System.Drawing.Color.Navy;
+      this.RowsCountSubLabel.Location = new System.Drawing.Point(177, 296);
+      this.RowsCountSubLabel.Name = "RowsCountSubLabel";
+      this.RowsCountSubLabel.Size = new System.Drawing.Size(13, 15);
+      this.RowsCountSubLabel.TabIndex = 14;
+      this.RowsCountSubLabel.Text = "0";
+      // 
+      // RowsCountMainLabel
+      // 
+      this.RowsCountMainLabel.AutoSize = true;
+      this.RowsCountMainLabel.BackColor = System.Drawing.Color.Transparent;
+      this.RowsCountMainLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.RowsCountMainLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+      this.RowsCountMainLabel.Location = new System.Drawing.Point(84, 296);
+      this.RowsCountMainLabel.Name = "RowsCountMainLabel";
+      this.RowsCountMainLabel.Size = new System.Drawing.Size(69, 15);
+      this.RowsCountMainLabel.TabIndex = 13;
+      this.RowsCountMainLabel.Text = "Row Count:";
       // 
       // ImportProcedureForm
       // 
@@ -417,23 +444,26 @@ namespace MySQL.ForExcel.Forms
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(846, 646);
+      this.ClientSize = new System.Drawing.Size(846, 616);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
       this.MainInstructionLocation = new System.Drawing.Point(11, 15);
-      this.MinimumSize = new System.Drawing.Size(862, 640);
+      this.MinimumSize = new System.Drawing.Size(862, 655);
       this.Name = "ImportProcedureForm";
       this.Text = "Import Data";
       this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ImportProcedureForm_FormClosing);
       this.Load += new System.EventHandler(this.ImportProcedureForm_Load);
+      this.Controls.SetChildIndex(this.FootnoteAreaPanel, 0);
+      this.Controls.SetChildIndex(this.ContentAreaPanel, 0);
+      this.Controls.SetChildIndex(this.CommandAreaPanel, 0);
       this.ContentAreaPanel.ResumeLayout(false);
       this.ContentAreaPanel.PerformLayout();
       this.CommandAreaPanel.ResumeLayout(false);
       ((System.ComponentModel.ISupportInitialize)(this.ColumnOptionsPictureBox)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.ProcedureParametersPictureBox)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.OptionsWarningPictureBox)).EndInit();
-      ((System.ComponentModel.ISupportInitialize)(this.ResultSetsDataGridView)).EndInit();
+      this.GridContextMenuStrip.ResumeLayout(false);
       this.ResumeLayout(false);
 
     }
@@ -456,12 +486,16 @@ namespace MySQL.ForExcel.Forms
     private System.Windows.Forms.PictureBox ProcedureParametersPictureBox;
     private System.Windows.Forms.Label ImportDataLabel;
     private System.Windows.Forms.TabControl ResultSetsTabControl;
-    private PreviewDataGridView ResultSetsDataGridView;
     private System.Windows.Forms.Label OptionsWarningLabel;
     private System.Windows.Forms.PictureBox OptionsWarningPictureBox;
     private System.Windows.Forms.Label SubSetOfDataLabel;
     private System.Windows.Forms.Button AdvancedOptionsButton;
     private System.Windows.Forms.CheckBox CreatePivotTableCheckBox;
     private System.Windows.Forms.CheckBox AddSummaryFieldsCheckBox;
+    private System.Windows.Forms.ContextMenuStrip GridContextMenuStrip;
+    private System.Windows.Forms.ToolStripMenuItem SelectAllToolStripMenuItem;
+    private System.Windows.Forms.ToolStripMenuItem SelectNoneToolStripMenuItem;
+    private System.Windows.Forms.Label RowsCountSubLabel;
+    private System.Windows.Forms.Label RowsCountMainLabel;
   }
 }

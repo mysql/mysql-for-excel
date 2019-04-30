@@ -28,6 +28,8 @@
 - Modified the way relationships are created for an Import Data operation for multiple tables, so that relationships among tables that could create a
   circular reference are not added to the Excel data model.
   (MySQL Bug #93581, Bug #29050558 - CANNOT CREATE RELATIONSHIPS ON DATA MODEL DURING IMPORT DATA FOR RELATED TABLES)
+- The Import Data dialog for stored procedures now allows to select individual columns to be imported from each of the returned result sets, in a similar
+  way the importing functionality works for tables and views. (Bug #16239029 - IMPORT PROCEDURE DATA - INDIVIDUAL COLUMNS SELECTION SHOULD BE ALLOWED)
 
 1.3.7
 - Changed the behavior of how the "First Row Contains Column Names" selection affects the Data Type for columns. The value of the aforementioned checkbox
