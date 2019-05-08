@@ -305,6 +305,7 @@ namespace MySQL.ForExcel.Controls
       }
 
       SelectionMode = DataGridViewSelectionMode.FullColumnSelect;
+      SelectAll();
     }
 
     /// <summary>

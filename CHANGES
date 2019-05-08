@@ -30,6 +30,9 @@
   (MySQL Bug #93581, Bug #29050558 - CANNOT CREATE RELATIONSHIPS ON DATA MODEL DURING IMPORT DATA FOR RELATED TABLES)
 - The Import Data dialog for stored procedures now allows to select individual columns to be imported from each of the returned result sets, in a similar
   way the importing functionality works for tables and views. (Bug #16239029 - IMPORT PROCEDURE DATA - INDIVIDUAL COLUMNS SELECTION SHOULD BE ALLOWED)
+- Set the limit of preview rows for Import and Edit Data operations to 100 rows for consistency. The max limit was previously 1000 in the advanced options
+  for the Import Data operation (which defeats the purpose of "previewing a small amount of data"), but was correctly set to 100 in the Preview Data dialog
+  shown for Edit Data operations. (MySQL Bug #95267, Bug #29745518 - VALUE OF '300' IS NOT VALID FOR 'VALUE' ERROR WHEN TRYING TO EDIT A TABLE'S DATA)
 
 1.3.7
 - Changed the behavior of how the "First Row Contains Column Names" selection affects the Data Type for columns. The value of the aforementioned checkbox

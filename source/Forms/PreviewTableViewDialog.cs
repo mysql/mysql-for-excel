@@ -29,6 +29,15 @@ namespace MySQL.ForExcel.Forms
   /// </summary>
   public partial class PreviewTableViewDialog : AutoStyleableBaseDialog
   {
+    #region Constants
+
+    /// <summary>
+    /// The maximum number of preview rows used for importing data into Excel.
+    /// </summary>
+    public const int MAXIMUM_PREVIEW_ROWS_NUMBER = 100; 
+
+    #endregion Constants
+
     #region Fields
 
     /// <summary>
@@ -56,7 +65,7 @@ namespace MySQL.ForExcel.Forms
 
       PreviewDataGridView.SelectAllAfterBindingComplete = true;
       InitializeDialogButtons(showCancelButton);
-      RowsNumericUpDown.Value = Settings.Default.ImportPreviewRowsQuantity;
+      RowsNumericUpDown.Value = Math.Min(MAXIMUM_PREVIEW_ROWS_NUMBER, Settings.Default.ImportPreviewRowsQuantity);
       TableNameMainLabel.Text = previewTableOrView is DbTable ? "Table Name" : "View Name";
       TableNameSubLabel.Text = previewTableOrView.Name;
       FillPreviewGrid();

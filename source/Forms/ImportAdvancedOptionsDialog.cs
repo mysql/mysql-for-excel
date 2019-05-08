@@ -144,7 +144,7 @@ namespace MySQL.ForExcel.Forms
       }
       else
       {
-        PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewRowsQuantityNumericUpDown.Maximum, Settings.Default.ImportPreviewRowsQuantity);
+        PreviewRowsQuantityNumericUpDown.Value = Math.Min(PreviewTableViewDialog.MAXIMUM_PREVIEW_ROWS_NUMBER, Settings.Default.ImportPreviewRowsQuantity);
         EscapeFormulaValuesCheckBox.Checked = Settings.Default.ImportEscapeFormulaTextValues;
         CreateExcelTableCheckbox.Checked = Settings.Default.ImportCreateExcelTable;
         UseStyleComboBox.Text = Settings.Default.ImportExcelTableStyleName;

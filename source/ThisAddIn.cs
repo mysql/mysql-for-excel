@@ -1283,6 +1283,7 @@ namespace MySQL.ForExcel
     {
       ConvertSettingsStoredMappingsCasing();
       AdjustSettingsForBulkInserts();
+      SetMaximumPreviewRowsNumber();
     }
 
     /// <summary>
@@ -1313,6 +1314,23 @@ namespace MySQL.ForExcel
         // Add new EditConnectionInfo in memory collection to serialized collection
         activeEditConnectionInfo.LastAccess = DateTime.Now;
       }
+    }
+
+    /// <summary>
+    /// Sets the maximum allowed number for previewing rows in import and edit data operations if it was previously set beyond the limit.
+    /// </summary>
+    private void SetMaximumPreviewRowsNumber()
+    {
+      // Check if settings file exists, if it does not flag the conversion as done since it was not needed.
+      var settings = new MySqlForExcelSettings();
+      if (!File.Exists(settings.SettingsPath)
+          || Settings.Default.ImportPreviewRowsQuantity <= PreviewTableViewDialog.MAXIMUM_PREVIEW_ROWS_NUMBER)
+      {
+        return;
+      }
+
+      Settings.Default.ImportPreviewRowsQuantity = PreviewTableViewDialog.MAXIMUM_PREVIEW_ROWS_NUMBER;
+      MiscUtilities.SaveSettings();
     }
 
     /// <summary>

@@ -134,11 +134,6 @@ namespace MySQL.ForExcel.Forms
       // 
       this.PreviewRowsQuantityNumericUpDown.Font = new System.Drawing.Font("Segoe UI", 9F);
       this.PreviewRowsQuantityNumericUpDown.Location = new System.Drawing.Point(111, 47);
-      this.PreviewRowsQuantityNumericUpDown.Maximum = new decimal(new int[] {
-            1000,
-            0,
-            0,
-            0});
       this.PreviewRowsQuantityNumericUpDown.Minimum = new decimal(new int[] {
             1,
             0,
@@ -343,7 +338,7 @@ namespace MySQL.ForExcel.Forms
       this.FormattingTabPage.Location = new System.Drawing.Point(4, 24);
       this.FormattingTabPage.Name = "FormattingTabPage";
       this.FormattingTabPage.Padding = new System.Windows.Forms.Padding(3);
-      this.FormattingTabPage.Size = new System.Drawing.Size(543, 248);
+      this.FormattingTabPage.Size = new System.Drawing.Size(626, 264);
       this.FormattingTabPage.TabIndex = 1;
       this.FormattingTabPage.Text = "Formatting";
       this.FormattingTabPage.UseVisualStyleBackColor = true;
@@ -401,7 +396,7 @@ namespace MySQL.ForExcel.Forms
       this.ExcelTablesTabPage.Controls.Add(this.ExcelTableOptionsLabel);
       this.ExcelTablesTabPage.Location = new System.Drawing.Point(4, 24);
       this.ExcelTablesTabPage.Name = "ExcelTablesTabPage";
-      this.ExcelTablesTabPage.Size = new System.Drawing.Size(543, 248);
+      this.ExcelTablesTabPage.Size = new System.Drawing.Size(626, 264);
       this.ExcelTablesTabPage.TabIndex = 2;
       this.ExcelTablesTabPage.Text = "Excel Tables";
       this.ExcelTablesTabPage.UseVisualStyleBackColor = true;
