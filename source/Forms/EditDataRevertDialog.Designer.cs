@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2019, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -58,31 +58,35 @@ namespace MySQL.ForExcel.Forms
       // 
       // FootnoteAreaPanel
       // 
-      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 292);
-      this.FootnoteAreaPanel.Size = new System.Drawing.Size(634, 0);
+      this.FootnoteAreaPanel.Location = new System.Drawing.Point(0, 691);
+      this.FootnoteAreaPanel.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
+      this.FootnoteAreaPanel.Size = new System.Drawing.Size(1426, 0);
       // 
       // ContentAreaPanel
       // 
       this.ContentAreaPanel.Controls.Add(this.OperationSummaryLabel);
       this.ContentAreaPanel.Controls.Add(this.LogoPictureBox);
       this.ContentAreaPanel.Controls.Add(this.RevertDataLabel);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(484, 151);
+      this.ContentAreaPanel.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(717, 244);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.RefreshDataButton);
       this.CommandAreaPanel.Controls.Add(this.RevertDataButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
-      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 106);
-      this.CommandAreaPanel.Size = new System.Drawing.Size(484, 45);
+      this.CommandAreaPanel.Location = new System.Drawing.Point(0, 175);
+      this.CommandAreaPanel.Margin = new System.Windows.Forms.Padding(6, 8, 6, 8);
+      this.CommandAreaPanel.Size = new System.Drawing.Size(717, 69);
       // 
       // OperationSummaryLabel
       // 
       this.OperationSummaryLabel.AutoSize = true;
       this.OperationSummaryLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.OperationSummaryLabel.Location = new System.Drawing.Point(92, 56);
+      this.OperationSummaryLabel.Location = new System.Drawing.Point(138, 86);
+      this.OperationSummaryLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
       this.OperationSummaryLabel.Name = "OperationSummaryLabel";
-      this.OperationSummaryLabel.Size = new System.Drawing.Size(341, 30);
+      this.OperationSummaryLabel.Size = new System.Drawing.Size(516, 50);
       this.OperationSummaryLabel.TabIndex = 26;
       this.OperationSummaryLabel.Text = "Reverting changes or refreshing data from the DB will cause\r\nyour changes to be l" +
     "ost. Click on the buttons below to proceed.";
@@ -90,10 +94,10 @@ namespace MySQL.ForExcel.Forms
       // LogoPictureBox
       // 
       this.LogoPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.MySQLforExcel_Logo_64x64;
-      this.LogoPictureBox.Location = new System.Drawing.Point(21, 22);
-      this.LogoPictureBox.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+      this.LogoPictureBox.Location = new System.Drawing.Point(32, 34);
+      this.LogoPictureBox.Margin = new System.Windows.Forms.Padding(4, 6, 4, 6);
       this.LogoPictureBox.Name = "LogoPictureBox";
-      this.LogoPictureBox.Size = new System.Drawing.Size(64, 64);
+      this.LogoPictureBox.Size = new System.Drawing.Size(96, 98);
       this.LogoPictureBox.TabIndex = 27;
       this.LogoPictureBox.TabStop = false;
       // 
@@ -102,9 +106,10 @@ namespace MySQL.ForExcel.Forms
       this.RevertDataLabel.AutoSize = true;
       this.RevertDataLabel.Font = new System.Drawing.Font("Segoe UI", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.RevertDataLabel.ForeColor = System.Drawing.Color.Navy;
-      this.RevertDataLabel.Location = new System.Drawing.Point(91, 29);
+      this.RevertDataLabel.Location = new System.Drawing.Point(136, 45);
+      this.RevertDataLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
       this.RevertDataLabel.Name = "RevertDataLabel";
-      this.RevertDataLabel.Size = new System.Drawing.Size(87, 20);
+      this.RevertDataLabel.Size = new System.Drawing.Size(132, 31);
       this.RevertDataLabel.TabIndex = 25;
       this.RevertDataLabel.Text = "Revert Data";
       // 
@@ -112,9 +117,10 @@ namespace MySQL.ForExcel.Forms
       // 
       this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.DialogCancelButton.Location = new System.Drawing.Point(397, 11);
+      this.DialogCancelButton.Location = new System.Drawing.Point(587, 17);
+      this.DialogCancelButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
       this.DialogCancelButton.Name = "DialogCancelButton";
-      this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
+      this.DialogCancelButton.Size = new System.Drawing.Size(112, 35);
       this.DialogCancelButton.TabIndex = 0;
       this.DialogCancelButton.Text = "Cancel";
       this.DialogCancelButton.UseVisualStyleBackColor = true;
@@ -123,9 +129,10 @@ namespace MySQL.ForExcel.Forms
       // 
       this.RevertDataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.RevertDataButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.RevertDataButton.Location = new System.Drawing.Point(235, 11);
+      this.RevertDataButton.Location = new System.Drawing.Point(344, 17);
+      this.RevertDataButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
       this.RevertDataButton.Name = "RevertDataButton";
-      this.RevertDataButton.Size = new System.Drawing.Size(156, 23);
+      this.RevertDataButton.Size = new System.Drawing.Size(234, 35);
       this.RevertDataButton.TabIndex = 1;
       this.RevertDataButton.Text = "Revert Changed Data";
       this.RevertDataButton.UseVisualStyleBackColor = true;
@@ -135,9 +142,10 @@ namespace MySQL.ForExcel.Forms
       // 
       this.RefreshDataButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.RefreshDataButton.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.RefreshDataButton.Location = new System.Drawing.Point(85, 11);
+      this.RefreshDataButton.Location = new System.Drawing.Point(119, 17);
+      this.RefreshDataButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
       this.RefreshDataButton.Name = "RefreshDataButton";
-      this.RefreshDataButton.Size = new System.Drawing.Size(144, 23);
+      this.RefreshDataButton.Size = new System.Drawing.Size(216, 35);
       this.RefreshDataButton.TabIndex = 2;
       this.RefreshDataButton.Text = "Refresh Data from DB";
       this.RefreshDataButton.UseVisualStyleBackColor = true;
@@ -145,16 +153,13 @@ namespace MySQL.ForExcel.Forms
       // 
       // EditDataRevertDialog
       // 
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(484, 151);
+      this.ClientSize = new System.Drawing.Size(717, 244);
       this.CommandAreaVisible = true;
-      this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
       this.FootnoteAreaHeight = 0;
-      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
-      this.MaximumSize = new System.Drawing.Size(500, 190);
-      this.MinimumSize = new System.Drawing.Size(500, 190);
+      this.Margin = new System.Windows.Forms.Padding(9, 12, 9, 12);
       this.Name = "EditDataRevertDialog";
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
       this.Text = "MySQL for Excel";

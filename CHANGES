@@ -33,6 +33,8 @@
 - Set the limit of preview rows for Import and Edit Data operations to 100 rows for consistency. The max limit was previously 1000 in the advanced options
   for the Import Data operation (which defeats the purpose of "previewing a small amount of data"), but was correctly set to 100 in the Preview Data dialog
   shown for Edit Data operations. (MySQL Bug #95267, Bug #29745518 - VALUE OF '300' IS NOT VALID FOR 'VALUE' ERROR WHEN TRYING TO EDIT A TABLE'S DATA)
+- Fixed the automatic scaling of visual elements when the OS is configured with a DPI settings different than 100%.
+  (MySQL Bug #81003, Bug #23218058 - AUTO-SCALING PER DPI SETTING NOT WORKING PROPERLY IN 1.3.6 RELEASE)
 
 1.3.7
 - Changed the behavior of how the "First Row Contains Column Names" selection affects the Data Type for columns. The value of the aforementioned checkbox

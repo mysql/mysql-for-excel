@@ -30,6 +30,8 @@ using MySQL.ForExcel.Structs;
 using MySql.Utility.Classes;
 using MySql.Utility.Classes.Logging;
 using MySql.Utility.Classes.MySqlWorkbench;
+using MySql.Utility.Classes.VisualStyles;
+using MySql.Utility.Forms;
 
 namespace MySQL.ForExcel.Controls
 {
@@ -1347,7 +1349,10 @@ namespace MySQL.ForExcel.Controls
         return;
       }
 
-      var tex = new TvItemEx(TVIF_HANDLE | TVIF_INTEGRAL, node.Handle, heightMultiplier);
+      var currentDpiMultiplier = AutoStyleableBaseForm.HandleDpiSizeConversions
+        ? (int) (heightMultiplier * this.GetDpiScaleY())
+        : heightMultiplier;
+      var tex = new TvItemEx(TVIF_HANDLE | TVIF_INTEGRAL, node.Handle, currentDpiMultiplier);
       var ptr = Marshal.AllocHGlobal(Marshal.SizeOf(tex));
       Marshal.StructureToPtr(tex, ptr, false);
       MiscUtilities.SendMessage(Handle, TVM_SETITEM, IntPtr.Zero, ptr);

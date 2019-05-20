@@ -78,7 +78,7 @@ namespace MySQL.ForExcel.Panels
       }
 
       // Load connections just obtained from Workbench or locally created
-      foreach (var conn in MySqlWorkbench.Connections.OrderBy(conn => conn.Name).Where(conn => !conn.IsUnknownConnection && !conn.IsFabricManaged))
+      foreach (var conn in MySqlWorkbench.Connections.OrderBy(conn => conn.Name).Where(conn => !conn.IsUnknownConnection))
       {
         conn.SetAdditionalConnectionProperties();
         AddConnectionToList(conn);

@@ -402,6 +402,7 @@ namespace MySQL.ForExcel
       // Note that in Excel 2007 and 2010 a MDI model is used so only a single Excel pane is instantiated, whereas in Excel 2013 and greater
       //  a SDI model is used instead, so an Excel pane is instantiated for each custom task pane appearing in each Excel window.
       var excelPane = new ExcelAddInPane { Dock = DockStyle.Fill };
+      var paneWidth = excelPane.Width;
       excelPane.SizeChanged += ExcelPane_SizeChanged;
       ExcelPanesList.Add(excelPane);
 
@@ -410,7 +411,7 @@ namespace MySQL.ForExcel
       activeCustomPane.VisibleChanged += CustomTaskPaneVisibleChanged;
       activeCustomPane.DockPosition = MsoCTPDockPosition.msoCTPDockPositionRight;
       activeCustomPane.DockPositionRestrict = MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoHorizontal;
-      activeCustomPane.Width = ADD_IN_MIN_PANE_WIDTH;
+      activeCustomPane.Width = Math.Max(ADD_IN_MIN_PANE_WIDTH, paneWidth);
 
       // First run if no Excel panes have been opened yet.
       if (firstRun)
@@ -1119,6 +1120,7 @@ namespace MySQL.ForExcel
       InfoDialog.ErrorLogo = Resources.MySQLforExcel_InfoDlg_Error_64x64;
       InfoDialog.WarningLogo = Resources.MySQLforExcel_InfoDlg_Warning_64x64;
       InfoDialog.InformationLogo = Resources.MySQLforExcel_Logo_64x64;
+      AutoStyleableBaseForm.HandleDpiSizeConversions = true;
       PasswordDialog.ApplicationIcon = Resources.mysql_for_excel;
       PasswordDialog.SecurityLogo = Resources.MySQLforExcel_Security;
     }
