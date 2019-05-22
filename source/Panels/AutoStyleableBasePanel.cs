@@ -93,32 +93,6 @@ namespace MySQL.ForExcel.Panels
     }
 
     /// <summary>
-    /// Event delegate method fired when a <see cref="Label"/> control is being painted.
-    /// </summary>
-    /// <param name="sender">A <see cref="Label"/> control object.</param>
-    /// <param name="e">Event arguments.</param>
-    protected void Label_Paint(object sender, PaintEventArgs e)
-    {
-      if (!(sender is Label label))
-      {
-        return;
-      }
-
-      // Get the actual size of rectangle needed for all of text.
-      var fullSize = e.Graphics.MeasureString(label.Text, label.Font);
-
-      // Set a tooltip if not all text fits in label's size.
-      if (fullSize.Width > label.Width || fullSize.Height > label.Height)
-      {
-        LabelsToolTip.SetToolTip(label, label.Text);
-      }
-      else
-      {
-        LabelsToolTip.SetToolTip(label, null);
-      }
-    }
-
-    /// <summary>
     /// Raises the <see cref="System.Windows.Forms.UserControl.Load"/> event.
     /// </summary>
     /// <param name="e">Event arguments.</param>

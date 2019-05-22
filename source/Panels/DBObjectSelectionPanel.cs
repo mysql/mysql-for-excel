@@ -62,11 +62,6 @@ namespace MySQL.ForExcel.Panels
       LoadedTables = new List<DbTable>();
       LoadedViews = new List<DbView>();
       InitializeComponent();
-
-      ConnectionNameLabel.Paint += Label_Paint;
-      UserIPLabel.Paint += Label_Paint;
-      SchemaLabel.Paint += Label_Paint;
-
       InheritFontToControlsExceptionList.AddRange(new[]
       {
         ExportToNewTableHotLabel.Name,
@@ -186,8 +181,9 @@ namespace MySQL.ForExcel.Panels
       _wbConnection = connection;
       _wbConnection.Schema = schema;
       ConnectionNameLabel.Text = _wbConnection.Name;
-      UserIPLabel.Text = $@"User: {_wbConnection.UserName}, IP: {_wbConnection.Host}";
-      SchemaLabel.Text = $@"Schema: {_wbConnection.Schema}";
+      UserLabel.Text = connection.UserName;
+      ConnectionInfoLabel.Text = connection.DisplayConnectionSummaryText;
+      SchemaLabel.Text = _wbConnection.Schema;
       DBObjectsFilter.Width = DBObjectList.Width;
       var schemasLoadedSuccessfully = RefreshDbObjectsList(true);
       RefreshActionLabelsEnabledStatus(null, false);

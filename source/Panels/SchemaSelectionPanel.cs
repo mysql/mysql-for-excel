@@ -59,8 +59,6 @@ namespace MySQL.ForExcel.Panels
 
       DisplaySchemaCollationsToolStripMenuItem.Checked = Settings.Default.SchemasDisplayCollations;
       SetItemsAppearance(false);
-      ConnectionNameLabel.Paint += Label_Paint;
-      UserIPLabel.Paint += Label_Paint;
       InheritFontToControlsExceptionList.Add(SelectSchemaHotLabel.Name);
       InheritFontToControlsExceptionList.Add(CreateNewSchemaHotLabel.Name);
       LoadedSchemas = new List<DbSchema>();
@@ -86,7 +84,8 @@ namespace MySQL.ForExcel.Panels
       _filter = string.Empty;
       _wbConnection = connection;
       ConnectionNameLabel.Text = connection.Name;
-      UserIPLabel.Text = $@"User: {connection.UserName}, IP: {connection.Host}";
+      UserLabel.Text = connection.UserName;
+      ConnectionInfoLabel.Text = connection.DisplayConnectionSummaryText;
       var schemasLoaded = LoadSchemas();
       if (schemasLoaded)
       {

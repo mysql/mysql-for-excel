@@ -2104,6 +2104,16 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap network_light {
+            get {
+                object obj = ResourceManager.GetObject("network_light", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Created the MySQL Schema `{0}` successfully..
         /// </summary>
         internal static string NewSchemaCreatedSuccessfullyText {
@@ -2493,6 +2503,16 @@ namespace MySQL.ForExcel.Properties {
         internal static string ReviewSqlQueryRevertTitle {
             get {
                 return ResourceManager.GetString("ReviewSqlQueryRevertTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap schema_light {
+            get {
+                object obj = ResourceManager.GetObject("schema_light", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -2945,6 +2965,16 @@ namespace MySQL.ForExcel.Properties {
         internal static string UnsupportedClientCharSetError {
             get {
                 return ResourceManager.GetString("UnsupportedClientCharSetError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap user_light {
+            get {
+                object obj = ResourceManager.GetObject("user_light", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         

@@ -65,8 +65,7 @@ namespace MySQL.ForExcel.Classes
     public MySqlListViewNode(MySqlWorkbenchConnection connection, bool excludeFromMultiSelection = false)
       : this(connection.Name, string.Empty, MySqlNodeType.Connection, excludeFromMultiSelection)
     {
-      var hostName = connection.GetHostNameForConnectionSubtitle();
-      Subtitle = $"User: {connection.UserName}, Host: {hostName}:{connection.Port}";
+      Subtitle = $"User: {connection.UserName}, Host: {connection.DisplayConnectionSummaryText}";
       WbConnection = connection;
     }
 

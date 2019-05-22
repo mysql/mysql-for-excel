@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2019, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -70,8 +70,11 @@ namespace MySQL.ForExcel.Panels
       this.RefreshSchemasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.CreateNewSchemaHotLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.UpperPanel = new System.Windows.Forms.Panel();
+      this.ConnectionInfoLabel = new System.Windows.Forms.Label();
+      this.ConnectionPictureBox = new System.Windows.Forms.PictureBox();
+      this.UserPictureBox = new System.Windows.Forms.PictureBox();
       this.SeparatorImage = new MySQL.ForExcel.Controls.TransparentPictureBox();
-      this.UserIPLabel = new System.Windows.Forms.Label();
+      this.UserLabel = new System.Windows.Forms.Label();
       this.SchemaFilter = new MySQL.ForExcel.Controls.SearchEdit();
       this.SelectSchemaHotLabel = new MySQL.ForExcel.Controls.HotLabel();
       this.InstructionsLabel = new MySQL.ForExcel.Controls.TransparentLabel();
@@ -79,6 +82,8 @@ namespace MySQL.ForExcel.Panels
       this.MainLogoPictureBox = new System.Windows.Forms.PictureBox();
       this.SchemasContextMenuStrip.SuspendLayout();
       this.UpperPanel.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.ConnectionPictureBox)).BeginInit();
+      ((System.ComponentModel.ISupportInitialize)(this.UserPictureBox)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.MainLogoPictureBox)).BeginInit();
       this.SuspendLayout();
       // 
@@ -96,7 +101,7 @@ namespace MySQL.ForExcel.Panels
       this.BackButton.Location = new System.Drawing.Point(95, 599);
       this.BackButton.Name = "BackButton";
       this.BackButton.Size = new System.Drawing.Size(75, 23);
-      this.BackButton.TabIndex = 7;
+      this.BackButton.TabIndex = 4;
       this.BackButton.Text = "< Back";
       this.BackButton.UseVisualStyleBackColor = true;
       this.BackButton.Click += new System.EventHandler(this.BackButton_Click);
@@ -109,7 +114,7 @@ namespace MySQL.ForExcel.Panels
       this.NextButton.Location = new System.Drawing.Point(176, 599);
       this.NextButton.Name = "NextButton";
       this.NextButton.Size = new System.Drawing.Size(75, 23);
-      this.NextButton.TabIndex = 8;
+      this.NextButton.TabIndex = 5;
       this.NextButton.Text = "Next >";
       this.NextButton.UseVisualStyleBackColor = true;
       this.NextButton.Click += new System.EventHandler(this.NextButton_Click);
@@ -121,7 +126,7 @@ namespace MySQL.ForExcel.Panels
       this.OptionsButton.Location = new System.Drawing.Point(9, 599);
       this.OptionsButton.Name = "OptionsButton";
       this.OptionsButton.Size = new System.Drawing.Size(75, 23);
-      this.OptionsButton.TabIndex = 6;
+      this.OptionsButton.TabIndex = 3;
       this.OptionsButton.Text = "Options";
       this.OptionsButton.UseVisualStyleBackColor = true;
       this.OptionsButton.Click += new System.EventHandler(this.OptionsButton_Click);
@@ -152,7 +157,7 @@ namespace MySQL.ForExcel.Panels
       this.SchemasList.ScaleImages = false;
       this.SchemasList.ShowNodeToolTips = true;
       this.SchemasList.Size = new System.Drawing.Size(242, 325);
-      this.SchemasList.TabIndex = 23;
+      this.SchemasList.TabIndex = 1;
       this.SchemasList.TextHorizontalOffset = 3;
       this.SchemasList.TitleColorOpacity = 0.8D;
       this.SchemasList.TitleTextVerticalOffset = 0;
@@ -207,7 +212,7 @@ namespace MySQL.ForExcel.Panels
       this.CreateNewSchemaHotLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.CreateNewSchemaHotLabel.Name = "CreateNewSchemaHotLabel";
       this.CreateNewSchemaHotLabel.Size = new System.Drawing.Size(237, 28);
-      this.CreateNewSchemaHotLabel.TabIndex = 15;
+      this.CreateNewSchemaHotLabel.TabIndex = 2;
       this.CreateNewSchemaHotLabel.Title = "Create New Schema";
       this.CreateNewSchemaHotLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.CreateNewSchemaHotLabel.TitleColorOpacity = 0.95D;
@@ -223,8 +228,11 @@ namespace MySQL.ForExcel.Panels
       // 
       this.UpperPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+      this.UpperPanel.Controls.Add(this.ConnectionInfoLabel);
+      this.UpperPanel.Controls.Add(this.ConnectionPictureBox);
+      this.UpperPanel.Controls.Add(this.UserPictureBox);
       this.UpperPanel.Controls.Add(this.SeparatorImage);
-      this.UpperPanel.Controls.Add(this.UserIPLabel);
+      this.UpperPanel.Controls.Add(this.UserLabel);
       this.UpperPanel.Controls.Add(this.SchemaFilter);
       this.UpperPanel.Controls.Add(this.SelectSchemaHotLabel);
       this.UpperPanel.Controls.Add(this.InstructionsLabel);
@@ -233,7 +241,39 @@ namespace MySQL.ForExcel.Panels
       this.UpperPanel.Location = new System.Drawing.Point(0, 0);
       this.UpperPanel.Name = "UpperPanel";
       this.UpperPanel.Size = new System.Drawing.Size(260, 222);
-      this.UpperPanel.TabIndex = 27;
+      this.UpperPanel.TabIndex = 0;
+      // 
+      // ConnectionInfoLabel
+      // 
+      this.ConnectionInfoLabel.AutoEllipsis = true;
+      this.ConnectionInfoLabel.AutoSize = true;
+      this.ConnectionInfoLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.ConnectionInfoLabel.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+      this.ConnectionInfoLabel.Location = new System.Drawing.Point(83, 44);
+      this.ConnectionInfoLabel.Name = "ConnectionInfoLabel";
+      this.ConnectionInfoLabel.Size = new System.Drawing.Size(91, 13);
+      this.ConnectionInfoLabel.TabIndex = 2;
+      this.ConnectionInfoLabel.Text = "Connection info";
+      // 
+      // ConnectionPictureBox
+      // 
+      this.ConnectionPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.network_light;
+      this.ConnectionPictureBox.Location = new System.Drawing.Point(64, 46);
+      this.ConnectionPictureBox.Name = "ConnectionPictureBox";
+      this.ConnectionPictureBox.Size = new System.Drawing.Size(13, 11);
+      this.ConnectionPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+      this.ConnectionPictureBox.TabIndex = 35;
+      this.ConnectionPictureBox.TabStop = false;
+      // 
+      // UserPictureBox
+      // 
+      this.UserPictureBox.Image = global::MySQL.ForExcel.Properties.Resources.user_light;
+      this.UserPictureBox.Location = new System.Drawing.Point(64, 29);
+      this.UserPictureBox.Name = "UserPictureBox";
+      this.UserPictureBox.Size = new System.Drawing.Size(13, 11);
+      this.UserPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+      this.UserPictureBox.TabIndex = 34;
+      this.UserPictureBox.TabStop = false;
       // 
       // SeparatorImage
       // 
@@ -245,17 +285,19 @@ namespace MySQL.ForExcel.Panels
       this.SeparatorImage.Opacity = 0.3F;
       this.SeparatorImage.ScaleImage = false;
       this.SeparatorImage.Size = new System.Drawing.Size(242, 21);
-      this.SeparatorImage.TabIndex = 33;
+      this.SeparatorImage.TabIndex = 4;
       // 
-      // UserIPLabel
+      // UserLabel
       // 
-      this.UserIPLabel.AutoEllipsis = true;
-      this.UserIPLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.UserIPLabel.Location = new System.Drawing.Point(61, 28);
-      this.UserIPLabel.Name = "UserIPLabel";
-      this.UserIPLabel.Size = new System.Drawing.Size(190, 18);
-      this.UserIPLabel.TabIndex = 28;
-      this.UserIPLabel.Text = "User: ??, IP: ??";
+      this.UserLabel.AutoEllipsis = true;
+      this.UserLabel.AutoSize = true;
+      this.UserLabel.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.UserLabel.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+      this.UserLabel.Location = new System.Drawing.Point(83, 27);
+      this.UserLabel.Name = "UserLabel";
+      this.UserLabel.Size = new System.Drawing.Size(61, 13);
+      this.UserLabel.TabIndex = 1;
+      this.UserLabel.Text = "User name";
       // 
       // SchemaFilter
       // 
@@ -272,7 +314,7 @@ namespace MySQL.ForExcel.Panels
       this.SchemaFilter.SearchFiredOnLeave = false;
       this.SchemaFilter.SearchImage = global::MySQL.ForExcel.Properties.Resources.ExcelAddinFilter;
       this.SchemaFilter.Size = new System.Drawing.Size(242, 21);
-      this.SchemaFilter.TabIndex = 32;
+      this.SchemaFilter.TabIndex = 6;
       this.SchemaFilter.TextColor = System.Drawing.SystemColors.ControlText;
       this.SchemaFilter.SearchFired += new System.EventHandler(this.SchemaFilter_SearchFired);
       // 
@@ -299,7 +341,7 @@ namespace MySQL.ForExcel.Panels
       this.SelectSchemaHotLabel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.SelectSchemaHotLabel.Name = "SelectSchemaHotLabel";
       this.SelectSchemaHotLabel.Size = new System.Drawing.Size(237, 28);
-      this.SelectSchemaHotLabel.TabIndex = 31;
+      this.SelectSchemaHotLabel.TabIndex = 5;
       this.SelectSchemaHotLabel.Title = "Select a Database Schema";
       this.SelectSchemaHotLabel.TitleColor = System.Drawing.SystemColors.WindowText;
       this.SelectSchemaHotLabel.TitleColorOpacity = 0.95D;
@@ -323,7 +365,7 @@ namespace MySQL.ForExcel.Panels
       this.InstructionsLabel.ShadowOpacity = 0.7D;
       this.InstructionsLabel.ShadowPixelsXOffset = 0;
       this.InstructionsLabel.Size = new System.Drawing.Size(241, 53);
-      this.InstructionsLabel.TabIndex = 29;
+      this.InstructionsLabel.TabIndex = 3;
       this.InstructionsLabel.TextOpacity = 0.6D;
       this.InstructionsLabel.TransparentText = "Please select the MySQL schema you want to work with. Each schema can hold a coll" +
     "ection of tables that store data, views that hold selected data and routines tha" +
@@ -336,7 +378,7 @@ namespace MySQL.ForExcel.Panels
       this.ConnectionNameLabel.Location = new System.Drawing.Point(61, 8);
       this.ConnectionNameLabel.Name = "ConnectionNameLabel";
       this.ConnectionNameLabel.Size = new System.Drawing.Size(190, 18);
-      this.ConnectionNameLabel.TabIndex = 27;
+      this.ConnectionNameLabel.TabIndex = 0;
       this.ConnectionNameLabel.Text = "Connection Name";
       // 
       // MainLogoPictureBox
@@ -362,6 +404,9 @@ namespace MySQL.ForExcel.Panels
       this.Size = new System.Drawing.Size(260, 625);
       this.SchemasContextMenuStrip.ResumeLayout(false);
       this.UpperPanel.ResumeLayout(false);
+      this.UpperPanel.PerformLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.ConnectionPictureBox)).EndInit();
+      ((System.ComponentModel.ISupportInitialize)(this.UserPictureBox)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.MainLogoPictureBox)).EndInit();
       this.ResumeLayout(false);
 
@@ -379,12 +424,15 @@ namespace MySQL.ForExcel.Panels
     private System.Windows.Forms.ToolStripMenuItem RefreshSchemasToolStripMenuItem;
     private System.Windows.Forms.Panel UpperPanel;
     private TransparentPictureBox SeparatorImage;
-    private System.Windows.Forms.Label UserIPLabel;
+    private System.Windows.Forms.Label UserLabel;
     private SearchEdit SchemaFilter;
     private HotLabel SelectSchemaHotLabel;
     private TransparentLabel InstructionsLabel;
     private System.Windows.Forms.Label ConnectionNameLabel;
     private System.Windows.Forms.PictureBox MainLogoPictureBox;
     private System.Windows.Forms.ToolStripMenuItem DisplaySchemaCollationsToolStripMenuItem;
+    private System.Windows.Forms.Label ConnectionInfoLabel;
+    private System.Windows.Forms.PictureBox ConnectionPictureBox;
+    private System.Windows.Forms.PictureBox UserPictureBox;
   }
 }

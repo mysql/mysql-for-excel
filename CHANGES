@@ -35,6 +35,11 @@
   shown for Edit Data operations. (MySQL Bug #95267, Bug #29745518 - VALUE OF '300' IS NOT VALID FOR 'VALUE' ERROR WHEN TRYING TO EDIT A TABLE'S DATA)
 - Fixed the automatic scaling of visual elements when the OS is configured with a DPI settings different than 100%.
   (MySQL Bug #81003, Bug #23218058 - AUTO-SCALING PER DPI SETTING NOT WORKING PROPERLY IN 1.3.6 RELEASE)
+- Connections using SSL are now supported by MySQL for Excel. These connections may be created from MySQL Workbench or also specifying SSL options can be
+  done from MySQL for Excel. SSH tunneled connections are also supported now, the tunnel is created automatically and no need to have an intermediate
+  proxy software to create the tunnel, just the way also MySQL Workbench transparently works. (Bug #18550080 - SUPPORT FOR SSL CONNECTIONS TO MYSQL)
+- MySQL Fabric or other unknown connections are no longer shown by MySQL for Excel. Also SSH tunneled connections and connections using SSL are not
+  disabled anymore in MySQL for Excel. (MySQL Bug #86229, Bug #26025950 - MYSQL SERVER CONNECTION SHOWS FABRIC AND OTHER UNAVAILABLE CONNECTION METHODS)
 
 1.3.7
 - Changed the behavior of how the "First Row Contains Column Names" selection affects the Data Type for columns. The value of the aforementioned checkbox

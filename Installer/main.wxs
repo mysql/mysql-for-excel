@@ -58,6 +58,7 @@
               <File Id="MySql.Utility" Name="MySQL.Utility.dll" Source="..\Source\bin\Release\MySQL.Utility.dll" />
               <File Id="MySql.Utility.RegularExpressions" Name="MySql.Utility.RegularExpressions.dll" Source="..\Source\bin\Release\MySql.Utility.RegularExpressions.dll" />
               <File Id="MySql.Data" Name="MySql.Data.dll" Source="..\Source\bin\Release\MySql.Data.dll" />
+              <File Id="Renci.SshNet" Name="Renci.SshNet.dll" Source="..\Source\bin\Release\Renci.SshNet.dll" />
               <File Id="v40Utilities" Name="Microsoft.Office.Tools.Common.v4.0.Utilities.dll" Source="..\Source\bin\Release\Microsoft.Office.Tools.Common.v4.0.Utilities.dll" />
               <File Id="VSTOFile" Name="MySQL.ForExcel.vsto" Source="..\Source\bin\Release\MySQL.ForExcel.vsto" />
               <File Id="AddIn" Name="MySQL.ForExcel.dll" KeyPath="yes" Source="..\Source\bin\Release\MySQL.ForExcel.dll" />

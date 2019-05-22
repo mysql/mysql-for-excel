@@ -568,31 +568,6 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
-    /// Gets the host name used in connection nodes.
-    /// </summary>
-    /// <param name="connection">MySQL Workbench connection to a MySQL server instance selected by users.</param>
-    /// <returns>The host string for connection nodes subtitles.</returns>
-    public static string GetHostNameForConnectionSubtitle(this MySqlWorkbenchConnection connection)
-    {
-      if (connection == null)
-      {
-        return string.Empty;
-      }
-
-      var isSsh = connection.ConnectionMethod == MySqlWorkbenchConnection.ConnectionMethodType.Ssh;
-      var hostName = (connection.Host ?? string.Empty).Trim();
-      if (!isSsh)
-      {
-        return hostName;
-      }
-
-      var sshConnection = connection.HostIdentifier.Split('@');
-      var dbHost = sshConnection[1].Split(':')[0].Trim();
-      hostName = dbHost + @" (SSH)";
-      return hostName;
-    }
-
-    /// <summary>
     /// Gets the total count of affected rows within the given list of rows with statements of a given type.
     /// </summary>
     /// <param name="rowsList">The list of <see cref="IMySqlDataRow"/> objects holding <see cref="MySqlStatement"/>s.</param>
