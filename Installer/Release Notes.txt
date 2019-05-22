@@ -1,3 +1,33 @@
+MySQL for Excel 1.3.8 Release Notes
+------------------------------------
+
+Welcome to the release notes for MySQL for Excel 1.3.8
+
+* Connections using SSL are now supported by MySQL for Excel. These connections may be created from
+  MySQL Workbench or also specifying SSL options can be done from MySQL for Excel. SSH tunneled
+  connections are also supported now, the tunnel is created automatically and no need to have an
+  intermediate software to create the tunnel, just the way also MySQL Workbench transparently works.
+* Added a new advanced setting to the Import Data dialog called "Import all floating-point data using a
+  DECIMAL data type". This option is used to import all floating-point data as DECIMAL to prevent seeing
+  differences between stored numbers in the database and how they are imported to Excel. This behavior
+  affects FLOAT and DOUBLE data types, which follow the IEEE-754 standard and are stored as an
+  approximate value. DECIMAL data is stored as an exact value.
+* Added a new global option for Edit Sessions called "Tolerance for FLOAT and DOUBLE comparisons in
+  WHERE clause", which is used along with the "Use optimistic updates on all Edit Data sessions" option.
+  Now WHERE clauses for optimistic updates use something like "??float_or_double_column?? BETWEEN
+  [some_float_or_double_value]-[epsilon_tolerance] AND [some_float_or_double_value]+[epsilon_tolerance]"
+  which allows for a proper row matching in the database. This option does not have any effect if the
+  "Import all floating-point data using a DECIMAL data type" option for Import Data operations is used.
+* Fixed a bug (only present when connecting to MySQL 8 Servers) where fetching schema information for
+  columns returns the rows in alphabetical order instead of ordinal order.
+* Fixed a bug where MySQL for Excel was creating a new blank workbook when it shouldn't.
+* Fixed the automatic scaling of visual elements when the OS is configured with a DPI settings different
+  than 100%.
+* Other bug fixes (for a complete list refer to the CHANGES file).
+
+
+
+
 MySQL for Excel 1.3.7 Release Notes
 ------------------------------------
 
