@@ -420,16 +420,18 @@ namespace MySQL.ForExcel
       }
 
       // Ensure active Workbook has been initialized
-      InitializeWorkbook(ActiveWorkbook);
-
-      // Restore the links in Excel tables containing imported MySQL data so they can be refreshed
-      if (!Settings.Default.GlobalImportDataRestoreWhenOpeningWorkbook)
+      var initialized = InitializeWorkbook(ActiveWorkbook);
+      if (initialized)
       {
-        WorkbookConnectionInfos.RestoreImportConnectionInfos(ActiveWorkbook);
-      }
+        // Restore the links in Excel tables containing imported MySQL data so they can be refreshed
+        if (!Settings.Default.GlobalImportDataRestoreWhenOpeningWorkbook)
+        {
+          WorkbookConnectionInfos.RestoreImportConnectionInfos(ActiveWorkbook);
+        }
 
-      // Ask users about restoring Edit Data sessions that were open when the active Workbook was last saved
-      ShowOpenEditConnectionInfosDialog(ActiveWorkbook);
+        // Ask users about restoring Edit Data sessions that were open when the active Workbook was last saved
+        ShowOpenEditConnectionInfosDialog(ActiveWorkbook);
+      }
 
       Application.Cursor = ExcelInterop.XlMousePointer.xlDefault;
       return activeCustomPane;
@@ -1255,17 +1257,13 @@ namespace MySQL.ForExcel
     /// Method used to initialize a <see cref="ExcelInterop.Workbook" /> when it is opened or created.
     /// </summary>
     /// <param name="workbook">The <see cref="ExcelInterop.Workbook" /> being opened.</param>
-    private void InitializeWorkbook(ExcelInterop.Workbook workbook)
+    /// <returns><c>true</c> if the workbook is not new and was initialized, <c>false</c> otherwise.</returns>
+    private bool InitializeWorkbook(ExcelInterop.Workbook workbook)
     {
-      if (workbook == null)
-      {
-        return;
-      }
-
-      // When it is a new workbook it won't have any ConnectionInfo objects related to it, so we could skip the rest of the method altogether.
       if (workbook.IsNew())
       {
-        return;
+        // When it is a new workbook it won't have any ConnectionInfo objects related to it, so we could skip the rest of the method altogether.
+        return false;
       }
 
       // Restore the links in Excel tables containing imported MySQL data so they can be refreshed
@@ -1276,6 +1274,7 @@ namespace MySQL.ForExcel
 
       // Automatically delete ConnectionInfos that have a non-existent Excel Workbook.
       WorkbookConnectionInfos.DeleteUserSettingsConnectionInfosWithNonExistentWorkbook(true);
+      return true;
     }
 
     /// <summary>
