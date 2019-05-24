@@ -473,7 +473,7 @@ namespace MySQL.ForExcel.Classes
         var columnRequiresQuotes = column.MySqlDataType.RequiresQuotesForValue;
         var columnIsText = column.MySqlDataType.IsChar || column.MySqlDataType.IsText || column.MySqlDataType.IsSetOrEnum;
         var columnIsJson = column.MySqlDataType.IsJson;
-        var columnIsFloatOrDouble = column.MySqlDataType.IsFloatingPoint;
+        var columnIsFloatOrDouble = column.ServerDataType.IsFloatingPoint;
         var valueToDb = column.GetStringValue(this[column.ColumnName, DataRowVersion.Original], out var updatingValueIsNull);
         var wrapValueCharacter = columnRequiresQuotes && !updatingValueIsNull ? "'" : string.Empty;
         var valueForClause = string.Format("{0}{1}{0}", wrapValueCharacter, valueToDb);

@@ -217,7 +217,6 @@ namespace MySQL.ForExcel.Forms
       CreateNewWorksheetsRadioButton.Checked = !ReuseWorksheetsRadioButton.Checked;
       ShowingSidebarRadioButton.Checked = !OpeningWorkbookRadioButton.Checked;
       _manageConnectionInfosDialog?.RefreshControlValues(useDefaultValues);
-      ToleranceForFloatAndDoubleTextBox.ReadOnly = UseOptimisticUpdatesCheckBox.Checked;
     }
 
     /// <summary>
@@ -299,7 +298,7 @@ namespace MySQL.ForExcel.Forms
     /// <param name="e">Event arguments.</param>
     private void UseOptimisticUpdatesCheckBox_CheckedChanged(object sender, EventArgs e)
     {
-      ToleranceForFloatAndDoubleTextBox.ReadOnly = UseOptimisticUpdatesCheckBox.Checked;
+      ToleranceForFloatAndDoubleTextBox.ReadOnly = !UseOptimisticUpdatesCheckBox.Checked;
     }
   }
 }

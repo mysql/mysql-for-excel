@@ -2405,26 +2405,15 @@ namespace MySQL.ForExcel.Classes
         }
 
         var dataType = columnInfoRow["Type"].ToString();
-        if ((OperationType.IsForImport() || OperationType.IsForEdit())
-            && Settings.Default.ImportFloatingPointDataAsDecimal)
-        {
-          if (dataType.StartsWith("float", StringComparison.OrdinalIgnoreCase))
-          {
-            dataType = $"Decimal{dataType.Substring(5)}";
-          }
-          else if (dataType.StartsWith("double", StringComparison.OrdinalIgnoreCase))
-          {
-            dataType = $"Decimal{dataType.Substring(6)}";
-          }
-        }
-
         var allowNulls = columnInfoRow["Null"].ToString() == "YES";
         var keyInfo = columnInfoRow["Key"].ToString();
         var defaultValue = columnInfoRow["Default"].ToString();
         var charSet = columnInfoRow["CharSet"].ToString();
         var collation = columnInfoRow["Collation"].ToString();
         var extraInfo = columnInfoRow["Extra"].ToString();
-        var column = new MySqlDataColumn(colName, dataType, charSet, collation, false, allowNulls, keyInfo, defaultValue, extraInfo);
+        var treatFloatAndDoubleAsDecimal = (OperationType.IsForImport() || OperationType.IsForEdit())
+                                           && Settings.Default.ImportFloatingPointDataAsDecimal;
+        var column = new MySqlDataColumn(colName, dataType, charSet, collation, false, allowNulls, keyInfo, defaultValue, extraInfo, treatFloatAndDoubleAsDecimal);
         column.PropertyChanged += ColumnPropertyValueChanged;
         Columns.Add(column);
         column.SubscribeToParentTablePropertyChange();

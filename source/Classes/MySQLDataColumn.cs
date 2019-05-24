@@ -159,6 +159,12 @@ namespace MySQL.ForExcel.Classes
     private MySqlDataType _rowsFromSecondDataType;
 
     /// <summary>
+    /// The data type of the column at the server side.
+    /// Normally this value should be identical to <see cref="MySqlDataType"/>, unless there is a reason to override the data type at the client side.
+    /// </summary>
+    private MySqlDataType _serverDataType;
+
+    /// <summary>
     /// Flag indicating if the column has a related unique index.
     /// </summary>
     private bool _uniqueKey;
@@ -192,6 +198,7 @@ namespace MySQL.ForExcel.Classes
       _mappedDataColOrdinal = -1;
       _rowsFromFirstDataType = DefaultDataTypeForEmptyColumns;
       _rowsFromSecondDataType = DefaultDataTypeForEmptyColumns;
+      _serverDataType = null;
       _userDefaultValue = null;
       AutoIncrement = false;
       AutoPk = false;
@@ -249,14 +256,34 @@ namespace MySQL.ForExcel.Classes
     /// <param name="keyInfo">Information about the type of key this column belongs to.</param>
     /// <param name="defaultValue">The default value of this column.</param>
     /// <param name="extraInfo">Extra information related to the column's data type as stored by the MySQL server.</param>
-    public MySqlDataColumn(string columnName, string mySqlFullDataType, string charSet, string collation, bool datesAsMySqlDates, bool allowNulls, string keyInfo, string defaultValue, string extraInfo)
+    /// <param name="treatFloatAndDoubleAsDecimal">Flag indicating whether the column must use a DECIMAL data type if the server type is FLOAT or DOUBLE.</param>
+    public MySqlDataColumn(string columnName, string mySqlFullDataType, string charSet, string collation, bool datesAsMySqlDates, bool allowNulls, string keyInfo, string defaultValue, string extraInfo, bool treatFloatAndDoubleAsDecimal = false)
       : this()
     {
       DisplayName = ColumnName = columnName;
       AllowNull = allowNulls;
       CharSet = charSet;
       Collation = collation;
-      SetMySqlDataType(new MySqlDataType(mySqlFullDataType, true, datesAsMySqlDates));
+      var mySqlType = new MySqlDataType(mySqlFullDataType, true, datesAsMySqlDates);
+      if (treatFloatAndDoubleAsDecimal
+          && mySqlType.IsFloatingPoint)
+      {
+        ServerDataType = mySqlType;
+        var serverFullDataType = mySqlFullDataType.StartsWith("float", StringComparison.OrdinalIgnoreCase)
+          ? $"Decimal{mySqlFullDataType.Substring(5)}"
+          : mySqlFullDataType.StartsWith("double", StringComparison.OrdinalIgnoreCase)
+            ? $"Decimal{mySqlFullDataType.Substring(6)}"
+            : null;
+        if (!string.IsNullOrEmpty(serverFullDataType))
+        {
+          SetMySqlDataType(new MySqlDataType(serverFullDataType, true, datesAsMySqlDates));
+        }
+      }
+      else
+      {
+        SetMySqlDataType(mySqlType);
+      }
+
       DataType = MySqlDataType.DotNetType;
       UserDefaultValue = defaultValue;
       CreateIndex = keyInfo.Equals("mul", StringComparison.InvariantCultureIgnoreCase);
@@ -503,7 +530,6 @@ namespace MySQL.ForExcel.Classes
     public bool ExcludeColumn
     {
       get => _excludeColumn;
-
       set
       {
         var valueChanged = _excludeColumn != value;
@@ -556,7 +582,6 @@ namespace MySQL.ForExcel.Classes
     public int MappedDataColOrdinal
     {
       get => _mappedDataColOrdinal;
-
       set
       {
         _mappedDataColOrdinal = value;
@@ -590,7 +615,6 @@ namespace MySQL.ForExcel.Classes
     public bool PrimaryKey
     {
       get => _primaryKey;
-
       set
       {
         var valueChanged = _primaryKey != value;
@@ -617,12 +641,21 @@ namespace MySQL.ForExcel.Classes
     public int RangeColumnIndex { get; private set; }
 
     /// <summary>
+    /// Gets or sets the data type of the column at the server side.
+    /// Normally this value should be identical to <see cref="MySqlDataType"/>, unless there is a reason to override the data type at the client side.
+    /// </summary>
+    public MySqlDataType ServerDataType
+    {
+      get => _serverDataType ?? MySqlDataType;
+      private set => _serverDataType = value;
+    }
+
+    /// <summary>
     /// Gets or sets a value indicating whether the column has a related unique index.
     /// </summary>
     public bool UniqueKey
     {
       get => _uniqueKey;
-
       set
       {
         var valueChanged = _uniqueKey != value;
@@ -649,7 +682,6 @@ namespace MySQL.ForExcel.Classes
     public string UserDefaultValue
     {
       get => _userDefaultValue;
-
       set
       {
         var valueChanged = _userDefaultValue != value;

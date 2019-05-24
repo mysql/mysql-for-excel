@@ -1124,30 +1124,6 @@ namespace MySQL.ForExcel.Forms
     }
 
     /// <summary>
-    /// Sets the tooltip text shown on column headers, containing the data type of each column.
-    /// </summary>
-    /// <param name="grid">The <see cref="DataGridView"/> which column header tooltips need to be refreshed.</param>
-    private void RefreshColumnHeaderDataTypeToolTips(DataGridView grid)
-    {
-      if (grid == null)
-      {
-        return;
-      }
-
-      var showDataTypes = Settings.Default.AppendShowDataTypes;
-      var mySqlTable = grid.DataSource as MySqlDataTable;
-      foreach (DataGridViewColumn gridColumn in grid.Columns)
-      {
-        if (mySqlTable?.Columns[gridColumn.Index] is MySqlDataColumn mySqlColumn)
-        {
-          gridColumn.Tag = mySqlColumn.MySqlDataType.TypeName;
-        }
-
-        gridColumn.ToolTipText = showDataTypes ? string.Empty : gridColumn.Tag.ToString();
-      }
-    }
-
-    /// <summary>
     /// Rebuilds the rows of additional column headers and their column header tooltips.
     /// </summary>
     /// <param name="multiHeaderGrid">The <see cref="MultiHeaderDataGridView"/> object to refresh.</param>
@@ -1158,8 +1134,8 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      RefreshColumnHeaderDataTypeToolTips(multiHeaderGrid);
-      SetupAdditionalHeaderRows(multiHeaderGrid, multiHeaderGrid.Name == "TargetMySqlTableDataGridView");
+      multiHeaderGrid.RefreshColumnHeaderDataTypeToolTips();
+      SetupAdditionalHeaderRows(multiHeaderGrid, multiHeaderGrid.Name == nameof(TargetMySqlTableDataGridView));
     }
 
     /// <summary>

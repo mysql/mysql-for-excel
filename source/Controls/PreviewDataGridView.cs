@@ -85,6 +85,7 @@ namespace MySQL.ForExcel.Controls
       ReadOnly = true;
       RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
       SelectAllAfterBindingComplete = false;
+      ShowDataTypesOnColumnToolTips = true;
       AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
       DisableColumnsSelection = false;
     }
@@ -251,6 +252,12 @@ namespace MySQL.ForExcel.Controls
     }
 
     /// <summary>
+    /// Gets or sets a value indicating whether the grid column tool tips show the data type associated with the source table column.
+    /// </summary>
+    [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool ShowDataTypesOnColumnToolTips { get; set; }
+
+    /// <summary>
     /// Gets a value indicating whether or not the editing glyph is visible in the row header of the cell being edited.
     /// </summary>
     [Category("MySQL Custom"), Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -321,6 +328,32 @@ namespace MySQL.ForExcel.Controls
 
       var mySqlDataTable = new MySqlDataTable(dbTableOrView.Connection, dbTableOrView.Name, dbTableOrView.GetData(), MySqlDataTable.DataOperationType.ImportTableOrView, dbTableOrView.GetSelectQuery());
       Fill(mySqlDataTable);
+    }
+
+    /// <summary>
+    /// Sets the tooltip text shown on column headers, containing the data type of each column.
+    /// </summary>
+    public void RefreshColumnHeaderDataTypeToolTips()
+    {
+      if (!ShowDataTypesOnColumnToolTips)
+      {
+        return;
+      }
+
+      if (!(DataSource is MySqlDataTable mySqlTable))
+      {
+        return;
+      }
+
+      foreach (DataGridViewColumn gridColumn in Columns)
+      {
+        if (mySqlTable.Columns[gridColumn.Index] is MySqlDataColumn mySqlColumn)
+        {
+          gridColumn.Tag = mySqlColumn.ServerDataType.TypeName;
+        }
+
+        gridColumn.ToolTipText = gridColumn.Tag.ToString();
+      }
     }
 
     /// <summary>
@@ -401,6 +434,7 @@ namespace MySQL.ForExcel.Controls
     protected override void OnDataBindingComplete(DataGridViewBindingCompleteEventArgs e)
     {
       base.OnDataBindingComplete(e);
+      RefreshColumnHeaderDataTypeToolTips();
       if (SelectAllAfterBindingComplete)
       {
         SelectAll();
