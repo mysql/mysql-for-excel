@@ -457,7 +457,8 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      RowsCountSubLabel.Text = _importingRowsInfo[ResultSetsTabControl.SelectedIndex].RowsCount.ToString(CultureInfo.CurrentCulture);
+      _selectedResultSetIndex = ResultSetsTabControl.SelectedIndex;
+      RowsCountSubLabel.Text = _importingRowsInfo[_selectedResultSetIndex].RowsCount.ToString(CultureInfo.CurrentCulture);
       SetCompatibilityWarningControlsVisibility();
     }
 

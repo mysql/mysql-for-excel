@@ -347,11 +347,13 @@ namespace MySQL.ForExcel.Controls
 
       foreach (DataGridViewColumn gridColumn in Columns)
       {
-        if (mySqlTable.Columns[gridColumn.Index] is MySqlDataColumn mySqlColumn)
+        if (!(mySqlTable.Columns[gridColumn.Index] is MySqlDataColumn mySqlColumn)
+            || mySqlColumn.ServerDataType == null)
         {
-          gridColumn.Tag = mySqlColumn.ServerDataType.TypeName;
+          continue;
         }
 
+        gridColumn.Tag = mySqlColumn.ServerDataType.TypeName;
         gridColumn.ToolTipText = gridColumn.Tag.ToString();
       }
     }
