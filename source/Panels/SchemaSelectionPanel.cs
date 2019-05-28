@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using MySql.Utility.Classes.Logging;
@@ -34,7 +35,7 @@ namespace MySQL.ForExcel.Panels
   /// <summary>
   /// Second panel shown to users within the Add-In's <see cref="ExcelAddInPane"/> where schemas are managed.
   /// </summary>
-  public partial class SchemaSelectionPanel : AutoStyleableBasePanel
+  public sealed partial class SchemaSelectionPanel : AutoStyleableBasePanel
   {
     #region Fields
 
@@ -56,7 +57,7 @@ namespace MySQL.ForExcel.Panels
     public SchemaSelectionPanel()
     {
       InitializeComponent();
-
+      AdjustColorsForColorTheme(false, null);
       DisplaySchemaCollationsToolStripMenuItem.Checked = Settings.Default.SchemasDisplayCollations;
       SetItemsAppearance(false);
       InheritFontToControlsExceptionList.Add(SelectSchemaHotLabel.Name);
@@ -73,6 +74,24 @@ namespace MySQL.ForExcel.Panels
     public List<DbSchema> LoadedSchemas { get; }
 
     #endregion Properties
+
+    /// <summary>
+    /// Adjusts the colors to match the current color theme.
+    /// </summary>
+    /// <param name="callBase">Calls the base functionality.</param>
+    /// <param name="officeTheme">The current <see cref="OfficeTheme"/>.</param>
+    public override void AdjustColorsForColorTheme(bool callBase, OfficeTheme officeTheme)
+    {
+      if (callBase)
+      {
+        base.AdjustColorsForColorTheme(false, officeTheme);
+      }
+
+      ConnectionInfoLabel.ForeColor =
+        UserLabel.ForeColor = officeTheme != null && officeTheme.ThemeColor.IsThemeColorDark()
+          ? Color.LightGray
+          : SystemColors.ControlDarkDark;
+    }
 
     /// <summary>
     /// Sets the current active connection used to query the database.

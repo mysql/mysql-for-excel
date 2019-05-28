@@ -20,6 +20,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using MySql.Utility.Classes;
+using MySQL.ForExcel.Classes;
+using MySQL.ForExcel.Controls;
 
 namespace MySQL.ForExcel.Panels
 {
@@ -34,7 +37,6 @@ namespace MySQL.ForExcel.Panels
     public AutoStyleableBasePanel()
     {
       InitializeComponent();
-
       UseSystemFont = true;
       InheritSystemFontToControls = true;
       InheritFontToControlsExceptionList = new List<string>();
@@ -64,6 +66,39 @@ namespace MySQL.ForExcel.Panels
     public bool UseSystemFont { get; set; }
 
     #endregion Properties
+
+    /// <summary>
+    /// Adjusts the colors to match the current color theme.
+    /// </summary>
+    /// <param name="callBase">Calls the base functionality.</param>
+    /// <param name="officeTheme">The current <see cref="OfficeTheme"/>.</param>
+    public virtual void AdjustColorsForColorTheme(bool callBase, OfficeTheme officeTheme)
+    {
+      BackColor = officeTheme?.BodyBackgroundColor ?? SystemColors.Control;
+      var hotLabels = this.GetChildControlsOfType<HotLabel>();
+      foreach (var hotLabel in hotLabels)
+      {
+        hotLabel.AdjustColorsForColorTheme(officeTheme);
+      }
+
+      var listViews = this.GetChildControlsOfType<MySqlListView>();
+      foreach (var listView in listViews)
+      {
+        listView.AdjustColorsForColorTheme(officeTheme);
+      }
+
+      var searchEdits = this.GetChildControlsOfType<SearchEdit>();
+      foreach (var searchEdit in searchEdits)
+      {
+        searchEdit.AdjustColorsForColorTheme(officeTheme);
+      }
+
+      var panels = this.GetChildControlsOfType<Panel>();
+      foreach (var panel in panels)
+      {
+        panel.BackColor = officeTheme?.BodyBackgroundColor ?? SystemColors.Control;
+      }
+    }
 
     /// <summary>
     /// Sets the font in all controls of the given controls collection to the given font.

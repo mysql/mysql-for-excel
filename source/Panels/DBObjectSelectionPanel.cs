@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using MySql.Utility.Classes.Logging;
@@ -34,7 +35,7 @@ namespace MySQL.ForExcel.Panels
   /// <summary>
   /// Third panel shown to users within the Add-In's <see cref="ExcelAddInPane"/> where DB objects are managed.
   /// </summary>
-  public partial class DbObjectSelectionPanel : AutoStyleableBasePanel
+  public sealed partial class DbObjectSelectionPanel : AutoStyleableBasePanel
   {
     #region Fields
 
@@ -62,6 +63,7 @@ namespace MySQL.ForExcel.Panels
       LoadedTables = new List<DbTable>();
       LoadedViews = new List<DbView>();
       InitializeComponent();
+      AdjustColorsForColorTheme(false, null);
       InheritFontToControlsExceptionList.AddRange(new[]
       {
         ExportToNewTableHotLabel.Name,
@@ -138,6 +140,25 @@ namespace MySQL.ForExcel.Panels
     public List<DbView> LoadedViews { get; }
 
     #endregion Properties
+
+    /// <summary>
+    /// Adjusts the colors to match the current color theme.
+    /// </summary>
+    /// <param name="callBase">Calls the base functionality.</param>
+    /// <param name="officeTheme">The current <see cref="OfficeTheme"/>.</param>
+    public override void AdjustColorsForColorTheme(bool callBase, OfficeTheme officeTheme)
+    {
+      if (callBase)
+      {
+        base.AdjustColorsForColorTheme(false, officeTheme);
+      }
+
+      ConnectionInfoLabel.ForeColor =
+        UserLabel.ForeColor =
+          SchemaLabel.ForeColor = officeTheme != null && officeTheme.ThemeColor.IsThemeColorDark()
+            ? Color.LightGray
+            : SystemColors.ControlDarkDark;
+    }
 
     /// <summary>
     /// Refreshes the availability of action labels linked to the currently selected DB object.

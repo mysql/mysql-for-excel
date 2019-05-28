@@ -23,6 +23,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Microsoft.Office.Core;
+using Microsoft.Win32;
 using MySQL.ForExcel.Classes;
 using MySQL.ForExcel.Controls;
 using MySQL.ForExcel.Forms;
@@ -37,6 +38,7 @@ using ExcelInterop = Microsoft.Office.Interop.Excel;
 using ExcelTools = Microsoft.Office.Tools.Excel;
 using OfficeTools = Microsoft.Office.Tools;
 using OfficeCore = Microsoft.Office.Core;
+using OfficeTheme = MySQL.ForExcel.Classes.OfficeTheme;
 
 namespace MySQL.ForExcel
 {
@@ -137,6 +139,11 @@ namespace MySQL.ForExcel
     private bool _migratingStoredConnections;
 
     /// <summary>
+    /// A monitor to detect changes in the Windows registry.
+    /// </summary>
+    private RegistryMonitor _registryMonitor;
+
+    /// <summary>
     /// Flag indicating whether the detection of contents for a cell selection should be skipped.
     /// </summary>
     private bool _skipSelectedDataContentsDetection;
@@ -212,6 +219,11 @@ namespace MySQL.ForExcel
     public string AssemblyTitle { get; private set; }
 
     /// <summary>
+    /// Gets a the current <see cref="OfficeTheme"/>.
+    /// </summary>
+    public OfficeTheme CurrentOfficeTheme { get; private set; }
+
+    /// <summary>
     /// Gets the custom ribbon defined by this add-in.
     /// </summary>
     public MySqlRibbon CustomMySqlRibbon { get; private set; }
@@ -242,6 +254,11 @@ namespace MySQL.ForExcel
         }
       }
     }
+
+    /// <summary>
+    /// Gets the current theme color code.
+    /// </summary>
+    public int ExcelThemeColorCode { get; private set; }
 
     /// <summary>
     /// Gets the MS Excel major version number.
@@ -396,12 +413,15 @@ namespace MySQL.ForExcel
       {
         // Attempt to migrate all locally stored connections to the MySQL Workbench connections file.
         CheckForNextAutomaticConnectionsMigration(false);
+
+        // Start the registry monitor
+        _registryMonitor?.Start();
       }
 
-      // Instantiate the Excel Add-In pane to attach it to the Excel's custom task pane.
+      // Instantiate the Excel Add-In pane to attach it to the Excel custom task pane.
       // Note that in Excel 2007 and 2010 a MDI model is used so only a single Excel pane is instantiated, whereas in Excel 2013 and greater
       //  a SDI model is used instead, so an Excel pane is instantiated for each custom task pane appearing in each Excel window.
-      var excelPane = new ExcelAddInPane { Dock = DockStyle.Fill };
+      var excelPane = new ExcelAddInPane(CurrentOfficeTheme) { Dock = DockStyle.Fill };
       var paneWidth = excelPane.Width;
       excelPane.SizeChanged += ExcelPane_SizeChanged;
       ExcelPanesList.Add(excelPane);
@@ -1172,6 +1192,47 @@ namespace MySQL.ForExcel
     {
       // Unsubscribe from Excel events
       SetupExcelEvents(false);
+
+      // Stop the registry monitor
+      _registryMonitor?.Stop();
+    }
+
+    /// <summary>
+    /// Event delegate method fired when the registry key associated with Excel changes.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ExcelCommonRegistryKeyChanged(object sender, EventArgs e)
+    {
+      var previousFetchedColorCode = ExcelThemeColorCode;
+      ExcelThemeColorCode = ExcelVersionNumber.GetThemeColorFromRegistry();
+      var colorCodesChanged = ExcelThemeColorCode != previousFetchedColorCode;
+      if (colorCodesChanged
+          || CurrentOfficeTheme == null)
+      {
+        CurrentOfficeTheme = ExcelVersionNumber.GetRelatedOfficeTheme(ExcelThemeColorCode);
+      }
+
+      if (sender == null
+          || !colorCodesChanged)
+      {
+        return;
+      }
+
+      foreach (var excelPane in CustomTaskPanes.Where(ctp => ctp.Control is ExcelAddInPane).Select(ctp => ctp.Control as ExcelAddInPane))
+      {
+        excelPane?.AdjustColorsForColorTheme(CurrentOfficeTheme);
+      }
+    }
+
+    /// <summary>
+    /// Event delegate method fired when an error occurs while monitor changes to the registry key associated with Excel.
+    /// </summary>
+    /// <param name="sender">Sender object.</param>
+    /// <param name="e">Event arguments.</param>
+    private void ExcelCommonRegistryKeyMonitorError(object sender, ErrorEventArgs e)
+    {
+      Logger.LogException(e.GetException());
     }
 
     /// <summary>
@@ -1455,6 +1516,8 @@ namespace MySQL.ForExcel
     /// <param name="e">Event arguments.</param>
     private void ThisAddIn_Shutdown(object sender, EventArgs e)
     {
+      Logger.LogInformation(Resources.ShutdownMessage);
+
       // Stop global timer and dispose of it
       if (_connectionsMigrationTimer != null)
       {
@@ -1476,7 +1539,15 @@ namespace MySQL.ForExcel
       }
 
       ExcelAddInPanesClosed();
-      Logger.LogInformation(Resources.ShutdownMessage);
+
+      // Stop registry monitor and dispose of it
+      if (_registryMonitor != null)
+      {
+        _registryMonitor.Stop();
+        _registryMonitor.RegistryChanged -= ExcelCommonRegistryKeyChanged;
+        _registryMonitor.Error -= ExcelCommonRegistryKeyMonitorError;
+        _registryMonitor.Dispose();
+      }
 
       // Unsubscribe events tracked even when no Excel panes are open.
       Application.WorkbookOpen -= Application_WorkbookOpen;
@@ -1511,10 +1582,21 @@ namespace MySQL.ForExcel
         // Log the Add-In's Startup
         Logger.LogInformation(Resources.StartupMessage);
 
-        // Detect Excel version.
+        // Detect Excel version
         var pointPos = Application.Version.IndexOf('.');
         var majorVersionText = pointPos >= 0 ? Application.Version.Substring(0, pointPos) : Application.Version;
         ExcelVersionNumber = int.Parse(majorVersionText, CultureInfo.InvariantCulture);
+
+        // Extract from registry the current Office theme code
+        ExcelCommonRegistryKeyChanged(null, EventArgs.Empty);
+
+        // Initialize a registry monitor to detect changes to the registry value for the theme color
+        _registryMonitor = new RegistryMonitor(RegistryHive.CurrentUser, ExcelVersionNumber.GetRegistryKeyNameForColorTheme())
+        {
+          RegistryChangeNotifyFilter = RegistryChangeNotifyFilter.Value | RegistryChangeNotifyFilter.Key
+        };
+        _registryMonitor.RegistryChanged += ExcelCommonRegistryKeyChanged;
+        _registryMonitor.Error += ExcelCommonRegistryKeyMonitorError;
 
         // Adjust values in the settings.config file that have changed and must be adjusted or transformed
         PerformSettingsAdjustments();

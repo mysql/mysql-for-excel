@@ -20,6 +20,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using MySql.Utility.Classes;
+using MySQL.ForExcel.Classes;
 
 namespace MySQL.ForExcel.Controls
 {
@@ -49,12 +50,11 @@ namespace MySQL.ForExcel.Controls
     {
       InitializeComponent();
 
+      AdjustColorsForColorTheme(null);
       Behavior = BehaviorType.Label;
       CheckedState = CheckState.Indeterminate;
       DoubleBuffered = true;
       DrawShadow = false;
-      TitleColor = SystemColors.WindowText;
-      DescriptionColor = SystemColors.GrayText;
       TitleColorOpacity = 0.7;
       DescriptionColorOpacity = 0.7;
       TitleShadowOpacity = 0.3;
@@ -175,6 +175,12 @@ namespace MySQL.ForExcel.Controls
     public bool DrawShadow { get; set; }
 
     /// <summary>
+    /// Gets or sets the color used to paint the title text when being hot tracked.
+    /// </summary>
+    [Category("MySQL Custom"), Description("The color used to paint the title text when being hot tracked.")]
+    public Color HotTrackingColor { get; set; }
+
+    /// <summary>
     /// Gets or sets the image displayed at the left side of the label.
     /// </summary>
     [Category("MySQL Custom"), Description("The image displayed at the left side of the label.")]
@@ -259,6 +265,22 @@ namespace MySQL.ForExcel.Controls
     #endregion Properties
 
     /// <summary>
+    /// Adjusts the colors to match the current color theme.
+    /// </summary>
+    /// <param name="officeTheme">The current <see cref="OfficeTheme"/>.</param>
+    public void AdjustColorsForColorTheme(OfficeTheme officeTheme)
+    {
+      var isThemeColorDark = officeTheme != null && officeTheme.ThemeColor.IsThemeColorDark();
+      TitleColor = officeTheme?.ControlForegroundColor ?? SystemColors.WindowText;
+      HotTrackingColor = isThemeColorDark
+        ? Color.LightGray
+        : SystemColors.HotTrack;
+      DescriptionColor = isThemeColorDark
+        ? Color.LightGray
+        : SystemColors.GrayText;
+    }
+
+    /// <summary>
     /// Raises the <see cref="Control.Click"/> event.
     /// </summary>
     /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
@@ -329,10 +351,10 @@ namespace MySQL.ForExcel.Controls
       base.OnPaint(e);
 
       var i = Enabled
-        ? (Behavior != BehaviorType.CheckBox
+        ? Behavior != BehaviorType.CheckBox
           ? Image
-          : (CheckedState == CheckState.Checked ? CheckedImage : Image))
-        : (DisabledImage == null && Image != null ? new Bitmap(Image).ToGrayscale() : DisabledImage);
+          : CheckedState == CheckState.Checked ? CheckedImage : Image
+        : DisabledImage == null && Image != null ? new Bitmap(Image).ToGrayscale() : DisabledImage;
       var imageSize = Size.Empty;
       if (i != null)
       {
@@ -344,7 +366,7 @@ namespace MySQL.ForExcel.Controls
       var pt = new Point(imageSize.Width + TitleXOffset, TitleYOffset);
       if (!string.IsNullOrEmpty(Title))
       {
-        var currentTitleColor = _tracking ? SystemColors.HotTrack : TitleColor;
+        var currentTitleColor = _tracking ? HotTrackingColor : TitleColor;
         if (DrawShadow && Enabled)
         {
           using (var titleShadowBrush = new SolidBrush(Color.FromArgb(Convert.ToInt32(TitleShadowOpacity * 255), TitleColor)))

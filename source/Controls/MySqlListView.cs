@@ -138,6 +138,7 @@ namespace MySQL.ForExcel.Controls
     /// </summary>
     public MySqlListView()
     {
+      AdjustColorsForColorTheme(null);
       base.SelectedNode = null;
       _selectedNode = null;
       _selectedNodes = new List<MySqlListViewNode>();
@@ -254,7 +255,6 @@ namespace MySQL.ForExcel.Controls
     public new TreeViewDrawMode DrawMode
     {
       get => base.DrawMode;
-
       private set => base.DrawMode = value;
     }
 
@@ -289,7 +289,6 @@ namespace MySQL.ForExcel.Controls
     public int NodeHeightMultiple
     {
       get => _nodeHeightMultiple;
-
       set
       {
         if (value < 1)
@@ -320,6 +319,12 @@ namespace MySQL.ForExcel.Controls
     public int ScaledImagesVerticalSpacing { get; set; }
 
     /// <summary>
+    /// Gets or sets the color used to paint the node background when it is selected.
+    /// </summary>
+    [Category("MySQL Custom"), Description("The color used to paint the node background when it is selected")]
+    public Color SelectedColor { get; set; }
+
+    /// <summary>
     /// Gets or sets the node that is currently selected.
     /// </summary>
     /// <remarks>Overriding this property to implement own selection method.</remarks>
@@ -327,7 +332,6 @@ namespace MySQL.ForExcel.Controls
     public new MySqlListViewNode SelectedNode
     {
       get => _selectedNode;
-
       set
       {
         ClearSelectedNodes();
@@ -345,7 +349,6 @@ namespace MySQL.ForExcel.Controls
     public List<MySqlListViewNode> SelectedNodes
     {
       get => _selectedNodes;
-
       set
       {
         ClearSelectedNodes();
@@ -482,6 +485,22 @@ namespace MySQL.ForExcel.Controls
       node.ForeColor = SystemColors.ControlText;
       node.BackColor = SystemColors.ControlLight;
       return node;
+    }
+
+    /// <summary>
+    /// Adjusts the colors to match the current color theme.
+    /// </summary>
+    /// <param name="officeTheme">The current <see cref="OfficeTheme"/>.</param>
+    public void AdjustColorsForColorTheme(OfficeTheme officeTheme)
+    {
+      var isThemeColorDark = officeTheme != null && officeTheme.ThemeColor.IsThemeColorDark();
+      BackColor = officeTheme?.ControlBackgroundColor ?? SystemColors.Window;
+      DescriptionColor = isThemeColorDark
+        ? Color.SlateGray
+        : Color.Silver;
+      SelectedColor = isThemeColorDark
+        ? ColorTranslator.FromHtml("#969696")
+        : SystemColors.Highlight;
     }
 
     /// <summary>
@@ -1112,7 +1131,7 @@ namespace MySQL.ForExcel.Controls
         return;
       }
 
-      node.BackColor = isSelected ? SystemColors.Highlight : BackColor;
+      node.BackColor = isSelected ? SelectedColor : BackColor;
       node.IsSelected = isSelected;
       if (isSelected)
       {

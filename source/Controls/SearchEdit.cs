@@ -19,6 +19,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using MySQL.ForExcel.Classes;
 
 namespace MySQL.ForExcel.Controls
 {
@@ -72,10 +73,9 @@ namespace MySQL.ForExcel.Controls
       _searchImage = null;
       InitializeComponent();
       DoubleBuffered = true;
-      NoTextLabelColor = Color.Silver;
       SearchFiredOnLeave = false;
       Text = string.Empty;
-      TextColor = SystemColors.WindowText;
+      AdjustColorsForColorTheme(null);
       _initialPaint = true;
     }
 
@@ -213,6 +213,17 @@ namespace MySQL.ForExcel.Controls
         : _searchImage.Width;
 
     #endregion Properties
+
+    /// <summary>
+    /// Adjusts the colors to match the current color theme.
+    /// </summary>
+    /// <param name="officeTheme">The current <see cref="OfficeTheme"/>.</param>
+    public void AdjustColorsForColorTheme(OfficeTheme officeTheme)
+    {
+      BackColor = officeTheme?.ControlBackgroundColor ?? SystemColors.Window;
+      TextColor = officeTheme?.ControlForegroundColor ?? SystemColors.WindowText;
+      NoTextLabelColor = Color.Silver;
+    }
 
     /// <summary>
     /// Raises the <see cref="Control.Paint"/> event.

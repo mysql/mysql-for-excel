@@ -243,6 +243,7 @@
   <ItemGroup>
     <Compile Include="Classes\ImportDataParams.cs" />
     <Compile Include="Classes\ImportingRowsInfo.cs" />
+    <Compile Include="Classes\OfficeTheme.cs" />
     <Compile Include="Classes\WorkbookConnectionInfos.cs" />
     <Compile Include="Classes\CustomProperty.cs" />
     <Compile Include="Classes\CustomPropertyDescriptor.cs" />

@@ -43,12 +43,16 @@ namespace MySQL.ForExcel.Controls
     public ExcelAddInPane()
     {
       InitializeComponent();
-
       UpdateExcelSelectedDataStatus(Globals.ThisAddIn.Application.Selection as ExcelInterop.Range);
       ActiveEditDialog = null;
       FirstConnectionInfo = null;
       WbConnection = null;
       WelcomePanel1.LoadConnections(true);
+    }
+
+    public ExcelAddInPane(OfficeTheme officeTheme) : this()
+    {
+      AdjustColorsForColorTheme(officeTheme);
     }
 
     #region Properties
@@ -123,6 +127,25 @@ namespace MySQL.ForExcel.Controls
     public MySqlWorkbenchConnection WbConnection { get; private set; }
 
     #endregion Properties
+
+    /// <summary>
+    /// Adjusts the colors to match the current color theme.
+    /// </summary>
+    /// <param name="officeTheme">Flag indicating whether the current color theme is dark.</param>
+    public void AdjustColorsForColorTheme(OfficeTheme officeTheme)
+    {
+      if (InvokeRequired)
+      {
+        Invoke(new MethodInvoker(() => AdjustColorsForColorTheme(officeTheme)));
+        return;
+      }
+
+      var panels = this.GetChildControlsOfType<AutoStyleableBasePanel>();
+      foreach (var panel in panels)
+      {
+        panel.AdjustColorsForColorTheme(true, officeTheme);
+      }
+    }
 
     /// <summary>
     /// Exports currently selected Excel data to a new MySQL table or appends it to an existing MySQL table.

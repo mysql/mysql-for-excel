@@ -20,8 +20,10 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using Microsoft.Office.Core;
+using Microsoft.Win32;
 using MySQL.ForExcel.Properties;
 using MySql.Utility.Classes;
+using MySql.Utility.Classes.Attributes;
 using MySql.Utility.Classes.Logging;
 using MySql.Utility.Forms;
 using ExcelInterop = Microsoft.Office.Interop.Excel;
@@ -262,6 +264,8 @@ namespace MySQL.ForExcel.Classes
 
     #endregion Properties
 
+    #region Enums
+
     /// <summary>
     /// Specifies identifiers to indicate the position where new <see cref="ExcelInterop.PivotTable"/> objects are placed relative to imported table's data.
     /// </summary>
@@ -277,6 +281,8 @@ namespace MySQL.ForExcel.Classes
       /// </summary>
       Right
     }
+
+    #endregion Enums
 
     /// <summary>
     /// Adds a new row at the bottom of the given Excel range.
@@ -1183,6 +1189,22 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets a numeric code for the theme color if it's decorated with a <see cref="NumericCodeAttribute"/>.
+    /// </summary>
+    /// <param name="colorType">A <see cref="OfficeTheme.ColorType"/> value.</param>
+    /// <returns>A a numeric code for the theme color if it's decorated with a <see cref="NumericCodeAttribute"/>, <c>null</c> otheerwise.</returns>
+    public static int? GetNumericCode(this OfficeTheme.ColorType colorType)
+    {
+      var field = colorType.GetType().GetField(colorType.ToString());
+      if (!(Attribute.GetCustomAttribute(field, typeof(NumericCodeAttribute)) is NumericCodeAttribute numericCodeAttribute))
+      {
+        return null;
+      }
+
+      return numericCodeAttribute.NumericCode;
+    }
+
+    /// <summary>
     /// Gets the active workbook unique identifier if exists, if not, creates one and returns it.
     /// </summary>
     /// <param name="workbook">A <see cref="ExcelInterop.Workbook"/> object.</param>
@@ -1340,6 +1362,176 @@ namespace MySQL.ForExcel.Classes
     }
 
     /// <summary>
+    /// Gets the name of the registry value used to determine the Office color theme.
+    /// </summary>
+    /// <param name="excelVersionNumber">The Excel version number.</param>
+    /// <returns>The name of the registry value used to determine the Office color theme.</returns>
+    public static string GetRegistryKeyNameForColorTheme(this int excelVersionNumber)
+    {
+      return $"Software\\Microsoft\\Office\\{excelVersionNumber}.0\\Common";
+    }
+
+    /// <summary>
+    /// Gets the name of the registry value used to determine the Office color theme.
+    /// </summary>
+    /// <param name="excelVersionNumber">The Excel version number.</param>
+    /// <returns>The name of the registry value used to determine the Office color theme.</returns>
+    public static string GetRegistryValueNameForColorTheme(this int excelVersionNumber)
+    {
+      return excelVersionNumber < ThisAddIn.EXCEL_2013_VERSION_NUMBER
+        ? "Theme"
+        : "UI Theme";
+    }
+
+    /// <summary>
+    /// Gets the related <see cref="OfficeTheme.ColorType"/> from the given Excel version and theme color codes.
+    /// </summary>
+    /// <param name="excelVersionNumber">The Excel version number.</param>
+    /// <param name="themeColorCode">The color code number.</param>
+    /// <returns>A related <see cref="OfficeTheme.ColorType"/> value.</returns>
+    public static OfficeTheme.ColorType GetRelatedOfficeColorType(this int excelVersionNumber, int themeColorCode)
+    {
+      switch(excelVersionNumber)
+      {
+        case 12:
+          switch (themeColorCode)
+          {
+            case 1:
+              return OfficeTheme.ColorType.Blue12;
+
+            case 2:
+              return OfficeTheme.ColorType.Silver12;
+
+            case 3:
+              return OfficeTheme.ColorType.Black12;
+          }
+
+          break;
+
+        case 14:
+          switch (themeColorCode)
+          {
+            case 1:
+              return OfficeTheme.ColorType.Blue14;
+
+            case 2:
+              return OfficeTheme.ColorType.Silver14;
+
+            case 3:
+              return OfficeTheme.ColorType.Black14;
+          }
+
+          break;
+
+        case 15:
+          switch (themeColorCode)
+          {
+            case 0:
+              return OfficeTheme.ColorType.White15;
+
+            case 1:
+              return OfficeTheme.ColorType.LightGray15;
+
+            case 2:
+              return OfficeTheme.ColorType.DarkGray15;
+          }
+
+          break;
+
+        case 16:
+          switch (themeColorCode)
+          {
+            case 0:
+              return OfficeTheme.ColorType.Colorful16;
+
+            case 3:
+              return OfficeTheme.ColorType.DarkGray16;
+
+            case 4:
+              return OfficeTheme.ColorType.Black16;
+
+            case 5:
+              return OfficeTheme.ColorType.White16;
+          }
+
+          break;
+      }
+
+      return OfficeTheme.ColorType.Custom;
+    }
+
+    /// <summary>
+    /// Gets the related <see cref="OfficeTheme"/> from the given Excel version and theme color codes.
+    /// </summary>
+    /// <param name="excelVersionNumber">The Excel version number.</param>
+    /// <param name="themeColorCode">The color code number.</param>
+    /// <returns>A related <see cref="OfficeTheme"/>.</returns>
+    public static OfficeTheme GetRelatedOfficeTheme(this int excelVersionNumber, int themeColorCode)
+    {
+      return OfficeTheme.FromThemeColor(excelVersionNumber.GetRelatedOfficeColorType(themeColorCode));
+    }
+
+    /// <summary>
+    /// Gets the numeric code of the default theme color for the given Excel version.
+    /// </summary>
+    /// <param name="excelVersionNumber">The Excel version number.</param>
+    /// <returns>The numeric code of the default theme color for the given Excel version.</returns>
+    public static int GetThemeDefaultColor(this int excelVersionNumber)
+    {
+      int? code = null;
+      switch (excelVersionNumber)
+      {
+        case ThisAddIn.EXCEL_2007_VERSION_NUMBER:
+          code = OfficeTheme.ColorType.Blue12.GetNumericCode();
+          break;
+
+        case ThisAddIn.EXCEL_2010_VERSION_NUMBER:
+          code = OfficeTheme.ColorType.Blue14.GetNumericCode();
+          break;
+
+        case ThisAddIn.EXCEL_2013_VERSION_NUMBER:
+          code = OfficeTheme.ColorType.White15.GetNumericCode();
+          break;
+
+        case ThisAddIn.EXCEL_2016_VERSION_NUMBER:
+          code = OfficeTheme.ColorType.Colorful16.GetNumericCode();
+          break;
+      }
+
+      return code ?? 0;
+    }
+
+    /// <summary>
+    /// Gets from the Windows registry the numeric code of the theme color for the given Excel version.
+    /// </summary>
+    /// <param name="excelVersionNumber">The Excel version number.</param>
+    /// <returns>The numeric code of the theme color for the given Excel version.</returns>
+    public static int GetThemeColorFromRegistry(this int excelVersionNumber)
+    {
+      int colorValue = GetThemeDefaultColor(excelVersionNumber);
+      RegistryKey key = null;
+      try
+      {
+        key = RegistryHive.CurrentUser.OpenRegistryKey(GetRegistryKeyNameForColorTheme(excelVersionNumber));
+        var value = key?.GetValue(GetRegistryValueNameForColorTheme(excelVersionNumber));
+        if (value != null)
+        {
+          colorValue = Convert.ToInt32(value);
+        }
+      }
+      catch (Exception ex)
+      {
+        Logger.LogException(ex);
+      }
+      finally
+      {
+        key?.Close();
+      }
+
+      return colorValue;
+    }
+
+    /// <summary>
     /// Gets a valid name for a new <see cref="ExcelInterop.WorkbookConnection"/> that avoids duplicates with existing ones in the current <see cref="ExcelInterop.Workbook"/>.
     /// </summary>
     /// <param name="workbookConnectionName">The proposed name for a <see cref="ExcelInterop.WorkbookConnection"/>.</param>
@@ -1440,7 +1632,22 @@ namespace MySQL.ForExcel.Classes
     /// <returns><c>true</c> if PowerPivot is installed, <c>false</c> otherwise.</returns>
     public static bool IsPowerPivotEnabled()
     {
-      return Globals.ThisAddIn.Application.AddIns.Cast<ExcelInterop.AddIn>().Any(addIn => addIn.Title.Contains("PowerPivot") && addIn.Name == "PowerPivotExcelClientAddIn.dll" && addIn.Installed && addIn.IsOpen);
+      return Globals.ThisAddIn.Application.AddIns.Cast<ExcelInterop.AddIn>().Any(addIn => addIn.Title.Contains("PowerPivot")
+                                                                                          && addIn.Name == "PowerPivotExcelClientAddIn.dll"
+                                                                                          && addIn.Installed && addIn.IsOpen);
+    }
+
+    /// <summary>
+    /// Checks if the given <see cref="OfficeTheme.ColorType"/> value represents a dark theme.
+    /// </summary>
+    /// <param name="colorType"></param>
+    /// <returns><c>true</c> if the given enum value represents a theme color and is dark, <c>false</c> otherwise.</returns>
+    public static bool IsThemeColorDark(this OfficeTheme.ColorType colorType)
+    {
+      // As a note, not all black themes are really "dark" or paint with a dark background the pane and panel bodies
+      return colorType == OfficeTheme.ColorType.Black14
+             || colorType == OfficeTheme.ColorType.Black16
+             || colorType == OfficeTheme.ColorType.DarkGray16;
     }
 
     /// <summary>
