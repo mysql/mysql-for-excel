@@ -52,6 +52,7 @@ namespace MySQL.ForExcel.Forms
       this.ColumnMappingNameLabel = new System.Windows.Forms.Label();
       this.MappingNameLabel = new System.Windows.Forms.Label();
       this.InstructionsLabel = new System.Windows.Forms.Label();
+      ((System.ComponentModel.ISupportInitialize)(this.ValidationsErrorProvider)).BeginInit();
       this.ContentAreaPanel.SuspendLayout();
       this.CommandAreaPanel.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).BeginInit();
@@ -69,21 +70,21 @@ namespace MySQL.ForExcel.Forms
       this.ContentAreaPanel.Controls.Add(this.ColumnMappingNameLabel);
       this.ContentAreaPanel.Controls.Add(this.LogoPictureBox);
       this.ContentAreaPanel.Controls.Add(this.MappingNameTextBox);
-      this.ContentAreaPanel.Size = new System.Drawing.Size(514, 182);
+      this.ContentAreaPanel.Size = new System.Drawing.Size(540, 182);
       // 
       // CommandAreaPanel
       // 
       this.CommandAreaPanel.Controls.Add(this.OKButton);
       this.CommandAreaPanel.Controls.Add(this.DialogCancelButton);
       this.CommandAreaPanel.Location = new System.Drawing.Point(0, 137);
-      this.CommandAreaPanel.Size = new System.Drawing.Size(514, 45);
+      this.CommandAreaPanel.Size = new System.Drawing.Size(540, 45);
       // 
       // OKButton
       // 
       this.OKButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.OKButton.DialogResult = System.Windows.Forms.DialogResult.OK;
       this.OKButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.OKButton.Location = new System.Drawing.Point(346, 11);
+      this.OKButton.Location = new System.Drawing.Point(372, 11);
       this.OKButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.OKButton.Name = "OKButton";
       this.OKButton.Size = new System.Drawing.Size(75, 23);
@@ -96,7 +97,7 @@ namespace MySQL.ForExcel.Forms
       this.DialogCancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.DialogCancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
       this.DialogCancelButton.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.DialogCancelButton.Location = new System.Drawing.Point(427, 11);
+      this.DialogCancelButton.Location = new System.Drawing.Point(453, 11);
       this.DialogCancelButton.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
       this.DialogCancelButton.Name = "DialogCancelButton";
       this.DialogCancelButton.Size = new System.Drawing.Size(75, 23);
@@ -112,7 +113,8 @@ namespace MySQL.ForExcel.Forms
       this.MappingNameTextBox.Name = "MappingNameTextBox";
       this.MappingNameTextBox.Size = new System.Drawing.Size(316, 23);
       this.MappingNameTextBox.TabIndex = 1;
-      this.MappingNameTextBox.TextChanged += new System.EventHandler(this.MappingNameTextBox_TextChanged);
+      this.MappingNameTextBox.TextChanged += new System.EventHandler(this.TextChangedHandler);
+      this.MappingNameTextBox.Validated += new System.EventHandler(this.ValidatedHandler);
       // 
       // LogoPictureBox
       // 
@@ -161,13 +163,14 @@ namespace MySQL.ForExcel.Forms
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.CancelButton = this.DialogCancelButton;
-      this.ClientSize = new System.Drawing.Size(514, 182);
+      this.ClientSize = new System.Drawing.Size(540, 182);
       this.CommandAreaVisible = true;
       this.FootnoteAreaHeight = 0;
       this.MainInstructionLocation = new System.Drawing.Point(13, 13);
       this.MainInstructionLocationOffset = new System.Drawing.Size(-10, 10);
       this.Name = "AppendNewColumnMappingDialog";
       this.Text = "MySQL for Excel";
+      ((System.ComponentModel.ISupportInitialize)(this.ValidationsErrorProvider)).EndInit();
       this.ContentAreaPanel.ResumeLayout(false);
       this.ContentAreaPanel.PerformLayout();
       this.CommandAreaPanel.ResumeLayout(false);

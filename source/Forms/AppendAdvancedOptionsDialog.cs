@@ -17,7 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using MySQL.ForExcel.Classes;
@@ -250,17 +249,8 @@ namespace MySQL.ForExcel.Forms
         return;
       }
 
-      var indexForName = 1;
-      string proposedMappingName;
-      do
-      {
-        proposedMappingName = _selectedMapping.TableName + "Mapping" + (indexForName > 1 ? indexForName.ToString(CultureInfo.InvariantCulture) : string.Empty);
-        indexForName++;
-      }
-      while (Mappings.Any(mapping => mapping.Name == proposedMappingName));
-
       string newName;
-      using (var newColumnMappingDialog = new AppendNewColumnMappingDialog(proposedMappingName))
+      using (var newColumnMappingDialog = new AppendNewColumnMappingDialog(Mappings, _selectedMapping.TableName))
       {
         var dr = newColumnMappingDialog.ShowDialog();
         if (dr == DialogResult.Cancel)
@@ -268,15 +258,21 @@ namespace MySQL.ForExcel.Forms
           return;
         }
 
-        MappingsChanged = true;
         newName = newColumnMappingDialog.ColumnMappingName;
-      }
+        if (string.IsNullOrEmpty(newName))
+        {
+          // Should not get to this part of the code, if this is reached it means there is an issue in the logic above generating a mapping name.
+          MiscUtilities.ShowCustomizedErrorDialog("Error", Resources.AppendColumnMappingEmptyError);
+          return;
+        }
 
-      // Show error if name already exists
-      if (Mappings.Count(t => string.Compare(t.Name, newName, StringComparison.InvariantCultureIgnoreCase) == 0) > 0)
-      {
-        MiscUtilities.ShowCustomizedErrorDialog(Resources.MappingNameAlreadyExistsTitle, Resources.MappingNameAlreadyExistsDetail);
-        return;
+        if (string.Equals(_selectedMapping.Name, newName, StringComparison.OrdinalIgnoreCase))
+        {
+          // User input exactly the same name, so no renaming was actually done.
+          return;
+        }
+
+        MappingsChanged = true;
       }
 
       _selectedMapping.Name = newName;

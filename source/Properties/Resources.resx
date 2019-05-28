@@ -1159,4 +1159,10 @@ MySQL for Excel will automatically attempt to migrate Import and Edit Data relat
   <data name="schema_light" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\schema_light.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="AppendColumnMappingEmptyError" xml:space="preserve">
+    <value>The column mapping name is required.</value>
+  </data>
+  <data name="AppendColumnMappingExistsError" xml:space="preserve">
+    <value>A stored mapping with the specified name already exists in the stored mappings collection.</value>
+  </data>
 </root>

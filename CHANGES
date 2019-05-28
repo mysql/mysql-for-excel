@@ -3,6 +3,9 @@
   SHA256 authentication plugin. This update of the MySql.Data library also fixes a MySQL Server 8.0 bug where fetching schema information for columns
   returns the rows in alphabetical order instead of ordinal order.
   (MySQL Bug #93501, Bug #29030866 - ERROR COPYING TABLE DATA / VALUE IS NOT SUITABLE TO BE CONVERTED TO A DATETIME)
+- The update of the MySql.Data library also fixes a bug where schema information for stored procedures on MySQL 8.0 servers should be retrieved from the
+  information_schema table instead of the older mysql system tables.
+  (MySQL Bug #93814, Bug #29215137 - IMPORTING USING PROCEDURES NEEDS MYSQL.PROC TABLE WHILE IT DOESN'T EXIST)
 - Fixed a bug where MySQL for Excel was creating a new blank workbook in the scenario where a Workbook is being opened, so by the time the add-in loads
   the application's active workbook has not been yet defined. (MySQL Bug #86633, Bug #26245818 - MYSQL FOR EXCEL ADDON)
 - Added a new advanced setting to the Import Data dialog called "Import all floating-point data using a DECIMAL data type". This option is used to import
@@ -40,6 +43,9 @@
   proxy software to create the tunnel, just the way also MySQL Workbench transparently works. (Bug #18550080 - SUPPORT FOR SSL CONNECTIONS TO MYSQL)
 - MySQL Fabric or other unknown connections are no longer shown by MySQL for Excel. Also SSH tunneled connections and connections using SSL are not
   disabled anymore in MySQL for Excel. (MySQL Bug #86229, Bug #26025950 - MYSQL SERVER CONNECTION SHOWS FABRIC AND OTHER UNAVAILABLE CONNECTION METHODS)
+- Added validations to the addition and renaming of stored column mappings for Append Data operations, so that the name of a stored column mapping cannot
+  be empty (it is required) and so that no duplicate names end up in the stored mappings collection for the current user.
+  (Bug #29826762 - APPENDDATA STORE MAPPING ALLOW DUPLICATED MAPPING METHOD INSTEAD OF OVERWRITE IT)
 
 1.3.7
 - Changed the behavior of how the "First Row Contains Column Names" selection affects the Data Type for columns. The value of the aforementioned checkbox

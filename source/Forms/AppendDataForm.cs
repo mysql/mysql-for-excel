@@ -1351,33 +1351,27 @@ namespace MySQL.ForExcel.Forms
     /// <param name="showNewColumnMappingDialog">Flag indicating whether a dialog asking the user to confirm or change the proposed mapping name is shown.</param>
     private void StoreCurrentColumnMapping(bool showNewColumnMappingDialog)
     {
-      var numericSuffix = 1;
-      var proposedMappingName = new[] { string.Empty };
-      do
+      string proposedMappingName;
+      using (var newColumnMappingDialog = new AppendNewColumnMappingDialog(StoredColumnMappingsList, _targetMySqlPreviewDataTable.TableName))
       {
-        var suffix = numericSuffix > 1 ? $"_{numericSuffix}" : string.Empty;
-        proposedMappingName[0] = $"{_targetMySqlPreviewDataTable.TableName}_mapping{suffix}";
-        numericSuffix++;
-      }
-      while (StoredColumnMappingsList.Any(mapping => string.Equals(mapping.Name, proposedMappingName[0], StringComparison.InvariantCultureIgnoreCase)));
-
-      if (showNewColumnMappingDialog)
-      {
-        DialogResult dr;
-        using (var newColumnMappingDialog = new AppendNewColumnMappingDialog(proposedMappingName[0]))
-        {
-          dr = newColumnMappingDialog.ShowDialog();
-          proposedMappingName[0] = newColumnMappingDialog.ColumnMappingName;
-        }
-
-        if (dr == DialogResult.Cancel)
+        if (showNewColumnMappingDialog
+            && newColumnMappingDialog.ShowDialog() == DialogResult.Cancel)
         {
           return;
         }
+
+        proposedMappingName = newColumnMappingDialog.ColumnMappingName;
+      }
+
+      if (string.IsNullOrEmpty(proposedMappingName))
+      {
+        // Should not get to this part of the code, if this is reached it means there is an issue in the logic above generating a mapping name.
+        MiscUtilities.ShowCustomizedErrorDialog("Error", Resources.AppendColumnMappingEmptyError);
+        return;
       }
 
       // Initialize connection and DBObject information
-      _currentColumnMapping.Name = proposedMappingName[0];
+      _currentColumnMapping.Name = proposedMappingName;
       _currentColumnMapping.ConnectionName = _appendDbTable.Connection.Name;
       _currentColumnMapping.Port = _appendDbTable.Connection.Port;
       _currentColumnMapping.SchemaName = _appendDbTable.Connection.Schema;

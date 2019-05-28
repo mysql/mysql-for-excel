@@ -89,6 +89,24 @@ namespace MySQL.ForExcel.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The column mapping name is required..
+        /// </summary>
+        internal static string AppendColumnMappingEmptyError {
+            get {
+                return ResourceManager.GetString("AppendColumnMappingEmptyError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A stored mapping with the specified name already exists in the stored mappings collection..
+        /// </summary>
+        internal static string AppendColumnMappingExistsError {
+            get {
+                return ResourceManager.GetString("AppendColumnMappingExistsError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Excel data could not be appended to MySQL Table `{0}`..
         /// </summary>
         internal static string AppendDataDetailsDoneErrorText {

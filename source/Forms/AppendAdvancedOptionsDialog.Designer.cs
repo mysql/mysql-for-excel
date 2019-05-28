@@ -376,7 +376,7 @@ namespace MySQL.ForExcel.Forms
       this.StoredMappingsTabPage.Controls.Add(this.StoredColumnMappingsLabel);
       this.StoredMappingsTabPage.Location = new System.Drawing.Point(4, 24);
       this.StoredMappingsTabPage.Name = "StoredMappingsTabPage";
-      this.StoredMappingsTabPage.Size = new System.Drawing.Size(626, 264);
+      this.StoredMappingsTabPage.Size = new System.Drawing.Size(476, 272);
       this.StoredMappingsTabPage.TabIndex = 3;
       this.StoredMappingsTabPage.Text = "Stored Mappings";
       this.StoredMappingsTabPage.UseVisualStyleBackColor = true;
@@ -394,7 +394,7 @@ namespace MySQL.ForExcel.Forms
       this.MappingsListView.Location = new System.Drawing.Point(37, 50);
       this.MappingsListView.MultiSelect = false;
       this.MappingsListView.Name = "MappingsListView";
-      this.MappingsListView.Size = new System.Drawing.Size(350, 147);
+      this.MappingsListView.Size = new System.Drawing.Size(350, 163);
       this.MappingsListView.TabIndex = 20;
       this.MappingsListView.UseCompatibleStateImageBehavior = false;
       this.MappingsListView.View = System.Windows.Forms.View.Details;
@@ -459,7 +459,7 @@ namespace MySQL.ForExcel.Forms
       this.FieldDataTabPage.Location = new System.Drawing.Point(4, 24);
       this.FieldDataTabPage.Name = "FieldDataTabPage";
       this.FieldDataTabPage.Padding = new System.Windows.Forms.Padding(3);
-      this.FieldDataTabPage.Size = new System.Drawing.Size(626, 264);
+      this.FieldDataTabPage.Size = new System.Drawing.Size(476, 272);
       this.FieldDataTabPage.TabIndex = 1;
       this.FieldDataTabPage.Text = "Field Data";
       this.FieldDataTabPage.UseVisualStyleBackColor = true;
