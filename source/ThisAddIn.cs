@@ -277,7 +277,7 @@ namespace MySQL.ForExcel
         var lastAttempt = Settings.Default.WorkbenchMigrationLastAttempt;
         return alreadyMigrated || (lastAttempt.Equals(DateTime.MinValue) && delay == 0)
           ? DateTime.MinValue
-          : (delay == -1 ? DateTime.MaxValue : lastAttempt.AddHours(delay));
+          : delay == -1 ? DateTime.MaxValue : lastAttempt.AddHours(delay);
       }
     }
 
@@ -293,15 +293,10 @@ namespace MySQL.ForExcel
     public bool SkipSelectedDataContentsDetection
     {
       get => _skipSelectedDataContentsDetection;
-
       set
       {
         _skipSelectedDataContentsDetection = value;
-        var activeExcelPane = ActiveExcelPane;
-        if (!_skipSelectedDataContentsDetection)
-        {
-          activeExcelPane?.UpdateExcelSelectedDataStatus(Application.ActiveCell);
-        }
+        UpdateExcelSelectedDataStatus(Application.ActiveCell);
       }
     }
 
@@ -620,6 +615,7 @@ namespace MySQL.ForExcel
         return;
       }
 
+      UpdateExcelSelectedDataStatus(Application.ActiveCell);
       if (_lastDeactivatedSheetName.Length > 0 && !ActiveWorkbook.WorksheetExists(_lastDeactivatedSheetName))
       {
         // Worksheet was deleted and the Application_SheetBeforeDelete did not run, user is running Excel 2010 or earlier.
@@ -676,10 +672,7 @@ namespace MySQL.ForExcel
         return;
       }
 
-      if (!SkipSelectedDataContentsDetection)
-      {
-        ActiveExcelPane.UpdateExcelSelectedDataStatus(targetRange);
-      }
+      UpdateExcelSelectedDataStatus(targetRange);
     }
 
     /// <summary>
@@ -721,10 +714,7 @@ namespace MySQL.ForExcel
         return;
       }
 
-      if (!SkipSelectedDataContentsDetection)
-      {
-        ActiveExcelPane.UpdateExcelSelectedDataStatus(targetRange);
-      }
+      UpdateExcelSelectedDataStatus(targetRange);
     }
 
     /// <summary>
@@ -1630,6 +1620,20 @@ namespace MySQL.ForExcel
       {
         activeEditConnectionInfo.EditDialog.UnprotectWorksheet();
       }
+    }
+
+    /// <summary>
+    /// Checks if the selected <see cref="ExcelInterop.Range"/> contains any data in it and updates that status in the corresponding panel.
+    /// </summary>
+    /// <param name="range">A <see cref="ExcelInterop.Range"/>.</param>
+    private void UpdateExcelSelectedDataStatus(ExcelInterop.Range range)
+    {
+      if (SkipSelectedDataContentsDetection)
+      {
+        return;
+      }
+
+      ActiveExcelPane?.UpdateExcelSelectedDataStatus(range);
     }
 
     #region VSTO generated code

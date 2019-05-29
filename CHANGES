@@ -46,6 +46,8 @@
 - Added validations to the addition and renaming of stored column mappings for Append Data operations, so that the name of a stored column mapping cannot
   be empty (it is required) and so that no duplicate names end up in the stored mappings collection for the current user.
   (Bug #29826762 - APPENDDATA STORE MAPPING ALLOW DUPLICATED MAPPING METHOD INSTEAD OF OVERWRITE IT)
+- Fixed the enabling or disabling of the Export Data and Append Data actions when changing worksheets, depending on the existence of data in the active
+  cell of the worksheet in focus. (MySQL Bug #95555, Bug #29839647 - SWITCHING WORKSHEETS INCORRECTLY ENABLES ACTIONS ON EMPTY WORKSHEET CELL)
 
 1.3.7
 - Changed the behavior of how the "First Row Contains Column Names" selection affects the Data Type for columns. The value of the aforementioned checkbox
