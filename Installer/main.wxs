@@ -54,7 +54,7 @@
           <Directory Id="INSTALLDIR" Name="$(var.ProductName)">
             <Component Id='MainItems' Guid='2395C79F-4F2E-415F-9667-76CBE129D4CE'>
               <File Id="Manifest" Name="MySQL.ForExcel.dll.manifest" Source="..\Source\bin\Release\MySQL.ForExcel.dll.manifest" />
-              <File Id="BouncyCastle.Crypto" Name="BouncyCastle.Crypto" Source="..\Source\bin\Release\BouncyCastle.Crypto.dll" />
+              <File Id="BouncyCastle.Crypto" Name="BouncyCastle.Crypto.dll" Source="..\Source\bin\Release\BouncyCastle.Crypto.dll" />
               <File Id="MySql.Utility" Name="MySQL.Utility.dll" Source="..\Source\bin\Release\MySQL.Utility.dll" />
               <File Id="MySql.Utility.RegularExpressions" Name="MySql.Utility.RegularExpressions.dll" Source="..\Source\bin\Release\MySql.Utility.RegularExpressions.dll" />
               <File Id="MySql.Data" Name="MySql.Data.dll" Source="..\Source\bin\Release\MySql.Data.dll" />
