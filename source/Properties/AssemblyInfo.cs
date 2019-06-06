@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012, 2018, Oracle and/or its affiliates. All rights reserved.
+﻿// Copyright (c) 2012, 2019, Oracle and/or its affiliates. All rights reserved.
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License as
@@ -22,11 +22,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("MySQL For Excel")]
-[assembly: AssemblyDescription("MySQL for Excel is an application plug-in enabling data analysts to very easily access and manipulate MySQL data within Microsoft Excel.")]
+[assembly: AssemblyDescription("MySQL for Excel is an Excel add-in enabling data analysts to very easily access and manipulate MySQL data within Microsoft Excel.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Oracle Corporation")]
 [assembly: AssemblyProduct("MySQL For Excel")]
-[assembly: AssemblyCopyright("Copyright © 2012, 2018, Oracle and/or its affiliates. All rights reserved.")]
+[assembly: AssemblyCopyright("Copyright © 2012, 2019, Oracle and/or its affiliates. All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

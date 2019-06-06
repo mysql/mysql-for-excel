@@ -117,7 +117,7 @@ namespace MySQL.ForExcel.Forms
       this.CopyrightLabel.Name = "CopyrightLabel";
       this.CopyrightLabel.Size = new System.Drawing.Size(443, 17);
       this.CopyrightLabel.TabIndex = 8;
-      this.CopyrightLabel.Text = "Copyright © 2008, 2019 Oracle and/or its affiliates. All Rights Reserved.";
+      this.CopyrightLabel.Text = "Copyright © 2012, 2019, Oracle and/or its affiliates. All Rights Reserved.";
       // 
       // TrademarkLabel
       // 

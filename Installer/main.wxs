@@ -62,13 +62,13 @@
               <File Id="v40Utilities" Name="Microsoft.Office.Tools.Common.v4.0.Utilities.dll" Source="..\Source\bin\Release\Microsoft.Office.Tools.Common.v4.0.Utilities.dll" />
               <File Id="VSTOFile" Name="MySQL.ForExcel.vsto" Source="..\Source\bin\Release\MySQL.ForExcel.vsto" />
               <File Id="AddIn" Name="MySQL.ForExcel.dll" KeyPath="yes" Source="..\Source\bin\Release\MySQL.ForExcel.dll" />
-              <File Id='ReleaseNotes' Name='Release Notes.txt' Source='Release Notes.txt'/>
+              <File Id="ReleaseNotes" Name="Release Notes.txt" Source="Release Notes.txt" />
               <?if $(var.IsGPL) = true ?>
-              <File Id='ReadMe' Name='README' Source='README'/>
-              <File Id="COPYING" Name="COPYING" Source="COPYING" DiskId="1" />
+              <File Id="ReadMeGpl" Name="README" Source="README" />
+              <File Id="LicenseGpl" Name="LICENSE" Source="LICENSE" />
               <?else?>
-              <File Id="README2" Name="README" Source="README-Commercial" DiskId="1"/>
-              <File Id="LICENSE" Name="LICENSE" Source="LICENSE" DiskId="1" />
+              <File Id="ReadMeCom" Name="README" Source="README-Commercial" />
+              <File Id="LicenseCom" Name="LICENSE" Source="LICENSE-Commercial" />
               <?endif?>
               <RemoveFolder Id="INSTALLDIR" On="uninstall" />
             </Component>
@@ -76,7 +76,7 @@
               <Condition>
                 <![CDATA[EXCEL_2007_32_INSTALLED]]>
               </Condition>
-              <RegistryKey Id="EnableLMKey" Root="HKLM" Action="createAndRemoveOnUninstall" Key="SOFTWARE\Microsoft\Office\12.0\Common\General">
+              <RegistryKey Id="EnableLMKey" Root="HKLM" ForceCreateOnInstall="yes" ForceDeleteOnUninstall="yes" Key="SOFTWARE\Microsoft\Office\12.0\Common\General">
                 <RegistryValue Id="IdEnableLocalMachineVSTO" Name="EnableLocalMachineVSTO" Value="1" Type="integer"/>
               </RegistryKey>
             </Component>
